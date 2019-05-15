@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="summary_pref_per_app_proxy">為選擇的應用程式設定 Proxy</string>
+</resources>

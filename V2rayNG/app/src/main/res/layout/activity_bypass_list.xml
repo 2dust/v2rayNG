@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ProgressBar
+        android:id="@+id/pb_waiting"
+        style="@android:style/Widget.DeviceDefault.ProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+        tools:context=".ui.PerAppProxyActivity" />
+
+    <android.support.v7.widget.LinearLayoutCompat
+        android:id="@+id/header_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#f8f8f8"
+        android:orientation="vertical"
+        android:paddingEnd="20dp"
+        android:paddingStart="20dp">
+
+        <RelativeLayout
+            android:id="@+id/container_per_app_proxy"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/bypass_list_header_height">
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/switch_per_app_proxy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/switch_per_app_proxy"
+                android:layout_toStartOf="@id/switch_per_app_proxy"
+                android:text="@string/title_pref_per_app_proxy"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/container_bypass_apps"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/bypass_list_header_height">
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/switch_bypass_apps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/tv_bypass_apps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/switch_bypass_apps"
+                android:layout_toStartOf="@id/switch_bypass_apps"
+                android:text="@string/switch_bypass_apps_mode"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/bypass_list_header_height">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/et_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/msg_enter_keywords"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+            </android.support.design.widget.TextInputLayout>
+
+        </RelativeLayout>
+
+
+    </android.support.v7.widget.LinearLayoutCompat>
+
+</RelativeLayout>

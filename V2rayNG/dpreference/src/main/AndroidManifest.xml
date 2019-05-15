@@ -1,0 +1,16 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="me.dozen.dpreference">
+
+    <application
+        android:allowBackup="true"
+        android:supportsRtl="true">
+
+        <provider
+            android:name="me.dozen.dpreference.PreferenceProvider"
+            android:enabled="true"
+            android:authorities="com.v2ray.ang.dpreference"
+            android:exported="false" />
+
+    </application>
+
+</manifest>

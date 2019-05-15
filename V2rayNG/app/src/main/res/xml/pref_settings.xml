@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/title_settings">
+        <!--<CheckBoxPreference-->
+        <!--android:key="pref_bypass_mainland"-->
+        <!--android:summary="@string/summary_pref_bypass_mainland"-->
+        <!--android:title="@string/title_pref_bypass_mainland" />-->
+        <CheckBoxPreference
+            android:key="pref_per_app_proxy"
+            android:summary="@string/summary_pref_per_app_proxy"
+            android:title="@string/title_pref_per_app_proxy" />
+
+        <!--<CheckBoxPreference-->
+        <!--android:key="pref_mux_enabled"-->
+        <!--android:summary="@string/summary_pref_mux_enabled"-->
+        <!--android:title="@string/title_pref_mux_enabled" />-->
+
+        <CheckBoxPreference
+            android:key="pref_speed_enabled"
+            android:summary="@string/summary_pref_speed_enabled"
+            android:title="@string/title_pref_speed_enabled" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_sniffing_enabled"
+            android:summary="@string/summary_pref_sniffing_enabled"
+            android:title="@string/title_pref_sniffing_enabled" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_advanced">
+
+        <CheckBoxPreference
+            android:key="pref_forward_ipv6"
+            android:summary="@string/summary_pref_forward_ipv6"
+            android:title="@string/title_pref_forward_ipv6" />
+
+        <CheckBoxPreference
+            android:key="pref_local_dns_enabled"
+            android:summary="@string/summary_pref_local_dns_enabled"
+            android:title="@string/title_pref_local_dns_enabled" />
+
+        <EditTextPreference
+            android:key="pref_domestic_dns"
+            android:summary="@string/summary_pref_domestic_dns"
+            android:title="@string/title_pref_domestic_dns" />
+
+        <EditTextPreference
+            android:key="pref_remote_dns"
+            android:summary="@string/summary_pref_remote_dns"
+            android:title="@string/title_pref_remote_dns" />
+
+
+        <!--<EditTextPreference-->
+        <!--android:enabled="false"-->
+        <!--android:defaultValue="10808"-->
+        <!--android:key="pref_socks_port"-->
+        <!--android:summary="@string/summary_pref_socks_port"-->
+        <!--android:title="@string/title_pref_socks_port" />-->
+
+        <!--<EditTextPreference-->
+        <!--android:defaultValue="0"-->
+        <!--android:key="pref_lanconn_port"-->
+        <!--android:summary="@string/summary_pref_lanconn_port"-->
+        <!--android:title="@string/title_pref_lanconn_port" />-->
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_pref_routing">
+        <ListPreference
+            android:defaultValue="IPIfNonMatch"
+            android:entries="@array/routing_domain_strategy"
+            android:entryValues="@array/routing_domain_strategy"
+            android:key="pref_routing_domain_strategy"
+            android:summary="%s"
+            android:title="@string/title_pref_routing_domain_strategy" />
+
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/routing_mode"
+            android:entryValues="@array/routing_mode_value"
+            android:key="pref_routing_mode"
+            android:summary="%s"
+            android:title="@string/title_pref_routing_mode" />
+
+        <Preference
+            android:key="pref_routing_custom"
+            android:summary="@string/title_pref_routing_custom"
+            android:title="@string/title_pref_routing_custom" />
+
+        <!--<Preference-->
+        <!--android:key="pref_donate"-->
+        <!--android:summary="@string/summary_pref_donate"-->
+        <!--android:title="@string/title_pref_donate" />-->
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_about">
+        <!--<Preference-->
+        <!--android:key="pref_licenses"-->
+        <!--android:title="@string/notices_title" />-->
+
+        <!--<Preference-->
+        <!--android:key="pref_feedback"-->
+        <!--android:summary="@string/summary_pref_feedback"-->
+        <!--android:title="@string/title_pref_feedback" />-->
+
+        <!--<Preference-->
+        <!--android:key="pref_tg_group"-->
+        <!--android:title="@string/summary_pref_tg_group" />-->
+
+        <Preference
+            android:key="pref_version"
+            android:title="@string/title_pref_version" />
+    </PreferenceCategory>
+</PreferenceScreen>

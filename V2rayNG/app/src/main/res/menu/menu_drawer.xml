@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group
+        android:id="@+id/group_main"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/server_profile"
+            android:icon="@drawable/ic_description_white_24dp"
+            android:title="@string/title_server" />
+        <item
+            android:id="@+id/sub_setting"
+            android:icon="@drawable/ic_subscriptions_white_24dp"
+            android:title="@string/title_sub_setting" />
+        <item
+            android:id="@+id/settings"
+            android:icon="@drawable/ic_settings_white_24dp"
+            android:title="@string/title_settings" />
+
+    </group>
+
+    <item android:title="@string/title_about">
+        <menu>
+            <item
+                android:id="@+id/promotion"
+                android:icon="@drawable/ic_whatshot_white_24dp"
+                android:title="@string/title_pref_promotion" />
+            <item
+                android:id="@+id/donate"
+                android:icon="@drawable/ic_attach_money_white_24dp"
+                android:title="@string/title_pref_donate" />
+            <item
+                android:id="@+id/logcat"
+                android:icon="@drawable/ic_logcat_white_24dp"
+                android:title="@string/title_logcat" />
+            <item
+                android:id="@+id/feedback"
+                android:icon="@drawable/ic_feedback_white_24dp"
+                android:title="@string/title_pref_feedback" />
+        </menu>
+    </item>
+
+</menu>

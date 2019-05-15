@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">v2rayNG</string>
+    <string name="app_widget_name">开关</string>
+    <string name="app_tile_name">开关</string>
+    <string name="app_tile_first_use">初次使用此功能请先用APP激活VPN</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- Notifications -->
+    <string name="notification_action_stop_v2ray">停止</string>
+    <string name="toast_permission_denied">无法取得权D:\vssHotel\SourceCode\Hotel.root\Hotel\Clubank.Hotel\FrontCounter\CheckoutListForm.cs限</string>
+    <string name="notification_action_more">点击了解更多</string>
+    <string name="toast_services_start">启动服务中</string>
+    <string name="toast_services_stop">关闭中</string>
+    <string name="toast_services_success">启动服务成功</string>
+    <string name="toast_services_failure">启动服务失败</string>
+
+    <!--ServerActivity-->
+    <string name="title_server">配置文件</string>
+    <string name="menu_item_add_config">添加配置</string>
+    <string name="menu_item_save_config">保存配置</string>
+    <string name="menu_item_del_config">删除配置</string>
+    <string name="menu_item_import_config_qrcode">扫描二维码</string>
+    <string name="menu_item_import_config_clipboard">从剪贴板导入</string>
+    <string name="menu_item_import_config_manually_vmess">手动输入[Vmess]</string>
+    <string name="menu_item_import_config_manually_ss">手动输入[Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">手动输入[Socks]</string>
+    <string name="menu_item_import_config_custom">自定义配置</string>
+    <string name="menu_item_import_config_custom_clipboard">从剪贴板导入自定义配置</string>
+    <string name="menu_item_import_config_custom_local">从本地导入自定义配置</string>
+    <string name="menu_item_import_config_custom_url">剪贴板URL导入自定义配置</string>
+    <string name="menu_item_import_config_custom_url_scan">扫描URL导入自定义配置</string>
+    <string name="del_config_comfirm">确认删除？</string>
+    <string name="server_lab_remarks">别名(remarks)</string>
+    <string name="server_lab_address">地址(address)</string>
+    <string name="server_lab_port">端口(port)</string>
+    <string name="server_lab_id">用户ID(id)</string>
+    <string name="server_lab_alterid">额外ID(alterId)</string>
+    <string name="server_lab_security">加密方式(security)</string>
+    <string name="server_lab_network">传输协议(network)</string>
+    <string name="server_lab_more_function">功能设置（不清楚则保持默认值）</string>
+    <string name="server_lab_head_type">伪装类型(type)</string>
+    <string name="server_lab_request_host">伪装域名host(host/ws host/h2 host)/QUIC 加密方式</string>
+    <string name="server_lab_path">path(ws path/h2 path)/QUIC 加密密钥</string>
+    <string name="server_lab_stream_security">底层传输安全</string>
+    <string name="server_lab_allow_insecure">allowInsecure</string>
+    <string name="server_lab_address3">服务器地址</string>
+    <string name="server_lab_port3">服务器端口</string>
+    <string name="server_lab_id3">密码</string>
+    <string name="server_lab_security3">加密方式</string>
+    <string name="toast_success">成功</string>
+    <string name="toast_failure">失败</string>
+    <string name="toast_none_data">没有数据</string>
+    <string name="toast_incorrect_protocol">不正确的协议</string>
+    <string name="toast_decoding_failed">解码失败</string>
+    <string name="title_file_chooser">选择一个配置文件</string>
+    <string name="toast_require_file_manager">请安装一个文件管理器</string>
+    <string name="server_customize_config">自定义配置</string>
+    <string name="toast_config_file_invalid">无效的配置文件</string>
+    <string name="server_lab_content">内容</string>
+    <string name="toast_none_data_clipboard">剪贴板中没有数据</string>
+    <string name="toast_invalid_url">无效的网址</string>
+    <string name="server_lab_need_inbound">确保inbound有socks代理端口10808</string>
+
+    <!-- PerAppProxyActivity -->
+    <string name="msg_dialog_progress">正在加载</string>
+    <string name="menu_item_select_all">全选</string>
+    <string name="msg_enter_keywords">输入关键字</string>
+    <string name="switch_bypass_apps_mode">绕行模式</string>
+    <string name="menu_item_select_proxy_app">自动选中需代理应用</string>
+    <string name="msg_downloading_content">正在下载内容</string>
+
+    <!-- Preferences -->
+    <string name="title_settings">设置</string>
+    <string name="title_about">关于</string>
+    <string name="title_advanced">进阶设置</string>
+
+    <string name="title_pref_per_app_proxy">分应用代理</string>
+    <string name="summary_pref_per_app_proxy">分应用代理仅支持 Android 5.0 Lollipop 及更高</string>
+
+    <string name="title_pref_mux_enabled">启用Mux多路复用</string>
+    <string name="summary_pref_mux_enabled">开启可能会加速,关闭可能会减少断流</string>
+
+    <string name="title_pref_speed_enabled">启用速度显示</string>
+    <string name="summary_pref_speed_enabled">在通知中显示当前速度</string>
+
+    <string name="title_pref_sniffing_enabled">启用流量探测</string>
+    <string name="summary_pref_sniffing_enabled">流量探测</string>
+
+    <string name="title_pref_local_dns_enabled">启用本地DNS</string>
+    <string name="summary_pref_local_dns_enabled">DNS由本地设备的v2Ray-core处理（测试）</string>
+
+    <string name="title_pref_forward_ipv6">IPv6 路由</string>
+    <string name="summary_pref_forward_ipv6">转发 IPv6 流量到远程服务器（测试）</string>
+
+    <string name="title_pref_routing">路由设置</string>
+    <string name="title_pref_routing_domain_strategy">域名策略</string>
+    <string name="title_pref_routing_mode">路由模式</string>
+    <string name="title_pref_routing_custom">自定义路由</string>
+
+    <string name="title_pref_donate">捐赠</string>
+    <string name="summary_pref_donate">支持开发者</string>
+    <string name="donate_detail">陆续增加一些试验性的进阶功能</string>
+
+    <string name="title_pref_remote_dns">远程DNS (可选)</string>
+    <string name="summary_pref_remote_dns">DNS</string>
+
+    <string name="title_pref_domestic_dns">境内DNS (可选，本地DNS模式下生效)</string>
+    <string name="summary_pref_domestic_dns">DNS</string>
+
+    <string name="title_pref_socks_port">SOCKS5代理端口</string>
+    <string name="summary_pref_socks_port">SOCKS5代理端口</string>
+
+    <string name="title_pref_lanconn_port">HTTP代理端口(0=不允许)</string>
+    <string name="summary_pref_lanconn_port">HTTP代理端口</string>
+
+    <string name="title_pref_feedback">反馈</string>
+    <string name="summary_pref_feedback">反馈改进或漏洞至 GitHub</string>
+    <string name="summary_pref_tg_group">加入Telegram Group</string>
+    <string name="toast_tg_app_not_found">未找到Telegram app</string>
+
+    <string name="title_pref_promotion">推广</string>
+    <string name="summary_pref_promotion">一些推广,点击查看详情(捐赠可去除)</string>
+
+    <string name="title_pref_version">版本</string>
+
+    <string name="donate_error_setup">初始化错误:</string>
+    <string name="donate_error_inventory">无法查询到项目</string>
+    <string name="donate_error_purchase1">错误:</string>
+    <string name="donate_error_purchase2">错误,真实性验证失败.</string>
+    <string name="donate_success_purchase">感谢您的捐赠!</string>
+    <string name="donate_item_click">捐赠</string>
+    <string name="donate_item_paypal">Paypal</string>
+
+    <string name="title_logcat">Logcat</string>
+    <string name="logcat_copy">复制</string>
+    <string name="title_export_all">导出全部配置至剪贴板</string>
+    <string name="title_sub_setting">订阅设置</string>
+    <string name="sub_setting_remarks">备注</string>
+    <string name="sub_setting_url">地址(url)</string>
+    <string name="title_sub_update">更新订阅</string>
+    <string name="title_ping_all_server">测试所有配置延迟(Tcping)</string>
+
+    <string name="tasker_start_service">启动服务</string>
+    <string name="tasker_setting_confirm">确定</string>
+
+    <string name="routing_settings_title">路由设置</string>
+    <string name="routing_settings_tips">用逗号(,)隔开,可以一行多个,记得保存</string>
+    <string name="routing_settings_save">保存</string>
+    <string name="routing_settings_delete">清空</string>
+    <string name="routing_settings_scan_replace">扫描并替换</string>
+    <string name="routing_settings_scan_append">扫描并追加</string>
+    <string name="routing_settings_default_rules">设置默认路由规则</string>
+
+    <string name="connection_test_pending">"检查网络连接"</string>
+    <string name="connection_test_testing">"测试中…"</string>
+    <string name="connection_test_available">"连接成功：延时 %d 毫秒"</string>
+    <string name="connection_test_error">"失败：%s"</string>
+    <string name="connection_test_fail">"无互联网连接"</string>
+    <string name="connection_test_error_status_code">"状态码无效（#%d）"</string>
+    <string name="connection_connected">"已连接，点击测试连接"</string>
+    <string name="connection_not_connected">"未连接"</string>
+
+    <string-array name="share_method">
+        <item>二维码</item>
+        <item>导出至剪贴板</item>
+        <item>导出完整配置至剪贴板</item>
+    </string-array>
+    share_method
+    <string-array name="routing_tag">
+        <item>代理的网址或IP</item>
+        <item>直连的网址或IP</item>
+        <item>阻止的网址或IP</item>
+    </string-array>
+
+    <string-array name="routing_mode">
+        <item>全局</item>
+        <item>绕过局域网地址</item>
+        <item>绕过大陆地址</item>
+        <item>绕过局域网及大陆地址</item>
+    </string-array>
+
+</resources>
