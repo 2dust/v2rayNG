@@ -182,11 +182,19 @@ class V2RayVpnService : VpnService() {
         sendFd()
 
         if (defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false)) {
+            val cf_name = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
+            var last_zero_speed = false
             mSubscription = Observable.interval(3, java.util.concurrent.TimeUnit.SECONDS)
                     .subscribe {
                         val uplink = v2rayPoint.queryStats("socks", "uplink")
                         val downlink = v2rayPoint.queryStats("socks", "downlink")
-                        updateNotification("${(uplink / 3).toSpeedString()} ↑  ${(downlink / 3).toSpeedString()} ↓")
+                        val total = uplink + downlink
+                        if (total > 0 || !last_zero_speed) {
+                            updateNotification(
+                                "${cf_name} [${(total / 3).toSpeedString()}]",
+                                "${(uplink / 3).toSpeedString()} ↑  ${(downlink / 3).toSpeedString()} ↓")
+                        }
+                        last_zero_speed = (total == 0L)
                     }
         }
     }
@@ -357,9 +365,10 @@ class V2RayVpnService : VpnService() {
         mSubscription = null
     }
 
-    private fun updateNotification(contentText: String) {
+    private fun updateNotification(titleText: String, contentText: String) {
         if (mBuilder != null) {
             mBuilder?.setContentText(contentText)
+            mBuilder?.setContentTitle(titleText)
             getNotificationManager().notify(NOTIFICATION_ID, mBuilder?.build())
         }
     }
