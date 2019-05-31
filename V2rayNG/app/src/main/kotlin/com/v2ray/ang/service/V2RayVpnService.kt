@@ -188,13 +188,11 @@ class V2RayVpnService : VpnService() {
                     .subscribe {
                         val uplink = v2rayPoint.queryStats("socks", "uplink")
                         val downlink = v2rayPoint.queryStats("socks", "downlink")
-                        val total = uplink + downlink
-                        if (total > 0 || !last_zero_speed) {
-                            updateNotification(
-                                "${cf_name} [${(total / 3).toSpeedString()}]",
-                                "${(uplink / 3).toSpeedString()} ↑  ${(downlink / 3).toSpeedString()} ↓")
+                        val zero_speed = (uplink == 0L && downlink == 0L)
+                        if (!zero_speed || !last_zero_speed) {
+                            updateNotification("${cf_name}  ·  ${(uplink / 3).toSpeedString()} ↑  ${(downlink / 3).toSpeedString()} ↓")
                         }
-                        last_zero_speed = (total == 0L)
+                        last_zero_speed = zero_speed
                     }
         }
     }
@@ -329,7 +327,6 @@ class V2RayVpnService : VpnService() {
         mBuilder = NotificationCompat.Builder(applicationContext, channelId)
                 .setSmallIcon(R.drawable.ic_v)
                 .setContentTitle(defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, ""))
-                .setContentText(getString(R.string.notification_action_more))
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setOngoing(true)
                 .setShowWhen(false)
@@ -365,10 +362,9 @@ class V2RayVpnService : VpnService() {
         mSubscription = null
     }
 
-    private fun updateNotification(titleText: String, contentText: String) {
+    private fun updateNotification(contentText: String) {
         if (mBuilder != null) {
-            mBuilder?.setContentText(contentText)
-            mBuilder?.setContentTitle(titleText)
+            mBuilder?.setContentTitle(contentText)
             getNotificationManager().notify(NOTIFICATION_ID, mBuilder?.build())
         }
     }
