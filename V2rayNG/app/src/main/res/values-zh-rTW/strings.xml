@@ -61,7 +61,7 @@
     <string name="server_lab_content">內容</string>
     <string name="toast_none_data_clipboard">剪貼簿內無資料</string>
     <string name="toast_invalid_url">網址無效</string>
-    <string name="server_lab_need_inbound">​​確保inbound有socks代理端口10808</string>
+    <string name="server_lab_need_inbound">​​確保inbound有socks=10808,http=10809</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">載入</string>

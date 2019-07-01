@@ -61,7 +61,7 @@
     <string name="server_lab_content">Content</string>
     <string name="toast_none_data_clipboard">There is no data in the clipboard</string>
     <string name="toast_invalid_url">Invalid URL</string>
-    <string name="server_lab_need_inbound">Ensure inbound has socks proxy port 10808</string>
+    <string name="server_lab_need_inbound">Ensure inbound has socks=10808,http=10809</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Loading</string>

@@ -61,7 +61,7 @@
     <string name="server_lab_content">内容</string>
     <string name="toast_none_data_clipboard">剪贴板中没有数据</string>
     <string name="toast_invalid_url">无效的网址</string>
-    <string name="server_lab_need_inbound">确保inbound有socks代理端口10808</string>
+    <string name="server_lab_need_inbound">确保inbound有socks=10808,http=10809</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">正在加载</string>
