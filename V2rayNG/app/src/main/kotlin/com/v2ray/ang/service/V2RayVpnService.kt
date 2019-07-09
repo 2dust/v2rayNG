@@ -183,21 +183,7 @@ class V2RayVpnService : VpnService() {
         // Create a new interface using the builder and save the parameters.
         mInterface = builder.establish()
         sendFd()
-
-        if (defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false)) {
-            val cf_name = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
-            var last_zero_speed = false
-            mSubscription = Observable.interval(3, java.util.concurrent.TimeUnit.SECONDS)
-                    .subscribe {
-                        val uplink = v2rayPoint.queryStats("socks", "uplink")
-                        val downlink = v2rayPoint.queryStats("socks", "downlink")
-                        val zero_speed = (uplink == 0L && downlink == 0L)
-                        if (!zero_speed || !last_zero_speed) {
-                            updateNotification("${cf_name}  ·  ${(uplink / 3).toSpeedString()} ↑  ${(downlink / 3).toSpeedString()} ↓")
-                        }
-                        last_zero_speed = zero_speed
-                    }
-        }
+        startSpeedNotification()
     }
 
     fun shutdown() {
@@ -237,7 +223,11 @@ class V2RayVpnService : VpnService() {
         if (!v2rayPoint.isRunning) {
 
             try {
-                registerReceiver(mMsgReceive, IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE))
+                val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
+                mFilter.addAction(Intent.ACTION_SCREEN_ON)
+                mFilter.addAction(Intent.ACTION_SCREEN_OFF)
+                mFilter.addAction(Intent.ACTION_USER_PRESENT)
+                registerReceiver(mMsgReceive, mFilter)
             } catch (e: Exception) {
             }
 
@@ -375,6 +365,36 @@ class V2RayVpnService : VpnService() {
         return mNotificationManager!!
     }
 
+    fun startSpeedNotification() {
+        if (mSubscription == null &&
+                defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false)) {
+            val cf_name = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
+            var last_zero_speed = false
+
+            mSubscription = Observable.interval(3, java.util.concurrent.TimeUnit.SECONDS)
+                    .subscribe {
+                        val uplink = v2rayPoint.queryStats("socks", "uplink")
+                        val downlink = v2rayPoint.queryStats("socks", "downlink")
+                        val zero_speed = (uplink == 0L && downlink == 0L)
+                        if (!zero_speed || !last_zero_speed) {
+                            updateNotification("${cf_name}  •  ${(uplink / 3).toSpeedString()}↑  ${(downlink / 3).toSpeedString()}↓")
+                        }
+                        last_zero_speed = zero_speed
+                    }
+        }
+    }
+
+
+    fun stopSpeedNotification() {
+        if (mSubscription != null) {
+            mSubscription?.unsubscribe() //stop queryStats
+            mSubscription = null
+
+            val cf_name = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
+            updateNotification(cf_name)
+        }
+    }
+
     private inner class V2RayCallback : V2RayVPNServiceSupportsSet {
         override fun shutdown(): Long {
             // called by go
@@ -451,6 +471,21 @@ class V2RayVpnService : VpnService() {
                 }
                 AppConfig.MSG_STATE_RESTART -> {
                     vpnService?.startV2ray()
+                }
+            }
+
+            when (intent?.action) {
+                Intent.ACTION_SCREEN_OFF -> {
+                    Log.d(AppConfig.ANG_PACKAGE, "SCREEN_OFF, stop querying stats")
+                    vpnService?.stopSpeedNotification()
+                }
+                Intent.ACTION_SCREEN_ON -> {
+                    Log.d(AppConfig.ANG_PACKAGE, "SCREEN_ON, start querying stats")
+                    vpnService?.startSpeedNotification()
+                }
+                Intent.ACTION_USER_PRESENT -> {
+                    Log.d(AppConfig.ANG_PACKAGE, "USER_PRESENT, start querying stats")
+                    vpnService?.startSpeedNotification()
                 }
             }
         }
