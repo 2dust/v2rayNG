@@ -367,6 +367,7 @@ class V2RayVpnService : VpnService() {
 
     fun startSpeedNotification() {
         if (mSubscription == null &&
+                v2rayPoint.isRunning &&
                 defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false)) {
             val cf_name = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
             var last_zero_speed = false
