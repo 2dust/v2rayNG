@@ -55,8 +55,7 @@ class V2RayVpnService : VpnService() {
         }
     }
 
-    private val v2rayPoint = Libv2ray.newV2RayPoint()
-    private val v2rayCallback = V2RayCallback()
+    private val v2rayPoint = Libv2ray.newV2RayPoint(V2RayCallback())
     private lateinit var configContent: String
     private lateinit var mInterface: ParcelFileDescriptor
     val fd: Int get() = mInterface.fd
@@ -110,9 +109,13 @@ class V2RayVpnService : VpnService() {
         stopV2Ray()
     }
 
+    override fun onLowMemory() {
+        stopV2Ray()
+        super.onLowMemory()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-
         cancelNotification()
     }
 
@@ -239,7 +242,6 @@ class V2RayVpnService : VpnService() {
             }
 
             configContent = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
-            v2rayPoint.supportSet = v2rayCallback
             v2rayPoint.configureFileContent = configContent
             v2rayPoint.enableLocalDNS = defaultDPreference.getPrefBoolean(SettingsActivity.PREF_LOCAL_DNS_ENABLED, false)
             v2rayPoint.forwardIpv6 = defaultDPreference.getPrefBoolean(SettingsActivity.PREF_FORWARD_IPV6, false)
