@@ -198,10 +198,7 @@ class V2RayVpnService : VpnService() {
     }
 
     fun shutdown() {
-        try {
-            mInterface.close()
-        } catch (ignored: Exception) {
-        }
+        stopV2Ray(true)
     }
 
     fun sendFd() {
@@ -378,6 +375,8 @@ class V2RayVpnService : VpnService() {
 
     private inner class V2RayCallback : V2RayVPNServiceSupportsSet {
         override fun shutdown(): Long {
+            // called by go
+            // shutdown the whole vpn service
             try {
                 this@V2RayVpnService.shutdown()
                 return 0
