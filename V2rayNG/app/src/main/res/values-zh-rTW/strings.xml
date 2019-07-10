@@ -113,8 +113,8 @@
     <string name="title_pref_socks_port">SOCKS5代理端口</string>
     <string name="summary_pref_socks_port">SOCKS5代理端口</string>
 
-    <string name="title_pref_lanconn_port">HTTP代理端口(0=不允許)</string>
-    <string name="summary_pref_lanconn_port">HTTP代理端口</string>
+    <string name="title_pref_http_port">HTTP代理端口</string>
+    <string name="summary_pref_http_port">HTTP代理端口</string>
 
 
     <string name="title_pref_feedback">回饋</string>

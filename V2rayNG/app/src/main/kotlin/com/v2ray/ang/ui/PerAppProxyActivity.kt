@@ -98,7 +98,7 @@ class PerAppProxyActivity : BaseActivity() {
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             var dst = 0
             val threshold = resources.getDimensionPixelSize(R.dimen.bypass_list_header_height) * 3
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 dst += dy
                 if (dst > threshold) {
                     header_view.hide()

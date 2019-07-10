@@ -131,7 +131,7 @@ object V2rayConfigUtil {
         try {
             v2rayConfig.inbounds[0].port = 10808
 //            val socksPort = Utils.parseInt(app.defaultDPreference.getPrefString(SettingsActivity.PREF_SOCKS_PORT, "10808"))
-//            val lanconnPort = Utils.parseInt(app.defaultDPreference.getPrefString(SettingsActivity.PREF_LANCONN_PORT, ""))
+//            val lanconnPort = Utils.parseInt(app.defaultDPreference.getPrefString(SettingsActivity.PREF_HTTP_PORT, ""))
 
 //            if (socksPort > 0) {
 //                v2rayConfig.inbounds[0].port = socksPort

@@ -34,7 +34,7 @@ class SettingsActivity : BaseActivity() {
         const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
 
 //        const val PREF_SOCKS_PORT = "pref_socks_port"
-//        const val PREF_LANCONN_PORT = "pref_lanconn_port"
+//        const val PREF_HTTP_PORT = "pref_http_port"
 
         const val PREF_ROUTING_DOMAIN_STRATEGY = "pref_routing_domain_strategy"
         const val PREF_ROUTING_MODE = "pref_routing_mode"
@@ -67,7 +67,7 @@ class SettingsActivity : BaseActivity() {
         val forwardIpv6 by lazy { findPreference(PREF_FORWARD_IPV6) as CheckBoxPreference }
 
 //        val socksPort by lazy { findPreference(PREF_SOCKS_PORT) as EditTextPreference }
-//        val lanconnPort by lazy { findPreference(PREF_LANCONN_PORT) as EditTextPreference }
+//        val httpPort by lazy { findPreference(PREF_HTTP_PORT) as EditTextPreference }
 
         val routingCustom: Preference by lazy { findPreference(PREF_ROUTING_CUSTOM) }
 //        val donate: Preference by lazy { findPreference(PREF_DONATE) }
@@ -132,8 +132,8 @@ class SettingsActivity : BaseActivity() {
 //                socksPort.summary = any as String
 //                true
 //            }
-//            lanconnPort.setOnPreferenceChangeListener { preference, any ->
-//                lanconnPort.summary = any as String
+//            httpPort.setOnPreferenceChangeListener { preference, any ->
+//                httpPort.summary = any as String
 //                true
 //            }
 
@@ -156,7 +156,7 @@ class SettingsActivity : BaseActivity() {
             }
 
 //            socksPort.summary = defaultSharedPreferences.getString(PREF_SOCKS_PORT, "10808")
-//            lanconnPort.summary = defaultSharedPreferences.getString(PREF_LANCONN_PORT, "")
+//            lanconnPort.summary = defaultSharedPreferences.getString(PREF_HTTP_PORT, "")
 
             defaultSharedPreferences.registerOnSharedPreferenceChangeListener(this)
         }

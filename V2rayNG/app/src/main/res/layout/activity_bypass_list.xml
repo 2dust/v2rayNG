@@ -54,7 +54,7 @@
                 android:layout_toLeftOf="@id/switch_per_app_proxy"
                 android:layout_toStartOf="@id/switch_per_app_proxy"
                 android:text="@string/title_pref_per_app_proxy"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
         </RelativeLayout>
 
@@ -81,7 +81,7 @@
                 android:layout_toLeftOf="@id/switch_bypass_apps"
                 android:layout_toStartOf="@id/switch_bypass_apps"
                 android:text="@string/switch_bypass_apps_mode"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
         </RelativeLayout>
 

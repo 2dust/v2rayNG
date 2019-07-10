@@ -62,6 +62,7 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
 
         val icon = itemView.icon!!
         val name = itemView.name!!
+        val package_name = itemView.package_name!!
         val checkBox = itemView.check_box!!
 
         fun bind(appInfo: AppInfo) {
@@ -71,10 +72,7 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
 //            name.text = appInfo.appName
 
             checkBox.isChecked = inBlacklist
-
-//            name.textColor = mActivity.resources.getColor(if (appInfo.isSystemApp)
-//                R.color.color_highlight_material else R.color.abc_secondary_text_material_light)
-
+            package_name.text = appInfo.packageName
             if (appInfo.isSystemApp) {
                 name.text = String.format("** %1s", appInfo.appName)
                 name.textColor = Color.RED

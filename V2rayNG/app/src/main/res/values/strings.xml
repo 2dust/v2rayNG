@@ -113,8 +113,8 @@
     <string name="title_pref_socks_port">SOCKS5 proxy port</string>
     <string name="summary_pref_socks_port">SOCKS5 proxy port</string>
 
-    <string name="title_pref_lanconn_port">HTTP proxy port(0=not allowed)</string>
-    <string name="summary_pref_lanconn_port">HTTP proxy port</string>
+    <string name="title_pref_http_port">HTTP proxy port</string>
+    <string name="summary_pref_http_port">HTTP proxy port</string>
 
     <string name="title_pref_feedback">Feedback</string>
     <string name="summary_pref_feedback">Feedback enhancements or bugs to GitHub</string>
