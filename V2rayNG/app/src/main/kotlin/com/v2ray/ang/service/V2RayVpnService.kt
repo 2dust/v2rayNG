@@ -484,10 +484,6 @@ class V2RayVpnService : VpnService() {
                     Log.d(AppConfig.ANG_PACKAGE, "SCREEN_ON, start querying stats")
                     vpnService?.startSpeedNotification()
                 }
-                Intent.ACTION_USER_PRESENT -> {
-                    Log.d(AppConfig.ANG_PACKAGE, "USER_PRESENT, start querying stats")
-                    vpnService?.startSpeedNotification()
-                }
             }
         }
     }
