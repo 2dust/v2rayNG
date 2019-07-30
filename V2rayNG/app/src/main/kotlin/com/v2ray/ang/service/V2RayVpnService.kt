@@ -55,8 +55,7 @@ class V2RayVpnService : VpnService() {
         }
     }
 
-    private val v2rayPoint = Libv2ray.newV2RayPoint()
-    private val v2rayCallback = V2RayCallback()
+    private val v2rayPoint = Libv2ray.newV2RayPoint(V2RayCallback())
     private lateinit var configContent: String
     private lateinit var mInterface: ParcelFileDescriptor
     val fd: Int get() = mInterface.fd
@@ -110,9 +109,13 @@ class V2RayVpnService : VpnService() {
         stopV2Ray()
     }
 
+    override fun onLowMemory() {
+        stopV2Ray()
+        super.onLowMemory()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-
         cancelNotification()
     }
 
@@ -180,22 +183,11 @@ class V2RayVpnService : VpnService() {
         // Create a new interface using the builder and save the parameters.
         mInterface = builder.establish()
         sendFd()
-
-        if (defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false)) {
-            mSubscription = Observable.interval(3, java.util.concurrent.TimeUnit.SECONDS)
-                    .subscribe {
-                        val uplink = v2rayPoint.queryStats("socks", "uplink")
-                        val downlink = v2rayPoint.queryStats("socks", "downlink")
-                        updateNotification("${(uplink / 3).toSpeedString()} ↑  ${(downlink / 3).toSpeedString()} ↓")
-                    }
-        }
+        startSpeedNotification()
     }
 
     fun shutdown() {
-        try {
-            mInterface.close()
-        } catch (ignored: Exception) {
-        }
+        stopV2Ray(true)
     }
 
     fun sendFd() {
@@ -231,12 +223,15 @@ class V2RayVpnService : VpnService() {
         if (!v2rayPoint.isRunning) {
 
             try {
-                registerReceiver(mMsgReceive, IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE))
+                val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
+                mFilter.addAction(Intent.ACTION_SCREEN_ON)
+                mFilter.addAction(Intent.ACTION_SCREEN_OFF)
+                mFilter.addAction(Intent.ACTION_USER_PRESENT)
+                registerReceiver(mMsgReceive, mFilter)
             } catch (e: Exception) {
             }
 
             configContent = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
-            v2rayPoint.supportSet = v2rayCallback
             v2rayPoint.configureFileContent = configContent
             v2rayPoint.enableLocalDNS = defaultDPreference.getPrefBoolean(SettingsActivity.PREF_LOCAL_DNS_ENABLED, false)
             v2rayPoint.forwardIpv6 = defaultDPreference.getPrefBoolean(SettingsActivity.PREF_FORWARD_IPV6, false)
@@ -321,7 +316,6 @@ class V2RayVpnService : VpnService() {
         mBuilder = NotificationCompat.Builder(applicationContext, channelId)
                 .setSmallIcon(R.drawable.ic_v)
                 .setContentTitle(defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, ""))
-                .setContentText(getString(R.string.notification_action_more))
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setOngoing(true)
                 .setShowWhen(false)
@@ -359,7 +353,7 @@ class V2RayVpnService : VpnService() {
 
     private fun updateNotification(contentText: String) {
         if (mBuilder != null) {
-            mBuilder?.setContentText(contentText)
+            mBuilder?.setContentTitle(contentText)
             getNotificationManager().notify(NOTIFICATION_ID, mBuilder?.build())
         }
     }
@@ -371,8 +365,41 @@ class V2RayVpnService : VpnService() {
         return mNotificationManager!!
     }
 
+    fun startSpeedNotification() {
+        if (mSubscription == null &&
+                v2rayPoint.isRunning &&
+                defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false)) {
+            val cf_name = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
+            var last_zero_speed = false
+
+            mSubscription = Observable.interval(3, java.util.concurrent.TimeUnit.SECONDS)
+                    .subscribe {
+                        val uplink = v2rayPoint.queryStats("socks", "uplink")
+                        val downlink = v2rayPoint.queryStats("socks", "downlink")
+                        val zero_speed = (uplink == 0L && downlink == 0L)
+                        if (!zero_speed || !last_zero_speed) {
+                            updateNotification("${cf_name}  •  ${(uplink / 3).toSpeedString()}↑  ${(downlink / 3).toSpeedString()}↓")
+                        }
+                        last_zero_speed = zero_speed
+                    }
+        }
+    }
+
+
+    fun stopSpeedNotification() {
+        if (mSubscription != null) {
+            mSubscription?.unsubscribe() //stop queryStats
+            mSubscription = null
+
+            val cf_name = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
+            updateNotification(cf_name)
+        }
+    }
+
     private inner class V2RayCallback : V2RayVPNServiceSupportsSet {
         override fun shutdown(): Long {
+            // called by go
+            // shutdown the whole vpn service
             try {
                 this@V2RayVpnService.shutdown()
                 return 0
@@ -445,6 +472,17 @@ class V2RayVpnService : VpnService() {
                 }
                 AppConfig.MSG_STATE_RESTART -> {
                     vpnService?.startV2ray()
+                }
+            }
+
+            when (intent?.action) {
+                Intent.ACTION_SCREEN_OFF -> {
+                    Log.d(AppConfig.ANG_PACKAGE, "SCREEN_OFF, stop querying stats")
+                    vpnService?.stopSpeedNotification()
+                }
+                Intent.ACTION_SCREEN_ON -> {
+                    Log.d(AppConfig.ANG_PACKAGE, "SCREEN_ON, start querying stats")
+                    vpnService?.startSpeedNotification()
                 }
             }
         }
