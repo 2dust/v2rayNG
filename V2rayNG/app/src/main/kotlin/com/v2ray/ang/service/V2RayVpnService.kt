@@ -103,6 +103,7 @@ class V2RayVpnService : VpnService() {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         v2rayPoint.packageName = Utils.packagePath(applicationContext)
+        //Seq.setContext(applicationContext)
     }
 
     override fun onRevoke() {
