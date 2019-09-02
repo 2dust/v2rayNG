@@ -27,7 +27,7 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
-import com.v2ray.ang.InappBuyActivity
+//import com.v2ray.ang.InappBuyActivity
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
@@ -561,7 +561,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 Utils.openUri(this, AppConfig.promotionUrl)
             }
             R.id.donate -> {
-                startActivity<InappBuyActivity>()
+//                startActivity<InappBuyActivity>()
             }
             R.id.logcat -> {
                 startActivity<LogcatActivity>()
