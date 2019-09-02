@@ -57,7 +57,7 @@
         <activity android:name=".ui.SettingsActivity" />
         <activity android:name=".ui.PerAppProxyActivity" />
         <activity android:name=".ui.ScannerActivity" />
-        <activity android:name=".InappBuyActivity" />
+<!--        <activity android:name=".InappBuyActivity" />-->
         <activity android:name=".ui.LogcatActivity" />
         <activity
             android:name=".ui.RoutingSettingsActivity"
