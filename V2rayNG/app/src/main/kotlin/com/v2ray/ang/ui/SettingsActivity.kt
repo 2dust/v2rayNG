@@ -9,7 +9,7 @@ import android.preference.EditTextPreference
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import com.v2ray.ang.BuildConfig
-import com.v2ray.ang.InappBuyActivity
+//import com.v2ray.ang.InappBuyActivity
 import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.extension.defaultDPreference
