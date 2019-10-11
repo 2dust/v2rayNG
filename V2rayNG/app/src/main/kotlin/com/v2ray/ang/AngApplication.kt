@@ -11,6 +11,7 @@ class AngApplication : Application() {
         const val PREF_LAST_VERSION = "pref_last_version"
     }
 
+    var curIndex = -1 //Current proxy that is opened. (Used to implement restart feature)
     var firstRun = false
         private set
 

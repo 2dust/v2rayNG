@@ -340,6 +340,7 @@ object Utils {
      */
     fun startVService(context: Context, guid: String): Boolean {
         val index = AngConfigManager.getIndexViaGuid(guid)
+        context.v2RayApplication.curIndex=index
         return startVService(context, index)
     }
 

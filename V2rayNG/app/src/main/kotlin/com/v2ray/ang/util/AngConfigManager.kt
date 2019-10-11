@@ -147,13 +147,15 @@ object AngConfigManager {
     fun setActiveServer(index: Int): Int {
         try {
             if (index < 0 || index > angConfig.vmess.count() - 1) {
+                app.curIndex = -1
                 return -1
             }
             angConfig.index = index
-
+            app.curIndex = index
             storeConfigFile()
         } catch (e: Exception) {
             e.printStackTrace()
+            app.curIndex = -1
             return -1
         }
         return 0
