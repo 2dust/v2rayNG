@@ -29,6 +29,7 @@ class SettingsActivity : BaseActivity() {
 //        const val PREF_MUX_ENAimport libv2ray.Libv2rayBLED = "pref_mux_enabled"
         const val PREF_SPEED_ENABLED = "pref_speed_enabled"
         const val PREF_SNIFFING_ENABLED = "pref_sniffing_enabled"
+        const val PREF_PROXY_SHARING = "pref_proxy_sharing_enabled"
         const val PREF_LOCAL_DNS_ENABLED = "pref_local_dns_enabled"
         const val PREF_REMOTE_DNS = "pref_remote_dns"
         const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
@@ -59,6 +60,7 @@ class SettingsActivity : BaseActivity() {
 
     class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
         val perAppProxy by lazy { findPreference(PREF_PER_APP_PROXY) as CheckBoxPreference }
+        val proxySharing by lazy { findPreference(PREF_PROXY_SHARING) as CheckBoxPreference }
         //        val autoRestart by lazy { findPreference(PREF_AUTO_RESTART) as CheckBoxPreference }
         val remoteDns by lazy { findPreference(PREF_REMOTE_DNS) as EditTextPreference }
         val domesticDns by lazy { findPreference(PREF_DOMESTIC_DNS) as EditTextPreference }
@@ -115,6 +117,14 @@ class SettingsActivity : BaseActivity() {
                 perAppProxy.isChecked = true
                 false
             }
+
+            proxySharing.setOnPreferenceClickListener {
+                if (proxySharing.isChecked)
+                    toast(R.string.toast_warning_pref_proxysharing)
+                false
+            }
+
+
 
             remoteDns.setOnPreferenceChangeListener { preference, any ->
                 // remoteDns.summary = any as String

@@ -22,6 +22,13 @@
             android:summary="@string/summary_pref_sniffing_enabled"
             android:title="@string/title_pref_sniffing_enabled" />
 
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_proxy_sharing_enabled"
+            android:onClick="proxySharingOnClick"
+            android:summary="@string/summary_pref_proxy_sharing_enabled"
+            android:title="@string/title_pref_proxy_sharing_enabled" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_pref_routing">

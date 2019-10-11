@@ -129,6 +129,12 @@ object V2rayConfigUtil {
      */
     private fun inbounds(vmess: VmessBean, v2rayConfig: V2rayConfig, app: AngApplication): Boolean {
         try {
+            v2rayConfig.inbounds.forEach { curInbound ->
+                if (!app.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_PROXY_SHARING, false)) {
+                    //bind all inbounds to localhost if the user requests
+                    curInbound.listen = "127.0.0.1"
+                }
+            }
             v2rayConfig.inbounds[0].port = 10808
 //            val socksPort = Utils.parseInt(app.defaultDPreference.getPrefString(SettingsActivity.PREF_SOCKS_PORT, "10808"))
 //            val lanconnPort = Utils.parseInt(app.defaultDPreference.getPrefString(SettingsActivity.PREF_HTTP_PORT, ""))
@@ -547,7 +553,7 @@ object V2rayConfigUtil {
                             mux = null))
             }
 
-            // DNS routing 
+            // DNS routing
             v2rayConfig.routing.rules.add(0, V2rayConfig.RoutingBean.RulesBean(
                     type = "field",
                     outboundTag = AppConfig.TAG_DIRECT,

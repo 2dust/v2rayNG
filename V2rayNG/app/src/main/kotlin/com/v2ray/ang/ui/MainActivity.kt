@@ -232,7 +232,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         R.id.export_all -> {
             if (AngConfigManager.shareAll2Clipboard() == 0) {
-                toast(R.string.toast_success)
+                //remove toast, otherwise it will block previous warning message
             } else {
                 toast(R.string.toast_failure)
             }
