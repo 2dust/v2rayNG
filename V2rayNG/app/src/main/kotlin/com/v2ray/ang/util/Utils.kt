@@ -27,6 +27,7 @@ import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.responseLength
+import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.service.V2RayVpnService
 import com.v2ray.ang.ui.SettingsActivity
 import kotlinx.android.synthetic.main.activity_logcat.*
@@ -311,7 +312,11 @@ object Utils {
      * startVService
      */
     fun startVService(context: Context): Boolean {
-        context.toast(R.string.toast_services_start)
+        if (context.v2RayApplication.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_PROXY_SHARING, false)) {
+            context.toast(R.string.toast_warning_pref_proxysharing_short)
+        }else{
+            context.toast(R.string.toast_services_start)
+        }
         if (AngConfigManager.genStoreV2rayConfig(-1)) {
             val configContent = AngConfigManager.currGeneratedV2rayConfig()
             val configType = AngConfigManager.currConfigType()
@@ -335,6 +340,7 @@ object Utils {
      */
     fun startVService(context: Context, guid: String): Boolean {
         val index = AngConfigManager.getIndexViaGuid(guid)
+        context.v2RayApplication.curIndex=index
         return startVService(context, index)
     }
 
