@@ -37,6 +37,7 @@ import java.lang.ref.SoftReference
 import android.os.Build
 import android.annotation.TargetApi
 import android.util.Log
+import go.Seq
 import org.jetbrains.anko.doAsync
 
 class V2RayVpnService : VpnService() {
