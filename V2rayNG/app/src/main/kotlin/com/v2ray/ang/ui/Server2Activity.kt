@@ -1,9 +1,11 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
+import android.text.Editable
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import com.google.gson.Gson
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
@@ -12,6 +14,7 @@ import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.Utils
 import kotlinx.android.synthetic.main.activity_server2.*
 import org.jetbrains.anko.*
+import java.lang.Exception
 
 
 class Server2Activity : BaseActivity() {
@@ -50,7 +53,7 @@ class Server2Activity : BaseActivity() {
      */
     fun bindingServer(vmess: AngConfig.VmessBean): Boolean {
         et_remarks.text = Utils.getEditable(vmess.remarks)
-        tv_content.text = defaultDPreference.getPrefString(AppConfig.ANG_CONFIG + edit_guid, "")
+        tv_content.text = Editable.Factory.getInstance().newEditable(defaultDPreference.getPrefString(AppConfig.ANG_CONFIG + edit_guid, ""))
         return true
     }
 
@@ -66,21 +69,40 @@ class Server2Activity : BaseActivity() {
      * save server config
      */
     fun saveServer(): Boolean {
+        var saveSuccess: Boolean
         val vmess = configs.vmess[edit_index]
 
         vmess.remarks = et_remarks.text.toString()
 
         if (TextUtils.isEmpty(vmess.remarks)) {
             toast(R.string.server_lab_remarks)
-            return false
+            saveSuccess = false
         }
+
 
         if (AngConfigManager.addCustomServer(vmess, edit_index) == 0) {
             toast(R.string.toast_success)
+            saveSuccess = true
+        } else {
+            toast(R.string.toast_failure)
+            saveSuccess = false
+        }
+
+
+        try {
+            Gson().fromJson<Object>(tv_content.text.toString(), Object::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            toast(R.string.toast_malformed_josn)
+            saveSuccess = false
+        }
+
+        if (saveSuccess) {
+            //update config
+            defaultDPreference.setPrefString(AppConfig.ANG_CONFIG + edit_guid, tv_content.text.toString())
             finish()
             return true
         } else {
-            toast(R.string.toast_failure)
             return false
         }
     }

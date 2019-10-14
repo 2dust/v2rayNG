@@ -186,4 +186,5 @@
     <string name="summary_pref_proxy_sharing_enabled">綁定代理入口ip到0.0.0.0</string>
     <string name="toast_warning_pref_proxysharing">其他設備可以使用socks/http協議通過您的IP地址連接到代理\nHttp 代理: http://您的ip:10809\nSocks 代理: socks(4/5)://您的ip:10808\n僅在受信任的網絡中啟用以避免未經授權的連接</string>
     <string name="toast_warning_pref_proxysharing_short">代理共享已啟用，請確保處於受信網絡</string>
+    <string name="toast_malformed_josn">配置格式錯誤</string>
 </resources>

@@ -68,20 +68,15 @@
                 android:text="@string/server_lab_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
-            <TextView
+            <EditText
                 android:id="@+id/tv_content"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_marginTop="@dimen/layout_margin_top_height"
                 android:text="" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/layout_margin_top_height"
-            android:layout_marginBottom="@dimen/layout_margin_top_height"
-            android:orientation="vertical" />
+
 
     </LinearLayout>
 </ScrollView>
