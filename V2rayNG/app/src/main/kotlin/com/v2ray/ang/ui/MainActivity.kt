@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import SpeedUpVPN.VpnEncrypt
 import android.Manifest
 import android.content.*
 import android.net.Uri
@@ -22,6 +23,7 @@ import org.jetbrains.anko.*
 import java.lang.ref.SoftReference
 import java.net.URL
 import android.content.IntentFilter
+import android.graphics.Color
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
@@ -33,6 +35,7 @@ import rx.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.AngConfigManager.configs
+import com.google.android.gms.ads.*
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     companion object {
@@ -58,10 +61,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
     private var mItemTouchHelper: ItemTouchHelper? = null
-
+    lateinit var mAdView : AdView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        MobileAds.initialize(this)
+        mAdView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
         title = getString(R.string.title_server)
         setSupportActionBar(toolbar)
 
@@ -93,6 +100,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
         }
 
+        var recsite1= getResources().getString(R.string.recommended_site_1)
+        recommended_site_1.setBackgroundColor(Color.TRANSPARENT);
+        recommended_site_1.loadData(recsite1,"text/html; charset=utf-8",  "UTF-8")
+
         recycler_view.setHasFixedSize(true)
         recycler_view.layoutManager = LinearLayoutManager(this)
         recycler_view.adapter = adapter
@@ -107,6 +118,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
         nav_view.setNavigationItemSelectedListener(this)
+        importConfigViaBuildinSub()
     }
 
     fun startV2Ray() {
@@ -305,13 +317,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
-    fun importBatchConfig(server: String?, subid: String = "") {
+    fun importBatchConfig(server: String?, subid: String = "") : Boolean {
         val count = AngConfigManager.importBatchConfig(server, subid)
         if (count > 0) {
             toast(R.string.toast_success)
             adapter.updateConfigList()
+	    return true
         } else {
             toast(R.string.toast_failure)
+	    return false
         }
     }
 
@@ -380,7 +394,38 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
         return true
     }
-
+    /**
+     * import config from BuildinSub
+     */
+    fun importConfigViaBuildinSub(){
+        toast(R.string.update_builtin_servers)
+        var  builtinSubUrls  = getResources().getStringArray(R.array.builtinSubUrls)
+        doAsync {
+            for (i in 0 until builtinSubUrls.size) {
+                try {
+                    val url = builtinSubUrls.get(i)
+                    //Log.d("Main", url)
+                    val configText = URL(url).readText()
+                    //if (configText.isNotEmpty()&&configText.isNotBlank())VpnEncrypt.builtinServersUpdated=true
+                    uiThread {
+                        // builtinSub set id 999
+                        VpnEncrypt.builtinServersUpdated = importBatchConfig(VpnEncrypt.aesDecrypt(configText), VpnEncrypt.builtinSubID)
+                    }
+                    Thread.sleep(10_000)
+                    Log.d("VpnEncrypt", VpnEncrypt.builtinServersUpdated.toString())
+                    if(VpnEncrypt.builtinServersUpdated){
+                        Log.d("VpnEncrypt", "VpnEncrypt builtinServersUpdated,break")
+                        break
+                    }
+                }
+                catch (e: Exception) {
+                    //Log.e("VpnEncrypt","",e)
+                    //Log.e("VpnEncrypt",e.toString())  //with url
+                    Log.e("VpnEncrypt",e.stackTrace.first().toString())
+                }
+            }
+        }
+    }
     /**
      * import config from sub
      */
@@ -561,6 +606,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 Utils.openUri(this, AppConfig.promotionUrl)
             }
             R.id.donate -> {
+                Utils.openUri(this, AppConfig.abloutUrl)
 //                startActivity<InappBuyActivity>()
             }
             R.id.logcat -> {

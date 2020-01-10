@@ -119,7 +119,9 @@
             </intent-filter>
         </receiver>
         <!-- =====================Tasker===================== -->
-
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2194043486084479~8520668797"/>
     </application>
 
 </manifest>

@@ -35,6 +35,7 @@
             tools:context=".ui.MainActivity">
 
             <android.support.design.widget.CoordinatorLayout
+                android:layout_above="@id/adDividerLine"
                 android:id="@+id/main_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -51,6 +52,7 @@
                         android:layout_weight="1" />
 
                     <LinearLayout
+                        android:orientation="vertical"
                         android:id="@+id/layout_test"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/connection_test_height"
@@ -61,14 +63,22 @@
                             android:id="@+id/tv_test_state"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:maxLines="2"
+                            android:maxLines="1"
                             android:minLines="1"
-                            android:paddingStart="16dp"
+                            android:paddingStart="5dp"
                             android:text="@string/connection_test_pending"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
                             android:textColor="@color/colorPrimary_light" />
-
-
+                        <WebView
+                            android:paddingStart="5dp"
+                            android:text="@string/recommended_site_1"
+                            android:id="@+id/recommended_site_1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="16dp"
+                            android:singleLine="true"
+                            android:gravity="bottom|left"
+                            android:layout_gravity="bottom|left"
+                            tools:ignore="WebViewLayout" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -78,7 +88,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="24dp"
-                    android:layout_gravity="bottom|end">
+                    android:layout_gravity="bottom|center">
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/fab"
@@ -86,16 +96,31 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_alignParentEnd="true"
-                        android:layout_gravity="bottom|end"
+                        android:layout_gravity="bottom|center"
                         android:layout_marginBottom="16dp"
                         android:layout_marginRight="16dp"
                         android:layout_marginLeft="16dp"
                         android:layout_marginTop="16dp"
                         android:src="@drawable/ic_v_idle"
-                        app:layout_anchorGravity="bottom|right|end" />
+                        app:layout_anchorGravity="bottom|center" />
 
                 </com.github.jorgecastilloprz.FABProgressCircle>
             </android.support.design.widget.CoordinatorLayout>
+            <View android:id="@+id/adDividerLine"
+                android:layout_above="@id/adView"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="#00A191"/>
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="bottom"
+                android:background="@android:color/transparent"
+                app:adSize="SMART_BANNER"
+                app:adUnitId="ca-app-pub-2194043486084479/7710984154" />
         </RelativeLayout>
     </LinearLayout>
 

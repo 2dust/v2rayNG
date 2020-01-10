@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">v2rayNG</string>
     <string name="app_widget_name">切換</string>
     <string name="app_tile_name">切換</string>
     <string name="app_tile_first_use">首次使用此功能，請使用此應用程式來啟用 VPN</string>
@@ -100,7 +99,7 @@
     <string name="title_pref_routing_mode">路由模式</string>
     <string name="title_pref_routing_custom">自訂路由</string>
 
-    <string name="title_pref_donate">捐款</string>
+    <string name="title_pref_donate">關於</string>
     <string name="summary_pref_donate">向開發人員捐款</string>
     <string name="donate_detail">新增一些實驗性進階功能</string>
 
@@ -187,4 +186,24 @@
     <string name="toast_warning_pref_proxysharing">其他設備可以使用socks/http協議通過您的IP地址連接到代理\nHttp 代理: http://您的ip:10809\nSocks 代理: socks(4/5)://您的ip:10808\n僅在受信任的網絡中啟用以避免未經授權的連接</string>
     <string name="toast_warning_pref_proxysharing_short">代理共享已啟用，請確保處於受信網絡</string>
     <string name="toast_malformed_josn">配置格式錯誤</string>
+    <string name="recommended_site_1"><![CDATA[
+    <html>
+    <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
+      <a href=\'https://www.bannedbook.org/bnews/zh-tw/?utm_source=v2ray.vpn.b5\' style=\'color:#e4f2fd\'>禁聞網</a>&nbsp;&nbsp;<a href=\'https://www.bannedbook.org/b5/?utm_source=v2ray.vpn.b5\' style=\'color:#e4f2fd\'>禁書網</a>&nbsp;&nbsp;
+    </body>
+    </html>
+  ]]></string>
+    <string name="recommended_site_2"><![CDATA[
+    <html>
+    <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
+      <a href=\'https://www.bannedbook.org/b5/?utm_source=speedup.vpn.b5\' style=\'color:#e4f2fd\'>禁書網</a>
+    </body>
+    </html>
+  ]]></string>
+    <string-array name="builtinSubUrls">
+        <item>https://bannedbook.github.io/fanqiang/v2.py</item>
+        <item>https://raw.githubusercontent.com/bannedbook/fanqiang/master/docs/v2.py</item>
+        <item>https://gitlab.com/bobmolen/cloud/raw/master/v2.py</item>
+    </string-array>
+    <string name="update_builtin_servers">更新內置VPN伺服器</string>
 </resources>

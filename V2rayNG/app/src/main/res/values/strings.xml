@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">v2rayNG</string>
+    <string name="app_name" translatable="false">V2ray VPN</string>
     <string name="app_widget_name">Switch</string>
     <string name="app_tile_name">Switch</string>
     <string name="app_tile_first_use">First use of this feature, please use the app to activate VPN</string>
@@ -100,7 +100,7 @@
     <string name="title_pref_routing_mode">Routing mode</string>
     <string name="title_pref_routing_custom">Custom routing</string>
 
-    <string name="title_pref_donate">Donate</string>
+    <string name="title_pref_donate">About</string>
     <string name="summary_pref_donate">Donate developer</string>
     <string name="donate_detail">Add some experimental advanced features</string>
 
@@ -187,4 +187,12 @@
     <string name="toast_warning_pref_proxysharing_short">Proxy sharing enabled\nMake sure you are in a trusted network</string>
     <string name="toast_malformed_josn">Config malformed</string>
 
+  <string name="recommended_site_1"></string>
+  <string name="recommended_site_2"></string>
+  <string-array name="builtinSubUrls">
+    <item>https://bannedbook.github.io/fanqiang/v2.py</item>
+    <item>https://raw.githubusercontent.com/bannedbook/fanqiang/master/docs/v2.py</item>
+    <item>https://gitlab.com/bobmolen/cloud/raw/master/v2.py</item>
+  </string-array>
+  <string name="update_builtin_servers">Update builtin servers</string>
 </resources>

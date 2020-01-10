@@ -1,5 +1,6 @@
 package com.v2ray.ang.util
 
+import SpeedUpVPN.VpnEncrypt
 import android.graphics.Bitmap
 import android.text.TextUtils
 import android.util.Log
@@ -11,6 +12,7 @@ import com.v2ray.ang.AppConfig.PREF_CURR_CONFIG
 import com.v2ray.ang.AppConfig.PREF_CURR_CONFIG_GUID
 import com.v2ray.ang.AppConfig.PREF_CURR_CONFIG_NAME
 import com.v2ray.ang.AppConfig.SOCKS_PROTOCOL
+import com.v2ray.ang.AppConfig.SSR_PROTOCOL
 import com.v2ray.ang.AppConfig.SS_PROTOCOL
 import com.v2ray.ang.AppConfig.VMESS_PROTOCOL
 import com.v2ray.ang.R
@@ -327,6 +329,30 @@ object AngConfigManager {
                 vmess.subid = subid
 
                 addShadowsocksServer(vmess, -1)
+            } else if (server.startsWith(SSR_PROTOCOL)) {
+                var server = server.replace(SSR_PROTOCOL, "")
+                server = Utils.decode(server)
+                val decodedPattern_ssr = "(?i)^((.+):(\\d+?):(.*):(.+):(.*):(.+)/(.*))".toRegex()
+                val match = decodedPattern_ssr.matchEntire(server)
+                //Log.e("------","match="+match.toString())
+                if (match == null) {
+                    return R.string.toast_incorrect_protocol
+                }
+
+                vmess.remarks=""
+                val decodedPattern_ssr_groupparam = "(?i)(.*)[?&]group=([A-Za-z0-9_=-]*)(.*)".toRegex()
+                val match4 = decodedPattern_ssr_groupparam.matchEntire(match.groupValues[8])
+                if (match4 != null) vmess.remarks = Utils.decode(match4.groupValues[2])
+                if (vmess.remarks==VpnEncrypt.vpnGroupName)vmess.remarks=VpnEncrypt.vpnRemark
+                vmess.security = match.groupValues[5].toLowerCase(Locale.ENGLISH)
+                vmess.id = Utils.decode(match.groupValues[7]) //is passwd?
+                vmess.address = match.groupValues[2].toLowerCase(Locale.ENGLISH)
+                if (vmess.address.firstOrNull() == '[' && vmess.address.lastOrNull() == ']')
+                    vmess.address = vmess.address.substring(1, vmess.address.length - 1)
+                vmess.port = match.groupValues[3].toInt()
+                vmess.subid = subid
+
+                addShadowsocksServer(vmess, -1)
             } else if (server.startsWith(SOCKS_PROTOCOL)) {
                 var result = server.replace(SOCKS_PROTOCOL, "")
                 val indexSplit = result.indexOf("#")
@@ -413,6 +439,7 @@ object AngConfigManager {
             }
 
             val vmess = angConfig.vmess[index]
+            if (vmess.remarks== VpnEncrypt.vpnRemark)return ""
             if (angConfig.vmess[index].configType == AppConfig.EConfigType.Vmess) {
 
                 val vmessQRCode = VmessQRCode()
@@ -725,7 +752,7 @@ object AngConfigManager {
 
     fun importBatchConfig(servers: String?, subid: String): Int {
         try {
-            if (servers == null) {
+            if (servers == null || servers =="") {
                 return 0
             }
             removeServerViaSubid(subid)
@@ -736,8 +763,20 @@ object AngConfigManager {
 //            }
 
             var count = 0
-            servers.lines()
-                    .forEach {
+            var limit = -1
+            var serverList=servers.trim().lines()
+            if (servers.indexOf("MAX=") == 0) {
+                limit = servers.split("\n")[0].split("MAX=")[1]
+                        .replace("\\D+".toRegex(), "").toInt()
+                serverList=serverList.drop(1)
+            }
+            //Log.e("------","limit is "+limit)
+            //Log.e("------","serverList1:"+serverList)
+            if (limit != -1 && limit < serverList.size) {
+                serverList = serverList.shuffled().take(limit)
+            }
+            //Log.e("------","serverList2:"+serverList)
+            serverList.forEach {
                         val resId = importConfig(it, subid)
                         if (resId == 0) {
                             count++

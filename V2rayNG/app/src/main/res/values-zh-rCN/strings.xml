@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">v2rayNG</string>
     <string name="app_widget_name">开关</string>
     <string name="app_tile_name">开关</string>
     <string name="app_tile_first_use">初次使用此功能请先用APP激活VPN</string>
@@ -99,7 +98,7 @@
     <string name="title_pref_routing_mode">路由模式</string>
     <string name="title_pref_routing_custom">自定义路由</string>
 
-    <string name="title_pref_donate">捐赠</string>
+    <string name="title_pref_donate">关于</string>
     <string name="summary_pref_donate">支持开发者</string>
     <string name="donate_detail">陆续增加一些试验性的进阶功能</string>
 
@@ -120,7 +119,7 @@
     <string name="summary_pref_tg_group">加入Telegram Group</string>
     <string name="toast_tg_app_not_found">未找到Telegram app</string>
 
-    <string name="title_pref_promotion">推广</string>
+    <string name="title_pref_promotion">翻墙服务</string>
     <string name="summary_pref_promotion">一些推广,点击查看详情(捐赠可去除)</string>
 
     <string name="title_pref_version">版本</string>
@@ -186,4 +185,25 @@
     <string name="toast_warning_pref_proxysharing_short">代理共享已启用，请确保处于受信网络</string>
     <string name="toast_malformed_josn">配置格式错误</string>
 
+    <string name="recommended_site_1"><![CDATA[
+    <html>
+    <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
+      <a href=\'http://dongtaiwang.com/loc/mobile/\' style=\'color:#e4f2fd\'>动态网</a>&nbsp;&nbsp;<a href=\'https://www.bannedbook.org/?utm_source=v2ray.vpn.cn\' style=\'color:#e4f2fd\'>禁闻网</a>&nbsp;&nbsp;
+    </body>
+    </html>
+  ]]></string>
+    <string name="recommended_site_2"><![CDATA[
+    <html>
+    <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
+      <a href=\'https://www.bannedbook.org/?utm_source=speedup.vpn.cn\' style=\'color:#e4f2fd\'>看禁闻</a>
+    </body>
+    </html>
+  ]]></string>
+    <string-array name="builtinSubUrls">
+        <item>https://gitlab.com/bobmolen/cloud/raw/master/v2.py</item>
+        <item>https://bannedbook.github.io/fanqiang/v2.py</item>
+        <item>https://storage.googleapis.com/jwnews/v2.py</item>
+        <item>https://raw.githubusercontent.com/bannedbook/fanqiang/master/docs/v2.py</item>
+    </string-array>
+    <string name="update_builtin_servers">更新内置VPN服务器</string>
 </resources>

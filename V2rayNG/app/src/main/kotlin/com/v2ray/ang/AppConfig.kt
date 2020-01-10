@@ -5,7 +5,7 @@ package com.v2ray.ang
  * App Config Const
  */
 object AppConfig {
-    const val ANG_PACKAGE = "com.v2ray.ang"
+    const val ANG_PACKAGE = "free.v2ray.proxy.VPN"
     const val ANG_CONFIG = "ang_config"
     const val PREF_CURR_CONFIG = "pref_v2ray_config"
     const val PREF_CURR_CONFIG_GUID = "pref_v2ray_config_guid"
@@ -14,6 +14,7 @@ object AppConfig {
     const val PREF_INAPP_BUY_IS_PREMIUM = "pref_inapp_buy_is_premium"
     const val VMESS_PROTOCOL: String = "vmess://"
     const val SS_PROTOCOL: String = "ss://"
+    const val SSR_PROTOCOL: String = "ssr://"
     const val SOCKS_PROTOCOL: String = "socks://"
     const val BROADCAST_ACTION_SERVICE = "com.v2ray.ang.action.service"
     const val BROADCAST_ACTION_ACTIVITY = "com.v2ray.ang.action.activity"
@@ -34,8 +35,9 @@ object AppConfig {
 
     const val androidpackagenamelistUrl = "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
     const val v2rayCustomRoutingListUrl = "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
-    const val v2rayNGIssues = "https://github.com/2dust/v2rayNG/issues"
-    const val promotionUrl = "https://1.2345345.xyz/ads.html"
+    const val v2rayNGIssues = "https://github.com/bannedbook/v2ray.vpn/issues"
+    const val promotionUrl = "https://lihi1.com/mWZJL"
+    const val abloutUrl = "https://github.com/bannedbook/v2ray.vpn"
 
     const val DNS_AGENT = "1.1.1.1"
     const val DNS_DIRECT = "223.5.5.5"

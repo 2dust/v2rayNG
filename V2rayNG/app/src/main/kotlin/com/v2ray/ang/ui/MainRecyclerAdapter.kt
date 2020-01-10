@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import SpeedUpVPN.VpnEncrypt
 import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
@@ -83,6 +84,12 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 holder.type.text = "socks"
                 holder.statistics.text = "$address : $port"
                 holder.layout_share.visibility = View.VISIBLE
+            }
+
+            if(VpnEncrypt.vpnRemark == remarks){
+                holder.statistics.text = address.toString().substring(0,5)+"..."
+                holder.layout_share.visibility=View.INVISIBLE
+                holder.layout_edit.visibility=View.INVISIBLE
             }
 
             holder.layout_share.setOnClickListener {
