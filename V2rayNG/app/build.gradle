@@ -5,7 +5,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
-
+    archivesBaseName = "v2ray.vpn"
     compileOptions {
         targetCompatibility = "8"
         sourceCompatibility = "8"
@@ -16,8 +16,8 @@ android {
         minSdkVersion 17
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
-        versionCode 212
-        versionName "1.0.2"
+        versionCode 213
+        versionName "2.0"
     }
 
     signingConfigs {
