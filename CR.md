@@ -30,4 +30,4 @@ V2ray VPN 尊重并保护所有用户的个人隐私权，为此我们向大众�
 	
 6. 广告
 
-	我们的APP可能会显示Google广告，<a href="https://www.google.com/intl/zh-CN/policies/privacy/partners/">查看详情</a>。
+	我们的APP可能会显示Google广告，<a href="https://policies.google.com/technologies/partner-sites?hl=zh-CN">查看详情</a>。
