@@ -30,4 +30,4 @@ V2ray VPN 尊重并保护所有用户的个人隐私权，为此我们向大众�
 	
 6. 广告
 
-	我们的APP可能会使用设备标识符来制作贴合用户需求的内容与广告、提供社交媒体功能以及分析我们的流量。我们还与社交媒体、广告和分析合作伙伴分享此类标识符以及来自您设备的其他信息，这些合作伙伴可能会将此类信息与您提供给他们或他们在您使用其服务的过程中收集的其他信息相结合。 <a href="https://www.google.com/intl/zh-CN/policies/privacy/partners/">查看详情</a>。
+	我们的APP可能会显示Google广告，<a href="https://www.google.com/intl/zh-CN/policies/privacy/partners/">查看详情</a>。
