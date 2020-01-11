@@ -1,5 +1,3 @@
-# v2rayNG
+# V2ray VPN
 
-<a href="https://play.google.com/store/apps/details?id=com.v2ray.ang">
-<img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="165" height="64" />
-</a>
+V2ray VPN 基于 V2ray技术的安卓免费VPN APP，内置免费V2ray VPN服务器。
