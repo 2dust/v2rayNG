@@ -200,10 +200,6 @@
     </body>
     </html>
   ]]></string>
-    <string-array name="builtinSubUrls">
-        <item>https://bannedbook.github.io/fanqiang/v2.py</item>
-        <item>https://raw.githubusercontent.com/bannedbook/fanqiang/master/docs/v2.py</item>
-        <item>https://gitlab.com/bobmolen/cloud/raw/master/v2.py</item>
-    </string-array>
+    <item>your_url</item>
     <string name="update_builtin_servers">更新內置VPN伺服器</string>
 </resources>

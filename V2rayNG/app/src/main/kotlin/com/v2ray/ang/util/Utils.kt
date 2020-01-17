@@ -407,6 +407,7 @@ object Utils {
             conn = url.openConnection(
                 Proxy(Proxy.Type.HTTP,
                 InetSocketAddress("127.0.0.1", port + 1))) as HttpURLConnection
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36");
             conn.connectTimeout = 30000
             conn.readTimeout = 30000
             conn.setRequestProperty("Connection", "close")

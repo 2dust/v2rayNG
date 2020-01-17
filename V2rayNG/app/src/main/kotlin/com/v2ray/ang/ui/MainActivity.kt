@@ -236,7 +236,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //            startActivity<SubSettingActivity>()
 //            true
 //        }
-
+        R.id.servers_update -> {
+            importConfigViaBuildinSub()
+            true
+        }
         R.id.sub_update -> {
             importConfigViaSub()
             true

@@ -190,9 +190,7 @@
   <string name="recommended_site_1"></string>
   <string name="recommended_site_2"></string>
   <string-array name="builtinSubUrls">
-    <item>https://bannedbook.github.io/fanqiang/v2.py</item>
-    <item>https://raw.githubusercontent.com/bannedbook/fanqiang/master/docs/v2.py</item>
-    <item>https://gitlab.com/bobmolen/cloud/raw/master/v2.py</item>
+    <item>your_url</item>
   </string-array>
   <string name="update_builtin_servers">Update builtin servers</string>
 </resources>
