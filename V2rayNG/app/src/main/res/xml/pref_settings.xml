@@ -41,7 +41,7 @@
             android:title="@string/title_pref_routing_domain_strategy" />
 
         <ListPreference
-            android:defaultValue="0"
+            android:defaultValue="3"
             android:entries="@array/routing_mode"
             android:entryValues="@array/routing_mode_value"
             android:key="pref_routing_mode"
