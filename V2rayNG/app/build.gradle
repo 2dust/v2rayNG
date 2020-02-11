@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+//apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 28
@@ -16,8 +17,8 @@ android {
         minSdkVersion 17
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
-        versionCode 216
-        versionName "2.0.2"
+        versionCode 217
+        versionName "2.0.3"
     }
 
     signingConfigs {
@@ -111,6 +112,7 @@ dependencies {
 
     implementation(name: 'libv2ray', ext: 'aar')
     //implementation(name: 'tun2socks', ext: 'aar')
+    //implementation 'com.google.firebase:firebase-analytics:17.2.2'
 }
 
 buildscript {

@@ -332,17 +332,33 @@ object AngConfigManager {
             } else if (server.startsWith(SSR_PROTOCOL)) {
                 var server = server.replace(SSR_PROTOCOL, "")
                 server = Utils.decode(server)
+                //Log.e("------","server="+server)
+
                 val decodedPattern_ssr = "(?i)^((.+):(\\d+?):(.*):(.+):(.*):(.+)/(.*))".toRegex()
                 val match = decodedPattern_ssr.matchEntire(server)
-                //Log.e("------","match="+match.toString())
+
                 if (match == null) {
                     return R.string.toast_incorrect_protocol
+                }
+
+                for (i in 0 until match.groupValues.size) {
+                    //Log.e("---",i.toString()+":"+match.groupValues[i])
                 }
 
                 vmess.remarks=""
                 val decodedPattern_ssr_groupparam = "(?i)(.*)[?&]group=([A-Za-z0-9_=-]*)(.*)".toRegex()
                 val match4 = decodedPattern_ssr_groupparam.matchEntire(match.groupValues[8])
-                if (match4 != null) vmess.remarks = Utils.decode(match4.groupValues[2])
+
+                if (match4 != null) {
+                    vmess.remarks = Utils.decode(match4.groupValues[2])
+                    for (i in 0 until match4.groupValues.size) {
+                        //Log.e("---", i.toString() + ":" + match4.groupValues[i])
+                    }
+                }
+                else{//某些不明情况下，Base64会解析错误，无法取得群组名，就直接设为内置吧
+                    vmess.remarks=VpnEncrypt.vpnRemark
+                }
+
                 if (vmess.remarks==VpnEncrypt.vpnGroupName)vmess.remarks=VpnEncrypt.vpnRemark
                 vmess.security = match.groupValues[5].toLowerCase(Locale.ENGLISH)
                 vmess.id = Utils.decode(match.groupValues[7]) //is passwd?
@@ -388,7 +404,7 @@ object AngConfigManager {
                 return R.string.toast_incorrect_protocol
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("server---","err",e)
             return -1
         }
         return 0
