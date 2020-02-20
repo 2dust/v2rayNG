@@ -136,6 +136,7 @@
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Copy</string>
+    <string name="logcat_delete">Delete</string>
     <string name="title_export_all">Export all config to clipboard</string>
     <string name="title_sub_setting">Subscription setting</string>
     <string name="sub_setting_remarks">remarks</string>
