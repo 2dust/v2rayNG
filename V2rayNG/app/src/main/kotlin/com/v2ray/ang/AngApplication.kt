@@ -1,12 +1,12 @@
 package com.v2ray.ang
 
-import android.app.Application
 //import com.squareup.leakcanary.LeakCanary
+import android.support.multidex.MultiDexApplication
 import com.v2ray.ang.util.AngConfigManager
 import me.dozen.dpreference.DPreference
 import org.jetbrains.anko.defaultSharedPreferences
 
-class AngApplication : Application() {
+class AngApplication : MultiDexApplication() {
     companion object {
         const val PREF_LAST_VERSION = "pref_last_version"
     }
