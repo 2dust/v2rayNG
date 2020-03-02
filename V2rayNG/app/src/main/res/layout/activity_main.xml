@@ -54,8 +54,10 @@
                         android:id="@+id/layout_test"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/connection_test_height"
-                        android:background="@color/colorPrimary_text"
-                        android:gravity="center|left">
+                        android:background="@drawable/background_test_button"
+                        android:gravity="center|left"
+                        android:clickable="true"
+                        android:focusable="true">
 
                         <TextView
                             android:id="@+id/tv_test_state"
@@ -92,6 +94,8 @@
                         android:layout_marginLeft="16dp"
                         android:layout_marginTop="16dp"
                         android:src="@drawable/ic_v_idle"
+                        android:clickable="true"
+                        android:focusable="true"
                         app:layout_anchorGravity="bottom|right|end" />
 
                 </com.github.jorgecastilloprz.FABProgressCircle>

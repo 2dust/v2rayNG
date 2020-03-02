@@ -6,6 +6,7 @@
     android:gravity="center_vertical">
 
     <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/item_cardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
@@ -13,7 +14,8 @@
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
         android:orientation="horizontal"
-        card_view:cardCornerRadius="5dp">
+        card_view:cardCornerRadius="5dp"
+        android:nextFocusRight="@+id/layout_edit">
 
         <LinearLayout
             android:id="@+id/info_container"
@@ -62,11 +64,14 @@
                 <LinearLayout
                     android:id="@+id/layout_share"
                     android:layout_width="wrap_content"
-                    android:layout_height="@dimen/server_height"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingEnd="@dimen/layout_margin_right_height"
-                    android:visibility="invisible">
+                    android:padding="@dimen/layout_margin_spacing"
+                    android:visibility="invisible"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <ImageView
                         android:layout_width="@dimen/png_height"
@@ -78,10 +83,14 @@
                 <LinearLayout
                     android:id="@+id/layout_edit"
                     android:layout_width="wrap_content"
-                    android:layout_height="@dimen/server_height"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingEnd="@dimen/layout_margin_right_height">
+                    android:padding="@dimen/layout_margin_spacing"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:nextFocusLeft="@+id/item_cardview">
 
                     <ImageView
                         android:layout_width="@dimen/png_height"

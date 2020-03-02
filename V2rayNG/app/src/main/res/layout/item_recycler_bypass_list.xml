@@ -2,7 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/icon"
@@ -40,6 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="false"
+        android:focusable="false"
         android:paddingStart="2dp"
         android:paddingLeft="2dp"
         android:paddingEnd="6dp"

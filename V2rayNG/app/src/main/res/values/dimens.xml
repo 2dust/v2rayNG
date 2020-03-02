@@ -3,6 +3,7 @@
     <dimen name="bypass_list_header_height">50dp</dimen>
     <dimen name="layout_margin_top_height">16dp</dimen>
     <dimen name="layout_margin_right_height">16dp</dimen>
+    <dimen name="layout_margin_spacing">8dp</dimen>
     <dimen name="edit_height">50dp</dimen>
     <dimen name="png_height">24dp</dimen>
     <dimen name="server_height">72dp</dimen>
