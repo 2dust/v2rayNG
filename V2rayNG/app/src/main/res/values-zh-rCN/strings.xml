@@ -184,7 +184,8 @@
     <string name="toast_warning_pref_proxysharing">其他设备可以使用socks/http协议通过您的IP地址连接到代理\nHttp  代理: http://您的ip:10809\nSocks 代理: socks(4/5)://您的ip:10808\n仅在受信任的网络中启用以避免未经授权的连接</string>
     <string name="toast_warning_pref_proxysharing_short">代理共享已启用，请确保处于受信网络</string>
     <string name="toast_malformed_josn">配置格式错误</string>
-
+    <string name="auto_update_servers">"自动更新服务器"</string>
+    <string name="auto_update_servers_summary">"应用启动后自动更新VPN服务器"</string>
     <string name="recommended_site_1"><![CDATA[
     <html>
     <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
@@ -192,13 +193,6 @@
     </body>
     </html>
   ]]></string>
-    <string name="recommended_site_2"><![CDATA[
-    <html>
-    <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
-      <a href=\'https://www.bannedbook.org/?utm_source=speedup.vpn.cn\' style=\'color:#e4f2fd\'>看禁闻</a>
-    </body>
-    </html>
-  ]]></string>
-    <item>your_url</item>
+    <string name="recommended_site_2"></string>
     <string name="update_builtin_servers">更新内置VPN服务器</string>
 </resources>

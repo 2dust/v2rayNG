@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.AngConfigManager.configs
 import com.google.android.gms.ads.*
+import com.v2ray.ang.extension.v2RayApplication
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     companion object {
@@ -118,7 +119,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
         nav_view.setNavigationItemSelectedListener(this)
-        importConfigViaBuildinSub()
+        if(v2RayApplication.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_isAutoUpdateServers, true)){
+            importConfigViaBuildinSub()
+        }
     }
 
     fun startV2Ray() {

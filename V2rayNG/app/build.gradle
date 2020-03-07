@@ -17,8 +17,8 @@ android {
         minSdkVersion 17
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
-        versionCode 217
-        versionName "2.0.3"
+        versionCode 218
+        versionName "2.0.4"
     }
 
     signingConfigs {
@@ -93,6 +93,7 @@ dependencies {
     implementation "com.android.support:cardview-v7:$supportLibVersion"
     implementation "com.android.support:preference-v7:$supportLibVersion"
     implementation "com.android.support:recyclerview-v7:$supportLibVersion"
+    implementation "com.android.support:multidex:1.0.3"
     // DSL
     implementation "org.jetbrains.anko:anko-sdk15:$ankoVersion"
     implementation "org.jetbrains.anko:anko-support-v4:$ankoVersion"

@@ -23,6 +23,7 @@ class SettingsActivity : BaseActivity() {
     companion object {
         //        const val PREF_BYPASS_MAINLAND = "pref_bypass_mainland"
         //        const val PREF_START_ON_BOOT = "pref_start_on_boot"
+        const val PREF_isAutoUpdateServers = "isAutoUpdateServers"
         const val PREF_PER_APP_PROXY = "pref_per_app_proxy"
 //        const val PREF_MUX_ENAimport libv2ray.Libv2rayBLED = "pref_mux_enabled"
         const val PREF_SPEED_ENABLED = "pref_speed_enabled"
@@ -57,6 +58,7 @@ class SettingsActivity : BaseActivity() {
     }
 
     class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+        val isAutoUpdateServers by lazy { findPreference(PREF_isAutoUpdateServers) as CheckBoxPreference }
         val perAppProxy by lazy { findPreference(PREF_PER_APP_PROXY) as CheckBoxPreference }
         val sppedEnabled by lazy { findPreference(PREF_SPEED_ENABLED) as CheckBoxPreference }
         val sniffingEnabled by lazy { findPreference(PREF_SNIFFING_ENABLED) as CheckBoxPreference }
@@ -95,7 +97,9 @@ class SettingsActivity : BaseActivity() {
             super.onCreate(savedInstanceState)
             addPreferencesFromResource(R.xml.pref_settings)
             var app = activity.application as AngApplication
-
+            isAutoUpdateServers.setOnPreferenceClickListener {
+                true
+            }
             perAppProxy.setOnPreferenceClickListener {
                 if (isRunning()) {
                     Utils.stopVService(activity)

@@ -313,9 +313,9 @@ object Utils {
      */
     fun startVService(context: Context): Boolean {
         if (context.v2RayApplication.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_PROXY_SHARING, false)) {
-            context.toast(R.string.toast_warning_pref_proxysharing_short)
+            context.v2RayApplication.toast(R.string.toast_warning_pref_proxysharing_short)
         }else{
-            context.toast(R.string.toast_services_start)
+            context.v2RayApplication.toast(R.string.toast_services_start)
         }
         if (AngConfigManager.genStoreV2rayConfig(-1)) {
             val configContent = AngConfigManager.currGeneratedV2rayConfig()
@@ -324,7 +324,7 @@ object Utils {
                 try {
                     Libv2ray.testConfig(configContent)
                 } catch (e: Exception) {
-                    context.toast(e.toString())
+                    context.v2RayApplication.toast(e.toString())
                     return false
                 }
             }
@@ -356,7 +356,7 @@ object Utils {
      * stopVService
      */
     fun stopVService(context: Context) {
-        context.toast(R.string.toast_services_stop)
+        context.v2RayApplication.toast(R.string.toast_services_stop)
         MessageUtil.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
     }
 

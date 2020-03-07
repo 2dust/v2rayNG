@@ -9,3 +9,5 @@ V2rayNG/gradle/wrapper/gradle-wrapper.properties
 V2rayNG/gradle/wrapper/gradle-wrapper.properties
 V2rayNG/gradle/wrapper/gradle-wrapper.properties
 V2rayNG/app/release/output.json
+gitupdate.bat
+*.bak

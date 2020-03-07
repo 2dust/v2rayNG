@@ -17,7 +17,7 @@
     <string name="toast_services_failure">Start Services Failure</string>
 
     <!--ServerActivity-->
-    <string name="title_server">Configuration file</string>
+    <string name="title_server">Config file</string>
     <string name="menu_item_add_config">Add config</string>
     <string name="menu_item_save_config">Save config</string>
     <string name="menu_item_del_config">Delete config</string>
@@ -186,9 +186,16 @@
     <string name="toast_warning_pref_proxysharing">Other devices can connect to proxy by your ip address through socks/http protocol\nHttp  Proxy: http://yourIP:10809\nSocks Proxy: socks(4/5)://yourIP:10808\nOnly enable in trusted network to avoid unauthorized connection</string>
     <string name="toast_warning_pref_proxysharing_short">Proxy sharing enabled\nMake sure you are in a trusted network</string>
     <string name="toast_malformed_josn">Config malformed</string>
-
-  <string name="recommended_site_1"></string>
-  <string name="recommended_site_2"></string>
+    <string name = "auto_update_servers">Automatic Update Servers</string>
+    <string name = "auto_update_servers_summary">Automatically update VPN servers when App launch</string>
+    <string name="recommended_site_1"><![CDATA[
+<html>
+    <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
+      <a href=\'https://www.theepochtimes.com/?utm_source=ss.vpn\' style=\'color:#e4f2fd\'>News</a>&nbsp;&nbsp;<a href=\'https://github.com/killgcd/justmysocks/blob/master/en.md#head\' style=\'color:#e4f2fd\'>Ad:SS Server</a>&nbsp;&nbsp;
+    </body>
+    </html>
+  ]]></string>
+    <string name="recommended_site_2"></string>
   <string-array name="builtinSubUrls">
     <item>your_url</item>
   </string-array>

@@ -2,6 +2,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/title_settings">
         <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="isAutoUpdateServers"
+            android:summary="@string/auto_update_servers_summary"
+            android:title="@string/auto_update_servers"/>
+        <CheckBoxPreference
             android:key="pref_per_app_proxy"
             android:summary="@string/summary_pref_per_app_proxy"
             android:title="@string/title_pref_per_app_proxy" />
