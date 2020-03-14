@@ -69,36 +69,28 @@ class V2RayVpnService : VpnService() {
         *
         * Source: https://android.googlesource.com/platform/frameworks/base/+/2df4c7d/services/core/java/com/android/server/ConnectivityService.java#887
         */
-    private val defaultNetworkRequest by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            NetworkRequest.Builder()
+    private val defaultNetworkRequest by lazy @RequiresApi(Build.VERSION_CODES.P) {
+        NetworkRequest.Builder()
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
                 .build()
-        } else {
-            null
-        }
     }
 
 
     private val connectivity by lazy { getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
 
-    private val defaultNetworkCallback by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            object : ConnectivityManager.NetworkCallback() {
-                override fun onAvailable(network: Network) {
-                    setUnderlyingNetworks(arrayOf(network))
-                }
-                override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities?) {
-                    // it's a good idea to refresh capabilities
-                    setUnderlyingNetworks(arrayOf(network))
-                }
-                override fun onLost(network: Network) {
-                    setUnderlyingNetworks(null)
-                }
+    private val defaultNetworkCallback by lazy @RequiresApi(Build.VERSION_CODES.P) {
+        object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                setUnderlyingNetworks(arrayOf(network))
             }
-        } else {
-            null
+            override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities?) {
+                // it's a good idea to refresh capabilities
+                setUnderlyingNetworks(arrayOf(network))
+            }
+            override fun onLost(network: Network) {
+                setUnderlyingNetworks(null)
+            }
         }
     }
     private var listeningForDefaultNetwork = false
