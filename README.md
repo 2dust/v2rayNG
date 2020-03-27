@@ -5,5 +5,7 @@ V2ray VPN for Android with built-in free & unmetered traffic vpn servers, forked
 <p><a href="https://play.google.com/store/apps/details?id=free.v2ray.proxy.VPN"><img src="https://camo.githubusercontent.com/bdaf711a93d64d0bb5e5abfc346a8b84ea47f164/68747470733a2f2f706c61792e676f6f676c652e636f6d2f696e746c2f656e5f75732f6261646765732f696d616765732f67656e657269632f656e2d706c61792d62616467652e706e67" style="max-width:100%"></a>
 </p>
 
+更多翻墙信息，请访问[bannedbook翻墙主页](https://github.com/bannedbook/fanqiang/wiki)。
+
 ### Feedback
 <a target="_blank" href="https://github.com/bannedbook/v2ray.vpn/issues">Issues</a>、<a target="_blank" href="https://t.me/fqchat">Telegram Group</a>
