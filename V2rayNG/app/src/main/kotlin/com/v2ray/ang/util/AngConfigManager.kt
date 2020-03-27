@@ -70,6 +70,14 @@ object AngConfigManager {
      */
     fun addServer(vmess: AngConfig.VmessBean, index: Int): Int {
         try {
+            if (vmess.address=="127.0.0.1" || vmess.address=="localhost") return -1
+
+            if (vmess.subid != VpnEncrypt.builtinSubID) {
+                for (k in 0 until configs.vmess.count()) {//Check for duplicates
+                    if (configs.vmess[k].address == vmess.address && configs.vmess[k].port == vmess.port) return -1
+                }
+            }
+
             vmess.configVersion = 2
             vmess.configType = AppConfig.EConfigType.Vmess
 
@@ -255,7 +263,7 @@ object AngConfigManager {
 
                 val indexSplit = server.indexOf("?")
                 if (indexSplit > 0) {
-                    vmess = ResolveVmess4Kitsunebi(server)
+                    vmess = ResolveVmess4Kitsunebi(server,subid)
                 } else {
 
                     var result = server.replace(VMESS_PROTOCOL, "")
@@ -431,6 +439,41 @@ object AngConfigManager {
             return vmess
         }
 
+        vmess.address = arr22[0]
+        vmess.port = Utils.parseInt(arr22[1])
+        vmess.security = arr21[0]
+        vmess.id = arr21[1]
+
+        vmess.security = "chacha20-poly1305"
+        vmess.network = "tcp"
+        vmess.headerType = "none"
+        vmess.remarks = "Alien"
+        vmess.alterId = 0
+
+        return vmess
+    }
+
+    private fun ResolveVmess4Kitsunebi(server: String,subid:String): AngConfig.VmessBean {
+
+        val vmess = AngConfig.VmessBean()
+
+        var result = server.replace(VMESS_PROTOCOL, "")
+        val indexSplit = result.indexOf("?")
+        if (indexSplit > 0) {
+            result = result.substring(0, indexSplit)
+        }
+        result = Utils.decode(result)
+
+        val arr1 = result.split('@')
+        if (arr1.count() != 2) {
+            return vmess
+        }
+        val arr21 = arr1[0].split(':')
+        val arr22 = arr1[1].split(':')
+        if (arr21.count() != 2 || arr21.count() != 2) {
+            return vmess
+        }
+        vmess.subid=subid
         vmess.address = arr22[0]
         vmess.port = Utils.parseInt(arr22[1])
         vmess.security = arr21[0]
@@ -718,6 +761,14 @@ object AngConfigManager {
 
     fun addShadowsocksServer(vmess: AngConfig.VmessBean, index: Int): Int {
         try {
+            if (vmess.address=="127.0.0.1" || vmess.address=="localhost") return -1
+
+            if (vmess.subid != VpnEncrypt.builtinSubID) {
+                for (k in 0 until configs.vmess.count()) {//Check for duplicates
+                    if (configs.vmess[k].address == vmess.address && configs.vmess[k].port == vmess.port) return -1
+                }
+            }
+
             vmess.configVersion = 2
             vmess.configType = AppConfig.EConfigType.Shadowsocks
 
@@ -835,7 +886,7 @@ object AngConfigManager {
                 angConfig.vmess.removeAt(k)
             }
         }
-
+        angConfig.vmess.trimToSize()
         storeConfigFile()
         return 0
     }

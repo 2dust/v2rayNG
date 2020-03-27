@@ -68,6 +68,21 @@
         android:title="@string/title_ping_all_server"
         app:showAsAction="never" />
     <item
+        android:id="@+id/real_ping_all"
+        android:icon="@drawable/ic_subscriptions_white_24dp"
+        android:title="@string/title_real_ping_all_server"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/retest_invalid_servers"
+        android:icon="@drawable/ic_subscriptions_white_24dp"
+        android:title="@string/title_retest_invalid_servers"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/remove_invalid_servers"
+        android:icon="@drawable/ic_subscriptions_white_24dp"
+        android:title="@string/title_remove_invalid_servers"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/sub_update"
         android:icon="@drawable/ic_subscriptions_white_24dp"
         android:title="@string/title_sub_update"

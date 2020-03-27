@@ -74,7 +74,7 @@
                             android:text="@string/recommended_site_1"
                             android:id="@+id/recommended_site_1"
                             android:layout_width="wrap_content"
-                            android:layout_height="16dp"
+                            android:layout_height="20dp"
                             android:singleLine="true"
                             android:gravity="bottom|left"
                             android:layout_gravity="bottom|left"

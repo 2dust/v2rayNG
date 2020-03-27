@@ -28,6 +28,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.responseLength
 import com.v2ray.ang.extension.v2RayApplication
+import com.v2ray.ang.service.V2RayTestService
 import com.v2ray.ang.service.V2RayVpnService
 import com.v2ray.ang.ui.SettingsActivity
 import kotlinx.android.synthetic.main.activity_logcat.*
@@ -352,6 +353,24 @@ object Utils {
         return startVService(context)
     }
 
+    fun testVService(context: Context, index: Int) {
+        Log.e("testVService",index.toString())
+        AngConfigManager.setActiveServer(index)
+
+        if (AngConfigManager.genStoreV2rayConfig(-1)) {
+            val configContent = AngConfigManager.currGeneratedV2rayConfig()
+            val configType = AngConfigManager.currConfigType()
+            if (configType == AppConfig.EConfigType.Custom) {
+                try {
+                    Libv2ray.testConfig(configContent)
+                } catch (e: Exception) {
+                    context.v2RayApplication.toast(e.toString())
+                }
+            }
+            V2RayTestService.startV2Ray(context,index)
+        }
+    }
+
     /**
      * stopVService
      */
@@ -438,6 +457,47 @@ object Utils {
         return result
     }
 
+    fun testConnection2(context: Context, port: Int, timeout:Int = 10_000): Long {
+        var result: Long
+        var conn: HttpURLConnection? = null
+
+        try {
+            val url = URL("https",
+                    "raw.githubusercontent.com",
+                    "/")
+
+            conn = url.openConnection(
+                    Proxy(Proxy.Type.HTTP,
+                            InetSocketAddress("127.0.0.1", port + 1))) as HttpURLConnection
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36");
+            conn.connectTimeout = timeout
+            conn.readTimeout = timeout
+            conn.setRequestProperty("Connection", "close")
+            conn.instanceFollowRedirects = false
+            conn.useCaches = false
+
+            val start = SystemClock.elapsedRealtime()
+            val code = conn.responseCode
+            val elapsed = SystemClock.elapsedRealtime() - start
+
+            if (code == 301 && conn.responseLength == 0L) {
+                result = elapsed
+            } else {
+                throw IOException(context.getString(R.string.connection_test_error_status_code, code))
+            }
+        } catch (e: IOException) {
+            // network exception
+            Log.d(AppConfig.ANG_PACKAGE,"testConnection IOException: "+Log.getStackTraceString(e))
+            result = -1
+        } catch (e: Exception) {
+            // library exception, eg sumsung
+            Log.d(AppConfig.ANG_PACKAGE,"testConnection Exception: "+Log.getStackTraceString(e))
+            result = -1
+        } finally {
+            conn?.disconnect()
+        }
+        return result
+    }
     /**
      * package path
      */
@@ -499,7 +559,9 @@ object Utils {
     fun socketConnectTime(url: String, port: Int): Long {
         try {
             val start = System.currentTimeMillis()
-            val socket = Socket(url, port)
+            val socket = Socket()
+            var socketAddress = InetSocketAddress(url, port)
+            socket.connect(socketAddress,5000)
             val time = System.currentTimeMillis() - start
             socket.close()
             return time

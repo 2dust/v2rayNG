@@ -1,29 +1,30 @@
 package com.v2ray.ang.ui
 
-import android.content.Intent
+//import com.v2ray.ang.InappBuyActivity
+
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Bundle
 import android.preference.*
+import android.util.Log
 import com.v2ray.ang.AngApplication
-import com.v2ray.ang.BuildConfig
-//import com.v2ray.ang.InappBuyActivity
-import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.BuildConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.extension.onClick
 import com.v2ray.ang.util.Utils
+import libv2ray.Libv2ray
 import org.jetbrains.anko.act
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
-import libv2ray.Libv2ray
 
 class SettingsActivity : BaseActivity() {
     companion object {
         //        const val PREF_BYPASS_MAINLAND = "pref_bypass_mainland"
         //        const val PREF_START_ON_BOOT = "pref_start_on_boot"
         const val PREF_isAutoUpdateServers = "isAutoUpdateServers"
+        const val PREF_GET_FREE_SERVERS = "pref_get_free_servers"
         const val PREF_PER_APP_PROXY = "pref_per_app_proxy"
 //        const val PREF_MUX_ENAimport libv2ray.Libv2rayBLED = "pref_mux_enabled"
         const val PREF_SPEED_ENABLED = "pref_speed_enabled"
@@ -59,6 +60,7 @@ class SettingsActivity : BaseActivity() {
 
     class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
         val isAutoUpdateServers by lazy { findPreference(PREF_isAutoUpdateServers) as CheckBoxPreference }
+        val enableFreeServers by lazy { findPreference(PREF_GET_FREE_SERVERS) as CheckBoxPreference }
         val perAppProxy by lazy { findPreference(PREF_PER_APP_PROXY) as CheckBoxPreference }
         val sppedEnabled by lazy { findPreference(PREF_SPEED_ENABLED) as CheckBoxPreference }
         val sniffingEnabled by lazy { findPreference(PREF_SNIFFING_ENABLED) as CheckBoxPreference }
@@ -98,6 +100,13 @@ class SettingsActivity : BaseActivity() {
             addPreferencesFromResource(R.xml.pref_settings)
             var app = activity.application as AngApplication
             isAutoUpdateServers.setOnPreferenceClickListener {
+                true
+            }
+            enableFreeServers.setOnPreferenceClickListener {
+                if (enableFreeServers.isChecked) {
+                    Log.e("------","enableFreeServers.isChecked")
+                    MainActivity.instance.importFreeSubs()
+                }
                 true
             }
             perAppProxy.setOnPreferenceClickListener {

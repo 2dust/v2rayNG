@@ -53,6 +53,8 @@ object AppConfig {
     const val MSG_STATE_STOP_SUCCESS = 41
     const val MSG_STATE_RESTART = 5
 
+    const val MSG_TEST_SUCCESS = 51
+
     object EConfigType {
         val Vmess = 1
         val Custom = 2

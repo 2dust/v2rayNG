@@ -21,6 +21,14 @@ data class AngConfig(
                          var configVersion: Int = 1,
                          var testResult: String = "",
                          var subid: String = "")
+    /*    : Comparator<VmessBean> {
+        override fun compare(vb1:VmessBean, vb2:VmessBean): Int {
+            if(vb1 == null || vb2 == null){
+                return 0
+            }
+            return vb1.testResult.compareTo(vb2.testResult)
+        }
+    }*/
 
     data class SubItemBean(var id: String = "",
                            var remarks: String = "",

@@ -8,25 +8,25 @@
     <LinearLayout
         android:id="@+id/layout_edit"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/server_height"
+        android:layout_height="38dp"
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="5dp">
+        android:padding="2dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center|left"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/layout_margin_top_height">
+            android:paddingBottom="0dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/summary_pref_promotion"
                 android:textAppearance="@style/TextAppearance.AppCompat.Tooltip"
-                android:textColor="@color/fab_orange_dark" />
+                android:textColor="#00A191" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

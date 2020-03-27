@@ -121,8 +121,9 @@
     <string name="summary_pref_tg_group">Join Telegram Group</string>
     <string name="toast_tg_app_not_found">Telegram app not found</string>
 
-    <string name="title_pref_promotion">Promotion</string>
-    <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
+    <string name="title_pref_promotion">Ad:Shadowsocks</string>
+    <string name="summary_pref_promotion">Ad: High Speed Shadowsocks Proxy Service</string>
+    <string name="promotionUrl">https://github.com/killgcd/justmysocks/blob/master/en.md#head</string>
 
     <string name="title_pref_version">Version</string>
 
@@ -141,7 +142,11 @@
     <string name="sub_setting_remarks">remarks</string>
     <string name="sub_setting_url">url</string>
     <string name="title_sub_update">Update subscription</string>
-    <string name="title_ping_all_server">Tcping all configuration</string>
+    <string name="title_ping_all_server">Tcping all servers</string>
+    <string name="title_real_ping_all_server">Real test all servers</string>
+    <string name="title_retest_invalid_servers">Re-test invalid servers</string>
+    <string name="title_remove_invalid_servers">Sort &amp; Remove invalid servers</string>
+    <string name="toast_test_ended">The test ended successfully</string>
 
     <string name="tasker_start_service">Start Service</string>
     <string name="tasker_setting_confirm">Confirm</string>
@@ -188,6 +193,8 @@
     <string name="toast_malformed_josn">Config malformed</string>
     <string name = "auto_update_servers">Automatic Update Servers</string>
     <string name = "auto_update_servers_summary">Automatically update VPN servers when App launch</string>
+    <string name = "get_free_servers">Enable 3rd-party servers</string>
+    <string name = "get_free_servers_summary">Crawl 3rd-party free servers from internet, security unknown.</string>
     <string name="recommended_site_1"><![CDATA[
 <html>
     <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>

@@ -17,8 +17,8 @@ android {
         minSdkVersion 17
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
-        versionCode 218
-        versionName "2.0.4"
+        versionCode 219
+        versionName "2.0.5"
     }
 
     signingConfigs {
@@ -60,7 +60,8 @@ android {
         abi {
             enable true
             reset()
-            include 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a' //select ABIs to build APKs for
+            //include 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a' //select ABIs to build APKs for
+            include 'armeabi-v7a', 'arm64-v8a'
             universalApk true //generate an additional APK that contains all the ABIs
         }
     }

@@ -1,42 +1,45 @@
 package com.v2ray.ang.ui
 
+//import com.v2ray.ang.InappBuyActivity
 import SpeedUpVPN.VpnEncrypt
 import android.Manifest
-import android.content.*
-import android.net.Uri
-import android.net.VpnService
-import android.support.v7.widget.LinearLayoutManager
-import android.view.Menu
-import android.view.MenuItem
-import com.tbruyelle.rxpermissions.RxPermissions
-import com.v2ray.ang.R
-import com.v2ray.ang.util.AngConfigManager
-import com.v2ray.ang.util.Utils
-import kotlinx.android.synthetic.main.activity_main.*
-import android.os.Bundle
-import android.text.TextUtils
-import android.view.KeyEvent
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.util.MessageUtil
-import com.v2ray.ang.util.V2rayConfigUtil
-import org.jetbrains.anko.*
-import java.lang.ref.SoftReference
-import java.net.URL
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
+import android.net.Uri
+import android.net.VpnService
+import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.text.TextUtils
 import android.util.Log
-//import com.v2ray.ang.InappBuyActivity
+import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
+import com.tbruyelle.rxpermissions.RxPermissions
+import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
+import com.v2ray.ang.extension.v2RayApplication
+import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
+import com.v2ray.ang.util.AngConfigManager
+import com.v2ray.ang.util.AngConfigManager.configs
+import com.v2ray.ang.util.MessageUtil
+import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.V2rayConfigUtil
+import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.*
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
+import java.lang.ref.SoftReference
+import java.net.URL
 import java.util.concurrent.TimeUnit
-import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
-import com.v2ray.ang.util.AngConfigManager.configs
-import com.google.android.gms.ads.*
-import com.v2ray.ang.extension.v2RayApplication
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     companion object {
@@ -44,6 +47,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         private const val REQUEST_SCAN = 1
         private const val REQUEST_FILE_CHOOSER = 2
         private const val REQUEST_SCAN_URL = 3
+        lateinit var instance: MainActivity
+            private set
     }
 
     var isRunning = false
@@ -65,6 +70,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     lateinit var mAdView : AdView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        instance = this
         setContentView(R.layout.activity_main)
         MobileAds.initialize(this)
         mAdView = findViewById(R.id.adView)
@@ -106,7 +112,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         recommended_site_1.loadData(recsite1,"text/html; charset=utf-8",  "UTF-8")
 
         recycler_view.setHasFixedSize(true)
-        recycler_view.layoutManager = LinearLayoutManager(this)
+        val llm=RecyclerViewNoBugLinearLayoutManager(this)
+        llm.setStackFromEnd(true)
+        llm.setReverseLayout(true)
+        recycler_view.layoutManager =llm
         recycler_view.adapter = adapter
 
         val callback = SimpleItemTouchHelperCallback(adapter)
@@ -120,6 +129,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         toggle.syncState()
         nav_view.setNavigationItemSelectedListener(this)
         if(v2RayApplication.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_isAutoUpdateServers, true)){
+            if(v2RayApplication.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_GET_FREE_SERVERS, false)){
+                importFreeSubs()
+            }
             importConfigViaBuildinSub()
         }
     }
@@ -240,6 +252,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //            true
 //        }
         R.id.servers_update -> {
+            if(v2RayApplication.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_GET_FREE_SERVERS, false)){
+                importFreeSubs()
+            }
             importConfigViaBuildinSub()
             true
         }
@@ -275,10 +290,86 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
-//        R.id.settings -> {
-//            startActivity<SettingsActivity>("isRunning" to isRunning)
-//            true
-//        }
+        R.id.real_ping_all -> {
+            for (k in 0 until configs.vmess.count()) {
+                configs.vmess[k].testResult = ""
+                adapter.updateConfigList()
+            }
+            doAsync{
+                for (k in configs.vmess.count()-1 downTo 0) {
+                    try {
+                        if (configs.vmess[k].configType != AppConfig.EConfigType.Custom) {
+                            configs.vmess[k].testResult = VpnEncrypt.testing
+                            uiThread {
+                                var llm = recycler_view.layoutManager as RecyclerViewNoBugLinearLayoutManager
+                                llm.scrollToPositionWithOffset(k, 0)
+                                llm.stackFromEnd = true
+                                adapter.updateSelectedItem(k)
+                            }
+                            Utils.testVService(this@MainActivity,k)
+                            while(configs.vmess[k].testResult==VpnEncrypt.testing)Thread.sleep(300)
+                        }
+                    }
+                    catch (e:Exception){
+                        e.printStackTrace()
+                    }
+                }
+                configs.vmess.sortBy {it.testResult}
+                AngConfigManager.storeConfigFile()
+                uiThread {toast(R.string.toast_test_ended)}
+            }
+            true
+        }
+
+        R.id.retest_invalid_servers -> {
+            doAsync{
+                for (k in configs.vmess.count()-1 downTo 0) {
+                    try {
+                        if (configs.vmess[k].configType != AppConfig.EConfigType.Custom) {
+
+                        if (configs.vmess[k].testResult != "-1ms"
+                                && configs.vmess[k].testResult != ""
+                                && configs.vmess[k].testResult != VpnEncrypt.testing)continue
+
+                            configs.vmess[k].testResult = VpnEncrypt.testing
+                            uiThread {
+                                var llm = recycler_view.layoutManager as RecyclerViewNoBugLinearLayoutManager
+                                llm.scrollToPositionWithOffset(k, 0)
+                                llm.stackFromEnd = true
+                                adapter.updateSelectedItem(k)
+                            }
+                            Utils.testVService(this@MainActivity,k)
+                            while(configs.vmess[k].testResult==VpnEncrypt.testing)Thread.sleep(300)
+                        }
+                    }
+                    catch (e:Exception){
+                        e.printStackTrace()
+                    }
+                }
+                configs.vmess.sortBy {it.testResult}
+                AngConfigManager.storeConfigFile()
+                uiThread {toast(R.string.toast_test_ended)}
+            }
+            true
+        }
+
+        R.id.remove_invalid_servers -> {
+            try {
+                for (k in configs.vmess.count() - 1 downTo 0) {
+                    if (configs.vmess[k].testResult == VpnEncrypt.testing || configs.vmess[k].testResult == "")configs.vmess[k].testResult = "0"
+                    if (configs.vmess[k].testResult == "-1ms") AngConfigManager.removeServer(k)
+                }
+                configs.vmess.trimToSize()
+                configs.vmess.sortBy { it.testResult.replace("ms", "").toInt() }
+                //configs.vmess.reverse()
+                AngConfigManager.storeConfigFile()
+                adapter.updateConfigList()
+            }
+            catch (e:Exception){
+                e.printStackTrace()
+            }
+            true
+        }
 //        R.id.logcat -> {
 //            startActivity<LogcatActivity>()
 //            true
@@ -407,6 +498,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         toast(R.string.update_builtin_servers)
         var  builtinSubUrls  = getResources().getStringArray(R.array.builtinSubUrls)
         doAsync {
+            VpnEncrypt.builtinServersUpdated=false
             for (i in 0 until builtinSubUrls.size) {
                 try {
                     val url = builtinSubUrls.get(i)
@@ -426,12 +518,34 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 }
                 catch (e: Exception) {
                     //Log.e("VpnEncrypt","",e)
-                    //Log.e("VpnEncrypt",e.toString())  //with url
+                    //Log.e("updatevpn",e.message)  //with url
                     Log.e("VpnEncrypt",e.stackTrace.first().toString())
                 }
             }
+            if(!VpnEncrypt.builtinServersUpdated)uiThread{toast(R.string.connection_test_fail)}
         }
     }
+
+    /**
+     * import free sub
+     */
+    fun importFreeSubs()
+            : Boolean {
+        try {
+            toast(R.string.title_sub_update)
+            doAsync {
+                val configText = URL(VpnEncrypt.freeSubUrl).readText()
+                uiThread {
+                    importBatchConfig(Utils.decode(configText), VpnEncrypt.freeSubID)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+        return true
+    }
+
     /**
      * import config from sub
      */
@@ -547,6 +661,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 AppConfig.MSG_STATE_NOT_RUNNING -> {
                     activity?.isRunning = false
                 }
+                AppConfig.MSG_TEST_SUCCESS -> {
+                    var mixmsg=intent?.getStringExtra("content")
+                    var msg = mixmsg.split(",")
+                    configs.vmess[msg[0].toInt()].testResult=msg[1]
+                    activity?.adapter?.updateSelectedItem(msg[0].toInt())
+                    //activity?.isRunning = true
+                }
                 AppConfig.MSG_STATE_START_SUCCESS -> {
                     activity?.toast(R.string.toast_services_success)
                     activity?.isRunning = true
@@ -609,7 +730,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 Utils.openUri(this, AppConfig.v2rayNGIssues)
             }
             R.id.promotion -> {
-                Utils.openUri(this, AppConfig.promotionUrl)
+                Utils.openUri(this, getString(R.string.promotionUrl))
             }
             R.id.donate -> {
                 Utils.openUri(this, AppConfig.abloutUrl)

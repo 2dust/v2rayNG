@@ -8,11 +8,10 @@ import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-
 object VpnEncrypt{
     private const val theKey="your key"
     const val vpnRemark="v2ray.vpn"
-    val vpnGroupName="SpeedUp.VPN"
+    const val vpnGroupName="SpeedUp.VPN"
     @JvmField var builtinServersUpdated=false
     @JvmField var builtinSubID="999"
     @JvmStatic fun aesEncrypt(v:String, secretKey:String=theKey) = AES256.encrypt(v, secretKey)

@@ -7,6 +7,11 @@
             android:summary="@string/auto_update_servers_summary"
             android:title="@string/auto_update_servers"/>
         <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_get_free_servers"
+            android:summary="@string/get_free_servers_summary"
+            android:title="@string/get_free_servers"/>
+        <CheckBoxPreference
             android:key="pref_per_app_proxy"
             android:summary="@string/summary_pref_per_app_proxy"
             android:title="@string/title_pref_per_app_proxy" />

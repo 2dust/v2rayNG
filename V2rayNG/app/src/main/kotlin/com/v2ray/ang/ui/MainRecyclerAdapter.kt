@@ -4,6 +4,7 @@ import SpeedUpVPN.VpnEncrypt
 import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import com.v2ray.ang.AppConfig
@@ -49,6 +50,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     override fun getItemCount() = configs.vmess.count() + 1
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        try {
         if (holder is MainViewHolder) {
             val configType = configs.vmess[position].configType
             val remarks = configs.vmess[position].remarks
@@ -173,13 +175,13 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
         }
         if (holder is FooterViewHolder) {
             //if (activity?.defaultDPreference?.getPrefBoolean(AppConfig.PREF_INAPP_BUY_IS_PREMIUM, false)) {
-            if (true) {
-                holder.layout_edit.visibility = View.INVISIBLE
-            } else {
+                //holder.layout_edit.visibility = View.INVISIBLE
                 holder.layout_edit.setOnClickListener {
-                    Utils.openUri(mActivity, AppConfig.promotionUrl)
+                    Utils.openUri(mActivity, mActivity.getString(R.string.promotionUrl))
                 }
-            }
+        }
+        }catch (e:IndexOutOfBoundsException){
+            Log.e("speedup.vpn",this.javaClass.name+":"+e.javaClass.name)
         }
     }
 
@@ -204,8 +206,15 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
 //    }
 
     fun updateSelectedItem(pos: Int) {
+        //Log.e("updateSelectedItem",pos.toString())
         //notifyItemChanged(pos)
-        notifyItemRangeChanged(pos, itemCount - pos)
+        try {
+            notifyItemRangeChanged(pos, itemCount - pos)
+        }
+        catch (e:java.lang.Exception){
+            e.printStackTrace()
+        }
+
     }
 
     override fun getItemViewType(position: Int): Int {

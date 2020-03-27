@@ -121,8 +121,9 @@
     <string name="summary_pref_tg_group">加入Telegram Group</string>
     <string name="toast_tg_app_not_found">未找到Telegram app</string>
 
-    <string name="title_pref_promotion">推廣</string>
-    <string name="summary_pref_promotion">一些推廣,點擊查看詳情(捐款可去除)</string>
+    <string name="title_pref_promotion">Ad:高速Shadowsocks</string>
+    <string name="summary_pref_promotion">廣告:力薦-穩定高速的搬瓦工官方SS服務</string>
+    <string name="promotionUrl">https://lihi1.com/mWZJL</string>
 
     <string name="title_pref_version">版本</string>
 
@@ -141,7 +142,11 @@
     <string name="sub_setting_remarks">備註</string>
     <string name="sub_setting_url">位址(url)</string>
     <string name="title_sub_update">更新訂閱</string>
-    <string name="title_ping_all_server">測試所有配置延遲(Tcping)</string>
+    <string name="title_ping_all_server">測試全部配置Tcping</string>
+    <string name="title_real_ping_all_server">測試全部配置真連接</string>
+    <string name="title_retest_invalid_servers">再測無效伺服器</string>
+    <string name="title_remove_invalid_servers">刪除無效伺服器並排序</string>
+    <string name="toast_test_ended">啊!測試結束啦!</string>
 
     <string name="tasker_start_service">啟動服務</string>
     <string name="tasker_setting_confirm">確定</string>
@@ -188,6 +193,8 @@
     <string name="toast_malformed_josn">配置格式錯誤</string>
     <string name="auto_update_servers">"自動更新服務器"</string>
     <string name="auto_update_servers_summary">"應用啟動後自動更新VPN服務器"</string>
+    <string name = "get_free_servers">啟用第三方伺服器</string>
+    <string name = "get_free_servers_summary">從網絡抓取第三方免費伺服器，安全性未知</string>
     <string name="recommended_site_1"><![CDATA[
     <html>
     <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
