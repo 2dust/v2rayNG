@@ -27,12 +27,14 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
+import com.v2ray.ang.dto.AngConfig
 //import com.v2ray.ang.InappBuyActivity
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.AngConfigManager.configs
+import java.util.*
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     companion object {
@@ -247,9 +249,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             for (k in 0 until configs.vmess.count()) {
                 if (configs.vmess[k].configType != AppConfig.EConfigType.Custom) {
                     doAsync {
-                        configs.vmess[k].testResult = Utils.tcping(configs.vmess[k].address, configs.vmess[k].port)
+                        val testingNode = configs.vmess[k]
+                        val myResult = Utils.tcping(testingNode.address, testingNode.port)
                         uiThread {
-                            adapter.updateSelectedItem(k)
+                            animateCellForNewTestResult(testingNode, myResult)
                         }
                     }
                 }
@@ -268,7 +271,52 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         else -> super.onOptionsItemSelected(item)
     }
 
+    private fun animateCellForNewTestResult(testingNode: AngConfig.VmessBean, myResult: String) {
+        val selectedNode = configs.vmess[configs.index]
+        var oldIndex = 0
+        for (i in 0 until configs.vmess.count()) {
+            if (testingNode.equals(configs.vmess[i])) {
+                oldIndex = i
+                break
+            }
+        }
+        configs.vmess[oldIndex].testResult = myResult
+        configs.vmess.sortWith(Comparator { t, t2 -> convertTestResultToInt(t.testResult).compareTo(convertTestResultToInt(t2.testResult)) })
 
+        var newIndex = 0
+        for (i in 0 until configs.vmess.count()) {
+            if (selectedNode.equals(configs.vmess[i])) {
+                configs.index = i
+            }
+            if (testingNode.equals(configs.vmess[i])) {
+                newIndex = i
+            }
+        }
+        AngConfigManager.storeConfigFile()
+
+        //we only update one result and sort right after, in this process we only need to update UI for one moving cell
+        //JVM sort is stable
+        //This way we can avoid calling notifyDataSetChanged(), we will have a nice animation
+        if (oldIndex != newIndex) {
+            adapter.notifyItemMoved(oldIndex, newIndex)
+        }
+        adapter.notifyItemChanged(newIndex)
+        if (newIndex == 0) {
+            recycler_view.scrollToPosition(0) //scroll to top since user care about fastest node
+        }
+    }
+
+    private fun convertTestResultToInt(testResult: String): Int {
+        val time = testResult.replace("ms", "")
+        if (TextUtils.isEmpty(time)) {
+            return Int.MAX_VALUE - 1
+        }
+        if (time.toInt() < 0) {
+            return Int.MAX_VALUE
+        }
+        return time.toInt()
+    }
+    
     /**
      * import config from qrcode
      */
