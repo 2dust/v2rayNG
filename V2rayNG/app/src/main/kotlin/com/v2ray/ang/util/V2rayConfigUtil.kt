@@ -51,11 +51,6 @@ object V2rayConfigUtil {
                 result = getV2rayConfigType1(app, vmess)
             }
 
-            val domainName = parseDomainName(result.content)
-            if (!TextUtils.isEmpty(domainName)) {
-                app.defaultDPreference.setPrefString(AppConfig.PREF_CURR_CONFIG_DOMAIN, domainName)
-            }
-
             Log.d("V2rayConfigUtilGoLog", result.content)
             return result
         } catch (e: Exception) {
@@ -116,6 +111,13 @@ object V2rayConfigUtil {
             val jsonConfig = app.defaultDPreference.getPrefString(AppConfig.ANG_CONFIG + guid, "")
             result.status = true
             result.content = jsonConfig
+
+            val jsonObject = JSONObject(jsonConfig);
+            val domainName = parseDomainName(jsonObject)
+            if (!TextUtils.isEmpty(domainName)) {
+                app.defaultDPreference.setPrefString(AppConfig.PREF_CURR_CONFIG_DOMAIN, domainName)
+            }
+            app.defaultDPreference.setPrefStringSet(AppConfig.PREF_CURR_CONFIG_INBOUND_TAGS, parseInboundTags(jsonObject))
             return result
 
         } catch (e: Exception) {
@@ -129,10 +131,14 @@ object V2rayConfigUtil {
      */
     private fun inbounds(vmess: VmessBean, v2rayConfig: V2rayConfig, app: AngApplication): Boolean {
         try {
+            val tags = HashSet<String>()
             v2rayConfig.inbounds.forEach { curInbound ->
                 if (!app.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_PROXY_SHARING, false)) {
                     //bind all inbounds to localhost if the user requests
                     curInbound.listen = "127.0.0.1"
+                }
+                if (!TextUtils.isEmpty(curInbound.tag)) {
+                    tags.add(curInbound.tag)
                 }
             }
             v2rayConfig.inbounds[0].port = 10808
@@ -149,6 +155,7 @@ object V2rayConfigUtil {
 //                v2rayConfig.inbounds.add(httpCopy)
 //            }
             v2rayConfig.inbounds[0].sniffing?.enabled = app.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SNIFFING_ENABLED, true)
+            app.defaultDPreference.setPrefStringSet(AppConfig.PREF_CURR_CONFIG_INBOUND_TAGS, tags)
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -619,19 +626,34 @@ object V2rayConfigUtil {
         }
     }
 
-    private fun parseDomainName(jsonConfig: String): String {
+    private fun parseInboundTags(jObj: JSONObject): Set<String> {
+        val tags = HashSet<String>()
+        if (jObj.has("inbounds")) {
+            val inbounds = jObj.optJSONArray("inbounds")
+            for (i in 0..(inbounds.length() - 1)) {
+                if (inbounds.getJSONObject(i).has("tag")) {
+                    val tag = inbounds.getJSONObject(i).getString("tag")
+                    if (!TextUtils.isEmpty(tag)) {
+                        tags.add(tag)
+                    }
+                }
+            }
+        }
+        return tags
+    }
+
+    private fun parseDomainName(jObj: JSONObject): String {
         try {
-            val jObj = JSONObject(jsonConfig)
             var domainName: String
             if (jObj.has("outbound")) {
-                domainName = parseDomainName(jObj.optJSONObject("outbound"))
+                domainName = parseDomainNameFromOutbound(jObj.optJSONObject("outbound"))
                 if (!TextUtils.isEmpty(domainName)) {
                     return domainName
                 }
             }
             if (jObj.has("outbounds")) {
                 for (i in 0..(jObj.optJSONArray("outbounds").length() - 1)) {
-                    domainName = parseDomainName(jObj.optJSONArray("outbounds").getJSONObject(i))
+                    domainName = parseDomainNameFromOutbound(jObj.optJSONArray("outbounds").getJSONObject(i))
                     if (!TextUtils.isEmpty(domainName)) {
                         return domainName
                     }
@@ -639,7 +661,7 @@ object V2rayConfigUtil {
             }
             if (jObj.has("outboundDetour")) {
                 for (i in 0..(jObj.optJSONArray("outboundDetour").length() - 1)) {
-                    domainName = parseDomainName(jObj.optJSONArray("outboundDetour").getJSONObject(i))
+                    domainName = parseDomainNameFromOutbound(jObj.optJSONArray("outboundDetour").getJSONObject(i))
                     if (!TextUtils.isEmpty(domainName)) {
                         return domainName
                     }
@@ -651,7 +673,7 @@ object V2rayConfigUtil {
         return ""
     }
 
-    private fun parseDomainName(outbound: JSONObject): String {
+    private fun parseDomainNameFromOutbound(outbound: JSONObject): String {
         try {
             if (outbound.has("settings")) {
                 var vnext: JSONArray?

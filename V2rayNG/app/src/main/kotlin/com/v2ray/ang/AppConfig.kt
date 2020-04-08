@@ -11,6 +11,7 @@ object AppConfig {
     const val PREF_CURR_CONFIG_GUID = "pref_v2ray_config_guid"
     const val PREF_CURR_CONFIG_NAME = "pref_v2ray_config_name"
     const val PREF_CURR_CONFIG_DOMAIN = "pref_v2ray_config_domain"
+    const val PREF_CURR_CONFIG_INBOUND_TAGS = "pref_v2ray_config_inbound_tags"
     const val PREF_INAPP_BUY_IS_PREMIUM = "pref_inapp_buy_is_premium"
     const val VMESS_PROTOCOL: String = "vmess://"
     const val SS_PROTOCOL: String = "ss://"

@@ -372,19 +372,33 @@ class V2RayVpnService : VpnService() {
     }
 
     fun startSpeedNotification() {
+        val inboundTags = defaultDPreference.getPrefStringSet(AppConfig.PREF_CURR_CONFIG_INBOUND_TAGS, HashSet<String>())
         if (mSubscription == null &&
                 v2rayPoint.isRunning &&
-                defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false)) {
+                defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false) &&
+                !inboundTags.isEmpty()) {
             val cf_name = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
             var last_zero_speed = false
 
             mSubscription = Observable.interval(3, java.util.concurrent.TimeUnit.SECONDS)
                     .subscribe {
-                        val uplink = v2rayPoint.queryStats("socks", "uplink")
-                        val downlink = v2rayPoint.queryStats("socks", "downlink")
+                        var uplink = -1L
+                        var downlink = 0L
+                        var currentTag = ""
+                        inboundTags.forEach {
+                            val up = v2rayPoint.queryStats(it, "uplink")
+                            val down = v2rayPoint.queryStats(it, "downlink")
+                            if (up + down > uplink + downlink) {
+                                uplink = up
+                                downlink = down
+                                currentTag = it
+                            }
+                        }
+
                         val zero_speed = (uplink == 0L && downlink == 0L)
                         if (!zero_speed || !last_zero_speed) {
-                            updateNotification("${cf_name}  •  ${(uplink / 3).toSpeedString()}↑  ${(downlink / 3).toSpeedString()}↓")
+                            updateNotification("${cf_name}:${currentTag}  •  ${(uplink / 3).toSpeedString()}↑  " +
+                                    "${(downlink / 3).toSpeedString()}↓")
                         }
                         last_zero_speed = zero_speed
                     }
