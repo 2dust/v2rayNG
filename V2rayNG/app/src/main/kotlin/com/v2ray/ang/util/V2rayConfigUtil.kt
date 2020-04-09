@@ -626,7 +626,7 @@ object V2rayConfigUtil {
         }
     }
 
-    private fun parseInboundTags(jObj: JSONObject): Set<String> {
+    fun parseInboundTags(jObj: JSONObject): Set<String> {
         val tags = HashSet<String>()
         if (jObj.has("inbounds")) {
             val inbounds = jObj.optJSONArray("inbounds")

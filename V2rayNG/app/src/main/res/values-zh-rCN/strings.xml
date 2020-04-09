@@ -186,5 +186,6 @@
     <string name="toast_warning_pref_proxysharing">其他设备可以使用socks/http协议通过您的IP地址连接到代理\nHttp  代理: http://您的ip:10809\nSocks 代理: socks(4/5)://您的ip:10808\n仅在受信任的网络中启用以避免未经授权的连接</string>
     <string name="toast_warning_pref_proxysharing_short">代理共享已启用，请确保处于受信网络</string>
     <string name="toast_malformed_josn">配置格式错误</string>
+    <string name="toast_missing_inbound_tags">缺少inbound tag，通知中将无法显示速度</string>
 
 </resources>

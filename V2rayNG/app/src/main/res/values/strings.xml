@@ -187,5 +187,6 @@
     <string name="toast_warning_pref_proxysharing">Other devices can connect to proxy by your ip address through socks/http protocol\nHttp  Proxy: http://yourIP:10809\nSocks Proxy: socks(4/5)://yourIP:10808\nOnly enable in trusted network to avoid unauthorized connection</string>
     <string name="toast_warning_pref_proxysharing_short">Proxy sharing enabled\nMake sure you are in a trusted network</string>
     <string name="toast_malformed_josn">Config malformed</string>
+    <string name="toast_missing_inbound_tags">Missing inbound tag. The speed display will be off in notification</string>
 
 </resources>

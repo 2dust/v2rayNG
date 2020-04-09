@@ -12,8 +12,10 @@ import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.dto.AngConfig
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.V2rayConfigUtil.parseInboundTags
 import kotlinx.android.synthetic.main.activity_server2.*
 import org.jetbrains.anko.*
+import org.json.JSONObject
 import java.lang.Exception
 
 
@@ -93,7 +95,7 @@ class Server2Activity : BaseActivity() {
             Gson().fromJson<Object>(tv_content.text.toString(), Object::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
-            toast(R.string.toast_malformed_josn)
+            toast("${getString(R.string.toast_malformed_josn)} : ${e.cause?.message}")
             saveSuccess = false
         }
 
@@ -153,9 +155,18 @@ class Server2Activity : BaseActivity() {
             true
         }
         R.id.save_config -> {
-            saveServer()
+            if (saveServer()) {
+                checkForWarnings()
+            }
             true
         }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun checkForWarnings() {
+        val inboundTags = parseInboundTags(JSONObject(tv_content.text.toString()))
+        if (inboundTags.isEmpty()) {
+            longToast(R.string.toast_missing_inbound_tags)
+        }
     }
 }
