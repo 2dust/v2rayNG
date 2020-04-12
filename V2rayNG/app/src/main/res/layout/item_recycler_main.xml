@@ -9,10 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:orientation="horizontal"
         card_view:cardCornerRadius="5dp">
 
         <LinearLayout
@@ -21,7 +17,11 @@
             android:layout_height="@dimen/server_height"
             android:layout_gravity="center"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:nextFocusRight="@+id/layout_share">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -111,10 +111,14 @@
                     <LinearLayout
                         android:id="@+id/layout_share"
                         android:layout_width="wrap_content"
-                        android:layout_height="@dimen/server_height"
+                        android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingEnd="@dimen/layout_margin_right_height">
+                        android:padding="@dimen/layout_margin_spacing"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:nextFocusLeft="@+id/info_container">
 
                         <ImageView
                             android:layout_width="wrap_content"
@@ -126,10 +130,13 @@
                     <LinearLayout
                         android:id="@+id/layout_edit"
                         android:layout_width="wrap_content"
-                        android:layout_height="@dimen/server_height"
+                        android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingEnd="@dimen/layout_margin_right_height">
+                        android:padding="@dimen/layout_margin_spacing"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
 
                         <ImageView
                             android:layout_width="@dimen/png_height"
@@ -141,10 +148,13 @@
                     <LinearLayout
                         android:id="@+id/layout_remove"
                         android:layout_width="wrap_content"
-                        android:layout_height="@dimen/server_height"
+                        android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingEnd="@dimen/layout_margin_right_height">
+                        android:padding="@dimen/layout_margin_spacing"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
 
                         <ImageView
                             android:layout_width="@dimen/png_height"
