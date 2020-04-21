@@ -103,6 +103,7 @@ class V2RayVpnService : VpnService() {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         v2rayPoint.packageName = Utils.packagePath(applicationContext)
+        v2rayPoint.packageCodePath = applicationContext.applicationInfo.nativeLibraryDir + "/"
         Seq.setContext(applicationContext)
     }
 

@@ -3,8 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion Integer.parseInt("$compileSdkVer")
+    buildToolsVersion buildToolsVer
 
     compileOptions {
         targetCompatibility = "8"

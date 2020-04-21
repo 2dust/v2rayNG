@@ -441,7 +441,6 @@ object Utils {
         return path
     }
 
-
     /**
      * readTextFromAssets
      */

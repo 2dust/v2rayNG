@@ -44,6 +44,7 @@ type V2RayPoint struct {
 	closeChan chan struct{}
 
 	PackageName          string
+	PackageCodePath      string
 	DomainName           string
 	ConfigureFileContent string
 	EnableLocalDNS       bool
@@ -67,6 +68,7 @@ func (v *V2RayPoint) RunLoop() (err error) {
 	defer v.v2rayOP.Unlock()
 	//Construct Context
 	v.status.PackageName = v.PackageName
+	v.status.PackageCodePath = v.PackageCodePath
 
 	if !v.status.IsRunning {
 		v.closeChan = make(chan struct{})
