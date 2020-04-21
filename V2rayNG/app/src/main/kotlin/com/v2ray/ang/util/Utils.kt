@@ -95,7 +95,7 @@ object Utils {
         try {
             val cmb = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clipData = ClipData.newPlainText(null, content)
-            cmb.primaryClip = clipData
+            cmb.setPrimaryClip(clipData)
         } catch (e: Exception) {
             e.printStackTrace()
         }
