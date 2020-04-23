@@ -16,16 +16,16 @@
     <string name="toast_services_failure">Сбой при запуске служб</string>
 
     <!--ServerActivity-->
-    <string name="title_server">Файл настроек</string>
-    <string name="menu_item_add_config">Добавить настройки</string>
-    <string name="menu_item_save_config">Сохранить настройки</string>
-    <string name="menu_item_del_config">Удалить настройки</string>
-    <string name="menu_item_import_config_qrcode">Импорт настроек из QR-кода</string>
-    <string name="menu_item_import_config_clipboard">Импорт настроек из буфера обмена</string>
-    <string name="menu_item_import_config_manually_vmess">Ручные настройки Vmess</string>
-    <string name="menu_item_import_config_manually_ss">Ручные настройки Shadowsocks</string>
-    <string name="menu_item_import_config_manually_socks">Ручные настройки Socks</string>
-    <string name="menu_item_import_config_custom">Пользовательские настройки</string>
+    <string name="title_server">Профиль</string>
+    <string name="menu_item_add_config">Добавить профиль</string>
+    <string name="menu_item_save_config">Сохранить профиль</string>
+    <string name="menu_item_del_config">Удалить профиль</string>
+    <string name="menu_item_import_config_qrcode">Импорт профиля из QR-кода</string>
+    <string name="menu_item_import_config_clipboard">Импорт профиля из буфера обмена</string>
+    <string name="menu_item_import_config_manually_vmess">Ручной ввод профиля Vmess</string>
+    <string name="menu_item_import_config_manually_ss">Ручной ввод профиля Shadowsocks</string>
+    <string name="menu_item_import_config_manually_socks">Ручной ввод профиля Socks</string>
+    <string name="menu_item_import_config_custom">Пользовательский профиль</string>
     <string name="menu_item_import_config_custom_clipboard">Импорт из буфера обмена</string>
     <string name="menu_item_import_config_custom_local">Импорт с устройства</string>
     <string name="menu_item_import_config_custom_url">Импорт из URL</string>
@@ -36,27 +36,27 @@
     <string name="server_lab_port">Порт</string>
     <string name="server_lab_id">ID</string>
     <string name="server_lab_alterid">Альтернативный ID</string>
-    <string name="server_lab_security">Безопасность</string>
+    <string name="server_lab_security">Шифрование</string>
     <string name="server_lab_network">Сеть</string>
     <string name="server_lab_more_function">Другие параметры</string>
     <string name="server_lab_head_type">Главный тип</string>
-    <string name="server_lab_request_host">Запрос хоста (WS/H2) / Безопасность QUIC</string>
+    <string name="server_lab_request_host">Запрос хоста (WS/H2) / Шифрование QUIC</string>
     <string name="server_lab_path">Путь (WS/H2) / Ключ QUIC</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_allow_insecure">Разрешать небезопасные</string>
     <string name="server_lab_address3">Адрес</string>
     <string name="server_lab_port3">Порт</string>
     <string name="server_lab_id3">Пароль</string>
-    <string name="server_lab_security3">Безопасность</string>
+    <string name="server_lab_security3">Шифрование</string>
     <string name="toast_success">Успешно</string>
     <string name="toast_failure">Ошибка</string>
     <string name="toast_none_data">Ничего нет</string>
     <string name="toast_incorrect_protocol">Неправильный протокол</string>
     <string name="toast_decoding_failed">Невозможно декодировать</string>
-    <string name="title_file_chooser">Выберите файл настроек</string>
+    <string name="title_file_chooser">Выберите файл профиля</string>
     <string name="toast_require_file_manager">Установите файловый менеджер</string>
-    <string name="server_customize_config">Изменить настройки</string>
-    <string name="toast_config_file_invalid">Неправильные настройки</string>
+    <string name="server_customize_config">Изменить профиль</string>
+    <string name="toast_config_file_invalid">Неправильный профиль</string>
     <string name="server_lab_content">Данные</string>
     <string name="toast_none_data_clipboard">В буфере обмена нет данных</string>
     <string name="toast_invalid_url">Неправильный URL</string>
@@ -133,12 +133,12 @@
     <string name="title_logcat">Системный журнал</string>
     <string name="logcat_copy">Копировать</string>
     <string name="logcat_delete">Удалить</string>
-    <string name="title_export_all">Экспорт всех настроек в буфер обмена</string>
+    <string name="title_export_all">Экспорт всех профилей в буфер обмена</string>
     <string name="title_sub_setting">Настройка подписки</string>
     <string name="sub_setting_remarks">Описание</string>
     <string name="sub_setting_url">URL</string>
     <string name="title_sub_update">Обновить подписку</string>
-    <string name="title_ping_all_server">Проверка доступности всех настроек</string>
+    <string name="title_ping_all_server">Проверка доступности профилей</string>
 
     <string name="tasker_start_service">Запуск службы</string>
     <string name="tasker_setting_confirm">Подтвердить</string>
@@ -163,7 +163,7 @@
     <string-array name="share_method">
         <item>QR-код</item>
         <item>Экспорт в буфер обмена</item>
-        <item>Экспорт настроек целиком в буфер обмена</item>
+        <item>Экспорт всего профиля в буфер обмена</item>
     </string-array>
 
     <string-array name="routing_tag">
@@ -178,10 +178,10 @@
         <item>Все, кроме Китая</item>
         <item>Все, кроме LAN и Китая</item>
     </string-array>
-    <string name="title_pref_proxy_sharing_enabled">Обмен прокси</string>
+    <string name="title_pref_proxy_sharing_enabled">Разрешить подключения из LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться к прокси по вашему IP-адресу через протокол SOCKS/HTTP. Используйте только в надёжной сети, чтобы избежать несанкционированного подключения.</string>
     <string name="toast_warning_pref_proxysharing">Другие устройства могут подключаться к прокси по вашему IP-адресу через протокол SOCKS/HTTP.\nHTTP-прокси: http://вашIP:10809\nSOCKS-прокси: socks(4/5)://вашIP:10808\nИспользуйте только в надёжной сети, чтобы избежать несанкционированного подключения.</string>
-    <string name="toast_warning_pref_proxysharing_short">Доступ к прокси включён.\n\nУбедитесь, что вы находитесь в надёжной сети.</string>
-    <string name="toast_malformed_josn">Настройки повреждены</string>
+    <string name="toast_warning_pref_proxysharing_short">Доступ из LAN разрешён, убедитесь, что вы находитесь в надёжной сети</string>
+    <string name="toast_malformed_josn">Профиль повреждён</string>
 
 </resources>
