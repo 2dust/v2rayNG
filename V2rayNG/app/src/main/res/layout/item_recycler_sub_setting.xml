@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/item_bg"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/item_bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
 
     <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/item_cardview"
@@ -76,7 +77,7 @@
                     <ImageView
                         android:layout_width="@dimen/png_height"
                         android:layout_height="@dimen/png_height"
-                        android:src="@drawable/ic_share_black_24dp" />
+                            app:srcCompat="@drawable/ic_share_black_24dp" />
 
                 </LinearLayout>
 
@@ -95,7 +96,7 @@
                     <ImageView
                         android:layout_width="@dimen/png_height"
                         android:layout_height="@dimen/png_height"
-                        android:src="@drawable/ic_edit_black_24dp" />
+                            app:srcCompat="@drawable/ic_edit_black_24dp" />
 
                 </LinearLayout>
             </LinearLayout>

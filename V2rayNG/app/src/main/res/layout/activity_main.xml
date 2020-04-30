@@ -93,7 +93,7 @@
                         android:layout_marginRight="16dp"
                         android:layout_marginLeft="16dp"
                         android:layout_marginTop="16dp"
-                        android:src="@drawable/ic_v_idle"
+                            app:srcCompat="@drawable/ic_v_idle"
                         android:clickable="true"
                         android:focusable="true"
                         app:layout_anchorGravity="bottom|right|end" />
