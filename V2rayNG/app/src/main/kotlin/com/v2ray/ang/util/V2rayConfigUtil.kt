@@ -278,6 +278,10 @@ object V2rayConfigUtil {
 					if (!TextUtils.isEmpty(host)) {
                         tlssettings.serverName = host
                     }
+                    if (!TextUtils.isEmpty(vmess.tlsCertificateFile)) {
+                        tlssettings.certificates = arrayListOf(V2rayConfig.OutboundBean.StreamSettingsBean.TlssettingsBean.
+                                CertficateBean(vmess.tlsCertificateFile))
+                    }
                     streamSettings.tlssettings = tlssettings
                 }
                 "h2" -> {
@@ -293,6 +297,10 @@ object V2rayConfigUtil {
 
                     val tlssettings = V2rayConfig.OutboundBean.StreamSettingsBean.TlssettingsBean()
                     tlssettings.allowInsecure = true
+                    if (!TextUtils.isEmpty(vmess.tlsCertificateFile)) {
+                        tlssettings.certificates = arrayListOf(V2rayConfig.OutboundBean.StreamSettingsBean.TlssettingsBean.
+                                CertficateBean(vmess.tlsCertificateFile))
+                    }
                     streamSettings.tlssettings = tlssettings
                 }
                 "quic" -> {

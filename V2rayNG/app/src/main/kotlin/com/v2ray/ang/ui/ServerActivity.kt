@@ -1,20 +1,25 @@
 package com.v2ray.ang.ui
 
+import android.Manifest
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import com.tbruyelle.rxpermissions.RxPermissions
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AngConfig
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.Utils
 import kotlinx.android.synthetic.main.activity_server.*
 import org.jetbrains.anko.*
+import java.io.File
 
 
 class ServerActivity : BaseActivity() {
     companion object {
-        private const val REQUEST_SCAN = 1
+        private const val REQUEST_FILE_CHOOSER = 1
     }
 
     var del_config: MenuItem? = null
@@ -53,6 +58,48 @@ class ServerActivity : BaseActivity() {
             clearServer()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        button_tls_cert.setOnClickListener { showFileChooser() }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            REQUEST_FILE_CHOOSER -> {
+                val uri = data?.data
+                if (resultCode == RESULT_OK && uri != null) {
+                    et_tls_cert.text = Utils.getEditable(copyFileToCertFolder(uri))
+                }
+            }
+        }
+    }
+
+    private fun showFileChooser() {
+        RxPermissions(this).request(Manifest.permission.READ_EXTERNAL_STORAGE).subscribe {
+            if (it) {
+                val intent = Intent(Intent.ACTION_GET_CONTENT)
+                intent.type = "*/*"
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+
+                try {
+                    startActivityForResult(
+                            Intent.createChooser(intent, getString(R.string.title_file_chooser)),
+                            REQUEST_FILE_CHOOSER)
+                } catch (ex: android.content.ActivityNotFoundException) {
+                    toast(R.string.toast_require_file_manager)
+                }
+            }
+        }
+    }
+
+    private fun copyFileToCertFolder(uri: Uri): String{
+        val targetFile = File(getDir("cert", 0), File(uri.path).name)
+        contentResolver.openInputStream(uri).use { inputStream ->
+            targetFile.outputStream().use { fileOut ->
+                inputStream?.copyTo(fileOut)
+                toast(R.string.toast_success_copy_cert)
+            }
+        }
+        return targetFile.path
     }
 
     /**
@@ -86,6 +133,7 @@ class ServerActivity : BaseActivity() {
         if (streamSecurity >= 0) {
             sp_stream_security.setSelection(streamSecurity)
         }
+        et_tls_cert.text = Utils.getEditable(vmess.tlsCertificateFile)
         return true
     }
 
@@ -132,6 +180,7 @@ class ServerActivity : BaseActivity() {
         vmess.requestHost = et_request_host.text.toString()
         vmess.path = et_path.text.toString()
         vmess.streamSecurity = streamsecuritys[sp_stream_security.selectedItemPosition]
+        vmess.tlsCertificateFile = et_tls_cert.text.toString()
 
         if (TextUtils.isEmpty(vmess.remarks)) {
             toast(R.string.server_lab_remarks)

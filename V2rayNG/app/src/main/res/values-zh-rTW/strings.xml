@@ -45,6 +45,7 @@
     <string name="server_lab_path">path(ws path/h2 path)/QUIC加密密鑰</string>
     <string name="server_lab_stream_security">傳輸層安全性</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
+    <string name="server_lab_tls_cert_file">tls 證書文件路徑 (.crt)</string>
     <string name="server_lab_address3">伺服器位址</string>
     <string name="server_lab_port3">伺服器埠</string>
     <string name="server_lab_id3">密碼</string>
@@ -62,6 +63,7 @@
     <string name="toast_none_data_clipboard">剪貼簿內無資料</string>
     <string name="toast_invalid_url">網址無效</string>
     <string name="server_lab_need_inbound">​​確保inbound有socks=10808,http=10809</string>
+    <string name="toast_success_copy_cert">成功複製文件到v2rayNG</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">載入</string>

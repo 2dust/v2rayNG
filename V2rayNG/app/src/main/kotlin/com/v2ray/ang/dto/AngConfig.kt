@@ -17,6 +17,7 @@ data class AngConfig(
                          var requestHost: String = "",
                          var path: String = "",
                          var streamSecurity: String = "",
+                         var tlsCertificateFile: String = "",
                          var configType: Int = 1,
                          var configVersion: Int = 1,
                          var testResult: String = "",

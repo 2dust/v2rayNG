@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.ServerActivity">
@@ -240,6 +241,39 @@
                 android:entries="@array/streamsecuritys" />
 
         </LinearLayout>
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_top_height">
+
+            <TextView
+                    android:id="@+id/text_tls_cert"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/server_lab_tls_cert_file"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentStart="true"
+                    android:labelFor="@+id/et_tls_cert"/>
+
+            <EditText
+                    android:id="@+id/et_tls_cert"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/edit_height"
+                    android:inputType="text"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_tls_cert"
+                    android:layout_toStartOf="@+id/button_tls_cert"/>
+
+            <ImageButton
+                    android:id="@+id/button_tls_cert"
+                    android:layout_width="@dimen/edit_height"
+                    android:layout_height="@dimen/edit_height"
+                        app:srcCompat="@drawable/ic_description_black_24dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:contentDescription="@string/server_lab_tls_cert_file" />
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

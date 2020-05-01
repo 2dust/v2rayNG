@@ -45,6 +45,7 @@
     <string name="server_lab_path">path(ws path/h2 path)/QUIC 加密密钥</string>
     <string name="server_lab_stream_security">底层传输安全</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
+    <string name="server_lab_tls_cert_file">tls 证书文件路径 (.crt)</string>
     <string name="server_lab_address3">服务器地址</string>
     <string name="server_lab_port3">服务器端口</string>
     <string name="server_lab_id3">密码</string>
@@ -62,6 +63,7 @@
     <string name="toast_none_data_clipboard">剪贴板中没有数据</string>
     <string name="toast_invalid_url">无效的网址</string>
     <string name="server_lab_need_inbound">确保inbound有socks=10808,http=10809</string>
+    <string name="toast_success_copy_cert">成功复制文件到v2rayNG</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">正在加载</string>

@@ -99,7 +99,11 @@ data class V2rayConfig(
             data class HttpsettingsBean(var host: List<String> = ArrayList<String>(), var path: String = "")
 
             data class TlssettingsBean(var allowInsecure: Boolean = true,
-                                       var serverName: String = "")
+                                       var serverName: String = "",
+                                       var certificates: List<CertficateBean> = arrayListOf()) {
+                data class CertficateBean(var certificateFile: String,
+                                          var usage: String = "verify")
+            }
 
             data class QuicsettingBean(var security: String = "none",
                                         var key: String = "",
