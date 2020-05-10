@@ -240,6 +240,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.ping_all -> {
+            Utils.closeAllTcpSockets()
             for (k in 0 until configs.vmess.count()) {
                 configs.vmess[k].testResult = ""
                 adapter.updateConfigList()

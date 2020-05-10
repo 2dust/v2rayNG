@@ -48,6 +48,8 @@ import libv2ray.Libv2ray
 
 object Utils {
 
+    val tcpTestingSockets = ArrayList<Socket?>()
+
     /**
      * convert string to editalbe for kotlin
      *
@@ -497,19 +499,35 @@ object Utils {
 
     fun socketConnectTime(url: String, port: Int): Long {
         try {
+            val socket = Socket()
+            synchronized(this) {
+                tcpTestingSockets.add(socket)
+            }
             val start = System.currentTimeMillis()
-            val socket = Socket(url, port)
+            socket.connect(InetSocketAddress(url, port))
             val time = System.currentTimeMillis() - start
+            synchronized(this) {
+                tcpTestingSockets.remove(socket)
+            }
             socket.close()
             return time
         } catch (e: UnknownHostException) {
             e.printStackTrace()
         } catch (e: IOException) {
-            e.printStackTrace()
+            Log.d(AppConfig.ANG_PACKAGE, "socketConnectTime IOException: $e")
         } catch (e: Exception) {
             e.printStackTrace()
         }
         return -1
+    }
+
+    fun closeAllTcpSockets() {
+        synchronized(this) {
+            tcpTestingSockets.forEach {
+                it?.close()
+            }
+            tcpTestingSockets.clear()
+        }
     }
 }
 
