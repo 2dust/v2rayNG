@@ -31,6 +31,7 @@ import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.service.V2RayVpnService
 import com.v2ray.ang.ui.SettingsActivity
 import kotlinx.android.synthetic.main.activity_logcat.*
+import kotlinx.coroutines.isActive
 import me.dozen.dpreference.DPreference
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
@@ -44,6 +45,7 @@ import java.util.regex.Pattern
 import java.math.BigInteger
 import java.util.concurrent.TimeUnit
 import libv2ray.Libv2ray
+import kotlin.coroutines.coroutineContext
 
 
 object Utils {
@@ -485,10 +487,13 @@ object Utils {
     /**
      * tcping
      */
-    fun tcping(url: String, port: Int): String {
+    suspend fun tcping(url: String, port: Int): String {
         var time = -1L
         for (k in 0 until 2) {
             val one = socketConnectTime(url, port)
+            if (!coroutineContext.isActive) {
+                break
+            }
             if (one != -1L  )
                 if(time == -1L || one < time) {
                 time = one

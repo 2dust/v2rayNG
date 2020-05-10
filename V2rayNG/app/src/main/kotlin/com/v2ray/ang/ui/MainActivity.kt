@@ -33,6 +33,7 @@ import rx.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.AngConfigManager.configs
+import kotlinx.coroutines.*
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     companion object {
@@ -58,6 +59,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
     private var mItemTouchHelper: ItemTouchHelper? = null
+    private val testingJobs = ArrayList<Job>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -240,6 +242,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.ping_all -> {
+            testingJobs.forEach {
+                it.cancel()
+            }
+            testingJobs.clear()
             Utils.closeAllTcpSockets()
             for (k in 0 until configs.vmess.count()) {
                 configs.vmess[k].testResult = ""
@@ -247,12 +253,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             for (k in 0 until configs.vmess.count()) {
                 if (configs.vmess[k].configType != AppConfig.EConfigType.Custom) {
-                    doAsync {
+                    testingJobs.add(GlobalScope.launch(Dispatchers.IO) {
                         configs.vmess[k].testResult = Utils.tcping(configs.vmess[k].address, configs.vmess[k].port)
-                        uiThread {
+                        val myJob = coroutineContext[Job]
+                        launch(Dispatchers.Main) {
+                            testingJobs.remove(myJob)
                             adapter.updateSelectedItem(k)
                         }
-                    }
+                    })
                 }
             }
             true
