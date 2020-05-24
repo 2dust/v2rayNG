@@ -7,10 +7,6 @@
         android:id="@+id/group_main"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/server_profile"
-            android:icon="@drawable/ic_description_white_24dp"
-            android:title="@string/title_server" />
-        <item
             android:id="@+id/sub_setting"
             android:icon="@drawable/ic_subscriptions_white_24dp"
             android:title="@string/title_sub_setting" />
