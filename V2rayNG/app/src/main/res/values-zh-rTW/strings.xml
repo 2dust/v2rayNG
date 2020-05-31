@@ -17,7 +17,7 @@
     <string name="toast_services_failure">啟動服務失敗</string>
 
     <!--ServerActivity-->
-    <string name="title_server">組態</string>
+    <string name="title_server">設定檔</string>
     <string name="menu_item_add_config">新增組態</string>
     <string name="menu_item_save_config">儲存組態</string>
     <string name="menu_item_del_config">刪除組態</string>
@@ -57,7 +57,7 @@
     <string name="title_file_chooser">選取一個設定檔</string>
     <string name="toast_require_file_manager">請安裝檔案總管。</string>
     <string name="server_customize_config">自訂組態</string>
-    <string name="toast_config_file_invalid">無效組態</string>
+    <string name="toast_config_file_invalid">無效設定檔</string>
     <string name="server_lab_content">內容</string>
     <string name="toast_none_data_clipboard">剪貼簿內無資料</string>
     <string name="toast_invalid_url">網址無效</string>
@@ -104,17 +104,17 @@
     <string name="summary_pref_donate">向開發人員捐款</string>
     <string name="donate_detail">新增一些實驗性進階功能</string>
 
-    <string name="title_pref_remote_dns">遠端DNS (可选)</string>
+    <string name="title_pref_remote_dns">遠端DNS (可選)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
-    <string name="title_pref_domestic_dns">境内DNS (可选，僅本地DNS模式下生效)</string>
+    <string name="title_pref_domestic_dns">境内DNS (可選，僅本地DNS模式下生效)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
-    <string name="title_pref_socks_port">SOCKS5代理端口</string>
-    <string name="summary_pref_socks_port">SOCKS5代理端口</string>
+    <string name="title_pref_socks_port">SOCKS5代理連接埠</string>
+    <string name="summary_pref_socks_port">SOCKS5代理連接埠</string>
 
-    <string name="title_pref_http_port">HTTP代理端口</string>
-    <string name="summary_pref_http_port">HTTP代理端口</string>
+    <string name="title_pref_http_port">HTTP代理連接埠</string>
+    <string name="summary_pref_http_port">HTTP代理連接埠</string>
 
 
     <string name="title_pref_feedback">回饋</string>
@@ -154,7 +154,7 @@
     <string name="routing_settings_delete">清除</string>
     <string name="routing_settings_scan_replace">掃描並取代</string>
     <string name="routing_settings_scan_append">掃描並附加</string>
-    <string name="routing_settings_default_rules">設置默認路由規則</string>
+    <string name="routing_settings_default_rules">設置預設路由規則</string>
 
     <string name="connection_test_pending">"檢查連線能力"</string>
     <string name="connection_test_testing">"測試中……"</string>
@@ -179,13 +179,13 @@
 
     <string-array name="routing_mode">
         <item>全球</item>
-        <item>略過局域網</item>
+        <item>略過區域網路</item>
         <item>略過中國大陸</item>
-        <item>略過局域網及中國大陸</item>
+        <item>略過區域網路及中國大陸</item>
     </string-array>
     <string name="title_pref_proxy_sharing_enabled">代理共享</string>
     <string name="summary_pref_proxy_sharing_enabled">綁定代理入口ip到0.0.0.0</string>
-    <string name="toast_warning_pref_proxysharing">其他設備可以使用socks/http協議通過您的IP地址連接到代理\nHttp 代理: http://您的ip:10809\nSocks 代理: socks(4/5)://您的ip:10808\n僅在受信任的網絡中啟用以避免未經授權的連接</string>
-    <string name="toast_warning_pref_proxysharing_short">代理共享已啟用，請確保處於受信網絡</string>
+    <string name="toast_warning_pref_proxysharing">其他設備可以使用socks/http協定通過您的IP地址連接到代理\nHttp 代理: http://您的ip:10809\nSocks 代理: socks(4/5)://您的ip:10808\n僅在受信任的網路中啟用以避免未經授權的連接</string>
+    <string name="toast_warning_pref_proxysharing_short">代理共享已啟用，請確保處於受信網路</string>
     <string name="toast_malformed_josn">配置格式錯誤</string>
 </resources>
