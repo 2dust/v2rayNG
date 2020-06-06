@@ -93,16 +93,16 @@
                 android:value="true" />
         </service>
 
-        <!--<receiver android:name=".receiver.WidgetProvider">-->
-        <!--<meta-data-->
-        <!--android:name="android.appwidget.provider"-->
-        <!--android:resource="@xml/app_widget_provider" />-->
-
-        <!--<intent-filter>-->
-        <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
-        <!--<action android:name="com.v2ray.ang.action.widget.click" />-->
-        <!--</intent-filter>-->
-        <!--</receiver>-->
+        <receiver android:name=".receiver.WidgetProvider"
+                android:process=":RunSoLibV2RayDaemon">
+            <meta-data
+                    android:name="android.appwidget.provider"
+                    android:resource="@xml/app_widget_provider" />
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.v2ray.ang.action.widget.click" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".service.QSTileService"

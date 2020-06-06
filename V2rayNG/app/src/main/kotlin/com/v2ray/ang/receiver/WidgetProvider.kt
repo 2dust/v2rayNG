@@ -20,7 +20,8 @@ class WidgetProvider : AppWidgetProvider() {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
 
         val remoteViews = RemoteViews(context.packageName, R.layout.widget_switch)
-        val intent = Intent(AppConfig.BROADCAST_ACTION_WIDGET_CLICK)
+        val intent = Intent(context, WidgetProvider::class.java)
+        intent.setAction(AppConfig.BROADCAST_ACTION_WIDGET_CLICK)
         val pendingIntent = PendingIntent.getBroadcast(context, R.id.layout_switch, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         remoteViews.setOnClickPendingIntent(R.id.layout_switch, pendingIntent)
 
