@@ -104,16 +104,7 @@ object AngConfigManager {
             angConfig.vmess.removeAt(index)
 
             //移除的是活动的
-            if (angConfig.index == index) {
-                if (angConfig.vmess.count() > 0) {
-                    angConfig.index = 0
-                } else {
-                    angConfig.index = -1
-                }
-            } else if (index < angConfig.index)//移除活动之前的
-            {
-                angConfig.index--
-            }
+            adjustIndexForRemovalAt(index)
 
             storeConfigFile()
         } catch (e: Exception) {
@@ -121,6 +112,19 @@ object AngConfigManager {
             return -1
         }
         return 0
+    }
+
+    private fun adjustIndexForRemovalAt(index: Int) {
+        if (angConfig.index == index) {
+            if (angConfig.vmess.count() > 0) {
+                angConfig.index = 0
+            } else {
+                angConfig.index = -1
+            }
+        } else if (index < angConfig.index)//移除活动之前的
+        {
+            angConfig.index--
+        }
     }
 
     fun swapServer(fromPosition: Int, toPosition: Int): Int {
@@ -241,7 +245,7 @@ object AngConfigManager {
     /**
      * import config form qrcode or...
      */
-    fun importConfig(server: String?, subid: String): Int {
+    fun importConfig(server: String?, subid: String, removedSelectedServer: AngConfig.VmessBean?): Int {
         try {
             if (server == null || TextUtils.isEmpty(server)) {
                 return R.string.toast_none_data
@@ -360,6 +364,12 @@ object AngConfigManager {
                 addSocksServer(vmess, -1)
             } else {
                 return R.string.toast_incorrect_protocol
+            }
+            if (removedSelectedServer != null &&
+                    vmess.subid.equals(removedSelectedServer.subid) &&
+                    vmess.address.equals(removedSelectedServer.address) &&
+                    vmess.port.equals(removedSelectedServer.port)) {
+                setActiveServer(configs.vmess.count() - 1)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -728,6 +738,11 @@ object AngConfigManager {
             if (servers == null) {
                 return 0
             }
+            val removedSelectedServer =
+                    if (!TextUtils.isEmpty(subid) && configs.vmess[configs.index].subid.equals(subid))
+                        configs.vmess[configs.index]
+                    else
+                        null
             removeServerViaSubid(subid)
 
 //            var servers = server
@@ -738,7 +753,7 @@ object AngConfigManager {
             var count = 0
             servers.lines()
                     .forEach {
-                        val resId = importConfig(it, subid)
+                        val resId = importConfig(it, subid, removedSelectedServer)
                         if (resId == 0) {
                             count++
                         }
@@ -778,6 +793,7 @@ object AngConfigManager {
         for (k in configs.vmess.count() - 1 downTo 0) {
             if (configs.vmess[k].subid.equals(subid)) {
                 angConfig.vmess.removeAt(k)
+                adjustIndexForRemovalAt(k)
             }
         }
 
