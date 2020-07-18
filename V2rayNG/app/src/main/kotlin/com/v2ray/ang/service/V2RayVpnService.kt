@@ -52,6 +52,7 @@ class V2RayVpnService : VpnService() {
     }
 
     private val v2rayPoint = Libv2ray.newV2RayPoint(V2RayCallback())
+    private var lastQueryTime = 0L
     private lateinit var configContent: String
     private lateinit var mInterface: ParcelFileDescriptor
     val fd: Int get() = mInterface.fd
@@ -182,6 +183,7 @@ class V2RayVpnService : VpnService() {
         // Create a new interface using the builder and save the parameters.
         mInterface = builder.establish()
         sendFd()
+        lastQueryTime = System.currentTimeMillis()
         startSpeedNotification()
     }
 
@@ -383,10 +385,13 @@ class V2RayVpnService : VpnService() {
                         val uplink = v2rayPoint.queryStats("socks", "uplink")
                         val downlink = v2rayPoint.queryStats("socks", "downlink")
                         val zero_speed = (uplink == 0L && downlink == 0L)
+                        val queryTime = System.currentTimeMillis()
                         if (!zero_speed || !last_zero_speed) {
-                            updateNotification("${cf_name}  •  ${(uplink / 3).toSpeedString()}↑  ${(downlink / 3).toSpeedString()}↓")
+                            updateNotification("${cf_name}  •  ${(uplink * 1000 / (queryTime - lastQueryTime)).toSpeedString()}↑" +
+                                    "  ${(downlink * 1000 / (queryTime - lastQueryTime)).toSpeedString()}↓")
                         }
                         last_zero_speed = zero_speed
+                        lastQueryTime = queryTime
                     }
         }
     }
