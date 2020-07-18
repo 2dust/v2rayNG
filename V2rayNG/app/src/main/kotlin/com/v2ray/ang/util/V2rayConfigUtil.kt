@@ -9,7 +9,6 @@ import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.AngConfig.VmessBean
 import com.v2ray.ang.dto.V2rayConfig
-import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.ui.SettingsActivity
 import org.json.JSONException
 import org.json.JSONObject
@@ -246,7 +245,7 @@ object V2rayConfigUtil {
             //streamSettings
             when (streamSettings.network) {
                 "kcp" -> {
-                    val kcpsettings = V2rayConfig.OutboundBean.StreamSettingsBean.KcpsettingsBean()
+                    val kcpsettings = V2rayConfig.OutboundBean.StreamSettingsBean.KcpSettingsBean()
                     kcpsettings.mtu = 1350
                     kcpsettings.tti = 50
                     kcpsettings.uplinkCapacity = 12
@@ -254,34 +253,33 @@ object V2rayConfigUtil {
                     kcpsettings.congestion = false
                     kcpsettings.readBufferSize = 1
                     kcpsettings.writeBufferSize = 1
-                    kcpsettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.KcpsettingsBean.HeaderBean()
+                    kcpsettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.KcpSettingsBean.HeaderBean()
                     kcpsettings.header.type = vmess.headerType
-                    streamSettings.kcpsettings = kcpsettings
+                    streamSettings.kcpSettings = kcpsettings
                 }
                 "ws" -> {
-                    val wssettings = V2rayConfig.OutboundBean.StreamSettingsBean.WssettingsBean()
-                    wssettings.connectionReuse = true
+                    val wssettings = V2rayConfig.OutboundBean.StreamSettingsBean.WsSettingsBean()
                     val host = vmess.requestHost.trim()
                     val path = vmess.path.trim()
 
                     if (!TextUtils.isEmpty(host)) {
-                        wssettings.headers = V2rayConfig.OutboundBean.StreamSettingsBean.WssettingsBean.HeadersBean()
+                        wssettings.headers = V2rayConfig.OutboundBean.StreamSettingsBean.WsSettingsBean.HeadersBean()
                         wssettings.headers.Host = host
                     }
                     if (!TextUtils.isEmpty(path)) {
                         wssettings.path = path
                     }
-                    streamSettings.wssettings = wssettings
+                    streamSettings.wsSettings = wssettings
 
-                    val tlssettings = V2rayConfig.OutboundBean.StreamSettingsBean.TlssettingsBean()
+                    val tlssettings = V2rayConfig.OutboundBean.StreamSettingsBean.TlsSettingsBean()
                     tlssettings.allowInsecure = true
 					if (!TextUtils.isEmpty(host)) {
                         tlssettings.serverName = host
                     }
-                    streamSettings.tlssettings = tlssettings
+                    streamSettings.tlsSettings = tlssettings
                 }
                 "h2" -> {
-                    val httpsettings = V2rayConfig.OutboundBean.StreamSettingsBean.HttpsettingsBean()
+                    val httpsettings = V2rayConfig.OutboundBean.StreamSettingsBean.HttpSettingsBean()
                     val host = vmess.requestHost.trim()
                     val path = vmess.path.trim()
 
@@ -289,31 +287,30 @@ object V2rayConfigUtil {
                         httpsettings.host = host.split(",").map { it.trim() }
                     }
                     httpsettings.path = path
-                    streamSettings.httpsettings = httpsettings
+                    streamSettings.httpSettings = httpsettings
 
-                    val tlssettings = V2rayConfig.OutboundBean.StreamSettingsBean.TlssettingsBean()
+                    val tlssettings = V2rayConfig.OutboundBean.StreamSettingsBean.TlsSettingsBean()
                     tlssettings.allowInsecure = true
-                    streamSettings.tlssettings = tlssettings
+                    streamSettings.tlsSettings = tlssettings
                 }
                 "quic" -> {
-                    val quicsettings = V2rayConfig.OutboundBean.StreamSettingsBean.QuicsettingBean()
+                    val quicsettings = V2rayConfig.OutboundBean.StreamSettingsBean.QuicSettingBean()
                     val host = vmess.requestHost.trim()
                     val path = vmess.path.trim()
 
                     quicsettings.security = host
                     quicsettings.key = path
 
-                    quicsettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.QuicsettingBean.HeaderBean()
+                    quicsettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.QuicSettingBean.HeaderBean()
                     quicsettings.header.type = vmess.headerType
 
-                    streamSettings.quicsettings = quicsettings
+                    streamSettings.quicSettings = quicsettings
                 }
                 else -> {
                     //tcp带http伪装
                     if (vmess.headerType == "http") {
-                        val tcpSettings = V2rayConfig.OutboundBean.StreamSettingsBean.TcpsettingsBean()
-                        tcpSettings.connectionReuse = true
-                        tcpSettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.TcpsettingsBean.HeaderBean()
+                        val tcpSettings = V2rayConfig.OutboundBean.StreamSettingsBean.TcpSettingsBean()
+                        tcpSettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.TcpSettingsBean.HeaderBean()
                         tcpSettings.header.type = vmess.headerType
 
 //                        if (requestObj.has("headers")
