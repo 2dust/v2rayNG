@@ -31,6 +31,7 @@ import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.service.V2RayVpnService
 import com.v2ray.ang.ui.SettingsActivity
 import kotlinx.android.synthetic.main.activity_logcat.*
+import kotlinx.coroutines.isActive
 import me.dozen.dpreference.DPreference
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
@@ -44,9 +45,12 @@ import java.util.regex.Pattern
 import java.math.BigInteger
 import java.util.concurrent.TimeUnit
 import libv2ray.Libv2ray
+import kotlin.coroutines.coroutineContext
 
 
 object Utils {
+
+    val tcpTestingSockets = ArrayList<Socket?>()
 
     /**
      * convert string to editalbe for kotlin
@@ -483,10 +487,13 @@ object Utils {
     /**
      * tcping
      */
-    fun tcping(url: String, port: Int): String {
+    suspend fun tcping(url: String, port: Int): String {
         var time = -1L
         for (k in 0 until 2) {
             val one = socketConnectTime(url, port)
+            if (!coroutineContext.isActive) {
+                break
+            }
             if (one != -1L  )
                 if(time == -1L || one < time) {
                 time = one
@@ -497,19 +504,35 @@ object Utils {
 
     fun socketConnectTime(url: String, port: Int): Long {
         try {
+            val socket = Socket()
+            synchronized(this) {
+                tcpTestingSockets.add(socket)
+            }
             val start = System.currentTimeMillis()
-            val socket = Socket(url, port)
+            socket.connect(InetSocketAddress(url, port))
             val time = System.currentTimeMillis() - start
+            synchronized(this) {
+                tcpTestingSockets.remove(socket)
+            }
             socket.close()
             return time
         } catch (e: UnknownHostException) {
             e.printStackTrace()
         } catch (e: IOException) {
-            e.printStackTrace()
+            Log.d(AppConfig.ANG_PACKAGE, "socketConnectTime IOException: $e")
         } catch (e: Exception) {
             e.printStackTrace()
         }
         return -1
+    }
+
+    fun closeAllTcpSockets() {
+        synchronized(this) {
+            tcpTestingSockets.forEach {
+                it?.close()
+            }
+            tcpTestingSockets.clear()
+        }
     }
 }
 
