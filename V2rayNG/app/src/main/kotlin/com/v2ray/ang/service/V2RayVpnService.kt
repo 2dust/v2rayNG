@@ -361,7 +361,7 @@ class V2RayVpnService : VpnService() {
 
     private fun updateNotification(contentText: String) {
         if (mBuilder != null) {
-            mBuilder?.setContentTitle(contentText)
+            mBuilder?.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             getNotificationManager().notify(NOTIFICATION_ID, mBuilder?.build())
         }
     }
@@ -382,13 +382,18 @@ class V2RayVpnService : VpnService() {
 
             mSubscription = Observable.interval(3, java.util.concurrent.TimeUnit.SECONDS)
                     .subscribe {
-                        val uplink = v2rayPoint.queryStats("socks", "uplink")
-                        val downlink = v2rayPoint.queryStats("socks", "downlink")
-                        val zero_speed = (uplink == 0L && downlink == 0L)
+                        val proxyUplink = v2rayPoint.queryStats("proxy", "uplink")
+                        val proxyDownlink = v2rayPoint.queryStats("proxy", "downlink")
+                        val directUplink = v2rayPoint.queryStats("direct", "uplink")
+                        val directDownlink = v2rayPoint.queryStats("direct", "downlink")
+                        val zero_speed = (proxyUplink == 0L && proxyDownlink == 0L && directUplink == 0L && directDownlink == 0L)
                         val queryTime = System.currentTimeMillis()
                         if (!zero_speed || !last_zero_speed) {
-                            updateNotification("${cf_name}  •  ${(uplink * 1000 / (queryTime - lastQueryTime)).toSpeedString()}↑" +
-                                    "  ${(downlink * 1000 / (queryTime - lastQueryTime)).toSpeedString()}↓")
+                            val sinceLastQueryInSeconds = (queryTime - lastQueryTime) / 1000.0
+                            updateNotification("proxy\t•  ${(proxyUplink / sinceLastQueryInSeconds).toLong().toSpeedString()}↑  " +
+                                    "${(proxyDownlink / sinceLastQueryInSeconds).toLong().toSpeedString()}↓\n" +
+                                    "direct\t•  ${(directUplink / sinceLastQueryInSeconds).toLong().toSpeedString()}↑  " +
+                                    "${(directDownlink / sinceLastQueryInSeconds).toLong().toSpeedString()}↓")
                         }
                         last_zero_speed = zero_speed
                         lastQueryTime = queryTime
