@@ -40,6 +40,7 @@ class V2RayVpnService : VpnService() {
         const val NOTIFICATION_ID = 1
         const val NOTIFICATION_PENDING_INTENT_CONTENT = 0
         const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 1
+        const val NOTIFICATION_ICON_THRESHOLD = 3000
 
         fun startV2Ray(context: Context) {
             val intent = Intent(context.applicationContext, V2RayVpnService::class.java)
@@ -359,8 +360,15 @@ class V2RayVpnService : VpnService() {
         mSubscription = null
     }
 
-    private fun updateNotification(contentText: String) {
+    private fun updateNotification(contentText: String, proxyTraffic: Long, directTraffic: Long) {
         if (mBuilder != null) {
+            if (proxyTraffic < NOTIFICATION_ICON_THRESHOLD && directTraffic < NOTIFICATION_ICON_THRESHOLD) {
+                mBuilder?.setSmallIcon(R.drawable.ic_v)
+            } else if (proxyTraffic > directTraffic) {
+                mBuilder?.setSmallIcon(R.drawable.ic_stat_proxy)
+            } else {
+                mBuilder?.setSmallIcon(R.drawable.ic_stat_direct)
+            }
             mBuilder?.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             getNotificationManager().notify(NOTIFICATION_ID, mBuilder?.build())
         }
@@ -393,7 +401,8 @@ class V2RayVpnService : VpnService() {
                             updateNotification("proxy\t•  ${(proxyUplink / sinceLastQueryInSeconds).toLong().toSpeedString()}↑  " +
                                     "${(proxyDownlink / sinceLastQueryInSeconds).toLong().toSpeedString()}↓\n" +
                                     "direct\t•  ${(directUplink / sinceLastQueryInSeconds).toLong().toSpeedString()}↑  " +
-                                    "${(directDownlink / sinceLastQueryInSeconds).toLong().toSpeedString()}↓")
+                                    "${(directDownlink / sinceLastQueryInSeconds).toLong().toSpeedString()}↓",
+                                    proxyDownlink + proxyUplink, directDownlink + directUplink)
                         }
                         last_zero_speed = zero_speed
                         lastQueryTime = queryTime
@@ -408,7 +417,7 @@ class V2RayVpnService : VpnService() {
             mSubscription = null
 
             val cf_name = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
-            updateNotification(cf_name)
+            updateNotification(cf_name, 0, 0)
         }
     }
 
