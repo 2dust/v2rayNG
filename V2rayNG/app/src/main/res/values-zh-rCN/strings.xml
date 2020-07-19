@@ -83,7 +83,7 @@
     <string name="summary_pref_mux_enabled">开启可能会加速,关闭可能会减少断流</string>
 
     <string name="title_pref_speed_enabled">启用速度显示</string>
-    <string name="summary_pref_speed_enabled">在通知中显示当前速度</string>
+    <string name="summary_pref_speed_enabled">在通知中显示当前速度\n小图标显示流量的路由情况</string>
 
     <string name="title_pref_sniffing_enabled">启用流量探测</string>
     <string name="summary_pref_sniffing_enabled">流量探测</string>

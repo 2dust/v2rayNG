@@ -40,6 +40,7 @@ class V2RayVpnService : VpnService() {
         const val NOTIFICATION_ID = 1
         const val NOTIFICATION_PENDING_INTENT_CONTENT = 0
         const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 1
+        const val NOTIFICATION_ICON_THRESHOLD = 3000
 
         fun startV2Ray(context: Context) {
             val intent = Intent(context.applicationContext, V2RayVpnService::class.java)
@@ -359,9 +360,16 @@ class V2RayVpnService : VpnService() {
         mSubscription = null
     }
 
-    private fun updateNotification(contentText: String) {
+    private fun updateNotification(contentText: String, proxyTraffic: Long, directTraffic: Long) {
         if (mBuilder != null) {
-            mBuilder?.setContentTitle(contentText)
+            if (proxyTraffic < NOTIFICATION_ICON_THRESHOLD && directTraffic < NOTIFICATION_ICON_THRESHOLD) {
+                mBuilder?.setSmallIcon(R.drawable.ic_v)
+            } else if (proxyTraffic > directTraffic) {
+                mBuilder?.setSmallIcon(R.drawable.ic_stat_proxy)
+            } else {
+                mBuilder?.setSmallIcon(R.drawable.ic_stat_direct)
+            }
+            mBuilder?.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             getNotificationManager().notify(NOTIFICATION_ID, mBuilder?.build())
         }
     }
@@ -382,13 +390,19 @@ class V2RayVpnService : VpnService() {
 
             mSubscription = Observable.interval(3, java.util.concurrent.TimeUnit.SECONDS)
                     .subscribe {
-                        val uplink = v2rayPoint.queryStats("socks", "uplink")
-                        val downlink = v2rayPoint.queryStats("socks", "downlink")
-                        val zero_speed = (uplink == 0L && downlink == 0L)
+                        val proxyUplink = v2rayPoint.queryStats("proxy", "uplink")
+                        val proxyDownlink = v2rayPoint.queryStats("proxy", "downlink")
+                        val directUplink = v2rayPoint.queryStats("direct", "uplink")
+                        val directDownlink = v2rayPoint.queryStats("direct", "downlink")
+                        val zero_speed = (proxyUplink == 0L && proxyDownlink == 0L && directUplink == 0L && directDownlink == 0L)
                         val queryTime = System.currentTimeMillis()
                         if (!zero_speed || !last_zero_speed) {
-                            updateNotification("${cf_name}  •  ${(uplink * 1000 / (queryTime - lastQueryTime)).toSpeedString()}↑" +
-                                    "  ${(downlink * 1000 / (queryTime - lastQueryTime)).toSpeedString()}↓")
+                            val sinceLastQueryInSeconds = (queryTime - lastQueryTime) / 1000.0
+                            updateNotification("proxy\t•  ${(proxyUplink / sinceLastQueryInSeconds).toLong().toSpeedString()}↑  " +
+                                    "${(proxyDownlink / sinceLastQueryInSeconds).toLong().toSpeedString()}↓\n" +
+                                    "direct\t•  ${(directUplink / sinceLastQueryInSeconds).toLong().toSpeedString()}↑  " +
+                                    "${(directDownlink / sinceLastQueryInSeconds).toLong().toSpeedString()}↓",
+                                    proxyDownlink + proxyUplink, directDownlink + directUplink)
                         }
                         last_zero_speed = zero_speed
                         lastQueryTime = queryTime
@@ -403,7 +417,7 @@ class V2RayVpnService : VpnService() {
             mSubscription = null
 
             val cf_name = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
-            updateNotification(cf_name)
+            updateNotification(cf_name, 0, 0)
         }
     }
 

@@ -84,7 +84,8 @@
     <string name="summary_pref_mux_enabled">Enable maybe speed up network and switch network maybe flash</string>
 
     <string name="title_pref_speed_enabled">Enable speed display</string>
-    <string name="summary_pref_speed_enabled">Display current speed in the notification</string>
+    <string name="summary_pref_speed_enabled">Display current speed in the notification.\nNotification icon would change based on
+        usage.</string>
 
     <string name="title_pref_sniffing_enabled">Enable Sniffing</string>
     <string name="summary_pref_sniffing_enabled">Sniffing</string>

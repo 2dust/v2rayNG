@@ -119,7 +119,7 @@ func (v V2RayPoint) QueryStats(tag string, direct string) int64 {
 	if v.statsManager == nil {
 		return 0
 	}
-	counter := v.statsManager.GetCounter(fmt.Sprintf("inbound>>>%s>>>traffic>>>%s", tag, direct))
+	counter := v.statsManager.GetCounter(fmt.Sprintf("outbound>>>%s>>>traffic>>>%s", tag, direct))
 	if counter == nil {
 		return 0
 	}
