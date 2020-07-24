@@ -393,7 +393,7 @@ object AngConfigManager {
             val vmess = AngConfig.VmessBean()
             vmess.address = uri.host
             vmess.port = uri.port
-            vmess.guid = uuid
+            vmess.id = uuid
             vmess.alterId = alterId.toInt()
             vmess.streamSecurity = if (tls) "tls" else ""
             vmess.remarks = uri.fragment
@@ -423,7 +423,7 @@ object AngConfigManager {
                 }
                 "quic" -> {
                     vmess.network = "quic"
-                    vmess.security = queryParam["security"] ?: "none"
+                    vmess.requestHost = queryParam["security"] ?: "none"
                     vmess.headerType = queryParam["type"] ?: "none"
                     vmess.path = queryParam["key"] ?: ""
                 }
