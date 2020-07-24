@@ -397,6 +397,7 @@ object AngConfigManager {
             vmess.alterId = alterId.toInt()
             vmess.streamSecurity = if (tls) "tls" else ""
             vmess.remarks = uri.fragment
+            vmess.security = "auto"
 
             // TODO: allowInsecure not supported
 
