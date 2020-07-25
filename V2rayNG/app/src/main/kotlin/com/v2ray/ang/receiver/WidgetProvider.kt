@@ -3,14 +3,13 @@ package com.v2ray.ang.receiver
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.widget.RemoteViews
 import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.util.Utils
-import org.jetbrains.anko.toast
 
 class WidgetProvider : AppWidgetProvider() {
     /**
@@ -19,10 +18,21 @@ class WidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
 
+        val isRunning = Utils.isServiceRun(context, "com.v2ray.ang.service.V2RayVpnService")
+        updateWidgetBackground(context, appWidgetManager, appWidgetIds, isRunning)
+    }
+
+    private fun updateWidgetBackground(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, isRunning: Boolean) {
         val remoteViews = RemoteViews(context.packageName, R.layout.widget_switch)
-        val intent = Intent(AppConfig.BROADCAST_ACTION_WIDGET_CLICK)
+        val intent = Intent(context, WidgetProvider::class.java)
+        intent.setAction(AppConfig.BROADCAST_ACTION_WIDGET_CLICK)
         val pendingIntent = PendingIntent.getBroadcast(context, R.id.layout_switch, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         remoteViews.setOnClickPendingIntent(R.id.layout_switch, pendingIntent)
+        if (isRunning) {
+            remoteViews.setInt(R.id.layout_switch, "setBackgroundResource", R.drawable.ic_rounded_corner_theme);
+        } else {
+            remoteViews.setInt(R.id.layout_switch, "setBackgroundResource", R.drawable.ic_rounded_corner_grey);
+        }
 
         for (appWidgetId in appWidgetIds) {
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
@@ -44,7 +54,9 @@ class WidgetProvider : AppWidgetProvider() {
 //                context.toast(R.string.toast_services_start)
                 Utils.startVService(context)
             }
+            val manager = AppWidgetManager.getInstance(context)
+            updateWidgetBackground(context, manager, manager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java)),
+                    !isRunning);
         }
     }
-
 }
