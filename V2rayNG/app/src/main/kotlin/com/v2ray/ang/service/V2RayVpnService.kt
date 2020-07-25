@@ -131,6 +131,7 @@ class V2RayVpnService : VpnService() {
         // Configure a builder while parsing the parameters.
         val builder = Builder()
         val enableLocalDns = defaultDPreference.getPrefBoolean(SettingsActivity.PREF_LOCAL_DNS_ENABLED, false)
+        val routingMode = defaultDPreference.getPrefString(SettingsActivity.PREF_ROUTING_MODE, "0")
 
         parameters.split(" ")
                 .map { it.split(",") }
@@ -139,7 +140,20 @@ class V2RayVpnService : VpnService() {
                         'm' -> builder.setMtu(java.lang.Short.parseShort(it[1]).toInt())
                         's' -> builder.addSearchDomain(it[1])
                         'a' -> builder.addAddress(it[1], Integer.parseInt(it[2]))
-                        'r' -> builder.addRoute(it[1], Integer.parseInt(it[2]))
+                        'r' -> {
+                            if (routingMode == "1" || routingMode == "3") {
+                                if (it[1] == "::") { //not very elegant, should move Vpn setting in Kotlin, simplify go code
+                                    builder.addRoute("2000::", 3)
+                                } else {
+                                    resources.getStringArray(R.array.bypass_private_ip_address).forEach {
+                                        val addr = it.split('/')
+                                        builder.addRoute(addr[0], addr[1].toInt())
+                                    }
+                                }
+                            } else {
+                                builder.addRoute(it[1], Integer.parseInt(it[2]))
+                            }
+                        }
                         'd' -> builder.addDnsServer(it[1])
                     }
                 }
