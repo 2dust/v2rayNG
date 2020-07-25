@@ -137,7 +137,7 @@ object AngConfigManager {
             } else if (index == toPosition) {
                 angConfig.index = fromPosition
             }
-            storeConfigFile()
+            //storeConfigFile()
         } catch (e: Exception) {
             e.printStackTrace()
             return -1

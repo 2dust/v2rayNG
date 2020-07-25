@@ -265,4 +265,8 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
         updateSelectedItem(if (fromPosition < toPosition) fromPosition else toPosition)
         return true
     }
+
+    override fun onItemMoveCompleted() {
+        AngConfigManager.storeConfigFile()
+    }
 }
