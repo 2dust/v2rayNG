@@ -794,7 +794,7 @@ object AngConfigManager {
                 return 0
             }
             val removedSelectedServer =
-                    if (!TextUtils.isEmpty(subid) && configs.vmess[configs.index].subid.equals(subid))
+                    if (!TextUtils.isEmpty(subid) && configs.vmess.count() > 0 && configs.vmess[configs.index].subid.equals(subid))
                         configs.vmess[configs.index]
                     else
                         null
