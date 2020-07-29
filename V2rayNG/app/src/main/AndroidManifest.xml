@@ -76,7 +76,11 @@
 
         <activity android:name=".ui.SubEditActivity" />
         <activity android:name=".ui.ScScannerActivity" />
-        <activity android:name=".ui.ScSwitchActivity" />
+        <activity 
+            android:name=".ui.ScSwitchActivity"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:process=":RunSoLibV2RayDaemon"/>
 
         <service
             android:name=".service.V2RayVpnService"
