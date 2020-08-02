@@ -384,6 +384,7 @@ class V2RayVpnService : VpnService() {
                 mBuilder?.setSmallIcon(R.drawable.ic_stat_direct)
             }
             mBuilder?.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+            mBuilder?.setContentText(contentText) // Emui4.1 need content text even if style is set as BigTextStyle
             getNotificationManager().notify(NOTIFICATION_ID, mBuilder?.build())
         }
     }
