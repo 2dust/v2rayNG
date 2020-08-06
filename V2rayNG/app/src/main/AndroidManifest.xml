@@ -76,7 +76,10 @@
 
         <activity android:name=".ui.SubEditActivity" />
         <activity android:name=".ui.ScScannerActivity" />
-        <activity android:name=".ui.ScSwitchActivity" />
+        <activity
+            android:name=".ui.ScSwitchActivity"
+            android:excludeFromRecents="true"
+            android:theme="@style/AppTheme.NoActionBar.Translucent" />
 
         <service
             android:name=".service.V2RayVpnService"
