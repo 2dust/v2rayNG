@@ -20,34 +20,17 @@ android {
         versionName "1.0.2"
     }
 
-    signingConfigs {
-        release {
-            storeFile file("../key.jks")
-            keyAlias 'ang'
-            keyPassword '123456'
-            storePassword '123456'
-        }
-        debug {
-            storeFile file("../key.jks")
-            keyAlias 'ang'
-            keyPassword '123456'
-            storePassword '123456'
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false
             zipAlignEnabled false
             shrinkResources false
-            signingConfig signingConfigs.release
 //            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
             minifyEnabled false
             zipAlignEnabled false
             shrinkResources false
-            signingConfig signingConfigs.release
         }
     }
 
