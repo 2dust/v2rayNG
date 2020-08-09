@@ -16,7 +16,7 @@ object AppManagerUtil {
         val apps = ArrayList<AppInfo>()
 
         for (pkg in packages) {
-            if (!pkg.hasInternetPermission) continue
+            if (!pkg.hasInternetPermission && pkg.packageName != "android") continue
 
             val applicationInfo = pkg.applicationInfo
 
