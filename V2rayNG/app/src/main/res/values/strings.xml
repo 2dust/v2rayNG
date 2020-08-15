@@ -41,7 +41,7 @@
     <string name="server_lab_network">network</string>
     <string name="server_lab_more_function">more function</string>
     <string name="server_lab_head_type">head type</string>
-    <string name="server_lab_request_host">request host(host/ws host/h2 host)/QUIC securty</string>
+    <string name="server_lab_request_host">request host(host/ws host/h2 host)/QUIC security</string>
     <string name="server_lab_path">path(ws path/h2 path)/QUIC key</string>
     <string name="server_lab_stream_security">tls</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
