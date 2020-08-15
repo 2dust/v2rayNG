@@ -9,10 +9,12 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AngConfig
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.V2rayConfigUtil
 import kotlinx.android.synthetic.main.item_qrcode.view.*
 import kotlinx.android.synthetic.main.item_recycler_main.view.*
 import org.jetbrains.anko.*
@@ -67,31 +69,40 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 holder.subid.text = "S"
             }
 
+            var shareOptions = share_method.asList()
             if (configType == EConfigType.CUSTOM) {
                 holder.type.text = mActivity.getString(R.string.server_customize_config)
-                holder.statistics.text = ""//mActivity.getString(R.string.server_customize_config)
-                holder.layout_share.visibility = View.INVISIBLE
+                val serverOutbound = V2rayConfigUtil.getCustomConfigServerOutbound(mActivity.applicationContext, configs.vmess[position].guid)
+                if (serverOutbound == null) {
+                    holder.statistics.text = ""
+                } else {
+                    holder.statistics.text = "${serverOutbound.getServerAddress()} : ${serverOutbound.getServerPort()}"
+                }
+                shareOptions = shareOptions.takeLast(1)
             } else {
                 holder.type.text = configType?.name?.toLowerCase()
                 holder.statistics.text = "$address : $port"
-                holder.layout_share.visibility = View.VISIBLE
             }
 
             holder.layout_share.setOnClickListener {
-                mActivity.selector(null, share_method.asList()) { dialogInterface, i ->
+                mActivity.selector(null, shareOptions) { dialogInterface, i ->
                     try {
                         when (i) {
                             0 -> {
-                                val iv = mActivity.layoutInflater.inflate(R.layout.item_qrcode, null)
-                                iv.iv_qcode.setImageBitmap(AngConfigManager.share2QRCode(position))
+                                if (configType == EConfigType.CUSTOM) {
+                                    shareFullContent(position)
+                                } else {
+                                    val iv = mActivity.layoutInflater.inflate(R.layout.item_qrcode, null)
+                                    iv.iv_qcode.setImageBitmap(AngConfigManager.share2QRCode(position))
 
-                                mActivity.alert {
-                                    customView {
-                                        linearLayout {
-                                            addView(iv)
+                                    mActivity.alert {
+                                        customView {
+                                            linearLayout {
+                                                addView(iv)
+                                            }
                                         }
-                                    }
-                                }.show()
+                                    }.show()
+                                }
                             }
                             1 -> {
                                 if (AngConfigManager.share2Clipboard(position) == 0) {
@@ -100,15 +111,8 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                                     mActivity.toast(R.string.toast_failure)
                                 }
                             }
-                            2 -> {
-                                if (AngConfigManager.shareFullContent2Clipboard(position) == 0) {
-                                    mActivity.toast(R.string.toast_success)
-                                } else {
-                                    mActivity.toast(R.string.toast_failure)
-                                }
-                            }
-                            else ->
-                                mActivity.toast("else")
+                            2 -> shareFullContent(position)
+                            else -> mActivity.toast("else")
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -165,6 +169,14 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                     Utils.openUri(mActivity, AppConfig.promotionUrl)
                 }
             }
+        }
+    }
+
+    private fun shareFullContent(position: Int) {
+        if (AngConfigManager.shareFullContent2Clipboard(position) == 0) {
+            mActivity.toast(R.string.toast_success)
+        } else {
+            mActivity.toast(R.string.toast_failure)
         }
     }
 

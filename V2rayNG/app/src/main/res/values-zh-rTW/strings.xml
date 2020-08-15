@@ -138,7 +138,7 @@
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">複製</string>
     <string name="logcat_delete">刪除</string>
-    <string name="title_export_all">匯出全部配置至剪貼簿</string>
+    <string name="title_export_all">匯出全部(非自訂)配置至剪貼簿</string>
     <string name="title_sub_setting">訂閱設定</string>
     <string name="sub_setting_remarks">備註</string>
     <string name="sub_setting_url">位址(url)</string>
