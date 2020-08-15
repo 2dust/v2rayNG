@@ -27,6 +27,7 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
+import com.v2ray.ang.dto.EConfigType
 //import com.v2ray.ang.InappBuyActivity
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
@@ -252,7 +253,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 adapter.updateConfigList()
             }
             for (k in 0 until configs.vmess.count()) {
-                if (configs.vmess[k].configType != AppConfig.EConfigType.Custom) {
+                if (configs.vmess[k].configType != EConfigType.CUSTOM.value) {
                     testingJobs.add(GlobalScope.launch(Dispatchers.IO) {
                         configs.vmess[k].testResult = Utils.tcping(configs.vmess[k].address, configs.vmess[k].port)
                         val myJob = coroutineContext[Job]

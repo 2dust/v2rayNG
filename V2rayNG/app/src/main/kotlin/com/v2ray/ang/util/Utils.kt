@@ -14,36 +14,25 @@ import kotlin.collections.HashMap
 import android.app.ActivityManager
 import android.content.ClipData
 import android.content.Intent
-import android.content.res.AssetManager
 import android.net.Uri
 import android.os.SystemClock
 import android.text.TextUtils
-import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.util.Patterns
-import android.view.View
 import android.webkit.URLUtil
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.responseLength
 import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.service.V2RayVpnService
 import com.v2ray.ang.ui.SettingsActivity
-import kotlinx.android.synthetic.main.activity_logcat.*
 import kotlinx.coroutines.isActive
 import me.dozen.dpreference.DPreference
 import org.jetbrains.anko.toast
-import org.jetbrains.anko.uiThread
-import java.io.BufferedReader
-import java.io.File
 import java.io.IOException
-import java.io.InputStreamReader
 import java.net.*
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-import java.math.BigInteger
-import java.util.concurrent.TimeUnit
 import libv2ray.Libv2ray
 import kotlin.coroutines.coroutineContext
 
@@ -324,7 +313,7 @@ object Utils {
         if (AngConfigManager.genStoreV2rayConfig(-1)) {
             val configContent = AngConfigManager.currGeneratedV2rayConfig()
             val configType = AngConfigManager.currConfigType()
-            if (configType == AppConfig.EConfigType.Custom) {
+            if (configType == EConfigType.CUSTOM) {
                 try {
                     Libv2ray.testConfig(configContent)
                 } catch (e: Exception) {

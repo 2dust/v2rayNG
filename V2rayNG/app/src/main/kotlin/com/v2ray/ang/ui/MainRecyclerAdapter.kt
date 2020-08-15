@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AngConfig
+import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
 import com.v2ray.ang.util.AngConfigManager
@@ -18,7 +19,6 @@ import org.jetbrains.anko.*
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
-import com.v2ray.ang.extension.defaultDPreference
 
 class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<MainRecyclerAdapter.BaseViewHolder>()
         , ItemTouchHelperAdapter {
@@ -49,7 +49,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         if (holder is MainViewHolder) {
-            val configType = configs.vmess[position].configType
+            val configType = EConfigType.fromInt(configs.vmess[position].configType)
             val remarks = configs.vmess[position].remarks
             val subid = configs.vmess[position].subid
             val address = configs.vmess[position].address
@@ -67,20 +67,12 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 holder.subid.text = "S"
             }
 
-            if (configType == AppConfig.EConfigType.Vmess) {
-                holder.type.text = "vmess"
-                holder.statistics.text = "$address : $port"
-                holder.layout_share.visibility = View.VISIBLE
-            } else if (configType == AppConfig.EConfigType.Custom) {
+            if (configType == EConfigType.CUSTOM) {
                 holder.type.text = mActivity.getString(R.string.server_customize_config)
                 holder.statistics.text = ""//mActivity.getString(R.string.server_customize_config)
                 holder.layout_share.visibility = View.INVISIBLE
-            } else if (configType == AppConfig.EConfigType.Shadowsocks) {
-                holder.type.text = "shadowsocks"
-                holder.statistics.text = "$address : $port"
-                holder.layout_share.visibility = View.VISIBLE
-            } else if (configType == AppConfig.EConfigType.Socks) {
-                holder.type.text = "socks"
+            } else {
+                holder.type.text = configType?.name?.toLowerCase()
                 holder.statistics.text = "$address : $port"
                 holder.layout_share.visibility = View.VISIBLE
             }
@@ -125,13 +117,13 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             }
 
             holder.layout_edit.setOnClickListener {
-                if (configType == AppConfig.EConfigType.Vmess) {
+                if (configType == EConfigType.VMESS) {
                     mActivity.startActivity<ServerActivity>("position" to position, "isRunning" to !changeable)
-                } else if (configType == AppConfig.EConfigType.Custom) {
+                } else if (configType == EConfigType.CUSTOM) {
                     mActivity.startActivity<Server2Activity>("position" to position, "isRunning" to !changeable)
-                } else if (configType == AppConfig.EConfigType.Shadowsocks) {
+                } else if (configType == EConfigType.SHADOWSOCKS) {
                     mActivity.startActivity<Server3Activity>("position" to position, "isRunning" to !changeable)
-                } else if (configType == AppConfig.EConfigType.Socks) {
+                } else if (configType == EConfigType.SOCKS) {
                     mActivity.startActivity<Server4Activity>("position" to position, "isRunning" to !changeable)
                 }
             }

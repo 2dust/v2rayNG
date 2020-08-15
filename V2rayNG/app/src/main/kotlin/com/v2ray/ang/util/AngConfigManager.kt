@@ -14,6 +14,7 @@ import com.v2ray.ang.AppConfig.SS_PROTOCOL
 import com.v2ray.ang.AppConfig.VMESS_PROTOCOL
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AngConfig
+import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.VmessQRCode
 import java.net.URI
 import java.net.URLDecoder
@@ -65,7 +66,7 @@ object AngConfigManager {
     fun addServer(vmess: AngConfig.VmessBean, index: Int): Int {
         try {
             vmess.configVersion = 2
-            vmess.configType = AppConfig.EConfigType.Vmess
+            vmess.configType = EConfigType.VMESS.value
 
             if (index >= 0) {
                 //edit
@@ -208,14 +209,14 @@ object AngConfigManager {
         return app.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
     }
 
-    fun currConfigType(): Int {
+    fun currConfigType(): EConfigType? {
         if (angConfig.index < 0
                 || angConfig.vmess.count() <= 0
                 || angConfig.index > angConfig.vmess.count() - 1
         ) {
-            return -1
+            return null
         }
-        return angConfig.vmess[angConfig.index].configType
+        return EConfigType.fromInt(angConfig.vmess[angConfig.index].configType)
     }
 
     fun currConfigName(): String {
@@ -275,7 +276,7 @@ object AngConfigManager {
                         return R.string.toast_incorrect_protocol
                     }
 
-                    vmess.configType = AppConfig.EConfigType.Vmess
+                    vmess.configType = EConfigType.VMESS.value
                     vmess.security = "auto"
                     vmess.network = "tcp"
                     vmess.headerType = "none"
@@ -478,7 +479,7 @@ object AngConfigManager {
             }
 
             val vmess = angConfig.vmess[index]
-            if (angConfig.vmess[index].configType == AppConfig.EConfigType.Vmess) {
+            if (angConfig.vmess[index].configType == EConfigType.VMESS.value) {
 
                 val vmessQRCode = VmessQRCode()
                 vmessQRCode.v = vmess.configVersion.toString()
@@ -496,7 +497,7 @@ object AngConfigManager {
                 val conf = VMESS_PROTOCOL + Utils.encode(json)
 
                 return conf
-            } else if (angConfig.vmess[index].configType == AppConfig.EConfigType.Shadowsocks) {
+            } else if (angConfig.vmess[index].configType == EConfigType.SHADOWSOCKS.value) {
                 val remark = "#" + Utils.urlEncode(vmess.remarks)
                 val url = String.format("%s:%s@%s:%s",
                         vmess.security,
@@ -504,7 +505,7 @@ object AngConfigManager {
                         vmess.address,
                         vmess.port)
                 return SS_PROTOCOL + Utils.encode(url) + remark
-            } else if (angConfig.vmess[index].configType == AppConfig.EConfigType.Socks) {
+            } else if (angConfig.vmess[index].configType == EConfigType.SOCKS.value) {
                 val remark = "#" + Utils.urlEncode(vmess.remarks)
                 val url = String.format("%s:%s",
                         vmess.address,
@@ -613,7 +614,7 @@ object AngConfigManager {
             //add
             val vmess = AngConfig.VmessBean()
             vmess.configVersion = 2
-            vmess.configType = AppConfig.EConfigType.Custom
+            vmess.configType = EConfigType.CUSTOM.value
             vmess.guid = guid
             vmess.remarks = vmess.guid
 
@@ -716,7 +717,7 @@ object AngConfigManager {
     fun addCustomServer(vmess: AngConfig.VmessBean, index: Int): Int {
         try {
             vmess.configVersion = 2
-            vmess.configType = AppConfig.EConfigType.Custom
+            vmess.configType = EConfigType.CUSTOM.value
 
             if (index >= 0) {
                 //edit
@@ -741,7 +742,7 @@ object AngConfigManager {
     fun addShadowsocksServer(vmess: AngConfig.VmessBean, index: Int): Int {
         try {
             vmess.configVersion = 2
-            vmess.configType = AppConfig.EConfigType.Shadowsocks
+            vmess.configType = EConfigType.SHADOWSOCKS.value
 
             if (index >= 0) {
                 //edit
@@ -766,7 +767,7 @@ object AngConfigManager {
     fun addSocksServer(vmess: AngConfig.VmessBean, index: Int): Int {
         try {
             vmess.configVersion = 2
-            vmess.configType = AppConfig.EConfigType.Socks
+            vmess.configType = EConfigType.SOCKS.value
 
             if (index >= 0) {
                 //edit
