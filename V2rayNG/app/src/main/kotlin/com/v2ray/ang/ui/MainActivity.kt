@@ -253,16 +253,22 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 adapter.updateConfigList()
             }
             for (k in 0 until configs.vmess.count()) {
-                if (configs.vmess[k].configType != EConfigType.CUSTOM.value) {
-                    testingJobs.add(GlobalScope.launch(Dispatchers.IO) {
-                        configs.vmess[k].testResult = Utils.tcping(configs.vmess[k].address, configs.vmess[k].port)
-                        val myJob = coroutineContext[Job]
-                        launch(Dispatchers.Main) {
-                            testingJobs.remove(myJob)
-                            adapter.updateSelectedItem(k)
-                        }
-                    })
+                var serverAddress = configs.vmess[k].address
+                var serverPort = configs.vmess[k].port
+                if (configs.vmess[k].configType == EConfigType.CUSTOM.value) {
+                    val serverOutbound = V2rayConfigUtil.getCustomConfigServerOutbound(applicationContext, configs.vmess[k].guid)
+                            ?: continue
+                    serverAddress = serverOutbound.getServerAddress() ?: continue
+                    serverPort = serverOutbound.getServerPort() ?: continue
                 }
+                testingJobs.add(GlobalScope.launch(Dispatchers.IO) {
+                    configs.vmess[k].testResult = Utils.tcping(serverAddress, serverPort)
+                    val myJob = coroutineContext[Job]
+                    launch(Dispatchers.Main) {
+                        testingJobs.remove(myJob)
+                        adapter.updateSelectedItem(k)
+                    }
+                })
             }
             true
         }

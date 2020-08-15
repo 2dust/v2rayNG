@@ -1,5 +1,6 @@
 package com.v2ray.ang.util
 
+import android.content.Context
 import android.text.TextUtils
 import android.util.Log
 import com.google.gson.Gson
@@ -15,6 +16,7 @@ import org.json.JSONObject
 import org.json.JSONArray
 import com.google.gson.JsonObject
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.extension.defaultDPreference
 
 object V2rayConfigUtil {
     private val requestObj: JsonObject by lazy {
@@ -58,6 +60,22 @@ object V2rayConfigUtil {
             e.printStackTrace()
             return result
         }
+    }
+
+    fun getCustomConfigServerOutbound(content: Context, guid: String): V2rayConfig.OutboundBean? {
+        val jsonConfig = content.defaultDPreference.getPrefString(AppConfig.ANG_CONFIG + guid, "")
+        if (TextUtils.isEmpty(jsonConfig)) {
+            return null
+        }
+        val v2rayConfig = Gson().fromJson(jsonConfig, V2rayConfig::class.java) ?: return null
+        for (outbound in v2rayConfig.outbounds) {
+            if (outbound.protocol.equals(EConfigType.VMESS.name.toLowerCase()) ||
+                    outbound.protocol.equals(EConfigType.SHADOWSOCKS.name.toLowerCase()) ||
+                    outbound.protocol.equals(EConfigType.SOCKS.name.toLowerCase())) {
+                return outbound
+            }
+        }
+        return null
     }
 
     /**
