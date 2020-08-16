@@ -108,6 +108,24 @@ data class V2rayConfig(
         }
 
         data class MuxBean(var enabled: Boolean)
+
+        fun getServerAddress(): String? {
+            if (protocol.equals(EConfigType.VMESS.name.toLowerCase())) {
+                return settings?.vnext?.get(0)?.address
+            } else if (protocol.equals(EConfigType.SHADOWSOCKS.name.toLowerCase()) || protocol.equals(EConfigType.SOCKS.name.toLowerCase())) {
+                return settings?.servers?.get(0)?.address
+            }
+            return null
+        }
+
+        fun getServerPort(): Int? {
+            if (protocol.equals(EConfigType.VMESS.name.toLowerCase())) {
+                return settings?.vnext?.get(0)?.port
+            } else if (protocol.equals(EConfigType.SHADOWSOCKS.name.toLowerCase()) || protocol.equals(EConfigType.SOCKS.name.toLowerCase())) {
+                return settings?.servers?.get(0)?.port
+            }
+            return null
+        }
     }
 
     //data class DnsBean(var servers: List<String>)
