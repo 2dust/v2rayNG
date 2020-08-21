@@ -262,11 +262,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     serverPort = serverOutbound.getServerPort() ?: continue
                 }
                 testingJobs.add(GlobalScope.launch(Dispatchers.IO) {
-                    configs.vmess[k].testResult = Utils.tcping(serverAddress, serverPort)
-                    val myJob = coroutineContext[Job]
-                    launch(Dispatchers.Main) {
-                        testingJobs.remove(myJob)
-                        adapter.updateSelectedItem(k)
+                    configs.vmess.getOrNull(k)?.let {  // check null in case array is modified during testing
+                        it.testResult = Utils.tcping(serverAddress, serverPort)
+                        val myJob = coroutineContext[Job]
+                        launch(Dispatchers.Main) {
+                            testingJobs.remove(myJob)
+                            adapter.updateSelectedItem(k)
+                        }
                     }
                 })
             }
