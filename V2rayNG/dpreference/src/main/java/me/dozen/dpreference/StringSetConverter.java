@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class StringSetConverter {
@@ -13,8 +14,8 @@ public class StringSetConverter {
         return gson.toJson(src);
     }
 
-    public static Set<String> decode(String json) {
-        Type setType = new TypeToken<Set<String>>() {
+    public static LinkedHashSet<String> decode(String json) {
+        Type setType = new TypeToken<LinkedHashSet<String>>() {
         }.getType();
         return gson.fromJson(json, setType);
     }
