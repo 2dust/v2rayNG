@@ -11,11 +11,14 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.*
-import android.net.VpnService
-import android.os.*
+import android.os.Build
+import android.os.ParcelFileDescriptor
+import android.os.StrictMode
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
+import android.util.Log
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.extension.toSpeedString
@@ -24,16 +27,14 @@ import com.v2ray.ang.ui.PerAppProxyActivity
 import com.v2ray.ang.ui.SettingsActivity
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
+import go.Seq
 import libv2ray.Libv2ray
 import libv2ray.V2RayVPNServiceSupportsSet
+import org.jetbrains.anko.doAsync
 import rx.Observable
 import rx.Subscription
 import java.io.File
 import java.lang.ref.SoftReference
-import android.os.Build
-import android.util.Log
-import go.Seq
-import org.jetbrains.anko.doAsync
 
 class V2RayVpnService : VpnService() {
     companion object {
@@ -400,24 +401,34 @@ class V2RayVpnService : VpnService() {
         if (mSubscription == null &&
                 v2rayPoint.isRunning &&
                 defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false)) {
-            val cf_name = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
             var last_zero_speed = false
+            val outboundTags = defaultDPreference.getPrefStringOrderedSet(AppConfig.PREF_CURR_CONFIG_OUTBOUND_TAGS, LinkedHashSet())
+            outboundTags.remove(TAG_DIRECT)
 
             mSubscription = Observable.interval(3, java.util.concurrent.TimeUnit.SECONDS)
                     .subscribe {
-                        val proxyUplink = v2rayPoint.queryStats("proxy", "uplink")
-                        val proxyDownlink = v2rayPoint.queryStats("proxy", "downlink")
-                        val directUplink = v2rayPoint.queryStats("direct", "uplink")
-                        val directDownlink = v2rayPoint.queryStats("direct", "downlink")
-                        val zero_speed = (proxyUplink == 0L && proxyDownlink == 0L && directUplink == 0L && directDownlink == 0L)
                         val queryTime = System.currentTimeMillis()
+                        val sinceLastQueryInSeconds = (queryTime - lastQueryTime) / 1000.0
+                        var proxyTotal = 0L
+                        val text = StringBuilder()
+                        outboundTags.forEach {
+                            val up = v2rayPoint.queryStats(it, "uplink")
+                            val down = v2rayPoint.queryStats(it, "downlink")
+                            if (up + down > 0) {
+                                appendSpeedString(text, it, up / sinceLastQueryInSeconds, down / sinceLastQueryInSeconds)
+                                proxyTotal += up + down
+                            }
+                        }
+                        val directUplink = v2rayPoint.queryStats(TAG_DIRECT, "uplink")
+                        val directDownlink = v2rayPoint.queryStats(TAG_DIRECT, "downlink")
+                        val zero_speed = (proxyTotal == 0L && directUplink == 0L && directDownlink == 0L)
                         if (!zero_speed || !last_zero_speed) {
-                            val sinceLastQueryInSeconds = (queryTime - lastQueryTime) / 1000.0
-                            updateNotification("proxy\t•  ${(proxyUplink / sinceLastQueryInSeconds).toLong().toSpeedString()}↑  " +
-                                    "${(proxyDownlink / sinceLastQueryInSeconds).toLong().toSpeedString()}↓\n" +
-                                    "direct\t•  ${(directUplink / sinceLastQueryInSeconds).toLong().toSpeedString()}↑  " +
-                                    "${(directDownlink / sinceLastQueryInSeconds).toLong().toSpeedString()}↓",
-                                    proxyDownlink + proxyUplink, directDownlink + directUplink)
+                            if (proxyTotal == 0L) {
+                                appendSpeedString(text, outboundTags.firstOrNull(), 0.0, 0.0)
+                            }
+                            appendSpeedString(text, TAG_DIRECT, directUplink / sinceLastQueryInSeconds,
+                                    directDownlink / sinceLastQueryInSeconds)
+                            updateNotification(text.toString(), proxyTotal, directDownlink + directUplink)
                         }
                         last_zero_speed = zero_speed
                         lastQueryTime = queryTime
@@ -425,6 +436,15 @@ class V2RayVpnService : VpnService() {
         }
     }
 
+    private fun appendSpeedString(text: StringBuilder, name: String?, up: Double, down: Double) {
+        var n = name ?: "no tag"
+        n = n.substring(0, Math.min(n.length, 6))
+        text.append(n)
+        for (i in n.length..6 step 2) {
+            text.append("\t")
+        }
+        text.append("•  ${up.toLong().toSpeedString()}↑  ${down.toLong().toSpeedString()}↓\n")
+    }
 
     fun stopSpeedNotification() {
         if (mSubscription != null) {
