@@ -119,10 +119,10 @@ class ScannerActivity : BaseActivity(), ZXingScannerView.ResultHandler {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
-            REQUEST_FILE_CHOOSER ->
-                if (resultCode == RESULT_OK) {
+            REQUEST_FILE_CHOOSER -> {
+                val uri = data?.data
+                if (resultCode == RESULT_OK && uri != null) {
                     try {
-                        val uri = data!!.data
                         val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
                         val text = QRCodeDecoder.syncDecodeQRCode(bitmap)
                         finished(text)
@@ -131,6 +131,7 @@ class ScannerActivity : BaseActivity(), ZXingScannerView.ResultHandler {
                         toast(e.message.toString())
                     }
                 }
+            }
         }
     }
 }

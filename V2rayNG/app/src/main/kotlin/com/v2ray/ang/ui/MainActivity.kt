@@ -165,8 +165,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     importBatchConfig(data?.getStringExtra("SCAN_RESULT"))
                 }
             REQUEST_FILE_CHOOSER -> {
-                if (resultCode == RESULT_OK) {
-                    val uri = data!!.data
+                val uri = data?.data
+                if (resultCode == RESULT_OK && uri != null) {
                     readContentFromUri(uri)
                 }
             }
@@ -460,9 +460,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .subscribe {
                     if (it) {
                         try {
-                            val inputStream = contentResolver.openInputStream(uri)
-                            val configText = inputStream.bufferedReader().readText()
-                            importCustomizeConfig(configText)
+                            contentResolver.openInputStream(uri).use {
+                                val configText = it?.bufferedReader()?.readText()
+                                importCustomizeConfig(configText)
+                            }
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
