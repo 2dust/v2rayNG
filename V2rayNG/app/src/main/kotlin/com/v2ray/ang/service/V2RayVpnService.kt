@@ -76,6 +76,7 @@ class V2RayVpnService : VpnService() {
         NetworkRequest.Builder()
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
                 .build()
     }
 
@@ -549,4 +550,3 @@ class V2RayVpnService : VpnService() {
         }
     }
 }
-
