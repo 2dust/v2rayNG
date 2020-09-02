@@ -76,7 +76,6 @@ class V2RayVpnService : VpnService() {
         NetworkRequest.Builder()
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
                 .build()
     }
 
@@ -196,6 +195,10 @@ class V2RayVpnService : VpnService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
             listeningForDefaultNetwork = true
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            builder.setMetered(false)
         }
 
         // Create a new interface using the builder and save the parameters.
