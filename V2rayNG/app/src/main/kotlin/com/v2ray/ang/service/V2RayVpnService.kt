@@ -1,67 +1,27 @@
 package com.v2ray.ang.service
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.BroadcastReceiver
+import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.net.*
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.StrictMode
 import android.support.annotation.RequiresApi
-import android.support.v4.app.NotificationCompat
 import android.util.Log
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
-import com.v2ray.ang.extension.toSpeedString
-import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.ui.PerAppProxyActivity
 import com.v2ray.ang.ui.SettingsActivity
-import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
-import go.Seq
-import libv2ray.Libv2ray
-import libv2ray.V2RayVPNServiceSupportsSet
 import org.jetbrains.anko.doAsync
-import rx.Observable
-import rx.Subscription
 import java.io.File
 import java.lang.ref.SoftReference
 
-class V2RayVpnService : VpnService() {
-    companion object {
-        const val NOTIFICATION_ID = 1
-        const val NOTIFICATION_PENDING_INTENT_CONTENT = 0
-        const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 1
-        const val NOTIFICATION_ICON_THRESHOLD = 3000
-
-        fun startV2Ray(context: Context) {
-            val intent = Intent(context.applicationContext, V2RayVpnService::class.java)
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
-            }
-        }
-    }
-
-    private val v2rayPoint = Libv2ray.newV2RayPoint(V2RayCallback())
-    private var lastQueryTime = 0L
-    private lateinit var configContent: String
+class V2RayVpnService : VpnService(), ServiceControl {
     private lateinit var mInterface: ParcelFileDescriptor
-    val fd: Int get() = mInterface.fd
-    private var mBuilder: NotificationCompat.Builder? = null
-    private var mSubscription: Subscription? = null
-    private var mNotificationManager: NotificationManager? = null
-
 
     /**
         * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
@@ -103,9 +63,7 @@ class V2RayVpnService : VpnService() {
 
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
-        v2rayPoint.packageName = Utils.packagePath(applicationContext)
-        v2rayPoint.packageCodePath = applicationContext.applicationInfo.nativeLibraryDir + "/"
-        Seq.setContext(applicationContext)
+        V2RayServiceManager.serviceControl = SoftReference(this)
     }
 
     override fun onRevoke() {
@@ -119,7 +77,7 @@ class V2RayVpnService : VpnService() {
 
     override fun onDestroy() {
         super.onDestroy()
-        cancelNotification()
+        V2RayServiceManager.cancelNotification()
     }
 
     fun setup(parameters: String) {
@@ -200,12 +158,6 @@ class V2RayVpnService : VpnService() {
         // Create a new interface using the builder and save the parameters.
         mInterface = builder.establish()
         sendFd()
-        lastQueryTime = System.currentTimeMillis()
-        startSpeedNotification()
-    }
-
-    fun shutdown() {
-        stopV2Ray(true)
     }
 
     fun sendFd() {
@@ -232,44 +184,9 @@ class V2RayVpnService : VpnService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startV2ray()
+        V2RayServiceManager.startV2rayPoint()
         return START_STICKY
         //return super.onStartCommand(intent, flags, startId)
-    }
-
-    private fun startV2ray() {
-        if (!v2rayPoint.isRunning) {
-
-            try {
-                val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
-                mFilter.addAction(Intent.ACTION_SCREEN_ON)
-                mFilter.addAction(Intent.ACTION_SCREEN_OFF)
-                mFilter.addAction(Intent.ACTION_USER_PRESENT)
-                registerReceiver(mMsgReceive, mFilter)
-            } catch (e: Exception) {
-            }
-
-            configContent = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
-            v2rayPoint.configureFileContent = configContent
-            v2rayPoint.enableLocalDNS = defaultDPreference.getPrefBoolean(SettingsActivity.PREF_LOCAL_DNS_ENABLED, false)
-            v2rayPoint.forwardIpv6 = defaultDPreference.getPrefBoolean(SettingsActivity.PREF_FORWARD_IPV6, false)
-            v2rayPoint.domainName = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_DOMAIN, "")
-
-            try {
-                v2rayPoint.runLoop()
-            } catch (e: Exception) {
-                Log.d(packageName, e.toString())
-            }
-
-            if (v2rayPoint.isRunning) {
-                MessageUtil.sendMsg2UI(this, AppConfig.MSG_STATE_START_SUCCESS, "")
-                showNotification()
-            } else {
-                MessageUtil.sendMsg2UI(this, AppConfig.MSG_STATE_START_FAILURE, "")
-                cancelNotification()
-            }
-        }
-        //        showNotification()
     }
 
     private fun stopV2Ray(isForced: Boolean = true) {
@@ -283,23 +200,10 @@ class V2RayVpnService : VpnService() {
                 listeningForDefaultNetwork = false
             }
         }
-        if (v2rayPoint.isRunning) {
-            try {
-                v2rayPoint.stopLoop()
-            } catch (e: Exception) {
-                Log.d(packageName, e.toString())
-            }
-        }
 
-        MessageUtil.sendMsg2UI(this, AppConfig.MSG_STATE_STOP_SUCCESS, "")
-        cancelNotification()
+        V2RayServiceManager.stopV2rayPoint()
 
         if (isForced) {
-            try {
-                unregisterReceiver(mMsgReceive)
-            } catch (e: Exception) {
-            }
-
             //stopSelf has to be called ahead of mInterface.close(). otherwise v2ray core cannot be stooped
             //It's strage but true.
             //This can be verified by putting stopself() behind and call stopLoop and startLoop
@@ -315,238 +219,24 @@ class V2RayVpnService : VpnService() {
         }
     }
 
-    private fun showNotification() {
-        val startMainIntent = Intent(applicationContext, MainActivity::class.java)
-        val contentPendingIntent = PendingIntent.getActivity(applicationContext,
-                NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val stopV2RayIntent = Intent(AppConfig.BROADCAST_ACTION_SERVICE)
-        stopV2RayIntent.`package` = AppConfig.ANG_PACKAGE
-        stopV2RayIntent.putExtra("key", AppConfig.MSG_STATE_STOP)
-
-        val stopV2RayPendingIntent = PendingIntent.getBroadcast(applicationContext,
-                NOTIFICATION_PENDING_INTENT_STOP_V2RAY, stopV2RayIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val channelId =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    createNotificationChannel()
-                } else {
-                    // If earlier version channel ID is not used
-                    // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
-                    ""
-                }
-
-        mBuilder = NotificationCompat.Builder(applicationContext, channelId)
-                .setSmallIcon(R.drawable.ic_v)
-                .setContentTitle(defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, ""))
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setOngoing(true)
-                .setShowWhen(false)
-                .setOnlyAlertOnce(true)
-                .setContentIntent(contentPendingIntent)
-                .addAction(R.drawable.ic_close_grey_800_24dp,
-                        getString(R.string.notification_action_stop_v2ray),
-                        stopV2RayPendingIntent)
-        //.build()
-
-        //mBuilder?.setDefaults(NotificationCompat.FLAG_ONLY_ALERT_ONCE)  //取消震动,铃声其他都不好使
-
-        startForeground(NOTIFICATION_ID, mBuilder?.build())
+    override fun getService(): Service {
+        return this
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(): String {
-        val channelId = "RAY_NG_M_CH_ID"
-        val channelName = "V2rayNG Background Service"
-        val chan = NotificationChannel(channelId,
-                channelName, NotificationManager.IMPORTANCE_HIGH)
-        chan.lightColor = Color.DKGRAY
-        chan.importance = NotificationManager.IMPORTANCE_NONE
-        chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-        getNotificationManager().createNotificationChannel(chan)
-        return channelId
+    override fun startService(parameters: String) {
+        setup(parameters)
     }
 
-    private fun cancelNotification() {
-        stopForeground(true)
-        mBuilder = null
-        mSubscription?.unsubscribe()
-        mSubscription = null
+    override fun stopService() {
+        stopV2Ray(true)
     }
 
-    private fun updateNotification(contentText: String, proxyTraffic: Long, directTraffic: Long) {
-        if (mBuilder != null) {
-            if (proxyTraffic < NOTIFICATION_ICON_THRESHOLD && directTraffic < NOTIFICATION_ICON_THRESHOLD) {
-                mBuilder?.setSmallIcon(R.drawable.ic_v)
-            } else if (proxyTraffic > directTraffic) {
-                mBuilder?.setSmallIcon(R.drawable.ic_stat_proxy)
-            } else {
-                mBuilder?.setSmallIcon(R.drawable.ic_stat_direct)
-            }
-            mBuilder?.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-            mBuilder?.setContentText(contentText) // Emui4.1 need content text even if style is set as BigTextStyle
-            getNotificationManager().notify(NOTIFICATION_ID, mBuilder?.build())
-        }
+    override fun vpnProtect(socket: Int): Boolean {
+        return protect(socket)
     }
 
-    private fun getNotificationManager(): NotificationManager {
-        if (mNotificationManager == null) {
-            mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        }
-        return mNotificationManager!!
-    }
-
-    fun startSpeedNotification() {
-        if (mSubscription == null &&
-                v2rayPoint.isRunning &&
-                defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false)) {
-            var last_zero_speed = false
-            val outboundTags = defaultDPreference.getPrefStringOrderedSet(AppConfig.PREF_CURR_CONFIG_OUTBOUND_TAGS, LinkedHashSet())
-            outboundTags.remove(TAG_DIRECT)
-
-            mSubscription = Observable.interval(3, java.util.concurrent.TimeUnit.SECONDS)
-                    .subscribe {
-                        val queryTime = System.currentTimeMillis()
-                        val sinceLastQueryInSeconds = (queryTime - lastQueryTime) / 1000.0
-                        var proxyTotal = 0L
-                        val text = StringBuilder()
-                        outboundTags.forEach {
-                            val up = v2rayPoint.queryStats(it, "uplink")
-                            val down = v2rayPoint.queryStats(it, "downlink")
-                            if (up + down > 0) {
-                                appendSpeedString(text, it, up / sinceLastQueryInSeconds, down / sinceLastQueryInSeconds)
-                                proxyTotal += up + down
-                            }
-                        }
-                        val directUplink = v2rayPoint.queryStats(TAG_DIRECT, "uplink")
-                        val directDownlink = v2rayPoint.queryStats(TAG_DIRECT, "downlink")
-                        val zero_speed = (proxyTotal == 0L && directUplink == 0L && directDownlink == 0L)
-                        if (!zero_speed || !last_zero_speed) {
-                            if (proxyTotal == 0L) {
-                                appendSpeedString(text, outboundTags.firstOrNull(), 0.0, 0.0)
-                            }
-                            appendSpeedString(text, TAG_DIRECT, directUplink / sinceLastQueryInSeconds,
-                                    directDownlink / sinceLastQueryInSeconds)
-                            updateNotification(text.toString(), proxyTotal, directDownlink + directUplink)
-                        }
-                        last_zero_speed = zero_speed
-                        lastQueryTime = queryTime
-                    }
-        }
-    }
-
-    private fun appendSpeedString(text: StringBuilder, name: String?, up: Double, down: Double) {
-        var n = name ?: "no tag"
-        n = n.substring(0, Math.min(n.length, 6))
-        text.append(n)
-        for (i in n.length..6 step 2) {
-            text.append("\t")
-        }
-        text.append("•  ${up.toLong().toSpeedString()}↑  ${down.toLong().toSpeedString()}↓\n")
-    }
-
-    fun stopSpeedNotification() {
-        if (mSubscription != null) {
-            mSubscription?.unsubscribe() //stop queryStats
-            mSubscription = null
-
-            val cf_name = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
-            updateNotification(cf_name, 0, 0)
-        }
-    }
-
-    private inner class V2RayCallback : V2RayVPNServiceSupportsSet {
-        override fun shutdown(): Long {
-            // called by go
-            // shutdown the whole vpn service
-            try {
-                this@V2RayVpnService.shutdown()
-                return 0
-            } catch (e: Exception) {
-                Log.d(packageName, e.toString())
-                return -1
-            }
-        }
-
-        override fun prepare(): Long {
-            return 0
-        }
-
-        override fun protect(l: Long) = (if (this@V2RayVpnService.protect(l.toInt())) 0 else 1).toLong()
-
-        override fun onEmitStatus(l: Long, s: String?): Long {
-            //Logger.d(s)
-            return 0
-        }
-
-        override fun setup(s: String): Long {
-            //Logger.d(s)
-            try {
-                this@V2RayVpnService.setup(s)
-                return 0
-            } catch (e: Exception) {
-                Log.d(packageName, e.toString())
-                return -1
-            }
-        }
-
-        override fun sendFd(): Long {
-            try {
-                this@V2RayVpnService.sendFd()
-            } catch (e: Exception) {
-                Log.d(packageName, e.toString())
-                return -1
-            }
-            return 0
-        }
-    }
-
-    private var mMsgReceive = ReceiveMessageHandler(this@V2RayVpnService)
-
-    private class ReceiveMessageHandler(vpnService: V2RayVpnService) : BroadcastReceiver() {
-        internal var mReference: SoftReference<V2RayVpnService> = SoftReference(vpnService)
-
-        override fun onReceive(ctx: Context?, intent: Intent?) {
-            val vpnService = mReference.get()
-            when (intent?.getIntExtra("key", 0)) {
-                AppConfig.MSG_REGISTER_CLIENT -> {
-                    //Logger.e("ReceiveMessageHandler", intent?.getIntExtra("key", 0).toString())
-
-                    val isRunning = vpnService?.v2rayPoint!!.isRunning
-                            && VpnService.prepare(vpnService) == null
-                    if (isRunning) {
-                        MessageUtil.sendMsg2UI(vpnService, AppConfig.MSG_STATE_RUNNING, "")
-                    } else {
-                        MessageUtil.sendMsg2UI(vpnService, AppConfig.MSG_STATE_NOT_RUNNING, "")
-                    }
-                }
-                AppConfig.MSG_UNREGISTER_CLIENT -> {
-//                    vpnService?.mMsgSend = null
-                }
-                AppConfig.MSG_STATE_START -> {
-                    //nothing to do
-                }
-                AppConfig.MSG_STATE_STOP -> {
-                    vpnService?.stopV2Ray()
-                }
-                AppConfig.MSG_STATE_RESTART -> {
-                    vpnService?.startV2ray()
-                }
-            }
-
-            when (intent?.action) {
-                Intent.ACTION_SCREEN_OFF -> {
-                    Log.d(AppConfig.ANG_PACKAGE, "SCREEN_OFF, stop querying stats")
-                    vpnService?.stopSpeedNotification()
-                }
-                Intent.ACTION_SCREEN_ON -> {
-                    Log.d(AppConfig.ANG_PACKAGE, "SCREEN_ON, start querying stats")
-                    vpnService?.startSpeedNotification()
-                }
-            }
-        }
+    override fun vpnSendFd() {
+        sendFd()
     }
 }
 

@@ -26,7 +26,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.responseLength
 import com.v2ray.ang.extension.v2RayApplication
-import com.v2ray.ang.service.V2RayVpnService
+import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.ui.SettingsActivity
 import kotlinx.coroutines.isActive
 import me.dozen.dpreference.DPreference
@@ -321,7 +321,7 @@ object Utils {
                     return false
                 }
             }
-            V2RayVpnService.startV2Ray(context)
+            V2RayServiceManager.startV2Ray(context)
             return true
         } else {
             return false
