@@ -114,10 +114,11 @@
         </receiver>
 
         <service
-            android:name=".service.QSTileService"
-            android:icon="@drawable/ic_v"
-            android:label="@string/app_tile_name"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+                android:name=".service.QSTileService"
+                android:icon="@drawable/ic_v"
+                android:label="@string/app_tile_name"
+                android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+                android:process=":RunSoLibV2RayDaemon">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
@@ -132,7 +133,8 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".receiver.TaskerReceiver">
+        <receiver android:name=".receiver.TaskerReceiver"
+                android:process=":RunSoLibV2RayDaemon">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
             </intent-filter>
