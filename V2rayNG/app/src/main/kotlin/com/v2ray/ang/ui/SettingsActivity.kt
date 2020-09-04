@@ -88,7 +88,7 @@ class SettingsActivity : BaseActivity() {
         }
 
         private fun isRunning(): Boolean {
-            return Utils.isServiceRun(activity, "com.v2ray.ang.service.V2RayVpnService")
+            return false //TODO no point of adding logic now since Settings will be changed soon
         }
 
         override fun onCreate(savedInstanceState: Bundle?) {

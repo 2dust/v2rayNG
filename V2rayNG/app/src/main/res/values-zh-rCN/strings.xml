@@ -3,7 +3,7 @@
     <string name="app_name">v2rayNG</string>
     <string name="app_widget_name">开关</string>
     <string name="app_tile_name">开关</string>
-    <string name="app_tile_first_use">初次使用此功能请先用APP激活VPN</string>
+    <string name="app_tile_first_use">初次使用此功能请先用APP添加配置</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 

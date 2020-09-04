@@ -9,6 +9,7 @@ import android.content.Intent
 import android.widget.RemoteViews
 import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.Utils
 
 class WidgetProvider : AppWidgetProvider() {
@@ -17,21 +18,19 @@ class WidgetProvider : AppWidgetProvider() {
      */
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
-
-        val isRunning = Utils.isServiceRun(context, "com.v2ray.ang.service.V2RayVpnService")
-        updateWidgetBackground(context, appWidgetManager, appWidgetIds, isRunning)
+        updateWidgetBackground(context, appWidgetManager, appWidgetIds, V2RayServiceManager.v2rayPoint.isRunning)
     }
 
     private fun updateWidgetBackground(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, isRunning: Boolean) {
         val remoteViews = RemoteViews(context.packageName, R.layout.widget_switch)
         val intent = Intent(context, WidgetProvider::class.java)
-        intent.setAction(AppConfig.BROADCAST_ACTION_WIDGET_CLICK)
+        intent.action = AppConfig.BROADCAST_ACTION_WIDGET_CLICK
         val pendingIntent = PendingIntent.getBroadcast(context, R.id.layout_switch, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         remoteViews.setOnClickPendingIntent(R.id.layout_switch, pendingIntent)
         if (isRunning) {
-            remoteViews.setInt(R.id.layout_switch, "setBackgroundResource", R.drawable.ic_rounded_corner_theme);
+            remoteViews.setInt(R.id.layout_switch, "setBackgroundResource", R.drawable.ic_rounded_corner_theme)
         } else {
-            remoteViews.setInt(R.id.layout_switch, "setBackgroundResource", R.drawable.ic_rounded_corner_grey);
+            remoteViews.setInt(R.id.layout_switch, "setBackgroundResource", R.drawable.ic_rounded_corner_grey)
         }
 
         for (appWidgetId in appWidgetIds) {
@@ -40,23 +39,28 @@ class WidgetProvider : AppWidgetProvider() {
     }
 
     /**
-     * 接收窗口小部件点击时发送的广播
+     * 接收窗口小部件发送的广播
      */
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (AppConfig.BROADCAST_ACTION_WIDGET_CLICK == intent.action) {
-
-            val isRunning = Utils.isServiceRun(context, "com.v2ray.ang.service.V2RayVpnService")
-            if (isRunning) {
-//                context.toast(R.string.toast_services_stop)
+            if (V2RayServiceManager.v2rayPoint.isRunning) {
                 Utils.stopVService(context)
             } else {
-//                context.toast(R.string.toast_services_start)
-                Utils.startVService(context)
+                Utils.startVServiceFromToggle(context)
             }
+        } else if (AppConfig.BROADCAST_ACTION_ACTIVITY == intent.action) {
             val manager = AppWidgetManager.getInstance(context)
-            updateWidgetBackground(context, manager, manager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java)),
-                    !isRunning);
+            when (intent.getIntExtra("key", 0)) {
+                AppConfig.MSG_STATE_RUNNING, AppConfig.MSG_STATE_START_SUCCESS -> {
+                    updateWidgetBackground(context, manager, manager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java)),
+                            true)
+                }
+                AppConfig.MSG_STATE_NOT_RUNNING, AppConfig.MSG_STATE_START_FAILURE, AppConfig.MSG_STATE_STOP_SUCCESS -> {
+                    updateWidgetBackground(context, manager, manager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java)),
+                            false)
+                }
+            }
         }
     }
 }

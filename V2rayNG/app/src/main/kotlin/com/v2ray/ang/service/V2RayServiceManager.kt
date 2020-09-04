@@ -24,6 +24,7 @@ import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import go.Seq
 import libv2ray.Libv2ray
+import libv2ray.V2RayPoint
 import libv2ray.V2RayVPNServiceSupportsSet
 import rx.Observable
 import rx.Subscription
@@ -36,7 +37,7 @@ object V2RayServiceManager {
     private const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 1
     private const val NOTIFICATION_ICON_THRESHOLD = 3000
 
-    private val v2rayPoint = Libv2ray.newV2RayPoint(V2RayCallback())
+    val v2rayPoint: V2RayPoint = Libv2ray.newV2RayPoint(V2RayCallback())
     private val mMsgReceive = ReceiveMessageHandler()
 
     var serviceControl: SoftReference<ServiceControl>? = null
