@@ -39,7 +39,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 .build()
     }
 
-
     private val connectivity by lazy { getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
 
     private val defaultNetworkCallback by lazy @RequiresApi(Build.VERSION_CODES.P) {
@@ -56,6 +55,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
         }
     }
+
     private var listeningForDefaultNetwork = false
 
     override fun onCreate() {
@@ -80,9 +80,9 @@ class V2RayVpnService : VpnService(), ServiceControl {
         V2RayServiceManager.cancelNotification()
     }
 
-    fun setup(parameters: String) {
+    private fun setup(parameters: String) {
 
-        val prepare = VpnService.prepare(this)
+        val prepare = prepare(this)
         if (prepare != null) {
             return
         }
@@ -105,8 +105,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
                                 if (it[1] == "::") { //not very elegant, should move Vpn setting in Kotlin, simplify go code
                                     builder.addRoute("2000::", 3)
                                 } else {
-                                    resources.getStringArray(R.array.bypass_private_ip_address).forEach {
-                                        val addr = it.split('/')
+                                    resources.getStringArray(R.array.bypass_private_ip_address).forEach { cidr ->
+                                        val addr = cidr.split('/')
                                         builder.addRoute(addr[0], addr[1].toInt())
                                     }
                                 }
@@ -147,8 +147,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
         try {
             mInterface.close()
         } catch (ignored: Exception) {
+            // ignored
         }
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
@@ -160,7 +160,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         sendFd()
     }
 
-    fun sendFd() {
+    private fun sendFd() {
         val fd = mInterface.fileDescriptor
         val path = File(Utils.packagePath(applicationContext), "sock_path").absolutePath
 
@@ -168,7 +168,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             var tries = 0
             while (true) try {
                 Thread.sleep(50L shl tries)
-                Log.d(packageName, "sendFd tries: " + tries.toString())
+                Log.d(packageName, "sendFd tries: $tries")
                 LocalSocket().use { localSocket ->
                     localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
                     localSocket.setFileDescriptorsForSend(arrayOf(fd))
@@ -194,11 +194,9 @@ class V2RayVpnService : VpnService(), ServiceControl {
 //        val emptyInfo = VpnNetworkInfo()
 //        val info = loadVpnNetworkInfo(configName, emptyInfo)!! + (lastNetworkInfo ?: emptyInfo)
 //        saveVpnNetworkInfo(configName, info)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            if (listeningForDefaultNetwork) {
-                connectivity.unregisterNetworkCallback(defaultNetworkCallback)
-                listeningForDefaultNetwork = false
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && listeningForDefaultNetwork) {
+            connectivity.unregisterNetworkCallback(defaultNetworkCallback)
+            listeningForDefaultNetwork = false
         }
 
         V2RayServiceManager.stopV2rayPoint()
@@ -214,6 +212,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             try {
                 mInterface.close()
             } catch (ignored: Exception) {
+                // ignored
             }
 
         }

@@ -28,6 +28,7 @@ import libv2ray.V2RayVPNServiceSupportsSet
 import rx.Observable
 import rx.Subscription
 import java.lang.ref.SoftReference
+import kotlin.math.min
 
 object V2RayServiceManager {
     private const val NOTIFICATION_ID = 1
@@ -68,12 +69,12 @@ object V2RayServiceManager {
             val serviceControl = serviceControl?.get() ?: return -1
             // called by go
             // shutdown the whole vpn service
-            try {
+            return try {
                 serviceControl.stopService()
-                return 0
+                0
             } catch (e: Exception) {
                 Log.d(serviceControl.getService().packageName, e.toString())
-                return -1
+                -1
             }
         }
 
@@ -83,10 +84,7 @@ object V2RayServiceManager {
 
         override fun protect(l: Long): Long {
             val serviceControl = serviceControl?.get() ?: return 1
-            if (serviceControl.vpnProtect(l.toInt()))
-                return 0
-            else
-                return 1
+            return if (serviceControl.vpnProtect(l.toInt())) 0 else 1
         }
 
         override fun onEmitStatus(l: Long, s: String?): Long {
@@ -97,14 +95,14 @@ object V2RayServiceManager {
         override fun setup(s: String): Long {
             val serviceControl = serviceControl?.get() ?: return -1
             //Logger.d(s)
-            try {
+            return try {
                 serviceControl.startService(s)
                 lastQueryTime = System.currentTimeMillis()
                 startSpeedNotification()
-                return 0
+                0
             } catch (e: Exception) {
                 Log.d(serviceControl.getService().packageName, e.toString())
-                return -1
+                -1
             }
         }
 
@@ -131,6 +129,7 @@ object V2RayServiceManager {
                 mFilter.addAction(Intent.ACTION_USER_PRESENT)
                 service.registerReceiver(mMsgReceive, mFilter)
             } catch (e: Exception) {
+                Log.d(service.packageName, e.toString())
             }
 
             v2rayPoint.configureFileContent = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
@@ -152,7 +151,6 @@ object V2RayServiceManager {
                 cancelNotification()
             }
         }
-        //        showNotification()
     }
 
     fun stopV2rayPoint() {
@@ -172,6 +170,7 @@ object V2RayServiceManager {
         try {
             service.unregisterReceiver(mMsgReceive)
         } catch (e: Exception) {
+            Log.d(service.packageName, e.toString())
         }
     }
 
@@ -188,10 +187,10 @@ object V2RayServiceManager {
                     }
                 }
                 AppConfig.MSG_UNREGISTER_CLIENT -> {
-//                    vpnService?.mMsgSend = null
+                    // nothing to do
                 }
                 AppConfig.MSG_STATE_START -> {
-                    //nothing to do
+                    // nothing to do
                 }
                 AppConfig.MSG_STATE_STOP -> {
                     serviceControl.stopService()
@@ -305,7 +304,7 @@ object V2RayServiceManager {
         if (mSubscription == null &&
                 v2rayPoint.isRunning &&
                 service.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false)) {
-            var last_zero_speed = false
+            var lastZeroSpeed = false
             val outboundTags = service.defaultDPreference.getPrefStringOrderedSet(AppConfig.PREF_CURR_CONFIG_OUTBOUND_TAGS, LinkedHashSet())
             outboundTags.remove(TAG_DIRECT)
 
@@ -325,8 +324,8 @@ object V2RayServiceManager {
                         }
                         val directUplink = v2rayPoint.queryStats(TAG_DIRECT, "uplink")
                         val directDownlink = v2rayPoint.queryStats(TAG_DIRECT, "downlink")
-                        val zero_speed = (proxyTotal == 0L && directUplink == 0L && directDownlink == 0L)
-                        if (!zero_speed || !last_zero_speed) {
+                        val zeroSpeed = (proxyTotal == 0L && directUplink == 0L && directDownlink == 0L)
+                        if (!zeroSpeed || !lastZeroSpeed) {
                             if (proxyTotal == 0L) {
                                 appendSpeedString(text, outboundTags.firstOrNull(), 0.0, 0.0)
                             }
@@ -334,7 +333,7 @@ object V2RayServiceManager {
                                     directDownlink / sinceLastQueryInSeconds)
                             updateNotification(text.toString(), proxyTotal, directDownlink + directUplink)
                         }
-                        last_zero_speed = zero_speed
+                        lastZeroSpeed = zeroSpeed
                         lastQueryTime = queryTime
                     }
         }
@@ -342,7 +341,7 @@ object V2RayServiceManager {
 
     private fun appendSpeedString(text: StringBuilder, name: String?, up: Double, down: Double) {
         var n = name ?: "no tag"
-        n = n.substring(0, Math.min(n.length, 6))
+        n = n.substring(0, min(n.length, 6))
         text.append(n)
         for (i in n.length..6 step 2) {
             text.append("\t")
@@ -356,8 +355,8 @@ object V2RayServiceManager {
             mSubscription?.unsubscribe() //stop queryStats
             mSubscription = null
 
-            val cf_name = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
-            updateNotification(cf_name, 0, 0)
+            val cfName = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
+            updateNotification(cfName, 0, 0)
         }
     }
 }
