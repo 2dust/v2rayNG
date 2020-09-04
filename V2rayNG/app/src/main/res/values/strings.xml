@@ -125,6 +125,7 @@
     <string name="title_pref_promotion">Promotion</string>
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
 
+    <string name="title_mode">Mode</string>
     <string name="title_pref_version">Version</string>
 
     <string name="donate_error_setup">Error Setup:</string>

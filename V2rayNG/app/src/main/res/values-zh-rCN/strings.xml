@@ -123,6 +123,7 @@
     <string name="title_pref_promotion">推广</string>
     <string name="summary_pref_promotion">一些推广,点击查看详情(捐赠可去除)</string>
 
+    <string name="title_mode">模式</string>
     <string name="title_pref_version">版本</string>
 
     <string name="donate_error_setup">初始化错误:</string>

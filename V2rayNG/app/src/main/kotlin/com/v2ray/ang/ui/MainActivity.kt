@@ -28,6 +28,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.extension.defaultDPreference
 //import com.v2ray.ang.InappBuyActivity
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
@@ -71,13 +72,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         fab.setOnClickListener {
             if (isRunning) {
                 Utils.stopVService(this)
-            } else {
+            } else if (defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN") == "VPN") {
                 val intent = VpnService.prepare(this)
                 if (intent == null) {
                     startV2Ray()
                 } else {
                     startActivityForResult(intent, REQUEST_CODE_VPN_PREPARE)
                 }
+            } else {
+                startV2Ray()
             }
         }
         layout_test.setOnClickListener {

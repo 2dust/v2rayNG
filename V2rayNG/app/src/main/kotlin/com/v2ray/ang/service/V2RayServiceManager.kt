@@ -56,8 +56,12 @@ object V2RayServiceManager {
     private var mSubscription: Subscription? = null
     private var mNotificationManager: NotificationManager? = null
 
-    fun startV2Ray(context: Context) {
-        val intent = Intent(context.applicationContext, V2RayVpnService::class.java)
+    fun startV2Ray(context: Context, mode: String) {
+        val intent = if (mode == "VPN") {
+            Intent(context.applicationContext, V2RayVpnService::class.java)
+        } else {
+            Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
+        }
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
             context.startForegroundService(intent)
         } else {

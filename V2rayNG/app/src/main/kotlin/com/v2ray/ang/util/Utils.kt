@@ -300,7 +300,7 @@ object Utils {
                     return false
                 }
             }
-            V2RayServiceManager.startV2Ray(context)
+            V2RayServiceManager.startV2Ray(context, context.v2RayApplication.defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN"))
             return true
         } else {
             return false
