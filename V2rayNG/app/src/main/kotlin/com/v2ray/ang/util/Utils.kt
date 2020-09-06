@@ -11,7 +11,6 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.EncodeHintType
 import java.util.*
 import kotlin.collections.HashMap
-import android.app.ActivityManager
 import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
@@ -26,7 +25,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.responseLength
 import com.v2ray.ang.extension.v2RayApplication
-import com.v2ray.ang.service.V2RayVpnService
+import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.ui.SettingsActivity
 import kotlinx.coroutines.isActive
 import me.dozen.dpreference.DPreference
@@ -273,32 +272,12 @@ object Utils {
         return false
     }
 
-
-    /**
-     * 判断服务是否后台运行
-
-     * @param context
-     * *            Context
-     * *
-     * @param className
-     * *            判断的服务名字
-     * *
-     * @return true 在运行 false 不在运行
-     */
-    fun isServiceRun(context: Context, className: String): Boolean {
-        var isRun = false
-        val activityManager = context
-                .getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val serviceList = activityManager
-                .getRunningServices(999)
-        val size = serviceList.size
-        for (i in 0..size - 1) {
-            if (serviceList[i].service.className == className) {
-                isRun = true
-                break
-            }
+    fun startVServiceFromToggle(context: Context): Boolean {
+        val result = startVService(context)
+        if (!result) {
+            context.toast(R.string.app_tile_first_use)
         }
-        return isRun
+        return result
     }
 
     /**
@@ -321,7 +300,7 @@ object Utils {
                     return false
                 }
             }
-            V2RayVpnService.startV2Ray(context)
+            V2RayServiceManager.startV2Ray(context, context.v2RayApplication.defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN"))
             return true
         } else {
             return false

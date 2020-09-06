@@ -3,7 +3,7 @@
     <string name="app_name">v2rayNG</string>
     <string name="app_widget_name">切換</string>
     <string name="app_tile_name">切換</string>
-    <string name="app_tile_first_use">首次使用此功能，請使用此應用程式來啟用 VPN</string>
+    <string name="app_tile_first_use">首次使用此功能，請使用此應用程式新增組態</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -125,6 +125,7 @@
     <string name="title_pref_promotion">推廣</string>
     <string name="summary_pref_promotion">一些推廣,點擊查看詳情(捐款可去除)</string>
 
+    <string name="title_mode">模式</string>
     <string name="title_pref_version">版本</string>
 
     <string name="donate_error_setup">錯誤設定:</string>

@@ -67,6 +67,11 @@
         <item>IPOnDemand</item>
     </string-array>
 
+    <string-array name="mode_value" translatable="false">
+        <item>VPN</item>
+        <item>Proxy only</item>
+    </string-array>
+
     <!-- minimum list https://serverfault.com/a/304791 -->
     <string-array name="bypass_private_ip_address" translatable="false">
         <item>0.0.0.0/5</item>
