@@ -197,6 +197,10 @@ class V2RayVpnService : VpnService() {
             listeningForDefaultNetwork = true
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            builder.setMetered(false)
+        }
+
         // Create a new interface using the builder and save the parameters.
         mInterface = builder.establish()
         sendFd()
@@ -549,4 +553,3 @@ class V2RayVpnService : VpnService() {
         }
     }
 }
-
