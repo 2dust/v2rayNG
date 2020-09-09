@@ -44,6 +44,7 @@ type V2RayPoint struct {
 	closeChan chan struct{}
 
 	PackageName          string
+	PackageCodePath      string
 	DomainName           string
 	ConfigureFileContent string
 	EnableLocalDNS       bool
@@ -67,6 +68,7 @@ func (v *V2RayPoint) RunLoop() (err error) {
 	defer v.v2rayOP.Unlock()
 	//Construct Context
 	v.status.PackageName = v.PackageName
+	v.status.PackageCodePath = v.PackageCodePath
 
 	if !v.status.IsRunning {
 		v.closeChan = make(chan struct{})
@@ -116,7 +118,7 @@ func (v V2RayPoint) QueryStats(tag string, direct string) int64 {
 	if v.statsManager == nil {
 		return 0
 	}
-	counter := v.statsManager.GetCounter(fmt.Sprintf("inbound>>>%s>>>traffic>>>%s", tag, direct))
+	counter := v.statsManager.GetCounter(fmt.Sprintf("outbound>>>%s>>>traffic>>>%s", tag, direct))
 	if counter == nil {
 		return 0
 	}
@@ -233,7 +235,7 @@ func (v V2RayPoint) runTun2socks() error {
 
 	v.escorter.EscortingUp()
 	go v.escorter.EscortRun(
-		v.status.GetApp("tun2socks"),
+		v.status.GetApp("libtun2socks.so"),
 		v.status.GetTun2socksArgs(v.EnableLocalDNS, v.ForwardIpv6), "",
 		v.SupportSet.SendFd)
 

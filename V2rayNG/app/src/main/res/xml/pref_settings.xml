@@ -85,6 +85,14 @@
             android:key="pref_http_port"
             android:summary="10809"
             android:title="@string/title_pref_http_port" />
+
+        <ListPreference
+                android:defaultValue="VPN"
+                android:entries="@array/mode_value"
+                android:entryValues="@array/mode_value"
+                android:key="pref_mode"
+                android:summary="%s"
+                android:title="@string/title_mode" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_about">

@@ -2,10 +2,8 @@ V2rayNG/app/src/main/res/layout/activity_inapp_buy.xml
 V2rayNG/app/src/main/assets/geoip.dat
 V2rayNG/app/src/main/assets/geosite.dat
 V2rayNG/app/src/main/java/com/v2ray/ang/InappBuyActivity.java
-V2rayNG/gradle/wrapper/gradle-wrapper.properties
-V2rayNG/gradle/wrapper/gradle-wrapper.properties
 *.dat
 *.jks
-V2rayNG/gradle/wrapper/gradle-wrapper.properties
-V2rayNG/gradle/wrapper/gradle-wrapper.properties
 V2rayNG/app/release/output.json
+.idea/
+.gradle/

@@ -2,7 +2,9 @@ package me.dozen.dpreference;
 
 
 import android.content.Context;
+import android.text.TextUtils;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -45,10 +47,6 @@ public class DPreference {
         PrefAccessor.setInt(mContext, mName, key, value);
     }
 
-    public void setPrefStringSet(final String key, final Set<String> value) {
-        PrefAccessor.setStringSet(mContext, mName, key, value);
-    }
-
     public int getPrefInt(final String key, final int defaultValue) {
         return PrefAccessor.getInt(mContext, mName, key, defaultValue);
     }
@@ -61,8 +59,24 @@ public class DPreference {
         return PrefAccessor.getLong(mContext, mName, key, defaultValue);
     }
 
+    public void setPrefStringSet(final String key, final Set<String> value) {
+        PrefAccessor.setStringSet(mContext, mName, key, value);
+    }
+
     public Set<String> getPrefStringSet(final String key, final Set<String> defaultValue) {
         return PrefAccessor.getStringSet(mContext, mName, key, defaultValue);
+    }
+
+    public void setPrefStringOrderedSet(final String key, final LinkedHashSet<String> value) {
+        PrefAccessor.setString(mContext, mName, key, StringSetConverter.encode(value));
+    }
+
+    public LinkedHashSet<String> getPrefStringOrderedSet(final String key, final LinkedHashSet<String> defaultValue) {
+        String value = PrefAccessor.getString(mContext, mName, key, "");
+        if (TextUtils.isEmpty(value)) {
+            return defaultValue;
+        }
+        return StringSetConverter.decode(value);
     }
 
     public void removePreference(final String key) {

@@ -1,5 +1,6 @@
 package com.v2ray.ang.util
 
+import android.content.Context
 import android.text.TextUtils
 import android.util.Log
 import com.google.gson.Gson
@@ -9,12 +10,15 @@ import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.AngConfig.VmessBean
 import com.v2ray.ang.dto.V2rayConfig
-import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.ui.SettingsActivity
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONArray
 import com.google.gson.JsonObject
+import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.extension.defaultDPreference
+import kotlin.collections.ArrayList
+import kotlin.collections.LinkedHashSet
 
 object V2rayConfigUtil {
     private val requestObj: JsonObject by lazy {
@@ -41,19 +45,10 @@ object V2rayConfigUtil {
 //                return result
 //            }
 
-            if (vmess.configType == AppConfig.EConfigType.Vmess) {
-                result = getV2rayConfigType1(app, vmess)
-            } else if (vmess.configType == AppConfig.EConfigType.Custom) {
+            if (vmess.configType == EConfigType.CUSTOM.value) {
                 result = getV2rayConfigType2(app, vmess)
-            } else if (vmess.configType == AppConfig.EConfigType.Shadowsocks) {
+            } else {
                 result = getV2rayConfigType1(app, vmess)
-            } else if (vmess.configType == AppConfig.EConfigType.Socks) {
-                result = getV2rayConfigType1(app, vmess)
-            }
-
-            val domainName = parseDomainName(result.content)
-            if (!TextUtils.isEmpty(domainName)) {
-                app.defaultDPreference.setPrefString(AppConfig.PREF_CURR_CONFIG_DOMAIN, domainName)
             }
 
             Log.d("V2rayConfigUtilGoLog", result.content)
@@ -62,6 +57,22 @@ object V2rayConfigUtil {
             e.printStackTrace()
             return result
         }
+    }
+
+    fun getCustomConfigServerOutbound(content: Context, guid: String): V2rayConfig.OutboundBean? {
+        val jsonConfig = content.defaultDPreference.getPrefString(AppConfig.ANG_CONFIG + guid, "")
+        if (TextUtils.isEmpty(jsonConfig)) {
+            return null
+        }
+        val v2rayConfig = Gson().fromJson(jsonConfig, V2rayConfig::class.java) ?: return null
+        for (outbound in v2rayConfig.outbounds) {
+            if (outbound.protocol.equals(EConfigType.VMESS.name.toLowerCase()) ||
+                    outbound.protocol.equals(EConfigType.SHADOWSOCKS.name.toLowerCase()) ||
+                    outbound.protocol.equals(EConfigType.SOCKS.name.toLowerCase())) {
+                return outbound
+            }
+        }
+        return null
     }
 
     /**
@@ -116,6 +127,7 @@ object V2rayConfigUtil {
             val jsonConfig = app.defaultDPreference.getPrefString(AppConfig.ANG_CONFIG + guid, "")
             result.status = true
             result.content = jsonConfig
+            parseDomainNameAndTag(app, jsonConfig)
             return result
 
         } catch (e: Exception) {
@@ -164,8 +176,12 @@ object V2rayConfigUtil {
         try {
             val outbound = v2rayConfig.outbounds[0]
 
-            when (vmess.configType) {
-                AppConfig.EConfigType.Vmess -> {
+            val configType = EConfigType.fromInt(vmess.configType)
+            if (configType != null) {
+                outbound.protocol = configType.name.toLowerCase()
+            }
+            when (configType) {
+                EConfigType.VMESS -> {
                     outbound.settings?.servers = null
 
                     val vnext = v2rayConfig.outbounds[0].settings?.vnext?.get(0)
@@ -183,10 +199,8 @@ object V2rayConfigUtil {
 
                     //远程服务器底层传输配置
                     outbound.streamSettings = boundStreamSettings(vmess)
-
-                    outbound.protocol = "vmess"
                 }
-                AppConfig.EConfigType.Shadowsocks -> {
+                EConfigType.SHADOWSOCKS -> {
                     outbound.settings?.vnext = null
 
                     val server = outbound.settings?.servers?.get(0)
@@ -199,10 +213,8 @@ object V2rayConfigUtil {
 
                     //Mux
                     outbound.mux?.enabled = false
-
-                    outbound.protocol = "shadowsocks"
                 }
-                AppConfig.EConfigType.Socks -> {
+                EConfigType.SOCKS -> {
                     outbound.settings?.vnext = null
 
                     val server = outbound.settings?.servers?.get(0)
@@ -211,21 +223,22 @@ object V2rayConfigUtil {
 
                     //Mux
                     outbound.mux?.enabled = false
-
-                    outbound.protocol = "socks"
-                }
-                else -> {
                 }
             }
 
-            var serverDomain: String
-            if(Utils.isIpv6Address(vmess.address)) {
-                serverDomain = String.format("[%s]:%s", vmess.address, vmess.port)
+            val serverDomain = if (Utils.isIpv6Address(vmess.address)) {
+                String.format("[%s]:%s", vmess.address, vmess.port)
             } else {
-                serverDomain = String.format("%s:%s", vmess.address, vmess.port)
+                String.format("%s:%s", vmess.address, vmess.port)
             }
             app.defaultDPreference.setPrefString(AppConfig.PREF_CURR_CONFIG_DOMAIN, serverDomain)
-
+            val tags = LinkedHashSet<String>()
+            v2rayConfig.outbounds.forEach {
+                if (!TextUtils.isEmpty(it.tag)) {
+                    tags.add(it.tag)
+                }
+            }
+            app.defaultDPreference.setPrefStringOrderedSet(AppConfig.PREF_CURR_CONFIG_OUTBOUND_TAGS, tags)
         } catch (e: Exception) {
             e.printStackTrace()
             return false
@@ -246,7 +259,7 @@ object V2rayConfigUtil {
             //streamSettings
             when (streamSettings.network) {
                 "kcp" -> {
-                    val kcpsettings = V2rayConfig.OutboundBean.StreamSettingsBean.KcpsettingsBean()
+                    val kcpsettings = V2rayConfig.OutboundBean.StreamSettingsBean.KcpSettingsBean()
                     kcpsettings.mtu = 1350
                     kcpsettings.tti = 50
                     kcpsettings.uplinkCapacity = 12
@@ -254,34 +267,33 @@ object V2rayConfigUtil {
                     kcpsettings.congestion = false
                     kcpsettings.readBufferSize = 1
                     kcpsettings.writeBufferSize = 1
-                    kcpsettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.KcpsettingsBean.HeaderBean()
+                    kcpsettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.KcpSettingsBean.HeaderBean()
                     kcpsettings.header.type = vmess.headerType
-                    streamSettings.kcpsettings = kcpsettings
+                    streamSettings.kcpSettings = kcpsettings
                 }
                 "ws" -> {
-                    val wssettings = V2rayConfig.OutboundBean.StreamSettingsBean.WssettingsBean()
-                    wssettings.connectionReuse = true
+                    val wssettings = V2rayConfig.OutboundBean.StreamSettingsBean.WsSettingsBean()
                     val host = vmess.requestHost.trim()
                     val path = vmess.path.trim()
 
                     if (!TextUtils.isEmpty(host)) {
-                        wssettings.headers = V2rayConfig.OutboundBean.StreamSettingsBean.WssettingsBean.HeadersBean()
+                        wssettings.headers = V2rayConfig.OutboundBean.StreamSettingsBean.WsSettingsBean.HeadersBean()
                         wssettings.headers.Host = host
                     }
                     if (!TextUtils.isEmpty(path)) {
                         wssettings.path = path
                     }
-                    streamSettings.wssettings = wssettings
+                    streamSettings.wsSettings = wssettings
 
-                    val tlssettings = V2rayConfig.OutboundBean.StreamSettingsBean.TlssettingsBean()
+                    val tlssettings = V2rayConfig.OutboundBean.StreamSettingsBean.TlsSettingsBean()
                     tlssettings.allowInsecure = true
 					if (!TextUtils.isEmpty(host)) {
                         tlssettings.serverName = host
                     }
-                    streamSettings.tlssettings = tlssettings
+                    streamSettings.tlsSettings = tlssettings
                 }
                 "h2" -> {
-                    val httpsettings = V2rayConfig.OutboundBean.StreamSettingsBean.HttpsettingsBean()
+                    val httpsettings = V2rayConfig.OutboundBean.StreamSettingsBean.HttpSettingsBean()
                     val host = vmess.requestHost.trim()
                     val path = vmess.path.trim()
 
@@ -289,31 +301,30 @@ object V2rayConfigUtil {
                         httpsettings.host = host.split(",").map { it.trim() }
                     }
                     httpsettings.path = path
-                    streamSettings.httpsettings = httpsettings
+                    streamSettings.httpSettings = httpsettings
 
-                    val tlssettings = V2rayConfig.OutboundBean.StreamSettingsBean.TlssettingsBean()
+                    val tlssettings = V2rayConfig.OutboundBean.StreamSettingsBean.TlsSettingsBean()
                     tlssettings.allowInsecure = true
-                    streamSettings.tlssettings = tlssettings
+                    streamSettings.tlsSettings = tlssettings
                 }
                 "quic" -> {
-                    val quicsettings = V2rayConfig.OutboundBean.StreamSettingsBean.QuicsettingBean()
+                    val quicsettings = V2rayConfig.OutboundBean.StreamSettingsBean.QuicSettingBean()
                     val host = vmess.requestHost.trim()
                     val path = vmess.path.trim()
 
                     quicsettings.security = host
                     quicsettings.key = path
 
-                    quicsettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.QuicsettingBean.HeaderBean()
+                    quicsettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.QuicSettingBean.HeaderBean()
                     quicsettings.header.type = vmess.headerType
 
-                    streamSettings.quicsettings = quicsettings
+                    streamSettings.quicSettings = quicsettings
                 }
                 else -> {
                     //tcp带http伪装
                     if (vmess.headerType == "http") {
-                        val tcpSettings = V2rayConfig.OutboundBean.StreamSettingsBean.TcpsettingsBean()
-                        tcpSettings.connectionReuse = true
-                        tcpSettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.TcpsettingsBean.HeaderBean()
+                        val tcpSettings = V2rayConfig.OutboundBean.StreamSettingsBean.TcpSettingsBean()
+                        tcpSettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.TcpSettingsBean.HeaderBean()
                         tcpSettings.header.type = vmess.headerType
 
 //                        if (requestObj.has("headers")
@@ -619,42 +630,58 @@ object V2rayConfigUtil {
         }
     }
 
-    private fun parseDomainName(jsonConfig: String): String {
+    private fun parseDomainNameAndTag(app: AngApplication, jsonConfig: String) {
         try {
             val jObj = JSONObject(jsonConfig)
-            var domainName: String
+            var domainName = ""
+            val tags = LinkedHashSet<String>()
             if (jObj.has("outbound")) {
-                domainName = parseDomainName(jObj.optJSONObject("outbound"))
-                if (!TextUtils.isEmpty(domainName)) {
-                    return domainName
+                val (domain, tag) = parseDomainNameAndTag(jObj.optJSONObject("outbound"))
+                domainName = domain
+                if (!TextUtils.isEmpty(tag)) {
+                    tags.add(tag)
                 }
             }
             if (jObj.has("outbounds")) {
                 for (i in 0..(jObj.optJSONArray("outbounds").length() - 1)) {
-                    domainName = parseDomainName(jObj.optJSONArray("outbounds").getJSONObject(i))
-                    if (!TextUtils.isEmpty(domainName)) {
-                        return domainName
+                    val (domain, tag) = parseDomainNameAndTag(jObj.optJSONArray("outbounds").getJSONObject(i))
+                    if (!TextUtils.isEmpty(domain) && TextUtils.isEmpty(domainName)) {
+                        domainName = domain
+                    }
+                    if (!TextUtils.isEmpty(tag)) {
+                        tags.add(tag)
                     }
                 }
             }
             if (jObj.has("outboundDetour")) {
                 for (i in 0..(jObj.optJSONArray("outboundDetour").length() - 1)) {
-                    domainName = parseDomainName(jObj.optJSONArray("outboundDetour").getJSONObject(i))
-                    if (!TextUtils.isEmpty(domainName)) {
-                        return domainName
+                    val (domain, tag) = parseDomainNameAndTag(jObj.optJSONArray("outboundDetour").getJSONObject(i))
+                    if (!TextUtils.isEmpty(domain) && TextUtils.isEmpty(domainName)) {
+                        domainName = domain
+                    }
+                    if (!TextUtils.isEmpty(tag)) {
+                        tags.add(tag)
                     }
                 }
             }
+            if (!TextUtils.isEmpty(domainName)) {
+                app.defaultDPreference.setPrefString(AppConfig.PREF_CURR_CONFIG_DOMAIN, domainName)
+            }
+            app.defaultDPreference.setPrefStringOrderedSet(AppConfig.PREF_CURR_CONFIG_OUTBOUND_TAGS, tags)
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return ""
     }
 
-    private fun parseDomainName(outbound: JSONObject): String {
+    private fun parseDomainNameAndTag(outbound: JSONObject): Pair<String, String> {
+        val tag = if (outbound.has("tag")) {
+            outbound.getString("tag")
+        } else {
+            ""
+        }
         try {
             if (outbound.has("settings")) {
-                var vnext: JSONArray?
+                val vnext: JSONArray?
                 if (outbound.optJSONObject("settings").has("vnext")) {
                     // vmess
                     vnext = outbound.optJSONObject("settings").optJSONArray("vnext")
@@ -662,22 +689,22 @@ object V2rayConfigUtil {
                     // shadowsocks or socks
                     vnext = outbound.optJSONObject("settings").optJSONArray("servers")
                 } else {
-                    return ""
+                    return Pair("", tag)
                 }
                 for (i in 0..(vnext.length() - 1)) {
                     val item = vnext.getJSONObject(i)
                     val address = item.getString("address")
                     val port = item.getString("port")
                     if(Utils.isIpv6Address(address)) {
-                        return String.format("[%s]:%s", address, port)
+                        return Pair(String.format("[%s]:%s", address, port), tag)
                     } else {
-                        return String.format("%s:%s", address, port)
+                        return Pair(String.format("%s:%s", address, port), tag)
                     }
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return ""
+        return Pair("", tag)
     }
 }

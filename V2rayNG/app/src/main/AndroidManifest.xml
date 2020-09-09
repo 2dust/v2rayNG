@@ -76,7 +76,10 @@
 
         <activity android:name=".ui.SubEditActivity" />
         <activity android:name=".ui.ScScannerActivity" />
-        <activity android:name=".ui.ScSwitchActivity" />
+        <activity
+            android:name=".ui.ScSwitchActivity"
+            android:excludeFromRecents="true"
+            android:theme="@style/AppTheme.NoActionBar.Translucent" />
 
         <service
             android:name=".service.V2RayVpnService"
@@ -93,22 +96,30 @@
                 android:value="true" />
         </service>
 
-        <!--<receiver android:name=".receiver.WidgetProvider">-->
-        <!--<meta-data-->
-        <!--android:name="android.appwidget.provider"-->
-        <!--android:resource="@xml/app_widget_provider" />-->
+        <service android:name=".service.V2RayProxyOnlyService"
+                android:exported="false"
+                android:label="@string/app_name"
+                android:process=":RunSoLibV2RayDaemon">
+        </service>
 
-        <!--<intent-filter>-->
-        <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
-        <!--<action android:name="com.v2ray.ang.action.widget.click" />-->
-        <!--</intent-filter>-->
-        <!--</receiver>-->
+        <receiver android:name=".receiver.WidgetProvider"
+                android:process=":RunSoLibV2RayDaemon">
+            <meta-data
+                    android:name="android.appwidget.provider"
+                    android:resource="@xml/app_widget_provider" />
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.v2ray.ang.action.widget.click" />
+                <action android:name="com.v2ray.ang.action.activity" />
+            </intent-filter>
+        </receiver>
 
         <service
-            android:name=".service.QSTileService"
-            android:icon="@drawable/ic_v"
-            android:label="@string/app_tile_name"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+                android:name=".service.QSTileService"
+                android:icon="@drawable/ic_v"
+                android:label="@string/app_tile_name"
+                android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+                android:process=":RunSoLibV2RayDaemon">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
@@ -123,7 +134,8 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".receiver.TaskerReceiver">
+        <receiver android:name=".receiver.TaskerReceiver"
+                android:process=":RunSoLibV2RayDaemon">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
             </intent-filter>

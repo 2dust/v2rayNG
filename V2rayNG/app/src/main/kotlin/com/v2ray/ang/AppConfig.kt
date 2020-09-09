@@ -11,7 +11,10 @@ object AppConfig {
     const val PREF_CURR_CONFIG_GUID = "pref_v2ray_config_guid"
     const val PREF_CURR_CONFIG_NAME = "pref_v2ray_config_name"
     const val PREF_CURR_CONFIG_DOMAIN = "pref_v2ray_config_domain"
+    const val PREF_CURR_CONFIG_OUTBOUND_TAGS = "pref_v2ray_config_outbound_tags"
     const val PREF_INAPP_BUY_IS_PREMIUM = "pref_inapp_buy_is_premium"
+    const val PREF_MODE = "pref_mode"
+
     const val VMESS_PROTOCOL: String = "vmess://"
     const val SS_PROTOCOL: String = "ss://"
     const val SOCKS_PROTOCOL: String = "socks://"
@@ -50,12 +53,4 @@ object AppConfig {
     const val MSG_STATE_STOP = 4
     const val MSG_STATE_STOP_SUCCESS = 41
     const val MSG_STATE_RESTART = 5
-
-    object EConfigType {
-        val Vmess = 1
-        val Custom = 2
-        val Shadowsocks = 3
-        val Socks = 4
-    }
-
 }

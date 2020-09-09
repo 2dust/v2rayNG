@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:gravity="center"
-    android:orientation="vertical">
-
-    <LinearLayout
         android:id="@+id/layout_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,16 +7,9 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <ImageView
+    <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@mipmap/ic_launcher" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/app_widget_name"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-    </LinearLayout>
+            android:padding="10dp"
+            android:src="@drawable/ic_v" />
 </LinearLayout>

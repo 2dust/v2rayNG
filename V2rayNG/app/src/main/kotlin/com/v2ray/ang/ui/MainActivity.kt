@@ -27,12 +27,15 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
+import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.extension.defaultDPreference
 //import com.v2ray.ang.InappBuyActivity
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.AngConfigManager.configs
+import kotlinx.coroutines.*
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     companion object {
@@ -58,6 +61,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
     private var mItemTouchHelper: ItemTouchHelper? = null
+    private val testingJobs = ArrayList<Job>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,13 +72,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         fab.setOnClickListener {
             if (isRunning) {
                 Utils.stopVService(this)
-            } else {
+            } else if (defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN") == "VPN") {
                 val intent = VpnService.prepare(this)
                 if (intent == null) {
                     startV2Ray()
                 } else {
                     startActivityForResult(intent, REQUEST_CODE_VPN_PREPARE)
                 }
+            } else {
+                startV2Ray()
             }
         }
         layout_test.setOnClickListener {
@@ -162,8 +168,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     importBatchConfig(data?.getStringExtra("SCAN_RESULT"))
                 }
             REQUEST_FILE_CHOOSER -> {
-                if (resultCode == RESULT_OK) {
-                    val uri = data!!.data
+                val uri = data?.data
+                if (resultCode == RESULT_OK && uri != null) {
                     readContentFromUri(uri)
                 }
             }
@@ -240,19 +246,34 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.ping_all -> {
+            testingJobs.forEach {
+                it.cancel()
+            }
+            testingJobs.clear()
+            Utils.closeAllTcpSockets()
             for (k in 0 until configs.vmess.count()) {
                 configs.vmess[k].testResult = ""
                 adapter.updateConfigList()
             }
             for (k in 0 until configs.vmess.count()) {
-                if (configs.vmess[k].configType != AppConfig.EConfigType.Custom) {
-                    doAsync {
-                        configs.vmess[k].testResult = Utils.tcping(configs.vmess[k].address, configs.vmess[k].port)
-                        uiThread {
+                var serverAddress = configs.vmess[k].address
+                var serverPort = configs.vmess[k].port
+                if (configs.vmess[k].configType == EConfigType.CUSTOM.value) {
+                    val serverOutbound = V2rayConfigUtil.getCustomConfigServerOutbound(applicationContext, configs.vmess[k].guid)
+                            ?: continue
+                    serverAddress = serverOutbound.getServerAddress() ?: continue
+                    serverPort = serverOutbound.getServerPort() ?: continue
+                }
+                testingJobs.add(GlobalScope.launch(Dispatchers.IO) {
+                    configs.vmess.getOrNull(k)?.let {  // check null in case array is modified during testing
+                        it.testResult = Utils.tcping(serverAddress, serverPort)
+                        val myJob = coroutineContext[Job]
+                        launch(Dispatchers.Main) {
+                            testingJobs.remove(myJob)
                             adapter.updateSelectedItem(k)
                         }
                     }
-                }
+                })
             }
             true
         }
@@ -442,9 +463,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .subscribe {
                     if (it) {
                         try {
-                            val inputStream = contentResolver.openInputStream(uri)
-                            val configText = inputStream.bufferedReader().readText()
-                            importCustomizeConfig(configText)
+                            contentResolver.openInputStream(uri).use {
+                                val configText = it?.bufferedReader()?.readText()
+                                importCustomizeConfig(configText)
+                            }
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }

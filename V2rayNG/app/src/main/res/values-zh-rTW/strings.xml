@@ -3,7 +3,7 @@
     <string name="app_name">v2rayNG</string>
     <string name="app_widget_name">切換</string>
     <string name="app_tile_name">切換</string>
-    <string name="app_tile_first_use">首次使用此功能，請使用此應用程式來啟用 VPN</string>
+    <string name="app_tile_first_use">首次使用此功能，請使用此應用程式新增組態</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -84,7 +84,7 @@
     <string name="summary_pref_mux_enabled">啟用或許會加快網路速度，切換或許會閃爍</string>
 
     <string name="title_pref_speed_enabled">啟用速度顯示</string>
-    <string name="summary_pref_speed_enabled">在通知中顯示當前速度</string>
+    <string name="summary_pref_speed_enabled">在通知中顯示當前速度\n小圖標顯示流量的路由情況</string>
 
     <string name="title_pref_sniffing_enabled">啟用流量探測</string>
     <string name="summary_pref_sniffing_enabled">流量探測</string>
@@ -125,6 +125,7 @@
     <string name="title_pref_promotion">推廣</string>
     <string name="summary_pref_promotion">一些推廣,點擊查看詳情(捐款可去除)</string>
 
+    <string name="title_mode">模式</string>
     <string name="title_pref_version">版本</string>
 
     <string name="donate_error_setup">錯誤設定:</string>
@@ -138,7 +139,7 @@
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">複製</string>
     <string name="logcat_delete">刪除</string>
-    <string name="title_export_all">匯出全部配置至剪貼簿</string>
+    <string name="title_export_all">匯出全部(非自訂)配置至剪貼簿</string>
     <string name="title_sub_setting">訂閱設定</string>
     <string name="sub_setting_remarks">備註</string>
     <string name="sub_setting_url">位址(url)</string>

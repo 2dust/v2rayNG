@@ -5,14 +5,15 @@ import (
 )
 
 type Status struct {
-	IsRunning   bool
-	PackageName string
+	IsRunning       bool
+	PackageName     string
+	PackageCodePath string
 
 	Vpoint v2core.Server
 }
 
 func CheckVersion() int {
-	return 20
+	return 21
 }
 
 func (v *Status) GetDataDir() string {
@@ -20,7 +21,7 @@ func (v *Status) GetDataDir() string {
 }
 
 func (v *Status) GetApp(name string) string {
-	return v.PackageName + name
+	return v.PackageCodePath + name
 }
 
 func (v *Status) GetTun2socksArgs(localDNS bool, enableIPv6 bool) (ret []string) {

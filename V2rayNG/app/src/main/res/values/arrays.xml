@@ -66,4 +66,44 @@
         <item>IPIfNonMatch</item>
         <item>IPOnDemand</item>
     </string-array>
+
+    <string-array name="mode_value" translatable="false">
+        <item>VPN</item>
+        <item>Proxy only</item>
+    </string-array>
+
+    <!-- minimum list https://serverfault.com/a/304791 -->
+    <string-array name="bypass_private_ip_address" translatable="false">
+        <item>0.0.0.0/5</item>
+        <item>8.0.0.0/7</item>
+        <item>11.0.0.0/8</item>
+        <item>12.0.0.0/6</item>
+        <item>16.0.0.0/4</item>
+        <item>32.0.0.0/3</item>
+        <item>64.0.0.0/2</item>
+        <item>128.0.0.0/3</item>
+        <item>160.0.0.0/5</item>
+        <item>168.0.0.0/6</item>
+        <item>172.0.0.0/12</item>
+        <item>172.32.0.0/11</item>
+        <item>172.64.0.0/10</item>
+        <item>172.128.0.0/9</item>
+        <item>173.0.0.0/8</item>
+        <item>174.0.0.0/7</item>
+        <item>176.0.0.0/4</item>
+        <item>192.0.0.0/9</item>
+        <item>192.128.0.0/11</item>
+        <item>192.160.0.0/13</item>
+        <item>192.169.0.0/16</item>
+        <item>192.170.0.0/15</item>
+        <item>192.172.0.0/14</item>
+        <item>192.176.0.0/12</item>
+        <item>192.192.0.0/10</item>
+        <item>193.0.0.0/8</item>
+        <item>194.0.0.0/7</item>
+        <item>196.0.0.0/6</item>
+        <item>200.0.0.0/5</item>
+        <item>208.0.0.0/4</item>
+        <item>224.0.0.0/3</item>
+    </string-array>
 </resources>

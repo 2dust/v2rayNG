@@ -4,12 +4,7 @@
     tools:showIn="navigation_view">
 
     <group
-        android:id="@+id/group_main"
-        android:checkableBehavior="single">
-        <item
-            android:id="@+id/server_profile"
-            android:icon="@drawable/ic_description_white_24dp"
-            android:title="@string/title_server" />
+        android:id="@+id/group_main">
         <item
             android:id="@+id/sub_setting"
             android:icon="@drawable/ic_subscriptions_white_24dp"

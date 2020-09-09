@@ -64,22 +64,21 @@ data class V2rayConfig(
 
         data class StreamSettingsBean(var network: String,
                                       var security: String,
-                                      var tcpSettings: TcpsettingsBean?,
-                                      var kcpsettings: KcpsettingsBean?,
-                                      var wssettings: WssettingsBean?,
-                                      var httpsettings: HttpsettingsBean?,
-                                      var tlssettings: TlssettingsBean?,
-                                      var quicsettings: QuicsettingBean?
+                                      var tcpSettings: TcpSettingsBean?,
+                                      var kcpSettings: KcpSettingsBean?,
+                                      var wsSettings: WsSettingsBean?,
+                                      var httpSettings: HttpSettingsBean?,
+                                      var tlsSettings: TlsSettingsBean?,
+                                      var quicSettings: QuicSettingBean?
         ) {
 
-            data class TcpsettingsBean(var connectionReuse: Boolean = true,
-                                       var header: HeaderBean = HeaderBean()) {
+            data class TcpSettingsBean(var header: HeaderBean = HeaderBean()) {
                 data class HeaderBean(var type: String = "none",
                                       var request: Any? = null,
                                       var response: Any? = null)
             }
 
-            data class KcpsettingsBean(var mtu: Int = 1350,
+            data class KcpSettingsBean(var mtu: Int = 1350,
                                        var tti: Int = 20,
                                        var uplinkCapacity: Int = 12,
                                        var downlinkCapacity: Int = 100,
@@ -90,25 +89,43 @@ data class V2rayConfig(
                 data class HeaderBean(var type: String = "none")
             }
 
-            data class WssettingsBean(var connectionReuse: Boolean = true,
-                                      var path: String = "",
+            data class WsSettingsBean(var path: String = "",
                                       var headers: HeadersBean = HeadersBean()) {
                 data class HeadersBean(var Host: String = "")
             }
 
-            data class HttpsettingsBean(var host: List<String> = ArrayList<String>(), var path: String = "")
+            data class HttpSettingsBean(var host: List<String> = ArrayList(),
+                                        var path: String = "")
 
-            data class TlssettingsBean(var allowInsecure: Boolean = true,
+            data class TlsSettingsBean(var allowInsecure: Boolean = true,
                                        var serverName: String = "")
 
-            data class QuicsettingBean(var security: String = "none",
-                                        var key: String = "",
-                                        var header: HeaderBean = HeaderBean()) {
+            data class QuicSettingBean(var security: String = "none",
+                                       var key: String = "",
+                                       var header: HeaderBean = HeaderBean()) {
                 data class HeaderBean(var type: String = "none")
             }
         }
 
         data class MuxBean(var enabled: Boolean)
+
+        fun getServerAddress(): String? {
+            if (protocol.equals(EConfigType.VMESS.name.toLowerCase())) {
+                return settings?.vnext?.get(0)?.address
+            } else if (protocol.equals(EConfigType.SHADOWSOCKS.name.toLowerCase()) || protocol.equals(EConfigType.SOCKS.name.toLowerCase())) {
+                return settings?.servers?.get(0)?.address
+            }
+            return null
+        }
+
+        fun getServerPort(): Int? {
+            if (protocol.equals(EConfigType.VMESS.name.toLowerCase())) {
+                return settings?.vnext?.get(0)?.port
+            } else if (protocol.equals(EConfigType.SHADOWSOCKS.name.toLowerCase()) || protocol.equals(EConfigType.SOCKS.name.toLowerCase())) {
+                return settings?.servers?.get(0)?.port
+            }
+            return null
+        }
     }
 
     //data class DnsBean(var servers: List<String>)

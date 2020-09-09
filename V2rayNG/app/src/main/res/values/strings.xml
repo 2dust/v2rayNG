@@ -3,7 +3,7 @@
     <string name="app_name">v2rayNG</string>
     <string name="app_widget_name">Switch</string>
     <string name="app_tile_name">Switch</string>
-    <string name="app_tile_first_use">First use of this feature, please use the app to activate VPN</string>
+    <string name="app_tile_first_use">First use of this feature, please use the app to add server</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -41,7 +41,7 @@
     <string name="server_lab_network">network</string>
     <string name="server_lab_more_function">more function</string>
     <string name="server_lab_head_type">head type</string>
-    <string name="server_lab_request_host">request host(host/ws host/h2 host)/QUIC securty</string>
+    <string name="server_lab_request_host">request host(host/ws host/h2 host)/QUIC security</string>
     <string name="server_lab_path">path(ws path/h2 path)/QUIC key</string>
     <string name="server_lab_stream_security">tls</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
@@ -84,7 +84,8 @@
     <string name="summary_pref_mux_enabled">Enable maybe speed up network and switch network maybe flash</string>
 
     <string name="title_pref_speed_enabled">Enable speed display</string>
-    <string name="summary_pref_speed_enabled">Display current speed in the notification</string>
+    <string name="summary_pref_speed_enabled">Display current speed in the notification.\nNotification icon would change based on
+        usage.</string>
 
     <string name="title_pref_sniffing_enabled">Enable Sniffing</string>
     <string name="summary_pref_sniffing_enabled">Sniffing</string>
@@ -124,6 +125,7 @@
     <string name="title_pref_promotion">Promotion</string>
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
 
+    <string name="title_mode">Mode</string>
     <string name="title_pref_version">Version</string>
 
     <string name="donate_error_setup">Error Setup:</string>
@@ -137,7 +139,7 @@
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Copy</string>
     <string name="logcat_delete">Delete</string>
-    <string name="title_export_all">Export all config to clipboard</string>
+    <string name="title_export_all">Export non-custom configs to clipboard</string>
     <string name="title_sub_setting">Subscription setting</string>
     <string name="sub_setting_remarks">remarks</string>
     <string name="sub_setting_url">url</string>
