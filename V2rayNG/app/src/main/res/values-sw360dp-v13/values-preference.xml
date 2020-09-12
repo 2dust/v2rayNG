@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://stackoverflow.com/a/52960668/5495739 -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <bool name="config_materialPreferenceIconSpaceReserved" tools:ignore="MissingDefaultResource,PrivateResource">false</bool>
+    <dimen name="preference_category_padding_start" tools:ignore="MissingDefaultResource,PrivateResource">0dp</dimen>
+</resources>

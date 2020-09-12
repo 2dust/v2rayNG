@@ -74,7 +74,6 @@
 
     <!-- Preferences -->
     <string name="title_settings">Settings</string>
-    <string name="title_about">About</string>
     <string name="title_advanced">Advanced Settings</string>
 
     <string name="title_pref_per_app_proxy">Per-app proxy</string>
@@ -126,7 +125,6 @@
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
 
     <string name="title_mode">Mode</string>
-    <string name="title_pref_version">Version</string>
 
     <string name="donate_error_setup">Error Setup:</string>
     <string name="donate_error_inventory">Error querying inventory</string>
@@ -189,5 +187,10 @@
     <string name="toast_warning_pref_proxysharing">Other devices can connect to proxy by your ip address through socks/http protocol\nHttp  Proxy: http://yourIP:10809\nSocks Proxy: socks(4/5)://yourIP:10808\nOnly enable in trusted network to avoid unauthorized connection</string>
     <string name="toast_warning_pref_proxysharing_short">Proxy sharing enabled\nMake sure you are in a trusted network</string>
     <string name="toast_malformed_josn">Config malformed</string>
+
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>Proxy only</item>
+    </string-array>
 
 </resources>

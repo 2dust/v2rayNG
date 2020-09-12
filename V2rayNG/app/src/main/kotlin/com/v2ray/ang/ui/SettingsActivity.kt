@@ -1,23 +1,13 @@
 package com.v2ray.ang.ui
 
-import android.content.Intent
-import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Bundle
-import android.preference.*
-import com.v2ray.ang.AngApplication
-import com.v2ray.ang.BuildConfig
-//import com.v2ray.ang.InappBuyActivity
+import android.support.v7.preference.*
 import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.extension.defaultDPreference
-import com.v2ray.ang.extension.onClick
 import com.v2ray.ang.util.Utils
-import org.jetbrains.anko.act
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
-import libv2ray.Libv2ray
 
 class SettingsActivity : BaseActivity() {
     companion object {
@@ -42,7 +32,6 @@ class SettingsActivity : BaseActivity() {
         //        const val PREF_LICENSES = "pref_licenses"
 //        const val PREF_FEEDBACK = "pref_feedback"
 //        const val PREF_TG_GROUP = "pref_tg_group"
-        const val PREF_VERSION = "pref_version"
         //        const val PREF_AUTO_RESTART = "pref_auto_restart"
         const val PREF_FORWARD_IPV6 = "pref_forward_ipv6"
     }
@@ -56,18 +45,18 @@ class SettingsActivity : BaseActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
-        val perAppProxy by lazy { findPreference(PREF_PER_APP_PROXY) as CheckBoxPreference }
-        val sppedEnabled by lazy { findPreference(PREF_SPEED_ENABLED) as CheckBoxPreference }
-        val sniffingEnabled by lazy { findPreference(PREF_SNIFFING_ENABLED) as CheckBoxPreference }
-        val proxySharing by lazy { findPreference(PREF_PROXY_SHARING) as CheckBoxPreference }
-        val domainStrategy by lazy { findPreference(PREF_ROUTING_DOMAIN_STRATEGY) as ListPreference }
-        val routingMode by lazy { findPreference(PREF_ROUTING_MODE) as ListPreference }
+    class SettingsFragment : PreferenceFragmentCompat() {
+        private val perAppProxy by lazy { findPreference(PREF_PER_APP_PROXY) as CheckBoxPreference }
+        private val sppedEnabled by lazy { findPreference(PREF_SPEED_ENABLED) as CheckBoxPreference }
+        private val sniffingEnabled by lazy { findPreference(PREF_SNIFFING_ENABLED) as CheckBoxPreference }
+        private val proxySharing by lazy { findPreference(PREF_PROXY_SHARING) as CheckBoxPreference }
+        private val domainStrategy by lazy { findPreference(PREF_ROUTING_DOMAIN_STRATEGY) as ListPreference }
+        private val routingMode by lazy { findPreference(PREF_ROUTING_MODE) as ListPreference }
 
-        val forwardIpv6 by lazy { findPreference(PREF_FORWARD_IPV6) as CheckBoxPreference }
-        val enableLocalDns by lazy { findPreference(PREF_LOCAL_DNS_ENABLED) as CheckBoxPreference }
-        val domesticDns by lazy { findPreference(PREF_DOMESTIC_DNS) as EditTextPreference }
-        val remoteDns by lazy { findPreference(PREF_REMOTE_DNS) as EditTextPreference }
+        private val forwardIpv6 by lazy { findPreference(PREF_FORWARD_IPV6) as CheckBoxPreference }
+        private val enableLocalDns by lazy { findPreference(PREF_LOCAL_DNS_ENABLED) as CheckBoxPreference }
+        private val domesticDns by lazy { findPreference(PREF_DOMESTIC_DNS) as EditTextPreference }
+        private val remoteDns by lazy { findPreference(PREF_REMOTE_DNS) as EditTextPreference }
 
         //        val autoRestart by lazy { findPreference(PREF_AUTO_RESTART) as CheckBoxPreference }
 
@@ -75,32 +64,31 @@ class SettingsActivity : BaseActivity() {
 //        val socksPort by lazy { findPreference(PREF_SOCKS_PORT) as EditTextPreference }
 //        val httpPort by lazy { findPreference(PREF_HTTP_PORT) as EditTextPreference }
 
-        val routingCustom: Preference by lazy { findPreference(PREF_ROUTING_CUSTOM) }
+        private val routingCustom: Preference by lazy { findPreference(PREF_ROUTING_CUSTOM) }
 //        val donate: Preference by lazy { findPreference(PREF_DONATE) }
         //        val licenses: Preference by lazy { findPreference(PREF_LICENSES) }
 //        val feedback: Preference by lazy { findPreference(PREF_FEEDBACK) }
 //        val tgGroup: Preference by lazy { findPreference(PREF_TG_GROUP) }
-        val version: Preference by lazy { findPreference(PREF_VERSION) }
+
+        private val mode: Preference by lazy { findPreference(AppConfig.PREF_MODE) }
 
         private fun restartProxy() {
-            Utils.stopVService(activity)
-            Utils.startVService(activity)
+            Utils.stopVService(requireContext())
+            Utils.startVService(requireContext())
         }
 
         private fun isRunning(): Boolean {
             return false //TODO no point of adding logic now since Settings will be changed soon
         }
 
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
+        override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             addPreferencesFromResource(R.xml.pref_settings)
-            var app = activity.application as AngApplication
 
             perAppProxy.setOnPreferenceClickListener {
                 if (isRunning()) {
-                    Utils.stopVService(activity)
+                    Utils.stopVService(requireContext())
                 }
-                startActivity<PerAppProxyActivity>()
+                activity?.startActivity<PerAppProxyActivity>()
                 perAppProxy.isChecked = true
                 true
             }
@@ -117,7 +105,7 @@ class SettingsActivity : BaseActivity() {
 
             proxySharing.setOnPreferenceClickListener {
                 if (proxySharing.isChecked)
-                    toast(R.string.toast_warning_pref_proxysharing)
+                    activity?.toast(R.string.toast_warning_pref_proxysharing)
                 if (isRunning())
                     restartProxy()
                 true
@@ -134,10 +122,11 @@ class SettingsActivity : BaseActivity() {
                 true
             }
 
-            routingCustom.onClick {
+            routingCustom.setOnPreferenceClickListener {
                 if (isRunning())
-                    Utils.stopVService(activity)
-                startActivity<RoutingSettingsActivity>()
+                    Utils.stopVService(requireContext())
+                activity?.startActivity<RoutingSettingsActivity>()
+                false
             }
 
             forwardIpv6.setOnPreferenceClickListener {
@@ -153,7 +142,7 @@ class SettingsActivity : BaseActivity() {
             }
 
 
-            domesticDns.setOnPreferenceChangeListener { preference, any ->
+            domesticDns.setOnPreferenceChangeListener { _, any ->
                 // domesticDns.summary = any as String
                 val nval = any as String
                 domesticDns.summary = if (nval == "") AppConfig.DNS_DIRECT else nval
@@ -162,12 +151,17 @@ class SettingsActivity : BaseActivity() {
                 true
             }
 
-            remoteDns.setOnPreferenceChangeListener { preference, any ->
+            remoteDns.setOnPreferenceChangeListener { _, any ->
                 // remoteDns.summary = any as String
                 val nval = any as String
                 remoteDns.summary = if (nval == "") AppConfig.DNS_AGENT else nval
                 if (isRunning())
                     restartProxy()
+                true
+            }
+
+            mode.setOnPreferenceChangeListener { _, newValue ->
+                updatePerAppProxy(newValue.toString())
                 true
             }
 
@@ -206,16 +200,13 @@ class SettingsActivity : BaseActivity() {
 //                httpPort.summary = any as String
 //                true
 //            }
-
-            version.summary = "${BuildConfig.VERSION_NAME} (${Libv2ray.checkVersionX()})"
         }
 
         override fun onStart() {
             super.onStart()
-
-            perAppProxy.isChecked = defaultSharedPreferences.getBoolean(PREF_PER_APP_PROXY, false)
-            remoteDns.summary = defaultSharedPreferences.getString(PREF_REMOTE_DNS, "")
-            domesticDns.summary = defaultSharedPreferences.getString(PREF_DOMESTIC_DNS, "")
+            updatePerAppProxy(activity?.defaultSharedPreferences?.getString(AppConfig.PREF_MODE, "VPN"))
+            remoteDns.summary = activity?.defaultSharedPreferences?.getString(PREF_REMOTE_DNS, "")
+            domesticDns.summary = activity?.defaultSharedPreferences?.getString(PREF_DOMESTIC_DNS, "")
 
             if (remoteDns.summary == "") {
                 remoteDns.summary = AppConfig.DNS_AGENT
@@ -227,24 +218,17 @@ class SettingsActivity : BaseActivity() {
 
 //            socksPort.summary = defaultSharedPreferences.getString(PREF_SOCKS_PORT, "10808")
 //            lanconnPort.summary = defaultSharedPreferences.getString(PREF_HTTP_PORT, "")
-
-            defaultSharedPreferences.registerOnSharedPreferenceChangeListener(this)
         }
 
-        override fun onStop() {
-            super.onStop()
-            defaultSharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-        }
-
-        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
-            when (key) {
-//                PREF_AUTO_RESTART ->
-//                    act.defaultDPreference.setPrefBoolean(key, sharedPreferences.getBoolean(key, false))
-
-                PREF_PER_APP_PROXY ->
-                    act.defaultDPreference.setPrefBoolean(key, sharedPreferences.getBoolean(key, false))
+        private fun updatePerAppProxy(mode: String?) {
+            val preference = activity?.defaultSharedPreferences ?: return
+            if (mode == "VPN") {
+                perAppProxy.isEnabled = true
+                perAppProxy.isChecked = preference.getBoolean(PREF_PER_APP_PROXY, false)
+            } else {
+                perAppProxy.isEnabled = false
+                perAppProxy.isChecked = false
             }
         }
     }
-
 }
