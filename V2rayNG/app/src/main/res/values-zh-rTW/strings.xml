@@ -74,7 +74,6 @@
 
     <!-- Preferences -->
     <string name="title_settings">設定</string>
-    <string name="title_about">關於</string>
     <string name="title_advanced">進階設定</string>
 
     <string name="title_pref_per_app_proxy">Proxy 個別應用程式</string>
@@ -126,7 +125,6 @@
     <string name="summary_pref_promotion">一些推廣,點擊查看詳情(捐款可去除)</string>
 
     <string name="title_mode">模式</string>
-    <string name="title_pref_version">版本</string>
 
     <string name="donate_error_setup">錯誤設定:</string>
     <string name="donate_error_inventory">Error querying inventory</string>

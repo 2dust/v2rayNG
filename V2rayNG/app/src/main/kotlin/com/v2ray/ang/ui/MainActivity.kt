@@ -27,6 +27,7 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
+import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.defaultDPreference
 //import com.v2ray.ang.InappBuyActivity
@@ -36,6 +37,7 @@ import java.util.concurrent.TimeUnit
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.AngConfigManager.configs
 import kotlinx.coroutines.*
+import libv2ray.Libv2ray
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     companion object {
@@ -113,6 +115,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
         nav_view.setNavigationItemSelectedListener(this)
+        version.text = "v${BuildConfig.VERSION_NAME} (${Libv2ray.checkVersionX()})"
     }
 
     fun startV2Ray() {

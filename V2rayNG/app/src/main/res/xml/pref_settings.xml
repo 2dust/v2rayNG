@@ -94,28 +94,4 @@
                 android:summary="%s"
                 android:title="@string/title_mode" />
     </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/title_about">
-        <!--<Preference-->
-        <!--android:key="pref_donate"-->
-        <!--android:summary="@string/summary_pref_donate"-->
-        <!--android:title="@string/title_pref_donate" />-->
-
-        <!--<Preference-->
-        <!--android:key="pref_licenses"-->
-        <!--android:title="@string/notices_title" />-->
-
-        <!--<Preference-->
-        <!--android:key="pref_feedback"-->
-        <!--android:summary="@string/summary_pref_feedback"-->
-        <!--android:title="@string/title_pref_feedback" />-->
-
-        <!--<Preference-->
-        <!--android:key="pref_tg_group"-->
-        <!--android:title="@string/summary_pref_tg_group" />-->
-
-        <Preference
-            android:key="pref_version"
-            android:title="@string/title_pref_version" />
-    </PreferenceCategory>
 </PreferenceScreen>

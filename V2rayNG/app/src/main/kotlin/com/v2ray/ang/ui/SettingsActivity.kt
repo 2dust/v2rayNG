@@ -1,13 +1,9 @@
 package com.v2ray.ang.ui
 
-import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Bundle
 import android.preference.*
 import com.v2ray.ang.AngApplication
-import com.v2ray.ang.BuildConfig
-//import com.v2ray.ang.InappBuyActivity
 import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.extension.defaultDPreference
@@ -17,7 +13,6 @@ import org.jetbrains.anko.act
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
-import libv2ray.Libv2ray
 
 class SettingsActivity : BaseActivity() {
     companion object {
@@ -42,7 +37,6 @@ class SettingsActivity : BaseActivity() {
         //        const val PREF_LICENSES = "pref_licenses"
 //        const val PREF_FEEDBACK = "pref_feedback"
 //        const val PREF_TG_GROUP = "pref_tg_group"
-        const val PREF_VERSION = "pref_version"
         //        const val PREF_AUTO_RESTART = "pref_auto_restart"
         const val PREF_FORWARD_IPV6 = "pref_forward_ipv6"
     }
@@ -80,7 +74,6 @@ class SettingsActivity : BaseActivity() {
         //        val licenses: Preference by lazy { findPreference(PREF_LICENSES) }
 //        val feedback: Preference by lazy { findPreference(PREF_FEEDBACK) }
 //        val tgGroup: Preference by lazy { findPreference(PREF_TG_GROUP) }
-        val version: Preference by lazy { findPreference(PREF_VERSION) }
 
         private fun restartProxy() {
             Utils.stopVService(activity)
@@ -206,8 +199,6 @@ class SettingsActivity : BaseActivity() {
 //                httpPort.summary = any as String
 //                true
 //            }
-
-            version.summary = "${BuildConfig.VERSION_NAME} (${Libv2ray.checkVersionX()})"
         }
 
         override fun onStart() {
