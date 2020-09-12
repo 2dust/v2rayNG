@@ -187,4 +187,10 @@
     <string name="toast_warning_pref_proxysharing">其他設備可以使用socks/http協定通過您的IP地址連接到代理\nHttp 代理: http://您的ip:10809\nSocks 代理: socks(4/5)://您的ip:10808\n僅在受信任的網路中啟用以避免未經授權的連接</string>
     <string name="toast_warning_pref_proxysharing_short">代理共享已啟用，請確保處於受信網路</string>
     <string name="toast_malformed_josn">配置格式錯誤</string>
+
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>僅代理</item>
+    </string-array>
+
 </resources>

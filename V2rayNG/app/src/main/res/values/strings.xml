@@ -188,4 +188,9 @@
     <string name="toast_warning_pref_proxysharing_short">Proxy sharing enabled\nMake sure you are in a trusted network</string>
     <string name="toast_malformed_josn">Config malformed</string>
 
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>Proxy only</item>
+    </string-array>
+
 </resources>

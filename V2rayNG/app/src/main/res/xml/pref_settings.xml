@@ -88,7 +88,7 @@
 
         <ListPreference
                 android:defaultValue="VPN"
-                android:entries="@array/mode_value"
+                android:entries="@array/mode_entries"
                 android:entryValues="@array/mode_value"
                 android:key="pref_mode"
                 android:summary="%s"
