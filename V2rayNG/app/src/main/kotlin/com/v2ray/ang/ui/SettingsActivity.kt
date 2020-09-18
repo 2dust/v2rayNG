@@ -2,6 +2,7 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import android.support.v7.preference.*
+import android.view.View
 import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.util.Utils
@@ -70,7 +71,7 @@ class SettingsActivity : BaseActivity() {
 //        val feedback: Preference by lazy { findPreference(PREF_FEEDBACK) }
 //        val tgGroup: Preference by lazy { findPreference(PREF_TG_GROUP) }
 
-        private val mode: Preference by lazy { findPreference(AppConfig.PREF_MODE) }
+        private val mode by lazy { findPreference(AppConfig.PREF_MODE) as ListPreference }
 
         private fun restartProxy() {
             Utils.stopVService(requireContext())
@@ -164,6 +165,7 @@ class SettingsActivity : BaseActivity() {
                 updatePerAppProxy(newValue.toString())
                 true
             }
+            mode.dialogLayoutResource = R.layout.preference_with_help_link
 
 //            donate.onClick {
 //                startActivity<InappBuyActivity>()
@@ -230,5 +232,9 @@ class SettingsActivity : BaseActivity() {
                 perAppProxy.isChecked = false
             }
         }
+    }
+
+    fun onModeHelpClicked(view: View) {
+        Utils.openUri(this, AppConfig.v2rayNGWikiMode)
     }
 }

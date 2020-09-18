@@ -123,6 +123,7 @@
     <string name="summary_pref_promotion">一些推广,点击查看详情(捐赠可去除)</string>
 
     <string name="title_mode">模式</string>
+    <string name="title_mode_help">点此查看更多帮助</string>
 
     <string name="donate_error_setup">初始化错误:</string>
     <string name="donate_error_inventory">无法查询到项目</string>
