@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:onClick="onModeHelpClicked"
+        android:text="@string/title_mode_help"
+        android:textAlignment="textStart"
+        android:textStyle="italic" />
