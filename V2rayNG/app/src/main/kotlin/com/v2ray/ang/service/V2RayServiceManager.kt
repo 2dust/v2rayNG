@@ -88,7 +88,7 @@ object V2RayServiceManager {
         }
 
         override fun protect(l: Long): Long {
-            val serviceControl = serviceControl?.get() ?: return 1
+            val serviceControl = serviceControl?.get() ?: return 0
             return if (serviceControl.vpnProtect(l.toInt())) 0 else 1
         }
 
