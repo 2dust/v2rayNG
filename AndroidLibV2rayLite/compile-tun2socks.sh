@@ -34,14 +34,10 @@ $NDK_HOME/ndk-build \
 	NDK_OUT=$TMPDIR/tmp \
 	APP_SHORT_COMMANDS=false LOCAL_SHORT_COMMANDS=false -B -j4
 
-install -v -m755 libs/armeabi-v7a/tun2socks  $__dir/shippedBinarys/ArchDep/arm/ 
-install -v -m755 libs/arm64-v8a/tun2socks    $__dir/shippedBinarys/ArchDep/arm64/
-install -v -m755 libs/x86/tun2socks          $__dir/shippedBinarys/ArchDep/386/ 
-install -v -m755 libs/x86_64/tun2socks       $__dir/shippedBinarys/ArchDep/amd64/ 
-popd
-
-pushd $__dir/shippedBinarys
-make clean && make shippedBinary
+install -v -m755 libs/armeabi-v7a/tun2socks  $__dir/../V2rayNG/app/src/main/jniLibs/armeabi-v7a/libtun2socks.so
+install -v -m755 libs/arm64-v8a/tun2socks    $__dir/../V2rayNG/app/src/main/jniLibs/arm64-v8a/libtun2socks.so
+install -v -m755 libs/x86/tun2socks          $__dir/../V2rayNG/app/src/main/jniLibs/x86/libtun2socks.so
+install -v -m755 libs/x86_64/tun2socks       $__dir/../V2rayNG/app/src/main/jniLibs/x86_64/libtun2socks.so
 popd
 
 rm -rf $TMPDIR
