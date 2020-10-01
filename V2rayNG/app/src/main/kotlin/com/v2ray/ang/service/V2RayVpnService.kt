@@ -153,8 +153,12 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
-            listeningForDefaultNetwork = true
+            try {
+                connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
+                listeningForDefaultNetwork = true
+            } catch (ignored: Exception) {
+                // ignored
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -200,9 +204,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
 //        val emptyInfo = VpnNetworkInfo()
 //        val info = loadVpnNetworkInfo(configName, emptyInfo)!! + (lastNetworkInfo ?: emptyInfo)
 //        saveVpnNetworkInfo(configName, info)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && listeningForDefaultNetwork) {
-            connectivity.unregisterNetworkCallback(defaultNetworkCallback)
-            listeningForDefaultNetwork = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            try {
+                connectivity.unregisterNetworkCallback(defaultNetworkCallback)
+                listeningForDefaultNetwork = false
+            } catch (ignored: Exception) {
+                // ignored
+            }
         }
 
         V2RayServiceManager.stopV2rayPoint()
