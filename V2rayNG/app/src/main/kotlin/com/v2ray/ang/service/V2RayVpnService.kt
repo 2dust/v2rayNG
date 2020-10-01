@@ -58,8 +58,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
     }
 
-    private var listeningForDefaultNetwork = false
-
     override fun onCreate() {
         super.onCreate()
 
@@ -155,7 +153,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             try {
                 connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
-                listeningForDefaultNetwork = true
             } catch (ignored: Exception) {
                 // ignored
             }
@@ -207,7 +204,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             try {
                 connectivity.unregisterNetworkCallback(defaultNetworkCallback)
-                listeningForDefaultNetwork = false
             } catch (ignored: Exception) {
                 // ignored
             }
