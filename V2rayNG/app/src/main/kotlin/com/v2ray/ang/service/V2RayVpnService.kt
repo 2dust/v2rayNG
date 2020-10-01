@@ -164,7 +164,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
         // Create a new interface using the builder and save the parameters.
         mInterface = builder.establish()
-        sendFd()
     }
 
     private fun sendFd() {
