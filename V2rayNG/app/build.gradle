@@ -82,9 +82,6 @@ dependencies {
 
     // DSL
     implementation "org.jetbrains.anko:anko-sdk15:$ankoVersion"
-    implementation "org.jetbrains.anko:anko-support-v4:$ankoVersion"
-    implementation "org.jetbrains.anko:anko-appcompat-v7:$ankoVersion"
-    implementation "org.jetbrains.anko:anko-design:$ankoVersion"
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'io.reactivex:rxjava:1.3.4'
     implementation 'io.reactivex:rxandroid:1.2.1'

@@ -30,7 +30,7 @@ import android.util.Log
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.defaultDPreference
-//import com.v2ray.ang.InappBuyActivity
+import com.v2ray.ang.extension.toast
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
@@ -306,7 +306,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .request(Manifest.permission.CAMERA)
                 .subscribe {
                     if (it)
-                        startActivityForResult<ScannerActivity>(requestCode)
+                        startActivityForResult(Intent(this, ScannerActivity::class.java), requestCode)
                     else
                         toast(R.string.toast_permission_denied)
                 }

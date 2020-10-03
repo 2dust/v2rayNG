@@ -10,12 +10,12 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.dto.AngConfig
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.Utils
 import kotlinx.android.synthetic.main.activity_server2.*
 import org.jetbrains.anko.*
 import java.lang.Exception
-
 
 class Server2Activity : BaseActivity() {
     companion object {

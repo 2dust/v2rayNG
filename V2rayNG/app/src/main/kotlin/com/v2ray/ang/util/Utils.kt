@@ -24,17 +24,16 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.responseLength
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.ui.SettingsActivity
 import kotlinx.coroutines.isActive
 import me.dozen.dpreference.DPreference
-import org.jetbrains.anko.toast
 import java.io.IOException
 import java.net.*
 import libv2ray.Libv2ray
 import kotlin.coroutines.coroutineContext
-
 
 object Utils {
 

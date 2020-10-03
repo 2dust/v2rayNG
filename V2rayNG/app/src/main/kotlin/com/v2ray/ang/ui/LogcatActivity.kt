@@ -8,10 +8,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import com.v2ray.ang.R
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.Utils
 import kotlinx.android.synthetic.main.activity_logcat.*
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 
 import java.io.IOException

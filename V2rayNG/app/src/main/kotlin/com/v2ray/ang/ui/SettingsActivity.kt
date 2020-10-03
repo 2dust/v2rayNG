@@ -5,10 +5,10 @@ import android.support.v7.preference.*
 import android.view.View
 import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.Utils
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.startActivity
-import org.jetbrains.anko.toast
 
 class SettingsActivity : BaseActivity() {
     companion object {
