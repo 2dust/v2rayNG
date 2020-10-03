@@ -2,6 +2,7 @@ package com.v2ray.ang.ui
 
 import android.content.Intent
 import android.graphics.Color
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.View
@@ -61,7 +62,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
 
             holder.name.text = remarks
             holder.radio.isChecked = (position == configs.index)
-            holder.itemView.backgroundColor = Color.TRANSPARENT
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
             holder.test_result.text = test_result
 
             if (TextUtils.isEmpty(subid)) {
@@ -86,7 +87,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             }
 
             holder.layout_share.setOnClickListener {
-                mActivity.selector(null, shareOptions) { dialogInterface, i ->
+                AlertDialog.Builder(mActivity).setItems(shareOptions.toTypedArray()) { _, i ->
                     try {
                         when (i) {
                             0 -> {
@@ -95,14 +96,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                                 } else {
                                     val iv = mActivity.layoutInflater.inflate(R.layout.item_qrcode, null)
                                     iv.iv_qcode.setImageBitmap(AngConfigManager.share2QRCode(position))
-
-                                    mActivity.alert {
-                                        customView {
-                                            linearLayout {
-                                                addView(iv)
-                                            }
-                                        }
-                                    }.show()
+                                    AlertDialog.Builder(mActivity).setView(iv).show()
                                 }
                             }
                             1 -> {
@@ -118,7 +112,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
-                }
+                }.show()
             }
 
             holder.layout_edit.setOnClickListener {

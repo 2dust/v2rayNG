@@ -29,7 +29,7 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
 
             holder.name.text = remarks
             holder.url.text = url
-            holder.itemView.backgroundColor = Color.TRANSPARENT
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
 
             holder.layout_edit.setOnClickListener {
                 mActivity.startActivity(Intent(mActivity, SubEditActivity::class.java)

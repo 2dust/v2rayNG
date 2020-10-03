@@ -18,7 +18,6 @@ import android.view.KeyEvent
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.V2rayConfigUtil
-import org.jetbrains.anko.*
 import java.lang.ref.SoftReference
 import java.net.URL
 import android.content.IntentFilter
@@ -52,10 +51,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             field = value
             adapter.changeable = !value
             if (value) {
-                fab.imageResource = R.drawable.ic_v
+                fab.setImageResource(R.drawable.ic_v)
                 tv_test_state.text = getString(R.string.connection_connected)
             } else {
-                fab.imageResource = R.drawable.ic_v_idle
+                fab.setImageResource(R.drawable.ic_v_idle)
                 tv_test_state.text = getString(R.string.connection_not_connected)
             }
             hideCircle()
