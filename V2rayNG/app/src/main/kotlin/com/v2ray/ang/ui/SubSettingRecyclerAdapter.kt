@@ -3,13 +3,13 @@ package com.v2ray.ang.ui
 import android.content.Intent
 import android.graphics.Color
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AngConfig
 import com.v2ray.ang.util.AngConfigManager
 import kotlinx.android.synthetic.main.item_recycler_sub_setting.view.*
-import org.jetbrains.anko.*
 
 class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView.Adapter<SubSettingRecyclerAdapter.BaseViewHolder>() {
 
@@ -41,7 +41,7 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return MainViewHolder(parent.context.layoutInflater
+        return MainViewHolder(LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_recycler_sub_setting, parent, false))
     }
 

@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.v2ray.ang.AppConfig
@@ -19,7 +20,6 @@ import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
 import kotlinx.android.synthetic.main.item_qrcode.view.*
 import kotlinx.android.synthetic.main.item_recycler_main.view.*
-import org.jetbrains.anko.*
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
@@ -180,10 +180,10 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         when (viewType) {
             VIEW_TYPE_ITEM ->
-                return MainViewHolder(parent.context.layoutInflater
+                return MainViewHolder(LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_recycler_main, parent, false))
             else ->
-                return FooterViewHolder(parent.context.layoutInflater
+                return FooterViewHolder(LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_recycler_footer, parent, false))
         }
     }

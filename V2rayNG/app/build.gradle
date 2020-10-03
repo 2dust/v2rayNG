@@ -81,7 +81,6 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:2.0.1'
 
     // DSL
-    implementation "org.jetbrains.anko:anko-sdk15:$ankoVersion"
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'io.reactivex:rxjava:1.3.4'
     implementation 'io.reactivex:rxandroid:1.2.1'

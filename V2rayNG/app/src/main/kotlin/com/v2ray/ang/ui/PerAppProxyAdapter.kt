@@ -2,12 +2,12 @@ package com.v2ray.ang.ui
 
 import android.graphics.Color
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
 import kotlinx.android.synthetic.main.item_recycler_bypass_list.view.*
-import org.jetbrains.anko.layoutInflater
 import java.util.*
 
 class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, blacklist: MutableSet<String>?) :
@@ -43,7 +43,7 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
 //            VIEW_TYPE_ITEM -> AppViewHolder(ctx.layoutInflater
 //                    .inflate(R.layout.item_recycler_bypass_list, parent, false))
 
-            else -> AppViewHolder(ctx.layoutInflater
+            else -> AppViewHolder(LayoutInflater.from(ctx)
                     .inflate(R.layout.item_recycler_bypass_list, parent, false))
 
         }
