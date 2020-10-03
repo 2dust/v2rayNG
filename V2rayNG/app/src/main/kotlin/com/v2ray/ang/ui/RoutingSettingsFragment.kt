@@ -14,8 +14,9 @@ import android.view.MenuInflater
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.extension.toast
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.URL
 
 class RoutingSettingsFragment : Fragment() {
@@ -112,10 +113,15 @@ class RoutingSettingsFragment : Fragment() {
         }
 
         activity?.toast(R.string.msg_downloading_content)
-        doAsync {
-            val content = URL(url).readText()
-            uiThread {
-                et_routing_content.text = Utils.getEditable(content!!)
+        GlobalScope.launch(Dispatchers.IO) {
+            val content = try {
+                URL(url).readText()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ""
+            }
+            launch(Dispatchers.Main) {
+                et_routing_content.text = Utils.getEditable(content)
                 activity?.toast(R.string.toast_success)
             }
         }

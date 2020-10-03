@@ -29,8 +29,9 @@ import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.util.Utils
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.URL
 
 class PerAppProxyActivity : BaseActivity() {
@@ -220,9 +221,14 @@ class PerAppProxyActivity : BaseActivity() {
     private fun selectProxyApp() {
         toast(R.string.msg_downloading_content)
         val url = AppConfig.androidpackagenamelistUrl
-        doAsync {
-            val content = URL(url).readText()
-            uiThread {
+        GlobalScope.launch(Dispatchers.IO) {
+            val content = try {
+                URL(url).readText()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ""
+            }
+            launch(Dispatchers.Main) {
                 Log.d("selectProxyApp", content)
                 selectProxyApp(content)
                 toast(R.string.toast_success)

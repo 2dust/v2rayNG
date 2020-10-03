@@ -63,7 +63,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
     private var mItemTouchHelper: ItemTouchHelper? = null
-    private val testingJobs = ArrayList<Job>()
+    private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,9 +90,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 val socksPort = 10808//Utils.parseInt(defaultDPreference.getPrefString(SettingsActivity.PREF_SOCKS_PORT, "10808"))
 
                 tv_test_state.text = getString(R.string.connection_test_testing)
-                doAsync {
+                GlobalScope.launch(Dispatchers.IO) {
                     val result = Utils.testConnection(this@MainActivity, socksPort)
-                    uiThread {
+                    launch(Dispatchers.Main) {
                         tv_test_state.text = Utils.getEditable(result)
                     }
                 }
@@ -249,10 +249,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.ping_all -> {
-            testingJobs.forEach {
-                it.cancel()
-            }
-            testingJobs.clear()
+            tcpingTestScope.coroutineContext[Job]?.cancelChildren()
             Utils.closeAllTcpSockets()
             for (k in 0 until configs.vmess.count()) {
                 configs.vmess[k].testResult = ""
@@ -267,16 +264,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     serverAddress = serverOutbound.getServerAddress() ?: continue
                     serverPort = serverOutbound.getServerPort() ?: continue
                 }
-                testingJobs.add(GlobalScope.launch(Dispatchers.IO) {
+                tcpingTestScope.launch {
                     configs.vmess.getOrNull(k)?.let {  // check null in case array is modified during testing
                         it.testResult = Utils.tcping(serverAddress, serverPort)
-                        val myJob = coroutineContext[Job]
                         launch(Dispatchers.Main) {
-                            testingJobs.remove(myJob)
                             adapter.updateSelectedItem(k)
                         }
                     }
-                })
+                }
             }
             true
         }
@@ -392,9 +387,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 toast(R.string.toast_invalid_url)
                 return false
             }
-            doAsync {
-                val configText = URL(url).readText()
-                uiThread {
+            GlobalScope.launch(Dispatchers.IO) {
+                val configText = try {
+                    URL(url).readText()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    ""
+                }
+                launch(Dispatchers.Main) {
                     importCustomizeConfig(configText)
                 }
             }
@@ -426,9 +426,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     continue
                 }
                 Log.d("Main", url)
-                doAsync {
-                    val configText = URL(url).readText()
-                    uiThread {
+                GlobalScope.launch(Dispatchers.IO) {
+                    val configText = try {
+                        URL(url).readText()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        ""
+                    }
+                    launch(Dispatchers.Main) {
                         importBatchConfig(Utils.decode(configText), id)
                     }
                 }
