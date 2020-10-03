@@ -4,6 +4,8 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.os.Bundle
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.util.Log
@@ -12,7 +14,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
-import com.dinuscxj.itemdecoration.LinearDividerItemDecoration
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.util.AppManagerUtil
@@ -47,8 +48,7 @@ class PerAppProxyActivity : BaseActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val dividerItemDecoration = LinearDividerItemDecoration(
-                this, LinearDividerItemDecoration.LINEAR_DIVIDER_VERTICAL)
+        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recycler_view.addItemDecoration(dividerItemDecoration)
 
         val blacklist = defaultDPreference.getPrefStringSet(PREF_PER_APP_PROXY_SET, null)
