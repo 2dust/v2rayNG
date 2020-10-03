@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.preference.*
 import android.view.View
@@ -8,7 +9,6 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.Utils
 import org.jetbrains.anko.defaultSharedPreferences
-import org.jetbrains.anko.startActivity
 
 class SettingsActivity : BaseActivity() {
     companion object {
@@ -89,7 +89,7 @@ class SettingsActivity : BaseActivity() {
                 if (isRunning()) {
                     Utils.stopVService(requireContext())
                 }
-                activity?.startActivity<PerAppProxyActivity>()
+                startActivity(Intent(activity, PerAppProxyActivity::class.java))
                 perAppProxy.isChecked = true
                 true
             }
@@ -126,7 +126,7 @@ class SettingsActivity : BaseActivity() {
             routingCustom.setOnPreferenceClickListener {
                 if (isRunning())
                     Utils.stopVService(requireContext())
-                activity?.startActivity<RoutingSettingsActivity>()
+                startActivity(Intent(activity, RoutingSettingsActivity::class.java))
                 false
             }
 

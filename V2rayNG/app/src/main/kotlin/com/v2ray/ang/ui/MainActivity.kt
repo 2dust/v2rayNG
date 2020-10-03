@@ -188,6 +188,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
+    private fun getOptionIntent() = Intent().putExtra("position", -1)
+            .putExtra("isRunning", isRunning)
+
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.import_qrcode -> {
             importQRcode(REQUEST_SCAN)
@@ -198,17 +201,17 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
         R.id.import_manually_vmess -> {
-            startActivity<ServerActivity>("position" to -1, "isRunning" to isRunning)
+            startActivity(getOptionIntent().setClass(this, ServerActivity::class.java))
             adapter.updateConfigList()
             true
         }
         R.id.import_manually_ss -> {
-            startActivity<Server3Activity>("position" to -1, "isRunning" to isRunning)
+            startActivity(getOptionIntent().setClass(this, Server3Activity::class.java))
             adapter.updateConfigList()
             true
         }
         R.id.import_manually_socks -> {
-            startActivity<Server4Activity>("position" to -1, "isRunning" to isRunning)
+            startActivity(getOptionIntent().setClass(this, Server4Activity::class.java))
             adapter.updateConfigList()
             true
         }
@@ -579,10 +582,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         when (item.itemId) {
             //R.id.server_profile -> activityClass = MainActivity::class.java
             R.id.sub_setting -> {
-                startActivity<SubSettingActivity>()
+                startActivity(Intent(this, SubSettingActivity::class.java))
             }
             R.id.settings -> {
-                startActivity<SettingsActivity>("isRunning" to isRunning)
+                startActivity(Intent(this, SettingsActivity::class.java)
+                        .putExtra("isRunning", isRunning))
             }
             R.id.feedback -> {
                 Utils.openUri(this, AppConfig.v2rayNGIssues)
@@ -594,7 +598,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //                startActivity<InappBuyActivity>()
             }
             R.id.logcat -> {
-                startActivity<LogcatActivity>()
+                startActivity(Intent(this, LogcatActivity::class.java))
             }
         }
         drawer_layout.closeDrawer(GravityCompat.START)

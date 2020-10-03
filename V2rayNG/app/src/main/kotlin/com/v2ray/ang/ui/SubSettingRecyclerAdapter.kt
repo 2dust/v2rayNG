@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import android.content.Intent
 import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -31,7 +32,9 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
             holder.itemView.backgroundColor = Color.TRANSPARENT
 
             holder.layout_edit.setOnClickListener {
-                mActivity.startActivity<SubEditActivity>("position" to position)
+                mActivity.startActivity(Intent(mActivity, SubEditActivity::class.java)
+                        .putExtra("position", position)
+                )
             }
         } else {
         }

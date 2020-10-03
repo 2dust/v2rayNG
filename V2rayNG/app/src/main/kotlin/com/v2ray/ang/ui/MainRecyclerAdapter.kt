@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import android.content.Intent
 import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
@@ -121,14 +122,16 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             }
 
             holder.layout_edit.setOnClickListener {
+                val intent = Intent().putExtra("position", position)
+                        .putExtra("isRunning", !changeable)
                 if (configType == EConfigType.VMESS) {
-                    mActivity.startActivity<ServerActivity>("position" to position, "isRunning" to !changeable)
+                    mActivity.startActivity(intent.setClass(mActivity, ServerActivity::class.java))
                 } else if (configType == EConfigType.CUSTOM) {
-                    mActivity.startActivity<Server2Activity>("position" to position, "isRunning" to !changeable)
+                    mActivity.startActivity(intent.setClass(mActivity, Server2Activity::class.java))
                 } else if (configType == EConfigType.SHADOWSOCKS) {
-                    mActivity.startActivity<Server3Activity>("position" to position, "isRunning" to !changeable)
+                    mActivity.startActivity(intent.setClass(mActivity, Server3Activity::class.java))
                 } else if (configType == EConfigType.SOCKS) {
-                    mActivity.startActivity<Server4Activity>("position" to position, "isRunning" to !changeable)
+                    mActivity.startActivity(intent.setClass(mActivity, Server4Activity::class.java))
                 }
             }
             holder.layout_remove.setOnClickListener {
