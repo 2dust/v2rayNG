@@ -8,9 +8,6 @@ asset:
 	# cd assets;curl https://raw.githubusercontent.com/2dust/AndroidLibV2rayLite/master/data/geosite.dat > geosite.dat		
 	# cd assets;curl https://raw.githubusercontent.com/2dust/AndroidLibV2rayLite/master/data/geoip.dat > geoip.dat
 
-shippedBinary:
-	cd shippedBinarys; $(MAKE) shippedBinary
-
 fetchDep:
 	-go get  github.com/2dust/AndroidLibV2rayLite
 	go get github.com/2dust/AndroidLibV2rayLite
@@ -30,5 +27,5 @@ downloadGoMobile:
 BuildMobile:
 	@echo Stub
 
-all: asset pb shippedBinary fetchDep
+all: asset pb fetchDep
 	@echo DONE
