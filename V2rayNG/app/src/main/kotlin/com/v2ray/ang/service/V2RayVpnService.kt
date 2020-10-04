@@ -58,8 +58,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
     }
 
-    private var listeningForDefaultNetwork = false
-
     override fun onCreate() {
         super.onCreate()
 
@@ -153,8 +151,11 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
-            listeningForDefaultNetwork = true
+            try {
+                connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
+            } catch (ignored: Exception) {
+                // ignored
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -162,8 +163,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
 
         // Create a new interface using the builder and save the parameters.
-        mInterface = builder.establish()
-        sendFd()
+        try {
+            mInterface = builder.establish()!!
+        } catch (e: Exception) {
+            // non-nullable lateinit var
+            e.printStackTrace()
+            stopV2Ray()
+        }
     }
 
     private fun sendFd() {
@@ -200,9 +206,12 @@ class V2RayVpnService : VpnService(), ServiceControl {
 //        val emptyInfo = VpnNetworkInfo()
 //        val info = loadVpnNetworkInfo(configName, emptyInfo)!! + (lastNetworkInfo ?: emptyInfo)
 //        saveVpnNetworkInfo(configName, info)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && listeningForDefaultNetwork) {
-            connectivity.unregisterNetworkCallback(defaultNetworkCallback)
-            listeningForDefaultNetwork = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            try {
+                connectivity.unregisterNetworkCallback(defaultNetworkCallback)
+            } catch (ignored: Exception) {
+                // ignored
+            }
         }
 
         V2RayServiceManager.stopV2rayPoint()
