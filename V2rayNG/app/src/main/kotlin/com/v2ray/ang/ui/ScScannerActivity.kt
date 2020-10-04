@@ -6,7 +6,7 @@ import com.tbruyelle.rxpermissions.RxPermissions
 import com.v2ray.ang.R
 import com.v2ray.ang.util.AngConfigManager
 import android.os.Bundle
-import org.jetbrains.anko.*
+import com.v2ray.ang.extension.toast
 
 class ScScannerActivity : BaseActivity() {
     companion object {
@@ -24,7 +24,7 @@ class ScScannerActivity : BaseActivity() {
                 .request(Manifest.permission.CAMERA)
                 .subscribe {
                     if (it)
-                        startActivityForResult<ScannerActivity>(requestCode)
+                        startActivityForResult(Intent(this, ScannerActivity::class.java), requestCode)
                     else
                         toast(R.string.toast_permission_denied)
                 }
@@ -43,7 +43,7 @@ class ScScannerActivity : BaseActivity() {
                     } else {
                         toast(R.string.toast_failure)
                     }
-                    startActivity<MainActivity>()
+                    startActivity(Intent(this, MainActivity::class.java))
                 }
         }
         finish()

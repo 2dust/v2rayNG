@@ -1,14 +1,13 @@
 package com.v2ray.ang.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.preference.*
 import android.view.View
 import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.Utils
-import org.jetbrains.anko.defaultSharedPreferences
-import org.jetbrains.anko.startActivity
-import org.jetbrains.anko.toast
 
 class SettingsActivity : BaseActivity() {
     companion object {
@@ -89,7 +88,7 @@ class SettingsActivity : BaseActivity() {
                 if (isRunning()) {
                     Utils.stopVService(requireContext())
                 }
-                activity?.startActivity<PerAppProxyActivity>()
+                startActivity(Intent(activity, PerAppProxyActivity::class.java))
                 perAppProxy.isChecked = true
                 true
             }
@@ -126,7 +125,7 @@ class SettingsActivity : BaseActivity() {
             routingCustom.setOnPreferenceClickListener {
                 if (isRunning())
                     Utils.stopVService(requireContext())
-                activity?.startActivity<RoutingSettingsActivity>()
+                startActivity(Intent(activity, RoutingSettingsActivity::class.java))
                 false
             }
 
@@ -206,9 +205,10 @@ class SettingsActivity : BaseActivity() {
 
         override fun onStart() {
             super.onStart()
-            updatePerAppProxy(activity?.defaultSharedPreferences?.getString(AppConfig.PREF_MODE, "VPN"))
-            remoteDns.summary = activity?.defaultSharedPreferences?.getString(PREF_REMOTE_DNS, "")
-            domesticDns.summary = activity?.defaultSharedPreferences?.getString(PREF_DOMESTIC_DNS, "")
+            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+            updatePerAppProxy(defaultSharedPreferences.getString(AppConfig.PREF_MODE, "VPN"))
+            remoteDns.summary = defaultSharedPreferences.getString(PREF_REMOTE_DNS, "")
+            domesticDns.summary = defaultSharedPreferences.getString(PREF_DOMESTIC_DNS, "")
 
             if (remoteDns.summary == "") {
                 remoteDns.summary = AppConfig.DNS_AGENT
@@ -223,10 +223,10 @@ class SettingsActivity : BaseActivity() {
         }
 
         private fun updatePerAppProxy(mode: String?) {
-            val preference = activity?.defaultSharedPreferences ?: return
             if (mode == "VPN") {
                 perAppProxy.isEnabled = true
-                perAppProxy.isChecked = preference.getBoolean(PREF_PER_APP_PROXY, false)
+                perAppProxy.isChecked = PreferenceManager.getDefaultSharedPreferences(activity)
+                        .getBoolean(PREF_PER_APP_PROXY, false)
             } else {
                 perAppProxy.isEnabled = false
                 perAppProxy.isChecked = false

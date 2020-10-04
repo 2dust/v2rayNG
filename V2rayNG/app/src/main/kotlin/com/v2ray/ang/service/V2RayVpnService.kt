@@ -16,7 +16,9 @@ import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.ui.PerAppProxyActivity
 import com.v2ray.ang.ui.SettingsActivity
 import com.v2ray.ang.util.Utils
-import org.jetbrains.anko.doAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 import java.lang.ref.SoftReference
 
@@ -176,7 +178,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         val fd = mInterface.fileDescriptor
         val path = File(Utils.packagePath(applicationContext), "sock_path").absolutePath
 
-        doAsync {
+        GlobalScope.launch(Dispatchers.IO) {
             var tries = 0
             while (true) try {
                 Thread.sleep(50L shl tries)

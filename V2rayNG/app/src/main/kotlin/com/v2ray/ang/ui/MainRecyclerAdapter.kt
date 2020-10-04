@@ -1,15 +1,18 @@
 package com.v2ray.ang.ui
 
+import android.content.Intent
 import android.graphics.Color
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AngConfig
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.extension.defaultDPreference
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
 import com.v2ray.ang.util.AngConfigManager
@@ -17,7 +20,6 @@ import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
 import kotlinx.android.synthetic.main.item_qrcode.view.*
 import kotlinx.android.synthetic.main.item_recycler_main.view.*
-import org.jetbrains.anko.*
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
@@ -60,7 +62,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
 
             holder.name.text = remarks
             holder.radio.isChecked = (position == configs.index)
-            holder.itemView.backgroundColor = Color.TRANSPARENT
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
             holder.test_result.text = test_result
 
             if (TextUtils.isEmpty(subid)) {
@@ -85,7 +87,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             }
 
             holder.layout_share.setOnClickListener {
-                mActivity.selector(null, shareOptions) { dialogInterface, i ->
+                AlertDialog.Builder(mActivity).setItems(shareOptions.toTypedArray()) { _, i ->
                     try {
                         when (i) {
                             0 -> {
@@ -94,14 +96,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                                 } else {
                                     val iv = mActivity.layoutInflater.inflate(R.layout.item_qrcode, null)
                                     iv.iv_qcode.setImageBitmap(AngConfigManager.share2QRCode(position))
-
-                                    mActivity.alert {
-                                        customView {
-                                            linearLayout {
-                                                addView(iv)
-                                            }
-                                        }
-                                    }.show()
+                                    AlertDialog.Builder(mActivity).setView(iv).show()
                                 }
                             }
                             1 -> {
@@ -117,18 +112,20 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
-                }
+                }.show()
             }
 
             holder.layout_edit.setOnClickListener {
+                val intent = Intent().putExtra("position", position)
+                        .putExtra("isRunning", !changeable)
                 if (configType == EConfigType.VMESS) {
-                    mActivity.startActivity<ServerActivity>("position" to position, "isRunning" to !changeable)
+                    mActivity.startActivity(intent.setClass(mActivity, ServerActivity::class.java))
                 } else if (configType == EConfigType.CUSTOM) {
-                    mActivity.startActivity<Server2Activity>("position" to position, "isRunning" to !changeable)
+                    mActivity.startActivity(intent.setClass(mActivity, Server2Activity::class.java))
                 } else if (configType == EConfigType.SHADOWSOCKS) {
-                    mActivity.startActivity<Server3Activity>("position" to position, "isRunning" to !changeable)
+                    mActivity.startActivity(intent.setClass(mActivity, Server3Activity::class.java))
                 } else if (configType == EConfigType.SOCKS) {
-                    mActivity.startActivity<Server4Activity>("position" to position, "isRunning" to !changeable)
+                    mActivity.startActivity(intent.setClass(mActivity, Server4Activity::class.java))
                 }
             }
             holder.layout_remove.setOnClickListener {
@@ -183,10 +180,10 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         when (viewType) {
             VIEW_TYPE_ITEM ->
-                return MainViewHolder(parent.context.layoutInflater
+                return MainViewHolder(LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_recycler_main, parent, false))
             else ->
-                return FooterViewHolder(parent.context.layoutInflater
+                return FooterViewHolder(LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_recycler_footer, parent, false))
         }
     }
