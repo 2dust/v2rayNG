@@ -170,6 +170,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
             e.printStackTrace()
             stopV2Ray()
         }
+
+        sendFd()
     }
 
     private fun sendFd() {
