@@ -131,6 +131,7 @@ func (v *V2RayPoint) shutdownInit() {
 	v.status.Vpoint = nil
 	v.statsManager = nil
 	v.escorter.EscortingDown()
+	v.SupportSet.Shutdown()
 }
 
 func (v *V2RayPoint) pointloop() error {
