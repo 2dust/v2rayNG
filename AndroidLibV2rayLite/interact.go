@@ -135,16 +135,6 @@ func (v *V2RayPoint) shutdownInit() {
 }
 
 func (v *V2RayPoint) pointloop() error {
-	if err := v.runTun2socks(); err != nil {
-		log.Println(err)
-		return err
-	}
-
-	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s",
-		v.EnableLocalDNS,
-		v.ForwardIpv6,
-		v.DomainName)
-
 	log.Println("loading v2ray config")
 	config, err := v2serial.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
 	if err != nil {
@@ -172,6 +162,17 @@ func (v *V2RayPoint) pointloop() error {
 	v.SupportSet.Prepare()
 	v.SupportSet.Setup(v.status.GetVPNSetupArg(v.EnableLocalDNS, v.ForwardIpv6))
 	v.SupportSet.OnEmitStatus(0, "Running")
+
+	if err := v.runTun2socks(); err != nil {
+		log.Println(err)
+		return err
+	}
+
+	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s",
+		v.EnableLocalDNS,
+		v.ForwardIpv6,
+		v.DomainName)
+
 	return nil
 }
 
