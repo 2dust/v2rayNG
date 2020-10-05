@@ -250,8 +250,4 @@ class V2RayVpnService : VpnService(), ServiceControl {
     override fun vpnProtect(socket: Int): Boolean {
         return protect(socket)
     }
-
-    override fun vpnSendFd() {
-        sendFd()
-    }
 }

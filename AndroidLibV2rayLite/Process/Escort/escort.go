@@ -10,7 +10,7 @@ import (
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 )
 
-func (v *Escorting) EscortRun(proc string, pt []string, additionalEnv string, sendFd func() int) {
+func (v *Escorting) EscortRun(proc string, pt []string, additionalEnv string) {
 	log.Println(proc, pt)
 	count := 0
 	for count <= 42 {
@@ -36,13 +36,6 @@ func (v *Escorting) EscortRun(proc string, pt []string, additionalEnv string, se
 
 		*v.escortProcess = append(*v.escortProcess, cmd.Process)
 		log.Println("EscortRun Waiting....")
-
-		if count > 0 {
-			go func() {
-				time.Sleep(time.Second)
-				sendFd()
-			}()
-		}
 
 		if err := cmd.Wait(); err != nil {
 			log.Println("EscortRun cmd.Wait err:", err)

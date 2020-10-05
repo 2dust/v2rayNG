@@ -58,7 +58,6 @@ type V2RayVPNServiceSupportsSet interface {
 	Shutdown() int
 	Protect(int) int
 	OnEmitStatus(int, string) int
-	SendFd() int
 }
 
 /*RunLoop Run V2Ray main loop
@@ -237,8 +236,7 @@ func (v V2RayPoint) runTun2socks() error {
 	v.escorter.EscortingUp()
 	go v.escorter.EscortRun(
 		v.status.GetApp("libtun2socks.so"),
-		v.status.GetTun2socksArgs(v.EnableLocalDNS, v.ForwardIpv6), "",
-		v.SupportSet.SendFd)
+		v.status.GetTun2socksArgs(v.EnableLocalDNS, v.ForwardIpv6), "")
 
 	return nil
 }
