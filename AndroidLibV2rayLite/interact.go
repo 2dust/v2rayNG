@@ -82,7 +82,6 @@ func (v *V2RayPoint) RunLoop() (err error) {
 				if !v.dialer.IsVServerReady() {
 					log.Println("vServer cannot resolved, shutdown")
 					v.StopLoop()
-					v.SupportSet.Shutdown()
 				}
 
 			// stop waiting if manually closed
