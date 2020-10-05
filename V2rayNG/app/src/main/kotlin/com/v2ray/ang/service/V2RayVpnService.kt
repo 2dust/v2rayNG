@@ -191,7 +191,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 break
             } catch (e: Exception) {
                 Log.d(packageName, e.toString())
-                if (tries > 5) break
+                if (tries > 20) break  // below 10 as my experience
                 tries += 1
             }
         }
