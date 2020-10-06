@@ -160,7 +160,12 @@ object V2rayConfigUtil {
 //                httpCopy.protocol = "http"
 //                v2rayConfig.inbounds.add(httpCopy)
 //            }
-            v2rayConfig.inbounds[0].sniffing?.enabled = app.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SNIFFING_ENABLED, true)
+
+            if (!app.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_LOCAL_DNS_ENABLED, false)) {
+                v2rayConfig.inbounds[0].sniffing?.enabled = true
+            } else {
+                v2rayConfig.inbounds[0].sniffing?.enabled = app.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SNIFFING_ENABLED, true)
+            }
 
         } catch (e: Exception) {
             e.printStackTrace()
