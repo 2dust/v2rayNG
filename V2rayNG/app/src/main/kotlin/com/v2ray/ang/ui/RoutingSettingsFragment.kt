@@ -1,29 +1,23 @@
 package com.v2ray.ang.ui
 
-
 import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.text.TextUtils
-import android.util.Log
 import android.view.*
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.util.Utils
 import kotlinx.android.synthetic.main.fragment_routing_settings.*
-import org.jetbrains.anko.toast
 import android.view.MenuInflater
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.v2ray.ang.AppConfig
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.startActivityForResult
-import org.jetbrains.anko.support.v4.startActivityForResult
-import org.jetbrains.anko.support.v4.toast
-import org.jetbrains.anko.uiThread
+import com.v2ray.ang.extension.toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.URL
-
 
 class RoutingSettingsFragment : Fragment() {
     companion object {
@@ -96,7 +90,7 @@ class RoutingSettingsFragment : Fragment() {
                 .request(Manifest.permission.CAMERA)
                 .subscribe {
                     if (it)
-                        startActivityForResult<ScannerActivity>(requestCode)
+                        startActivityForResult(Intent(activity, ScannerActivity::class.java), requestCode)
                     else
                         activity?.toast(R.string.toast_permission_denied)
                 }
@@ -118,12 +112,17 @@ class RoutingSettingsFragment : Fragment() {
             }
         }
 
-        toast(R.string.msg_downloading_content)
-        doAsync {
-            val content = URL(url).readText()
-            uiThread {
-                et_routing_content.text = Utils.getEditable(content!!)
-                toast(R.string.toast_success)
+        activity?.toast(R.string.msg_downloading_content)
+        GlobalScope.launch(Dispatchers.IO) {
+            val content = try {
+                URL(url).readText()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ""
+            }
+            launch(Dispatchers.Main) {
+                et_routing_content.text = Utils.getEditable(content)
+                activity?.toast(R.string.toast_success)
             }
         }
         return true

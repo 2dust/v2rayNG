@@ -7,23 +7,13 @@ import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.icu.util.TimeUnit
 import android.view.Menu
 import android.view.MenuItem
 import com.google.zxing.BarcodeFormat
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.v2ray.ang.R
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.QRCodeDecoder
-import org.jetbrains.anko.toast
-import rx.Observable
-import android.os.SystemClock
-import kotlinx.android.synthetic.main.activity_main.*
-import rx.Observer
-import rx.android.schedulers.AndroidSchedulers
-import javax.xml.datatype.DatatypeConstants.SECONDS
-
-
-
 
 class ScannerActivity : BaseActivity(), ZXingScannerView.ResultHandler {
     companion object {

@@ -1,10 +1,9 @@
 package com.v2ray.ang
 
-//import com.squareup.leakcanary.LeakCanary
 import android.support.multidex.MultiDexApplication
+import android.support.v7.preference.PreferenceManager
 import com.v2ray.ang.util.AngConfigManager
 import me.dozen.dpreference.DPreference
-import org.jetbrains.anko.defaultSharedPreferences
 
 class AngApplication : MultiDexApplication() {
     companion object {
@@ -22,6 +21,7 @@ class AngApplication : MultiDexApplication() {
 
 //        LeakCanary.install(this)
 
+        val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         firstRun = defaultSharedPreferences.getInt(PREF_LAST_VERSION, 0) != BuildConfig.VERSION_CODE
         if (firstRun)
             defaultSharedPreferences.edit().putInt(PREF_LAST_VERSION, BuildConfig.VERSION_CODE).apply()

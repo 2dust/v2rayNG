@@ -18,17 +18,6 @@
         <license>Apache Software License 2.0</license>
     </notice>
     <notice>
-        <name>Apache Commons Validator</name>
-        <url>http://commons.apache.org/proper/commons-collections/</url>
-        <copyright>Copyright(C) 2001-2014 The Apache Software Foundation</copyright>
-        <license>Apache Software License 2.0</license>
-    </notice>
-    <notice>
-        <name>anko</name>
-        <url>https://github.com/Kotlin/anko</url>
-        <license>Apache Software License 2.0</license>
-    </notice>
-    <notice>
         <name>Google Gson</name>
         <url>https://github.com/google/gson</url>
         <copyright>Copyright 2008-2011 Google Inc.</copyright>
@@ -53,32 +42,8 @@
         <license>Apache Software License 2.0</license>
     </notice>
     <notice>
-        <name>ReactiveNetwork</name>
-        <url>https://github.com/pwittchen/ReactiveNetwork</url>
-        <copyright>Copyright 2016 Piotr Wittchen</copyright>
-        <license>Apache Software License 2.0</license>
-    </notice>
-    <notice>
-        <name>RecyclerItemDecoration</name>
-        <url>https://github.com/dinuscxj/RecyclerItemDecoration</url>
-        <copyright>Copyright 2015-2019 dinus</copyright>
-        <license>Apache Software License 2.0</license>
-    </notice>
-    <notice>
-        <name>RxKotlin</name>
-        <url>https://github.com/ReactiveX/RxKotlin</url>
-        <copyright>Copyright 2012 Netflix, Inc.</copyright>
-        <license>Apache Software License 2.0</license>
-    </notice>
-    <notice>
         <name>RxPermissions</name>
         <url>https://github.com/tbruyelle/RxPermissions</url>
-        <license>Apache Software License 2.0</license>
-    </notice>
-    <notice>
-        <name>RecyclerItemDecoration</name>
-        <url>https://github.com/dinuscxj/RecyclerItemDecoration</url>
-        <copyright>Copyright 2015-2019 dinus</copyright>
         <license>Apache Software License 2.0</license>
     </notice>
 </notices>

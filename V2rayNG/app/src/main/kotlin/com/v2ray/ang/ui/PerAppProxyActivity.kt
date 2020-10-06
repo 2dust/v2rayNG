@@ -4,6 +4,8 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.os.Bundle
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.util.Log
@@ -12,7 +14,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
-import com.dinuscxj.itemdecoration.LinearDividerItemDecoration
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.util.AppManagerUtil
@@ -25,11 +26,12 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.AppInfo
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.util.Utils
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.URL
 
 class PerAppProxyActivity : BaseActivity() {
@@ -47,8 +49,7 @@ class PerAppProxyActivity : BaseActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val dividerItemDecoration = LinearDividerItemDecoration(
-                this, LinearDividerItemDecoration.LINEAR_DIVIDER_VERTICAL)
+        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recycler_view.addItemDecoration(dividerItemDecoration)
 
         val blacklist = defaultDPreference.getPrefStringSet(PREF_PER_APP_PROXY_SET, null)
@@ -220,9 +221,14 @@ class PerAppProxyActivity : BaseActivity() {
     private fun selectProxyApp() {
         toast(R.string.msg_downloading_content)
         val url = AppConfig.androidpackagenamelistUrl
-        doAsync {
-            val content = URL(url).readText()
-            uiThread {
+        GlobalScope.launch(Dispatchers.IO) {
+            val content = try {
+                URL(url).readText()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ""
+            }
+            launch(Dispatchers.Main) {
                 Log.d("selectProxyApp", content)
                 selectProxyApp(content)
                 toast(R.string.toast_success)

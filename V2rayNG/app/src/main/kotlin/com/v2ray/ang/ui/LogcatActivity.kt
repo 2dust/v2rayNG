@@ -8,12 +8,12 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import com.v2ray.ang.R
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.Utils
 import kotlinx.android.synthetic.main.activity_logcat.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.uiThread
-
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.LinkedHashSet
 
@@ -34,7 +34,7 @@ class LogcatActivity : BaseActivity() {
         try {
             pb_waiting.visibility = View.VISIBLE
 
-            doAsync {
+            GlobalScope.launch(Dispatchers.Default) {
                 if (shouldFlushLog) {
                     val lst = LinkedHashSet<String>()
                     lst.add("logcat")
@@ -54,7 +54,7 @@ class LogcatActivity : BaseActivity() {
 //                        InputStreamReader(process.inputStream))
 //                val allText = bufferedReader.use(BufferedReader::readText)
                 val allText = process.inputStream.bufferedReader().use { it.readText() }
-                uiThread {
+                launch(Dispatchers.Main) {
                     tv_logcat.text = allText
                     tv_logcat.movementMethod = ScrollingMovementMethod()
                     pb_waiting.visibility = View.GONE

@@ -2,14 +2,12 @@ package com.v2ray.ang.ui
 
 import android.graphics.Color
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
 import kotlinx.android.synthetic.main.item_recycler_bypass_list.view.*
-import org.jetbrains.anko.image
-import org.jetbrains.anko.layoutInflater
-import org.jetbrains.anko.textColor
 import java.util.*
 
 class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, blacklist: MutableSet<String>?) :
@@ -45,7 +43,7 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
 //            VIEW_TYPE_ITEM -> AppViewHolder(ctx.layoutInflater
 //                    .inflate(R.layout.item_recycler_bypass_list, parent, false))
 
-            else -> AppViewHolder(ctx.layoutInflater
+            else -> AppViewHolder(LayoutInflater.from(ctx)
                     .inflate(R.layout.item_recycler_bypass_list, parent, false))
 
         }
@@ -68,17 +66,17 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
         fun bind(appInfo: AppInfo) {
             this.appInfo = appInfo
 
-            icon.image = appInfo.appIcon
+            icon.setImageDrawable(appInfo.appIcon)
 //            name.text = appInfo.appName
 
             checkBox.isChecked = inBlacklist
             package_name.text = appInfo.packageName
             if (appInfo.isSystemApp) {
                 name.text = String.format("** %1s", appInfo.appName)
-                name.textColor = Color.RED
+                name.setTextColor(Color.RED)
             } else {
                 name.text = appInfo.appName
-                name.textColor = Color.DKGRAY
+                name.setTextColor(Color.DKGRAY)
             }
 
             itemView.setOnClickListener(this)

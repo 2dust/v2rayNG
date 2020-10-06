@@ -1,12 +1,12 @@
 package com.v2ray.ang.ui
 
+import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import com.v2ray.ang.R
 import kotlinx.android.synthetic.main.activity_sub_setting.*
 import android.os.Bundle
-import org.jetbrains.anko.startActivity
 
 class SubSettingActivity : BaseActivity() {
 
@@ -40,7 +40,9 @@ class SubSettingActivity : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.add_config -> {
-            startActivity<SubEditActivity>("position" to -1)
+            startActivity(Intent(this, SubEditActivity::class.java)
+                    .putExtra("position", -1)
+            )
             adapter.updateConfigList()
             true
         }

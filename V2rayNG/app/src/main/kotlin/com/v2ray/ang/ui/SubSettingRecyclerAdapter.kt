@@ -1,14 +1,15 @@
 package com.v2ray.ang.ui
 
+import android.content.Intent
 import android.graphics.Color
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AngConfig
 import com.v2ray.ang.util.AngConfigManager
 import kotlinx.android.synthetic.main.item_recycler_sub_setting.view.*
-import org.jetbrains.anko.*
 
 class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView.Adapter<SubSettingRecyclerAdapter.BaseViewHolder>() {
 
@@ -28,17 +29,19 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
 
             holder.name.text = remarks
             holder.url.text = url
-            holder.itemView.backgroundColor = Color.TRANSPARENT
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
 
             holder.layout_edit.setOnClickListener {
-                mActivity.startActivity<SubEditActivity>("position" to position)
+                mActivity.startActivity(Intent(mActivity, SubEditActivity::class.java)
+                        .putExtra("position", position)
+                )
             }
         } else {
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return MainViewHolder(parent.context.layoutInflater
+        return MainViewHolder(LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_recycler_sub_setting, parent, false))
     }
 
