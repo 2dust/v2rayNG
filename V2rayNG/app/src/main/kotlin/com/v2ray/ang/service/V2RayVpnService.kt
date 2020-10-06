@@ -16,6 +16,7 @@ import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.ui.PerAppProxyActivity
 import com.v2ray.ang.ui.SettingsActivity
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -183,7 +184,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         GlobalScope.launch(Dispatchers.IO) {
             var tries = 0
             while (true) try {
-                Thread.sleep(50L shl tries)
+                delay(1000L shl tries)
                 Log.d(packageName, "sendFd tries: $tries")
                 LocalSocket().use { localSocket ->
                     localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
@@ -193,7 +194,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 break
             } catch (e: Exception) {
                 Log.d(packageName, e.toString())
-                if (tries > 20) break  // below 10 as my experience
+                if (tries > 5) break  // waits below 2 seconds as my experience
                 tries += 1
             }
         }
