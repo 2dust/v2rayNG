@@ -161,11 +161,8 @@ object V2rayConfigUtil {
 //                v2rayConfig.inbounds.add(httpCopy)
 //            }
 
-            if (!app.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_LOCAL_DNS_ENABLED, false)) {
-                v2rayConfig.inbounds[0].sniffing?.enabled = true
-            } else {
-                v2rayConfig.inbounds[0].sniffing?.enabled = app.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SNIFFING_ENABLED, true)
-            }
+            // enforce trafficSniffing to prevent from dns-poisoning
+            v2rayConfig.inbounds[0].sniffing?.enabled = true
 
         } catch (e: Exception) {
             e.printStackTrace()
