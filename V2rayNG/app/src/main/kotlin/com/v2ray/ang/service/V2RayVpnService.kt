@@ -172,6 +172,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
             e.printStackTrace()
             stopV2Ray()
         }
+
+        sendFd()
     }
 
     private fun sendFd() {
@@ -181,7 +183,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         GlobalScope.launch(Dispatchers.IO) {
             var tries = 0
             while (true) try {
-                Thread.sleep(50L shl tries)
+                Thread.sleep(1000L shl tries)
                 Log.d(packageName, "sendFd tries: $tries")
                 LocalSocket().use { localSocket ->
                     localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
@@ -251,7 +253,4 @@ class V2RayVpnService : VpnService(), ServiceControl {
         return protect(socket)
     }
 
-    override fun vpnSendFd() {
-        sendFd()
-    }
 }

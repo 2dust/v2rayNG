@@ -111,16 +111,6 @@ object V2RayServiceManager {
             }
         }
 
-        override fun sendFd(): Long {
-            val serviceControl = serviceControl?.get() ?: return -1
-            try {
-                serviceControl.vpnSendFd()
-            } catch (e: Exception) {
-                Log.d(serviceControl.getService().packageName, e.toString())
-                return -1
-            }
-            return 0
-        }
     }
 
     fun startV2rayPoint() {
