@@ -14,7 +14,16 @@ A V2Ray client for Android
 
 ### Usage
 
-See our [wiki](https://github.com/2dust/v2rayNG/wiki)
+#### Geoip and Geosite
+v2rayNG release already embedded domain file `geoip.dat` and `geosite.dat`. However it is (probably) not the latest and not the most complete list.
+For power user, the embedded files can be easily replaced with the following steps:
+1. Launch v2rayNG (v1.4.9+)
+2. Find existing geoip.dat and geosite.dat in `Android/data/com.v2ray.ang/files/assets` (path may differ on some Android device)
+3. Replace them with the latest [domain list](https://github.com/v2fly/domain-list-community) and [ip list](https://github.com/v2fly/geoip)
+4. Enhanced version can be found in this [repo](https://github.com/Loyalsoldier/v2ray-rules-dat) (recommend to use `geosite:geolocation-!cn` for proxy dns and routing)
+5. It is also possible to use third party dat file in the same folder, like [h2y](https://guide.v2fly.org/routing/sitedata.html#%E5%A4%96%E7%BD%AE%E7%9A%84%E5%9F%9F%E5%90%8D%E6%96%87%E4%BB%B6)
+
+#### See more in our [wiki](https://github.com/2dust/v2rayNG/wiki)
 
 ### Development guide
 
