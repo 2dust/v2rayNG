@@ -1,11 +1,11 @@
 package com.v2ray.ang
 
-import android.support.multidex.MultiDexApplication
+import android.app.Application
 import android.support.v7.preference.PreferenceManager
 import com.v2ray.ang.util.AngConfigManager
 import me.dozen.dpreference.DPreference
 
-class AngApplication : MultiDexApplication() {
+class AngApplication : Application() {
     companion object {
         const val PREF_LAST_VERSION = "pref_last_version"
     }

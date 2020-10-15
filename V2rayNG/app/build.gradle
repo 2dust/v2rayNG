@@ -15,7 +15,6 @@ android {
         applicationId "com.v2ray.ang"
         minSdkVersion 17
         targetSdkVersion Integer.parseInt("$targetSdkVer")
-        multiDexEnabled true
         versionCode 212
         versionName "1.0.2"
     }
@@ -77,7 +76,6 @@ dependencies {
     implementation "com.android.support:cardview-v7:$supportLibVersion"
     implementation "com.android.support:preference-v7:$supportLibVersion"
     implementation "com.android.support:recyclerview-v7:$supportLibVersion"
-    implementation "com.android.support:multidex:1.0.3"
     implementation 'com.android.support.constraint:constraint-layout:2.0.1'
 
     // DSL
