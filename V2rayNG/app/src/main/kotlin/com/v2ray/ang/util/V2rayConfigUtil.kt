@@ -483,7 +483,7 @@ object V2rayConfigUtil {
         }
     }
 
-    private fun userRule2Domian(userRule: String): ArrayList<String> {
+    private fun userRule2Domain(userRule: String): ArrayList<String> {
         val domain = ArrayList<String>()
         userRule.trim().replace("\n", "").split(",").forEach {
             if ((it.startsWith("geosite:") || it.startsWith("domain:")) &&
@@ -508,12 +508,12 @@ object V2rayConfigUtil {
 
             val domesticDns = Utils.getDomesticDnsServers(app.defaultDPreference)
 
-            val agDomain = userRule2Domian(app.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_AGENT, ""))
+            val agDomain = userRule2Domain(app.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_AGENT, ""))
             if (agDomain.size > 0) {
                 servers.add(V2rayConfig.DnsBean.ServersBean(remoteDns.first(), 53, agDomain))
             }
 
-            val dirDomain = userRule2Domian(app.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_DIRECT, ""))
+            val dirDomain = userRule2Domain(app.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_DIRECT, ""))
             if (dirDomain.size > 0) {
                 servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, dirDomain))
             }
@@ -523,7 +523,7 @@ object V2rayConfigUtil {
                 servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, arrayListOf("geosite:cn")))
             }
 
-            val blkDomain = userRule2Domian(app.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED, ""))
+            val blkDomain = userRule2Domain(app.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED, ""))
             if (blkDomain.size > 0) {
                 hosts.putAll(blkDomain.map { it to "127.0.0.1" })
             }
