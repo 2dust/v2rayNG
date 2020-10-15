@@ -57,7 +57,6 @@ type V2RayVPNServiceSupportsSet interface {
 	Shutdown() int
 	Protect(int) int
 	OnEmitStatus(int, string) int
-	SendFd() int
 }
 
 /*RunLoop Run V2Ray main loop
@@ -81,7 +80,6 @@ func (v *V2RayPoint) RunLoop() (err error) {
 				if !v.dialer.IsVServerReady() {
 					log.Println("vServer cannot resolved, shutdown")
 					v.StopLoop()
-					v.SupportSet.Shutdown()
 				}
 
 			// stop waiting if manually closed
@@ -130,19 +128,10 @@ func (v *V2RayPoint) shutdownInit() {
 	v.status.Vpoint = nil
 	v.statsManager = nil
 	v.escorter.EscortingDown()
+	v.SupportSet.Shutdown()
 }
 
 func (v *V2RayPoint) pointloop() error {
-	if err := v.runTun2socks(); err != nil {
-		log.Println(err)
-		return err
-	}
-
-	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s",
-		v.EnableLocalDNS,
-		v.ForwardIpv6,
-		v.DomainName)
-
 	log.Println("loading v2ray config")
 	config, err := v2serial.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
 	if err != nil {
@@ -170,6 +159,17 @@ func (v *V2RayPoint) pointloop() error {
 	v.SupportSet.Prepare()
 	v.SupportSet.Setup(v.status.GetVPNSetupArg(v.EnableLocalDNS, v.ForwardIpv6))
 	v.SupportSet.OnEmitStatus(0, "Running")
+
+	if err := v.runTun2socks(); err != nil {
+		log.Println(err)
+		return err
+	}
+
+	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s",
+		v.EnableLocalDNS,
+		v.ForwardIpv6,
+		v.DomainName)
+
 	return nil
 }
 
@@ -229,8 +229,7 @@ func (v V2RayPoint) runTun2socks() error {
 	v.escorter.EscortingUp()
 	go v.escorter.EscortRun(
 		v.status.GetApp("libtun2socks.so"),
-		v.status.GetTun2socksArgs(v.EnableLocalDNS, v.ForwardIpv6), "",
-		v.SupportSet.SendFd)
+		v.status.GetTun2socksArgs(v.EnableLocalDNS, v.ForwardIpv6), "")
 
 	return nil
 }
