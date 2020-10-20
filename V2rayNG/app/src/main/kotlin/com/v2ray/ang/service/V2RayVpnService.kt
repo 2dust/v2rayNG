@@ -50,7 +50,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             override fun onAvailable(network: Network) {
                 setUnderlyingNetworks(arrayOf(network))
             }
-            override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities?) {
+            override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
                 // it's a good idea to refresh capabilities
                 setUnderlyingNetworks(arrayOf(network))
             }
