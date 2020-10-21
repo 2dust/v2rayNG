@@ -48,6 +48,7 @@ type V2RayPoint struct {
 	ConfigureFileContent string
 	EnableLocalDNS       bool
 	ForwardIpv6          bool
+	ProxyOnly            bool
 }
 
 /*V2RayVPNServiceSupportsSet To support Android VPN mode*/
@@ -160,15 +161,17 @@ func (v *V2RayPoint) pointloop() error {
 	v.SupportSet.Setup(v.status.GetVPNSetupArg(v.EnableLocalDNS, v.ForwardIpv6))
 	v.SupportSet.OnEmitStatus(0, "Running")
 
-	if err := v.runTun2socks(); err != nil {
-		log.Println(err)
-		return err
-	}
+	if !v.ProxyOnly {
+		if err := v.runTun2socks(); err != nil {
+			log.Println(err)
+			return err
+		}
 
-	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s",
-		v.EnableLocalDNS,
-		v.ForwardIpv6,
-		v.DomainName)
+		log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s",
+			v.EnableLocalDNS,
+			v.ForwardIpv6,
+			v.DomainName)
+	}
 
 	return nil
 }
