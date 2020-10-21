@@ -79,7 +79,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     override fun onDestroy() {
         super.onDestroy()
-        V2RayServiceManager.cancelNotification()
+        stopV2Ray()
     }
 
     private fun setup(parameters: String) {
