@@ -28,5 +28,6 @@ jobs:
 
     - name: Debug Build
       run: |
+        cd V2rayNG
         chmod +x ./gradlew
         ./gradlew assembleDebug
