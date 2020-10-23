@@ -308,6 +308,7 @@ object V2RayServiceManager {
                         val queryTime = System.currentTimeMillis()
                         val sinceLastQueryInSeconds = (queryTime - lastQueryTime) / 1000.0
                         var proxyTotal = 0L
+                        var directTotal = 0L
                         val text = StringBuilder()
                         outboundTags.forEach {
                             val up = v2rayPoint.queryStats(it, "uplink")
@@ -319,6 +320,7 @@ object V2RayServiceManager {
                         }
                         val directUplink = v2rayPoint.queryStats(TAG_DIRECT, "uplink")
                         val directDownlink = v2rayPoint.queryStats(TAG_DIRECT, "downlink")
+                        directTotal += directUplink + directDownlink
                         val zeroSpeed = (proxyTotal == 0L && directUplink == 0L && directDownlink == 0L)
                         if (!zeroSpeed || !lastZeroSpeed) {
                             if (proxyTotal == 0L) {
@@ -326,7 +328,7 @@ object V2RayServiceManager {
                             }
                             appendSpeedString(text, TAG_DIRECT, directUplink / sinceLastQueryInSeconds,
                                     directDownlink / sinceLastQueryInSeconds)
-                            updateNotification(text.toString(), proxyTotal, directDownlink + directUplink)
+                            updateNotification(text.toString(), proxyTotal, directTotal)
                         }
                         lastZeroSpeed = zeroSpeed
                         lastQueryTime = queryTime
