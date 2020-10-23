@@ -20,6 +20,7 @@ import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.ui.SettingsActivity
+import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import go.Seq
@@ -332,6 +333,7 @@ object V2RayServiceManager {
                         }
                         lastZeroSpeed = zeroSpeed
                         lastQueryTime = queryTime
+                        AngConfigManager.updateTrafficStats(proxyTotal + directTotal)
                     }
         }
     }

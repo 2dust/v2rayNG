@@ -124,6 +124,14 @@ object AngConfigManager {
         }
     }
 
+    /**
+     * update traffic stats
+     */
+    fun updateTrafficStats(total: Long) {
+        angConfig.vmess[angConfig.index].traffic += total
+        storeConfigFile()
+    }
+
     fun swapServer(fromPosition: Int, toPosition: Int): Int {
         try {
             Collections.swap(angConfig.vmess, fromPosition, toPosition)

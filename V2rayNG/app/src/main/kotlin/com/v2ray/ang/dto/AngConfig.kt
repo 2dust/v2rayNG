@@ -20,6 +20,7 @@ data class AngConfig(
                          var configType: Int = 1,
                          var configVersion: Int = 1,
                          var testResult: String = "",
+                         var traffic: Long = 0L,
                          var subid: String = "")
 
     data class SubItemBean(var id: String = "",
