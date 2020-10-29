@@ -111,16 +111,6 @@ object V2RayServiceManager {
             }
         }
 
-        override fun sendFd(): Long {
-            val serviceControl = serviceControl?.get() ?: return -1
-            try {
-                serviceControl.vpnSendFd()
-            } catch (e: Exception) {
-                Log.d(serviceControl.getService().packageName, e.toString())
-                return -1
-            }
-            return 0
-        }
     }
 
     fun startV2rayPoint() {
@@ -141,6 +131,7 @@ object V2RayServiceManager {
             v2rayPoint.enableLocalDNS = service.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_LOCAL_DNS_ENABLED, false)
             v2rayPoint.forwardIpv6 = service.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_FORWARD_IPV6, false)
             v2rayPoint.domainName = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_DOMAIN, "")
+            v2rayPoint.proxyOnly = service.defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN") != "VPN"
 
             try {
                 v2rayPoint.runLoop()

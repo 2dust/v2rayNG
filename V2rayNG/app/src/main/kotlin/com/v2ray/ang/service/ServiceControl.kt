@@ -11,5 +11,4 @@ interface ServiceControl {
 
     fun vpnProtect(socket: Int): Boolean
 
-    fun vpnSendFd()
 }

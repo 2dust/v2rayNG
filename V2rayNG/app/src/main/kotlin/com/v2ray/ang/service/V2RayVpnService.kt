@@ -50,7 +50,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             override fun onAvailable(network: Network) {
                 setUnderlyingNetworks(arrayOf(network))
             }
-            override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities?) {
+            override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
                 // it's a good idea to refresh capabilities
                 setUnderlyingNetworks(arrayOf(network))
             }
@@ -79,7 +79,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     override fun onDestroy() {
         super.onDestroy()
-        V2RayServiceManager.cancelNotification()
+        stopV2Ray()
     }
 
     private fun setup(parameters: String) {
@@ -155,8 +155,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             try {
                 connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
-            } catch (ignored: Exception) {
-                // ignored
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
 
@@ -172,6 +172,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
             e.printStackTrace()
             stopV2Ray()
         }
+
+        sendFd()
     }
 
     private fun sendFd() {
@@ -181,7 +183,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         GlobalScope.launch(Dispatchers.IO) {
             var tries = 0
             while (true) try {
-                Thread.sleep(50L shl tries)
+                Thread.sleep(1000L shl tries)
                 Log.d(packageName, "sendFd tries: $tries")
                 LocalSocket().use { localSocket ->
                     localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
@@ -251,7 +253,4 @@ class V2RayVpnService : VpnService(), ServiceControl {
         return protect(socket)
     }
 
-    override fun vpnSendFd() {
-        sendFd()
-    }
 }

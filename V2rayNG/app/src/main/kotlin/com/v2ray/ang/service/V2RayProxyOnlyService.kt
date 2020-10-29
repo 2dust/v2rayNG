@@ -37,10 +37,6 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
         return true
     }
 
-    override fun vpnSendFd() {
-        // do nothing
-    }
-
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }

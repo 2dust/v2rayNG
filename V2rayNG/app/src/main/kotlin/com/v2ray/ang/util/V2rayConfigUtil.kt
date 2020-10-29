@@ -3,9 +3,7 @@ package com.v2ray.ang.util
 import android.content.Context
 import android.text.TextUtils
 import android.util.Log
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
+import com.google.gson.*
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.AngConfig.VmessBean
@@ -14,7 +12,6 @@ import com.v2ray.ang.ui.SettingsActivity
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONArray
-import com.google.gson.JsonObject
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.defaultDPreference
 import kotlin.collections.ArrayList
@@ -64,11 +61,16 @@ object V2rayConfigUtil {
         if (TextUtils.isEmpty(jsonConfig)) {
             return null
         }
-        val v2rayConfig = Gson().fromJson(jsonConfig, V2rayConfig::class.java) ?: return null
-        for (outbound in v2rayConfig.outbounds) {
-            if (outbound.protocol.equals(EConfigType.VMESS.name.toLowerCase()) ||
-                    outbound.protocol.equals(EConfigType.SHADOWSOCKS.name.toLowerCase()) ||
-                    outbound.protocol.equals(EConfigType.SOCKS.name.toLowerCase())) {
+        val v2rayConfig: V2rayConfig? = try {
+            Gson().fromJson(jsonConfig, V2rayConfig::class.java)
+        } catch (e: JsonSyntaxException) {
+            e.printStackTrace()
+            null
+        }
+        v2rayConfig?.outbounds?.forEach { outbound ->
+            if (outbound.protocol.equals(EConfigType.VMESS.name, true) ||
+                    outbound.protocol.equals(EConfigType.SHADOWSOCKS.name, true) ||
+                    outbound.protocol.equals(EConfigType.SOCKS.name, true)) {
                 return outbound
             }
         }

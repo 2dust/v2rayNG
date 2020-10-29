@@ -44,9 +44,6 @@
     static void throwUninitializedPropertyAccessException(java.lang.String);
 }
 
--dontwarn org.jetbrains.anko.internals.**
--keep class org.jetbrains.anko.internals.** { *;}
-
 -dontwarn rx.internal.util.unsafe.**
 -keep class rx.internal.util.unsafe.** { *;}
 
