@@ -1,11 +1,9 @@
 package Escort
 
 import (
+	"log"
 	"os"
 	"os/exec"
-	"time"
-
-	"log"
 
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 )
