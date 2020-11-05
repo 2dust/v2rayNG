@@ -318,7 +318,7 @@ object AngConfigManager {
                     result = Utils.decode(result)
                 }
 
-                val legacyPattern = "^(.+?):(.*)@(.+?):(\\d+?)$".toRegex()
+                val legacyPattern = "^(.+?):(.*)@(.+?):(\\d+?)/?$".toRegex()
                 val match = legacyPattern.matchEntire(result)
                 if (match == null) {
                     return R.string.toast_incorrect_protocol
