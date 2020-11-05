@@ -3,7 +3,6 @@ package Escort
 import (
 	"os"
 	"os/exec"
-	"time"
 
 	"log"
 
