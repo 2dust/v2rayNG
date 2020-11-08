@@ -1,0 +1,66 @@
+{
+  "version": 2,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.v2ray.ang",
+  "variantName": "processReleaseResources",
+  "elements": [
+    {
+      "type": "UNIVERSAL",
+      "filters": [],
+      "versionCode": 213,
+      "versionName": "1.0.3",
+      "outputFile": "app-universal-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86"
+        }
+      ],
+      "versionCode": 3000213,
+      "versionName": "1.0.3",
+      "outputFile": "app-x86-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "arm64-v8a"
+        }
+      ],
+      "versionCode": 2000213,
+      "versionName": "1.0.3",
+      "outputFile": "app-arm64-v8a-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        }
+      ],
+      "versionCode": 1000213,
+      "versionName": "1.0.3",
+      "outputFile": "app-armeabi-v7a-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86_64"
+        }
+      ],
+      "versionCode": 4000213,
+      "versionName": "1.0.3",
+      "outputFile": "app-x86_64-release.apk"
+    }
+  ]
+}

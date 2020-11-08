@@ -4,8 +4,8 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        android:layout_height="match_parent">
 
     <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -23,7 +23,7 @@
         <LinearLayout
                 android:id="@+id/layout_test"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/connection_test_height"
+                android:layout_height="?attr/actionBarSize"
                 android:background="@drawable/background_test_button"
                 android:gravity="center|start"
                 android:clickable="true"
@@ -86,8 +86,8 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             app:headerLayout="@layout/nav_header"
-            app:itemIconTint="@color/colorPrimary_dark"
-            app:itemTextColor="@color/colorPrimary"
+            app:itemIconTint="@android:color/primary_text_light"
+            app:itemTextColor="@android:color/primary_text_light"
             app:menu="@menu/menu_drawer">
 
         <LinearLayout
@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:background="@color/white"
-                android:padding="14dp">
+                android:padding="15dp">
 
             <TextView
                     android:id="@+id/version"
