@@ -110,6 +110,10 @@ func (v *V2RayPoint) GetIsRunning() bool {
 	return v.status.IsRunning
 }
 
+func (v *V2RayPoint) GetIsTRunning() bool {
+	return v.status.IsTRunning
+}
+
 //Delegate Funcation
 func (v V2RayPoint) QueryStats(tag string, direct string) int64 {
 	if v.statsManager == nil {
@@ -160,12 +164,12 @@ func (v *V2RayPoint) pointloop() error {
 	v.SupportSet.Setup(v.status.GetVPNSetupArg(v.EnableLocalDNS, v.ForwardIpv6))
 	v.SupportSet.OnEmitStatus(0, "Running")
 
-	isTRunning := false
+	v.status.IsTRunning = false
 	if err := v.runTun2socks(); err != nil {
 		log.Println(err)
 		return err
 	}
-	isTRunning = true
+	v.status.IsTRunning = true
 
 	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s",
 		v.EnableLocalDNS,
