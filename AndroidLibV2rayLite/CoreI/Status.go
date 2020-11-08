@@ -6,6 +6,7 @@ import (
 
 type Status struct {
 	IsRunning       bool
+	IsTRunning      bool
 	PackageName     string
 	PackageCodePath string
 
