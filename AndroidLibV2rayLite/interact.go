@@ -161,11 +161,13 @@ func (v *V2RayPoint) pointloop() error {
 	v.SupportSet.Setup(v.status.GetVPNSetupArg(v.EnableLocalDNS, v.ForwardIpv6))
 	v.SupportSet.OnEmitStatus(0, "Running")
 
+	isTRunning := false
 	if !v.ProxyOnly {
 		if err := v.runTun2socks(); err != nil {
 			log.Println(err)
 			return err
 		}
+		isTRunning = true
 
 		log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s",
 			v.EnableLocalDNS,
