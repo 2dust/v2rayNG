@@ -98,9 +98,7 @@ func (v *V2RayPoint) StopLoop() (err error) {
 	v.v2rayOP.Lock()
 	defer v.v2rayOP.Unlock()
 	if v.status.IsRunning {
-		close(v.closeChan)
 		v.shutdownInit()
-		v.SupportSet.OnEmitStatus(0, "Closed")
 	}
 	return
 }
@@ -123,12 +121,16 @@ func (v V2RayPoint) QueryStats(tag string, direct string) int64 {
 }
 
 func (v *V2RayPoint) shutdownInit() {
-	v.status.IsRunning = false
+	close(v.closeChan)
+	v.statsManager = nil
 	v.status.Vpoint.Close()
 	v.status.Vpoint = nil
-	v.statsManager = nil
+	v.status.IsRunning = false
+
 	v.escorter.EscortingDown()
+
 	v.SupportSet.Shutdown()
+	v.SupportSet.OnEmitStatus(0, "Closed")
 }
 
 func (v *V2RayPoint) pointloop() error {
