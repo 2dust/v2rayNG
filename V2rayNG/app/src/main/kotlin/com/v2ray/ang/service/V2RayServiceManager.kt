@@ -310,11 +310,12 @@ object V2RayServiceManager {
                         val sinceLastQueryInSeconds = (queryTime - lastQueryTime) / 1000.0
                         var proxyTotal = 0L
                         val text = StringBuilder()
-                        outboundTags.forEach {
+                        outboundTags.forEach<String> {
                             val up = v2rayPoint.queryStats(it, "uplink")
                             val down = v2rayPoint.queryStats(it, "downlink")
                             if (up + down > 0) {
-                                appendSpeedString(text, it, up / sinceLastQueryInSeconds, down / sinceLastQueryInSeconds)
+                                appendSpeedString(text, it, up / sinceLastQueryInSeconds, down /
+                                        sinceLastQueryInSeconds)
                                 proxyTotal += up + down
                             }
                         }
