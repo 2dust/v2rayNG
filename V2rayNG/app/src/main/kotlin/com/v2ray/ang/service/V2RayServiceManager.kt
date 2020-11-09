@@ -314,8 +314,7 @@ object V2RayServiceManager {
                             val up = v2rayPoint.queryStats(it, "uplink")
                             val down = v2rayPoint.queryStats(it, "downlink")
                             if (up + down > 0) {
-                                appendSpeedString(text, it, up / sinceLastQueryInSeconds, down /
-                                        sinceLastQueryInSeconds)
+                                appendSpeedString(text, it, up / sinceLastQueryInSeconds, down / sinceLastQueryInSeconds)
                                 proxyTotal += up + down
                             }
                         }

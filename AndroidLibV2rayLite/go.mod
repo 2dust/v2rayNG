@@ -1,6 +1,6 @@
 module github.com/2dust/AndroidLibV2rayLite
 
-go 1.14
+go 1.15
 
 require (
 	golang.org/x/mobile v0.0.0-20200329125638-4c31acba0007
