@@ -1,3 +1,8 @@
+---
+name: v2rayNG程序问题
+about: 创建一个报告来帮助我们改进
+---
+
 在提出问题前请先自行排除服务器端问题，同时也请通过搜索确认是否有人提出过相同问题。
 
 
@@ -14,7 +19,8 @@
 
 ### 日志信息
 <details>
-通过 `adb logcat -s com.v2ray.ang GoLog V2rayConfigUtilGoLog Main` 获取日志。请自行删减日志中可能出现的敏感信息。
+
+通过`adb logcat -s com.v2ray.ang GoLog V2rayConfigUtilGoLog Main`获取日志。请自行删减日志中可能出现的敏感信息。
 
 如果问题可重现，建议先执行`adb logcat -c`清空系统日志再执行上述命令，再操作重现问题。
 ```
