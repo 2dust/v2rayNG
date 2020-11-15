@@ -1,42 +1,46 @@
 package com.v2ray.ang.ui
 
 import android.Manifest
-import android.content.*
+import android.arch.lifecycle.ViewModelProviders
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.net.VpnService
-import android.support.v7.widget.LinearLayoutManager
-import android.view.Menu
-import android.view.MenuItem
-import com.tbruyelle.rxpermissions.RxPermissions
-import com.v2ray.ang.R
-import com.v2ray.ang.util.AngConfigManager
-import com.v2ray.ang.util.Utils
-import kotlinx.android.synthetic.main.activity_main.*
 import android.os.Bundle
-import android.text.TextUtils
-import android.view.KeyEvent
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.util.MessageUtil
-import com.v2ray.ang.util.V2rayConfigUtil
-import java.lang.ref.SoftReference
-import java.net.URL
-import android.content.IntentFilter
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.text.TextUtils
 import android.util.Log
+import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
+import com.tbruyelle.rxpermissions.RxPermissions
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
-import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
+import com.v2ray.ang.util.AngConfigManager
+import com.v2ray.ang.util.MessageUtil
+import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.V2rayConfigUtil
+import com.v2ray.ang.viewmodel.MainViewModel
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import libv2ray.Libv2ray
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
+import java.lang.ref.SoftReference
+import java.net.URL
 import java.util.concurrent.TimeUnit
-import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
-import com.v2ray.ang.util.AngConfigManager.configs
-import kotlinx.coroutines.*
-import libv2ray.Libv2ray
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     companion object {
@@ -62,7 +66,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
     private var mItemTouchHelper: ItemTouchHelper? = null
-    private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
+    private val mainViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,6 +119,19 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         toggle.syncState()
         nav_view.setNavigationItemSelectedListener(this)
         version.text = "v${BuildConfig.VERSION_NAME} (${Libv2ray.checkVersionX()})"
+
+        setupViewModelObserver()
+    }
+
+    private fun setupViewModelObserver() {
+        mainViewModel.updateListAction.observe(this, {
+            val index = it ?: return@observe
+            if (index >= 0) {
+                adapter.updateSelectedItem(index)
+            } else {
+                adapter.updateConfigList()
+            }
+        })
     }
 
     fun startV2Ray() {
@@ -251,30 +268,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.ping_all -> {
-            tcpingTestScope.coroutineContext[Job]?.cancelChildren()
-            Utils.closeAllTcpSockets()
-            for (k in 0 until configs.vmess.count()) {
-                configs.vmess[k].testResult = ""
-                adapter.updateConfigList()
-            }
-            for (k in 0 until configs.vmess.count()) {
-                var serverAddress = configs.vmess[k].address
-                var serverPort = configs.vmess[k].port
-                if (configs.vmess[k].configType == EConfigType.CUSTOM.value) {
-                    val serverOutbound = V2rayConfigUtil.getCustomConfigServerOutbound(applicationContext, configs.vmess[k].guid)
-                            ?: continue
-                    serverAddress = serverOutbound.getServerAddress() ?: continue
-                    serverPort = serverOutbound.getServerPort() ?: continue
-                }
-                tcpingTestScope.launch {
-                    configs.vmess.getOrNull(k)?.let {  // check null in case array is modified during testing
-                        it.testResult = Utils.tcping(serverAddress, serverPort)
-                        launch(Dispatchers.Main) {
-                            adapter.updateSelectedItem(k)
-                        }
-                    }
-                }
-            }
+            mainViewModel.testAllTcping()
             true
         }
 
