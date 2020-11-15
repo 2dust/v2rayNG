@@ -2,10 +2,7 @@ package com.v2ray.ang.ui
 
 import android.Manifest
 import android.arch.lifecycle.ViewModelProviders
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
@@ -27,7 +24,6 @@ import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.AngConfigManager
-import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
 import com.v2ray.ang.viewmodel.MainViewModel
@@ -38,7 +34,6 @@ import kotlinx.coroutines.launch
 import libv2ray.Libv2ray
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
-import java.lang.ref.SoftReference
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
@@ -49,20 +44,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         private const val REQUEST_FILE_CHOOSER = 2
         private const val REQUEST_SCAN_URL = 3
     }
-
-    var isRunning = false
-        set(value) {
-            field = value
-            adapter.changeable = !value
-            if (value) {
-                fab.setImageResource(R.drawable.ic_v)
-                tv_test_state.text = getString(R.string.connection_connected)
-            } else {
-                fab.setImageResource(R.drawable.ic_v_idle)
-                tv_test_state.text = getString(R.string.connection_not_connected)
-            }
-            hideCircle()
-        }
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
     private var mItemTouchHelper: ItemTouchHelper? = null
@@ -75,7 +56,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener {
-            if (isRunning) {
+            if (mainViewModel.isRunning.value == true) {
                 Utils.stopVService(this)
             } else if (defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN") == "VPN") {
                 val intent = VpnService.prepare(this)
@@ -89,16 +70,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
         }
         layout_test.setOnClickListener {
-            if (isRunning) {
-                val socksPort = 10808//Utils.parseInt(defaultDPreference.getPrefString(SettingsActivity.PREF_SOCKS_PORT, "10808"))
-
+            if (mainViewModel.isRunning.value == true) {
                 tv_test_state.text = getString(R.string.connection_test_testing)
-                GlobalScope.launch(Dispatchers.IO) {
-                    val result = Utils.testConnection(this@MainActivity, socksPort)
-                    launch(Dispatchers.Main) {
-                        tv_test_state.text = Utils.getEditable(result)
-                    }
-                }
+                mainViewModel.testCurrentServerRealPing()
             } else {
 //                tv_test_state.text = getString(R.string.connection_test_fail)
             }
@@ -132,6 +106,20 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 adapter.updateConfigList()
             }
         })
+        mainViewModel.updateTestResultAction.observe(this, { tv_test_state.text = it })
+        mainViewModel.isRunning.observe(this, {
+            val isRunning = it ?: return@observe
+            adapter.changeable = !isRunning
+            if (isRunning) {
+                fab.setImageResource(R.drawable.ic_v)
+                tv_test_state.text = getString(R.string.connection_connected)
+            } else {
+                fab.setImageResource(R.drawable.ic_v_idle)
+                tv_test_state.text = getString(R.string.connection_not_connected)
+            }
+            hideCircle()
+        })
+        mainViewModel.startListenBroadcast()
     }
 
     fun startV2Ray() {
@@ -142,27 +130,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //        toast(R.string.toast_services_start)
         if (!Utils.startVService(this)) {
             hideCircle()
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        isRunning = false
-
-//        val intent = Intent(this.applicationContext, V2RayVpnService::class.java)
-//        intent.`package` = AppConfig.ANG_PACKAGE
-//        bindService(intent, mConnection, BIND_AUTO_CREATE)
-
-        mMsgReceive = ReceiveMessageHandler(this@MainActivity)
-        registerReceiver(mMsgReceive, IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY))
-        MessageUtil.sendMsg2Service(this, AppConfig.MSG_REGISTER_CLIENT, "")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        if (mMsgReceive != null) {
-            unregisterReceiver(mMsgReceive)
-            mMsgReceive = null
         }
     }
 
@@ -205,7 +172,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private fun getOptionIntent() = Intent().putExtra("position", -1)
-            .putExtra("isRunning", isRunning)
+            .putExtra("isRunning", mainViewModel.isRunning.value == true)
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.import_qrcode -> {
@@ -508,35 +475,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //        }
 //    }
 
-    private
-    var mMsgReceive: BroadcastReceiver? = null
-
-    private class ReceiveMessageHandler(activity: MainActivity) : BroadcastReceiver() {
-        internal var mReference: SoftReference<MainActivity> = SoftReference(activity)
-        override fun onReceive(ctx: Context?, intent: Intent?) {
-            val activity = mReference.get()
-            when (intent?.getIntExtra("key", 0)) {
-                AppConfig.MSG_STATE_RUNNING -> {
-                    activity?.isRunning = true
-                }
-                AppConfig.MSG_STATE_NOT_RUNNING -> {
-                    activity?.isRunning = false
-                }
-                AppConfig.MSG_STATE_START_SUCCESS -> {
-                    activity?.toast(R.string.toast_services_success)
-                    activity?.isRunning = true
-                }
-                AppConfig.MSG_STATE_START_FAILURE -> {
-                    activity?.toast(R.string.toast_services_failure)
-                    activity?.isRunning = false
-                }
-                AppConfig.MSG_STATE_STOP_SUCCESS -> {
-                    activity?.isRunning = false
-                }
-            }
-        }
-    }
-
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             moveTaskToBack(false)
@@ -579,7 +517,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             R.id.settings -> {
                 startActivity(Intent(this, SettingsActivity::class.java)
-                        .putExtra("isRunning", isRunning))
+                        .putExtra("isRunning", mainViewModel.isRunning.value == true))
             }
             R.id.feedback -> {
                 Utils.openUri(this, AppConfig.v2rayNGIssues)
