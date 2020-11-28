@@ -10,7 +10,6 @@ import android.os.ParcelFileDescriptor
 import android.os.StrictMode
 import android.support.annotation.RequiresApi
 import android.util.Log
-import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.ui.PerAppProxyActivity
@@ -127,7 +126,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 }
         }
 
-        builder.setSession(defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, ""))
+        builder.setSession(V2RayServiceManager.currentConfigName)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
                 defaultDPreference.getPrefBoolean(SettingsActivity.PREF_PER_APP_PROXY, false)) {

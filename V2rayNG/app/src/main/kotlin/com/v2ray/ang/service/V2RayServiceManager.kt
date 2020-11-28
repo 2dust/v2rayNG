@@ -50,6 +50,7 @@ object V2RayServiceManager {
                 Seq.setContext(context)
             }
         }
+    var currentConfigName = "NG"
 
     private var lastQueryTime = 0L
     private var mBuilder: NotificationCompat.Builder? = null
@@ -132,6 +133,7 @@ object V2RayServiceManager {
             v2rayPoint.forwardIpv6 = service.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_FORWARD_IPV6, false)
             v2rayPoint.domainName = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_DOMAIN, "")
             v2rayPoint.proxyOnly = service.defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN") != "VPN"
+            currentConfigName = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "NG")
 
             try {
                 v2rayPoint.runLoop()
@@ -235,7 +237,7 @@ object V2RayServiceManager {
 
         mBuilder = NotificationCompat.Builder(service, channelId)
                 .setSmallIcon(R.drawable.ic_v)
-                .setContentTitle(service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, ""))
+                .setContentTitle(currentConfigName)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setOngoing(true)
                 .setShowWhen(false)
@@ -346,13 +348,10 @@ object V2RayServiceManager {
     }
 
     fun stopSpeedNotification() {
-        val service = serviceControl?.get()?.getService() ?: return
         if (mSubscription != null) {
             mSubscription?.unsubscribe() //stop queryStats
             mSubscription = null
-
-            val cfName = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "")
-            updateNotification(cfName, 0, 0)
+            updateNotification(currentConfigName, 0, 0)
         }
     }
 }

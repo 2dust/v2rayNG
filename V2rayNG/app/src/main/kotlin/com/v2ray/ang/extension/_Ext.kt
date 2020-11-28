@@ -15,6 +15,10 @@ import java.net.URLConnection
 val Context.v2RayApplication: AngApplication
     get() = applicationContext as AngApplication
 
+// Usage note: DPreference use Android ContentProvider to redirect multi process access to main process.
+// Currently, RunSoLibV2RayDaemon process will run proxy core, keep minimum configuration and long running
+// in the background, support toggle on/off. That means it should NOT use DPreference after the initial
+// creation and setup of the service
 val Context.defaultDPreference: DPreference
     get() = v2RayApplication.defaultDPreference
 
