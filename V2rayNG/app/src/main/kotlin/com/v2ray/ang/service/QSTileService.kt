@@ -11,11 +11,9 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import java.lang.ref.SoftReference
-
 
 @TargetApi(Build.VERSION_CODES.N)
 class QSTileService : TileService() {
@@ -27,7 +25,7 @@ class QSTileService : TileService() {
             qsTile?.icon = Icon.createWithResource(applicationContext, R.drawable.ic_v_idle)
         } else if (state == Tile.STATE_ACTIVE) {
             qsTile?.state = Tile.STATE_ACTIVE
-            qsTile?.label = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "NG")
+            qsTile?.label = V2RayServiceManager.currentConfigName
             qsTile?.icon = Icon.createWithResource(applicationContext, R.drawable.ic_v)
         }
 
