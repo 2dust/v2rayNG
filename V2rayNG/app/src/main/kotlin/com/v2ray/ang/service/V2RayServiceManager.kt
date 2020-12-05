@@ -18,6 +18,8 @@ import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.extension.toSpeedString
+import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.ui.SettingsActivity
 import com.v2ray.ang.util.MessageUtil
@@ -57,8 +59,13 @@ object V2RayServiceManager {
     private var mSubscription: Subscription? = null
     private var mNotificationManager: NotificationManager? = null
 
-    fun startV2Ray(context: Context, mode: String) {
-        val intent = if (mode == "VPN") {
+    fun startV2Ray(context: Context) {
+        if (context.v2RayApplication.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_PROXY_SHARING, false)) {
+            context.toast(R.string.toast_warning_pref_proxysharing_short)
+        }else{
+            context.toast(R.string.toast_services_start)
+        }
+        val intent = if (context.v2RayApplication.defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN") == "VPN") {
             Intent(context.applicationContext, V2RayVpnService::class.java)
         } else {
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)

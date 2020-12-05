@@ -7,6 +7,7 @@ import android.view.View
 import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.Utils
 
 class SettingsActivity : BaseActivity() {
@@ -74,7 +75,7 @@ class SettingsActivity : BaseActivity() {
 
         private fun restartProxy() {
             Utils.stopVService(requireContext())
-            Utils.startVService(requireContext())
+            Utils.startVService(requireContext(), AngConfigManager.configs.index)
         }
 
         private fun isRunning(): Boolean {
