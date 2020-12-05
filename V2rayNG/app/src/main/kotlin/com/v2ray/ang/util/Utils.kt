@@ -22,7 +22,7 @@ import android.webkit.URLUtil
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.extension.responseLength
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
@@ -32,7 +32,6 @@ import kotlinx.coroutines.isActive
 import me.dozen.dpreference.DPreference
 import java.io.IOException
 import java.net.*
-import libv2ray.Libv2ray
 import kotlin.coroutines.coroutineContext
 
 object Utils {
@@ -272,38 +271,13 @@ object Utils {
     }
 
     fun startVServiceFromToggle(context: Context): Boolean {
-        val result = startVService(context)
-        if (!result) {
+        val result = context.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
+        if (result.isBlank()) {
             context.toast(R.string.app_tile_first_use)
-        }
-        return result
-    }
-
-    /**
-     * startVService
-     */
-    fun startVService(context: Context): Boolean {
-        if (context.v2RayApplication.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_PROXY_SHARING, false)) {
-            context.toast(R.string.toast_warning_pref_proxysharing_short)
-        }else{
-            context.toast(R.string.toast_services_start)
-        }
-        if (AngConfigManager.genStoreV2rayConfig(-1)) {
-            val configContent = AngConfigManager.currGeneratedV2rayConfig()
-            val configType = AngConfigManager.currConfigType()
-            if (configType == EConfigType.CUSTOM) {
-                try {
-                    Libv2ray.testConfig(configContent)
-                } catch (e: Exception) {
-                    context.toast(e.toString())
-                    return false
-                }
-            }
-            V2RayServiceManager.startV2Ray(context, context.v2RayApplication.defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN"))
-            return true
-        } else {
             return false
         }
+        V2RayServiceManager.startV2Ray(context)
+        return true
     }
 
     /**
@@ -319,8 +293,11 @@ object Utils {
      * startVService
      */
     fun startVService(context: Context, index: Int): Boolean {
-        AngConfigManager.setActiveServer(index)
-        return startVService(context)
+        if (AngConfigManager.setActiveServer(index) < 0) {
+            return false
+        }
+        V2RayServiceManager.startV2Ray(context)
+        return true
     }
 
     /**

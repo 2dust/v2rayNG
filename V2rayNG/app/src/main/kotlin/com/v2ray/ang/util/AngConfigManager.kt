@@ -2,6 +2,7 @@ package com.v2ray.ang.util
 
 import android.graphics.Bitmap
 import android.text.TextUtils
+import android.util.Log
 import com.google.gson.Gson
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
@@ -154,6 +155,10 @@ object AngConfigManager {
             angConfig.index = index
             app.curIndex = index
             storeConfigFile()
+            if (!genStoreV2rayConfig(index)) {
+                Log.d(AppConfig.ANG_PACKAGE, "set active index $index but generate full configuration failed!")
+                return -1
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             app.curIndex = -1
@@ -586,9 +591,9 @@ object AngConfigManager {
      */
     fun shareFullContent2Clipboard(index: Int): Int {
         try {
-            if (AngConfigManager.genStoreV2rayConfig(index)) {
-                val configContent = app.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
-                Utils.setClipboard(app.applicationContext, configContent)
+            val result = V2rayConfigUtil.getV2rayConfig(app, angConfig.vmess[index])
+            if (result.status) {
+                Utils.setClipboard(app.applicationContext, result.content)
             } else {
                 return -1
             }

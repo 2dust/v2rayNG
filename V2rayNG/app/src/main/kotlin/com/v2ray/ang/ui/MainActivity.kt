@@ -128,7 +128,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
         showCircle()
 //        toast(R.string.toast_services_start)
-        if (!Utils.startVService(this)) {
+        if (!Utils.startVService(this, AngConfigManager.configs.index)) {
             hideCircle()
         }
     }

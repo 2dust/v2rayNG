@@ -143,16 +143,14 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 } else {
                     mActivity.showCircle()
                     Utils.stopVService(mActivity)
-                    AngConfigManager.setActiveServer(position)
                     Observable.timer(500, TimeUnit.MILLISECONDS)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 mActivity.showCircle()
-                                if (!Utils.startVService(mActivity)) {
+                                if (!Utils.startVService(mActivity, position)) {
                                     mActivity.hideCircle()
                                 }
                             }
-
                 }
                 notifyDataSetChanged()
             }

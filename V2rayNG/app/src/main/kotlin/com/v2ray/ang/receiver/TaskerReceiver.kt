@@ -21,7 +21,7 @@ class TaskerReceiver : BroadcastReceiver() {
                 return
             } else if (switch) {
                 if (guid == AppConfig.TASKER_DEFAULT_GUID) {
-                    Utils.startVService(context)
+                    Utils.startVServiceFromToggle(context)
                 } else {
                     Utils.startVService(context, guid)
                 }
