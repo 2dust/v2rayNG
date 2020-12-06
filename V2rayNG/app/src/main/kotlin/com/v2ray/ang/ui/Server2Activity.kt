@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.text.Editable
 import android.text.TextUtils
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import com.google.gson.Gson
@@ -100,6 +101,11 @@ class Server2Activity : BaseActivity() {
         if (saveSuccess) {
             //update config
             defaultDPreference.setPrefString(AppConfig.ANG_CONFIG + edit_guid, tv_content.text.toString())
+            if (edit_index == configs.index) {
+                if (!AngConfigManager.genStoreV2rayConfig(edit_index)) {
+                    Log.d(AppConfig.ANG_PACKAGE, "update custom config $edit_index but generate full configuration failed!")
+                }
+            }
             finish()
             return true
         } else {

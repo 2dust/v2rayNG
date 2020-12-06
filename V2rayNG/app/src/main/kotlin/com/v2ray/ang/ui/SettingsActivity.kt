@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.preference.*
@@ -9,6 +10,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.viewmodel.SettingsViewModel
 
 class SettingsActivity : BaseActivity() {
     companion object {
@@ -37,6 +39,8 @@ class SettingsActivity : BaseActivity() {
         const val PREF_FORWARD_IPV6 = "pref_forward_ipv6"
     }
 
+    private val settingsViewModel by lazy { ViewModelProviders.of(this).get(SettingsViewModel::class.java) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -44,6 +48,8 @@ class SettingsActivity : BaseActivity() {
         title = getString(R.string.title_settings)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        settingsViewModel.startListenPreferenceChange()
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
