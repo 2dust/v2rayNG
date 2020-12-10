@@ -17,7 +17,6 @@ import (
 	v2filesystem "v2ray.com/core/common/platform/filesystem"
 	v2stats "v2ray.com/core/features/stats"
 	v2serial "v2ray.com/core/infra/conf/serial"
-	_ "v2ray.com/core/main/distro/all"
 	v2internet "v2ray.com/core/transport/internet"
 
 	v2applog "v2ray.com/core/app/log"
