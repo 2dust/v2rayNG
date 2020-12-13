@@ -50,15 +50,16 @@ class WidgetProvider : AppWidgetProvider() {
                 Utils.startVServiceFromToggle(context)
             }
         } else if (AppConfig.BROADCAST_ACTION_ACTIVITY == intent.action) {
-            val manager = AppWidgetManager.getInstance(context)
-            when (intent.getIntExtra("key", 0)) {
-                AppConfig.MSG_STATE_RUNNING, AppConfig.MSG_STATE_START_SUCCESS -> {
-                    updateWidgetBackground(context, manager, manager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java)),
-                            true)
-                }
-                AppConfig.MSG_STATE_NOT_RUNNING, AppConfig.MSG_STATE_START_FAILURE, AppConfig.MSG_STATE_STOP_SUCCESS -> {
-                    updateWidgetBackground(context, manager, manager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java)),
-                            false)
+            AppWidgetManager.getInstance(context)?.let { manager ->
+                when (intent.getIntExtra("key", 0)) {
+                    AppConfig.MSG_STATE_RUNNING, AppConfig.MSG_STATE_START_SUCCESS -> {
+                        updateWidgetBackground(context, manager, manager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java)),
+                                true)
+                    }
+                    AppConfig.MSG_STATE_NOT_RUNNING, AppConfig.MSG_STATE_START_FAILURE, AppConfig.MSG_STATE_STOP_SUCCESS -> {
+                        updateWidgetBackground(context, manager, manager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java)),
+                                false)
+                    }
                 }
             }
         }
