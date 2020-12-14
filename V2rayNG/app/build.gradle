@@ -96,6 +96,7 @@ dependencies {
     implementation 'me.dm7.barcodescanner:core:1.9.8'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
     implementation 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
+    implementation 'me.drakeet.support:toastcompat:1.1.0'
 
     implementation(name: 'libv2ray', ext: 'aar')
     //implementation(name: 'tun2socks', ext: 'aar')
