@@ -155,6 +155,7 @@ class ServerActivity : BaseActivity() {
         }
 
         if (AngConfigManager.addServer(vmess, edit_index) == 0) {
+            AngConfigManager.genStoreV2rayConfigIfActive(edit_index)
             toast(R.string.toast_success)
             finish()
             return true
