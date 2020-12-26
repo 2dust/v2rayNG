@@ -36,7 +36,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_V2RAY_ROUTING_BLOCKED,
             AppConfig.PREF_V2RAY_ROUTING_DIRECT -> {
                 GlobalScope.launch {
-                    if (!AngConfigManager.genStoreV2rayConfig(AngConfigManager.configs.index)) {
+                    if (!AngConfigManager.genStoreV2rayConfig()) {
                         Log.d(AppConfig.ANG_PACKAGE, "$key changed but generate full configuration failed!")
                     }
                 }

@@ -155,7 +155,7 @@ object AngConfigManager {
             angConfig.index = index
             app.curIndex = index
             storeConfigFile()
-            if (!genStoreV2rayConfig(index)) {
+            if (!genStoreV2rayConfig()) {
                 Log.d(AppConfig.ANG_PACKAGE, "set active index $index but generate full configuration failed!")
                 return -1
             }
@@ -179,35 +179,32 @@ object AngConfigManager {
         }
     }
 
+    fun genStoreV2rayConfigIfActive(index: Int) {
+        if (index == configs.index) {
+            if (!genStoreV2rayConfig()) {
+                Log.d(AppConfig.ANG_PACKAGE, "update config $index but generate full configuration failed!")
+            }
+        }
+    }
+
     /**
      * gen and store v2ray config file
      */
-    fun genStoreV2rayConfig(index: Int): Boolean {
+    fun genStoreV2rayConfig(): Boolean {
         try {
-            if (angConfig.index < 0
-                    || angConfig.vmess.count() <= 0
-                    || angConfig.index > angConfig.vmess.count() - 1
-            ) {
-                return false
-            }
-            var index2 = angConfig.index
-            if (index >= 0) {
-                index2 = index
-            }
-
-            val result = V2rayConfigUtil.getV2rayConfig(app, angConfig.vmess[index2])
-            if (result.status) {
-                app.defaultDPreference.setPrefString(PREF_CURR_CONFIG, result.content)
-                app.defaultDPreference.setPrefString(PREF_CURR_CONFIG_GUID, currConfigGuid())
-                app.defaultDPreference.setPrefString(PREF_CURR_CONFIG_NAME, currConfigName())
-                return true
-            } else {
-                return false
+            angConfig.vmess.getOrNull(angConfig.index)?.let {
+                val result = V2rayConfigUtil.getV2rayConfig(app, it)
+                if (result.status) {
+                    app.defaultDPreference.setPrefString(PREF_CURR_CONFIG, result.content)
+                    app.defaultDPreference.setPrefString(PREF_CURR_CONFIG_GUID, currConfigGuid())
+                    app.defaultDPreference.setPrefString(PREF_CURR_CONFIG_NAME, currConfigName())
+                    return true
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            return false
         }
+        return false
     }
 
     fun currGeneratedV2rayConfig(): String {

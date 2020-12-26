@@ -96,6 +96,7 @@ class Server4Activity : BaseActivity() {
         }
 
         if (AngConfigManager.addSocksServer(vmess, edit_index) == 0) {
+            AngConfigManager.genStoreV2rayConfigIfActive(edit_index)
             toast(R.string.toast_success)
             finish()
             return true
