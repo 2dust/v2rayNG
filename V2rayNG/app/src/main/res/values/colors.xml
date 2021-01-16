@@ -9,4 +9,5 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
     <color name="colorPing">#185534</color>
+    <color name="colorSubscription">#247BA0</color>
 </resources>
