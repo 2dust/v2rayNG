@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/item_bg"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/item_bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
 
-    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
-        card_view:cardCornerRadius="5dp">
+        app:cardCornerRadius="5dp">
 
         <LinearLayout
             android:id="@+id/info_container"
@@ -18,33 +20,18 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:orientation="horizontal"
-            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:nextFocusRight="@+id/layout_share">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_subid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="8dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                <android.support.v7.widget.AppCompatRadioButton
+            <android.support.v7.widget.AppCompatRadioButton
                     android:id="@+id/btn_radio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:clickable="false"
                     android:focusable="false"
                     android:focusableInTouchMode="false" />
-
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -85,20 +72,31 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:orientation="vertical"
-                    android:paddingEnd="5dp">
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingEnd="5dp">
 
                     <TextView
-                        android:id="@+id/tv_test_result"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:lines="1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/colorPing"
-                        android:textSize="10sp" />
+                            android:id="@+id/tv_subscription"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:lines="1"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                            android:textColor="@color/colorSubscription"
+                            android:textSize="10sp"
+                            tools:text="Sub" />
+
+                    <TextView
+                            android:id="@+id/tv_test_result"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:lines="1"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                            android:textColor="@color/colorPing"
+                            android:textSize="10sp"
+                            tools:text="214ms" />
                 </LinearLayout>
 
                 <LinearLayout

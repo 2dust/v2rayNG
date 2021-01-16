@@ -64,11 +64,13 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             holder.radio.isChecked = (position == configs.index)
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
             holder.test_result.text = test_result
-
-            if (TextUtils.isEmpty(subid)) {
-                holder.subid.text = ""
-            } else {
-                holder.subid.text = "S"
+            holder.subscription.text = ""
+            if (!TextUtils.isEmpty(subid)) {
+                for (sub in configs.subItem) {
+                    if (sub.id == subid) {
+                        holder.subscription.text = sub.remarks
+                    }
+                }
             }
 
             var shareOptions = share_method.asList()
@@ -211,7 +213,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     open class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     class MainViewHolder(itemView: View) : BaseViewHolder(itemView), ItemTouchHelperViewHolder {
-        val subid = itemView.tv_subid
+        val subscription = itemView.tv_subscription
         val radio = itemView.btn_radio!!
         val name = itemView.tv_name!!
         val test_result = itemView.tv_test_result!!
