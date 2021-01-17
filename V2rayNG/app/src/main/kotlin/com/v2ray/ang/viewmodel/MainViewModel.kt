@@ -65,6 +65,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun sortAllConfiguration() {
+        AngConfigManager.configs.vmess.sortBy {
+            val delay = it.testResult.substringBefore("ms").toIntOrNull() ?: 0
+            if (delay < 1) {
+                Int.MAX_VALUE
+            } else {
+                delay
+            }
+        }
+        AngConfigManager.storeConfigFile()
+        for (k in AngConfigManager.configs.vmess.indices) {
+            updateListAction.value = k
+        }
+    }
+
     fun testCurrentServerRealPing() {
         val socksPort = 10808//Utils.parseInt(defaultDPreference.getPrefString(SettingsActivity.PREF_SOCKS_PORT, "10808"))
         GlobalScope.launch(Dispatchers.IO) {

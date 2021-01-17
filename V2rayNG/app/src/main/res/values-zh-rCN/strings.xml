@@ -141,6 +141,7 @@
     <string name="sub_setting_remarks">备注</string>
     <string name="sub_setting_url">地址(url)</string>
     <string name="title_sub_update">更新订阅</string>
+    <string name="title_sort_all">排序订阅</string>
     <string name="title_ping_all_server">测试所有配置延迟(Tcping)</string>
 
     <string name="tasker_start_service">启动服务</string>

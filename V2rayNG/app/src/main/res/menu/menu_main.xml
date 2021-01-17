@@ -67,4 +67,9 @@
         android:icon="@drawable/ic_subscriptions_white_24dp"
         android:title="@string/title_sub_update"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/sort_all"
+        android:icon="@drawable/ic_subscriptions_white_24dp"
+        android:title="@string/title_sort_all"
+        app:showAsAction="never" />
 </menu>

@@ -143,6 +143,7 @@
     <string name="sub_setting_remarks">remarks</string>
     <string name="sub_setting_url">url</string>
     <string name="title_sub_update">Update subscription</string>
+    <string name="title_sort_all">Sort all configuration</string>
     <string name="title_ping_all_server">Tcping all configuration</string>
 
     <string name="tasker_start_service">Start Service</string>

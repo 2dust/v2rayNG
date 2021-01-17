@@ -239,6 +239,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
+        R.id.sort_all -> {
+            mainViewModel.sortAllConfiguration()
+            true
+        }
+
 //        R.id.settings -> {
 //            startActivity<SettingsActivity>("isRunning" to isRunning)
 //            true
