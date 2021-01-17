@@ -1,6 +1,8 @@
 package com.v2ray.ang.ui
 
 import android.Manifest
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
@@ -119,6 +121,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             hideCircle()
         })
+        mainViewModel.removedConfigurationCount.observe(this) {
+            toast(getString(R.string.toast_remove_duplication, it ?: 0))
+        }
         mainViewModel.startListenBroadcast()
     }
 
@@ -241,6 +246,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         R.id.sort_all -> {
             mainViewModel.sortAllConfiguration()
+            true
+        }
+
+        R.id.remove_duplication -> {
+            mainViewModel.removeDuplication()
             true
         }
 

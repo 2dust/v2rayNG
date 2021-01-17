@@ -11,6 +11,7 @@ import android.util.Log
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.AngConfig
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.AngConfigManager
@@ -23,6 +24,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
     val updateTestResultAction by lazy { MutableLiveData<String>() }
+    val removedConfigurationCount by lazy { MutableLiveData<Int>() }
 
     private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
 
@@ -75,9 +77,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
         AngConfigManager.storeConfigFile()
-        for (k in AngConfigManager.configs.vmess.indices) {
-            updateListAction.value = k
+        updateListAction.value = -1
+    }
+
+    fun removeDuplication() {
+        val dup = hashSetOf<String>()
+        val newList = arrayListOf<AngConfig.VmessBean>()
+        AngConfigManager.configs.vmess.forEach {
+            if (!dup.contains(it.address)) {
+                newList.add(it)
+            }
+            dup.add(it.address)
         }
+        val removedCount = AngConfigManager.configs.vmess.size - newList.size
+        AngConfigManager.configs.vmess = newList
+        AngConfigManager.storeConfigFile()
+        updateListAction.value = -1
+        removedConfigurationCount.value = removedCount
     }
 
     fun testCurrentServerRealPing() {

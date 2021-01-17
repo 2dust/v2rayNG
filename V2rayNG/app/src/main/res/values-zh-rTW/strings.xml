@@ -144,6 +144,8 @@
     <string name="sub_setting_url">位址(url)</string>
     <string name="title_sub_update">更新訂閱</string>
     <string name="title_sort_all">排序訂閲</string>
+    <string name="title_remove_duplication">刪除重複配置</string>
+    <string name="toast_remove_duplication">删除了%d个重复配置</string>
     <string name="title_ping_all_server">測試所有配置延遲(Tcping)</string>
 
     <string name="tasker_start_service">啟動服務</string>

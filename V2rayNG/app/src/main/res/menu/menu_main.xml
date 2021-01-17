@@ -72,4 +72,9 @@
         android:icon="@drawable/ic_subscriptions_white_24dp"
         android:title="@string/title_sort_all"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/remove_duplication"
+        android:icon="@drawable/ic_subscriptions_white_24dp"
+        android:title="@string/title_remove_duplication"
+        app:showAsAction="never" />
 </menu>
