@@ -458,12 +458,10 @@ object V2rayConfigUtil {
                 rulesIP.outboundTag = tag
                 rulesIP.ip = ArrayList<String>()
 
-                userRule.trim().replace("\n", "")
-                        .split(",")
-                        .forEach {
+                userRule.split(",").map { it.trim() }.forEach {
                             if (Utils.isIpAddress(it) || it.startsWith("geoip:")) {
                                 rulesIP.ip?.add(it)
-                            } else if (it.isNotBlank() || it.isNotEmpty())
+                            } else if (it.isNotEmpty())
 //                                if (Utils.isValidUrl(it)
 //                                    || it.startsWith("geosite:")
 //                                    || it.startsWith("regexp:")
@@ -487,9 +485,8 @@ object V2rayConfigUtil {
 
     private fun userRule2Domian(userRule: String): ArrayList<String> {
         val domain = ArrayList<String>()
-        userRule.trim().replace("\n", "").split(",").forEach {
-            if ((it.startsWith("geosite:") || it.startsWith("domain:")) &&
-                    it.isNotBlank() && it.isNotEmpty()) {
+        userRule.split(",").map { it.trim() }.forEach {
+            if (it.startsWith("geosite:") || it.startsWith("domain:")) {
                 domain.add(it)
             }
         }
