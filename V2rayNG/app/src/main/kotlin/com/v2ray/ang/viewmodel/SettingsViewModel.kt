@@ -6,8 +6,6 @@ import android.content.SharedPreferences
 import android.support.v7.preference.PreferenceManager
 import android.util.Log
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.ui.SettingsActivity.Companion
-import com.v2ray.ang.util.AngConfigManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -25,20 +23,17 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         Log.d(AppConfig.ANG_PACKAGE, "Observe settings changed: $key")
         when(key) {
-            Companion.PREF_SNIFFING_ENABLED,
-            Companion.PREF_PROXY_SHARING,
-            Companion.PREF_LOCAL_DNS_ENABLED,
-            Companion.PREF_REMOTE_DNS,
-            Companion.PREF_DOMESTIC_DNS,
-            Companion.PREF_ROUTING_DOMAIN_STRATEGY,
-            Companion.PREF_ROUTING_MODE,
+            AppConfig.PREF_SNIFFING_ENABLED,
+            AppConfig.PREF_PROXY_SHARING,
+            AppConfig.PREF_LOCAL_DNS_ENABLED,
+            AppConfig.PREF_REMOTE_DNS,
+            AppConfig.PREF_DOMESTIC_DNS,
+            AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,
+            AppConfig.PREF_ROUTING_MODE,
             AppConfig.PREF_V2RAY_ROUTING_AGENT,
             AppConfig.PREF_V2RAY_ROUTING_BLOCKED,
             AppConfig.PREF_V2RAY_ROUTING_DIRECT -> {
                 GlobalScope.launch {
-                    if (!AngConfigManager.genStoreV2rayConfig()) {
-                        Log.d(AppConfig.ANG_PACKAGE, "$key changed but generate full configuration failed!")
-                    }
                 }
             }
         }

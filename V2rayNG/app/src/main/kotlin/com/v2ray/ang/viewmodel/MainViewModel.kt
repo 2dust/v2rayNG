@@ -8,18 +8,21 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
+import com.google.gson.Gson
+import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.AngConfigManager
-import com.v2ray.ang.util.MessageUtil
-import com.v2ray.ang.util.Utils
-import com.v2ray.ang.util.V2rayConfigUtil
+import com.v2ray.ang.util.*
+import com.v2ray.ang.util.MmkvManager.KEY_ANG_CONFIGS
 import kotlinx.coroutines.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
+    private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
+    private val serverAffStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_AFF, MMKV.MULTI_PROCESS_MODE) }
+
+    val serverList by lazy { Gson().fromJson(mainStorage?.decodeString(KEY_ANG_CONFIGS), Array<String>::class.java).toList() }
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
     val updateTestResultAction by lazy { MutableLiveData<String>() }
@@ -34,31 +37,37 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     override fun onCleared() {
         getApplication<AngApplication>().unregisterReceiver(mMsgReceiver)
+        tcpingTestScope.coroutineContext[Job]?.cancelChildren()
+        Utils.closeAllTcpSockets()
         Log.i(AppConfig.ANG_PACKAGE, "Main ViewModel is cleared")
         super.onCleared()
+    }
+
+    fun getGuid(index: Int): String? {
+        return serverList.getOrNull(index)
     }
 
     fun testAllTcping() {
         tcpingTestScope.coroutineContext[Job]?.cancelChildren()
         Utils.closeAllTcpSockets()
-        for (k in 0 until AngConfigManager.configs.vmess.count()) {
-            AngConfigManager.configs.vmess[k].testResult = ""
-            updateListAction.value = -1 // update all
-        }
-        for (k in 0 until AngConfigManager.configs.vmess.count()) {
-            var serverAddress = AngConfigManager.configs.vmess[k].address
-            var serverPort = AngConfigManager.configs.vmess[k].port
-            if (AngConfigManager.configs.vmess[k].configType == EConfigType.CUSTOM.value) {
-                val serverOutbound = V2rayConfigUtil.getCustomConfigServerOutbound(getApplication(),
-                        AngConfigManager.configs.vmess[k].guid) ?: continue
-                serverAddress = serverOutbound.getServerAddress() ?: continue
-                serverPort = serverOutbound.getServerPort() ?: continue
-            }
-            tcpingTestScope.launch {
-                AngConfigManager.configs.vmess.getOrNull(k)?.let {  // check null in case array is modified during testing
-                    it.testResult = Utils.tcping(serverAddress, serverPort)
-                    launch(Dispatchers.Main) {
-                        updateListAction.value = k
+        MmkvManager.clearAllTestDelayResults()
+        updateListAction.value = -1 // update all
+
+        getApplication<AngApplication>().toast(R.string.connection_test_testing)
+        for (guid in serverList) {
+            MmkvManager.decodeServerConfig(guid)?.getProxyOutbound()?.let { outbound ->
+                val serverAddress = outbound.getServerAddress()
+                val serverPort = outbound.getServerPort()
+                if (serverAddress != null && serverPort != null) {
+                    tcpingTestScope.launch {
+                        val testResult = Utils.tcping(serverAddress, serverPort)
+                        launch(Dispatchers.Main) {
+                            MmkvManager.decodeServerAffiliationInfo(guid)?.let { aff ->
+                                aff.testDelayMillis = testResult
+                                serverAffStorage?.encode(guid, Gson().toJson(aff))
+                                updateListAction.value = serverList.indexOf(guid)
+                            }
+                        }
                     }
                 }
             }

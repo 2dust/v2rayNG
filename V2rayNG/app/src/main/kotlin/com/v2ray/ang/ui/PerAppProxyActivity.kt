@@ -142,9 +142,9 @@ class PerAppProxyActivity : BaseActivity() {
         })
 
         switch_per_app_proxy.setOnCheckedChangeListener { buttonView, isChecked ->
-            defaultDPreference.setPrefBoolean(SettingsActivity.PREF_PER_APP_PROXY, isChecked)
+            defaultDPreference.setPrefBoolean(AppConfig.PREF_PER_APP_PROXY, isChecked)
         }
-        switch_per_app_proxy.isChecked = defaultDPreference.getPrefBoolean(SettingsActivity.PREF_PER_APP_PROXY, false)
+        switch_per_app_proxy.isChecked = defaultDPreference.getPrefBoolean(AppConfig.PREF_PER_APP_PROXY, false)
 
         switch_bypass_apps.setOnCheckedChangeListener { buttonView, isChecked ->
             defaultDPreference.setPrefBoolean(PREF_BYPASS_APPS, isChecked)

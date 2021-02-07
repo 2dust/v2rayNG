@@ -80,11 +80,51 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/layout_margin_top_height"
-            android:layout_marginTop="@dimen/layout_margin_top_height"
-            android:orientation="vertical" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:orientation="vertical">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="User(Optional)" />
+
+
+            <EditText
+                    android:id="@+id/et_security"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/edit_height"
+                    android:inputType="text" />
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:orientation="vertical">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Password(Optional)" />
+
+            <EditText
+                    android:id="@+id/et_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/edit_height"
+                    android:inputType="textPassword" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/layout_margin_top_height"
+                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:orientation="vertical" />
 
     </LinearLayout>
 </ScrollView>

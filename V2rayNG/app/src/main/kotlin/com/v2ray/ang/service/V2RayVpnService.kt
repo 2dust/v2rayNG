@@ -10,10 +10,10 @@ import android.os.ParcelFileDescriptor
 import android.os.StrictMode
 import android.support.annotation.RequiresApi
 import android.util.Log
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.ui.PerAppProxyActivity
-import com.v2ray.ang.ui.SettingsActivity
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -91,8 +91,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
         // If the old interface has exactly the same parameters, use it!
         // Configure a builder while parsing the parameters.
         val builder = Builder()
-        val enableLocalDns = defaultDPreference.getPrefBoolean(SettingsActivity.PREF_LOCAL_DNS_ENABLED, false)
-        val routingMode = defaultDPreference.getPrefString(SettingsActivity.PREF_ROUTING_MODE, "0")
+        val enableLocalDns = defaultDPreference.getPrefBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
+        val routingMode = defaultDPreference.getPrefString(AppConfig.PREF_ROUTING_MODE, "0")
 
         parameters.split(" ")
                 .map { it.split(",") }
@@ -129,7 +129,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         builder.setSession(V2RayServiceManager.currentConfigName)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
-                defaultDPreference.getPrefBoolean(SettingsActivity.PREF_PER_APP_PROXY, false)) {
+                defaultDPreference.getPrefBoolean(AppConfig.PREF_PER_APP_PROXY, false)) {
             val apps = defaultDPreference.getPrefStringSet(PerAppProxyActivity.PREF_PER_APP_PROXY_SET, null)
             val bypassApps = defaultDPreference.getPrefBoolean(PerAppProxyActivity.PREF_BYPASS_APPS, false)
             apps?.forEach {

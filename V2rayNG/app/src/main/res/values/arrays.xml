@@ -53,6 +53,17 @@
         <item></item>
         <item>tls</item>
     </string-array>
+    <string-array name="streamsecurityxs" translatable="false">
+        <item></item>
+        <item>tls</item>
+        <item>xtls</item>
+    </string-array>
+
+    <string-array name="allowinsecures" translatable="false">
+        <item></item>
+        <item>true</item>
+        <item>false</item>
+    </string-array>
 
     <string-array name="routing_mode_value" translatable="false">
         <item>0</item>
@@ -67,10 +78,28 @@
         <item>IPOnDemand</item>
     </string-array>
 
+    <string-array name="core_loglevel" translatable="false">
+        <item>debug</item>
+        <item>info</item>
+        <item>warning</item>
+        <item>error</item>
+        <item>none</item>
+    </string-array>
+
     <string-array name="mode_value" translatable="false">
         <item>VPN</item>
         <item>Proxy only</item>
     </string-array>
+
+    <string-array name="flows" translatable="false">
+        <item></item>
+        <item>xtls-rprx-origin</item>
+        <item>xtls-rprx-origin-udp443</item>
+        <item>xtls-rprx-direct</item>
+        <item>xtls-rprx-direct-udp443</item>
+        <item>xtls-rprx-splice</item>
+    </string-array>
+
 
     <!-- minimum list https://serverfault.com/a/304791 -->
     <string-array name="bypass_private_ip_address" translatable="false">

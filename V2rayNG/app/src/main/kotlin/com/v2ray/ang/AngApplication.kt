@@ -2,6 +2,7 @@ package com.v2ray.ang
 
 import android.support.multidex.MultiDexApplication
 import android.support.v7.preference.PreferenceManager
+import com.tencent.mmkv.MMKV
 import com.v2ray.ang.util.AngConfigManager
 import me.dozen.dpreference.DPreference
 
@@ -28,5 +29,6 @@ class AngApplication : MultiDexApplication() {
 
         //Logger.init().logLevel(if (BuildConfig.DEBUG) LogLevel.FULL else LogLevel.NONE)
         AngConfigManager.inject(this)
+        MMKV.initialize(this)
     }
 }

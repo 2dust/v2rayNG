@@ -21,7 +21,6 @@ import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.ui.MainActivity
-import com.v2ray.ang.ui.SettingsActivity
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import go.Seq
@@ -60,7 +59,7 @@ object V2RayServiceManager {
     private var mNotificationManager: NotificationManager? = null
 
     fun startV2Ray(context: Context) {
-        if (context.v2RayApplication.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_PROXY_SHARING, false)) {
+        if (context.v2RayApplication.defaultDPreference.getPrefBoolean(AppConfig.PREF_PROXY_SHARING, false)) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)
         }else{
             context.toast(R.string.toast_services_start)
@@ -136,8 +135,8 @@ object V2RayServiceManager {
             }
 
             v2rayPoint.configureFileContent = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
-            v2rayPoint.enableLocalDNS = service.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_LOCAL_DNS_ENABLED, false)
-            v2rayPoint.forwardIpv6 = service.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_FORWARD_IPV6, false)
+            v2rayPoint.enableLocalDNS = service.defaultDPreference.getPrefBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
+            v2rayPoint.forwardIpv6 = service.defaultDPreference.getPrefBoolean(AppConfig.PREF_FORWARD_IPV6, false)
             v2rayPoint.domainName = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_DOMAIN, "")
             v2rayPoint.proxyOnly = service.defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN") != "VPN"
             currentConfigName = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "NG")
@@ -308,7 +307,7 @@ object V2RayServiceManager {
         val service = serviceControl?.get()?.getService() ?: return
         if (mSubscription == null &&
                 v2rayPoint.isRunning &&
-                service.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false)) {
+                service.defaultDPreference.getPrefBoolean(AppConfig.PREF_SPEED_ENABLED, false)) {
             var lastZeroSpeed = false
             val outboundTags = service.defaultDPreference.getPrefStringOrderedSet(AppConfig.PREF_CURR_CONFIG_OUTBOUND_TAGS, LinkedHashSet())
             outboundTags.remove(TAG_DIRECT)

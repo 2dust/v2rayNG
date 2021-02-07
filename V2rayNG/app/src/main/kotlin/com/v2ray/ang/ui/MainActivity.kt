@@ -20,6 +20,7 @@ import com.tbruyelle.rxpermissions.RxPermissions
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
@@ -47,7 +48,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
     private var mItemTouchHelper: ItemTouchHelper? = null
-    private val mainViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
+    val mainViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,9 +102,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         mainViewModel.updateListAction.observe(this, {
             val index = it ?: return@observe
             if (index >= 0) {
-                adapter.updateSelectedItem(index)
+                adapter.notifyItemChanged(index)
             } else {
-                adapter.updateConfigList()
+                adapter.notifyDataSetChanged()
             }
         })
         mainViewModel.updateTestResultAction.observe(this, { tv_test_state.text = it })
@@ -113,9 +114,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             if (isRunning) {
                 fab.setImageResource(R.drawable.ic_v)
                 tv_test_state.text = getString(R.string.connection_connected)
+                layout_test.isFocusable = true
             } else {
                 fab.setImageResource(R.drawable.ic_v_idle)
                 tv_test_state.text = getString(R.string.connection_not_connected)
+                layout_test.isFocusable = false
             }
             hideCircle()
         })
@@ -135,7 +138,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     public override fun onResume() {
         super.onResume()
-        adapter.updateConfigList()
+        adapter.notifyDataSetChanged()
     }
 
     public override fun onPause() {
@@ -171,9 +174,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
-    private fun getOptionIntent() = Intent().putExtra("position", -1)
-            .putExtra("isRunning", mainViewModel.isRunning.value == true)
-
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.import_qrcode -> {
             importQRcode(REQUEST_SCAN)
@@ -184,18 +184,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
         R.id.import_manually_vmess -> {
-            startActivity(getOptionIntent().setClass(this, ServerActivity::class.java))
-            adapter.updateConfigList()
+            startActivity(Intent().putExtra("createConfigType", EConfigType.VMESS.value).
+            setClass(this, ServerActivity::class.java))
             true
         }
         R.id.import_manually_ss -> {
-            startActivity(getOptionIntent().setClass(this, Server3Activity::class.java))
-            adapter.updateConfigList()
+            startActivity(Intent().putExtra("createConfigType", EConfigType.SHADOWSOCKS.value).
+            setClass(this, ServerActivity::class.java))
             true
         }
         R.id.import_manually_socks -> {
-            startActivity(getOptionIntent().setClass(this, Server4Activity::class.java))
-            adapter.updateConfigList()
+            startActivity(Intent().putExtra("createConfigType", EConfigType.SOCKS.value).
+            setClass(this, ServerActivity::class.java))
             true
         }
         R.id.import_config_custom_clipboard -> {
@@ -226,8 +226,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.export_all -> {
-            if (AngConfigManager.shareAll2Clipboard() == 0) {
-                //remove toast, otherwise it will block previous warning message
+            if (AngConfigManager.shareNonCustomConfigsToClipboard(mainViewModel.serverList) == 0) {
+                toast(R.string.toast_success)
             } else {
                 toast(R.string.toast_failure)
             }
@@ -288,10 +288,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     fun importBatchConfig(server: String?, subid: String = "") {
-        val count = AngConfigManager.importBatchConfig(server, subid)
+        var count = AngConfigManager.importBatchConfig(server, subid)
+        if (count <= 0) {
+            count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid)
+        }
         if (count > 0) {
             toast(R.string.toast_success)
-            adapter.updateConfigList()
+            adapter.notifyDataSetChanged()
         } else {
             toast(R.string.toast_failure)
         }
@@ -462,7 +465,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             toast(resId)
         } else {
             toast(R.string.toast_success)
-            adapter.updateConfigList()
+            adapter.notifyDataSetChanged()
         }
     }
 

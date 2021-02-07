@@ -89,6 +89,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:2.0.1'
 
     // DSL
+    implementation 'com.tencent:mmkv-static:1.0.19'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'io.reactivex:rxjava:1.3.4'
     implementation 'io.reactivex:rxandroid:1.2.1'

@@ -27,7 +27,6 @@ import com.v2ray.ang.extension.responseLength
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.service.V2RayServiceManager
-import com.v2ray.ang.ui.SettingsActivity
 import kotlinx.coroutines.isActive
 import me.dozen.dpreference.DPreference
 import java.io.IOException
@@ -36,7 +35,7 @@ import kotlin.coroutines.coroutineContext
 
 object Utils {
 
-    val tcpTestingSockets = ArrayList<Socket?>()
+    private val tcpTestingSockets = ArrayList<Socket?>()
 
     /**
      * convert string to editalbe for kotlin
@@ -126,7 +125,7 @@ object Utils {
      * get remote dns servers from preference
      */
     fun getRemoteDnsServers(defaultDPreference: DPreference): ArrayList<String> {
-        val remoteDns = defaultDPreference.getPrefString(SettingsActivity.PREF_REMOTE_DNS, AppConfig.DNS_AGENT)
+        val remoteDns = defaultDPreference.getPrefString(AppConfig.PREF_REMOTE_DNS, AppConfig.DNS_AGENT)
         val ret = ArrayList<String>()
         if (!TextUtils.isEmpty(remoteDns)) {
             remoteDns
@@ -147,7 +146,7 @@ object Utils {
      * get remote dns servers from preference
      */
     fun getDomesticDnsServers(defaultDPreference: DPreference): ArrayList<String> {
-        val domesticDns = defaultDPreference.getPrefString(SettingsActivity.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
+        val domesticDns = defaultDPreference.getPrefString(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
         val ret = ArrayList<String>()
         if (!TextUtils.isEmpty(domesticDns)) {
             domesticDns
@@ -430,19 +429,18 @@ object Utils {
     /**
      * tcping
      */
-    suspend fun tcping(url: String, port: Int): String {
+    suspend fun tcping(url: String, port: Int): Long {
         var time = -1L
         for (k in 0 until 2) {
             val one = socketConnectTime(url, port)
             if (!coroutineContext.isActive) {
                 break
             }
-            if (one != -1L  )
-                if(time == -1L || one < time) {
+            if (one != -1L && (time == -1L || one < time)) {
                 time = one
             }
         }
-        return time.toString() + "ms"
+        return time
     }
 
     fun socketConnectTime(url: String, port: Int): Long {
