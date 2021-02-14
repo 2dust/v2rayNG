@@ -1,14 +1,15 @@
 package com.v2ray.ang.util
 
+import android.content.Context
 import android.text.TextUtils
 import android.util.Log
 import com.google.gson.*
-import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.V2rayConfig
 import org.json.JSONException
 import org.json.JSONObject
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.extension.defaultDPreference
 
 object V2rayConfigUtil {
 //    private val requestObj: JsonObject by lazy {
@@ -23,7 +24,7 @@ object V2rayConfigUtil {
     /**
      * 生成v2ray的客户端配置文件
      */
-    fun getV2rayConfig(app: AngApplication, guid: String): Result {
+    fun getV2rayConfig(context: Context, guid: String): Result {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return Result(false, "")
             if (config.configType == EConfigType.CUSTOM) {
@@ -32,7 +33,7 @@ object V2rayConfigUtil {
                 return Result(true, customConfig)
             }
             val outbound = config.getProxyOutbound() ?: return Result(false, "")
-            val result = getV2rayNonCustomConfig(app, outbound)
+            val result = getV2rayNonCustomConfig(context, outbound)
             Log.d("V2rayConfigUtilGoLog", result.content)
             return result
         } catch (e: Exception) {
@@ -44,10 +45,10 @@ object V2rayConfigUtil {
     /**
      * 生成v2ray的客户端配置文件
      */
-    private fun getV2rayNonCustomConfig(app: AngApplication, outbound: V2rayConfig.OutboundBean): Result {
+    private fun getV2rayNonCustomConfig(context: Context, outbound: V2rayConfig.OutboundBean): Result {
         val result = Result(false, "")
         //取得默认配置
-        val assets = Utils.readTextFromAssets(app, "v2ray_config.json")
+        val assets = Utils.readTextFromAssets(context, "v2ray_config.json")
         if (TextUtils.isEmpty(assets)) {
             return result
         }
@@ -55,18 +56,18 @@ object V2rayConfigUtil {
         //转成Json
         val v2rayConfig = Gson().fromJson(assets, V2rayConfig::class.java) ?: return result
 
-        //v2rayConfig.log.loglevel = app.defaultDPreference.getPrefString(AppConfig.PREF_LOGLEVEL, "warning")
+        //v2rayConfig.log.loglevel = context.defaultDPreference.getPrefString(AppConfig.PREF_LOGLEVEL, "warning")
 
-        inbounds(v2rayConfig, app)
+        inbounds(v2rayConfig, context)
 
         v2rayConfig.outbounds[0] = outbound
 
-        routing(v2rayConfig, app)
+        routing(v2rayConfig, context)
 
-        if (app.defaultDPreference.getPrefBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)) {
-            customLocalDns(v2rayConfig, app)
+        if (context.defaultDPreference.getPrefBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)) {
+            customLocalDns(v2rayConfig, context)
         } else {
-            customRemoteDns(v2rayConfig, app)
+            customRemoteDns(v2rayConfig, context)
         }
 
         val finalConfig = GsonBuilder().setPrettyPrinting().create().toJson(v2rayConfig)
@@ -79,19 +80,19 @@ object V2rayConfigUtil {
     /**
      *
      */
-    private fun inbounds(v2rayConfig: V2rayConfig, app: AngApplication): Boolean {
+    private fun inbounds(v2rayConfig: V2rayConfig, context: Context): Boolean {
         try {
-            //val socksPort = Utils.parseInt(app.defaultDPreference.getPrefStringNonEmpty(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS))
-            //val httpPort = Utils.parseInt(app.defaultDPreference.getPrefStringNonEmpty(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP))
+            //val socksPort = Utils.parseInt(context.defaultDPreference.getPrefStringNonEmpty(AppConfig.PREF_SOCKS_PORT, AppConfig .PORT_SOCKS))
+            //val httpPort = Utils.parseInt(context.defaultDPreference.getPrefStringNonEmpty(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP))
 
             v2rayConfig.inbounds.forEach { curInbound ->
-                if (!app.defaultDPreference.getPrefBoolean(AppConfig.PREF_PROXY_SHARING, false)) {
+                if (!context.defaultDPreference.getPrefBoolean(AppConfig.PREF_PROXY_SHARING, false)) {
                     //bind all inbounds to localhost if the user requests
                     curInbound.listen = "127.0.0.1"
                 }
             }
             v2rayConfig.inbounds[0].port = 10808
-            v2rayConfig.inbounds[0].sniffing?.enabled = app.defaultDPreference.getPrefBoolean(AppConfig.PREF_SNIFFING_ENABLED, true)
+            v2rayConfig.inbounds[0].sniffing?.enabled = context.defaultDPreference.getPrefBoolean(AppConfig.PREF_SNIFFING_ENABLED, true)
 
             //v2rayConfig.inbounds[1].port = httpPort
 
@@ -111,14 +112,14 @@ object V2rayConfigUtil {
     /**
      * routing
      */
-    private fun routing(v2rayConfig: V2rayConfig, app: AngApplication): Boolean {
+    private fun routing(v2rayConfig: V2rayConfig, context: Context): Boolean {
         try {
-            routingUserRule(app.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_AGENT, ""), AppConfig.TAG_AGENT, v2rayConfig)
-            routingUserRule(app.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_DIRECT, ""), AppConfig.TAG_DIRECT, v2rayConfig)
-            routingUserRule(app.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED, ""), AppConfig.TAG_BLOCKED, v2rayConfig)
+            routingUserRule(context.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_AGENT, ""), AppConfig.TAG_AGENT, v2rayConfig)
+            routingUserRule(context.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_DIRECT, ""), AppConfig.TAG_DIRECT, v2rayConfig)
+            routingUserRule(context.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED, ""), AppConfig.TAG_BLOCKED, v2rayConfig)
 
-            v2rayConfig.routing.domainStrategy = app.defaultDPreference.getPrefString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, "IPIfNonMatch")
-            val routingMode = app.defaultDPreference.getPrefString(AppConfig.PREF_ROUTING_MODE, "0")
+            v2rayConfig.routing.domainStrategy = context.defaultDPreference.getPrefString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, "IPIfNonMatch")
+            val routingMode = context.defaultDPreference.getPrefString(AppConfig.PREF_ROUTING_MODE, "0")
 
             // Hardcode googleapis.cn
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
@@ -229,36 +230,36 @@ object V2rayConfigUtil {
     /**
      * Custom Dns
      */
-    private fun customLocalDns(v2rayConfig: V2rayConfig, app: AngApplication): Boolean {
+    private fun customLocalDns(v2rayConfig: V2rayConfig, context: Context): Boolean {
         try {
             val hosts = mutableMapOf<String, String>()
             val servers = ArrayList<Any>()
-            val remoteDns = Utils.getRemoteDnsServers(app.defaultDPreference)
+            val remoteDns = Utils.getRemoteDnsServers(context.defaultDPreference)
 
             remoteDns.forEach {
                 servers.add(it)
             }
 
-            val domesticDns = Utils.getDomesticDnsServers(app.defaultDPreference)
+            val domesticDns = Utils.getDomesticDnsServers(context.defaultDPreference)
             val geositeCn = arrayListOf("geosite:cn")
             val geoipCn = arrayListOf("geoip:cn")
 
-            val agDomain = userRule2Domian(app.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_AGENT, ""))
+            val agDomain = userRule2Domian(context.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_AGENT, ""))
             if (agDomain.size > 0) {
                 servers.add(V2rayConfig.DnsBean.ServersBean(remoteDns.first(), 53, agDomain, null))
             }
 
-            val dirDomain = userRule2Domian(app.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_DIRECT, ""))
+            val dirDomain = userRule2Domian(context.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_DIRECT, ""))
             if (dirDomain.size > 0) {
                 servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, dirDomain, geoipCn))
             }
 
-            val routingMode = app.defaultDPreference.getPrefString(AppConfig.PREF_ROUTING_MODE, "0")
+            val routingMode = context.defaultDPreference.getPrefString(AppConfig.PREF_ROUTING_MODE, "0")
             if (routingMode == "2" || routingMode == "3") {
                 servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, geositeCn, geoipCn))
             }
 
-            val blkDomain = userRule2Domian(app.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED, ""))
+            val blkDomain = userRule2Domian(context.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED, ""))
             if (blkDomain.size > 0) {
                 hosts.putAll(blkDomain.map { it to "127.0.0.1" })
             }
@@ -278,7 +279,7 @@ object V2rayConfigUtil {
                         port = 53,
                         network = "tcp,udp")
 
-                //val localDnsPort = Utils.parseInt(app.defaultDPreference.getPrefStringNonEmpty(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS))
+                //val localDnsPort = Utils.parseInt(context.defaultDPreference.getPrefStringNonEmpty(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS))
                 v2rayConfig.inbounds.add(
                         V2rayConfig.InboundBean(
                                 tag = "dns-in",
@@ -338,12 +339,12 @@ object V2rayConfigUtil {
     /**
      * Custom Remote Dns
      */
-    private fun customRemoteDns(v2rayConfig: V2rayConfig, app: AngApplication): Boolean {
+    private fun customRemoteDns(v2rayConfig: V2rayConfig, context: Context): Boolean {
         try {
             val servers = ArrayList<Any>()
             val hosts = mutableMapOf<String, String>()
 
-            Utils.getRemoteDnsServers(app.defaultDPreference).forEach {
+            Utils.getRemoteDnsServers(context.defaultDPreference).forEach {
                 servers.add(it)
             }
             // hardcode googleapi rule to fix play store problems

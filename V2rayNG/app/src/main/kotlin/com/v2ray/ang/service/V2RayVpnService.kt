@@ -126,7 +126,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 }
         }
 
-        builder.setSession(V2RayServiceManager.currentConfigName)
+        builder.setSession(V2RayServiceManager.currentConfig?.remarks.orEmpty())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
                 defaultDPreference.getPrefBoolean(AppConfig.PREF_PER_APP_PROXY, false)) {

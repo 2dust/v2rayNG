@@ -17,6 +17,7 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import com.tbruyelle.rxpermissions.RxPermissions
+import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
@@ -24,7 +25,9 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
+import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.AngConfigManager
+import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
 import com.v2ray.ang.viewmodel.MainViewModel
@@ -47,6 +50,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
+    private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private var mItemTouchHelper: ItemTouchHelper? = null
     val mainViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
 
@@ -110,7 +114,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         mainViewModel.updateTestResultAction.observe(this, { tv_test_state.text = it })
         mainViewModel.isRunning.observe(this, {
             val isRunning = it ?: return@observe
-            adapter.changeable = !isRunning
+            adapter.isRunning = isRunning
             if (isRunning) {
                 fab.setImageResource(R.drawable.ic_v)
                 tv_test_state.text = getString(R.string.connection_connected)
@@ -126,19 +130,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     fun startV2Ray() {
-        if (AngConfigManager.configs.index < 0) {
+        if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
             return
         }
         showCircle()
 //        toast(R.string.toast_services_start)
-        if (!Utils.startVService(this, AngConfigManager.configs.index)) {
-            hideCircle()
-        }
+        V2RayServiceManager.startV2Ray(this)
+        hideCircle()
     }
 
     public override fun onResume() {
         super.onResume()
-        adapter.notifyDataSetChanged()
+        mainViewModel.reloadServerList()
     }
 
     public override fun onPause() {
@@ -437,9 +440,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .subscribe {
                     if (it) {
                         try {
-                            contentResolver.openInputStream(uri).use {
-                                val configText = it?.bufferedReader()?.readText()
-                                importCustomizeConfig(configText)
+                            contentResolver.openInputStream(uri).use { input ->
+                                importCustomizeConfig(input?.bufferedReader()?.readText())
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -453,19 +455,21 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      * import customize config
      */
     fun importCustomizeConfig(server: String?) {
-        if (server == null) {
-            return
-        }
-        if (!V2rayConfigUtil.isValidConfig(server)) {
-            toast(R.string.toast_config_file_invalid)
-            return
-        }
-        val resId = AngConfigManager.importCustomizeConfig(server)
-        if (resId > 0) {
-            toast(resId)
-        } else {
+        try {
+            if (server == null || TextUtils.isEmpty(server)) {
+                toast(R.string.toast_none_data)
+                return
+            }
+            if (!V2rayConfigUtil.isValidConfig(server)) {
+                toast(R.string.toast_config_file_invalid)
+                return
+            }
+            mainViewModel.appendCustomConfigServer(server)
             toast(R.string.toast_success)
-            adapter.notifyDataSetChanged()
+            adapter.notifyItemInserted(mainViewModel.serverList.lastIndex)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return
         }
     }
 

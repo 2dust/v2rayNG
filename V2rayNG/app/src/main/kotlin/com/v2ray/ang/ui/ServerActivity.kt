@@ -12,7 +12,6 @@ import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_NETWORK
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_PORT
-import com.v2ray.ang.dto.V2rayConfig.Companion.HTTP
 import com.v2ray.ang.dto.V2rayConfig.Companion.TLS
 import com.v2ray.ang.dto.V2rayConfig.Companion.XTLS
 import com.v2ray.ang.extension.toast
@@ -37,7 +36,11 @@ class ServerActivity : BaseActivity() {
 
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
-    private val isRunning by lazy { editGuid.isNotEmpty() && editGuid == mainStorage?.decodeString(KEY_SELECTED_SERVER) }
+    private val isRunning by lazy {
+        intent.getBooleanExtra("isRunning", false)
+                && editGuid.isNotEmpty()
+                && editGuid == mainStorage?.decodeString(KEY_SELECTED_SERVER)
+    }
     private val createConfigType by lazy {
         EConfigType.fromInt(intent.getIntExtra("createConfigType", EConfigType.VMESS.value)) ?: EConfigType.VMESS
     }
@@ -237,73 +240,25 @@ class ServerActivity : BaseActivity() {
     }
 
     private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean) {
-        streamSetting.network = if (sp_network != null) networks[sp_network.selectedItemPosition] else DEFAULT_NETWORK
-        val headerType = if (sp_header_type != null) headertypes[sp_header_type.selectedItemPosition] else ""
         val requestHost = et_request_host.text.toString().trim()
         val path = et_path?.text.toString().trim()
-        var sni = requestHost
-        when (streamSetting.network) {
-            "tcp" -> if (headerType == HTTP) {
-                val tcpSetting = V2rayConfig.OutboundBean.StreamSettingsBean.TcpSettingsBean()
-                tcpSetting.header.type = headerType
-                if (!TextUtils.isEmpty(requestHost) || !TextUtils.isEmpty(path)) {
-                    val requestObj = V2rayConfig.OutboundBean.StreamSettingsBean.TcpSettingsBean.HeaderBean.RequestBean()
-                    requestObj.headers.Host = requestHost.split(",").map { it.trim() }
-                    requestObj.path = path.split(",").map { it.trim() }
-                    tcpSetting.header.request = requestObj
-                    sni = requestObj.headers.Host.getOrNull(0) ?: sni
-                }
-                streamSetting.tcpSettings = tcpSetting
-            }
-            "kcp" -> {
-                val kcpsetting = V2rayConfig.OutboundBean.StreamSettingsBean.KcpSettingsBean()
-                kcpsetting.header.type = headerType
-                if (TextUtils.isEmpty(path)) {
-                    kcpsetting.seed = null
-                } else {
-                    kcpsetting.seed = path
-                }
-                streamSetting.kcpSettings = kcpsetting
-            }
-            "ws" -> {
-                val wssetting = V2rayConfig.OutboundBean.StreamSettingsBean.WsSettingsBean()
-                if (!TextUtils.isEmpty(requestHost)) {
-                    wssetting.headers.Host = requestHost
-                    sni = requestHost
-                }
-                if (!TextUtils.isEmpty(path)) {
-                    wssetting.path = path
-                }
-                streamSetting.wsSettings = wssetting
-            }
-            "h2" -> {
-                val h2Setting = V2rayConfig.OutboundBean.StreamSettingsBean.HttpSettingsBean()
-                if (!TextUtils.isEmpty(requestHost)) {
-                    h2Setting.host = requestHost.split(",").map { it.trim() }
-                    sni = h2Setting.host.getOrNull(0) ?: sni
-                }
-                h2Setting.path = path
-                streamSetting.httpSettings = h2Setting
-            }
-            "quic" -> {
-                val quicsetting = V2rayConfig.OutboundBean.StreamSettingsBean.QuicSettingBean()
-                quicsetting.security = requestHost
-                quicsetting.key = path
-                quicsetting.header.type = headerType
-                streamSetting.quicSettings = quicsetting
-            }
-        }
-
-        streamSetting.security = if (sp_stream_security != null) streamSecuritys[sp_stream_security.selectedItemPosition] else TLS
-        val tlsSetting = V2rayConfig.OutboundBean.StreamSettingsBean.TlsSettingsBean(
-                allowInsecure = if (sp_allow_insecure != null) allowinsecures[sp_allow_insecure.selectedItemPosition].toBoolean() else false,
-                serverName = sni
+        var sni = streamSetting.populateTransportSettings(
+                if (sp_network != null) networks[sp_network.selectedItemPosition] else DEFAULT_NETWORK,
+                if (sp_header_type != null) headertypes[sp_header_type.selectedItemPosition] else "",
+                requestHost,
+                path,
+                path,
+                requestHost,
+                path
         )
-        if (streamSetting.security == TLS) {
-            streamSetting.tlsSettings = tlsSetting
-        } else if (streamSetting.security == XTLS) {
-            streamSetting.xtlsSettings = tlsSetting
+        if (sni.isEmpty()) {
+            sni = requestHost
         }
+        streamSetting.populateTlsSettings(
+                if (sp_stream_security != null) streamSecuritys[sp_stream_security.selectedItemPosition] else TLS,
+                if (sp_allow_insecure != null) allowinsecures[sp_allow_insecure.selectedItemPosition].toBoolean() else false,
+                sni
+        )
     }
 
     /**

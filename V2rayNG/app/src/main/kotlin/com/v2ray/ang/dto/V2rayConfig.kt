@@ -1,5 +1,7 @@
 package com.v2ray.ang.dto
 
+import android.text.TextUtils
+
 data class V2rayConfig(
         val stats: Any? = null,
         val log: LogBean,
@@ -112,7 +114,7 @@ data class V2rayConfig(
                                        var readBufferSize: Int = 1,
                                        var writeBufferSize: Int = 1,
                                        var header: HeaderBean = HeaderBean(),
-                                       var seed: String? = "") {
+                                       var seed: String? = null) {
                 data class HeaderBean(var type: String = "none")
             }
 
@@ -131,6 +133,72 @@ data class V2rayConfig(
                                        var key: String = "",
                                        var header: HeaderBean = HeaderBean()) {
                 data class HeaderBean(var type: String = "none")
+            }
+
+            fun populateTransportSettings(transport: String, headerType: String?, host: String?, path: String?, seed: String?,
+                                          quicSecurity: String?, key: String?): String {
+                var sni = ""
+                network = transport
+                when (network) {
+                    "tcp" -> if (headerType == HTTP) {
+                        val tcpSetting = TcpSettingsBean()
+                        tcpSetting.header.type = HTTP
+                        if (!TextUtils.isEmpty(host) || !TextUtils.isEmpty(path)) {
+                            val requestObj = TcpSettingsBean.HeaderBean.RequestBean()
+                            requestObj.headers.Host = (host ?: "").split(",").map { it.trim() }
+                            requestObj.path = (path ?: "").split(",").map { it.trim() }
+                            tcpSetting.header.request = requestObj
+                            sni = requestObj.headers.Host.getOrNull(0) ?: sni
+                        }
+                        tcpSettings = tcpSetting
+                    }
+                    "kcp" -> {
+                        val kcpsetting = KcpSettingsBean()
+                        kcpsetting.header.type = headerType ?: "none"
+                        if (seed.isNullOrEmpty()) {
+                            kcpsetting.seed = null
+                        } else {
+                            kcpsetting.seed = seed
+                        }
+                        kcpSettings = kcpsetting
+                    }
+                    "ws" -> {
+                        val wssetting = WsSettingsBean()
+                        wssetting.headers.Host = host ?: ""
+                        sni = wssetting.headers.Host
+                        wssetting.path = path ?: "/"
+                        wsSettings = wssetting
+                    }
+                    "h2", "http" -> {
+                        network = "h2"
+                        val h2Setting = HttpSettingsBean()
+                        h2Setting.host = (host ?: "").split(",").map { it.trim() }
+                        sni = h2Setting.host.getOrNull(0) ?: sni
+                        h2Setting.path = path ?: "/"
+                        httpSettings = h2Setting
+                    }
+                    "quic" -> {
+                        val quicsetting = QuicSettingBean()
+                        quicsetting.security = quicSecurity ?: "none"
+                        quicsetting.key = key ?: ""
+                        quicsetting.header.type = headerType ?: "none"
+                        quicSettings = quicsetting
+                    }
+                }
+                return sni
+            }
+
+            fun populateTlsSettings(streamSecurity: String, allowInsecure: Boolean, sni: String) {
+                security = streamSecurity
+                val tlsSetting = TlsSettingsBean(
+                        allowInsecure = allowInsecure,
+                        serverName = sni
+                )
+                if (security == TLS) {
+                    tlsSettings = tlsSetting
+                } else if (security == XTLS) {
+                    xtlsSettings = tlsSetting
+                }
             }
         }
 

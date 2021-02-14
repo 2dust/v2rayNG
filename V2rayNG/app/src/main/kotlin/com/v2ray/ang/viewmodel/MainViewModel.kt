@@ -13,16 +13,21 @@ import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.*
 import com.v2ray.ang.util.MmkvManager.KEY_ANG_CONFIGS
 import kotlinx.coroutines.*
+import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val serverAffStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_AFF, MMKV.MULTI_PROCESS_MODE) }
 
-    val serverList by lazy { Gson().fromJson(mainStorage?.decodeString(KEY_ANG_CONFIGS), Array<String>::class.java).toList() }
+    var serverList= Gson().fromJson(mainStorage?.decodeString(KEY_ANG_CONFIGS), Array<String>::class.java).toMutableList()
+        private set
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
     val updateTestResultAction by lazy { MutableLiveData<String>() }
@@ -43,8 +48,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         super.onCleared()
     }
 
-    fun getGuid(index: Int): String? {
-        return serverList.getOrNull(index)
+    fun reloadServerList() {
+        serverList = Gson().fromJson(mainStorage?.decodeString(KEY_ANG_CONFIGS), Array<String>::class.java).toMutableList()
+        updateListAction.value = -1
+    }
+
+    fun removeServer(guid: String) {
+        serverList.remove(guid)
+        MmkvManager.removeServer(guid)
+    }
+
+    fun appendCustomConfigServer(server: String) {
+        val config = ServerConfig.create(EConfigType.CUSTOM)
+        config.remarks = System.currentTimeMillis().toString()
+        config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
+        serverList.add(MmkvManager.encodeServerConfig("", config))
+    }
+
+    fun swapServer(fromPosition: Int, toPosition: Int) {
+        Collections.swap(serverList, fromPosition, toPosition)
+        mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
     }
 
     fun testAllTcping() {

@@ -7,20 +7,22 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import java.util.ArrayList
 import com.v2ray.ang.R
-import com.v2ray.ang.util.AngConfigManager
 import android.content.Intent
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import com.google.zxing.WriterException
+import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.util.MmkvManager
 import kotlinx.android.synthetic.main.activity_tasker.*
-
 
 class TaskerActivity : BaseActivity() {
     private var listview: ListView? = null
     private var lstData: ArrayList<String> = ArrayList()
     private var lstGuid: ArrayList<String> = ArrayList()
+
+    private val serverStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_CONFIG, MMKV.MULTI_PROCESS_MODE) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +32,11 @@ class TaskerActivity : BaseActivity() {
         lstData.add("Default")
         lstGuid.add(AppConfig.TASKER_DEFAULT_GUID)
 
-        AngConfigManager.configs.vmess.forEach {
-            lstData.add(it.remarks)
-            lstGuid.add(it.guid)
+        serverStorage?.allKeys()?.forEach { key ->
+            MmkvManager.decodeServerConfig(key)?.let { config ->
+                lstData.add(config.remarks)
+                lstGuid.add(key)
+            }
         }
         val adapter = ArrayAdapter(this,
                 android.R.layout.simple_list_item_single_choice, lstData)
@@ -108,4 +112,3 @@ class TaskerActivity : BaseActivity() {
     }
 
 }
-

@@ -1,9 +1,14 @@
 package com.v2ray.ang.dto
 
+import com.v2ray.ang.AppConfig.TAG_AGENT
+import com.v2ray.ang.AppConfig.TAG_BLOCKED
+import com.v2ray.ang.AppConfig.TAG_DIRECT
+import com.v2ray.ang.util.Utils
+
 data class ServerConfig(
         val configVersion: Int = 3,
         val configType: EConfigType,
-        val subscriptionId: String = "",
+        var subscriptionId: String = "",
         val addedTime: Long = System.currentTimeMillis(),
         var remarks: String = "",
         val outboundBean: V2rayConfig.OutboundBean? = null,
@@ -47,5 +52,25 @@ data class ServerConfig(
             return outboundBean
         }
         return fullConfig?.getProxyOutbound()
+    }
+
+    fun getAllOutboundTags(): MutableList<String> {
+        if (configType != EConfigType.CUSTOM) {
+            return mutableListOf(TAG_AGENT, TAG_DIRECT, TAG_BLOCKED)
+        }
+        fullConfig?.let { config ->
+            return config.outbounds.map { it.tag }.toMutableList()
+        }
+        return mutableListOf()
+    }
+
+    fun getV2rayPointDomainAndPort(): String {
+        val address = getProxyOutbound()?.getServerAddress().orEmpty()
+        val port = getProxyOutbound()?.getServerPort()
+        return if (Utils.isIpv6Address(address)) {
+            String.format("[%s]:%s", address, port)
+        } else {
+            String.format("%s:%s", address, port)
+        }
     }
 }

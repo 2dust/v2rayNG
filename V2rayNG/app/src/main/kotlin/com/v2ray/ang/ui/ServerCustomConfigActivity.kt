@@ -21,7 +21,11 @@ class ServerCustomConfigActivity : BaseActivity() {
 
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
-    private val isRunning by lazy { editGuid.isNotEmpty() && editGuid == mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER) }
+    private val isRunning by lazy {
+        intent.getBooleanExtra("isRunning", false)
+                && editGuid.isNotEmpty()
+                && editGuid == mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

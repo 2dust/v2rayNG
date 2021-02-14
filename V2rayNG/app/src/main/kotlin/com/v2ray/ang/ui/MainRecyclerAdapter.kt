@@ -15,6 +15,7 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
+import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
@@ -36,20 +37,13 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     private val share_method: Array<out String> by lazy {
         mActivity.resources.getStringArray(R.array.share_method)
     }
-
-    var changeable: Boolean = true
-        set(value) {
-            if (field == value)
-                return
-            field = value
-            notifyDataSetChanged()
-        }
+    var isRunning = false
 
     override fun getItemCount() = mActivity.mainViewModel.serverList.size
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         if (holder is MainViewHolder) {
-            val guid = mActivity.mainViewModel.getGuid(position) ?: return
+            val guid = mActivity.mainViewModel.serverList.getOrNull(position) ?: return
             val config = MmkvManager.decodeServerConfig(guid) ?: return
             val outbound = config.getProxyOutbound() ?: return
             val aff = MmkvManager.decodeServerAffiliationInfo(guid)
@@ -59,7 +53,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
             holder.test_result.text = aff?.getTestDelayString() ?: ""
             if (aff?.testDelayMillis?:0L < 0L) {
-                holder.test_result.setTextColor(ContextCompat.getColor(mActivity, R.color.viewfinder_laser))
+                holder.test_result.setTextColor(ContextCompat.getColor(mActivity, android.R.color.holo_red_dark))
             } else {
                 holder.test_result.setTextColor(ContextCompat.getColor(mActivity, R.color.colorPing))
             }
@@ -83,7 +77,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                         when (i) {
                             0 -> {
                                 if (config.configType == EConfigType.CUSTOM) {
-                                    shareFullContent(position)
+                                    shareFullContent(guid)
                                 } else {
                                     val iv = LayoutInflater.from(mActivity).inflate(R.layout.item_qrcode, null)
                                     iv.iv_qcode.setImageBitmap(AngConfigManager.share2QRCode(guid))
@@ -97,7 +91,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                                     mActivity.toast(R.string.toast_failure)
                                 }
                             }
-                            2 -> shareFullContent(position)
+                            2 -> shareFullContent(guid)
                             else -> mActivity.toast("else")
                         }
                     } catch (e: Exception) {
@@ -108,6 +102,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
 
             holder.layout_edit.setOnClickListener {
                 val intent = Intent().putExtra("guid", guid)
+                        .putExtra("isRunning", isRunning)
                 if (config.configType == EConfigType.CUSTOM) {
                     mActivity.startActivity(intent.setClass(mActivity, ServerCustomConfigActivity::class.java))
                 } else {
@@ -115,28 +110,29 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 }
             }
             holder.layout_remove.setOnClickListener {
-                if (guid != mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)
-                        && AngConfigManager.removeServer(position) == 0) {
+                if (guid != mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
+                    mActivity.mainViewModel.removeServer(guid)
                     notifyItemRemoved(position)
                 }
             }
 
             holder.infoContainer.setOnClickListener {
-                if (changeable) {
-                    AngConfigManager.setActiveServer(position)
-                } else {
-                    mActivity.showCircle()
-                    Utils.stopVService(mActivity)
-                    Observable.timer(500, TimeUnit.MILLISECONDS)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe {
-                                mActivity.showCircle()
-                                if (!Utils.startVService(mActivity, position)) {
+                val selected = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)
+                if (guid != selected) {
+                    mainStorage?.encode(MmkvManager.KEY_SELECTED_SERVER, guid)
+                    notifyItemChanged(mActivity.mainViewModel.serverList.indexOf(selected))
+                    notifyItemChanged(mActivity.mainViewModel.serverList.indexOf(guid))
+                    if (isRunning) {
+                        mActivity.showCircle()
+                        Utils.stopVService(mActivity)
+                        Observable.timer(500, TimeUnit.MILLISECONDS)
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe {
+                                    V2RayServiceManager.startV2Ray(mActivity)
                                     mActivity.hideCircle()
                                 }
-                            }
+                    }
                 }
-                notifyDataSetChanged()
             }
         }
         if (holder is FooterViewHolder) {
@@ -151,8 +147,8 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
         }
     }
 
-    private fun shareFullContent(position: Int) {
-        if (AngConfigManager.shareFullContent2Clipboard(mActivity.mainViewModel.getGuid(position)) == 0) {
+    private fun shareFullContent(guid: String) {
+        if (AngConfigManager.shareFullContent2Clipboard(guid) == 0) {
             mActivity.toast(R.string.toast_success)
         } else {
             mActivity.toast(R.string.toast_failure)
@@ -214,12 +210,12 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     }
 
     override fun onItemDismiss(position: Int) {
-        if (mActivity.mainViewModel.getGuid(position) != mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
+        val guid = mActivity.mainViewModel.serverList.getOrNull(position) ?: return
+        if (guid != mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
 //            mActivity.alert(R.string.del_config_comfirm) {
 //                positiveButton(android.R.string.ok) {
-            if (AngConfigManager.removeServer(position) == 0) {
-                notifyItemRemoved(position)
-            }
+            mActivity.mainViewModel.removeServer(guid)
+            notifyItemRemoved(position)
 //                }
 //                show()
 //            }
@@ -227,13 +223,13 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     }
 
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
-        AngConfigManager.swapServer(fromPosition, toPosition)
+        mActivity.mainViewModel.swapServer(fromPosition, toPosition)
         notifyItemMoved(fromPosition, toPosition)
-        notifyItemRangeChanged(fromPosition, toPosition - fromPosition + 1)
+        //notifyItemRangeChanged(fromPosition, toPosition - fromPosition + 1)
         return true
     }
 
     override fun onItemMoveCompleted() {
-        AngConfigManager.storeConfigFile()
+        // do nothing
     }
 }

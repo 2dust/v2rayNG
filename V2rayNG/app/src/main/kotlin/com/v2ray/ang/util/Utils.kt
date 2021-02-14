@@ -19,6 +19,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
+import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -35,6 +36,7 @@ import kotlin.coroutines.coroutineContext
 
 object Utils {
 
+    private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val tcpTestingSockets = ArrayList<Socket?>()
 
     /**
@@ -270,29 +272,8 @@ object Utils {
     }
 
     fun startVServiceFromToggle(context: Context): Boolean {
-        val result = context.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
-        if (result.isBlank()) {
+        if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
             context.toast(R.string.app_tile_first_use)
-            return false
-        }
-        V2RayServiceManager.startV2Ray(context)
-        return true
-    }
-
-    /**
-     * startVService
-     */
-    fun startVService(context: Context, guid: String): Boolean {
-        val index = AngConfigManager.getIndexViaGuid(guid)
-        context.v2RayApplication.curIndex=index
-        return startVService(context, index)
-    }
-
-    /**
-     * startVService
-     */
-    fun startVService(context: Context, index: Int): Boolean {
-        if (AngConfigManager.setActiveServer(index) < 0) {
             return false
         }
         V2RayServiceManager.startV2Ray(context)
@@ -398,8 +379,8 @@ object Utils {
     /**
      * readTextFromAssets
      */
-    fun readTextFromAssets(app: AngApplication, fileName: String): String {
-        val content = app.assets.open(fileName).bufferedReader().use {
+    fun readTextFromAssets(context: Context, fileName: String): String {
+        val content = context.assets.open(fileName).bufferedReader().use {
             it.readText()
         }
         return content
