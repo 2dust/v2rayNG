@@ -48,7 +48,8 @@
                         android:id="@+id/recycler_view"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="1" />
+                        android:layout_weight="1"
+                        android:nextFocusRight="@+id/fab" />
 
                     <LinearLayout
                         android:id="@+id/layout_test"
@@ -96,7 +97,8 @@
                         android:src="@drawable/ic_v_idle"
                         android:clickable="true"
                         android:focusable="true"
-                        app:layout_anchorGravity="bottom|right|end" />
+                        app:layout_anchorGravity="bottom|right|end"
+                        android:nextFocusLeft="@+id/recycler_view" />
 
                 </com.github.jorgecastilloprz.FABProgressCircle>
             </android.support.design.widget.CoordinatorLayout>
