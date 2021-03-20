@@ -7,36 +7,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.AngConfig
-import com.v2ray.ang.util.AngConfigManager
 import kotlinx.android.synthetic.main.item_recycler_sub_setting.view.*
 
 class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView.Adapter<SubSettingRecyclerAdapter.BaseViewHolder>() {
 
     private var mActivity: SubSettingActivity = activity
-    private lateinit var configs: AngConfig
 
-    init {
-        updateConfigList()
-    }
-
-    override fun getItemCount() = configs.subItem.count()
+    override fun getItemCount() = mActivity.subscriptions.size
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         if (holder is MainViewHolder) {
-            val remarks = configs.subItem[position].remarks
-            val url = configs.subItem[position].url
-
-            holder.name.text = remarks
-            holder.url.text = url
+            val subId = mActivity.subscriptions[position].first
+            val subItem = mActivity.subscriptions[position].second
+            holder.name.text = subItem.remarks
+            holder.url.text = subItem.url
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
 
             holder.layout_edit.setOnClickListener {
                 mActivity.startActivity(Intent(mActivity, SubEditActivity::class.java)
-                        .putExtra("position", position)
+                        .putExtra("subId", subId)
                 )
             }
-        } else {
         }
     }
 
@@ -44,15 +35,6 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
         return MainViewHolder(LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_recycler_sub_setting, parent, false))
     }
-
-    fun updateConfigList() {
-        configs = AngConfigManager.configs
-        notifyDataSetChanged()
-    }
-
-//    fun updateSelectedItem() {
-//        notifyItemChanged(configs.index)
-//    }
 
     open class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 

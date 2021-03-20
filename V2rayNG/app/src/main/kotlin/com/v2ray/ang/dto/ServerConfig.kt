@@ -28,14 +28,7 @@ data class ServerConfig(
                                     streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()))
                 EConfigType.CUSTOM ->
                     return ServerConfig(configType = configType)
-                EConfigType.SHADOWSOCKS, EConfigType.SOCKS ->
-                    return ServerConfig(
-                            configType = configType,
-                            outboundBean = V2rayConfig.OutboundBean(
-                                    protocol = configType.name.toLowerCase(),
-                                    settings = V2rayConfig.OutboundBean.OutSettingsBean(
-                                            servers = listOf(V2rayConfig.OutboundBean.OutSettingsBean.ServersBean()))))
-                EConfigType.TROJAN ->
+                EConfigType.SHADOWSOCKS, EConfigType.SOCKS, EConfigType.TROJAN ->
                     return ServerConfig(
                             configType = configType,
                             outboundBean = V2rayConfig.OutboundBean(

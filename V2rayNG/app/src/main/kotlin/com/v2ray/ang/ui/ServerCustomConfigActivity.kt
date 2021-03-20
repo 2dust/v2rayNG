@@ -15,7 +15,6 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import kotlinx.android.synthetic.main.activity_server_custom_config.*
-import java.lang.Exception
 
 class ServerCustomConfigActivity : BaseActivity() {
 
@@ -46,7 +45,7 @@ class ServerCustomConfigActivity : BaseActivity() {
      */
     private fun bindingServer(config: ServerConfig): Boolean {
         et_remarks.text = Utils.getEditable(config.remarks)
-        tv_content.text = Utils.getEditable(Gson().toJson(config.fullConfig))
+        tv_content.text = Utils.getEditable(config.fullConfig?.toPrettyPrinting().orEmpty())
         return true
     }
 

@@ -24,9 +24,8 @@ import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
-    private val serverAffStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_AFF, MMKV.MULTI_PROCESS_MODE) }
 
-    var serverList= Gson().fromJson(mainStorage?.decodeString(KEY_ANG_CONFIGS), Array<String>::class.java).toMutableList()
+    var serverList= MmkvManager.decodeServerList()
         private set
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
@@ -49,7 +48,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun reloadServerList() {
-        serverList = Gson().fromJson(mainStorage?.decodeString(KEY_ANG_CONFIGS), Array<String>::class.java).toMutableList()
+        serverList = MmkvManager.decodeServerList()
         updateListAction.value = -1
     }
 
@@ -85,11 +84,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     tcpingTestScope.launch {
                         val testResult = Utils.tcping(serverAddress, serverPort)
                         launch(Dispatchers.Main) {
-                            MmkvManager.decodeServerAffiliationInfo(guid)?.let { aff ->
-                                aff.testDelayMillis = testResult
-                                serverAffStorage?.encode(guid, Gson().toJson(aff))
-                                updateListAction.value = serverList.indexOf(guid)
-                            }
+                            MmkvManager.encodeServerTestDelayMillis(guid, testResult)
+                            updateListAction.value = serverList.indexOf(guid)
                         }
                     }
                 }

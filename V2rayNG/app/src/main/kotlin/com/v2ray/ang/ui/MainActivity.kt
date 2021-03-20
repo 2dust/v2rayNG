@@ -22,7 +22,6 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.service.V2RayServiceManager
@@ -51,6 +50,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
+    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
     private var mItemTouchHelper: ItemTouchHelper? = null
     val mainViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
 
@@ -63,7 +63,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         fab.setOnClickListener {
             if (mainViewModel.isRunning.value == true) {
                 Utils.stopVService(this)
-            } else if (defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN") == "VPN") {
+            } else if (settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN" == "VPN") {
                 val intent = VpnService.prepare(this)
                 if (intent == null) {
                     startV2Ray()
@@ -297,7 +297,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
         if (count > 0) {
             toast(R.string.toast_success)
-            adapter.notifyDataSetChanged()
+            mainViewModel.reloadServerList()
         } else {
             toast(R.string.toast_failure)
         }
@@ -381,18 +381,16 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             : Boolean {
         try {
             toast(R.string.title_sub_update)
-            val subItem = AngConfigManager.configs.subItem
-            for (k in 0 until subItem.count()) {
-                if (TextUtils.isEmpty(subItem[k].id)
-                        || TextUtils.isEmpty(subItem[k].remarks)
-                        || TextUtils.isEmpty(subItem[k].url)
+            MmkvManager.decodeSubscriptions().forEach {
+                if (TextUtils.isEmpty(it.first)
+                        || TextUtils.isEmpty(it.second.remarks)
+                        || TextUtils.isEmpty(it.second.url)
                 ) {
-                    continue
+                    return@forEach
                 }
-                val id = subItem[k].id
-                val url = subItem[k].url
+                val url = it.second.url
                 if (!Utils.isValidUrl(url)) {
-                    continue
+                    return@forEach
                 }
                 Log.d("Main", url)
                 GlobalScope.launch(Dispatchers.IO) {
@@ -403,7 +401,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         ""
                     }
                     launch(Dispatchers.Main) {
-                        importBatchConfig(Utils.decode(configText), id)
+                        importBatchConfig(Utils.decode(configText), it.first)
                     }
                 }
             }

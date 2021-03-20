@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.dto.ServerAffiliationInfo
 import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.dto.SubscriptionItem
 
 object MmkvManager {
     const val ID_MAIN = "MAIN"
@@ -17,6 +18,16 @@ object MmkvManager {
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val serverStorage by lazy { MMKV.mmkvWithID(ID_SERVER_CONFIG, MMKV.MULTI_PROCESS_MODE) }
     private val serverAffStorage by lazy { MMKV.mmkvWithID(ID_SERVER_AFF, MMKV.MULTI_PROCESS_MODE) }
+    private val subStorage by lazy { MMKV.mmkvWithID(ID_SUB, MMKV.MULTI_PROCESS_MODE) }
+
+    fun decodeServerList(): MutableList<String> {
+        val json = mainStorage?.decodeString(KEY_ANG_CONFIGS)
+        return if (json.isNullOrBlank()) {
+            mutableListOf()
+        } else {
+            Gson().fromJson(json, Array<String>::class.java).toMutableList()
+        }
+    }
 
     fun decodeServerConfig(guid: String): ServerConfig? {
         if (guid.isBlank()) {
@@ -36,11 +47,13 @@ object MmkvManager {
             guid
         }
         serverStorage?.encode(key, Gson().toJson(config))
-        val serverList= Gson().fromJson(mainStorage?.decodeString(KEY_ANG_CONFIGS), Array<String>::class.java).toMutableList()
-        serverList.add(guid)
-        mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
-        if (mainStorage?.decodeString(KEY_SELECTED_SERVER).isNullOrBlank()) {
-            mainStorage?.encode(KEY_SELECTED_SERVER, guid)
+        val serverList= decodeServerList()
+        if (!serverList.contains(key)) {
+            serverList.add(key)
+            mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
+            if (mainStorage?.decodeString(KEY_SELECTED_SERVER).isNullOrBlank()) {
+                mainStorage?.encode(KEY_SELECTED_SERVER, key)
+            }
         }
         return key
     }
@@ -52,7 +65,7 @@ object MmkvManager {
         if (mainStorage?.decodeString(KEY_SELECTED_SERVER) == guid) {
             mainStorage?.remove(KEY_SELECTED_SERVER)
         }
-        val serverList= Gson().fromJson(mainStorage?.decodeString(KEY_ANG_CONFIGS), Array<String>::class.java).toMutableList()
+        val serverList= decodeServerList()
         serverList.remove(guid)
         mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
         serverStorage?.remove(guid)
@@ -83,6 +96,15 @@ object MmkvManager {
         return Gson().fromJson(json, ServerAffiliationInfo::class.java)
     }
 
+    fun encodeServerTestDelayMillis(guid: String, testResult: Long) {
+        if (guid.isBlank()) {
+            return
+        }
+        val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
+        aff.testDelayMillis = testResult
+        serverAffStorage?.encode(guid, Gson().toJson(aff))
+    }
+
     fun clearAllTestDelayResults() {
         serverAffStorage?.allKeys()?.forEach { key ->
             decodeServerAffiliationInfo(key)?.let { aff ->
@@ -90,5 +112,36 @@ object MmkvManager {
                 serverAffStorage?.encode(key, Gson().toJson(aff))
             }
         }
+    }
+
+    fun importUrlAsSubscription(url: String): Int {
+        val subscriptions = decodeSubscriptions()
+        subscriptions.forEach {
+            if (it.second.url == url) {
+                return 0
+            }
+        }
+        val subItem = SubscriptionItem()
+        subItem.remarks = "import sub"
+        subItem.url = url
+        subStorage?.encode(Utils.getUuid(), Gson().toJson(subItem))
+        return 1
+    }
+
+    fun decodeSubscriptions(): List<Pair<String, SubscriptionItem>> {
+        val subscriptions = mutableListOf<Pair<String, SubscriptionItem>>()
+        subStorage?.allKeys()?.forEach { key ->
+            val json = subStorage?.decodeString(key)
+            if (!json.isNullOrBlank()) {
+                subscriptions.add(Pair(key, Gson().fromJson(json, SubscriptionItem::class.java)))
+            }
+        }
+        subscriptions.sortedBy { (_, value) -> value.addedTime }
+        return subscriptions
+    }
+
+    fun removeSubscription(subid: String) {
+        subStorage?.remove(subid)
+        removeServerViaSubid(subid)
     }
 }

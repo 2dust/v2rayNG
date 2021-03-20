@@ -12,7 +12,6 @@ import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_NETWORK
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_PORT
-import com.v2ray.ang.dto.V2rayConfig.Companion.TLS
 import com.v2ray.ang.dto.V2rayConfig.Companion.XTLS
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
@@ -35,6 +34,7 @@ import kotlinx.android.synthetic.main.activity_server_vmess.sp_stream_security
 class ServerActivity : BaseActivity() {
 
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
+    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
     private val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
     private val isRunning by lazy {
         intent.getBooleanExtra("isRunning", false)
@@ -96,7 +96,7 @@ class ServerActivity : BaseActivity() {
 
         et_remarks.text = Utils.getEditable(config.remarks)
         et_address.text = Utils.getEditable(outbound.getServerAddress().orEmpty())
-        et_port.text = Utils.getEditable(outbound.getServerPort()?.or(DEFAULT_PORT).toString())
+        et_port.text = Utils.getEditable(outbound.getServerPort()?.toString() ?: DEFAULT_PORT.toString())
         et_id.text = Utils.getEditable(outbound.getPassword().orEmpty())
         et_alterId?.text = Utils.getEditable(outbound.settings?.vnext?.get(0)?.users?.get(0)?.alterId.toString())
         if (config.configType == EConfigType.SOCKS) {
@@ -229,18 +229,22 @@ class ServerActivity : BaseActivity() {
         if (config.configType == EConfigType.SHADOWSOCKS) {
             server.password = et_id.text.toString().trim()
             server.method = shadowsocksSecuritys[sp_security.selectedItemPosition]
-        } else if (config.configType == EConfigType.SOCKS && !TextUtils.isEmpty(et_security.text) && !TextUtils.isEmpty(et_id.text)) {
-            val socksUsersBean = V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
-            socksUsersBean.user = et_security.text.toString().trim()
-            socksUsersBean.pass = et_id.text.toString().trim()
-            server.users = listOf(socksUsersBean)
+        } else if (config.configType == EConfigType.SOCKS) {
+            if (TextUtils.isEmpty(et_security.text) && TextUtils.isEmpty(et_id.text)) {
+                server.users = null
+            } else {
+                val socksUsersBean = V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
+                socksUsersBean.user = et_security.text.toString().trim()
+                socksUsersBean.pass = et_id.text.toString().trim()
+                server.users = listOf(socksUsersBean)
+            }
         } else if (config.configType == EConfigType.TROJAN) {
             server.password = et_id.text.toString().trim()
         }
     }
 
     private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean) {
-        val requestHost = et_request_host.text.toString().trim()
+        val requestHost = et_request_host?.text.toString().trim()
         val path = et_path?.text.toString().trim()
         var sni = streamSetting.populateTransportSettings(
                 if (sp_network != null) networks[sp_network.selectedItemPosition] else DEFAULT_NETWORK,
@@ -254,9 +258,18 @@ class ServerActivity : BaseActivity() {
         if (sni.isEmpty()) {
             sni = requestHost
         }
+        val allowInsecure = if (sp_allow_insecure != null) {
+            if (allowinsecures[sp_allow_insecure.selectedItemPosition].isBlank()) {
+                false//settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
+            } else {
+                allowinsecures[sp_allow_insecure.selectedItemPosition].toBoolean()
+            }
+        } else {
+            false
+        }
         streamSetting.populateTlsSettings(
-                if (sp_stream_security != null) streamSecuritys[sp_stream_security.selectedItemPosition] else TLS,
-                if (sp_allow_insecure != null) allowinsecures[sp_allow_insecure.selectedItemPosition].toBoolean() else false,
+                if (sp_stream_security != null) streamSecuritys[sp_stream_security.selectedItemPosition] else "",
+                allowInsecure,
                 sni
         )
     }

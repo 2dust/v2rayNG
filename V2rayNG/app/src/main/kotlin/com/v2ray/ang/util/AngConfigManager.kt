@@ -1,6 +1,7 @@
 package com.v2ray.ang.util
 
 import android.graphics.Bitmap
+import android.support.v7.preference.PreferenceManager
 import android.text.TextUtils
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
@@ -20,8 +21,8 @@ import java.util.*
 object AngConfigManager {
     private lateinit var app: AngApplication
     private lateinit var angConfig: AngConfig
-    val configs: AngConfig get() = angConfig
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
+    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     fun inject(app: AngApplication) {
         this.app = app
@@ -33,7 +34,8 @@ object AngConfigManager {
      */
     private fun loadConfig() {
         try {
-            val context = app.defaultDPreference.getPrefString(ANG_CONFIG, "")
+            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
+            val context = defaultSharedPreferences.getString(ANG_CONFIG, "")
             if (!TextUtils.isEmpty(context)) {
                 angConfig = Gson().fromJson(context, AngConfig::class.java)
             } else {
@@ -57,18 +59,6 @@ object AngConfigManager {
     }
 
     /**
-     * store config to file
-     */
-    fun storeConfigFile() {
-        try {
-            val conf = Gson().toJson(angConfig)
-            app.defaultDPreference.setPrefString(ANG_CONFIG, conf)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    /**
      * import config form qrcode or...
      */
     private fun importConfig(str: String?, subid: String, removedSelectedServer: ServerConfig?): Int {
@@ -79,12 +69,12 @@ object AngConfigManager {
 
             //maybe sub
             if (str.startsWith(HTTP_PROTOCOL) || str.startsWith(HTTPS_PROTOCOL)) {
-                addSubItem(str)
+                MmkvManager.importUrlAsSubscription(str)
                 return 0
             }
 
             var config: ServerConfig? = null
-            val allowInsecure = false//app.defaultDPreference.getPrefBoolean(AppConfig.PREF_ALLOW_INSECURE, false)
+            val allowInsecure = false//settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
             if (str.startsWith(EConfigType.VMESS.protocolScheme)) {
                 config = ServerConfig.create(EConfigType.VMESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
@@ -570,79 +560,6 @@ object AngConfigManager {
             return count
         } catch (e: Exception) {
             e.printStackTrace()
-        }
-        return 0
-    }
-
-
-    private fun saveSubItem(subItem: ArrayList<AngConfig.SubItemBean>): Int {
-        try {
-            if (subItem.count() <= 0) {
-                return -1
-            }
-            for (k in 0 until subItem.count()) {
-                if (TextUtils.isEmpty(subItem[k].id)) {
-                    subItem[k].id = Utils.getUuid()
-                }
-            }
-            angConfig.subItem = subItem
-
-            storeConfigFile()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return -1
-        }
-        return 0
-    }
-
-    fun addSubItem(subItem: AngConfig.SubItemBean, index: Int): Int {
-        try {
-            if (index >= 0) {
-                //edit
-                angConfig.subItem[index] = subItem
-            } else {
-                //add
-                angConfig.subItem.add(subItem)
-            }
-
-            saveSubItem(angConfig.subItem)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return -1
-        }
-        return 0
-    }
-
-    private fun addSubItem(url: String): Int {
-        //already exists
-        angConfig.subItem.forEach {
-            if (it.url == url) {
-                return 0
-            }
-        }
-        val subItem = AngConfig.SubItemBean()
-        subItem.remarks = "import sub"
-        subItem.url = url
-        return addSubItem(subItem, -1)
-    }
-
-    /**
-     *
-     */
-    fun removeSubItem(index: Int): Int {
-        try {
-            if (index < 0 || index > angConfig.subItem.count() - 1) {
-                return -1
-            }
-            val subid = angConfig.subItem[index].id
-            MmkvManager.removeServerViaSubid(subid)
-
-            angConfig.subItem.removeAt(index)
-
-            storeConfigFile()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return -1
         }
         return 0
     }

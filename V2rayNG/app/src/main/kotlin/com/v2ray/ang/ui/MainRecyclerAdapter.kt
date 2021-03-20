@@ -39,7 +39,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     }
     var isRunning = false
 
-    override fun getItemCount() = mActivity.mainViewModel.serverList.size
+    override fun getItemCount() = mActivity.mainViewModel.serverList.size + 1
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         if (holder is MainViewHolder) {

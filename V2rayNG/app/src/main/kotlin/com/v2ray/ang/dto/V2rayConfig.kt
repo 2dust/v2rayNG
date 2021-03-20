@@ -1,6 +1,12 @@
 package com.v2ray.ang.dto
 
 import android.text.TextUtils
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 
 data class V2rayConfig(
         val stats: Any? = null,
@@ -284,7 +290,7 @@ data class V2rayConfig(
                     "quic" -> {
                         val quicSetting = streamSettings?.quicSettings ?: return null
                         listOf(quicSetting.header.type,
-                                quicSetting.key,
+                                quicSetting.security,
                                 quicSetting.key)
                     }
                     else -> null
@@ -335,5 +341,16 @@ data class V2rayConfig(
             }
         }
         return null
+    }
+
+    fun toPrettyPrinting(): String {
+        return GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter( // custom serialiser is needed here since JSON by default parse number as Double, core will fail to start
+                        object: TypeToken<Double>() {}.type,
+                        JsonSerializer { src: Double?, _: Type?, _: JsonSerializationContext? -> JsonPrimitive(src?.toInt()) }
+                )
+                .create()
+                .toJson(this)
     }
 }

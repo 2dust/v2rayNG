@@ -20,16 +20,12 @@ import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
 import com.tencent.mmkv.MMKV
-import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.extension.responseLength
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.service.V2RayServiceManager
 import kotlinx.coroutines.isActive
-import me.dozen.dpreference.DPreference
 import java.io.IOException
 import java.net.*
 import kotlin.coroutines.coroutineContext
@@ -37,6 +33,7 @@ import kotlin.coroutines.coroutineContext
 object Utils {
 
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
+    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
     private val tcpTestingSockets = ArrayList<Socket?>()
 
     /**
@@ -126,8 +123,8 @@ object Utils {
     /**
      * get remote dns servers from preference
      */
-    fun getRemoteDnsServers(defaultDPreference: DPreference): ArrayList<String> {
-        val remoteDns = defaultDPreference.getPrefString(AppConfig.PREF_REMOTE_DNS, AppConfig.DNS_AGENT)
+    fun getRemoteDnsServers(): ArrayList<String> {
+        val remoteDns = settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_AGENT
         val ret = ArrayList<String>()
         if (!TextUtils.isEmpty(remoteDns)) {
             remoteDns
@@ -147,8 +144,8 @@ object Utils {
     /**
      * get remote dns servers from preference
      */
-    fun getDomesticDnsServers(defaultDPreference: DPreference): ArrayList<String> {
-        val domesticDns = defaultDPreference.getPrefString(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
+    fun getDomesticDnsServers(): ArrayList<String> {
+        val domesticDns = settingsStorage?.decodeString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
         val ret = ArrayList<String>()
         if (!TextUtils.isEmpty(domesticDns)) {
             domesticDns

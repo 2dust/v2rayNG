@@ -5,10 +5,12 @@ import android.support.v7.app.AlertDialog
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import com.google.gson.Gson
+import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.AngConfig
+import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.AngConfigManager
+import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import kotlinx.android.synthetic.main.activity_sub_edit.*
 
@@ -17,20 +19,17 @@ class SubEditActivity : BaseActivity() {
     var del_config: MenuItem? = null
     var save_config: MenuItem? = null
 
-    private lateinit var configs: AngConfig
-    private var edit_index: Int = -1 //当前编辑的
+    private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
+    private val editSubId by lazy { intent.getStringExtra("subId").orEmpty() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sub_edit)
-
-        configs = AngConfigManager.configs
-        edit_index = intent.getIntExtra("position", -1)
-
         title = getString(R.string.title_sub_setting)
 
-        if (edit_index >= 0) {
-            bindingServer(configs.subItem[edit_index])
+        val json = subStorage?.decodeString(editSubId)
+        if (!json.isNullOrBlank()) {
+            bindingServer(Gson().fromJson(json, SubscriptionItem::class.java))
         } else {
             clearServer()
         }
@@ -40,7 +39,7 @@ class SubEditActivity : BaseActivity() {
     /**
      * bingding seleced server config
      */
-    fun bindingServer(subItem: AngConfig.SubItemBean): Boolean {
+    private fun bindingServer(subItem: SubscriptionItem): Boolean {
         et_remarks.text = Utils.getEditable(subItem.remarks)
         et_url.text = Utils.getEditable(subItem.url)
 
@@ -50,7 +49,7 @@ class SubEditActivity : BaseActivity() {
     /**
      * clear or init server config
      */
-    fun clearServer(): Boolean {
+    private fun clearServer(): Boolean {
         et_remarks.text = null
         et_url.text = null
 
@@ -60,12 +59,15 @@ class SubEditActivity : BaseActivity() {
     /**
      * save server config
      */
-    fun saveServer(): Boolean {
-        val subItem: AngConfig.SubItemBean
-        if (edit_index >= 0) {
-            subItem = configs.subItem[edit_index]
+    private fun saveServer(): Boolean {
+        val subItem: SubscriptionItem
+        val json = subStorage?.decodeString(editSubId)
+        var subId = editSubId
+        if (!json.isNullOrBlank()) {
+            subItem = Gson().fromJson(json, SubscriptionItem::class.java)
         } else {
-            subItem = AngConfig.SubItemBean()
+            subId = Utils.getUuid()
+            subItem = SubscriptionItem()
         }
 
         subItem.remarks = et_remarks.text.toString()
@@ -80,32 +82,23 @@ class SubEditActivity : BaseActivity() {
             return false
         }
 
-        if (AngConfigManager.addSubItem(subItem, edit_index) == 0) {
-            toast(R.string.toast_success)
-            finish()
-            return true
-        } else {
-            toast(R.string.toast_failure)
-            return false
-        }
+        subStorage?.encode(subId, Gson().toJson(subItem))
+        toast(R.string.toast_success)
+        finish()
+        return true
     }
 
     /**
      * save server config
      */
-    fun deleteServer(): Boolean {
-        if (edit_index >= 0) {
+    private fun deleteServer(): Boolean {
+        if (editSubId.isNotEmpty()) {
             AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                        if (AngConfigManager.removeSubItem(edit_index) == 0) {
-                            toast(R.string.toast_success)
-                            finish()
-                        } else {
-                            toast(R.string.toast_failure)
-                        }
+                        MmkvManager.removeSubscription(editSubId)
+                        finish()
                     }
                     .show()
-        } else {
         }
         return true
     }
@@ -115,8 +108,7 @@ class SubEditActivity : BaseActivity() {
         del_config = menu?.findItem(R.id.del_config)
         save_config = menu?.findItem(R.id.save_config)
 
-        if (edit_index >= 0) {
-        } else {
+        if (editSubId.isEmpty()) {
             del_config?.isVisible = false
         }
 
