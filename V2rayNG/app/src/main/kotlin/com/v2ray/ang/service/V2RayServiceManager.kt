@@ -13,17 +13,18 @@ import android.os.Build
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.util.Log
+import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.defaultDPreference
+import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.ui.MainActivity
-import com.v2ray.ang.ui.SettingsActivity
 import com.v2ray.ang.util.MessageUtil
+import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.V2rayConfigUtil
 import go.Seq
 import libv2ray.Libv2ray
 import libv2ray.V2RayPoint
@@ -41,6 +42,8 @@ object V2RayServiceManager {
 
     val v2rayPoint: V2RayPoint = Libv2ray.newV2RayPoint(V2RayCallback())
     private val mMsgReceive = ReceiveMessageHandler()
+    private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
+    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -52,7 +55,7 @@ object V2RayServiceManager {
                 Seq.setContext(context)
             }
         }
-    var currentConfigName = "NG"
+    var currentConfig: ServerConfig? = null
 
     private var lastQueryTime = 0L
     private var mBuilder: NotificationCompat.Builder? = null
@@ -60,12 +63,12 @@ object V2RayServiceManager {
     private var mNotificationManager: NotificationManager? = null
 
     fun startV2Ray(context: Context) {
-        if (context.v2RayApplication.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_PROXY_SHARING, false)) {
+        if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) == true) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)
         }else{
             context.toast(R.string.toast_services_start)
         }
-        val intent = if (context.v2RayApplication.defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN") == "VPN") {
+        val intent = if (settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN" == "VPN") {
             Intent(context.applicationContext, V2RayVpnService::class.java)
         } else {
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
@@ -123,7 +126,12 @@ object V2RayServiceManager {
 
     fun startV2rayPoint() {
         val service = serviceControl?.get()?.getService() ?: return
+        val guid = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER) ?: return
+        val config = MmkvManager.decodeServerConfig(guid) ?: return
         if (!v2rayPoint.isRunning) {
+            val result = V2rayConfigUtil.getV2rayConfig(service, guid)
+            if (!result.status)
+                return
 
             try {
                 val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
@@ -135,12 +143,12 @@ object V2RayServiceManager {
                 Log.d(service.packageName, e.toString())
             }
 
-            v2rayPoint.configureFileContent = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
-            v2rayPoint.enableLocalDNS = service.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_LOCAL_DNS_ENABLED, false)
-            v2rayPoint.forwardIpv6 = service.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_FORWARD_IPV6, false)
-            v2rayPoint.domainName = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_DOMAIN, "")
-            v2rayPoint.proxyOnly = service.defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN") != "VPN"
-            currentConfigName = service.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, "NG")
+            v2rayPoint.configureFileContent = result.content
+            v2rayPoint.domainName = config.getV2rayPointDomainAndPort()
+            currentConfig = config
+            v2rayPoint.enableLocalDNS = settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) ?: false
+            v2rayPoint.forwardIpv6 = settingsStorage?.decodeBool(AppConfig.PREF_FORWARD_IPV6) ?: false
+            v2rayPoint.proxyOnly = settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN" != "VPN"
 
             try {
                 v2rayPoint.runLoop()
@@ -244,7 +252,7 @@ object V2RayServiceManager {
 
         mBuilder = NotificationCompat.Builder(service, channelId)
                 .setSmallIcon(R.drawable.ic_v)
-                .setContentTitle(currentConfigName)
+                .setContentTitle(currentConfig?.remarks)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setOngoing(true)
                 .setShowWhen(false)
@@ -281,7 +289,7 @@ object V2RayServiceManager {
         mSubscription = null
     }
 
-    private fun updateNotification(contentText: String, proxyTraffic: Long, directTraffic: Long) {
+    private fun updateNotification(contentText: String?, proxyTraffic: Long, directTraffic: Long) {
         if (mBuilder != null) {
             if (proxyTraffic < NOTIFICATION_ICON_THRESHOLD && directTraffic < NOTIFICATION_ICON_THRESHOLD) {
                 mBuilder?.setSmallIcon(R.drawable.ic_v)
@@ -305,13 +313,12 @@ object V2RayServiceManager {
     }
 
     fun startSpeedNotification() {
-        val service = serviceControl?.get()?.getService() ?: return
         if (mSubscription == null &&
                 v2rayPoint.isRunning &&
-                service.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_SPEED_ENABLED, false)) {
+                settingsStorage?.decodeBool(AppConfig.PREF_SPEED_ENABLED) == true) {
             var lastZeroSpeed = false
-            val outboundTags = service.defaultDPreference.getPrefStringOrderedSet(AppConfig.PREF_CURR_CONFIG_OUTBOUND_TAGS, LinkedHashSet())
-            outboundTags.remove(TAG_DIRECT)
+            val outboundTags = currentConfig?.getAllOutboundTags()
+            outboundTags?.remove(TAG_DIRECT)
 
             mSubscription = Observable.interval(3, java.util.concurrent.TimeUnit.SECONDS)
                     .subscribe {
@@ -319,7 +326,7 @@ object V2RayServiceManager {
                         val sinceLastQueryInSeconds = (queryTime - lastQueryTime) / 1000.0
                         var proxyTotal = 0L
                         val text = StringBuilder()
-                        outboundTags.forEach {
+                        outboundTags?.forEach {
                             val up = v2rayPoint.queryStats(it, "uplink")
                             val down = v2rayPoint.queryStats(it, "downlink")
                             if (up + down > 0) {
@@ -332,7 +339,7 @@ object V2RayServiceManager {
                         val zeroSpeed = (proxyTotal == 0L && directUplink == 0L && directDownlink == 0L)
                         if (!zeroSpeed || !lastZeroSpeed) {
                             if (proxyTotal == 0L) {
-                                appendSpeedString(text, outboundTags.firstOrNull(), 0.0, 0.0)
+                                appendSpeedString(text, outboundTags?.firstOrNull(), 0.0, 0.0)
                             }
                             appendSpeedString(text, TAG_DIRECT, directUplink / sinceLastQueryInSeconds,
                                     directDownlink / sinceLastQueryInSeconds)
@@ -358,7 +365,7 @@ object V2RayServiceManager {
         if (mSubscription != null) {
             mSubscription?.unsubscribe() //stop queryStats
             mSubscription = null
-            updateNotification(currentConfigName, 0, 0)
+            updateNotification(currentConfig?.remarks, 0, 0)
         }
     }
 }

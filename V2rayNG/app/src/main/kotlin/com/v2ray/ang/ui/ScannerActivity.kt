@@ -23,8 +23,8 @@ class ScannerActivity : BaseActivity(), ZXingScannerView.ResultHandler {
 
     private var mScannerView: ZXingScannerView? = null
 
-    public override fun onCreate(state: Bundle?) {
-        super.onCreate(state)
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         mScannerView = ZXingScannerView(this)   // Programmatically initialize the scanner view
 
         mScannerView?.setAutoFocus(true)

@@ -5,9 +5,9 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.preference.PreferenceManager
 import android.view.*
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.util.Utils
 import kotlinx.android.synthetic.main.fragment_routing_settings.*
 import android.view.MenuInflater
@@ -26,6 +26,8 @@ class RoutingSettingsFragment : Fragment() {
         private const val REQUEST_SCAN_APPEND = 12
     }
 
+    val defaultSharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -40,10 +42,10 @@ class RoutingSettingsFragment : Fragment() {
         return fragment
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val content = activity?.defaultDPreference?.getPrefString(arguments!!.getString(routing_arg), "")
+        val content = defaultSharedPreferences.getString(arguments!!.getString(routing_arg), "")
         et_routing_content.text = Utils.getEditable(content!!)
 
         setHasOptionsMenu(true)
@@ -57,7 +59,7 @@ class RoutingSettingsFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.save_routing -> {
             val content = et_routing_content.text.toString()
-            activity?.defaultDPreference?.setPrefString(arguments!!.getString(routing_arg), content)
+            defaultSharedPreferences.edit().putString(arguments!!.getString(routing_arg), content).apply()
             activity?.toast(R.string.toast_success)
             true
         }

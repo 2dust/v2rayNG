@@ -19,24 +19,22 @@ import android.text.TextUtils
 import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
-import com.v2ray.ang.AngApplication
+import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.defaultDPreference
 import com.v2ray.ang.extension.responseLength
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.service.V2RayServiceManager
-import com.v2ray.ang.ui.SettingsActivity
 import kotlinx.coroutines.isActive
-import me.dozen.dpreference.DPreference
 import java.io.IOException
 import java.net.*
 import kotlin.coroutines.coroutineContext
 
 object Utils {
 
-    val tcpTestingSockets = ArrayList<Socket?>()
+    private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
+    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
+    private val tcpTestingSockets = ArrayList<Socket?>()
 
     /**
      * convert string to editalbe for kotlin
@@ -125,8 +123,8 @@ object Utils {
     /**
      * get remote dns servers from preference
      */
-    fun getRemoteDnsServers(defaultDPreference: DPreference): ArrayList<String> {
-        val remoteDns = defaultDPreference.getPrefString(SettingsActivity.PREF_REMOTE_DNS, AppConfig.DNS_AGENT)
+    fun getRemoteDnsServers(): ArrayList<String> {
+        val remoteDns = settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_AGENT
         val ret = ArrayList<String>()
         if (!TextUtils.isEmpty(remoteDns)) {
             remoteDns
@@ -146,8 +144,8 @@ object Utils {
     /**
      * get remote dns servers from preference
      */
-    fun getDomesticDnsServers(defaultDPreference: DPreference): ArrayList<String> {
-        val domesticDns = defaultDPreference.getPrefString(SettingsActivity.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
+    fun getDomesticDnsServers(): ArrayList<String> {
+        val domesticDns = settingsStorage?.decodeString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
         val ret = ArrayList<String>()
         if (!TextUtils.isEmpty(domesticDns)) {
             domesticDns
@@ -260,7 +258,7 @@ object Utils {
      */
     fun isValidUrl(value: String?): Boolean {
         try {
-            if (Patterns.WEB_URL.matcher(value).matches() || URLUtil.isValidUrl(value)) {
+            if (value != null && Patterns.WEB_URL.matcher(value).matches() || URLUtil.isValidUrl(value)) {
                 return true
             }
         } catch (e: WriterException) {
@@ -271,29 +269,8 @@ object Utils {
     }
 
     fun startVServiceFromToggle(context: Context): Boolean {
-        val result = context.defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
-        if (result.isBlank()) {
+        if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
             context.toast(R.string.app_tile_first_use)
-            return false
-        }
-        V2RayServiceManager.startV2Ray(context)
-        return true
-    }
-
-    /**
-     * startVService
-     */
-    fun startVService(context: Context, guid: String): Boolean {
-        val index = AngConfigManager.getIndexViaGuid(guid)
-        context.v2RayApplication.curIndex=index
-        return startVService(context, index)
-    }
-
-    /**
-     * startVService
-     */
-    fun startVService(context: Context, index: Int): Boolean {
-        if (AngConfigManager.setActiveServer(index) < 0) {
             return false
         }
         V2RayServiceManager.startV2Ray(context)
@@ -399,8 +376,8 @@ object Utils {
     /**
      * readTextFromAssets
      */
-    fun readTextFromAssets(app: AngApplication, fileName: String): String {
-        val content = app.assets.open(fileName).bufferedReader().use {
+    fun readTextFromAssets(context: Context, fileName: String): String {
+        val content = context.assets.open(fileName).bufferedReader().use {
             it.readText()
         }
         return content
@@ -430,19 +407,18 @@ object Utils {
     /**
      * tcping
      */
-    suspend fun tcping(url: String, port: Int): String {
+    suspend fun tcping(url: String, port: Int): Long {
         var time = -1L
         for (k in 0 until 2) {
             val one = socketConnectTime(url, port)
             if (!coroutineContext.isActive) {
                 break
             }
-            if (one != -1L  )
-                if(time == -1L || one < time) {
+            if (one != -1L && (time == -1L || one < time)) {
                 time = one
             }
         }
-        return time.toString() + "ms"
+        return time
     }
 
     fun socketConnectTime(url: String, port: Int): Long {

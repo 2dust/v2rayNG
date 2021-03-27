@@ -6,6 +6,8 @@
     <string name="app_tile_first_use">初次使用此功能请先用APP添加配置</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="migration_success">数据迁移成功!</string>
+    <string name="migration_fail">数据迁移失败啦!</string>
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">停止</string>

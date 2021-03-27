@@ -17,13 +17,16 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import com.tbruyelle.rxpermissions.RxPermissions
+import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.defaultDPreference
+import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
+import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.AngConfigManager
+import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
 import com.v2ray.ang.viewmodel.MainViewModel
@@ -46,8 +49,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
+    private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
+    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
     private var mItemTouchHelper: ItemTouchHelper? = null
-    private val mainViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
+    val mainViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +63,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         fab.setOnClickListener {
             if (mainViewModel.isRunning.value == true) {
                 Utils.stopVService(this)
-            } else if (defaultDPreference.getPrefString(AppConfig.PREF_MODE, "VPN") == "VPN") {
+            } else if (settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN" == "VPN") {
                 val intent = VpnService.prepare(this)
                 if (intent == null) {
                     startV2Ray()
@@ -95,47 +100,65 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         version.text = "v${BuildConfig.VERSION_NAME} (${Libv2ray.checkVersionX()})"
 
         setupViewModelObserver()
+        migrateLegacy()
     }
 
     private fun setupViewModelObserver() {
         mainViewModel.updateListAction.observe(this, {
             val index = it ?: return@observe
             if (index >= 0) {
-                adapter.updateSelectedItem(index)
+                adapter.notifyItemChanged(index)
             } else {
-                adapter.updateConfigList()
+                adapter.notifyDataSetChanged()
             }
         })
         mainViewModel.updateTestResultAction.observe(this, { tv_test_state.text = it })
         mainViewModel.isRunning.observe(this, {
             val isRunning = it ?: return@observe
-            adapter.changeable = !isRunning
+            adapter.isRunning = isRunning
             if (isRunning) {
                 fab.setImageResource(R.drawable.ic_v)
                 tv_test_state.text = getString(R.string.connection_connected)
+                layout_test.isFocusable = true
             } else {
                 fab.setImageResource(R.drawable.ic_v_idle)
                 tv_test_state.text = getString(R.string.connection_not_connected)
+                layout_test.isFocusable = false
             }
             hideCircle()
         })
         mainViewModel.startListenBroadcast()
     }
 
+    private fun migrateLegacy() {
+        GlobalScope.launch(Dispatchers.IO) {
+            val result = AngConfigManager.migrateLegacyConfig(this@MainActivity)
+            if (result != null) {
+                launch(Dispatchers.Main) {
+                    if (result) {
+                        toast(getString(R.string.migration_success))
+                        mainViewModel.reloadServerList()
+                    } else {
+                        toast(getString(R.string.migration_fail))
+                    }
+                }
+            }
+        }
+    }
+
     fun startV2Ray() {
-        if (AngConfigManager.configs.index < 0) {
+        if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
             return
         }
         showCircle()
 //        toast(R.string.toast_services_start)
-        if (!Utils.startVService(this, AngConfigManager.configs.index)) {
-            hideCircle()
-        }
+        V2RayServiceManager.startV2Ray(this)
+        hideCircle()
     }
 
     public override fun onResume() {
         super.onResume()
-        adapter.updateConfigList()
+        mainViewModel.reloadServerList()
     }
 
     public override fun onPause() {
@@ -171,9 +194,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
-    private fun getOptionIntent() = Intent().putExtra("position", -1)
-            .putExtra("isRunning", mainViewModel.isRunning.value == true)
-
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.import_qrcode -> {
             importQRcode(REQUEST_SCAN)
@@ -184,18 +204,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
         R.id.import_manually_vmess -> {
-            startActivity(getOptionIntent().setClass(this, ServerActivity::class.java))
-            adapter.updateConfigList()
+            startActivity(Intent().putExtra("createConfigType", EConfigType.VMESS.value).
+            setClass(this, ServerActivity::class.java))
             true
         }
         R.id.import_manually_ss -> {
-            startActivity(getOptionIntent().setClass(this, Server3Activity::class.java))
-            adapter.updateConfigList()
+            startActivity(Intent().putExtra("createConfigType", EConfigType.SHADOWSOCKS.value).
+            setClass(this, ServerActivity::class.java))
             true
         }
         R.id.import_manually_socks -> {
-            startActivity(getOptionIntent().setClass(this, Server4Activity::class.java))
-            adapter.updateConfigList()
+            startActivity(Intent().putExtra("createConfigType", EConfigType.SOCKS.value).
+            setClass(this, ServerActivity::class.java))
             true
         }
         R.id.import_config_custom_clipboard -> {
@@ -226,8 +246,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.export_all -> {
-            if (AngConfigManager.shareAll2Clipboard() == 0) {
-                //remove toast, otherwise it will block previous warning message
+            if (AngConfigManager.shareNonCustomConfigsToClipboard(this, mainViewModel.serverList) == 0) {
+                toast(R.string.toast_success)
             } else {
                 toast(R.string.toast_failure)
             }
@@ -288,10 +308,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     fun importBatchConfig(server: String?, subid: String = "") {
-        val count = AngConfigManager.importBatchConfig(server, subid)
+        var count = AngConfigManager.importBatchConfig(server, subid)
+        if (count <= 0) {
+            count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid)
+        }
         if (count > 0) {
             toast(R.string.toast_success)
-            adapter.updateConfigList()
+            mainViewModel.reloadServerList()
         } else {
             toast(R.string.toast_failure)
         }
@@ -375,18 +398,16 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             : Boolean {
         try {
             toast(R.string.title_sub_update)
-            val subItem = AngConfigManager.configs.subItem
-            for (k in 0 until subItem.count()) {
-                if (TextUtils.isEmpty(subItem[k].id)
-                        || TextUtils.isEmpty(subItem[k].remarks)
-                        || TextUtils.isEmpty(subItem[k].url)
+            MmkvManager.decodeSubscriptions().forEach {
+                if (TextUtils.isEmpty(it.first)
+                        || TextUtils.isEmpty(it.second.remarks)
+                        || TextUtils.isEmpty(it.second.url)
                 ) {
-                    continue
+                    return@forEach
                 }
-                val id = subItem[k].id
-                val url = subItem[k].url
+                val url = it.second.url
                 if (!Utils.isValidUrl(url)) {
-                    continue
+                    return@forEach
                 }
                 Log.d("Main", url)
                 GlobalScope.launch(Dispatchers.IO) {
@@ -397,7 +418,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         ""
                     }
                     launch(Dispatchers.Main) {
-                        importBatchConfig(Utils.decode(configText), id)
+                        importBatchConfig(Utils.decode(configText), it.first)
                     }
                 }
             }
@@ -434,9 +455,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .subscribe {
                     if (it) {
                         try {
-                            contentResolver.openInputStream(uri).use {
-                                val configText = it?.bufferedReader()?.readText()
-                                importCustomizeConfig(configText)
+                            contentResolver.openInputStream(uri).use { input ->
+                                importCustomizeConfig(input?.bufferedReader()?.readText())
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -450,19 +470,21 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      * import customize config
      */
     fun importCustomizeConfig(server: String?) {
-        if (server == null) {
-            return
-        }
-        if (!V2rayConfigUtil.isValidConfig(server)) {
-            toast(R.string.toast_config_file_invalid)
-            return
-        }
-        val resId = AngConfigManager.importCustomizeConfig(server)
-        if (resId > 0) {
-            toast(resId)
-        } else {
+        try {
+            if (server == null || TextUtils.isEmpty(server)) {
+                toast(R.string.toast_none_data)
+                return
+            }
+            if (!V2rayConfigUtil.isValidConfig(server)) {
+                toast(R.string.toast_config_file_invalid)
+                return
+            }
+            mainViewModel.appendCustomConfigServer(server)
             toast(R.string.toast_success)
-            adapter.updateConfigList()
+            adapter.notifyItemInserted(mainViewModel.serverList.lastIndex)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return
         }
     }
 

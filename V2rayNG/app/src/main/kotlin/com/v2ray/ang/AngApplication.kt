@@ -2,8 +2,7 @@ package com.v2ray.ang
 
 import android.support.multidex.MultiDexApplication
 import android.support.v7.preference.PreferenceManager
-import com.v2ray.ang.util.AngConfigManager
-import me.dozen.dpreference.DPreference
+import com.tencent.mmkv.MMKV
 
 class AngApplication : MultiDexApplication() {
     companion object {
@@ -13,8 +12,6 @@ class AngApplication : MultiDexApplication() {
     var curIndex = -1 //Current proxy that is opened. (Used to implement restart feature)
     var firstRun = false
         private set
-
-    val defaultDPreference by lazy { DPreference(this, packageName + "_preferences") }
 
     override fun onCreate() {
         super.onCreate()
@@ -27,6 +24,6 @@ class AngApplication : MultiDexApplication() {
             defaultSharedPreferences.edit().putInt(PREF_LAST_VERSION, BuildConfig.VERSION_CODE).apply()
 
         //Logger.init().logLevel(if (BuildConfig.DEBUG) LogLevel.FULL else LogLevel.NONE)
-        AngConfigManager.inject(this)
+        MMKV.initialize(this)
     }
 }

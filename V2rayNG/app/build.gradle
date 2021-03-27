@@ -25,12 +25,14 @@ android {
             minifyEnabled false
             zipAlignEnabled false
             shrinkResources false
+            ndk.abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
 //            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
             minifyEnabled false
             zipAlignEnabled false
             shrinkResources false
+            ndk.abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
     }
 
@@ -67,7 +69,6 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.13'
-    implementation project(':dpreference')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
@@ -89,6 +90,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:2.0.1'
 
     // DSL
+    implementation 'com.tencent:mmkv-static:1.0.19'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'io.reactivex:rxjava:1.3.4'
     implementation 'io.reactivex:rxandroid:1.2.1'
