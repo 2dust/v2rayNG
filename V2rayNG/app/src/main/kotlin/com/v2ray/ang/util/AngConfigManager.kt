@@ -110,7 +110,8 @@ object AngConfigManager {
                         }
                         val sni = streamSetting.populateTransportSettings(vmessQRCode.net, vmessQRCode.type, vmessQRCode.host,
                                 vmessQRCode.path, vmessQRCode.path, vmessQRCode.host, vmessQRCode.path)
-                        streamSetting.populateTlsSettings(vmessQRCode.tls, allowInsecure, sni)
+                        streamSetting.populateTlsSettings(vmessQRCode.tls, allowInsecure,
+                                if (vmessQRCode.sni.isNotBlank()) vmessQRCode.sni else sni)
                     }
                 }
             } else if (str.startsWith(EConfigType.SHADOWSOCKS.protocolScheme)) {
@@ -212,7 +213,7 @@ object AngConfigManager {
 
                 val sni = streamSetting.populateTransportSettings(queryParam["type"] ?: "tcp", queryParam["headerType"],
                         queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"])
-                streamSetting.populateTlsSettings(queryParam["security"] ?: "", allowInsecure, sni)
+                streamSetting.populateTlsSettings(queryParam["security"] ?: "", allowInsecure, queryParam["sni"] ?: sni)
             }
             if (config == null){
                 return R.string.toast_incorrect_protocol
@@ -312,6 +313,7 @@ object AngConfigManager {
                     vmessQRCode.aid = outbound.settings?.vnext?.get(0)?.users?.get(0)?.alterId.toString()
                     vmessQRCode.net = streamSetting.network
                     vmessQRCode.tls = streamSetting.security
+                    vmessQRCode.sni = streamSetting.tlsSettings?.serverName.orEmpty()
                     outbound.getTransportSettingDetails()?.let { transportDetails ->
                         vmessQRCode.type = transportDetails[0]
                         vmessQRCode.host = transportDetails[1]
@@ -352,6 +354,11 @@ object AngConfigManager {
                     else outbound.getSecurityEncryption().orEmpty()
                     dicQuery["security"] = if (streamSetting.security.isEmpty()) "none"
                     else streamSetting.security
+                    (streamSetting.tlsSettings?: streamSetting.xtlsSettings)?.let { tlsSetting ->
+                        if (!TextUtils.isEmpty(tlsSetting.serverName)) {
+                            dicQuery["sni"] = tlsSetting.serverName
+                        }
+                    }
                     dicQuery["type"] = if (streamSetting.network.isEmpty()) V2rayConfig.DEFAULT_NETWORK
                     else streamSetting.network
 

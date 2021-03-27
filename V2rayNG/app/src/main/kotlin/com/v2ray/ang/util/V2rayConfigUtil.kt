@@ -71,6 +71,10 @@ object V2rayConfigUtil {
         } else {
             customRemoteDns(v2rayConfig, context)
         }
+        if (settingsStorage?.decodeBool(AppConfig.PREF_SPEED_ENABLED) != true) {
+            v2rayConfig.stats = null
+            v2rayConfig.policy = null
+        }
         result.status = true
         result.content = v2rayConfig.toPrettyPrinting()
         return result

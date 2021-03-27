@@ -9,9 +9,9 @@ import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
 data class V2rayConfig(
-        val stats: Any? = null,
+        var stats: Any? = null,
         val log: LogBean,
-        val policy: PolicyBean,
+        var policy: PolicyBean?,
         val inbounds: ArrayList<InboundBean>,
         var outbounds: ArrayList<OutboundBean>,
         var dns: DnsBean,

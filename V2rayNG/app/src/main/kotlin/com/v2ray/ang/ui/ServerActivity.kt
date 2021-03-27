@@ -257,9 +257,6 @@ class ServerActivity : BaseActivity() {
                 requestHost,
                 path
         )
-        if (sni.isEmpty()) {
-            sni = requestHost
-        }
         val allowInsecure = if (sp_allow_insecure == null || allowinsecures[sp_allow_insecure.selectedItemPosition].isBlank()) {
             false//settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
         } else {
