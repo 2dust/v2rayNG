@@ -65,7 +65,7 @@ object AngConfigManager {
                 AppConfig.PREF_V2RAY_ROUTING_AGENT,
                 AppConfig.PREF_V2RAY_ROUTING_BLOCKED,
                 AppConfig.PREF_V2RAY_ROUTING_DIRECT,).forEach { key ->
-            settingsStorage?.encode(key, sharedPreferences.getString(key, ""))
+            settingsStorage?.encode(key, sharedPreferences.getString(key, null))
         }
         listOf(AppConfig.PREF_SPEED_ENABLED,
                 AppConfig.PREF_SNIFFING_ENABLED,
