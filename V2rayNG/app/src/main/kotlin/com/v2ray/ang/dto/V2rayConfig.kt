@@ -68,17 +68,17 @@ data class V2rayConfig(
 
         data class OutSettingsBean(var vnext: List<VnextBean>? = null,
                                    var servers: List<ServersBean>? = null,
-                                    /*Blackhole*/
+                /*Blackhole*/
                                    var response: Response? = null,
-                                    /*DNS*/
+                /*DNS*/
                                    val network: String? = null,
                                    val address: String? = null,
                                    val port: Int? = null,
-                                    /*Freedom*/
+                /*Freedom*/
                                    val domainStrategy: String? = null,
                                    val redirect: String? = null,
                                    val userLevel: Int? = null,
-                                    /*Loopback*/
+                /*Loopback*/
                                    val inboundTag: String? = null) {
 
             data class VnextBean(var address: String = "",
@@ -172,15 +172,19 @@ data class V2rayConfig(
                 var sni = ""
                 network = transport
                 when (network) {
-                    "tcp" -> if (headerType == HTTP) {
+                    "tcp" -> {
                         val tcpSetting = TcpSettingsBean()
-                        tcpSetting.header.type = HTTP
-                        if (!TextUtils.isEmpty(host) || !TextUtils.isEmpty(path)) {
-                            val requestObj = TcpSettingsBean.HeaderBean.RequestBean()
-                            requestObj.headers.Host = (host ?: "").split(",").map { it.trim() }
-                            requestObj.path = (path ?: "").split(",").map { it.trim() }
-                            tcpSetting.header.request = requestObj
-                            sni = requestObj.headers.Host.getOrNull(0) ?: sni
+                        if (headerType == HTTP) {
+                            tcpSetting.header.type = HTTP
+                            if (!TextUtils.isEmpty(host) || !TextUtils.isEmpty(path)) {
+                                val requestObj = TcpSettingsBean.HeaderBean.RequestBean()
+                                requestObj.headers.Host = (host ?: "").split(",").map { it.trim() }
+                                requestObj.path = (path ?: "").split(",").map { it.trim() }
+                                tcpSetting.header.request = requestObj
+                                sni = requestObj.headers.Host.getOrNull(0) ?: sni
+                            }
+                        } else {
+                            tcpSetting.header.type = "none"
                         }
                         tcpSettings = tcpSetting
                     }
@@ -286,7 +290,7 @@ data class V2rayConfig(
             if (protocol.equals(EConfigType.VMESS.name, true)
                     || protocol.equals(EConfigType.VLESS.name, true)) {
                 val transport = streamSettings?.network ?: return null
-                return when(transport) {
+                return when (transport) {
                     "tcp" -> {
                         val tcpSetting = streamSettings?.tcpSettings ?: return null
                         listOf(tcpSetting.header.type,
@@ -388,7 +392,7 @@ data class V2rayConfig(
         return GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter( // custom serialiser is needed here since JSON by default parse number as Double, core will fail to start
-                        object: TypeToken<Double>() {}.type,
+                        object : TypeToken<Double>() {}.type,
                         JsonSerializer { src: Double?, _: Type?, _: JsonSerializationContext? -> JsonPrimitive(src?.toInt()) }
                 )
                 .create()
