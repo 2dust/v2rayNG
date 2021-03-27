@@ -186,10 +186,14 @@ object AngConfigManager {
                     server.port = uri.port
                     server.password = uri.userInfo
                 }
-                val queryParam = uri.rawQuery.split("&")
-                        .map { it.split("=").let { (k, v) -> k to URLDecoder.decode(v, "utf-8")!! } }
-                        .toMap()
-                config.outboundBean?.streamSettings?.populateTlsSettings(TLS, allowInsecure, queryParam["sni"] ?: "")
+                var sni = ""
+                uri.rawQuery?.let { rawQuery ->
+                    val queryParam = rawQuery.split("&")
+                            .map { it.split("=").let { (k, v) -> k to URLDecoder.decode(v, "utf-8")!! } }
+                            .toMap()
+                    sni = queryParam["sni"] ?: ""
+                }
+                config.outboundBean?.streamSettings?.populateTlsSettings(TLS, allowInsecure, sni)
             } else if (str.startsWith(EConfigType.VLESS.protocolScheme)) {
                 val uri = URI(str)
                 val queryParam = uri.rawQuery.split("&")
@@ -317,10 +321,19 @@ object AngConfigManager {
                     Utils.encode(json)
                 }
                 EConfigType.CUSTOM -> ""
-                EConfigType.SHADOWSOCKS, EConfigType.SOCKS -> {
+                EConfigType.SHADOWSOCKS -> {
                     val remark = "#" + Utils.urlEncode(config.remarks)
                     val url = String.format("%s:%s@%s:%s",
                             outbound.getSecurityEncryption(),
+                            outbound.getPassword(),
+                            outbound.getServerAddress(),
+                            outbound.getServerPort())
+                    Utils.encode(url) + remark
+                }
+                EConfigType.SOCKS -> {
+                    val remark = "#" + Utils.urlEncode(config.remarks)
+                    val url = String.format("%s:%s@%s:%s",
+                            outbound.settings?.servers?.get(0)?.users?.get(0)?.user,
                             outbound.getPassword(),
                             outbound.getServerAddress(),
                             outbound.getServerPort())
@@ -396,7 +409,7 @@ object AngConfigManager {
                 EConfigType.TROJAN -> {
                     val remark = "#" + Utils.urlEncode(config.remarks)
                     var query = ""
-                    streamSetting.tlsSettings?: streamSetting.xtlsSettings?.let { tlsSetting ->
+                    (streamSetting.tlsSettings?: streamSetting.xtlsSettings)?.let { tlsSetting ->
                         if (!TextUtils.isEmpty(tlsSetting.serverName)) {
                             query = "?sni=${tlsSetting.serverName}"
                         }

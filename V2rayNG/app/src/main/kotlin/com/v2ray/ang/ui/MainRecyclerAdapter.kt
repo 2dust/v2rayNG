@@ -8,10 +8,12 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
@@ -34,6 +36,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
 
     private var mActivity: MainActivity = activity
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
+    private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
     private val share_method: Array<out String> by lazy {
         mActivity.resources.getStringArray(R.array.share_method)
     }
@@ -58,7 +61,11 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 holder.test_result.setTextColor(ContextCompat.getColor(mActivity, R.color.colorPing))
             }
             holder.subscription.text = ""
-            // TODO: add sub remarks
+            val json = subStorage?.decodeString(config.subscriptionId)
+            if (!json.isNullOrBlank()) {
+                val sub = Gson().fromJson(json, SubscriptionItem::class.java)
+                holder.subscription.text = sub.remarks
+            }
 
             var shareOptions = share_method.asList()
             if (config.configType == EConfigType.CUSTOM) {
@@ -113,6 +120,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 if (guid != mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
                     mActivity.mainViewModel.removeServer(guid)
                     notifyItemRemoved(position)
+                    notifyItemRangeChanged(position, mActivity.mainViewModel.serverList.size)
                 }
             }
 

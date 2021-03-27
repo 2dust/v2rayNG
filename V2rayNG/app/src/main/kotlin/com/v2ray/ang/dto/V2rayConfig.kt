@@ -15,7 +15,11 @@ data class V2rayConfig(
         val inbounds: ArrayList<InboundBean>,
         var outbounds: ArrayList<OutboundBean>,
         var dns: DnsBean,
-        val routing: RoutingBean) {
+        val routing: RoutingBean,
+        val api: Any? = null,
+        val transport: Any? = null,
+        val reverse: Any? = null,
+        val fakedns: Any? = null) {
     companion object {
         const val DEFAULT_PORT = 443
         const val DEFAULT_SECURITY = "auto"
@@ -37,8 +41,10 @@ data class V2rayConfig(
             var port: Int,
             var protocol: String,
             var listen: String? = null,
-            val settings: InSettingsBean,
-            val sniffing: SniffingBean?) {
+            val settings: Any? = null,
+            val sniffing: SniffingBean?,
+            val streamSettings: Any? = null,
+            val allocate: Any? = null) {
 
         data class InSettingsBean(val auth: String? = null,
                                   val udp: Boolean? = null,
@@ -48,18 +54,32 @@ data class V2rayConfig(
                                   val network: String? = null)
 
         data class SniffingBean(var enabled: Boolean,
-                                val destOverride: List<String>)
+                                val destOverride: List<String>,
+                                val metadataOnly: Boolean? = null)
     }
 
     data class OutboundBean(val tag: String = "proxy",
                             var protocol: String,
-                            var settings: OutSettingsBean?,
+                            var settings: OutSettingsBean? = null,
                             var streamSettings: StreamSettingsBean? = null,
+                            val proxySettings: Any? = null,
+                            val sendThrough: String? = null,
                             val mux: MuxBean? = MuxBean(false)) {
 
         data class OutSettingsBean(var vnext: List<VnextBean>? = null,
                                    var servers: List<ServersBean>? = null,
-                                   var response: Response? = null) {
+                                    /*Blackhole*/
+                                   var response: Response? = null,
+                                    /*DNS*/
+                                   val network: String? = null,
+                                   val address: String? = null,
+                                   val port: Int? = null,
+                                    /*Freedom*/
+                                   val domainStrategy: String? = null,
+                                   val redirect: String? = null,
+                                   val userLevel: Int? = null,
+                                    /*Loopback*/
+                                   val inboundTag: String? = null) {
 
             data class VnextBean(var address: String = "",
                                  var port: Int = DEFAULT_PORT,
@@ -98,7 +118,10 @@ data class V2rayConfig(
                                       var httpSettings: HttpSettingsBean? = null,
                                       var tlsSettings: TlsSettingsBean? = null,
                                       var quicSettings: QuicSettingBean? = null,
-                                      var xtlsSettings: TlsSettingsBean? = null
+                                      var xtlsSettings: TlsSettingsBean? = null,
+                                      val grpcSettings: Any? = null,
+                                      val dsSettings: Any? = null,
+                                      val sockopt: Any? = null
         ) {
 
             data class TcpSettingsBean(var header: HeaderBean = HeaderBean()) {
@@ -133,7 +156,10 @@ data class V2rayConfig(
                                         var path: String = "")
 
             data class TlsSettingsBean(var allowInsecure: Boolean = false,
-                                       var serverName: String = "")
+                                       var serverName: String = "",
+                                       val alpn: List<String>? = null,
+                                       val certificates: List<Any>? = null,
+                                       val disableSystemRoot: Boolean? = null)
 
             data class QuicSettingBean(var security: String = "none",
                                        var key: String = "",
@@ -248,14 +274,12 @@ data class V2rayConfig(
         }
 
         fun getSecurityEncryption(): String? {
-            if (protocol.equals(EConfigType.VMESS.name, true)) {
-                return settings?.vnext?.get(0)?.users?.get(0)?.security
-            } else if (protocol.equals(EConfigType.VLESS.name, true)) {
-                return settings?.vnext?.get(0)?.users?.get(0)?.encryption
-            } else if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)) {
-                return settings?.servers?.get(0)?.method
+            return when {
+                protocol.equals(EConfigType.VMESS.name, true) -> settings?.vnext?.get(0)?.users?.get(0)?.security
+                protocol.equals(EConfigType.VLESS.name, true) -> settings?.vnext?.get(0)?.users?.get(0)?.encryption
+                protocol.equals(EConfigType.SHADOWSOCKS.name, true) -> settings?.servers?.get(0)?.method
+                else -> null
             }
-            return null
         }
 
         fun getTransportSettingDetails(): List<String>? {
@@ -300,25 +324,39 @@ data class V2rayConfig(
         }
     }
 
-    //data class DnsBean(var servers: List<String>)
     data class DnsBean(var servers: List<Any>? = null,
-                       var hosts: Map<String, String>? = null
+                       var hosts: Map<String, String>? = null,
+                       val clientIp: String? = null,
+                       val disableCache: Boolean? = null,
+                       val tag: String? = null
     ) {
         data class ServersBean(var address: String = "",
                                var port: Int = 0,
                                var domains: List<String>?,
-                               var expectIPs: List<String>?)
+                               var expectIPs: List<String>?,
+                               val clientIp: String? = null)
     }
 
     data class RoutingBean(var domainStrategy: String,
-                           var rules: ArrayList<RulesBean>) {
+                           val domainMatcher: String? = null,
+                           var rules: ArrayList<RulesBean>,
+                           val balancers: List<Any>? = null) {
 
         data class RulesBean(var type: String = "",
                              var ip: ArrayList<String>? = null,
                              var domain: ArrayList<String>? = null,
                              var outboundTag: String = "",
+                             var balancerTag: String? = null,
                              var port: String? = null,
-                             var inboundTag: ArrayList<String>? = null)
+                             val sourcePort: String? = null,
+                             val network: String? = null,
+                             val source: List<String>? = null,
+                             val user: List<String>? = null,
+                             var inboundTag: List<String>? = null,
+                             val protocol: List<String>? = null,
+                             val attrs: String? = null,
+                             val domainMatcher: String? = null
+        )
     }
 
     data class PolicyBean(var levels: Map<String, LevelBean>,
@@ -327,7 +365,10 @@ data class V2rayConfig(
                 var handshake: Int? = null,
                 var connIdle: Int? = null,
                 var uplinkOnly: Int? = null,
-                var downlinkOnly: Int? = null)
+                var downlinkOnly: Int? = null,
+                val statsUserUplink: Boolean? = null,
+                val statsUserDownlink: Boolean? = null,
+                var bufferSize: Int? = null)
     }
 
     fun getProxyOutbound(): OutboundBean? {

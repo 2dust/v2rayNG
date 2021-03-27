@@ -117,7 +117,7 @@ class ServerActivity : BaseActivity() {
         val streamSecurity = Utils.arrayFind(streamSecuritys, streamSetting.security)
         if (streamSecurity >= 0) {
             sp_stream_security?.setSelection(streamSecurity)
-            streamSetting.tlsSettings?: streamSetting.xtlsSettings?.let { tlsSetting ->
+            (streamSetting.tlsSettings?: streamSetting.xtlsSettings)?.let { tlsSetting ->
                 val allowinsecure = Utils.arrayFind(allowinsecures, tlsSetting.allowInsecure.toString())
                 if (allowinsecure >= 0) {
                     sp_allow_insecure?.setSelection(allowinsecure)
@@ -198,7 +198,7 @@ class ServerActivity : BaseActivity() {
             saveServers(server, port, config)
         }
         config.outboundBean?.streamSettings?.let {
-            saveStreamSettings(it)
+            saveStreamSettings(it, config)
         }
 
         MmkvManager.encodeServerConfig(editGuid, config)
@@ -217,8 +217,10 @@ class ServerActivity : BaseActivity() {
         } else if (config.configType == EConfigType.VLESS) {
             vnext.users[0].encryption = et_security.text.toString().trim()
             if (streamSecuritys[sp_stream_security.selectedItemPosition] == XTLS) {
-//                vnext.users[0].flow = if (flows[sp_flow.selectedItemPosition].isBlank()) DEFAULT_FLOW
+//                vnext.users[0].flow = if (flows[sp_flow.selectedItemPosition].isBlank()) V2rayConfig.DEFAULT_FLOW
 //                else flows[sp_flow.selectedItemPosition]
+            } else {
+                vnext.users[0].flow = ""
             }
         }
     }
@@ -243,7 +245,7 @@ class ServerActivity : BaseActivity() {
         }
     }
 
-    private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean) {
+    private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean, config: ServerConfig) {
         val requestHost = et_request_host?.text.toString().trim()
         val path = et_path?.text.toString().trim()
         var sni = streamSetting.populateTransportSettings(
@@ -258,17 +260,14 @@ class ServerActivity : BaseActivity() {
         if (sni.isEmpty()) {
             sni = requestHost
         }
-        val allowInsecure = if (sp_allow_insecure != null) {
-            if (allowinsecures[sp_allow_insecure.selectedItemPosition].isBlank()) {
-                false//settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
-            } else {
-                allowinsecures[sp_allow_insecure.selectedItemPosition].toBoolean()
-            }
+        val allowInsecure = if (sp_allow_insecure == null || allowinsecures[sp_allow_insecure.selectedItemPosition].isBlank()) {
+            false//settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
         } else {
-            false
+            allowinsecures[sp_allow_insecure.selectedItemPosition].toBoolean()
         }
+        val defaultTls = if (config.configType == EConfigType.TROJAN) V2rayConfig.TLS else ""
         streamSetting.populateTlsSettings(
-                if (sp_stream_security != null) streamSecuritys[sp_stream_security.selectedItemPosition] else "",
+                if (sp_stream_security != null) streamSecuritys[sp_stream_security.selectedItemPosition] else defaultTls,
                 allowInsecure,
                 sni
         )
