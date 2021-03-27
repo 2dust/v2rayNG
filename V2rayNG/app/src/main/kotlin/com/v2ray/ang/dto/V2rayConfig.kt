@@ -99,6 +99,8 @@ data class V2rayConfig(
                                    var password: String = "",
                                    var port: Int = DEFAULT_PORT,
                                    var level: Int = DEFAULT_LEVEL,
+                                   val email: String? = null,
+                                   val flow: String? = null,
                                    var users: List<SocksUsersBean>? = null) {
 
 
