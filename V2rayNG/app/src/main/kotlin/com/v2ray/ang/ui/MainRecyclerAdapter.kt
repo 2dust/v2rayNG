@@ -92,7 +92,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                                 }
                             }
                             1 -> {
-                                if (AngConfigManager.share2Clipboard(guid) == 0) {
+                                if (AngConfigManager.share2Clipboard(mActivity, guid) == 0) {
                                     mActivity.toast(R.string.toast_success)
                                 } else {
                                     mActivity.toast(R.string.toast_failure)
@@ -156,7 +156,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     }
 
     private fun shareFullContent(guid: String) {
-        if (AngConfigManager.shareFullContent2Clipboard(guid) == 0) {
+        if (AngConfigManager.shareFullContent2Clipboard(mActivity, guid) == 0) {
             mActivity.toast(R.string.toast_success)
         } else {
             mActivity.toast(R.string.toast_failure)

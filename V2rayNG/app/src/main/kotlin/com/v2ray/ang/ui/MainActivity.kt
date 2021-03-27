@@ -100,6 +100,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         version.text = "v${BuildConfig.VERSION_NAME} (${Libv2ray.checkVersionX()})"
 
         setupViewModelObserver()
+        migrateLegacy()
     }
 
     private fun setupViewModelObserver() {
@@ -127,6 +128,22 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             hideCircle()
         })
         mainViewModel.startListenBroadcast()
+    }
+
+    private fun migrateLegacy() {
+        GlobalScope.launch(Dispatchers.IO) {
+            val result = AngConfigManager.migrateLegacyConfig(this@MainActivity)
+            if (result != null) {
+                launch(Dispatchers.Main) {
+                    if (result) {
+                        toast(getString(R.string.migration_success))
+                        mainViewModel.reloadServerList()
+                    } else {
+                        toast(getString(R.string.migration_fail))
+                    }
+                }
+            }
+        }
     }
 
     fun startV2Ray() {
@@ -229,7 +246,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.export_all -> {
-            if (AngConfigManager.shareNonCustomConfigsToClipboard(mainViewModel.serverList) == 0) {
+            if (AngConfigManager.shareNonCustomConfigsToClipboard(this, mainViewModel.serverList) == 0) {
                 toast(R.string.toast_success)
             } else {
                 toast(R.string.toast_failure)

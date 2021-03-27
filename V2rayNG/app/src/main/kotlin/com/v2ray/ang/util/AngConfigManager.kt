@@ -1,11 +1,13 @@
 package com.v2ray.ang.util
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.support.v7.preference.PreferenceManager
 import android.text.TextUtils
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
-import com.v2ray.ang.AngApplication
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_CONFIG
 import com.v2ray.ang.AppConfig.HTTPS_PROTOCOL
 import com.v2ray.ang.AppConfig.HTTP_PROTOCOL
@@ -19,42 +21,138 @@ import java.net.URLDecoder
 import java.util.*
 
 object AngConfigManager {
-    private lateinit var app: AngApplication
-    private lateinit var angConfig: AngConfig
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
-
-    fun inject(app: AngApplication) {
-        this.app = app
-        loadConfig()
-    }
+    private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
 
     /**
-     * loading config
+     * Legacy loading config
      */
-    private fun loadConfig() {
+    fun migrateLegacyConfig(c: Context): Boolean? {
         try {
-            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
+            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(c)
             val context = defaultSharedPreferences.getString(ANG_CONFIG, "")
-            if (!TextUtils.isEmpty(context)) {
-                angConfig = Gson().fromJson(context, AngConfig::class.java)
-            } else {
-                angConfig = AngConfig(0, vmess = arrayListOf(AngConfig.VmessBean()), subItem = arrayListOf(AngConfig.SubItemBean()))
-                angConfig.index = -1
-                angConfig.vmess.clear()
-                angConfig.subItem.clear()
+            if (context.isNullOrBlank()) {
+                return null
             }
-
+            val angConfig = Gson().fromJson(context, AngConfig::class.java)
             for (i in angConfig.vmess.indices) {
                 upgradeServerVersion(angConfig.vmess[i])
             }
 
-//            if (configs.subItem == null) {
-//                configs.subItem = arrayListOf(AngConfig.SubItemBean())
-//            }
+            copyLegacySettings(defaultSharedPreferences)
+            migrateVmessBean(angConfig, defaultSharedPreferences)
+            migrateSubItemBean(angConfig)
 
+            defaultSharedPreferences.edit().remove(ANG_CONFIG).apply()
+            return true
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+        return false
+    }
+
+    private fun copyLegacySettings(sharedPreferences: SharedPreferences) {
+        listOf(AppConfig.PREF_MODE,
+                AppConfig.PREF_REMOTE_DNS,
+                AppConfig.PREF_DOMESTIC_DNS,
+//                AppConfig.PREF_LOCAL_DNS_PORT,
+//                AppConfig.PREF_SOCKS_PORT,
+//                AppConfig.PREF_HTTP_PORT,
+//                AppConfig.PREF_LOGLEVEL,
+                AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,
+                AppConfig.PREF_ROUTING_MODE,
+                AppConfig.PREF_V2RAY_ROUTING_AGENT,
+                AppConfig.PREF_V2RAY_ROUTING_BLOCKED,
+                AppConfig.PREF_V2RAY_ROUTING_DIRECT,).forEach { key ->
+            settingsStorage?.encode(key, sharedPreferences.getString(key, ""))
+        }
+        listOf(AppConfig.PREF_SPEED_ENABLED,
+                AppConfig.PREF_SNIFFING_ENABLED,
+                AppConfig.PREF_PROXY_SHARING,
+                AppConfig.PREF_LOCAL_DNS_ENABLED,
+//                AppConfig.PREF_ALLOW_INSECURE,
+//                AppConfig.PREF_PREFER_IPV6,
+                AppConfig.PREF_PER_APP_PROXY,
+                AppConfig.PREF_BYPASS_APPS,).forEach { key ->
+            settingsStorage?.encode(key, sharedPreferences.getBoolean(key, false))
+        }
+        settingsStorage?.encode(AppConfig.PREF_PER_APP_PROXY_SET, sharedPreferences.getStringSet(AppConfig.PREF_PER_APP_PROXY_SET, setOf()))
+    }
+
+    private fun migrateVmessBean(angConfig: AngConfig, sharedPreferences: SharedPreferences) {
+        angConfig.vmess.forEachIndexed { index, vmessBean ->
+            val type = EConfigType.fromInt(vmessBean.configType) ?: return@forEachIndexed
+            val config = ServerConfig.create(type)
+            config.remarks = vmessBean.remarks
+            config.subscriptionId = vmessBean.subid
+            if (type == EConfigType.CUSTOM) {
+                val jsonConfig = sharedPreferences.getString(ANG_CONFIG + vmessBean.guid, "")
+                val v2rayConfig = try {
+                    Gson().fromJson(jsonConfig, V2rayConfig::class.java)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    return@forEachIndexed
+                }
+                config.fullConfig = v2rayConfig
+            } else {
+                config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
+                    vnext.address = vmessBean.address
+                    vnext.port = vmessBean.port
+                    vnext.users[0].id = vmessBean.id
+                    if (config.configType == EConfigType.VMESS) {
+                        vnext.users[0].alterId = vmessBean.alterId
+                        vnext.users[0].security = vmessBean.security
+                    } else if (config.configType == EConfigType.VLESS) {
+                        vnext.users[0].encryption = vmessBean.security
+//                        vnext.users[0].flow = vmessBean.flow
+                    }
+                }
+                config.outboundBean?.settings?.servers?.get(0)?.let { server ->
+                    server.address = vmessBean.address
+                    server.port = vmessBean.port
+                    if (config.configType == EConfigType.SHADOWSOCKS) {
+                        server.password = vmessBean.id
+                        server.method = vmessBean.security
+                    } else if (config.configType == EConfigType.SOCKS) {
+                        if (TextUtils.isEmpty(vmessBean.security) && TextUtils.isEmpty(vmessBean.id)) {
+                            server.users = null
+                        } else {
+                            val socksUsersBean = V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
+                            socksUsersBean.user = vmessBean.security
+                            socksUsersBean.pass = vmessBean.id
+                            server.users = listOf(socksUsersBean)
+                        }
+                    } else if (config.configType == EConfigType.TROJAN) {
+                        server.password = vmessBean.id
+                    }
+                }
+                config.outboundBean?.streamSettings?.let { streamSetting ->
+                    val sni = streamSetting.populateTransportSettings(vmessBean.network, vmessBean.headerType,
+                            vmessBean.requestHost, vmessBean.path, vmessBean.path, vmessBean.requestHost, vmessBean.path)
+//                    val allowInsecure = if (vmessBean.allowInsecure.isBlank()) {
+//                        settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
+//                    } else {
+//                        vmessBean.allowInsecure.toBoolean()
+//                    }
+                    streamSetting.populateTlsSettings(vmessBean.streamSecurity, false,
+                            sni)//if (vmessBean.sni.isNotBlank()) vmessBean.sni else sni)
+                }
+            }
+            val key = MmkvManager.encodeServerConfig(vmessBean.guid, config)
+            if (index == angConfig.index) {
+                mainStorage?.encode(KEY_SELECTED_SERVER, key)
+            }
+        }
+    }
+
+    private fun migrateSubItemBean(angConfig: AngConfig) {
+        angConfig.subItem.forEach {
+            val subItem = SubscriptionItem()
+            subItem.remarks = it.remarks
+            subItem.url = it.url
+            //subItem.enabled = it.enabled
+            subStorage?.encode(it.id, Gson().toJson(subItem))
         }
     }
 
@@ -437,14 +535,14 @@ object AngConfigManager {
     /**
      * share2Clipboard
      */
-    fun share2Clipboard(guid: String): Int {
+    fun share2Clipboard(context: Context, guid: String): Int {
         try {
             val conf = shareConfig(guid)
             if (TextUtils.isEmpty(conf)) {
                 return -1
             }
 
-            Utils.setClipboard(app.applicationContext, conf)
+            Utils.setClipboard(context, conf)
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -456,7 +554,7 @@ object AngConfigManager {
     /**
      * share2Clipboard
      */
-    fun shareNonCustomConfigsToClipboard(serverList: List<String>): Int {
+    fun shareNonCustomConfigsToClipboard(context: Context, serverList: List<String>): Int {
         try {
             val sb = StringBuilder()
             for (guid in serverList) {
@@ -468,7 +566,7 @@ object AngConfigManager {
                 sb.appendLine()
             }
             if (sb.count() > 0) {
-                Utils.setClipboard(app.applicationContext, sb.toString())
+                Utils.setClipboard(context, sb.toString())
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -497,12 +595,12 @@ object AngConfigManager {
     /**
      * shareFullContent2Clipboard
      */
-    fun shareFullContent2Clipboard(guid: String?): Int {
+    fun shareFullContent2Clipboard(context: Context, guid: String?): Int {
         try {
             if (guid == null) return -1
-            val result = V2rayConfigUtil.getV2rayConfig(app, guid)
+            val result = V2rayConfigUtil.getV2rayConfig(context, guid)
             if (result.status) {
-                Utils.setClipboard(app.applicationContext, result.content)
+                Utils.setClipboard(context, result.content)
             } else {
                 return -1
             }

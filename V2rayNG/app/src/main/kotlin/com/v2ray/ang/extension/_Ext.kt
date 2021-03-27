@@ -27,7 +27,7 @@ inline fun Context.toast(message: CharSequence): Toast = ToastCompat
             show()
         }
 
-fun JSONObject.putOpt(pair: Pair<String, Any>) = putOpt(pair.first, pair.second)!!
+fun JSONObject.putOpt(pair: Pair<String, Any>) = putOpt(pair.first, pair.second)
 fun JSONObject.putOpt(pairs: Map<String, Any>) = pairs.forEach { putOpt(it.key to it.value) }
 
 const val threshold = 1000

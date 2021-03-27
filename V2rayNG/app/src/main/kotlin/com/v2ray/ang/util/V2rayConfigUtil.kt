@@ -60,16 +60,16 @@ object V2rayConfigUtil {
 
         //v2rayConfig.log.loglevel = settingsStorage?.decodeString(AppConfig.PREF_LOGLEVEL) ?: "warning"
 
-        inbounds(v2rayConfig, context)
+        inbounds(v2rayConfig)
 
         v2rayConfig.outbounds[0] = outbound
 
-        routing(v2rayConfig, context)
+        routing(v2rayConfig)
 
         if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
-            customLocalDns(v2rayConfig, context)
+            customLocalDns(v2rayConfig)
         } else {
-            customRemoteDns(v2rayConfig, context)
+            customRemoteDns(v2rayConfig)
         }
         if (settingsStorage?.decodeBool(AppConfig.PREF_SPEED_ENABLED) != true) {
             v2rayConfig.stats = null
@@ -83,7 +83,7 @@ object V2rayConfigUtil {
     /**
      *
      */
-    private fun inbounds(v2rayConfig: V2rayConfig, context: Context): Boolean {
+    private fun inbounds(v2rayConfig: V2rayConfig): Boolean {
         try {
             //val socksPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT) ?: AppConfig.PORT_SOCKS)
             //val httpPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT) ?: AppConfig.PORT_HTTP)
@@ -115,7 +115,7 @@ object V2rayConfigUtil {
     /**
      * routing
      */
-    private fun routing(v2rayConfig: V2rayConfig, context: Context): Boolean {
+    private fun routing(v2rayConfig: V2rayConfig): Boolean {
         try {
             routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT) ?: "", AppConfig.TAG_AGENT, v2rayConfig)
             routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT) ?: "", AppConfig.TAG_DIRECT, v2rayConfig)
@@ -233,7 +233,7 @@ object V2rayConfigUtil {
     /**
      * Custom Dns
      */
-    private fun customLocalDns(v2rayConfig: V2rayConfig, context: Context): Boolean {
+    private fun customLocalDns(v2rayConfig: V2rayConfig): Boolean {
         try {
             val hosts = mutableMapOf<String, String>()
             val servers = ArrayList<Any>()
@@ -342,7 +342,7 @@ object V2rayConfigUtil {
     /**
      * Custom Remote Dns
      */
-    private fun customRemoteDns(v2rayConfig: V2rayConfig, context: Context): Boolean {
+    private fun customRemoteDns(v2rayConfig: V2rayConfig): Boolean {
         try {
             val servers = ArrayList<Any>()
             val hosts = mutableMapOf<String, String>()

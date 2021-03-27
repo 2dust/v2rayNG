@@ -138,12 +138,12 @@ class PerAppProxyActivity : BaseActivity() {
             }
         })
 
-        switch_per_app_proxy.setOnCheckedChangeListener { buttonView, isChecked ->
+        switch_per_app_proxy.setOnCheckedChangeListener { _, isChecked ->
             defaultSharedPreferences.edit().putBoolean(AppConfig.PREF_PER_APP_PROXY, isChecked).apply()
         }
         switch_per_app_proxy.isChecked = defaultSharedPreferences.getBoolean(AppConfig.PREF_PER_APP_PROXY, false)
 
-        switch_bypass_apps.setOnCheckedChangeListener { buttonView, isChecked ->
+        switch_bypass_apps.setOnCheckedChangeListener { _, isChecked ->
             defaultSharedPreferences.edit().putBoolean(AppConfig.PREF_BYPASS_APPS, isChecked).apply()
         }
         switch_bypass_apps.isChecked = defaultSharedPreferences.getBoolean(AppConfig.PREF_BYPASS_APPS, false)

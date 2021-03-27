@@ -79,12 +79,10 @@ class TaskerActivity : BaseActivity() {
         val intent = Intent()
 
         val remarks = lstData[position]
-        var blurb = ""
-
-        if (switch_start_service.isChecked) {
-            blurb = "Start $remarks"
+        val blurb = if (switch_start_service.isChecked) {
+            "Start $remarks"
         } else {
-            blurb = "Stop $remarks"
+            "Stop $remarks"
         }
 
         intent.putExtra(AppConfig.TASKER_EXTRA_BUNDLE, extraBundle)

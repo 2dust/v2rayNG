@@ -258,7 +258,7 @@ object Utils {
      */
     fun isValidUrl(value: String?): Boolean {
         try {
-            if (Patterns.WEB_URL.matcher(value).matches() || URLUtil.isValidUrl(value)) {
+            if (value != null && Patterns.WEB_URL.matcher(value).matches() || URLUtil.isValidUrl(value)) {
                 return true
             }
         } catch (e: WriterException) {

@@ -3,7 +3,6 @@ package com.v2ray.ang
 import android.support.multidex.MultiDexApplication
 import android.support.v7.preference.PreferenceManager
 import com.tencent.mmkv.MMKV
-import com.v2ray.ang.util.AngConfigManager
 
 class AngApplication : MultiDexApplication() {
     companion object {
@@ -25,7 +24,6 @@ class AngApplication : MultiDexApplication() {
             defaultSharedPreferences.edit().putInt(PREF_LAST_VERSION, BuildConfig.VERSION_CODE).apply()
 
         //Logger.init().logLevel(if (BuildConfig.DEBUG) LogLevel.FULL else LogLevel.NONE)
-        AngConfigManager.inject(this)
         MMKV.initialize(this)
     }
 }

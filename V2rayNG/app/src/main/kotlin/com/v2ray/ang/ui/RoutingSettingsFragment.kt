@@ -42,8 +42,8 @@ class RoutingSettingsFragment : Fragment() {
         return fragment
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val content = defaultSharedPreferences.getString(arguments!!.getString(routing_arg), "")
         et_routing_content.text = Utils.getEditable(content!!)
