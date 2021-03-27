@@ -185,6 +185,7 @@ data class V2rayConfig(
                             }
                         } else {
                             tcpSetting.header.type = "none"
+                            sni = host ?: ""
                         }
                         tcpSettings = tcpSetting
                     }
