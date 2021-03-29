@@ -5,6 +5,7 @@
         <item>aes-128-gcm</item>
         <item>auto</item>
         <item>none</item>
+        <item>zero</item>
     </string-array>
     <string-array name="ss_securitys" translatable="false">
         <item>aes-256-cfb</item>
@@ -98,6 +99,7 @@
         <item>xtls-rprx-direct</item>
         <item>xtls-rprx-direct-udp443</item>
         <item>xtls-rprx-splice</item>
+        <item>xtls-rprx-splice-udp443</item>
     </string-array>
 
 

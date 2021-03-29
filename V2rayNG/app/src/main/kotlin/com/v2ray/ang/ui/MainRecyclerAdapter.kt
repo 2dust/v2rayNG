@@ -48,7 +48,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
         if (holder is MainViewHolder) {
             val guid = mActivity.mainViewModel.serverList.getOrNull(position) ?: return
             val config = MmkvManager.decodeServerConfig(guid) ?: return
-            val outbound = config.getProxyOutbound() ?: return
+            val outbound = config.getProxyOutbound()
             val aff = MmkvManager.decodeServerAffiliationInfo(guid)
 
             holder.name.text = config.remarks
@@ -76,7 +76,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             } else {
                 holder.type.text = config.configType.name.toLowerCase()
             }
-            holder.statistics.text = "${outbound.getServerAddress()} : ${outbound.getServerPort()}"
+            holder.statistics.text = "${outbound?.getServerAddress()} : ${outbound?.getServerPort()}"
 
             holder.layout_share.setOnClickListener {
                 AlertDialog.Builder(mActivity).setItems(shareOptions.toTypedArray()) { _, i ->
