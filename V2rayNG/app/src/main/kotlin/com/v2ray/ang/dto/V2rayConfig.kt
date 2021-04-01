@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
@@ -34,7 +35,8 @@ data class V2rayConfig(
 
     data class LogBean(val access: String,
                        val error: String,
-                       var loglevel: String?)
+                       var loglevel: String?,
+                       val dnsLog: Boolean? = null)
 
     data class InboundBean(
             var tag: String,
@@ -126,13 +128,22 @@ data class V2rayConfig(
                                       val sockopt: Any? = null
         ) {
 
-            data class TcpSettingsBean(var header: HeaderBean = HeaderBean()) {
+            data class TcpSettingsBean(var header: HeaderBean = HeaderBean(),
+                                       val acceptProxyProtocol: Boolean? = null) {
                 data class HeaderBean(var type: String = "none",
                                       var request: RequestBean? = null,
                                       var response: Any? = null) {
                     data class RequestBean(var path: List<String> = ArrayList(),
-                                           var headers: HeadersBean = HeadersBean()) {
-                        data class HeadersBean(var Host: List<String> = ArrayList())
+                                           var headers: HeadersBean = HeadersBean(),
+                                           val version: String? = null,
+                                           val method: String? = null) {
+                        data class HeadersBean(var Host: List<String> = ArrayList(),
+                                               @SerializedName("User-Agent")
+                                               val userAgent: List<String>? = null,
+                                               @SerializedName("Accept-Encoding")
+                                               val acceptEncoding: List<String>? = null,
+                                               val Connection: List<String>? = null,
+                                               val Pragma: String? = null)
                     }
                 }
             }
@@ -150,7 +161,8 @@ data class V2rayConfig(
             }
 
             data class WsSettingsBean(var path: String = "",
-                                      var headers: HeadersBean = HeadersBean()) {
+                                      var headers: HeadersBean = HeadersBean(),
+                                      val acceptProxyProtocol: Boolean? = null) {
                 data class HeadersBean(var Host: String = "")
             }
 
@@ -160,8 +172,14 @@ data class V2rayConfig(
             data class TlsSettingsBean(var allowInsecure: Boolean = false,
                                        var serverName: String = "",
                                        val alpn: List<String>? = null,
+                                       val minVersion: String? = null,
+                                       val maxVersion: String? = null,
+                                       val preferServerCipherSuites: Boolean? = null,
+                                       val cipherSuites: String? = null,
+                                       val fingerprint: String? = null,
                                        val certificates: List<Any>? = null,
-                                       val disableSystemRoot: Boolean? = null)
+                                       val disableSystemRoot: Boolean? = null,
+                                       val enableSessionResumption: Boolean? = null)
 
             data class QuicSettingBean(var security: String = "none",
                                        var key: String = "",
