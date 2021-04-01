@@ -360,17 +360,4 @@ object V2rayConfigUtil {
         }
         return true
     }
-
-    /**
-     * is valid config
-     */
-    fun isValidConfig(conf: String): Boolean {
-        return try {
-            val jObj = JSONObject(conf)
-            //hasBound = (jObj.has("outbounds") and jObj.has("inbounds")) or (jObj.has("outbound") and jObj.has("inbound"))
-            jObj.has("outbounds") or jObj.has("outbound")
-        } catch (e: JSONException) {
-            false
-        }
-    }
 }
