@@ -24,6 +24,7 @@
         <item>ws</item>
         <item>h2</item>
         <item>quic</item>
+        <item>grpc</item>
     </string-array>
 
     <string-array name="headertypes" translatable="false">

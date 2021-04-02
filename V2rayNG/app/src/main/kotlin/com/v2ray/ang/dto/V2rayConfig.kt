@@ -123,7 +123,7 @@ data class V2rayConfig(
                                       var tlsSettings: TlsSettingsBean? = null,
                                       var quicSettings: QuicSettingBean? = null,
                                       var xtlsSettings: TlsSettingsBean? = null,
-                                      val grpcSettings: Any? = null,
+                                      var grpcSettings: GrpcSettingsBean? = null,
                                       val dsSettings: Any? = null,
                                       val sockopt: Any? = null
         ) {
@@ -187,6 +187,8 @@ data class V2rayConfig(
                 data class HeaderBean(var type: String = "none")
             }
 
+            data class GrpcSettingsBean(var serviceName: String = "")
+
             fun populateTransportSettings(transport: String, headerType: String?, host: String?, path: String?, seed: String?,
                                           quicSecurity: String?, key: String?): String {
                 var sni = ""
@@ -240,6 +242,12 @@ data class V2rayConfig(
                         quicsetting.key = key ?: ""
                         quicsetting.header.type = headerType ?: "none"
                         quicSettings = quicsetting
+                    }
+                    "grpc" -> {
+                        val grpcSetting = GrpcSettingsBean()
+                        grpcSetting.serviceName = path ?: ""
+                        sni = host ?: ""
+                        grpcSettings = grpcSetting
                     }
                 }
                 return sni
@@ -341,6 +349,12 @@ data class V2rayConfig(
                         listOf(quicSetting.header.type,
                                 quicSetting.security,
                                 quicSetting.key)
+                    }
+                    "grpc" -> {
+                        val grpcSetting = streamSettings?.grpcSettings ?: return null
+                        listOf("",
+                                "",
+                                grpcSetting.serviceName)
                     }
                     else -> null
                 }

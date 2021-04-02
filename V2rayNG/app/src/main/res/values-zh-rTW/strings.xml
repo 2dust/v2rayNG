@@ -43,10 +43,10 @@
     <string name="server_lab_network">網路</string>
     <string name="server_lab_more_function">更多功能</string>
     <string name="server_lab_head_type">標頭類型</string>
-    <string name="server_lab_request_host">要求主機(host/ws host/h2 host)/QUIC加密方式</string>
-    <string name="server_lab_path">path(ws path/h2 path)/QUIC加密密鑰</string>
-    <string name="server_lab_stream_security">傳輸層安全性</string>
-    <string name="server_lab_allow_insecure">allowInsecure</string>
+    <string name="server_lab_request_host">要求主機(host)(host/ws host/h2 host)/QUIC加密方式</string>
+    <string name="server_lab_path">path(ws path/h2 path)/QUIC加密密鑰/kcp seed/grpc serviceName</string>
+    <string name="server_lab_stream_security">傳輸層安全性(tls)</string>
+    <string name="server_lab_allow_insecure">跳過證書驗證(allowInsecure)</string>
     <string name="server_lab_address3">伺服器位址</string>
     <string name="server_lab_port3">伺服器埠</string>
     <string name="server_lab_id3">密碼</string>
