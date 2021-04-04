@@ -20,7 +20,8 @@ data class V2rayConfig(
         val api: Any? = null,
         val transport: Any? = null,
         val reverse: Any? = null,
-        val fakedns: Any? = null) {
+        val fakedns: Any? = null,
+        val browserForwarder: Any? = null) {
     companion object {
         const val DEFAULT_PORT = 443
         const val DEFAULT_SECURITY = "auto"
@@ -103,6 +104,7 @@ data class V2rayConfig(
                                    var level: Int = DEFAULT_LEVEL,
                                    val email: String? = null,
                                    val flow: String? = null,
+                                   val ivCheck: Boolean? = null,
                                    var users: List<SocksUsersBean>? = null) {
 
 
@@ -162,6 +164,8 @@ data class V2rayConfig(
 
             data class WsSettingsBean(var path: String = "",
                                       var headers: HeadersBean = HeadersBean(),
+                                      val maxEarlyData: Int? = null,
+                                      val useBrowserForwarding: Boolean? = null,
                                       val acceptProxyProtocol: Boolean? = null) {
                 data class HeadersBean(var Host: String = "")
             }
@@ -187,7 +191,8 @@ data class V2rayConfig(
                 data class HeaderBean(var type: String = "none")
             }
 
-            data class GrpcSettingsBean(var serviceName: String = "")
+            data class GrpcSettingsBean(var serviceName: String = "",
+                                        val multiMode: Boolean? = null)
 
             fun populateTransportSettings(transport: String, headerType: String?, host: String?, path: String?, seed: String?,
                                           quicSecurity: String?, key: String?): String {
@@ -367,6 +372,7 @@ data class V2rayConfig(
                        var hosts: Map<String, String>? = null,
                        val clientIp: String? = null,
                        val disableCache: Boolean? = null,
+                       val queryStrategy: String? = null,
                        val tag: String? = null
     ) {
         data class ServersBean(var address: String = "",
