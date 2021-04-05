@@ -5,6 +5,7 @@ import android.support.v7.app.AlertDialog
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
@@ -15,6 +16,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import kotlinx.android.synthetic.main.activity_server_custom_config.*
+import me.drakeet.support.toast.ToastCompat
 
 class ServerCustomConfigActivity : BaseActivity() {
 
@@ -70,7 +72,7 @@ class ServerCustomConfigActivity : BaseActivity() {
             Gson().fromJson(tv_content.text.toString(), V2rayConfig::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
-            toast(R.string.toast_malformed_josn)
+            ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
             return false
         }
 

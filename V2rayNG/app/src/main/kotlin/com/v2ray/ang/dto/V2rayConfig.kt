@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
@@ -19,7 +20,8 @@ data class V2rayConfig(
         val api: Any? = null,
         val transport: Any? = null,
         val reverse: Any? = null,
-        val fakedns: Any? = null) {
+        val fakedns: Any? = null,
+        val browserForwarder: Any? = null) {
     companion object {
         const val DEFAULT_PORT = 443
         const val DEFAULT_SECURITY = "auto"
@@ -34,7 +36,8 @@ data class V2rayConfig(
 
     data class LogBean(val access: String,
                        val error: String,
-                       var loglevel: String?)
+                       var loglevel: String?,
+                       val dnsLog: Boolean? = null)
 
     data class InboundBean(
             var tag: String,
@@ -101,6 +104,7 @@ data class V2rayConfig(
                                    var level: Int = DEFAULT_LEVEL,
                                    val email: String? = null,
                                    val flow: String? = null,
+                                   val ivCheck: Boolean? = null,
                                    var users: List<SocksUsersBean>? = null) {
 
 
@@ -121,18 +125,27 @@ data class V2rayConfig(
                                       var tlsSettings: TlsSettingsBean? = null,
                                       var quicSettings: QuicSettingBean? = null,
                                       var xtlsSettings: TlsSettingsBean? = null,
-                                      val grpcSettings: Any? = null,
+                                      var grpcSettings: GrpcSettingsBean? = null,
                                       val dsSettings: Any? = null,
                                       val sockopt: Any? = null
         ) {
 
-            data class TcpSettingsBean(var header: HeaderBean = HeaderBean()) {
+            data class TcpSettingsBean(var header: HeaderBean = HeaderBean(),
+                                       val acceptProxyProtocol: Boolean? = null) {
                 data class HeaderBean(var type: String = "none",
                                       var request: RequestBean? = null,
                                       var response: Any? = null) {
                     data class RequestBean(var path: List<String> = ArrayList(),
-                                           var headers: HeadersBean = HeadersBean()) {
-                        data class HeadersBean(var Host: List<String> = ArrayList())
+                                           var headers: HeadersBean = HeadersBean(),
+                                           val version: String? = null,
+                                           val method: String? = null) {
+                        data class HeadersBean(var Host: List<String> = ArrayList(),
+                                               @SerializedName("User-Agent")
+                                               val userAgent: List<String>? = null,
+                                               @SerializedName("Accept-Encoding")
+                                               val acceptEncoding: List<String>? = null,
+                                               val Connection: List<String>? = null,
+                                               val Pragma: String? = null)
                     }
                 }
             }
@@ -150,7 +163,10 @@ data class V2rayConfig(
             }
 
             data class WsSettingsBean(var path: String = "",
-                                      var headers: HeadersBean = HeadersBean()) {
+                                      var headers: HeadersBean = HeadersBean(),
+                                      val maxEarlyData: Int? = null,
+                                      val useBrowserForwarding: Boolean? = null,
+                                      val acceptProxyProtocol: Boolean? = null) {
                 data class HeadersBean(var Host: String = "")
             }
 
@@ -160,14 +176,23 @@ data class V2rayConfig(
             data class TlsSettingsBean(var allowInsecure: Boolean = false,
                                        var serverName: String = "",
                                        val alpn: List<String>? = null,
+                                       val minVersion: String? = null,
+                                       val maxVersion: String? = null,
+                                       val preferServerCipherSuites: Boolean? = null,
+                                       val cipherSuites: String? = null,
+                                       val fingerprint: String? = null,
                                        val certificates: List<Any>? = null,
-                                       val disableSystemRoot: Boolean? = null)
+                                       val disableSystemRoot: Boolean? = null,
+                                       val enableSessionResumption: Boolean? = null)
 
             data class QuicSettingBean(var security: String = "none",
                                        var key: String = "",
                                        var header: HeaderBean = HeaderBean()) {
                 data class HeaderBean(var type: String = "none")
             }
+
+            data class GrpcSettingsBean(var serviceName: String = "",
+                                        val multiMode: Boolean? = null)
 
             fun populateTransportSettings(transport: String, headerType: String?, host: String?, path: String?, seed: String?,
                                           quicSecurity: String?, key: String?): String {
@@ -222,6 +247,12 @@ data class V2rayConfig(
                         quicsetting.key = key ?: ""
                         quicsetting.header.type = headerType ?: "none"
                         quicSettings = quicsetting
+                    }
+                    "grpc" -> {
+                        val grpcSetting = GrpcSettingsBean()
+                        grpcSetting.serviceName = path ?: ""
+                        sni = host ?: ""
+                        grpcSettings = grpcSetting
                     }
                 }
                 return sni
@@ -324,6 +355,12 @@ data class V2rayConfig(
                                 quicSetting.security,
                                 quicSetting.key)
                     }
+                    "grpc" -> {
+                        val grpcSetting = streamSettings?.grpcSettings ?: return null
+                        listOf("",
+                                "",
+                                grpcSetting.serviceName)
+                    }
                     else -> null
                 }
             }
@@ -335,6 +372,7 @@ data class V2rayConfig(
                        var hosts: Map<String, String>? = null,
                        val clientIp: String? = null,
                        val disableCache: Boolean? = null,
+                       val queryStrategy: String? = null,
                        val tag: String? = null
     ) {
         data class ServersBean(var address: String = "",

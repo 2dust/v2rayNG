@@ -16,6 +16,7 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
@@ -28,13 +29,13 @@ import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
-import com.v2ray.ang.util.V2rayConfigUtil
 import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import libv2ray.Libv2ray
+import me.drakeet.support.toast.ToastCompat
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import java.net.URL
@@ -475,14 +476,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 toast(R.string.toast_none_data)
                 return
             }
-            if (!V2rayConfigUtil.isValidConfig(server)) {
-                toast(R.string.toast_config_file_invalid)
-                return
-            }
             mainViewModel.appendCustomConfigServer(server)
             toast(R.string.toast_success)
             adapter.notifyItemInserted(mainViewModel.serverList.lastIndex)
         } catch (e: Exception) {
+            ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
             e.printStackTrace()
             return
         }
