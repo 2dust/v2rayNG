@@ -9,6 +9,7 @@ import com.v2ray.ang.dto.SubscriptionItem
 object MmkvManager {
     const val ID_MAIN = "MAIN"
     const val ID_SERVER_CONFIG = "SERVER_CONFIG"
+    const val ID_SERVER_RAW = "SERVER_RAW"
     const val ID_SERVER_AFF = "SERVER_AFF"
     const val ID_SUB = "SUB"
     const val ID_SETTING = "SETTING"

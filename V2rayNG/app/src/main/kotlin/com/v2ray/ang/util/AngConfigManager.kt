@@ -22,6 +22,7 @@ import java.util.*
 
 object AngConfigManager {
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
+    private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
     private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
 
@@ -95,6 +96,7 @@ object AngConfigManager {
                     return@forEachIndexed
                 }
                 config.fullConfig = v2rayConfig
+                serverRawStorage?.encode(vmessBean.guid, jsonConfig)
             } else {
                 config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
                     vnext.address = vmessBean.address

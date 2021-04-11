@@ -7,8 +7,6 @@ import com.google.gson.*
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.V2rayConfig
-import org.json.JSONException
-import org.json.JSONObject
 import com.v2ray.ang.dto.EConfigType
 
 object V2rayConfigUtil {
@@ -19,6 +17,7 @@ object V2rayConfigUtil {
 //        JSONObject("""{"version":"1.1","status":"200","reason":"OK","headers":{"Content-Type":["application/octet-stream","video/mpeg"],"Transfer-Encoding":["chunked"],"Connection":["keep-alive"],"Pragma":"no-cache"}}""")
 //    }
 
+    private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     data class Result(var status: Boolean, var content: String)
@@ -30,7 +29,12 @@ object V2rayConfigUtil {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return Result(false, "")
             if (config.configType == EConfigType.CUSTOM) {
-                val customConfig = config.fullConfig?.toPrettyPrinting() ?: return Result(false, "")
+                val raw = serverRawStorage?.decodeString(guid)
+                val customConfig = if (raw.isNullOrBlank()) {
+                    config.fullConfig?.toPrettyPrinting() ?: return Result(false, "")
+                } else {
+                    raw
+                }
                 Log.d("V2rayConfigUtilGoLog", customConfig)
                 return Result(true, customConfig)
             }

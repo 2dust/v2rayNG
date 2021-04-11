@@ -21,6 +21,7 @@ import me.drakeet.support.toast.ToastCompat
 class ServerCustomConfigActivity : BaseActivity() {
 
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
+    private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
     private val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
     private val isRunning by lazy {
         intent.getBooleanExtra("isRunning", false)
@@ -47,7 +48,12 @@ class ServerCustomConfigActivity : BaseActivity() {
      */
     private fun bindingServer(config: ServerConfig): Boolean {
         et_remarks.text = Utils.getEditable(config.remarks)
-        tv_content.text = Utils.getEditable(config.fullConfig?.toPrettyPrinting().orEmpty())
+        val raw = serverRawStorage?.decodeString(editGuid)
+        if (raw.isNullOrBlank()) {
+            tv_content.text = Utils.getEditable(config.fullConfig?.toPrettyPrinting().orEmpty())
+        } else {
+            tv_content.text = Utils.getEditable(raw)
+        }
         return true
     }
 
@@ -81,6 +87,7 @@ class ServerCustomConfigActivity : BaseActivity() {
         config.fullConfig = v2rayConfig
 
         MmkvManager.encodeServerConfig(editGuid, config)
+        serverRawStorage?.encode(editGuid, tv_content.text.toString())
         toast(R.string.toast_success)
         finish()
         return true

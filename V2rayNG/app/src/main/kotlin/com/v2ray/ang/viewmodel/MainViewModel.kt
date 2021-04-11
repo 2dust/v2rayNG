@@ -24,6 +24,7 @@ import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
+    private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
 
     var serverList= MmkvManager.decodeServerList()
         private set
@@ -61,7 +62,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val config = ServerConfig.create(EConfigType.CUSTOM)
         config.remarks = System.currentTimeMillis().toString()
         config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
-        serverList.add(MmkvManager.encodeServerConfig("", config))
+        val key = MmkvManager.encodeServerConfig("", config)
+        serverRawStorage?.encode(key, server)
+        serverList.add(key)
     }
 
     fun swapServer(fromPosition: Int, toPosition: Int) {
