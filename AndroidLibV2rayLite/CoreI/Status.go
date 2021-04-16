@@ -1,7 +1,7 @@
 package CoreI
 
 import (
-	v2core "v2ray.com/core"
+	v2core "github.com/xtls/xray-core/core"
 )
 
 type Status struct {
@@ -14,7 +14,7 @@ type Status struct {
 }
 
 func CheckVersion() int {
-	return 22
+	return 23
 }
 
 func (v *Status) GetDataDir() string {

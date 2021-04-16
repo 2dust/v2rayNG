@@ -13,18 +13,19 @@ import (
 	"github.com/2dust/AndroidLibV2rayLite/VPN"
 	mobasset "golang.org/x/mobile/asset"
 
-	v2core "v2ray.com/core"
-	v2filesystem "v2ray.com/core/common/platform/filesystem"
-	v2stats "v2ray.com/core/features/stats"
-	v2serial "v2ray.com/core/infra/conf/serial"
-	v2internet "v2ray.com/core/transport/internet"
+	v2core "github.com/xtls/xray-core/core"
+	v2filesystem "github.com/xtls/xray-core/common/platform/filesystem"
+	v2stats "github.com/xtls/xray-core/features/stats"
+	v2serial "github.com/xtls/xray-core/infra/conf/serial"
+	_ "github.com/xtls/xray-core/main/distro/all"
+	v2internet "github.com/xtls/xray-core/transport/internet"
 
-	v2applog "v2ray.com/core/app/log"
-	v2commlog "v2ray.com/core/common/log"
+	v2applog "github.com/xtls/xray-core/app/log"
+	v2commlog "github.com/xtls/xray-core/common/log"
 )
 
 const (
-	v2Assert    = "v2ray.location.asset"
+	v2Assert    = "xray.location.asset"
 	assetperfix = "/dev/libv2rayfs0/asset"
 )
 
