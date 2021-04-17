@@ -37,13 +37,15 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 settingsStorage?.encode(key, sharedPreferences.getString(key, ""))
             }
             AppConfig.PREF_SPEED_ENABLED,
-            AppConfig.PREF_SNIFFING_ENABLED,
             AppConfig.PREF_PROXY_SHARING,
             AppConfig.PREF_LOCAL_DNS_ENABLED,
             AppConfig.PREF_FORWARD_IPV6,
             AppConfig.PREF_PER_APP_PROXY,
             AppConfig.PREF_BYPASS_APPS, -> {
                 settingsStorage?.encode(key, sharedPreferences.getBoolean(key, false))
+            }
+            AppConfig.PREF_SNIFFING_ENABLED, -> {
+                settingsStorage?.encode(key, sharedPreferences.getBoolean(key, true))
             }
             AppConfig.PREF_PER_APP_PROXY_SET -> {
                 settingsStorage?.encode(key, sharedPreferences.getStringSet(key, setOf()))
