@@ -47,7 +47,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         if (holder is MainViewHolder) {
             val guid = mActivity.mainViewModel.serverList.getOrNull(position) ?: return
-            val config = MmkvManager.decodeServerConfig(guid) ?: return
+            val config = mActivity.mainViewModel.serversCache.getOrElse(guid, { MmkvManager.decodeServerConfig(guid) })?: return
             val outbound = config.getProxyOutbound()
             val aff = MmkvManager.decodeServerAffiliationInfo(guid)
 

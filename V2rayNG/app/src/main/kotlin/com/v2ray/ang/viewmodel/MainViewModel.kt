@@ -21,13 +21,15 @@ import com.v2ray.ang.util.*
 import com.v2ray.ang.util.MmkvManager.KEY_ANG_CONFIGS
 import kotlinx.coroutines.*
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
 
-    var serverList= MmkvManager.decodeServerList()
+    var serverList = MmkvManager.decodeServerList()
         private set
+    val serversCache = ConcurrentHashMap<String, ServerConfig>()
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
     val updateTestResultAction by lazy { MutableLiveData<String>() }
@@ -50,6 +52,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun reloadServerList() {
         serverList = MmkvManager.decodeServerList()
+        updateCache()
         updateListAction.value = -1
     }
 
@@ -65,11 +68,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val key = MmkvManager.encodeServerConfig("", config)
         serverRawStorage?.encode(key, server)
         serverList.add(key)
+        serversCache[key] = config
     }
 
     fun swapServer(fromPosition: Int, toPosition: Int) {
         Collections.swap(serverList, fromPosition, toPosition)
         mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
+    }
+
+    fun updateCache() {
+        serversCache.clear()
+        GlobalScope.launch(Dispatchers.Default) {
+            serverList.forEach { guid ->
+                MmkvManager.decodeServerConfig(guid)?.let {
+                    serversCache[guid] = it
+                }
+            }
+        }
     }
 
     fun testAllTcping() {
@@ -80,7 +95,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         getApplication<AngApplication>().toast(R.string.connection_test_testing)
         for (guid in serverList) {
-            MmkvManager.decodeServerConfig(guid)?.getProxyOutbound()?.let { outbound ->
+            serversCache.getOrElse(guid, { MmkvManager.decodeServerConfig(guid) })?.getProxyOutbound()?.let { outbound ->
                 val serverAddress = outbound.getServerAddress()
                 val serverPort = outbound.getServerPort()
                 if (serverAddress != null && serverPort != null) {
