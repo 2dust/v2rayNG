@@ -8,15 +8,10 @@ import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_NETWORK
+import com.v2ray.ang.dto.V2rayConfig.Companion.HTTP
 
 object V2rayConfigUtil {
-//    private val requestObj: JsonObject by lazy {
-//        Gson().fromJson("""{"version":"1.1","method":"GET","path":["/"],"headers":{"User-Agent":["Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.75 Safari/537.36","Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_2 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/53.0.2785.109 Mobile/14A456 Safari/601.1.46"],"Accept-Encoding":["gzip, deflate"],"Connection":["keep-alive"],"Pragma":"no-cache"}}""", JsonObject::class.java)
-//    }
-//    private val responseObj: JSONObject by lazy {
-//        JSONObject("""{"version":"1.1","status":"200","reason":"OK","headers":{"Content-Type":["application/octet-stream","video/mpeg"],"Transfer-Encoding":["chunked"],"Connection":["keep-alive"],"Pragma":"no-cache"}}""")
-//    }
-
     private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
@@ -66,9 +61,12 @@ object V2rayConfigUtil {
 
         inbounds(v2rayConfig)
 
+        httpRequestObject(outbound)
+
         v2rayConfig.outbounds[0] = outbound
 
         routing(v2rayConfig)
+
 
         if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
             customLocalDns(v2rayConfig)
@@ -99,7 +97,8 @@ object V2rayConfigUtil {
                 }
             }
             v2rayConfig.inbounds[0].port = 10808
-            v2rayConfig.inbounds[0].sniffing?.enabled = settingsStorage?.decodeBool(AppConfig.PREF_SNIFFING_ENABLED) ?: true
+            v2rayConfig.inbounds[0].sniffing?.enabled = settingsStorage?.decodeBool(AppConfig.PREF_SNIFFING_ENABLED)
+                    ?: true
 
             //v2rayConfig.inbounds[1].port = httpPort
 
@@ -121,11 +120,15 @@ object V2rayConfigUtil {
      */
     private fun routing(v2rayConfig: V2rayConfig): Boolean {
         try {
-            routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT) ?: "", AppConfig.TAG_AGENT, v2rayConfig)
-            routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT) ?: "", AppConfig.TAG_DIRECT, v2rayConfig)
-            routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED) ?: "", AppConfig.TAG_BLOCKED, v2rayConfig)
+            routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
+                    ?: "", AppConfig.TAG_AGENT, v2rayConfig)
+            routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
+                    ?: "", AppConfig.TAG_DIRECT, v2rayConfig)
+            routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
+                    ?: "", AppConfig.TAG_BLOCKED, v2rayConfig)
 
-            v2rayConfig.routing.domainStrategy = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY) ?: "IPIfNonMatch"
+            v2rayConfig.routing.domainStrategy = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY)
+                    ?: "IPIfNonMatch"
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: "0"
 
             // Hardcode googleapis.cn
@@ -251,12 +254,14 @@ object V2rayConfigUtil {
             val geositeCn = arrayListOf("geosite:cn")
             val geoipCn = arrayListOf("geoip:cn")
 
-            val agDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT) ?: "")
+            val agDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
+                    ?: "")
             if (agDomain.size > 0) {
                 servers.add(V2rayConfig.DnsBean.ServersBean(remoteDns.first(), 53, agDomain, null))
             }
 
-            val dirDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT) ?: "")
+            val dirDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
+                    ?: "")
             if (dirDomain.size > 0) {
                 servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, dirDomain, geoipCn))
             }
@@ -266,7 +271,8 @@ object V2rayConfigUtil {
                 servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, geositeCn, geoipCn))
             }
 
-            val blkDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED) ?: "")
+            val blkDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
+                    ?: "")
             if (blkDomain.size > 0) {
                 hosts.putAll(blkDomain.map { it to "127.0.0.1" })
             }
@@ -364,4 +370,27 @@ object V2rayConfigUtil {
         }
         return true
     }
+
+    private fun httpRequestObject(outbound: V2rayConfig.OutboundBean): Boolean {
+        try {
+            if (outbound.streamSettings?.network == DEFAULT_NETWORK
+                    && outbound.streamSettings?.tcpSettings?.header?.type == HTTP) {
+                val path = outbound.streamSettings?.tcpSettings?.header?.request?.path
+                val Host = outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host
+
+                val requestString: String by lazy {
+                    """{"version":"1.1","method":"GET","headers":{"User-Agent":["Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36","Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_2 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/53.0.2785.109 Mobile/14A456 Safari/601.1.46"],"Accept-Encoding":["gzip, deflate"],"Connection":["keep-alive"],"Pragma":"no-cache"}}"""
+                }
+                outbound.streamSettings?.tcpSettings?.header?.request = Gson().fromJson(requestString, V2rayConfig.OutboundBean.StreamSettingsBean.TcpSettingsBean.HeaderBean.RequestBean::class.java)
+                outbound.streamSettings?.tcpSettings?.header?.request?.path = path!!
+                outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host = Host!!
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+        return true
+    }
+
 }
