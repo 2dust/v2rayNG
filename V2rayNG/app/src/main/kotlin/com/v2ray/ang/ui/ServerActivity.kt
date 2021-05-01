@@ -246,8 +246,8 @@ class ServerActivity : BaseActivity() {
     }
 
     private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean, config: ServerConfig) {
-        val requestHost = et_request_host?.text.toString().trim()
-        val path = et_path?.text.toString().trim()
+        val requestHost = if (et_request_host != null) et_request_host.text.toString().trim() else ""
+        val path = if (et_path != null) et_path.text.toString().trim() else ""
         var sni = streamSetting.populateTransportSettings(
                 if (sp_network != null) networks[sp_network.selectedItemPosition] else DEFAULT_NETWORK,
                 if (sp_header_type != null) headertypes[sp_header_type.selectedItemPosition] else "",
