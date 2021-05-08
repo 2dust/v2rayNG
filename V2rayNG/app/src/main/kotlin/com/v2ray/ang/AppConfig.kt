@@ -22,6 +22,7 @@ object AppConfig {
     const val PREF_VPN_DNS = "pref_vpn_dns"
     const val PREF_REMOTE_DNS = "pref_remote_dns"
     const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
+    const val PREF_LOCAL_DNS_PORT = "pref_local_dns_port"
     const val PREF_FORWARD_IPV6 = "pref_forward_ipv6"
     const val PREF_ROUTING_DOMAIN_STRATEGY = "pref_routing_domain_strategy"
     const val PREF_ROUTING_MODE = "pref_routing_mode"
