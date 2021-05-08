@@ -122,10 +122,12 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 }
 
         if(!enableLocalDns) {
-            Utils.getRemoteDnsServers()
-                .forEach {
-                    builder.addDnsServer(it)
-                }
+            Utils.getVpnDnsServers()
+                    .forEach {
+                        if (Utils.isPureIpAddress(it)) {
+                            builder.addDnsServer(it)
+                        }
+                    }
         }
 
         builder.setSession(V2RayServiceManager.currentConfig?.remarks.orEmpty())
