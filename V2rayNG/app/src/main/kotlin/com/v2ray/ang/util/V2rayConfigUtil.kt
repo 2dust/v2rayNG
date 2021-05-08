@@ -67,6 +67,7 @@ object V2rayConfigUtil {
 
         routing(v2rayConfig)
 
+        fakedns(v2rayConfig)
 
         if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
             customLocalDns(v2rayConfig)
@@ -97,8 +98,17 @@ object V2rayConfigUtil {
                 }
             }
             v2rayConfig.inbounds[0].port = 10808
-            v2rayConfig.inbounds[0].sniffing?.enabled = settingsStorage?.decodeBool(AppConfig.PREF_SNIFFING_ENABLED)
+            val fakedns = settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED)
+                    ?: false
+            val sniffAllTlsAndHttp = settingsStorage?.decodeBool(AppConfig.PREF_SNIFFING_ENABLED)
                     ?: true
+            v2rayConfig.inbounds[0].sniffing?.enabled = fakedns || sniffAllTlsAndHttp
+            if (!sniffAllTlsAndHttp) {
+                v2rayConfig.inbounds[0].sniffing?.destOverride?.clear()
+            }
+            if (fakedns) {
+                v2rayConfig.inbounds[0].sniffing?.destOverride?.add("fakedns")
+            }
 
             //v2rayConfig.inbounds[1].port = httpPort
 
@@ -113,6 +123,15 @@ object V2rayConfigUtil {
             return false
         }
         return true
+    }
+
+    private fun fakedns(v2rayConfig: V2rayConfig) {
+        if (settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
+            v2rayConfig.fakedns = V2rayConfig.FakednsBean()
+            v2rayConfig.outbounds.filter { it.protocol == "freedom" }.forEach {
+                it.settings?.domainStrategy = "UseIP"
+            }
+        }
     }
 
     /**
@@ -245,27 +264,27 @@ object V2rayConfigUtil {
             val hosts = mutableMapOf<String, String>()
             val servers = ArrayList<Any>()
             val remoteDns = Utils.getRemoteDnsServers()
-
-            remoteDns.forEach {
-                servers.add(it)
-            }
-
             val domesticDns = Utils.getDomesticDnsServers()
             val geositeCn = arrayListOf("geosite:cn")
             val geoipCn = arrayListOf("geoip:cn")
-
-            val agDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
+            val proxyDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
                     ?: "")
-            if (agDomain.size > 0) {
-                servers.add(V2rayConfig.DnsBean.ServersBean(remoteDns.first(), 53, agDomain, null))
-            }
-
-            val dirDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
+            val directDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
                     ?: "")
-            if (dirDomain.size > 0) {
-                servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, dirDomain, geoipCn))
-            }
 
+            if (settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
+                // fakedns with all domains to make it always top priority
+                servers.add(V2rayConfig.DnsBean.ServersBean(address = "fakedns", domains = geositeCn.plus(proxyDomain).plus(directDomain)))
+            }
+            remoteDns.forEach {
+                servers.add(it)
+            }
+            if (proxyDomain.size > 0) {
+                servers.add(V2rayConfig.DnsBean.ServersBean(remoteDns.first(), 53, proxyDomain, null))
+            }
+            if (directDomain.size > 0) {
+                servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, directDomain, geoipCn))
+            }
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: "0"
             if (routingMode == "2" || routingMode == "3") {
                 servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, geositeCn, geoipCn))

@@ -39,6 +39,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_SPEED_ENABLED,
             AppConfig.PREF_PROXY_SHARING,
             AppConfig.PREF_LOCAL_DNS_ENABLED,
+            AppConfig.PREF_FAKE_DNS_ENABLED,
             AppConfig.PREF_FORWARD_IPV6,
             AppConfig.PREF_PER_APP_PROXY,
             AppConfig.PREF_BYPASS_APPS, -> {
