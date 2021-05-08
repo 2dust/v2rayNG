@@ -19,6 +19,7 @@ object AppConfig {
     const val PREF_PROXY_SHARING = "pref_proxy_sharing_enabled"
     const val PREF_LOCAL_DNS_ENABLED = "pref_local_dns_enabled"
     const val PREF_FAKE_DNS_ENABLED = "pref_fake_dns_enabled"
+    const val PREF_VPN_DNS = "pref_vpn_dns"
     const val PREF_REMOTE_DNS = "pref_remote_dns"
     const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
     const val PREF_FORWARD_IPV6 = "pref_forward_ipv6"

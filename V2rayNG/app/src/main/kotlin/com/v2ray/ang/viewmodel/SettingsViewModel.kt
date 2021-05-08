@@ -27,6 +27,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         Log.d(AppConfig.ANG_PACKAGE, "Observe settings changed: $key")
         when(key) {
             AppConfig.PREF_MODE,
+            AppConfig.PREF_VPN_DNS,
             AppConfig.PREF_REMOTE_DNS,
             AppConfig.PREF_DOMESTIC_DNS,
             AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,
