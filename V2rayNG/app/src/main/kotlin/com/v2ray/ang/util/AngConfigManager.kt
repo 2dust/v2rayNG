@@ -131,7 +131,8 @@ object AngConfigManager {
                 }
                 config.outboundBean?.streamSettings?.let { streamSetting ->
                     val sni = streamSetting.populateTransportSettings(vmessBean.network, vmessBean.headerType,
-                            vmessBean.requestHost, vmessBean.path, vmessBean.path, vmessBean.requestHost, vmessBean.path)
+                            vmessBean.requestHost, vmessBean.path, vmessBean.path, vmessBean.requestHost, vmessBean.path,
+                            vmessBean.headerType, vmessBean.path)
 //                    val allowInsecure = if (vmessBean.allowInsecure.isBlank()) {
 //                        settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
 //                    } else {
@@ -209,7 +210,7 @@ object AngConfigManager {
                             vnext.users[0].alterId = Utils.parseInt(vmessQRCode.aid)
                         }
                         val sni = streamSetting.populateTransportSettings(vmessQRCode.net, vmessQRCode.type, vmessQRCode.host,
-                                vmessQRCode.path, vmessQRCode.path, vmessQRCode.host, vmessQRCode.path)
+                                vmessQRCode.path, vmessQRCode.path, vmessQRCode.host, vmessQRCode.path, vmessQRCode.type, vmessQRCode.path)
                         streamSetting.populateTlsSettings(vmessQRCode.tls, allowInsecure,
                                 if (vmessQRCode.sni.isNotBlank()) vmessQRCode.sni else sni)
                     }
@@ -312,7 +313,8 @@ object AngConfigManager {
                 }
 
                 val sni = streamSetting.populateTransportSettings(queryParam["type"] ?: "tcp", queryParam["headerType"],
-                        queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"])
+                        queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
+                        queryParam["mode"], queryParam["serviceName"])
                 streamSetting.populateTlsSettings(queryParam["security"] ?: "", allowInsecure, queryParam["sni"] ?: sni)
             }
             if (config == null){
@@ -337,7 +339,7 @@ object AngConfigManager {
             val uri = URI(uriString)
             check(uri.scheme == "vmess")
             val (_, protocol, tlsStr, uuid, alterId) =
-                    Regex("(tcp|http|ws|kcp|quic)(\\+tls)?:([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12})-([0-9]+)")
+                    Regex("(tcp|http|ws|kcp|quic|grpc)(\\+tls)?:([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12})-([0-9]+)")
                             .matchEntire(uri.userInfo)?.groupValues
                             ?: error("parse user info fail.")
             val tls = tlsStr.isNotBlank()
@@ -357,8 +359,8 @@ object AngConfigManager {
 
             val sni = streamSetting.populateTransportSettings(protocol, queryParam["type"],
                     queryParam["host"]?.split("|")?.get(0) ?: "",
-                    queryParam["path"]?.takeIf { it.trim() != "/" } ?: "",
-                    queryParam["seed"], queryParam["security"], queryParam["key"])
+                    queryParam["path"]?.takeIf { it.trim() != "/" } ?: "", queryParam["seed"], queryParam["security"],
+                    queryParam["key"], queryParam["mode"], queryParam["serviceName"])
             streamSetting.populateTlsSettings(if (tls) TLS else "", allowInsecure, sni)
             true
         }.getOrElse { false }
@@ -500,6 +502,10 @@ object AngConfigManager {
                                 else transportDetails[0]
                                 dicQuery["quicSecurity"] = Utils.urlEncode(transportDetails[1])
                                 dicQuery["key"] = Utils.urlEncode(transportDetails[2])
+                            }
+                            "grpc" -> {
+                                dicQuery["mode"] = transportDetails[0]
+                                dicQuery["serviceName"] = transportDetails[2]
                             }
                         }
                     }

@@ -272,16 +272,19 @@ class ServerActivity : BaseActivity() {
 
     private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean, config: ServerConfig) {
         val network = if (sp_network != null) networks[sp_network.selectedItemPosition] else DEFAULT_NETWORK
+        val type = if (sp_header_type != null) transportTypes(network)[sp_header_type.selectedItemPosition] else "";
         val requestHost = if (et_request_host != null) et_request_host.text.toString().trim() else ""
         val path = if (et_path != null) et_path.text.toString().trim() else ""
         var sni = streamSetting.populateTransportSettings(
-                network,
-                if (sp_header_type != null) transportTypes(network)[sp_header_type.selectedItemPosition] else "",
-                requestHost,
-                path,
-                path,
-                requestHost,
-                path
+                transport = network,
+                headerType = type,
+                host = requestHost,
+                path = path,
+                seed = path,
+                quicSecurity = requestHost,
+                key = path,
+                mode = type,
+                serviceName = path
         )
         val allowInsecure = if (sp_allow_insecure == null || allowinsecures[sp_allow_insecure.selectedItemPosition].isBlank()) {
             false//settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false

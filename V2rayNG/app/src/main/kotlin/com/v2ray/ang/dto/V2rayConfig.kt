@@ -192,10 +192,10 @@ data class V2rayConfig(
             }
 
             data class GrpcSettingsBean(var serviceName: String = "",
-                                        val multiMode: Boolean? = null)
+                                        var multiMode: Boolean? = null)
 
             fun populateTransportSettings(transport: String, headerType: String?, host: String?, path: String?, seed: String?,
-                                          quicSecurity: String?, key: String?): String {
+                                          quicSecurity: String?, key: String?, mode: String?, serviceName: String?): String {
                 var sni = ""
                 network = transport
                 when (network) {
@@ -250,7 +250,8 @@ data class V2rayConfig(
                     }
                     "grpc" -> {
                         val grpcSetting = GrpcSettingsBean()
-                        grpcSetting.serviceName = path ?: ""
+                        grpcSetting.multiMode = mode == "multi"
+                        grpcSetting.serviceName = serviceName ?: ""
                         sni = host ?: ""
                         grpcSettings = grpcSetting
                     }
@@ -357,7 +358,7 @@ data class V2rayConfig(
                     }
                     "grpc" -> {
                         val grpcSetting = streamSettings?.grpcSettings ?: return null
-                        listOf("",
+                        listOf(if (grpcSetting.multiMode == true) "multi" else "gun",
                                 "",
                                 grpcSetting.serviceName)
                     }
