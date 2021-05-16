@@ -5,6 +5,9 @@ import android.support.v7.app.AlertDialog
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
@@ -28,6 +31,7 @@ import kotlinx.android.synthetic.main.activity_server_vmess.et_remarks
 import kotlinx.android.synthetic.main.activity_server_vmess.et_request_host
 import kotlinx.android.synthetic.main.activity_server_vmess.sp_allow_insecure
 import kotlinx.android.synthetic.main.activity_server_vmess.sp_header_type
+import kotlinx.android.synthetic.main.activity_server_vmess.sp_header_type_title
 import kotlinx.android.synthetic.main.activity_server_vmess.sp_network
 import kotlinx.android.synthetic.main.activity_server_vmess.sp_stream_security
 
@@ -56,8 +60,14 @@ class ServerActivity : BaseActivity() {
     private val networks: Array<out String> by lazy {
         resources.getStringArray(R.array.networks)
     }
-    private val headertypes: Array<out String> by lazy {
-        resources.getStringArray(R.array.headertypes)
+    private val tcpTypes: Array<out String> by lazy {
+        resources.getStringArray(R.array.header_type_tcp)
+    }
+    private val kcpAndQuicTypes: Array<out String> by lazy {
+        resources.getStringArray(R.array.header_type_kcp_and_quic)
+    }
+    private val grpcModes: Array<out String> by lazy {
+        resources.getStringArray(R.array.mode_type_grpc)
     }
     private val streamSecuritys: Array<out String> by lazy {
         resources.getStringArray(R.array.streamsecurityxs)
@@ -78,6 +88,26 @@ class ServerActivity : BaseActivity() {
             EConfigType.SOCKS -> setContentView(R.layout.activity_server_socks)
 //            EConfigType.VLESS -> setContentView(R.layout.activity_server_vless)
 //            EConfigType.TROJAN -> setContentView(R.layout.activity_server_trojan)
+        }
+        sp_network?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val types = transportTypes(networks[position])
+                sp_header_type?.isEnabled = types.size > 1
+                val adapter = ArrayAdapter(this@ServerActivity, android.R.layout.simple_spinner_item, types)
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                sp_header_type?.adapter = adapter
+                sp_header_type_title?.text = if (networks[position] == "grpc")
+                    getString(R.string.server_lab_mode_type) else
+                    getString(R.string.server_lab_head_type)
+                config?.getProxyOutbound()?.getTransportSettingDetails()?.let { transportDetails ->
+                    sp_header_type.setSelection(Utils.arrayFind(types, transportDetails[0]))
+                    et_request_host.text = Utils.getEditable(transportDetails[1])
+                    et_path.text = Utils.getEditable(transportDetails[2])
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // do nothing
+            }
         }
         if (config != null) {
             bindingServer(config)
@@ -128,11 +158,6 @@ class ServerActivity : BaseActivity() {
         val network = Utils.arrayFind(networks, streamSetting.network)
         if (network >= 0) {
             sp_network?.setSelection(network)
-        }
-        outbound.getTransportSettingDetails()?.let { transportDetails ->
-            sp_header_type.setSelection(Utils.arrayFind(headertypes, transportDetails[0]))
-            et_request_host.text = Utils.getEditable(transportDetails[1])
-            et_path.text = Utils.getEditable(transportDetails[2])
         }
         return true
     }
@@ -246,11 +271,12 @@ class ServerActivity : BaseActivity() {
     }
 
     private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean, config: ServerConfig) {
+        val network = if (sp_network != null) networks[sp_network.selectedItemPosition] else DEFAULT_NETWORK
         val requestHost = if (et_request_host != null) et_request_host.text.toString().trim() else ""
         val path = if (et_path != null) et_path.text.toString().trim() else ""
         var sni = streamSetting.populateTransportSettings(
-                if (sp_network != null) networks[sp_network.selectedItemPosition] else DEFAULT_NETWORK,
-                if (sp_header_type != null) headertypes[sp_header_type.selectedItemPosition] else "",
+                network,
+                if (sp_header_type != null) transportTypes(network)[sp_header_type.selectedItemPosition] else "",
                 requestHost,
                 path,
                 path,
@@ -268,6 +294,18 @@ class ServerActivity : BaseActivity() {
                 allowInsecure,
                 sni
         )
+    }
+
+    private fun transportTypes(network: String?): Array<out String> {
+        return if (network == "tcp") {
+            tcpTypes
+        } else if (network == "kcp" || network == "quic") {
+            kcpAndQuicTypes
+        } else if (network == "grpc") {
+            grpcModes
+        } else {
+            arrayOf("---")
+        }
     }
 
     /**
