@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/title_settings">
+    <CheckBoxPreference
+            android:key="pref_speed_enabled"
+            android:summary="@string/summary_pref_speed_enabled"
+            android:title="@string/title_pref_speed_enabled" />
+
+    <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_sniffing_enabled"
+            android:summary="@string/summary_pref_sniffing_enabled"
+            android:title="@string/title_pref_sniffing_enabled" />
+
+    <PreferenceCategory android:title="@string/title_vpn_settings">
         <CheckBoxPreference
             android:key="pref_per_app_proxy"
             android:summary="@string/summary_pref_per_app_proxy"
@@ -10,24 +21,26 @@
         <!--android:key="pref_mux_enabled"-->
         <!--android:summary="@string/summary_pref_mux_enabled"-->
         <!--android:title="@string/title_pref_mux_enabled" />-->
+        <CheckBoxPreference
+                android:key="pref_local_dns_enabled"
+                android:summary="@string/summary_pref_local_dns_enabled"
+                android:title="@string/title_pref_local_dns_enabled" />
 
         <CheckBoxPreference
-            android:key="pref_speed_enabled"
-            android:summary="@string/summary_pref_speed_enabled"
-            android:title="@string/title_pref_speed_enabled" />
+                android:key="pref_fake_dns_enabled"
+                android:summary="@string/summary_pref_fake_dns_enabled"
+                android:title="@string/title_pref_fake_dns_enabled" />
 
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="pref_sniffing_enabled"
-            android:summary="@string/summary_pref_sniffing_enabled"
-            android:title="@string/title_pref_sniffing_enabled" />
+        <EditTextPreference
+                android:key="pref_local_dns_port"
+                android:summary="10807"
+                android:inputType="number"
+                android:title="@string/title_pref_local_dns_port" />
 
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="pref_proxy_sharing_enabled"
-            android:onClick="proxySharingOnClick"
-            android:summary="@string/summary_pref_proxy_sharing_enabled"
-            android:title="@string/title_pref_proxy_sharing_enabled" />
+        <EditTextPreference
+                android:key="pref_vpn_dns"
+                android:summary="@string/summary_pref_remote_dns"
+                android:title="@string/title_pref_vpn_dns" />
 
     </PreferenceCategory>
 
@@ -40,6 +53,11 @@
             android:summary="%s"
             android:title="@string/title_pref_routing_domain_strategy" />
 
+        <Preference
+                android:key="pref_routing_custom"
+                android:summary="@string/title_pref_routing_custom"
+                android:title="@string/title_pref_routing_custom" />
+
         <ListPreference
             android:defaultValue="0"
             android:entries="@array/routing_mode"
@@ -47,11 +65,6 @@
             android:key="pref_routing_mode"
             android:summary="%s"
             android:title="@string/title_pref_routing_mode" />
-
-        <Preference
-            android:key="pref_routing_custom"
-            android:summary="@string/title_pref_routing_custom"
-            android:title="@string/title_pref_routing_custom" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_advanced">
@@ -62,19 +75,11 @@
             android:title="@string/title_pref_forward_ipv6" />
 
         <CheckBoxPreference
-            android:key="pref_local_dns_enabled"
-            android:summary="@string/summary_pref_local_dns_enabled"
-            android:title="@string/title_pref_local_dns_enabled" />
-
-        <EditTextPreference
-            android:key="pref_domestic_dns"
-            android:summary="@string/summary_pref_domestic_dns"
-            android:title="@string/title_pref_domestic_dns" />
-
-        <EditTextPreference
-            android:key="pref_remote_dns"
-            android:summary="@string/summary_pref_remote_dns"
-            android:title="@string/title_pref_remote_dns" />
+                android:defaultValue="false"
+                android:key="pref_proxy_sharing_enabled"
+                android:onClick="proxySharingOnClick"
+                android:summary="@string/summary_pref_proxy_sharing_enabled"
+                android:title="@string/title_pref_proxy_sharing_enabled" />
 
         <Preference
             android:key="pref_socks_port"
@@ -85,6 +90,16 @@
             android:key="pref_http_port"
             android:summary="10809"
             android:title="@string/title_pref_http_port" />
+
+        <EditTextPreference
+                android:key="pref_remote_dns"
+                android:summary="@string/summary_pref_remote_dns"
+                android:title="@string/title_pref_remote_dns" />
+
+        <EditTextPreference
+                android:key="pref_domestic_dns"
+                android:summary="@string/summary_pref_domestic_dns"
+                android:title="@string/title_pref_domestic_dns" />
 
         <ListPreference
                 android:defaultValue="VPN"

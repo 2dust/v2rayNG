@@ -27,9 +27,13 @@
         <item>grpc</item>
     </string-array>
 
-    <string-array name="headertypes" translatable="false">
+    <string-array name="header_type_tcp" translatable="false">
         <item>none</item>
         <item>http</item>
+    </string-array>
+
+    <string-array name="header_type_kcp_and_quic" translatable="false">
+        <item>none</item>
         <item>srtp</item>
         <item>utp</item>
         <item>wechat-video</item>
@@ -37,18 +41,10 @@
         <item>wireguard</item>
     </string-array>
 
-    <string-array name="headertypetcps" translatable="false">
-        <item>none</item>
-        <item>http</item>
-    </string-array>
-
-    <string-array name="headertypekcps" translatable="false">
-        <item>none</item>
-        <item>srtp</item>
-        <item>utp</item>
-        <item>wechat-video</item>
-        <item>dtls</item>
-        <item>wireguard</item>
+    <string-array name="mode_type_grpc" translatable="false">
+        <item>gun</item>
+        <item>multi</item>
+ <!--Hide this option until core support it       <item>guna</item>-->
     </string-array>
 
     <string-array name="streamsecuritys" translatable="false">

@@ -15,7 +15,6 @@ import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
 import android.os.SystemClock
-import android.text.TextUtils
 import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
@@ -123,41 +122,31 @@ object Utils {
     /**
      * get remote dns servers from preference
      */
-    fun getRemoteDnsServers(): ArrayList<String> {
+    fun getRemoteDnsServers(): List<String> {
         val remoteDns = settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_AGENT
-        val ret = ArrayList<String>()
-        if (!TextUtils.isEmpty(remoteDns)) {
-            remoteDns
-                    .split(",")
-                    .forEach {
-                        if (Utils.isPureIpAddress(it)) {
-                            ret.add(it)
-                        }
-                    }
-        }
-        if (ret.size == 0) {
-            ret.add(AppConfig.DNS_AGENT)
+        val ret = remoteDns.split(",").filter { isPureIpAddress(it) || it.startsWith("https") }
+        if (ret.isEmpty()) {
+            return listOf(AppConfig.DNS_AGENT)
         }
         return ret
+    }
+
+    fun getVpnDnsServers(): List<String> {
+        val vpnDns = settingsStorage?.decodeString(AppConfig.PREF_VPN_DNS)
+                ?: settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS)
+                ?: AppConfig.DNS_AGENT
+        return vpnDns.split(",").filter { isPureIpAddress(it) }
+        // allow empty, in that case dns will use system default
     }
 
     /**
      * get remote dns servers from preference
      */
-    fun getDomesticDnsServers(): ArrayList<String> {
+    fun getDomesticDnsServers(): List<String> {
         val domesticDns = settingsStorage?.decodeString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
-        val ret = ArrayList<String>()
-        if (!TextUtils.isEmpty(domesticDns)) {
-            domesticDns
-                    .split(",")
-                    .forEach {
-                        if (Utils.isPureIpAddress(it)) {
-                            ret.add(it)
-                        }
-                    }
-        }
-        if (ret.size == 0) {
-            ret.add(AppConfig.DNS_DIRECT)
+        val ret = domesticDns.split(",").filter { isPureIpAddress(it) || it.startsWith("https") }
+        if (ret.isEmpty()) {
+            return listOf(AppConfig.DNS_DIRECT)
         }
         return ret
     }
@@ -391,7 +380,7 @@ object Utils {
             val command = "/system/bin/ping -c 3 $url"
             val process = Runtime.getRuntime().exec(command)
             val allText = process.inputStream.bufferedReader().use { it.readText() }
-            if (!TextUtils.isEmpty(allText)) {
+            if (allText.isNotBlank()) {
                 val tempInfo = allText.substring(allText.indexOf("min/avg/max/mdev") + 19)
                 val temps = tempInfo.split("/".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                 if (temps.count() > 0 && temps[0].length < 10) {

@@ -20,7 +20,7 @@ data class V2rayConfig(
         val api: Any? = null,
         val transport: Any? = null,
         val reverse: Any? = null,
-        val fakedns: Any? = null,
+        var fakedns: FakednsBean? = null,
         val browserForwarder: Any? = null) {
     companion object {
         const val DEFAULT_PORT = 443
@@ -57,7 +57,7 @@ data class V2rayConfig(
                                   val network: String? = null)
 
         data class SniffingBean(var enabled: Boolean,
-                                val destOverride: List<String>,
+                                val destOverride: ArrayList<String>,
                                 val metadataOnly: Boolean? = null)
     }
 
@@ -78,7 +78,7 @@ data class V2rayConfig(
                                    val address: String? = null,
                                    val port: Int? = null,
                 /*Freedom*/
-                                   val domainStrategy: String? = null,
+                                   var domainStrategy: String? = null,
                                    val redirect: String? = null,
                                    val userLevel: Int? = null,
                 /*Loopback*/
@@ -192,10 +192,10 @@ data class V2rayConfig(
             }
 
             data class GrpcSettingsBean(var serviceName: String = "",
-                                        val multiMode: Boolean? = null)
+                                        var multiMode: Boolean? = null)
 
             fun populateTransportSettings(transport: String, headerType: String?, host: String?, path: String?, seed: String?,
-                                          quicSecurity: String?, key: String?): String {
+                                          quicSecurity: String?, key: String?, mode: String?, serviceName: String?): String {
                 var sni = ""
                 network = transport
                 when (network) {
@@ -250,7 +250,8 @@ data class V2rayConfig(
                     }
                     "grpc" -> {
                         val grpcSetting = GrpcSettingsBean()
-                        grpcSetting.serviceName = path ?: ""
+                        grpcSetting.multiMode = mode == "multi"
+                        grpcSetting.serviceName = serviceName ?: ""
                         sni = host ?: ""
                         grpcSettings = grpcSetting
                     }
@@ -357,7 +358,7 @@ data class V2rayConfig(
                     }
                     "grpc" -> {
                         val grpcSetting = streamSettings?.grpcSettings ?: return null
-                        listOf("",
+                        listOf(if (grpcSetting.multiMode == true) "multi" else "gun",
                                 "",
                                 grpcSetting.serviceName)
                     }
@@ -376,9 +377,9 @@ data class V2rayConfig(
                        val tag: String? = null
     ) {
         data class ServersBean(var address: String = "",
-                               var port: Int = 0,
-                               var domains: List<String>?,
-                               var expectIPs: List<String>?,
+                               var port: Int? = null,
+                               var domains: List<String>? = null,
+                               var expectIPs: List<String>? = null,
                                val clientIp: String? = null)
     }
 
@@ -415,6 +416,9 @@ data class V2rayConfig(
                 val statsUserDownlink: Boolean? = null,
                 var bufferSize: Int? = null)
     }
+
+    data class FakednsBean(var ipPool: String = "198.18.0.0/15",
+                           var poolSize: Int = 10000) // roughly 10 times smaller than total ip pool
 
     fun getProxyOutbound(): OutboundBean? {
         outbounds.forEach { outbound ->

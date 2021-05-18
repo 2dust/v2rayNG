@@ -40,11 +40,12 @@
     <string name="server_lab_id">id</string>
     <string name="server_lab_alterid">alterId</string>
     <string name="server_lab_security">security</string>
-    <string name="server_lab_network">network</string>
+    <string name="server_lab_network">Network</string>
     <string name="server_lab_more_function">more function</string>
     <string name="server_lab_head_type">head type</string>
+    <string name="server_lab_mode_type">gRPC mode</string>
     <string name="server_lab_request_host">request host(host/ws host/h2 host)/QUIC security</string>
-    <string name="server_lab_path">path(ws path/h2 path)/QUIC key/kcp seed/grpc serviceName</string>
+    <string name="server_lab_path">path(ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
     <string name="server_lab_stream_security">tls</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
     <string name="server_lab_address3">address</string>
@@ -77,7 +78,7 @@
     <!-- Preferences -->
     <string name="title_settings">Settings</string>
     <string name="title_advanced">Advanced Settings</string>
-
+    <string name="title_vpn_settings">VPN Settings</string>
     <string name="title_pref_per_app_proxy">Per-app proxy</string>
     <string name="summary_pref_per_app_proxy">Per-app proxy mode only support Android 5.0 Lollipop or higher</string>
 
@@ -89,10 +90,14 @@
         usage.</string>
 
     <string name="title_pref_sniffing_enabled">Enable Sniffing</string>
-    <string name="summary_pref_sniffing_enabled">Sniffing</string>
+    <string name="summary_pref_sniffing_enabled">Try sniff domain from the packet (default on)</string>
 
     <string name="title_pref_local_dns_enabled">Enable local DNS</string>
-    <string name="summary_pref_local_dns_enabled">DNS processed by v2ray-core (BETA)</string>
+    <string name="summary_pref_local_dns_enabled">DNS processed by core‘s DNS module (Recommended, if need routing Bypassing LAN and
+        mainland address)</string>
+
+    <string name="title_pref_fake_dns_enabled">Enable fake DNS</string>
+    <string name="summary_pref_fake_dns_enabled">local DNS returns fake IP address (faster, but it may not work for some apps)</string>
 
     <string name="title_pref_forward_ipv6">IPv6 Route</string>
     <string name="summary_pref_forward_ipv6">Redirect IPv6 traffic to remote (BETA)</string>
@@ -109,7 +114,9 @@
     <string name="title_pref_remote_dns">Remote DNS (Optional)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
-    <string name="title_pref_domestic_dns">Domestic DNS (Optional, effects on LocalDNS mode)</string>
+    <string name="title_pref_vpn_dns">VPN DNS (only IPv4/v6)</string>
+
+    <string name="title_pref_domestic_dns">Domestic DNS (Optional)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
     <string name="title_pref_socks_port">SOCKS5 proxy port</string>
@@ -117,6 +124,9 @@
 
     <string name="title_pref_http_port">HTTP proxy port</string>
     <string name="summary_pref_http_port">HTTP proxy port</string>
+
+    <string name="title_pref_local_dns_port">Local DNS port</string>
+    <string name="summary_pref_local_dns_port">Local DNS port</string>
 
     <string name="title_pref_feedback">Feedback</string>
     <string name="summary_pref_feedback">Feedback enhancements or bugs to GitHub</string>

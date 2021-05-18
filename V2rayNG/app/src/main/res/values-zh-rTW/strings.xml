@@ -43,8 +43,9 @@
     <string name="server_lab_network">網路</string>
     <string name="server_lab_more_function">更多功能</string>
     <string name="server_lab_head_type">標頭類型</string>
+    <string name="server_lab_mode_type">gRPC 傳輸模式 (mode)</string>
     <string name="server_lab_request_host">要求主機(host)(host/ws host/h2 host)/QUIC加密方式</string>
-    <string name="server_lab_path">path(ws path/h2 path)/QUIC加密密鑰/kcp seed/grpc serviceName</string>
+    <string name="server_lab_path">path(ws path/h2 path)/QUIC加密密鑰/kcp seed/gRPC serviceName</string>
     <string name="server_lab_stream_security">傳輸層安全性(tls)</string>
     <string name="server_lab_allow_insecure">跳過證書驗證(allowInsecure)</string>
     <string name="server_lab_address3">伺服器位址</string>
@@ -77,7 +78,7 @@
     <!-- Preferences -->
     <string name="title_settings">設定</string>
     <string name="title_advanced">進階設定</string>
-
+    <string name="title_vpn_settings">VPN 設定</string>
     <string name="title_pref_per_app_proxy">Proxy 個別應用程式</string>
     <string name="summary_pref_per_app_proxy">Proxy 個別應用程式模式只支援 Android 5.0 (Lollipop) 或更高</string>
 
@@ -88,10 +89,13 @@
     <string name="summary_pref_speed_enabled">在通知中顯示當前速度\n小圖標顯示流量的路由情況</string>
 
     <string name="title_pref_sniffing_enabled">啟用流量探測</string>
-    <string name="summary_pref_sniffing_enabled">流量探測</string>
+    <string name="summary_pref_sniffing_enabled">從流量中探測域名 (默認啟用)</string>
 
     <string name="title_pref_local_dns_enabled">啟用本地DNS</string>
-    <string name="summary_pref_local_dns_enabled">DNS請求由本地的v2ray core處理（測試）</string>
+    <string name="summary_pref_local_dns_enabled">DNS 請求導入 core 由 DNS 模塊處理（推薦啟用 如果需要路由略過局域網及中國大陸）</string>
+
+    <string name="title_pref_fake_dns_enabled">啟用虛擬DNS</string>
+    <string name="summary_pref_fake_dns_enabled">本地返回虛構解析結果 (減低延時 但個別應用可能無法使用)</string>
 
     <string name="title_pref_forward_ipv6">IPv6 路由</string>
     <string name="summary_pref_forward_ipv6">向遠端重新導向 IPv6 流量（測試）</string>
@@ -108,7 +112,9 @@
     <string name="title_pref_remote_dns">遠端DNS (可選)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
-    <string name="title_pref_domestic_dns">境内DNS (可選，僅本地DNS模式下生效)</string>
+    <string name="title_pref_vpn_dns">VPN DNS (僅支持 IPv4/v6)</string>
+
+    <string name="title_pref_domestic_dns">境内DNS (可選)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
     <string name="title_pref_socks_port">SOCKS5代理連接埠</string>
@@ -117,6 +123,8 @@
     <string name="title_pref_http_port">HTTP代理連接埠</string>
     <string name="summary_pref_http_port">HTTP代理連接埠</string>
 
+    <string name="title_pref_local_dns_port">本地DNS端口</string>
+    <string name="summary_pref_local_dns_port">本地DNS端口</string>
 
     <string name="title_pref_feedback">回饋</string>
     <string name="summary_pref_feedback">回饋提升或前往 GitHub 回報 Bug</string>
