@@ -69,10 +69,10 @@ object V2rayConfigUtil {
 
         fakedns(v2rayConfig)
 
+        dns(v2rayConfig)
+
         if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
             customLocalDns(v2rayConfig)
-        } else {
-            customRemoteDns(v2rayConfig)
         }
         if (settingsStorage?.decodeBool(AppConfig.PREF_SPEED_ENABLED) != true) {
             v2rayConfig.stats = null
@@ -261,50 +261,19 @@ object V2rayConfigUtil {
      */
     private fun customLocalDns(v2rayConfig: V2rayConfig): Boolean {
         try {
-            val hosts = mutableMapOf<String, String>()
-            val servers = ArrayList<Any>()
-            val remoteDns = Utils.getRemoteDnsServers()
-            val domesticDns = Utils.getDomesticDnsServers()
-            val geositeCn = arrayListOf("geosite:cn")
-            val geoipCn = arrayListOf("geoip:cn")
-            val proxyDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                    ?: "")
-            val directDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                    ?: "")
-
             if (settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
+                val geositeCn = arrayListOf("geosite:cn")
+                val proxyDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
+                        ?: "")
+                val directDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
+                        ?: "")
                 // fakedns with all domains to make it always top priority
-                servers.add(V2rayConfig.DnsBean.ServersBean(address = "fakedns", domains = geositeCn.plus(proxyDomain).plus(directDomain)))
+                v2rayConfig.dns.servers?.add(0,
+                        V2rayConfig.DnsBean.ServersBean(address = "fakedns", domains = geositeCn.plus(proxyDomain).plus(directDomain)))
             }
-            remoteDns.forEach {
-                servers.add(it)
-            }
-            if (proxyDomain.size > 0) {
-                servers.add(V2rayConfig.DnsBean.ServersBean(remoteDns.first(), 53, proxyDomain, null))
-            }
-            if (directDomain.size > 0) {
-                servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, directDomain, geoipCn))
-            }
-            val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: "0"
-            if (routingMode == "2" || routingMode == "3") {
-                servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, geositeCn, geoipCn))
-            }
-
-            val blkDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
-                    ?: "")
-            if (blkDomain.size > 0) {
-                hosts.putAll(blkDomain.map { it to "127.0.0.1" })
-            }
-
-            // hardcode googleapi rule to fix play store problems
-            hosts.put("domain:googleapis.cn", "googleapis.com")
-
-            // DNS dns对象
-            v2rayConfig.dns = V2rayConfig.DnsBean(
-                    servers = servers,
-                    hosts = hosts)
 
             // DNS inbound对象
+            val remoteDns = Utils.getRemoteDnsServers()
             if (v2rayConfig.inbounds.none { e -> e.protocol == "dokodemo-door" && e.tag == "dns-in" }) {
                 val dnsInboundSettings = V2rayConfig.InboundBean.InSettingsBean(
                         address = if (remoteDns.first().startsWith("https")) "1.1.1.1" else remoteDns.first(),
@@ -333,16 +302,75 @@ object V2rayConfigUtil {
                                 mux = null))
             }
 
-            // DNS routing
-            if (!domesticDns.first().startsWith("https")) {
-                v2rayConfig.routing.rules.add(0, V2rayConfig.RoutingBean.RulesBean(
-                        type = "field",
-                        outboundTag = AppConfig.TAG_DIRECT,
-                        port = "53",
-                        ip = arrayListOf(domesticDns.first()),
-                        domain = null)
-                )
+            // DNS routing tag
+            v2rayConfig.routing.rules.add(0, V2rayConfig.RoutingBean.RulesBean(
+                    type = "field",
+                    inboundTag = arrayListOf("dns-in"),
+                    outboundTag = "dns-out",
+                    domain = null)
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+        return true
+    }
+
+    private fun dns(v2rayConfig: V2rayConfig): Boolean {
+        try {
+            val hosts = mutableMapOf<String, String>()
+            val servers = ArrayList<Any>()
+            val remoteDns = Utils.getRemoteDnsServers()
+            val proxyDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
+                    ?: "")
+
+            remoteDns.forEach {
+                servers.add(it)
             }
+            if (proxyDomain.size > 0) {
+                servers.add(V2rayConfig.DnsBean.ServersBean(remoteDns.first(), 53, proxyDomain, null))
+            }
+
+            // domestic DNS
+            val directDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
+                    ?: "")
+            val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: "0"
+            if (directDomain.size > 0 || routingMode == "2" || routingMode == "3") {
+                val domesticDns = Utils.getDomesticDnsServers()
+                val geositeCn = arrayListOf("geosite:cn")
+                val geoipCn = arrayListOf("geoip:cn")
+                if (directDomain.size > 0) {
+                    servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, directDomain, geoipCn))
+                }
+                if (routingMode == "2" || routingMode == "3") {
+                    servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, geositeCn, geoipCn))
+                }
+                if (!domesticDns.first().startsWith("https")) {
+                    v2rayConfig.routing.rules.add(0, V2rayConfig.RoutingBean.RulesBean(
+                            type = "field",
+                            outboundTag = AppConfig.TAG_DIRECT,
+                            port = "53",
+                            ip = arrayListOf(domesticDns.first()),
+                            domain = null)
+                    )
+                }
+            }
+
+            val blkDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
+                    ?: "")
+            if (blkDomain.size > 0) {
+                hosts.putAll(blkDomain.map { it to "127.0.0.1" })
+            }
+
+            // hardcode googleapi rule to fix play store problems
+            hosts.put("domain:googleapis.cn", "googleapis.com")
+
+            // DNS dns对象
+            v2rayConfig.dns = V2rayConfig.DnsBean(
+                    servers = servers,
+                    hosts = hosts)
+
+            // DNS routing
             if (!remoteDns.first().startsWith("https")) {
                 v2rayConfig.routing.rules.add(0, V2rayConfig.RoutingBean.RulesBean(
                         type = "field",
@@ -352,37 +380,6 @@ object V2rayConfigUtil {
                         domain = null)
                 )
             }
-
-            // DNS routing tag
-            v2rayConfig.routing.rules.add(0, V2rayConfig.RoutingBean.RulesBean(
-                    type = "field",
-                    inboundTag = arrayListOf("dns-in"),
-                    outboundTag = "dns-out",
-                    domain = null)
-            )
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return false
-        }
-        return true
-    }
-
-    /**
-     * Custom Remote Dns
-     */
-    private fun customRemoteDns(v2rayConfig: V2rayConfig): Boolean {
-        try {
-            val servers = ArrayList<Any>()
-            val hosts = mutableMapOf<String, String>()
-
-            Utils.getRemoteDnsServers().forEach {
-                servers.add(it)
-            }
-            // hardcode googleapi rule to fix play store problems
-            hosts.put("domain:googleapis.cn", "googleapis.com")
-
-            v2rayConfig.dns = V2rayConfig.DnsBean(servers = servers, hosts = hosts)
         } catch (e: Exception) {
             e.printStackTrace()
             return false
