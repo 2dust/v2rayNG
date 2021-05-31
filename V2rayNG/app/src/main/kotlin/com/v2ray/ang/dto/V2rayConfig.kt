@@ -369,7 +369,7 @@ data class V2rayConfig(
         }
     }
 
-    data class DnsBean(var servers: List<Any>? = null,
+    data class DnsBean(var servers: ArrayList<Any>? = null,
                        var hosts: Map<String, String>? = null,
                        val clientIp: String? = null,
                        val disableCache: Boolean? = null,

@@ -132,6 +132,6 @@
         <item>196.0.0.0/6</item>
         <item>200.0.0.0/5</item>
         <item>208.0.0.0/4</item>
-        <item>224.0.0.0/3</item>
+        <item>240.0.0.0/4</item>
     </string-array>
 </resources>
