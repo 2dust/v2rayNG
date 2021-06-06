@@ -192,6 +192,7 @@ object AngConfigManager {
                             return R.string.toast_decoding_failed
                         }
                         val vmessQRCode = Gson().fromJson(result, VmessQRCode::class.java)
+                        // Although VmessQRCode fields are non null, looks like Gson may still create null fields
                         if (TextUtils.isEmpty(vmessQRCode.add)
                                 || TextUtils.isEmpty(vmessQRCode.port)
                                 || TextUtils.isEmpty(vmessQRCode.id)
@@ -212,7 +213,7 @@ object AngConfigManager {
                         val sni = streamSetting.populateTransportSettings(vmessQRCode.net, vmessQRCode.type, vmessQRCode.host,
                                 vmessQRCode.path, vmessQRCode.path, vmessQRCode.host, vmessQRCode.path, vmessQRCode.type, vmessQRCode.path)
                         streamSetting.populateTlsSettings(vmessQRCode.tls, allowInsecure,
-                                if (vmessQRCode.sni.isNotBlank()) vmessQRCode.sni else sni)
+                                if (TextUtils.isEmpty(vmessQRCode.sni)) sni else vmessQRCode.sni)
                     }
                 }
             } else if (str.startsWith(EConfigType.SHADOWSOCKS.protocolScheme)) {
