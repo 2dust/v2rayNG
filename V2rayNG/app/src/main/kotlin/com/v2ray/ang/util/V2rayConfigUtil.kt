@@ -6,6 +6,7 @@ import android.util.Log
 import com.google.gson.*
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_NETWORK
@@ -30,12 +31,12 @@ object V2rayConfigUtil {
                 } else {
                     raw
                 }
-                Log.d("V2rayConfigUtilGoLog", customConfig)
+                Log.d(ANG_PACKAGE, customConfig)
                 return Result(true, customConfig)
             }
             val outbound = config.getProxyOutbound() ?: return Result(false, "")
             val result = getV2rayNonCustomConfig(context, outbound)
-            Log.d("V2rayConfigUtilGoLog", result.content)
+            Log.d(ANG_PACKAGE, result.content)
             return result
         } catch (e: Exception) {
             e.printStackTrace()

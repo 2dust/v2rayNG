@@ -15,6 +15,7 @@ import android.support.v4.app.NotificationCompat
 import android.util.Log
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.ServerConfig
@@ -26,6 +27,9 @@ import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
 import go.Seq
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import libv2ray.Libv2ray
 import libv2ray.V2RayPoint
 import libv2ray.V2RayVPNServiceSupportsSet
@@ -89,7 +93,7 @@ object V2RayServiceManager {
                 serviceControl.stopService()
                 0
             } catch (e: Exception) {
-                Log.d(serviceControl.getService().packageName, e.toString())
+                Log.d(ANG_PACKAGE, e.toString())
                 -1
             }
         }
@@ -117,7 +121,7 @@ object V2RayServiceManager {
                 startSpeedNotification()
                 0
             } catch (e: Exception) {
-                Log.d(serviceControl.getService().packageName, e.toString())
+                Log.d(ANG_PACKAGE, e.toString())
                 -1
             }
         }
@@ -140,7 +144,7 @@ object V2RayServiceManager {
                 mFilter.addAction(Intent.ACTION_USER_PRESENT)
                 service.registerReceiver(mMsgReceive, mFilter)
             } catch (e: Exception) {
-                Log.d(service.packageName, e.toString())
+                Log.d(ANG_PACKAGE, e.toString())
             }
 
             v2rayPoint.configureFileContent = result.content
@@ -153,7 +157,7 @@ object V2RayServiceManager {
             try {
                 v2rayPoint.runLoop()
             } catch (e: Exception) {
-                Log.d(service.packageName, e.toString())
+                Log.d(ANG_PACKAGE, e.toString())
             }
 
             if (v2rayPoint.isRunning) {
@@ -170,10 +174,12 @@ object V2RayServiceManager {
         val service = serviceControl?.get()?.getService() ?: return
 
         if (v2rayPoint.isRunning) {
-            try {
-                v2rayPoint.stopLoop()
-            } catch (e: Exception) {
-                Log.d(service.packageName, e.toString())
+            GlobalScope.launch(Dispatchers.Default) {
+                try {
+                    v2rayPoint.stopLoop()
+                } catch (e: Exception) {
+                    Log.d(ANG_PACKAGE, e.toString())
+                }
             }
         }
 
@@ -183,7 +189,7 @@ object V2RayServiceManager {
         try {
             service.unregisterReceiver(mMsgReceive)
         } catch (e: Exception) {
-            Log.d(service.packageName, e.toString())
+            Log.d(ANG_PACKAGE, e.toString())
         }
     }
 
@@ -215,11 +221,11 @@ object V2RayServiceManager {
 
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
-                    Log.d(AppConfig.ANG_PACKAGE, "SCREEN_OFF, stop querying stats")
+                    Log.d(ANG_PACKAGE, "SCREEN_OFF, stop querying stats")
                     stopSpeedNotification()
                 }
                 Intent.ACTION_SCREEN_ON -> {
-                    Log.d(AppConfig.ANG_PACKAGE, "SCREEN_ON, start querying stats")
+                    Log.d(ANG_PACKAGE, "SCREEN_ON, start querying stats")
                     startSpeedNotification()
                 }
             }
@@ -234,7 +240,7 @@ object V2RayServiceManager {
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
         val stopV2RayIntent = Intent(AppConfig.BROADCAST_ACTION_SERVICE)
-        stopV2RayIntent.`package` = AppConfig.ANG_PACKAGE
+        stopV2RayIntent.`package` = ANG_PACKAGE
         stopV2RayIntent.putExtra("key", AppConfig.MSG_STATE_STOP)
 
         val stopV2RayPendingIntent = PendingIntent.getBroadcast(service,

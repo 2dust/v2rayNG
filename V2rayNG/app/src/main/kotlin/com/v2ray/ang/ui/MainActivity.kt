@@ -20,6 +20,7 @@ import android.widget.Toast
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
@@ -410,7 +411,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 if (!Utils.isValidUrl(url)) {
                     return@forEach
                 }
-                Log.d("Main", url)
+                Log.d(ANG_PACKAGE, url)
                 GlobalScope.launch(Dispatchers.IO) {
                     val configText = try {
                         URL(url).readText()
