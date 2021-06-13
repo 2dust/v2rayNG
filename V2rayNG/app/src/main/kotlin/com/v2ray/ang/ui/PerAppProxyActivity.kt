@@ -25,6 +25,7 @@ import java.util.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
@@ -226,7 +227,7 @@ class PerAppProxyActivity : BaseActivity() {
                 ""
             }
             launch(Dispatchers.Main) {
-                Log.d("selectProxyApp", content)
+                Log.d(ANG_PACKAGE, content)
                 selectProxyApp(content)
                 toast(R.string.toast_success)
             }
@@ -250,7 +251,7 @@ class PerAppProxyActivity : BaseActivity() {
                 adapter?.let {
                     it.apps.forEach block@{
                         val packageName = it.packageName
-                        Log.d("selectProxyApp2", packageName)
+                        Log.d(ANG_PACKAGE, packageName)
                         if (proxyApps.indexOf(packageName) < 0) {
                             adapter?.blacklist!!.add(packageName)
                             println(packageName)
@@ -263,7 +264,7 @@ class PerAppProxyActivity : BaseActivity() {
                 adapter?.let {
                     it.apps.forEach block@{
                         val packageName = it.packageName
-                        Log.d("selectProxyApp3", packageName)
+                        Log.d(ANG_PACKAGE, packageName)
                         if (proxyApps.indexOf(packageName) >= 0) {
                             adapter?.blacklist!!.add(packageName)
                             println(packageName)

@@ -7,6 +7,7 @@ import android.text.method.ScrollingMovementMethod
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.Utils
@@ -48,7 +49,7 @@ class LogcatActivity : BaseActivity() {
                 lst.add("-v")
                 lst.add("time")
                 lst.add("-s")
-                lst.add("GoLog,tun2socks,com.v2ray.ang")
+                lst.add("GoLog,tun2socks,${ANG_PACKAGE},AndroidRuntime,System.err")
                 val process = Runtime.getRuntime().exec(lst.toTypedArray())
 //                val bufferedReader = BufferedReader(
 //                        InputStreamReader(process.inputStream))
