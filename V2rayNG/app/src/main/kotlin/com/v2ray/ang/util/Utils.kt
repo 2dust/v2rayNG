@@ -102,9 +102,14 @@ object Utils {
         try {
             return Base64.decode(text, Base64.NO_WRAP).toString(charset("UTF-8"))
         } catch (e: Exception) {
-            e.printStackTrace()
-            return ""
+            Log.i(AppConfig.ANG_PACKAGE, "Parse base64 standard failed $e")
         }
+        try {
+            return Base64.decode(text, Base64.NO_WRAP.or(Base64.URL_SAFE)).toString(charset("UTF-8"))
+        } catch (e: Exception) {
+            Log.i(AppConfig.ANG_PACKAGE, "Parse base64 url safe failed $e")
+        }
+        return ""
     }
 
     /**
