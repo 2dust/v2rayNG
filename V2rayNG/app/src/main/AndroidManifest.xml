@@ -28,6 +28,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> -->
 
+    <uses-sdk tools:overrideLibrary="com.blacksquircle.ui.editorkit, com.blacksquircle.ui.language.json, com.blacksquircle.ui.language.base"/>
+
     <application
         android:name=".AngApplication"
         android:allowBackup="true"
