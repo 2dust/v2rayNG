@@ -6,7 +6,7 @@ import android.view.MenuItem
 import com.v2ray.ang.R
 import kotlinx.android.synthetic.main.activity_sub_setting.*
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.util.MmkvManager
 
