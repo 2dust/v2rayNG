@@ -1,9 +1,9 @@
 package com.v2ray.ang.viewmodel
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
+import androidx.lifecycle.AndroidViewModel
 import android.content.SharedPreferences
-import android.support.v7.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.util.Log
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig

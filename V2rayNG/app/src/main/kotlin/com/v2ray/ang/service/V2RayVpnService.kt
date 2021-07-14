@@ -8,7 +8,7 @@ import android.net.*
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.StrictMode
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import android.util.Log
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig

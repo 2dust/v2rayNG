@@ -1,11 +1,12 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import com.blacksquircle.ui.language.json.JsonLanguage
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
@@ -34,6 +35,7 @@ class ServerCustomConfigActivity : BaseActivity() {
         setContentView(R.layout.activity_server_custom_config)
         title = getString(R.string.title_server)
 
+        editor.language = JsonLanguage()
         val config = MmkvManager.decodeServerConfig(editGuid)
         if (config != null) {
             bindingServer(config)
@@ -50,9 +52,9 @@ class ServerCustomConfigActivity : BaseActivity() {
         et_remarks.text = Utils.getEditable(config.remarks)
         val raw = serverRawStorage?.decodeString(editGuid)
         if (raw.isNullOrBlank()) {
-            tv_content.text = Utils.getEditable(config.fullConfig?.toPrettyPrinting().orEmpty())
+            editor.setTextContent(Utils.getEditable(config.fullConfig?.toPrettyPrinting().orEmpty()))
         } else {
-            tv_content.text = Utils.getEditable(raw)
+            editor.setTextContent(Utils.getEditable(raw))
         }
         return true
     }
@@ -75,7 +77,7 @@ class ServerCustomConfigActivity : BaseActivity() {
         }
 
         val v2rayConfig = try {
-            Gson().fromJson(tv_content.text.toString(), V2rayConfig::class.java)
+            Gson().fromJson(editor.text.toString(), V2rayConfig::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
             ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
@@ -87,7 +89,7 @@ class ServerCustomConfigActivity : BaseActivity() {
         config.fullConfig = v2rayConfig
 
         MmkvManager.encodeServerConfig(editGuid, config)
-        serverRawStorage?.encode(editGuid, tv_content.text.toString())
+        serverRawStorage?.encode(editGuid, editor.text.toString())
         toast(R.string.toast_success)
         finish()
         return true

@@ -76,21 +76,21 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
 
     // Androidx ktx
-    implementation 'android.arch.lifecycle:extensions:1.1.1'
-    implementation 'android.arch.lifecycle:livedata:1.1.1'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.0.0'
 
     // Android support library
-    implementation "com.android.support:support-v4:$supportLibVersion"
-    implementation "com.android.support:appcompat-v7:$supportLibVersion"
-    implementation "com.android.support:design:$supportLibVersion"
-    implementation "com.android.support:cardview-v7:$supportLibVersion"
-    implementation "com.android.support:preference-v7:$supportLibVersion"
-    implementation "com.android.support:recyclerview-v7:$supportLibVersion"
-    implementation "com.android.support:multidex:1.0.3"
-    implementation 'com.android.support.constraint:constraint-layout:2.0.1'
+    implementation "androidx.legacy:legacy-support-v4:$supportLibVersion"
+    implementation "androidx.appcompat:appcompat:$supportLibVersion"
+    implementation "com.google.android.material:material:$supportLibVersion"
+    implementation "androidx.cardview:cardview:$supportLibVersion"
+    implementation "androidx.preference:preference:$supportLibVersion"
+    implementation "androidx.recyclerview:recyclerview:$supportLibVersion"
+    implementation 'androidx.multidex:multidex:2.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
     // DSL
-    implementation 'com.tencent:mmkv-static:1.0.19'
+    implementation 'com.tencent:mmkv-static:1.2.7'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'io.reactivex:rxjava:1.3.4'
     implementation 'io.reactivex:rxandroid:1.2.1'
@@ -99,6 +99,8 @@ dependencies {
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
     implementation 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
     implementation 'me.drakeet.support:toastcompat:1.1.0'
+    implementation 'com.blacksquircle.ui:editorkit:2.0.0'
+    implementation 'com.blacksquircle.ui:language-json:2.0.0'
 
     implementation(name: 'libv2ray', ext: 'aar')
     //implementation(name: 'tun2socks', ext: 'aar')

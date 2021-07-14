@@ -7,7 +7,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical">
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
@@ -24,7 +24,7 @@
             android:focusable="true"
             android:nextFocusRight="@+id/layout_share">
 
-            <android.support.v7.widget.AppCompatRadioButton
+            <androidx.appcompat.widget.AppCompatRadioButton
                     android:id="@+id/btn_radio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -182,5 +182,5 @@
             </LinearLayout>
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

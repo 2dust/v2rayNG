@@ -3,7 +3,7 @@ package com.v2ray.ang.ui
 import android.graphics.Color
 import android.os.Bundle
 import com.v2ray.ang.R
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.v2ray.ang.AppConfig
 import kotlinx.android.synthetic.main.activity_routing_settings.*
 
