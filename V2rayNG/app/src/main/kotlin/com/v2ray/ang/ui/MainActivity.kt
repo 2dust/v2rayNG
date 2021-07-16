@@ -417,6 +417,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         URL(url).readText()
                     } catch (e: Exception) {
                         e.printStackTrace()
+                        return@launch
                         ""
                     }
                     launch(Dispatchers.Main) {
