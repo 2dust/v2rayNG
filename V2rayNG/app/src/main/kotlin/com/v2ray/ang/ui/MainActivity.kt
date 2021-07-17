@@ -380,7 +380,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     URL(url).readText()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    ""
                 }
                 launch(Dispatchers.Main) {
                     importCustomizeConfig(configText)
@@ -418,7 +417,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     } catch (e: Exception) {
                         e.printStackTrace()
                         return@launch
-                        ""
                     }
                     launch(Dispatchers.Main) {
                         importBatchConfig(Utils.decode(configText), it.first)
