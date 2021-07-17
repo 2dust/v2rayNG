@@ -380,6 +380,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     URL(url).readText()
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    ""
                 }
                 launch(Dispatchers.Main) {
                     importCustomizeConfig(configText)
