@@ -45,7 +45,7 @@ class RoutingSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val content = defaultSharedPreferences.getString(arguments!!.getString(routing_arg), "")
+        val content = defaultSharedPreferences.getString(requireArguments().getString(routing_arg), "")
         et_routing_content.text = Utils.getEditable(content!!)
 
         setHasOptionsMenu(true)
@@ -59,7 +59,7 @@ class RoutingSettingsFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.save_routing -> {
             val content = et_routing_content.text.toString()
-            defaultSharedPreferences.edit().putString(arguments!!.getString(routing_arg), content).apply()
+            defaultSharedPreferences.edit().putString(requireArguments().getString(routing_arg), content).apply()
             activity?.toast(R.string.toast_success)
             true
         }
@@ -88,7 +88,7 @@ class RoutingSettingsFragment : Fragment() {
 //                    .addCategory(Intent.CATEGORY_DEFAULT)
 //                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP), requestCode)
 //        } catch (e: Exception) {
-        RxPermissions(activity!!)
+        RxPermissions(requireActivity())
                 .request(Manifest.permission.CAMERA)
                 .subscribe {
                     if (it)
@@ -102,7 +102,7 @@ class RoutingSettingsFragment : Fragment() {
 
     fun setDefaultRules(): Boolean {
         var url = AppConfig.v2rayCustomRoutingListUrl
-        when (arguments!!.getString(routing_arg)) {
+        when (requireArguments().getString(routing_arg)) {
             AppConfig.PREF_V2RAY_ROUTING_AGENT -> {
                 url += AppConfig.TAG_AGENT
             }
