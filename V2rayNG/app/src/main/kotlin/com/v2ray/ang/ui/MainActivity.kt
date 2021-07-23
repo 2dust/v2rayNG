@@ -23,6 +23,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
@@ -31,7 +32,6 @@ import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -49,6 +49,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         private const val REQUEST_FILE_CHOOSER = 2
         private const val REQUEST_SCAN_URL = 3
     }
+    private lateinit var binding: ActivityMainBinding
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
@@ -58,11 +59,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         title = getString(R.string.title_server)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
 
-        fab.setOnClickListener {
+        binding.fab.setOnClickListener {
             if (mainViewModel.isRunning.value == true) {
                 Utils.stopVService(this)
             } else if (settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN" == "VPN") {
@@ -76,30 +79,30 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 startV2Ray()
             }
         }
-        layout_test.setOnClickListener {
+        binding.layoutTest.setOnClickListener {
             if (mainViewModel.isRunning.value == true) {
-                tv_test_state.text = getString(R.string.connection_test_testing)
+                binding.tvTestState.text = getString(R.string.connection_test_testing)
                 mainViewModel.testCurrentServerRealPing()
             } else {
 //                tv_test_state.text = getString(R.string.connection_test_fail)
             }
         }
 
-        recycler_view.setHasFixedSize(true)
-        recycler_view.layoutManager = LinearLayoutManager(this)
-        recycler_view.adapter = adapter
+        binding.recyclerView.setHasFixedSize(true)
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = adapter
 
         val callback = SimpleItemTouchHelperCallback(adapter)
         mItemTouchHelper = ItemTouchHelper(callback)
-        mItemTouchHelper?.attachToRecyclerView(recycler_view)
+        mItemTouchHelper?.attachToRecyclerView(binding.recyclerView)
 
 
         val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer_layout.addDrawerListener(toggle)
+                this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-        nav_view.setNavigationItemSelectedListener(this)
-        version.text = "v${BuildConfig.VERSION_NAME} (${Libv2ray.checkVersionX()})"
+        binding.navView.setNavigationItemSelectedListener(this)
+        binding.version.text = "v${BuildConfig.VERSION_NAME} (${Libv2ray.checkVersionX()})"
 
         setupViewModelObserver()
         migrateLegacy()
@@ -114,18 +117,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 adapter.notifyDataSetChanged()
             }
         })
-        mainViewModel.updateTestResultAction.observe(this, { tv_test_state.text = it })
+        mainViewModel.updateTestResultAction.observe(this, { binding.tvTestState.text = it })
         mainViewModel.isRunning.observe(this, {
             val isRunning = it ?: return@observe
             adapter.isRunning = isRunning
             if (isRunning) {
-                fab.setImageResource(R.drawable.ic_v)
-                tv_test_state.text = getString(R.string.connection_connected)
-                layout_test.isFocusable = true
+                binding.fab.setImageResource(R.drawable.ic_v)
+                binding.tvTestState.text = getString(R.string.connection_connected)
+                binding.layoutTest.isFocusable = true
             } else {
-                fab.setImageResource(R.drawable.ic_v_idle)
-                tv_test_state.text = getString(R.string.connection_not_connected)
-                layout_test.isFocusable = false
+                binding.fab.setImageResource(R.drawable.ic_v_idle)
+                binding.tvTestState.text = getString(R.string.connection_not_connected)
+                binding.layoutTest.isFocusable = false
             }
             hideCircle()
         })
@@ -505,7 +508,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     fun showCircle() {
-        fabProgressCircle?.show()
+        binding.fabProgressCircle?.show()
     }
 
     fun hideCircle() {
@@ -513,8 +516,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             Observable.timer(300, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
-                        if (fabProgressCircle.isShown) {
-                            fabProgressCircle.hide()
+                        if (binding.fabProgressCircle.isShown) {
+                            binding.fabProgressCircle.hide()
                         }
                     }
         } catch (e: Exception) {
@@ -522,8 +525,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     override fun onBackPressed() {
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-            drawer_layout.closeDrawer(GravityCompat.START)
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
         } else {
             super.onBackPressed()
         }
@@ -553,7 +556,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 startActivity(Intent(this, LogcatActivity::class.java))
             }
         }
-        drawer_layout.closeDrawer(GravityCompat.START)
+        binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
 }

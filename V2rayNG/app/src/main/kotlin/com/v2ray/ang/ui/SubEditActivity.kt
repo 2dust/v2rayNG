@@ -8,13 +8,14 @@ import android.view.MenuItem
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
+import com.v2ray.ang.databinding.ActivitySubEditBinding
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
-import kotlinx.android.synthetic.main.activity_sub_edit.*
 
 class SubEditActivity : BaseActivity() {
+    private lateinit var binding: ActivitySubEditBinding
 
     var del_config: MenuItem? = null
     var save_config: MenuItem? = null
@@ -24,7 +25,9 @@ class SubEditActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sub_edit)
+        binding = ActivitySubEditBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         title = getString(R.string.title_sub_setting)
 
         val json = subStorage?.decodeString(editSubId)
@@ -40,8 +43,8 @@ class SubEditActivity : BaseActivity() {
      * bingding seleced server config
      */
     private fun bindingServer(subItem: SubscriptionItem): Boolean {
-        et_remarks.text = Utils.getEditable(subItem.remarks)
-        et_url.text = Utils.getEditable(subItem.url)
+        binding.etRemarks.text = Utils.getEditable(subItem.remarks)
+        binding.etUrl.text = Utils.getEditable(subItem.url)
 
         return true
     }
@@ -50,8 +53,8 @@ class SubEditActivity : BaseActivity() {
      * clear or init server config
      */
     private fun clearServer(): Boolean {
-        et_remarks.text = null
-        et_url.text = null
+        binding.etRemarks.text = null
+        binding.etUrl.text = null
 
         return true
     }
@@ -70,8 +73,8 @@ class SubEditActivity : BaseActivity() {
             subItem = SubscriptionItem()
         }
 
-        subItem.remarks = et_remarks.text.toString()
-        subItem.url = et_url.text.toString()
+        subItem.remarks = binding.etRemarks.text.toString()
+        subItem.url = binding.etUrl.text.toString()
 
         if (TextUtils.isEmpty(subItem.remarks)) {
             toast(R.string.sub_setting_remarks)

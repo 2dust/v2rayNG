@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.v2ray.ang.R
+import com.v2ray.ang.databinding.ItemRecyclerBypassListBinding
 import com.v2ray.ang.dto.AppInfo
-import kotlinx.android.synthetic.main.item_recycler_bypass_list.view.*
 import java.util.*
 
 class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, blacklist: MutableSet<String>?) :
@@ -18,8 +18,7 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
         private const val VIEW_TYPE_ITEM = 1
     }
 
-    private var mActivity: BaseActivity = activity
-    val blacklist = if (blacklist == null) HashSet<String>() else HashSet<String>(blacklist)
+    val blacklist = if (blacklist == null) HashSet() else HashSet(blacklist)
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         if (holder is AppViewHolder) {
@@ -43,8 +42,7 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
 //            VIEW_TYPE_ITEM -> AppViewHolder(ctx.layoutInflater
 //                    .inflate(R.layout.item_recycler_bypass_list, parent, false))
 
-            else -> AppViewHolder(LayoutInflater.from(ctx)
-                    .inflate(R.layout.item_recycler_bypass_list, parent, false))
+            else -> AppViewHolder(ItemRecyclerBypassListBinding.inflate(LayoutInflater.from(ctx), parent, false))
 
         }
     }
@@ -53,30 +51,25 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
 
     open class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    inner class AppViewHolder(itemView: View) : BaseViewHolder(itemView),
+    inner class AppViewHolder(private val itemBypassBinding: ItemRecyclerBypassListBinding) : BaseViewHolder(itemBypassBinding.root),
             View.OnClickListener {
         private val inBlacklist: Boolean get() = blacklist.contains(appInfo.packageName)
         private lateinit var appInfo: AppInfo
 
-        val icon = itemView.icon!!
-        val name = itemView.name!!
-        val package_name = itemView.package_name!!
-        val checkBox = itemView.check_box!!
-
         fun bind(appInfo: AppInfo) {
             this.appInfo = appInfo
 
-            icon.setImageDrawable(appInfo.appIcon)
+            itemBypassBinding.icon.setImageDrawable(appInfo.appIcon)
 //            name.text = appInfo.appName
 
-            checkBox.isChecked = inBlacklist
-            package_name.text = appInfo.packageName
+            itemBypassBinding.checkBox.isChecked = inBlacklist
+            itemBypassBinding.packageName.text = appInfo.packageName
             if (appInfo.isSystemApp) {
-                name.text = String.format("** %1s", appInfo.appName)
-                name.setTextColor(Color.RED)
+                itemBypassBinding.name.text = String.format("** %1s", appInfo.appName)
+                itemBypassBinding.name.setTextColor(Color.RED)
             } else {
-                name.text = appInfo.appName
-                name.setTextColor(Color.DKGRAY)
+                itemBypassBinding.name.text = appInfo.appName
+                itemBypassBinding.name.setTextColor(Color.DKGRAY)
             }
 
             itemView.setOnClickListener(this)
@@ -85,10 +78,10 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
         override fun onClick(v: View?) {
             if (inBlacklist) {
                 blacklist.remove(appInfo.packageName)
-                checkBox.isChecked = false
+                itemBypassBinding.checkBox.isChecked = false
             } else {
                 blacklist.add(appInfo.packageName)
-                checkBox.isChecked = true
+                itemBypassBinding.checkBox.isChecked = true
             }
         }
     }
