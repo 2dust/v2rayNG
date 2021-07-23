@@ -64,6 +64,10 @@ android {
                             1000000 + android.defaultConfig.versionCode
         }
     }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
