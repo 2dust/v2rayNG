@@ -10,16 +10,17 @@ import com.blacksquircle.ui.language.json.JsonLanguage
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
+import com.v2ray.ang.databinding.ActivityServerCustomConfigBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
-import kotlinx.android.synthetic.main.activity_server_custom_config.*
 import me.drakeet.support.toast.ToastCompat
 
 class ServerCustomConfigActivity : BaseActivity() {
+    private lateinit var binding: ActivityServerCustomConfigBinding
 
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
@@ -32,10 +33,12 @@ class ServerCustomConfigActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_server_custom_config)
+        binding = ActivityServerCustomConfigBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         title = getString(R.string.title_server)
 
-        editor.language = JsonLanguage()
+        binding.editor.language = JsonLanguage()
         val config = MmkvManager.decodeServerConfig(editGuid)
         if (config != null) {
             bindingServer(config)
@@ -49,12 +52,12 @@ class ServerCustomConfigActivity : BaseActivity() {
      * bingding seleced server config
      */
     private fun bindingServer(config: ServerConfig): Boolean {
-        et_remarks.text = Utils.getEditable(config.remarks)
+        binding.etRemarks.text = Utils.getEditable(config.remarks)
         val raw = serverRawStorage?.decodeString(editGuid)
         if (raw.isNullOrBlank()) {
-            editor.setTextContent(Utils.getEditable(config.fullConfig?.toPrettyPrinting().orEmpty()))
+            binding.editor.setTextContent(Utils.getEditable(config.fullConfig?.toPrettyPrinting().orEmpty()))
         } else {
-            editor.setTextContent(Utils.getEditable(raw))
+            binding.editor.setTextContent(Utils.getEditable(raw))
         }
         return true
     }
@@ -63,7 +66,7 @@ class ServerCustomConfigActivity : BaseActivity() {
      * clear or init server config
      */
     private fun clearServer(): Boolean {
-        et_remarks.text = null
+        binding.etRemarks.text = null
         return true
     }
 
@@ -71,13 +74,13 @@ class ServerCustomConfigActivity : BaseActivity() {
      * save server config
      */
     private fun saveServer(): Boolean {
-        if (TextUtils.isEmpty(et_remarks.text.toString())) {
+        if (TextUtils.isEmpty(binding.etRemarks.text.toString())) {
             toast(R.string.server_lab_remarks)
             return false
         }
 
         val v2rayConfig = try {
-            Gson().fromJson(editor.text.toString(), V2rayConfig::class.java)
+            Gson().fromJson(binding.editor.text.toString(), V2rayConfig::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
             ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
@@ -85,11 +88,11 @@ class ServerCustomConfigActivity : BaseActivity() {
         }
 
         val config = MmkvManager.decodeServerConfig(editGuid) ?: ServerConfig.create(EConfigType.CUSTOM)
-        config.remarks = et_remarks.text.toString().trim()
+        config.remarks = binding.etRemarks.text.toString().trim()
         config.fullConfig = v2rayConfig
 
         MmkvManager.encodeServerConfig(editGuid, config)
-        serverRawStorage?.encode(editGuid, editor.text.toString())
+        serverRawStorage?.encode(editGuid, binding.editor.text.toString())
         toast(R.string.toast_success)
         finish()
         return true
