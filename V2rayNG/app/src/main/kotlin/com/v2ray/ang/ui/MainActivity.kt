@@ -17,6 +17,7 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
@@ -43,17 +44,16 @@ import java.net.URL
 import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
-    companion object {
-        private const val REQUEST_CODE_VPN_PREPARE = 0
-        private const val REQUEST_SCAN = 1
-        private const val REQUEST_FILE_CHOOSER = 2
-        private const val REQUEST_SCAN_URL = 3
-    }
     private lateinit var binding: ActivityMainBinding
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
+    private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            startV2Ray()
+        }
+    }
     private var mItemTouchHelper: ItemTouchHelper? = null
     val mainViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
 
@@ -73,7 +73,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 if (intent == null) {
                     startV2Ray()
                 } else {
-                    startActivityForResult(intent, REQUEST_CODE_VPN_PREPARE)
+                    requestVpnPermission.launch(intent)
                 }
             } else {
                 startV2Ray()
@@ -170,30 +170,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         super.onPause()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            REQUEST_CODE_VPN_PREPARE ->
-                if (resultCode == RESULT_OK) {
-                    startV2Ray()
-                }
-            REQUEST_SCAN ->
-                if (resultCode == RESULT_OK) {
-                    importBatchConfig(data?.getStringExtra("SCAN_RESULT"))
-                }
-            REQUEST_FILE_CHOOSER -> {
-                val uri = data?.data
-                if (resultCode == RESULT_OK && uri != null) {
-                    readContentFromUri(uri)
-                }
-            }
-            REQUEST_SCAN_URL ->
-                if (resultCode == RESULT_OK) {
-                    importConfigCustomUrl(data?.getStringExtra("SCAN_RESULT"))
-                }
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
@@ -201,7 +177,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.import_qrcode -> {
-            importQRcode(REQUEST_SCAN)
+            importQRcode(true)
             true
         }
         R.id.import_clipboard -> {
@@ -236,7 +212,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
         R.id.import_config_custom_url_scan -> {
-            importQRcode(REQUEST_SCAN_URL)
+            importQRcode(false)
             true
         }
 
@@ -279,7 +255,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     /**
      * import config from qrcode
      */
-    fun importQRcode(requestCode: Int): Boolean {
+    fun importQRcode(forConfig: Boolean): Boolean {
 //        try {
 //            startActivityForResult(Intent("com.google.zxing.client.android.SCAN")
 //                    .addCategory(Intent.CATEGORY_DEFAULT)
@@ -289,12 +265,27 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .request(Manifest.permission.CAMERA)
                 .subscribe {
                     if (it)
-                        startActivityForResult(Intent(this, ScannerActivity::class.java), requestCode)
+                        if (forConfig)
+                            scanQRCodeForConfig.launch(Intent(this, ScannerActivity::class.java))
+                        else
+                            scanQRCodeForUrlToCustomConfig.launch(Intent(this, ScannerActivity::class.java))
                     else
                         toast(R.string.toast_permission_denied)
                 }
 //        }
         return true
+    }
+
+    private val scanQRCodeForConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            importBatchConfig(it.data?.getStringExtra("SCAN_RESULT"))
+        }
+    }
+
+    private val scanQRCodeForUrlToCustomConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            importConfigCustomUrl(it.data?.getStringExtra("SCAN_RESULT"))
+        }
     }
 
     /**
@@ -443,11 +434,16 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         intent.addCategory(Intent.CATEGORY_OPENABLE)
 
         try {
-            startActivityForResult(
-                    Intent.createChooser(intent, getString(R.string.title_file_chooser)),
-                    REQUEST_FILE_CHOOSER)
+            chooseFileForCustomConfig.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
         } catch (ex: android.content.ActivityNotFoundException) {
             toast(R.string.toast_require_file_manager)
+        }
+    }
+
+    private val chooseFileForCustomConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        val uri = it.data?.data
+        if (it.resultCode == RESULT_OK && uri != null) {
+            readContentFromUri(uri)
         }
     }
 

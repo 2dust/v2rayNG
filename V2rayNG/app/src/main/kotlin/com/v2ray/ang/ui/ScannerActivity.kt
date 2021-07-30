@@ -9,6 +9,7 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.zxing.BarcodeFormat
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.v2ray.ang.R
@@ -16,10 +17,6 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.QRCodeDecoder
 
 class ScannerActivity : BaseActivity(), ZXingScannerView.ResultHandler {
-    companion object {
-        private const val REQUEST_FILE_CHOOSER = 2
-    }
-
 
     private var mScannerView: ZXingScannerView? = null
 
@@ -59,7 +56,7 @@ class ScannerActivity : BaseActivity(), ZXingScannerView.ResultHandler {
 //        mScannerView!!.resumeCameraPreview(this)
     }
 
-    fun finished(text: String) {
+    private fun finished(text: String) {
         val intent = Intent()
         intent.putExtra("SCAN_RESULT", text)
         setResult(Activity.RESULT_OK, intent)
@@ -97,30 +94,22 @@ class ScannerActivity : BaseActivity(), ZXingScannerView.ResultHandler {
         //intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
 
         try {
-            startActivityForResult(
-                    Intent.createChooser(intent, getString(R.string.title_file_chooser)),
-                    REQUEST_FILE_CHOOSER)
+            chooseFile.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
         } catch (ex: android.content.ActivityNotFoundException) {
             toast(R.string.toast_require_file_manager)
         }
     }
 
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            REQUEST_FILE_CHOOSER -> {
-                val uri = data?.data
-                if (resultCode == RESULT_OK && uri != null) {
-                    try {
-                        val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
-                        val text = QRCodeDecoder.syncDecodeQRCode(bitmap)
-                        finished(text)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        toast(e.message.toString())
-                    }
-                }
+    private val chooseFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        val uri = it.data?.data
+        if (it.resultCode == RESULT_OK && uri != null) {
+            try {
+                val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
+                val text = QRCodeDecoder.syncDecodeQRCode(bitmap)
+                finished(text)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                toast(e.message.toString())
             }
         }
     }

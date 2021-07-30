@@ -11,6 +11,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.util.Utils
 import kotlinx.android.synthetic.main.fragment_routing_settings.*
 import android.view.MenuInflater
+import androidx.activity.result.contract.ActivityResultContracts
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.extension.toast
@@ -22,8 +23,6 @@ import java.net.URL
 class RoutingSettingsFragment : Fragment() {
     companion object {
         private const val routing_arg = "routing_arg"
-        private const val REQUEST_SCAN_REPLACE = 11
-        private const val REQUEST_SCAN_APPEND = 12
     }
 
     val defaultSharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
@@ -68,11 +67,11 @@ class RoutingSettingsFragment : Fragment() {
             true
         }
         R.id.scan_replace -> {
-            scanQRcode(REQUEST_SCAN_REPLACE)
+            scanQRcode(true)
             true
         }
         R.id.scan_append -> {
-            scanQRcode(REQUEST_SCAN_APPEND)
+            scanQRcode(false)
             true
         }
         R.id.default_rules -> {
@@ -82,7 +81,7 @@ class RoutingSettingsFragment : Fragment() {
         else -> super.onOptionsItemSelected(item)
     }
 
-    fun scanQRcode(requestCode: Int): Boolean {
+    fun scanQRcode(forReplace: Boolean): Boolean {
 //        try {
 //            startActivityForResult(Intent("com.google.zxing.client.android.SCAN")
 //                    .addCategory(Intent.CATEGORY_DEFAULT)
@@ -92,12 +91,29 @@ class RoutingSettingsFragment : Fragment() {
                 .request(Manifest.permission.CAMERA)
                 .subscribe {
                     if (it)
-                        startActivityForResult(Intent(activity, ScannerActivity::class.java), requestCode)
+                        if (forReplace)
+                            scanQRCodeForReplace.launch(Intent(activity, ScannerActivity::class.java))
+                        else
+                            scanQRCodeForAppend.launch(Intent(activity, ScannerActivity::class.java))
                     else
                         activity?.toast(R.string.toast_permission_denied)
                 }
 //        }
         return true
+    }
+
+    private val scanQRCodeForReplace = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            val content = it.data?.getStringExtra("SCAN_RESULT")
+            et_routing_content.text = Utils.getEditable(content!!)
+        }
+    }
+
+    private val scanQRCodeForAppend = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            val content = it.data?.getStringExtra("SCAN_RESULT")
+            et_routing_content.text = Utils.getEditable("${et_routing_content.text},$content")
+        }
     }
 
     fun setDefaultRules(): Boolean {
@@ -129,22 +145,4 @@ class RoutingSettingsFragment : Fragment() {
         }
         return true
     }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            REQUEST_SCAN_REPLACE ->
-                if (resultCode == RESULT_OK) {
-                    val content = data?.getStringExtra("SCAN_RESULT")
-                    et_routing_content.text = Utils.getEditable(content!!)
-                }
-            REQUEST_SCAN_APPEND ->
-                if (resultCode == RESULT_OK) {
-                    val content = data?.getStringExtra("SCAN_RESULT")
-                    et_routing_content.text = Utils.getEditable("${et_routing_content.text},$content")
-                }
-        }
-    }
-
-
 }
