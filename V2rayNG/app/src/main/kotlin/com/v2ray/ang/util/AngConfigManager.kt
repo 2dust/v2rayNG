@@ -245,7 +245,7 @@ object AngConfigManager {
                     server.address = match.groupValues[3].removeSurrounding("[", "]")
                     server.port = match.groupValues[4].toInt()
                     server.password = match.groupValues[2]
-                    server.method = match.groupValues[1].toLowerCase()
+                    server.method = match.groupValues[1].lowercase()
                 }
             } else if (str.startsWith(EConfigType.SOCKS.protocolScheme)) {
                 var result = str.replace(EConfigType.SOCKS.protocolScheme, "")
@@ -276,7 +276,7 @@ object AngConfigManager {
                     server.address = match.groupValues[3].removeSurrounding("[", "]")
                     server.port = match.groupValues[4].toInt()
                     val socksUsersBean = V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
-                    socksUsersBean.user = match.groupValues[1].toLowerCase()
+                    socksUsersBean.user = match.groupValues[1].lowercase()
                     socksUsersBean.pass = match.groupValues[2]
                     server.users = listOf(socksUsersBean)
                 }

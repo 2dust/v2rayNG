@@ -75,7 +75,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             } else if (config.configType == EConfigType.VLESS) {
                 holder.itemMainBinding.tvType.text = config.configType.name
             } else {
-                holder.itemMainBinding.tvType.text = config.configType.name.toLowerCase()
+                holder.itemMainBinding.tvType.text = config.configType.name.lowercase()
             }
             holder.itemMainBinding.tvStatistics.text = "${outbound?.getServerAddress()} : ${outbound?.getServerPort()}"
 
