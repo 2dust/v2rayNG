@@ -1,11 +1,11 @@
 package com.v2ray.ang.ui
 
-import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import androidx.preference.*
 import android.text.TextUtils
 import android.view.View
+import androidx.activity.viewModels
 import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.extension.toast
@@ -14,8 +14,7 @@ import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.SettingsViewModel
 
 class SettingsActivity : BaseActivity() {
-
-    private val settingsViewModel by lazy { ViewModelProviders.of(this).get(SettingsViewModel::class.java) }
+    private val settingsViewModel: SettingsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
