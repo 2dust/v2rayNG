@@ -152,13 +152,13 @@ class PerAppProxyActivity : BaseActivity() {
         }
         binding.switchBypassApps.isChecked = defaultSharedPreferences.getBoolean(AppConfig.PREF_BYPASS_APPS, false)
 
-        binding.etSearch.setOnEditorActionListener { v, actionId, event ->
+        binding.etSearch.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 //hide
                 var imm: InputMethodManager = v.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
 
-                val key = v.text.toString().toUpperCase()
+                val key = v.text.toString().uppercase()
                 val apps = ArrayList<AppInfo>()
                 if (TextUtils.isEmpty(key)) {
                     appsAll?.forEach {
@@ -166,7 +166,7 @@ class PerAppProxyActivity : BaseActivity() {
                     }
                 } else {
                     appsAll?.forEach {
-                        if (it.appName.toUpperCase().indexOf(key) >= 0) {
+                        if (it.appName.uppercase().indexOf(key) >= 0) {
                             apps.add(it)
                         }
                     }

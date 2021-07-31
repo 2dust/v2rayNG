@@ -71,7 +71,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'], exclude: [])
     testImplementation 'junit:junit:4.13'
 
     // Androidx
@@ -83,8 +83,10 @@ dependencies {
     implementation "androidx.preference:preference:1.0.0"
     implementation "androidx.recyclerview:recyclerview:1.2.1"
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
 
     // Androidx ktx
+    implementation 'androidx.activity:activity-ktx:1.2.4'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
 
@@ -105,8 +107,6 @@ dependencies {
     implementation 'me.drakeet.support:toastcompat:1.1.0'
     implementation 'com.blacksquircle.ui:editorkit:2.0.0'
     implementation 'com.blacksquircle.ui:language-json:2.0.0'
-
-    implementation(name: 'libv2ray', ext: 'aar')
 }
 
 buildscript {
@@ -117,10 +117,5 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
-    }
-}
-repositories {
-    flatDir {
-        dirs 'libs'
     }
 }

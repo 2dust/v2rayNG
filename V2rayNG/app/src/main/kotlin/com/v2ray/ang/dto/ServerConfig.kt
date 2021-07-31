@@ -21,7 +21,7 @@ data class ServerConfig(
                     return ServerConfig(
                             configType = configType,
                             outboundBean = V2rayConfig.OutboundBean(
-                                    protocol = configType.name.toLowerCase(),
+                                    protocol = configType.name.lowercase(),
                                     settings = V2rayConfig.OutboundBean.OutSettingsBean(
                                             vnext = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean(
                                                     users = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean.UsersBean())))),
@@ -32,7 +32,7 @@ data class ServerConfig(
                     return ServerConfig(
                             configType = configType,
                             outboundBean = V2rayConfig.OutboundBean(
-                                    protocol = configType.name.toLowerCase(),
+                                    protocol = configType.name.lowercase(),
                                     settings = V2rayConfig.OutboundBean.OutSettingsBean(
                                             servers = listOf(V2rayConfig.OutboundBean.OutSettingsBean.ServersBean())),
                                     streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()))
