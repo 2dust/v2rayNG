@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">v2rayNG</string>
+    <string name="app_widget_name">Beralih</string>
+    <string name="app_tile_name">Beralih</string>
+    <string name="app_tile_first_use">Penggunaan pertama dari fitur ini, silakan gunakan aplikasi untuk menambahkan server</string>
+    <string name="navigation_drawer_open">Buka laci navigasi</string>
+    <string name="navigation_drawer_close">Tutup laci navigasi</string>
+    <string name="migration_success">Migrasi data berhasil!</string>
+    <string name="migration_fail">Migrasi data gagal!</string>
+
+    <!-- Notifications -->
+    <string name="notification_action_stop_v2ray">Berhenti</string>
+    <string name="toast_permission_denied">Tidak dapat memperoleh izin</string>
+    <string name="notification_action_more">klik untuk lebih</string>
+    <string name="toast_services_start">Mulai Layanan</string>
+    <string name="toast_services_stop">Stop Layanan</string>
+    <string name="toast_services_success">Mulai Layanan Sukses</string>
+    <string name="toast_services_failure">Mulai Kegagalan Layanan</string>
+
+    <!--ServerActivity-->
+    <string name="title_server">Konfigurasi file</string>
+    <string name="menu_item_add_config">Tambah config</string>
+    <string name="menu_item_save_config">Simpan config</string>
+    <string name="menu_item_del_config">Hapus config</string>
+    <string name="menu_item_import_config_qrcode">Import config dari QRcode</string>
+    <string name="menu_item_import_config_clipboard">Import config dari papan klip</string>
+    <string name="menu_item_import_config_manually_vmess">Memasukan manual[Vmess]</string>
+    <string name="menu_item_import_config_manually_ss">Memasukan manual[Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">Memasukan manual[Socks]</string>
+    <string name="menu_item_import_config_custom">Modifikasi config</string>
+    <string name="menu_item_import_config_custom_clipboard">Import modifikasi config dari papan klip</string>
+    <string name="menu_item_import_config_custom_local">Import modifikasi config dari perangkat</string>
+    <string name="menu_item_import_config_custom_url">Import modifikasi config dari URL</string>
+    <string name="menu_item_import_config_custom_url_scan">Import modifikasi config scan URL</string>
+    <string name="del_config_comfirm">Konfirmasi Hapus？</string>
+    <string name="server_lab_remarks">remarks</string>
+    <string name="server_lab_address">alamat</string>
+    <string name="server_lab_port">port</string>
+    <string name="server_lab_id">id</string>
+    <string name="server_lab_alterid">alterId</string>
+    <string name="server_lab_security">keamanan</string>
+    <string name="server_lab_network">Jaringan</string>
+    <string name="server_lab_more_function">fungsi lainya</string>
+    <string name="server_lab_head_type">tipe head</string>
+    <string name="server_lab_mode_type">mode gRPC</string>
+    <string name="server_lab_request_host">permintaan host(host/ws host/h2 host)/QUIC security</string>
+    <string name="server_lab_path">jalur(ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
+    <string name="server_lab_stream_security">tls</string>
+    <string name="server_lab_allow_insecure">allowInsecure</string>
+    <string name="server_lab_address3">alamat</string>
+    <string name="server_lab_port3">port</string>
+    <string name="server_lab_id3">kata sandi</string>
+    <string name="server_lab_security3">keamanan</string>
+    <string name="toast_success">Berhasil</string>
+    <string name="toast_failure">Kegagalan</string>
+    <string name="toast_none_data">Tidak ada apa-apa</string>
+    <string name="toast_incorrect_protocol">Protokol yang salah</string>
+    <string name="toast_decoding_failed">Dekode gagal</string>
+    <string name="title_file_chooser">Pilih Config File</string>
+    <string name="toast_require_file_manager">Silakan instal Pengelola File.</string>
+    <string name="server_customize_config">Modifikasi Config</string>
+    <string name="toast_config_file_invalid">Config Tidak Sah</string>
+    <string name="server_lab_content">Isi</string>
+    <string name="toast_none_data_clipboard">Tidak ada data di papan klip</string>
+    <string name="toast_invalid_url">URL Tidak Sah</string>
+    <string name="server_lab_need_inbound">Pastikan inbound memiliki socks=10808,http=10809</string>
+
+    <!-- PerAppProxyActivity -->
+    <string name="msg_dialog_progress">Memuat</string>
+    <string name="menu_item_select_all">Pilih Semua</string>
+    <string name="msg_enter_keywords">Masukan kata kunci</string>
+    <string name="switch_bypass_apps_mode">Mode Bypass</string>
+    <string name="menu_item_select_proxy_app">Pilih aplikasi proxy secara otomatis</string>
+    <string name="msg_downloading_content">Unduh konten</string>
+
+
+    <!-- Preferences -->
+    <string name="title_settings">Pengaturan</string>
+    <string name="title_advanced">Pengaturan lanjutan</string>
+    <string name="title_vpn_settings">Pengaturan VPN</string>
+    <string name="title_pref_per_app_proxy">Per-app proxy</string>
+    <string name="summary_pref_per_app_proxy">Per-app mode proxy hanya mendukung Android 5.0 Lollipop atau lebih tinggi</string>
+
+    <string name="title_pref_mux_enabled">Aktifkan Mux</string>
+    <string name="summary_pref_mux_enabled">Aktifkan mungkin percepat jaringan dan alihkan jaringan mungkin flash</string>
+
+    <string name="title_pref_speed_enabled">Aktifkan tampilan kecepatan</string>
+    <string name="summary_pref_speed_enabled">Tampilkan kecepatan saat ini di notifikasi.\n Ikon notifikasi akan berubah berdasarkan
+        penggunaan.</string>
+
+    <string name="title_pref_sniffing_enabled">Aktifkan Sniffing</string>
+    <string name="summary_pref_sniffing_enabled">Coba sniff domain dari paket (default aktif)</string>
+
+    <string name="title_pref_local_dns_enabled">Aktifkan lokal DNS</string>
+    <string name="summary_pref_local_dns_enabled">DNS diproses oleh modul DNS inti (Disarankan, jika perlu perutean Melewati LAN dan
+        alamat daratan)</string>
+
+    <string name="title_pref_fake_dns_enabled">Aktifkan DNS Palsu</string>
+    <string name="summary_pref_fake_dns_enabled">DNS lokal mengembalikan alamat IP palsu (lebih cepat, tetapi mungkin tidak berfungsi untuk beberapa aplikasi)</string>
+
+    <string name="title_pref_forward_ipv6">IPv6 Route</string>
+    <string name="summary_pref_forward_ipv6">Arahkan ulang lalu lintas IPv6 ke jarak jauh (BETA)</string>
+
+    <string name="title_pref_routing">Routing</string>
+    <string name="title_pref_routing_domain_strategy">Domain strategy</string>
+    <string name="title_pref_routing_mode">mode Routing</string>
+    <string name="title_pref_routing_custom">Modifikasi routing</string>
+
+    <string name="title_pref_donate">Donasi</string>
+    <string name="summary_pref_donate">Donasi Pengembang Aplikasi</string>
+    <string name="donate_detail">Tambahkan beberapa fitur lanjutan eksperimental</string>
+
+    <string name="title_pref_remote_dns">Remote DNS (pilihan)</string>
+    <string name="summary_pref_remote_dns">DNS</string>
+
+    <string name="title_pref_vpn_dns">VPN DNS (hanya IPv4/v6)</string>
+
+    <string name="title_pref_domestic_dns">Domestic DNS (pilihan)</string>
+    <string name="summary_pref_domestic_dns">DNS</string>
+
+    <string name="title_pref_socks_port">SOCKS5 proxy port</string>
+    <string name="summary_pref_socks_port">SOCKS5 proxy port</string>
+
+    <string name="title_pref_http_port">HTTP proxy port</string>
+    <string name="summary_pref_http_port">HTTP proxy port</string>
+
+    <string name="title_pref_local_dns_port">Lokal DNS port</string>
+    <string name="summary_pref_local_dns_port">Lokal DNS port</string>
+
+    <string name="title_pref_feedback">Umpan Balik</string>
+    <string name="summary_pref_feedback">Peningkatan umpan balik atau bug ke GitHub</string>
+    <string name="summary_pref_tg_group">Gabung Telegram Group</string>
+    <string name="toast_tg_app_not_found">Telegram tidak ditemukan diperangkat anda</string>
+
+    <string name="title_pref_promotion">Promosi</string>
+    <string name="summary_pref_promotion">Promosi, klik untuk detail (Donasi dapat dihapus)</string>
+
+    <string name="title_mode">Mode</string>
+    <string name="title_mode_help">Klik untuk bantuan lebih lanjut</string>
+
+    <string name="donate_error_setup">Error Setup:</string>
+    <string name="donate_error_inventory">Terjadi kesalahan saat mengkueri inventaris</string>
+    <string name="donate_error_purchase1">Pembelian Error:</string>
+    <string name="donate_error_purchase2">Kesalahan Pembelian, Verifikasi keaslian gagal.</string>
+    <string name="donate_success_purchase">Terimaksih Sudah Berdonasi!</string>
+    <string name="donate_item_click">Donasi</string>
+    <string name="donate_item_paypal">Paypal</string>
+
+    <string name="title_logcat"></string>
+    <string name="logcat_copy">Salin</string>
+    <string name="logcat_delete">Hapus</string>
+    <string name="title_export_all">Ekspor konfigurasi non-modifikasi ke clipboard</string>
+    <string name="title_sub_setting">Pengaturan berlangganan</string>
+    <string name="sub_setting_remarks">remarks</string>
+    <string name="sub_setting_url">url</string>
+    <string name="title_sub_update">Perbaharui berlangganan</string>
+    <string name="title_ping_all_server">Tcping semua konfigurasi</string>
+
+    <string name="tasker_start_service">Memulai layanan</string>
+    <string name="tasker_setting_confirm">konfirmasi</string>
+
+    <string name="routing_settings_title">Pengaturan Routing</string>
+    <string name="routing_settings_tips">Dipisahkan dengan koma (,), jangan lupa simpan</string>
+    <string name="routing_settings_save">Simpan</string>
+    <string name="routing_settings_delete">Bersihkan</string>
+    <string name="routing_settings_scan_replace">Scan dan ganti</string>
+    <string name="routing_settings_scan_append">Scan dan tambahkan</string>
+    <string name="routing_settings_default_rules"> tetapkan aturan perutean default</string>
+
+    <string name="connection_test_pending">Cek Konektifitas</string>
+    <string name="connection_test_testing">Mencoba…</string>
+    <string name="connection_test_available">Sukses: jabat tangan HTTPS berlangsung %dms</string>
+    <string name="connection_test_error">Gagal mendeteksi koneksi internet: %s</string>
+    <string name="connection_test_fail">Internet Tidak Tersedia</string>
+    <string name="connection_test_error_status_code">Kode error: #%d</string>
+    <string name="connection_connected">Terhubung, ketuk untuk memeriksa koneksi</string>
+    <string name="connection_not_connected">Tidak Terhubung</string>
+
+    <string-array name="share_method">
+        <item>QRcode</item>
+        <item>Export ke clipboard</item>
+        <item>Export semua pengaturan ke clipboard</item>
+    </string-array>
+
+    <string-array name="routing_tag">
+        <item>proxy URL atau IP</item>
+        <item>alihkan URL atau IP</item>
+        <item>blokir URL atau IP</item>
+    </string-array>
+
+    <string-array name="routing_mode">
+        <item>Global</item>
+        <item>Melewati alamat LAN</item>
+        <item>Lewati alamat daratan</item>
+        <item>Melewati LAN dan alamat daratan</item>
+    </string-array>
+    <string name="title_pref_proxy_sharing_enabled">Berbagi Proxy</string>
+    <string name="summary_pref_proxy_sharing_enabled">Ikat masuk ke 0.0.0.0</string>
+    <string name="toast_warning_pref_proxysharing">Perangkat lain dapat terhubung ke proxy dengan alamat ip Anda melalui socks/http protocol\nHttp  Proxy: http://yourIP:10809\nSocks Proxy: socks(4/5)://yourIP:10808\nHanya aktifkan di jaringan tepercaya untuk menghindari koneksi yang tidak sah</string>
+    <string name="toast_warning_pref_proxysharing_short">Berbagi proxy diaktifkan \nPastikan Anda berada di jaringan tepercaya</string>
+    <string name="toast_malformed_josn">Config malformed</string>
+
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>Hanya Proxy</item>
+    </string-array>
+
+</resources>
