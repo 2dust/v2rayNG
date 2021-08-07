@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
+import android.os.Looper
 import com.google.android.material.navigation.NavigationView
 import androidx.core.view.GravityCompat
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -411,6 +412,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         URL(url).readText()
                     } catch (e: Exception) {
                         e.printStackTrace()
+                        Looper.prepare()
+                        toast("\"" + it.second.remarks + "\" " + getString(R.string.toast_failure))
+                        Looper.loop()
                         return@launch
                     }
                     launch(Dispatchers.Main) {
