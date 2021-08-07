@@ -99,6 +99,15 @@ object Utils {
      * base64 decode
      */
     fun decode(text: String): String {
+        tryDecodeBase64(text)?.let { return it }
+        if (text.endsWith('=')) {
+            // try again for some loosely formatted base64
+            tryDecodeBase64(text.trimEnd('='))?.let { return it }
+        }
+        return ""
+    }
+
+    fun tryDecodeBase64(text: String): String? {
         try {
             return Base64.decode(text, Base64.NO_WRAP).toString(charset("UTF-8"))
         } catch (e: Exception) {
@@ -109,7 +118,7 @@ object Utils {
         } catch (e: Exception) {
             Log.i(AppConfig.ANG_PACKAGE, "Parse base64 url safe failed $e")
         }
-        return ""
+        return null
     }
 
     /**
