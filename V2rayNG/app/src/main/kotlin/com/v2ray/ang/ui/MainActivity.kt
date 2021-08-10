@@ -411,6 +411,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         URL(url).readText()
                     } catch (e: Exception) {
                         e.printStackTrace()
+                        launch(Dispatchers.Main) {
+                            toast("\"" + it.second.remarks + "\" " + getString(R.string.toast_failure))
+                        }
                         return@launch
                     }
                     launch(Dispatchers.Main) {
