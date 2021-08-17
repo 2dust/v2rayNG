@@ -213,7 +213,11 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
         mActivity.mainViewModel.swapServer(fromPosition, toPosition)
         notifyItemMoved(fromPosition, toPosition)
-        //notifyItemRangeChanged(fromPosition, toPosition - fromPosition + 1)
+        // position is changed, since position is used by click callbacks, need to update range
+        if (toPosition > fromPosition)
+            notifyItemRangeChanged(fromPosition, toPosition - fromPosition + 1)
+        else
+            notifyItemRangeChanged(toPosition, fromPosition - toPosition + 1)
         return true
     }
 
