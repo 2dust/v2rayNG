@@ -371,7 +371,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             GlobalScope.launch(Dispatchers.IO) {
                 val configText = try {
-                    URL(url).readText()
+                    Utils.getUrlContentWithCustomUserAgent(url)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     ""
@@ -408,7 +408,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 Log.d(ANG_PACKAGE, url)
                 GlobalScope.launch(Dispatchers.IO) {
                     val configText = try {
-                        URL(url).readText()
+                        Utils.getUrlContentWithCustomUserAgent(url)
                     } catch (e: Exception) {
                         e.printStackTrace()
                         launch(Dispatchers.Main) {
