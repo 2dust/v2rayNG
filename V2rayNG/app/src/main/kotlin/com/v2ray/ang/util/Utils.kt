@@ -459,10 +459,15 @@ object Utils {
     }
 
     @Throws(IOException::class)
-    fun getUrlContentWithCustomUserAgent(url: String?): String {
-        val conn = URL(url).openConnection()
+    fun getUrlContentWithCustomUserAgent(urlStr: String?): String {
+        val url = URL(urlStr)
+        val conn = url.openConnection()
         conn.setRequestProperty("Connection", "close")
         conn.setRequestProperty("User-agent", "v2rayNG/${BuildConfig.VERSION_NAME}")
+        url.userInfo?.let {
+            conn.setRequestProperty("Authorization",
+                "Basic ${encode(URLDecoder.decode(it,"UTF-8"))}")
+        }
         conn.useCaches = false
         return conn.inputStream.use {
             it.bufferedReader().readText()
