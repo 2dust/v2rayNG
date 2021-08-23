@@ -466,7 +466,7 @@ object Utils {
         conn.setRequestProperty("User-agent", "v2rayNG/${BuildConfig.VERSION_NAME}")
         url.userInfo?.let {
             conn.setRequestProperty("Authorization",
-                "Basic ${encode(URLDecoder.decode(it,"UTF-8"))}")
+                "Basic ${encode(urlDecode(it))}")
         }
         conn.useCaches = false
         return conn.inputStream.use {
