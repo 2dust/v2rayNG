@@ -83,7 +83,7 @@ dependencies {
     implementation "androidx.preference:preference:1.0.0"
     implementation "androidx.recyclerview:recyclerview:1.2.1"
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+    implementation 'androidx.viewpager2:viewpager2:1.1.0-beta01'
 
     // Androidx ktx
     implementation 'androidx.activity:activity-ktx:1.2.4'
