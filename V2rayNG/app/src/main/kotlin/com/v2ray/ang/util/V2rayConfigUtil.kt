@@ -101,7 +101,7 @@ object V2rayConfigUtil {
             v2rayConfig.inbounds[0].port = 10808
             val fakedns = settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED)
                     ?: false
-            val sniffAllTlsAndHttp = settingsStorage?.decodeBool(AppConfig.PREF_SNIFFING_ENABLED)
+            val sniffAllTlsAndHttp = settingsStorage?.decodeBool(AppConfig.PREF_SNIFFING_ENABLED, true)
                     ?: true
             v2rayConfig.inbounds[0].sniffing?.enabled = fakedns || sniffAllTlsAndHttp
             if (!sniffAllTlsAndHttp) {
