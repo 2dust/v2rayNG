@@ -139,7 +139,7 @@ object Utils {
      */
     fun getRemoteDnsServers(): List<String> {
         val remoteDns = settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_AGENT
-        val ret = remoteDns.split(",").filter { isPureIpAddress(it) || it.startsWith("https") }
+        val ret = remoteDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
         if (ret.isEmpty()) {
             return listOf(AppConfig.DNS_AGENT)
         }
@@ -159,7 +159,7 @@ object Utils {
      */
     fun getDomesticDnsServers(): List<String> {
         val domesticDns = settingsStorage?.decodeString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
-        val ret = domesticDns.split(",").filter { isPureIpAddress(it) || it.startsWith("https") }
+        val ret = domesticDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
         if (ret.isEmpty()) {
             return listOf(AppConfig.DNS_DIRECT)
         }
@@ -255,6 +255,10 @@ object Utils {
         }
         val regV6 = Regex("^((?:[0-9A-Fa-f]{1,4}))?((?::[0-9A-Fa-f]{1,4}))*::((?:[0-9A-Fa-f]{1,4}))?((?::[0-9A-Fa-f]{1,4}))*|((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4})){7}$")
         return regV6.matches(addr)
+    }
+
+    private fun isCoreDNSAddress(s: String): Boolean {
+        return s.startsWith("https") || s.startsWith("tcp") || s.startsWith("quic")
     }
 
     /**

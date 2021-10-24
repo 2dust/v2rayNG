@@ -277,7 +277,7 @@ object V2rayConfigUtil {
             val remoteDns = Utils.getRemoteDnsServers()
             if (v2rayConfig.inbounds.none { e -> e.protocol == "dokodemo-door" && e.tag == "dns-in" }) {
                 val dnsInboundSettings = V2rayConfig.InboundBean.InSettingsBean(
-                        address = if (remoteDns.first().startsWith("https")) "1.1.1.1" else remoteDns.first(),
+                        address = if (Utils.isPureIpAddress(remoteDns.first())) remoteDns.first() else "1.1.1.1",
                         port = 53,
                         network = "tcp,udp")
 
@@ -346,7 +346,7 @@ object V2rayConfigUtil {
                 if (routingMode == "2" || routingMode == "3") {
                     servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, geositeCn, geoipCn))
                 }
-                if (!domesticDns.first().startsWith("https")) {
+                if (Utils.isPureIpAddress(domesticDns.first())) {
                     v2rayConfig.routing.rules.add(0, V2rayConfig.RoutingBean.RulesBean(
                             type = "field",
                             outboundTag = AppConfig.TAG_DIRECT,
@@ -372,7 +372,7 @@ object V2rayConfigUtil {
                     hosts = hosts)
 
             // DNS routing
-            if (!remoteDns.first().startsWith("https")) {
+            if (Utils.isPureIpAddress(remoteDns.first())) {
                 v2rayConfig.routing.rules.add(0, V2rayConfig.RoutingBean.RulesBean(
                         type = "field",
                         outboundTag = AppConfig.TAG_AGENT,
