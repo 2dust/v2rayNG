@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="allowinsecures">
+        <item></item>
+        <item>Cho phép</item>
+        <item>Từ chối</item>
+    </string-array>
+    <string-array name="core_loglevel">
+        <item>Gỡ lỗi</item>
+        <item>Thông tin</item>
+        <item>Cảnh báo</item>
+        <item>Lỗi</item>
+        <item>Trống</item>
+    </string-array>
+    <string-array name="header_type_kcp_and_quic">
+        <item>không</item>
+        <item>srtp</item>
+        <item>utp</item>
+        <item>wechat-video</item>
+        <item>dtls</item>
+        <item>wireguard</item>
+    </string-array>
+    <string-array name="header_type_tcp">
+        <item>không</item>
+        <item>http</item>
+    </string-array>
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>chỉ Proxy</item>
+    </string-array>
+    <string-array name="mode_value">
+        <item>VPN</item>
+        <item>chỉ Proxy</item>
+    </string-array>
+    <string-array name="routing_mode">
+        <item>Toàn cầu</item>
+        <item>Bỏ qua địa chỉ mạng LAN</item>
+        <item>Bỏ qua địa chỉ thực</item>
+        <item>Bỏ qua mạng LAN và địa chỉ thực</item>
+    </string-array>
+    <string-array name="routing_tag">
+        <item>URL proxy hoặc IP</item>
+        <item>URL hoặc IP trực tiếp</item>
+        <item>URL hoặc IP bị chặn</item>
+    </string-array>
+    <string-array name="securitys">
+        <item>chacha20-poly1305</item>
+        <item>aes-128-gcm</item>
+        <item>Tự động</item>
+        <item>Bỏ qua</item>
+        <item>Trống</item>
+    </string-array>
+    <string-array name="share_method">
+        <item>QRcode</item>
+        <item>Xuất sang khay nhớ tạm</item>
+        <item>Xuất cấu hình đầy đủ vào khay nhớ tạm</item>
+    </string-array>
+</resources>
