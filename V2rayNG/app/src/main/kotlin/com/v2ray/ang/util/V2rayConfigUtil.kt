@@ -128,7 +128,7 @@ object V2rayConfigUtil {
 
     private fun fakedns(v2rayConfig: V2rayConfig) {
         if (settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
-            v2rayConfig.fakedns = V2rayConfig.FakednsBean()
+            v2rayConfig.fakedns = listOf(V2rayConfig.FakednsBean())
             v2rayConfig.outbounds.filter { it.protocol == "freedom" }.forEach {
                 it.settings?.domainStrategy = "UseIP"
             }

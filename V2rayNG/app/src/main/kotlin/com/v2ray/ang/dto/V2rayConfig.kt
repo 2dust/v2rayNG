@@ -20,7 +20,7 @@ data class V2rayConfig(
         val api: Any? = null,
         val transport: Any? = null,
         val reverse: Any? = null,
-        var fakedns: FakednsBean? = null,
+        var fakedns: Any? = null,
         val browserForwarder: Any? = null) {
     companion object {
         const val DEFAULT_PORT = 443
@@ -370,7 +370,7 @@ data class V2rayConfig(
     }
 
     data class DnsBean(var servers: ArrayList<Any>? = null,
-                       var hosts: Map<String, String>? = null,
+                       var hosts: Map<String, Any>? = null,
                        val clientIp: String? = null,
                        val disableCache: Boolean? = null,
                        val queryStrategy: String? = null,
