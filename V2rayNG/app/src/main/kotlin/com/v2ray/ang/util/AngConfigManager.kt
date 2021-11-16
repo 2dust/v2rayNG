@@ -18,6 +18,7 @@ import com.v2ray.ang.dto.V2rayConfig.Companion.TLS
 import com.v2ray.ang.util.MmkvManager.KEY_SELECTED_SERVER
 import java.net.URI
 import java.util.*
+import com.v2ray.ang.extension.idnHost
 
 object AngConfigManager {
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
@@ -53,27 +54,31 @@ object AngConfigManager {
     }
 
     private fun copyLegacySettings(sharedPreferences: SharedPreferences) {
-        listOf(AppConfig.PREF_MODE,
-                AppConfig.PREF_REMOTE_DNS,
-                AppConfig.PREF_DOMESTIC_DNS,
-//                AppConfig.PREF_LOCAL_DNS_PORT,
-//                AppConfig.PREF_SOCKS_PORT,
-//                AppConfig.PREF_HTTP_PORT,
-//                AppConfig.PREF_LOGLEVEL,
-                AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,
-                AppConfig.PREF_ROUTING_MODE,
-                AppConfig.PREF_V2RAY_ROUTING_AGENT,
-                AppConfig.PREF_V2RAY_ROUTING_BLOCKED,
-                AppConfig.PREF_V2RAY_ROUTING_DIRECT,).forEach { key ->
+        listOf(
+            AppConfig.PREF_MODE,
+            AppConfig.PREF_REMOTE_DNS,
+            AppConfig.PREF_DOMESTIC_DNS,
+            AppConfig.PREF_LOCAL_DNS_PORT,
+//            AppConfig.PREF_SOCKS_PORT,
+//            AppConfig.PREF_HTTP_PORT,
+//            AppConfig.PREF_LOGLEVEL,
+            AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,
+            AppConfig.PREF_ROUTING_MODE,
+            AppConfig.PREF_V2RAY_ROUTING_AGENT,
+            AppConfig.PREF_V2RAY_ROUTING_BLOCKED,
+            AppConfig.PREF_V2RAY_ROUTING_DIRECT,
+        ).forEach { key ->
             settingsStorage?.encode(key, sharedPreferences.getString(key, null))
         }
-        listOf(AppConfig.PREF_SPEED_ENABLED,
-                AppConfig.PREF_PROXY_SHARING,
-                AppConfig.PREF_LOCAL_DNS_ENABLED,
-//                AppConfig.PREF_ALLOW_INSECURE,
-//                AppConfig.PREF_PREFER_IPV6,
-                AppConfig.PREF_PER_APP_PROXY,
-                AppConfig.PREF_BYPASS_APPS,).forEach { key ->
+        listOf(
+            AppConfig.PREF_SPEED_ENABLED,
+            AppConfig.PREF_PROXY_SHARING,
+            AppConfig.PREF_LOCAL_DNS_ENABLED,
+//            AppConfig.PREF_ALLOW_INSECURE,
+//            AppConfig.PREF_PREFER_IPV6,
+            AppConfig.PREF_PER_APP_PROXY,
+            AppConfig.PREF_BYPASS_APPS,
+        ).forEach { key ->
             settingsStorage?.encode(key, sharedPreferences.getBoolean(key, false))
         }
         settingsStorage?.encode(AppConfig.PREF_SNIFFING_ENABLED, sharedPreferences.getBoolean(AppConfig.PREF_SNIFFING_ENABLED, true))
@@ -281,7 +286,7 @@ object AngConfigManager {
                 config = ServerConfig.create(EConfigType.TROJAN)
                 config.remarks = uri.fragment ?: ""
                 config.outboundBean?.settings?.servers?.get(0)?.let { server ->
-                    server.address = uri.host
+                    server.address = uri.idnHost
                     server.port = uri.port
                     server.password = uri.userInfo
                 }
@@ -300,7 +305,7 @@ object AngConfigManager {
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
                 config.remarks = uri.fragment ?: ""
                 config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
-                    vnext.address = uri.host
+                    vnext.address = uri.idnHost
                     vnext.port = uri.port
                     vnext.users[0].id = uri.userInfo
                     vnext.users[0].encryption = queryParam["encryption"] ?: "none"
@@ -344,7 +349,7 @@ object AngConfigManager {
             val streamSetting = config.outboundBean?.streamSettings ?: return false
             config.remarks = uri.fragment
             config.outboundBean.settings?.vnext?.get(0)?.let { vnext ->
-                vnext.address = uri.host
+                vnext.address = uri.idnHost
                 vnext.port = uri.port
                 vnext.users[0].id = uuid
                 vnext.users[0].encryption = DEFAULT_SECURITY
@@ -501,7 +506,7 @@ object AngConfigManager {
 
                     val url = String.format("%s@%s:%s",
                             outbound.getPassword(),
-                            outbound.getServerAddress(),
+                            Utils.getIpv6Address(outbound.getServerAddress()!!),
                             outbound.getServerPort())
                     url + query + remark
                 }
@@ -515,7 +520,7 @@ object AngConfigManager {
                     }
                     val url = String.format("%s@%s:%s",
                             outbound.getPassword(),
-                            outbound.getServerAddress(),
+                            Utils.getIpv6Address(outbound.getServerAddress()!!),
                             outbound.getServerPort())
                     url + query + remark
                 }
