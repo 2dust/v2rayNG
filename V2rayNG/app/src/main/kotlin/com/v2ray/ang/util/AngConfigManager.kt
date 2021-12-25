@@ -284,7 +284,7 @@ object AngConfigManager {
             } else if (str.startsWith(EConfigType.TROJAN.protocolScheme)) {
                 val uri = URI(str)
                 config = ServerConfig.create(EConfigType.TROJAN)
-                config.remarks = uri.fragment ?: ""
+                config.remarks = Utils.urlDecode(uri.fragment ?: "")
                 config.outboundBean?.settings?.servers?.get(0)?.let { server ->
                     server.address = uri.idnHost
                     server.port = uri.port
@@ -303,7 +303,7 @@ object AngConfigManager {
                     .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
                 config = ServerConfig.create(EConfigType.VLESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
-                config.remarks = uri.fragment ?: ""
+                config.remarks = Utils.urlDecode(uri.fragment ?: "")
                 config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
                     vnext.address = uri.idnHost
                     vnext.port = uri.port
@@ -347,7 +347,7 @@ object AngConfigManager {
                 .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
 
             val streamSetting = config.outboundBean?.streamSettings ?: return false
-            config.remarks = uri.fragment
+            config.remarks = Utils.urlDecode(uri.fragment ?: "")
             config.outboundBean.settings?.vnext?.get(0)?.let { vnext ->
                 vnext.address = uri.idnHost
                 vnext.port = uri.port
