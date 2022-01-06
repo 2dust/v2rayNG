@@ -36,9 +36,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:extractNativeLibs="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="m">
         <activity
+            android:exported="true"
             android:name=".ui.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:launchMode="singleTask">
@@ -59,24 +61,40 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
+            android:exported="false"
             android:name=".ui.ServerActivity"
             android:windowSoftInputMode="stateUnchanged" />
         <activity
+            android:exported="false"
             android:name=".ui.ServerCustomConfigActivity"
             android:windowSoftInputMode="stateUnchanged" />
-        <activity android:name=".ui.SettingsActivity" />
-        <activity android:name=".ui.PerAppProxyActivity" />
-        <activity android:name=".ui.ScannerActivity" />
-<!--        <activity android:name=".InappBuyActivity" />-->
-        <activity android:name=".ui.LogcatActivity" />
         <activity
+            android:exported="false"
+            android:name=".ui.SettingsActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.PerAppProxyActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.ScannerActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.LogcatActivity" />
+        <activity
+            android:exported="false"
             android:name=".ui.RoutingSettingsActivity"
             android:windowSoftInputMode="stateUnchanged" />
-        <activity android:name=".ui.SubSettingActivity" />
-
-        <activity android:name=".ui.SubEditActivity" />
-        <activity android:name=".ui.ScScannerActivity" />
         <activity
+            android:exported="false"
+            android:name=".ui.SubSettingActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.SubEditActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.ScScannerActivity" />
+        <activity
+            android:exported="false"
             android:name=".ui.ScSwitchActivity"
             android:excludeFromRecents="true"
             android:process=":RunSoLibV2RayDaemon"
@@ -103,7 +121,9 @@
                 android:process=":RunSoLibV2RayDaemon">
         </service>
 
-        <receiver android:name=".receiver.WidgetProvider"
+        <receiver
+                android:exported="false"
+                android:name=".receiver.WidgetProvider"
                 android:process=":RunSoLibV2RayDaemon">
             <meta-data
                     android:name="android.appwidget.provider"
@@ -116,6 +136,7 @@
         </receiver>
 
         <service
+                android:exported="true"
                 android:name=".service.QSTileService"
                 android:icon="@drawable/ic_v"
                 android:label="@string/app_tile_name"
@@ -127,6 +148,7 @@
         </service>
         <!-- =====================Tasker===================== -->
         <activity
+            android:exported="true"
             android:name=".ui.TaskerActivity"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name">
@@ -135,7 +157,9 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".receiver.TaskerReceiver"
+        <receiver
+            android:exported="true"
+            android:name=".receiver.TaskerReceiver"
                 android:process=":RunSoLibV2RayDaemon">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
