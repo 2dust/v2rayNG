@@ -48,7 +48,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         if (holder is MainViewHolder) {
             val guid = mActivity.mainViewModel.serverList.getOrNull(position) ?: return
-            val config = mActivity.mainViewModel.serversCache.getOrElse(guid, { MmkvManager.decodeServerConfig(guid) })?: return
+            val config = mActivity.mainViewModel.serversCache.getOrElse(guid) { MmkvManager.decodeServerConfig(guid) } ?: return
             val outbound = config.getProxyOutbound()
             val aff = MmkvManager.decodeServerAffiliationInfo(guid)
 
@@ -69,13 +69,17 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             }
 
             var shareOptions = share_method.asList()
-            if (config.configType == EConfigType.CUSTOM) {
-                holder.itemMainBinding.tvType.text = mActivity.getString(R.string.server_customize_config)
-                shareOptions = shareOptions.takeLast(1)
-            } else if (config.configType == EConfigType.VLESS) {
-                holder.itemMainBinding.tvType.text = config.configType.name
-            } else {
-                holder.itemMainBinding.tvType.text = config.configType.name.lowercase()
+            when (config.configType) {
+                EConfigType.CUSTOM -> {
+                    holder.itemMainBinding.tvType.text = mActivity.getString(R.string.server_customize_config)
+                    shareOptions = shareOptions.takeLast(1)
+                }
+                EConfigType.VLESS -> {
+                    holder.itemMainBinding.tvType.text = config.configType.name
+                }
+                else -> {
+                    holder.itemMainBinding.tvType.text = config.configType.name.lowercase()
+                }
             }
             holder.itemMainBinding.tvStatistics.text = "${outbound?.getServerAddress()} : ${outbound?.getServerPort()}"
 

@@ -242,8 +242,7 @@ class ServerActivity : BaseActivity() {
         } else if (config.configType == EConfigType.VLESS) {
             vnext.users[0].encryption = et_security.text.toString().trim()
             if (streamSecuritys[sp_stream_security.selectedItemPosition] == XTLS) {
-//                vnext.users[0].flow = if (flows[sp_flow.selectedItemPosition].isBlank()) V2rayConfig.DEFAULT_FLOW
-//                else flows[sp_flow.selectedItemPosition]
+//                vnext.users[0].flow = flows[sp_flow.selectedItemPosition].ifBlank { V2rayConfig.DEFAULT_FLOW }
             } else {
                 vnext.users[0].flow = ""
             }
@@ -272,7 +271,7 @@ class ServerActivity : BaseActivity() {
 
     private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean, config: ServerConfig) {
         val network = if (sp_network != null) networks[sp_network.selectedItemPosition] else DEFAULT_NETWORK
-        val type = if (sp_header_type != null) transportTypes(network)[sp_header_type.selectedItemPosition] else "";
+        val type = if (sp_header_type != null) transportTypes(network)[sp_header_type.selectedItemPosition] else ""
         val requestHost = if (et_request_host != null) et_request_host.text.toString().trim() else ""
         val path = if (et_path != null) et_path.text.toString().trim() else ""
         var sni = streamSetting.populateTransportSettings(

@@ -66,8 +66,8 @@ class PerAppProxyActivity : BaseActivity() {
                                 one.isSelected = 0
                             }
                         }
-                        val comparator = object : Comparator<AppInfo> {
-                            override fun compare(p1: AppInfo, p2: AppInfo): Int = when {
+                        val comparator = Comparator<AppInfo> { p1, p2 ->
+                            when {
                                 p1.isSelected > p2.isSelected -> -1
                                 p1.isSelected == p2.isSelected -> 0
                                 else -> 1

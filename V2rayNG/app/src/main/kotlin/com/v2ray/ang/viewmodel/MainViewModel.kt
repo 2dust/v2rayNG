@@ -95,7 +95,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         getApplication<AngApplication>().toast(R.string.connection_test_testing)
         for (guid in serverList) {
-            serversCache.getOrElse(guid, { MmkvManager.decodeServerConfig(guid) })?.getProxyOutbound()?.let { outbound ->
+            serversCache.getOrElse(guid) { MmkvManager.decodeServerConfig(guid) }?.getProxyOutbound()?.let { outbound ->
                 val serverAddress = outbound.getServerAddress()
                 val serverPort = outbound.getServerPort()
                 if (serverAddress != null && serverPort != null) {

@@ -17,7 +17,6 @@ import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_SECURITY
 import com.v2ray.ang.dto.V2rayConfig.Companion.TLS
 import com.v2ray.ang.util.MmkvManager.KEY_SELECTED_SERVER
 import java.net.URI
-import java.net.URLDecoder
 import java.util.*
 
 object AngConfigManager {
@@ -139,7 +138,7 @@ object AngConfigManager {
 //                        vmessBean.allowInsecure.toBoolean()
 //                    }
                     streamSetting.populateTlsSettings(vmessBean.streamSecurity, false,
-                            sni)//if (vmessBean.sni.isNotBlank()) vmessBean.sni else sni)
+                            sni)//vmessBean.sni.ifBlank { sni })
                 }
             }
             val key = MmkvManager.encodeServerConfig(vmessBean.guid, config)
@@ -292,16 +291,14 @@ object AngConfigManager {
                 var sni = ""
                 uri.rawQuery?.let { rawQuery ->
                     val queryParam = rawQuery.split("&")
-                            .map { it.split("=").let { (k, v) -> k to URLDecoder.decode(v, "utf-8")!! } }
-                            .toMap()
+                        .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
                     sni = queryParam["sni"] ?: ""
                 }
                 config.outboundBean?.streamSettings?.populateTlsSettings(TLS, allowInsecure, sni)
             } else if (str.startsWith(EConfigType.VLESS.protocolScheme)) {
                 val uri = URI(str)
                 val queryParam = uri.rawQuery.split("&")
-                        .map { it.split("=").let { (k, v) -> k to URLDecoder.decode(v, "utf-8")!! } }
-                        .toMap()
+                    .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
                 config = ServerConfig.create(EConfigType.VLESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
                 config.remarks = uri.fragment ?: ""
@@ -345,8 +342,7 @@ object AngConfigManager {
                             ?: error("parse user info fail.")
             val tls = tlsStr.isNotBlank()
             val queryParam = uri.rawQuery.split("&")
-                    .map { it.split("=").let { (k, v) -> k to URLDecoder.decode(v, "utf-8")!! } }
-                    .toMap()
+                .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
 
             val streamSetting = config.outboundBean?.streamSettings ?: return false
             config.remarks = uri.fragment
@@ -455,28 +451,24 @@ object AngConfigManager {
                     }
                     dicQuery["encryption"] = if (outbound.getSecurityEncryption().isNullOrEmpty()) "none"
                     else outbound.getSecurityEncryption().orEmpty()
-                    dicQuery["security"] = if (streamSetting.security.isEmpty()) "none"
-                    else streamSetting.security
+                    dicQuery["security"] = streamSetting.security.ifEmpty { "none" }
                     (streamSetting.tlsSettings?: streamSetting.xtlsSettings)?.let { tlsSetting ->
                         if (!TextUtils.isEmpty(tlsSetting.serverName)) {
                             dicQuery["sni"] = tlsSetting.serverName
                         }
                     }
-                    dicQuery["type"] = if (streamSetting.network.isEmpty()) V2rayConfig.DEFAULT_NETWORK
-                    else streamSetting.network
+                    dicQuery["type"] = streamSetting.network.ifEmpty { V2rayConfig.DEFAULT_NETWORK }
 
                     outbound.getTransportSettingDetails()?.let { transportDetails ->
                         when (streamSetting.network) {
                             "tcp" -> {
-                                dicQuery["headerType"] = if (transportDetails[0].isEmpty()) "none"
-                                else transportDetails[0]
+                                dicQuery["headerType"] = transportDetails[0].ifEmpty { "none" }
                                 if (!TextUtils.isEmpty(transportDetails[1])) {
                                     dicQuery["host"] = Utils.urlEncode(transportDetails[1])
                                 }
                             }
                             "kcp" -> {
-                                dicQuery["headerType"] = if (transportDetails[0].isEmpty()) "none"
-                                else transportDetails[0]
+                                dicQuery["headerType"] = transportDetails[0].ifEmpty { "none" }
                                 if (!TextUtils.isEmpty(transportDetails[2])) {
                                     dicQuery["seed"] = Utils.urlEncode(transportDetails[2])
                                 }
@@ -499,8 +491,7 @@ object AngConfigManager {
                                 }
                             }
                             "quic" -> {
-                                dicQuery["headerType"] = if (transportDetails[0].isEmpty()) "none"
-                                else transportDetails[0]
+                                dicQuery["headerType"] = transportDetails[0].ifEmpty { "none" }
                                 dicQuery["quicSecurity"] = Utils.urlEncode(transportDetails[1])
                                 dicQuery["key"] = Utils.urlEncode(transportDetails[2])
                             }
