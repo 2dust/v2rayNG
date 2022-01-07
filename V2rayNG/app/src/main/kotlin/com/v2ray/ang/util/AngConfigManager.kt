@@ -102,7 +102,6 @@ object AngConfigManager {
                     vnext.port = vmessBean.port
                     vnext.users[0].id = vmessBean.id
                     if (config.configType == EConfigType.VMESS) {
-                        vnext.users[0].alterId = vmessBean.alterId
                         vnext.users[0].security = vmessBean.security
                     } else if (config.configType == EConfigType.VLESS) {
                         vnext.users[0].encryption = vmessBean.security
@@ -195,7 +194,6 @@ object AngConfigManager {
                         if (TextUtils.isEmpty(vmessQRCode.add)
                                 || TextUtils.isEmpty(vmessQRCode.port)
                                 || TextUtils.isEmpty(vmessQRCode.id)
-                                || TextUtils.isEmpty(vmessQRCode.aid)
                                 || TextUtils.isEmpty(vmessQRCode.net)
                         ) {
                             return R.string.toast_incorrect_protocol
@@ -207,7 +205,6 @@ object AngConfigManager {
                             vnext.port = Utils.parseInt(vmessQRCode.port)
                             vnext.users[0].id = vmessQRCode.id
                             vnext.users[0].encryption = DEFAULT_SECURITY
-                            vnext.users[0].alterId = Utils.parseInt(vmessQRCode.aid)
                         }
                         val sni = streamSetting.populateTransportSettings(vmessQRCode.net, vmessQRCode.type, vmessQRCode.host,
                                 vmessQRCode.path, vmessQRCode.path, vmessQRCode.host, vmessQRCode.path, vmessQRCode.type, vmessQRCode.path)
@@ -336,8 +333,8 @@ object AngConfigManager {
         return runCatching {
             val uri = URI(uriString)
             check(uri.scheme == "vmess")
-            val (_, protocol, tlsStr, uuid, alterId) =
-                    Regex("(tcp|http|ws|kcp|quic|grpc)(\\+tls)?:([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12})-([0-9]+)")
+            val (_, protocol, tlsStr, uuid) =
+                    Regex("(tcp|http|ws|kcp|quic|grpc)(\\+tls)?:([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12})")
                             .matchEntire(uri.userInfo)?.groupValues
                             ?: error("parse user info fail.")
             val tls = tlsStr.isNotBlank()
@@ -351,7 +348,6 @@ object AngConfigManager {
                 vnext.port = uri.port
                 vnext.users[0].id = uuid
                 vnext.users[0].encryption = DEFAULT_SECURITY
-                vnext.users[0].alterId = alterId.toInt()
             }
 
             val sni = streamSetting.populateTransportSettings(protocol, queryParam["type"],
@@ -388,7 +384,6 @@ object AngConfigManager {
             vnext.port = Utils.parseInt(arr22[1])
             vnext.users[0].id = arr21[1]
             vnext.users[0].encryption = arr21[0]
-            vnext.users[0].alterId = 0
         }
         return true
     }
@@ -409,7 +404,6 @@ object AngConfigManager {
                     vmessQRCode.add = outbound.getServerAddress().orEmpty()
                     vmessQRCode.port = outbound.getServerPort().toString()
                     vmessQRCode.id = outbound.getPassword().orEmpty()
-                    vmessQRCode.aid = outbound.settings?.vnext?.get(0)?.users?.get(0)?.alterId.toString()
                     vmessQRCode.net = streamSetting.network
                     vmessQRCode.tls = streamSetting.security
                     vmessQRCode.sni = streamSetting.tlsSettings?.serverName.orEmpty()

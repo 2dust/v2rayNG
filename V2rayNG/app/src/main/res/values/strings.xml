@@ -38,7 +38,6 @@
     <string name="server_lab_address">address</string>
     <string name="server_lab_port">port</string>
     <string name="server_lab_id">id</string>
-    <string name="server_lab_alterid">alterId</string>
     <string name="server_lab_security">security</string>
     <string name="server_lab_network">Network</string>
     <string name="server_lab_more_function">more function</string>

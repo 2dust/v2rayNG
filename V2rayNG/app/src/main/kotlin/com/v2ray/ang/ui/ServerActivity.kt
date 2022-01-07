@@ -128,7 +128,6 @@ class ServerActivity : BaseActivity() {
         et_address.text = Utils.getEditable(outbound.getServerAddress().orEmpty())
         et_port.text = Utils.getEditable(outbound.getServerPort()?.toString() ?: DEFAULT_PORT.toString())
         et_id.text = Utils.getEditable(outbound.getPassword().orEmpty())
-        et_alterId?.text = Utils.getEditable(outbound.settings?.vnext?.get(0)?.users?.get(0)?.alterId.toString())
         if (config.configType == EConfigType.SOCKS) {
             et_security.text = Utils.getEditable(outbound.settings?.servers?.get(0)?.users?.get(0)?.user.orEmpty())
         } else if (config.configType == EConfigType.VLESS) {
@@ -170,7 +169,6 @@ class ServerActivity : BaseActivity() {
         et_address.text = null
         et_port.text = Utils.getEditable(DEFAULT_PORT.toString())
         et_id.text = null
-        et_alterId?.text = Utils.getEditable("0")
         sp_security?.setSelection(0)
         sp_network?.setSelection(0)
 
@@ -207,13 +205,6 @@ class ServerActivity : BaseActivity() {
             toast(R.string.server_lab_id)
             return false
         }
-        et_alterId?.let {
-            val alterId = Utils.parseInt(et_alterId.text.toString())
-            if (alterId < 0) {
-                toast(R.string.server_lab_alterid)
-                return false
-            }
-        }
 
         config.remarks = et_remarks.text.toString().trim()
         config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
@@ -237,7 +228,6 @@ class ServerActivity : BaseActivity() {
         vnext.port = port
         vnext.users[0].id = et_id.text.toString().trim()
         if (config.configType == EConfigType.VMESS) {
-            vnext.users[0].alterId = Utils.parseInt(et_alterId.text.toString())
             vnext.users[0].security = securitys[sp_security.selectedItemPosition]
         } else if (config.configType == EConfigType.VLESS) {
             vnext.users[0].encryption = et_security.text.toString().trim()
