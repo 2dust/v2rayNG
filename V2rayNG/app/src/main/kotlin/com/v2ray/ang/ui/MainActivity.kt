@@ -40,7 +40,6 @@ import libv2ray.Libv2ray
 import me.drakeet.support.toast.ToastCompat
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
-import java.net.URL
 import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -109,16 +108,16 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private fun setupViewModelObserver() {
-        mainViewModel.updateListAction.observe(this, {
+        mainViewModel.updateListAction.observe(this) {
             val index = it ?: return@observe
             if (index >= 0) {
                 adapter.notifyItemChanged(index)
             } else {
                 adapter.notifyDataSetChanged()
             }
-        })
-        mainViewModel.updateTestResultAction.observe(this, { binding.tvTestState.text = it })
-        mainViewModel.isRunning.observe(this, {
+        }
+        mainViewModel.updateTestResultAction.observe(this) { binding.tvTestState.text = it }
+        mainViewModel.isRunning.observe(this) {
             val isRunning = it ?: return@observe
             adapter.isRunning = isRunning
             if (isRunning) {
@@ -131,7 +130,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 binding.layoutTest.isFocusable = false
             }
             hideCircle()
-        })
+        }
         mainViewModel.startListenBroadcast()
     }
 

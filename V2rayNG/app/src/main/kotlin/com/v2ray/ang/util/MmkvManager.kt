@@ -42,11 +42,7 @@ object MmkvManager {
     }
 
     fun encodeServerConfig(guid: String, config: ServerConfig): String {
-        val key = if (guid.isBlank()) {
-            Utils.getUuid()
-        } else {
-            guid
-        }
+        val key = guid.ifBlank { Utils.getUuid() }
         serverStorage?.encode(key, Gson().toJson(config))
         val serverList= decodeServerList()
         if (!serverList.contains(key)) {

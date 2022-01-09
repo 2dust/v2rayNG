@@ -89,7 +89,6 @@ data class V2rayConfig(
                                  var users: List<UsersBean>) {
 
                 data class UsersBean(var id: String = "",
-                                     var alterId: Int? = null,
                                      var security: String = DEFAULT_SECURITY,
                                      var level: Int = DEFAULT_LEVEL,
                                      var encryption: String = "",

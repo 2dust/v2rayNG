@@ -62,11 +62,11 @@ object Utils {
      * parseInt
      */
     fun parseInt(str: String): Int {
-        try {
-            return Integer.parseInt(str)
+        return try {
+            Integer.parseInt(str)
         } catch (e: Exception) {
             e.printStackTrace()
-            return 0
+            0
         }
     }
 
@@ -74,12 +74,12 @@ object Utils {
      * get text from clipboard
      */
     fun getClipboard(context: Context): String {
-        try {
+        return try {
             val cmb = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            return cmb.primaryClip?.getItemAt(0)?.text.toString()
+            cmb.primaryClip?.getItemAt(0)?.text.toString()
         } catch (e: Exception) {
             e.printStackTrace()
-            return ""
+            ""
         }
     }
 
@@ -126,11 +126,11 @@ object Utils {
      * base64 encode
      */
     fun encode(text: String): String {
-        try {
-            return Base64.encodeToString(text.toByteArray(charset("UTF-8")), Base64.NO_WRAP)
+        return try {
+            Base64.encodeToString(text.toByteArray(charset("UTF-8")), Base64.NO_WRAP)
         } catch (e: Exception) {
             e.printStackTrace()
-            return ""
+            ""
         }
     }
 
@@ -172,12 +172,12 @@ object Utils {
     fun createQRCode(text: String, size: Int = 800): Bitmap? {
         try {
             val hints = HashMap<EncodeHintType, String>()
-            hints.put(EncodeHintType.CHARACTER_SET, "utf-8")
+            hints[EncodeHintType.CHARACTER_SET] = "utf-8"
             val bitMatrix = QRCodeWriter().encode(text,
                     BarcodeFormat.QR_CODE, size, size, hints)
             val pixels = IntArray(size * size)
-            for (y in 0..size - 1) {
-                for (x in 0..size - 1) {
+            for (y in 0 until size) {
+                for (x in 0 until size) {
                     if (bitMatrix.get(x, y)) {
                         pixels[y * size + x] = 0xff000000.toInt()
                     } else {
@@ -222,7 +222,7 @@ object Utils {
             }
 
             // addr = addr.toLowerCase()
-            var octets = addr.split('.').toTypedArray()
+            val octets = addr.split('.').toTypedArray()
             if (octets.size == 4) {
                 if(octets[3].indexOf(":") > 0) {
                     addr = addr.substring(0, addr.indexOf(":"))
@@ -302,29 +302,29 @@ object Utils {
      * uuid
      */
     fun getUuid(): String {
-        try {
-            return UUID.randomUUID().toString().replace("-", "")
+        return try {
+            UUID.randomUUID().toString().replace("-", "")
         } catch (e: Exception) {
             e.printStackTrace()
-            return ""
+            ""
         }
     }
 
     fun urlDecode(url: String): String {
-        try {
-            return URLDecoder.decode(url, "UTF-8")
+        return try {
+            URLDecoder.decode(url, "UTF-8")
         } catch (e: Exception) {
             e.printStackTrace()
-            return url
+            url
         }
     }
 
     fun urlEncode(url: String): String {
-        try {
-            return URLEncoder.encode(url, "UTF-8")
+        return try {
+            URLEncoder.encode(url, "UTF-8")
         } catch (e: Exception) {
             e.printStackTrace()
-            return url
+            url
         }
     }
 
@@ -401,7 +401,7 @@ object Utils {
             val allText = process.inputStream.bufferedReader().use { it.readText() }
             if (allText.isNotBlank()) {
                 val tempInfo = allText.substring(allText.indexOf("min/avg/max/mdev") + 19)
-                val temps = tempInfo.split("/".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                val temps = tempInfo.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 if (temps.count() > 0 && temps[0].length < 10) {
                     return temps[0].toFloat().toInt().toString() + "ms"
                 }

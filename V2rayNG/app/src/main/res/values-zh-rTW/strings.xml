@@ -38,7 +38,6 @@
     <string name="server_lab_address">位址</string>
     <string name="server_lab_port">埠</string>
     <string name="server_lab_id">使用者識別碼</string>
-    <string name="server_lab_alterid">AlterId</string>
     <string name="server_lab_security">安全性</string>
     <string name="server_lab_network">網路</string>
     <string name="server_lab_more_function">更多功能</string>

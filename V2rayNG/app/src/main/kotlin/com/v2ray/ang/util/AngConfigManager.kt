@@ -17,7 +17,6 @@ import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_SECURITY
 import com.v2ray.ang.dto.V2rayConfig.Companion.TLS
 import com.v2ray.ang.util.MmkvManager.KEY_SELECTED_SERVER
 import java.net.URI
-import java.net.URLDecoder
 import java.util.*
 
 object AngConfigManager {
@@ -103,7 +102,6 @@ object AngConfigManager {
                     vnext.port = vmessBean.port
                     vnext.users[0].id = vmessBean.id
                     if (config.configType == EConfigType.VMESS) {
-                        vnext.users[0].alterId = vmessBean.alterId
                         vnext.users[0].security = vmessBean.security
                     } else if (config.configType == EConfigType.VLESS) {
                         vnext.users[0].encryption = vmessBean.security
@@ -139,7 +137,7 @@ object AngConfigManager {
 //                        vmessBean.allowInsecure.toBoolean()
 //                    }
                     streamSetting.populateTlsSettings(vmessBean.streamSecurity, false,
-                            sni)//if (vmessBean.sni.isNotBlank()) vmessBean.sni else sni)
+                            sni)//vmessBean.sni.ifBlank { sni })
                 }
             }
             val key = MmkvManager.encodeServerConfig(vmessBean.guid, config)
@@ -196,7 +194,6 @@ object AngConfigManager {
                         if (TextUtils.isEmpty(vmessQRCode.add)
                                 || TextUtils.isEmpty(vmessQRCode.port)
                                 || TextUtils.isEmpty(vmessQRCode.id)
-                                || TextUtils.isEmpty(vmessQRCode.aid)
                                 || TextUtils.isEmpty(vmessQRCode.net)
                         ) {
                             return R.string.toast_incorrect_protocol
@@ -208,7 +205,6 @@ object AngConfigManager {
                             vnext.port = Utils.parseInt(vmessQRCode.port)
                             vnext.users[0].id = vmessQRCode.id
                             vnext.users[0].encryption = DEFAULT_SECURITY
-                            vnext.users[0].alterId = Utils.parseInt(vmessQRCode.aid)
                         }
                         val sni = streamSetting.populateTransportSettings(vmessQRCode.net, vmessQRCode.type, vmessQRCode.host,
                                 vmessQRCode.path, vmessQRCode.path, vmessQRCode.host, vmessQRCode.path, vmessQRCode.type, vmessQRCode.path)
@@ -292,16 +288,14 @@ object AngConfigManager {
                 var sni = ""
                 uri.rawQuery?.let { rawQuery ->
                     val queryParam = rawQuery.split("&")
-                            .map { it.split("=").let { (k, v) -> k to URLDecoder.decode(v, "utf-8")!! } }
-                            .toMap()
+                        .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
                     sni = queryParam["sni"] ?: ""
                 }
                 config.outboundBean?.streamSettings?.populateTlsSettings(TLS, allowInsecure, sni)
             } else if (str.startsWith(EConfigType.VLESS.protocolScheme)) {
                 val uri = URI(str)
                 val queryParam = uri.rawQuery.split("&")
-                        .map { it.split("=").let { (k, v) -> k to URLDecoder.decode(v, "utf-8")!! } }
-                        .toMap()
+                    .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
                 config = ServerConfig.create(EConfigType.VLESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
                 config.remarks = uri.fragment ?: ""
@@ -339,14 +333,13 @@ object AngConfigManager {
         return runCatching {
             val uri = URI(uriString)
             check(uri.scheme == "vmess")
-            val (_, protocol, tlsStr, uuid, alterId) =
-                    Regex("(tcp|http|ws|kcp|quic|grpc)(\\+tls)?:([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12})-([0-9]+)")
+            val (_, protocol, tlsStr, uuid) =
+                    Regex("(tcp|http|ws|kcp|quic|grpc)(\\+tls)?:([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12})")
                             .matchEntire(uri.userInfo)?.groupValues
                             ?: error("parse user info fail.")
             val tls = tlsStr.isNotBlank()
             val queryParam = uri.rawQuery.split("&")
-                    .map { it.split("=").let { (k, v) -> k to URLDecoder.decode(v, "utf-8")!! } }
-                    .toMap()
+                .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
 
             val streamSetting = config.outboundBean?.streamSettings ?: return false
             config.remarks = uri.fragment
@@ -355,7 +348,6 @@ object AngConfigManager {
                 vnext.port = uri.port
                 vnext.users[0].id = uuid
                 vnext.users[0].encryption = DEFAULT_SECURITY
-                vnext.users[0].alterId = alterId.toInt()
             }
 
             val sni = streamSetting.populateTransportSettings(protocol, queryParam["type"],
@@ -392,7 +384,6 @@ object AngConfigManager {
             vnext.port = Utils.parseInt(arr22[1])
             vnext.users[0].id = arr21[1]
             vnext.users[0].encryption = arr21[0]
-            vnext.users[0].alterId = 0
         }
         return true
     }
@@ -413,7 +404,6 @@ object AngConfigManager {
                     vmessQRCode.add = outbound.getServerAddress().orEmpty()
                     vmessQRCode.port = outbound.getServerPort().toString()
                     vmessQRCode.id = outbound.getPassword().orEmpty()
-                    vmessQRCode.aid = outbound.settings?.vnext?.get(0)?.users?.get(0)?.alterId.toString()
                     vmessQRCode.net = streamSetting.network
                     vmessQRCode.tls = streamSetting.security
                     vmessQRCode.sni = streamSetting.tlsSettings?.serverName.orEmpty()
@@ -455,28 +445,24 @@ object AngConfigManager {
                     }
                     dicQuery["encryption"] = if (outbound.getSecurityEncryption().isNullOrEmpty()) "none"
                     else outbound.getSecurityEncryption().orEmpty()
-                    dicQuery["security"] = if (streamSetting.security.isEmpty()) "none"
-                    else streamSetting.security
+                    dicQuery["security"] = streamSetting.security.ifEmpty { "none" }
                     (streamSetting.tlsSettings?: streamSetting.xtlsSettings)?.let { tlsSetting ->
                         if (!TextUtils.isEmpty(tlsSetting.serverName)) {
                             dicQuery["sni"] = tlsSetting.serverName
                         }
                     }
-                    dicQuery["type"] = if (streamSetting.network.isEmpty()) V2rayConfig.DEFAULT_NETWORK
-                    else streamSetting.network
+                    dicQuery["type"] = streamSetting.network.ifEmpty { V2rayConfig.DEFAULT_NETWORK }
 
                     outbound.getTransportSettingDetails()?.let { transportDetails ->
                         when (streamSetting.network) {
                             "tcp" -> {
-                                dicQuery["headerType"] = if (transportDetails[0].isEmpty()) "none"
-                                else transportDetails[0]
+                                dicQuery["headerType"] = transportDetails[0].ifEmpty { "none" }
                                 if (!TextUtils.isEmpty(transportDetails[1])) {
                                     dicQuery["host"] = Utils.urlEncode(transportDetails[1])
                                 }
                             }
                             "kcp" -> {
-                                dicQuery["headerType"] = if (transportDetails[0].isEmpty()) "none"
-                                else transportDetails[0]
+                                dicQuery["headerType"] = transportDetails[0].ifEmpty { "none" }
                                 if (!TextUtils.isEmpty(transportDetails[2])) {
                                     dicQuery["seed"] = Utils.urlEncode(transportDetails[2])
                                 }
@@ -499,8 +485,7 @@ object AngConfigManager {
                                 }
                             }
                             "quic" -> {
-                                dicQuery["headerType"] = if (transportDetails[0].isEmpty()) "none"
-                                else transportDetails[0]
+                                dicQuery["headerType"] = transportDetails[0].ifEmpty { "none" }
                                 dicQuery["quicSecurity"] = Utils.urlEncode(transportDetails[1])
                                 dicQuery["key"] = Utils.urlEncode(transportDetails[2])
                             }

@@ -93,7 +93,7 @@ object V2rayConfigUtil {
             //val httpPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT) ?: AppConfig.PORT_HTTP)
 
             v2rayConfig.inbounds.forEach { curInbound ->
-                if (!(settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) ?: false)) {
+                if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) != true) {
                     //bind all inbounds to localhost if the user requests
                     curInbound.listen = "127.0.0.1"
                 }
@@ -187,7 +187,7 @@ object V2rayConfigUtil {
                     val rulesIP = V2rayConfig.RoutingBean.RulesBean()
                     rulesIP.type = "field"
                     rulesIP.outboundTag = tag
-                    rulesIP.ip = ArrayList<String>()
+                    rulesIP.ip = ArrayList()
                     rulesIP.ip?.add("geoip:$code")
                     v2rayConfig.routing.rules.add(rulesIP)
                 }
@@ -197,7 +197,7 @@ object V2rayConfigUtil {
                     val rulesDomain = V2rayConfig.RoutingBean.RulesBean()
                     rulesDomain.type = "field"
                     rulesDomain.outboundTag = tag
-                    rulesDomain.domain = ArrayList<String>()
+                    rulesDomain.domain = ArrayList()
                     rulesDomain.domain?.add("geosite:$code")
                     v2rayConfig.routing.rules.add(rulesDomain)
                 }
@@ -214,13 +214,13 @@ object V2rayConfigUtil {
                 val rulesDomain = V2rayConfig.RoutingBean.RulesBean()
                 rulesDomain.type = "field"
                 rulesDomain.outboundTag = tag
-                rulesDomain.domain = ArrayList<String>()
+                rulesDomain.domain = ArrayList()
 
                 //IP
                 val rulesIP = V2rayConfig.RoutingBean.RulesBean()
                 rulesIP.type = "field"
                 rulesIP.outboundTag = tag
-                rulesIP.ip = ArrayList<String>()
+                rulesIP.ip = ArrayList()
 
                 userRule.split(",").map { it.trim() }.forEach {
                     if (Utils.isIpAddress(it) || it.startsWith("geoip:")) {
@@ -364,7 +364,7 @@ object V2rayConfigUtil {
             }
 
             // hardcode googleapi rule to fix play store problems
-            hosts.put("domain:googleapis.cn", "googleapis.com")
+            hosts["domain:googleapis.cn"] = "googleapis.com"
 
             // DNS dns对象
             v2rayConfig.dns = V2rayConfig.DnsBean(
@@ -393,14 +393,22 @@ object V2rayConfigUtil {
             if (outbound.streamSettings?.network == DEFAULT_NETWORK
                     && outbound.streamSettings?.tcpSettings?.header?.type == HTTP) {
                 val path = outbound.streamSettings?.tcpSettings?.header?.request?.path
-                val Host = outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host
+                val host = outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host
 
                 val requestString: String by lazy {
                     """{"version":"1.1","method":"GET","headers":{"User-Agent":["Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36","Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_2 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/53.0.2785.109 Mobile/14A456 Safari/601.1.46"],"Accept-Encoding":["gzip, deflate"],"Connection":["keep-alive"],"Pragma":"no-cache"}}"""
                 }
-                outbound.streamSettings?.tcpSettings?.header?.request = Gson().fromJson(requestString, V2rayConfig.OutboundBean.StreamSettingsBean.TcpSettingsBean.HeaderBean.RequestBean::class.java)
-                outbound.streamSettings?.tcpSettings?.header?.request?.path = path!!
-                outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host = Host!!
+                outbound.streamSettings?.tcpSettings?.header?.request = Gson().fromJson(
+                    requestString,
+                    V2rayConfig.OutboundBean.StreamSettingsBean.TcpSettingsBean.HeaderBean.RequestBean::class.java
+                )
+                outbound.streamSettings?.tcpSettings?.header?.request?.path =
+                    if (path.isNullOrEmpty()) {
+                        listOf("/")
+                    } else {
+                        path
+                    }
+                outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host = host!!
             }
 
         } catch (e: Exception) {

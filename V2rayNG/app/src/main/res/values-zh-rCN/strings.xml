@@ -38,7 +38,6 @@
     <string name="server_lab_address">地址(address)</string>
     <string name="server_lab_port">端口(port)</string>
     <string name="server_lab_id">用户ID(id)</string>
-    <string name="server_lab_alterid">额外ID(alterId)</string>
     <string name="server_lab_security">加密方式(security)</string>
     <string name="server_lab_network">传输协议(network)</string>
     <string name="server_lab_more_function">功能设置（不清楚则保持默认值）</string>

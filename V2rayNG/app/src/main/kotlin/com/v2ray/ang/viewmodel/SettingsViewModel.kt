@@ -46,7 +46,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_BYPASS_APPS, -> {
                 settingsStorage?.encode(key, sharedPreferences.getBoolean(key, false))
             }
-            AppConfig.PREF_SNIFFING_ENABLED, -> {
+            AppConfig.PREF_SNIFFING_ENABLED -> {
                 settingsStorage?.encode(key, sharedPreferences.getBoolean(key, true))
             }
             AppConfig.PREF_PER_APP_PROXY_SET -> {
