@@ -63,6 +63,11 @@
         android:title="@string/title_ping_all_server"
         app:showAsAction="never" />
     <item
+            android:id="@+id/test_speed"
+            android:icon="@drawable/ic_share_white_24dp"
+            android:title="@string/title_test_speed"
+            app:showAsAction="never" />
+    <item
         android:id="@+id/sub_update"
         android:icon="@drawable/ic_subscriptions_white_24dp"
         android:title="@string/title_sub_update"

@@ -239,6 +239,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
+        R.id.test_speed ->{
+            if (mainViewModel.isRunning.value == true) {
+                binding.tvTestState.text = getString(R.string.connection_speed_testing)
+                mainViewModel.testSpeed()
+            }
+            true
+        }
+
 //        R.id.settings -> {
 //            startActivity<SettingsActivity>("isRunning" to isRunning)
 //            true

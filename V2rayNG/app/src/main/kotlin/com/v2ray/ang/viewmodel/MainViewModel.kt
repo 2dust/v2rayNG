@@ -38,7 +38,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun startListenBroadcast() {
         isRunning.value = false
-        getApplication<AngApplication>().registerReceiver(mMsgReceiver, IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY))
+        getApplication<AngApplication>().registerReceiver(
+            mMsgReceiver,
+            IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY)
+        )
         MessageUtil.sendMsg2Service(getApplication(), AppConfig.MSG_REGISTER_CLIENT, "")
     }
 
@@ -112,9 +115,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun testCurrentServerRealPing() {
-        val socksPort = 10808//Utils.parseInt(defaultDPreference.getPrefString(SettingsActivity.PREF_SOCKS_PORT, "10808"))
+        val socksPort =
+            10808//Utils.parseInt(defaultDPreference.getPrefString(SettingsActivity.PREF_SOCKS_PORT, "10808"))
         GlobalScope.launch(Dispatchers.IO) {
             val result = Utils.testConnection(getApplication(), socksPort)
+            launch(Dispatchers.Main) {
+                updateTestResultAction.value = result
+            }
+        }
+    }
+
+
+    fun testSpeed() {
+        val socksPort = 10808
+        GlobalScope.launch(Dispatchers.IO) {
+            val result = Utils.testSpeed(getApplication(), socksPort)
             launch(Dispatchers.Main) {
                 updateTestResultAction.value = result
             }

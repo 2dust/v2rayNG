@@ -201,5 +201,8 @@
         <item>VPN</item>
         <item>仅代理</item>
     </string-array>
+    <string name="title_test_speed">测试网络速率</string>
+    <string name="connection_speed_testing">正在测速......</string>
+    <string name="connection_speed_available">测速完毕，速率 %.2f Mbps</string>
 
 </resources>

@@ -27,6 +27,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.service.V2RayServiceManager
 import kotlinx.coroutines.isActive
 import java.io.IOException
+import java.io.InputStream
 import java.net.*
 import kotlin.coroutines.coroutineContext
 
@@ -148,8 +149,8 @@ object Utils {
 
     fun getVpnDnsServers(): List<String> {
         val vpnDns = settingsStorage?.decodeString(AppConfig.PREF_VPN_DNS)
-                ?: settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS)
-                ?: AppConfig.DNS_AGENT
+            ?: settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS)
+            ?: AppConfig.DNS_AGENT
         return vpnDns.split(",").filter { isPureIpAddress(it) }
         // allow empty, in that case dns will use system default
     }
@@ -173,8 +174,10 @@ object Utils {
         try {
             val hints = HashMap<EncodeHintType, String>()
             hints[EncodeHintType.CHARACTER_SET] = "utf-8"
-            val bitMatrix = QRCodeWriter().encode(text,
-                    BarcodeFormat.QR_CODE, size, size, hints)
+            val bitMatrix = QRCodeWriter().encode(
+                text,
+                BarcodeFormat.QR_CODE, size, size, hints
+            )
             val pixels = IntArray(size * size)
             for (y in 0 until size) {
                 for (x in 0 until size) {
@@ -186,8 +189,10 @@ object Utils {
 
                 }
             }
-            val bitmap = Bitmap.createBitmap(size, size,
-                    Bitmap.Config.ARGB_8888)
+            val bitmap = Bitmap.createBitmap(
+                size, size,
+                Bitmap.Config.ARGB_8888
+            )
             bitmap.setPixels(pixels, 0, size, 0, 0, size, size)
             return bitmap
         } catch (e: WriterException) {
@@ -224,7 +229,7 @@ object Utils {
             // addr = addr.toLowerCase()
             val octets = addr.split('.').toTypedArray()
             if (octets.size == 4) {
-                if(octets[3].indexOf(":") > 0) {
+                if (octets[3].indexOf(":") > 0) {
                     addr = addr.substring(0, addr.indexOf(":"))
                 }
                 return isIpv4Address(addr)
@@ -243,7 +248,8 @@ object Utils {
     }
 
     fun isIpv4Address(value: String): Boolean {
-        val regV4 = Regex("^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$")
+        val regV4 =
+            Regex("^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$")
         return regV4.matches(value)
     }
 
@@ -253,7 +259,8 @@ object Utils {
             addr = addr.drop(1)
             addr = addr.dropLast(addr.count() - addr.lastIndexOf("]"))
         }
-        val regV6 = Regex("^((?:[0-9A-Fa-f]{1,4}))?((?::[0-9A-Fa-f]{1,4}))*::((?:[0-9A-Fa-f]{1,4}))?((?::[0-9A-Fa-f]{1,4}))*|((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4})){7}$")
+        val regV6 =
+            Regex("^((?:[0-9A-Fa-f]{1,4}))?((?::[0-9A-Fa-f]{1,4}))*::((?:[0-9A-Fa-f]{1,4}))?((?::[0-9A-Fa-f]{1,4}))*|((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4})){7}$")
         return regV6.matches(addr)
     }
 
@@ -333,13 +340,18 @@ object Utils {
         var conn: HttpURLConnection? = null
 
         try {
-            val url = URL("https",
-                    "www.google.com",
-                    "/generate_204")
+            val url = URL(
+                "https",
+                "www.google.com",
+                "/generate_204"
+            )
 
             conn = url.openConnection(
-                Proxy(Proxy.Type.HTTP,
-                InetSocketAddress("127.0.0.1", port + 1))) as HttpURLConnection
+                Proxy(
+                    Proxy.Type.HTTP,
+                    InetSocketAddress("127.0.0.1", port + 1)
+                )
+            ) as HttpURLConnection
             conn.connectTimeout = 30000
             conn.readTimeout = 30000
             conn.setRequestProperty("Connection", "close")
@@ -357,11 +369,11 @@ object Utils {
             }
         } catch (e: IOException) {
             // network exception
-            Log.d(AppConfig.ANG_PACKAGE,"testConnection IOException: "+Log.getStackTraceString(e))
+            Log.d(AppConfig.ANG_PACKAGE, "testConnection IOException: " + Log.getStackTraceString(e))
             result = context.getString(R.string.connection_test_error, e.message)
         } catch (e: Exception) {
             // library exception, eg sumsung
-            Log.d(AppConfig.ANG_PACKAGE,"testConnection Exception: "+Log.getStackTraceString(e))
+            Log.d(AppConfig.ANG_PACKAGE, "testConnection Exception: " + Log.getStackTraceString(e))
             result = context.getString(R.string.connection_test_error, e.message)
         } finally {
             conn?.disconnect()
@@ -369,6 +381,56 @@ object Utils {
 
         return result
     }
+
+    /**
+     * speed test
+     */
+    fun testSpeed(context: Context, port: Int): String {
+        var result: String
+        var conn: HttpURLConnection? = null
+        var s: InputStream? = null
+        try {
+            val url = URL(
+                "https",
+                "redirector.gvt1.com",
+                "/edgedl/android/studio/install/2021.1.1.21/android-studio-2021.1.1.21-windows.exe"
+            )
+            conn = url.openConnection(
+                Proxy(
+                    Proxy.Type.HTTP,
+                    InetSocketAddress("127.0.0.1", port + 1)
+                )
+            ) as HttpURLConnection
+
+            val byteArray = ByteArray(8192);
+            var re = 0
+            var size = 0
+            s = conn.inputStream
+            val start = SystemClock.elapsedRealtime()
+            while (re >= 0 && size < 32 * 1024 * 1024) {
+                re = s.read(byteArray)
+                size += re
+            }
+            val elapsed = SystemClock.elapsedRealtime() - start
+            val speed = (size / 1024.0 / 1024.0) * 8 / (elapsed / 1000.0)
+            result = context.getString(R.string.connection_speed_available) .format(speed)
+
+        } catch (e: IOException) {
+            // network exception
+            Log.d(AppConfig.ANG_PACKAGE, "testConnection IOException: " + Log.getStackTraceString(e))
+            result = context.getString(R.string.connection_test_error, e.message)
+        } catch (e: Exception) {
+            // library exception, eg sumsung
+            Log.d(AppConfig.ANG_PACKAGE, "testConnection Exception: " + Log.getStackTraceString(e))
+            result = context.getString(R.string.connection_test_error, e.message)
+        } finally {
+            s?.close()
+            conn?.disconnect()
+        }
+
+        return result
+    }
+
 
     /**
      * package path
@@ -469,8 +531,10 @@ object Utils {
         conn.setRequestProperty("Connection", "close")
         conn.setRequestProperty("User-agent", "v2rayNG/${BuildConfig.VERSION_NAME}")
         url.userInfo?.let {
-            conn.setRequestProperty("Authorization",
-                "Basic ${encode(urlDecode(it))}")
+            conn.setRequestProperty(
+                "Authorization",
+                "Basic ${encode(urlDecode(it))}"
+            )
         }
         conn.useCaches = false
         return conn.inputStream.use {
