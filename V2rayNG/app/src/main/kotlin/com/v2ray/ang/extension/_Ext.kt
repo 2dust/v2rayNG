@@ -15,13 +15,13 @@ import java.net.URLConnection
 val Context.v2RayApplication: AngApplication
     get() = applicationContext as AngApplication
 
-inline fun Context.toast(message: Int): Toast = ToastCompat
+fun Context.toast(message: Int): Toast = ToastCompat
         .makeText(this, message, Toast.LENGTH_SHORT)
         .apply {
             show()
         }
 
-inline fun Context.toast(message: CharSequence): Toast = ToastCompat
+fun Context.toast(message: CharSequence): Toast = ToastCompat
         .makeText(this, message, Toast.LENGTH_SHORT)
         .apply {
             show()

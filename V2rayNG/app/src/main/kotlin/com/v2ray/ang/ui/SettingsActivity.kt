@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.preference.*
 import android.text.TextUtils
-import android.view.View
 import androidx.activity.viewModels
 import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
@@ -203,7 +202,7 @@ class SettingsActivity : BaseActivity() {
 
         override fun onStart() {
             super.onStart()
-            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
             updateMode(defaultSharedPreferences.getString(AppConfig.PREF_MODE, "VPN"))
             var remoteDnsString = defaultSharedPreferences.getString(AppConfig.PREF_REMOTE_DNS, "")
             domesticDns.summary = defaultSharedPreferences.getString(AppConfig.PREF_DOMESTIC_DNS, "")
@@ -222,10 +221,10 @@ class SettingsActivity : BaseActivity() {
         }
 
         private fun updateMode(mode: String?) {
-            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
             val vpn = mode == "VPN"
             perAppProxy.isEnabled = vpn
-            perAppProxy.isChecked = PreferenceManager.getDefaultSharedPreferences(activity)
+            perAppProxy.isChecked = PreferenceManager.getDefaultSharedPreferences(requireActivity())
                     .getBoolean(AppConfig.PREF_PER_APP_PROXY, false)
             localDns?.isEnabled = vpn
             fakeDns?.isEnabled = vpn
@@ -243,7 +242,7 @@ class SettingsActivity : BaseActivity() {
         }
     }
 
-    fun onModeHelpClicked(view: View) {
+    fun onModeHelpClicked() {
         Utils.openUri(this, AppConfig.v2rayNGWikiMode)
     }
 }

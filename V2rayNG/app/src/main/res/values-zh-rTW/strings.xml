@@ -79,7 +79,7 @@
     <string name="title_advanced">進階</string>
     <string name="title_vpn_settings">VPN 設定</string>
     <string name="title_pref_per_app_proxy">Proxy 個別應用程式</string>
-    <string name="summary_pref_per_app_proxy">Proxy 個別應用程式模式只支援 Android 5.0 (Lollipop) 或更高</string>
+    <string name="summary_pref_per_app_proxy">常規:勾選的App被代理,未勾選的直連;\n繞行模式:勾選的App直連,未勾選的被代理.\n不明白者在菜單中選擇自動選中需代理應用</string>
 
     <string name="title_pref_mux_enabled">啟用 Mux</string>
     <string name="summary_pref_mux_enabled">啟用或許會加快網路速度，關閉或許會閃爍</string>

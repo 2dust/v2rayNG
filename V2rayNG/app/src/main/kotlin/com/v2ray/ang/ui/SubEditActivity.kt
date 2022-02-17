@@ -106,10 +106,10 @@ class SubEditActivity : BaseActivity() {
         return true
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.action_server, menu)
-        del_config = menu?.findItem(R.id.del_config)
-        save_config = menu?.findItem(R.id.save_config)
+        del_config = menu.findItem(R.id.del_config)
+        save_config = menu.findItem(R.id.save_config)
 
         if (editSubId.isEmpty()) {
             del_config?.isVisible = false
