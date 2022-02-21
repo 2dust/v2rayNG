@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.preference.*
 import android.text.TextUtils
+import android.view.View
 import androidx.activity.viewModels
 import com.v2ray.ang.R
 import com.v2ray.ang.AppConfig
@@ -242,7 +243,7 @@ class SettingsActivity : BaseActivity() {
         }
     }
 
-    fun onModeHelpClicked() {
+    fun onModeHelpClicked(view: View) {
         Utils.openUri(this, AppConfig.v2rayNGWikiMode)
     }
 }
