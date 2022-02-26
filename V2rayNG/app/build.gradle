@@ -77,10 +77,10 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 
     // Androidx
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
-    implementation "androidx.appcompat:appcompat:1.3.0"
-    implementation "com.google.android.material:material:1.4.0"
+    implementation "androidx.appcompat:appcompat:1.4.1"
+    implementation "com.google.android.material:material:1.5.0"
     implementation "androidx.cardview:cardview:1.0.0"
     implementation "androidx.preference:preference:1.0.0"
     implementation "androidx.recyclerview:recyclerview:1.2.1"
@@ -88,9 +88,9 @@ dependencies {
     implementation 'androidx.viewpager2:viewpager2:1.1.0-beta01'
 
     // Androidx ktx
-    implementation 'androidx.activity:activity-ktx:1.2.4'
+    implementation 'androidx.activity:activity-ktx:1.4.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
 
     //kotlin
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
