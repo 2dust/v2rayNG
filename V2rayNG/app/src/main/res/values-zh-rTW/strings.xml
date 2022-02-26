@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">v2rayNG</string>
-    <string name="app_widget_name">切換</string>
-    <string name="app_tile_name">切換</string>
+    <string name="app_widget_name">開關</string>
+    <string name="app_tile_name">開關</string>
     <string name="app_tile_first_use">首次使用此功能，請使用此應用程式新增組態</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="migration_success">數據遷移成功!</string>
-    <string name="migration_fail">數據遷移失敗啦!</string>
+    <string name="migration_success">資料遷移成功！</string>
+    <string name="migration_fail">資料遷移失敗！</string>
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">停止</string>
@@ -23,11 +23,11 @@
     <string name="menu_item_add_config">新增組態</string>
     <string name="menu_item_save_config">儲存組態</string>
     <string name="menu_item_del_config">刪除組態</string>
-    <string name="menu_item_import_config_qrcode">自 QR 碼匯入組態</string>
+    <string name="menu_item_import_config_qrcode">自 QR Code 匯入組態</string>
     <string name="menu_item_import_config_clipboard">自剪貼簿匯入組態</string>
-    <string name="menu_item_import_config_manually_vmess">手動鍵入[Vmess]</string>
-    <string name="menu_item_import_config_manually_ss">手動鍵入[Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">手動鍵入[Socks]</string>
+    <string name="menu_item_import_config_manually_vmess">手動鍵入 [Vmess]</string>
+    <string name="menu_item_import_config_manually_ss">手動鍵入 [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">手動鍵入 [Socks]</string>
     <string name="menu_item_import_config_custom">自訂組態</string>
     <string name="menu_item_import_config_custom_clipboard">自剪貼簿匯入自訂組態</string>
     <string name="menu_item_import_config_custom_local">自本機匯入自訂組態</string>
@@ -37,16 +37,16 @@
     <string name="server_lab_remarks">備註</string>
     <string name="server_lab_address">位址</string>
     <string name="server_lab_port">埠</string>
-    <string name="server_lab_id">使用者識別碼</string>
+    <string name="server_lab_id">使用者 ID</string>
     <string name="server_lab_security">安全性</string>
     <string name="server_lab_network">網路</string>
     <string name="server_lab_more_function">更多功能</string>
     <string name="server_lab_head_type">標頭類型</string>
     <string name="server_lab_mode_type">gRPC 傳輸模式 (mode)</string>
-    <string name="server_lab_request_host">要求主機(host)(host/ws host/h2 host)/QUIC加密方式</string>
-    <string name="server_lab_path">path(ws path/h2 path)/QUIC加密密鑰/kcp seed/gRPC serviceName</string>
-    <string name="server_lab_stream_security">傳輸層安全性(tls)</string>
-    <string name="server_lab_allow_insecure">跳過證書驗證(allowInsecure)</string>
+    <string name="server_lab_request_host">要求主機 (host)(host/ws host/h2 host)/QUIC 加密方式</string>
+    <string name="server_lab_path">path(ws path/h2 path)/QUIC 加密金鑰/kcp seed/gRPC serviceName</string>
+    <string name="server_lab_stream_security">傳輸層安全性 (tls)</string>
+    <string name="server_lab_allow_insecure">跳過憑證驗證 (allowInsecure)</string>
     <string name="server_lab_address3">伺服器位址</string>
     <string name="server_lab_port3">伺服器埠</string>
     <string name="server_lab_id3">密碼</string>
@@ -63,121 +63,121 @@
     <string name="server_lab_content">內容</string>
     <string name="toast_none_data_clipboard">剪貼簿內無資料</string>
     <string name="toast_invalid_url">網址無效</string>
-    <string name="server_lab_need_inbound">​​確保inbound有socks=10808,http=10809</string>
+    <string name="server_lab_need_inbound">​​確保 inbound 有 socks=10808,http=10809</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">載入</string>
     <string name="menu_item_select_all">全選</string>
     <string name="msg_enter_keywords">輸入關鍵字</string>
     <string name="switch_bypass_apps_mode">略過模式</string>
-    <string name="menu_item_select_proxy_app">自動選中需代理應用</string>
+    <string name="menu_item_select_proxy_app">自動選中需要 Proxy 的應用</string>
     <string name="msg_downloading_content">正在下載內容</string>
 
 
     <!-- Preferences -->
     <string name="title_settings">設定</string>
-    <string name="title_advanced">進階設定</string>
+    <string name="title_advanced">進階</string>
     <string name="title_vpn_settings">VPN 設定</string>
     <string name="title_pref_per_app_proxy">Proxy 個別應用程式</string>
     <string name="summary_pref_per_app_proxy">Proxy 個別應用程式模式只支援 Android 5.0 (Lollipop) 或更高</string>
 
     <string name="title_pref_mux_enabled">啟用 Mux</string>
-    <string name="summary_pref_mux_enabled">啟用或許會加快網路速度，切換或許會閃爍</string>
+    <string name="summary_pref_mux_enabled">啟用或許會加快網路速度，關閉或許會閃爍</string>
 
     <string name="title_pref_speed_enabled">啟用速度顯示</string>
-    <string name="summary_pref_speed_enabled">在通知中顯示當前速度\n小圖標顯示流量的路由情況</string>
+    <string name="summary_pref_speed_enabled">在通知中顯示當前速度\n小圖示顯示流量的轉送情況</string>
 
-    <string name="title_pref_sniffing_enabled">啟用流量探測</string>
-    <string name="summary_pref_sniffing_enabled">從流量中探測域名 (默認啟用)</string>
+    <string name="title_pref_sniffing_enabled">啟用網路監測</string>
+    <string name="summary_pref_sniffing_enabled">從封包中監測網域 (預設啟用)</string>
 
-    <string name="title_pref_local_dns_enabled">啟用本地DNS</string>
-    <string name="summary_pref_local_dns_enabled">DNS 請求導入 core 由 DNS 模塊處理（推薦啟用 如果需要路由略過局域網及中國大陸）</string>
+    <string name="title_pref_local_dns_enabled">啟用本地 DNS</string>
+    <string name="summary_pref_local_dns_enabled">DNS 請求匯入 core 由 DNS 模塊處理 (建議啟用，可能需要轉送略過局域網及中國大陸)</string>
 
-    <string name="title_pref_fake_dns_enabled">啟用虛擬DNS</string>
-    <string name="summary_pref_fake_dns_enabled">本地返回虛構解析結果 (減低延時 但個別應用可能無法使用)</string>
+    <string name="title_pref_fake_dns_enabled">啟用偽 DNS</string>
+    <string name="summary_pref_fake_dns_enabled">本地返回偽造解析結果 (減低延時，但個別應用可能無法使用)</string>
 
     <string name="title_pref_forward_ipv6">IPv6 路由</string>
-    <string name="summary_pref_forward_ipv6">向遠端重新導向 IPv6 流量（測試）</string>
+    <string name="summary_pref_forward_ipv6">向遠端重新導向 IPv6 流量 (測試)</string>
 
-    <string name="title_pref_routing">路由設置</string>
-    <string name="title_pref_routing_domain_strategy">域名策略</string>
-    <string name="title_pref_routing_mode">路由模式</string>
-    <string name="title_pref_routing_custom">自訂路由</string>
+    <string name="title_pref_routing">轉送設定</string>
+    <string name="title_pref_routing_domain_strategy">網域策略</string>
+    <string name="title_pref_routing_mode">轉送模式</string>
+    <string name="title_pref_routing_custom">自訂轉送</string>
 
-    <string name="title_pref_donate">捐款</string>
-    <string name="summary_pref_donate">向開發人員捐款</string>
+    <string name="title_pref_donate">捐助</string>
+    <string name="summary_pref_donate">向開發人員捐助</string>
     <string name="donate_detail">新增一些實驗性進階功能</string>
 
-    <string name="title_pref_remote_dns">遠端DNS (可選)</string>
+    <string name="title_pref_remote_dns">遠端 DNS (可選)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
-    <string name="title_pref_vpn_dns">VPN DNS (僅支持 IPv4/v6)</string>
+    <string name="title_pref_vpn_dns">VPN DNS (僅支援 IPv4/v6)</string>
 
-    <string name="title_pref_domestic_dns">境内DNS (可選)</string>
+    <string name="title_pref_domestic_dns">境内 DNS (可選)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
-    <string name="title_pref_socks_port">SOCKS5代理連接埠</string>
-    <string name="summary_pref_socks_port">SOCKS5代理連接埠</string>
+    <string name="title_pref_socks_port">SOCKS5 Proxy 埠</string>
+    <string name="summary_pref_socks_port">SOCKS5 Proxy 埠</string>
 
-    <string name="title_pref_http_port">HTTP代理連接埠</string>
-    <string name="summary_pref_http_port">HTTP代理連接埠</string>
+    <string name="title_pref_http_port">HTTP Proxy 埠</string>
+    <string name="summary_pref_http_port">HTTP Proxy 埠</string>
 
-    <string name="title_pref_local_dns_port">本地DNS端口</string>
-    <string name="summary_pref_local_dns_port">本地DNS端口</string>
+    <string name="title_pref_local_dns_port">本地 DNS 埠</string>
+    <string name="summary_pref_local_dns_port">本地 DNS 埠</string>
 
-    <string name="title_pref_feedback">回饋</string>
-    <string name="summary_pref_feedback">回饋提升或前往 GitHub 回報 Bug</string>
-    <string name="summary_pref_tg_group">加入Telegram Group</string>
-    <string name="toast_tg_app_not_found">未找到Telegram app</string>
+    <string name="title_pref_feedback">意見回饋</string>
+    <string name="summary_pref_feedback">前往 GitHub 回報錯誤</string>
+    <string name="summary_pref_tg_group">加入 Telegram 群組</string>
+    <string name="toast_tg_app_not_found">未找到 Telegram 應用程式</string>
 
     <string name="title_pref_promotion">推廣</string>
-    <string name="summary_pref_promotion">一些推廣,點擊查看詳情(捐款可去除)</string>
+    <string name="summary_pref_promotion">一些推廣，輕觸以檢視 (捐贈可去除)</string>
 
     <string name="title_mode">模式</string>
     <string name="title_mode_help">點此查看更多幫助</string>
 
-    <string name="donate_error_setup">錯誤設定:</string>
-    <string name="donate_error_inventory">Error querying inventory</string>
-    <string name="donate_error_purchase1">購買錯誤:</string>
+    <string name="donate_error_setup">錯誤設定：</string>
+    <string name="donate_error_inventory">未查詢到庫存</string>
+    <string name="donate_error_purchase1">購買錯誤：</string>
     <string name="donate_error_purchase2">購買錯誤，真實性驗證失敗。</string>
-    <string name="donate_success_purchase">感謝您的捐款！</string>
-    <string name="donate_item_click">捐款</string>
+    <string name="donate_success_purchase">感謝您的捐助！</string>
+    <string name="donate_item_click">捐助</string>
     <string name="donate_item_paypal">Paypal</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">複製</string>
     <string name="logcat_delete">刪除</string>
-    <string name="title_export_all">匯出全部(非自訂)配置至剪貼簿</string>
+    <string name="title_export_all">匯出全部 (非自訂) 組態至剪貼簿</string>
     <string name="title_sub_setting">訂閱設定</string>
     <string name="sub_setting_remarks">備註</string>
-    <string name="sub_setting_url">位址(url)</string>
+    <string name="sub_setting_url">位址 (url)</string>
     <string name="title_sub_update">更新訂閱</string>
-    <string name="title_ping_all_server">測試所有配置延遲(Tcping)</string>
+    <string name="title_ping_all_server">測試所有組態延遲 (Tcping)</string>
 
     <string name="tasker_start_service">啟動服務</string>
     <string name="tasker_setting_confirm">確定</string>
 
-    <string name="routing_settings_title">路由設定</string>
-    <string name="routing_settings_tips">以英文逗號「,」分隔，記得儲存唷</string>
+    <string name="routing_settings_title">轉送設定</string>
+    <string name="routing_settings_tips">以半形逗號「,」分隔，記得儲存唷</string>
     <string name="routing_settings_save">儲存</string>
     <string name="routing_settings_delete">清除</string>
     <string name="routing_settings_scan_replace">掃描並取代</string>
     <string name="routing_settings_scan_append">掃描並附加</string>
-    <string name="routing_settings_default_rules">設置預設路由規則</string>
+    <string name="routing_settings_default_rules">設定預設轉送規則</string>
 
     <string name="connection_test_pending">"檢查連線能力"</string>
     <string name="connection_test_testing">"測試中……"</string>
-    <string name="connection_test_available">"成功: %d 毫秒延遲"</string>
-    <string name="connection_test_error">"偵測出網際網路連線失敗: %s"</string>
+    <string name="connection_test_available">"成功： %d 毫秒延遲"</string>
+    <string name="connection_test_error">"偵測出網際網路連線失敗：%s"</string>
     <string name="connection_test_fail">"無法使用網際網路"</string>
-    <string name="connection_test_error_status_code">"錯誤碼: （#%d）"</string>
+    <string name="connection_test_error_status_code">"錯誤碼：(#%d)"</string>
     <string name="connection_connected">"已連線，輕觸以檢查連線能力"</string>
     <string name="connection_not_connected">"未連線"</string>
 
     <string-array name="share_method">
-        <item>QR 碼</item>
+        <item>QR Code</item>
         <item>匯出至剪貼簿</item>
-        <item>匯出完整配置至剪貼簿</item>
+        <item>匯出完整組態至剪貼簿</item>
     </string-array>
 
     <string-array name="routing_tag">
@@ -187,20 +187,20 @@
     </string-array>
 
     <string-array name="routing_mode">
-        <item>全球</item>
+        <item>全域</item>
         <item>略過區域網路</item>
         <item>略過中國大陸</item>
         <item>略過區域網路及中國大陸</item>
     </string-array>
-    <string name="title_pref_proxy_sharing_enabled">代理共享</string>
-    <string name="summary_pref_proxy_sharing_enabled">綁定代理入口ip到0.0.0.0</string>
-    <string name="toast_warning_pref_proxysharing">其他設備可以使用socks/http協定通過您的IP地址連接到代理\nHttp 代理: http://您的ip:10809\nSocks 代理: socks(4/5)://您的ip:10808\n僅在受信任的網路中啟用以避免未經授權的連接</string>
-    <string name="toast_warning_pref_proxysharing_short">代理共享已啟用，請確保處於受信網路</string>
-    <string name="toast_malformed_josn">配置格式錯誤</string>
+    <string name="title_pref_proxy_sharing_enabled">Proxy 共用</string>
+    <string name="summary_pref_proxy_sharing_enabled">綁定 Proxy 入口 IP 到 0.0.0.0</string>
+    <string name="toast_warning_pref_proxysharing">其他裝置可以使用 socks/http 協定通過您的 IP 位址連線到 Proxy \nHttp Proxy：http://您的ip:10809\nSocks Proxy：socks(4/5)://您的ip:10808\n僅在受信任的網路中啟用以避免未經授權的連線</string>
+    <string name="toast_warning_pref_proxysharing_short">Proxy 共用已啟用，請確保處於受信網路</string>
+    <string name="toast_malformed_josn">組態格式錯誤</string>
 
     <string-array name="mode_entries">
         <item>VPN</item>
-        <item>僅代理</item>
+        <item>僅 Proxy</item>
     </string-array>
 
 </resources>
