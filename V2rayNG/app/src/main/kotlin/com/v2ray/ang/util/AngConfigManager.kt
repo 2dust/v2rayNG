@@ -167,7 +167,7 @@ object AngConfigManager {
             }
 
             //maybe sub
-            if (str.startsWith(HTTP_PROTOCOL) || str.startsWith(HTTPS_PROTOCOL)) {
+            if (TextUtils.isEmpty(subid) && (str.startsWith(HTTP_PROTOCOL) || str.startsWith(HTTPS_PROTOCOL))) {
                 MmkvManager.importUrlAsSubscription(str)
                 return 0
             }

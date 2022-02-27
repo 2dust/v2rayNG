@@ -203,7 +203,7 @@ class SettingsActivity : BaseActivity() {
 
         override fun onStart() {
             super.onStart()
-            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
             updateMode(defaultSharedPreferences.getString(AppConfig.PREF_MODE, "VPN"))
             var remoteDnsString = defaultSharedPreferences.getString(AppConfig.PREF_REMOTE_DNS, "")
             domesticDns.summary = defaultSharedPreferences.getString(AppConfig.PREF_DOMESTIC_DNS, "")
@@ -222,10 +222,10 @@ class SettingsActivity : BaseActivity() {
         }
 
         private fun updateMode(mode: String?) {
-            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
             val vpn = mode == "VPN"
             perAppProxy.isEnabled = vpn
-            perAppProxy.isChecked = PreferenceManager.getDefaultSharedPreferences(activity)
+            perAppProxy.isChecked = PreferenceManager.getDefaultSharedPreferences(requireActivity())
                     .getBoolean(AppConfig.PREF_PER_APP_PROXY, false)
             localDns?.isEnabled = vpn
             fakeDns?.isEnabled = vpn

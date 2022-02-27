@@ -78,7 +78,7 @@
     <string name="title_advanced">进阶设置</string>
     <string name="title_vpn_settings">VPN 设置</string>
     <string name="title_pref_per_app_proxy">分应用代理</string>
-    <string name="summary_pref_per_app_proxy">分应用代理仅支持 Android 5.0 Lollipop 及更高</string>
+    <string name="summary_pref_per_app_proxy">常规:勾选的App被代理,未勾选的直连;\n绕行模式:勾选的App直连,未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
 
     <string name="title_pref_mux_enabled">启用Mux多路复用</string>
     <string name="summary_pref_mux_enabled">开启可能会加速,关闭可能会减少断流</string>

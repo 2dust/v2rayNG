@@ -37,10 +37,10 @@ class SubSettingActivity : BaseActivity() {
         adapter.notifyDataSetChanged()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.action_sub_setting, menu)
-        menu?.findItem(R.id.del_config)?.isVisible = false
-        menu?.findItem(R.id.save_config)?.isVisible = false
+        menu.findItem(R.id.del_config)?.isVisible = false
+        menu.findItem(R.id.save_config)?.isVisible = false
 
         return super.onCreateOptionsMenu(menu)
     }

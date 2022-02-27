@@ -315,10 +315,10 @@ class ServerActivity : BaseActivity() {
         return true
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.action_server, menu)
-        val delButton = menu?.findItem(R.id.del_config)
-        val saveButton = menu?.findItem(R.id.save_config)
+        val delButton = menu.findItem(R.id.del_config)
+        val saveButton = menu.findItem(R.id.save_config)
 
         if (editGuid.isNotEmpty()) {
             if (isRunning) {

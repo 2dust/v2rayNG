@@ -132,8 +132,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
         builder.setSession(V2RayServiceManager.currentConfig?.remarks.orEmpty())
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
-                settingsStorage?.decodeBool(AppConfig.PREF_PER_APP_PROXY) == true) {
+        if (settingsStorage?.decodeBool(AppConfig.PREF_PER_APP_PROXY) == true) {
             val apps = settingsStorage?.decodeStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
             val bypassApps = settingsStorage?.decodeBool(AppConfig.PREF_BYPASS_APPS) ?: false
             apps?.forEach {

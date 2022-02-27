@@ -237,7 +237,11 @@ object V2RayServiceManager {
         val startMainIntent = Intent(service, MainActivity::class.java)
         val contentPendingIntent = PendingIntent.getActivity(service,
                 NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            })
 
         val stopV2RayIntent = Intent(AppConfig.BROADCAST_ACTION_SERVICE)
         stopV2RayIntent.`package` = ANG_PACKAGE
@@ -245,7 +249,11 @@ object V2RayServiceManager {
 
         val stopV2RayPendingIntent = PendingIntent.getBroadcast(service,
                 NOTIFICATION_PENDING_INTENT_STOP_V2RAY, stopV2RayIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            })
 
         val channelId =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

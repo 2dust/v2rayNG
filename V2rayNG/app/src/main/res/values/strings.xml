@@ -79,7 +79,7 @@
     <string name="title_advanced">Advanced Settings</string>
     <string name="title_vpn_settings">VPN Settings</string>
     <string name="title_pref_per_app_proxy">Per-app proxy</string>
-    <string name="summary_pref_per_app_proxy">Per-app proxy mode only support Android 5.0 Lollipop or higher</string>
+    <string name="summary_pref_per_app_proxy">General: Checked App is proxy, unchecked direct connection; \nbypass mode: checked app directly connected, unchecked proxy. \nThe option to automatically select the proxy application in the menu</string>
 
     <string name="title_pref_mux_enabled">Enable Mux</string>
     <string name="summary_pref_mux_enabled">Enable maybe speed up network and switch network maybe flash</string>
