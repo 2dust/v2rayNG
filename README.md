@@ -29,4 +29,5 @@ Android project under V2rayNG folder can be compiled directly in Android Studio,
 The aar can be compiled from the Golang project under AndroidLibV2rayLite folder. For a quick start, read guide for [Go Mobile](https://github.com/golang/go/wiki/Mobile)
 and [Makefiles for Go Developers](https://tutorialedge.net/golang/makefiles-for-go-developers/)
 
-v2rayNG can run on Android Emulators. But VPN mode will not work if system don't support it, like Windows 11 WSA
+v2rayNG can run on Android Emulators. For WSA, VPN permission need to be granted via
+`appops set [package name] ACTIVATE_VPN allow`

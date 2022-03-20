@@ -6,14 +6,12 @@ import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import android.widget.*
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
-import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_NETWORK
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_PORT
 import com.v2ray.ang.dto.V2rayConfig.Companion.XTLS
 import com.v2ray.ang.extension.toast
@@ -21,19 +19,6 @@ import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.ID_MAIN
 import com.v2ray.ang.util.MmkvManager.KEY_SELECTED_SERVER
 import com.v2ray.ang.util.Utils
-import kotlinx.android.synthetic.main.activity_server_socks.*
-import kotlinx.android.synthetic.main.activity_server_vmess.*
-import kotlinx.android.synthetic.main.activity_server_vmess.et_address
-import kotlinx.android.synthetic.main.activity_server_vmess.et_id
-import kotlinx.android.synthetic.main.activity_server_vmess.et_path
-import kotlinx.android.synthetic.main.activity_server_vmess.et_port
-import kotlinx.android.synthetic.main.activity_server_vmess.et_remarks
-import kotlinx.android.synthetic.main.activity_server_vmess.et_request_host
-import kotlinx.android.synthetic.main.activity_server_vmess.sp_allow_insecure
-import kotlinx.android.synthetic.main.activity_server_vmess.sp_header_type
-import kotlinx.android.synthetic.main.activity_server_vmess.sp_header_type_title
-import kotlinx.android.synthetic.main.activity_server_vmess.sp_network
-import kotlinx.android.synthetic.main.activity_server_vmess.sp_stream_security
 
 class ServerActivity : BaseActivity() {
 
@@ -76,6 +61,26 @@ class ServerActivity : BaseActivity() {
         resources.getStringArray(R.array.allowinsecures)
     }
 
+    // Kotlin synthetics was used, but since it is removed in 1.8. We switch to old manual approach.
+    // We don't use AndroidViewBinding because, it is better to share similar logics for different
+    // protocols. Use findViewById manually ensures the xml are de-coupled with the activity logic.
+    private val et_remarks: EditText by lazy { findViewById(R.id.et_remarks) }
+    private val et_address: EditText by lazy { findViewById(R.id.et_address) }
+    private val et_port: EditText by lazy { findViewById(R.id.et_port) }
+    private val et_id: EditText by lazy { findViewById(R.id.et_id) }
+    //private val et_alterId: EditText? by lazy { findViewById(R.id.et_alterId) }
+    private val et_security: EditText? by lazy { findViewById(R.id.et_security) }
+    //private val sp_flow: Spinner? by lazy { findViewById(R.id.sp_flow) }
+    private val sp_security: Spinner? by lazy { findViewById(R.id.sp_security) }
+    private val sp_stream_security: Spinner? by lazy { findViewById(R.id.sp_stream_security) }
+    private val sp_allow_insecure: Spinner? by lazy { findViewById(R.id.sp_allow_insecure) }
+    //private val et_sni: EditText? by lazy { findViewById(R.id.et_sni) }
+    private val sp_network: Spinner? by lazy { findViewById(R.id.sp_network) }
+    private val sp_header_type: Spinner? by lazy { findViewById(R.id.sp_header_type) }
+    private val sp_header_type_title: TextView? by lazy { findViewById(R.id.sp_header_type_title) }
+    private val et_request_host: EditText? by lazy { findViewById(R.id.et_request_host) }
+    private val et_path: EditText? by lazy { findViewById(R.id.et_path) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         title = getString(R.string.title_server)
@@ -100,9 +105,9 @@ class ServerActivity : BaseActivity() {
                     getString(R.string.server_lab_mode_type) else
                     getString(R.string.server_lab_head_type)
                 config?.getProxyOutbound()?.getTransportSettingDetails()?.let { transportDetails ->
-                    sp_header_type.setSelection(Utils.arrayFind(types, transportDetails[0]))
-                    et_request_host.text = Utils.getEditable(transportDetails[1])
-                    et_path.text = Utils.getEditable(transportDetails[2])
+                    sp_header_type?.setSelection(Utils.arrayFind(types, transportDetails[0]))
+                    et_request_host?.text = Utils.getEditable(transportDetails[1])
+                    et_path?.text = Utils.getEditable(transportDetails[2])
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -129,9 +134,9 @@ class ServerActivity : BaseActivity() {
         et_port.text = Utils.getEditable(outbound.getServerPort()?.toString() ?: DEFAULT_PORT.toString())
         et_id.text = Utils.getEditable(outbound.getPassword().orEmpty())
         if (config.configType == EConfigType.SOCKS) {
-            et_security.text = Utils.getEditable(outbound.settings?.servers?.get(0)?.users?.get(0)?.user.orEmpty())
+            et_security?.text = Utils.getEditable(outbound.settings?.servers?.get(0)?.users?.get(0)?.user.orEmpty())
         } else if (config.configType == EConfigType.VLESS) {
-            et_security.text = Utils.getEditable(outbound.getSecurityEncryption().orEmpty())
+            et_security?.text = Utils.getEditable(outbound.getSecurityEncryption().orEmpty())
             val flow = Utils.arrayFind(flows, outbound.settings?.vnext?.get(0)?.users?.get(0)?.flow.orEmpty())
             if (flow >= 0) {
                 //sp_flow.setSelection(flow)
@@ -151,7 +156,7 @@ class ServerActivity : BaseActivity() {
                 if (allowinsecure >= 0) {
                     sp_allow_insecure?.setSelection(allowinsecure)
                 }
-                et_request_host.text = Utils.getEditable(tlsSetting.serverName)
+                et_request_host?.text = Utils.getEditable(tlsSetting.serverName)
             }
         }
         val network = Utils.arrayFind(networks, streamSetting.network)
@@ -214,7 +219,7 @@ class ServerActivity : BaseActivity() {
             saveServers(server, port, config)
         }
         config.outboundBean?.streamSettings?.let {
-            saveStreamSettings(it, config)
+            saveStreamSettings(it)
         }
 
         MmkvManager.encodeServerConfig(editGuid, config)
@@ -228,10 +233,10 @@ class ServerActivity : BaseActivity() {
         vnext.port = port
         vnext.users[0].id = et_id.text.toString().trim()
         if (config.configType == EConfigType.VMESS) {
-            vnext.users[0].security = securitys[sp_security.selectedItemPosition]
+            vnext.users[0].security = securitys[sp_security?.selectedItemPosition ?: 0]
         } else if (config.configType == EConfigType.VLESS) {
-            vnext.users[0].encryption = et_security.text.toString().trim()
-            if (streamSecuritys[sp_stream_security.selectedItemPosition] == XTLS) {
+            vnext.users[0].encryption = et_security?.text.toString().trim()
+            if (streamSecuritys[sp_stream_security?.selectedItemPosition ?: 0] == XTLS) {
 //                vnext.users[0].flow = flows[sp_flow.selectedItemPosition].ifBlank { V2rayConfig.DEFAULT_FLOW }
             } else {
                 vnext.users[0].flow = ""
@@ -244,13 +249,13 @@ class ServerActivity : BaseActivity() {
         server.port = port
         if (config.configType == EConfigType.SHADOWSOCKS) {
             server.password = et_id.text.toString().trim()
-            server.method = shadowsocksSecuritys[sp_security.selectedItemPosition]
+            server.method = shadowsocksSecuritys[sp_security?.selectedItemPosition ?: 0]
         } else if (config.configType == EConfigType.SOCKS) {
-            if (TextUtils.isEmpty(et_security.text) && TextUtils.isEmpty(et_id.text)) {
+            if (TextUtils.isEmpty(et_security?.text) && TextUtils.isEmpty(et_id.text)) {
                 server.users = null
             } else {
                 val socksUsersBean = V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
-                socksUsersBean.user = et_security.text.toString().trim()
+                socksUsersBean.user = et_security?.text.toString().trim()
                 socksUsersBean.pass = et_id.text.toString().trim()
                 server.users = listOf(socksUsersBean)
             }
@@ -259,33 +264,36 @@ class ServerActivity : BaseActivity() {
         }
     }
 
-    private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean, config: ServerConfig) {
-        val network = if (sp_network != null) networks[sp_network.selectedItemPosition] else DEFAULT_NETWORK
-        val type = if (sp_header_type != null) transportTypes(network)[sp_header_type.selectedItemPosition] else ""
-        val requestHost = if (et_request_host != null) et_request_host.text.toString().trim() else ""
-        val path = if (et_path != null) et_path.text.toString().trim() else ""
+    private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean) {
+        val network = sp_network?.selectedItemPosition ?: return
+        val type = sp_header_type?.selectedItemPosition ?: return
+        val requestHost = et_request_host?.text?.toString()?.trim() ?: return
+        val path = et_path?.text?.toString()?.trim() ?: return
+        //val sniField = et_sni?.text?.toString()?.trim() ?: return
+        val allowInsecureField = sp_allow_insecure?.selectedItemPosition ?: return
+        val streamSecurity = sp_stream_security?.selectedItemPosition ?: return
+
         var sni = streamSetting.populateTransportSettings(
-                transport = network,
-                headerType = type,
+                transport = networks[network],
+                headerType = transportTypes(networks[network])[type],
                 host = requestHost,
                 path = path,
                 seed = path,
                 quicSecurity = requestHost,
                 key = path,
-                mode = type,
+                mode = transportTypes(networks[network])[type],
                 serviceName = path
         )
-        val allowInsecure = if (sp_allow_insecure == null || allowinsecures[sp_allow_insecure.selectedItemPosition].isBlank()) {
+        //if (sniField.isNotBlank()) {
+        //    sni = sniField
+        //}
+        val allowInsecure = if (allowinsecures[allowInsecureField].isBlank()) {
             false//settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
         } else {
-            allowinsecures[sp_allow_insecure.selectedItemPosition].toBoolean()
+            allowinsecures[allowInsecureField].toBoolean()
         }
-        val defaultTls = if (config.configType == EConfigType.TROJAN) V2rayConfig.TLS else ""
-        streamSetting.populateTlsSettings(
-                if (sp_stream_security != null) streamSecuritys[sp_stream_security.selectedItemPosition] else defaultTls,
-                allowInsecure,
-                sni
-        )
+        streamSetting.populateTlsSettings(streamSecuritys[streamSecurity], allowInsecure, sni)
+
     }
 
     private fun transportTypes(network: String?): Array<out String> {

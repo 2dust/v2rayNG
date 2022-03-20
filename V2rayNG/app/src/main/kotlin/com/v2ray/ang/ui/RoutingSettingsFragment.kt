@@ -8,7 +8,6 @@ import android.text.TextUtils
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import android.view.*
-import kotlinx.android.synthetic.main.fragment_routing_settings.*
 import android.view.MenuInflater
 import androidx.activity.result.contract.ActivityResultContracts
 import com.tbruyelle.rxpermissions.RxPermissions
@@ -62,7 +61,7 @@ class RoutingSettingsFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.save_routing -> {
-            val content = et_routing_content.text.toString()
+            val content = binding.etRoutingContent.text.toString()
             defaultSharedPreferences.edit().putString(requireArguments().getString(routing_arg), content).apply()
             activity?.toast(R.string.toast_success)
             true

@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion Integer.parseInt("$compileSdkVer")
@@ -118,8 +117,5 @@ buildscript {
         maven { url 'https://maven.google.com' }
         maven { url 'https://jitpack.io' }
         jcenter()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
     }
 }
