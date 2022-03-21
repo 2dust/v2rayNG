@@ -334,8 +334,7 @@ object Utils {
 
         try {
             val url = URL("https",
-                    "www.google.com",
-                    "/generate_204")
+                    "cp.cloudflare.com","")
 
             conn = url.openConnection(
                 Proxy(Proxy.Type.HTTP,
