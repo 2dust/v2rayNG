@@ -120,7 +120,7 @@
         </service>
 
         <receiver
-                android:exported="false"
+                android:exported="true"
                 android:name=".receiver.WidgetProvider"
                 android:process=":RunSoLibV2RayDaemon">
             <meta-data
