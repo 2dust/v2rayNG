@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_widget_name">Kết nối ngay</string>
+    <string name="app_tile_name">Kết nối ngay</string>
+    <string name="app_tile_first_use">Vui lòng thêm một cấu hình vào v2rayNG để sử dụng.</string>
+    <string name="navigation_drawer_open">Mở menu ứng dụng</string>
+    <string name="navigation_drawer_close">Đóng menu ứng dụng</string>
+    <string name="migration_success">Đã chuyển dữ liệu!</string>
+    <string name="migration_fail">Không thể chuyển dữ liệu!</string>
+
+    <!-- Notifications -->
+    <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
+    <string name="toast_permission_denied">Vui lòng cấp quyền cần thiết cho v2rayNG. Bạn đã từ chối các quyền cần thiết như Camera hay Bộ nhớ.</string>
+    <string name="notification_action_more">Nhấn để biết thêm</string>
+    <string name="toast_services_start">Đang bắt đầu dịch vụ v2rayNG.</string>
+    <string name="toast_services_stop">Đã dừng dịch vụ v2rayNG.</string>
+    <string name="toast_services_success">Đã bắt đầu dịch vụ v2rayNG.</string>
+    <string name="toast_services_failure">Không thể bắt đầu dịch vụ, hãy thử kiểm tra lại cấu hình hoặc khởi động lại thiết bị.</string>
+
+    <!--ServerActivity-->
+    <string name="title_server">V2RayNG App :3</string>
+    <string name="menu_item_add_config">Thêm cấu hình</string>
+    <string name="menu_item_save_config">Lưu cấu hình</string>
+    <string name="menu_item_del_config">Xoá cấu hình</string>
+    <string name="menu_item_import_config_qrcode">Nhập cấu hình từ mã QR</string>
+    <string name="menu_item_import_config_clipboard">Nhập cấu hình từ bộ nhớ tạm thời</string>
+    <string name="menu_item_import_config_manually_vmess">Nhập thủ công [Vmess]</string>
+    <string name="menu_item_import_config_manually_vless">Nhập thủ công [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">Nhập thủ công [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">Nhập thủ công [Socks]</string>
+    <string name="menu_item_import_config_manually_trojan">Nhập thủ công [Trojan]</string>
+    <string name="menu_item_import_config_custom">Nâng cao / Cấu hình tùy chỉnh</string>
+    <string name="menu_item_import_config_custom_clipboard">Nhập cấu hình tùy chỉnh từ bộ nhớ tạm thời</string>
+    <string name="menu_item_import_config_custom_local">Nhập cấu hình tùy chỉnh từ Tệp</string>
+    <string name="menu_item_import_config_custom_url">Nhập cấu hình tùy chỉnh từ URL</string>
+    <string name="menu_item_import_config_custom_url_scan">Nhập cấu hình tùy chỉnh quét URL</string>
+    <string name="del_config_comfirm">Bạn có muốn xóa cấu hình ?</string>
+    <string name="server_lab_remarks">Tên cấu hình</string>
+    <string name="server_lab_address">Địa chỉ</string>
+    <string name="server_lab_port">Cổng</string>
+    <string name="server_lab_id">Địa chỉ ID</string>
+    <string name="server_lab_alterid">alterId</string>
+    <string name="server_lab_security">Bảo mật</string>
+    <string name="server_lab_network">Kiểu kết nối</string>
+    <string name="server_lab_more_function">Nâng cao</string>
+    <string name="server_lab_head_type">Kiểu Head</string>
+    <string name="server_lab_mode_type">Chế độ gRPC</string>
+    <string name="server_lab_request_host">Yêu cầu host(host/ws host/h2 host)/Bảo mật QUIC</string>
+    <string name="server_lab_path">Đường dẫn (ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
+    <string name="server_lab_stream_security">tls</string>
+    <string name="server_lab_allow_insecure">allowInsecure</string>
+    <string name="server_lab_sni">Địa chỉ SNI</string>
+    <string name="server_lab_address3">Địa chỉ</string>
+    <string name="server_lab_port3">Cổng</string>
+    <string name="server_lab_id3">Mật khẩu</string>
+    <string name="server_lab_security3">Bảo mật</string>
+    <string name="server_lab_id4">Mật khẩu(Bổ sung)</string>
+    <string name="server_lab_security4">Tên người dùng(Bổ sung)</string>
+    <string name="server_lab_encryption">Mã hoá</string>
+    <string name="server_lab_flow">flow</string>
+    <string name="toast_success">Đã thực hiện thành công thao tác của bạn, Nếu có gì đó không ổn, hãy thao tác lại.</string>
+    <string name="toast_failure">Đã xảy ra lỗi, hãy thử kiểm tra lại hoặc thử lại.</string>
+    <string name="toast_none_data">Không có gì ở đây</string>
+    <string name="toast_incorrect_protocol">Không đúng protocol</string>
+    <string name="toast_decoding_failed">Không thể decode</string>
+    <string name="title_file_chooser">Vui lòng chọn tệp cấu hình</string>
+    <string name="toast_require_file_manager">Vui lòng cài đặt trình quản lý tệp để tiếp tục.</string>
+    <string name="server_customize_config">Cấu hình tùy chỉnh</string>
+    <string name="toast_config_file_invalid">Cấu hình không hợp lệ</string>
+    <string name="server_lab_content">Nội dung</string>
+    <string name="toast_none_data_clipboard">Không có dữ liệu nào trong bộ nhớ tạm thời</string>
+    <string name="toast_invalid_url">URL không hợp lệ hoặc không có gì</string>
+    <string name="server_lab_need_inbound">Đảm bảo cấu hình tùy chỉnh này không bị lỗi trước khi sử dụng. v2rayNG được Dịch Tiếng Việt bởi CuynuTT😘</string>
+    <string name="toast_malformed_josn">Cấu hình không hợp lệ </string>
+    <string name="server_lab_request_host6">Host(SNI)(Bổ sung)</string>
+    <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp</string>
+    <string name="menu_item_add_file">Thêm tệp</string>
+    <string name="menu_item_download_file">Tải xuống tệp tin</string>
+
+    <!-- PerAppProxyActivity -->
+    <string name="msg_dialog_progress">Đang tải...</string>
+    <string name="menu_item_search">Tìm kiếm</string>
+    <string name="menu_item_select_all">Chọn tất cả</string>
+    <string name="msg_enter_keywords">Nhập từ khoá</string>
+    <string name="switch_bypass_apps_mode">Bỏ qua kết nối VPN</string>
+    <string name="menu_item_select_proxy_app">Tự động chọn ứng dụng Proxy</string>
+    <string name="msg_downloading_content">Đang tải xuống nội dung...</string>
+    <string name="menu_item_export_proxy_app">Xuất và sao chép</string>
+    <string name="menu_item_import_proxy_app">Nhập từ bộ nhớ tạm thời</string>
+
+
+    <!-- Preferences -->
+    <string name="title_settings">Cài đặt</string>
+    <string name="title_advanced">Cài đặt nâng cao</string>
+    <string name="title_vpn_settings">Cài đặt cho VPN</string>
+    <string name="title_pref_per_app_proxy">Proxy cho ứng dụng</string>
+    <string name="summary_pref_per_app_proxy">Chung: Ứng dụng đã chọn sẽ kết nối Proxy, Chưa lựa chọn sẽ kết nối trực tiếp; \nBỏ qua kết nối: Ứng dụng được chọn sẽ trực tiếp kết nối, không lựa chọn Proxy. \nLựa chọn để tự động chọn ứng dụng Proxy trong Menu.</string>
+
+    <string name="title_pref_mux_enabled">Cho phép Mux</string>
+    <string name="summary_pref_mux_enabled">Bật lên có thể làm tăng tốc độ mạng và chuyển mạng nhanh hơn.</string>
+
+    <string name="title_pref_speed_enabled">Cho phép hiển thị tốc độ mạng</string>
+    <string name="summary_pref_speed_enabled">Hiển thị tốc độ mạng hiện tại trên thanh thông báo.\nBiểu tượng trên thanh trạng thái có thể thay đổi tùy vào mức sử dụng.</string>
+
+    <string name="title_pref_sniffing_enabled">Cho phép Sniffing</string>
+    <string name="summary_pref_sniffing_enabled">Thử chuyển kết nối hiện tại của bạn qua trung gian để trung gian xử lý kết nối về lại cho bạn (Mặc định là bật, hãy tắt nó nếu kết nối không ổn định.)</string>
+
+    <string name="title_pref_local_dns_enabled">Cho phép DNS cục bộ</string>
+    <string name="summary_pref_local_dns_enabled">DNS được xử lý bởi mô đun của lõi DNS.
+(Khuyến cáo, nếu cần lộ trình Bẻ khoá LAN và
+        địa chỉ mainland)</string>
+
+    <string name="title_pref_fake_dns_enabled">Cho phép DNS giả</string>
+    <string name="summary_pref_fake_dns_enabled">DNS cục bộ trả về địa chỉ IP giả (Nhanh hơn, nhưng có thể không hoạt động với một số ứng dụng)</string>
+
+    <string name="title_pref_prefer_ipv6">Ưu tiên IPv6</string>
+    <string name="summary_pref_prefer_ipv6">Ưu tiên sử dụng địa chỉ IPv6 cho kết nối và lộ trình.</string>
+
+    <string name="title_pref_routing">Lộ trình</string>
+    <string name="title_pref_routing_domain_strategy">Tùy chọn tên miền</string>
+    <string name="title_pref_routing_mode">Tùy chỉnh quy tắc lộ trình</string>
+    <string name="title_pref_routing_custom">Tùy chỉnh lộ trình</string>
+
+    <string name="title_pref_remote_dns">Điều khiển DNS (Bổ sung)</string>
+    <string name="summary_pref_remote_dns">DNS</string>
+
+    <string name="title_pref_vpn_dns">VPN DNS (Chỉ IPv4/v6)</string>
+
+    <string name="title_pref_domestic_dns">Domestic DNS (Bổ sung)</string>
+    <string name="summary_pref_domestic_dns">DNS</string>
+
+    <string name="title_pref_proxy_sharing_enabled">Cho phép kết nối từ mạng LAN</string>
+    <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác có thể kết nối đến proxy bởi địa chỉ IP thông qua socks/http, Chỉ bật khi bạn tin tưởng kết nối để tránh kết nối lạ.</string>
+    <string name="toast_warning_pref_proxysharing_short">Cho phép kết nối từ mạng LAN, Đảm bảo rằng bạn tin tưởng kết nối hiện tại.</string>
+
+    <string name="title_pref_allow_insecure">Cho phép đặt lại allowInsecure</string>
+    <string name="summary_pref_allow_insecure">Khi kết nối TLS, đặt cài đặt allowInsecure thành mặc định</string>
+
+    <string name="title_pref_socks_port">Cổng Proxy SOCKS5</string>
+    <string name="summary_pref_socks_port">Cổng Proxy SOCKS5</string>
+
+    <string name="title_pref_http_port">Cổng Proxy HTTP</string>
+    <string name="summary_pref_http_port">Cổng Proxy HTTP</string>
+
+    <string name="title_pref_local_dns_port">Cổng DNS cục bộ</string>
+    <string name="summary_pref_local_dns_port">Cổng DNS cục bộ</string>
+
+    <string name="title_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình</string>
+    <string name="summary_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình khi bạn xoá một cấu hình.</string>
+
+    <string name="title_pref_feedback">Phản hồi lỗi</string>
+    <string name="summary_pref_feedback">Phản hồi cải tiến hoặc bug lên GitHub</string>
+    <string name="summary_pref_tg_group">Tham gia nhóm Telegram</string>
+    <string name="toast_tg_app_not_found">Không tìm thấy ứng dụng Telegram</string>
+
+    <string name="title_pref_promotion">Quảng cáo Server</string>
+    <string name="summary_pref_promotion">Quảng cáo,nhấn để biết thêm(Ủng hộ có thể được gỡ bỏ)</string>
+
+    <string name="title_core_loglevel">Mức độ nhật ký</string>
+    <string name="title_mode">Chế độ kết nối</string>
+    <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp</string>
+    <string name="title_language">Ngôn ngữ ứng dụng</string>
+
+    <string name="title_logcat">Nhật ký hoạt động</string>
+    <string name="logcat_copy">Sao chép nhật ký</string>
+    <string name="logcat_clear">Xoá nhật ký</string>
+    <string name="title_service_restart">Kết nối lại v2rayNG</string>
+    <string name="title_del_all_config">Xoá tất cả cấu hình</string>
+    <string name="title_del_invalid_config">Xoá cấu hình lỗi (Kiểm tra trước)</string>
+    <string name="title_export_all">Xuất và sao chép tất cả cấu hình</string>
+    <string name="title_sub_setting">Các gói đăng ký</string>
+    <string name="sub_setting_remarks">Tên các gói đăng ký</string>
+    <string name="sub_setting_url">URL gói đăng ký</string>
+    <string name="sub_setting_enable">Sử dụng gói đăng ký này</string>
+    <string name="title_sub_update">Cập nhật các gói đăng ký</string>
+    <string name="title_ping_all_server">Ping tất cả máy chủ</string>
+    <string name="title_real_ping_all_server">Kiểm tra máy chủ</string>
+    <string name="title_user_asset_setting">Tệp Geo assets</string>
+    <string name="title_sort_by_test_results">Sắp xếp lại theo lần kiểm tra cuối cùng</string>
+    <string name="title_filter_config">Filter configuration file</string>
+    <string name="filter_config_all">All subscription groups</string>
+
+    <string name="tasker_start_service">Bắt đầu dịch vụ</string>
+    <string name="tasker_setting_confirm">Xác nhận</string>
+
+    <string name="routing_settings_title">Cài đặt lộ trình</string>
+    <string name="routing_settings_tips">Được phân cách bằng dấu chấm phẩy(,),Hãy nhớ nó để lưu lại.</string>
+    <string name="routing_settings_save">Lưu lại</string>
+    <string name="routing_settings_delete">Xoá</string>
+    <string name="routing_settings_scan_replace">Dò và thay thế</string>
+    <string name="routing_settings_scan_append">Dò và nối</string>
+    <string name="routing_settings_default_rules">Đặt luật lệ lộ trình mặc định</string>
+
+    <string name="connection_test_pending">Kiểm tra kết nối</string>
+    <string name="connection_test_testing">Đang kiểm tra kết nối mạng…</string>
+    <string name="connection_test_available">Đã kiểm tra kết nối mạng thành công, Ping hiện tại là %d</string>
+    <string name="connection_test_error">Lỗi kết nối mạng hãy thử đổi cấu hình hoặc kiểm tra lại. Mã lỗi: %s</string>
+    <string name="connection_test_fail">Không có kết nối mạng</string>
+    <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
+    <string name="connection_connected">Đã kết nối, hãy nhấn vào đây để kiểm tra kết nối</string>
+    <string name="connection_not_connected">Chưa kết nối, hãy thêm một cấu hình để kết nối. Đừng để bị lừa đảo bởi cấu hình mất tiền,Dịch TV bởi CuynuTT😘</string>
+
+    <string-array name="share_method">
+        <item>Xuất ra mã QR (Chụp màn hình để lưu)</item>
+        <item>Sao chép cấu hình này</item>
+        <item>Sao chép thành cấu hình tùy chỉnh</item>
+    </string-array>
+
+    <string-array name="routing_tag">
+        <item>proxy URL hoặc IP</item>
+        <item>direct URL hoặc IP</item>
+        <item>URL đã chặn hoặc IP</item>
+    </string-array>
+
+    <string-array name="routing_mode">
+        <item>Proxy Global</item>
+        <item>Bẻ khoá địa chỉ LAN rồi proxy</item>
+        <item>Bẻ khoá địa chỉ mainland rồi proxy</item>
+        <item>Bẻ khoá LAN và địa chỉ mainland rồi proxy</item>
+        <item>Trực tiếp Global</item>
+    </string-array>
+
+    <string-array name="mode_entries">
+        <item>Chế độ VPN</item>
+        <item>Chế độ Proxy</item>
+    </string-array>
+
+</resources>
