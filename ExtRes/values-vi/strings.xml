@@ -70,7 +70,7 @@
     <string name="server_lab_content">Nội dung</string>
     <string name="toast_none_data_clipboard">Không có dữ liệu nào trong bộ nhớ tạm thời</string>
     <string name="toast_invalid_url">URL không hợp lệ hoặc không có gì</string>
-    <string name="server_lab_need_inbound">Đảm bảo cấu hình tùy chỉnh này không bị lỗi trước khi sử dụng. v2rayNG được Dịch Tiếng Việt bởi CuynuTT😘</string>
+    <string name="server_lab_need_inbound">Vui lòng đảm bảo cấu hình tùy chỉnh này không bị lỗi trước khi sử dụng. v2rayNG được Dịch Tiếng Việt bởi CuynuTT😘</string>
     <string name="toast_malformed_josn">Cấu hình không hợp lệ </string>
     <string name="server_lab_request_host6">Host(SNI)(Bổ sung)</string>
     <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp</string>
@@ -177,8 +177,8 @@
     <string name="title_real_ping_all_server">Kiểm tra máy chủ</string>
     <string name="title_user_asset_setting">Tệp Geo assets</string>
     <string name="title_sort_by_test_results">Sắp xếp lại theo lần kiểm tra cuối cùng</string>
-    <string name="title_filter_config">Filter configuration file</string>
-    <string name="filter_config_all">All subscription groups</string>
+    <string name="title_filter_config">Lọc cấu hình theo các gói đăng ký</string>
+    <string name="filter_config_all">Hiển thị tất cả các gói đăng ký</string>
 
     <string name="tasker_start_service">Bắt đầu dịch vụ</string>
     <string name="tasker_setting_confirm">Xác nhận</string>
@@ -197,7 +197,7 @@
     <string name="connection_test_error">Lỗi kết nối mạng hãy thử đổi cấu hình hoặc kiểm tra lại. Mã lỗi: %s</string>
     <string name="connection_test_fail">Không có kết nối mạng</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
-    <string name="connection_connected">Đã kết nối, hãy nhấn vào đây để kiểm tra kết nối</string>
+    <string name="connection_connected">Đã kết nối, hãy nhấn vào đây để kiểm tra kết nối mạng.</string>
     <string name="connection_not_connected">Chưa kết nối, hãy thêm một cấu hình để kết nối. Đừng để bị lừa đảo bởi cấu hình mất tiền,Dịch TV bởi CuynuTT😘</string>
 
     <string-array name="share_method">
