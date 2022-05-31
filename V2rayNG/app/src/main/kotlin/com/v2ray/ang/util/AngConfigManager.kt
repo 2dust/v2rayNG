@@ -218,35 +218,37 @@ object AngConfigManager {
                     }
                 }
             } else if (str.startsWith(EConfigType.SHADOWSOCKS.protocolScheme)) {
-                var result = str.replace(EConfigType.SHADOWSOCKS.protocolScheme, "")
-                val indexSplit = result.indexOf("#")
                 config = ServerConfig.create(EConfigType.SHADOWSOCKS)
-                if (indexSplit > 0) {
-                    try {
-                        config.remarks = Utils.urlDecode(result.substring(indexSplit + 1, result.length))
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+                if (!tryResolveResolveSip002(str, config)) {
+                    var result = str.replace(EConfigType.SHADOWSOCKS.protocolScheme, "")
+                    val indexSplit = result.indexOf("#")
+                    if (indexSplit > 0) {
+                        try {
+                            config.remarks = Utils.urlDecode(result.substring(indexSplit + 1, result.length))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+
+                        result = result.substring(0, indexSplit)
                     }
 
-                    result = result.substring(0, indexSplit)
-                }
+                    //part decode
+                    val indexS = result.indexOf("@")
+                    result = if (indexS > 0) {
+                        Utils.decode(result.substring(0, indexS)) + result.substring(indexS, result.length)
+                    } else {
+                        Utils.decode(result)
+                    }
 
-                //part decode
-                val indexS = result.indexOf("@")
-                result = if (indexS > 0) {
-                    Utils.decode(result.substring(0, indexS)) + result.substring(indexS, result.length)
-                } else {
-                    Utils.decode(result)
-                }
+                    val legacyPattern = "^(.+?):(.*)@(.+?):(\\d+?)/?$".toRegex()
+                    val match = legacyPattern.matchEntire(result) ?: return R.string.toast_incorrect_protocol
 
-                val legacyPattern = "^(.+?):(.*)@(.+?):(\\d+?)/?$".toRegex()
-                val match = legacyPattern.matchEntire(result) ?: return R.string.toast_incorrect_protocol
-
-                config.outboundBean?.settings?.servers?.get(0)?.let { server ->
-                    server.address = match.groupValues[3].removeSurrounding("[", "]")
-                    server.port = match.groupValues[4].toInt()
-                    server.password = match.groupValues[2]
-                    server.method = match.groupValues[1].lowercase()
+                    config.outboundBean?.settings?.servers?.get(0)?.let { server ->
+                        server.address = match.groupValues[3].removeSurrounding("[", "]")
+                        server.port = match.groupValues[4].toInt()
+                        server.password = match.groupValues[2]
+                        server.method = match.groupValues[1].lowercase()
+                    }
                 }
             } else if (str.startsWith(EConfigType.SOCKS.protocolScheme)) {
                 var result = str.replace(EConfigType.SOCKS.protocolScheme, "")
@@ -389,6 +391,37 @@ object AngConfigManager {
             vnext.port = Utils.parseInt(arr22[1])
             vnext.users[0].id = arr21[1]
             vnext.users[0].encryption = arr21[0]
+        }
+        return true
+    }
+
+    private fun tryResolveResolveSip002(server: String, config: ServerConfig): Boolean {
+        val uri = URI(server.replace(" ", "%20"))
+        config.remarks = Utils.urlDecode(uri.fragment ?: "")
+
+        val method: String
+        val password: String
+        if (uri.userInfo.contains(":")) {
+            val arrUserInfo = uri.userInfo.split(":").map { it.trim() }
+            if (arrUserInfo.count() < 2) {
+                return false
+            }
+            method = arrUserInfo[0]
+            password = Utils.urlDecode(arrUserInfo[1])
+        } else {
+            val arrUserInfo = Utils.decode(uri.userInfo).split(":").map { it.trim() }
+            if (arrUserInfo.count() < 2) {
+                return false
+            }
+            method = arrUserInfo[0]
+            password = arrUserInfo[1]
+        }
+
+        config.outboundBean?.settings?.servers?.get(0)?.let { server ->
+            server.address = uri.idnHost
+            server.port = uri.port
+            server.password = password
+            server.method = method
         }
         return true
     }
