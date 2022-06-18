@@ -395,26 +395,27 @@ object AngConfigManager {
         return true
     }
 
-    private fun tryResolveResolveSip002(server: String, config: ServerConfig): Boolean {
-        val uri = URI(server.replace(" ", "%20"))
+    private fun tryResolveResolveSip002(str: String, config: ServerConfig): Boolean {
+        val uri = URI(str.replace(" ", "%20"))
         config.remarks = Utils.urlDecode(uri.fragment ?: "")
 
         val method: String
         val password: String
         if (uri.userInfo.contains(":")) {
             val arrUserInfo = uri.userInfo.split(":").map { it.trim() }
-            if (arrUserInfo.count() < 2) {
+            if (arrUserInfo.count() != 2) {
                 return false
             }
             method = arrUserInfo[0]
             password = Utils.urlDecode(arrUserInfo[1])
         } else {
-            val arrUserInfo = Utils.decode(uri.userInfo).split(":").map { it.trim() }
-            if (arrUserInfo.count() < 2) {
+            val base64Decode = Utils.decode(uri.userInfo)
+            val arrUserInfo = base64Decode.split(":").map { it.trim() }
+            if (arrUserInfo.count() != 2 && arrUserInfo.count() != 3) {
                 return false
             }
             method = arrUserInfo[0]
-            password = arrUserInfo[1]
+            password = base64Decode.substringAfter(":")
         }
 
         config.outboundBean?.settings?.servers?.get(0)?.let { server ->
