@@ -8,14 +8,15 @@
         <item>zero</item>
     </string-array>
     <string-array name="ss_securitys" translatable="false">
-        <item>aes-256-cfb</item>
-        <item>aes-128-cfb</item>
-        <item>chacha20</item>
-        <item>chacha20-ietf</item>
         <item>aes-256-gcm</item>
         <item>aes-128-gcm</item>
         <item>chacha20-poly1305</item>
         <item>chacha20-ietf-poly1305</item>
+        <item>none</item>
+        <item>plain</item>
+        <item>2022-blake3-aes-128-gcm</item>
+        <item>2022-blake3-aes-256-gcm</item>
+        <item>2022-blake3-chacha20-poly1305</item>
     </string-array>
 
     <string-array name="networks" translatable="false">

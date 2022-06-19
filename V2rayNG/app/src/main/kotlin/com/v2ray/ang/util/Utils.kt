@@ -477,5 +477,13 @@ object Utils {
             it.bufferedReader().readText()
         }
     }
+
+    fun getIpv6Address(address: String): String {
+        return if (isIpv6Address(address)) {
+            String.format("[%s]", address)
+        } else {
+            address
+        }
+    }
 }
 
