@@ -3,8 +3,9 @@ package com.v2ray.ang.util
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
-import androidx.preference.PreferenceManager
 import android.text.TextUtils
+import android.util.Log
+import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
@@ -396,35 +397,40 @@ object AngConfigManager {
     }
 
     private fun tryResolveResolveSip002(str: String, config: ServerConfig): Boolean {
-        val uri = URI(str.replace(" ", "%20"))
-        config.remarks = Utils.urlDecode(uri.fragment ?: "")
+        try {
+            val uri = URI(str.replace(" ", "%20"))
+            config.remarks = Utils.urlDecode(uri.fragment ?: "")
 
-        val method: String
-        val password: String
-        if (uri.userInfo.contains(":")) {
-            val arrUserInfo = uri.userInfo.split(":").map { it.trim() }
-            if (arrUserInfo.count() != 2) {
-                return false
+            val method: String
+            val password: String
+            if (uri.userInfo.contains(":")) {
+                val arrUserInfo = uri.userInfo.split(":").map { it.trim() }
+                if (arrUserInfo.count() != 2) {
+                    return false
+                }
+                method = arrUserInfo[0]
+                password = Utils.urlDecode(arrUserInfo[1])
+            } else {
+                val base64Decode = Utils.decode(uri.userInfo)
+                val arrUserInfo = base64Decode.split(":").map { it.trim() }
+                if (arrUserInfo.count() < 2) {
+                    return false
+                }
+                method = arrUserInfo[0]
+                password = base64Decode.substringAfter(":")
             }
-            method = arrUserInfo[0]
-            password = Utils.urlDecode(arrUserInfo[1])
-        } else {
-            val base64Decode = Utils.decode(uri.userInfo)
-            val arrUserInfo = base64Decode.split(":").map { it.trim() }
-            if (arrUserInfo.count() != 2 && arrUserInfo.count() != 3) {
-                return false
-            }
-            method = arrUserInfo[0]
-            password = base64Decode.substringAfter(":")
-        }
 
-        config.outboundBean?.settings?.servers?.get(0)?.let { server ->
-            server.address = uri.idnHost
-            server.port = uri.port
-            server.password = password
-            server.method = method
+            config.outboundBean?.settings?.servers?.get(0)?.let { server ->
+                server.address = uri.idnHost
+                server.port = uri.port
+                server.password = password
+                server.method = method
+            }
+            return true
+        } catch (e: Exception) {
+            Log.d(AppConfig.ANG_PACKAGE, e.toString())
+            return false
         }
-        return true
     }
 
     /**

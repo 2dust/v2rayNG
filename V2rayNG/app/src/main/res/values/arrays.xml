@@ -12,6 +12,8 @@
         <item>aes-128-gcm</item>
         <item>chacha20-poly1305</item>
         <item>chacha20-ietf-poly1305</item>
+        <item>xchacha20-poly1305</item>
+        <item>xchacha20-ietf-poly1305</item>
         <item>none</item>
         <item>plain</item>
         <item>2022-blake3-aes-128-gcm</item>
