@@ -1,17 +1,20 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.PREF_ALLOW_INSECURE
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_FLOW
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_PORT
 import com.v2ray.ang.dto.V2rayConfig.Companion.XTLS
 import com.v2ray.ang.extension.toast
@@ -33,6 +36,10 @@ class ServerActivity : BaseActivity() {
     private val createConfigType by lazy {
         EConfigType.fromInt(intent.getIntExtra("createConfigType", EConfigType.VMESS.value)) ?: EConfigType.VMESS
     }
+    private val subscriptionId by lazy {
+        intent.getStringExtra("subscriptionId")
+    }
+
     private val securitys: Array<out String> by lazy {
         resources.getStringArray(R.array.securitys)
     }
@@ -68,13 +75,13 @@ class ServerActivity : BaseActivity() {
     private val et_address: EditText by lazy { findViewById(R.id.et_address) }
     private val et_port: EditText by lazy { findViewById(R.id.et_port) }
     private val et_id: EditText by lazy { findViewById(R.id.et_id) }
-    //private val et_alterId: EditText? by lazy { findViewById(R.id.et_alterId) }
+    private val et_alterId: EditText? by lazy { findViewById(R.id.et_alterId) }
     private val et_security: EditText? by lazy { findViewById(R.id.et_security) }
-    //private val sp_flow: Spinner? by lazy { findViewById(R.id.sp_flow) }
+    private val sp_flow: Spinner? by lazy { findViewById(R.id.sp_flow) }
     private val sp_security: Spinner? by lazy { findViewById(R.id.sp_security) }
     private val sp_stream_security: Spinner? by lazy { findViewById(R.id.sp_stream_security) }
     private val sp_allow_insecure: Spinner? by lazy { findViewById(R.id.sp_allow_insecure) }
-    //private val et_sni: EditText? by lazy { findViewById(R.id.et_sni) }
+    private val et_sni: EditText? by lazy { findViewById(R.id.et_sni) }
     private val sp_network: Spinner? by lazy { findViewById(R.id.sp_network) }
     private val sp_header_type: Spinner? by lazy { findViewById(R.id.sp_header_type) }
     private val sp_header_type_title: TextView? by lazy { findViewById(R.id.sp_header_type_title) }
@@ -91,8 +98,8 @@ class ServerActivity : BaseActivity() {
             EConfigType.CUSTOM -> return
             EConfigType.SHADOWSOCKS -> setContentView(R.layout.activity_server_shadowsocks)
             EConfigType.SOCKS -> setContentView(R.layout.activity_server_socks)
-//            EConfigType.VLESS -> setContentView(R.layout.activity_server_vless)
-//            EConfigType.TROJAN -> setContentView(R.layout.activity_server_trojan)
+            EConfigType.VLESS -> setContentView(R.layout.activity_server_vless)
+            EConfigType.TROJAN -> setContentView(R.layout.activity_server_trojan)
         }
         sp_network?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -133,13 +140,19 @@ class ServerActivity : BaseActivity() {
         et_address.text = Utils.getEditable(outbound.getServerAddress().orEmpty())
         et_port.text = Utils.getEditable(outbound.getServerPort()?.toString() ?: DEFAULT_PORT.toString())
         et_id.text = Utils.getEditable(outbound.getPassword().orEmpty())
+        et_alterId?.text = Utils.getEditable(outbound.settings?.vnext?.get(0)?.users?.get(0)?.alterId.toString())
         if (config.configType == EConfigType.SOCKS) {
             et_security?.text = Utils.getEditable(outbound.settings?.servers?.get(0)?.users?.get(0)?.user.orEmpty())
         } else if (config.configType == EConfigType.VLESS) {
             et_security?.text = Utils.getEditable(outbound.getSecurityEncryption().orEmpty())
             val flow = Utils.arrayFind(flows, outbound.settings?.vnext?.get(0)?.users?.get(0)?.flow.orEmpty())
             if (flow >= 0) {
-                //sp_flow.setSelection(flow)
+                sp_flow?.setSelection(flow)
+            }
+        } else if (config.configType == EConfigType.TROJAN) {
+            val flow = Utils.arrayFind(flows, outbound.settings?.servers?.get(0)?.flow.orEmpty())
+            if (flow >= 0) {
+                sp_flow?.setSelection(flow)
             }
         }
         val securityEncryptions = if (config.configType == EConfigType.SHADOWSOCKS) shadowsocksSecuritys else securitys
@@ -156,7 +169,7 @@ class ServerActivity : BaseActivity() {
                 if (allowinsecure >= 0) {
                     sp_allow_insecure?.setSelection(allowinsecure)
                 }
-                et_request_host?.text = Utils.getEditable(tlsSetting.serverName)
+                et_sni?.text = Utils.getEditable(tlsSetting.serverName)
             }
         }
         val network = Utils.arrayFind(networks, streamSetting.network)
@@ -174,6 +187,7 @@ class ServerActivity : BaseActivity() {
         et_address.text = null
         et_port.text = Utils.getEditable(DEFAULT_PORT.toString())
         et_id.text = null
+        et_alterId?.text = Utils.getEditable("0")
         sp_security?.setSelection(0)
         sp_network?.setSelection(0)
 
@@ -182,9 +196,10 @@ class ServerActivity : BaseActivity() {
         et_path?.text = null
         sp_stream_security?.setSelection(0)
         sp_allow_insecure?.setSelection(0)
+        et_sni?.text = null
 
         //et_security.text = null
-        //sp_flow?.setSelection(0)
+        sp_flow?.setSelection(0)
         return true
     }
 
@@ -210,6 +225,19 @@ class ServerActivity : BaseActivity() {
             toast(R.string.server_lab_id)
             return false
         }
+        sp_stream_security?.let {
+            if (config.configType == EConfigType.TROJAN && TextUtils.isEmpty(streamSecuritys[it.selectedItemPosition])) {
+                toast(R.string.server_lab_stream_security)
+                return false
+            }
+        }
+        et_alterId?.let {
+            val alterId = Utils.parseInt(it.text.toString())
+            if (alterId < 0) {
+                toast(R.string.server_lab_alterid)
+                return false
+            }
+        }
 
         config.remarks = et_remarks.text.toString().trim()
         config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
@@ -220,6 +248,9 @@ class ServerActivity : BaseActivity() {
         }
         config.outboundBean?.streamSettings?.let {
             saveStreamSettings(it)
+        }
+        if(config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
+            config.subscriptionId = subscriptionId!!
         }
 
         MmkvManager.encodeServerConfig(editGuid, config)
@@ -233,11 +264,12 @@ class ServerActivity : BaseActivity() {
         vnext.port = port
         vnext.users[0].id = et_id.text.toString().trim()
         if (config.configType == EConfigType.VMESS) {
+            vnext.users[0].alterId = Utils.parseInt(et_alterId?.text.toString())
             vnext.users[0].security = securitys[sp_security?.selectedItemPosition ?: 0]
         } else if (config.configType == EConfigType.VLESS) {
             vnext.users[0].encryption = et_security?.text.toString().trim()
             if (streamSecuritys[sp_stream_security?.selectedItemPosition ?: 0] == XTLS) {
-//                vnext.users[0].flow = flows[sp_flow.selectedItemPosition].ifBlank { V2rayConfig.DEFAULT_FLOW }
+                vnext.users[0].flow = flows[sp_flow?.selectedItemPosition ?: 0].ifBlank { DEFAULT_FLOW }
             } else {
                 vnext.users[0].flow = ""
             }
@@ -261,6 +293,12 @@ class ServerActivity : BaseActivity() {
             }
         } else if (config.configType == EConfigType.TROJAN) {
             server.password = et_id.text.toString().trim()
+            server.flow =
+                    if (streamSecuritys[sp_stream_security?.selectedItemPosition ?: 0] == XTLS) {
+                        flows[sp_flow?.selectedItemPosition ?: 0].ifBlank { DEFAULT_FLOW }
+                    } else {
+                        ""
+                    }
         }
     }
 
@@ -269,7 +307,7 @@ class ServerActivity : BaseActivity() {
         val type = sp_header_type?.selectedItemPosition ?: return
         val requestHost = et_request_host?.text?.toString()?.trim() ?: return
         val path = et_path?.text?.toString()?.trim() ?: return
-        //val sniField = et_sni?.text?.toString()?.trim() ?: return
+        val sniField = et_sni?.text?.toString()?.trim() ?: return
         val allowInsecureField = sp_allow_insecure?.selectedItemPosition ?: return
         val streamSecurity = sp_stream_security?.selectedItemPosition ?: return
 
@@ -284,16 +322,15 @@ class ServerActivity : BaseActivity() {
                 mode = transportTypes(networks[network])[type],
                 serviceName = path
         )
-        //if (sniField.isNotBlank()) {
-        //    sni = sniField
-        //}
+        if (sniField.isNotBlank()) {
+            sni = sniField
+        }
         val allowInsecure = if (allowinsecures[allowInsecureField].isBlank()) {
-            false//settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
+            settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
         } else {
             allowinsecures[allowInsecureField].toBoolean()
         }
         streamSetting.populateTlsSettings(streamSecuritys[streamSecurity], allowInsecure, sni)
-
     }
 
     private fun transportTypes(network: String?): Array<out String> {
@@ -313,12 +350,19 @@ class ServerActivity : BaseActivity() {
      */
     private fun deleteServer(): Boolean {
         if (editGuid.isNotEmpty()) {
-            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        MmkvManager.removeServer(editGuid)
-                        finish()
-                    }
-                    .show()
+            if (editGuid != mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
+                if (settingsStorage?.decodeBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
+                    AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            MmkvManager.removeServer(editGuid)
+                            finish()
+                        }
+                        .show()
+                } else {
+                    MmkvManager.removeServer(editGuid)
+                    finish()
+                }
+            }
         }
         return true
     }

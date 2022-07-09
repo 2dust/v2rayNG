@@ -1,8 +1,7 @@
 package com.v2ray.ang.ui
 
-import android.graphics.Color
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import com.v2ray.ang.R
@@ -36,7 +35,7 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
             VIEW_TYPE_HEADER -> {
                 val view = View(ctx)
                 view.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ctx.resources.getDimensionPixelSize(R.dimen.bypass_list_header_height) * 3)
+                        ctx.resources.getDimensionPixelSize(R.dimen.bypass_list_header_height) * 0)
                 BaseViewHolder(view)
             }
 //            VIEW_TYPE_ITEM -> AppViewHolder(ctx.layoutInflater
@@ -66,10 +65,10 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
             itemBypassBinding.packageName.text = appInfo.packageName
             if (appInfo.isSystemApp) {
                 itemBypassBinding.name.text = String.format("** %1s", appInfo.appName)
-                itemBypassBinding.name.setTextColor(Color.RED)
+                //name.textColor = Color.RED
             } else {
                 itemBypassBinding.name.text = appInfo.appName
-                itemBypassBinding.name.setTextColor(Color.DKGRAY)
+                //name.textColor = Color.DKGRAY
             }
 
             itemView.setOnClickListener(this)

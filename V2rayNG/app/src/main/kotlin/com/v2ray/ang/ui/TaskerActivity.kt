@@ -114,3 +114,4 @@ class TaskerActivity : BaseActivity() {
     }
 
 }
+

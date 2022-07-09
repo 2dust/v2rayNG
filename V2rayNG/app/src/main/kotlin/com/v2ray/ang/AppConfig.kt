@@ -6,6 +6,7 @@ package com.v2ray.ang
  */
 object AppConfig {
     const val ANG_PACKAGE = "com.v2ray.ang"
+    const val DIR_ASSETS = "assets"
 
     // legacy
     const val ANG_CONFIG = "ang_config"
@@ -23,7 +24,12 @@ object AppConfig {
     const val PREF_REMOTE_DNS = "pref_remote_dns"
     const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
     const val PREF_LOCAL_DNS_PORT = "pref_local_dns_port"
-    const val PREF_FORWARD_IPV6 = "pref_forward_ipv6"
+    const val PREF_ALLOW_INSECURE = "pref_allow_insecure"
+    const val PREF_SOCKS_PORT = "pref_socks_port"
+    const val PREF_HTTP_PORT = "pref_http_port"
+    const val PREF_LOGLEVEL = "pref_core_loglevel"
+    const val PREF_LANGUAGE = "pref_language"
+    const val PREF_PREFER_IPV6 = "pref_prefer_ipv6"
     const val PREF_ROUTING_DOMAIN_STRATEGY = "pref_routing_domain_strategy"
     const val PREF_ROUTING_MODE = "pref_routing_mode"
     const val PREF_V2RAY_ROUTING_AGENT = "pref_v2ray_routing_agent"
@@ -32,16 +38,7 @@ object AppConfig {
     const val PREF_PER_APP_PROXY = "pref_per_app_proxy"
     const val PREF_PER_APP_PROXY_SET = "pref_per_app_proxy_set"
     const val PREF_BYPASS_APPS = "pref_bypass_apps"
-    //        const val PREF_BYPASS_MAINLAND = "pref_bypass_mainland"
-    //        const val PREF_START_ON_BOOT = "pref_start_on_boot"
-    //        const val PREF_MUX_ENAimport libv2ray.Libv2rayBLED = "pref_mux_enabled"
-    //        const val PREF_SOCKS_PORT = "pref_socks_port"
-//        const val PREF_HTTP_PORT = "pref_http_port"
-    //        const val PREF_DONATE = "pref_donate"
-    //        const val PREF_LICENSES = "pref_licenses"
-//        const val PREF_FEEDBACK = "pref_feedback"
-//        const val PREF_TG_GROUP = "pref_tg_group"
-    //        const val PREF_AUTO_RESTART = "pref_auto_restart"
+    const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
 
     const val HTTP_PROTOCOL: String = "http://"
     const val HTTPS_PROTOCOL: String = "https://"
@@ -64,10 +61,15 @@ object AppConfig {
     const val v2rayCustomRoutingListUrl = "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
     const val v2rayNGIssues = "https://github.com/2dust/v2rayNG/issues"
     const val v2rayNGWikiMode = "https://github.com/2dust/v2rayNG/wiki/Mode"
-    const val promotionUrl = "https://1.2345345.xyz/ads.html"
+    const val promotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
+    const val geoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/";
 
     const val DNS_AGENT = "1.1.1.1"
     const val DNS_DIRECT = "223.5.5.5"
+
+    const val PORT_LOCAL_DNS = "10853"
+    const val PORT_SOCKS = "10808"
+    const val PORT_HTTP = "10809"
 
     const val MSG_REGISTER_CLIENT = 1
     const val MSG_STATE_RUNNING = 11
@@ -79,4 +81,9 @@ object AppConfig {
     const val MSG_STATE_STOP = 4
     const val MSG_STATE_STOP_SUCCESS = 41
     const val MSG_STATE_RESTART = 5
+    const val MSG_MEASURE_DELAY = 6
+    const val MSG_MEASURE_DELAY_SUCCESS = 61
+    const val MSG_MEASURE_CONFIG = 7
+    const val MSG_MEASURE_CONFIG_SUCCESS = 71
+    const val MSG_MEASURE_CONFIG_CANCEL = 72
 }

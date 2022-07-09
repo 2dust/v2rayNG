@@ -13,28 +13,28 @@ import java.util.*
 import kotlin.collections.HashMap
 import android.content.ClipData
 import android.content.Intent
+import android.content.res.Configuration.UI_MODE_NIGHT_MASK
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
-import android.os.SystemClock
+import android.os.Build
+import android.os.LocaleList
 import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.responseLength
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.service.V2RayServiceManager
-import kotlinx.coroutines.isActive
-import java.io.IOException
 import java.net.*
-import kotlin.coroutines.coroutineContext
+import com.v2ray.ang.service.V2RayServiceManager
+import java.io.IOException
 
 object Utils {
 
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
-    private val tcpTestingSockets = ArrayList<Socket?>()
 
     /**
      * convert string to editalbe for kotlin
@@ -62,11 +62,16 @@ object Utils {
      * parseInt
      */
     fun parseInt(str: String): Int {
+        return parseInt(str, 0)
+    }
+
+    fun parseInt(str: String?, default: Int): Int {
+        str ?: return default
         return try {
             Integer.parseInt(str)
         } catch (e: Exception) {
             e.printStackTrace()
-            0
+            default
         }
     }
 
@@ -112,12 +117,12 @@ object Utils {
         try {
             return Base64.decode(text, Base64.NO_WRAP).toString(charset("UTF-8"))
         } catch (e: Exception) {
-            Log.i(AppConfig.ANG_PACKAGE, "Parse base64 standard failed $e")
+            Log.i(ANG_PACKAGE, "Parse base64 standard failed $e")
         }
         try {
             return Base64.decode(text, Base64.NO_WRAP.or(Base64.URL_SAFE)).toString(charset("UTF-8"))
         } catch (e: Exception) {
-            Log.i(AppConfig.ANG_PACKAGE, "Parse base64 url safe failed $e")
+            Log.i(ANG_PACKAGE, "Parse base64 url safe failed $e")
         }
         return null
     }
@@ -224,7 +229,7 @@ object Utils {
             // addr = addr.toLowerCase()
             val octets = addr.split('.').toTypedArray()
             if (octets.size == 4) {
-                if(octets[3].indexOf(":") > 0) {
+                if (octets[3].indexOf(":") > 0) {
                     addr = addr.substring(0, addr.indexOf(":"))
                 }
                 return isIpv4Address(addr)
@@ -312,7 +317,7 @@ object Utils {
 
     fun urlDecode(url: String): String {
         return try {
-            URLDecoder.decode(url, "UTF-8")
+            URLDecoder.decode(URLDecoder.decode(url), "utf-8")
         } catch (e: Exception) {
             e.printStackTrace()
             url
@@ -328,58 +333,6 @@ object Utils {
         }
     }
 
-    fun testConnection(context: Context, port: Int): String {
-        var result: String
-        var conn: HttpURLConnection? = null
-
-        try {
-            val url = URL("https",
-                    "www.google.com",
-                    "/generate_204")
-
-            conn = url.openConnection(
-                Proxy(Proxy.Type.HTTP,
-                InetSocketAddress("127.0.0.1", port + 1))) as HttpURLConnection
-            conn.connectTimeout = 30000
-            conn.readTimeout = 30000
-            conn.setRequestProperty("Connection", "close")
-            conn.instanceFollowRedirects = false
-            conn.useCaches = false
-
-            val start = SystemClock.elapsedRealtime()
-            val code = conn.responseCode
-            val elapsed = SystemClock.elapsedRealtime() - start
-
-            if (code == 204 || code == 200 && conn.responseLength == 0L) {
-                result = context.getString(R.string.connection_test_available, elapsed)
-            } else {
-                throw IOException(context.getString(R.string.connection_test_error_status_code, code))
-            }
-        } catch (e: IOException) {
-            // network exception
-            Log.d(AppConfig.ANG_PACKAGE,"testConnection IOException: "+Log.getStackTraceString(e))
-            result = context.getString(R.string.connection_test_error, e.message)
-        } catch (e: Exception) {
-            // library exception, eg sumsung
-            Log.d(AppConfig.ANG_PACKAGE,"testConnection Exception: "+Log.getStackTraceString(e))
-            result = context.getString(R.string.connection_test_error, e.message)
-        } finally {
-            conn?.disconnect()
-        }
-
-        return result
-    }
-
-    /**
-     * package path
-     */
-    fun packagePath(context: Context): String {
-        var path = context.filesDir.toString()
-        path = path.replace("files", "")
-        //path += "tun2socks"
-
-        return path
-    }
 
     /**
      * readTextFromAssets
@@ -391,75 +344,33 @@ object Utils {
         return content
     }
 
-    /**
-     * ping
-     */
-    fun ping(url: String): String {
+    fun userAssetPath(context: Context?): String {
+        if (context == null)
+            return ""
+        val extDir = context.getExternalFilesDir(AppConfig.DIR_ASSETS)
+                ?: return context.getDir(AppConfig.DIR_ASSETS, 0).absolutePath
+        return extDir.absolutePath
+    }
+
+    fun getUrlContext(url: String, timeout: Int): String {
+        var result: String
+        var conn: HttpURLConnection? = null
+
         try {
-            val command = "/system/bin/ping -c 3 $url"
-            val process = Runtime.getRuntime().exec(command)
-            val allText = process.inputStream.bufferedReader().use { it.readText() }
-            if (allText.isNotBlank()) {
-                val tempInfo = allText.substring(allText.indexOf("min/avg/max/mdev") + 19)
-                val temps = tempInfo.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                if (temps.count() > 0 && temps[0].length < 10) {
-                    return temps[0].toFloat().toInt().toString() + "ms"
-                }
-            }
+            conn = URL(url).openConnection() as HttpURLConnection
+            conn.connectTimeout = timeout
+            conn.readTimeout = timeout
+            conn.setRequestProperty("Connection", "close")
+            conn.instanceFollowRedirects = false
+            conn.useCaches = false
+            //val code = conn.responseCode
+            result = conn.inputStream.bufferedReader().readText()
         } catch (e: Exception) {
-            e.printStackTrace()
+            result = ""
+        } finally {
+            conn?.disconnect()
         }
-        return "-1ms"
-    }
-
-    /**
-     * tcping
-     */
-    suspend fun tcping(url: String, port: Int): Long {
-        var time = -1L
-        for (k in 0 until 2) {
-            val one = socketConnectTime(url, port)
-            if (!coroutineContext.isActive) {
-                break
-            }
-            if (one != -1L && (time == -1L || one < time)) {
-                time = one
-            }
-        }
-        return time
-    }
-
-    fun socketConnectTime(url: String, port: Int): Long {
-        try {
-            val socket = Socket()
-            synchronized(this) {
-                tcpTestingSockets.add(socket)
-            }
-            val start = System.currentTimeMillis()
-            socket.connect(InetSocketAddress(url, port))
-            val time = System.currentTimeMillis() - start
-            synchronized(this) {
-                tcpTestingSockets.remove(socket)
-            }
-            socket.close()
-            return time
-        } catch (e: UnknownHostException) {
-            e.printStackTrace()
-        } catch (e: IOException) {
-            Log.d(AppConfig.ANG_PACKAGE, "socketConnectTime IOException: $e")
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return -1
-    }
-
-    fun closeAllTcpSockets() {
-        synchronized(this) {
-            tcpTestingSockets.forEach {
-                it?.close()
-            }
-            tcpTestingSockets.clear()
-        }
+        return result
     }
 
     @Throws(IOException::class)
@@ -478,12 +389,39 @@ object Utils {
         }
     }
 
+    fun getDarkModeStatus(context: Context): Boolean {
+        val mode = context.resources.configuration.uiMode and UI_MODE_NIGHT_MASK
+        return mode == UI_MODE_NIGHT_YES
+    }
+
     fun getIpv6Address(address: String): String {
         return if (isIpv6Address(address)) {
             String.format("[%s]", address)
         } else {
             address
         }
+    }
+
+    fun getLocale(context: Context): Locale =
+        when (settingsStorage?.decodeString(AppConfig.PREF_LANGUAGE) ?: "auto") {
+            "auto" ->  getSysLocale()
+            "en" -> Locale("en")
+            "zh-rCN" -> Locale("zh", "CN")
+            "zh-rTW" -> Locale("zh", "TW")
+            "vi" -> Locale("vi")
+            else -> getSysLocale()
+        }
+
+    private fun getSysLocale(): Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        LocaleList.getDefault()[0]
+    } else {
+        Locale.getDefault()
+    }
+
+    fun fixIllegalUrl(str: String): String {
+        return str
+            .replace(" ","%20")
+            .replace("|","%7C")
     }
 }
 

@@ -106,7 +106,7 @@ class ScannerActivity : BaseActivity(), ZXingScannerView.ResultHandler {
             try {
                 val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
                 val text = QRCodeDecoder.syncDecodeQRCode(bitmap)
-                finished(text)
+                finished(text!!)
             } catch (e: Exception) {
                 e.printStackTrace()
                 toast(e.message.toString())

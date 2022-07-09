@@ -1,46 +1,47 @@
 package com.v2ray.ang.ui
 
 import android.Manifest
-import android.content.Intent
+import android.content.*
 import android.net.Uri
 import android.net.VpnService
-import android.os.Bundle
-import com.google.android.material.navigation.NavigationView
-import androidx.core.view.GravityCompat
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import android.text.TextUtils
-import android.util.Log
-import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
+import com.tbruyelle.rxpermissions.RxPermissions
+import com.v2ray.ang.R
+import android.os.Bundle
+import android.text.TextUtils
+import android.view.KeyEvent
+import com.v2ray.ang.AppConfig
+import android.content.res.ColorStateList
+import com.google.android.material.navigation.NavigationView
+import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.recyclerview.widget.ItemTouchHelper
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import com.tbruyelle.rxpermissions.RxPermissions
+import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import com.tencent.mmkv.MMKV
-import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.BuildConfig
-import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
-import com.v2ray.ang.service.V2RayServiceManager
-import com.v2ray.ang.util.AngConfigManager
-import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.Utils
-import com.v2ray.ang.viewmodel.MainViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import libv2ray.Libv2ray
-import me.drakeet.support.toast.ToastCompat
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
+import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
+import com.v2ray.ang.service.V2RayServiceManager
+import com.v2ray.ang.util.*
+import com.v2ray.ang.viewmodel.MainViewModel
+import kotlinx.coroutines.*
+import me.drakeet.support.toast.ToastCompat
+import java.io.File
+import java.io.FileOutputStream
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var binding: ActivityMainBinding
@@ -80,7 +81,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
         binding.layoutTest.setOnClickListener {
             if (mainViewModel.isRunning.value == true) {
-                binding.tvTestState.text = getString(R.string.connection_test_testing)
+                setTestState(getString(R.string.connection_test_testing))
                 mainViewModel.testCurrentServerRealPing()
             } else {
 //                tv_test_state.text = getString(R.string.connection_test_fail)
@@ -101,32 +102,31 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         binding.navView.setNavigationItemSelectedListener(this)
-        binding.version.text = "v${BuildConfig.VERSION_NAME} (${Libv2ray.checkVersionX()})"
+        binding.version.text = "v${BuildConfig.VERSION_NAME} (${SpeedtestUtil.getLibVersion()})"
 
-        setupViewModelObserver()
+        setupViewModel()
+        copyAssets()
         migrateLegacy()
     }
 
-    private fun setupViewModelObserver() {
-        mainViewModel.updateListAction.observe(this) {
-            val index = it ?: return@observe
+    private fun setupViewModel() {
+        mainViewModel.updateListAction.observe(this) { index ->
             if (index >= 0) {
                 adapter.notifyItemChanged(index)
             } else {
                 adapter.notifyDataSetChanged()
             }
         }
-        mainViewModel.updateTestResultAction.observe(this) { binding.tvTestState.text = it }
-        mainViewModel.isRunning.observe(this) {
-            val isRunning = it ?: return@observe
+        mainViewModel.updateTestResultAction.observe(this) { setTestState(it) }
+        mainViewModel.isRunning.observe(this) { isRunning ->
             adapter.isRunning = isRunning
             if (isRunning) {
-                binding.fab.setImageResource(R.drawable.ic_v)
-                binding.tvTestState.text = getString(R.string.connection_connected)
+                binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorSelected))
+                setTestState(getString(R.string.connection_connected))
                 binding.layoutTest.isFocusable = true
             } else {
-                binding.fab.setImageResource(R.drawable.ic_v_idle)
-                binding.tvTestState.text = getString(R.string.connection_not_connected)
+                binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorUnselected))
+                setTestState(getString(R.string.connection_not_connected))
                 binding.layoutTest.isFocusable = false
             }
             hideCircle()
@@ -134,8 +134,31 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         mainViewModel.startListenBroadcast()
     }
 
+    private fun copyAssets() {
+        val extFolder = Utils.userAssetPath(this)
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val geo = arrayOf("geosite.dat", "geoip.dat")
+                assets.list("")
+                        ?.filter { geo.contains(it) }
+                        ?.filter { !File(extFolder, it).exists() }
+                        ?.forEach {
+                            val target = File(extFolder, it)
+                            assets.open(it).use { input ->
+                                FileOutputStream(target).use { output ->
+                                    input.copyTo(output)
+                                }
+                            }
+                            Log.i(ANG_PACKAGE, "Copied from apk assets folder to ${target.absolutePath}")
+                        }
+            } catch (e: Exception) {
+                Log.e(ANG_PACKAGE, "asset copy failed", e)
+            }
+        }
+    }
+
     private fun migrateLegacy() {
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             val result = AngConfigManager.migrateLegacyConfig(this@MainActivity)
             if (result != null) {
                 launch(Dispatchers.Main) {
@@ -158,6 +181,17 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //        toast(R.string.toast_services_start)
         V2RayServiceManager.startV2Ray(this)
         hideCircle()
+    }
+
+    fun restartV2Ray() {
+        if (mainViewModel.isRunning.value == true) {
+            Utils.stopVService(this)
+        }
+        Observable.timer(500, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    startV2Ray()
+                }
     }
 
     public override fun onResume() {
@@ -184,18 +218,23 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
         R.id.import_manually_vmess -> {
-            startActivity(Intent().putExtra("createConfigType", EConfigType.VMESS.value).
-            setClass(this, ServerActivity::class.java))
+            importManually(EConfigType.VMESS.value)
+            true
+        }
+        R.id.import_manually_vless -> {
+            importManually(EConfigType.VLESS.value)
             true
         }
         R.id.import_manually_ss -> {
-            startActivity(Intent().putExtra("createConfigType", EConfigType.SHADOWSOCKS.value).
-            setClass(this, ServerActivity::class.java))
+            importManually(EConfigType.SHADOWSOCKS.value)
             true
         }
         R.id.import_manually_socks -> {
-            startActivity(Intent().putExtra("createConfigType", EConfigType.SOCKS.value).
-            setClass(this, ServerActivity::class.java))
+            importManually(EConfigType.SOCKS.value)
+            true
+        }
+        R.id.import_manually_trojan -> {
+            importManually(EConfigType.TROJAN.value)
             true
         }
         R.id.import_config_custom_clipboard -> {
@@ -239,17 +278,56 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
-//        R.id.settings -> {
-//            startActivity<SettingsActivity>("isRunning" to isRunning)
-//            true
-//        }
-//        R.id.logcat -> {
-//            startActivity<LogcatActivity>()
-//            true
-//        }
+        R.id.real_ping_all -> {
+            mainViewModel.testAllRealPing()
+            true
+        }
+
+        R.id.service_restart -> {
+            restartV2Ray()
+            true
+        }
+
+        R.id.del_all_config -> {
+            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        MmkvManager.removeAllServer()
+                        mainViewModel.reloadServerList()
+                    }
+                    .show()
+            true
+        }
+
+        R.id.del_invalid_config -> {
+            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    MmkvManager.removeInvalidServer()
+                    mainViewModel.reloadServerList()
+                }
+                .show()
+            true
+        }
+        R.id.sort_by_test_results -> {
+            MmkvManager.sortByTestResults()
+            mainViewModel.reloadServerList()
+            true
+        }
+        R.id.filter_config -> {
+            mainViewModel.filterConfig(this)
+            true
+        }
+
         else -> super.onOptionsItemSelected(item)
     }
 
+    private fun importManually(createConfigType : Int) {
+        startActivity(
+            Intent()
+                .putExtra("createConfigType", createConfigType)
+                .putExtra("subscriptionId", mainViewModel.subscriptionId)
+                .setClass(this, ServerActivity::class.java)
+        )
+    }
 
     /**
      * import config from qrcode
@@ -303,9 +381,16 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     fun importBatchConfig(server: String?, subid: String = "") {
-        var count = AngConfigManager.importBatchConfig(server, subid)
+        val subid2 = if(subid.isNullOrEmpty()){
+            mainViewModel.subscriptionId
+        }else{
+            subid
+        }
+        val append = subid.isNullOrEmpty()
+
+        var count = AngConfigManager.importBatchConfig(server, subid2, append)
         if (count <= 0) {
-            count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid)
+            count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append)
         }
         if (count > 0) {
             toast(R.string.toast_success)
@@ -368,7 +453,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 toast(R.string.toast_invalid_url)
                 return false
             }
-            GlobalScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch(Dispatchers.IO) {
                 val configText = try {
                     Utils.getUrlContentWithCustomUserAgent(url)
                 } catch (e: Exception) {
@@ -400,12 +485,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 ) {
                     return@forEach
                 }
+                if (!it.second.enabled) {
+                    return@forEach
+                }
                 val url = it.second.url
                 if (!Utils.isValidUrl(url)) {
                     return@forEach
                 }
                 Log.d(ANG_PACKAGE, url)
-                GlobalScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch(Dispatchers.IO) {
                     val configText = try {
                         Utils.getUrlContentWithCustomUserAgent(url)
                     } catch (e: Exception) {
@@ -416,7 +504,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         return@launch
                     }
                     launch(Dispatchers.Main) {
-                        importBatchConfig(Utils.decode(configText), it.first)
+                        importBatchConfig(configText, it.first)
                     }
                 }
             }
@@ -437,7 +525,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         try {
             chooseFileForCustomConfig.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
-        } catch (ex: android.content.ActivityNotFoundException) {
+        } catch (ex: ActivityNotFoundException) {
             toast(R.string.toast_require_file_manager)
         }
     }
@@ -479,13 +567,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 return
             }
             mainViewModel.appendCustomConfigServer(server)
+            mainViewModel.reloadServerList()
             toast(R.string.toast_success)
-            adapter.notifyItemInserted(mainViewModel.serverList.lastIndex)
+            //adapter.notifyItemInserted(mainViewModel.serverList.lastIndex)
         } catch (e: Exception) {
             ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
             e.printStackTrace()
             return
         }
+    }
+
+    fun setTestState(content: String?) {
+        binding.tvTestState.text = content
     }
 
 //    val mConnection = object : ServiceConnection {
@@ -514,11 +607,16 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             Observable.timer(300, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
-                        if (binding.fabProgressCircle.isShown) {
-                            binding.fabProgressCircle.hide()
+                        try {
+                            if (binding.fabProgressCircle.isShown) {
+                                binding.fabProgressCircle.hide()
+                            }
+                        } catch (e: Exception) {
+                            Log.w(ANG_PACKAGE, e)
                         }
                     }
         } catch (e: Exception) {
+            Log.d(ANG_PACKAGE, e.toString())
         }
     }
 
@@ -541,14 +639,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 startActivity(Intent(this, SettingsActivity::class.java)
                         .putExtra("isRunning", mainViewModel.isRunning.value == true))
             }
+            R.id.user_asset_setting -> {
+                startActivity(Intent(this, UserAssetActivity::class.java))
+            }
             R.id.feedback -> {
                 Utils.openUri(this, AppConfig.v2rayNGIssues)
             }
             R.id.promotion -> {
-                Utils.openUri(this, AppConfig.promotionUrl)
-            }
-            R.id.donate -> {
-//                startActivity<InappBuyActivity>()
+                Utils.openUri(this, "${Utils.decode(AppConfig.promotionUrl)}?t=${System.currentTimeMillis()}")
             }
             R.id.logcat -> {
                 startActivity(Intent(this, LogcatActivity::class.java))

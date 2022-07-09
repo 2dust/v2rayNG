@@ -1,10 +1,10 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
@@ -45,7 +45,7 @@ class SubEditActivity : BaseActivity() {
     private fun bindingServer(subItem: SubscriptionItem): Boolean {
         binding.etRemarks.text = Utils.getEditable(subItem.remarks)
         binding.etUrl.text = Utils.getEditable(subItem.url)
-
+        binding.chkEnable.isChecked = subItem.enabled
         return true
     }
 
@@ -55,7 +55,7 @@ class SubEditActivity : BaseActivity() {
     private fun clearServer(): Boolean {
         binding.etRemarks.text = null
         binding.etUrl.text = null
-
+        binding.chkEnable.isChecked = true
         return true
     }
 
@@ -75,15 +75,16 @@ class SubEditActivity : BaseActivity() {
 
         subItem.remarks = binding.etRemarks.text.toString()
         subItem.url = binding.etUrl.text.toString()
+        subItem.enabled = binding.chkEnable.isChecked
 
         if (TextUtils.isEmpty(subItem.remarks)) {
             toast(R.string.sub_setting_remarks)
             return false
         }
-        if (TextUtils.isEmpty(subItem.url)) {
-            toast(R.string.sub_setting_url)
-            return false
-        }
+//        if (TextUtils.isEmpty(subItem.url)) {
+//            toast(R.string.sub_setting_url)
+//            return false
+//        }
 
         subStorage?.encode(subId, Gson().toJson(subItem))
         toast(R.string.toast_success)

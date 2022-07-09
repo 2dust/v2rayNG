@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,19 +19,14 @@
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
+                android:layout_height="?attr/actionBarSize" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            tools:context=".ui.MainActivity">
+            android:fitsSystemWindows="true">
 
             <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:id="@+id/main_content"
@@ -55,10 +49,12 @@
                         android:id="@+id/layout_test"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/connection_test_height"
-                        android:background="@drawable/background_test_button"
+                        android:background="?attr/colorPrimary"
                         android:gravity="center|left"
+                        android:nextFocusRight="@+id/fab"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:nextFocusLeft="@+id/recycler_view">
 
                         <TextView
                             android:id="@+id/tv_test_state"
@@ -69,8 +65,7 @@
                             android:paddingStart="16dp"
                             android:text="@string/connection_test_pending"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                            android:textColor="@color/colorPrimary_light" />
-
+                            android:textColor="@color/colorWhite" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -80,25 +75,25 @@
                     android:id="@+id/fabProgressCircle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:layout_gravity="bottom|end">
+                    android:layout_gravity="bottom|end"
+                    android:layout_marginBottom="24dp">
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/fab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
                         android:layout_alignParentEnd="true"
+                        android:layout_alignParentBottom="true"
                         android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="16dp"
-                        android:layout_marginRight="16dp"
                         android:layout_marginLeft="16dp"
                         android:layout_marginTop="16dp"
-                        android:src="@drawable/ic_v_idle"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginBottom="16dp"
                         android:clickable="true"
                         android:focusable="true"
-                        app:layout_anchorGravity="bottom|right|end"
-                        android:nextFocusLeft="@+id/recycler_view" />
+                        android:nextFocusLeft="@+id/layout_test"
+                        android:src="@drawable/ic_stat_name"
+                        app:layout_anchorGravity="bottom|right|end" />
 
                 </com.github.jorgecastilloprz.FABProgressCircle>
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
@@ -111,23 +106,19 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
-        app:itemIconTint="@color/colorPrimary_dark"
-        app:itemTextColor="@color/colorPrimary"
         app:menu="@menu/menu_drawer" >
 
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:background="@color/white"
-                android:padding="14dp">
+                android:padding="2dp">
 
             <TextView
                     android:id="@+id/version"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="@color/accent" />
+                    android:gravity="center" />
         </LinearLayout>
     </com.google.android.material.navigation.NavigationView>
 

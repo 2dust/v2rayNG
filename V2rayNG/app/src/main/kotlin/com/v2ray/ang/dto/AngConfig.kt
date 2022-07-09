@@ -17,12 +17,16 @@ data class AngConfig(
                          var requestHost: String = "",
                          var path: String = "",
                          var streamSecurity: String = "",
+                         var allowInsecure: String = "",
                          var configType: Int = 1,
                          var configVersion: Int = 1,
                          var testResult: String = "",
-                         var subid: String = "")
+                         var subid: String = "",
+                         var flow: String = "",
+                         var sni: String = "")
 
     data class SubItemBean(var id: String = "",
                            var remarks: String = "",
-                           var url: String = "")
+                           var url: String = "",
+                           var enabled: Boolean = true)
 }

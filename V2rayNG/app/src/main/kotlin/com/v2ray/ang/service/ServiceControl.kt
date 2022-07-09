@@ -5,10 +5,9 @@ import android.app.Service
 interface ServiceControl {
     fun getService(): Service
 
-    fun startService(parameters: String)
+    fun startService()
 
     fun stopService()
 
     fun vpnProtect(socket: Int): Boolean
-
 }

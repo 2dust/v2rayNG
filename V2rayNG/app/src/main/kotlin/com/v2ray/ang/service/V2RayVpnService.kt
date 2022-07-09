@@ -1,6 +1,6 @@
 package com.v2ray.ang.service
 
-import android.app.*
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -8,12 +8,14 @@ import android.net.*
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.StrictMode
-import androidx.annotation.RequiresApi
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.ERoutingMode
 import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -22,19 +24,31 @@ import java.io.File
 import java.lang.ref.SoftReference
 
 class V2RayVpnService : VpnService(), ServiceControl {
+    companion object {
+        private const val VPN_MTU = 1500
+        private const val PRIVATE_VLAN4_CLIENT = "26.26.26.1"
+        private const val PRIVATE_VLAN4_ROUTER = "26.26.26.2"
+        private const val PRIVATE_VLAN6_CLIENT = "da26:2626::1"
+        private const val PRIVATE_VLAN6_ROUTER = "da26:2626::2"
+        private const val TUN2SOCKS = "libtun2socks.so"
+    }
+
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     private lateinit var mInterface: ParcelFileDescriptor
 
-    /**
-        * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
-        *
-        * This makes doing a requestNetwork with REQUEST necessary so that we don't get ALL possible networks that
-        * satisfies default network capabilities but only THE default network. Unfortunately we need to have
-        * android.permission.CHANGE_NETWORK_STATE to be able to call requestNetwork.
-        *
-        * Source: https://android.googlesource.com/platform/frameworks/base/+/2df4c7d/services/core/java/com/android/server/ConnectivityService.java#887
-        */
+    //val fd: Int get() = mInterface.fd
+    private lateinit var process: Process
+
+    /**destroy
+     * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
+     *
+     * This makes doing a requestNetwork with REQUEST necessary so that we don't get ALL possible networks that
+     * satisfies default network capabilities but only THE default network. Unfortunately we need to have
+     * android.permission.CHANGE_NETWORK_STATE to be able to call requestNetwork.
+     *
+     * Source: https://android.googlesource.com/platform/frameworks/base/+/2df4c7d/services/core/java/com/android/server/ConnectivityService.java#887
+     */
     @delegate:RequiresApi(Build.VERSION_CODES.P)
     private val defaultNetworkRequest by lazy {
         NetworkRequest.Builder()
@@ -51,10 +65,12 @@ class V2RayVpnService : VpnService(), ServiceControl {
             override fun onAvailable(network: Network) {
                 setUnderlyingNetworks(arrayOf(network))
             }
+
             override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
                 // it's a good idea to refresh capabilities
                 setUnderlyingNetworks(arrayOf(network))
             }
+
             override fun onLost(network: Network) {
                 setUnderlyingNetworks(null)
             }
@@ -73,18 +89,17 @@ class V2RayVpnService : VpnService(), ServiceControl {
         stopV2Ray()
     }
 
-    override fun onLowMemory() {
-        stopV2Ray()
-        super.onLowMemory()
-    }
+//    override fun onLowMemory() {
+//        stopV2Ray()
+//        super.onLowMemory()
+//    }
 
     override fun onDestroy() {
         super.onDestroy()
-        stopV2Ray()
+        V2RayServiceManager.cancelNotification()
     }
 
-    private fun setup(parameters: String) {
-
+    private fun setup() {
         val prepare = prepare(this)
         if (prepare != null) {
             return
@@ -93,35 +108,34 @@ class V2RayVpnService : VpnService(), ServiceControl {
         // If the old interface has exactly the same parameters, use it!
         // Configure a builder while parsing the parameters.
         val builder = Builder()
-        val enableLocalDns = settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) ?: false
-        val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: "0"
+        //val enableLocalDns = defaultDPreference.getPrefBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
 
-        parameters.split(" ")
-                .map { it.split(",") }
-                .forEach {
-                    when (it[0][0]) {
-                        'm' -> builder.setMtu(java.lang.Short.parseShort(it[1]).toInt())
-                        's' -> builder.addSearchDomain(it[1])
-                        'a' -> builder.addAddress(it[1], Integer.parseInt(it[2]))
-                        'r' -> {
-                            if (routingMode == "1" || routingMode == "3") {
-                                if (it[1] == "::") { //not very elegant, should move Vpn setting in Kotlin, simplify go code
-                                    builder.addRoute("2000::", 3)
-                                } else {
-                                    resources.getStringArray(R.array.bypass_private_ip_address).forEach { cidr ->
-                                        val addr = cidr.split('/')
-                                        builder.addRoute(addr[0], addr[1].toInt())
-                                    }
-                                }
-                            } else {
-                                builder.addRoute(it[1], Integer.parseInt(it[2]))
-                            }
-                        }
-                        'd' -> builder.addDnsServer(it[1])
-                    }
-                }
+        val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: ERoutingMode.GLOBAL_PROXY.value
 
-        if(!enableLocalDns) {
+        builder.setMtu(VPN_MTU)
+        builder.addAddress(PRIVATE_VLAN4_CLIENT, 30)
+        //builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
+        if (routingMode == ERoutingMode.BYPASS_LAN.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
+            resources.getStringArray(R.array.bypass_private_ip_address).forEach {
+                val addr = it.split('/')
+                builder.addRoute(addr[0], addr[1].toInt())
+            }
+        } else {
+            builder.addRoute("0.0.0.0", 0)
+        }
+
+        if (settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) == true) {
+            builder.addAddress(PRIVATE_VLAN6_CLIENT, 126)
+            if (routingMode == ERoutingMode.BYPASS_LAN.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
+                builder.addRoute("2000::", 3) //currently only 1/8 of total ipV6 is in use
+            } else {
+                builder.addRoute("::", 0)
+            }
+        }
+
+        if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
+            builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
+        } else {
             Utils.getVpnDnsServers()
                     .forEach {
                         if (Utils.isPureIpAddress(it)) {
@@ -169,23 +183,59 @@ class V2RayVpnService : VpnService(), ServiceControl {
         // Create a new interface using the builder and save the parameters.
         try {
             mInterface = builder.establish()!!
+            runTun2socks()
         } catch (e: Exception) {
             // non-nullable lateinit var
             e.printStackTrace()
             stopV2Ray()
         }
+    }
 
-        sendFd()
+    private fun runTun2socks() {
+        val socksPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+        val cmd = arrayListOf(File(applicationContext.applicationInfo.nativeLibraryDir, TUN2SOCKS).absolutePath,
+                "--netif-ipaddr", PRIVATE_VLAN4_ROUTER,
+                "--netif-netmask", "255.255.255.252",
+                "--socks-server-addr", "127.0.0.1:${socksPort}",
+                "--tunmtu", VPN_MTU.toString(),
+                "--sock-path", "sock_path",//File(applicationContext.filesDir, "sock_path").absolutePath,
+                "--enable-udprelay",
+                "--loglevel", "notice")
+
+        if (settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) == true) {
+            cmd.add("--netif-ip6addr")
+            cmd.add(PRIVATE_VLAN6_ROUTER)
+        }
+        if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
+            val localDnsPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_LOCAL_DNS_PORT), AppConfig.PORT_LOCAL_DNS.toInt())
+            cmd.add("--dnsgw")
+            cmd.add("127.0.0.1:${localDnsPort}")
+        }
+        Log.d(packageName, cmd.toString())
+
+        try {
+            val proBuilder = ProcessBuilder(cmd)
+            proBuilder.redirectErrorStream(true)
+            process = proBuilder
+                    .directory(applicationContext.filesDir)
+                    .start()
+            Log.d(packageName, process.toString())
+
+            sendFd()
+        } catch (e: Exception) {
+            Log.d(packageName, e.toString())
+        }
     }
 
     private fun sendFd() {
         val fd = mInterface.fileDescriptor
-        val path = File(Utils.packagePath(applicationContext), "sock_path").absolutePath
+        val path = File(applicationContext.filesDir, "sock_path").absolutePath
+        Log.d(packageName, path)
 
         GlobalScope.launch(Dispatchers.IO) {
             var tries = 0
             while (true) try {
-                Thread.sleep(1000L shl tries)
+                Thread.sleep(50L shl tries)
                 Log.d(packageName, "sendFd tries: $tries")
                 LocalSocket().use { localSocket ->
                     localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
@@ -220,6 +270,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
         }
 
+        try {
+            Log.d(packageName, "tun2socks destroy")
+            process.destroy()
+        } catch (e: Exception) {
+            Log.d(packageName, e.toString())
+        }
+
         V2RayServiceManager.stopV2rayPoint()
 
         if (isForced) {
@@ -235,7 +292,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
             } catch (ignored: Exception) {
                 // ignored
             }
-
         }
     }
 
@@ -243,8 +299,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
         return this
     }
 
-    override fun startService(parameters: String) {
-        setup(parameters)
+    override fun startService() {
+        setup()
     }
 
     override fun stopService() {
@@ -255,4 +311,11 @@ class V2RayVpnService : VpnService(), ServiceControl {
         return protect(socket)
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
+    override fun attachBaseContext(newBase: Context?) {
+        val context = newBase?.let {
+            MyContextWrapper.wrap(newBase,  Utils.getLocale(newBase))
+        }
+        super.attachBaseContext(context)
+    }
 }
