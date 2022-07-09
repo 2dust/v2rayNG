@@ -89,6 +89,7 @@ data class V2rayConfig(
                                  var users: List<UsersBean>) {
 
                 data class UsersBean(var id: String = "",
+                                     var alterId: Int? = null,
                                      var security: String = DEFAULT_SECURITY,
                                      var level: Int = DEFAULT_LEVEL,
                                      var encryption: String = "",
@@ -102,7 +103,7 @@ data class V2rayConfig(
                                    var port: Int = DEFAULT_PORT,
                                    var level: Int = DEFAULT_LEVEL,
                                    val email: String? = null,
-                                   val flow: String? = null,
+                                   var flow: String? = null,
                                    val ivCheck: Boolean? = null,
                                    var users: List<SocksUsersBean>? = null) {
 
@@ -261,12 +262,14 @@ data class V2rayConfig(
             fun populateTlsSettings(streamSecurity: String, allowInsecure: Boolean, sni: String) {
                 security = streamSecurity
                 val tlsSetting = TlsSettingsBean(
-                        allowInsecure = allowInsecure,
-                        serverName = sni
+                    allowInsecure = allowInsecure,
+                    serverName = sni
                 )
                 if (security == TLS) {
                     tlsSettings = tlsSetting
+                    xtlsSettings = null
                 } else if (security == XTLS) {
+                    tlsSettings = null
                     xtlsSettings = tlsSetting
                 }
             }
@@ -322,7 +325,8 @@ data class V2rayConfig(
 
         fun getTransportSettingDetails(): List<String>? {
             if (protocol.equals(EConfigType.VMESS.name, true)
-                    || protocol.equals(EConfigType.VLESS.name, true)) {
+                    || protocol.equals(EConfigType.VLESS.name, true)
+                    || protocol.equals(EConfigType.TROJAN.name, true)) {
                 val transport = streamSettings?.network ?: return null
                 return when (transport) {
                     "tcp" -> {
@@ -383,7 +387,7 @@ data class V2rayConfig(
     }
 
     data class RoutingBean(var domainStrategy: String,
-                           val domainMatcher: String? = null,
+                           var domainMatcher: String? = null,
                            var rules: ArrayList<RulesBean>,
                            val balancers: List<Any>? = null) {
 

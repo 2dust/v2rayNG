@@ -44,7 +44,7 @@ object MmkvManager {
     fun encodeServerConfig(guid: String, config: ServerConfig): String {
         val key = guid.ifBlank { Utils.getUuid() }
         serverStorage?.encode(key, Gson().toJson(config))
-        val serverList= decodeServerList()
+        val serverList = decodeServerList()
         if (!serverList.contains(key)) {
             serverList.add(key)
             mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
@@ -62,7 +62,7 @@ object MmkvManager {
         if (mainStorage?.decodeString(KEY_SELECTED_SERVER) == guid) {
             mainStorage?.remove(KEY_SELECTED_SERVER)
         }
-        val serverList= decodeServerList()
+        val serverList = decodeServerList()
         serverList.remove(guid)
         mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
         serverStorage?.remove(guid)
@@ -140,5 +140,40 @@ object MmkvManager {
     fun removeSubscription(subid: String) {
         subStorage?.remove(subid)
         removeServerViaSubid(subid)
+    }
+
+    fun removeAllServer() {
+        mainStorage?.clearAll()
+        serverStorage?.clearAll()
+        serverAffStorage?.clearAll()
+    }
+
+    fun removeInvalidServer() {
+        serverAffStorage?.allKeys()?.forEach { key ->
+            decodeServerAffiliationInfo(key)?.let { aff ->
+                if (aff.testDelayMillis <= 0L) {
+                    removeServer(key)
+                }
+            }
+        }
+    }
+
+    fun sortByTestResults( ) {
+        data class ServerDelay(var guid: String, var testDelayMillis: Long)
+
+        val serverDelays = mutableListOf<ServerDelay>()
+        val serverList = decodeServerList()
+        serverList.forEach { key ->
+            val delay = decodeServerAffiliationInfo(key)?.testDelayMillis ?: 0L
+            serverDelays.add(ServerDelay(key, if (delay <= 0L) 999999 else delay))
+        }
+        serverDelays.sortBy { it.testDelayMillis }
+
+        serverDelays.forEach {
+            serverList.remove(it.guid)
+            serverList.add(it.guid)
+        }
+
+        mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
     }
 }

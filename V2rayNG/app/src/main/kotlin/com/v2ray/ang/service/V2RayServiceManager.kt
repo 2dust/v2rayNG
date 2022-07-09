@@ -1,18 +1,15 @@
 package com.v2ray.ang.service
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import android.util.Log
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
@@ -44,7 +41,7 @@ object V2RayServiceManager {
     private const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 1
     private const val NOTIFICATION_ICON_THRESHOLD = 3000
 
-    val v2rayPoint: V2RayPoint = Libv2ray.newV2RayPoint(V2RayCallback())
+    val v2rayPoint: V2RayPoint = Libv2ray.newV2RayPoint(V2RayCallback(), Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
     private val mMsgReceive = ReceiveMessageHandler()
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
@@ -52,12 +49,8 @@ object V2RayServiceManager {
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
             field = value
-            val context = value?.get()?.getService()?.applicationContext
-            context?.let {
-                v2rayPoint.packageName = Utils.packagePath(context)
-                v2rayPoint.packageCodePath = context.applicationInfo.nativeLibraryDir + "/"
-                Seq.setContext(context)
-            }
+            Seq.setContext(value?.get()?.getService()?.applicationContext)
+            Libv2ray.initV2Env(Utils.userAssetPath(value?.get()?.getService()))
         }
     var currentConfig: ServerConfig? = null
 
@@ -69,7 +62,7 @@ object V2RayServiceManager {
     fun startV2Ray(context: Context) {
         if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) == true) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)
-        }else{
+        } else {
             context.toast(R.string.toast_services_start)
         }
         val intent = if (settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN" == "VPN") {
@@ -88,7 +81,6 @@ object V2RayServiceManager {
         override fun shutdown(): Long {
             val serviceControl = serviceControl?.get() ?: return -1
             // called by go
-            // shutdown the whole vpn service
             return try {
                 serviceControl.stopService()
                 0
@@ -102,9 +94,9 @@ object V2RayServiceManager {
             return 0
         }
 
-        override fun protect(l: Long): Long {
-            val serviceControl = serviceControl?.get() ?: return 0
-            return if (serviceControl.vpnProtect(l.toInt())) 0 else 1
+        override fun protect(l: Long): Boolean {
+            val serviceControl = serviceControl?.get() ?: return true
+            return serviceControl.vpnProtect(l.toInt())
         }
 
         override fun onEmitStatus(l: Long, s: String?): Long {
@@ -116,7 +108,7 @@ object V2RayServiceManager {
             val serviceControl = serviceControl?.get() ?: return -1
             //Logger.d(s)
             return try {
-                serviceControl.startService(s)
+                serviceControl.startService()
                 lastQueryTime = System.currentTimeMillis()
                 startSpeedNotification()
                 0
@@ -125,7 +117,6 @@ object V2RayServiceManager {
                 -1
             }
         }
-
     }
 
     fun startV2rayPoint() {
@@ -150,12 +141,9 @@ object V2RayServiceManager {
             v2rayPoint.configureFileContent = result.content
             v2rayPoint.domainName = config.getV2rayPointDomainAndPort()
             currentConfig = config
-            v2rayPoint.enableLocalDNS = settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) ?: false
-            v2rayPoint.forwardIpv6 = settingsStorage?.decodeBool(AppConfig.PREF_FORWARD_IPV6) ?: false
-            v2rayPoint.proxyOnly = settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN" != "VPN"
 
             try {
-                v2rayPoint.runLoop()
+                v2rayPoint.runLoop(settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) ?: false)
             } catch (e: Exception) {
                 Log.d(ANG_PACKAGE, e.toString())
             }
@@ -217,6 +205,9 @@ object V2RayServiceManager {
                 AppConfig.MSG_STATE_RESTART -> {
                     startV2rayPoint()
                 }
+                AppConfig.MSG_MEASURE_DELAY -> {
+                    measureV2rayDelay()
+                }
             }
 
             when (intent?.action) {
@@ -229,6 +220,29 @@ object V2RayServiceManager {
                     startSpeedNotification()
                 }
             }
+        }
+    }
+
+    private fun measureV2rayDelay() {
+        GlobalScope.launch(Dispatchers.IO) {
+            val service = serviceControl?.get()?.getService() ?: return@launch
+            var time = -1L
+            var errstr = ""
+            if (v2rayPoint.isRunning) {
+                try {
+                    time = v2rayPoint.measureDelay()
+                } catch (e: Exception) {
+                    Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
+                    errstr = e.message?.substringAfter("\":") ?: "empty message"
+                }
+            }
+            val result = if (time == -1L) {
+                service.getString(R.string.connection_test_error, errstr)
+            } else {
+                service.getString(R.string.connection_test_available, time)
+            }
+
+            MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, result)
         }
     }
 
@@ -265,7 +279,7 @@ object V2RayServiceManager {
                 }
 
         mBuilder = NotificationCompat.Builder(service, channelId)
-                .setSmallIcon(R.drawable.ic_v)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(currentConfig?.remarks)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setOngoing(true)
@@ -306,7 +320,7 @@ object V2RayServiceManager {
     private fun updateNotification(contentText: String?, proxyTraffic: Long, directTraffic: Long) {
         if (mBuilder != null) {
             if (proxyTraffic < NOTIFICATION_ICON_THRESHOLD && directTraffic < NOTIFICATION_ICON_THRESHOLD) {
-                mBuilder?.setSmallIcon(R.drawable.ic_v)
+                mBuilder?.setSmallIcon(R.drawable.ic_stat_name)
             } else if (proxyTraffic > directTraffic) {
                 mBuilder?.setSmallIcon(R.drawable.ic_stat_proxy)
             } else {
@@ -326,7 +340,7 @@ object V2RayServiceManager {
         return mNotificationManager
     }
 
-    fun startSpeedNotification() {
+    private fun startSpeedNotification() {
         if (mSubscription == null &&
                 v2rayPoint.isRunning &&
                 settingsStorage?.decodeBool(AppConfig.PREF_SPEED_ENABLED) == true) {
@@ -375,7 +389,7 @@ object V2RayServiceManager {
         text.append("•  ${up.toLong().toSpeedString()}↑  ${down.toLong().toSpeedString()}↓\n")
     }
 
-    fun stopSpeedNotification() {
+    private fun stopSpeedNotification() {
         if (mSubscription != null) {
             mSubscription?.unsubscribe() //stop queryStats
             mSubscription = null

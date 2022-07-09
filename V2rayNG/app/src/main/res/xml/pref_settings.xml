@@ -33,7 +33,7 @@
 
         <EditTextPreference
                 android:key="pref_local_dns_port"
-                android:summary="10807"
+                android:summary="10853"
                 android:inputType="number"
                 android:title="@string/title_pref_local_dns_port" />
 
@@ -41,7 +41,6 @@
                 android:key="pref_vpn_dns"
                 android:summary="@string/summary_pref_remote_dns"
                 android:title="@string/title_pref_vpn_dns" />
-
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_pref_routing">
@@ -54,9 +53,9 @@
             android:title="@string/title_pref_routing_domain_strategy" />
 
         <Preference
-                android:key="pref_routing_custom"
-                android:summary="@string/title_pref_routing_custom"
-                android:title="@string/title_pref_routing_custom" />
+            android:key="pref_routing_custom"
+            android:summary="@string/title_pref_routing_custom"
+            android:title="@string/title_pref_routing_custom" />
 
         <ListPreference
             android:defaultValue="0"
@@ -65,41 +64,57 @@
             android:key="pref_routing_mode"
             android:summary="%s"
             android:title="@string/title_pref_routing_mode" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_advanced">
 
         <CheckBoxPreference
-            android:key="pref_forward_ipv6"
-            android:summary="@string/summary_pref_forward_ipv6"
-            android:title="@string/title_pref_forward_ipv6" />
+            android:key="pref_prefer_ipv6"
+            android:summary="@string/summary_pref_prefer_ipv6"
+            android:title="@string/title_pref_prefer_ipv6" />
 
         <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="pref_proxy_sharing_enabled"
-                android:onClick="proxySharingOnClick"
-                android:summary="@string/summary_pref_proxy_sharing_enabled"
-                android:title="@string/title_pref_proxy_sharing_enabled" />
+            android:defaultValue="false"
+            android:key="pref_proxy_sharing_enabled"
+            android:summary="@string/summary_pref_proxy_sharing_enabled"
+            android:title="@string/title_pref_proxy_sharing_enabled" />
 
-        <Preference
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_allow_insecure"
+            android:summary="@string/summary_pref_allow_insecure"
+            android:title="@string/title_pref_allow_insecure" />
+
+        <EditTextPreference
             android:key="pref_socks_port"
             android:summary="10808"
+            android:inputType="number"
             android:title="@string/title_pref_socks_port" />
 
-        <Preference
+        <EditTextPreference
             android:key="pref_http_port"
             android:summary="10809"
+            android:inputType="number"
             android:title="@string/title_pref_http_port" />
 
         <EditTextPreference
-                android:key="pref_remote_dns"
-                android:summary="@string/summary_pref_remote_dns"
-                android:title="@string/title_pref_remote_dns" />
+            android:key="pref_remote_dns"
+            android:summary="@string/summary_pref_remote_dns"
+            android:title="@string/title_pref_remote_dns" />
 
         <EditTextPreference
                 android:key="pref_domestic_dns"
                 android:summary="@string/summary_pref_domestic_dns"
                 android:title="@string/title_pref_domestic_dns" />
+
+        <ListPreference
+            android:defaultValue="warning"
+            android:entries="@array/core_loglevel"
+            android:entryValues="@array/core_loglevel"
+            android:key="pref_core_loglevel"
+            android:summary="%s"
+            android:title="@string/title_core_loglevel" />
 
         <ListPreference
                 android:defaultValue="VPN"
@@ -108,5 +123,19 @@
                 android:key="pref_mode"
                 android:summary="%s"
                 android:title="@string/title_mode" />
+
+        <ListPreference
+            android:defaultValue="auto"
+            android:entries="@array/language_select"
+            android:entryValues="@array/language_select_value"
+            android:key="pref_language"
+            android:summary="%s"
+            android:title="@string/title_language" />
+
+        <CheckBoxPreference
+            android:key="pref_confirm_remove"
+            android:summary="@string/summary_pref_confirm_remove"
+            android:title="@string/title_pref_confirm_remove" />
+
     </PreferenceCategory>
 </PreferenceScreen>

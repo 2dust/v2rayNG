@@ -76,7 +76,5 @@
                     android:layout_marginTop="@dimen/layout_margin_top_height" />
         </LinearLayout>
 
-
-
     </LinearLayout>
 </ScrollView>

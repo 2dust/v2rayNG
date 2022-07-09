@@ -26,11 +26,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:background="@android:drawable/edit_text"
                 android:gravity="top"
                 android:inputType="textMultiLine"
-                android:maxLines="100"
-                android:minLines="10"
+                android:maxLines="1000"
+                android:minLines="20"
                 android:scrollbars="vertical" />
 
         </LinearLayout>

@@ -9,16 +9,16 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/icon"
-        android:layout_width="46dp"
-        android:layout_height="46dp"
-        android:paddingStart="14dp"
-        android:paddingLeft="14dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:paddingStart="10dp"
+        android:paddingLeft="10dp"
         android:paddingEnd="10dp"
         android:paddingRight="10dp" />
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="46dp"
+        android:layout_height="60dp"
         android:layout_weight="1.0"
         android:gravity="center"
         android:orientation="vertical"

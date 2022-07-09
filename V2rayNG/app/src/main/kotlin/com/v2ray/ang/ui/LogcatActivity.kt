@@ -1,12 +1,13 @@
 package com.v2ray.ang.ui
 
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityLogcatBinding
@@ -15,6 +16,7 @@ import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+
 import java.io.IOException
 import java.util.LinkedHashSet
 
@@ -23,9 +25,9 @@ class LogcatActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLogcatBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+       binding = ActivityLogcatBinding.inflate(layoutInflater)
+       val view = binding.root
+       setContentView(view)
 
         title = getString(R.string.title_logcat)
 
@@ -38,7 +40,7 @@ class LogcatActivity : BaseActivity() {
         try {
             binding.pbWaiting.visibility = View.VISIBLE
 
-            GlobalScope.launch(Dispatchers.Default) {
+            lifecycleScope.launch(Dispatchers.Default) {
                 if (shouldFlushLog) {
                     val lst = LinkedHashSet<String>()
                     lst.add("logcat")
@@ -81,7 +83,7 @@ class LogcatActivity : BaseActivity() {
             toast(R.string.toast_success)
             true
         }
-        R.id.delete -> {
+        R.id.clear_all -> {
             logcat(true)
             true
         }

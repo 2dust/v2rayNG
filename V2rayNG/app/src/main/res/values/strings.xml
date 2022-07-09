@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">v2rayNG</string>
+    <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">Switch</string>
     <string name="app_tile_name">Switch</string>
     <string name="app_tile_first_use">First use of this feature, please use the app to add server</string>
@@ -26,8 +26,10 @@
     <string name="menu_item_import_config_qrcode">Import config from QRcode</string>
     <string name="menu_item_import_config_clipboard">Import config from Clipboard</string>
     <string name="menu_item_import_config_manually_vmess">Type manually[Vmess]</string>
+    <string name="menu_item_import_config_manually_vless">Type manually[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">Type manually[Shadowsocks]</string>
     <string name="menu_item_import_config_manually_socks">Type manually[Socks]</string>
+    <string name="menu_item_import_config_manually_trojan">Type manually[Trojan]</string>
     <string name="menu_item_import_config_custom">custom config</string>
     <string name="menu_item_import_config_custom_clipboard">Import custom config from Clipboard</string>
     <string name="menu_item_import_config_custom_local">Import custom config from locally</string>
@@ -38,19 +40,25 @@
     <string name="server_lab_address">address</string>
     <string name="server_lab_port">port</string>
     <string name="server_lab_id">id</string>
+    <string name="server_lab_alterid">alterId</string>
     <string name="server_lab_security">security</string>
     <string name="server_lab_network">Network</string>
-    <string name="server_lab_more_function">more function</string>
+    <string name="server_lab_more_function">Transport</string>
     <string name="server_lab_head_type">head type</string>
     <string name="server_lab_mode_type">gRPC mode</string>
     <string name="server_lab_request_host">request host(host/ws host/h2 host)/QUIC security</string>
     <string name="server_lab_path">path(ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
     <string name="server_lab_stream_security">tls</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
+    <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">address</string>
     <string name="server_lab_port3">port</string>
     <string name="server_lab_id3">password</string>
     <string name="server_lab_security3">security</string>
+    <string name="server_lab_id4">Password(Optional)</string>
+    <string name="server_lab_security4">User(Optional)</string>
+    <string name="server_lab_encryption">encryption</string>
+    <string name="server_lab_flow">flow</string>
     <string name="toast_success">Success</string>
     <string name="toast_failure">Failure</string>
     <string name="toast_none_data">There is nothing</string>
@@ -63,15 +71,23 @@
     <string name="server_lab_content">Content</string>
     <string name="toast_none_data_clipboard">There is no data in the clipboard</string>
     <string name="toast_invalid_url">Invalid URL</string>
-    <string name="server_lab_need_inbound">Ensure inbound has socks=10808,http=10809</string>
+    <string name="server_lab_need_inbound">Ensure inbounds port is consistent with the settings</string>
+    <string name="toast_malformed_josn">Config malformed</string>
+    <string name="server_lab_request_host6">Host(SNI)(Optional)</string>
+    <string name="toast_asset_copy_failed">File copy failed, please use File Manager</string>
+    <string name="menu_item_add_file">Add files</string>
+    <string name="menu_item_download_file">Download files</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Loading</string>
+    <string name="menu_item_search">Search</string>
     <string name="menu_item_select_all">Select all</string>
     <string name="msg_enter_keywords">Enter keywords</string>
     <string name="switch_bypass_apps_mode">Bypass Mode</string>
     <string name="menu_item_select_proxy_app">Auto select proxy app</string>
     <string name="msg_downloading_content">Downloading content</string>
+    <string name="menu_item_export_proxy_app">Export to Clipboard</string>
+    <string name="menu_item_import_proxy_app">Import from Clipboard</string>
 
 
     <!-- Preferences -->
@@ -98,17 +114,13 @@
     <string name="title_pref_fake_dns_enabled">Enable fake DNS</string>
     <string name="summary_pref_fake_dns_enabled">local DNS returns fake IP address (faster, but it may not work for some apps)</string>
 
-    <string name="title_pref_forward_ipv6">IPv6 Route</string>
-    <string name="summary_pref_forward_ipv6">Redirect IPv6 traffic to remote (BETA)</string>
+    <string name="title_pref_prefer_ipv6">Prefer IPv6</string>
+    <string name="summary_pref_prefer_ipv6">Prefer IPv6 address and routes</string>
 
     <string name="title_pref_routing">Routing</string>
     <string name="title_pref_routing_domain_strategy">Domain strategy</string>
-    <string name="title_pref_routing_mode">Routing mode</string>
-    <string name="title_pref_routing_custom">Custom routing</string>
-
-    <string name="title_pref_donate">Donate</string>
-    <string name="summary_pref_donate">Donate developer</string>
-    <string name="donate_detail">Add some experimental advanced features</string>
+    <string name="title_pref_routing_mode">Predefined rules</string>
+    <string name="title_pref_routing_custom">Custom rules</string>
 
     <string name="title_pref_remote_dns">Remote DNS (Optional)</string>
     <string name="summary_pref_remote_dns">DNS</string>
@@ -117,6 +129,13 @@
 
     <string name="title_pref_domestic_dns">Domestic DNS (Optional)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
+
+    <string name="title_pref_proxy_sharing_enabled">Allow connections from the LAN</string>
+    <string name="summary_pref_proxy_sharing_enabled">Other devices can connect to proxy by your ip address through socks/http, Only enable in trusted network to avoid unauthorized connection</string>
+    <string name="toast_warning_pref_proxysharing_short">Allow connections from the LAN, Make sure you are in a trusted network</string>
+
+    <string name="title_pref_allow_insecure">allowInsecure</string>
+    <string name="summary_pref_allow_insecure">When TLS, the default allowInsecure</string>
 
     <string name="title_pref_socks_port">SOCKS5 proxy port</string>
     <string name="summary_pref_socks_port">SOCKS5 proxy port</string>
@@ -127,6 +146,9 @@
     <string name="title_pref_local_dns_port">Local DNS port</string>
     <string name="summary_pref_local_dns_port">Local DNS port</string>
 
+    <string name="title_pref_confirm_remove">Delete configuration file confirmation</string>
+    <string name="summary_pref_confirm_remove">Whether to delete the configuration file requires a second confirmation by the user</string>
+
     <string name="title_pref_feedback">Feedback</string>
     <string name="summary_pref_feedback">Feedback enhancements or bugs to GitHub</string>
     <string name="summary_pref_tg_group">Join Telegram Group</string>
@@ -135,26 +157,29 @@
     <string name="title_pref_promotion">Promotion</string>
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
 
+    <string name="title_core_loglevel">Log Level</string>
     <string name="title_mode">Mode</string>
     <string name="title_mode_help">Click me for more help</string>
-
-    <string name="donate_error_setup">Error Setup:</string>
-    <string name="donate_error_inventory">Error querying inventory</string>
-    <string name="donate_error_purchase1">Error Purchase:</string>
-    <string name="donate_error_purchase2">Error Purchase,Authenticity verification failed.</string>
-    <string name="donate_success_purchase">Thank you for your donation!</string>
-    <string name="donate_item_click">Donate</string>
-    <string name="donate_item_paypal">Paypal</string>
+    <string name="title_language">Language</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Copy</string>
-    <string name="logcat_delete">Delete</string>
+    <string name="logcat_clear">Clear</string>
+    <string name="title_service_restart">Service restart</string>
+    <string name="title_del_all_config">Delete all config</string>
+    <string name="title_del_invalid_config">Delete invalid config(Test first)</string>
     <string name="title_export_all">Export non-custom configs to clipboard</string>
-    <string name="title_sub_setting">Subscription setting</string>
+    <string name="title_sub_setting">Subscription group setting</string>
     <string name="sub_setting_remarks">remarks</string>
-    <string name="sub_setting_url">url</string>
+    <string name="sub_setting_url">Optional URL</string>
+    <string name="sub_setting_enable">enable update</string>
     <string name="title_sub_update">Update subscription</string>
     <string name="title_ping_all_server">Tcping all configuration</string>
+    <string name="title_real_ping_all_server">Real delay all configuration</string>
+    <string name="title_user_asset_setting">Geo asset files</string>
+    <string name="title_sort_by_test_results">Sorting by test results</string>
+    <string name="title_filter_config">Filter configuration file</string>
+    <string name="filter_config_all">All subscription groups</string>
 
     <string name="tasker_start_service">Start Service</string>
     <string name="tasker_setting_confirm">Confirm</string>
@@ -169,7 +194,7 @@
 
     <string name="connection_test_pending">Check Connectivity</string>
     <string name="connection_test_testing">Testing…</string>
-    <string name="connection_test_available">Success: HTTPS handshake took %dms</string>
+    <string name="connection_test_available">Success: HTTP connection took %dms</string>
     <string name="connection_test_error">Fail to detect internet connection: %s</string>
     <string name="connection_test_fail">Internet Unavailable</string>
     <string name="connection_test_error_status_code">Error code: #%d</string>
@@ -189,16 +214,12 @@
     </string-array>
 
     <string-array name="routing_mode">
-        <item>Global</item>
-        <item>Bypassing the LAN address</item>
-        <item>Bypass mainland address</item>
-        <item>Bypassing LAN and mainland address</item>
+        <item>Global proxy</item>
+        <item>Bypassing the LAN address then proxy</item>
+        <item>Bypass mainland address then proxy</item>
+        <item>Bypassing LAN and mainland address then proxy</item>
+        <item>Global direct</item>
     </string-array>
-    <string name="title_pref_proxy_sharing_enabled">Proxy sharing</string>
-    <string name="summary_pref_proxy_sharing_enabled">Bind inbound to 0.0.0.0</string>
-    <string name="toast_warning_pref_proxysharing">Other devices can connect to proxy by your ip address through socks/http protocol\nHttp  Proxy: http://yourIP:10809\nSocks Proxy: socks(4/5)://yourIP:10808\nOnly enable in trusted network to avoid unauthorized connection</string>
-    <string name="toast_warning_pref_proxysharing_short">Proxy sharing enabled\nMake sure you are in a trusted network</string>
-    <string name="toast_malformed_josn">Config malformed</string>
 
     <string-array name="mode_entries">
         <item>VPN</item>

@@ -9,6 +9,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.ERoutingMode
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_NETWORK
 import com.v2ray.ang.dto.V2rayConfig.Companion.HTTP
 
@@ -58,7 +59,8 @@ object V2rayConfigUtil {
         //转成Json
         val v2rayConfig = Gson().fromJson(assets, V2rayConfig::class.java) ?: return result
 
-        //v2rayConfig.log.loglevel = settingsStorage?.decodeString(AppConfig.PREF_LOGLEVEL) ?: "warning"
+        v2rayConfig.log.loglevel = settingsStorage?.decodeString(AppConfig.PREF_LOGLEVEL)
+                ?: "warning"
 
         inbounds(v2rayConfig)
 
@@ -89,8 +91,8 @@ object V2rayConfigUtil {
      */
     private fun inbounds(v2rayConfig: V2rayConfig): Boolean {
         try {
-            //val socksPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT) ?: AppConfig.PORT_SOCKS)
-            //val httpPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT) ?: AppConfig.PORT_HTTP)
+            val socksPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+            val httpPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT), AppConfig.PORT_HTTP.toInt())
 
             v2rayConfig.inbounds.forEach { curInbound ->
                 if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) != true) {
@@ -98,7 +100,7 @@ object V2rayConfigUtil {
                     curInbound.listen = "127.0.0.1"
                 }
             }
-            v2rayConfig.inbounds[0].port = 10808
+            v2rayConfig.inbounds[0].port = socksPort
             val fakedns = settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED)
                     ?: false
             val sniffAllTlsAndHttp = settingsStorage?.decodeBool(AppConfig.PREF_SNIFFING_ENABLED, true)
@@ -111,7 +113,7 @@ object V2rayConfigUtil {
                 v2rayConfig.inbounds[0].sniffing?.destOverride?.add("fakedns")
             }
 
-            //v2rayConfig.inbounds[1].port = httpPort
+            v2rayConfig.inbounds[1].port = httpPort
 
 //            if (httpPort > 0) {
 //                val httpCopy = v2rayConfig.inbounds[0].copy()
@@ -149,7 +151,8 @@ object V2rayConfigUtil {
 
             v2rayConfig.routing.domainStrategy = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY)
                     ?: "IPIfNonMatch"
-            val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: "0"
+            v2rayConfig.routing.domainMatcher = "mph"
+            val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: ERoutingMode.GLOBAL_PROXY.value
 
             // Hardcode googleapis.cn
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
@@ -159,17 +162,25 @@ object V2rayConfigUtil {
             )
 
             when (routingMode) {
-                "1" -> {
+                ERoutingMode.BYPASS_LAN.value -> {
                     routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
                 }
-                "2" -> {
+                ERoutingMode.BYPASS_MAINLAND.value -> {
                     routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
-                "3" -> {
+                ERoutingMode.BYPASS_LAN_MAINLAND.value -> {
                     routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
                     routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
+                }
+                ERoutingMode.GLOBAL_DIRECT.value -> {
+                    val globalDirect = V2rayConfig.RoutingBean.RulesBean(
+                        type = "field",
+                        outboundTag = AppConfig.TAG_DIRECT,
+                        port = "0-65535"
+                    )
+                    v2rayConfig.routing.rules.add(globalDirect)
                 }
             }
         } catch (e: Exception) {
@@ -281,11 +292,11 @@ object V2rayConfigUtil {
                         port = 53,
                         network = "tcp,udp")
 
-                //val localDnsPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_LOCAL_DNS_PORT) ?: AppConfig.PORT_LOCAL_DNS)
+                val localDnsPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_LOCAL_DNS_PORT), AppConfig.PORT_LOCAL_DNS.toInt())
                 v2rayConfig.inbounds.add(
                         V2rayConfig.InboundBean(
                                 tag = "dns-in",
-                                port = 10807,
+                                port = localDnsPort,
                                 listen = "127.0.0.1",
                                 protocol = "dokodemo-door",
                                 settings = dnsInboundSettings,
@@ -335,15 +346,15 @@ object V2rayConfigUtil {
             // domestic DNS
             val directDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
                     ?: "")
-            val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: "0"
-            if (directDomain.size > 0 || routingMode == "2" || routingMode == "3") {
+            val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: ERoutingMode.GLOBAL_PROXY.value
+            if (directDomain.size > 0 || routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
                 val domesticDns = Utils.getDomesticDnsServers()
                 val geositeCn = arrayListOf("geosite:cn")
                 val geoipCn = arrayListOf("geoip:cn")
                 if (directDomain.size > 0) {
                     servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, directDomain, geoipCn))
                 }
-                if (routingMode == "2" || routingMode == "3") {
+                if (routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
                     servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, geositeCn, geoipCn))
                 }
                 if (Utils.isPureIpAddress(domesticDns.first())) {

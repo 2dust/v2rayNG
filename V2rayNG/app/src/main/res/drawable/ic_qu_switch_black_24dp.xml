@@ -9,7 +9,7 @@
         android:bottom="2dp" />
 
     <item
-        android:drawable="@drawable/ic_v_connected_black"
+        android:drawable="@drawable/ic_stat_name"
         android:left="12dp"
         android:top="12dp"
         android:right="12dp"

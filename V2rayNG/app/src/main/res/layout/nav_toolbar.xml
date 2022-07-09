@@ -2,14 +2,12 @@
 <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="?android:attr/actionBarSize"
-    android:theme="@style/AppTheme.AppBarOverlay">
+    android:layout_height="?android:attr/actionBarSize">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_scrollFlags="scroll|enterAlways"
-        app:popupTheme="@style/AppTheme.PopupOverlay" />
+        app:layout_scrollFlags="scroll|enterAlways" />
 
 </com.google.android.material.appbar.AppBarLayout>

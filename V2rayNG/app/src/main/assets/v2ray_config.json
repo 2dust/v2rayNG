@@ -54,6 +54,7 @@
           "users": [
             {
               "id": "a3482e88-686a-4a58-8126-99c9df64b7bf",
+              "alterId": 0,
               "security": "auto",
               "level": 8
             }

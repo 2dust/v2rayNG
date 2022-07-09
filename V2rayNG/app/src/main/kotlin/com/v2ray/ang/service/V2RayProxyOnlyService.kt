@@ -1,8 +1,13 @@
 package com.v2ray.ang.service
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.IBinder
+import androidx.annotation.RequiresApi
+import com.v2ray.ang.util.MyContextWrapper
+import com.v2ray.ang.util.Utils
 import java.lang.ref.SoftReference
 
 class V2RayProxyOnlyService : Service(), ServiceControl {
@@ -25,7 +30,7 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
         return this
     }
 
-    override fun startService(parameters: String) {
+    override fun startService() {
         // do nothing
     }
 
@@ -39,5 +44,13 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    override fun attachBaseContext(newBase: Context?) {
+        val context = newBase?.let {
+            MyContextWrapper.wrap(newBase,  Utils.getLocale(newBase))
+        }
+        super.attachBaseContext(context)
     }
 }

@@ -94,7 +94,7 @@
                 android:id="@+id/et_id"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/edit_height"
-                android:inputType="textPassword" />
+                android:inputType="text" />
 
         </LinearLayout>
 

@@ -5,11 +5,11 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import android.view.*
-import android.view.MenuInflater
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -20,7 +20,6 @@ import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.net.URL
 
 class RoutingSettingsFragment : Fragment() {
     private lateinit var binding: FragmentRoutingSettingsBinding
@@ -61,9 +60,7 @@ class RoutingSettingsFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.save_routing -> {
-            val content = binding.etRoutingContent.text.toString()
-            defaultSharedPreferences.edit().putString(requireArguments().getString(routing_arg), content).apply()
-            activity?.toast(R.string.toast_success)
+            saveRouting()
             true
         }
         R.id.del_routing -> {
@@ -128,26 +125,23 @@ class RoutingSettingsFragment : Fragment() {
 
     fun setDefaultRules(): Boolean {
         var url = AppConfig.v2rayCustomRoutingListUrl
+        var tag = ""
         when (requireArguments().getString(routing_arg)) {
             AppConfig.PREF_V2RAY_ROUTING_AGENT -> {
-                url += AppConfig.TAG_AGENT
+                tag = AppConfig.TAG_AGENT
             }
             AppConfig.PREF_V2RAY_ROUTING_DIRECT -> {
-                url += AppConfig.TAG_DIRECT
+                tag = AppConfig.TAG_DIRECT
             }
             AppConfig.PREF_V2RAY_ROUTING_BLOCKED -> {
-                url += AppConfig.TAG_BLOCKED
+                tag = AppConfig.TAG_BLOCKED
             }
         }
+        url += tag
 
         activity?.toast(R.string.msg_downloading_content)
-        GlobalScope.launch(Dispatchers.IO) {
-            val content = try {
-                URL(url).readText()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                ""
-            }
+        lifecycleScope.launch(Dispatchers.IO) {
+            val content = Utils.getUrlContext(url, 5000)
             launch(Dispatchers.Main) {
                 val routingList = if (TextUtils.isEmpty(content)) {
                     Utils.readTextFromAssets(activity?.v2RayApplication!!, "custom_routing_$tag")

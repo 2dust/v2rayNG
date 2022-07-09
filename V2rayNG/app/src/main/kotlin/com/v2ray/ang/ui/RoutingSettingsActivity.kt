@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui
 
-import android.graphics.Color
 import android.os.Bundle
 import com.v2ray.ang.R
 import androidx.fragment.app.Fragment
@@ -21,7 +20,7 @@ class RoutingSettingsActivity : BaseActivity() {
         val view = binding.root
         setContentView(view)
 
-        title = getString(R.string.routing_settings_title)
+        title = getString(R.string.title_pref_routing_custom)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val fragments = ArrayList<Fragment>()
@@ -31,7 +30,7 @@ class RoutingSettingsActivity : BaseActivity() {
 
         val adapter = FragmentAdapter(this, fragments)
         binding.viewpager.adapter = adapter
-        binding.tablayout.setTabTextColors(Color.BLACK, Color.RED)
+        //tablayout.setTabTextColors(Color.BLACK, Color.RED)
         TabLayoutMediator(binding.tablayout, binding.viewpager) { tab, position ->
             tab.text = titles[position]
         }.attach()

@@ -6,6 +6,4 @@
     android:layout_height="match_parent"
     android:layout_gravity="start"
     app:headerLayout="@layout/nav_header"
-    app:itemTextColor="@color/colorPrimary"
-    app:itemIconTint="@color/colorPrimary_dark"
     app:menu="@menu/menu_drawer" />

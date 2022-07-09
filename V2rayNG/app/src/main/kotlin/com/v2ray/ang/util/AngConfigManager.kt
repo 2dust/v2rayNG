@@ -60,9 +60,9 @@ object AngConfigManager {
             AppConfig.PREF_REMOTE_DNS,
             AppConfig.PREF_DOMESTIC_DNS,
             AppConfig.PREF_LOCAL_DNS_PORT,
-//            AppConfig.PREF_SOCKS_PORT,
-//            AppConfig.PREF_HTTP_PORT,
-//            AppConfig.PREF_LOGLEVEL,
+            AppConfig.PREF_SOCKS_PORT,
+            AppConfig.PREF_HTTP_PORT,
+            AppConfig.PREF_LOGLEVEL,
             AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,
             AppConfig.PREF_ROUTING_MODE,
             AppConfig.PREF_V2RAY_ROUTING_AGENT,
@@ -75,8 +75,8 @@ object AngConfigManager {
             AppConfig.PREF_SPEED_ENABLED,
             AppConfig.PREF_PROXY_SHARING,
             AppConfig.PREF_LOCAL_DNS_ENABLED,
-//            AppConfig.PREF_ALLOW_INSECURE,
-//            AppConfig.PREF_PREFER_IPV6,
+            AppConfig.PREF_ALLOW_INSECURE,
+            AppConfig.PREF_PREFER_IPV6,
             AppConfig.PREF_PER_APP_PROXY,
             AppConfig.PREF_BYPASS_APPS,
         ).forEach { key ->
@@ -108,10 +108,11 @@ object AngConfigManager {
                     vnext.port = vmessBean.port
                     vnext.users[0].id = vmessBean.id
                     if (config.configType == EConfigType.VMESS) {
+                        vnext.users[0].alterId = vmessBean.alterId
                         vnext.users[0].security = vmessBean.security
                     } else if (config.configType == EConfigType.VLESS) {
                         vnext.users[0].encryption = vmessBean.security
-//                        vnext.users[0].flow = vmessBean.flow
+                        vnext.users[0].flow = vmessBean.flow
                     }
                 }
                 config.outboundBean?.settings?.servers?.get(0)?.let { server ->
@@ -137,13 +138,13 @@ object AngConfigManager {
                     val sni = streamSetting.populateTransportSettings(vmessBean.network, vmessBean.headerType,
                             vmessBean.requestHost, vmessBean.path, vmessBean.path, vmessBean.requestHost, vmessBean.path,
                             vmessBean.headerType, vmessBean.path)
-//                    val allowInsecure = if (vmessBean.allowInsecure.isBlank()) {
-//                        settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
-//                    } else {
-//                        vmessBean.allowInsecure.toBoolean()
-//                    }
-                    streamSetting.populateTlsSettings(vmessBean.streamSecurity, false,
-                            sni)//vmessBean.sni.ifBlank { sni })
+                    val allowInsecure = if (vmessBean.allowInsecure.isBlank()) {
+                        settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
+                    } else {
+                        vmessBean.allowInsecure.toBoolean()
+                    }
+                    streamSetting.populateTlsSettings(vmessBean.streamSecurity, allowInsecure,
+                        vmessBean.sni.ifBlank { sni })
                 }
             }
             val key = MmkvManager.encodeServerConfig(vmessBean.guid, config)
@@ -158,7 +159,7 @@ object AngConfigManager {
             val subItem = SubscriptionItem()
             subItem.remarks = it.remarks
             subItem.url = it.url
-            //subItem.enabled = it.enabled
+            subItem.enabled = it.enabled
             subStorage?.encode(it.id, Gson().toJson(subItem))
         }
     }
@@ -179,7 +180,7 @@ object AngConfigManager {
             }
 
             var config: ServerConfig? = null
-            val allowInsecure = false//settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
+            val allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
             if (str.startsWith(EConfigType.VMESS.protocolScheme)) {
                 config = ServerConfig.create(EConfigType.VMESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
@@ -210,7 +211,8 @@ object AngConfigManager {
                             vnext.address = vmessQRCode.add
                             vnext.port = Utils.parseInt(vmessQRCode.port)
                             vnext.users[0].id = vmessQRCode.id
-                            vnext.users[0].encryption = DEFAULT_SECURITY
+                            vnext.users[0].security = if (TextUtils.isEmpty(vmessQRCode.scy)) DEFAULT_SECURITY else vmessQRCode.scy
+                            vnext.users[0].alterId = Utils.parseInt(vmessQRCode.aid)
                         }
                         val sni = streamSetting.populateTransportSettings(vmessQRCode.net, vmessQRCode.type, vmessQRCode.host,
                                 vmessQRCode.path, vmessQRCode.path, vmessQRCode.host, vmessQRCode.path, vmessQRCode.type, vmessQRCode.path)
@@ -268,7 +270,7 @@ object AngConfigManager {
                 //part decode
                 val indexS = result.indexOf("@")
                 if (indexS > 0) {
-                    //result = Utils.decode(result.substring(0, indexS)) + result.substring(indexS, result.length)
+                    result = Utils.decode(result.substring(0, indexS)) + result.substring(indexS, result.length)
                 } else {
                     result = Utils.decode(result)
                 }
@@ -285,23 +287,32 @@ object AngConfigManager {
                     server.users = listOf(socksUsersBean)
                 }
             } else if (str.startsWith(EConfigType.TROJAN.protocolScheme)) {
-                val uri = URI(str)
+                val uri = URI(Utils.fixIllegalUrl(str))
                 config = ServerConfig.create(EConfigType.TROJAN)
                 config.remarks = Utils.urlDecode(uri.fragment ?: "")
+
+                var flow = ""
+                if (uri.rawQuery != null) {
+                    val queryParam = uri.rawQuery.split("&")
+                        .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
+
+                    val sni = config.outboundBean?.streamSettings?.populateTransportSettings(queryParam["type"] ?: "tcp", queryParam["headerType"],
+                        queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
+                        queryParam["mode"], queryParam["serviceName"])
+                    config.outboundBean?.streamSettings?.populateTlsSettings(queryParam["security"] ?: TLS, allowInsecure, queryParam["sni"] ?: sni!!)
+                    flow = queryParam["flow"] ?: ""
+                } else {
+                    config.outboundBean?.streamSettings?.populateTlsSettings(TLS, allowInsecure, "")
+                }
+
                 config.outboundBean?.settings?.servers?.get(0)?.let { server ->
                     server.address = uri.idnHost
                     server.port = uri.port
                     server.password = uri.userInfo
+                    server.flow = flow
                 }
-                var sni = ""
-                uri.rawQuery?.let { rawQuery ->
-                    val queryParam = rawQuery.split("&")
-                        .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
-                    sni = queryParam["sni"] ?: ""
-                }
-                config.outboundBean?.streamSettings?.populateTlsSettings(TLS, allowInsecure, sni)
             } else if (str.startsWith(EConfigType.VLESS.protocolScheme)) {
-                val uri = URI(str)
+                val uri = URI(Utils.fixIllegalUrl(str))
                 val queryParam = uri.rawQuery.split("&")
                     .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
                 config = ServerConfig.create(EConfigType.VLESS)
@@ -341,7 +352,7 @@ object AngConfigManager {
         return runCatching {
             val uri = URI(uriString)
             check(uri.scheme == "vmess")
-            val (_, protocol, tlsStr, uuid) =
+            val (_, protocol, tlsStr, uuid, alterId) =
                     Regex("(tcp|http|ws|kcp|quic|grpc)(\\+tls)?:([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12})")
                             .matchEntire(uri.userInfo)?.groupValues
                             ?: error("parse user info fail.")
@@ -355,7 +366,8 @@ object AngConfigManager {
                 vnext.address = uri.idnHost
                 vnext.port = uri.port
                 vnext.users[0].id = uuid
-                vnext.users[0].encryption = DEFAULT_SECURITY
+                vnext.users[0].security = DEFAULT_SECURITY
+                vnext.users[0].alterId = alterId.toInt()
             }
 
             val sni = streamSetting.populateTransportSettings(protocol, queryParam["type"],
@@ -391,14 +403,15 @@ object AngConfigManager {
             vnext.address = arr22[0]
             vnext.port = Utils.parseInt(arr22[1])
             vnext.users[0].id = arr21[1]
-            vnext.users[0].encryption = arr21[0]
+            vnext.users[0].security = arr21[0]
+            vnext.users[0].alterId = 0
         }
         return true
     }
 
     private fun tryResolveResolveSip002(str: String, config: ServerConfig): Boolean {
         try {
-            val uri = URI(str.replace(" ", "%20"))
+            val uri = URI(Utils.fixIllegalUrl(str))
             config.remarks = Utils.urlDecode(uri.fragment ?: "")
 
             val method: String
@@ -449,6 +462,8 @@ object AngConfigManager {
                     vmessQRCode.add = outbound.getServerAddress().orEmpty()
                     vmessQRCode.port = outbound.getServerPort().toString()
                     vmessQRCode.id = outbound.getPassword().orEmpty()
+                    vmessQRCode.aid = outbound.settings?.vnext?.get(0)?.users?.get(0)?.alterId.toString()
+                    vmessQRCode.scy = outbound.settings?.vnext?.get(0)?.users?.get(0)?.security.toString()
                     vmessQRCode.net = streamSetting.network
                     vmessQRCode.tls = streamSetting.security
                     vmessQRCode.sni = streamSetting.tlsSettings?.serverName.orEmpty()
@@ -463,33 +478,44 @@ object AngConfigManager {
                 EConfigType.CUSTOM -> ""
                 EConfigType.SHADOWSOCKS -> {
                     val remark = "#" + Utils.urlEncode(config.remarks)
-                    val url = String.format("%s:%s@%s:%s",
-                            outbound.getSecurityEncryption(),
-                            outbound.getPassword(),
-                            outbound.getServerAddress(),
+                    val pw = Utils.encode("${outbound.getSecurityEncryption()}:${outbound.getPassword()}")
+                    val url = String.format("%s@%s:%s",
+                            pw,
+                            Utils.getIpv6Address(outbound.getServerAddress()!!),
                             outbound.getServerPort())
-                    Utils.encode(url) + remark
+                    url + remark
                 }
                 EConfigType.SOCKS -> {
                     val remark = "#" + Utils.urlEncode(config.remarks)
-                    val url = String.format("%s:%s@%s:%s",
-                            outbound.settings?.servers?.get(0)?.users?.get(0)?.user,
-                            outbound.getPassword(),
-                            outbound.getServerAddress(),
-                            outbound.getServerPort())
-                    Utils.encode(url) + remark
+                    val pw = Utils.encode("${outbound.settings?.servers?.get(0)?.users?.get(0)?.user}:${outbound.getPassword()}")
+                    val url = String.format("%s@%s:%s",
+                        pw,
+                        Utils.getIpv6Address(outbound.getServerAddress()!!),
+                        outbound.getServerPort())
+                    url + remark
                 }
-                EConfigType.VLESS -> {
+                EConfigType.VLESS,
+                EConfigType.TROJAN -> {
                     val remark = "#" + Utils.urlEncode(config.remarks)
 
                     val dicQuery = HashMap<String, String>()
-                    outbound.settings?.vnext?.get(0)?.users?.get(0)?.flow?.let {
-                        if (!TextUtils.isEmpty(it)) {
-                            dicQuery["flow"] = it
+                    if (config.configType == EConfigType.VLESS) {
+                        outbound.settings?.vnext?.get(0)?.users?.get(0)?.flow?.let {
+                            if (!TextUtils.isEmpty(it)) {
+                                dicQuery["flow"] = it
+                            }
+                        }
+                        dicQuery["encryption"] =
+                            if (outbound.getSecurityEncryption().isNullOrEmpty()) "none"
+                            else outbound.getSecurityEncryption().orEmpty()
+                    } else if (config.configType == EConfigType.TROJAN) {
+                        config.outboundBean?.settings?.servers?.get(0)?.flow?.let {
+                            if (!TextUtils.isEmpty(it)) {
+                                dicQuery["flow"] = it
+                            }
                         }
                     }
-                    dicQuery["encryption"] = if (outbound.getSecurityEncryption().isNullOrEmpty()) "none"
-                    else outbound.getSecurityEncryption().orEmpty()
+
                     dicQuery["security"] = streamSetting.security.ifEmpty { "none" }
                     (streamSetting.tlsSettings?: streamSetting.xtlsSettings)?.let { tlsSetting ->
                         if (!TextUtils.isEmpty(tlsSetting.serverName)) {
@@ -544,20 +570,6 @@ object AngConfigManager {
                             separator = "&",
                             transform = { it.first + "=" + it.second })
 
-                    val url = String.format("%s@%s:%s",
-                            outbound.getPassword(),
-                            Utils.getIpv6Address(outbound.getServerAddress()!!),
-                            outbound.getServerPort())
-                    url + query + remark
-                }
-                EConfigType.TROJAN -> {
-                    val remark = "#" + Utils.urlEncode(config.remarks)
-                    var query = ""
-                    (streamSetting.tlsSettings?: streamSetting.xtlsSettings)?.let { tlsSetting ->
-                        if (!TextUtils.isEmpty(tlsSetting.serverName)) {
-                            query = "?sni=${tlsSetting.serverName}"
-                        }
-                    }
                     val url = String.format("%s@%s:%s",
                             outbound.getPassword(),
                             Utils.getIpv6Address(outbound.getServerAddress()!!),
@@ -683,13 +695,13 @@ object AngConfigManager {
         }
     }
 
-    fun importBatchConfig(servers: String?, subid: String): Int {
+    fun importBatchConfig(servers: String?, subid: String, append: Boolean): Int {
         try {
             if (servers == null) {
                 return 0
             }
             val removedSelectedServer =
-                    if (!TextUtils.isEmpty(subid)) {
+                    if (!TextUtils.isEmpty(subid) && !append) {
                         MmkvManager.decodeServerConfig(mainStorage?.decodeString(KEY_SELECTED_SERVER) ?: "")?.let {
                             if (it.subscriptionId == subid) {
                                 return@let it
@@ -699,8 +711,9 @@ object AngConfigManager {
                     } else {
                         null
                     }
-            MmkvManager.removeServerViaSubid(subid)
-
+            if(!append) {
+                MmkvManager.removeServerViaSubid(subid)
+            }
 //            var servers = server
 //            if (server.indexOf("vmess") >= 0 && server.indexOf("vmess") == server.lastIndexOf("vmess")) {
 //                servers = server.replace("\n", "")
