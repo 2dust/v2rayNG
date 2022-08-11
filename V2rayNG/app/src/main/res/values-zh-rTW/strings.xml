@@ -31,7 +31,7 @@
     <string name="menu_item_import_config_manually_trojan">手動鍵入 [Trojan]</string>
     <string name="menu_item_import_config_custom">自訂組態</string>
     <string name="menu_item_import_config_custom_clipboard">從剪貼簿匯入自訂組態</string>
-    <string name="menu_item_import_config_custom_local">從 URL 匯入自訂組態</string>
+    <string name="menu_item_import_config_custom_local">從本地匯入自訂組態</string>
     <string name="menu_item_import_config_custom_url">從 URL 匯入自訂組態</string>
     <string name="menu_item_import_config_custom_url_scan">掃描 URL 匯入自訂組態</string>
     <string name="del_config_comfirm">確定刪除？</string>
