@@ -141,10 +141,10 @@ class UserAssetActivity : BaseActivity() {
                 val result = downloadGeo(it, 60000, httpPort)
                 launch(Dispatchers.Main) {
                     if (result) {
-                        toast(getString(R.string.toast_success) + it)
+                        toast(getString(R.string.toast_success) + " " + it)
                         binding.recyclerView.adapter?.notifyDataSetChanged()
                     } else {
-                        toast(getString(R.string.toast_failure) + it)
+                        toast(getString(R.string.toast_failure) + " " + it)
                     }
                 }
             }
