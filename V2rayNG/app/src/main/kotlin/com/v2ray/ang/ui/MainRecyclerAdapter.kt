@@ -2,6 +2,7 @@ package com.v2ray.ang.ui
 
 import android.content.Intent
 import android.graphics.Color
+import android.text.TextUtils
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
@@ -153,7 +154,9 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 val selected = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)
                 if (guid != selected) {
                     mainStorage?.encode(MmkvManager.KEY_SELECTED_SERVER, guid)
-                    notifyItemChanged(mActivity.mainViewModel.getPosition(selected!!))
+                    if (!TextUtils.isEmpty(selected)) {
+                        notifyItemChanged(mActivity.mainViewModel.getPosition(selected!!))
+                    }
                     notifyItemChanged(mActivity.mainViewModel.getPosition(guid))
                     if (isRunning) {
                         mActivity.showCircle()
