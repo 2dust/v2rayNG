@@ -27,7 +27,6 @@ data class V2rayConfig(
         const val DEFAULT_SECURITY = "auto"
         const val DEFAULT_LEVEL = 8
         const val DEFAULT_NETWORK = "tcp"
-        const val DEFAULT_FLOW = "xtls-rprx-splice"
 
         const val TLS = "tls"
         const val XTLS = "xtls"
