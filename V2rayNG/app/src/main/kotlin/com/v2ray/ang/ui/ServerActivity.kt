@@ -67,7 +67,9 @@ class ServerActivity : BaseActivity() {
     private val allowinsecures: Array<out String> by lazy {
         resources.getStringArray(R.array.allowinsecures)
     }
-
+    private  val  uTlsItems:  Array<out String> by lazy {
+        resources.getStringArray(R.array.streamsecurity_utls)
+    }
     // Kotlin synthetics was used, but since it is removed in 1.8. We switch to old manual approach.
     // We don't use AndroidViewBinding because, it is better to share similar logics for different
     // protocols. Use findViewById manually ensures the xml are de-coupled with the activity logic.
@@ -82,6 +84,7 @@ class ServerActivity : BaseActivity() {
     private val sp_stream_security: Spinner? by lazy { findViewById(R.id.sp_stream_security) }
     private val sp_allow_insecure: Spinner? by lazy { findViewById(R.id.sp_allow_insecure) }
     private val et_sni: EditText? by lazy { findViewById(R.id.et_sni) }
+    private val sp_stream_fingerprint: Spinner? by lazy { findViewById(R.id.sp_stream_fingerprint) } //uTLS
     private val sp_network: Spinner? by lazy { findViewById(R.id.sp_network) }
     private val sp_header_type: Spinner? by lazy { findViewById(R.id.sp_header_type) }
     private val sp_header_type_title: TextView? by lazy { findViewById(R.id.sp_header_type_title) }
@@ -170,6 +173,12 @@ class ServerActivity : BaseActivity() {
                     sp_allow_insecure?.setSelection(allowinsecure)
                 }
                 et_sni?.text = Utils.getEditable(tlsSetting.serverName)
+
+                tlsSetting.fingerprint?.let {
+                    val utlsIndex = Utils.arrayFind(uTlsItems, tlsSetting.fingerprint)
+                    sp_stream_fingerprint?.setSelection(utlsIndex)
+                }
+
             }
         }
         val network = Utils.arrayFind(networks, streamSetting.network)
@@ -310,6 +319,7 @@ class ServerActivity : BaseActivity() {
         val sniField = et_sni?.text?.toString()?.trim() ?: return
         val allowInsecureField = sp_allow_insecure?.selectedItemPosition ?: return
         val streamSecurity = sp_stream_security?.selectedItemPosition ?: return
+        var utlsIndex = sp_stream_fingerprint?.selectedItemPosition ?: return
 
         var sni = streamSetting.populateTransportSettings(
                 transport = networks[network],
@@ -330,7 +340,8 @@ class ServerActivity : BaseActivity() {
         } else {
             allowinsecures[allowInsecureField].toBoolean()
         }
-        streamSetting.populateTlsSettings(streamSecuritys[streamSecurity], allowInsecure, sni)
+
+        streamSetting.populateTlsSettings(streamSecuritys[streamSecurity], allowInsecure, sni, uTlsItems[utlsIndex])
     }
 
     private fun transportTypes(network: String?): Array<out String> {

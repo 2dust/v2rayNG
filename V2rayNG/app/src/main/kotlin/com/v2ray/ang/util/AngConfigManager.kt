@@ -143,8 +143,9 @@ object AngConfigManager {
                     } else {
                         vmessBean.allowInsecure.toBoolean()
                     }
+                    var fingerprint = streamSetting.tlsSettings?.fingerprint
                     streamSetting.populateTlsSettings(vmessBean.streamSecurity, allowInsecure,
-                        vmessBean.sni.ifBlank { sni })
+                        vmessBean.sni.ifBlank { sni }, fingerprint)
                 }
             }
             val key = MmkvManager.encodeServerConfig(vmessBean.guid, config)
@@ -185,6 +186,9 @@ object AngConfigManager {
                 config = ServerConfig.create(EConfigType.VMESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
 
+                var fingerprint = streamSetting.tlsSettings?.fingerprint
+
+
                 if (!tryParseNewVmess(str, config, allowInsecure)) {
                     if (str.indexOf("?") > 0) {
                         if (!tryResolveVmess4Kitsunebi(str, config)) {
@@ -216,8 +220,10 @@ object AngConfigManager {
                         }
                         val sni = streamSetting.populateTransportSettings(vmessQRCode.net, vmessQRCode.type, vmessQRCode.host,
                                 vmessQRCode.path, vmessQRCode.path, vmessQRCode.host, vmessQRCode.path, vmessQRCode.type, vmessQRCode.path)
+
+
                         streamSetting.populateTlsSettings(vmessQRCode.tls, allowInsecure,
-                                if (TextUtils.isEmpty(vmessQRCode.sni)) sni else vmessQRCode.sni)
+                                if (TextUtils.isEmpty(vmessQRCode.sni)) sni else vmessQRCode.sni, fingerprint)
                     }
                 }
             } else if (str.startsWith(EConfigType.SHADOWSOCKS.protocolScheme)) {
@@ -292,6 +298,7 @@ object AngConfigManager {
                 config.remarks = Utils.urlDecode(uri.fragment ?: "")
 
                 var flow = ""
+                var fingerprint = config.outboundBean?.streamSettings?.tlsSettings?.fingerprint
                 if (uri.rawQuery != null) {
                     val queryParam = uri.rawQuery.split("&")
                         .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
@@ -299,10 +306,11 @@ object AngConfigManager {
                     val sni = config.outboundBean?.streamSettings?.populateTransportSettings(queryParam["type"] ?: "tcp", queryParam["headerType"],
                         queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
                         queryParam["mode"], queryParam["serviceName"])
-                    config.outboundBean?.streamSettings?.populateTlsSettings(queryParam["security"] ?: TLS, allowInsecure, queryParam["sni"] ?: sni!!)
+                    config.outboundBean?.streamSettings?.populateTlsSettings(queryParam["security"] ?: TLS, allowInsecure, queryParam["sni"] ?: sni!!, fingerprint)
                     flow = queryParam["flow"] ?: ""
                 } else {
-                    config.outboundBean?.streamSettings?.populateTlsSettings(TLS, allowInsecure, "")
+
+                    config.outboundBean?.streamSettings?.populateTlsSettings(TLS, allowInsecure, "", fingerprint)
                 }
 
                 config.outboundBean?.settings?.servers?.get(0)?.let { server ->
@@ -317,6 +325,8 @@ object AngConfigManager {
                     .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
                 config = ServerConfig.create(EConfigType.VLESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
+                var fingerprint = streamSetting.tlsSettings?.fingerprint
+
                 config.remarks = Utils.urlDecode(uri.fragment ?: "")
                 config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
                     vnext.address = uri.idnHost
@@ -329,7 +339,7 @@ object AngConfigManager {
                 val sni = streamSetting.populateTransportSettings(queryParam["type"] ?: "tcp", queryParam["headerType"],
                         queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
                         queryParam["mode"], queryParam["serviceName"])
-                streamSetting.populateTlsSettings(queryParam["security"] ?: "", allowInsecure, queryParam["sni"] ?: sni)
+                streamSetting.populateTlsSettings(queryParam["security"] ?: "", allowInsecure, queryParam["sni"] ?: sni, fingerprint)
             }
             if (config == null){
                 return R.string.toast_incorrect_protocol
@@ -369,12 +379,12 @@ object AngConfigManager {
                 vnext.users[0].security = DEFAULT_SECURITY
                 vnext.users[0].alterId = alterId.toInt()
             }
-
+            var fingerprint = streamSetting.tlsSettings?.fingerprint
             val sni = streamSetting.populateTransportSettings(protocol, queryParam["type"],
                     queryParam["host"]?.split("|")?.get(0) ?: "",
                     queryParam["path"]?.takeIf { it.trim() != "/" } ?: "", queryParam["seed"], queryParam["security"],
                     queryParam["key"], queryParam["mode"], queryParam["serviceName"])
-            streamSetting.populateTlsSettings(if (tls) TLS else "", allowInsecure, sni)
+            streamSetting.populateTlsSettings(if (tls) TLS else "", allowInsecure, sni, fingerprint)
             true
         }.getOrElse { false }
     }

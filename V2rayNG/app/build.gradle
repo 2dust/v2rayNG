@@ -9,7 +9,7 @@ android {
     buildToolsVersion "$buildToolsVer"
 
     compileOptions {
-        targetCompatibility = "8"
+        targetCompatibility = "11"
         sourceCompatibility = "8"
     }
 
