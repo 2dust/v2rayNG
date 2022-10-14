@@ -49,6 +49,7 @@
     <string name="server_lab_request_host">request host(host/ws host/h2 host)/QUIC security</string>
     <string name="server_lab_path">path(ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
     <string name="server_lab_stream_security">tls</string>
+    <string name="server_lab_stream_fingerprint">uTLS</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">address</string>
