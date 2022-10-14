@@ -9,7 +9,7 @@ android {
     buildToolsVersion "$buildToolsVer"
 
     compileOptions {
-        targetCompatibility = "11"
+        targetCompatibility = "8"
         sourceCompatibility = "8"
     }
 
@@ -18,8 +18,8 @@ android {
         minSdkVersion 21
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
-        versionCode 475
-        versionName "1.7.20"
+        versionCode 476
+        versionName "1.7.21"
     }
 
     if (props["sign"]) {
