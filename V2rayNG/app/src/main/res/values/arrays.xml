@@ -154,6 +154,7 @@
         <item>中文简体</item>
         <item>中文繁體</item>
         <item>Tiếng Việt</item>
+        <item>Русский</item>
     </string-array>
 
 
@@ -163,5 +164,6 @@
         <item>zh-rCN</item>
         <item>zh-rTW</item>
         <item>vi</item>
+        <item>ru</item>
     </string-array>
 </resources>
