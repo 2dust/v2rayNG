@@ -409,6 +409,7 @@ object Utils {
             "zh-rCN" -> Locale("zh", "CN")
             "zh-rTW" -> Locale("zh", "TW")
             "vi" -> Locale("vi")
+            "ru" -> Locale("ru")
             else -> getSysLocale()
         }
 
