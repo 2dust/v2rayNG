@@ -145,7 +145,7 @@ object AngConfigManager {
                     }
                     var fingerprint = streamSetting.tlsSettings?.fingerprint
                     streamSetting.populateTlsSettings(vmessBean.streamSecurity, allowInsecure,
-                        vmessBean.sni.ifBlank { sni }, fingerprint)
+                        vmessBean.sni.ifBlank { sni }, fingerprint, null)
                 }
             }
             val key = MmkvManager.encodeServerConfig(vmessBean.guid, config)
@@ -223,7 +223,7 @@ object AngConfigManager {
 
 
                         streamSetting.populateTlsSettings(vmessQRCode.tls, allowInsecure,
-                                if (TextUtils.isEmpty(vmessQRCode.sni)) sni else vmessQRCode.sni, fingerprint)
+                                if (TextUtils.isEmpty(vmessQRCode.sni)) sni else vmessQRCode.sni, fingerprint, vmessQRCode.alpn)
                     }
                 }
             } else if (str.startsWith(EConfigType.SHADOWSOCKS.protocolScheme)) {
@@ -306,11 +306,11 @@ object AngConfigManager {
                     val sni = config.outboundBean?.streamSettings?.populateTransportSettings(queryParam["type"] ?: "tcp", queryParam["headerType"],
                         queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
                         queryParam["mode"], queryParam["serviceName"])
-                    config.outboundBean?.streamSettings?.populateTlsSettings(queryParam["security"] ?: TLS, allowInsecure, queryParam["sni"] ?: sni!!, fingerprint)
+                    config.outboundBean?.streamSettings?.populateTlsSettings(queryParam["security"] ?: TLS, allowInsecure, queryParam["sni"] ?: sni!!, fingerprint, queryParam["alpn"])
                     flow = queryParam["flow"] ?: ""
                 } else {
 
-                    config.outboundBean?.streamSettings?.populateTlsSettings(TLS, allowInsecure, "", fingerprint)
+                    config.outboundBean?.streamSettings?.populateTlsSettings(TLS, allowInsecure, "", fingerprint, null)
                 }
 
                 config.outboundBean?.settings?.servers?.get(0)?.let { server ->
@@ -339,7 +339,7 @@ object AngConfigManager {
                 val sni = streamSetting.populateTransportSettings(queryParam["type"] ?: "tcp", queryParam["headerType"],
                         queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
                         queryParam["mode"], queryParam["serviceName"])
-                streamSetting.populateTlsSettings(queryParam["security"] ?: "", allowInsecure, queryParam["sni"] ?: sni, fingerprint)
+                streamSetting.populateTlsSettings(queryParam["security"] ?: "", allowInsecure, queryParam["sni"] ?: sni, fingerprint, queryParam["alpn"])
             }
             if (config == null){
                 return R.string.toast_incorrect_protocol
@@ -384,7 +384,7 @@ object AngConfigManager {
                     queryParam["host"]?.split("|")?.get(0) ?: "",
                     queryParam["path"]?.takeIf { it.trim() != "/" } ?: "", queryParam["seed"], queryParam["security"],
                     queryParam["key"], queryParam["mode"], queryParam["serviceName"])
-            streamSetting.populateTlsSettings(if (tls) TLS else "", allowInsecure, sni, fingerprint)
+            streamSetting.populateTlsSettings(if (tls) TLS else "", allowInsecure, sni, fingerprint, null)
             true
         }.getOrElse { false }
     }
@@ -477,6 +477,7 @@ object AngConfigManager {
                     vmessQRCode.net = streamSetting.network
                     vmessQRCode.tls = streamSetting.security
                     vmessQRCode.sni = streamSetting.tlsSettings?.serverName.orEmpty()
+                    vmessQRCode.alpn = Utils.removeWhiteSpace(streamSetting.tlsSettings?.alpn?.joinToString()).orEmpty()
                     outbound.getTransportSettingDetails()?.let { transportDetails ->
                         vmessQRCode.type = transportDetails[0]
                         vmessQRCode.host = transportDetails[1]
@@ -530,6 +531,9 @@ object AngConfigManager {
                     (streamSetting.tlsSettings?: streamSetting.xtlsSettings)?.let { tlsSetting ->
                         if (!TextUtils.isEmpty(tlsSetting.serverName)) {
                             dicQuery["sni"] = tlsSetting.serverName
+                        }
+                        if (!tlsSetting.alpn.isNullOrEmpty() && tlsSetting.alpn.isNotEmpty()) {
+                            dicQuery["alpn"] = Utils.removeWhiteSpace(tlsSetting.alpn.joinToString()).orEmpty()
                         }
                     }
                     dicQuery["type"] = streamSetting.network.ifEmpty { V2rayConfig.DEFAULT_NETWORK }

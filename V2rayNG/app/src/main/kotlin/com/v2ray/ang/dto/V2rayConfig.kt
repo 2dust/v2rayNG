@@ -259,12 +259,13 @@ data class V2rayConfig(
                 return sni
             }
 
-            fun populateTlsSettings(streamSecurity: String, allowInsecure: Boolean, sni: String, fingerprint: String?) {
+            fun populateTlsSettings(streamSecurity: String, allowInsecure: Boolean, sni: String, fingerprint: String?, alpns: String?) {
                 security = streamSecurity
                 val tlsSetting = TlsSettingsBean(
                     allowInsecure = allowInsecure,
                     serverName = sni,
-                    fingerprint = fingerprint
+                    fingerprint = fingerprint,
+                    alpn = if (alpns.isNullOrEmpty()) null else alpns.split(",").map { it.trim() }.filter { it.isNotEmpty() }
                 )
                 if (security == TLS) {
                     tlsSettings = tlsSetting

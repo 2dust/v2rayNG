@@ -64,11 +64,31 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/edit_height"
             android:entries="@array/streamsecurity_utls"
-            android:nextFocusDown="@+id/sp_allow_insecure" />
+            android:nextFocusDown="@+id/sp_stream_alpn" />
 
     </LinearLayout>
     <LinearLayout
         android:id="@+id/l4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_lab_stream_alpn" />
+
+        <Spinner
+            android:id="@+id/sp_stream_alpn"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/edit_height"
+            android:entries="@array/streamsecurity_alpn"
+            android:nextFocusDown="@+id/sp_allow_insecure" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/l5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
