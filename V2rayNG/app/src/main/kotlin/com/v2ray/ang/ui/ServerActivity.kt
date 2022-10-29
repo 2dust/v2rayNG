@@ -14,9 +14,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
-import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_FLOW
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_PORT
-import com.v2ray.ang.dto.V2rayConfig.Companion.XTLS
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.ID_MAIN
@@ -285,11 +283,7 @@ class ServerActivity : BaseActivity() {
             vnext.users[0].security = securitys[sp_security?.selectedItemPosition ?: 0]
         } else if (config.configType == EConfigType.VLESS) {
             vnext.users[0].encryption = et_security?.text.toString().trim()
-            if (streamSecuritys[sp_stream_security?.selectedItemPosition ?: 0] == XTLS) {
-                vnext.users[0].flow = flows[sp_flow?.selectedItemPosition ?: 0].ifBlank { DEFAULT_FLOW }
-            } else {
-                vnext.users[0].flow = ""
-            }
+            vnext.users[0].flow = flows[sp_flow?.selectedItemPosition ?: 0]
         }
     }
 
@@ -311,8 +305,8 @@ class ServerActivity : BaseActivity() {
         } else if (config.configType == EConfigType.TROJAN) {
             server.password = et_id.text.toString().trim()
             server.flow =
-                    if (streamSecuritys[sp_stream_security?.selectedItemPosition ?: 0] == XTLS) {
-                        flows[sp_flow?.selectedItemPosition ?: 0].ifBlank { DEFAULT_FLOW }
+                    if (streamSecuritys[sp_stream_security?.selectedItemPosition ?: 0] == V2rayConfig.XTLS) {
+                        flows[sp_flow?.selectedItemPosition ?: 0]
                     } else {
                         ""
                     }
