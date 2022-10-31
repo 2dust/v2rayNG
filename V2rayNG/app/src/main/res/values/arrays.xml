@@ -47,7 +47,7 @@
     <string-array name="mode_type_grpc" translatable="false">
         <item>gun</item>
         <item>multi</item>
- <!--Hide this option until core support it       <item>guna</item>-->
+        <!--Hide this option until core support it       <item>guna</item>-->
     </string-array>
 
     <string-array name="streamsecuritys" translatable="false">
@@ -164,6 +164,7 @@
         <item>中文繁體</item>
         <item>Tiếng Việt</item>
         <item>Русский</item>
+        <item>فارسی</item>
     </string-array>
 
 
@@ -174,5 +175,6 @@
         <item>zh-rTW</item>
         <item>vi</item>
         <item>ru</item>
+        <item>fa</item>
     </string-array>
 </resources>
