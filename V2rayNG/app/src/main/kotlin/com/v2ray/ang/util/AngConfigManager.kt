@@ -186,7 +186,6 @@ object AngConfigManager {
                 config = ServerConfig.create(EConfigType.VMESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
 
-                var fingerprint = streamSetting.tlsSettings?.fingerprint
 
 
                 if (!tryParseNewVmess(str, config, allowInsecure)) {
@@ -209,7 +208,7 @@ object AngConfigManager {
                         ) {
                             return R.string.toast_incorrect_protocol
                         }
-
+                        var fingerprint = if (TextUtils.isEmpty(vmessQRCode.fngpr)) streamSetting.tlsSettings?.fingerprint else vmessQRCode.fngpr
                         config.remarks = vmessQRCode.ps
                         config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
                             vnext.address = vmessQRCode.add
@@ -476,6 +475,7 @@ object AngConfigManager {
                     vmessQRCode.scy = outbound.settings?.vnext?.get(0)?.users?.get(0)?.security.toString()
                     vmessQRCode.net = streamSetting.network
                     vmessQRCode.tls = streamSetting.security
+                    vmessQRCode.fngpr = streamSetting.tlsSettings?.fingerprint.toString()
                     vmessQRCode.sni = streamSetting.tlsSettings?.serverName.orEmpty()
                     vmessQRCode.alpn = Utils.removeWhiteSpace(streamSetting.tlsSettings?.alpn?.joinToString()).orEmpty()
                     outbound.getTransportSettingDetails()?.let { transportDetails ->
