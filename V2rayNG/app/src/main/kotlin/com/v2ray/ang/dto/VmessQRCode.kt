@@ -13,4 +13,5 @@ data class VmessQRCode(var v: String = "",
                        var path: String = "",
                        var tls: String = "",
                        var sni: String = "",
+                       var fngpr: String = "",
                        var alpn: String = "")
