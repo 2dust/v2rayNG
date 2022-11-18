@@ -46,7 +46,7 @@
     <string name="server_lab_more_function">انتقال</string>
     <string name="server_lab_head_type">نوع head</string>
     <string name="server_lab_mode_type">حالت gRPC</string>
-    <string name="server_lab_request_host">درخواست میزبان (میزبان/میزبان ws/ یزبان h2)/امنیت QUIC</string>
+    <string name="server_lab_request_host">درخواست میزبان (میزبان/میزبان ws/ میزبان h2)/امنیت QUIC</string>
     <string name="server_lab_path">مسیر (مسیر ws/ مسیر h2) کلید QUIC/دانه kcp/نام‌خدمات gRPC</string>
     <string name="server_lab_stream_security">tls</string>
     <string name="server_lab_stream_fingerprint" translatable="false">uTLS</string>
