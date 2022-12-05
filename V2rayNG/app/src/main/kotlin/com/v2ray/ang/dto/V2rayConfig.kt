@@ -74,14 +74,18 @@ data class V2rayConfig(
                                    var response: Response? = null,
                 /*DNS*/
                                    val network: String? = null,
-                                   val address: String? = null,
+                                   val address: Any? = null,
                                    val port: Int? = null,
                 /*Freedom*/
                                    var domainStrategy: String? = null,
                                    val redirect: String? = null,
                                    val userLevel: Int? = null,
                 /*Loopback*/
-                                   val inboundTag: String? = null) {
+                                   val inboundTag: String? = null,
+                /*Wireguard*/
+                                   val secretKey: String? = null,
+                                   val peers: List<WireGuardBean>? = null,
+        ) {
 
             data class VnextBean(var address: String = "",
                                  var port: Int = DEFAULT_PORT,
@@ -113,6 +117,9 @@ data class V2rayConfig(
             }
 
             data class Response(var type: String)
+
+            data class WireGuardBean(var publicKey: String = "",
+                                     var endpoint: String = "")
         }
 
         data class StreamSettingsBean(var network: String = DEFAULT_NETWORK,
@@ -286,6 +293,8 @@ data class V2rayConfig(
                     || protocol.equals(EConfigType.SOCKS.name, true)
                     || protocol.equals(EConfigType.TROJAN.name, true)) {
                 return settings?.servers?.get(0)?.address
+            } else if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
+                return settings?.peers?.get(0)?.endpoint?.substringBeforeLast(":")
             }
             return null
         }
@@ -298,6 +307,8 @@ data class V2rayConfig(
                     || protocol.equals(EConfigType.SOCKS.name, true)
                     || protocol.equals(EConfigType.TROJAN.name, true)) {
                 return settings?.servers?.get(0)?.port
+            } else if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
+                return settings?.peers?.get(0)?.endpoint?.substringAfterLast(":")?.toInt()
             }
             return null
         }
@@ -311,6 +322,8 @@ data class V2rayConfig(
                 return settings?.servers?.get(0)?.password
             } else if (protocol.equals(EConfigType.SOCKS.name, true)) {
                 return settings?.servers?.get(0)?.users?.get(0)?.pass
+            } else if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
+                return settings?.secretKey
             }
             return null
         }
@@ -426,12 +439,10 @@ data class V2rayConfig(
 
     fun getProxyOutbound(): OutboundBean? {
         outbounds.forEach { outbound ->
-            if (outbound.protocol.equals(EConfigType.VMESS.name, true) ||
-                    outbound.protocol.equals(EConfigType.VLESS.name, true) ||
-                    outbound.protocol.equals(EConfigType.SHADOWSOCKS.name, true) ||
-                    outbound.protocol.equals(EConfigType.SOCKS.name, true) ||
-                    outbound.protocol.equals(EConfigType.TROJAN.name, true)) {
-                return outbound
+            EConfigType.values().forEach {
+                if (outbound.protocol.equals(it.name, true)) {
+                    return outbound
+                }
             }
         }
         return null

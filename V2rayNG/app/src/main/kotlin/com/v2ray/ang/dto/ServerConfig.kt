@@ -26,7 +26,7 @@ data class ServerConfig(
                                             vnext = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean(
                                                     users = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean.UsersBean())))),
                                     streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()))
-                EConfigType.CUSTOM ->
+                EConfigType.CUSTOM, EConfigType.WIREGUARD ->
                     return ServerConfig(configType = configType)
                 EConfigType.SHADOWSOCKS, EConfigType.SOCKS, EConfigType.TROJAN ->
                     return ServerConfig(
