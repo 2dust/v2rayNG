@@ -488,7 +488,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 if (!it.second.enabled) {
                     return@forEach
                 }
-                val url = it.second.url
+                val url = Utils.idnToASCII(it.second.url)
                 if (!Utils.isValidUrl(url)) {
                     return@forEach
                 }
