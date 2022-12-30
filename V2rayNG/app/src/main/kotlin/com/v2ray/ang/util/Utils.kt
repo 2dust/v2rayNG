@@ -431,19 +431,9 @@ object Utils {
     }
 
     fun idnToASCII(str: String): String {
-        var url = str
-        var prot = ""
-        if (url.startsWith(AppConfig.HTTPS_PROTOCOL)) {
-            url = url.substring(8)
-            prot = AppConfig.HTTPS_PROTOCOL
-        } else if (url.startsWith(AppConfig.HTTP_PROTOCOL)) {
-            url = url.substring(7)
-            prot = AppConfig.HTTP_PROTOCOL
-        }
-        url = prot + IDN.toASCII(url, IDN.ALLOW_UNASSIGNED)
-        if (url != str) return url else {
-            return str
-        }
+        val url = URL(str)
+        return URL(url.protocol, IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED), url.port, url.file)
+            .toExternalForm()
     }
 }
 
