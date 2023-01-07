@@ -50,6 +50,7 @@
     <string name="server_lab_path">Путь (WS/H2) / Ключ QUIC / Сид KCP / Сервис gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">uTLS</string>
+    <string name="server_lab_stream_alpn" translatable="false">alpn</string>
     <string name="server_lab_allow_insecure">Разрешать небезопасные</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">Адрес</string>
@@ -102,7 +103,7 @@
     <string name="summary_pref_mux_enabled">Включение может ускорить работу и переключение сети</string>
 
     <string name="title_pref_speed_enabled">Отображение скорости</string>
-    <string name="summary_pref_speed_enabled">Показывать текущую скорость в уведомлении.\n\nЗначок будет меняться в зависимости от использования.</string>
+    <string name="summary_pref_speed_enabled">Показывать текущую скорость в уведомлении.\nЗначок будет меняться в зависимости от использования.</string>
 
     <string name="title_pref_sniffing_enabled">Анализ пакетов</string>
     <string name="summary_pref_sniffing_enabled">Использовать анализ пакетов (по умолчанию включено)</string>
@@ -166,9 +167,9 @@
     <string name="logcat_clear">Очистить</string>
     <string name="title_service_restart">Перезапуск службы</string>
     <string name="title_del_all_config">Удалить все профили</string>
-    <string name="title_del_invalid_config">Удалить сбойный профиль (после проверки)</string>
+    <string name="title_del_invalid_config">Удалить сбойные профили (после проверки)</string>
     <string name="title_export_all">Экспорт всех профилей в буфер обмена</string>
-    <string name="title_sub_setting">Подписки</string>
+    <string name="title_sub_setting">Группы</string>
     <string name="sub_setting_remarks">примечания</string>
     <string name="sub_setting_url">URL (необязательно)</string>
     <string name="sub_setting_enable">использовать обновление</string>
@@ -178,7 +179,7 @@
     <string name="title_user_asset_setting">Файлы георесурсов</string>
     <string name="title_sort_by_test_results">Сортировка по результатам теста</string>
     <string name="title_filter_config">Фильтр профилей</string>
-    <string name="filter_config_all">Все профили</string>
+    <string name="filter_config_all">Все группы</string>
 
     <string name="tasker_start_service">Запуск службы</string>
     <string name="tasker_setting_confirm">Подтвердить</string>
