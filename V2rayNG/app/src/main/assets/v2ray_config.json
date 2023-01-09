@@ -32,6 +32,7 @@
         "http",
         "tls"
       ]
+      "routeOnly": true
     }
   },
   {
