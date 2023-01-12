@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/add_file"
+        android:icon="@drawable/ic_add_white_24dp"
+        android:title="@string/menu_item_add_file"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/download_file"
+        android:icon="@drawable/ic_cloud_download_white_24dp"
+        android:title="@string/menu_item_download_file"
+        app:showAsAction="always" />
+</menu>

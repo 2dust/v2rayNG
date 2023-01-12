@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.v2ray.ang">
+
+    <supports-screens
+        android:anyDensity="true"
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"/>
+
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+
+    <!-- https://developer.android.com/about/versions/11/privacy/package-visibility -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+            tools:ignore="QueryAllPackagesPermission" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- <useapplications-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> -->
+
+    <application
+        android:name=".AngApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppThemeLight"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="m">
+        <activity
+            android:exported="true"
+            android:name=".ui.MainActivity"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
+        <activity
+            android:exported="false"
+            android:name=".ui.ServerActivity"
+            android:windowSoftInputMode="stateUnchanged" />
+        <activity
+            android:exported="false"
+            android:name=".ui.ServerCustomConfigActivity"
+            android:windowSoftInputMode="stateUnchanged" />
+        <activity
+            android:exported="false"
+            android:name=".ui.SettingsActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.PerAppProxyActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.ScannerActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.LogcatActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.RoutingSettingsActivity"
+            android:windowSoftInputMode="stateUnchanged" />
+        <activity
+            android:exported="false"
+            android:name=".ui.SubSettingActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.UserAssetActivity" />
+
+        <activity
+            android:exported="false"
+            android:name=".ui.SubEditActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.ScScannerActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.ScSwitchActivity"
+            android:excludeFromRecents="true"
+            android:process=":RunSoLibV2RayDaemon"
+            android:theme="@style/AppTheme.NoActionBar.Translucent" />
+
+        <activity
+            android:exported="true"
+            android:name=".ui.UrlSchemeActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="v2rayng"
+                    android:host="install-config" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".service.V2RayVpnService"
+            android:enabled="true"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_VPN_SERVICE"
+            android:process=":RunSoLibV2RayDaemon">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+                android:value="true" />
+        </service>
+
+        <service android:name=".service.V2RayProxyOnlyService"
+                android:exported="false"
+                android:label="@string/app_name"
+                android:process=":RunSoLibV2RayDaemon">
+        </service>
+
+        <service android:name=".service.V2RayTestService"
+            android:exported="false"
+            android:process=":RunSoLibV2RayDaemon">
+        </service>
+
+        <receiver
+                android:exported="true"
+                android:name=".receiver.WidgetProvider"
+                android:process=":RunSoLibV2RayDaemon">
+            <meta-data
+                    android:name="android.appwidget.provider"
+                    android:resource="@xml/app_widget_provider" />
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.v2ray.ang.action.widget.click" />
+                <action android:name="com.v2ray.ang.action.activity" />
+            </intent-filter>
+        </receiver>
+
+        <service
+                android:exported="true"
+                android:name=".service.QSTileService"
+                android:icon="@drawable/ic_stat_name"
+                android:label="@string/app_tile_name"
+                android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+                android:process=":RunSoLibV2RayDaemon">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+        <!-- =====================Tasker===================== -->
+        <activity
+            android:exported="true"
+            android:name=".ui.TaskerActivity"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:exported="true"
+            android:name=".receiver.TaskerReceiver"
+                android:process=":RunSoLibV2RayDaemon">
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
+            </intent-filter>
+        </receiver>
+        <!-- =====================Tasker===================== -->
+
+    </application>
+
+</manifest>

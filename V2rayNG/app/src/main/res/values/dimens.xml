@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bypass_list_header_height">50dp</dimen>
+    <dimen name="layout_margin_top_height">16dp</dimen>
+    <dimen name="layout_margin_right_height">16dp</dimen>
+    <dimen name="layout_margin_spacing">8dp</dimen>
+    <dimen name="edit_height">50dp</dimen>
+    <dimen name="png_height">24dp</dimen>
+    <dimen name="server_height">72dp</dimen>
+    <dimen name="connection_test_height">60dp</dimen>
+
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="nav_header_vertical_spacing">8dp</dimen>
+    <dimen name="nav_header_height">160dp</dimen>
+</resources>

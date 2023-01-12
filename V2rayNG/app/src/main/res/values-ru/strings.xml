@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_widget_name">Переключить</string>
+    <string name="app_tile_name">Переключить</string>
+    <string name="app_tile_first_use">Первое использование этой функции, пожалуйста, используйте приложение, чтобы добавить сервер</string>
+    <string name="navigation_drawer_open">Открыть панель навигации</string>
+    <string name="navigation_drawer_close">Закрыть панель навигации</string>
+    <string name="migration_success">Успешный перенос данных!</string>
+    <string name="migration_fail">Перенос данных не выполнен!</string>
+
+    <!-- Notifications -->
+    <string name="notification_action_stop_v2ray">Остановить</string>
+    <string name="toast_permission_denied">Разрешение не получено</string>
+    <string name="notification_action_more">Ещё…</string>
+    <string name="toast_services_start">Запуск служб</string>
+    <string name="toast_services_stop">Остановка служб</string>
+    <string name="toast_services_success">Службы успешно запущены</string>
+    <string name="toast_services_failure">Сбой при запуске служб</string>
+
+    <!--ServerActivity-->
+    <string name="title_server">Профиль</string>
+    <string name="menu_item_add_config">Добавить профиль</string>
+    <string name="menu_item_save_config">Сохранить профиль</string>
+    <string name="menu_item_del_config">Удалить профиль</string>
+    <string name="menu_item_import_config_qrcode">Импорт профиля из QR-кода</string>
+    <string name="menu_item_import_config_clipboard">Импорт профиля из буфера обмена</string>
+    <string name="menu_item_import_config_manually_vmess">Ручной ввод профиля Vmess</string>
+    <string name="menu_item_import_config_manually_vless">Ручной ввод профиля VLESS</string>
+    <string name="menu_item_import_config_manually_ss">Ручной ввод профиля Shadowsocks</string>
+    <string name="menu_item_import_config_manually_socks">Ручной ввод профиля Socks</string>
+    <string name="menu_item_import_config_manually_trojan">Ручной ввод профиля Trojan</string>
+    <string name="menu_item_import_config_custom">Пользовательский профиль</string>
+    <string name="menu_item_import_config_custom_clipboard">Импорт из буфера обмена</string>
+    <string name="menu_item_import_config_custom_local">Импорт с устройства</string>
+    <string name="menu_item_import_config_custom_url">Импорт из URL</string>
+    <string name="menu_item_import_config_custom_url_scan">Импорт сканированием URL</string>
+    <string name="del_config_comfirm">Подтверждаете удаление?</string>
+    <string name="server_lab_remarks">Описание</string>
+    <string name="server_lab_address">Адрес</string>
+    <string name="server_lab_port">Порт</string>
+    <string name="server_lab_id">ID</string>
+    <string name="server_lab_alterid">Альтернативный ID</string>
+    <string name="server_lab_security">Безопасность</string>
+    <string name="server_lab_network">Сеть</string>
+    <string name="server_lab_more_function">Другие параметры</string>
+    <string name="server_lab_head_type">Тип заголовка</string>
+    <string name="server_lab_mode_type">Режим gRPC</string>
+    <string name="server_lab_request_host">Запрос узла (WS/H2) / Шифрование QUIC</string>
+    <string name="server_lab_path">Путь (WS/H2) / Ключ QUIC / Сид KCP / Сервис gRPC</string>
+    <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_fingerprint">uTLS</string>
+    <string name="server_lab_stream_alpn" translatable="false">alpn</string>
+    <string name="server_lab_allow_insecure">Разрешать небезопасные</string>
+    <string name="server_lab_sni">SNI</string>
+    <string name="server_lab_address3">Адрес</string>
+    <string name="server_lab_port3">Порт</string>
+    <string name="server_lab_id3">Пароль</string>
+    <string name="server_lab_security3">Безопасность</string>
+    <string name="server_lab_id4">Пароль (необязательно)</string>
+    <string name="server_lab_security4">Пользователь (необязательно)</string>
+    <string name="server_lab_encryption">Шифрование</string>
+    <string name="server_lab_flow">Поток</string>
+    <string name="toast_success">Успешно</string>
+    <string name="toast_failure">Ошибка</string>
+    <string name="toast_none_data">Ничего нет</string>
+    <string name="toast_incorrect_protocol">Неправильный протокол</string>
+    <string name="toast_decoding_failed">Невозможно декодировать</string>
+    <string name="title_file_chooser">Выберите файл профиля</string>
+    <string name="toast_require_file_manager">Установите файловый менеджер</string>
+    <string name="server_customize_config">Изменить профиль</string>
+    <string name="toast_config_file_invalid">Неправильный профиль</string>
+    <string name="server_lab_content">Данные</string>
+    <string name="toast_none_data_clipboard">В буфере обмена нет данных</string>
+    <string name="toast_invalid_url">Неправильный URL</string>
+    <string name="server_lab_need_inbound">Убедитесь, что входящий порт соответствует настройкам</string>
+    <string name="toast_malformed_josn">Профиль повреждён</string>
+    <string name="server_lab_request_host6">Узел (SNI) (необязательно)</string>
+    <string name="toast_asset_copy_failed">Невозможно скопировать файл, используйте файловый менеджер</string>
+    <string name="menu_item_add_file">Добавить файлы</string>
+    <string name="menu_item_download_file">Загрузить файлы</string>
+
+    <!-- PerAppProxyActivity -->
+    <string name="msg_dialog_progress">Загрузка…</string>
+    <string name="menu_item_search">Поиск</string>
+    <string name="menu_item_select_all">Выбрать все</string>
+    <string name="msg_enter_keywords">Введите ключевые слова</string>
+    <string name="switch_bypass_apps_mode">Режим обхода</string>
+    <string name="menu_item_select_proxy_app">Автовыбор проксируемых приложений</string>
+    <string name="msg_downloading_content">Загрузка данных</string>
+    <string name="menu_item_export_proxy_app">Экспорт в буфер обмена</string>
+    <string name="menu_item_import_proxy_app">Импорт из буфера обмена</string>
+
+
+    <!-- Preferences -->
+    <string name="title_settings">Настройки</string>
+    <string name="title_advanced">Расширенные настройки</string>
+    <string name="title_vpn_settings">Настройки VPN</string>
+    <string name="title_pref_per_app_proxy">Прокси для выбранных приложений</string>
+    <string name="summary_pref_per_app_proxy">Основной: выделенное приложение соединяется через прокси, не выделенное — напрямую; \n\nРежим обхода: выделенное приложение соединяется напрямую, не выделенное — через прокси.\n\nЕсть возможность автоматического выбора проксируемых приложений в меню.</string>
+
+    <string name="title_pref_mux_enabled">Использовать мультиплексирование</string>
+    <string name="summary_pref_mux_enabled">Включение может ускорить работу и переключение сети</string>
+
+    <string name="title_pref_speed_enabled">Отображение скорости</string>
+    <string name="summary_pref_speed_enabled">Показывать текущую скорость в уведомлении.\nЗначок будет меняться в зависимости от использования.</string>
+
+    <string name="title_pref_sniffing_enabled">Анализ пакетов</string>
+    <string name="summary_pref_sniffing_enabled">Использовать анализ пакетов (по умолчанию включено)</string>
+
+    <string name="title_pref_local_dns_enabled">Использовать локальную DNS</string>
+    <string name="summary_pref_local_dns_enabled">Обслуживание выполняется DNS-модулем ядра (в настройках маршрутизации рекомендуется выбрать режим «Все, кроме LAN и Китая»)</string>
+
+    <string name="title_pref_fake_dns_enabled">Использовать поддельную DNS</string>
+    <string name="summary_pref_fake_dns_enabled">Локальная DNS возвращает поддельный IP-адрес (быстрее, но может не работать с некоторыми приложениями)</string>
+
+    <string name="title_pref_prefer_ipv6">Предпочитать IPv6</string>
+    <string name="summary_pref_prefer_ipv6">Предпочитать IPv6-адреса и маршрутизацию</string>
+
+    <string name="title_pref_routing">Маршрутизация</string>
+    <string name="title_pref_routing_domain_strategy">Доменная стратегия</string>
+    <string name="title_pref_routing_mode">Режим маршрутизации</string>
+    <string name="title_pref_routing_custom">Пользовательские правила</string>
+
+    <string name="title_pref_remote_dns">Удалённая DNS (необязательно)</string>
+    <string name="summary_pref_remote_dns">DNS</string>
+
+    <string name="title_pref_vpn_dns">VPN DNS (только IPv4/v6)</string>
+
+    <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
+    <string name="summary_pref_domestic_dns">DNS</string>
+
+    <string name="title_pref_proxy_sharing_enabled">Разрешать подключения из LAN</string>
+    <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться к прокси по вашему IP-адресу через протокол SOCKS/HTTP. Используйте только в надёжной сети, чтобы избежать несанкционированного подключения.</string>
+    <string name="toast_warning_pref_proxysharing_short">Доступ из LAN разрешён, убедитесь, что вы находитесь в надёжной сети</string>
+
+    <string name="title_pref_allow_insecure">Разрешать небезопасные</string>
+    <string name="summary_pref_allow_insecure">Для TLS по умолчанию разрешены небезопасные соединения</string>
+
+    <string name="title_pref_socks_port">Порт SOCKS5-прокси</string>
+    <string name="summary_pref_socks_port">Порт SOCKS5-прокси</string>
+
+    <string name="title_pref_http_port">Порт HTTP-прокси</string>
+    <string name="summary_pref_http_port">Порт HTTP-прокси</string>
+
+    <string name="title_pref_local_dns_port">Локальный порт DNS</string>
+    <string name="summary_pref_local_dns_port">Локальный порт DNS</string>
+
+    <string name="title_pref_confirm_remove">Подтверждение удаления профиля</string>
+    <string name="summary_pref_confirm_remove">Требовать двойное подтверждение удаления профиля</string>
+
+    <string name="title_pref_feedback">Обратная связь</string>
+    <string name="summary_pref_feedback">Предложить улучшение или сообщить об ошибке на GitHub</string>
+    <string name="summary_pref_tg_group">Присоединиться к группе в Telegram</string>
+    <string name="toast_tg_app_not_found">Приложение Telegram не найдено</string>
+
+    <string name="title_pref_promotion">Содействие</string>
+    <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации (пожертвование может быть удалено)</string>
+
+    <string name="title_core_loglevel">Подробность ведения журнала</string>
+    <string name="title_mode">Режим</string>
+    <string name="title_mode_help">Нажмите для получения дополнительной информации</string>
+    <string name="title_language">Язык</string>
+
+    <string name="title_logcat">Системный журнал</string>
+    <string name="logcat_copy">Копировать</string>
+    <string name="logcat_clear">Очистить</string>
+    <string name="title_service_restart">Перезапуск службы</string>
+    <string name="title_del_all_config">Удалить все профили</string>
+    <string name="title_del_invalid_config">Удалить сбойные профили (после проверки)</string>
+    <string name="title_export_all">Экспорт всех профилей в буфер обмена</string>
+    <string name="title_sub_setting">Группы</string>
+    <string name="sub_setting_remarks">примечания</string>
+    <string name="sub_setting_url">URL (необязательно)</string>
+    <string name="sub_setting_enable">использовать обновление</string>
+    <string name="title_sub_update">Обновить подписку</string>
+    <string name="title_ping_all_server">Проверка доступности профилей</string>
+    <string name="title_real_ping_all_server">Время отклика профилей</string>
+    <string name="title_user_asset_setting">Файлы георесурсов</string>
+    <string name="title_sort_by_test_results">Сортировка по результатам теста</string>
+    <string name="title_filter_config">Фильтр профилей</string>
+    <string name="filter_config_all">Все группы</string>
+
+    <string name="tasker_start_service">Запуск службы</string>
+    <string name="tasker_setting_confirm">Подтвердить</string>
+
+    <string name="routing_settings_title">Настройки маршрутизации</string>
+    <string name="routing_settings_tips">Введите требуемые IP/URL через запятую. Не забудьте сохранить изменения.</string>
+    <string name="routing_settings_save">Сохранить</string>
+    <string name="routing_settings_delete">Очистить</string>
+    <string name="routing_settings_scan_replace">Сканировать и заменить</string>
+    <string name="routing_settings_scan_append">Сканировать и добавить</string>
+    <string name="routing_settings_default_rules"> Правила по умолчанию</string>
+
+    <string name="connection_test_pending">Проверить подключение</string>
+    <string name="connection_test_testing">Проверка…</string>
+    <string name="connection_test_available">Успешно: рукопожатие HTTP заняло %d мс</string>
+    <string name="connection_test_error">Сбой проверки интернет-соединения: %s</string>
+    <string name="connection_test_fail">Интернет недоступен</string>
+    <string name="connection_test_error_status_code">Код ошибки: #%d</string>
+    <string name="connection_connected">Подключено, нажмите для проверки</string>
+    <string name="connection_not_connected">Не подключено</string>
+
+    <string-array name="share_method">
+        <item>QR-код</item>
+        <item>Экспорт в буфер обмена</item>
+        <item>Экспорт всего профиля в буфер обмена</item>
+    </string-array>
+
+    <string-array name="routing_tag">
+        <item>Проксируемые</item>
+        <item>Прямые</item>
+        <item>Блокируемые</item>
+    </string-array>
+
+    <string-array name="routing_mode">
+        <item>Все через прокси</item>
+        <item>Все, кроме LAN через прокси</item>
+        <item>Все, кроме Китая через прокси</item>
+        <item>Все, кроме LAN и Китая через прокси</item>
+        <item>Все напрямую</item>
+    </string-array>
+
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>Только прокси</item>
+    </string-array>
+
+</resources>

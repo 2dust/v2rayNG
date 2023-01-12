@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_widget_name">開關</string>
+    <string name="app_tile_name">開關</string>
+    <string name="app_tile_first_use">首次使用此功能，請使用此應用程式新增伺服器</string>
+    <string name="navigation_drawer_open">開啟導覽匣</string>
+    <string name="navigation_drawer_close">關閉導覽匣</string>
+    <string name="migration_success">資料遷移成功！</string>
+    <string name="migration_fail">資料遷移失敗！</string>
+
+    <!-- Notifications -->
+    <string name="notification_action_stop_v2ray">停止</string>
+    <string name="toast_permission_denied">無法取得此權限</string>
+    <string name="notification_action_more">瞭解更多</string>
+    <string name="toast_services_start">啟動服務</string>
+    <string name="toast_services_stop">停止服務</string>
+    <string name="toast_services_success">啟動服務成功</string>
+    <string name="toast_services_failure">啟動服務失敗</string>
+
+    <!--ServerActivity-->
+    <string name="title_server">組態檔案</string>
+    <string name="menu_item_add_config">新增組態</string>
+    <string name="menu_item_save_config">儲存組態</string>
+    <string name="menu_item_del_config">刪除組態</string>
+    <string name="menu_item_import_config_qrcode">從 QR Code 匯入組態</string>
+    <string name="menu_item_import_config_clipboard">從剪貼簿匯入組態</string>
+    <string name="menu_item_import_config_manually_vmess">手動鍵入 [Vmess]</string>
+    <string name="menu_item_import_config_manually_vless">手動鍵入 [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">手動鍵入 [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">手動鍵入 [Socks]</string>
+    <string name="menu_item_import_config_manually_trojan">手動鍵入 [Trojan]</string>
+    <string name="menu_item_import_config_custom">自訂組態</string>
+    <string name="menu_item_import_config_custom_clipboard">從剪貼簿匯入自訂組態</string>
+    <string name="menu_item_import_config_custom_local">從本地匯入自訂組態</string>
+    <string name="menu_item_import_config_custom_url">從 URL 匯入自訂組態</string>
+    <string name="menu_item_import_config_custom_url_scan">掃描 URL 匯入自訂組態</string>
+    <string name="del_config_comfirm">確定刪除？</string>
+    <string name="server_lab_remarks">備註</string>
+    <string name="server_lab_address">位址</string>
+    <string name="server_lab_port">埠</string>
+    <string name="server_lab_id">使用者 ID</string>
+    <string name="server_lab_alterid">alterId</string>
+    <string name="server_lab_security">安全性</string>
+    <string name="server_lab_network">網路</string>
+    <string name="server_lab_more_function">底層傳輸方式 (transport)</string>
+    <string name="server_lab_head_type">標頭類型</string>
+    <string name="server_lab_mode_type">gRPC 傳輸模式 (mode)</string>
+    <string name="server_lab_request_host">要求主機 (host)(host/ws host/h2 host)/QUIC 加密方式</string>
+    <string name="server_lab_path">path(ws path/h2 path)/QUIC 加密金鑰/kcp seed/gRPC serviceName</string>
+    <string name="server_lab_stream_security">傳輸層安全 (tls)</string>
+    <string name="server_lab_allow_insecure">跳過憑證驗證 (allowInsecure)</string>
+    <string name="server_lab_sni">SNI</string>
+    <string name="server_lab_address3">伺服器位址</string>
+    <string name="server_lab_port3">伺服器埠</string>
+    <string name="server_lab_id3">密碼</string>
+    <string name="server_lab_security3">加密方式</string>
+    <string name="server_lab_id4">密碼 (可選)</string>
+    <string name="server_lab_security4">使用者名稱 (可選)</string>
+    <string name="server_lab_encryption">加密 (encryption)</string>
+    <string name="server_lab_flow">流程 (flow)</string>
+    <string name="toast_success">成功</string>
+    <string name="toast_failure">失敗</string>
+    <string name="toast_none_data">無資料</string>
+    <string name="toast_incorrect_protocol">通訊協定不正確</string>
+    <string name="toast_decoding_failed">解碼失敗</string>
+    <string name="title_file_chooser">選取一個組態檔</string>
+    <string name="toast_require_file_manager">請安裝檔案總管。</string>
+    <string name="server_customize_config">自訂組態</string>
+    <string name="toast_config_file_invalid">無效組態</string>
+    <string name="server_lab_content">內容</string>
+    <string name="toast_none_data_clipboard">剪貼簿內無資料</string>
+    <string name="toast_invalid_url">URL 無效</string>
+    <string name="server_lab_need_inbound">​​確保 inbounds port 和設定中的一致</string>
+    <string name="toast_malformed_josn">組態格式不正確</string>
+    <string name="server_lab_request_host6">Host(SNI)(可選)</string>
+    <string name="toast_asset_copy_failed">失敗，請使用檔案總管</string>
+    <string name="menu_item_add_file">新增檔案</string>
+    <string name="menu_item_download_file">下載檔案</string>
+
+    <!-- PerAppProxyActivity -->
+    <string name="msg_dialog_progress">載入</string>
+    <string name="menu_item_search">搜尋</string>
+    <string name="menu_item_select_all">全選</string>
+    <string name="msg_enter_keywords">輸入關鍵字</string>
+    <string name="switch_bypass_apps_mode">略過模式</string>
+    <string name="menu_item_select_proxy_app">自動選中需 Proxy 應用</string>
+    <string name="msg_downloading_content">正在下載內容</string>
+    <string name="menu_item_export_proxy_app">匯出至剪貼簿</string>
+    <string name="menu_item_import_proxy_app">從剪貼簿匯入</string>
+
+
+    <!-- Preferences -->
+    <string name="title_settings">設定</string>
+    <string name="title_advanced">進階</string>
+    <string name="title_vpn_settings">VPN 設定</string>
+    <string name="title_pref_per_app_proxy">Proxy 個別應用程式</string>
+    <string name="summary_pref_per_app_proxy">常規：勾選的 App 啟用 Proxy，未勾選的直接連線；\n繞行模式：勾選的 App 直接連線，未勾選的啟用 Proxy。\n可在選單中選擇自動選中需 Proxy 應用</string>
+
+    <string name="title_pref_mux_enabled">啟用 Mux</string>
+    <string name="summary_pref_mux_enabled">啟用或許會加快網路速度，切換或許會閃爍</string>
+
+    <string name="title_pref_speed_enabled">啟用速度顯示</string>
+    <string name="summary_pref_speed_enabled">在通知中顯示當前速度\n小圖示顯示流量的轉送狀況</string>
+
+    <string name="title_pref_sniffing_enabled">啟用流量監聽</string>
+    <string name="summary_pref_sniffing_enabled">從流量中監聽網域 (預設啟用)</string>
+
+    <string name="title_pref_local_dns_enabled">啟用本機 DNS</string>
+    <string name="summary_pref_local_dns_enabled">DNS 請求匯入 core 由 DNS 模塊處理 (建議啟用，如果需要轉送略過區域網路及中國大陸)</string>
+
+    <string name="title_pref_fake_dns_enabled">啟用假 DNS</string>
+    <string name="summary_pref_fake_dns_enabled">本機退回假解析結果 (減低延時，但個別應用可能無法使用)</string>
+
+    <string name="title_pref_prefer_ipv6">IPv6 偏好</string>
+    <string name="summary_pref_prefer_ipv6">App 優先使用 IPv6 位址連線伺服器，同时開啟 VPN 的 IPv6 路由</string>
+
+    <string name="title_pref_routing">轉送設定</string>
+    <string name="title_pref_routing_domain_strategy">網域策略</string>
+    <string name="title_pref_routing_mode">轉送模式</string>
+    <string name="title_pref_routing_custom">自訂轉送</string>
+
+    <string name="title_pref_remote_dns">遠端 DNS (可選)</string>
+    <string name="summary_pref_remote_dns">DNS</string>
+
+    <string name="title_pref_vpn_dns">VPN DNS (僅支援 IPv4/v6)</string>
+
+    <string name="title_pref_domestic_dns">國內 DNS (可選)</string>
+    <string name="summary_pref_domestic_dns">DNS</string>
+
+    <string name="title_pref_proxy_sharing_enabled">允許來自區域網路的連線</string>
+    <string name="summary_pref_proxy_sharing_enabled">其他裝置可以使用 socks/http 協定透過您的 IP 位址連線到 Proxy，僅在受信任的網路中啟用以避免未經授權的連線</string>
+    <string name="toast_warning_pref_proxysharing_short">允許來自區域網路的連線，請確保處於受信網路</string>
+
+    <string name="title_pref_allow_insecure">跳過憑證驗證 (allowInsecure)</string>
+    <string name="summary_pref_allow_insecure">傳輸層安全選 tls 時，預設跳過憑證驗證 (allowInsecure)</string>
+
+    <string name="title_pref_socks_port">SOCKS5 Proxy 埠</string>
+    <string name="summary_pref_socks_port">SOCKS5 Proxy 埠</string>
+
+    <string name="title_pref_http_port">HTTP Proxy 埠</string>
+    <string name="summary_pref_http_port">HTTP Proxy 埠</string>
+
+    <string name="title_pref_local_dns_port">本機 DNS 埠</string>
+    <string name="summary_pref_local_dns_port">本機 DNS 埠</string>
+
+    <string name="title_pref_confirm_remove">刪除配置文件確認</string>
+    <string name="summary_pref_confirm_remove">刪除配置文件是否需要用戶二次確認</string>
+
+    <string name="title_pref_feedback">意見回饋</string>
+    <string name="summary_pref_feedback">前往 GitHub 回報錯誤</string>
+    <string name="summary_pref_tg_group">加入 Telegram 群組</string>
+    <string name="toast_tg_app_not_found">未找到 Telegram 應用程式</string>
+
+    <string name="title_pref_promotion">推廣</string>
+    <string name="summary_pref_promotion">一些推廣，輕觸以檢視 (捐贈可去除)</string>
+
+    <string name="title_core_loglevel">記錄層級</string>
+    <string name="title_mode">模式</string>
+    <string name="title_mode_help">輕觸以檢視說明</string>
+    <string name="title_language">語言</string>
+
+    <string name="title_logcat">Logcat</string>
+    <string name="logcat_copy">複製</string>
+    <string name="logcat_clear">清除</string>
+    <string name="title_service_restart">服務重啟</string>
+    <string name="title_del_all_config">刪除全部組態</string>
+    <string name="title_del_invalid_config">刪除無效組態 (先偵測)</string>
+    <string name="title_export_all">匯出全部 (非自訂) 組態至剪貼簿</string>
+    <string name="title_sub_setting">訂閱分組設定</string>
+    <string name="sub_setting_remarks">備註</string>
+    <string name="sub_setting_url">Optional URL</string>
+    <string name="sub_setting_enable">啟用更新</string>
+    <string name="title_sub_update">更新訂閱</string>
+    <string name="title_ping_all_server">偵測所有組態 Tcping</string>
+    <string name="title_real_ping_all_server">偵測所有組態真延遲</string>
+    <string name="title_user_asset_setting">Geo 資源檔案</string>
+    <string name="title_sort_by_test_results">依偵測結果排序</string>
+    <string name="title_filter_config">過濾組態</string>
+    <string name="filter_config_all">所有訂閱分組</string>
+
+    <string name="tasker_start_service">啟動服務</string>
+    <string name="tasker_setting_confirm">確定</string>
+
+    <string name="routing_settings_title">轉送設定</string>
+    <string name="routing_settings_tips">以半形逗號「,」分隔，並手動儲存</string>
+    <string name="routing_settings_save">儲存</string>
+    <string name="routing_settings_delete">清除</string>
+    <string name="routing_settings_scan_replace">掃描並取代</string>
+    <string name="routing_settings_scan_append">掃描並附加</string>
+    <string name="routing_settings_default_rules">設定預設轉送規則</string>
+
+    <string name="connection_test_pending">"測試連線能力"</string>
+    <string name="connection_test_testing">"測試中……"</string>
+    <string name="connection_test_available">"成功：%d ms延遲"</string>
+    <string name="connection_test_error">"測試網際網路連線失敗：%s"</string>
+    <string name="connection_test_fail">"無法使用網際網路"</string>
+    <string name="connection_test_error_status_code">"錯誤碼：(#%d)"</string>
+    <string name="connection_connected">"已連線，輕觸以檢查連線能力"</string>
+    <string name="connection_not_connected">"未連線"</string>
+
+    <string-array name="share_method">
+        <item>QR Code</item>
+        <item>匯出至剪貼簿</item>
+        <item>匯出完整組態至剪貼簿</item>
+    </string-array>
+
+    <string-array name="routing_tag">
+        <item>Proxy URL 或 IP</item>
+        <item>直接連線 URL 或 IP</item>
+        <item>已封鎖的 URL 或 IP</item>
+    </string-array>
+
+    <string-array name="routing_mode">
+        <item>全域 Proxy</item>
+        <item>略過區域網路的 Proxy</item>
+        <item>略過中國大陸的 Proxy</item>
+        <item>略過區域網路及中國大陸的 Proxy</item>
+        <item>直接連線</item>
+    </string-array>
+
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>僅 Proxy</item>
+    </string-array>
+
+</resources>

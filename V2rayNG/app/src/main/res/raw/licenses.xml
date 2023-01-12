@@ -1,0 +1,49 @@
+<notices>
+    <notice>
+        <name>Android Compatibility Library v4</name>
+        <url>http://source.android.com</url>
+        <copyright>Copyright(C) 2008-2011 The Android Open Source Project</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>Android Compatibility Library v7</name>
+        <url>http://source.android.com</url>
+        <copyright>Copyright(C) 2008-2011 The Android Open Source Project</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>Android Design Library</name>
+        <url>http://source.android.com</url>
+        <copyright>Copyright(C) 2008-2011 The Android Open Source Project</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>Google Gson</name>
+        <url>https://github.com/google/gson</url>
+        <copyright>Copyright 2008-2011 Google Inc.</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>kotlin</name>
+        <url>http://kotlinlang.org/</url>
+        <copyright>Copyright 2010-2016 JetBrains s.r.o.</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>Logger</name>
+        <url>https://github.com/orhanobut/logger</url>
+        <copyright>Copyright 2015 Orhan Obut</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>LeakCanary</name>
+        <url>https://github.com/square/leakcanary</url>
+        <copyright>Copyright 2015 Square, Inc.</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>RxPermissions</name>
+        <url>https://github.com/tbruyelle/RxPermissions</url>
+        <license>Apache Software License 2.0</license>
+    </notice>
+</notices>
