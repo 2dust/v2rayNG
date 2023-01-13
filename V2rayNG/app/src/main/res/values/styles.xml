@@ -1,5 +1,6 @@
 <resources>
-    <style name="AppThemeLight" parent="Theme.AppCompat.DayNight.DarkActionBar">
+
+    <style name="AppThemeDayNight" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -7,20 +8,7 @@
         <item name="colorMainText">@color/colorText</item>
     </style>
 
-    <style name="AppThemeDark" parent="Theme.AppCompat.DayNight.DarkActionBar">
-        <item name="colorPrimary">@color/colorPrimaryByDark</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDarkByDark</item>
-        <item name="colorAccent">@color/colorAccentByDark</item>
-        <item name="colorMainBg">@color/colorBgByDark</item>
-        <item name="colorMainText">@color/colorTextByDark</item>
-    </style>
-
-    <style name="AppThemeLight_NoActionBar" parent="AppThemeLight">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="AppThemeDark_NoActionBar" parent="AppThemeDark">
+    <style name="AppThemeDayNight.NoActionBar" parent="AppThemeDayNight">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
