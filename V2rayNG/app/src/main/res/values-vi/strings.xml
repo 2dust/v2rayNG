@@ -18,7 +18,7 @@
     <string name="toast_services_failure">Không thể bắt đầu v2rayNG, kiểm tra lại cấu hình hoặc khởi động lại thiết bị.</string>
 
     <!--ServerActivity-->
-    <string name="title_server">V2RayNG</string>
+    <string name="title_server">V2rayNG</string>
     <string name="menu_item_add_config">Thêm cấu hình</string>
     <string name="menu_item_save_config">Lưu cấu hình</string>
     <string name="menu_item_del_config">Xoá cấu hình</string>
