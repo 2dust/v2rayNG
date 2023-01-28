@@ -15,10 +15,4 @@
     <color name="colorAccent">#D81B60</color>
     <color name="colorBg">#FFFFFF</color>
     <color name="colorText">#000000</color>
-
-    <color name="colorPrimaryByDark">#2B2B2B</color>
-    <color name="colorPrimaryDarkByDark">#161616</color>
-    <color name="colorAccentByDark">#12976F</color>
-    <color name="colorBgByDark">#252525</color>
-    <color name="colorTextByDark">#CCCCCC</color>
 </resources>

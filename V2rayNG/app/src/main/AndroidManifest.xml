@@ -31,13 +31,15 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppThemeLight"
+        android:theme="@style/AppThemeDayNight"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+
         <activity
-            android:exported="true"
             android:name=".ui.MainActivity"
-            android:launchMode="singleTask">
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/AppThemeDayNight.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
