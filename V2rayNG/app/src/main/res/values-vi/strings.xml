@@ -94,7 +94,7 @@
     <string name="title_advanced">Cài đặt nâng cao</string>
     <string name="title_vpn_settings">Cài đặt VPN</string>
     <string name="title_pref_per_app_proxy">Proxy ứng dụng</string>
-    <string name="summary_pref_per_app_proxy">Chung: Ứng dụng đã chọn sẽ kết nối Proxy, chưa lựa chọn sẽ kết nối trực tiếp; \nBỏ qua kết nối: Ứng dụng được chọn sẽ trực tiếp kết nối, không lựa chọn sẽ kết nối qua Proxy. \nLựa chọn để tự động chọn ứng dụng Proxy trong Menu.</string>
+    <string name="summary_pref_per_app_proxy">- Chung: Ứng dụng đã chọn sẽ kết nối Proxy, chưa lựa chọn sẽ kết nối trực tiếp. \n- Bỏ qua kết nối: Ứng dụng được chọn sẽ trực tiếp kết nối, không lựa chọn sẽ kết nối qua Proxy. \n- Lựa chọn để tự động chọn ứng dụng Proxy trong Menu.</string>
 
     <string name="title_pref_mux_enabled">Cho phép Mux</string>
     <string name="summary_pref_mux_enabled">Bật lên có thể làm tăng tốc độ mạng và chuyển mạng nhanh hơn!</string>
@@ -191,12 +191,12 @@
 
     <string name="connection_test_pending">Kiểm tra kết nối</string>
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng...</string>
-    <string name="connection_test_available">kiểm tra kết nối mạng thành công! Ping hiện tại là %d</string>
+    <string name="connection_test_available">Kiểm tra kết nối mạng thành công! Ping hiện tại là %d</string>
     <string name="connection_test_error">Lỗi kết nối mạng, hãy thử đổi cấu hình hoặc kiểm tra lại! Mã lỗi: %s</string>
     <string name="connection_test_fail">Không có kết nối mạng!</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
     <string name="connection_connected">Đã kết nối, hãy nhấn vào đây để kiểm tra kết nối mạng!</string>
-    <string name="connection_not_connected">Chưa kết nối, hãy thêm một cấu hình để kết nối!</string>
+    <string name="connection_not_connected">Chưa kết nối, hãy chọn một cấu hình để kết nối!</string>
 
     <string-array name="share_method">
         <item>Xuất ra mã QR (Chụp màn hình để lưu)</item>
