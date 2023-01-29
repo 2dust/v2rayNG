@@ -97,7 +97,7 @@
     <string name="summary_pref_per_app_proxy">- Chung: Ứng dụng đã chọn sẽ kết nối Proxy, chưa lựa chọn sẽ kết nối trực tiếp. \n- Bỏ qua kết nối: Ứng dụng được chọn sẽ trực tiếp kết nối, không lựa chọn sẽ kết nối qua Proxy. \n- Lựa chọn để tự động chọn ứng dụng Proxy trong Menu.</string>
 
     <string name="title_pref_mux_enabled">Cho phép Mux</string>
-    <string name="summary_pref_mux_enabled">Bật lên có thể làm tăng tốc độ mạng và chuyển mạng nhanh hơn!</string>
+    <string name="summary_pref_mux_enabled">Bật lên có thể làm tăng tốc độ mạng và chuyển mạng nhanh hơn.</string>
 
     <string name="title_pref_speed_enabled">Cho phép hiển thị tốc độ mạng</string>
     <string name="summary_pref_speed_enabled">Hiển thị tốc độ mạng hiện tại trên thanh thông báo.\nBiểu tượng trên thanh trạng thái có thể thay đổi tùy vào mức sử dụng.</string>
@@ -129,10 +129,10 @@
 
     <string name="title_pref_proxy_sharing_enabled">Cho phép kết nối từ mạng LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác có thể kết nối đến Proxy bởi địa chỉ IP thông qua Socks/HTTP, chỉ bật khi bạn tin tưởng kết nối đó.</string>
-    <string name="toast_warning_pref_proxysharing_short">Cho phép kết nối từ mạng LAN, Đảm bảo rằng bạn tin tưởng kết nối hiện tại.</string>
+    <string name="toast_warning_pref_proxysharing_short">Cho phép kết nối từ mạng LAN, đảm bảo rằng bạn tin tưởng kết nối hiện tại!</string>
 
     <string name="title_pref_allow_insecure">Cho phép đặt lại Bỏ qua xác minh chứng chỉ</string>
-    <string name="summary_pref_allow_insecure">Khi kết nối TLS, đặt cài đặt Bỏ qua xác minh chứng chỉ thành mặc định</string>
+    <string name="summary_pref_allow_insecure">Khi kết nối TLS, đặt cài đặt Bỏ qua xác minh chứng chỉ thành mặc định.</string>
 
     <string name="title_pref_socks_port">Cổng Proxy SOCKS5</string>
     <string name="summary_pref_socks_port">Cổng Proxy SOCKS5</string>
@@ -144,7 +144,7 @@
     <string name="summary_pref_local_dns_port">Cổng DNS cục bộ</string>
 
     <string name="title_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình</string>
-    <string name="summary_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình khi bạn xoá một cấu hình!</string>
+    <string name="summary_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình khi bạn xoá một cấu hình.</string>
 
     <string name="title_pref_feedback">Phản hồi lỗi</string>
     <string name="summary_pref_feedback">Phản hồi cải tiến hoặc lỗi lên GitHub</string>
