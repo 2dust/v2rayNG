@@ -10,10 +10,10 @@
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
-    <string name="toast_permission_denied">Vui lòng cấp quyền cần thiết cho v2rayNG! Bạn đã từ chối các quyền cần thiết như Camera hay Bộ nhớ?</string>
+    <string name="toast_permission_denied">Vui lòng cấp quyền cần thiết cho v2rayNG! Bạn đã từ chối các quyền cần thiết như Camera hay Bộ nhớ.</string>
     <string name="notification_action_more">Nhấn để biết thêm</string>
-    <string name="toast_services_start">Đang bắt đầu v2rayNG...</string>
-    <string name="toast_services_stop">Đã dừng v2rayNG!</string>
+    <string name="toast_services_start">Đang bắt đầu dịch vụ v2rayNG...</string>
+    <string name="toast_services_stop">Đã dừng dịch vụ v2rayNG</string>
     <string name="toast_services_success">Đã bắt đầu v2rayNG!</string>
     <string name="toast_services_failure">Không thể bắt đầu v2rayNG, kiểm tra lại cấu hình hoặc khởi động lại thiết bị.</string>
 
@@ -23,18 +23,18 @@
     <string name="menu_item_save_config">Lưu cấu hình</string>
     <string name="menu_item_del_config">Xoá cấu hình</string>
     <string name="menu_item_import_config_qrcode">Nhập cấu hình từ mã QR</string>
-    <string name="menu_item_import_config_clipboard">Nhập cấu hình từ Clipboard</string>
+    <string name="menu_item_import_config_clipboard">Nhập cấu hình từ bộ nhớ tạm thời</string>
     <string name="menu_item_import_config_manually_vmess">Nhập thủ công [Vmess]</string>
     <string name="menu_item_import_config_manually_vless">Nhập thủ công [VLESS]</string>
     <string name="menu_item_import_config_manually_ss">Nhập thủ công [Shadowsocks]</string>
     <string name="menu_item_import_config_manually_socks">Nhập thủ công [Socks]</string>
     <string name="menu_item_import_config_manually_trojan">Nhập thủ công [Trojan]</string>
     <string name="menu_item_import_config_custom">Nâng cao / Cấu hình tùy chỉnh</string>
-    <string name="menu_item_import_config_custom_clipboard">Nhập cấu hình tùy chỉnh từ Clipboard</string>
+    <string name="menu_item_import_config_custom_clipboard">Nhập cấu hình tùy chỉnh từ bộ nhớ tạm thời</string>
     <string name="menu_item_import_config_custom_local">Nhập cấu hình tùy chỉnh từ Tệp</string>
     <string name="menu_item_import_config_custom_url">Nhập cấu hình tùy chỉnh từ URL</string>
     <string name="menu_item_import_config_custom_url_scan">Nhập cấu hình tùy chỉnh quét URL</string>
-    <string name="del_config_comfirm">Bạn có muốn xóa cấu hình không?</string>
+    <string name="del_config_comfirm">Bạn có muốn xóa cấu hình ?</string>
     <string name="server_lab_remarks">Tên cấu hình</string>
     <string name="server_lab_address">Địa chỉ</string>
     <string name="server_lab_port">Cổng</string>
@@ -48,7 +48,7 @@
     <string name="server_lab_request_host">Yêu cầu host (Host/WS/H2) / Bảo mật QUIC</string>
     <string name="server_lab_path">Đường dẫn (WS/H2) / Khóa QUIC / KCP seed / Dịch vụ gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
-    <string name="server_lab_allow_insecure">Bỏ qua xác minh chứng chỉ</string>
+    <string name="server_lab_allow_insecure">allowinsecure (Kết nối không an toàn)</string>
     <string name="server_lab_sni">Địa chỉ SNI</string>
     <string name="server_lab_address3">Địa chỉ</string>
     <string name="server_lab_port3">Cổng</string>
@@ -59,19 +59,19 @@
     <string name="server_lab_encryption">Mã hoá</string>
     <string name="server_lab_flow">Kiểm soát lưu lượng</string>
     <string name="toast_success">Thành công!</string>
-    <string name="toast_failure">Đã xảy ra lỗi, vui lòng thử lại!</string>
+    <string name="toast_failure">Đã xảy ra lỗi, vui lòng thử lại.</string>
     <string name="toast_none_data">Không có gì ở đây</string>
     <string name="toast_incorrect_protocol">Không đúng Protocol</string>
     <string name="toast_decoding_failed">Không thể giải mã</string>
     <string name="title_file_chooser">Vui lòng chọn tệp cấu hình!</string>
-    <string name="toast_require_file_manager">Vui lòng cài đặt trình quản lý tệp để tiếp tục!</string>
+    <string name="toast_require_file_manager">Vui lòng cài đặt trình quản lý tệp để tiếp tục.</string>
     <string name="server_customize_config">Cấu hình tùy chỉnh</string>
-    <string name="toast_config_file_invalid">Cấu hình không hợp lệ!</string>
+    <string name="toast_config_file_invalid">Cấu hình không hợp lệ.</string>
     <string name="server_lab_content">Nội dung</string>
-    <string name="toast_none_data_clipboard">Không có dữ liệu nào trong Clipboard!</string>
+    <string name="toast_none_data_clipboard">Không có dữ liệu nào trong bộ nhớ tạm thời</string>
     <string name="toast_invalid_url">URL không hợp lệ hoặc trống!</string>
-    <string name="server_lab_need_inbound">Vui lòng đảm bảo cấu hình tùy chỉnh này không bị lỗi trước khi sử dụng!</string>
-    <string name="toast_malformed_josn">Cấu hình không hợp lệ!</string>
+    <string name="server_lab_need_inbound">Vui lòng đảm bảo cấu hình tùy chỉnh này không bị lỗi trước khi sử dụng.</string>
+    <string name="toast_malformed_josn">Cấu hình không hợp lệ.</string>
     <string name="server_lab_request_host6">Host (SNI) (Bổ sung)</string>
     <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp!</string>
     <string name="menu_item_add_file">Thêm tệp</string>
@@ -97,12 +97,12 @@
     <string name="summary_pref_per_app_proxy">Chung: Ứng dụng đã chọn sẽ kết nối Proxy, chưa lựa chọn sẽ kết nối trực tiếp; \nBỏ qua kết nối: Ứng dụng được chọn sẽ trực tiếp kết nối, không lựa chọn sẽ kết nối qua Proxy. \nLựa chọn để tự động chọn ứng dụng Proxy trong Menu.</string>
 
     <string name="title_pref_mux_enabled">Cho phép Mux</string>
-    <string name="summary_pref_mux_enabled">Bật lên có thể làm tăng tốc độ mạng và chuyển mạng nhanh hơn!</string>
+    <string name="summary_pref_mux_enabled">Bật lên có thể làm tăng tốc độ mạng và chuyển mạng nhanh hơn.</string>
 
     <string name="title_pref_speed_enabled">Cho phép hiển thị tốc độ mạng</string>
     <string name="summary_pref_speed_enabled">Hiển thị tốc độ mạng hiện tại trên thanh thông báo.\nBiểu tượng trên thanh trạng thái có thể thay đổi tùy vào mức sử dụng.</string>
 
-    <string name="title_pref_sniffing_enabled">Bật tính năng phát hiện luồng</string>
+    <string name="title_pref_sniffing_enabled">Cho phép Sniffing</string>
     <string name="summary_pref_sniffing_enabled">Thử chuyển kết nối hiện tại của bạn qua trung gian để trung gian xử lý kết nối về lại cho bạn. (Mặc định là bật, hãy tắt nó nếu kết nối không ổn định)</string>
 
     <string name="title_pref_local_dns_enabled">Cho phép DNS cục bộ</string>
@@ -144,7 +144,7 @@
     <string name="summary_pref_local_dns_port">Cổng DNS cục bộ</string>
 
     <string name="title_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình</string>
-    <string name="summary_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình khi bạn xoá một cấu hình!</string>
+    <string name="summary_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình khi bạn xoá một cấu hình.</string>
 
     <string name="title_pref_feedback">Phản hồi lỗi</string>
     <string name="summary_pref_feedback">Phản hồi cải tiến hoặc lỗi lên GitHub</string>
@@ -156,7 +156,7 @@
 
     <string name="title_core_loglevel">Mức độ nhật ký</string>
     <string name="title_mode">Chế độ kết nối</string>
-    <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp!</string>
+    <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp</string>
     <string name="title_language">Ngôn ngữ</string>
 
     <string name="title_logcat">Nhật ký hoạt động</string>
@@ -191,12 +191,12 @@
 
     <string name="connection_test_pending">Kiểm tra kết nối</string>
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng...</string>
-    <string name="connection_test_available">kiểm tra kết nối mạng thành công! Ping hiện tại là %d</string>
-    <string name="connection_test_error">Lỗi kết nối mạng, hãy thử đổi cấu hình hoặc kiểm tra lại! Mã lỗi: %s</string>
+    <string name="connection_test_available">Đã kiểm kiểm tra kết nối mạng thành công! Ping hiện tại là %d</string>
+    <string name="connection_test_error">Lỗi kết nối mạng, hãy thử đổi cấu hình hoặc kiểm tra lại. Mã lỗi: %s</string>
     <string name="connection_test_fail">Không có kết nối mạng!</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
-    <string name="connection_connected">Đã kết nối, hãy nhấn vào đây để kiểm tra kết nối mạng!</string>
-    <string name="connection_not_connected">Chưa kết nối, hãy thêm một cấu hình để kết nối!</string>
+    <string name="connection_connected">Đã kết nối, hãy nhấn vào đây để kiểm tra kết nối mạng.</string>
+    <string name="connection_not_connected">Chưa kết nối, hãy thêm một cấu hình để kết nối.</string>
 
     <string-array name="share_method">
         <item>Xuất ra mã QR (Chụp màn hình để lưu)</item>
@@ -211,10 +211,10 @@
     </string-array>
 
     <string-array name="routing_mode">
-        <item>Proxy toàn cầu</item>
+        <item>Proxy Global</item>
         <item>Bỏ qua địa chỉ LAN rồi Proxy</item>
         <item>Bỏ qua địa chỉ đất liền rồi Proxy</item>
-        <item>Bỏ qua LAN và địa chỉ đất liền rồi Proxy</item>
+        <item>Bỏ qua LAN và địa chỉ address rồi Proxy</item>
         <item>Kết nối trực tiếp toàn cầu</item>
     </string-array>
 
