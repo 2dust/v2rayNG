@@ -191,9 +191,9 @@
 
     <string name="connection_test_pending">Kiểm tra kết nối</string>
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng...</string>
-    <string name="connection_test_available">Đã kiểm kiểm tra kết nối mạng thành công! Ping hiện tại là %d</string>
+    <string name="connection_test_available">Đã kiểm kiểm tra kết nối mạng thành công. Ping hiện tại là %d</string>
     <string name="connection_test_error">Lỗi kết nối mạng, hãy thử đổi cấu hình hoặc kiểm tra lại. Mã lỗi: %s</string>
-    <string name="connection_test_fail">Không có kết nối mạng!</string>
+    <string name="connection_test_fail">Không có kết nối mạng</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
     <string name="connection_connected">Đã kết nối, hãy nhấn vào đây để kiểm tra kết nối mạng.</string>
     <string name="connection_not_connected">Chưa kết nối, hãy thêm một cấu hình để kết nối.</string>
