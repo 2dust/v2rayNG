@@ -30,7 +30,7 @@
     <string name="menu_item_import_config_manually_ss">Type manually[Shadowsocks]</string>
     <string name="menu_item_import_config_manually_socks">Type manually[Socks]</string>
     <string name="menu_item_import_config_manually_trojan">Type manually[Trojan]</string>
-    <string name="menu_item_import_config_custom">custom config</string>
+    <string name="menu_item_import_config_custom">Custom config</string>
     <string name="menu_item_import_config_custom_clipboard">Import custom config from Clipboard</string>
     <string name="menu_item_import_config_custom_local">Import custom config from locally</string>
     <string name="menu_item_import_config_custom_url">Import custom config from URL</string>
