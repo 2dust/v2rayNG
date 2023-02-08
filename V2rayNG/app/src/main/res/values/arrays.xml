@@ -65,6 +65,12 @@
         <item>chrome</item>
         <item>firefox</item>
         <item>safari</item>
+        <item>ios</item>
+        <item>android</item>
+        <item>edge</item>
+        <item>360</item>
+        <item>qq</item>
+        <item>random</item>
         <item>randomized</item>
     </string-array>
 
