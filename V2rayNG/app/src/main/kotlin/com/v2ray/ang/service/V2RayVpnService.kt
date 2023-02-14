@@ -17,11 +17,12 @@ import com.v2ray.ang.dto.ERoutingMode
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.v2ray.ang.util.V2rayConfigUtil
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import java.io.File
 import java.lang.ref.SoftReference
+import kotlin.concurrent.thread
 
 class V2RayVpnService : VpnService(), ServiceControl {
     companion object {
@@ -193,6 +194,15 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
     }
 
+    private fun startProcess(cmd : List<String>) {
+        val proBuilder = ProcessBuilder(cmd)
+        proBuilder.redirectErrorStream(true)
+        process = proBuilder
+                .directory(applicationContext.filesDir)
+                .start()
+        Log.d(packageName, process.toString())
+    }
+
     private fun runTun2socks() {
         val socksPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
         val cmd = arrayListOf(File(applicationContext.applicationInfo.nativeLibraryDir, TUN2SOCKS).absolutePath,
@@ -215,50 +225,52 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
         Log.d(packageName, cmd.toString())
 
-        try {
-            val proBuilder = ProcessBuilder(cmd)
-            proBuilder.redirectErrorStream(true)
-            process = proBuilder
-                    .directory(applicationContext.filesDir)
-                    .start()
-            Thread(Runnable {
-                Log.d(packageName,"$TUN2SOCKS check")
-                process.waitFor()
-                Log.d(packageName,"$TUN2SOCKS exited")
-                if (isRunning) {
-                    Log.d(packageName,"$TUN2SOCKS restart")
-                    runTun2socks()
-                }
-            }).start()
-            Log.d(packageName, process.toString())
+        GlobalScope.launch(Dispatchers.Main) {
+            try {
+                val exitChannel = Channel<Int>()
+                while(true) {
+                    startProcess(cmd)
+                    thread(name = "$TUN2SOCKS") {
+                        Log.d(packageName,"$TUN2SOCKS check")
+                        // this thread also acts as a daemon thread for waitFor
+                        runBlocking { exitChannel.send(process.waitFor()) }
+                    }
+                    sendFd()
 
-            sendFd()
-        } catch (e: Exception) {
-            Log.d(packageName, e.toString())
+                    val exitCode = exitChannel.receive()
+                    Log.d(packageName,"$TUN2SOCKS exited $exitCode")
+                    Log.d(packageName, process.toString())
+
+                    if (!isRunning) {
+                        break
+                    }
+                    Log.d(packageName,"$TUN2SOCKS restart")
+                }
+            } catch (e: Exception) {
+                Log.d(packageName, e.toString())
+            }
         }
     }
 
-    private fun sendFd() {
+    private suspend fun sendFd() {
         val fd = mInterface.fileDescriptor
         val path = File(applicationContext.filesDir, "sock_path").absolutePath
         Log.d(packageName, path)
 
-        GlobalScope.launch(Dispatchers.IO) {
-            var tries = 0
-            while (true) try {
-                Thread.sleep(50L shl tries)
-                Log.d(packageName, "sendFd tries: $tries")
-                LocalSocket().use { localSocket ->
-                    localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
-                    localSocket.setFileDescriptorsForSend(arrayOf(fd))
-                    localSocket.outputStream.write(42)
-                }
-                break
-            } catch (e: Exception) {
-                Log.d(packageName, e.toString())
-                if (tries > 5) break
-                tries += 1
+        var tries = 0
+        while (true) try {
+            delay(50L shl tries)
+            Log.d(packageName, "sendFd tries: $tries")
+            LocalSocket().use { localSocket ->
+                localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
+                localSocket.setFileDescriptorsForSend(arrayOf(fd))
+                localSocket.outputStream.write(42)
             }
+            break
+        } catch (e: Exception) {
+            Log.d(packageName, e.toString())
+            if (tries > 5) break
+            tries += 1
         }
     }
 

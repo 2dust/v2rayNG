@@ -1,0 +1,6 @@
+[submodule "badvpn"]
+	path = V2rayNG/app/src/main/cpp/badvpn
+	url = https://github.com/XTLS/badvpn.git
+[submodule "libancillary"]
+	path = V2rayNG/app/src/main/cpp/libancillary
+	url = https://github.com/shadowsocks/libancillary.git

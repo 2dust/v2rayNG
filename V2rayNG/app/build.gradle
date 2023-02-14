@@ -20,6 +20,14 @@ android {
         multiDexEnabled true
         versionCode 502
         versionName "1.7.38"
+        ndkVersion "25.1.8937393"
+    }
+
+    externalNativeBuild {
+        cmake {
+            version "3.22.1"
+            path 'src/main/cpp/CMakeLists.txt'
+        }
     }
 
     if (props["sign"]) {
