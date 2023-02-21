@@ -104,5 +104,64 @@
             android:layout_height="@dimen/edit_height"
             android:entries="@array/allowinsecures" />
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/l6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:orientation="vertical">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_lab_public_key" />
+
+        <EditText
+            android:id="@+id/et_public_key"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/edit_height"
+            android:inputType="text"
+            android:nextFocusDown="@+id/sp_stream_fingerprint" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/l7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_lab_short_id" />
+
+        <EditText
+            android:id="@+id/et_short_id"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/edit_height"
+            android:inputType="text"
+            android:nextFocusDown="@+id/sp_stream_fingerprint" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/l8"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_lab_spider_x" />
+
+        <EditText
+            android:id="@+id/et_spider_x"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/edit_height"
+            android:inputType="text"
+            android:nextFocusDown="@+id/sp_stream_fingerprint" />
+
+    </LinearLayout>
 </LinearLayout>

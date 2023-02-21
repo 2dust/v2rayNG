@@ -15,6 +15,7 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_PORT
+import com.v2ray.ang.dto.V2rayConfig.Companion.TLS
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.ID_MAIN
@@ -84,14 +85,24 @@ class ServerActivity : BaseActivity() {
     private val sp_security: Spinner? by lazy { findViewById(R.id.sp_security) }
     private val sp_stream_security: Spinner? by lazy { findViewById(R.id.sp_stream_security) }
     private val sp_allow_insecure: Spinner? by lazy { findViewById(R.id.sp_allow_insecure) }
+    private val container_allow_insecure: LinearLayout? by lazy { findViewById(R.id.l5) }
     private val et_sni: EditText? by lazy { findViewById(R.id.et_sni) }
+    private val container_sni: LinearLayout? by lazy { findViewById(R.id.l2) }
     private val sp_stream_fingerprint: Spinner? by lazy { findViewById(R.id.sp_stream_fingerprint) } //uTLS
+    private val container_fingerprint: LinearLayout? by lazy { findViewById(R.id.l3) }
     private val sp_network: Spinner? by lazy { findViewById(R.id.sp_network) }
     private val sp_header_type: Spinner? by lazy { findViewById(R.id.sp_header_type) }
     private val sp_header_type_title: TextView? by lazy { findViewById(R.id.sp_header_type_title) }
     private val et_request_host: EditText? by lazy { findViewById(R.id.et_request_host) }
     private val et_path: EditText? by lazy { findViewById(R.id.et_path) }
     private val sp_stream_alpn: Spinner? by lazy { findViewById(R.id.sp_stream_alpn) } //uTLS
+    private val container_alpn: LinearLayout? by lazy { findViewById(R.id.l4) }
+    private val et_public_key: EditText? by lazy { findViewById(R.id.et_public_key) }
+    private val container_public_key: LinearLayout? by lazy { findViewById(R.id.l6) }
+    private val et_short_id: EditText? by lazy { findViewById(R.id.et_short_id) }
+    private val container_short_id: LinearLayout? by lazy { findViewById(R.id.l7) }
+    private val et_spider_x: EditText? by lazy { findViewById(R.id.et_spider_x) }
+    private val container_spider_x: LinearLayout? by lazy { findViewById(R.id.l8) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,6 +134,37 @@ class ServerActivity : BaseActivity() {
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
+                // do nothing
+            }
+        }
+        sp_stream_security?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (streamSecuritys[position].isBlank()) {
+                    container_sni?.visibility = View.GONE
+                    container_fingerprint?.visibility = View.GONE
+                    container_alpn?.visibility = View.GONE
+                    container_allow_insecure?.visibility = View.GONE
+                    container_public_key?.visibility = View.GONE
+                    container_short_id?.visibility = View.GONE
+                    container_spider_x?.visibility = View.GONE
+                } else {
+                    container_sni?.visibility = View.VISIBLE
+                    container_fingerprint?.visibility = View.VISIBLE
+                    container_alpn?.visibility = View.VISIBLE
+                    if (streamSecuritys[position] == TLS) {
+                        container_allow_insecure?.visibility = View.VISIBLE
+                        container_public_key?.visibility = View.GONE
+                        container_short_id?.visibility = View.GONE
+                        container_spider_x?.visibility = View.GONE
+                    } else {
+                        container_allow_insecure?.visibility = View.GONE
+                        container_public_key?.visibility = View.VISIBLE
+                        container_short_id?.visibility = View.VISIBLE
+                        container_spider_x?.visibility = View.VISIBLE
+                    }
+                }
+            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {
                 // do nothing
             }
         }
@@ -169,13 +211,11 @@ class ServerActivity : BaseActivity() {
         val streamSecurity = Utils.arrayFind(streamSecuritys, streamSetting.security)
         if (streamSecurity >= 0) {
             sp_stream_security?.setSelection(streamSecurity)
-            (streamSetting.tlsSettings?: streamSetting.xtlsSettings)?.let { tlsSetting ->
-                val allowinsecure = Utils.arrayFind(allowinsecures, tlsSetting.allowInsecure.toString())
-                if (allowinsecure >= 0) {
-                    sp_allow_insecure?.setSelection(allowinsecure)
-                }
+            (streamSetting.tlsSettings?: streamSetting.realitySettings)?.let { tlsSetting ->
+                container_sni?.visibility = View.VISIBLE
+                container_fingerprint?.visibility = View.VISIBLE
+                container_alpn?.visibility = View.VISIBLE
                 et_sni?.text = Utils.getEditable(tlsSetting.serverName)
-
                 tlsSetting.fingerprint?.let {
                     val utlsIndex = Utils.arrayFind(uTlsItems, tlsSetting.fingerprint)
                     sp_stream_fingerprint?.setSelection(utlsIndex)
@@ -184,7 +224,33 @@ class ServerActivity : BaseActivity() {
                     val alpnIndex = Utils.arrayFind(alpns, Utils.removeWhiteSpace(tlsSetting.alpn.joinToString())!!)
                     sp_stream_alpn?.setSelection(alpnIndex)
                 }
-
+                if (streamSetting.tlsSettings != null) {
+                    container_allow_insecure?.visibility = View.VISIBLE
+                    val allowinsecure = Utils.arrayFind(allowinsecures, tlsSetting.allowInsecure.toString())
+                    if (allowinsecure >= 0) {
+                        sp_allow_insecure?.setSelection(allowinsecure)
+                    }
+                    container_public_key?.visibility = View.GONE
+                    container_short_id?.visibility = View.GONE
+                    container_spider_x?.visibility = View.GONE
+                } else { // reality settings
+                    container_public_key?.visibility = View.VISIBLE
+                    et_public_key?.text = Utils.getEditable(tlsSetting.publicKey.orEmpty())
+                    container_short_id?.visibility = View.VISIBLE
+                    et_short_id?.text = Utils.getEditable(tlsSetting.shortId.orEmpty())
+                    container_spider_x?.visibility = View.VISIBLE
+                    et_spider_x?.text = Utils.getEditable(tlsSetting.spiderX.orEmpty())
+                    container_allow_insecure?.visibility = View.GONE
+                }
+            }
+            if (streamSetting.tlsSettings == null && streamSetting.realitySettings == null) {
+                container_sni?.visibility = View.GONE
+                container_fingerprint?.visibility = View.GONE
+                container_alpn?.visibility = View.GONE
+                container_allow_insecure?.visibility = View.GONE
+                container_public_key?.visibility = View.GONE
+                container_short_id?.visibility = View.GONE
+                container_spider_x?.visibility = View.GONE
             }
         }
         val network = Utils.arrayFind(networks, streamSetting.network)
@@ -304,12 +370,6 @@ class ServerActivity : BaseActivity() {
             }
         } else if (config.configType == EConfigType.TROJAN) {
             server.password = et_id.text.toString().trim()
-            server.flow =
-                    if (streamSecuritys[sp_stream_security?.selectedItemPosition ?: 0] == V2rayConfig.XTLS) {
-                        flows[sp_flow?.selectedItemPosition ?: 0]
-                    } else {
-                        ""
-                    }
         }
     }
 
@@ -323,6 +383,9 @@ class ServerActivity : BaseActivity() {
         val streamSecurity = sp_stream_security?.selectedItemPosition ?: return
         var utlsIndex = sp_stream_fingerprint?.selectedItemPosition ?: return
         var alpnIndex = sp_stream_alpn?.selectedItemPosition ?: return
+        val publicKey = et_public_key?.text?.toString()?.trim() ?: return
+        val shortId = et_short_id?.text?.toString()?.trim() ?: return
+        val spiderX = et_spider_x?.text?.toString()?.trim() ?: return
 
         var sni = streamSetting.populateTransportSettings(
                 transport = networks[network],
@@ -344,7 +407,16 @@ class ServerActivity : BaseActivity() {
             allowinsecures[allowInsecureField].toBoolean()
         }
 
-        streamSetting.populateTlsSettings(streamSecuritys[streamSecurity], allowInsecure, sni, uTlsItems[utlsIndex], alpns[alpnIndex])
+        streamSetting.populateTlsSettings(
+                streamSecurity = streamSecuritys[streamSecurity],
+                allowInsecure = allowInsecure,
+                sni = sni,
+                fingerprint = uTlsItems[utlsIndex],
+                alpns = alpns[alpnIndex],
+                publicKey = publicKey,
+                shortId = shortId,
+                spiderX = spiderX
+        )
     }
 
     private fun transportTypes(network: String?): Array<out String> {
