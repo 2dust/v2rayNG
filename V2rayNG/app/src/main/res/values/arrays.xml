@@ -57,7 +57,7 @@
     <string-array name="streamsecurityxs" translatable="false">
         <item></item>
         <item>tls</item>
-        <item>xtls</item>
+        <item>reality</item>
     </string-array>
 
     <string-array name="streamsecurity_utls" translatable="false">
@@ -116,12 +116,6 @@
 
     <string-array name="flows" translatable="false">
         <item></item>
-        <item>xtls-rprx-origin</item>
-        <item>xtls-rprx-origin-udp443</item>
-        <item>xtls-rprx-direct</item>
-        <item>xtls-rprx-direct-udp443</item>
-        <item>xtls-rprx-splice</item>
-        <item>xtls-rprx-splice-udp443</item>
         <item>xtls-rprx-vision</item>
         <item>xtls-rprx-vision-udp443</item>
     </string-array>

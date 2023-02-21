@@ -29,7 +29,7 @@ data class V2rayConfig(
         const val DEFAULT_NETWORK = "tcp"
 
         const val TLS = "tls"
-        const val XTLS = "xtls"
+        const val REALITY = "reality"
         const val HTTP = "http"
     }
 
@@ -130,7 +130,7 @@ data class V2rayConfig(
                                       var httpSettings: HttpSettingsBean? = null,
                                       var tlsSettings: TlsSettingsBean? = null,
                                       var quicSettings: QuicSettingBean? = null,
-                                      var xtlsSettings: TlsSettingsBean? = null,
+                                      var realitySettings: TlsSettingsBean? = null,
                                       var grpcSettings: GrpcSettingsBean? = null,
                                       val dsSettings: Any? = null,
                                       val sockopt: Any? = null
@@ -189,7 +189,12 @@ data class V2rayConfig(
                                        val fingerprint: String? = null,
                                        val certificates: List<Any>? = null,
                                        val disableSystemRoot: Boolean? = null,
-                                       val enableSessionResumption: Boolean? = null)
+                                       val enableSessionResumption: Boolean? = null,
+                    // REALITY settings
+                                       val show: Boolean = true,
+                                       var publicKey: String? = null,
+                                       var shortId: String? = null,
+                                       var spiderX: String? = null)
 
             data class QuicSettingBean(var security: String = "none",
                                        var key: String = "",
@@ -265,20 +270,24 @@ data class V2rayConfig(
                 return sni
             }
 
-            fun populateTlsSettings(streamSecurity: String, allowInsecure: Boolean, sni: String, fingerprint: String?, alpns: String?) {
+            fun populateTlsSettings(streamSecurity: String, allowInsecure: Boolean, sni: String, fingerprint: String?, alpns: String?,
+                                    publicKey: String?, shortId: String?, spiderX: String?) {
                 security = streamSecurity
                 val tlsSetting = TlsSettingsBean(
-                    allowInsecure = allowInsecure,
-                    serverName = sni,
-                    fingerprint = fingerprint,
-                    alpn = if (alpns.isNullOrEmpty()) null else alpns.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                        allowInsecure = allowInsecure,
+                        serverName = sni,
+                        fingerprint = fingerprint,
+                        alpn = if (alpns.isNullOrEmpty()) null else alpns.split(",").map { it.trim() }.filter { it.isNotEmpty() },
+                        publicKey = publicKey,
+                        shortId = shortId,
+                        spiderX = spiderX
                 )
                 if (security == TLS) {
                     tlsSettings = tlsSetting
-                    xtlsSettings = null
-                } else if (security == XTLS) {
+                    realitySettings = null
+                } else if (security == REALITY) {
                     tlsSettings = null
-                    xtlsSettings = tlsSetting
+                    realitySettings = tlsSetting
                 }
             }
         }
