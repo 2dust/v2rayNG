@@ -14,6 +14,8 @@ import android.text.TextUtils
 import android.view.KeyEvent
 import com.v2ray.ang.AppConfig
 import android.content.res.ColorStateList
+import android.net.ConnectivityManager
+import android.net.wifi.WifiManager
 import com.google.android.material.navigation.NavigationView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -28,6 +30,7 @@ import androidx.lifecycle.lifecycleScope
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.BuildConfig
+import com.v2ray.ang.NetworkReceiver
 import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
@@ -56,6 +59,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
     private var mItemTouchHelper: ItemTouchHelper? = null
     val mainViewModel: MainViewModel by viewModels()
+    private var netWorkReceiver : NetworkReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,6 +111,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         setupViewModel()
         copyAssets()
         migrateLegacy()
+
+        netWorkReceiver = NetworkReceiver();
+        val filter = IntentFilter();
+        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(netWorkReceiver, filter);
     }
 
     private fun setupViewModel() {
@@ -201,6 +212,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     public override fun onPause() {
         super.onPause()
+    }
+
+    public override fun onDestroy() {
+        super.onDestroy()
+        if(netWorkReceiver != null)
+        {
+            unregisterReceiver(netWorkReceiver)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

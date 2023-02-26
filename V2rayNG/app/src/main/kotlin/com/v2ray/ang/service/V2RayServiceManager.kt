@@ -59,6 +59,7 @@ object V2RayServiceManager {
     private var mSubscription: Subscription? = null
     private var mNotificationManager: NotificationManager? = null
 
+    @JvmStatic
     fun startV2Ray(context: Context) {
         if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) == true) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)

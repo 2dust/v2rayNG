@@ -10,6 +10,7 @@ import java.io.Serializable
 
 object MessageUtil {
 
+    @JvmStatic
     fun sendMsg2Service(ctx: Context, what: Int, content: Serializable) {
         sendMsg(ctx, AppConfig.BROADCAST_ACTION_SERVICE, what, content)
     }

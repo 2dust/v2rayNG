@@ -14,6 +14,7 @@ import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import com.v2ray.ang.NetworkReceiver
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.DialogConfigFilterBinding
 import com.v2ray.ang.dto.*
@@ -40,6 +41,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun startListenBroadcast() {
         isRunning.value = false
+        NetworkReceiver.isRunning = false;
         getApplication<AngApplication>().registerReceiver(mMsgReceiver, IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY))
         MessageUtil.sendMsg2Service(getApplication(), AppConfig.MSG_REGISTER_CLIENT, "")
     }
@@ -206,20 +208,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             when (intent?.getIntExtra("key", 0)) {
                 AppConfig.MSG_STATE_RUNNING -> {
                     isRunning.value = true
+                    NetworkReceiver.isRunning = true
                 }
                 AppConfig.MSG_STATE_NOT_RUNNING -> {
                     isRunning.value = false
+                    NetworkReceiver.isRunning = false
                 }
                 AppConfig.MSG_STATE_START_SUCCESS -> {
                     getApplication<AngApplication>().toast(R.string.toast_services_success)
                     isRunning.value = true
+                    NetworkReceiver.isRunning = true
                 }
                 AppConfig.MSG_STATE_START_FAILURE -> {
                     getApplication<AngApplication>().toast(R.string.toast_services_failure)
                     isRunning.value = false
+                    NetworkReceiver.isRunning = false
                 }
                 AppConfig.MSG_STATE_STOP_SUCCESS -> {
                     isRunning.value = false
+                    NetworkReceiver.isRunning = false
                 }
                 AppConfig.MSG_MEASURE_DELAY_SUCCESS -> {
                     updateTestResultAction.value = intent.getStringExtra("content")
