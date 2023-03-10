@@ -49,8 +49,6 @@
     <string name="server_lab_request_host">Запрос узла (WS/H2) / Шифрование QUIC</string>
     <string name="server_lab_path">Путь (WS/H2) / Ключ QUIC / Сид KCP / Сервис gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
-    <string name="server_lab_stream_fingerprint">uTLS</string>
-    <string name="server_lab_stream_alpn" translatable="false">alpn</string>
     <string name="server_lab_allow_insecure">Разрешать небезопасные</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">Адрес</string>

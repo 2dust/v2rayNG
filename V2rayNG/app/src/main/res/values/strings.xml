@@ -48,9 +48,9 @@
     <string name="server_lab_mode_type">gRPC mode</string>
     <string name="server_lab_request_host">request host(host/ws host/h2 host)/QUIC security</string>
     <string name="server_lab_path">path(ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
-    <string name="server_lab_stream_security">tls</string>
-    <string name="server_lab_stream_fingerprint" translatable="false">uTLS</string>
-    <string name="server_lab_stream_alpn" translatable="false">alpn</string>
+    <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_fingerprint" translatable="false">Fingerprint</string>
+    <string name="server_lab_stream_alpn" translatable="false">Alpn</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">address</string>
@@ -61,9 +61,9 @@
     <string name="server_lab_security4">User(Optional)</string>
     <string name="server_lab_encryption">encryption</string>
     <string name="server_lab_flow">flow</string>
-    <string name="server_lab_public_key">public key</string>
-    <string name="server_lab_short_id">short Id</string>
-    <string name="server_lab_spider_x">spiderX</string>
+    <string name="server_lab_public_key" translatable="false">Public key</string>
+    <string name="server_lab_short_id" translatable="false">Short Id</string>
+    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
     <string name="toast_success">Success</string>
     <string name="toast_failure">Failure</string>
     <string name="toast_none_data">There is nothing</string>
