@@ -165,6 +165,22 @@ object V2rayConfigUtil {
                 ERoutingMode.BYPASS_LAN.value -> {
                     routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
                 }
+                ERoutingMode.FOREIGN_SITES.value -> {
+                    routingGeo("", "ir", AppConfig.TAG_DIRECT, v2rayConfig)
+//                    v2rayConfig.routing.rules.add(0, googleapisRoute)
+                }
+                ERoutingMode.BLOCKED_SITES.value -> {
+                    routingGeo("", "ir", AppConfig.TAG_DIRECT, v2rayConfig)
+
+                    routingGeo("", "ir-blocked", AppConfig.TAG_AGENT, v2rayConfig)
+                    val globalDirect = V2rayConfig.RoutingBean.RulesBean(
+                        type = "field",
+                        outboundTag = AppConfig.TAG_DIRECT,
+                        port = "0-65535"
+                    )
+                    v2rayConfig.routing.rules.add(globalDirect)
+//                    v2rayConfig.routing.rules.add(0, googleapisRoute)
+                }
                 ERoutingMode.BYPASS_MAINLAND.value -> {
                     routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)

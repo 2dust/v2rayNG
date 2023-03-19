@@ -14,31 +14,32 @@
                 android:id="@+id/import_clipboard"
                 android:title="@string/menu_item_import_config_clipboard"
                 app:showAsAction="never" />
-            <item
-                android:id="@+id/import_manually_vmess"
-                android:title="@string/menu_item_import_config_manually_vmess"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/import_manually_vless"
-                android:title="@string/menu_item_import_config_manually_vless"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/import_manually_ss"
-                android:title="@string/menu_item_import_config_manually_ss"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/import_manually_socks"
-                android:title="@string/menu_item_import_config_manually_socks"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/import_manually_trojan"
-                android:title="@string/menu_item_import_config_manually_trojan"
-                app:showAsAction="never" />
 
             <item
                 android:title="@string/menu_item_import_config_custom"
                 app:showAsAction="always">
                 <menu>
+                    <item
+                        android:id="@+id/import_manually_vmess"
+                        android:title="@string/menu_item_import_config_manually_vmess"
+                        app:showAsAction="never" />
+                    <item
+                        android:id="@+id/import_manually_vless"
+                        android:title="@string/menu_item_import_config_manually_vless"
+                        app:showAsAction="never" />
+                    <item
+                        android:id="@+id/import_manually_ss"
+                        android:title="@string/menu_item_import_config_manually_ss"
+                        app:showAsAction="never" />
+                    <item
+                        android:id="@+id/import_manually_socks"
+                        android:title="@string/menu_item_import_config_manually_socks"
+                        app:showAsAction="never" />
+                    <item
+                        android:id="@+id/import_manually_trojan"
+                        android:title="@string/menu_item_import_config_manually_trojan"
+                        app:showAsAction="never" />
+
                     <item
                         android:id="@+id/import_config_custom_clipboard"
                         android:title="@string/menu_item_import_config_custom_clipboard"

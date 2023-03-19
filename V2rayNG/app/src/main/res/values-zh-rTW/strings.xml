@@ -211,11 +211,9 @@
     </string-array>
 
     <string-array name="routing_mode">
-        <item>全域 Proxy</item>
-        <item>略過區域網路的 Proxy</item>
-        <item>略過中國大陸的 Proxy</item>
-        <item>略過區域網路及中國大陸的 Proxy</item>
-        <item>直接連線</item>
+        <item>Global proxy</item>
+        <item>Foreign Sites</item>
+        <item>Blocked Sites</item>
     </string-array>
 
     <string-array name="mode_entries">

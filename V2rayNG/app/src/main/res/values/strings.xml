@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="title_hiddify">Hiddify</string>
+    <string name="fab_start">Start</string>
     <string name="app_name" translatable="false">Hiddify NG</string>
     <string name="app_widget_name">Switch</string>
     <string name="app_tile_name">Switch</string>
@@ -220,10 +222,8 @@
 
     <string-array name="routing_mode">
         <item>Global proxy</item>
-        <item>Bypassing the LAN address then proxy</item>
-        <item>Bypass mainland address then proxy</item>
-        <item>Bypassing LAN and mainland address then proxy</item>
-        <item>Global direct</item>
+        <item>Foreign Sites</item>
+        <item>Blocked Sites</item>
     </string-array>
 
     <string-array name="mode_entries">

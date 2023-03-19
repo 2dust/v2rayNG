@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string-array name="securitys" translatable="false">
         <item>chacha20-poly1305</item>
         <item>aes-128-gcm</item>
@@ -91,8 +92,6 @@
         <item>0</item>
         <item>1</item>
         <item>2</item>
-        <item>3</item>
-        <item>4</item>
     </string-array>
 
     <string-array name="routing_domain_strategy" translatable="false">

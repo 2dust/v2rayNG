@@ -211,11 +211,9 @@
     </string-array>
 
     <string-array name="routing_mode">
-        <item>全局代理</item>
-        <item>绕过局域网地址而后代理</item>
-        <item>绕过大陆地址而后代理</item>
-        <item>绕过局域网及大陆地址而后代理</item>
-        <item>全局直连</item>
+        <item>Global proxy</item>
+        <item>Foreign Sites</item>
+        <item>Blocked Sites</item>
     </string-array>
 
     <string-array name="mode_entries">

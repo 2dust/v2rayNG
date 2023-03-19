@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Hiddify NG</string>
+    <string name="title_hiddify">هیدیفای</string>
+    <string name="fab_start">اجرا</string>
+    <string name="app_name" translatable="false">هیدیفای</string>
     <string name="app_widget_name">تعویض</string>
     <string name="app_tile_name">تعویض</string>
     <string name="app_tile_first_use">برای اولین بار از این ویژگی استفاده می‌کنید، لطفا از برنامه برای افزودن سرور استفاده کنید</string>
@@ -19,7 +21,7 @@
     <string name="toast_services_failure">شروع خدمات انجام نشد</string>
 
     <!--ServerActivity-->
-    <string name="title_server">پرونده پیکربندی</string>
+    <string name="title_server">پروکسی ها</string>
     <string name="menu_item_add_config">افزودن پیکربندی</string>
     <string name="menu_item_save_config">ذخیره پیکربندی</string>
     <string name="menu_item_del_config">حذف پیکربندی</string>
@@ -212,11 +214,9 @@
     </string-array>
 
     <string-array name="routing_mode">
-        <item>پروکسی سراسری</item>
-        <item>دور زدن آدرس LAN و سپس پروکسی</item>
-        <item>دور زذن آدرس mainland و سپس پروکسی</item>
-        <item>دور زدن LAN و آدرس mainland و سپس پروکسی</item>
-        <item>مستقیم سراسری</item>
+        <item>همه سایت ها</item>
+        <item>سایت های خارجی</item>
+        <item>سایت های فیلتر شده</item>
     </string-array>
 
     <string-array name="mode_entries">

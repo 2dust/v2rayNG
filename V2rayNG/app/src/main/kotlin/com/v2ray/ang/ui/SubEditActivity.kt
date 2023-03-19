@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
@@ -88,6 +89,8 @@ class SubEditActivity : BaseActivity() {
 
         subStorage?.encode(subId, Gson().toJson(subItem))
         toast(R.string.toast_success)
+        val intent = Intent("com.hiddify.UPDATE_UI_ACTION")
+        sendBroadcast(intent);
         finish()
         return true
     }

@@ -61,7 +61,7 @@ object AppConfig {
     const val v2rayCustomRoutingListUrl = "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
     const val v2rayNGIssues = "https://github.com/hiddify/HiddifyAndroidNG/issues"
     const val v2rayNGWikiMode = "https://github.com/hiddify/HiddifyAndroidNG/wiki/Mode"
-    const val promotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
+    const val promotionUrl = "dGc6Ly9yZXNvbHZlP2RvbWFpbj1oaWRkaWZ5"
     const val geoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/";
 
     const val DNS_AGENT = "1.1.1.1"

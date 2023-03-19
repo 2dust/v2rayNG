@@ -2,46 +2,47 @@ package com.v2ray.ang.ui
 
 import android.Manifest
 import android.content.*
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.net.VpnService
-import androidx.recyclerview.widget.LinearLayoutManager
-import android.view.Menu
-import android.view.MenuItem
-import com.tbruyelle.rxpermissions.RxPermissions
-import com.v2ray.ang.R
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.KeyEvent
-import com.v2ray.ang.AppConfig
-import android.content.res.ColorStateList
-import com.google.android.material.navigation.NavigationView
-import androidx.core.content.ContextCompat
-import androidx.core.view.GravityCompat
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.recyclerview.widget.ItemTouchHelper
 import android.util.Log
+import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.navigation.NavigationView
+import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.BuildConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import java.util.concurrent.TimeUnit
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.*
 import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.*
 import me.drakeet.support.toast.ToastCompat
+import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
 import java.io.File
 import java.io.FileOutputStream
+import java.util.concurrent.TimeUnit
+
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var binding: ActivityMainBinding
@@ -57,8 +58,16 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private var mItemTouchHelper: ItemTouchHelper? = null
     val mainViewModel: MainViewModel by viewModels()
 
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            importConfigViaSub()
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val filter = IntentFilter("com.hiddify.UPDATE_UI_ACTION")
+        registerReceiver(receiver, filter)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
@@ -79,6 +88,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 startV2Ray()
             }
         }
+//        binding.routingSelector.setDropDownViewResource(android.R.layout.simple_spinner_item);
         binding.layoutTest.setOnClickListener {
             if (mainViewModel.isRunning.value == true) {
                 setTestState(getString(R.string.connection_test_testing))
@@ -211,10 +221,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.import_qrcode -> {
             importQRcode(true)
+            importConfigViaSub()
             true
         }
         R.id.import_clipboard -> {
             importClipboard()
+            importConfigViaSub()
             true
         }
         R.id.import_manually_vmess -> {
@@ -599,7 +611,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     fun showCircle() {
-        binding.fabProgressCircle.show()
+//        binding.fabProgressCircle.show()
     }
 
     fun hideCircle() {
@@ -608,9 +620,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         try {
-                            if (binding.fabProgressCircle.isShown) {
-                                binding.fabProgressCircle.hide()
-                            }
+//                            if (binding.fabProgressCircle.isShown) {
+//                                binding.fabProgressCircle.hide()
+//                            }
                         } catch (e: Exception) {
                             Log.w(ANG_PACKAGE, e)
                         }

@@ -212,11 +212,9 @@
     </string-array>
 
     <string-array name="routing_mode">
-        <item>Все через прокси</item>
-        <item>Все, кроме LAN через прокси</item>
-        <item>Все, кроме Китая через прокси</item>
-        <item>Все, кроме LAN и Китая через прокси</item>
-        <item>Все напрямую</item>
+        <item>Global proxy</item>
+        <item>Foreign Sites</item>
+        <item>Blocked Sites</item>
     </string-array>
 
     <string-array name="mode_entries">

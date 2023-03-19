@@ -107,8 +107,12 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="HiddifyNG"
-                    android:host="install-config" />
+                <data android:scheme="v2rayng" />
+                <data android:scheme="hiddify" />
+                <data android:scheme="vmess" />
+                <data android:scheme="ss" />
+                <data android:scheme="vless" />
+                <data android:scheme="trojan" />
             </intent-filter>
         </activity>
 

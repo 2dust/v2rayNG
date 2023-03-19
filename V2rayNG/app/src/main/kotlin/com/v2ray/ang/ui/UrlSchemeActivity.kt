@@ -3,11 +3,19 @@ package com.v2ray.ang.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
+import androidx.lifecycle.lifecycleScope
 import com.google.zxing.WriterException
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityLogcatBinding
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.AngConfigManager
+import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class UrlSchemeActivity : BaseActivity() {
     private lateinit var binding: ActivityLogcatBinding
@@ -39,6 +47,10 @@ class UrlSchemeActivity : BaseActivity() {
             val count = AngConfigManager.importBatchConfig(shareUrl, "", false)
             if (count > 0) {
                 toast(R.string.toast_success)
+                val intent = Intent("com.hiddify.UPDATE_UI_ACTION")
+                sendBroadcast(intent);
+
+
             } else {
                 toast(R.string.toast_failure)
             }
@@ -48,4 +60,7 @@ class UrlSchemeActivity : BaseActivity() {
             e.printStackTrace()
         }
     }
+
+
+
 }

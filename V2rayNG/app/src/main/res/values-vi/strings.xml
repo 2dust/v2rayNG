@@ -211,11 +211,9 @@
     </string-array>
 
     <string-array name="routing_mode">
-        <item>Proxy toàn cầu</item>
-        <item>Bỏ qua địa chỉ LAN rồi Proxy</item>
-        <item>Bỏ qua địa chỉ đất liền rồi Proxy</item>
-        <item>Bỏ qua LAN và địa chỉ đất liền rồi Proxy</item>
-        <item>Kết nối trực tiếp toàn cầu</item>
+        <item>Global proxy</item>
+        <item>Foreign Sites</item>
+        <item>Blocked Sites</item>
     </string-array>
 
     <string-array name="mode_entries">

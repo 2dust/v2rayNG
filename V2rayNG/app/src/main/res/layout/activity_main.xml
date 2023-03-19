@@ -50,7 +50,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/connection_test_height"
                         android:background="?attr/colorPrimary"
-                        android:gravity="center|left"
+                        android:gravity="center|start"
                         android:nextFocusRight="@+id/fab"
                         android:clickable="true"
                         android:focusable="true"
@@ -69,33 +69,50 @@
 
                     </LinearLayout>
                 </LinearLayout>
-
-
-                <com.github.jorgecastilloprz.FABProgressCircle
-                    android:id="@+id/fabProgressCircle"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:layout_gravity="bottom|end"
-                    android:layout_marginBottom="24dp">
+                    android:textAlignment="textEnd"
 
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    >
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                         android:id="@+id/fab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentBottom="true"
-                        android:layout_gravity="bottom|end"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:nextFocusLeft="@+id/layout_test"
-                        android:src="@drawable/ic_stat_name"
-                        app:layout_anchorGravity="bottom|right|end" />
+                        android:layout_gravity="end"
 
-                </com.github.jorgecastilloprz.FABProgressCircle>
+                        android:contentDescription="@string/fab_start"
+                        android:text="@string/fab_start"
+
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginEnd="16dp"
+                        app:backgroundTint="?attr/colorAccent"
+                        app:icon="@drawable/ic_hiddify"/>
+                    <Spinner
+                        android:id="@+id/routing_selector"
+                        android:layout_width="match_parent"
+
+                        android:layout_height="wrap_content"
+                        android:textAlignment="textStart"
+                        android:dropDownWidth="wrap_content"
+                        android:spinnerMode="dropdown"
+                        android:defaultValue="0"
+
+                        android:layout_gravity="center_horizontal"
+                        android:layout_margin="0dp"
+                        android:paddingBottom="10dp"
+                        android:paddingEnd="0dp"
+                        android:paddingStart="0dp"
+
+                        android:entries="@array/routing_mode"
+                        android:entryValues="@array/routing_mode_value"
+                        />
+
+                </LinearLayout>
+
+
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
         </RelativeLayout>
     </LinearLayout>

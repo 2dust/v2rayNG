@@ -288,6 +288,9 @@ class ServerActivity : BaseActivity() {
      * save server config
      */
     private fun saveServer(): Boolean {
+        if (isRunning) {
+            Utils.stopVService(this)
+        }
         if (TextUtils.isEmpty(et_remarks.text.toString())) {
             toast(R.string.server_lab_remarks)
             return false
@@ -435,6 +438,9 @@ class ServerActivity : BaseActivity() {
      * save server config
      */
     private fun deleteServer(): Boolean {
+        if (isRunning) {
+            Utils.stopVService(this)
+        }
         if (editGuid.isNotEmpty()) {
             if (editGuid != mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
                 if (settingsStorage?.decodeBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
@@ -460,8 +466,8 @@ class ServerActivity : BaseActivity() {
 
         if (editGuid.isNotEmpty()) {
             if (isRunning) {
-                delButton?.isVisible = false
-                saveButton?.isVisible = false
+//                delButton?.isVisible = false
+//                saveButton?.isVisible = false
             }
         } else {
             delButton?.isVisible = false
