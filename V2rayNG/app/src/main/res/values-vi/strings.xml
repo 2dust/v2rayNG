@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_widget_name">Kết nối ngay</string>
-    <string name="app_tile_name">Kết nối ngay</string>
-    <string name="app_tile_first_use">Vui lòng thêm một cấu hình vào v2rayNG để sử dụng!</string>
+    <string name="app_tile_name">Hiddify NG</string>
+    <string name="app_tile_first_use">Vui lòng thêm một cấu hình vào HiddifyNG để sử dụng!</string>
     <string name="navigation_drawer_open">Mở Menu ứng dụng</string>
     <string name="navigation_drawer_close">Đóng Menu ứng dụng</string>
     <string name="migration_success">Đã chuyển dữ liệu!</string>
     <string name="migration_fail">Không thể chuyển dữ liệu!</string>
 
     <!-- Notifications -->
-    <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
-    <string name="toast_permission_denied">Vui lòng cấp quyền cần thiết cho v2rayNG! Bạn đã từ chối các quyền cần thiết như Camera hay Bộ nhớ?</string>
+    <string name="notification_action_stop_v2ray">Ngắt kết nối HiddifyNG</string>
+    <string name="toast_permission_denied">Vui lòng cấp quyền cần thiết cho HiddifyNG! Bạn đã từ chối các quyền cần thiết như Camera hay Bộ nhớ?</string>
     <string name="notification_action_more">Nhấn để biết thêm</string>
-    <string name="toast_services_start">Đang bắt đầu v2rayNG...</string>
-    <string name="toast_services_stop">Đã dừng v2rayNG!</string>
-    <string name="toast_services_success">Đã bắt đầu v2rayNG!</string>
-    <string name="toast_services_failure">Không thể bắt đầu v2rayNG, kiểm tra lại cấu hình hoặc khởi động lại thiết bị.</string>
+    <string name="toast_services_start">Đang bắt đầu HiddifyNG...</string>
+    <string name="toast_services_stop">Đã dừng HiddifyNG!</string>
+    <string name="toast_services_success">Đã bắt đầu HiddifyNG!</string>
+    <string name="toast_services_failure">Không thể bắt đầu HiddifyNG, kiểm tra lại cấu hình hoặc khởi động lại thiết bị.</string>
 
     <!--ServerActivity-->
-    <string name="title_server">v2rayNG</string>
+    <string name="title_server">HiddifyNG</string>
     <string name="menu_item_add_config">Thêm cấu hình</string>
     <string name="menu_item_save_config">Lưu cấu hình</string>
     <string name="menu_item_del_config">Xoá cấu hình</string>
@@ -162,7 +162,7 @@
     <string name="title_logcat">Nhật ký hoạt động</string>
     <string name="logcat_copy">Sao chép nhật ký</string>
     <string name="logcat_clear">Xoá nhật ký</string>
-    <string name="title_service_restart">Kết nối lại v2rayNG</string>
+    <string name="title_service_restart">Kết nối lại HiddifyNG</string>
     <string name="title_del_all_config">Xoá tất cả cấu hình</string>
     <string name="title_del_invalid_config">Xoá cấu hình lỗi (Kiểm tra trước)</string>
     <string name="title_export_all">Xuất và sao chép tất cả cấu hình</string>
@@ -178,7 +178,7 @@
     <string name="title_filter_config">Lọc cấu hình theo các gói đăng ký</string>
     <string name="filter_config_all">Hiển thị tất cả các gói đăng ký</string>
 
-    <string name="tasker_start_service">Bắt đầu v2rayNG</string>
+    <string name="tasker_start_service">Bắt đầu HiddifyNG</string>
     <string name="tasker_setting_confirm">Xác nhận</string>
 
     <string name="routing_settings_title">Cài đặt lộ trình</string>

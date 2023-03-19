@@ -11,7 +11,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetClass="com.v2ray.ang.ui.ScSwitchActivity"
-            android:targetPackage="com.v2ray.ang" />
+            android:targetPackage="com.hiddify.ang" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
     <shortcut
@@ -25,7 +25,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetClass="com.v2ray.ang.ui.ScScannerActivity"
-            android:targetPackage="com.v2ray.ang" />
+            android:targetPackage="com.hiddify.ang" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
     <shortcut
@@ -39,7 +39,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetClass="com.v2ray.ang.ui.SettingsActivity"
-            android:targetPackage="com.v2ray.ang" />
+            android:targetPackage="com.hiddify.ang" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
 </shortcuts>

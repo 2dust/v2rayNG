@@ -5,7 +5,7 @@ package com.v2ray.ang
  * App Config Const
  */
 object AppConfig {
-    const val ANG_PACKAGE = "com.v2ray.ang"
+    const val ANG_PACKAGE = "com.hiddify.ang"
     const val DIR_ASSETS = "assets"
 
     // legacy
@@ -43,9 +43,9 @@ object AppConfig {
     const val HTTP_PROTOCOL: String = "http://"
     const val HTTPS_PROTOCOL: String = "https://"
 
-    const val BROADCAST_ACTION_SERVICE = "com.v2ray.ang.action.service"
-    const val BROADCAST_ACTION_ACTIVITY = "com.v2ray.ang.action.activity"
-    const val BROADCAST_ACTION_WIDGET_CLICK = "com.v2ray.ang.action.widget.click"
+    const val BROADCAST_ACTION_SERVICE = "com.hiddify.ang.action.service"
+    const val BROADCAST_ACTION_ACTIVITY = "com.hiddify.ang.action.activity"
+    const val BROADCAST_ACTION_WIDGET_CLICK = "com.hiddify.ang.action.widget.click"
 
     const val TASKER_EXTRA_BUNDLE = "com.twofortyfouram.locale.intent.extra.BUNDLE"
     const val TASKER_EXTRA_STRING_BLURB = "com.twofortyfouram.locale.intent.extra.BLURB"
@@ -59,8 +59,8 @@ object AppConfig {
 
     const val androidpackagenamelistUrl = "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
     const val v2rayCustomRoutingListUrl = "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
-    const val v2rayNGIssues = "https://github.com/2dust/v2rayNG/issues"
-    const val v2rayNGWikiMode = "https://github.com/2dust/v2rayNG/wiki/Mode"
+    const val v2rayNGIssues = "https://github.com/hiddify/HiddifyAndroidNG/issues"
+    const val v2rayNGWikiMode = "https://github.com/hiddify/HiddifyAndroidNG/wiki/Mode"
     const val promotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
     const val geoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/";
 

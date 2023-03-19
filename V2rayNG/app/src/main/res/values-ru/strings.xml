@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_name" translatable="false">Hiddify NG</string>
     <string name="app_widget_name">Переключить</string>
     <string name="app_tile_name">Переключить</string>
     <string name="app_tile_first_use">Первое использование этой функции, пожалуйста, используйте приложение, чтобы добавить сервер</string>

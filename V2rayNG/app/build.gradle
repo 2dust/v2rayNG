@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.v2ray.ang"
+        applicationId "com.hiddify.ang"
         minSdkVersion 21
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
@@ -87,7 +87,7 @@ android {
     android.applicationVariants.all { variant ->
         // assign different version code for each output
         variant.outputs.each { output ->
-            output.outputFileName = "v2rayNG_" + variant.versionName + "_" + output.getFilter(com.android.build.OutputFile.ABI) + ".apk"
+            output.outputFileName = "HiddifyNG_" + variant.versionName + "_" + output.getFilter(com.android.build.OutputFile.ABI) + ".apk"
 
                 output.versionCodeOverride =
                     project.ext.versionCodes.get(output.getFilter(com.android.build.OutputFile.ABI), 0) *
