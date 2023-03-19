@@ -7,6 +7,11 @@
         <item name="colorMainBg">@color/colorBg</item>
         <item name="colorMainText">@color/colorText</item>
         <item name="android:textColor">@color/colorText</item>
+        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
+        <item name="android:buttonStyle">@style/RobotoButtonStyle</item>
+        <item name="buttonStyle">@style/RobotoButtonStyle</item>
+
+        <item name="navigationViewStyle">@style/AppNavigationViewStyle</item>
     </style>
 
     <style name="AppThemeDayNight.NoActionBar" parent="AppThemeDayNight">
@@ -38,4 +43,24 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
+
+
+    <style name="RobotoTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/vazirmatn_regular</item>
+    </style>
+
+    <style name="RobotoButtonStyle" parent="android:Widget.Holo.Button">
+        <item name="android:fontFamily">@font/vazirmatn_regular</item>
+    </style>
+
+
+
+    <style name="AppNavigationViewStyle" parent="Widget.MaterialComponents.NavigationView">
+        <item name="itemTextAppearance">@style/AppNavigationViewItemTextAppearance</item>
+    </style>
+    <style name="AppNavigationViewItemTextAppearance" parent="@style/TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:fontFamily">@font/vazirmatn_regular</item>
+        <item name="fontFamily">@font/vazirmatn_regular</item>
+
+    </style>
 </resources>

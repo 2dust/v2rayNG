@@ -85,7 +85,7 @@
 
                         android:contentDescription="@string/fab_start"
                         android:text="@string/fab_start"
-
+                        android:fontFamily="@font/vazirmatn_regular"
                         android:layout_marginBottom="10dp"
                         android:layout_marginEnd="16dp"
                         app:backgroundTint="?attr/colorAccent"
@@ -122,8 +122,9 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/menu_drawer" >
+        app:menu="@menu/menu_drawer"  >
 
         <LinearLayout
                 android:layout_width="match_parent"

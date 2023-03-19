@@ -301,7 +301,7 @@ object AngConfigManager {
                 if (uri.rawQuery != null) {
                     val queryParam = uri.rawQuery.split("&")
                         .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
-
+                    var allowInsecure=(queryParam["allowInsecure"]?:"")=="true"
                     val sni = config.outboundBean?.streamSettings?.populateTransportSettings(queryParam["type"] ?: "tcp", queryParam["headerType"],
                         queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
                         queryParam["mode"], queryParam["serviceName"])
@@ -342,6 +342,7 @@ object AngConfigManager {
                         queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
                         queryParam["mode"], queryParam["serviceName"])
                 fingerprint = queryParam["fp"] ?: ""
+                var allowInsecure=(queryParam["allowInsecure"]?:"")=="true"
                 streamSetting.populateTlsSettings(queryParam["security"] ?: "", allowInsecure,
                         queryParam["sni"] ?: sni, fingerprint, queryParam["alpn"], null, null, null)
             }
@@ -362,7 +363,7 @@ object AngConfigManager {
         return 0
     }
 
-    private fun tryParseNewVmess(uriString: String, config: ServerConfig, allowInsecure: Boolean): Boolean {
+    private fun tryParseNewVmess(uriString: String, config: ServerConfig, allowInsecure_: Boolean): Boolean {
         return runCatching {
             val uri = URI(uriString)
             check(uri.scheme == "vmess")
@@ -384,6 +385,7 @@ object AngConfigManager {
                 vnext.users[0].alterId = alterId.toInt()
             }
             var fingerprint = streamSetting.tlsSettings?.fingerprint
+            var allowInsecure=(queryParam["allowInsecure"]?:"")=="true"
             val sni = streamSetting.populateTransportSettings(protocol, queryParam["type"],
                     queryParam["host"]?.split("|")?.get(0) ?: "",
                     queryParam["path"]?.takeIf { it.trim() != "/" } ?: "", queryParam["seed"], queryParam["security"],
