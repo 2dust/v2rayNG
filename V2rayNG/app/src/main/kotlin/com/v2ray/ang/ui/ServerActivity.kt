@@ -158,6 +158,7 @@ class ServerActivity : BaseActivity() {
                         container_spider_x?.visibility = View.GONE
                     } else {
                         container_allow_insecure?.visibility = View.GONE
+                        container_alpn?.visibility = View.GONE
                         container_public_key?.visibility = View.VISIBLE
                         container_short_id?.visibility = View.VISIBLE
                         container_spider_x?.visibility = View.VISIBLE
