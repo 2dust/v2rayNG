@@ -164,6 +164,7 @@
     <string name="logcat_clear">清除</string>
     <string name="title_service_restart">服務重啟</string>
     <string name="title_del_all_config">刪除全部組態</string>
+    <string name="title_del_duplicate_config">刪除重複組態</string>
     <string name="title_del_invalid_config">刪除無效組態 (先偵測)</string>
     <string name="title_export_all">匯出全部 (非自訂) 組態至剪貼簿</string>
     <string name="title_sub_setting">訂閱分組設定</string>
@@ -177,6 +178,7 @@
     <string name="title_sort_by_test_results">依偵測結果排序</string>
     <string name="title_filter_config">過濾組態</string>
     <string name="filter_config_all">所有訂閱分組</string>
+    <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
 
     <string name="tasker_start_service">啟動服務</string>
     <string name="tasker_setting_confirm">確定</string>
