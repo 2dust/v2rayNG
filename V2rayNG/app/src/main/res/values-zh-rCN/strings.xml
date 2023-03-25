@@ -164,6 +164,7 @@
     <string name="logcat_clear">清除</string>
     <string name="title_service_restart">服务重启</string>
     <string name="title_del_all_config">删除全部配置</string>
+    <string name="title_del_duplicate_config">删除重复配置</string>
     <string name="title_del_invalid_config">删除无效配置(先测试)</string>
     <string name="title_export_all">导出全部(非自定义)配置至剪贴板</string>
     <string name="title_sub_setting">订阅分组设置</string>
@@ -177,6 +178,7 @@
     <string name="title_sort_by_test_results">按测试结果排序</string>
     <string name="title_filter_config">过滤配置文件</string>
     <string name="filter_config_all">所有订阅分组</string>
+    <string name="title_del_duplicate_config_count">删除 %d 个重复配置</string>
 
     <string name="tasker_start_service">启动服务</string>
     <string name="tasker_setting_confirm">确定</string>

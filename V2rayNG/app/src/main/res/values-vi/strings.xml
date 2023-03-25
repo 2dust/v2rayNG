@@ -164,6 +164,7 @@
     <string name="logcat_clear">Xoá nhật ký</string>
     <string name="title_service_restart">Kết nối lại v2rayNG</string>
     <string name="title_del_all_config">Xoá tất cả cấu hình</string>
+    <string name="title_del_duplicate_config">Delete duplicate config</string>
     <string name="title_del_invalid_config">Xoá cấu hình lỗi (Kiểm tra trước)</string>
     <string name="title_export_all">Xuất và sao chép tất cả cấu hình</string>
     <string name="title_sub_setting">Các gói đăng ký</string>
@@ -177,6 +178,7 @@
     <string name="title_sort_by_test_results">Sắp xếp lại theo lần kiểm tra cuối cùng</string>
     <string name="title_filter_config">Lọc cấu hình theo các gói đăng ký</string>
     <string name="filter_config_all">Hiển thị tất cả các gói đăng ký</string>
+    <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
 
     <string name="tasker_start_service">Bắt đầu v2rayNG</string>
     <string name="tasker_setting_confirm">Xác nhận</string>

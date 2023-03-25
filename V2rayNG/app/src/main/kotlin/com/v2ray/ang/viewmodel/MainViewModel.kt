@@ -201,6 +201,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return -1
     }
 
+    fun removeDuplicateServer() {
+        val deleteServer = mutableListOf<String>()
+        serversCache.forEachIndexed { index, it ->
+            val outbound = it.config.getProxyOutbound()
+            serversCache.forEachIndexed { index2, it2 ->
+                if(index2 > index){
+                    val outbound2 = it2.config.getProxyOutbound()
+                    if( outbound == outbound2 && !deleteServer.contains(it2.guid))
+                    {
+                        deleteServer.add(it2.guid)
+                    }
+                }
+            }
+        }
+        for(it in deleteServer){
+            MmkvManager.removeServer(it)
+        }
+        reloadServerList()
+        getApplication<AngApplication>().toast(getApplication<AngApplication>().getString(R.string.title_del_duplicate_config_count, deleteServer.count()))
+    }
+
     private val mMsgReceiver = object : BroadcastReceiver() {
         override fun onReceive(ctx: Context?, intent: Intent?) {
             when (intent?.getIntExtra("key", 0)) {

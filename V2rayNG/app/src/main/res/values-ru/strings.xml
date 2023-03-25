@@ -165,6 +165,7 @@
     <string name="logcat_clear">Очистить</string>
     <string name="title_service_restart">Перезапуск службы</string>
     <string name="title_del_all_config">Удалить все профили</string>
+    <string name="title_del_duplicate_config">Delete duplicate config</string>
     <string name="title_del_invalid_config">Удалить сбойные профили (после проверки)</string>
     <string name="title_export_all">Экспорт всех профилей в буфер обмена</string>
     <string name="title_sub_setting">Группы</string>
@@ -178,6 +179,7 @@
     <string name="title_sort_by_test_results">Сортировка по результатам теста</string>
     <string name="title_filter_config">Фильтр профилей</string>
     <string name="filter_config_all">Все группы</string>
+    <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
 
     <string name="tasker_start_service">Запуск службы</string>
     <string name="tasker_setting_confirm">Подтвердить</string>

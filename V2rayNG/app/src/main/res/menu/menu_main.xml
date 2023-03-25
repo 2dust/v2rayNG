@@ -74,6 +74,11 @@
         android:title="@string/title_del_all_config"
         app:showAsAction="never" />
     <item
+        android:id="@+id/del_duplicate_config"
+        android:icon="@drawable/ic_delete_white_24dp"
+        android:title="@string/title_del_duplicate_config"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/del_invalid_config"
         android:icon="@drawable/ic_delete_white_24dp"
         android:title="@string/title_del_invalid_config"

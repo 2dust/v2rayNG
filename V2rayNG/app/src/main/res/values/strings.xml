@@ -172,6 +172,7 @@
     <string name="logcat_clear">Clear</string>
     <string name="title_service_restart">Service restart</string>
     <string name="title_del_all_config">Delete all config</string>
+    <string name="title_del_duplicate_config">Delete duplicate config</string>
     <string name="title_del_invalid_config">Delete invalid config(Test first)</string>
     <string name="title_export_all">Export non-custom configs to clipboard</string>
     <string name="title_sub_setting">Subscription group setting</string>
@@ -185,6 +186,7 @@
     <string name="title_sort_by_test_results">Sorting by test results</string>
     <string name="title_filter_config">Filter configuration file</string>
     <string name="filter_config_all">All subscription groups</string>
+    <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
 
     <string name="tasker_start_service">Start Service</string>
     <string name="tasker_setting_confirm">Confirm</string>
