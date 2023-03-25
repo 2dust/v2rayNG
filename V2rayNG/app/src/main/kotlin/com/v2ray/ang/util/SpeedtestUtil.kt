@@ -98,7 +98,7 @@ object SpeedtestUtil {
         var conn: HttpURLConnection? = null
 
         try {
-            val url = URL("https",
+            val url = URL("http",
                     "www.google.com",
                     "/generate_204")
 

@@ -28,6 +28,8 @@ data class ServerConfig(
                                     streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()))
                 EConfigType.CUSTOM, EConfigType.WIREGUARD ->
                     return ServerConfig(configType = configType)
+                EConfigType.LowestPing, EConfigType.LoadBalance, EConfigType.Usage ->
+                    return ServerConfig(configType = configType)
                 EConfigType.SHADOWSOCKS, EConfigType.SOCKS, EConfigType.TROJAN ->
                     return ServerConfig(
                             configType = configType,
