@@ -74,8 +74,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
         val key = MmkvManager.encodeServerConfig("", config)
         serverRawStorage?.encode(key, server)
-        serverList.add(key)
-        serversCache.add(ServersCache(key,config))
+        serverList.add(0, key)
+        serversCache.add(0, ServersCache(key,config))
     }
 
     fun swapServer(fromPosition: Int, toPosition: Int) {

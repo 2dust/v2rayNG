@@ -46,7 +46,7 @@ object MmkvManager {
         serverStorage?.encode(key, Gson().toJson(config))
         val serverList = decodeServerList()
         if (!serverList.contains(key)) {
-            serverList.add(key)
+            serverList.add(0, key)
             mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
             if (mainStorage?.decodeString(KEY_SELECTED_SERVER).isNullOrBlank()) {
                 mainStorage?.encode(KEY_SELECTED_SERVER, key)
