@@ -47,7 +47,7 @@ class UrlSchemeActivity : BaseActivity() {
             val count = AngConfigManager.importBatchConfig(shareUrl, "", false)
             if (count > 0) {
                 toast(R.string.toast_success)
-                val intent = Intent("com.hiddify.UPDATE_UI_ACTION")
+                val intent = Intent(AppConfig.BROADCAST_ACTION_UPDATE_UI)
                 sendBroadcast(intent);
 
 

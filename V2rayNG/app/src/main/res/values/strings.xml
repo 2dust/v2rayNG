@@ -2,6 +2,8 @@
 <resources>
     <string name="title_hiddify">Hiddify</string>
     <string name="fab_start">Start</string>
+    <string name="fab_connected">Connected</string>
+
     <string name="app_name" translatable="false">Hiddify NG</string>
     <string name="app_widget_name">Switch</string>
     <string name="app_tile_name">Switch</string>
@@ -21,7 +23,7 @@
     <string name="toast_services_failure">Start Services Failure</string>
 
     <!--ServerActivity-->
-    <string name="title_server">Configuration file</string>
+    <string name="title_server">Proxies</string>
     <string name="menu_item_add_config">Add config</string>
     <string name="menu_item_save_config">Save config</string>
     <string name="menu_item_del_config">Delete config</string>
@@ -203,7 +205,7 @@
 
     <string name="connection_test_pending">Check Connectivity</string>
     <string name="connection_test_testing">Testing…</string>
-    <string name="connection_test_available">Success: HTTP connection took %dms</string>
+    <string name="connection_test_available">Success: took %dms</string>
     <string name="connection_test_error">Fail to detect internet connection: %s</string>
     <string name="connection_test_fail">Internet Unavailable</string>
     <string name="connection_test_error_status_code">Error code: #%d</string>

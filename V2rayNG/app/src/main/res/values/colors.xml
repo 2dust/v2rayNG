@@ -7,6 +7,8 @@
     <color name="colorUnselected">#B4BEE6</color>
     <color name="colorWhite">#CFD8DC</color>
     <color name="colorBlack">#212121</color>
+    <color name="colorTopBar">#D5DBFA</color>
+
 
     <!--    <color name="colorPrimary">#008577</color>-->
     <!--    <color name="colorPrimaryDark">#00574B</color>-->

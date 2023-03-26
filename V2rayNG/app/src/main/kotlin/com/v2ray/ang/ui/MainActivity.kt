@@ -11,6 +11,8 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -31,6 +33,7 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
@@ -50,6 +53,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private lateinit var binding: ActivityMainBinding
     private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
     private val adapter by lazy { MainRecyclerAdapter(this) }
+    private val subAdapter by lazy { MainSubAdapter(this) }
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
     private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -67,8 +71,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val filter = IntentFilter("com.hiddify.UPDATE_UI_ACTION")
-        registerReceiver(receiver, filter)
+
+        registerReceiver(receiver, IntentFilter(AppConfig.BROADCAST_ACTION_UPDATE_UI))
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
@@ -90,7 +94,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 startV2Ray()
             }
         }
-//        binding.routingSelector.setDropDownViewResource(android.R.layout.simple_spinner_item);
+
+
+
         binding.layoutTest.setOnClickListener {
             if (mainViewModel.isRunning.value == true) {
                 setTestState(getString(R.string.connection_test_testing))
@@ -99,7 +105,26 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //                tv_test_state.text = getString(R.string.connection_test_fail)
             }
         }
+        binding.spSubscriptionId.adapter=subAdapter
+        binding.spSubscriptionId.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>,
+                    view: View?,position: Int,id: Long) {
+                    // called when an item is selected in the Spinner
+//                    val selectedItem = parent.getItemAtPosition(position).toString()
+                    mainViewModel.subscriptionId = mainViewModel.subscriptions[position].first
+                    mainViewModel.reloadServerList()
+                }
 
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    // called when no item is selected in the Spinner
+                }
+            }
+
+//        onItemSelectedListener={
+//            mActivity.mainViewModel.subscriptionId = subId
+//            mActivity.mainViewModel.reloadServerList()
+//        }
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
@@ -115,6 +140,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         toggle.syncState()
         binding.navView.setNavigationItemSelectedListener(this)
         binding.version.text = "v${BuildConfig.VERSION_NAME} (${SpeedtestUtil.getLibVersion()})"
+
+
 
         setupViewModel()
         copyAssets()
@@ -135,11 +162,16 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             if (isRunning) {
                 binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorSelected))
                 setTestState(getString(R.string.connection_connected))
+                binding.fab.text=getString(R.string.fab_connected)
                 binding.layoutTest.isFocusable = true
+                setTestState(getString(R.string.connection_test_testing))
+                mainViewModel.testCurrentServerRealPing()
             } else {
                 binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorUnselected))
                 setTestState(getString(R.string.connection_not_connected))
+                binding.fab.text=getString(R.string.fab_start)
                 binding.layoutTest.isFocusable = false
+
             }
             hideCircle()
         }
@@ -416,6 +448,16 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 var sub = Gson().fromJson(json, SubscriptionItem::class.java)
                 var userinfo=response.headers.getOrDefault("Subscription-Userinfo",null)?.firstOrNull()
                 var homepage=response.headers.getOrDefault("Profile-Web-Page-Url",null)?.firstOrNull()
+                var content_disposition=response.headers.getOrDefault("Content-Disposition",null)?.firstOrNull()
+                var profile_update_interval=response.headers.getOrDefault("Profile-Update-Interval",null)?.firstOrNull()
+                if (!content_disposition.isNullOrEmpty()){
+                    val regex = "filename=\"([^\"]+)\"".toRegex()
+                    val matchResult = regex.find(content_disposition)
+                    sub.remarks = matchResult?.groupValues?.getOrNull(1)?:sub.remarks
+                }else if (!response.url.isNullOrEmpty()){
+                    var uri= Uri.parse(response.url)
+                    sub.remarks = Utils.getQueryParameterValueCaseInsensitive(uri,"Name")?:sub.remarks
+                }
                 if (!homepage.isNullOrEmpty()){
                     sub.home_link=homepage
                 }
@@ -448,9 +490,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append)
         }
         if (count > 0) {
+
+
             toast(R.string.toast_success)
             mainViewModel.reloadServerList()
         } else {
+
             toast(R.string.toast_failure)
         }
     }
@@ -563,8 +608,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     }
                 }
             }
+
         } catch (e: Exception) {
             e.printStackTrace()
+            mainViewModel. testAllRealPing()
             return false
         }
         return true

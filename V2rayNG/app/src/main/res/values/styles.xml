@@ -1,6 +1,10 @@
 <resources>
 
     <style name="AppThemeDayNight" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+        <item name="android:spinnerStyle">@style/MySpinnerStyle</item>
+
+
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -12,8 +16,12 @@
         <item name="buttonStyle">@style/RobotoButtonStyle</item>
 
         <item name="navigationViewStyle">@style/AppNavigationViewStyle</item>
+        <item name="android:toolbarStyle">@style/CustomToolbar</item>
     </style>
-
+    <style name="CustomToolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:backgroundTint">@color/colorPrimaryDark</item>
+    </style>
     <style name="AppThemeDayNight.NoActionBar" parent="AppThemeDayNight">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -21,6 +29,7 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+
         <!-- Customize your theme here. -->
         <!--<item name="colorPrimary">@color/colorPrimary</item>-->
         <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
@@ -63,4 +72,11 @@
         <item name="fontFamily">@font/vazirmatn_regular</item>
 
     </style>
+
+    <style name="MySpinnerStyle" parent="Widget.AppCompat.Spinner">
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textColorPrimary">@color/colorWhite</item>
+    </style>
+
+
 </resources>

@@ -15,6 +15,7 @@ import android.content.ClipData
 import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.icu.util.Calendar
 import android.net.Uri
 import android.os.Build
 import android.os.LocaleList
@@ -392,9 +393,9 @@ object Utils {
             it.bufferedReader().readText()
         }
 
-        return Response(headers, content)
+        return Response(headers, content,urlStr)
     }
-    data class Response(val headers: Map<String, List<String>>?, val content: String?)
+    data class Response(val headers: Map<String, List<String>>?, val content: String?,val url:String?=null)
 
 
     fun getDarkModeStatus(context: Context): Boolean {
@@ -443,11 +444,39 @@ object Utils {
         return URL(url.protocol, IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED), url.port, url.file)
             .toExternalForm()
     }
+    fun toGig(inbytes:Long):String{
+        var gb =inbytes.toDouble() / 1073741824.0
+        return String.format("%.1f GB", gb)
+    }
     fun timeToRelativeDate(time: Long): String {
-        val now = System.currentTimeMillis()
-        val diffInMillis = now - time
-        val flags = DateUtils.FORMAT_NO_MONTH_DAY //or FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_ABBREV_MONTH
-        return DateUtils.getRelativeTimeSpanString(time, now, diffInMillis, flags).toString()
+        if (time<0)
+            return ""
+
+        val now = System.currentTimeMillis()/1000
+        val diffInMillis = (time-now)/86400
+        val flags = DateUtils.FORMAT_SHOW_DATE// or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_ABBREV_MONTH
+        if (diffInMillis<0)
+            return "Expired"
+        return "Remain "+ diffInMillis.toInt() +" days"
+
+    }
+    fun timeToRelativeDateOld(time: Long): String {
+        if (time<0)
+            return ""
+
+        val now = System.currentTimeMillis()/1000
+        val diffInMillis = (time-now)/86400
+        val flags = DateUtils.FORMAT_SHOW_DATE// or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_ABBREV_MONTH
+        if (diffInMillis<0)
+            return "Expired "+ (-diffInMillis.toInt()) +" days ago"
+        return "Expire in "+ diffInMillis.toInt() +" days"
+
+    }
+
+    fun getQueryParameterValueCaseInsensitive(uri: Uri, paramName: String): String? {
+        val queryParameters = uri.queryParameterNames.associateWith { uri.getQueryParameter(it) }
+        val lowercaseParamName = paramName.toLowerCase()
+        return queryParameters.keys.find { it.toLowerCase() == lowercaseParamName }?.let { queryParameters[it] }
     }
 }
 

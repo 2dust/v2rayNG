@@ -43,6 +43,8 @@ object AppConfig {
     const val HTTP_PROTOCOL: String = "http://"
     const val HTTPS_PROTOCOL: String = "https://"
 
+    const val BROADCAST_ACTION_UPDATE_UI ="com.hiddify.UPDATE_UI_ACTION"
+    const val BROADCAST_ACTION_PING_TEST ="com.hiddify.PING_TEST_ACTION"
     const val BROADCAST_ACTION_SERVICE = "com.hiddify.ang.action.service"
     const val BROADCAST_ACTION_ACTIVITY = "com.hiddify.ang.action.activity"
     const val BROADCAST_ACTION_WIDGET_CLICK = "com.hiddify.ang.action.widget.click"
@@ -86,4 +88,7 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG = 7
     const val MSG_MEASURE_CONFIG_SUCCESS = 71
     const val MSG_MEASURE_CONFIG_CANCEL = 72
+
+
+    const val MSG_HIDDIFY_DO_TEST_PING = 1001
 }

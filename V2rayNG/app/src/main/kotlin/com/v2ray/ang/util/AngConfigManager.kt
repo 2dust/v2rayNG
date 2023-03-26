@@ -345,7 +345,6 @@ object AngConfigManager {
                 val pbk = queryParam["pbk"] ?: ""
                 val sid = queryParam["sid"] ?: ""
                 val spx =  Utils.urlDecode(queryParam["spx"] ?: "")
-                var allowInsecure=(queryParam["allowInsecure"]?:"")=="true"
                 streamSetting.populateTlsSettings(queryParam["security"] ?: "", allowInsecure,
                         queryParam["sni"] ?: sni, fingerprint, queryParam["alpn"], pbk, sid, spx)
             }
@@ -356,7 +355,10 @@ object AngConfigManager {
             val guid = MmkvManager.encodeServerConfig("", config)
             if (removedSelectedServer != null &&
                     config.getProxyOutbound()?.getServerAddress() == removedSelectedServer.getProxyOutbound()?.getServerAddress() &&
-                    config.getProxyOutbound()?.getServerPort() == removedSelectedServer.getProxyOutbound()?.getServerPort()) {
+                    config.getProxyOutbound()?.getServerPort() == removedSelectedServer.getProxyOutbound()?.getServerPort()
+                    && config.remarks==removedSelectedServer.remarks
+
+                    ) {
                 mainStorage?.encode(KEY_SELECTED_SERVER, guid)
             }
         } catch (e: Exception) {
@@ -388,6 +390,7 @@ object AngConfigManager {
                 vnext.users[0].alterId = alterId.toInt()
             }
             var fingerprint = streamSetting.tlsSettings?.fingerprint
+            var allowInsecure=(queryParam["allowInsecure"]?:"")=="true"
             val sni = streamSetting.populateTransportSettings(protocol, queryParam["type"],
                     queryParam["host"]?.split("|")?.get(0) ?: "",
                     queryParam["path"]?.takeIf { it.trim() != "/" } ?: "", queryParam["seed"], queryParam["security"],
@@ -497,6 +500,7 @@ object AngConfigManager {
                     Utils.encode(json)
                 }
                 EConfigType.CUSTOM, EConfigType.WIREGUARD -> ""
+                EConfigType.LowestPing, EConfigType.LoadBalance,EConfigType.Usage -> ""
                 EConfigType.SHADOWSOCKS -> {
                     val remark = "#" + Utils.urlEncode(config.remarks)
                     val pw = Utils.encode("${outbound.getSecurityEncryption()}:${outbound.getPassword()}")
@@ -736,9 +740,10 @@ object AngConfigManager {
             if (servers == null) {
                 return 0
             }
-            val removedSelectedServer =
+            var selected_server_guid=mainStorage?.decodeString(KEY_SELECTED_SERVER) ?: ""
+            var removedSelectedServer=
                     if (!TextUtils.isEmpty(subid) && !append) {
-                        MmkvManager.decodeServerConfig(mainStorage?.decodeString(KEY_SELECTED_SERVER) ?: "")?.let {
+                        MmkvManager.decodeServerConfig(selected_server_guid)?.let {
                             if (it.subscriptionId == subid) {
                                 return@let it
                             }
@@ -750,6 +755,8 @@ object AngConfigManager {
             if(!append) {
                 MmkvManager.removeServerViaSubid(subid)
             }
+            MmkvManager.encodeServerConfig(subid+1, ServerConfig(configType = EConfigType.LoadBalance, remarks = "LoadBalance", subscriptionId = subid))
+            MmkvManager.encodeServerConfig(subid+2, ServerConfig(configType = EConfigType.LowestPing, remarks = "LowestPing", subscriptionId = subid))
 //            var servers = server
 //            if (server.indexOf("vmess") >= 0 && server.indexOf("vmess") == server.lastIndexOf("vmess")) {
 //                servers = server.replace("\n", "")
@@ -763,10 +770,19 @@ object AngConfigManager {
                             count++
                         }
                     }
+            if (selected_server_guid==subid+"1"|| selected_server_guid==subid+"2"){
+                mainStorage?.encode(KEY_SELECTED_SERVER, selected_server_guid)
+            }
+            if (count==0){
+                MmkvManager.removeServer(subid+"1")
+                MmkvManager.removeServer(subid+"2")
+            }
             return count
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        MmkvManager.removeServer(subid+"1")
+        MmkvManager.removeServer(subid+"2")
         return 0
     }
 }

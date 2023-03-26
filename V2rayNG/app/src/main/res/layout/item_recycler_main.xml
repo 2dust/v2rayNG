@@ -3,6 +3,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/item_bg"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical">
@@ -44,7 +45,7 @@
                         android:id="@+id/tv_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:maxLines="2"
+                        android:maxLines="1"
                         android:minLines="1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
@@ -68,13 +69,14 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="end|center_vertical"
                 android:orientation="vertical">
 
                 <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="end"
                         android:paddingEnd="5dp">
 
                     <TextView
@@ -86,16 +88,21 @@
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
                             android:textColor="@color/colorSubscription"
                             android:textSize="10sp"
+                            android:visibility="gone"
                             tools:text="Sub" />
 
                     <TextView
+
                             android:id="@+id/tv_test_result"
+
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:lines="1"
+
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
                             android:textColor="@color/colorPing"
                             android:textSize="10sp"
+
                             tools:text="214ms" />
                 </LinearLayout>
 
@@ -103,7 +110,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:gravity="center"
+                    android:gravity="end|center_vertical"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -146,6 +153,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+
                         android:id="@+id/layout_remove"
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/server_height"

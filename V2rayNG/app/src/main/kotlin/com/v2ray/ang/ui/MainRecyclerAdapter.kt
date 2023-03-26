@@ -76,13 +76,15 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             } else {
                 holder.itemMainBinding.layoutIndicator.setBackgroundResource(R.color.colorUnselected)
             }
-            holder.itemMainBinding.tvSubscription.text = ""
-            val json = subStorage?.decodeString(config.subscriptionId)
-            if (!json.isNullOrBlank()) {
-                val sub = Gson().fromJson(json, SubscriptionItem::class.java)
-                holder.itemMainBinding.tvSubscription.text = sub.remarks
-            }
 
+            holder.itemMainBinding.tvStatistics.visibility=View.VISIBLE
+            holder.itemMainBinding.layoutShare.visibility=View.VISIBLE
+            holder.itemMainBinding.layoutEdit.visibility=View.VISIBLE
+            holder.itemMainBinding.layoutRemove.visibility=View.VISIBLE
+            if (!config.subscriptionId.isNullOrEmpty()){
+                holder.itemMainBinding.layoutShare.visibility=View.GONE
+                holder.itemMainBinding.layoutRemove.visibility=View.GONE
+            }
             var shareOptions = share_method.asList()
             when (config.configType) {
                 EConfigType.CUSTOM -> {
@@ -92,9 +94,22 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 EConfigType.VLESS -> {
                     holder.itemMainBinding.tvType.text = config.configType.name
                 }
+                EConfigType.LowestPing,EConfigType.LoadBalance->{
+                    holder.itemMainBinding.tvStatistics.visibility=View.GONE
+                    holder.itemMainBinding.layoutShare.visibility=View.GONE
+                    holder.itemMainBinding.layoutEdit.visibility=View.GONE
+                    holder.itemMainBinding.layoutRemove.visibility=View.GONE
+                }
                 else -> {
                     holder.itemMainBinding.tvType.text = config.configType.name.lowercase()
                 }
+            }
+            holder.itemMainBinding.tvSubscription.text = ""
+            val json = subStorage?.decodeString(config.subscriptionId)
+            if (!json.isNullOrBlank()) {
+                val sub = Gson().fromJson(json, SubscriptionItem::class.java)
+//                holder.itemMainBinding.tvSubscription.text = sub.remarks
+                holder.itemMainBinding.tvType.text= sub.remarks
             }
             holder.itemMainBinding.tvStatistics.text = "${outbound?.getServerAddress()} : ${outbound?.getServerPort()}"
 

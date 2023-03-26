@@ -10,6 +10,7 @@ import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ERoutingMode
+import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_NETWORK
 import com.v2ray.ang.dto.V2rayConfig.Companion.HTTP
 
@@ -35,6 +36,10 @@ object V2rayConfigUtil {
                 Log.d(ANG_PACKAGE, customConfig)
                 return Result(true, customConfig)
             }
+            if (config.configType == EConfigType.LoadBalance || config.configType == EConfigType.LowestPing) {
+                val result = getBalancerConfig(context, config)
+                return result
+            }
             val outbound = config.getProxyOutbound() ?: return Result(false, "")
             val result = getV2rayNonCustomConfig(context, outbound)
             Log.d(ANG_PACKAGE, result.content)
@@ -44,6 +49,50 @@ object V2rayConfigUtil {
             return Result(false, "")
         }
     }
+
+    /**
+     * 生成v2ray的客户端配置文件
+     */
+    private fun getBalancerConfig(context: Context, proxyItem: ServerConfig): Result {
+        val result = Result(false, "")
+        //取得默认配置
+        val assets = Utils.readTextFromAssets(context, "v2ray_config.json")
+        if (TextUtils.isEmpty(assets)) {
+            return result
+        }
+
+        //转成Json
+        val v2rayConfig = Gson().fromJson(assets, V2rayConfig::class.java) ?: return result
+
+        v2rayConfig.log.loglevel = settingsStorage?.decodeString(AppConfig.PREF_LOGLEVEL)
+            ?: "warning"
+
+        inbounds(v2rayConfig)
+
+
+//        var sublinks=subs.getOrNull(proxyItem.subscriptionId?!"")
+//        httpRequestObject(outbound)
+//
+//        v2rayConfig.outbounds[0] = outbound
+
+        routing(v2rayConfig)
+
+        fakedns(v2rayConfig)
+
+        dns(v2rayConfig)
+
+        if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
+            customLocalDns(v2rayConfig)
+        }
+        if (settingsStorage?.decodeBool(AppConfig.PREF_SPEED_ENABLED) != true) {
+            v2rayConfig.stats = null
+            v2rayConfig.policy = null
+        }
+        result.status = true
+        result.content = v2rayConfig.toPrettyPrinting()
+        return result
+    }
+
 
     /**
      * 生成v2ray的客户端配置文件

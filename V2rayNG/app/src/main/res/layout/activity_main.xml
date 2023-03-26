@@ -19,10 +19,44 @@
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
+                android:background="@color/colorPrimary"
+
                 android:layout_height="?attr/actionBarSize" />
+
 
         </com.google.android.material.appbar.AppBarLayout>
 
+<GridLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorTopBar"
+    >
+    <Spinner
+        android:id="@+id/sp_subscriptionId"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"/>
+    <Spinner
+        android:layout_gravity="end|center_vertical"
+        android:id="@+id/routing_selector"
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
+
+        android:dropDownWidth="wrap_content"
+        android:spinnerMode="dropdown"
+        android:defaultValue="0"
+
+        android:gravity="center_vertical"
+
+        android:layout_margin="0dp"
+        android:paddingBottom="10dp"
+        android:paddingEnd="0dp"
+        android:paddingStart="0dp"
+        android:entries="@array/routing_mode"
+        android:entryValues="@array/routing_mode_value"
+        />
+
+</GridLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -49,7 +83,7 @@
                         android:id="@+id/layout_test"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/connection_test_height"
-                        android:background="?attr/colorPrimary"
+                        android:background="@color/colorPrimary"
                         android:gravity="center|start"
                         android:nextFocusRight="@+id/fab"
                         android:clickable="true"
@@ -63,54 +97,29 @@
                             android:maxLines="2"
                             android:minLines="1"
                             android:paddingStart="16dp"
+
                             android:text="@string/connection_test_pending"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
                             android:textColor="@color/colorWhite" />
 
                     </LinearLayout>
                 </LinearLayout>
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_gravity="bottom|end"
-                    android:textAlignment="textEnd"
 
-                    >
                     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                         android:id="@+id/fab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
+                        android:layout_gravity="end|bottom"
 
                         android:contentDescription="@string/fab_start"
                         android:text="@string/fab_start"
                         android:fontFamily="@font/vazirmatn_regular"
-                        android:layout_marginBottom="10dp"
+                        android:layout_marginBottom="40dp"
                         android:layout_marginEnd="16dp"
                         app:backgroundTint="?attr/colorAccent"
                         app:icon="@drawable/ic_hiddify"/>
-                    <Spinner
-                        android:id="@+id/routing_selector"
-                        android:layout_width="match_parent"
 
-                        android:layout_height="wrap_content"
-                        android:textAlignment="textStart"
-                        android:dropDownWidth="wrap_content"
-                        android:spinnerMode="dropdown"
-                        android:defaultValue="0"
 
-                        android:layout_gravity="center_horizontal"
-                        android:layout_margin="0dp"
-                        android:paddingBottom="10dp"
-                        android:paddingEnd="0dp"
-                        android:paddingStart="0dp"
-
-                        android:entries="@array/routing_mode"
-                        android:entryValues="@array/routing_mode_value"
-                        />
-
-                </LinearLayout>
 
 
             </androidx.coordinatorlayout.widget.CoordinatorLayout>

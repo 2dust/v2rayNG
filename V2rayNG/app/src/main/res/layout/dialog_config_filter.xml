@@ -16,7 +16,7 @@
             android:orientation="vertical">
 
             <Spinner
-                android:id="@+id/sp_subscriptionId"
+                android:id="@+id/sp_subscriptionId2"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/edit_height"/>
         </LinearLayout>

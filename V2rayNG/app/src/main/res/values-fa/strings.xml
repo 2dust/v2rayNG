@@ -2,6 +2,7 @@
 <resources>
     <string name="title_hiddify">هیدیفای</string>
     <string name="fab_start">اجرا</string>
+    <string name="fab_connected">متصل</string>
     <string name="app_name" translatable="false">هیدیفای</string>
     <string name="app_widget_name">تعویض</string>
     <string name="app_tile_name">تعویض</string>
@@ -38,7 +39,7 @@
     <string name="menu_item_import_config_custom_url">پیکربندی سفارشی را از طریق نشانی اینترنتی وارد کنید</string>
     <string name="menu_item_import_config_custom_url_scan">نشانی اینترنتی اسکن پیکربندی سفارشی را وارد کنید</string>
     <string name="del_config_comfirm">تایید حذف؟</string>
-    <string name="server_lab_remarks">ملاحظات</string>
+    <string name="server_lab_remarks">نام</string>
     <string name="server_lab_address">نشانی</string>
     <string name="server_lab_port">پورت</string>
     <string name="server_lab_id">شناسه</string>
@@ -196,7 +197,7 @@
 
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
     <string name="connection_test_testing">در حال بررسی...</string>
-    <string name="connection_test_available">موفق: اتصال %dms طول کشید</string>
+    <string name="connection_test_available">موفق: %dms </string>
     <string name="connection_test_error">خطا در اتصال: %s</string>
     <string name="connection_test_fail">اینترنت در دسترس نیست</string>
     <string name="connection_test_error_status_code">کد خطا: #%d</string>

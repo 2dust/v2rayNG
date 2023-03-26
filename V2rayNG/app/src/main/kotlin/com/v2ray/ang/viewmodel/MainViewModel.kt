@@ -26,11 +26,11 @@ import java.util.*
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
-
+    var subscriptions = MmkvManager.decodeSubscriptions()
     var serverList = MmkvManager.decodeServerList()
     var subscriptionId: String = ""
     var keywordFilter: String = ""
-        private set
+        public set
     val serversCache = mutableListOf<ServersCache>()
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
@@ -54,8 +54,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun reloadServerList() {
         serverList = MmkvManager.decodeServerList()
+        subscriptions = MmkvManager.decodeSubscriptions()
         updateCache()
         updateListAction.value = -1
+        MessageUtil.sendMsg2UI(getApplication(),AppConfig.MSG_HIDDIFY_DO_TEST_PING,"")
     }
 
     fun removeServer(guid: String) {
@@ -144,6 +146,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         MessageUtil.sendMsg2Service(getApplication(), AppConfig.MSG_MEASURE_DELAY, "")
     }
 
+
     fun filterConfig(context :Context) {
         val subscriptions = MmkvManager.decodeSubscriptions()
         val listId = subscriptions.map { it.first }.toList().toMutableList()
@@ -156,14 +159,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         val ivBinding = DialogConfigFilterBinding.inflate(LayoutInflater.from(context))
-        ivBinding.spSubscriptionId.adapter = ArrayAdapter<String>( context, android.R.layout.simple_spinner_dropdown_item, listRemarks)
-        ivBinding.spSubscriptionId.setSelection(checkedItem)
+        ivBinding.spSubscriptionId2.adapter = ArrayAdapter<String>( context, android.R.layout.simple_spinner_dropdown_item, listRemarks)
+        ivBinding.spSubscriptionId2.setSelection(checkedItem)
         ivBinding.etKeyword.text = Utils.getEditable(keywordFilter)
         val builder = AlertDialog.Builder(context).setView(ivBinding.root)
         builder.setTitle(R.string.title_filter_config)
         builder.setPositiveButton(R.string.tasker_setting_confirm) { dialogInterface: DialogInterface?, _: Int ->
             try {
-                val position = ivBinding.spSubscriptionId.selectedItemPosition
+                val position = ivBinding.spSubscriptionId2.selectedItemPosition
                 subscriptionId = if (listRemarks.count() - 1 == position) {
                     ""
                 } else {
@@ -250,6 +253,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val resultPair = intent.getSerializableExtra("content") as Pair<String, Long>
                     MmkvManager.encodeServerTestDelayMillis(resultPair.first, resultPair.second)
                     updateListAction.value = getPosition(resultPair.first)
+                }
+                AppConfig.MSG_HIDDIFY_DO_TEST_PING->{
+                    testAllRealPing()
                 }
             }
         }

@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubEditBinding
 import com.v2ray.ang.dto.SubscriptionItem
@@ -89,7 +90,7 @@ class SubEditActivity : BaseActivity() {
 
         subStorage?.encode(subId, Gson().toJson(subItem))
         toast(R.string.toast_success)
-        val intent = Intent("com.hiddify.UPDATE_UI_ACTION")
+        val intent = Intent(AppConfig.BROADCAST_ACTION_UPDATE_UI)
         sendBroadcast(intent);
         finish()
         return true
