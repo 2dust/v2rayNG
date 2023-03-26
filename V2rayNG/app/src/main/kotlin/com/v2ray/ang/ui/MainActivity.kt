@@ -22,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.navigation.NavigationView
+import com.google.gson.Gson
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
@@ -30,6 +31,7 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.service.V2RayServiceManager
@@ -46,7 +48,7 @@ import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var binding: ActivityMainBinding
-
+    private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
     private val adapter by lazy { MainRecyclerAdapter(this) }
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
@@ -391,12 +393,46 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
         return true
     }
-
     fun importBatchConfig(server: String?, subid: String = "") {
+        return importBatchConfig(Utils.Response(null,server),subid)
+    }
+    fun importBatchConfig(response: Utils.Response?, subid: String = "") {
+        var server=response?.content
         val subid2 = if(subid.isNullOrEmpty()){
             mainViewModel.subscriptionId
         }else{
             subid
+        }
+        if( !subid.isNullOrEmpty() && response?.headers!=null) {
+            val json = subStorage?.decodeString(subid)
+            if (!json.isNullOrBlank()) {
+                var sub = Gson().fromJson(json, SubscriptionItem::class.java)
+                var userinfo=response.headers.getOrDefault("Subscription-Userinfo",null)?.firstOrNull()
+                var homepage=response.headers.getOrDefault("Profile-Web-Page-Url",null)?.firstOrNull()
+                if (!homepage.isNullOrEmpty()){
+                    sub.home_link=homepage
+                }
+                if (!userinfo.isNullOrEmpty()){
+                    fun get(regex: String): String? {
+                        return regex.toRegex().findAll(userinfo).mapNotNull {
+                            if (it.groupValues.size > 1) it.groupValues[1] else null
+                        }.firstOrNull();
+                    }
+
+                    sub.used = 0
+                    get("upload=([0-9]+)")?.apply {
+                        sub.used += toLong()
+                    }
+                    get("download=([0-9]+)")?.apply {
+                        sub.used += toLong()
+                    }
+                    sub.total = get("total=([0-9]+)")?.toLong() ?: 0
+
+                    sub.expire=get("expire=([0-9]+)")?.toLong() ?: 0
+                }
+
+                subStorage?.encode(subid, Gson().toJson(sub))
+            }
         }
         val append = subid.isNullOrEmpty()
 
@@ -420,7 +456,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 toast(R.string.toast_none_data_clipboard)
                 return false
             }
-            importCustomizeConfig(configText)
+            importCustomizeConfig(Utils.Response(null,configText))
             return true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -470,7 +506,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     Utils.getUrlContentWithCustomUserAgent(url)
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    ""
+                    Utils.Response(null,"")
                 }
                 launch(Dispatchers.Main) {
                     importCustomizeConfig(configText)
@@ -559,6 +595,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     if (it) {
                         try {
                             contentResolver.openInputStream(uri).use { input ->
+
                                 importCustomizeConfig(input?.bufferedReader()?.readText())
                             }
                         } catch (e: Exception) {
@@ -572,13 +609,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     /**
      * import customize config
      */
-    fun importCustomizeConfig(server: String?) {
+    fun importCustomizeConfig(response: String?) {
+        return importCustomizeConfig(Utils.Response(null,response))
+
+    }
+    fun importCustomizeConfig(response: Utils.Response) {
+        val server=response?.content
         try {
             if (server == null || TextUtils.isEmpty(server)) {
                 toast(R.string.toast_none_data)
                 return
             }
-            mainViewModel.appendCustomConfigServer(server)
+            mainViewModel.appendCustomConfigServer(response)
             mainViewModel.reloadServerList()
             toast(R.string.toast_success)
             //adapter.notifyItemInserted(mainViewModel.serverList.lastIndex)

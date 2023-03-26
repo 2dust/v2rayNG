@@ -67,7 +67,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun appendCustomConfigServer(server: String) {
+    fun appendCustomConfigServer(response: Utils.Response) {
+        val server=response.content;
         val config = ServerConfig.create(EConfigType.CUSTOM)
         config.remarks = System.currentTimeMillis().toString()
         config.subscriptionId = subscriptionId

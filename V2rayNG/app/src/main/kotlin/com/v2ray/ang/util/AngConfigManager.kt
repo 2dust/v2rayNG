@@ -495,6 +495,7 @@ object AngConfigManager {
                     Utils.encode(json)
                 }
                 EConfigType.CUSTOM, EConfigType.WIREGUARD -> ""
+                EConfigType.LoadBalance, EConfigType.LowestPing,EConfigType.Usage -> ""
                 EConfigType.SHADOWSOCKS -> {
                     val remark = "#" + Utils.urlEncode(config.remarks)
                     val pw = Utils.encode("${outbound.getSecurityEncryption()}:${outbound.getPassword()}")

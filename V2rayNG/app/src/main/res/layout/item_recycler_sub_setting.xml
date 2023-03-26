@@ -21,11 +21,11 @@
             android:background="?android:attr/selectableItemBackground"
             android:nextFocusRight="@+id/layout_edit"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/server_height"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
             android:orientation="horizontal">
-
+            <!--            android:layout_height="@dimen/server_height"-->
             <LinearLayout
                     android:id="@+id/chk_enable"
                     android:layout_width="10dp"
@@ -51,7 +51,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:lines="1"
+                    android:text="DD\nDDDDDDDDDDd\nnnn\ndddddd"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
             </LinearLayout>

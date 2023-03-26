@@ -10,6 +10,7 @@ import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ItemRecyclerSubSettingBinding
 import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.Utils
 
 class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView.Adapter<SubSettingRecyclerAdapter.MainViewHolder>() {
 
@@ -22,7 +23,9 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
         val subId = mActivity.subscriptions[position].first
         val subItem = mActivity.subscriptions[position].second
         holder.itemSubSettingBinding.tvName.text = subItem.remarks
-        holder.itemSubSettingBinding.tvUrl.text = subItem.url
+        var tmp = subItem.url
+        tmp+="\nused="+subItem.used+"\ntotal="+subItem.total+"\nexpire="+ Utils.timeToRelativeDate(subItem.expire)+"\nhome="+subItem.home_link
+        holder.itemSubSettingBinding.tvUrl.text=tmp
         if (subItem.enabled) {
             holder.itemSubSettingBinding.chkEnable.setBackgroundResource(R.color.colorSelected)
         } else {

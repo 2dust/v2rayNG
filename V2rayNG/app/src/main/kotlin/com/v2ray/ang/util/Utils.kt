@@ -18,6 +18,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import android.os.Build
 import android.os.LocaleList
+import android.text.format.DateUtils
 import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
@@ -374,7 +375,7 @@ object Utils {
     }
 
     @Throws(IOException::class)
-    fun getUrlContentWithCustomUserAgent(urlStr: String?): String {
+    fun getUrlContentWithCustomUserAgent(urlStr: String?): Response {
         val url = URL(urlStr)
         val conn = url.openConnection()
         conn.setRequestProperty("Connection", "close")
@@ -384,10 +385,17 @@ object Utils {
                 "Basic ${encode(urlDecode(it))}")
         }
         conn.useCaches = false
-        return conn.inputStream.use {
+
+        val headers = conn.headerFields
+
+        val content = conn.inputStream.use {
             it.bufferedReader().readText()
         }
+
+        return Response(headers, content)
     }
+    data class Response(val headers: Map<String, List<String>>?, val content: String?)
+
 
     fun getDarkModeStatus(context: Context): Boolean {
         val mode = context.resources.configuration.uiMode and UI_MODE_NIGHT_MASK
@@ -434,6 +442,12 @@ object Utils {
         val url = URL(str)
         return URL(url.protocol, IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED), url.port, url.file)
             .toExternalForm()
+    }
+    fun timeToRelativeDate(time: Long): String {
+        val now = System.currentTimeMillis()
+        val diffInMillis = now - time
+        val flags = DateUtils.FORMAT_NO_MONTH_DAY //or FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_ABBREV_MONTH
+        return DateUtils.getRelativeTimeSpanString(time, now, diffInMillis, flags).toString()
     }
 }
 
