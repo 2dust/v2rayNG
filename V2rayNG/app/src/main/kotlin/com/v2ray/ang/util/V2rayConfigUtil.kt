@@ -151,7 +151,7 @@ object V2rayConfigUtil {
 
             v2rayConfig.routing.domainStrategy = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY)
                     ?: "IPIfNonMatch"
-            v2rayConfig.routing.domainMatcher = "mph"
+//            v2rayConfig.routing.domainMatcher = "mph"
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: ERoutingMode.GLOBAL_PROXY.value
 
             // Hardcode googleapis.cn

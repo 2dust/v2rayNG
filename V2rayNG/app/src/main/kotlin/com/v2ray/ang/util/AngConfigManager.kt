@@ -342,9 +342,12 @@ object AngConfigManager {
                         queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
                         queryParam["mode"], queryParam["serviceName"])
                 fingerprint = queryParam["fp"] ?: ""
+                val pbk = queryParam["pbk"] ?: ""
+                val sid = queryParam["sid"] ?: ""
+                val spx =  Utils.urlDecode(queryParam["spx"] ?: "")
                 var allowInsecure=(queryParam["allowInsecure"]?:"")=="true"
                 streamSetting.populateTlsSettings(queryParam["security"] ?: "", allowInsecure,
-                        queryParam["sni"] ?: sni, fingerprint, queryParam["alpn"], null, null, null)
+                        queryParam["sni"] ?: sni, fingerprint, queryParam["alpn"], pbk, sid, spx)
             }
             if (config == null){
                 return R.string.toast_incorrect_protocol
@@ -385,7 +388,6 @@ object AngConfigManager {
                 vnext.users[0].alterId = alterId.toInt()
             }
             var fingerprint = streamSetting.tlsSettings?.fingerprint
-            var allowInsecure=(queryParam["allowInsecure"]?:"")=="true"
             val sni = streamSetting.populateTransportSettings(protocol, queryParam["type"],
                     queryParam["host"]?.split("|")?.get(0) ?: "",
                     queryParam["path"]?.takeIf { it.trim() != "/" } ?: "", queryParam["seed"], queryParam["security"],
@@ -495,7 +497,6 @@ object AngConfigManager {
                     Utils.encode(json)
                 }
                 EConfigType.CUSTOM, EConfigType.WIREGUARD -> ""
-                EConfigType.LoadBalance, EConfigType.LowestPing,EConfigType.Usage -> ""
                 EConfigType.SHADOWSOCKS -> {
                     val remark = "#" + Utils.urlEncode(config.remarks)
                     val pw = Utils.encode("${outbound.getSecurityEncryption()}:${outbound.getPassword()}")
@@ -546,6 +547,15 @@ object AngConfigManager {
                         }
                         if (!TextUtils.isEmpty(tlsSetting.fingerprint)) {
                             dicQuery["fp"] = tlsSetting.fingerprint!!
+                        }
+                        if (!TextUtils.isEmpty(tlsSetting.publicKey)) {
+                            dicQuery["pbk"] = tlsSetting.publicKey!!
+                        }
+                        if (!TextUtils.isEmpty(tlsSetting.shortId)) {
+                            dicQuery["sid"] = tlsSetting.shortId!!
+                        }
+                        if (!TextUtils.isEmpty(tlsSetting.spiderX)) {
+                            dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX!!)
                         }
                     }
                     dicQuery["type"] = streamSetting.network.ifEmpty { V2rayConfig.DEFAULT_NETWORK }

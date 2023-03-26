@@ -191,7 +191,7 @@ data class V2rayConfig(
                                        val disableSystemRoot: Boolean? = null,
                                        val enableSessionResumption: Boolean? = null,
                     // REALITY settings
-                                       val show: Boolean = true,
+                                       val show: Boolean = false,
                                        var publicKey: String? = null,
                                        var shortId: String? = null,
                                        var spiderX: String? = null)
@@ -447,7 +447,7 @@ data class V2rayConfig(
                            var poolSize: Int = 10000) // roughly 10 times smaller than total ip pool
 
     fun getProxyOutbound(): OutboundBean? {
-        outbounds.forEach { outbound ->
+        outbounds?.forEach { outbound ->
             EConfigType.values().forEach {
                 if (outbound.protocol.equals(it.name, true)) {
                     return outbound
