@@ -60,7 +60,7 @@ data class V2rayConfig(
                                 val metadataOnly: Boolean? = null)
     }
 
-    data class OutboundBean(val tag: String = "proxy",
+    data class OutboundBean(var tag: String = "proxy",
                             var protocol: String,
                             var settings: OutSettingsBean? = null,
                             var streamSettings: StreamSettingsBean? = null,
@@ -412,12 +412,12 @@ data class V2rayConfig(
     data class RoutingBean(var domainStrategy: String,
                            var domainMatcher: String? = null,
                            var rules: ArrayList<RulesBean>,
-                           val balancers: List<Any>? = null) {
+                           var balancers: List<BalancerBean>? = null) {
 
         data class RulesBean(var type: String = "",
                              var ip: ArrayList<String>? = null,
                              var domain: ArrayList<String>? = null,
-                             var outboundTag: String = "",
+                             var outboundTag: String? = "",
                              var balancerTag: String? = null,
                              var port: String? = null,
                              val sourcePort: String? = null,
@@ -468,4 +468,9 @@ data class V2rayConfig(
                 .create()
                 .toJson(this)
     }
+
+    data class BalancerBean(var tag: String?=null,var selector:List<String>?=null, var strategy:BalancerStrategyBean?=null, var optimalSettings: OptimalBalancerStrategySetting?=null)
+    data class BalancerStrategyBean(var type: String?=null)
+    data class OptimalBalancerStrategySetting(var timeout: Int?=null,var interval: Int?=null, var url: String?=null, var count:Int?=null)
+
 }

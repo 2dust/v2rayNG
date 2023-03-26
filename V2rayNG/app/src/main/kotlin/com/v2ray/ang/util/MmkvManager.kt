@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.dto.ServerAffiliationInfo
 import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.dto.SubscriptionItem
 
 object MmkvManager {
@@ -178,5 +179,17 @@ object MmkvManager {
         mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
     }
 
+
+    fun getServerConfigs(subid: String?):List<Pair<String,ServerConfig>>{
+        var res=ArrayList<Pair<String,ServerConfig>>()
+        for (guid in MmkvManager.decodeServerList()) {
+            val config = MmkvManager.decodeServerConfig(guid) ?: continue
+            if (!subid.isNullOrEmpty() && subid != config.subscriptionId) {
+                continue
+            }
+            res.add(Pair(guid,config))
+        }
+        return res
+    }
 
 }

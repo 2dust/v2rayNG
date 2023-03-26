@@ -3,16 +3,17 @@ package com.v2ray.ang.util
 import android.content.Context
 import android.text.TextUtils
 import android.util.Log
-import com.google.gson.*
+import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
-import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ERoutingMode
 import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_NETWORK
 import com.v2ray.ang.dto.V2rayConfig.Companion.HTTP
+
 
 object V2rayConfigUtil {
     private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
@@ -70,12 +71,29 @@ object V2rayConfigUtil {
         inbounds(v2rayConfig)
 
 
-//        var sublinks=subs.getOrNull(proxyItem.subscriptionId?!"")
+        var serversConfigs=MmkvManager.getServerConfigs(proxyItem.subscriptionId?:"")
+
+        v2rayConfig.outbounds.clear()
+        var balancerSelectors=ArrayList<String>()
+
+        for (pair in serversConfigs){
+            if (pair.second.configType==EConfigType.CUSTOM||
+                pair.second.configType==EConfigType.LowestPing||
+                pair.second.configType==EConfigType.LoadBalance)
+                continue
+            var outbound = pair.second.getProxyOutbound() ?: continue
+            httpRequestObject(outbound)
+            outbound.tag="P"+pair.first
+            balancerSelectors.add(outbound.tag)
+            v2rayConfig.outbounds.add(outbound)
+        }
+        var balancer=V2rayConfig.BalancerBean(tag="balancer",selector=balancerSelectors,strategy= V2rayConfig.BalancerStrategyBean(type="random"), optimalSettings = null)
 //        httpRequestObject(outbound)
 //
-//        v2rayConfig.outbounds[0] = outbound
 
-        routing(v2rayConfig)
+
+
+        routing(v2rayConfig,balancer)
 
         fakedns(v2rayConfig)
 
@@ -189,10 +207,12 @@ object V2rayConfigUtil {
     /**
      * routing
      */
-    private fun routing(v2rayConfig: V2rayConfig): Boolean {
+    private fun routing(v2rayConfig: V2rayConfig,balancer:V2rayConfig.BalancerBean?=null): Boolean {
         try {
+            if (balancer!=null)
+                v2rayConfig.routing.balancers=arrayListOf(balancer)
             routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                    ?: "", AppConfig.TAG_AGENT, v2rayConfig)
+                    ?: "", AppConfig.TAG_AGENT, v2rayConfig,balancer?.tag)
             routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
                     ?: "", AppConfig.TAG_DIRECT, v2rayConfig)
             routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
@@ -206,8 +226,10 @@ object V2rayConfigUtil {
             // Hardcode googleapis.cn
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
                     type = "field",
-                    outboundTag = AppConfig.TAG_AGENT,
-                    domain = arrayListOf("domain:googleapis.cn")
+                    outboundTag = if (balancer?.tag != null) "" else AppConfig.TAG_AGENT,
+                    balancerTag = balancer?.tag,
+                    domain = arrayListOf("domain:googleapis.cn"),
+
             )
 
             when (routingMode) {
@@ -221,7 +243,7 @@ object V2rayConfigUtil {
                 ERoutingMode.BLOCKED_SITES.value -> {
                     routingGeo("", "ir", AppConfig.TAG_DIRECT, v2rayConfig)
 
-                    routingGeo("", "ir-blocked", AppConfig.TAG_AGENT, v2rayConfig)
+                    routingGeo("", "ir-blocked", AppConfig.TAG_AGENT, v2rayConfig,balancer?.tag)
                     val globalDirect = V2rayConfig.RoutingBean.RulesBean(
                         type = "field",
                         outboundTag = AppConfig.TAG_DIRECT,
@@ -255,14 +277,15 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun routingGeo(ipOrDomain: String, code: String, tag: String, v2rayConfig: V2rayConfig) {
+    private fun routingGeo(ipOrDomain: String, code: String, tag: String, v2rayConfig: V2rayConfig,balancerTag:String?=null) {
         try {
             if (!TextUtils.isEmpty(code)) {
                 //IP
                 if (ipOrDomain == "ip" || ipOrDomain == "") {
                     val rulesIP = V2rayConfig.RoutingBean.RulesBean()
                     rulesIP.type = "field"
-                    rulesIP.outboundTag = tag
+                    rulesIP.outboundTag = if (balancerTag != null) "" else tag
+                    rulesIP.balancerTag = balancerTag
                     rulesIP.ip = ArrayList()
                     rulesIP.ip?.add("geoip:$code")
                     v2rayConfig.routing.rules.add(rulesIP)
@@ -272,7 +295,8 @@ object V2rayConfigUtil {
                     //Domain
                     val rulesDomain = V2rayConfig.RoutingBean.RulesBean()
                     rulesDomain.type = "field"
-                    rulesDomain.outboundTag = tag
+                    rulesDomain.outboundTag = if (balancerTag != null) "" else tag
+                    rulesDomain.balancerTag = balancerTag
                     rulesDomain.domain = ArrayList()
                     rulesDomain.domain?.add("geosite:$code")
                     v2rayConfig.routing.rules.add(rulesDomain)
@@ -283,19 +307,21 @@ object V2rayConfigUtil {
         }
     }
 
-    private fun routingUserRule(userRule: String, tag: String, v2rayConfig: V2rayConfig) {
+    private fun routingUserRule(userRule: String, tag: String, v2rayConfig: V2rayConfig,balancerTag:String?=null) {
         try {
             if (!TextUtils.isEmpty(userRule)) {
                 //Domain
                 val rulesDomain = V2rayConfig.RoutingBean.RulesBean()
                 rulesDomain.type = "field"
-                rulesDomain.outboundTag = tag
+                rulesDomain.outboundTag = if (balancerTag != null) "" else tag
+                rulesDomain.balancerTag = balancerTag
                 rulesDomain.domain = ArrayList()
 
                 //IP
                 val rulesIP = V2rayConfig.RoutingBean.RulesBean()
                 rulesIP.type = "field"
-                rulesIP.outboundTag = tag
+                rulesIP.outboundTag = if (balancerTag != null) "" else tag
+                rulesIP.balancerTag = balancerTag
                 rulesIP.ip = ArrayList()
 
                 userRule.split(",").map { it.trim() }.forEach {
@@ -393,7 +419,7 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun dns(v2rayConfig: V2rayConfig): Boolean {
+    private fun dns(v2rayConfig: V2rayConfig,balancerTag:String?=null): Boolean {
         try {
             val hosts = mutableMapOf<String, String>()
             val servers = ArrayList<Any>()
@@ -449,9 +475,11 @@ object V2rayConfigUtil {
 
             // DNS routing
             if (Utils.isPureIpAddress(remoteDns.first())) {
+
                 v2rayConfig.routing.rules.add(0, V2rayConfig.RoutingBean.RulesBean(
                         type = "field",
-                        outboundTag = AppConfig.TAG_AGENT,
+                        outboundTag = if (balancerTag != null) "" else AppConfig.TAG_AGENT,
+                        balancerTag = balancerTag,
                         port = "53",
                         ip = arrayListOf(remoteDns.first()),
                         domain = null)
