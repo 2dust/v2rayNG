@@ -235,4 +235,12 @@
         <item>Proxy only</item>
     </string-array>
 
+    <!-- hiddify -->
+    <string name="default_layout_description" translatable="false">برای استفاده از برنامه نیاز است که حتما
+یک سرور پروکسی راه اندازی کرده باشید
+و آن پروفایل را در برنامه وارد کنید.</string>
+
+    <string name="import_from_clipboard" translatable="false">افزودن  از کلیپ برد</string>
+    <string name="scan_qr_code" translatable="false">اسکن کد</string>
+    <string name="advanced" translatable="false">پیشرفته</string>
 </resources>

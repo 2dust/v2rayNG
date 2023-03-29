@@ -38,7 +38,7 @@ class ScScannerActivity : BaseActivity() {
             } else {
                 toast(R.string.toast_failure)
             }
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, HiddifyMainActivity::class.java))  //todo: check to open main or hiddifyMain
         }
         finish()
     }

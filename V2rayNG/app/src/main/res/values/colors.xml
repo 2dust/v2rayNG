@@ -17,4 +17,11 @@
     <color name="colorAccent">#D81B60</color>
     <color name="colorBg">#FFFFFF</color>
     <color name="colorText">#000000</color>
+
+    <color name="colorBackground">#FCFDFF</color>
+    <color name="colorPrimary2">#455FE9</color>
+    <color name="colorAccent2">#4B528F</color>
+    <color name="colorDisable">#6F6EAE</color>
+    <color name="colorBorder">#BFBFBF</color>
+    <color name="colorGray">#32000000</color>
 </resources>
