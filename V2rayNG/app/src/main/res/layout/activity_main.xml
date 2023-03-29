@@ -33,7 +33,7 @@
     >
     <Spinner
         android:id="@+id/sp_subscriptionId"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Spinner
         android:layout_gravity="end|center_vertical"

@@ -28,6 +28,7 @@ class MainSubAdapter(val activity: MainActivity) :SpinnerAdapter {
     class MainViewHolder(val itemSubSettingBinding: ItemRecyclerSubMainBinding) : RecyclerView.ViewHolder(itemSubSettingBinding.root)
 
     override fun registerDataSetObserver(p0: DataSetObserver?) {
+//        activity.mainViewModel.subscriptions.observe(p0)
         return ;
     }
 
@@ -74,7 +75,7 @@ class MainSubAdapter(val activity: MainActivity) :SpinnerAdapter {
         val subItem = mActivity.mainViewModel.subscriptions[position].second
         itemSubSettingBinding.tvName.text = subItem.remarks
         if (subItem.used<0){
-            itemSubSettingBinding.usageProgress.visibility=View.INVISIBLE
+            itemSubSettingBinding.usageProgress.visibility=View.GONE
             itemSubSettingBinding.expireDate.visibility=View.GONE
         }else {
             itemSubSettingBinding.usageProgress.visibility=View.VISIBLE

@@ -27,6 +27,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.BuildConfig
@@ -154,6 +155,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 adapter.notifyItemChanged(index)
             } else {
                 adapter.notifyDataSetChanged()
+//                subAdapter.notifyDataSetChanged()
             }
         }
         mainViewModel.updateTestResultAction.observe(this) { setTestState(it) }
@@ -325,6 +327,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.real_ping_all -> {
+            this.toast(R.string.connection_test_testing)
             mainViewModel.testAllRealPing()
             true
         }
