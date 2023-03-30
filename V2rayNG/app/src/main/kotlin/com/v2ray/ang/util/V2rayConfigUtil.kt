@@ -87,7 +87,8 @@ object V2rayConfigUtil {
             balancerSelectors.add(outbound.tag)
             v2rayConfig.outbounds.add(outbound)
         }
-        var balancer=V2rayConfig.BalancerBean(tag="balancer",selector=balancerSelectors,strategy= V2rayConfig.BalancerStrategyBean(type="random"), optimalSettings = null)
+
+        var balancer=V2rayConfig.BalancerBean(tag="balancer",selector=balancerSelectors,strategy= V2rayConfig.BalancerStrategyBean(type="optimal", settings = V2rayConfig.OptimalBalancerStrategySetting(load_balancing =proxyItem.configType==EConfigType.LoadBalance )))
 //        httpRequestObject(outbound)
 //
 

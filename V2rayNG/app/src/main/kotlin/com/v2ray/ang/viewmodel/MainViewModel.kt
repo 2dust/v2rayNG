@@ -26,6 +26,7 @@ import java.util.*
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
+    private var lastPing=0L;
     var subscriptions = MmkvManager.decodeSubscriptions()
     var serverList = MmkvManager.decodeServerList()
     var subscriptionId: String = ""
@@ -55,9 +56,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun reloadServerList() {
         serverList = MmkvManager.decodeServerList()
         subscriptions = MmkvManager.decodeSubscriptions()
+
         updateCache()
         updateListAction.value = -1
         MessageUtil.sendMsg2UI(getApplication(),AppConfig.MSG_HIDDIFY_DO_TEST_PING,"")
+
     }
 
     fun removeServer(guid: String) {
@@ -127,11 +130,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun testAllRealPing() {
+        lastPing=System.currentTimeMillis()
         MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG_CANCEL, "")
         MmkvManager.clearAllTestDelayResults()
         updateListAction.value = -1 // update all
 
-        getApplication<AngApplication>().toast(R.string.connection_test_testing)
+//        getApplication<AngApplication>().toast(R.string.connection_test_testing)
         viewModelScope.launch(Dispatchers.Default) { // without Dispatchers.Default viewModelScope will launch in main thread
             for (item in ArrayList(serversCache)) {
                 val config = V2rayConfigUtil.getV2rayConfig(getApplication(), item.guid)
@@ -255,9 +259,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     updateListAction.value = getPosition(resultPair.first)
                 }
                 AppConfig.MSG_HIDDIFY_DO_TEST_PING->{
+                    if (System.currentTimeMillis()-lastPing>5000)
                     testAllRealPing()
                 }
             }
         }
+
     }
 }
