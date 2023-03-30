@@ -3,9 +3,6 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
-Properties props = new Properties()
-props.load(new FileInputStream(new File('local.properties')))
-
 android {
     compileSdkVersion Integer.parseInt("$compileSdkVer")
     buildToolsVersion "$buildToolsVer"
@@ -24,41 +21,17 @@ android {
         versionName "1.8.1"
     }
 
-    if (props["sign"]) {
-        signingConfigs {
-            release {
-                storeFile file("../key.jks")
-                keyAlias 'ang'
-                keyPassword '123456'
-                storePassword '123456'
-            }
-            debug {
-                storeFile file("../key.jks")
-                keyAlias 'ang'
-                keyPassword '123456'
-                storePassword '123456'
-            }
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false
             zipAlignEnabled false
             shrinkResources false
-            if (props["sign"]) {
-                signingConfig signingConfigs.release
-            }
             ndk.abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
-//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
             minifyEnabled false
             zipAlignEnabled false
             shrinkResources false
-            if (props["sign"]) {
-                signingConfig signingConfigs.release
-            }
             ndk.abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
     }
@@ -100,6 +73,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.v2ray.ang'
 }
 
 dependencies {
