@@ -1,5 +1,7 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
 
 Properties props = new Properties()
 props.load(new FileInputStream(new File('local.properties')))
@@ -18,7 +20,7 @@ android {
         minSdkVersion 21
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
-        versionCode 506
+        versionCode 507
         versionName "1.8.1"
     }
 
@@ -123,7 +125,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
 
     //kotlin
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.7.20"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
 
@@ -140,12 +142,3 @@ dependencies {
     implementation 'com.blacksquircle.ui:language-base:2.1.1'
     implementation 'com.blacksquircle.ui:language-json:2.1.1'
 }
-
-//buildscript {
-//    repositories {
-//        google()
-//        mavenCentral()
-//        maven { url 'https://maven.google.com' }
-//        maven { url 'https://jitpack.io' }
-//    }
-//}

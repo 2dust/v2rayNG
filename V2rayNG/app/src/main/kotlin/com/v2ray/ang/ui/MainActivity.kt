@@ -633,7 +633,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         } else {
             //super.onBackPressed()
             onBackPressedDispatcher.onBackPressed()
-
         }
     }
 
