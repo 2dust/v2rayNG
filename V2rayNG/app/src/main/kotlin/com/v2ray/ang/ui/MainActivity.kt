@@ -14,6 +14,7 @@ import android.text.TextUtils
 import android.view.KeyEvent
 import com.v2ray.ang.AppConfig
 import android.content.res.ColorStateList
+import android.os.Build
 import com.google.android.material.navigation.NavigationView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -107,6 +108,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         setupViewModel()
         copyAssets()
         migrateLegacy()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            RxPermissions(this)
+                .request(Manifest.permission.POST_NOTIFICATIONS)
+                .subscribe {
+                    if (!it)
+                        toast(R.string.toast_permission_denied)
+                }
+        }
     }
 
     private fun setupViewModel() {

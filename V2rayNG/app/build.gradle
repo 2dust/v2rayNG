@@ -74,6 +74,7 @@ android {
         viewBinding true
     }
     namespace 'com.v2ray.ang'
+    testNamespace 'com.v2ray.angTest'
 }
 
 dependencies {
