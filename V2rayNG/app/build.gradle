@@ -102,7 +102,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'], exclude: [])
-    implementation files('/Users/majid.n/Drive/Android/hiddify/AndroidLibV2rayLite/libv2ray.aar')
     testImplementation 'junit:junit:4.13.2'
 
     // Androidx
