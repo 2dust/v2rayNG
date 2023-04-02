@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.v2ray.ang.AngApplication
 import me.drakeet.support.toast.ToastCompat
 import org.json.JSONObject
@@ -106,6 +107,10 @@ fun View?.showHide(show:Boolean) {
     }else{
         this?.hide()
     }
+}
+
+fun Context?.getColorEx(color:Int):Int{
+    return ContextCompat.getColor(this?:return 0, color)
 }
 
 /**
