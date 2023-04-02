@@ -111,6 +111,12 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
         binding.toolbar.setting.click {
             bottomSheetPresenter.show(supportFragmentManager, AddConfigBottomSheets.newInstance())
         }
+        binding.toolbar.test.click {
+            runOnUiThread{
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+            }
+        }
         
         binding.advanced.click {
             bottomSheetPresenter.show(supportFragmentManager, SettingBottomSheets.newInstance())

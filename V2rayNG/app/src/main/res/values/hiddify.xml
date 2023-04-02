@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- hiddify -->
+    <string name="default_layout_description">To use the program, you must
+        have set up a proxy server and
+        enter that profile in the program.</string>
+    <string name="add_profile_description">New Profile</string>
+    <string name="import_from_clipboard">Insert From Clipboard</string>
+    <string name="scan_qr_code">QR Code</string>
+    <string name="advanced">Advanced</string>
+    <string name="tab_to_connect">Click to connect.</string>
+    <string name="connected">Connected</string>
+    <string name="connecting">Connecting...</string>
+    <string name="proxy">Proxy</string>
+    <string name="connection_mode">Connection mode</string>
+    <string name="filtered_sites">Blocked</string>
+    <string name="external_sites">Foreign</string>
+    <string name="sites_all">Global</string>
+    <string name="smart">Smart</string>
+    <string name="load_balance">Load Balance</string>
+    <string name="manual">Manual</string>
+    <string name="new_profile">New Profile</string>
+    <string name="first_profile">Profile 1</string>
+    <string name="consumer_traffic">Usage</string>
+    <string name="show">Panel</string>
+
+</resources>

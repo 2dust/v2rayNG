@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- hiddify -->
+    <string name="default_layout_description" translatable="false">برای استفاده از برنامه نیاز است که حتما
+یک سرور پروکسی راه اندازی کرده باشید
+و آن پروفایل را در برنامه وارد کنید.</string>
+    <string name="add_profile_description" translatable="false">افزودن پروفایل جدید</string>
+    <string name="import_from_clipboard" translatable="false">افزودن  از کلیپ برد</string>
+    <string name="scan_qr_code" translatable="false">اسکن کد</string>
+    <string name="advanced" translatable="false">پیشرفته</string>
+    <string name="tab_to_connect" translatable="false">جهت اتصال کلیک کنید.</string>
+    <string name="connected" translatable="false">متصل</string>
+    <string name="connecting" translatable="false">در حال اتصال ...</string>
+    <string name="proxy" translatable="false">چه سایت‌هایی از فیلترشکن استفاده کنه؟</string>
+    <string name="connection_mode" translatable="false">حالت اتصال</string>
+    <string name="filtered_sites" translatable="false">فیلتر</string>
+    <string name="external_sites" translatable="false">خارجی</string>
+    <string name="sites_all" translatable="false">همه</string>
+    <string name="smart" translatable="false">هوشمند</string>
+    <string name="load_balance" translatable="false">لودبالانس</string>
+    <string name="manual" translatable="false">دستی</string>
+    <string name="new_profile" translatable="false">پروفایل جدید</string>
+    <string name="first_profile" translatable="false">پروفایل یک</string>
+    <string name="consumer_traffic">ترافیک مصرفی</string>
+    <string name="show">مشاهده</string>
+
+
+</resources>
