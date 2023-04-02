@@ -29,6 +29,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:singleSelection="true"
+        app:selectionRequired="true"
+        android:layout_marginTop="8dp"
         app:checkedButton="@id/filteredSites">
 
         <com.google.android.material.button.MaterialButton
@@ -37,7 +39,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:cornerRadius="20dp"
+            app:strokeColor="@color/btn_stroke_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            android:textColor="@color/btn_text_color_selector"
+            app:cornerRadius="16dp"
             android:fontFamily="@font/vazirmatn_regular"
             android:text="@string/filtered_sites" />
 
@@ -47,6 +52,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            app:strokeColor="@color/btn_stroke_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            android:textColor="@color/btn_text_color_selector"
             app:cornerRadius="20dp"
             android:fontFamily="@font/vazirmatn_regular"
             android:text="@string/external_sites" />
@@ -57,6 +65,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            app:strokeColor="@color/btn_stroke_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            android:textColor="@color/btn_text_color_selector"
             app:cornerRadius="20dp"
             android:fontFamily="@font/vazirmatn_regular"
             android:text="@string/sites_all" />
@@ -83,6 +94,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            app:strokeColor="@color/btn_stroke_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            android:textColor="@color/btn_text_color_selector"
             app:cornerRadius="20dp"
             android:fontFamily="@font/vazirmatn_regular"
             android:text="@string/smart" />
@@ -93,6 +107,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            app:strokeColor="@color/btn_stroke_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            android:textColor="@color/btn_text_color_selector"
             app:cornerRadius="20dp"
             android:fontFamily="@font/vazirmatn_regular"
             android:text="@string/load_balance" />
@@ -103,6 +120,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            app:strokeColor="@color/btn_stroke_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            android:textColor="@color/btn_text_color_selector"
             app:cornerRadius="20dp"
             android:fontFamily="@font/vazirmatn_regular"
             android:text="@string/manual" />
