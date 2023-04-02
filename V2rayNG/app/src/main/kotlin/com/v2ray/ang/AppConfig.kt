@@ -5,7 +5,7 @@ package com.v2ray.ang
  * App Config Const
  */
 object AppConfig {
-    const val ANG_PACKAGE = "com.hiddify.ang"
+    const val ANG_PACKAGE = "ang.hiddify.com"
     const val DIR_ASSETS = "assets"
 
     // legacy
@@ -45,9 +45,9 @@ object AppConfig {
 
     const val BROADCAST_ACTION_UPDATE_UI ="com.hiddify.UPDATE_UI_ACTION"
     const val BROADCAST_ACTION_PING_TEST ="com.hiddify.PING_TEST_ACTION"
-    const val BROADCAST_ACTION_SERVICE = "com.hiddify.ang.action.service"
-    const val BROADCAST_ACTION_ACTIVITY = "com.hiddify.ang.action.activity"
-    const val BROADCAST_ACTION_WIDGET_CLICK = "com.hiddify.ang.action.widget.click"
+    const val BROADCAST_ACTION_SERVICE = "ang.hiddify.com.action.service"
+    const val BROADCAST_ACTION_ACTIVITY = "ang.hiddify.com.action.activity"
+    const val BROADCAST_ACTION_WIDGET_CLICK = "ang.hiddify.com.action.widget.click"
 
     const val TASKER_EXTRA_BUNDLE = "com.twofortyfouram.locale.intent.extra.BUNDLE"
     const val TASKER_EXTRA_STRING_BLURB = "com.twofortyfouram.locale.intent.extra.BLURB"
