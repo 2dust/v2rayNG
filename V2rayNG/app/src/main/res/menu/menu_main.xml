@@ -92,7 +92,7 @@
     <item
         android:id="@+id/sub_update"
         android:title="@string/title_sub_update"
-        android:icon="@drawable/ic_referesh"
+        android:icon="@drawable/ic_refresh"
         app:showAsAction="always" />
     <item
         android:id="@+id/ping_all"

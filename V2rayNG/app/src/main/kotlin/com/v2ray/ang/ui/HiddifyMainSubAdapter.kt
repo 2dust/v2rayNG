@@ -11,7 +11,6 @@ import com.v2ray.ang.databinding.ItemRecyclerSubMainBinding
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 
-
 class HiddifyMainSubAdapter(val activity: HiddifyMainActivity) :SpinnerAdapter {
 
     private var mActivity: HiddifyMainActivity = activity
@@ -29,11 +28,11 @@ class HiddifyMainSubAdapter(val activity: HiddifyMainActivity) :SpinnerAdapter {
     }
 
     override fun getCount(): Int {
-        return mActivity.mainViewModel.subscriptions.size
+        return mActivity.hiddifyMainViewModel.subscriptions.size
     }
 
     override fun getItem(p0: Int): Any {
-        return mActivity.mainViewModel.subscriptions[p0]
+        return mActivity.hiddifyMainViewModel.subscriptions[p0]
     }
 
     override fun getItemId(p0: Int): Long {
@@ -63,8 +62,8 @@ class HiddifyMainSubAdapter(val activity: HiddifyMainActivity) :SpinnerAdapter {
     }
 
     fun editView(itemSubSettingBinding:ItemRecyclerSubMainBinding, position: Int,clickable:Boolean=true){
-        val subId = mActivity.mainViewModel.subscriptions[position].first
-        val subItem = mActivity.mainViewModel.subscriptions[position].second
+        val subId = mActivity.hiddifyMainViewModel.subscriptions[position].first
+        val subItem = mActivity.hiddifyMainViewModel.subscriptions[position].second
         itemSubSettingBinding.tvName.text = subItem.remarks
         if (subItem.used<0){
             itemSubSettingBinding.usageProgress.visibility=View.INVISIBLE

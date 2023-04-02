@@ -24,4 +24,10 @@
     <color name="colorDisable">#6F6EAE</color>
     <color name="colorBorder">#BFBFBF</color>
     <color name="colorGray">#32000000</color>
+    <color name="colorDarkGray">#666666</color>
+    <color name="colorGreen">#2D7B2B</color>
+    <color name="colorYellow">#B9961A</color>
+    <color name="colorLightPrimary">#65455FE9</color>
+    <color name="colorLight">#9193A7</color>
+    <color name="colorBright">#EBEEFF</color>
 </resources>

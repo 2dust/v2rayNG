@@ -45,15 +45,15 @@ class HiddifyMainRecyclerAdapter(val activity: HiddifyMainActivity) : RecyclerVi
     }
     var isRunning = false
 
-    override fun getItemCount() = mActivity.mainViewModel.serversCache.size + 1
+    override fun getItemCount() = mActivity.hiddifyMainViewModel.serversCache.size + 1
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         if (holder is MainViewHolder) {
-            val guid = mActivity.mainViewModel.serversCache[position].guid
-            val config = mActivity.mainViewModel.serversCache[position].config
+            val guid = mActivity.hiddifyMainViewModel.serversCache[position].guid
+            val config = mActivity.hiddifyMainViewModel.serversCache[position].config
 //            //filter
-//            if (mActivity.mainViewModel.subscriptionId.isNotEmpty()
-//                && mActivity.mainViewModel.subscriptionId != config.subscriptionId
+//            if (mActivity.hiddifyMainViewModel.subscriptionId.isNotEmpty()
+//                && mActivity.hiddifyMainViewModel.subscriptionId != config.subscriptionId
 //            ) {
 //                holder.itemMainBinding.cardView.visibility = View.GONE
 //            } else {
@@ -170,11 +170,11 @@ class HiddifyMainRecyclerAdapter(val activity: HiddifyMainActivity) : RecyclerVi
                 if (guid != selected) {
                     mainStorage?.encode(MmkvManager.KEY_SELECTED_SERVER, guid)
                     if (!TextUtils.isEmpty(selected)) {
-                        notifyItemChanged(mActivity.mainViewModel.getPosition(selected!!))
+                        notifyItemChanged(mActivity.hiddifyMainViewModel.getPosition(selected!!))
                     }
-                    notifyItemChanged(mActivity.mainViewModel.getPosition(guid))
+                    notifyItemChanged(mActivity.hiddifyMainViewModel.getPosition(guid))
                     if (isRunning) {
-                        mActivity.showCircle()
+                        mActivity.updateCircleState("loading")
                         Utils.stopVService(mActivity)
                         Observable.timer(500, TimeUnit.MILLISECONDS)
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -207,9 +207,9 @@ class HiddifyMainRecyclerAdapter(val activity: HiddifyMainActivity) : RecyclerVi
     }
 
     private  fun removeServer(guid: String,position:Int) {
-        mActivity.mainViewModel.removeServer(guid)
+        mActivity.hiddifyMainViewModel.removeServer(guid)
         notifyItemRemoved(position)
-        notifyItemRangeChanged(position, mActivity.mainViewModel.serversCache.size)
+        notifyItemRangeChanged(position, mActivity.hiddifyMainViewModel.serversCache.size)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -222,7 +222,7 @@ class HiddifyMainRecyclerAdapter(val activity: HiddifyMainActivity) : RecyclerVi
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == mActivity.mainViewModel.serversCache.size) {
+        return if (position == mActivity.hiddifyMainViewModel.serversCache.size) {
             VIEW_TYPE_FOOTER
         } else {
             VIEW_TYPE_ITEM
@@ -246,11 +246,11 @@ class HiddifyMainRecyclerAdapter(val activity: HiddifyMainActivity) : RecyclerVi
             BaseViewHolder(itemFooterBinding.root), ItemTouchHelperViewHolder
 
     override fun onItemDismiss(position: Int) {
-        val guid = mActivity.mainViewModel.serversCache.getOrNull(position)?.guid ?: return
+        val guid = mActivity.hiddifyMainViewModel.serversCache.getOrNull(position)?.guid ?: return
         if (guid != mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
 //            mActivity.alert(R.string.del_config_comfirm) {
 //                positiveButton(android.R.string.ok) {
-            mActivity.mainViewModel.removeServer(guid)
+            mActivity.hiddifyMainViewModel.removeServer(guid)
             notifyItemRemoved(position)
 //                }
 //                show()
@@ -259,7 +259,7 @@ class HiddifyMainRecyclerAdapter(val activity: HiddifyMainActivity) : RecyclerVi
     }
 
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
-        mActivity.mainViewModel.swapServer(fromPosition, toPosition)
+        mActivity.hiddifyMainViewModel.swapServer(fromPosition, toPosition)
         notifyItemMoved(fromPosition, toPosition)
         // position is changed, since position is used by click callbacks, need to update range
         if (toPosition > fromPosition)

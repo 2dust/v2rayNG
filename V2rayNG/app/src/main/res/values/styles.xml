@@ -78,5 +78,11 @@
         <item name="android:textColorPrimary">@color/colorWhite</item>
     </style>
 
+    <style name="MyAppModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/round_fill_bottom_sheet</item>
+    </style>
 
+    <style name="DialogCurveStyle" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/MyAppModalStyle</item>
+    </style>
 </resources>
