@@ -49,6 +49,8 @@
     <string name="server_lab_request_host">Запрос узла (WS/H2) / Шифрование QUIC</string>
     <string name="server_lab_path">Путь (WS/H2) / Ключ QUIC / Сид KCP / Сервис gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_fingerprint" translatable="false">Fingerprint</string>
+    <string name="server_lab_stream_alpn" translatable="false">Alpn</string>
     <string name="server_lab_allow_insecure">Разрешать небезопасные</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">Адрес</string>
@@ -59,6 +61,9 @@
     <string name="server_lab_security4">Пользователь (необязательно)</string>
     <string name="server_lab_encryption">Шифрование</string>
     <string name="server_lab_flow">Поток</string>
+    <string name="server_lab_public_key" translatable="false">PublicKey</string>
+    <string name="server_lab_short_id" translatable="false">ShortId</string>
+    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
     <string name="toast_success">Успешно</string>
     <string name="toast_failure">Ошибка</string>
     <string name="toast_none_data">Ничего нет</string>
@@ -165,7 +170,7 @@
     <string name="logcat_clear">Очистить</string>
     <string name="title_service_restart">Перезапуск службы</string>
     <string name="title_del_all_config">Удалить все профили</string>
-    <string name="title_del_duplicate_config">Delete duplicate config</string>
+    <string name="title_del_duplicate_config">Удалить дубликаты профилей</string>
     <string name="title_del_invalid_config">Удалить сбойные профили (после проверки)</string>
     <string name="title_export_all">Экспорт всех профилей в буфер обмена</string>
     <string name="title_sub_setting">Группы</string>
@@ -179,7 +184,7 @@
     <string name="title_sort_by_test_results">Сортировка по результатам теста</string>
     <string name="title_filter_config">Фильтр профилей</string>
     <string name="filter_config_all">Все группы</string>
-    <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
+    <string name="title_del_duplicate_config_count">Удалено дубликатов профилей: %d</string>
 
     <string name="tasker_start_service">Запуск службы</string>
     <string name="tasker_setting_confirm">Подтвердить</string>
