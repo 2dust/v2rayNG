@@ -7,6 +7,7 @@ import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
@@ -70,18 +71,23 @@ class ScannerActivity : BaseActivity(), ZXingScannerView.ResultHandler {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.select_photo -> {
+            val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Manifest.permission.READ_MEDIA_IMAGES
+            } else {
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            }
             RxPermissions(this)
-                    .request(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    .subscribe {
-                        if (it) {
-                            try {
-                                showFileChooser()
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        } else
-                            toast(R.string.toast_permission_denied)
-                    }
+                .request(permission)
+                .subscribe {
+                    if (it) {
+                        try {
+                            showFileChooser()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    } else
+                        toast(R.string.toast_permission_denied)
+                }
             true
         }
         else -> super.onOptionsItemSelected(item)

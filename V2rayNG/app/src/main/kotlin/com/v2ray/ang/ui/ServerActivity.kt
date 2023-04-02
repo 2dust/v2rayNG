@@ -116,6 +116,7 @@ class ServerActivity : BaseActivity() {
             EConfigType.SOCKS -> setContentView(R.layout.activity_server_socks)
             EConfigType.VLESS -> setContentView(R.layout.activity_server_vless)
             EConfigType.TROJAN -> setContentView(R.layout.activity_server_trojan)
+            else -> setContentView(R.layout.activity_server_vmess)
         }
         sp_network?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -385,8 +386,8 @@ class ServerActivity : BaseActivity() {
         val sniField = et_sni?.text?.toString()?.trim() ?: return
         val allowInsecureField = sp_allow_insecure?.selectedItemPosition ?: return
         val streamSecurity = sp_stream_security?.selectedItemPosition ?: return
-        var utlsIndex = sp_stream_fingerprint?.selectedItemPosition ?: return
-        var alpnIndex = sp_stream_alpn?.selectedItemPosition ?: return
+        val utlsIndex = sp_stream_fingerprint?.selectedItemPosition ?: return
+        val alpnIndex = sp_stream_alpn?.selectedItemPosition ?: return
         val publicKey = et_public_key?.text?.toString()?.trim() ?: return
         val shortId = et_short_id?.text?.toString()?.trim() ?: return
         val spiderX = et_spider_x?.text?.toString()?.trim() ?: return
@@ -424,14 +425,19 @@ class ServerActivity : BaseActivity() {
     }
 
     private fun transportTypes(network: String?): Array<out String> {
-        return if (network == "tcp") {
-            tcpTypes
-        } else if (network == "kcp" || network == "quic") {
-            kcpAndQuicTypes
-        } else if (network == "grpc") {
-            grpcModes
-        } else {
-            arrayOf("---")
+        return when (network) {
+            "tcp" -> {
+                tcpTypes
+            }
+            "kcp", "quic" -> {
+                kcpAndQuicTypes
+            }
+            "grpc" -> {
+                grpcModes
+            }
+            else -> {
+                arrayOf("---")
+            }
         }
     }
 
@@ -443,7 +449,7 @@ class ServerActivity : BaseActivity() {
             Utils.stopVService(this)
         }
         if (editGuid.isNotEmpty()) {
-            if (editGuid != mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
+            if (editGuid != mainStorage?.decodeString(KEY_SELECTED_SERVER)) {
                 if (settingsStorage?.decodeBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
                     AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                         .setPositiveButton(android.R.string.ok) { _, _ ->

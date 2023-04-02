@@ -7,6 +7,15 @@ import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.KeyEvent
+import com.v2ray.ang.AppConfig
+import android.content.res.ColorStateList
+import android.os.Build
+import com.google.android.material.navigation.NavigationView
+import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.recyclerview.widget.ItemTouchHelper
 import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
@@ -147,6 +156,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         setupViewModel()
         copyAssets()
         migrateLegacy()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            RxPermissions(this)
+                .request(Manifest.permission.POST_NOTIFICATIONS)
+                .subscribe {
+                    if (!it)
+                        toast(R.string.toast_permission_denied)
+                }
+        }
     }
 
     private fun setupViewModel() {
@@ -731,11 +749,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         } else {
-            super.onBackPressed()
+            //super.onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
     }
 
