@@ -153,8 +153,8 @@
                     android:resource="@xml/app_widget_provider" />
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.hiddify.ang.action.widget.click" />
-                <action android:name="com.hiddify.ang.action.activity" />
+                <action android:name="ang.hiddify.com.action.widget.click" />
+                <action android:name="ang.hiddify.com.action.activity" />
             </intent-filter>
         </receiver>
 
