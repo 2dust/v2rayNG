@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.hiddify.ang"
+        applicationId "ang.hiddify.com"
         minSdkVersion 21
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
