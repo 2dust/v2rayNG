@@ -764,6 +764,7 @@ object AngConfigManager {
 
             var count = 0
             servers.lines()
+                    .reversed()
                     .forEach {
                         val resId = importConfig(it, subid, removedSelectedServer)
                         if (resId == 0) {
