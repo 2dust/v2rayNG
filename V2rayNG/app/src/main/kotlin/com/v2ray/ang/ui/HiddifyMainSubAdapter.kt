@@ -31,7 +31,6 @@ class HiddifyMainSubAdapter(val context: Context, val callback: (Int) -> Unit) :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         (holder as SubViewHolder).apply {
-            val subId = subscriptions[position].first
             val subItem = subscriptions[position].second
 
             profileName.text = subItem.remarks

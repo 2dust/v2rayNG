@@ -70,6 +70,7 @@
                     tools:text="۱۲۷/۵۰۰ G"
                     android:textSize="12sp"
                     android:textColor="@color/colorBlack"
+                    android:fontFamily="@font/vazir_light"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>

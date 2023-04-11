@@ -24,17 +24,17 @@ object HiddifyUtils {
         val now = System.currentTimeMillis() / 1000
         val diffInMillis = (time - now) / 86400
         if (diffInMillis <= 0)
-            return if (getLocale(context) == Locale("fa"))
+            return if (getLocale(context) == Locale("fa") || getLocale(context).toString() == "fa_IR")
                 "منقضی شده".bold("")
             else "Expired".bold("")
 
         if (totalInBytes == usedInBytes)
-            return if (getLocale(context) == Locale("fa"))
+            return if (getLocale(context) == Locale("fa") || getLocale(context).toString() == "fa_IR")
                 "اتمام حجم".bold("")
             else "Completion of the volume".bold("")
 
 
-        return if (getLocale(context) == Locale("fa")) {
+        return if (getLocale(context) == Locale("fa") || getLocale(context).toString() == "fa_IR") {
             if (diffInMillis > 10)
                 "$diffInMillis روز \n باقیمانده".toPersianDigit()
                     .colorlessTextPart("باقیمانده", context.getColorEx(R.color.colorBorder))
