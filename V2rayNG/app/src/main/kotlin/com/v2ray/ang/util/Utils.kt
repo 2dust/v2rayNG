@@ -413,14 +413,14 @@ object Utils {
 
     fun getLocale(context: Context): Locale =
         when (settingsStorage?.decodeString(AppConfig.PREF_LANGUAGE) ?: "auto") {
-            "auto" -> Locale("fa")//getSysLocale()
+            "auto" -> getSysLocale()
             "en" -> Locale("en")
             "zh-rCN" -> Locale("zh", "CN")
             "zh-rTW" -> Locale("zh", "TW")
             "vi" -> Locale("vi")
             "ru" -> Locale("ru")
             "fa" -> Locale("fa")
-            else -> Locale("fa") //getSysLocale()
+            else -> getSysLocale()
         }
 
     private fun getSysLocale(): Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

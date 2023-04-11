@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:gravity="center"
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/vazirmatn_regular"
+        android:gravity="center"
+        android:text="@string/profiles"
+        android:textColor="@color/colorDarkGray"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addProfile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="16dp"
+            android:text="@string/add_profile"
+            android:textColor="@color/colorPrimary2"
+            android:fontFamily="@font/vazirmatn_regular"
+            style="?android:attr/borderlessButtonStyle"
+            android:textAlignment="viewStart"
+            app:icon="@drawable/ic_plus"
+            app:iconTint="@color/colorPrimary2"
+            app:iconGravity="start" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginVertical="12dp"
+            android:background="@color/colorBorder"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/scanQrCode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="16dp"
+            android:text="@string/scan_qr_code"
+            android:textColor="@color/colorPrimary2"
+            android:fontFamily="@font/vazirmatn_regular"
+            style="?android:attr/borderlessButtonStyle"
+            android:textAlignment="viewEnd"
+            app:icon="@drawable/ic_qr_code"
+            app:iconTint="@color/colorPrimary2"
+            app:iconGravity="textStart" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorBorder"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/item_recycler_sub_hiddify_main"
+        tools:itemCount="3"/>
+</LinearLayout>

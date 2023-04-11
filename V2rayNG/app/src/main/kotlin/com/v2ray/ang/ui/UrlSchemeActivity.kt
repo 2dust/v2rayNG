@@ -54,6 +54,7 @@ class UrlSchemeActivity : BaseActivity() {
             } else {
                 toast(R.string.toast_failure)
             }
+            //todo @hiddify1
             startActivity(Intent(this, HiddifyMainActivity::class.java))  //todo: check to open main or hiddifyMain
             finish()
         } catch (e: WriterException) {

@@ -1,115 +1,71 @@
 package com.v2ray.ang.ui
 
-import android.database.DataSetObserver
+import android.content.Context
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SpinnerAdapter
+import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.tencent.mmkv.MMKV
-import com.v2ray.ang.databinding.ItemRecyclerSubMainBinding
+import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.v2ray.ang.R
+import com.v2ray.ang.extension.click
+import com.v2ray.ang.extension.getColorEx
+import com.v2ray.ang.extension.showGone
+import com.v2ray.ang.util.HiddifyUtils
 import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.Utils
 
-class HiddifyMainSubAdapter(val activity: HiddifyMainActivity) :SpinnerAdapter {
+class HiddifyMainSubAdapter(val context: Context, val callback: (Int) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var mActivity: HiddifyMainActivity = activity
-    private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
+    private var subscriptions = MmkvManager.decodeSubscriptions()
 
-
-    class MainViewHolder(val itemSubSettingBinding: ItemRecyclerSubMainBinding) : RecyclerView.ViewHolder(itemSubSettingBinding.root)
-
-    override fun registerDataSetObserver(p0: DataSetObserver?) {
-        return ;
+    override fun getItemCount(): Int {
+        return subscriptions.size
     }
 
-    override fun unregisterDataSetObserver(p0: DataSetObserver?) {
-        return ;
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_recycler_sub_hiddify_main, parent, false)
+        return SubViewHolder(itemView)
     }
 
-    override fun getCount(): Int {
-        return mActivity.hiddifyMainViewModel.subscriptions.size
-    }
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        (holder as SubViewHolder).apply {
+            val subId = subscriptions[position].first
+            val subItem = subscriptions[position].second
 
-    override fun getItem(p0: Int): Any {
-        return mActivity.hiddifyMainViewModel.subscriptions[p0]
-    }
+            profileName.text = subItem.remarks
 
-    override fun getItemId(p0: Int): Long {
-        return p0.toLong();
-    }
+            time.text =
+                HiddifyUtils.timeToRelativeDate(subItem.expire, subItem.total, subItem.used, context)
+            time.showGone(subItem.expire != (-1).toLong())
 
-    override fun hasStableIds(): Boolean {
-        return true
-    }
+            consumerTrafficValue.text = HiddifyUtils.toTotalUsedGig(
+                subItem.total,
+                subItem.used,
+                context
+            )
+            consumerTrafficValue.showGone(subItem.total != (-1).toLong())
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        var holder: MainViewHolder
-        if (convertView == null) {
+            progress.progress = (subItem.used / 1000000000).toInt()
+            progress.max = (subItem.total / 1000000000).toInt()
 
-            var convertView_=ItemRecyclerSubMainBinding.inflate(LayoutInflater.from(parent!!.context), parent, false)
-            holder = MainViewHolder(convertView_)
-            convertView_.root.setTag(holder)
-        } else {
-            holder = convertView.getTag() as MainViewHolder
+            itemBg.backgroundTintList = if (HiddifyUtils.checkState(subItem.expire, subItem.total, subItem.used) == "enable")
+                ColorStateList.valueOf(context.getColorEx(R.color.white))
+            else
+                ColorStateList.valueOf(context.getColorEx(R.color.colorLightRed))
+
+            itemView.click {
+                callback.invoke(bindingAdapterPosition)
+            }
         }
-        editView(holder.itemSubSettingBinding,position,false)
-        return holder.itemSubSettingBinding.root
     }
 
-    override fun getItemViewType(p0: Int): Int {
-        return 1
-    }
-
-    fun editView(itemSubSettingBinding:ItemRecyclerSubMainBinding, position: Int,clickable:Boolean=true){
-        val subId = mActivity.hiddifyMainViewModel.subscriptions[position].first
-        val subItem = mActivity.hiddifyMainViewModel.subscriptions[position].second
-        itemSubSettingBinding.tvName.text = subItem.remarks
-        if (subItem.used<0){
-            itemSubSettingBinding.usageProgress.visibility=View.INVISIBLE
-            itemSubSettingBinding.expireDate.visibility=View.GONE
-        }else {
-            itemSubSettingBinding.usageProgress.visibility=View.VISIBLE
-            itemSubSettingBinding.expireDate.visibility=View.VISIBLE
-            itemSubSettingBinding.usageProgress.progress = (subItem.used / 1000000000).toInt()
-            itemSubSettingBinding.usageProgress.max = (subItem.total / 1000000000).toInt()
-            var days = Utils.timeToRelativeDate(subItem.expire)
-            itemSubSettingBinding.expireDate.text =
-                days + " " + Utils.toGig(subItem.used) + "/" + Utils.toGig(subItem.total)
-        }
-        var tmp = subItem.url
-//        tmp+="\nused="+subItem.used+"\ntotal="+subItem.total+"\nexpire="+ Utils.timeToRelativeDate(subItem.expire)+"\nhome="+subItem.home_link
-//        holder.itemSubSettingBinding.tvUrl.text=tmp
-//        if (subItem.enabled) {
-//            holder.itemSubSettingBinding.chkEnable.setBackgroundResource(R.color.colorSelected)
-//        } else {
-//            holder.itemSubSettingBinding.chkEnable.setBackgroundResource(R.color.colorUnselected)
-//        }
-//        itemSubSettingBinding.setBackgroundColor(Color.TRANSPARENT)
-
-
-
-    }
-
-    override fun getViewTypeCount(): Int {
-        return 1
-    }
-
-    override fun isEmpty(): Boolean {
-        return count==0
-    }
-
-    override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        var holder: MainViewHolder
-        if (convertView == null) {
-
-            var convertView_=ItemRecyclerSubMainBinding.inflate(LayoutInflater.from(parent!!.context), parent, false)
-            holder = MainViewHolder(convertView_)
-            convertView_.root.setTag(holder)
-        } else {
-            holder = convertView.getTag() as MainViewHolder
-        }
-        editView(holder.itemSubSettingBinding,position,true)
-        return holder.itemSubSettingBinding.root
+    private inner class SubViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val time: TextView = itemView.findViewById(R.id.time)
+        val profileName: TextView = itemView.findViewById(R.id.profileName)
+        val consumerTrafficValue: TextView = itemView.findViewById(R.id.consumerTrafficValue)
+        val progress: LinearProgressIndicator = itemView.findViewById(R.id.progress)
+        val itemBg: CardView = itemView.findViewById(R.id.item_bg)
     }
 }

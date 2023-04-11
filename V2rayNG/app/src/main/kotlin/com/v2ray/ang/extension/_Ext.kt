@@ -2,9 +2,7 @@ package com.v2ray.ang.extension
 
 import android.content.Context
 import android.os.Build
-import android.view.View
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import com.v2ray.ang.AngApplication
 import me.drakeet.support.toast.ToastCompat
 import org.json.JSONObject
@@ -80,40 +78,3 @@ val URLConnection.responseLength: Long
 
 val URI.idnHost: String
     get() = (host!!).replace("[", "").replace("]", "")
-
-fun View?.show() {
-    this?.visibility = View.VISIBLE
-}
-
-fun View?.gone() {
-    this?.visibility = View.GONE
-}
-
-fun View?.hide() {
-    this?.visibility = View.INVISIBLE
-}
-
-fun View?.showGone(show:Boolean) {
-    if (show) {
-        this?.show()
-    }else{
-        this?.gone()
-    }
-}
-
-fun View?.showHide(show:Boolean) {
-    if (show) {
-        this?.show()
-    }else{
-        this?.hide()
-    }
-}
-
-fun Context?.getColorEx(color:Int):Int{
-    return ContextCompat.getColor(this?:return 0, color)
-}
-
-/**
- * Set an onclick listener
- */
-fun <T : View> T?.click(block: (T) -> Unit) = this?.setOnClickListener { block(it as T) }
