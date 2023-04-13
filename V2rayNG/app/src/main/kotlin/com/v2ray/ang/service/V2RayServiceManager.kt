@@ -18,6 +18,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.ui.HiddifyMainActivity
 import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
@@ -248,7 +249,8 @@ object V2RayServiceManager {
 
     private fun showNotification() {
         val service = serviceControl?.get()?.getService() ?: return
-        val startMainIntent = Intent(service, MainActivity::class.java)
+        //todo @hiddify1
+        val startMainIntent = Intent(service, HiddifyMainActivity::class.java) //todo: check to open main or hiddifyMain
         val contentPendingIntent = PendingIntent.getActivity(service,
                 NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

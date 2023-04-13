@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/colorDarkGray"
+        android:textSize="16sp"
+        android:fontFamily="@font/vazirmatn_regular"
+        android:text="@string/advanced"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/vazirmatn_regular"
+        android:textSize="16sp"
+        android:text="@string/proxy"/>
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/proxyToggleButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        android:layout_marginTop="8dp"
+        app:checkedButton="@id/filteredSites">
+
+        <com.google.android.material.button.MaterialButton
+            style="?attr/materialButtonOutlinedStyle"
+            android:id="@+id/filteredSites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:lines="1"
+            android:ellipsize="end"
+            app:strokeColor="@color/btn_stroke_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            android:textColor="@color/btn_text_color_selector"
+            app:cornerRadius="16dp"
+            android:fontFamily="@font/vazirmatn_regular"
+            android:text="@string/filtered_sites" />
+
+        <com.google.android.material.button.MaterialButton
+            style="?attr/materialButtonOutlinedStyle"
+            android:id="@+id/externalSites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:lines="1"
+            android:ellipsize="end"
+            app:strokeColor="@color/btn_stroke_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            android:textColor="@color/btn_text_color_selector"
+            app:cornerRadius="20dp"
+            android:fontFamily="@font/vazirmatn_regular"
+            android:text="@string/external_sites" />
+
+        <com.google.android.material.button.MaterialButton
+            style="?attr/materialButtonOutlinedStyle"
+            android:id="@+id/sitesAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:lines="1"
+            android:ellipsize="end"
+            app:strokeColor="@color/btn_stroke_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            android:textColor="@color/btn_text_color_selector"
+            app:cornerRadius="20dp"
+            android:fontFamily="@font/vazirmatn_regular"
+            android:text="@string/sites_all" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/vazirmatn_regular"
+        android:textSize="16sp"
+        android:layout_marginTop="18dp"
+        android:text="@string/connection_mode"/>
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/connectToggleButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:singleSelection="true"
+        app:checkedButton="@id/smart">
+
+        <com.google.android.material.button.MaterialButton
+            style="?attr/materialButtonOutlinedStyle"
+            android:id="@+id/smart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:lines="1"
+            android:ellipsize="end"
+            app:strokeColor="@color/btn_stroke_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            android:textColor="@color/btn_text_color_selector"
+            app:cornerRadius="20dp"
+            android:fontFamily="@font/vazirmatn_regular"
+            android:text="@string/smart" />
+
+        <com.google.android.material.button.MaterialButton
+            style="?attr/materialButtonOutlinedStyle"
+            android:id="@+id/loadBalance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:lines="1"
+            android:ellipsize="end"
+            app:strokeColor="@color/btn_stroke_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            android:textColor="@color/btn_text_color_selector"
+            app:cornerRadius="20dp"
+            android:fontFamily="@font/vazirmatn_regular"
+            android:text="@string/load_balance" />
+
+        <com.google.android.material.button.MaterialButton
+            style="?attr/materialButtonOutlinedStyle"
+            android:id="@+id/manual"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:lines="1"
+            android:ellipsize="end"
+            app:strokeColor="@color/btn_stroke_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            android:textColor="@color/btn_text_color_selector"
+            app:cornerRadius="20dp"
+            android:fontFamily="@font/vazirmatn_regular"
+            android:text="@string/manual" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+</LinearLayout>

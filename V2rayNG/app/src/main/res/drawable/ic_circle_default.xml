@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+  <!-- Shadow -->
+  <item>
+    <shape android:shape="oval">
+      <gradient
+          android:type="radial"
+          android:gradientRadius="40%p"
+          android:startColor="#686A6C"
+          android:endColor="#FCFDFF" />
+      <corners android:radius="3dp" />
+    </shape>
+  </item>
+</layer-list>

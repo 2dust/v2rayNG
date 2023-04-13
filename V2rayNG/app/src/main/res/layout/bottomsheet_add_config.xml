@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/colorDarkGray"
+        android:textSize="16sp"
+        android:fontFamily="@font/vazirmatn_regular"
+        android:text="@string/add_profile_description"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/importFromClipBoard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="16dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/import_from_clipboard"
+        android:textColor="@color/colorBlack"
+        android:fontFamily="@font/vazirmatn_regular"
+        app:icon="@drawable/ic_plus"
+        app:iconTint="@color/colorPrimary"
+        app:iconGravity="start"
+        app:strokeColor="@color/colorBorder"
+        app:strokeWidth="1dp"
+        app:cornerRadius="63dp"
+        app:backgroundTint="@color/colorBackground"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/scanQrCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="16dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/scan_qr_code"
+        android:textColor="@color/colorBlack"
+        android:fontFamily="@font/vazirmatn_regular"
+        app:icon="@drawable/ic_qr_code"
+        app:iconTint="@color/colorPrimary"
+        app:iconGravity="start"
+        app:strokeColor="@color/colorBorder"
+        app:strokeWidth="1dp"
+        app:cornerRadius="63dp"
+        app:backgroundTint="@color/colorBackground"/>
+</LinearLayout>
