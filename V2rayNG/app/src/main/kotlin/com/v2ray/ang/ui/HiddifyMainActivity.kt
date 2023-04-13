@@ -33,11 +33,9 @@ import com.v2ray.ang.extension.*
 import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.ui.bottomsheets.AddConfigBottomSheets
 import com.v2ray.ang.ui.bottomsheets.BottomSheetPresenter
+import com.v2ray.ang.ui.bottomsheets.ProfilesBottomSheets
 import com.v2ray.ang.ui.bottomsheets.SettingBottomSheets
-import com.v2ray.ang.util.AngConfigManager
-import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.SpeedtestUtil
-import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.*
 import com.v2ray.ang.viewmodel.HiddifyMainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,12 +46,11 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.TimeUnit
 
-class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSelectedListener*/,
-    AddConfigBottomSheets.Callback {
+class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSelectedListener,*/
+    AddConfigBottomSheets.Callback, ProfilesBottomSheets.Callback {
     private lateinit var binding: ActivityHiddifyMainBinding
     private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
     private val adapter by lazy { HiddifyMainRecyclerAdapter(this) }
-    private val subAdapter by lazy { HiddifyMainSubAdapter(this) }
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
     private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -156,10 +153,64 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
             if (!check) {
                 updateCircleState("default")
             } else {
+                val enableSubscription =
+                    if (hiddifyMainViewModel.subscriptionId == "")
+                        hiddifyMainViewModel.subscriptions.find { it.second.enabled }
+                else
+                    hiddifyMainViewModel.subscriptions.find { it.first == hiddifyMainViewModel.subscriptionId }
+
+                enableSubscription?.let { subscription ->
+                    binding.profileName.text = subscription.second.remarks
+
+                    binding.time.text = HiddifyUtils.timeToRelativeDate(
+                        subscription.second.expire, subscription.second.total,
+                        subscription.second.used, this
+                    )
+                    binding.time.showGone(subscription.second.expire != (-1).toLong())
+
+                    binding.consumerTrafficValue.text = HiddifyUtils.toTotalUsedGig(
+                        subscription.second.total,
+                        subscription.second.used,
+                        this
+                    )
+                    binding.consumerTrafficValue.showGone(subscription.second.total != (-1).toLong())
+                    binding.consumerTraffic.showGone(subscription.second.total != (-1).toLong())
+
+                    binding.progress.progress = (subscription.second.used / 1000000000).toInt()
+                    binding.progress.max = (subscription.second.total / 1000000000).toInt()
+                    binding.progress.showGone(subscription.second.total != (-1).toLong())
+
+                    binding.show.click {
+                        val intent =
+                            Intent(Intent.ACTION_VIEW, Uri.parse(subscription.second.home_link))
+                        if (intent.resolveActivity(packageManager) != null) {
+                            startActivity(intent)
+                        }
+                    }
+                    binding.show.showGone(subscription.second.home_link.isNotBlank())
+
+                    binding.profileName.click {
+                        bottomSheetPresenter.show(
+                            supportFragmentManager,
+                            ProfilesBottomSheets.newInstance()
+                        )
+                    }
+                    binding.addProfile.click {
+                        bottomSheetPresenter.show(
+                            supportFragmentManager,
+                            AddConfigBottomSheets.newInstance()
+                        )
+                    }
+                    binding.updateSubscription.click {
+                        importConfigViaSub()
+                    }
+                    binding.profileBox.show()
+                } ?: also {
+                    binding.profileBox.gone()
+                }
                 updateCircleState("ready")
             }
         }
-
         hiddifyMainViewModel.startListenBroadcast()
     }
 
@@ -192,10 +243,11 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
             if (result != null) {
                 launch(Dispatchers.Main) {
                     if (result) {
-                        toast(getString(R.string.migration_success))
+                        hiddifyToast(getString(R.string.migration_success))
                         hiddifyMainViewModel.reloadServerList()
+                        hiddifyMainViewModel.reloadSubscriptionsState()
                     } else {
-                        toast(getString(R.string.migration_fail))
+                        hiddifyToast(getString(R.string.migration_fail))
                     }
                 }
             }
@@ -207,7 +259,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
             return
         }
         updateCircleState("loading")
-//        toast(R.string.toast_services_start)
+//        hiddifyToast(R.string.toast_services_start)
         V2RayServiceManager.startV2Ray(this)
         hideCircle()
     }
@@ -226,6 +278,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
     public override fun onResume() {
         super.onResume()
         hiddifyMainViewModel.reloadServerList()
+        hiddifyMainViewModel.reloadSubscriptionsState()
     }
 
     public override fun onPause() {
@@ -297,9 +350,9 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
 
         R.id.export_all -> {
             if (AngConfigManager.shareNonCustomConfigsToClipboard(this, hiddifyMainViewModel.serverList) == 0) {
-                toast(R.string.toast_success)
+                hiddifyToast(R.string.toast_success)
             } else {
-                toast(R.string.toast_failure)
+                hiddifyToast(R.string.toast_failure)
             }
             true
         }
@@ -324,6 +377,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     MmkvManager.removeAllServer()
                     hiddifyMainViewModel.reloadServerList()
+                    hiddifyMainViewModel.reloadSubscriptionsState()
                 }
                 .show()
             true
@@ -341,6 +395,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     MmkvManager.removeInvalidServer()
                     hiddifyMainViewModel.reloadServerList()
+                    hiddifyMainViewModel.reloadSubscriptionsState()
                 }
                 .show()
             true
@@ -348,6 +403,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
         R.id.sort_by_test_results -> {
             MmkvManager.sortByTestResults()
             hiddifyMainViewModel.reloadServerList()
+            hiddifyMainViewModel.reloadSubscriptionsState()
             true
         }
         R.id.filter_config -> {
@@ -370,7 +426,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
     /**
      * import config from qrcode
      */
-    fun importQRcode(forConfig: Boolean): Boolean {
+    private fun importQRcode(forConfig: Boolean): Boolean {
 //        try {
 //            startActivityForResult(Intent("com.google.zxing.client.android.SCAN")
 //                    .addCategory(Intent.CATEGORY_DEFAULT)
@@ -385,7 +441,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
                     else
                         scanQRCodeForUrlToCustomConfig.launch(Intent(this, ScannerActivity::class.java))
                 else
-                    toast(R.string.toast_permission_denied)
+                    hiddifyToast(R.string.toast_permission_denied)
             }
 //        }
         return true
@@ -476,13 +532,11 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
             count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append)
         }
         if (count > 0) {
-
-
-            toast(R.string.toast_success)
+            hiddifyToast(R.string.toast_success)
             hiddifyMainViewModel.reloadServerList()
+            hiddifyMainViewModel.reloadSubscriptionsState()
         } else {
-
-            toast(R.string.toast_failure)
+            hiddifyToast(R.string.toast_failure)
         }
     }
 
@@ -491,7 +545,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
         try {
             val configText = Utils.getClipboard(this)
             if (TextUtils.isEmpty(configText)) {
-                toast(R.string.toast_none_data_clipboard)
+                hiddifyToast(R.string.toast_none_data_clipboard)
                 return false
             }
             importCustomizeConfig(Utils.Response(null,configText))
@@ -520,7 +574,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
         try {
             val url = Utils.getClipboard(this)
             if (TextUtils.isEmpty(url)) {
-                toast(R.string.toast_none_data_clipboard)
+                hiddifyToast(R.string.toast_none_data_clipboard)
                 return false
             }
             return importConfigCustomUrl(url)
@@ -536,7 +590,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
     private fun importConfigCustomUrl(url: String?): Boolean {
         try {
             if (!Utils.isValidUrl(url)) {
-                toast(R.string.toast_invalid_url)
+                hiddifyToast(R.string.toast_invalid_url)
                 return false
             }
             lifecycleScope.launch(Dispatchers.IO) {
@@ -563,7 +617,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
     fun importConfigViaSub()
             : Boolean {
         try {
-            toast(R.string.title_sub_update)
+            hiddifyToast(R.string.title_sub_update)
             MmkvManager.decodeSubscriptions().forEach {
                 if (TextUtils.isEmpty(it.first)
                     || TextUtils.isEmpty(it.second.remarks)
@@ -585,7 +639,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
                     } catch (e: Exception) {
                         e.printStackTrace()
                         launch(Dispatchers.Main) {
-                            toast("\"" + it.second.remarks + "\" " + getString(R.string.toast_failure))
+                            hiddifyToast("\"" + it.second.remarks + "\" " + getString(R.string.toast_failure))
                         }
                         return@launch
                     }
@@ -594,7 +648,6 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
                     }
                 }
             }
-
         } catch (e: Exception) {
             e.printStackTrace()
             hiddifyMainViewModel. testAllRealPing()
@@ -614,7 +667,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
         try {
             chooseFileForCustomConfig.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
         } catch (ex: ActivityNotFoundException) {
-            toast(R.string.toast_require_file_manager)
+            hiddifyToast(R.string.toast_require_file_manager)
         }
     }
 
@@ -642,7 +695,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
                         e.printStackTrace()
                     }
                 } else
-                    toast(R.string.toast_permission_denied)
+                    hiddifyToast(R.string.toast_permission_denied)
             }
     }
 
@@ -651,19 +704,19 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
      */
     private fun importCustomizeConfig(response: String?) {
         return importCustomizeConfig(Utils.Response(null,response))
-
     }
 
     private fun importCustomizeConfig(response: Utils.Response) {
         val server=response?.content
         try {
             if (server == null || TextUtils.isEmpty(server)) {
-                toast(R.string.toast_none_data)
+                hiddifyToast(R.string.toast_none_data)
                 return
             }
             hiddifyMainViewModel.appendCustomConfigServer(response)
             hiddifyMainViewModel.reloadServerList()
-            toast(R.string.toast_success)
+            hiddifyMainViewModel.reloadSubscriptionsState()
+            hiddifyToast(R.string.toast_success)
             //adapter.notifyItemInserted(hiddifyMainViewModel.serverList.lastIndex)
         } catch (e: Exception) {
             ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
@@ -703,6 +756,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
                 binding.connectState.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorYellow)))
                 binding.advanced.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorBlack)))
                 binding.advanced.iconTint = ColorStateList.valueOf(this.getColorEx(R.color.colorBlack))
+                binding.advanced.isEnabled = true
             }
             "connected" -> {
                 binding.importButtons.gone()
@@ -712,6 +766,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
                 binding.connectState.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorGreen)))
                 binding.advanced.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorBlack)))
                 binding.advanced.iconTint = ColorStateList.valueOf(this.getColorEx(R.color.colorBlack))
+                binding.advanced.isEnabled = true
             }
             "ready" -> {
                 binding.importButtons.gone()
@@ -721,6 +776,7 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
                 binding.connectState.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorPrimary2)))
                 binding.advanced.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorBlack)))
                 binding.advanced.iconTint = ColorStateList.valueOf(this.getColorEx(R.color.colorBlack))
+                binding.advanced.isEnabled = true
             }
             else -> {
                 binding.importButtons.show()
@@ -730,6 +786,8 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
                 binding.connectState.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorPrimary2)))
                 binding.advanced.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorBorder)))
                 binding.advanced.iconTint = ColorStateList.valueOf(this.getColorEx(R.color.colorBorder))
+                binding.advanced.isEnabled = false
+                binding.profileBox.gone()
             }
         }
     }
@@ -749,14 +807,6 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
                 }
         } catch (e: Exception) {
             Log.d(AppConfig.ANG_PACKAGE, e.toString())
-        }
-    }
-
-    override fun onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
         }
     }
 
@@ -786,5 +836,28 @@ class HiddifyMainActivity : BaseActivity()/*, NavigationView.OnNavigationItemSel
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
-    }*/
+    }
+*/
+    override fun onAddProfile() {
+        bottomSheetPresenter.show(supportFragmentManager, AddConfigBottomSheets.newInstance())
+    }
+
+    override fun onImportQrCode() {
+        importQRcode(true)
+        importConfigViaSub()
+    }
+
+    override fun onSelectSub(subPosition: Int) {
+        hiddifyMainViewModel.subscriptionId = hiddifyMainViewModel.subscriptions[subPosition].first
+        hiddifyMainViewModel.reloadServerList()
+        hiddifyMainViewModel.reloadSubscriptionsState()
+    }
+
+    override fun onBackPressed() {
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
+    }
 }

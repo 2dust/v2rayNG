@@ -203,4 +203,10 @@
         </receiver>
     </application>
 
+    <queries>
+        <!-- Specific intents you query for -->
+        <intent>
+            <action android:name="android.intent.action.View" />
+        </intent>
+    </queries>
 </manifest>

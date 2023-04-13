@@ -249,6 +249,7 @@ object V2RayServiceManager {
 
     private fun showNotification() {
         val service = serviceControl?.get()?.getService() ?: return
+        //todo @hiddify1
         val startMainIntent = Intent(service, HiddifyMainActivity::class.java) //todo: check to open main or hiddifyMain
         val contentPendingIntent = PendingIntent.getActivity(service,
                 NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent,

@@ -3,7 +3,7 @@
     <string name="title_hiddify">هیدیفای</string>
     <string name="fab_start">اجرا</string>
     <string name="fab_connected">متصل</string>
-    <string name="app_name" translatable="false">هیدیفای</string>
+    <string name="app_name">هیدیفای</string>
     <string name="app_widget_name">تعویض</string>
     <string name="app_tile_name">تعویض</string>
     <string name="app_tile_first_use">برای اولین بار از این ویژگی استفاده می‌کنید، لطفا از برنامه برای افزودن سرور استفاده کنید</string>
@@ -227,5 +227,28 @@
         <item>فقط پروکسی</item>
     </string-array>
 
-
+    <!-- hiddify -->
+    <string name="default_layout_description">برای استفاده از برنامه نیاز است که حتما
+یک سرور پروکسی راه اندازی کرده باشید
+و آن پروفایل را در برنامه وارد کنید.</string>
+    <string name="add_profile_description">افزودن پروفایل جدید</string>
+    <string name="import_from_clipboard">افزودن از کلیپ برد</string>
+    <string name="scan_qr_code">اسکن کد</string>
+    <string name="advanced">پیشرفته</string>
+    <string name="tab_to_connect">جهت اتصال کلیک کنید.</string>
+    <string name="connected">متصل</string>
+    <string name="connecting">در حال اتصال ...</string>
+    <string name="proxy">پروکسی</string>
+    <string name="connection_mode">حالت اتصال</string>
+    <string name="filtered_sites">سایت‌های فیلتر</string>
+    <string name="external_sites">سایت‌های خارجی</string>
+    <string name="sites_all">همه سایت‌ها</string>
+    <string name="smart">هوشمند</string>
+    <string name="load_balance">لودبالانس</string>
+    <string name="manual">دستی</string>
+    <string name="new_profile">پروفایل جدید</string>
+    <string name="consumer_traffic">ترافیک مصرفی</string>
+    <string name="show">مشاهده</string>
+    <string name="profiles">پروفایل‌ها</string>
+    <string name="add_profile">افزودن پروفایل</string>
 </resources>

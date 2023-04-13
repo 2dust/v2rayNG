@@ -5,8 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
-    android:layoutDirection="rtl">
+    android:background="@color/colorBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -45,6 +44,7 @@
                     android:layout_height="wrap_content">
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/addProfile"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingVertical="8dp"
@@ -52,23 +52,28 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         android:text="@string/new_profile"
+                        android:textAlignment="viewEnd"
                         android:textColor="@color/colorPrimary2"
                         android:fontFamily="@font/vazirmatn_regular"
                         style="?android:attr/borderlessButtonStyle"
                         app:icon="@drawable/ic_plus"
                         app:iconTint="@color/colorPrimary2"
-                        app:iconGravity="start" />
+                        app:iconGravity="textStart" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:layout_width="wrap_content"
+                        android:id="@+id/profileName"
+                        android:layout_width="180dp"
                         android:layout_height="wrap_content"
                         android:paddingVertical="8dp"
                         android:paddingHorizontal="16dp"
+                        android:lines="1"
+                        android:ellipsize="end"
+                        android:textAlignment="viewStart"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        android:text="@string/first_profile"
+                        tools:text="پروفایل ۱"
                         android:textColor="@color/colorBlack"
-                        android:fontFamily="@font/vazirmatn_regular"
+                        android:fontFamily="@font/vazir_medium"
                         style="?android:attr/borderlessButtonStyle"
                         app:icon="@drawable/ic_bottom_arrow"
                         app:iconTint="@color/colorLight"
@@ -91,12 +96,14 @@
                         android:id="@+id/time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAlignment="center"
-                        android:text="۲۸ روز\nباقیمانده"/>
+                        android:gravity="center"
+                        android:fontFamily="@font/vazir_bold"
+                        tools:text="۲۸۳۶۴۳۲ روز\nباقیمانده"/>
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:id="@+id/updateSubscription"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
                         app:srcCompat="@drawable/ic_refresh"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="10dp"
@@ -125,7 +132,9 @@
                             android:layout_height="wrap_content"
                             android:text="۱۲۷/۵۰۰ G"
                             android:textSize="16sp"
+                            android:fontFamily="@font/vazir_medium"
                             android:textColor="@color/colorBlack"
+                            android:textAlignment="viewEnd"
                             app:layout_constraintStart_toEndOf="@id/consumerTraffic"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"/>
@@ -134,12 +143,15 @@
                             android:id="@+id/progress"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:progress="80"
+                            app:trackCornerRadius="24dp"
+                            app:indicatorColor="@color/colorLightBlue"
                             app:layout_constraintTop_toBottomOf="@id/consumerTrafficValue"/>
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/show"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="40dp"
                             android:layout_marginTop="8dp"
                             android:text="@string/show"
                             android:textColor="@color/colorPrimary2"
@@ -170,42 +182,91 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center">
 
                 <LinearLayout
-                    android:layout_weight="1"
+                    android:id="@+id/upDownLayout"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content">
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/startButton"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ic_circle_default"
-                    android:padding="35dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-                    <ImageButton
-                        android:id="@+id/startButtonIcon"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/downloadSpeed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="8dp"
-                        android:background="@drawable/ic_circle"
-                        android:src="@drawable/ic_hiddify"
-                        android:contentDescription="@string/fab_start"
-                        app:tint="@color/colorDisable" />
+                        tools:text="۲.۶ KB/s"
+                        android:layout_gravity="center"
+                        android:textColor="@color/colorLightBlue"
+                        android:fontFamily="@font/vazir_light"
+                        style="?android:attr/borderlessButtonStyle"
+                        app:icon="@drawable/ic_download"
+                        app:iconTint="@color/colorLightBlue"
+                        app:iconGravity="end" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/uploadSpeed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="۲۰.۶ KB/s"
+                        android:layout_gravity="center"
+                        android:textColor="@color/colorLightYellow"
+                        android:fontFamily="@font/vazir_light"
+                        style="?android:attr/borderlessButtonStyle"
+                        app:icon="@drawable/ic_upload"
+                        app:iconTint="@color/colorLightYellow"
+                        app:iconGravity="end" />
                 </LinearLayout>
 
                 <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/startButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_circle_default"
+                        android:padding="35dp">
+
+                        <ImageButton
+                            android:id="@+id/startButtonIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:background="@drawable/ic_circle"
+                            android:src="@drawable/ic_hiddify"
+                            android:contentDescription="@string/fab_start"
+                            app:tint="@color/colorDisable" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/pinLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/ic_baseline_speed"/>
+
+                    <TextView
+                        android:id="@+id/ping"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorLightBlue"
+                        android:fontFamily="@font/vazir_light"
+                        tools:text="۳۶۰ ms 🐆️"/>
                 </LinearLayout>
             </LinearLayout>
 
@@ -226,12 +287,14 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="16dp"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/importFromClipBoard"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:paddingVertical="8dp"
                     android:paddingHorizontal="16dp"
                     android:text="@string/import_from_clipboard"
@@ -251,8 +314,9 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/scanQrCode"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:paddingVertical="8dp"
                     android:paddingHorizontal="16dp"
                     android:text="@string/scan_qr_code"
@@ -277,10 +341,10 @@
             app:cornerRadius="12dp"
             app:icon="@drawable/ic_setting"
             app:iconGravity="start"
-            app:iconTint="@color/colorBorder"
+            app:iconTint="@color/colorBlack"
             android:textAlignment="textStart"
             android:text="@string/advanced"
-            android:textColor="@color/colorBorder"
+            android:textColor="@color/colorBlack"
             android:fontFamily="@font/vazirmatn_regular"
             android:paddingHorizontal="16dp"
             android:paddingVertical="12dp"

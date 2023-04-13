@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Hiddify NG</string>
+    <string name="app_name">Hiddify NG</string>
     <string name="app_widget_name">Переключить</string>
     <string name="app_tile_name">Переключить</string>
     <string name="app_tile_first_use">Первое использование этой функции, пожалуйста, используйте приложение, чтобы добавить сервер</string>
@@ -225,26 +225,27 @@
     </string-array>
 
     <!-- hiddify -->
-    <string name="default_layout_description" translatable="false">برای استفاده از برنامه نیاز است که حتما
+    <string name="default_layout_description">برای استفاده از برنامه نیاز است که حتما
 یک سرور پروکسی راه اندازی کرده باشید
 و آن پروفایل را در برنامه وارد کنید.</string>
-    <string name="add_profile_description" translatable="false">افزودن پروفایل جدید</string>
-    <string name="import_from_clipboard" translatable="false">افزودن  از کلیپ برد</string>
-    <string name="scan_qr_code" translatable="false">اسکن کد</string>
-    <string name="advanced" translatable="false">پیشرفته</string>
-    <string name="tab_to_connect" translatable="false">جهت اتصال کلیک کنید.</string>
-    <string name="connected" translatable="false">متصل</string>
-    <string name="connecting" translatable="false">در حال اتصال ...</string>
-    <string name="proxy" translatable="false">پروکسی</string>
-    <string name="connection_mode" translatable="false">حالت اتصال</string>
-    <string name="filtered_sites" translatable="false">سایت‌های فیلتر</string>
-    <string name="external_sites" translatable="false">سایت‌های خارجی</string>
-    <string name="sites_all" translatable="false">همه سایت‌ها</string>
-    <string name="smart" translatable="false">هوشمند</string>
-    <string name="load_balance" translatable="false">لودبالانس</string>
-    <string name="manual" translatable="false">دستی</string>
-    <string name="new_profile" translatable="false">پروفایل جدید</string>
-    <string name="first_profile" translatable="false">پروفایل یک</string>
-    <string name="consumer_traffic">ترافیک مصرفی</string>
-    <string name="show">مشاهده</string>
+    <string name="add_profile_description">Add New Profile</string>
+    <string name="import_from_clipboard">Import from Clipboard</string>
+    <string name="scan_qr_code">Scan QRcode</string>
+    <string name="advanced">Advanced</string>
+    <string name="tab_to_connect">Click to connect.</string>
+    <string name="connected">Connected</string>
+    <string name="connecting">Connecting...</string>
+    <string name="proxy">Proxy</string>
+    <string name="connection_mode">Connection mode</string>
+    <string name="filtered_sites">سایت‌های فیلتر</string>
+    <string name="external_sites">سایت‌های خارجی</string>
+    <string name="sites_all">همه سایت‌ها</string>
+    <string name="smart">هوشمند</string>
+    <string name="load_balance">لودبالانس</string>
+    <string name="manual">دستی</string>
+    <string name="new_profile">New Profile</string>
+    <string name="consumer_traffic">Consumer traffic</string>
+    <string name="show">Show</string>
+    <string name="profiles">Profiles</string>
+    <string name="add_profile">Add Profile</string>
 </resources>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_bg"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardElevation="0dp"
+    android:background="?android:selectableItemBackground"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/profileName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:lines="1"
+                android:ellipsize="end"
+                android:textSize="14sp"
+                android:fontFamily="@font/vazir_bold"
+                android:textColor="@color/colorBlack"
+                tools:text="پروفایل یک"/>
+
+            <TextView
+                android:id="@+id/lastUpdate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:textSize="12sp"
+                android:textColor="@color/colorDarkGray"
+                tools:text=". بروزرسانی در ۶ دقیقه پیش"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:fontFamily="@font/vazir_light"
+                tools:text="۲۸۳۶۴۳۲ روز\nباقیمانده"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="0dp"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/consumerTrafficValue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    tools:text="۱۲۷/۵۰۰ G"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorBlack"
+                    android:fontFamily="@font/vazir_light"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progress="80"
+                    app:trackCornerRadius="24dp"
+                    app:indicatorColor="@color/colorLightBlue"
+                    app:layout_constraintTop_toBottomOf="@id/consumerTrafficValue"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
