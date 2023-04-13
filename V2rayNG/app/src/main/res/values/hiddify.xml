@@ -5,7 +5,6 @@
         have set up a proxy server and
         enter that profile in the program.</string>
     <string name="add_profile_description">New Profile</string>
-    <string name="import_from_clipboard">Insert From Clipboard</string>
     <string name="scan_qr_code">QR Code</string>
     <string name="advanced">Advanced</string>
     <string name="tab_to_connect">Click to connect.</string>
@@ -20,8 +19,16 @@
     <string name="load_balance">Load Balance</string>
     <string name="manual">Manual</string>
     <string name="new_profile">New Profile</string>
-    <string name="first_profile">Profile 1</string>
+    <string name="first_profile" translatable="false">Profile 1</string>
     <string name="consumer_traffic">Usage</string>
     <string name="show">Panel</string>
+    <!-- hiddify -->
 
+    <string name="import_from_clipboard">Import from Clipboard</string>
+
+
+
+
+    <string name="profiles">Profiles</string>
+    <string name="add_profile">Add Profile</string>
 </resources>
