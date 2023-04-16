@@ -4,13 +4,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.text.Editable
 import android.util.Base64
-import com.google.zxing.WriterException
-import android.graphics.Bitmap
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.qrcode.QRCodeWriter
-import com.google.zxing.EncodeHintType
 import java.util.*
-import kotlin.collections.HashMap
 import android.content.ClipData
 import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
@@ -172,36 +166,6 @@ object Utils {
     }
 
     /**
-     * create qrcode using zxing
-     */
-    fun createQRCode(text: String, size: Int = 800): Bitmap? {
-        try {
-            val hints = HashMap<EncodeHintType, String>()
-            hints[EncodeHintType.CHARACTER_SET] = "utf-8"
-            val bitMatrix = QRCodeWriter().encode(text,
-                    BarcodeFormat.QR_CODE, size, size, hints)
-            val pixels = IntArray(size * size)
-            for (y in 0 until size) {
-                for (x in 0 until size) {
-                    if (bitMatrix.get(x, y)) {
-                        pixels[y * size + x] = 0xff000000.toInt()
-                    } else {
-                        pixels[y * size + x] = 0xffffffff.toInt()
-                    }
-
-                }
-            }
-            val bitmap = Bitmap.createBitmap(size, size,
-                    Bitmap.Config.ARGB_8888)
-            bitmap.setPixels(pixels, 0, size, 0, 0, size, size)
-            return bitmap
-        } catch (e: WriterException) {
-            e.printStackTrace()
-            return null
-        }
-    }
-
-    /**
      * is ip address
      */
     fun isIpAddress(value: String): Boolean {
@@ -274,7 +238,7 @@ object Utils {
             if (value != null && Patterns.WEB_URL.matcher(value).matches() || URLUtil.isValidUrl(value)) {
                 return true
             }
-        } catch (e: WriterException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             return false
         }
