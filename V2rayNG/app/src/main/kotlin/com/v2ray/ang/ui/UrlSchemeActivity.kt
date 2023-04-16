@@ -3,7 +3,6 @@ package com.v2ray.ang.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import com.google.zxing.WriterException
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityLogcatBinding
 import com.v2ray.ang.extension.toast
@@ -44,7 +43,7 @@ class UrlSchemeActivity : BaseActivity() {
             }
             startActivity(Intent(this, MainActivity::class.java))
             finish()
-        } catch (e: WriterException) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
