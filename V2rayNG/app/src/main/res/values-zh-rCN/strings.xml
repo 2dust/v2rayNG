@@ -146,6 +146,9 @@
     <string name="title_pref_confirm_remove">删除配置文件确认</string>
     <string name="summary_pref_confirm_remove">删除配置文件是否需要用户二次确认</string>
 
+    <string name="title_pref_start_scan_immediate">立即启动扫码</string>
+    <string name="summary_pref_start_scan_immediate">启动时立即打开相机扫描，否则可在工具栏选择扫码或选照片</string>
+
     <string name="title_pref_feedback">反馈</string>
     <string name="summary_pref_feedback">反馈改进或漏洞至 GitHub</string>
     <string name="summary_pref_tg_group">加入Telegram Group</string>
@@ -158,6 +161,7 @@
     <string name="title_mode">模式</string>
     <string name="title_mode_help">点此查看更多帮助</string>
     <string name="title_language">语言</string>
+    <string name="title_ui_settings">用户界面设置</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">复制</string>

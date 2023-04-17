@@ -3,58 +3,62 @@ package com.v2ray.ang.ui
 import android.Manifest
 import android.app.Activity
 import android.os.Bundle
-import com.google.zxing.Result
-import me.dm7.barcodescanner.zxing.ZXingScannerView
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
-import com.google.zxing.BarcodeFormat
 import com.tbruyelle.rxpermissions.RxPermissions
+import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.QRCodeDecoder
+import io.github.g00fy2.quickie.QRResult
+import io.github.g00fy2.quickie.ScanCustomCode
+import io.github.g00fy2.quickie.config.ScannerConfig
 
-class ScannerActivity : BaseActivity(), ZXingScannerView.ResultHandler {
+class ScannerActivity : BaseActivity(){
 
-    private var mScannerView: ZXingScannerView? = null
+    private val scanQrCode = registerForActivityResult(ScanCustomCode(), ::handleResult)
+    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mScannerView = ZXingScannerView(this)   // Programmatically initialize the scanner view
 
-        mScannerView?.setAutoFocus(true)
-        val formats = ArrayList<BarcodeFormat>()
-        formats.add(BarcodeFormat.QR_CODE)
-        mScannerView?.setFormats(formats)
-
-        setContentView(mScannerView)                // Set the scanner view as the content view
+        if (settingsStorage?.decodeBool(AppConfig.PREF_START_SCAN_IMMEDIATE) == true) {
+            launchScan()
+        }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     public override fun onResume() {
         super.onResume()
-        mScannerView!!.setResultHandler(this) // Register ourselves as a handler for scan results.
-        mScannerView!!.startCamera()          // Start camera on resume
     }
 
     public override fun onPause() {
         super.onPause()
-        mScannerView!!.stopCamera()           // Stop camera on pause
     }
 
-    override fun handleResult(rawResult: Result) {
-        // Do something with the result here
-//        Log.v(FragmentActivity.TAG, rawResult.text) // Prints scan results
-//        Log.v(FragmentActivity.TAG, rawResult.barcodeFormat.toString()) // Prints the scan format (qrcode, pdf417 etc.)
+    private fun launchScan(){
+        scanQrCode.launch(
+            ScannerConfig.build {
+                setHapticSuccessFeedback(true) // enable (default) or disable haptic feedback when a barcode was detected
+                setShowTorchToggle(true) // show or hide (default) torch/flashlight toggle button
+                setShowCloseButton(true) // show or hide (default) close button
+            }
+        )
+    }
 
-        finished(rawResult.text)
-
-        // If you would like to resume scanning, call this method below:
-//        mScannerView!!.resumeCameraPreview(this)
+    private fun handleResult(result: QRResult) {
+        if (result is QRResult.QRSuccess ) {
+            finished(result.content.rawValue)
+        } else {
+            finish()
+        }
     }
 
     private fun finished(text: String) {
@@ -70,6 +74,10 @@ class ScannerActivity : BaseActivity(), ZXingScannerView.ResultHandler {
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.scan_code -> {
+            launchScan()
+            true
+        }
         R.id.select_photo -> {
             val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 Manifest.permission.READ_MEDIA_IMAGES

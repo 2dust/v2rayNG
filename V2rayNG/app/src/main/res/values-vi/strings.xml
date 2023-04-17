@@ -146,6 +146,9 @@
     <string name="title_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình</string>
     <string name="summary_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình khi bạn xoá một cấu hình.</string>
 
+    <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
+    <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
+
     <string name="title_pref_feedback">Phản hồi lỗi</string>
     <string name="summary_pref_feedback">Phản hồi cải tiến hoặc lỗi lên GitHub</string>
     <string name="summary_pref_tg_group">Tham gia nhóm Telegram</string>
@@ -158,6 +161,7 @@
     <string name="title_mode">Chế độ kết nối</string>
     <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp!</string>
     <string name="title_language">Ngôn ngữ</string>
+    <string name="title_ui_settings">UI settings</string>
 
     <string name="title_logcat">Nhật ký hoạt động</string>
     <string name="logcat_copy">Sao chép nhật ký</string>
