@@ -152,8 +152,8 @@
     <string name="title_pref_confirm_remove">Подтверждение удаления профиля</string>
     <string name="summary_pref_confirm_remove">Требовать двойное подтверждение удаления профиля</string>
 
-    <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
-    <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
+    <string name="title_pref_start_scan_immediate">Сканирование при запуске</string>
+    <string name="summary_pref_start_scan_immediate">Начинать сканирование сразу при запуске приложения или запускать функцию сканирования камерой или из изображения через панель инструментов</string>
 
     <string name="title_pref_feedback">Обратная связь</string>
     <string name="summary_pref_feedback">Предложить улучшение или сообщить об ошибке на GitHub</string>
@@ -167,7 +167,7 @@
     <string name="title_mode">Режим</string>
     <string name="title_mode_help">Нажмите для получения дополнительной информации</string>
     <string name="title_language">Язык</string>
-    <string name="title_ui_settings">UI settings</string>
+    <string name="title_ui_settings">Настройки интерфейса</string>
 
     <string name="title_logcat">Системный журнал</string>
     <string name="logcat_copy">Копировать</string>
