@@ -23,7 +23,9 @@ data class AngConfig(
                          var testResult: String = "",
                          var subid: String = "",
                          var flow: String = "",
-                         var sni: String = "")
+                         var sni: String = "",
+                         var fragment: String =""
+                         )
 
     data class SubItemBean(var id: String = "",
                            var remarks: String = "",

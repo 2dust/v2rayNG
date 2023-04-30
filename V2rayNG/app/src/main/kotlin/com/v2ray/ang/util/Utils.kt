@@ -260,7 +260,7 @@ object Utils {
      * stopVService
      */
     fun stopVService(context: Context) {
-        context.toast(R.string.toast_services_stop)
+//        context.toast(R.string.toast_services_stop)
         MessageUtil.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
     }
 
@@ -377,7 +377,7 @@ object Utils {
 
     fun getLocale(context: Context): Locale =
         when (settingsStorage?.decodeString(AppConfig.PREF_LANGUAGE) ?: "auto") {
-            "auto" -> getSysLocale()
+            "auto" -> Locale("fa")//getSysLocale()
             "en" -> Locale("en")
             "zh-rCN" -> Locale("zh", "CN")
             "zh-rTW" -> Locale("zh", "TW")

@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
 import com.tbruyelle.rxpermissions.RxPermissions
@@ -29,6 +30,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityHiddifyMainBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.SubscriptionItem
+import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.*
 import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.ui.bottomsheets.AddConfigBottomSheets
@@ -39,6 +41,7 @@ import com.v2ray.ang.util.*
 import com.v2ray.ang.viewmodel.HiddifyMainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 import me.drakeet.support.toast.ToastCompat
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
@@ -47,7 +50,7 @@ import java.io.FileOutputStream
 import java.util.concurrent.TimeUnit
 
 class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSelectedListener,*/
-    AddConfigBottomSheets.Callback, ProfilesBottomSheets.Callback {
+    AddConfigBottomSheets.Callback, ProfilesBottomSheets.Callback,SettingBottomSheets.Callback {
     private lateinit var binding: ActivityHiddifyMainBinding
     private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
     private val adapter by lazy { HiddifyMainRecyclerAdapter(this) }
@@ -58,6 +61,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             startV2Ray()
         }
     }
+    private var connect_mode=1;//1=smart 2=loadbalance 3=manual
     private var mItemTouchHelper: ItemTouchHelper? = null
     val hiddifyMainViewModel: HiddifyMainViewModel by viewModels()
     private val bottomSheetPresenter = BottomSheetPresenter()
@@ -102,24 +106,31 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }
 
         binding.startButtonIcon.click {
-            startV2Ray()
+            if (hiddifyMainViewModel.isRunning.value == true) {
+                Utils.stopVService(this)
+            }else {
+                startV2Ray()
+            }
         }
 
         binding.toolbar.setting.click {
             bottomSheetPresenter.show(supportFragmentManager, AddConfigBottomSheets.newInstance())
         }
         binding.toolbar.test.click {
-            runOnUiThread{
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-            }
+            open_old_v2ray()
         }
         
         binding.advanced.click {
             bottomSheetPresenter.show(supportFragmentManager, SettingBottomSheets.newInstance())
         }
-    }
 
+    }
+    fun open_old_v2ray(){
+        runOnUiThread{
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+    }
     override fun onClipBoard() {
         importClipboard()
         importConfigViaSub()
@@ -144,6 +155,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             if (isRunning) {
                 updateCircleState("connected")
             } else {
+                updateCircleState("disconnected")
                 hiddifyMainViewModel.subscriptionsAddedCheck()
             }
             hideCircle()
@@ -260,6 +272,18 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }
         updateCircleState("loading")
 //        hiddifyToast(R.string.toast_services_start)
+        when (connect_mode) {
+            1 ->{
+
+                MmkvManager.selectConfig(hiddifyMainViewModel.subscriptionId,connect_mode)
+            }
+            2 ->{
+                MmkvManager.selectConfig(hiddifyMainViewModel.subscriptionId,connect_mode)
+            }
+            else->{
+
+            }
+        }
         V2RayServiceManager.startV2Ray(this)
         hideCircle()
     }
@@ -279,6 +303,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         super.onResume()
         hiddifyMainViewModel.reloadServerList()
         hiddifyMainViewModel.reloadSubscriptionsState()
+
     }
 
     public override fun onPause() {
@@ -614,8 +639,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
     /**
      * import config from sub
      */
-    fun importConfigViaSub()
-            : Boolean {
+    fun importConfigViaSub() : Boolean {
         try {
             hiddifyToast(R.string.title_sub_update)
             MmkvManager.decodeSubscriptions().forEach {
@@ -858,6 +882,15 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         } else {
             super.onBackPressed()
+        }
+    }
+
+    override fun onModeChange(mode: Int) {
+        connect_mode=mode;
+        if (mode==3){
+            open_old_v2ray()
+        }else{
+            restartV2Ray()
         }
     }
 }

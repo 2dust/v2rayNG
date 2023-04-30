@@ -657,7 +657,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            moveTaskToBack(false)
+//            moveTaskToBack(false)
+            finish()
             return true
         }
         return super.onKeyDown(keyCode, event)
@@ -691,8 +692,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         } else {
             //super.onBackPressed()
-            onBackPressedDispatcher.onBackPressed()
+//            onBackPressedDispatcher.onBackPressed()
+            finish()
         }
+
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -713,7 +716,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 Utils.openUri(this, AppConfig.v2rayNGIssues)
             }
             R.id.promotion -> {
-                Utils.openUri(this, "${Utils.decode(AppConfig.promotionUrl)}?t=${System.currentTimeMillis()}")
+//                Utils.openUri(this, "${Utils.decode(AppConfig.promotionUrl)}?t=${System.currentTimeMillis()}")
+                Utils.openUri(this,"tg://resolve?domain=hiddify")
             }
             R.id.logcat -> {
                 startActivity(Intent(this, LogcatActivity::class.java))

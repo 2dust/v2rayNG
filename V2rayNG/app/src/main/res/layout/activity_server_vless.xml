@@ -223,6 +223,26 @@
                 android:inputType="text" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/hiddifyl4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fragment" />
+
+            <Spinner
+                android:id="@+id/sp_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edit_height"
+                android:entries="@array/fragment"
+                />
+
+        </LinearLayout>
         <include layout="@layout/tls_layout"  />
 
         <LinearLayout

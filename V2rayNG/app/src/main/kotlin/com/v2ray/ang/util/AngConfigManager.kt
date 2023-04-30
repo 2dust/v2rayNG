@@ -137,7 +137,7 @@ object AngConfigManager {
                 config.outboundBean?.streamSettings?.let { streamSetting ->
                     val sni = streamSetting.populateTransportSettings(vmessBean.network, vmessBean.headerType,
                             vmessBean.requestHost, vmessBean.path, vmessBean.path, vmessBean.requestHost, vmessBean.path,
-                            vmessBean.headerType, vmessBean.path)
+                            vmessBean.headerType, vmessBean.path,vmessBean.fragment)
                     val allowInsecure = if (vmessBean.allowInsecure.isBlank()) {
                         settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
                     } else {
@@ -217,7 +217,7 @@ object AngConfigManager {
                             vnext.users[0].alterId = Utils.parseInt(vmessQRCode.aid)
                         }
                         val sni = streamSetting.populateTransportSettings(vmessQRCode.net, vmessQRCode.type, vmessQRCode.host,
-                                vmessQRCode.path, vmessQRCode.path, vmessQRCode.host, vmessQRCode.path, vmessQRCode.type, vmessQRCode.path)
+                                vmessQRCode.path, vmessQRCode.path, vmessQRCode.host, vmessQRCode.path, vmessQRCode.type, vmessQRCode.path,vmessQRCode.fragment)
 
                         val fingerprint = vmessQRCode.fp ?: streamSetting.tlsSettings?.fingerprint
                         streamSetting.populateTlsSettings(vmessQRCode.tls, allowInsecure,
@@ -304,7 +304,7 @@ object AngConfigManager {
                     var allowInsecure=(queryParam["allowInsecure"]?:"")=="true"
                     val sni = config.outboundBean?.streamSettings?.populateTransportSettings(queryParam["type"] ?: "tcp", queryParam["headerType"],
                         queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
-                        queryParam["mode"], queryParam["serviceName"])
+                        queryParam["mode"], queryParam["serviceName"], queryParam["fragment"])
                     fingerprint = queryParam["fp"] ?: ""
                     config.outboundBean?.streamSettings?.populateTlsSettings(queryParam["security"] ?: TLS,
                             allowInsecure, queryParam["sni"] ?: sni!!, fingerprint, queryParam["alpn"],
@@ -340,7 +340,7 @@ object AngConfigManager {
 
                 val sni = streamSetting.populateTransportSettings(queryParam["type"] ?: "tcp", queryParam["headerType"],
                         queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
-                        queryParam["mode"], queryParam["serviceName"])
+                        queryParam["mode"], queryParam["serviceName"], queryParam["fragment"])
                 fingerprint = queryParam["fp"] ?: ""
                 val pbk = queryParam["pbk"] ?: ""
                 val sid = queryParam["sid"] ?: ""
@@ -394,7 +394,7 @@ object AngConfigManager {
             val sni = streamSetting.populateTransportSettings(protocol, queryParam["type"],
                     queryParam["host"]?.split("|")?.get(0) ?: "",
                     queryParam["path"]?.takeIf { it.trim() != "/" } ?: "", queryParam["seed"], queryParam["security"],
-                    queryParam["key"], queryParam["mode"], queryParam["serviceName"])
+                    queryParam["key"], queryParam["mode"], queryParam["serviceName"], queryParam["fragment"])
             streamSetting.populateTlsSettings(if (tls) TLS else "", allowInsecure, sni, fingerprint, null,
                     null, null, null)
             true
@@ -495,6 +495,8 @@ object AngConfigManager {
                         vmessQRCode.type = transportDetails[0]
                         vmessQRCode.host = transportDetails[1]
                         vmessQRCode.path = transportDetails[2]
+                        if (transportDetails.count()>3)
+                            vmessQRCode.fragment = transportDetails[3]
                     }
                     val json = Gson().toJson(vmessQRCode)
                     Utils.encode(json)
@@ -552,6 +554,7 @@ object AngConfigManager {
                         if (!TextUtils.isEmpty(tlsSetting.fingerprint)) {
                             dicQuery["fp"] = tlsSetting.fingerprint!!
                         }
+
                         if (!TextUtils.isEmpty(tlsSetting.publicKey)) {
                             dicQuery["pbk"] = tlsSetting.publicKey!!
                         }
@@ -584,6 +587,9 @@ object AngConfigManager {
                                 }
                                 if (!TextUtils.isEmpty(transportDetails[2])) {
                                     dicQuery["path"] = Utils.urlEncode(transportDetails[2])
+                                }
+                                if (transportDetails.count()>3 && !TextUtils.isEmpty(transportDetails[3])) {
+                                    dicQuery["fragment"] = transportDetails[3]
                                 }
                             }
                             "http", "h2" -> {
@@ -722,6 +728,9 @@ object AngConfigManager {
                     if (lstParameter.size > 1) {
                         path = lstParameter[0].trim()
                         host = lstParameter[1].trim()
+                    }
+                    if (lstParameter.size > 2) {
+                        vmess.fragment = lstParameter[2].trim()
                     }
                     vmess.path = path
                     vmess.requestHost = host

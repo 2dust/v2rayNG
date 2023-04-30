@@ -191,5 +191,20 @@ object MmkvManager {
         }
         return res
     }
+    fun selectConfig(subid: String?,mode:Int){
+        var res=ArrayList<Pair<String,ServerConfig>>()
+        for (guid in MmkvManager.decodeServerList()) {
+            val config = MmkvManager.decodeServerConfig(guid) ?: continue
+            if (!subid.isNullOrEmpty() && subid != config.subscriptionId) {
+                continue
+            }
+            if (guid==subid+mode){
+                mainStorage?.encode(KEY_SELECTED_SERVER, guid)
+                break
+            }
+            res.add(Pair(guid,config))
+        }
+
+    }
 
 }

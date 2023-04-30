@@ -54,6 +54,10 @@ class ServerActivity : BaseActivity() {
     private val tcpTypes: Array<out String> by lazy {
         resources.getStringArray(R.array.header_type_tcp)
     }
+    private val fragmentTypes: Array<out String> by lazy {
+        resources.getStringArray(R.array.fragment)
+    }
+
     private val kcpAndQuicTypes: Array<out String> by lazy {
         resources.getStringArray(R.array.header_type_kcp_and_quic)
     }
@@ -91,6 +95,7 @@ class ServerActivity : BaseActivity() {
     private val sp_stream_fingerprint: Spinner? by lazy { findViewById(R.id.sp_stream_fingerprint) } //uTLS
     private val container_fingerprint: LinearLayout? by lazy { findViewById(R.id.l3) }
     private val sp_network: Spinner? by lazy { findViewById(R.id.sp_network) }
+    private val sp_fragment: Spinner? by lazy { findViewById(R.id.sp_fragment) }
     private val sp_header_type: Spinner? by lazy { findViewById(R.id.sp_header_type) }
     private val sp_header_type_title: TextView? by lazy { findViewById(R.id.sp_header_type_title) }
     private val et_request_host: EditText? by lazy { findViewById(R.id.et_request_host) }
@@ -132,6 +137,8 @@ class ServerActivity : BaseActivity() {
                     sp_header_type?.setSelection(Utils.arrayFind(types, transportDetails[0]))
                     et_request_host?.text = Utils.getEditable(transportDetails[1])
                     et_path?.text = Utils.getEditable(transportDetails[2])
+                    if (transportDetails.count()>3)
+                        sp_fragment?.setSelection(Utils.arrayFind(fragmentTypes,transportDetails[3]))
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -277,6 +284,7 @@ class ServerActivity : BaseActivity() {
         sp_header_type?.setSelection(0)
         et_request_host?.text = null
         et_path?.text = null
+        sp_fragment?.setSelection(0)
         sp_stream_security?.setSelection(0)
         sp_allow_insecure?.setSelection(0)
         et_sni?.text = null
@@ -383,6 +391,7 @@ class ServerActivity : BaseActivity() {
         val type = sp_header_type?.selectedItemPosition ?: return
         val requestHost = et_request_host?.text?.toString()?.trim() ?: return
         val path = et_path?.text?.toString()?.trim() ?: return
+        val fragment=sp_fragment?.selectedItemPosition?:return
         val sniField = et_sni?.text?.toString()?.trim() ?: return
         val allowInsecureField = sp_allow_insecure?.selectedItemPosition ?: return
         val streamSecurity = sp_stream_security?.selectedItemPosition ?: return
@@ -401,7 +410,8 @@ class ServerActivity : BaseActivity() {
                 quicSecurity = requestHost,
                 key = path,
                 mode = transportTypes(networks[network])[type],
-                serviceName = path
+                serviceName = path,
+                fragmentation = fragmentTypes[fragment]
         )
         if (sniField.isNotBlank()) {
             sni = sniField

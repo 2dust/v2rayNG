@@ -21,9 +21,10 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/vazirmatn_regular"
         android:textSize="16sp"
-        android:text="@string/proxy"/>
+        android:text="@string/proxy" android:visibility="gone"/>
 
     <com.google.android.material.button.MaterialButtonToggleGroup
+        android:visibility="gone"
         android:id="@+id/proxyToggleButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

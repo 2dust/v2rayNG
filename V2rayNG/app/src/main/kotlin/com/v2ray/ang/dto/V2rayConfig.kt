@@ -168,11 +168,21 @@ data class V2rayConfig(
                 data class HeaderBean(var type: String = "none")
             }
 
+            data class FragmentationConfig(
+                var enabled: Boolean = false,
+                var fragmentationIntervalTimeout: Long = 100,
+                var strategy: String = "random",
+                var maxChunkSize: Int = 100,
+                var sni: String = "www.cloudflare.com"
+            )
+
             data class WsSettingsBean(var path: String = "",
                                       var headers: HeadersBean = HeadersBean(),
                                       val maxEarlyData: Int? = null,
                                       val useBrowserForwarding: Boolean? = null,
-                                      val acceptProxyProtocol: Boolean? = null) {
+                                      val acceptProxyProtocol: Boolean? = null,
+                                      var fragmentation: FragmentationConfig?=null//hiddify
+                                        ) {
                 data class HeadersBean(var Host: String = "")
             }
 
@@ -206,7 +216,7 @@ data class V2rayConfig(
                                         var multiMode: Boolean? = null)
 
             fun populateTransportSettings(transport: String, headerType: String?, host: String?, path: String?, seed: String?,
-                                          quicSecurity: String?, key: String?, mode: String?, serviceName: String?): String {
+                                          quicSecurity: String?, key: String?, mode: String?, serviceName: String?,fragmentation: String?): String {
                 var sni = ""
                 network = transport
                 when (network) {
@@ -242,7 +252,12 @@ data class V2rayConfig(
                         wssetting.headers.Host = host ?: ""
                         sni = wssetting.headers.Host
                         wssetting.path = path ?: "/"
+                        if (!fragmentation.isNullOrEmpty()) {
+                            wssetting.fragmentation = FragmentationConfig(enabled = true)
+                            wssetting.fragmentation?.strategy=fragmentation
+                        }
                         wsSettings = wssetting
+
                     }
                     "h2", "http" -> {
                         network = "h2"
@@ -368,7 +383,7 @@ data class V2rayConfig(
                         val wsSetting = streamSettings?.wsSettings ?: return null
                         listOf("",
                                 wsSetting.headers.Host,
-                                wsSetting.path)
+                                wsSetting.path,wsSetting.fragmentation?.strategy?:"")
                     }
                     "h2" -> {
                         val h2Setting = streamSettings?.httpSettings ?: return null

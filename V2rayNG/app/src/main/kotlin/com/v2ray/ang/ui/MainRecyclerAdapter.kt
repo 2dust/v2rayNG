@@ -192,7 +192,8 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 holder.itemFooterBinding.layoutEdit.visibility = View.INVISIBLE
             } else {
                 holder.itemFooterBinding.layoutEdit.setOnClickListener {
-                    Utils.openUri(mActivity, "${Utils.decode(AppConfig.promotionUrl)}?t=${System.currentTimeMillis()}")
+                    //Utils.openUri(mActivity, "${Utils.decode(AppConfig.promotionUrl)}?t=${System.currentTimeMillis()}")
+                    Utils.openUri(mActivity,"tg://resolve?domain=hiddify")
                 }
             }
         }

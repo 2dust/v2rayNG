@@ -81,6 +81,11 @@
         <item>http/1.1</item>
         <item>h2,http/1.1</item>
     </string-array>
+    <string-array name="fragment" translatable="false">
+        <item></item>
+        <item>random</item>
+        <item>sni</item>
+    </string-array>
 
     <string-array name="allowinsecures" translatable="false">
         <item></item>
