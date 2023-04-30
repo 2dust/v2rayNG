@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.*
 import android.content.res.ColorStateList
 import android.net.Uri
+import android.net.VpnService
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -108,7 +109,14 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         binding.startButtonIcon.click {
             if (hiddifyMainViewModel.isRunning.value == true) {
                 Utils.stopVService(this)
-            }else {
+            } else if (settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN" == "VPN") {
+                val intent = VpnService.prepare(this)
+                if (intent == null) {
+                    startV2Ray()
+                } else {
+                    requestVpnPermission.launch(intent)
+                }
+            } else {
                 startV2Ray()
             }
         }
