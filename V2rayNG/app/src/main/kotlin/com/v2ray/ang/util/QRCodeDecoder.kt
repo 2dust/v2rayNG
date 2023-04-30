@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import com.google.zxing.*
 import com.google.zxing.common.GlobalHistogramBinarizer
 import com.google.zxing.common.HybridBinarizer
+import com.google.zxing.qrcode.QRCodeWriter
 import java.util.*
 
 /**
@@ -12,6 +13,36 @@ import java.util.*
  */
 object QRCodeDecoder {
     val HINTS: MutableMap<DecodeHintType, Any?> = EnumMap(DecodeHintType::class.java)
+
+    /**
+     * create qrcode using zxing
+     */
+    fun createQRCode(text: String, size: Int = 800): Bitmap? {
+        try {
+            val hints = HashMap<EncodeHintType, String>()
+            hints[EncodeHintType.CHARACTER_SET] = "utf-8"
+            val bitMatrix = QRCodeWriter().encode(text,
+                BarcodeFormat.QR_CODE, size, size, hints)
+            val pixels = IntArray(size * size)
+            for (y in 0 until size) {
+                for (x in 0 until size) {
+                    if (bitMatrix.get(x, y)) {
+                        pixels[y * size + x] = 0xff000000.toInt()
+                    } else {
+                        pixels[y * size + x] = 0xffffffff.toInt()
+                    }
+
+                }
+            }
+            val bitmap = Bitmap.createBitmap(size, size,
+                Bitmap.Config.ARGB_8888)
+            bitmap.setPixels(pixels, 0, size, 0, 0, size, size)
+            return bitmap
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }
 
     /**
      * 同步解析本地图片二维码。该方法是耗时操作，请在子线程中调用。

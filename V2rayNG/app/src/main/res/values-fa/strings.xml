@@ -150,6 +150,9 @@
     <string name="title_pref_confirm_remove">تایید حذف پرونده پیکربندی</string>
     <string name="summary_pref_confirm_remove">آیا برای حذف پرونده پیکربندی نیاز به تایید دوم توسط کاربر است</string>
 
+    <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
+    <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
+
     <string name="title_pref_feedback">گزارش ایراد</string>
     <string name="summary_pref_feedback">بهبودهای بازخورد یا اشکالات در گیت‌هاب</string>
     <string name="summary_pref_tg_group">عضویت در گروه تلگرام</string>
@@ -162,6 +165,7 @@
     <string name="title_mode">حالت</string>
     <string name="title_mode_help">برای راهنمایی بیشتر روی این متن، کلیک کنید</string>
     <string name="title_language">زبان</string>
+    <string name="title_ui_settings">UI settings</string>
 
     <string name="title_logcat">فایل عیب یابی</string>
     <string name="logcat_copy">کپی</string>

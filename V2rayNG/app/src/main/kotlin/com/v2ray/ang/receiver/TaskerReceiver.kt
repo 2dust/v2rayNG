@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
-import com.google.zxing.WriterException
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.service.V2RayServiceManager
@@ -34,7 +33,7 @@ class TaskerReceiver : BroadcastReceiver() {
             } else {
                 Utils.stopVService(context)
             }
-        } catch (e: WriterException) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

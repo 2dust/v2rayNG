@@ -57,7 +57,7 @@ class UrlSchemeActivity : BaseActivity() {
             //todo @hiddify1
             startActivity(Intent(this, HiddifyMainActivity::class.java))  //todo: check to open main or hiddifyMain
             finish()
-        } catch (e: WriterException) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

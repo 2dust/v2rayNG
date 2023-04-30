@@ -158,6 +158,9 @@
     <string name="title_pref_confirm_remove">Delete configuration file confirmation</string>
     <string name="summary_pref_confirm_remove">Whether to delete the configuration file requires a second confirmation by the user</string>
 
+    <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
+    <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
+
     <string name="title_pref_feedback">Feedback</string>
     <string name="summary_pref_feedback">Feedback enhancements or bugs to GitHub</string>
     <string name="summary_pref_tg_group">Join Telegram Group</string>
@@ -170,6 +173,7 @@
     <string name="title_mode">Mode</string>
     <string name="title_mode_help">Click me for more help</string>
     <string name="title_language">Language</string>
+    <string name="title_ui_settings">UI settings</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Copy</string>
