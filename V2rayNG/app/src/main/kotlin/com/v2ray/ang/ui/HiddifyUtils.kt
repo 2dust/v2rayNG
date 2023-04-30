@@ -7,7 +7,7 @@ import com.v2ray.ang.extension.*
 import com.v2ray.ang.util.Utils.getLocale
 import java.util.Locale
 
-object HiddifyUtils {
+object HiddifyUtils1 {
     fun toTotalUsedGig(totalInBytes: Long, usedInBytes: Long, context: Context): String {
         val total = totalInBytes.toDouble() / 1073741824
         val used = usedInBytes.toDouble() / 1073741824
