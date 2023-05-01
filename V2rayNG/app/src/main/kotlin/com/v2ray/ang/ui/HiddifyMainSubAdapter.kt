@@ -37,18 +37,18 @@ class HiddifyMainSubAdapter(val context: Context, val callback: (Int) -> Unit) :
 
             time.text =
                 HiddifyUtils.timeToRelativeDate(subItem.expire, subItem.total, subItem.used, context)
-            time.showGone(subItem.expire != (-1).toLong())
+            time.showGone(subItem.expire > (0).toLong())
 
             consumerTrafficValue.text = HiddifyUtils.toTotalUsedGig(
                 subItem.total,
                 subItem.used,
                 context
             )
-            consumerTrafficValue.showGone(subItem.total != (-1).toLong())
+            consumerTrafficValue.showGone(subItem.total > (0).toLong())
 
             progress.progress = (subItem.used / 1000000000).toInt()
             progress.max = (subItem.total / 1000000000).toInt()
-
+            progress.showGone(subItem.total > (0).toLong())
             itemBg.backgroundTintList = if (HiddifyUtils.checkState(subItem.expire, subItem.total, subItem.used) == "enable")
                 ColorStateList.valueOf(context.getColorEx(R.color.white))
             else

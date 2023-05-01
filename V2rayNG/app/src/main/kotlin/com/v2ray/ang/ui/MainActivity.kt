@@ -717,7 +717,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             R.id.promotion -> {
 //                Utils.openUri(this, "${Utils.decode(AppConfig.promotionUrl)}?t=${System.currentTimeMillis()}")
-                Utils.openUri(this,"tg://resolve?domain=hiddify")
+                if (!Utils.openUri(this,"tg://resolve?domain=hiddify"))
+                    Utils.openUri(this,"https://t.me/hiddify")
             }
             R.id.logcat -> {
                 startActivity(Intent(this, LogcatActivity::class.java))

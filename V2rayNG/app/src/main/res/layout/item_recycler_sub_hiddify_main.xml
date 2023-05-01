@@ -29,7 +29,7 @@
                 android:ellipsize="end"
                 android:textSize="14sp"
                 android:fontFamily="@font/vazir_bold"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorText"
                 tools:text="پروفایل یک"/>
 
             <TextView
@@ -69,7 +69,7 @@
                     android:layout_height="wrap_content"
                     tools:text="۱۲۷/۵۰۰ G"
                     android:textSize="12sp"
-                    android:textColor="@color/colorBlack"
+                    android:textColor="@color/colorText"
                     android:fontFamily="@font/vazir_light"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

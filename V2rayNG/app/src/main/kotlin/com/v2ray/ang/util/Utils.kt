@@ -264,9 +264,16 @@ object Utils {
         MessageUtil.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
     }
 
-    fun openUri(context: Context, uriString: String) {
+    fun openUri(context: Context, uriString: String): Boolean {
         val uri = Uri.parse(uriString)
-        context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+        val intent=Intent(Intent.ACTION_VIEW, uri)
+        return try {
+            context.startActivity(intent)
+            true
+        }catch (e:Exception){
+            false
+        }
+
     }
 
     /**

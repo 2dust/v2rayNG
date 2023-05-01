@@ -5,5 +5,6 @@
     <color name="colorText">#CCCCCC</color>
     <color name="colorTopBar">#1c2766</color>
     <color name="colorPrimary">#1c2766</color>
-
+    <color name="colorBtnBg">#1c2766</color>
+    <color name="colorBtnText">#DCDADA</color>
 </resources>

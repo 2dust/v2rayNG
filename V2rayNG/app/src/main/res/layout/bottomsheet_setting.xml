@@ -92,6 +92,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:singleSelection="true"
+        android:background="@color/btn_bg_color_selector"
+        android:foreground="?android:attr/selectableItemBackground"
         app:checkedButton="@id/smart">
 
         <com.google.android.material.button.MaterialButton

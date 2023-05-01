@@ -14,6 +14,8 @@
     <!--    <color name="colorPrimary">#008577</color>-->
     <!--    <color name="colorPrimaryDark">#00574B</color>-->
     <color name="colorPrimary">#435ce1</color>
+    <color name="colorBtnBg">#FFFFFF</color>
+    <color name="colorBtnText">#221313</color>
     <color name="colorPrimaryDark">#1c2766</color>
     <color name="colorAccent">#D81B60</color>
     <color name="colorBg">#FFFFFF</color>

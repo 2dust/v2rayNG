@@ -25,15 +25,15 @@
         android:paddingHorizontal="16dp"
         android:layout_marginTop="10dp"
         android:text="@string/import_from_clipboard"
-        android:textColor="@color/colorBlack"
+        android:textColor="@color/colorBtnText"
         android:fontFamily="@font/vazirmatn_regular"
         app:icon="@drawable/ic_plus"
-        app:iconTint="@color/colorPrimary"
+        app:iconTint="@color/colorBtnText"
         app:iconGravity="start"
         app:strokeColor="@color/colorBorder"
         app:strokeWidth="1dp"
         app:cornerRadius="63dp"
-        app:backgroundTint="@color/colorBackground"/>
+        app:backgroundTint="@color/colorBtnBg"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/scanQrCode"
@@ -43,13 +43,13 @@
         android:paddingHorizontal="16dp"
         android:layout_marginTop="10dp"
         android:text="@string/scan_qr_code"
-        android:textColor="@color/colorBlack"
+        android:textColor="@color/colorBtnText"
         android:fontFamily="@font/vazirmatn_regular"
         app:icon="@drawable/ic_qr_code"
-        app:iconTint="@color/colorPrimary"
+        app:iconTint="@color/colorBtnText"
         app:iconGravity="start"
         app:strokeColor="@color/colorBorder"
         app:strokeWidth="1dp"
         app:cornerRadius="63dp"
-        app:backgroundTint="@color/colorBackground"/>
+        app:backgroundTint="@color/colorBtnBg"/>
 </LinearLayout>

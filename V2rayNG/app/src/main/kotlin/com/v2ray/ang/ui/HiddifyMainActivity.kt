@@ -3,6 +3,8 @@ package com.v2ray.ang.ui
 import android.Manifest
 import android.content.*
 import android.content.res.ColorStateList
+import android.graphics.BlendMode
+import android.graphics.PorterDuff
 import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
@@ -124,6 +126,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         binding.toolbar.setting.click {
             bottomSheetPresenter.show(supportFragmentManager, AddConfigBottomSheets.newInstance())
         }
+
         binding.toolbar.test.click {
             open_old_v2ray()
         }
@@ -176,7 +179,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                 val enableSubscription =
                     if (hiddifyMainViewModel.subscriptionId == "")
                         hiddifyMainViewModel.subscriptions.find { it.second.enabled }
-                else
+                    else
                     hiddifyMainViewModel.subscriptions.find { it.first == hiddifyMainViewModel.subscriptionId }
 
                 enableSubscription?.let { subscription ->
@@ -186,28 +189,27 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                         subscription.second.expire, subscription.second.total,
                         subscription.second.used, this
                     )
-                    binding.time.showGone(subscription.second.expire != (-1).toLong())
+                    binding.time.showGone(subscription.second.expire > (0).toLong())
 
                     binding.consumerTrafficValue.text = HiddifyUtils.toTotalUsedGig(
                         subscription.second.total,
                         subscription.second.used,
                         this
                     )
-                    binding.consumerTrafficValue.showGone(subscription.second.total != (-1).toLong())
-                    binding.consumerTraffic.showGone(subscription.second.total != (-1).toLong())
+                    binding.consumerTrafficValue.showGone(subscription.second.total > (0).toLong())
+                    binding.consumerTraffic.showGone(subscription.second.total > (0).toLong())
 
                     binding.progress.progress = (subscription.second.used / 1000000000).toInt()
                     binding.progress.max = (subscription.second.total / 1000000000).toInt()
-                    binding.progress.showGone(subscription.second.total != (-1).toLong())
+                    binding.progress.showGone(subscription.second.total > (0).toLong())
 
                     binding.show.click {
-                        val intent =
-                            Intent(Intent.ACTION_VIEW, Uri.parse(subscription.second.home_link))
-                        if (intent.resolveActivity(packageManager) != null) {
-                            startActivity(intent)
-                        }
+                        if (subscription.second.home_link.isNullOrEmpty())
+                            return@click
+                        Utils.openUri(this,subscription.second.home_link)
+
                     }
-                    binding.show.showGone(subscription.second.home_link.isNotBlank())
+                    binding.show.showGone(!subscription.second.home_link.isNullOrEmpty())
 
                     binding.profileName.click {
                         bottomSheetPresenter.show(
@@ -311,6 +313,8 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         super.onResume()
         hiddifyMainViewModel.reloadServerList()
         hiddifyMainViewModel.reloadSubscriptionsState()
+        updateCircleState(if (V2RayServiceManager.v2rayPoint.isRunning)"connected" else "ready")
+
 
     }
 
@@ -517,47 +521,8 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }else{
             subid
         }
-        if( !subid.isNullOrEmpty() && response?.headers!=null) {
-            val json = subStorage?.decodeString(subid)
-            if (!json.isNullOrBlank()) {
-                var sub = Gson().fromJson(json, SubscriptionItem::class.java)
-                var userinfo=response.headers.getOrDefault("Subscription-Userinfo",null)?.firstOrNull()
-                var homepage=response.headers.getOrDefault("Profile-Web-Page-Url",null)?.firstOrNull()
-                var content_disposition=response.headers.getOrDefault("Content-Disposition",null)?.firstOrNull()
-                var profile_update_interval=response.headers.getOrDefault("Profile-Update-Interval",null)?.firstOrNull()
-                if (!content_disposition.isNullOrEmpty()){
-                    val regex = "filename=\"([^\"]+)\"".toRegex()
-                    val matchResult = regex.find(content_disposition)
-                    sub.remarks = matchResult?.groupValues?.getOrNull(1)?:sub.remarks
-                }else if (!response.url.isNullOrEmpty()){
-                    var uri= Uri.parse(response.url)
-                    sub.remarks = Utils.getQueryParameterValueCaseInsensitive(uri,"Name")?:sub.remarks
-                }
-                if (!homepage.isNullOrEmpty()){
-                    sub.home_link=homepage
-                }
-                if (!userinfo.isNullOrEmpty()){
-                    fun get(regex: String): String? {
-                        return regex.toRegex().findAll(userinfo).mapNotNull {
-                            if (it.groupValues.size > 1) it.groupValues[1] else null
-                        }.firstOrNull();
-                    }
+        HiddifyUtils.extract_package_info_from_response(response,subid)
 
-                    sub.used = 0
-                    get("upload=([0-9]+)")?.apply {
-                        sub.used += toLong()
-                    }
-                    get("download=([0-9]+)")?.apply {
-                        sub.used += toLong()
-                    }
-                    sub.total = get("total=([0-9]+)")?.toLong() ?: 0
-
-                    sub.expire=get("expire=([0-9]+)")?.toLong() ?: 0
-                }
-
-                subStorage?.encode(subid, Gson().toJson(sub))
-            }
-        }
         val append = subid.isNullOrEmpty()
 
         var count = AngConfigManager.importBatchConfig(server, subid2, append)
@@ -783,11 +748,12 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             "loading" -> {
                 binding.importButtons.gone()
                 binding.startButton.background = ContextCompat.getDrawable(this, R.drawable.ic_circle_connecting)
+
                 binding.startButtonIcon.imageTintList = ColorStateList.valueOf(this.getColorEx(R.color.colorYellow))
                 binding.connectState.text = getString(R.string.connecting)
                 binding.connectState.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorYellow)))
-                binding.advanced.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorBlack)))
-                binding.advanced.iconTint = ColorStateList.valueOf(this.getColorEx(R.color.colorBlack))
+                binding.advanced.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorText)))
+                binding.advanced.iconTint = ColorStateList.valueOf(this.getColorEx(R.color.colorText))
                 binding.advanced.isEnabled = true
             }
             "connected" -> {
@@ -796,18 +762,23 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                 binding.startButtonIcon.imageTintList = ColorStateList.valueOf(this.getColorEx(R.color.colorGreen))
                 binding.connectState.text = getString(R.string.connected)
                 binding.connectState.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorGreen)))
-                binding.advanced.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorBlack)))
-                binding.advanced.iconTint = ColorStateList.valueOf(this.getColorEx(R.color.colorBlack))
+                binding.advanced.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorText)))
+                binding.advanced.iconTint = ColorStateList.valueOf(this.getColorEx(R.color.colorText))
                 binding.advanced.isEnabled = true
             }
             "ready" -> {
                 binding.importButtons.gone()
                 binding.startButton.background = ContextCompat.getDrawable(this, R.drawable.ic_circle_ready)
+//                binding.startButton.backgroundTintList= ColorStateList.valueOf(this.getColorEx(R.color.colorPrimary2))
+//                binding.startButton.backgroundTintBlendMode=BlendMode.MULTIPLY;
                 binding.startButtonIcon.imageTintList = ColorStateList.valueOf(this.getColorEx(R.color.colorPrimary2))
+
+
+
                 binding.connectState.text = getString(R.string.tab_to_connect)
                 binding.connectState.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorPrimary2)))
-                binding.advanced.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorBlack)))
-                binding.advanced.iconTint = ColorStateList.valueOf(this.getColorEx(R.color.colorBlack))
+//                binding.advanced.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorText)))
+//                binding.advanced.iconTint = ColorStateList.valueOf(this.getColorEx(R.color.colorText))
                 binding.advanced.isEnabled = true
             }
             else -> {
@@ -816,8 +787,8 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                 binding.startButtonIcon.imageTintList = ColorStateList.valueOf(this.getColorEx(R.color.colorDisable))
                 binding.connectState.text = getString(R.string.default_layout_description)
                 binding.connectState.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorPrimary2)))
-                binding.advanced.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorBorder)))
-                binding.advanced.iconTint = ColorStateList.valueOf(this.getColorEx(R.color.colorBorder))
+//                binding.advanced.setTextColor(ColorStateList.valueOf(this.getColorEx(R.color.colorBorder)))
+//                binding.advanced.iconTint = ColorStateList.valueOf(this.getColorEx(R.color.colorBorder))
                 binding.advanced.isEnabled = false
                 binding.profileBox.gone()
             }

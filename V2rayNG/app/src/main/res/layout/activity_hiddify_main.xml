@@ -5,7 +5,8 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground">
+    android:background="@color/colorBg"
+    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -16,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.AppBarOverlay"
+
             app:layout_constraintTop_toTopOf="parent">
 
             <include
@@ -72,11 +74,11 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:text="پروفایل ۱"
-                        android:textColor="@color/colorBlack"
+                        android:textColor="@color/colorText"
                         android:fontFamily="@font/vazir_medium"
                         style="?android:attr/borderlessButtonStyle"
                         app:icon="@drawable/ic_bottom_arrow"
-                        app:iconTint="@color/colorLight"
+                        app:iconTint="@color/colorText"
                         app:iconGravity="end" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -107,7 +109,7 @@
                         app:srcCompat="@drawable/ic_refresh"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="10dp"
-                        app:tint="@color/colorBlack"/>
+                        app:tint="@color/colorText"/>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="0dp"
@@ -133,7 +135,7 @@
                             android:text="۱۲۷/۵۰۰ G"
                             android:textSize="16sp"
                             android:fontFamily="@font/vazir_medium"
-                            android:textColor="@color/colorBlack"
+                            android:textColor="@color/colorText"
                             android:textAlignment="viewEnd"
                             app:layout_constraintStart_toEndOf="@id/consumerTraffic"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -174,6 +176,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+
             app:layout_constraintTop_toBottomOf="@id/profileBox"
             app:layout_constraintBottom_toTopOf="@id/advanced"
             app:layout_constraintStart_toStartOf="parent"
@@ -231,6 +234,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/ic_circle_default"
+
                         android:padding="35dp">
 
                         <ImageButton
@@ -298,15 +302,15 @@
                     android:paddingVertical="8dp"
                     android:paddingHorizontal="16dp"
                     android:text="@string/import_from_clipboard"
-                    android:textColor="@color/colorBlack"
+                    android:textColor="@color/colorBtnText"
                     android:fontFamily="@font/vazirmatn_regular"
                     app:icon="@drawable/ic_plus"
-                    app:iconTint="@color/colorPrimary2"
+                    app:iconTint="@color/colorBtnText"
                     app:iconGravity="end"
                     app:strokeColor="@color/colorBorder"
                     app:strokeWidth="1dp"
                     app:cornerRadius="63dp"
-                    app:backgroundTint="@color/colorBackground"/>
+                    app:backgroundTint="@color/colorBtnBg"/>
 
                 <View
                     android:layout_width="12dp"
@@ -320,15 +324,15 @@
                     android:paddingVertical="8dp"
                     android:paddingHorizontal="16dp"
                     android:text="@string/scan_qr_code"
-                    android:textColor="@color/colorBlack"
+                    android:textColor="@color/colorBtnText"
                     android:fontFamily="@font/vazirmatn_regular"
                     app:icon="@drawable/ic_qr_code"
-                    app:iconTint="@color/colorPrimary2"
+                    app:iconTint="@color/colorBtnText"
                     app:iconGravity="end"
                     app:strokeColor="@color/colorBorder"
                     app:strokeWidth="1dp"
                     app:cornerRadius="63dp"
-                    app:backgroundTint="@color/colorBackground"/>
+                    app:backgroundTint="@color/colorBtnBg"/>
             </LinearLayout>
         </LinearLayout>
 
@@ -338,13 +342,14 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:backgroundTint="@color/colorBg"
+            app:backgroundTintMode="add"
             app:cornerRadius="12dp"
             app:icon="@drawable/ic_setting"
             app:iconGravity="start"
-            app:iconTint="@color/colorBlack"
+            app:iconTint="@color/colorText"
             android:textAlignment="textStart"
             android:text="@string/advanced"
-            android:textColor="@color/colorBlack"
+            android:textColor="@color/colorText"
             android:fontFamily="@font/vazirmatn_regular"
             android:paddingHorizontal="16dp"
             android:paddingVertical="12dp"
