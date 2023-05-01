@@ -15,6 +15,7 @@ buildscript {
         // Make sure that you have the Google services Gradle plugin dependency
         classpath 'com.google.gms:google-services:4.3.15'
 
+
         // Add the dependency for the Crashlytics Gradle plugin
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.5'
     }
