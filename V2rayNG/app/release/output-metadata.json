@@ -11,35 +11,9 @@
       "type": "UNIVERSAL",
       "filters": [],
       "attributes": [],
-      "versionCode": 5100106,
-      "versionName": "1.01.6",
+      "versionCode": 5100200,
+      "versionName": "1.2.0",
       "outputFile": "HiddifyNG_null.apk"
-    },
-    {
-      "type": "ONE_OF_MANY",
-      "filters": [
-        {
-          "filterType": "ABI",
-          "value": "x86_64"
-        }
-      ],
-      "attributes": [],
-      "versionCode": 9100106,
-      "versionName": "1.01.6",
-      "outputFile": "HiddifyNG_x86_64.apk"
-    },
-    {
-      "type": "ONE_OF_MANY",
-      "filters": [
-        {
-          "filterType": "ABI",
-          "value": "arm64-v8a"
-        }
-      ],
-      "attributes": [],
-      "versionCode": 7100106,
-      "versionName": "1.01.6",
-      "outputFile": "HiddifyNG_arm64-v8a.apk"
     },
     {
       "type": "ONE_OF_MANY",
@@ -50,8 +24,8 @@
         }
       ],
       "attributes": [],
-      "versionCode": 6100106,
-      "versionName": "1.01.6",
+      "versionCode": 6100200,
+      "versionName": "1.2.0",
       "outputFile": "HiddifyNG_armeabi-v7a.apk"
     },
     {
@@ -63,9 +37,35 @@
         }
       ],
       "attributes": [],
-      "versionCode": 8100106,
-      "versionName": "1.01.6",
+      "versionCode": 8100200,
+      "versionName": "1.2.0",
       "outputFile": "HiddifyNG_x86.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "arm64-v8a"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 7100200,
+      "versionName": "1.2.0",
+      "outputFile": "HiddifyNG_arm64-v8a.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86_64"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 9100200,
+      "versionName": "1.2.0",
+      "outputFile": "HiddifyNG_x86_64.apk"
     }
   ],
   "elementType": "File"
