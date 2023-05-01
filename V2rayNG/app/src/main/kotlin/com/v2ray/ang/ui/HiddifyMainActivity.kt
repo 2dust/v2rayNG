@@ -313,7 +313,8 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         super.onResume()
         hiddifyMainViewModel.reloadServerList()
         hiddifyMainViewModel.reloadSubscriptionsState()
-        updateCircleState(if (V2RayServiceManager.v2rayPoint.isRunning)"connected" else "ready")
+        if (V2RayServiceManager.v2rayPoint.isRunning)
+            updateCircleState("connected")
 
 
     }

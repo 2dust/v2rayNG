@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -72,7 +74,9 @@ object V2RayServiceManager {
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
         }
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
-            context.startForegroundService(intent)
+            Handler(Looper.getMainLooper()).post{
+                context.startForegroundService(intent)
+            }
         } else {
             context.startService(intent)
         }
