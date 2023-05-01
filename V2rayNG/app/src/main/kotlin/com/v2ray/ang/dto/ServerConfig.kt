@@ -60,8 +60,12 @@ data class ServerConfig(
     }
 
     fun getV2rayPointDomainAndPort(): String {
-        val address = getProxyOutbound()?.getServerAddress().orEmpty()
-        val port = getProxyOutbound()?.getServerPort()
+        var address = getProxyOutbound()?.getServerAddress().orEmpty()
+        var port = getProxyOutbound()?.getServerPort()
+        if (configType==EConfigType.LowestPing||configType==EConfigType.LoadBalance){
+            address="www.snapp.ir"
+            port=80
+        }
         return if (Utils.isIpv6Address(address)) {
             String.format("[%s]:%s", address, port)
         } else {

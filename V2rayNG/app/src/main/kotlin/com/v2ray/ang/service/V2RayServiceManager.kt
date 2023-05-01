@@ -145,6 +145,7 @@ object V2RayServiceManager {
 
             v2rayPoint.configureFileContent = result.content
             v2rayPoint.domainName = config.getV2rayPointDomainAndPort()
+            Log.e("Hiddd",v2rayPoint.domainName)
             currentConfig = config
 
             try {

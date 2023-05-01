@@ -283,18 +283,20 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }
         updateCircleState("loading")
 //        hiddifyToast(R.string.toast_services_start)
-        when (connect_mode) {
-            1 ->{
+        val enableSubscription =
+            if (hiddifyMainViewModel.subscriptionId == "")
+                hiddifyMainViewModel.subscriptions.find { it.second.enabled }
+            else
+                hiddifyMainViewModel.subscriptions.find { it.first == hiddifyMainViewModel.subscriptionId }
 
-                MmkvManager.selectConfig(hiddifyMainViewModel.subscriptionId,connect_mode)
-            }
-            2 ->{
-                MmkvManager.selectConfig(hiddifyMainViewModel.subscriptionId,connect_mode)
-            }
-            else->{
+        enableSubscription?.let { subscription ->
+            if (connect_mode != 3) {
 
+                mainStorage?.encode(MmkvManager.KEY_SELECTED_SERVER, subscription.first + connect_mode)
+//                MmkvManager.selectConfig(hiddifyMainViewModel.subscriptionId,connect_mode)
             }
         }
+
         V2RayServiceManager.startV2Ray(this)
         hideCircle()
     }
