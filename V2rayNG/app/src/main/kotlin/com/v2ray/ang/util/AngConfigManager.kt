@@ -764,8 +764,8 @@ object AngConfigManager {
             if(!append) {
                 MmkvManager.removeServerViaSubid(subid)
             }
-            MmkvManager.encodeServerConfig(subid+1, ServerConfig(configType = EConfigType.LoadBalance, remarks = "LoadBalance", subscriptionId = subid))
-            MmkvManager.encodeServerConfig(subid+2, ServerConfig(configType = EConfigType.LowestPing, remarks = "LowestPing", subscriptionId = subid))
+            MmkvManager.encodeServerConfig(subid+2, ServerConfig(configType = EConfigType.LoadBalance, remarks = "LoadBalance", subscriptionId = subid))
+            MmkvManager.encodeServerConfig(subid+1, ServerConfig(configType = EConfigType.LowestPing, remarks = "LowestPing", subscriptionId = subid))
 //            var servers = server
 //            if (server.indexOf("vmess") >= 0 && server.indexOf("vmess") == server.lastIndexOf("vmess")) {
 //                servers = server.replace("\n", "")
