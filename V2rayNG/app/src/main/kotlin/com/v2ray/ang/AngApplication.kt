@@ -2,6 +2,7 @@ package com.v2ray.ang
 
 import androidx.multidex.MultiDexApplication
 import androidx.preference.PreferenceManager
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.tencent.mmkv.MMKV
 
 class AngApplication : MultiDexApplication() {
@@ -16,6 +17,9 @@ class AngApplication : MultiDexApplication() {
         super.onCreate()
 
 //        LeakCanary.install(this)
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
+        Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(this))
+
 
         val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         firstRun = defaultSharedPreferences.getInt(PREF_LAST_VERSION, 0) != BuildConfig.VERSION_CODE

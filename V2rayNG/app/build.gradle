@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'//hiddify
+    id 'com.google.firebase.crashlytics'//hiddify
 }
 
 android {
@@ -17,8 +19,8 @@ android {
         minSdkVersion 21
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
-        versionCode 5100106 //hiddify
-        versionName "1.01.6" //hiddify
+        versionCode 5100200 //hiddify
+        versionName "1.2.0" //hiddify
     }
 
     buildTypes {
@@ -117,4 +119,16 @@ dependencies {
     implementation 'com.blacksquircle.ui:language-json:2.1.1'
     implementation 'io.github.g00fy2.quickie:quickie-bundled:1.6.0'
     implementation 'com.google.zxing:core:3.5.1'
+
+
+    //Hiddify
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:31.5.0')
+
+    // Add the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+
+
 }

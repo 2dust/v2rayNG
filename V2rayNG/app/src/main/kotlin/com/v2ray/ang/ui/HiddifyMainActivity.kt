@@ -109,6 +109,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }
 
         binding.startButtonIcon.click {
+            throw RuntimeException("Test Crash") // Force a crash
             if (hiddifyMainViewModel.isRunning.value == true) {
                 Utils.stopVService(this)
             } else if (settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN" == "VPN") {
