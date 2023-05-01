@@ -487,6 +487,6 @@ data class V2rayConfig(
     data class BalancerBean(var tag: String?=null,var selector:List<String>?=null, var strategy:BalancerStrategyBean?=null)
     data class BalancerStrategyBean(var type: String?=null,var settings: BalancerStrategySetting?=null)
     open class BalancerStrategySetting{}
-    data class OptimalBalancerStrategySetting(var timeout: Int?=10000,var interval: Int?=60000*10, var url: String?="https://about.google", var count:Int?=3, var accept_little_diff:Boolean=true,val load_balancing:Boolean=false,var diff_percent:Double=0.5):BalancerStrategySetting()
+    data class OptimalBalancerStrategySetting(var timeout: Int?=10000,var interval: Int?=60000*10, var url: String?="https://cp.cloudflare.com", var count:Int?=3, var accept_little_diff:Boolean=true,val load_balancing:Boolean=false,var diff_percent:Double=0.5):BalancerStrategySetting()
 
 }

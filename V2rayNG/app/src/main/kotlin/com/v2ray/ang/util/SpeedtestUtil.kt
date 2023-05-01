@@ -99,7 +99,7 @@ object SpeedtestUtil {
 
         try {
             val url = URL("http",
-                    "www.google.com",
+                    "cp.cloudflare.com",
                     "/generate_204")
 
             conn = url.openConnection(
