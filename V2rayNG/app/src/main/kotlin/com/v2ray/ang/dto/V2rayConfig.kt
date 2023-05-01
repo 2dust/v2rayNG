@@ -173,7 +173,7 @@ data class V2rayConfig(
                 var fragmentationIntervalTimeout: Long = 100,
                 var strategy: String = "random",
                 var maxChunkSize: Int = 100,
-                var sni: String = "www.cloudflare.com"
+                var sni: String = ""
             )
 
             data class WsSettingsBean(var path: String = "",

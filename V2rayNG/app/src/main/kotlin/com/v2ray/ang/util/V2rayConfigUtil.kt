@@ -227,7 +227,7 @@ object V2rayConfigUtil {
             // Hardcode googleapis.cn
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
                     type = "field",
-                    outboundTag = if (balancer?.tag != null) "" else AppConfig.TAG_AGENT,
+                    outboundTag = if (balancer?.tag.isNullOrEmpty()) AppConfig.TAG_AGENT else "",
                     balancerTag = balancer?.tag,
                     domain = arrayListOf("domain:googleapis.cn"),
 
@@ -270,7 +270,17 @@ object V2rayConfigUtil {
                     )
                     v2rayConfig.routing.rules.add(globalDirect)
                 }
+
             }
+
+            val globalProxy = V2rayConfig.RoutingBean.RulesBean(
+                type = "field",
+                outboundTag = if (balancer?.tag.isNullOrEmpty()) AppConfig.TAG_AGENT else "",
+                balancerTag = balancer?.tag,
+                port = "0-65535"
+            )
+            v2rayConfig.routing.rules.add(globalProxy)
+
         } catch (e: Exception) {
             e.printStackTrace()
             return false
@@ -296,7 +306,7 @@ object V2rayConfigUtil {
                     //Domain
                     val rulesDomain = V2rayConfig.RoutingBean.RulesBean()
                     rulesDomain.type = "field"
-                    rulesDomain.outboundTag = if (balancerTag != null) "" else tag
+                    rulesDomain.outboundTag = if (balancerTag.isNullOrEmpty()) tag else ""
                     rulesDomain.balancerTag = balancerTag
                     rulesDomain.domain = ArrayList()
                     rulesDomain.domain?.add("geosite:$code")
@@ -314,14 +324,14 @@ object V2rayConfigUtil {
                 //Domain
                 val rulesDomain = V2rayConfig.RoutingBean.RulesBean()
                 rulesDomain.type = "field"
-                rulesDomain.outboundTag = if (balancerTag != null) "" else tag
+                rulesDomain.outboundTag = if (balancerTag.isNullOrEmpty()) tag else ""
                 rulesDomain.balancerTag = balancerTag
                 rulesDomain.domain = ArrayList()
 
                 //IP
                 val rulesIP = V2rayConfig.RoutingBean.RulesBean()
                 rulesIP.type = "field"
-                rulesIP.outboundTag = if (balancerTag != null) "" else tag
+                rulesIP.outboundTag = if (balancerTag.isNullOrEmpty())  tag else ""
                 rulesIP.balancerTag = balancerTag
                 rulesIP.ip = ArrayList()
 
@@ -479,7 +489,7 @@ object V2rayConfigUtil {
 
                 v2rayConfig.routing.rules.add(0, V2rayConfig.RoutingBean.RulesBean(
                         type = "field",
-                        outboundTag = if (balancerTag != null) "" else AppConfig.TAG_AGENT,
+                        outboundTag = if (balancerTag.isNullOrEmpty()) AppConfig.TAG_AGENT else "",
                         balancerTag = balancerTag,
                         port = "53",
                         ip = arrayListOf(remoteDns.first()),

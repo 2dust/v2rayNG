@@ -317,6 +317,8 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         if (V2RayServiceManager.v2rayPoint.isRunning)
             updateCircleState("connected")
 
+        hiddifyMainViewModel.startListenBroadcast()
+
 
     }
 
