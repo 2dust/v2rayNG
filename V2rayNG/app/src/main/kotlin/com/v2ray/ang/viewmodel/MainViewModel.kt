@@ -59,7 +59,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 
         updateCache()
         updateListAction.value = -1
-        MessageUtil.sendMsg2UI(getApplication(),AppConfig.MSG_HIDDIFY_DO_TEST_PING,"")
+//        MessageUtil.sendMsg2UI(getApplication(),AppConfig.MSG_HIDDIFY_DO_TEST_PING,"")
 
     }
 
@@ -240,7 +240,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                     isRunning.value = false
                 }
                 AppConfig.MSG_STATE_START_SUCCESS -> {
-                    getApplication<AngApplication>().toast(R.string.toast_services_success)
+//                    getApplication<AngApplication>().toast(R.string.toast_services_success)
                     isRunning.value = true
                 }
                 AppConfig.MSG_STATE_START_FAILURE -> {
@@ -259,8 +259,8 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                     updateListAction.value = getPosition(resultPair.first)
                 }
                 AppConfig.MSG_HIDDIFY_DO_TEST_PING->{
-                    if (System.currentTimeMillis()-lastPing>5000)
-                    testAllRealPing()
+                    if (System.currentTimeMillis()-lastPing>10000)
+                        testAllRealPing()
                 }
             }
         }

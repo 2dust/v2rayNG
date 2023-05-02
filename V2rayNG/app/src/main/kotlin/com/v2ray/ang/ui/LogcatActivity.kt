@@ -60,9 +60,16 @@ class LogcatActivity : BaseActivity() {
 //                        InputStreamReader(process.inputStream))
 //                val allText = bufferedReader.use(BufferedReader::readText)
                 val allText = process.inputStream.bufferedReader().use { it.readText() }
+                var regex=Regex("""\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{3}\s+([A-Z]\/[A-z.-]*)\s*\(?\d*\)?:?\|?\s*""")
+                val regex_xray = Regex("""^\d{4}/\d{2}/\d{2}\s+\d{2}:\d{2}:\d{2}\s*""")
+
+                var regex2=Regex("""  +""")
+
                 launch(Dispatchers.Main) {
-                    binding.tvLogcat.text = allText
+                    binding.tvLogcat.text = allText.replace(regex,"").replace(regex_xray,"").replace(regex2,"")
+                    binding.tvLogcat.textDirection=View.TEXT_DIRECTION_LTR
                     binding.tvLogcat.movementMethod = ScrollingMovementMethod()
+                    binding.tvLogcat.scrollTo(0,binding.tvLogcat.length())
                     binding.pbWaiting.visibility = View.GONE
                     Handler(Looper.getMainLooper()).post { binding.svLogcat.fullScroll(View.FOCUS_DOWN) }
                 }

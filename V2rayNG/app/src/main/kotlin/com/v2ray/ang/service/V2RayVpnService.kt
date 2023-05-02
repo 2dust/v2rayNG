@@ -153,6 +153,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             val bypassApps = settingsStorage?.decodeBool(AppConfig.PREF_BYPASS_APPS) ?: false
             apps?.forEach {
                 try {
+                    if (it==BuildConfig.APPLICATION_ID)return;
                     if (bypassApps)
                         builder.addDisallowedApplication(it)
                     else
