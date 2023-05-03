@@ -5,6 +5,7 @@ import android.content.*
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -92,6 +93,16 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         copyAssets()
         migrateLegacy()
         init()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            RxPermissions(this)
+                .request(Manifest.permission.POST_NOTIFICATIONS)
+                .subscribe {
+                    if (!it)
+                        toast(R.string.toast_permission_denied)
+                }
+        }
+
     }
 
     private fun init() {
@@ -552,8 +563,9 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append, selectSub = selectSub)
         }
         if (count > 0) {
-            if(selectSub)
+            if(selectSub) {
                 HiddifyUtils.setMode(connect_mode)
+            }
             hiddifyMainViewModel.testAllRealPing()
             toast(R.string.toast_success)
             hiddifyMainViewModel.reloadServerList()
@@ -892,12 +904,17 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }
 
         hiddifyMainViewModel.subscriptionId = subid
+
+
+        hiddifyMainViewModel.reloadServerList()
+        hiddifyMainViewModel.reloadSubscriptionsState()
+
         val enableSubscription =hiddifyMainViewModel.currentSubscription()
         if (enableSubscription?.second?.needUpdate() == true){
             importConfigViaSub(HiddifyUtils.getSelectedSubId())
+        }else{
+            hiddifyMainViewModel.testAllRealPing()
         }
-        hiddifyMainViewModel.reloadServerList()
-        hiddifyMainViewModel.reloadSubscriptionsState()
     }
 
     override fun onRemoveSelectSub(subid: String) {

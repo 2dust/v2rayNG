@@ -95,18 +95,21 @@ object MmkvManager {
         return Gson().fromJson(json, ServerAffiliationInfo::class.java)
     }
 
-    fun encodeServerTestDelayMillis(guid: String, testResult: Long) {
+    fun encodeServerTestDelayMillis(guid: String, testResult: Long,subid: String) {
         if (guid.isBlank()) {
             return
         }
         val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
         aff.testDelayMillis = testResult
+        aff.subid=subid
         serverAffStorage?.encode(guid, Gson().toJson(aff))
     }
 
     fun clearAllTestDelayResults() {
+        val selectedSub=HiddifyUtils.getSelectedSubId()
         serverAffStorage?.allKeys()?.forEach { key ->
             decodeServerAffiliationInfo(key)?.let { aff ->
+                if (aff.subid!=selectedSub)return@let
                 aff.testDelayMillis = 0
                 serverAffStorage?.encode(key, Gson().toJson(aff))
             }

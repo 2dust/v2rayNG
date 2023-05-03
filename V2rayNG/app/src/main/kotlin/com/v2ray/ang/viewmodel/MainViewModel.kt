@@ -124,7 +124,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                     tcpingTestScope.launch {
                         val testResult = SpeedtestUtil.tcping(serverAddress, serverPort)
                         launch(Dispatchers.Main) {
-                            MmkvManager.encodeServerTestDelayMillis(item.guid, testResult)
+                            MmkvManager.encodeServerTestDelayMillis(item.guid, testResult,subscriptionId)
                             updateListAction.value =  getPosition(item.guid)
                         }
                     }
@@ -142,6 +142,8 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 //        getApplication<AngApplication>().toast(R.string.connection_test_testing)
         viewModelScope.launch(Dispatchers.Default) { // without Dispatchers.Default viewModelScope will launch in main thread
             for (item in ArrayList(serversCache)) {
+                if (!subscriptionId.isNullOrEmpty() && item.config.subscriptionId!=subscriptionId)
+                    continue
                 val config = V2rayConfigUtil.getV2rayConfig(getApplication(), item.guid)
                 if (config.status) {
                     MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG, Pair(item.guid, config.content))
@@ -261,7 +263,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                 }
                 AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> {
                     val resultPair = intent.getSerializableExtra("content") as Pair<String, Long>
-                    MmkvManager.encodeServerTestDelayMillis(resultPair.first, resultPair.second)
+                    MmkvManager.encodeServerTestDelayMillis(resultPair.first, resultPair.second,subscriptionId)
                     updateListAction.value = getPosition(resultPair.first)
                 }
                 AppConfig.MSG_HIDDIFY_DO_TEST_PING->{

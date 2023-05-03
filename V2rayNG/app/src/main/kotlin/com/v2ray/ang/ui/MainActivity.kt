@@ -469,6 +469,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         if (count > 0) {
 //            toast(R.string.toast_success)
             mainViewModel.reloadServerList()
+            mainViewModel.testAllRealPing()
         } else {
             toast(R.string.toast_failure)
         }
@@ -588,7 +589,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             mainViewModel.testAllRealPing()
             return false
         }
-        mainViewModel.testAllRealPing()
+
         return true
     }
 
@@ -755,11 +756,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             HiddifyUtils.setSelectedSub(mainViewModel.subscriptionId)
         }
         binding.spSubscriptionId.setSelection(mainViewModel.subscriptions.indexOfFirst { it.first == subid })
+        mainViewModel.reloadServerList()
         val selected=HiddifyUtils.getSelectedSub()
         if (selected?.second?.needUpdate() == true){
             importConfigViaSub(selected.first)
+        }else{
+            mainViewModel.testAllRealPing()
         }
-        mainViewModel.reloadServerList()
+
 
     }
 }

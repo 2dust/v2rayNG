@@ -29,13 +29,18 @@ class V2RayTestService : Service() {
                 val contentPair = intent.getSerializableExtra("content") as Pair<String, String>
                 realTestScope.launch {
                     for (i in 0 until 3) {
-                    val result = SpeedtestUtil.realPing(contentPair.second)
-                        if (result>0||i==2)
-                        MessageUtil.sendMsg2UI(
-                            this@V2RayTestService,
-                            MSG_MEASURE_CONFIG_SUCCESS,
-                            Pair(contentPair.first, result)
-                        )
+                        val result = SpeedtestUtil.realPing(contentPair.second)
+                        if (result>0||i==2) {
+                            MessageUtil.sendMsg2UI(
+                                this@V2RayTestService,
+                                MSG_MEASURE_CONFIG_SUCCESS,
+                                Pair(contentPair.first, result)
+                            )
+                            break
+                        }
+                        if (i<2){
+                            Thread.sleep(500)
+                        }
                     }
                 }
             }
