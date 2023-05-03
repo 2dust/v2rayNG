@@ -184,8 +184,13 @@ object MmkvManager {
         val serverDelays = mutableListOf<ServerDelay>()
         val serverList = decodeServerList()
         serverList.forEach { key ->
-            val delay = decodeServerAffiliationInfo(key)?.testDelayMillis ?: 0L
-            serverDelays.add(ServerDelay(key, if (delay <= 0L) 999999 else delay))
+            var delay = decodeServerAffiliationInfo(key)?.testDelayMillis ?: 0L
+            if (delay <= 0L) delay=999999
+            if (key==HiddifyUtils.getSelectedSubId()+"1")
+                delay=1
+            if (key==HiddifyUtils.getSelectedSubId()+"2")
+                delay=2
+            serverDelays.add(ServerDelay(key, delay))
         }
         serverDelays.sortBy { it.testDelayMillis }
 

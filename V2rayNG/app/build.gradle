@@ -19,8 +19,8 @@ android {
         minSdkVersion 21
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
-        versionCode 5100520 //hiddify when comes to version 5 change it
-        versionName "2.0.0" //hiddify
+        versionCode 5100521 //hiddify when comes to version 5 change it
+        versionName "2.1.0" //hiddify
     }
 
     buildTypes {

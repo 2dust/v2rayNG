@@ -100,9 +100,13 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
             }
 
             if (keywordFilter.isEmpty() || config.remarks.contains(keywordFilter)) {
-                serversCache.add(ServersCache(guid, config))
+                if(config.configType==EConfigType.LoadBalance||config.configType==EConfigType.LowestPing)
+                    serversCache.add(0,ServersCache(guid, config))
+                else
+                    serversCache.add(ServersCache(guid, config))
             }
         }
+
     }
 
     fun testAllTcping() {
