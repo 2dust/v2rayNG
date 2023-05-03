@@ -12,9 +12,9 @@ A Hiddify client for Android, support [Xray core](https://github.com/XTLS/Xray-c
 
 [![API](https://img.shields.io/badge/API-21%2B-yellow.svg?style=flat)](https://developer.android.com/about/versions/lollipop)
 [![Kotlin Version](https://img.shields.io/badge/Kotlin-1.6.21-blue.svg)](https://kotlinlang.org)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/hiddify/HiddifyAndroidNG)](https://github.com/2dust/v2rayNG/commits/master)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/hiddify/HiddifyAndroidNG)](https://github.com/hiddify/HiddifyAndroidNG/commits/master)
 [![CodeFactor](https://www.codefactor.io/repository/github/hiddify/HiddifyAndroidNG/badge)](https://www.codefactor.io/repository/github/hiddify/HiddifyAndroidNG)
-[![GitHub Releases](https://img.shields.io/github/downloads/hiddify/HiddifyAndroidNG/latest/total?logo=github)](https://github.com/2dust/v2rayNG/releases)
+[![GitHub Releases](https://img.shields.io/github/downloads/hiddify/HiddifyAndroidNG/total?logo=github)](https://github.com/hiddify/HiddifyAndroidNG/releases)
 [![Chat on Telegram](https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg)](https://t.me/hiddify)
 
 <!--
