@@ -19,6 +19,7 @@
     <string name="load_balance">Load Balance</string>
     <string name="manual">Manual</string>
     <string name="new_profile">Import</string>
+    <string name="new_item">New</string>
     <string name="first_profile" translatable="false">Profile 1</string>
     <string name="consumer_traffic">Usage</string>
     <string name="show">Panel</string>

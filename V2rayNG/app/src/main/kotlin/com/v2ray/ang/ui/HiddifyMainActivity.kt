@@ -3,8 +3,6 @@ package com.v2ray.ang.ui
 import android.Manifest
 import android.content.*
 import android.content.res.ColorStateList
-import android.graphics.BlendMode
-import android.graphics.PorterDuff
 import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
@@ -13,27 +11,26 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
+import android.view.View
+import android.widget.*
+import android.widget.AdapterView.OnItemSelectedListener
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.navigation.NavigationView
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityHiddifyMainBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.SubscriptionItem
-import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.*
 import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.ui.bottomsheets.AddConfigBottomSheets
@@ -44,13 +41,13 @@ import com.v2ray.ang.util.*
 import com.v2ray.ang.viewmodel.HiddifyMainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.selects.select
 import me.drakeet.support.toast.ToastCompat
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.TimeUnit
+
 
 class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSelectedListener,*/
     AddConfigBottomSheets.Callback, ProfilesBottomSheets.Callback,SettingBottomSheets.Callback {
@@ -98,6 +95,10 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
     }
 
     private fun init() {
+        binding.pingLayout.click {
+            binding.ping.text="..."
+            hiddifyMainViewModel.testCurrentServerRealPing()
+        }
         binding.importFromClipBoard.click {
             importClipboard()
             importConfigViaSub(HiddifyUtils.getSelectedSubId())
@@ -168,6 +169,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             adapter.isRunning = isRunning
             if (isRunning) {
                 updateCircleState("connected")
+                hiddifyMainViewModel.testCurrentServerRealPing()//hiddify
             } else {
                 updateCircleState("disconnected")
                 hiddifyMainViewModel.subscriptionsAddedCheck()
@@ -266,11 +268,11 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             if (result != null) {
                 launch(Dispatchers.Main) {
                     if (result) {
-                        hiddifyToast(getString(R.string.migration_success))
+                        toast(getString(R.string.migration_success))
                         hiddifyMainViewModel.reloadServerList()
                         hiddifyMainViewModel.reloadSubscriptionsState()
                     } else {
-                        hiddifyToast(getString(R.string.migration_fail))
+                        toast(getString(R.string.migration_fail))
                     }
                 }
             }
@@ -279,13 +281,13 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
 
     private fun startV2Ray() {
         if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
-            hiddifyToast(R.string.no_server_selected)
+            toast(R.string.no_server_selected)
             return
         }
         updateCircleState("loading")
-//        hiddifyToast(R.string.toast_services_start)
+//        toast(R.string.toast_services_start)
         val enableSubscription =hiddifyMainViewModel.currentSubscription()
-
+        MmkvManager.sortByTestResults()
         enableSubscription?.let { subscription ->
             if (connect_mode != 3) {
                 HiddifyUtils.setMode(connect_mode)
@@ -317,8 +319,10 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
 //        HiddifyUtils.setMode(connect_mode)
         hiddifyMainViewModel.reloadServerList()
         hiddifyMainViewModel.reloadSubscriptionsState()
-        if (V2RayServiceManager.v2rayPoint.isRunning)
+        if (V2RayServiceManager.v2rayPoint.isRunning) {
             updateCircleState("connected")
+            hiddifyMainViewModel.testAllRealPing()
+        }
 
         hiddifyMainViewModel.startListenBroadcast()
 
@@ -396,9 +400,9 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
 
         R.id.export_all -> {
             if (AngConfigManager.shareNonCustomConfigsToClipboard(this, hiddifyMainViewModel.serverList) == 0) {
-                hiddifyToast(R.string.toast_success)
+                toast(R.string.toast_success)
             } else {
-                hiddifyToast(R.string.toast_failure)
+                toast(R.string.toast_failure)
             }
             true
         }
@@ -487,7 +491,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                     else
                         scanQRCodeForUrlToCustomConfig.launch(Intent(this, ScannerActivity::class.java))
                 else
-                    hiddifyToast(R.string.toast_permission_denied)
+                    toast(R.string.toast_permission_denied)
             }
 //        }
         return true
@@ -508,22 +512,32 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
     /**
      * import config from clipboard
      */
-    private fun importClipboard()
-            : Boolean {
+    private fun importClipboard(): Boolean {
         try {
             val clipboard = Utils.getClipboard(this)
-            importBatchConfig(clipboard, selectSub = true)
+            showAlarmIfnotSublink(clipboard)
         } catch (e: Exception) {
             e.printStackTrace()
             return false
         }
         return true
     }
-    private fun importBatchConfig(server: String?, subid: String = "",selectSub:Boolean) {
-        return importBatchConfig(Utils.Response(null,server),subid,selectSub)
+    private fun importBatchConfig(
+        server: String?,
+        subid: String = "",
+        selectSub: Boolean,
+        append: Boolean = false
+    ) {
+
+        return importBatchConfig(Utils.Response(null,server),subid,append,selectSub)
     }
 
-    private fun importBatchConfig(response: Utils.Response?, subid: String = "",selectSub:Boolean) {
+    private fun importBatchConfig(
+        response: Utils.Response?,
+        subid: String = "",
+        selectSub: Boolean,
+        append: Boolean = false
+    ) {
         var server=response?.content
         val subid2 = if(subid.isNullOrEmpty()){
             if (server?.startsWith("http") == true)"" else "default"
@@ -532,7 +546,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }
         HiddifyUtils.extract_package_info_from_response(response,subid)
 
-        val append = subid.isNullOrEmpty() || subid=="default"
+        val append = append||subid.isNullOrEmpty() || subid=="default"
         var count = AngConfigManager.importBatchConfig(server, subid2, append, selectSub = selectSub)
         if (count <= 0) {
             count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append, selectSub = selectSub)
@@ -540,11 +554,12 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         if (count > 0) {
             if(selectSub)
                 HiddifyUtils.setMode(connect_mode)
-            hiddifyToast(R.string.toast_success)
+            hiddifyMainViewModel.testAllRealPing()
+            toast(R.string.toast_success)
             hiddifyMainViewModel.reloadServerList()
             hiddifyMainViewModel.reloadSubscriptionsState()
         } else {
-            hiddifyToast(R.string.toast_failure)
+            toast(R.string.toast_failure)
         }
     }
 
@@ -553,7 +568,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         try {
             val configText = Utils.getClipboard(this)
             if (TextUtils.isEmpty(configText)) {
-                hiddifyToast(R.string.toast_none_data_clipboard)
+                toast(R.string.toast_none_data_clipboard)
                 return false
             }
             importCustomizeConfig(Utils.Response(null,configText))
@@ -582,7 +597,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         try {
             val url = Utils.getClipboard(this)
             if (TextUtils.isEmpty(url)) {
-                hiddifyToast(R.string.toast_none_data_clipboard)
+                toast(R.string.toast_none_data_clipboard)
                 return false
             }
             return importConfigCustomUrl(url)
@@ -598,7 +613,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
     private fun importConfigCustomUrl(url: String?): Boolean {
         try {
             if (!Utils.isValidUrl(url)) {
-                hiddifyToast(R.string.toast_invalid_url)
+                toast(R.string.toast_invalid_url)
                 return false
             }
             lifecycleScope.launch(Dispatchers.IO) {
@@ -624,7 +639,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
      */
     fun importConfigViaSub(subid: String?=null) : Boolean {
         try {
-//            hiddifyToast(R.string.title_sub_update)
+//            toast(R.string.title_sub_update)
             MmkvManager.decodeSubscriptions().forEach {
                 if (subid!=null&&it.first!=subid)return@forEach
                 if (TextUtils.isEmpty(it.first)
@@ -647,18 +662,19 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                     } catch (e: Exception) {
                         e.printStackTrace()
                         launch(Dispatchers.Main) {
-                            hiddifyToast("\"" + it.second.remarks + "\" " + getString(R.string.toast_failure))
+                            toast("\"" + it.second.remarks + "\" " + getString(R.string.toast_failure))
                         }
                         return@launch
                     }
                     launch(Dispatchers.Main) {
                         importBatchConfig(configText, it.first,false)
+                        hiddifyMainViewModel.testAllRealPing()
                     }
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            hiddifyToast(R.string.title_sub_update_failed)
+            toast(R.string.title_sub_update_failed)
             hiddifyMainViewModel. testAllRealPing()
             return false
         }
@@ -676,7 +692,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         try {
             chooseFileForCustomConfig.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
         } catch (ex: ActivityNotFoundException) {
-            hiddifyToast(R.string.toast_require_file_manager)
+            toast(R.string.toast_require_file_manager)
         }
     }
 
@@ -704,7 +720,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                         e.printStackTrace()
                     }
                 } else
-                    hiddifyToast(R.string.toast_permission_denied)
+                    toast(R.string.toast_permission_denied)
             }
     }
 
@@ -719,13 +735,13 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         val server=response?.content
         try {
             if (server == null || TextUtils.isEmpty(server)) {
-                hiddifyToast(R.string.toast_none_data)
+                toast(R.string.toast_none_data)
                 return
             }
             hiddifyMainViewModel.appendCustomConfigServer(response)
             hiddifyMainViewModel.reloadServerList()
             hiddifyMainViewModel.reloadSubscriptionsState()
-            hiddifyToast(R.string.toast_success)
+            toast(R.string.toast_success)
             //adapter.notifyItemInserted(hiddifyMainViewModel.serverList.lastIndex)
         } catch (e: Exception) {
             ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
@@ -734,8 +750,11 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }
     }
 
-    private fun setTestState(content: String?) {
+    private fun setTestState(content: Pair<Long,String>?) {
         //binding.tvTestState.text = content
+        if (content==null)return
+
+        binding.ping.text=if (content!!.first>=0)content!!.first.toString().toPersianDigit()+" ms" else getString(R.string.toast_failure)
     }
 
 //    val mConnection = object : ServiceConnection {
@@ -756,6 +775,8 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
     }
 
     fun updateCircleState(state: String) {
+        binding.pingLayout.showHide(state=="connected")
+        binding.ping.text="..."
         when(state) {
             "loading" -> {
                 binding.importButtons.gone()
@@ -770,6 +791,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             }
             "connected" -> {
                 binding.importButtons.gone()
+
                 binding.startButton.background = ContextCompat.getDrawable(this, R.drawable.ic_circle_connect)
                 binding.startButtonIcon.imageTintList = ColorStateList.valueOf(this.getColorEx(R.color.colorGreen))
                 binding.connectState.text = getString(R.string.connected)
@@ -862,11 +884,8 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         importConfigViaSub(HiddifyUtils.getSelectedSubId())
     }
 
-    override fun onSelectSub(subPosition: Int) {
-        var selected=hiddifyMainViewModel.subscriptions[subPosition]
-        onSelectSub(selected.first)
-    }
-    private fun onSelectSub(subid: String) {
+
+    override fun onSelectSub(subid: String) {
         if (HiddifyUtils.getSelectedSubId()!=subid) {
             HiddifyUtils.setSelectedSub(subid)
             HiddifyUtils.setMode(connect_mode)
@@ -879,6 +898,19 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }
         hiddifyMainViewModel.reloadServerList()
         hiddifyMainViewModel.reloadSubscriptionsState()
+    }
+
+    override fun onRemoveSelectSub(subid: String) {
+        if (subid=="default")return
+        AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                MmkvManager.removeSubscription(subid)
+                if (subid==HiddifyUtils.getSelectedSubId())
+                    HiddifyUtils.setSelectedSub("default")
+                hiddifyMainViewModel.reloadServerList()
+            }
+            .show()
+
     }
 
     override fun onBackPressed() {
@@ -898,4 +930,81 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             restartV2Ray()
         }
     }
+
+
+    fun showAlarmIfnotSublink(content: String) {
+        if (content.isNullOrEmpty()){
+            toast(R.string.title_sub_update_failed)
+            return
+        }
+        if (content.startsWith("http")){
+            importBatchConfig(content, selectSub = true)
+            return
+        }
+        val subscriptions = MmkvManager.decodeSubscriptions().filter { it.second.enabled &&!Utils.isValidUrl(it.second.url) }
+        val listId = subscriptions.map { it.first }.toList().toMutableList()
+        val listRemarks = subscriptions.map { it.second.remarks }.toList().toMutableList()
+        listId.add(0,"")
+        listRemarks.add(0,getString(R.string.new_item))
+        val context=this
+        var actv = Spinner(context)
+        var ll=LinearLayout(context)
+        ll.orientation=LinearLayout.VERTICAL
+        val tv=TextView(context)
+        tv.setText(R.string.no_sublink_found)
+        ll.addView(tv)
+        ll.addView(actv)
+        val customName=TextInputEditText(this)
+        ll.addView(customName)
+        customName.hint=getString(R.string.msg_enter_group_name)
+        customName.visibility=View.GONE
+        actv.setAdapter(ArrayAdapter<String>( context, android.R.layout.simple_spinner_dropdown_item, listRemarks))
+        var selectedSubid=""
+        actv.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                // Handle the selection of an item
+//                val selectedItem = parent?.getItemAtPosition(position).toString()
+
+                customName.visibility=if (position==0)View.VISIBLE else View.GONE
+
+                selectedSubid=listId[position]
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Handle the case where nothing is selected
+            }
+        }
+            val selectedIndex=listId.indexOf(HiddifyUtils.getSelectedSubId())
+            if (selectedIndex>=0)
+                actv.setSelection(selectedIndex)
+
+            //        actv.threshold = 1
+
+    //        actv.completionHint=getString(R.string.msg_enter_keywords)
+    //        actv.hint=getString(R.string.msg_enter_group_name)
+
+
+            val builder = AlertDialog.Builder(context).setView(ll)
+            builder.setTitle(R.string.autoconfig_link_not_found)
+            builder.setPositiveButton(R.string.tasker_setting_confirm) { dialogInterface: DialogInterface?, _: Int ->
+                try {
+                    var selected_sub= if (selectedSubid.isNullOrEmpty())
+                        Pair(Utils.getUuid(),SubscriptionItem(remarks = customName.text.toString()))
+                    else
+                        subscriptions.find { it.first==selectedSubid }!!
+                    if (selectedSubid.isNullOrEmpty()){
+                        subStorage?.encode(selected_sub.first, Gson().toJson(selected_sub.second))
+                        hiddifyMainViewModel. reloadServerList()
+                    }
+//                    onSelectSub(selected_sub.first)
+                    importBatchConfig(content, selected_sub.first,append = true, selectSub = true)
+                    dialogInterface?.dismiss()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            builder.show()
+
+
+        }
 }

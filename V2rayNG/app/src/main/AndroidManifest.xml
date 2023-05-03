@@ -24,6 +24,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- <useapplications-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:name=".AngApplication"

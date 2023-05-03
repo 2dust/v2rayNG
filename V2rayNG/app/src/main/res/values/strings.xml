@@ -215,7 +215,10 @@
     <string name="connection_test_error_status_code">Error code: #%d</string>
     <string name="connection_connected">Connected, tap to check connection</string>
     <string name="connection_not_connected">Not connected</string>
-    <string name="full_usage">Package Finished</string>
+    <string name="full_usage" translatable="false">Package Finished</string>
+    <string name="no_sublink_found" translatable="false">Please select a group to add a new config or create a new group.</string>
+    <string name="autoconfig_link_not_found">Autoconfig link not found</string>
+    <string name="msg_enter_group_name">Enter group name</string>
 
     <string-array name="share_method">
         <item>QRcode</item>

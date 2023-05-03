@@ -235,11 +235,19 @@ object V2RayServiceManager {
             var time = -1L
             var errstr = ""
             if (v2rayPoint.isRunning) {
-                try {
-                    time = v2rayPoint.measureDelay()
-                } catch (e: Exception) {
-                    Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
-                    errstr = e.message?.substringAfter("\":") ?: "empty message"
+                for (i in 0 until 10) {
+                    try {
+                        time = v2rayPoint.measureDelay()
+                        if (time>0)
+                            break
+
+
+                    } catch (e: Exception) {
+                        Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
+                        errstr = e.message?.substringAfter("\":") ?: "empty message"
+                    }
+                    if (i>3)
+                        Thread.sleep(500)
                 }
             }
             val result = if (time == -1L) {
@@ -248,7 +256,7 @@ object V2RayServiceManager {
                 service.getString(R.string.connection_test_available, time)
             }
 
-            MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, result)
+            MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, Pair(time,result))
         }
     }
 

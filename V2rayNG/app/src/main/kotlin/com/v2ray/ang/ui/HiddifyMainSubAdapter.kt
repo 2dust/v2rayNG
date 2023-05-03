@@ -16,9 +16,9 @@ import com.v2ray.ang.extension.showGone
 import com.v2ray.ang.util.HiddifyUtils
 import com.v2ray.ang.util.MmkvManager
 
-class HiddifyMainSubAdapter(val context: Context, val callback: (Int) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class HiddifyMainSubAdapter(val context: Context, val callback: (Int,Boolean) -> Any) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var subscriptions = MmkvManager.decodeSubscriptions()
+    public var subscriptions = MmkvManager.decodeSubscriptions()
 
     override fun getItemCount(): Int {
         return subscriptions.size
@@ -50,12 +50,16 @@ class HiddifyMainSubAdapter(val context: Context, val callback: (Int) -> Unit) :
             progress.max = (subItem.total / 1000000000).toInt()
             progress.showGone(subItem.total > (0).toLong())
             itemBg.backgroundTintList = if (HiddifyUtils.checkState(subItem.expire, subItem.total, subItem.used) == "enable")
-                ColorStateList.valueOf(context.getColorEx(R.color.white))
+                ColorStateList.valueOf(context.getColorEx(R.color.colorBtnBg))
             else
                 ColorStateList.valueOf(context.getColorEx(R.color.colorLightRed))
 
             itemView.click {
-                callback.invoke(bindingAdapterPosition)
+                callback.invoke(bindingAdapterPosition,false)
+            }
+            itemView.setOnLongClickListener {
+                callback.invoke(bindingAdapterPosition,true)
+                return@setOnLongClickListener true
             }
         }
     }

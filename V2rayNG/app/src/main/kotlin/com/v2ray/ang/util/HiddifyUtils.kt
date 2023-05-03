@@ -31,7 +31,7 @@ class HiddifyUtils {
             return subscriptions.find { it.first==selected }
         }
         fun getSelectedSubId() : String {
-            return mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SUB)?:""
+            return mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SUB)?:"default"
         }
         fun setSelectedSub(subid:String)  {
             mainStorage?.encode(MmkvManager.KEY_SELECTED_SUB,subid)

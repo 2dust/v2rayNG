@@ -35,7 +35,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     val serversCache = mutableListOf<ServersCache>()
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
-    val updateTestResultAction by lazy { MutableLiveData<String>() }
+    val updateTestResultAction by lazy { MutableLiveData<Pair<Long,String>>() }
 
     private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
 
@@ -206,6 +206,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 //            }.show()
     }
 
+
     fun getPosition(guid: String) : Int {
         serversCache.forEachIndexed { index, it ->
             if (it.guid == guid)
@@ -256,7 +257,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                     isRunning.value = false
                 }
                 AppConfig.MSG_MEASURE_DELAY_SUCCESS -> {
-                    updateTestResultAction.value = intent.getStringExtra("content")
+                    updateTestResultAction.value = intent.getSerializableExtra("content") as Pair<Long,String>
                 }
                 AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> {
                     val resultPair = intent.getSerializableExtra("content") as Pair<String, Long>
@@ -281,4 +282,8 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
             enableSubscription=subscriptions.find { it.second.enabled }
         return enableSubscription;
     }
+
+
+
+
 }

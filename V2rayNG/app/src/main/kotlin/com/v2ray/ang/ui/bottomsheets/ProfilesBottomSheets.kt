@@ -19,7 +19,8 @@ class ProfilesBottomSheets : BaseExpandedBottomSheet() {
     interface Callback {
         fun onAddProfile()
         fun onImportQrCode()
-        fun onSelectSub(subPosition: Int)
+        fun onSelectSub(subid: String)
+        fun onRemoveSelectSub(subid: String)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,15 +37,19 @@ class ProfilesBottomSheets : BaseExpandedBottomSheet() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        subAdapter = HiddifyMainSubAdapter(requireContext()) { subPosition ->
-            callback()?.onSelectSub(subPosition)
+        subAdapter = HiddifyMainSubAdapter(requireContext()) { subPosition,long ->
+            if (long)
+                callback()?.onRemoveSelectSub(subAdapter.subscriptions[subPosition].first)
+            else
+                callback()?.onSelectSub(subAdapter.subscriptions[subPosition].first)
             dismiss()
         }
+
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = subAdapter
-
+        
         binding.addProfile.click {
             callback()?.onAddProfile()
             dismiss()

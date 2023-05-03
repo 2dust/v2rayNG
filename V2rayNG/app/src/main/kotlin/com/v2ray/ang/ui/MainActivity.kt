@@ -314,7 +314,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //        }
 
         R.id.sub_update -> {
-            importConfigViaSub(HiddifyUtils.getSelectedSubId())
+            var selected=HiddifyUtils.getSelectedSub()
+            if (Utils.isValidUrl(selected?.second?.url))
+                importConfigViaSub(HiddifyUtils.getSelectedSubId())
+            else
+                mainViewModel.testAllRealPing()
             true
         }
 
@@ -347,6 +351,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .setPositiveButton(android.R.string.ok) { _, _ ->
 //                    MmkvManager.removeAllServer()
                     MmkvManager.removeSubscription(HiddifyUtils.getSelectedSubId())
+                    HiddifyUtils.setSelectedSub("default")
                     mainViewModel.reloadServerList()
                 }
                 .show()
@@ -417,7 +422,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private val scanQRCodeForConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
-            importBatchConfig(it.data?.getStringExtra("SCAN_RESULT"))
+            importBatchConfig(it.data?.getStringExtra("SCAN_RESULT"), selectSub = true)
         }
     }
 
@@ -434,7 +439,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             : Boolean {
         try {
             val clipboard = Utils.getClipboard(this)
-            importBatchConfig(clipboard)
+            importBatchConfig(clipboard, selectSub = true)
         } catch (e: Exception) {
             e.printStackTrace()
             return false
@@ -442,21 +447,21 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
-    fun importBatchConfig(server: String?, subid: String = "") {//hiddify
-        return importBatchConfig(Utils.Response(null,server),subid)//hiddify
+    fun importBatchConfig(server: String?, subid: String = "",selectSub:Boolean=false) {//hiddify
+        return importBatchConfig(Utils.Response(null,server),subid,selectSub)//hiddify
     }//hiddify
-    fun importBatchConfig(response: Utils.Response?, subid: String = "") {//hiddify
+    fun importBatchConfig(response: Utils.Response?, subid: String = "", selectSub:Boolean=false) {//hiddify
         var server=response?.content//hiddify
         val subid2 = if(subid.isNullOrEmpty()){
-            Utils.getUuid()
+            HiddifyUtils.getSelectedSubId()
         }else{
             subid
         }
         val append = subid.isNullOrEmpty() || subid=="default"
         HiddifyUtils.extract_package_info_from_response(response,subid)
-        var count = AngConfigManager.importBatchConfig(server, subid2, append, selectSub = true)
+        var count = AngConfigManager.importBatchConfig(server, subid2, append, selectSub = selectSub)
         if (count <= 0) {
-            count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append, selectSub = true)
+            count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append, selectSub = selectSub)
         }
         if (count > 0) {
 //            toast(R.string.toast_success)
@@ -542,7 +547,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      */
     fun importConfigViaSub(subid: String?=null) : Boolean {
         try {
-            binding.spSubscriptionId.adapter = MainSubAdapter(this) //hiddify
+//            binding.spSubscriptionId.adapter = MainSubAdapter(this) //hiddify
             toast(R.string.title_sub_update)
             MmkvManager.decodeSubscriptions().forEach {
                 if (subid!=null&&it.first!=subid)return@forEach
@@ -571,7 +576,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         return@launch
                     }
                     launch(Dispatchers.Main) {
-                        importBatchConfig(configText, it.first)
+                        importBatchConfig(configText, it.first,false)
+                        mainViewModel.testAllRealPing()
                     }
                 }
             }
@@ -648,8 +654,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
     }
 
-    fun setTestState(content: String?) {
-        binding.tvTestState.text = content
+    fun setTestState(content: String) {
+        setTestState(Pair(0,content))
+    }
+    fun setTestState(content: Pair<Long,String>?) {
+        binding.tvTestState.text = content?.second
     }
 
 //    val mConnection = object : ServiceConnection {

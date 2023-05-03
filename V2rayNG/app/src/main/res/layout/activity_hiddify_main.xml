@@ -64,10 +64,11 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/profileName"
-                        android:layout_width="180dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingVertical="8dp"
                         android:paddingHorizontal="16dp"
+                        android:layout_marginEnd="100dp"
                         android:lines="1"
                         android:ellipsize="end"
                         android:textAlignment="viewStart"
@@ -193,7 +194,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:visibility="gone"
+                    android:visibility="invisible"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical">
@@ -250,27 +251,29 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/pinLayout"
+                    android:id="@+id/pingLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:tint="@color/colorText"
                         app:srcCompat="@drawable/ic_baseline_speed"/>
 
                     <TextView
                         android:id="@+id/ping"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/colorLightBlue"
+                        android:textColor="@color/colorText"
+                        android:textAlignment="center"
                         android:fontFamily="@font/vazir_light"
-                        tools:text="۳۶۰ ms 🐆️"/>
+                        tools:text="۳۶۰ ms"/>
                 </LinearLayout>
             </LinearLayout>
 

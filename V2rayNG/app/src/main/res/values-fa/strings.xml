@@ -208,6 +208,9 @@
     <string name="connection_connected">متصل شد. کلیک برای بررسی اتصال</string>
     <string name="connection_not_connected">متصل نیست</string>
     <string name="full_usage">اتمام حجم</string>
+    <string name="no_sublink_found">لطفاً یک گروه را برای افزودن کانفیگ جدید انتخاب کنید یا یک گروه جدید ایجاد کنید.</string>
+    <string name="autoconfig_link_not_found">لینک کانفیگ خودکار پیدا نشد.</string>
+    <string name="msg_enter_group_name">نام گروه را وارد کنید</string>
 
     <string-array name="share_method">
         <item>QRcode</item>

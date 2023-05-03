@@ -7,7 +7,7 @@ class HiddifyMainViewModel(application: Application) : MainViewModel(application
     val subscriptionsAdded by lazy { MutableLiveData<Boolean>() }
 
     fun subscriptionsAddedCheck() {
-        subscriptionsAdded.value = subscriptions.isNotEmpty()
+        subscriptionsAdded.value = subscriptions.size >1 || serverList.isNotEmpty()
     }
 
     fun reloadSubscriptionsState() {

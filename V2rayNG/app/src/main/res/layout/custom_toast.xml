@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
-    app:cardBackgroundColor="@color/colorLightBlue"
+    app:cardBackgroundColor="@color/colorBtnBg"
     app:cardCornerRadius="5dp"
     app:cardElevation="2dp"
     app:cardPreventCornerOverlap="true">

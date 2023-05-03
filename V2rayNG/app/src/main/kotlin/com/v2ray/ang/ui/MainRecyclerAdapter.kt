@@ -68,6 +68,8 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             holder.itemMainBinding.tvTestResult.text = aff?.getTestDelayString() ?: ""
             if ((aff?.testDelayMillis ?: 0L) < 0L) {
                 holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(mActivity, R.color.colorPingRed))
+                if (config.configType==EConfigType.LoadBalance||config.configType==EConfigType.LowestPing)
+                    holder.itemMainBinding.tvTestResult.text=""
             } else {
                 holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(mActivity, R.color.colorPing))
             }

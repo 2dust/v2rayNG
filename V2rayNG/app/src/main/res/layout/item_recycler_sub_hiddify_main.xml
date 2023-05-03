@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     app:cardElevation="0dp"
     android:background="?android:selectableItemBackground"
+
     android:layout_marginVertical="8dp"
     app:cardCornerRadius="10dp">
 
@@ -24,7 +25,7 @@
                 android:id="@+id/profileName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.5"
+                android:layout_weight="1"
                 android:lines="1"
                 android:ellipsize="end"
                 android:textSize="14sp"
@@ -39,6 +40,7 @@
                 android:layout_weight="1"
                 android:layout_marginStart="4dp"
                 android:textSize="12sp"
+                android:visibility="gone"
                 android:textColor="@color/colorDarkGray"
                 tools:text=". بروزرسانی در ۶ دقیقه پیش"/>
         </LinearLayout>

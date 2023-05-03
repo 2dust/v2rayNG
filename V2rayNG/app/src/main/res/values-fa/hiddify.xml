@@ -25,6 +25,7 @@
     <string name="fragment" translatable="false">فرگمنت</string>
     <string name="manual">دستی</string>
     <string name="new_profile">جدید</string>
+    <string name="new_item">جدید</string>
     <string name="consumer_traffic">ترافیک مصرفی</string>
     <string name="show">مشاهده</string>
     <string name="profiles">پروفایل‌ها</string>
