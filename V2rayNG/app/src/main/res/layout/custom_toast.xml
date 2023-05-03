@@ -19,7 +19,7 @@
         android:padding="8dp"
         android:gravity="start"
         android:textSize="14sp"
-        android:textColor="@color/white"
+        android:textColor="@color/colorBtnText"
         tools:text="متن" />
 </androidx.cardview.widget.CardView>
 

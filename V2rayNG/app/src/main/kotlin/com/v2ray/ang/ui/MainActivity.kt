@@ -250,6 +250,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //        mainViewModel.reloadServerList()
         binding.spSubscriptionId.adapter = MainSubAdapter(this)
         onSelectSub(HiddifyUtils.getSelectedSubId())
+        if (V2RayServiceManager.v2rayPoint.isRunning) {
+            mainViewModel.testCurrentServerRealPing()
+        }
     }
 
     public override fun onPause() {
@@ -577,14 +580,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     }
                     launch(Dispatchers.Main) {
                         importBatchConfig(configText, it.first,false)
-                        mainViewModel.testAllRealPing()
                     }
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            mainViewModel.testAllRealPing()
             return false
         }
+        mainViewModel.testAllRealPing()
         return true
     }
 
@@ -751,6 +755,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             HiddifyUtils.setSelectedSub(mainViewModel.subscriptionId)
         }
         binding.spSubscriptionId.setSelection(mainViewModel.subscriptions.indexOfFirst { it.first == subid })
+        val selected=HiddifyUtils.getSelectedSub()
+        if (selected?.second?.needUpdate() == true){
+            importConfigViaSub(selected.first)
+        }
         mainViewModel.reloadServerList()
 
     }
