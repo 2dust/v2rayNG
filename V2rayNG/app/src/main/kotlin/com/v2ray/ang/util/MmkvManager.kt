@@ -174,6 +174,8 @@ object MmkvManager {
     fun removeInvalidServer() {
         serverAffStorage?.allKeys()?.forEach { key ->
             decodeServerAffiliationInfo(key)?.let { aff ->
+                if(aff.subid+"1"==key||aff.subid+"2"==key)
+                    return@let
                 if (aff.testDelayMillis <= 0L) {
                     removeServer(key)
                 }
