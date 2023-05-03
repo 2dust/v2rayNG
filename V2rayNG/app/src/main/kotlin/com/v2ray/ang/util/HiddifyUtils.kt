@@ -10,6 +10,7 @@ import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.*
 import com.v2ray.ang.util.Utils.getLocale
+import java.util.Base64
 import java.util.Locale
 
 class HiddifyUtils {
@@ -144,7 +145,9 @@ class HiddifyUtils {
                         sub.update_interval = profile_update_interval.toInt();
                     }
                     if (!profile_title.isNullOrEmpty()){
-                        sub.remarks=profile_title
+
+                        sub.remarks=if (!profile_title.startsWith("base64:"))profile_title else
+                            Utils.decode(profile_title.substring("base64:".length))
                     }else if (!content_disposition.isNullOrEmpty()) {
                         val regex = "filename=\"([^\"]+)\"".toRegex()
                         val matchResult = regex.find(content_disposition)
