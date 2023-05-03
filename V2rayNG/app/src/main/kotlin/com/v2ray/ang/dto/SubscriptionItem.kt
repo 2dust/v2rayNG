@@ -8,9 +8,9 @@ data class SubscriptionItem(
         var lastUpdateTime: Long = System.currentTimeMillis(),
         var used: Long=-1,
         var total: Long=-1,
-        var expire: Long=-1,
+        var expire: Long=-1,//in ms
         var home_link: String="",
-        var update_interval: Int=6
+        var update_interval: Int=1
         ) {
 
         fun needUpdate(): Boolean {

@@ -74,17 +74,14 @@ class HiddifyUtils {
             if (time < 0)
                 return "".bold("")
 
-            val now = System.currentTimeMillis() / 1000
-            val diffInMillis = (time - now) / 86400
+            val now = System.currentTimeMillis()
+            val diffInMillis = (time - now)/86400/1000
             if (diffInMillis <= 0)
-                return if (getLocale(context) == Locale("fa") || getLocale(context).toString() == "fa_IR")
-                    "منقضی شده".bold("")
-                else "Expired".bold("")
+                return context.getString(R.string.expired) .bold("")
 
-            if (totalInBytes == usedInBytes)
-                return if (getLocale(context) == Locale("fa") || getLocale(context).toString() == "fa_IR")
-                    "اتمام حجم".bold("")
-                else "Completion of the volume".bold("")
+            if (totalInBytes>0 && totalInBytes <= usedInBytes)
+                return context.getString(R.string.full_usage) .bold("")
+
 
 
             return if (getLocale(context) == Locale("fa") || getLocale(context).toString() == "fa_IR") {
@@ -113,16 +110,15 @@ class HiddifyUtils {
         }
 
         fun checkState(time: Long, totalInBytes: Long, usedInBytes: Long): String {
-            if (time < 0)
+            if (totalInBytes>0 && usedInBytes>=totalInBytes)
                 return "disable"
+
 
             val now = System.currentTimeMillis() / 1000
             val diffInMillis = (time - now) / 86400
-            if (diffInMillis <= 0)
+            if (time>0 && diffInMillis <= 0)
                 return "disable"
 
-            if (totalInBytes == usedInBytes)
-                return "disable"
 
             return "enable"
         }
@@ -175,9 +171,9 @@ class HiddifyUtils {
                         get("download=([0-9]+)")?.apply {
                             sub.used += toLong()
                         }
-                        sub.total = get("total=([0-9]+)")?.toLong() ?: 0
-
-                        sub.expire = get("expire=([0-9]+)")?.toLong() ?: 0
+                        sub.total = get("total=([0-9]+)")?.toLong() ?: -1
+                        //in ms
+                        sub.expire = get("expire=([0-9]+)")?.toLong()?.times(1000) ?: -1
                     }
 
                     subStorage?.encode(subid, Gson().toJson(sub))

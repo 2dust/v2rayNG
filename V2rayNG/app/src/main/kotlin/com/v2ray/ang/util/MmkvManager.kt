@@ -140,15 +140,15 @@ object MmkvManager {
     }
 
     fun decodeSubscriptions(): List<Pair<String, SubscriptionItem>> {
-        val subscriptions = mutableListOf<Pair<String, SubscriptionItem>>()
+        var subscriptions = mutableListOf<Pair<String, SubscriptionItem>>()
         subStorage?.allKeys()?.forEach { key ->
             val json = subStorage?.decodeString(key)
             if (!json.isNullOrBlank()) {
                 subscriptions.add(Pair(key, Gson().fromJson(json, SubscriptionItem::class.java)))
             }
         }
-        subscriptions.sortedBy { (guid, value) -> if (guid=="default") Long.MAX_VALUE else value.addedTime }
-        return subscriptions
+        return subscriptions.sortedBy { (guid, value) -> if (guid=="default") Long.MIN_VALUE else -value.addedTime }
+
     }
 
 

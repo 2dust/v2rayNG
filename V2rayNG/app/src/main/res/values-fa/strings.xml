@@ -207,6 +207,7 @@
     <string name="connection_test_error_status_code">کد خطا: #%d</string>
     <string name="connection_connected">متصل شد. کلیک برای بررسی اتصال</string>
     <string name="connection_not_connected">متصل نیست</string>
+    <string name="full_usage">اتمام حجم</string>
 
     <string-array name="share_method">
         <item>QRcode</item>

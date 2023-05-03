@@ -210,6 +210,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                     }
                     binding.show.showGone(!subscription.second.home_link.isNullOrEmpty())
 
+
                     binding.profileName.click {
                         bottomSheetPresenter.show(
                             supportFragmentManager,
@@ -225,6 +226,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                     binding.updateSubscription.click {
                         importConfigViaSub(HiddifyUtils.getSelectedSubId())
                     }
+                    binding.updateSubscription.showGone(subscription.second.url.startsWith("http"))
                     binding.profileBox.show()
                 } ?: also {
                     binding.profileBox.gone()
@@ -536,6 +538,8 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append, selectSub = selectSub)
         }
         if (count > 0) {
+            if(selectSub)
+                HiddifyUtils.setMode(connect_mode)
             hiddifyToast(R.string.toast_success)
             hiddifyMainViewModel.reloadServerList()
             hiddifyMainViewModel.reloadSubscriptionsState()

@@ -34,4 +34,5 @@
     <string name="add_profile">Add Profile</string>
     <string name="title_sub_update_failed" translatable="false">Update Sub failed</string>
     <string name="no_server_selected">No server is selected!</string>
+    <string name="expired">Expired</string>
 </resources>
