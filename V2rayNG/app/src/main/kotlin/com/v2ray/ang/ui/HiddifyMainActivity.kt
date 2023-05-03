@@ -932,11 +932,12 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
     }
 
 
-    fun showAlarmIfnotSublink(content: String) {
-        if (content.isNullOrEmpty()){
+    fun showAlarmIfnotSublink(content1: String) {
+        if (content1.isNullOrEmpty()){
             toast(R.string.title_sub_update_failed)
             return
         }
+        var content=if(content1.startsWith("hiddify"))Uri.parse(content1.trim()).getQueryParameter("url")?:"" else content1
         if (content.startsWith("http")){
             importBatchConfig(content, selectSub = true)
             return
