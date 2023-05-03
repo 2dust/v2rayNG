@@ -48,9 +48,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/AppThemeDayNight.NoActionBar">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
-            </intent-filter>
+
 
             <meta-data
                 android:name="android.app.shortcuts"

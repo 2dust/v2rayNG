@@ -27,6 +27,7 @@ class UrlSchemeActivity : BaseActivity() {
         setContentView(view)
 
         var shareUrl: String = ""
+        var name=""
         try {
             intent?.apply {
                 when (action) {
@@ -39,14 +40,16 @@ class UrlSchemeActivity : BaseActivity() {
                     }
                     Intent.ACTION_VIEW -> {
                         val uri: Uri? = intent.data
-                        shareUrl = uri?.getQueryParameter("url")!!
+                        shareUrl = uri?.getQueryParameter("url")?:uri?.toString()!!
+                        name=uri?.fragment?:""
                     }
                 }
             }
             toast(shareUrl)
-            val count = AngConfigManager.importBatchConfig(shareUrl, "", false)
+            val subid=if (shareUrl.startsWith("http"))"" else "default"
+            val count = AngConfigManager.importBatchConfig(shareUrl, subid, subid=="default", selectSub = true)
             if (count > 0) {
-                toast(R.string.toast_success)
+//                toast(R.string.toast_success)
                 val intent = Intent(AppConfig.BROADCAST_ACTION_UPDATE_UI)
                 sendBroadcast(intent);
 

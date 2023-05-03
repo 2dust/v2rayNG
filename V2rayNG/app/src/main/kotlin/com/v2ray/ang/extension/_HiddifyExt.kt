@@ -177,7 +177,7 @@ fun SpannableString.colorlessTextPart(
     return spannableString
 }
 
-fun Context?.hiddifyToast(s: String?, length : Int = Toast.LENGTH_LONG) {
+fun Context?.hiddifyToast(s: String?, length : Int = Toast.LENGTH_SHORT) {
 
     if (this is Activity) {
         if ((this.isFinishing || this.isDestroyed)) {

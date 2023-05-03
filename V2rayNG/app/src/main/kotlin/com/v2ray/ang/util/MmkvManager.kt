@@ -15,6 +15,7 @@ object MmkvManager {
     const val ID_SUB = "SUB"
     const val ID_SETTING = "SETTING"
     const val KEY_SELECTED_SERVER = "SELECTED_SERVER"
+    const val KEY_SELECTED_SUB = "SELECTED_SUB"
     const val KEY_ANG_CONFIGS = "ANG_CONFIGS"
 
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
@@ -111,19 +112,31 @@ object MmkvManager {
             }
         }
     }
-
-    fun importUrlAsSubscription(url: String): Int {
+    fun getDefaultSubscription(): SubscriptionItem {
+        val subscriptions = decodeSubscriptions()
+        subscriptions.forEach {
+            if (it.first== "default") {
+                return it.second
+            }
+        }
+        val subItem = SubscriptionItem()
+        subItem.remarks = "Default"
+        subStorage?.encode("default", Gson().toJson(subItem))
+        return subItem
+    }
+    fun importUrlAsSubscription(url: String): String {
         val subscriptions = decodeSubscriptions()
         subscriptions.forEach {
             if (it.second.url == url) {
-                return 0
+                return it.first
             }
         }
         val subItem = SubscriptionItem()
         subItem.remarks = "import sub"
         subItem.url = url
-        subStorage?.encode(Utils.getUuid(), Gson().toJson(subItem))
-        return 1
+        var uuid = Utils.getUuid()
+        subStorage?.encode(uuid, Gson().toJson(subItem))
+        return uuid
     }
 
     fun decodeSubscriptions(): List<Pair<String, SubscriptionItem>> {
@@ -134,13 +147,18 @@ object MmkvManager {
                 subscriptions.add(Pair(key, Gson().fromJson(json, SubscriptionItem::class.java)))
             }
         }
-        subscriptions.sortedBy { (_, value) -> value.addedTime }
+        subscriptions.sortedBy { (guid, value) -> if (guid=="default") Long.MAX_VALUE else value.addedTime }
         return subscriptions
     }
 
 
     fun removeSubscription(subid: String) {
-        subStorage?.remove(subid)
+
+        if (subid==HiddifyUtils.getSelectedSubId()){
+            HiddifyUtils.setSelectedSub("default")
+        }
+        if(subid!="default")
+            subStorage?.remove(subid)
         removeServerViaSubid(subid)
     }
 

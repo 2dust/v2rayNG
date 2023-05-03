@@ -48,7 +48,7 @@ import java.io.FileOutputStream
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var binding: ActivityMainBinding
-    private val subAdapter by lazy { MainSubAdapter(this) }//hiddify
+//    private var subAdapter by lazy {  }//hiddify
     private val adapter by lazy { MainRecyclerAdapter(this) }
     private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
@@ -63,7 +63,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     //Hiddify
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            importConfigViaSub()
+
+            importConfigViaSub(HiddifyUtils.getSelectedSubId())
         }
     }
 
@@ -134,7 +135,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         //hiddify
-        binding.spSubscriptionId.adapter = subAdapter //hiddify
+        binding.spSubscriptionId.adapter = MainSubAdapter(this) //hiddify
         binding.spSubscriptionId.onItemSelectedListener = //hiddify
             object : AdapterView.OnItemSelectedListener { //hiddify
                 override fun onItemSelected(
@@ -143,8 +144,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 ) {
                     // called when an item is selected in the Spinner
 //                    val selectedItem = parent.getItemAtPosition(position).toString()
-                    mainViewModel.subscriptionId = mainViewModel.subscriptions[position].first
-                    mainViewModel.reloadServerList()
+                    val selected=mainViewModel.subscriptions[position].first
+                    if (selected!=HiddifyUtils.getSelectedSubId())
+                        onSelectSub(selected)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -245,7 +247,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     public override fun onResume() {
         super.onResume()
-        mainViewModel.reloadServerList()
+//        mainViewModel.reloadServerList()
+        binding.spSubscriptionId.adapter = MainSubAdapter(this)
+        onSelectSub(HiddifyUtils.getSelectedSubId())
     }
 
     public override fun onPause() {
@@ -264,7 +268,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
         R.id.import_clipboard -> {
             importClipboard()
-            importConfigViaSub()
+            importConfigViaSub(HiddifyUtils.getSelectedSubId())
             true
         }
         R.id.import_manually_vmess -> {
@@ -310,7 +314,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //        }
 
         R.id.sub_update -> {
-            importConfigViaSub()
+            importConfigViaSub(HiddifyUtils.getSelectedSubId())
             true
         }
 
@@ -341,7 +345,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         R.id.del_all_config -> {
             AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    MmkvManager.removeAllServer()
+//                    MmkvManager.removeAllServer()
+                    MmkvManager.removeSubscription(HiddifyUtils.getSelectedSubId())
                     mainViewModel.reloadServerList()
                 }
                 .show()
@@ -443,18 +448,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     fun importBatchConfig(response: Utils.Response?, subid: String = "") {//hiddify
         var server=response?.content//hiddify
         val subid2 = if(subid.isNullOrEmpty()){
-            mainViewModel.subscriptionId
+            Utils.getUuid()
         }else{
             subid
         }
-        val append = subid.isNullOrEmpty()
+        val append = subid.isNullOrEmpty() || subid=="default"
         HiddifyUtils.extract_package_info_from_response(response,subid)
-        var count = AngConfigManager.importBatchConfig(server, subid2, append)
+        var count = AngConfigManager.importBatchConfig(server, subid2, append, selectSub = true)
         if (count <= 0) {
-            count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append)
+            count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append, selectSub = true)
         }
         if (count > 0) {
-            toast(R.string.toast_success)
+//            toast(R.string.toast_success)
             mainViewModel.reloadServerList()
         } else {
             toast(R.string.toast_failure)
@@ -535,11 +540,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     /**
      * import config from sub
      */
-    fun importConfigViaSub()
-            : Boolean {
+    fun importConfigViaSub(subid: String?=null) : Boolean {
         try {
+            binding.spSubscriptionId.adapter = MainSubAdapter(this) //hiddify
             toast(R.string.title_sub_update)
             MmkvManager.decodeSubscriptions().forEach {
+                if (subid!=null&&it.first!=subid)return@forEach
                 if (TextUtils.isEmpty(it.first)
                     || TextUtils.isEmpty(it.second.remarks)
                     || TextUtils.isEmpty(it.second.url)
@@ -726,5 +732,17 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+
+    fun onSelectSub(subid: String){
+
+        if (mainViewModel.subscriptionId!=subid) {
+            mainViewModel.subscriptionId = subid
+            HiddifyUtils.setSelectedSub(mainViewModel.subscriptionId)
+        }
+        binding.spSubscriptionId.setSelection(mainViewModel.subscriptions.indexOfFirst { it.first == subid })
+        mainViewModel.reloadServerList()
+
     }
 }

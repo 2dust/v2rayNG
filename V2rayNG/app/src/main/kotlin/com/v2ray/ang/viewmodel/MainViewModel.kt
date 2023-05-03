@@ -29,7 +29,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     private var lastPing=0L;
     var subscriptions = MmkvManager.decodeSubscriptions()
     var serverList = MmkvManager.decodeServerList()
-    var subscriptionId: String = ""
+    var subscriptionId: String = HiddifyUtils.getSelectedSubId()
     var keywordFilter: String = ""
         public set
     val serversCache = mutableListOf<ServersCache>()
@@ -176,6 +176,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                 } else {
                     subscriptions[position].first
                 }
+                HiddifyUtils.setSelectedSub(subscriptionId)
                 keywordFilter = ivBinding.etKeyword.text.toString()
                 reloadServerList()
 
@@ -265,5 +266,15 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
             }
         }
 
+    }
+
+
+
+    //hiddify
+    fun currentSubscription(): Pair<String, SubscriptionItem>? {
+        var enableSubscription = HiddifyUtils.getSelectedSub()
+        if (enableSubscription==null)
+            enableSubscription=subscriptions.find { it.second.enabled }
+        return enableSubscription;
     }
 }

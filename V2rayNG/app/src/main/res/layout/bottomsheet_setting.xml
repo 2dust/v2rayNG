@@ -92,7 +92,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:singleSelection="true"
-        android:background="@color/btn_bg_color_selector"
         android:foreground="?android:attr/selectableItemBackground"
         app:checkedButton="@id/smart">
 
@@ -119,6 +118,7 @@
             android:layout_weight="1"
             android:lines="1"
             android:ellipsize="end"
+
             app:strokeColor="@color/btn_stroke_color_selector"
             app:backgroundTint="@color/btn_bg_color_selector"
             android:textColor="@color/btn_text_color_selector"

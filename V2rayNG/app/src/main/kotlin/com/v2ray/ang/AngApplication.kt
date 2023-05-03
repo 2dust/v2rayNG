@@ -5,6 +5,7 @@ import androidx.preference.PreferenceManager
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.util.MmkvManager
 
 class AngApplication : MultiDexApplication() {
     companion object {
@@ -30,5 +31,6 @@ class AngApplication : MultiDexApplication() {
 
         //Logger.init().logLevel(if (BuildConfig.DEBUG) LogLevel.FULL else LogLevel.NONE)
         MMKV.initialize(this)
+        MmkvManager.getDefaultSubscription()
     }
 }

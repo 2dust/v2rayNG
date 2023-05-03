@@ -168,7 +168,7 @@ object AngConfigManager {
     /**
      * import config form qrcode or...
      */
-    private fun importConfig(str: String?, subid: String, removedSelectedServer: ServerConfig?): Int {
+    private fun importConfig(str: String?, subid: String, removedSelectedServer: ServerConfig?,selectSub:Boolean): Int {
         try {
             if (str == null || TextUtils.isEmpty(str)) {
                 return R.string.toast_none_data
@@ -176,7 +176,10 @@ object AngConfigManager {
 
             //maybe sub
             if (TextUtils.isEmpty(subid) && (str.startsWith(HTTP_PROTOCOL) || str.startsWith(HTTPS_PROTOCOL))) {
-                MmkvManager.importUrlAsSubscription(str)
+                val sub_uuid=MmkvManager.importUrlAsSubscription(str)
+                if (selectSub)
+                    HiddifyUtils.setSelectedSub(sub_uuid)
+
                 return 0
             }
 
@@ -744,12 +747,14 @@ object AngConfigManager {
         }
     }
 
-    fun importBatchConfig(servers: String?, subid: String, append: Boolean): Int {
+    fun importBatchConfig(servers: String?, subid: String, append: Boolean,selectSub:Boolean): Int {
         try {
             if (servers == null) {
                 return 0
             }
-            var selected_server_guid=mainStorage?.decodeString(KEY_SELECTED_SERVER) ?: ""
+            if (!subid.isNullOrEmpty()&&selectSub)
+                HiddifyUtils.setSelectedSub(subid)
+            var selected_server_guid=HiddifyUtils.getSelectedServerId() ?: ""
             var removedSelectedServer=
                     if (!TextUtils.isEmpty(subid) && !append) {
                         MmkvManager.decodeServerConfig(selected_server_guid)?.let {
@@ -775,7 +780,7 @@ object AngConfigManager {
             servers.lines()
                     .reversed()
                     .forEach {
-                        val resId = importConfig(it, subid, removedSelectedServer)
+                        val resId = importConfig(it, subid, removedSelectedServer,selectSub)
                         if (resId == 0) {
                             count++
                         }
@@ -783,7 +788,7 @@ object AngConfigManager {
             if (selected_server_guid==subid+"1"|| selected_server_guid==subid+"2"){
                 mainStorage?.encode(KEY_SELECTED_SERVER, selected_server_guid)
             }
-            if (count==0){
+            if (count==0 && subid!="default"){
                 MmkvManager.removeServer(subid+"1")
                 MmkvManager.removeServer(subid+"2")
             }

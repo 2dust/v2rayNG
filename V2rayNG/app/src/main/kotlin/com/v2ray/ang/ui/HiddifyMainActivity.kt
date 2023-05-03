@@ -64,14 +64,14 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             startV2Ray()
         }
     }
-    private var connect_mode=1;//1=smart 2=loadbalance 3=manual
+    private var connect_mode=HiddifyUtils.getMode();//1=smart 2=loadbalance 3=manual
     private var mItemTouchHelper: ItemTouchHelper? = null
     val hiddifyMainViewModel: HiddifyMainViewModel by viewModels()
     private val bottomSheetPresenter = BottomSheetPresenter()
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            importConfigViaSub()
+            importConfigViaSub(HiddifyUtils.getSelectedSubId())
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,12 +100,12 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
     private fun init() {
         binding.importFromClipBoard.click {
             importClipboard()
-            importConfigViaSub()
+            importConfigViaSub(HiddifyUtils.getSelectedSubId())
         }
 
         binding.scanQrCode.click {
             importQRcode(true)
-            importConfigViaSub()
+            importConfigViaSub(HiddifyUtils.getSelectedSubId())
         }
 
         binding.startButtonIcon.click {
@@ -133,7 +133,9 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }
         
         binding.advanced.click {
-            bottomSheetPresenter.show(supportFragmentManager, SettingBottomSheets.newInstance())
+            var current=hiddifyMainViewModel.currentSubscription()
+            connect_mode=HiddifyUtils.getMode()
+            bottomSheetPresenter.show(supportFragmentManager, SettingBottomSheets.newInstance(connect_mode))
         }
 
     }
@@ -145,12 +147,12 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
     }
     override fun onClipBoard() {
         importClipboard()
-        importConfigViaSub()
+        importConfigViaSub(HiddifyUtils.getSelectedSubId())
     }
 
     override fun onQrCode() {
         importQRcode(true)
-        importConfigViaSub()
+        importConfigViaSub(HiddifyUtils.getSelectedSubId())
     }
 
     private fun setupViewModel() {
@@ -177,11 +179,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             if (!check) {
                 updateCircleState("default")
             } else {
-                val enableSubscription =
-                    if (hiddifyMainViewModel.subscriptionId == "")
-                        hiddifyMainViewModel.subscriptions.find { it.second.enabled }
-                    else
-                    hiddifyMainViewModel.subscriptions.find { it.first == hiddifyMainViewModel.subscriptionId }
+                val enableSubscription =hiddifyMainViewModel.currentSubscription()
 
                 enableSubscription?.let { subscription ->
                     binding.profileName.text = subscription.second.remarks
@@ -225,7 +223,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                         )
                     }
                     binding.updateSubscription.click {
-                        importConfigViaSub()
+                        importConfigViaSub(HiddifyUtils.getSelectedSubId())
                     }
                     binding.profileBox.show()
                 } ?: also {
@@ -279,26 +277,25 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
 
     private fun startV2Ray() {
         if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
+            hiddifyToast(R.string.no_server_selected)
             return
         }
         updateCircleState("loading")
 //        hiddifyToast(R.string.toast_services_start)
-        val enableSubscription =
-            if (hiddifyMainViewModel.subscriptionId == "")
-                hiddifyMainViewModel.subscriptions.find { it.second.enabled }
-            else
-                hiddifyMainViewModel.subscriptions.find { it.first == hiddifyMainViewModel.subscriptionId }
+        val enableSubscription =hiddifyMainViewModel.currentSubscription()
 
         enableSubscription?.let { subscription ->
             if (connect_mode != 3) {
-
-                mainStorage?.encode(MmkvManager.KEY_SELECTED_SERVER, subscription.first + connect_mode)
-//                MmkvManager.selectConfig(hiddifyMainViewModel.subscriptionId,connect_mode)
+                HiddifyUtils.setMode(connect_mode)
             }
         }
 
         V2RayServiceManager.startV2Ray(this)
         hideCircle()
+    }
+
+    override fun onResumeFragments() {
+        super.onResumeFragments()
     }
 
     private fun restartV2Ray() {
@@ -314,12 +311,16 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
 
     public override fun onResume() {
         super.onResume()
+        onSelectSub(HiddifyUtils.getSelectedSubId())
+//        HiddifyUtils.setMode(connect_mode)
         hiddifyMainViewModel.reloadServerList()
         hiddifyMainViewModel.reloadSubscriptionsState()
         if (V2RayServiceManager.v2rayPoint.isRunning)
             updateCircleState("connected")
 
         hiddifyMainViewModel.startListenBroadcast()
+
+
 
 
     }
@@ -336,12 +337,12 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.import_qrcode -> {
             importQRcode(true)
-            importConfigViaSub()
+            importConfigViaSub(HiddifyUtils.getSelectedSubId())
             true
         }
         R.id.import_clipboard -> {
             importClipboard()
-            importConfigViaSub()
+            importConfigViaSub(HiddifyUtils.getSelectedSubId())
             true
         }
         R.id.import_manually_vmess -> {
@@ -387,7 +388,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
 //        }
 
         R.id.sub_update -> {
-            importConfigViaSub()
+            importConfigViaSub(HiddifyUtils.getSelectedSubId())
             true
         }
 
@@ -492,7 +493,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
 
     private val scanQRCodeForConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
-            importBatchConfig(it.data?.getStringExtra("SCAN_RESULT"))
+            importBatchConfig(it.data?.getStringExtra("SCAN_RESULT"), selectSub = true)
         }
     }
 
@@ -509,31 +510,30 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             : Boolean {
         try {
             val clipboard = Utils.getClipboard(this)
-            importBatchConfig(clipboard)
+            importBatchConfig(clipboard, selectSub = true)
         } catch (e: Exception) {
             e.printStackTrace()
             return false
         }
         return true
     }
-    private fun importBatchConfig(server: String?, subid: String = "") {
-        return importBatchConfig(Utils.Response(null,server),subid)
+    private fun importBatchConfig(server: String?, subid: String = "",selectSub:Boolean) {
+        return importBatchConfig(Utils.Response(null,server),subid,selectSub)
     }
 
-    private fun importBatchConfig(response: Utils.Response?, subid: String = "") {
+    private fun importBatchConfig(response: Utils.Response?, subid: String = "",selectSub:Boolean) {
         var server=response?.content
         val subid2 = if(subid.isNullOrEmpty()){
-            hiddifyMainViewModel.subscriptionId
+            if (server?.startsWith("http") == true)"" else "default"
         }else{
             subid
         }
         HiddifyUtils.extract_package_info_from_response(response,subid)
 
-        val append = subid.isNullOrEmpty()
-
-        var count = AngConfigManager.importBatchConfig(server, subid2, append)
+        val append = subid.isNullOrEmpty() || subid=="default"
+        var count = AngConfigManager.importBatchConfig(server, subid2, append, selectSub = selectSub)
         if (count <= 0) {
-            count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append)
+            count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append, selectSub = selectSub)
         }
         if (count > 0) {
             hiddifyToast(R.string.toast_success)
@@ -618,10 +618,11 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
     /**
      * import config from sub
      */
-    fun importConfigViaSub() : Boolean {
+    fun importConfigViaSub(subid: String?=null) : Boolean {
         try {
-            hiddifyToast(R.string.title_sub_update)
+//            hiddifyToast(R.string.title_sub_update)
             MmkvManager.decodeSubscriptions().forEach {
+                if (subid!=null&&it.first!=subid)return@forEach
                 if (TextUtils.isEmpty(it.first)
                     || TextUtils.isEmpty(it.second.remarks)
                     || TextUtils.isEmpty(it.second.url)
@@ -647,12 +648,13 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                         return@launch
                     }
                     launch(Dispatchers.Main) {
-                        importBatchConfig(configText, it.first)
+                        importBatchConfig(configText, it.first,false)
                     }
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            hiddifyToast(R.string.title_sub_update_failed)
             hiddifyMainViewModel. testAllRealPing()
             return false
         }
@@ -853,11 +855,24 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
 
     override fun onImportQrCode() {
         importQRcode(true)
-        importConfigViaSub()
+        importConfigViaSub(HiddifyUtils.getSelectedSubId())
     }
 
     override fun onSelectSub(subPosition: Int) {
-        hiddifyMainViewModel.subscriptionId = hiddifyMainViewModel.subscriptions[subPosition].first
+        var selected=hiddifyMainViewModel.subscriptions[subPosition]
+        onSelectSub(selected.first)
+    }
+    private fun onSelectSub(subid: String) {
+        if (HiddifyUtils.getSelectedSubId()!=subid) {
+            HiddifyUtils.setSelectedSub(subid)
+            HiddifyUtils.setMode(connect_mode)
+        }
+
+        hiddifyMainViewModel.subscriptionId = subid
+        val enableSubscription =hiddifyMainViewModel.currentSubscription()
+        if (enableSubscription?.second?.needUpdate() == true){
+            importConfigViaSub(HiddifyUtils.getSelectedSubId())
+        }
         hiddifyMainViewModel.reloadServerList()
         hiddifyMainViewModel.reloadSubscriptionsState()
     }
@@ -873,6 +888,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
     override fun onModeChange(mode: Int) {
         connect_mode=mode;
         if (mode==3){
+            bottomSheetPresenter.dismiss()
             open_old_v2ray()
         }else{
             restartV2Ray()

@@ -29,4 +29,6 @@
     <string name="show">مشاهده</string>
     <string name="profiles">پروفایل‌ها</string>
     <string name="add_profile">افزودن پروفایل</string>
+    <string name="title_sub_update_failed" >به روزرسانی اشتراک با خطا مواجه شد</string>
+    <string name="no_server_selected">هیچ سروری انتخاب نشده است.</string>
 </resources>
