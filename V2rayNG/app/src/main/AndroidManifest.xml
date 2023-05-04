@@ -16,8 +16,7 @@
     <uses-feature
         android:name="android.hardware.camera.autofocus"
         android:required="false" /> <!-- https://developer.android.com/about/versions/11/privacy/package-visibility -->
-    <!-- <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" -->
-    <!-- tools:ignore="QueryAllPackagesPermission" /> -->
+     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />

@@ -19,8 +19,8 @@ android {
         minSdkVersion 21
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
-        versionCode 5100530 //hiddify when comes to version 5 change it
-        versionName "3.0.0" //hiddify
+        versionCode 5100537 //hiddify when comes to version 5 change it
+        versionName "3.7.0" //hiddify
     }
 
     buildTypes {
@@ -50,11 +50,22 @@ android {
     }
 
     splits {
+        language {
+            enable = false
+        }
         abi {
             enable true
             reset()
             include 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a' //select ABIs to build APKs for
             universalApk true //generate an additional APK that contains all the ABIs
+        }
+    }
+    bundle {
+        language {
+            enableSplit = false
+        }
+        abi {
+            enableSplit = true
         }
     }
 
@@ -122,6 +133,8 @@ dependencies {
 
 
     //Hiddify
+    implementation fileTree(dir: 'jniLibs', include: ['*.so'], exclude: [ ])
+
     // Import the BoM for the Firebase platform
     implementation platform('com.google.firebase:firebase-bom:31.5.0')
 

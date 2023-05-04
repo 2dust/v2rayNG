@@ -14,7 +14,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import android.widget.AdapterView.OnItemSelectedListener
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -22,7 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
-import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.tbruyelle.rxpermissions.RxPermissions
@@ -47,6 +46,7 @@ import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import java.io.File
 import java.io.FileOutputStream
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -94,17 +94,57 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         migrateLegacy()
         init()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            RxPermissions(this)
-                .request(Manifest.permission.POST_NOTIFICATIONS)
-                .subscribe {
-                    if (!it)
-                        toast(R.string.toast_permission_denied)
-                }
-        }
+        showLangDialog()
 
     }
+    fun showLangDialog(){
+        if (settingsStorage?.containsKey(AppConfig.PREF_LANGUAGE)==true) {
+            showCountryDialog()
+            return
+        }
+        MaterialAlertDialogBuilder(this,R.style.AppTheme_ThemeOverlay_MaterialComponents_MaterialAlertDialog)
+            .setTitle(R.string.title_language)
+            .setCancelable(false)
+            .setItems(R.array.language_select) { dialog, which ->
+                val lang = resources.getStringArray(R.array.language_select_value)[which]
+                settingsStorage?.encode(AppConfig.PREF_LANGUAGE, lang)
+                dialog.dismiss()
+                val locale=Utils.getLocale(this);
+                Locale.setDefault(locale)
 
+
+                val resources = baseContext.resources
+                val configuration = resources.configuration
+                configuration.locale = locale
+                configuration.setLayoutDirection(locale)
+
+                resources.updateConfiguration(configuration, resources.displayMetrics)
+//                setContentView(R.layout.activity_hiddify_main);
+//                recreate()
+                finish();
+                startActivity(intent);
+
+//
+//                  restartActivity();
+
+            }
+            .show()
+    }
+    fun showCountryDialog(){
+        if (settingsStorage?.containsKey(AppConfig.PREF_COUNTRY)==true) {
+            return
+        }
+        MaterialAlertDialogBuilder(this,R.style.AppTheme_ThemeOverlay_MaterialComponents_MaterialAlertDialog)
+            .setTitle(R.string.title_country)
+            .setCancelable(false)
+
+            .setItems(R.array.country_select) { dialog, which ->
+                val country = resources.getStringArray(R.array.country_select_value)[which]
+                settingsStorage?.encode(AppConfig.PREF_COUNTRY, country)
+                dialog.dismiss()
+            }
+            .show()
+    }
     private fun init() {
         binding.pingLayout.click {
             binding.ping.text="..."
@@ -326,7 +366,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
 
     public override fun onResume() {
         super.onResume()
-        onSelectSub(HiddifyUtils.getSelectedSubId())
+        onSelectSub(HiddifyUtils.getSelectedSubId(),false)
 //        HiddifyUtils.setMode(connect_mode)
         hiddifyMainViewModel.reloadServerList()
         hiddifyMainViewModel.reloadSubscriptionsState()
@@ -565,6 +605,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         if (count > 0) {
             if(selectSub) {
                 HiddifyUtils.setMode(connect_mode)
+                onSelectSub(subid)
             }
             hiddifyMainViewModel.testAllRealPing()
             toast(R.string.toast_success)
@@ -575,8 +616,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }
     }
 
-    private fun importConfigCustomClipboard()
-            : Boolean {
+    private fun importConfigCustomClipboard(): Boolean {
         try {
             val configText = Utils.getClipboard(this)
             if (TextUtils.isEmpty(configText)) {
@@ -896,8 +936,12 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         importConfigViaSub(HiddifyUtils.getSelectedSubId())
     }
 
-
     override fun onSelectSub(subid: String) {
+        onSelectSub(subid,true)
+    }
+
+
+    fun onSelectSub(subid: String,do_ping:Boolean=true) {
         if (HiddifyUtils.getSelectedSubId()!=subid) {
             HiddifyUtils.setSelectedSub(subid)
             HiddifyUtils.setMode(connect_mode)
@@ -912,8 +956,16 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         val enableSubscription =hiddifyMainViewModel.currentSubscription()
         if (enableSubscription?.second?.needUpdate() == true){
             importConfigViaSub(HiddifyUtils.getSelectedSubId())
-        }else{
+        }else if (do_ping){
             hiddifyMainViewModel.testAllRealPing()
+        }
+        if (hiddifyMainViewModel.serverList.isNotEmpty() &&Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            RxPermissions(this)
+                .request(Manifest.permission.POST_NOTIFICATIONS)
+                .subscribe {
+//                    if (!it)
+//                        toast(R.string.toast_permission_denied)
+                }
         }
     }
 
@@ -954,9 +1006,11 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             toast(R.string.title_sub_update_failed)
             return
         }
-        var content=if(content1.startsWith("hiddify"))Uri.parse(content1.trim()).getQueryParameter("url")?:"" else content1
+        var content=if(content1.startsWith("hiddify"))Uri.parse(content1.trim()).getQueryParameter("url")?:"" else content1.trim()
         if (content.startsWith("http")){
-            importBatchConfig(content, selectSub = true)
+            var subid=MmkvManager.importUrlAsSubscription(content)
+            onSelectSub(subid)
+//            importConfigViaSub(subid)
             return
         }
         val subscriptions = MmkvManager.decodeSubscriptions().filter { it.second.enabled &&!Utils.isValidUrl(it.second.url) }

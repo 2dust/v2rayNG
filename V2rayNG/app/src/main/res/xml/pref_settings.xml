@@ -145,6 +145,13 @@
             android:key="pref_language"
             android:summary="%s"
             android:title="@string/title_language" />
+        <ListPreference
+            android:defaultValue="ir"
+            android:entries="@array/country_select"
+            android:entryValues="@array/country_select_value"
+            android:key="pref_country"
+            android:summary="%s"
+            android:title="@string/title_country" />
 
     </PreferenceCategory>
 </PreferenceScreen>

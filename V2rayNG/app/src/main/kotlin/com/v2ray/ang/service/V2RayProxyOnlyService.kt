@@ -14,6 +14,9 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
     override fun onCreate() {
         super.onCreate()
         V2RayServiceManager.serviceControl = SoftReference(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            V2RayServiceManager.showNotification(this)
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

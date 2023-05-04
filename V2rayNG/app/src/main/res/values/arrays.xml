@@ -162,23 +162,36 @@
 
 
     <string-array name="language_select" translatable="false">
-        <item>auto</item>
-        <item>English</item>
-        <item>中文简体</item>
-        <item>中文繁體</item>
-        <item>Tiếng Việt</item>
-        <item>Русский</item>
-        <item>فارسی</item>
+        <item>🌎 auto</item>
+        <item>🇮🇷 فارسی</item>
+        <item>🇺🇸 English</item>
+        <item>🇨🇳 中文简体</item>
+        <item>🇹🇼 中文繁體</item>
+        <item>🇻🇮 Tiếng Việt</item>
+        <item>🇷🇺 Русский</item>
     </string-array>
 
 
     <string-array name="language_select_value" translatable="false">
         <item>auto</item>
+        <item>fa</item>
         <item>en</item>
         <item>zh-rCN</item>
         <item>zh-rTW</item>
         <item>vi</item>
         <item>ru</item>
-        <item>fa</item>
+
+    </string-array>
+
+    <string-array name="country_select" translatable="false">
+        <item>🇮🇷 Iran</item>
+        <item>🇨🇳 China</item>
+        <item>🌎 Other</item>
+    </string-array>
+
+    <string-array name="country_select_value" translatable="false">
+        <item>ir</item>
+        <item>cn</item>
+        <item></item>
     </string-array>
 </resources>

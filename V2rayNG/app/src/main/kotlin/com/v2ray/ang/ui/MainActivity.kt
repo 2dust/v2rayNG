@@ -129,8 +129,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             RxPermissions(this)
                 .request(Manifest.permission.POST_NOTIFICATIONS)
                 .subscribe {
-                    if (!it)
-                        toast(R.string.toast_permission_denied)
+//                    if (!it)
+//                        toast(R.string.toast_permission_denied)
                 }
         }
 
@@ -249,7 +249,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         super.onResume()
 //        mainViewModel.reloadServerList()
         binding.spSubscriptionId.adapter = MainSubAdapter(this)
-        onSelectSub(HiddifyUtils.getSelectedSubId())
+        onSelectSub(HiddifyUtils.getSelectedSubId(),false)
         if (V2RayServiceManager.v2rayPoint.isRunning) {
             mainViewModel.testCurrentServerRealPing()
         }
@@ -749,7 +749,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
 
-    fun onSelectSub(subid: String){
+    fun onSelectSub(subid: String,do_ping:Boolean=true){
 
         if (mainViewModel.subscriptionId!=subid) {
             mainViewModel.subscriptionId = subid
@@ -760,8 +760,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         val selected=HiddifyUtils.getSelectedSub()
         if (selected?.second?.needUpdate() == true){
             importConfigViaSub(selected.first)
-        }else{
-            mainViewModel.testAllRealPing()
+        }else if (do_ping){
+                mainViewModel.testAllRealPing()
         }
 
 

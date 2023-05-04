@@ -14,6 +14,8 @@ object AppConfig {
     const val PREF_ROUTING_CUSTOM = "pref_routing_custom"
 
     // Preferences mapped to MMKV
+    const val FIRST_SETUP_DONE = "first_setup_done"//hiddify
+    const val PREF_COUNTRY="pref_country"//hiddify
     const val PREF_MODE = "pref_mode"
     const val PREF_SPEED_ENABLED = "pref_speed_enabled"
     const val PREF_SNIFFING_ENABLED = "pref_sniffing_enabled"
@@ -62,13 +64,13 @@ object AppConfig {
 
     const val androidpackagenamelistUrl = "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
     const val v2rayCustomRoutingListUrl = "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
-    const val v2rayNGIssues = "https://github.com/hiddify/HiddifyAndroidNG/issues"
-    const val v2rayNGWikiMode = "https://github.com/hiddify/HiddifyAndroidNG/wiki/Mode"
+    const val v2rayNGIssues = "https://github.com/hiddify/HiddifyNG/issues"
+    const val v2rayNGWikiMode = "https://github.com/hiddify/HiddifyNG/wiki/Mode"
     const val promotionUrl = "dGc6Ly9yZXNvbHZlP2RvbWFpbj1oaWRkaWZ5"
     const val geoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/";
 
     const val DNS_AGENT = "1.1.1.1"
-    const val DNS_DIRECT = "223.5.5.5"
+    const val DNS_DIRECT = "8.8.8.8"//223.5.5.5
 
     const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"

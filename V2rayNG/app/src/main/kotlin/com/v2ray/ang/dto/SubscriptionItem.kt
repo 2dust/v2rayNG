@@ -5,7 +5,7 @@ data class SubscriptionItem(
         var url: String = "",
         var enabled: Boolean = true,
         var addedTime: Long = System.currentTimeMillis(),
-        var lastUpdateTime: Long = System.currentTimeMillis(),
+        var lastUpdateTime: Long = 0,
         var used: Long=-1,
         var total: Long=-1,
         var expire: Long=-1,//in ms

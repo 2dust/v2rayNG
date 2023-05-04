@@ -85,4 +85,32 @@
     <style name="DialogCurveStyle" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/MyAppModalStyle</item>
     </style>
+
+
+    <style name="AppTheme_ThemeOverlay.MaterialComponents.MaterialAlertDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogTitleTextStyle">@style/AppTheme_MaterialAlertDialog.MaterialComponents.Title.Text</item>
+
+
+        <item name="materialAlertDialogBodyTextStyle">@style/AppTheme_MaterialAlertDialog.MaterialComponents.NormalText</item>
+
+    </style>
+    <style name="AppTheme_MaterialAlertDialog.MaterialComponents.Title.Text" parent="@style/MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textAppearance">@style/AppTheme_TextAppearance.MaterialComponents.Subtitle1</item>
+
+
+    </style>
+    <style name="AppTheme_MaterialAlertDialog.MaterialComponents.NormalText" parent="@style/MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="textAppearanceBody2">@font/vazir_light</item>
+        <item name="fontFamily">@font/vazir_light</item>
+        <item name="android:fontFamily">@font/vazir_light</item>
+
+
+    </style>
+
+    <style name="AppTheme_TextAppearance.MaterialComponents.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/vazir_bold</item>
+        <item name="android:fontFamily">@font/vazir_bold</item>
+        <!--        <item name="android:textStyle">.....</item>-->
+        <item name="android:textSize">20sp</item>
+    </style>
 </resources>

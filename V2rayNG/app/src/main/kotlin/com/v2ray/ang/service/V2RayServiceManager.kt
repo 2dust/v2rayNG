@@ -73,7 +73,7 @@ object V2RayServiceManager {
         } else {
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
         }
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
             Handler(Looper.getMainLooper()).post{
                 context.startForegroundService(intent)
             }
@@ -260,8 +260,8 @@ object V2RayServiceManager {
         }
     }
 
-    private fun showNotification() {
-        val service = serviceControl?.get()?.getService() ?: return
+    fun showNotification(service:Service? = serviceControl?.get()?.getService()) {
+         if (service==null) return
         //todo @hiddify1
         val startMainIntent = Intent(service, HiddifyMainActivity::class.java) //todo: check to open main or hiddifyMain
         val contentPendingIntent = PendingIntent.getActivity(service,
@@ -337,9 +337,11 @@ object V2RayServiceManager {
             if (proxyTraffic < NOTIFICATION_ICON_THRESHOLD && directTraffic < NOTIFICATION_ICON_THRESHOLD) {
                 mBuilder?.setSmallIcon(R.drawable.ic_stat_name)
             } else if (proxyTraffic > directTraffic) {
-                mBuilder?.setSmallIcon(R.drawable.ic_stat_proxy)
+                mBuilder?.setSmallIcon(R.drawable.ic_stat_name)
+//                mBuilder?.setSmallIcon(R.drawable.ic_stat_proxy)
             } else {
-                mBuilder?.setSmallIcon(R.drawable.ic_stat_direct)
+                mBuilder?.setSmallIcon(R.drawable.ic_stat_name)
+//                mBuilder?.setSmallIcon(R.drawable.ic_stat_direct)
             }
             mBuilder?.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             mBuilder?.setContentText(contentText) // Emui4.1 need content text even if style is set as BigTextStyle

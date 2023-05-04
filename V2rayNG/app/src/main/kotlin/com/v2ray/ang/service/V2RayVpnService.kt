@@ -23,6 +23,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 import java.lang.ref.SoftReference
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 
 class V2RayVpnService : VpnService(), ServiceControl {
     companion object {
@@ -85,6 +88,9 @@ class V2RayVpnService : VpnService(), ServiceControl {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         V2RayServiceManager.serviceControl = SoftReference(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            V2RayServiceManager.showNotification(this)
+        }
     }
 
     override fun onRevoke() {
@@ -218,6 +224,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
         Log.d(packageName, cmd.toString())
 
         try {
+            if(!applicationContext.filesDir.isDirectory)
+                applicationContext.filesDir.mkdirs()
             val proBuilder = ProcessBuilder(cmd)
             proBuilder.redirectErrorStream(true)
             process = proBuilder
@@ -233,13 +241,30 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 }
             }).start()
             Log.d(packageName, process.toString())
-
+            test("files",Paths.get(applicationContext.filesDir.absolutePath))
+            test("nativelib",Paths.get(applicationContext.applicationInfo.nativeLibraryDir))
+            test("nativelibroot",Paths.get(applicationContext.applicationInfo.nativeLibraryDir+"/../"))
             sendFd()
         } catch (e: Exception) {
             Log.d(packageName, e.toString())
         }
+        test("files",Paths.get(applicationContext.filesDir.absolutePath))
+        test("nativelib",Paths.get(applicationContext.applicationInfo.nativeLibraryDir))
+        test("nativelibroot",Paths.get(applicationContext.applicationInfo.nativeLibraryDir+"/../"))
     }
+    fun test(tag:String,folder: Path){
+        try {
+            Log.e(packageName, "$tag: testing======")
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Files.walk(folder)
+        //                    .filter { Files.isRegularFile(it) }
+                    .forEach { Log.e(packageName, it.toString()) }
+            }
+        }catch (e:java.lang.Exception){
+            Log.e(packageName,e.stackTraceToString())
+        }
+    }
     private fun sendFd() {
         val fd = mInterface.fileDescriptor
         val path = File(applicationContext.filesDir, "sock_path").absolutePath
