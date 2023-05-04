@@ -806,7 +806,10 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         //binding.tvTestState.text = content
         if (content==null)return
 
-        binding.ping.text=if (content!!.first>=0)content!!.first.toString().toPersianDigit()+" ms" else getString(R.string.toast_failure)
+        var text=if (content!!.first>=0)content!!.first.toString()+" ms" else getString(R.string.toast_failure)
+        if (Utils.getLocale(this).toString().startsWith("fa"))
+            text=text.toPersianDigit()
+        binding.ping.text=text
     }
 
 //    val mConnection = object : ServiceConnection {

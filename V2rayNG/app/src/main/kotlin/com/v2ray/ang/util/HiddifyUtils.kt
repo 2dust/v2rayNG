@@ -85,7 +85,7 @@ class HiddifyUtils {
 
 
 
-            return if (getLocale(context) == Locale("fa") || getLocale(context).toString() == "fa_IR") {
+            return if (getLocale(context).toString().startsWith("fa")) {
                 if (diffInMillis > 10)
                     "$diffInMillis روز \n باقیمانده".toPersianDigit()
                         .colorlessTextPart("باقیمانده", context.getColorEx(R.color.colorBorder))

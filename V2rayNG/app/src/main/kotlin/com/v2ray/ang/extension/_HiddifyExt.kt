@@ -19,6 +19,7 @@ import java.util.ArrayList
 
 
 fun String.toPersianDigit(): String {
+
     var number = this
     val persian = "۰۱۲۳۴۵۶۷۸۹"
     val english = "0123456789"
