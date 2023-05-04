@@ -2,6 +2,10 @@
 
 A Hiddify client for Android, support [Xray core](https://github.com/XTLS/Xray-core) <!-- and [v2fly core](https://github.com/v2fly/v2ray-core)-->
 
+<a href="https://play.google.com/store/apps/details?id=ang.hiddify.com">
+<img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="165" height="64" />
+</a>
+
 <center>
 <a href=""><img width="35%" src="https://user-images.githubusercontent.com/114227601/236047341-47a744e2-b552-4734-b919-2ee8f9416998.png" /></a>
 <a href=""><img width="35%" src="https://user-images.githubusercontent.com/114227601/236047343-85026615-c891-40d7-bd22-ec44b846d727.png" /></a>
@@ -17,11 +21,8 @@ A Hiddify client for Android, support [Xray core](https://github.com/XTLS/Xray-c
 [![GitHub Releases](https://img.shields.io/github/downloads/hiddify/HiddifyAndroidNG/total?logo=github)](https://github.com/hiddify/HiddifyAndroidNG/releases)
 [![Chat on Telegram](https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg)](https://t.me/hiddify)
 
-<!--
-<a href="https://play.google.com/store/apps/details?id=ang.hiddify.com">
-<img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="165" height="64" />
-</a>
--->
+
+
 
 ### Telegram Channel
 [hiddify](https://t.me/hiddify)
