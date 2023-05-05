@@ -1,0 +1,11 @@
+<resources>
+    <color name="bg_h_purple_text">#FFFFFF</color>
+    <color name="bg_h_blue_text">#FFFFFF</color>
+    <color name="bg_h_green_text">#FFFFFF</color>
+    <color name="bg_h_orange_text">#FFFFFF</color>
+    <color name="bg_h_turquoise_text">#FFFFFF</color>
+    <color name="bg_h_red_text">#FFFFFF</color>
+    <color name="bg_h_grey_text">#FFFFFF</color>
+    <color name="bg_h_pink_text">#FFFFFF</color>
+    <color name="bg_h_sky_text">#FFFFFF</color>
+</resources>
