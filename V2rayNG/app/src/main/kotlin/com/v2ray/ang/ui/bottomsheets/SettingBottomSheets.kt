@@ -73,16 +73,19 @@ class SettingBottomSheets(var mode: Int) : BaseExpandedBottomSheet() {
             true;
         }
         binding.sitesAll.setOnLongClickListener{
+            HiddifyUtils.setPerAppProxyMode(HiddifyUtils.PerAppProxyMode.Foreign)
             startActivity(Intent(activity, PerAppProxyActivity::class.java))
             dialog?.dismiss()
             true;
         }
         binding.externalSites.setOnLongClickListener{
+            HiddifyUtils.setPerAppProxyMode(HiddifyUtils.PerAppProxyMode.Foreign)
             startActivity(Intent(activity, PerAppProxyActivity::class.java))
             dialog?.dismiss()
             true;
         }
         binding.filteredSites.setOnLongClickListener{
+            HiddifyUtils.setPerAppProxyMode(HiddifyUtils.PerAppProxyMode.Blocked)
             startActivity(Intent(activity, PerAppProxyActivity::class.java))
             dialog?.dismiss()
             true;

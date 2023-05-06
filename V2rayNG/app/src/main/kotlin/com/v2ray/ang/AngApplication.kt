@@ -5,6 +5,8 @@ import androidx.multidex.MultiDexApplication
 import androidx.preference.PreferenceManager
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.util.MmkvManager
 
@@ -26,7 +28,7 @@ class AngApplication : MultiDexApplication() {
         FirebaseApp.initializeApp(this);
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(this))
-
+        Firebase.messaging.subscribeToTopic("all")
 
         val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         firstRun = defaultSharedPreferences.getInt(PREF_LAST_VERSION, 0) != BuildConfig.VERSION_CODE

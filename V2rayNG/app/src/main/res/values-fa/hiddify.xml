@@ -35,4 +35,5 @@
     <string name="expired">منقضی شده</string>
     <string name="title_country">کشور</string>
     <string name="proxyAppAndSites">پروکسی برنامه ها و سایت ها</string>
+    <string name="hiddify_notification">پیام های هیدیفای</string>
 </resources>

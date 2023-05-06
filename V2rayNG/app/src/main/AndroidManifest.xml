@@ -34,6 +34,13 @@
         android:theme="@style/AppThemeDayNight"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_name" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/hiddify_notification" />
         <activity
             android:name=".ui.SplashScreenActivity"
             android:exported="true">
@@ -129,7 +136,13 @@
                 <data android:scheme="trojan" />
             </intent-filter>
         </activity>
-
+        <service
+            android:name="com.hiddify.ang.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
         <service
             android:name=".service.V2RayVpnService"
             android:enabled="true"

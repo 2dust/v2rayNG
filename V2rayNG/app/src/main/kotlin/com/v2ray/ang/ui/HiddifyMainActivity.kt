@@ -23,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
@@ -75,6 +76,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         registerReceiver(receiver, IntentFilter(AppConfig.BROADCAST_ACTION_UPDATE_UI))
 
         binding = ActivityHiddifyMainBinding.inflate(layoutInflater)
@@ -95,6 +97,14 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         init()
 
         showLangDialog()
+        if (hiddifyMainViewModel.serverList.isNotEmpty() &&Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            RxPermissions(this)
+                .request(Manifest.permission.POST_NOTIFICATIONS)
+                .subscribe {
+//                    if (!it)
+//                        toast(R.string.toast_permission_denied)
+                }
+        }
 
     }
     fun showLangDialog(){
@@ -962,14 +972,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }else if (do_ping){
             hiddifyMainViewModel.testAllRealPing()
         }
-        if (hiddifyMainViewModel.serverList.isNotEmpty() &&Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            RxPermissions(this)
-                .request(Manifest.permission.POST_NOTIFICATIONS)
-                .subscribe {
-//                    if (!it)
-//                        toast(R.string.toast_permission_denied)
-                }
-        }
+
     }
 
     override fun onRemoveSelectSub(subid: String) {

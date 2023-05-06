@@ -38,4 +38,5 @@
     <string name="expired">Expired</string>
     <string name="title_country">Country</string>
     <string name="proxyAppAndSites">Proxy App and Sites</string>
+    <string name="hiddify_notification">Hiddify Notifications</string>
 </resources>
