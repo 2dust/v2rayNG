@@ -19,6 +19,7 @@ import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.util.AppManagerUtil
+import com.v2ray.ang.util.HiddifyUtils
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -46,49 +47,16 @@ class PerAppProxyActivity : BaseActivity() {
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         binding.recyclerView.addItemDecoration(dividerItemDecoration)
 
-        val blacklist = defaultSharedPreferences.getStringSet(AppConfig.PREF_PER_APP_PROXY_SET, null)
-
         AppManagerUtil.rxLoadNetworkAppList(this)
-                .subscribeOn(Schedulers.io())
-                .map {
-                    if (blacklist != null) {
-                        it.forEach { one ->
-                            if ((blacklist.contains(one.packageName))) {
-                                one.isSelected = 1
-                            } else {
-                                one.isSelected = 0
-                            }
-                        }
-                        val comparator = Comparator<AppInfo> { p1, p2 ->
-                            when {
-                                p1.isSelected > p2.isSelected -> -1
-                                p1.isSelected == p2.isSelected -> 0
-                                else -> 1
-                            }
-                        }
-                        it.sortedWith(comparator)
-                    } else {
-                        val comparator = object : Comparator<AppInfo> {
-                            val collator = Collator.getInstance()
-                            override fun compare(o1: AppInfo, o2: AppInfo) = collator.compare(o1.appName, o2.appName)
-                        }
-                        it.sortedWith(comparator)
-                    }
-                }
-//                .map {
-//                    val comparator = object : Comparator<AppInfo> {
-//                        val collator = Collator.getInstance()
-//                        override fun compare(o1: AppInfo, o2: AppInfo) = collator.compare(o1.appName, o2.appName)
-//                    }
-//                    it.sortedWith(comparator)
-//                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    appsAll = it
-                    adapter = PerAppProxyAdapter(this, it, blacklist)
-                    binding.recyclerView.adapter = adapter
-                    binding.pbWaiting.visibility = View.GONE
-                }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                appsAll = it
+                binding.pbWaiting.visibility = View.GONE
+                reloadAdaptor()
+            }
+
+
         /***
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
         var dst = 0
@@ -135,16 +103,27 @@ class PerAppProxyActivity : BaseActivity() {
         }
         })
          ***/
-
-        binding.switchPerAppProxy.setOnCheckedChangeListener { _, isChecked ->
-            defaultSharedPreferences.edit().putBoolean(AppConfig.PREF_PER_APP_PROXY, isChecked).apply()
+        binding.proxyToggleButton.addOnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked) {
+                if (HiddifyUtils.getPerAppProxyMode() != HiddifyUtils.PerAppProxyMode.Global)
+                    adapter?.let {
+                        defaultSharedPreferences.edit()
+                            .putStringSet(getCurrentListKey(), it.blacklist).apply()
+                    }
+                var mode = when (checkedId) {
+                    binding.filteredSites.id -> HiddifyUtils.PerAppProxyMode.Blocked
+                    binding.externalSites.id -> HiddifyUtils.PerAppProxyMode.Foreign
+                    else -> HiddifyUtils.PerAppProxyMode.Global
+                }
+                HiddifyUtils.setPerAppProxyMode(mode)
+                reloadAdaptor()
+            }
         }
-        binding.switchPerAppProxy.isChecked = defaultSharedPreferences.getBoolean(AppConfig.PREF_PER_APP_PROXY, false)
+        var bypassMode=HiddifyUtils.getPerAppProxyMode()
+        binding.sitesAll.isChecked = bypassMode== HiddifyUtils.PerAppProxyMode.Global
+        binding.filteredSites.isChecked = bypassMode==HiddifyUtils.PerAppProxyMode.Blocked
+        binding.externalSites.isChecked = bypassMode==HiddifyUtils.PerAppProxyMode.Foreign
 
-        binding.switchBypassApps.setOnCheckedChangeListener { _, isChecked ->
-            defaultSharedPreferences.edit().putBoolean(AppConfig.PREF_BYPASS_APPS, isChecked).apply()
-        }
-        binding.switchBypassApps.isChecked = defaultSharedPreferences.getBoolean(AppConfig.PREF_BYPASS_APPS, false)
 
         /***
         et_search.setOnEditorActionListener { v, actionId, event ->
@@ -176,11 +155,62 @@ class PerAppProxyActivity : BaseActivity() {
         }
          ***/
     }
+    fun getCurrentListKey(): String? {
+        return when(HiddifyUtils.getPerAppProxyMode()){
+            HiddifyUtils.PerAppProxyMode.Blocked-> AppConfig.PREF_PER_APP_PROXY_SET_BLACK
+            HiddifyUtils.PerAppProxyMode.Foreign-> AppConfig.PREF_PER_APP_PROXY_SET_WHITE
+            else-> null
+        }
 
+    }
+    fun reloadAdaptor(){
+        if(appsAll==null)return
+        if(HiddifyUtils.getPerAppProxyMode()==HiddifyUtils.PerAppProxyMode.Global) {
+            adapter=PerAppProxyAdapter(this, mutableListOf(), null)
+            binding.recyclerView.adapter = adapter
+            adapter?.notifyDataSetChanged()
+            return
+        }
+        binding.pbWaiting.visibility = View.VISIBLE
+        val blacklist = defaultSharedPreferences.getStringSet(getCurrentListKey(), null)
+        if (blacklist != null) {
+            appsAll?.forEach { one ->
+                        if ((blacklist.contains(one.packageName))) {
+                            one.isSelected = 1
+                        } else {
+                            one.isSelected = 0
+                        }
+                    }
+
+                    val comparator = Comparator<AppInfo> { p1, p2 ->
+                        when {
+                            p1.isSelected > p2.isSelected -> -1
+                            p1.isSelected == p2.isSelected -> 0
+                            else -> 1
+                        }
+                    }
+                    appsAll=appsAll?.sortedWith(comparator)
+                } else {
+                    val comparator = object : Comparator<AppInfo> {
+                        val collator = Collator.getInstance()
+                        override fun compare(o1: AppInfo, o2: AppInfo) = collator.compare(o1.appName, o2.appName)
+                    }
+            appsAll=appsAll?.sortedWith(comparator)
+                }
+        adapter = PerAppProxyAdapter(this, appsAll!!, blacklist)
+        binding.recyclerView.adapter = adapter
+        binding.pbWaiting.visibility = View.GONE
+        adapter?.notifyDataSetChanged()
+//
+
+
+
+    }
     override fun onPause() {
         super.onPause()
+        if(HiddifyUtils.getPerAppProxyMode()!=HiddifyUtils.PerAppProxyMode.Global)
         adapter?.let {
-            defaultSharedPreferences.edit().putStringSet(AppConfig.PREF_PER_APP_PROXY_SET, it.blacklist).apply()
+            defaultSharedPreferences.edit().putStringSet(getCurrentListKey(), it.blacklist).apply()
         }
     }
 
@@ -261,7 +291,7 @@ class PerAppProxyActivity : BaseActivity() {
     }
 
     private fun exportProxyApp() {
-        var lst = binding.switchBypassApps.isChecked.toString()
+        var lst = (HiddifyUtils.getPerAppProxyMode()==HiddifyUtils.PerAppProxyMode.Blocked).toString()
 
         adapter?.blacklist?.forEach block@{
             lst = lst + System.getProperty("line.separator") + it
@@ -283,7 +313,7 @@ class PerAppProxyActivity : BaseActivity() {
 
             adapter?.blacklist!!.clear()
 
-            if (binding.switchBypassApps.isChecked) {
+            if (HiddifyUtils.getPerAppProxyMode()==HiddifyUtils.PerAppProxyMode.Blocked) {
                 adapter?.let {
                     it.apps.forEach block@{
                         val packageName = it.packageName

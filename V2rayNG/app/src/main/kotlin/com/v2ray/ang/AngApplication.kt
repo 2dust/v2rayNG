@@ -1,5 +1,6 @@
 package com.v2ray.ang
 
+import android.content.Context
 import androidx.multidex.MultiDexApplication
 import androidx.preference.PreferenceManager
 import com.google.firebase.FirebaseApp
@@ -10,6 +11,9 @@ import com.v2ray.ang.util.MmkvManager
 class AngApplication : MultiDexApplication() {
     companion object {
         const val PREF_LAST_VERSION = "pref_last_version"
+        lateinit var appContext: Context
+                private set
+
     }
 
     var firstRun = false
@@ -17,7 +21,7 @@ class AngApplication : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
-
+        appContext = applicationContext
 //        LeakCanary.install(this)
         FirebaseApp.initializeApp(this);
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)

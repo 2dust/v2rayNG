@@ -19,59 +19,60 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/proxyToggleButton"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/bypass_list_header_height"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:id="@+id/container_per_app_proxy"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                android:layout_marginTop="8dp"
+                app:checkedButton="@id/filteredSites">
+                <com.google.android.material.button.MaterialButton
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:id="@+id/sitesAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/title_pref_per_app_proxy"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switch_per_app_proxy"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="20dp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/container_bypass_apps"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
+                    android:lines="1"
+                    android:ellipsize="end"
+                    app:strokeColor="@color/btn_stroke_color_selector"
+                    app:backgroundTint="@color/btn_bg_color_selector"
+                    android:textColor="@color/btn_text_color_selector"
+                    app:cornerRadius="20dp"
+                    android:fontFamily="@font/vazirmatn_regular"
+                    android:text="@string/sites_all" />
+                <com.google.android.material.button.MaterialButton
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:id="@+id/filteredSites"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                    android:lines="1"
+                    android:ellipsize="end"
+                    app:strokeColor="@color/btn_stroke_color_selector"
+                    app:backgroundTint="@color/btn_bg_color_selector"
+                    android:textColor="@color/btn_text_color_selector"
+                    app:cornerRadius="16dp"
+                    android:fontFamily="@font/vazirmatn_regular"
+                    android:text="@string/filtered_sites" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_bypass_apps"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/switch_bypass_apps_mode"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                <com.google.android.material.button.MaterialButton
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:id="@+id/externalSites"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:lines="1"
+                    android:ellipsize="end"
+                    app:strokeColor="@color/btn_stroke_color_selector"
+                    app:backgroundTint="@color/btn_bg_color_selector"
+                    android:textColor="@color/btn_text_color_selector"
+                    app:cornerRadius="20dp"
+                    android:fontFamily="@font/vazirmatn_regular"
+                    android:text="@string/external_sites" />
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switch_bypass_apps"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="20dp" />
 
-                </LinearLayout>
-            </LinearLayout>
-
+            </com.google.android.material.button.MaterialButtonToggleGroup>
 
         </LinearLayout>
     </LinearLayout>

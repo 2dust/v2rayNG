@@ -39,6 +39,8 @@ object AppConfig {
     const val PREF_V2RAY_ROUTING_BLOCKED = "pref_v2ray_routing_blocked"
     const val PREF_PER_APP_PROXY = "pref_per_app_proxy"
     const val PREF_PER_APP_PROXY_SET = "pref_per_app_proxy_set"
+    const val PREF_PER_APP_PROXY_SET_WHITE = "pref_per_app_proxy_set_white"//hiddify
+    const val PREF_PER_APP_PROXY_SET_BLACK = "pref_per_app_proxy_set_black"//hiddify
     const val PREF_BYPASS_APPS = "pref_bypass_apps"
     const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
     const val PREF_START_SCAN_IMMEDIATE = "pref_start_scan_immediate"
@@ -62,8 +64,8 @@ object AppConfig {
     const val TAG_DIRECT = "direct"
     const val TAG_BLOCKED = "block"
 
-    const val androidpackagenamelistUrl = "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
-    const val v2rayCustomRoutingListUrl = "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
+    const val androidpackagenamelistUrl = "https://raw.githubusercontent.com/hiddify/androidpackagenamelist/master/"
+    const val v2rayCustomRoutingListUrl = "https://raw.githubusercontent.com/hiddify/v2rayCustomRoutingList/master/"
     const val v2rayNGIssues = "https://github.com/hiddify/HiddifyNG/issues"
     const val v2rayNGWikiMode = "https://github.com/hiddify/HiddifyNG/wiki/Mode"
     const val promotionUrl = "dGc6Ly9yZXNvbHZlP2RvbWFpbj1oaWRkaWZ5"

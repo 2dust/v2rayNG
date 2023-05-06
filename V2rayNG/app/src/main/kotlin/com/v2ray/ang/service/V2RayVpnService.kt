@@ -153,13 +153,14 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
 
         builder.setSession(V2RayServiceManager.currentConfig?.remarks.orEmpty())
-        builder.addDisallowedApplication(BuildConfig.APPLICATION_ID)
-        if (settingsStorage?.decodeBool(AppConfig.PREF_PER_APP_PROXY) == true) {
+
+        val bypassApps = settingsStorage?.decodeBool(AppConfig.PREF_BYPASS_APPS) ?: false
+        val perAppProxy=settingsStorage?.decodeBool(AppConfig.PREF_PER_APP_PROXY) == true
+        if (perAppProxy) {
             val apps = settingsStorage?.decodeStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
-            val bypassApps = settingsStorage?.decodeBool(AppConfig.PREF_BYPASS_APPS) ?: false
             apps?.forEach {
                 try {
-                    if (it==BuildConfig.APPLICATION_ID)return;
+                    if (it==BuildConfig.APPLICATION_ID)return@forEach;
                     if (bypassApps)
                         builder.addDisallowedApplication(it)
                     else
@@ -169,7 +170,9 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 }
             }
         }
-
+        if (!perAppProxy || (perAppProxy&&bypassApps)) {
+            builder.addDisallowedApplication(BuildConfig.APPLICATION_ID)
+        }
         // Close the old interface since the parameters have been changed.
         try {
             mInterface.close()
@@ -241,16 +244,16 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 }
             }).start()
             Log.d(packageName, process.toString())
-            test("files",Paths.get(applicationContext.filesDir.absolutePath))
-            test("nativelib",Paths.get(applicationContext.applicationInfo.nativeLibraryDir))
-            test("nativelibroot",Paths.get(applicationContext.applicationInfo.nativeLibraryDir+"/../"))
+            //test("files",Paths.get(applicationContext.filesDir.absolutePath))
+            //test("nativelib",Paths.get(applicationContext.applicationInfo.nativeLibraryDir))
+            //test("nativelibroot",Paths.get(applicationContext.applicationInfo.nativeLibraryDir+"/../"))
             sendFd()
         } catch (e: Exception) {
             Log.d(packageName, e.toString())
         }
-        test("files",Paths.get(applicationContext.filesDir.absolutePath))
-        test("nativelib",Paths.get(applicationContext.applicationInfo.nativeLibraryDir))
-        test("nativelibroot",Paths.get(applicationContext.applicationInfo.nativeLibraryDir+"/../"))
+        //test("files",Paths.get(applicationContext.filesDir.absolutePath))
+        //test("nativelib",Paths.get(applicationContext.applicationInfo.nativeLibraryDir))
+        //test("nativelibroot",Paths.get(applicationContext.applicationInfo.nativeLibraryDir+"/../"))
     }
     fun test(tag:String,folder: Path){
         try {

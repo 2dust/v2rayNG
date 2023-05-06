@@ -212,15 +212,11 @@ object V2rayConfigUtil {
         try {
             if (balancer!=null)
                 v2rayConfig.routing.balancers=arrayListOf(balancer)
-            routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                    ?: "", AppConfig.TAG_AGENT, v2rayConfig,balancer?.tag)
-            routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                    ?: "", AppConfig.TAG_DIRECT, v2rayConfig)
+
             routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
                     ?: "", AppConfig.TAG_BLOCKED, v2rayConfig)
 
-            v2rayConfig.routing.domainStrategy = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY)
-                    ?: "IPIfNonMatch"
+            v2rayConfig.routing.domainStrategy = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY)?: "AsIs"
 //            v2rayConfig.routing.domainMatcher = "mph"
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: ERoutingMode.GLOBAL_PROXY.value
 
@@ -238,13 +234,19 @@ object V2rayConfigUtil {
                     routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
                 }
                 ERoutingMode.FOREIGN_SITES.value -> {
-                    routingGeo("", "ir", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("", HiddifyUtils.getCountry(), AppConfig.TAG_DIRECT, v2rayConfig)
+                    v2rayConfig.routing.rules.add(0, googleapisRoute)
+                    routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)?: "", AppConfig.TAG_DIRECT, v2rayConfig)
+
 //                    v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
                 ERoutingMode.BLOCKED_SITES.value -> {
-                    routingGeo("", "ir", AppConfig.TAG_DIRECT, v2rayConfig)
-
-                    routingGeo("", "ir-blocked", AppConfig.TAG_AGENT, v2rayConfig,balancer?.tag)
+                    routingGeo("", HiddifyUtils.getCountry(), AppConfig.TAG_DIRECT, v2rayConfig)
+                    if (HiddifyUtils.getCountry()=="ir")
+                        routingUserRule("10.10.34.34,10.10.34.35,10.10.34.36" , AppConfig.TAG_AGENT, v2rayConfig)
+                    routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)?: "", AppConfig.TAG_AGENT, v2rayConfig,balancer?.tag)
+                    //routingGeo("", "ir-blocked", AppConfig.TAG_AGENT, v2rayConfig,balancer?.tag)
                     val globalDirect = V2rayConfig.RoutingBean.RulesBean(
                         type = "field",
                         outboundTag = AppConfig.TAG_DIRECT,
@@ -277,6 +279,7 @@ object V2rayConfigUtil {
                 type = "field",
                 outboundTag = if (balancer?.tag.isNullOrEmpty()) AppConfig.TAG_AGENT else "",
                 balancerTag = balancer?.tag,
+
                 port = "0-65535"
             )
             v2rayConfig.routing.rules.add(globalProxy)
@@ -310,7 +313,8 @@ object V2rayConfigUtil {
                     rulesDomain.balancerTag = balancerTag
                     rulesDomain.domain = ArrayList()
                     rulesDomain.domain?.add("geosite:$code")
-                    v2rayConfig.routing.rules.add(rulesDomain)
+                    if(code!="ir")
+                        v2rayConfig.routing.rules.add(rulesDomain)
                 }
             }
         } catch (e: Exception) {

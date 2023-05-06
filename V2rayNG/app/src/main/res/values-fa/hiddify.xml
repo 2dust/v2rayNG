@@ -17,9 +17,9 @@
     <string name="connecting">در حال اتصال ...</string>
     <string name="proxy">پروکسی</string>
     <string name="connection_mode">حالت اتصال</string>
-    <string name="filtered_sites">سایت‌های فیلتر</string>
-    <string name="external_sites">سایت‌های خارجی</string>
-    <string name="sites_all">همه سایت‌ها</string>
+    <string name="filtered_sites">فیلتر</string>
+    <string name="external_sites">خارجی</string>
+    <string name="sites_all">همه</string>
     <string name="smart">هوشمند</string>
     <string name="load_balance">لودبالانس</string>
     <string name="fragment" translatable="false">فرگمنت</string>
@@ -34,4 +34,5 @@
     <string name="no_server_selected">هیچ سروری انتخاب نشده است.</string>
     <string name="expired">منقضی شده</string>
     <string name="title_country">کشور</string>
+    <string name="proxyAppAndSites">پروکسی برنامه ها و سایت ها</string>
 </resources>

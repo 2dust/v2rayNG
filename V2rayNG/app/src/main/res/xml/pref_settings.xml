@@ -45,7 +45,7 @@
 
     <PreferenceCategory android:title="@string/title_pref_routing">
         <ListPreference
-            android:defaultValue="IPIfNonMatch"
+            android:defaultValue="AsIs"
             android:entries="@array/routing_domain_strategy"
             android:entryValues="@array/routing_domain_strategy"
             android:key="pref_routing_domain_strategy"

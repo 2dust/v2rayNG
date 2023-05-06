@@ -140,7 +140,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
 
             .setItems(R.array.country_select) { dialog, which ->
                 val country = resources.getStringArray(R.array.country_select_value)[which]
-                settingsStorage?.encode(AppConfig.PREF_COUNTRY, country)
+                HiddifyUtils.setCountry(country)
                 dialog.dismiss()
             }
             .show()
@@ -1001,6 +1001,11 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }else{
             restartV2Ray()
         }
+    }
+
+    override fun onPerAppProxyModeChange(mode: HiddifyUtils.PerAppProxyMode) {
+        HiddifyUtils.setPerAppProxyMode(mode)
+        restartV2Ray()
     }
 
 
