@@ -1,0 +1,77 @@
+name: build_release
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - "v*"
+permissions:
+  contents: write
+jobs:
+  BuildRelease:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Checkout submodules
+        run: git submodule update --init --recursive --remote
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: 17
+
+      - name: Signing properties
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          touch signing.properties
+          echo keystore.password="$SIGNING_STORE_PASSWORD" > signing.properties
+          echo key.alias="$SIGNING_KEY_ALIAS" >> signing.properties
+          echo key.password="$SIGNING_KEY_PASSWORD" >> signing.properties
+            
+          echo "cat signing.properties"
+          cat signing.properties
+
+      - name: release Build
+        if: success()
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: --no-daemon app:assembleRelease
+
+      - name: Upload Release
+        uses: softprops/action-gh-release@v1
+        if: ${{  success() }}
+        with:
+          # tag: ${{ github.ref_name }}
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          files: app/build/outputs/apk/release/*
+          prerelease: false
+          generate_release_notes: true
+          
+      - name: Assemble Release Bundle
+        run: |
+          ./gradlew bundleRelease
+      - name: Sign Release
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+      - name: Create service_account.json
+        run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+      - name: Deploy to Internal Testers
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service_account.json
+          packageName: ang.hiddify.com
+          releaseName: ${{ github.ref }}
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: internal
+       
