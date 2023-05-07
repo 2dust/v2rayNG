@@ -210,6 +210,11 @@
         <item>Sao chép thành cấu hình tùy chỉnh</item>
     </string-array>
 
+    <string-array name="share_sub_method">
+        <item>Xuất ra mã QR (Chụp màn hình để lưu)</item>
+        <item>Sao chép cấu hình này</item>
+    </string-array>
+
     <string-array name="routing_tag">
         <item>Proxy URL hoặc IP</item>
         <item>Direct URL hoặc IP</item>

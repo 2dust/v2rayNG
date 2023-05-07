@@ -155,7 +155,7 @@
     <string name="summary_pref_tg_group">عضویت در گروه تلگرام</string>
     <string name="toast_tg_app_not_found">برنامه تلگرام پیدا نشد</string>
 
-    <string name="title_pref_promotion">تبلیغات،</string>
+    <string name="title_pref_promotion">تبلیغات</string>
     <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف شود)</string>
 
     <string name="title_core_loglevel">سطح گزارشات</string>
@@ -181,7 +181,7 @@
     <string name="title_real_ping_all_server">تاخیر واقعی همه پیکربندی</string>
     <string name="title_user_asset_setting">پرونده‌های دارایی جغرافیا</string>
     <string name="title_sort_by_test_results">مرتب‌سازی بر اساس نتایج آزمایش</string>
-    <string name="title_filter_config">فیلتر پرونده پیکربندی</string>
+    <string name="title_filter_config">فیلتر پرونده پیکربندی ها</string>
     <string name="filter_config_all">همه گروه‌های اشتراک</string>
     <string name="title_del_duplicate_config_count">حذف %d کانفیگ تکراری</string>
 
@@ -209,6 +209,11 @@
         <item>QRcode</item>
         <item>خروجی گرفتن در کلیپ‌بورد</item>
         <item>خروجی گرفتن پیکربندی کامل در کلیپ‌بورد</item>
+    </string-array>
+
+    <string-array name="share_sub_method">
+        <item>QRcode</item>
+        <item>خروجی گرفتن در کلیپ‌بورد</item>
     </string-array>
 
     <string-array name="routing_tag">

@@ -216,6 +216,11 @@
         <item>Экспорт всего профиля в буфер обмена</item>
     </string-array>
 
+    <string-array name="share_sub_method">
+        <item>QR-код</item>
+        <item>Экспорт в буфер обмена</item>
+    </string-array>
+
     <string-array name="routing_tag">
         <item>Проксируемые</item>
         <item>Прямые</item>
