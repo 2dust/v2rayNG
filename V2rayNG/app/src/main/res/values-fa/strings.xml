@@ -168,8 +168,8 @@
     <string name="logcat_copy">کپی</string>
     <string name="logcat_clear">پاک کردن</string>
     <string name="title_service_restart">راه‌اندازی مجدد خدمات</string>
-    <string name="title_del_all_config">حذف تمام پیکربندی ها</string>
-    <string name="title_del_duplicate_config">حذف پیکربندی های تکراری</string>
+    <string name="title_del_all_config">حذف تمام پیکربندی</string>
+    <string name="title_del_duplicate_config">حذف کانفیگ های تکراری</string>
     <string name="title_del_invalid_config">تنظیمات نامعتبر را حذف کنید (ابتدا آزمایش کنید)</string>
     <string name="title_export_all">خروجی گرفتن پیکربندی‌های غیرسفارشی در کلیپ‌بورد</string>
     <string name="title_sub_setting">تنظیمات گروه‌ی اشتراک</string>
@@ -183,7 +183,7 @@
     <string name="title_sort_by_test_results">مرتب‌سازی بر اساس نتایج آزمایش</string>
     <string name="title_filter_config">فیلتر پرونده پیکربندی ها</string>
     <string name="filter_config_all">همه گروه‌های اشتراک</string>
-    <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
+    <string name="title_del_duplicate_config_count">حذف %d کانفیگ تکراری</string>
 
     <string name="tasker_start_service">شروع خدمات</string>
     <string name="tasker_setting_confirm">تایید</string>
