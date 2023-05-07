@@ -198,7 +198,6 @@
     <string-array name="speedtest_proxy_select" translatable="false">
         <item>🗝️ With Proxy</item>
         <item>🔒 Without Proxy</item>
-        <item>🔐 Both</item>
     </string-array>
 
 

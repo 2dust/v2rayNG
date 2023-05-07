@@ -7,6 +7,8 @@ import java.io.DataOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,6 +23,7 @@ import javax.net.ssl.SSLSocketFactory;
  */
 public class HttpUploadTest extends Thread {
 
+    private final boolean useProxy;
     public String fileURL = "";
     static int uploadedKByte = 0;
     double uploadElapsedTime = 0;
@@ -29,8 +32,10 @@ public class HttpUploadTest extends Thread {
     double finalUploadRate = 0.0;
     long startTime;
 
-    public HttpUploadTest(String fileURL) {
+    public HttpUploadTest(String fileURL,boolean useProxy) {
+
         this.fileURL = fileURL;
+        this.useProxy=useProxy;
     }
 
     private double round(double value, int places) {
@@ -78,8 +83,8 @@ public class HttpUploadTest extends Thread {
             startTime = System.currentTimeMillis();
 
             ExecutorService executor = Executors.newFixedThreadPool(4);
-            for (int i = 0; i < 8; i++) {
-                executor.execute(new HandlerUpload(url));
+            for (int i = 0; i < 4; i++) {
+                executor.execute(new HandlerUpload(url,useProxy));
             }
             executor.shutdown();
             while (!executor.isTerminated()) {
@@ -102,11 +107,11 @@ public class HttpUploadTest extends Thread {
 }
 
 class HandlerUpload extends Thread {
-
+    private final boolean useProxy;
     URL url;
 
-    public HandlerUpload(URL url) {
-        this.url = url;
+    public HandlerUpload(URL url,boolean useProxy) {
+        this.url = url; this.useProxy=useProxy;
     }
 
     public void run() {
@@ -118,7 +123,13 @@ class HandlerUpload extends Thread {
 
             try {
                 HttpsURLConnection conn = null;
-                conn = (HttpsURLConnection) url.openConnection();
+                if (useProxy) {
+                    Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress("127.0.0.1", 10808));
+                    conn = (HttpsURLConnection) url.openConnection(proxy);
+                }else{
+                    conn = (HttpsURLConnection) url.openConnection();
+                }
+
                 conn.setDoOutput(true);
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Connection", "Keep-Alive");

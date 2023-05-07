@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +19,7 @@ import javax.net.ssl.SSLSocketFactory;
  * @author erdigurbuz
  */
 public class HttpDownloadTest extends Thread {
-
+    private final boolean useProxy;
     public String fileURL = "";
     long startTime = 0;
     long endTime = 0;
@@ -30,8 +32,9 @@ public class HttpDownloadTest extends Thread {
 
     HttpsURLConnection httpsConn = null;
 
-    public HttpDownloadTest(String fileURL) {
+    public HttpDownloadTest(String fileURL,Boolean useProxy) {
         this.fileURL = fileURL;
+        this.useProxy=useProxy;
     }
 
     private double round(double value, int places) {
@@ -84,7 +87,13 @@ public class HttpDownloadTest extends Thread {
         for (String link : fileUrls) {
             try {
                 url = new URL(link);
-                httpsConn = (HttpsURLConnection) url.openConnection();
+                if (useProxy) {
+                    Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress("127.0.0.1", 10808));
+                    httpsConn = (HttpsURLConnection) url.openConnection(proxy);
+                }else{
+                    httpsConn = (HttpsURLConnection) url.openConnection();
+                }
+
                 httpsConn.setSSLSocketFactory((SSLSocketFactory) SSLSocketFactory.getDefault());
                 httpsConn.setHostnameVerifier(new HostnameVerifier() {
                     @Override

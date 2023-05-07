@@ -3,13 +3,16 @@ package com.hiddify.ang.speedtest
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.v2ray.ang.R
+import com.v2ray.ang.service.V2RayServiceManager
 import org.achartengine.GraphicalView
 import org.achartengine.model.XYMultipleSeriesDataset
 import org.achartengine.renderer.XYMultipleSeriesRenderer
@@ -22,22 +25,58 @@ import java.text.DecimalFormat
 class SpeedTestActivity : AppCompatActivity() {
     var getSpeedTestHostsHandler: GetSpeedTestHostsHandler? = null
     var tempBlackList: HashSet<String>? = null
+    var useProxy=false
+    var testMode=3;
     public override fun onResume() {
         super.onResume()
+
         getSpeedTestHostsHandler = GetSpeedTestHostsHandler()
         getSpeedTestHostsHandler!!.start()
+        selectMode()
+    }
+
+
+    fun selectMode(){
+        var activity = this;
+        MaterialAlertDialogBuilder(activity, R.style.AppTheme_ThemeOverlay_MaterialComponents_MaterialAlertDialog)
+            .setTitle(R.string.title_speedtest_proxy_select)
+            .setItems(R.array.speedtest_proxy_select) { dialog, which_proxy ->
+                dialog.dismiss()
+                useProxy = which_proxy == 0
+                if (useProxy)
+                    V2RayServiceManager.startV2Ray(activity)
+                val proxymode = findViewById<View>(R.id.proxymode) as TextView
+                proxymode.text=activity.resources.getStringArray(R.array.speedtest_proxy_select)[which_proxy]
+
+                MaterialAlertDialogBuilder(activity, R.style.AppTheme_ThemeOverlay_MaterialComponents_MaterialAlertDialog)
+                    .setTitle(R.string.title_speedtest_mode_select)
+                    .setItems(R.array.speedtest_mode_select) { dialog, which_mode ->
+                        dialog.dismiss()
+                        testMode=which_mode
+                        startTest()
+                    }.show()
+            }.show()
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_speedtest)
         val startButton = findViewById<View>(R.id.startButton) as Button
-        val dec = DecimalFormat("#.##")
         startButton.text = "Begin Test"
-        tempBlackList = HashSet()
+
         getSpeedTestHostsHandler = GetSpeedTestHostsHandler()
         getSpeedTestHostsHandler!!.start()
-        startButton.setOnClickListener {
+        startButton.setOnClickListener{
+            startButton.isEnabled = false
+            selectMode()
+        }
+
+    }
+        fun startTest(){
+            val dec = DecimalFormat("#.##")
+            tempBlackList = HashSet()
+            val startButton = findViewById<View>(R.id.startButton) as Button
             startButton.isEnabled = false
 
             //Restart test icin eger baglanti koparsa
@@ -46,6 +85,7 @@ class SpeedTestActivity : AppCompatActivity() {
                 getSpeedTestHostsHandler!!.start()
             }
             Thread(object : Runnable {
+
                 var rotate: RotateAnimation? = null
                 var barImageView =
                     findViewById<View>(R.id.barImageView) as ImageView
@@ -59,7 +99,8 @@ class SpeedTestActivity : AppCompatActivity() {
                     runOnUiThread {
                         startButton.text = "Selecting best server based on ping..."
                     }
-
+                    if (useProxy)
+                        Thread.sleep(3000)
                     //Get egcodes.speedtest hosts
                     var timeCount = 600 //1min
                     while (!getSpeedTestHostsHandler!!.isFinished) {
@@ -241,6 +282,17 @@ class SpeedTestActivity : AppCompatActivity() {
                     var downloadTestFinished = false
                     var uploadTestStarted = false
                     var uploadTestFinished = false
+                    pingTestFinished=true
+                    pingTestStarted=true
+
+                    if(testMode==0){
+                        downloadTestStarted=true
+                        downloadTestFinished=true
+                    }
+                    if(testMode==1){
+                        uploadTestStarted=true
+                        uploadTestFinished=true
+                    }
 
                     //Init Test
                     val pingTest = PingTest(info[6].replace(":8080", ""), 3)
@@ -249,8 +301,8 @@ class SpeedTestActivity : AppCompatActivity() {
                             testAddr.split("/".toRegex()).dropLastWhile { it.isEmpty() }
                                 .toTypedArray()[testAddr.split("/".toRegex())
                                 .dropLastWhile { it.isEmpty() }
-                                .toTypedArray().size - 1], ""))
-                    val uploadTest = HttpUploadTest(testAddr)
+                                .toTypedArray().size - 1], ""),useProxy)
+                    val uploadTest = HttpUploadTest(testAddr,useProxy)
 
 
                     //Tests
@@ -310,7 +362,7 @@ class SpeedTestActivity : AppCompatActivity() {
 
                         //Download Test
                         if (pingTestFinished) {
-                            if (downloadTestFinished) {
+                            if (downloadTestFinished ) {
                                 //Failure
                                 if (downloadTest.getFinalDownloadRate() == 0.0) {
                                     println("Download error...")
@@ -325,8 +377,7 @@ class SpeedTestActivity : AppCompatActivity() {
                                 //Calc position
                                 val downloadRate = downloadTest.getInstantDownloadRate()
                                 downloadRateList.add(downloadRate)
-                                position =
-                                    getPositionByRate(downloadRate)
+                                position = getPositionByRate(downloadRate)
                                 runOnUiThread {
                                     rotate = RotateAnimation(
                                         lastPosition.toFloat(),
@@ -342,8 +393,7 @@ class SpeedTestActivity : AppCompatActivity() {
                                     downloadTextView.text =
                                         dec.format(downloadTest.getInstantDownloadRate()) + " Mbps"
                                 }
-                                lastPosition =
-                                    position
+                                lastPosition = position
 
                                 //Update chart
                                 runOnUiThread { // Creating an  XYSeries for Income
@@ -368,7 +418,7 @@ class SpeedTestActivity : AppCompatActivity() {
 
 
                         //Upload Test
-                        if (downloadTestFinished) {
+                        if (pingTestFinished&&downloadTestFinished) {
                             if (uploadTestFinished) {
                                 //Failure
                                 if (uploadTest.getFinalUploadRate() == 0.0) {
@@ -383,9 +433,10 @@ class SpeedTestActivity : AppCompatActivity() {
                             } else {
                                 //Calc position
                                 val uploadRate = uploadTest.instantUploadRate
+                                //if (uploadRate>0)
                                 uploadRateList.add(uploadRate)
-                                position =
-                                    getPositionByRate(uploadRate)
+                                position = getPositionByRate(uploadRate)
+                                Log.d("Speed","${uploadRate} position ${position} ${lastPosition}")
                                 runOnUiThread {
                                     rotate = RotateAnimation(
                                         lastPosition.toFloat(),
@@ -401,8 +452,7 @@ class SpeedTestActivity : AppCompatActivity() {
                                     uploadTextView.text =
                                         dec.format(uploadTest.instantUploadRate) + " Mbps"
                                 }
-                                lastPosition =
-                                    position
+                                lastPosition = position
 
                                 //Update chart
                                 runOnUiThread { // Creating an  XYSeries for Income
@@ -430,9 +480,7 @@ class SpeedTestActivity : AppCompatActivity() {
                         }
 
                         //Test bitti
-                        if (pingTestFinished && downloadTestFinished && uploadTest.isFinished) {
-                            break
-                        }
+
                         if (pingTest.isFinished) {
                             pingTestFinished = true
                         }
@@ -441,6 +489,9 @@ class SpeedTestActivity : AppCompatActivity() {
                         }
                         if (uploadTest.isFinished) {
                             uploadTestFinished = true
+                        }
+                        if (pingTestFinished && downloadTestFinished && uploadTestFinished) {
+                            break
                         }
                         if (pingTestStarted && !pingTestFinished) {
                             try {
@@ -463,8 +514,8 @@ class SpeedTestActivity : AppCompatActivity() {
                     }
                 }
             }).start()
+
         }
-    }
 
     fun getPositionByRate(rate: Double): Int {
         if (rate <= 1) {
