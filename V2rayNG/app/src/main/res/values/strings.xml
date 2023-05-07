@@ -218,6 +218,11 @@
         <item>Export full configuration to clipboard</item>
     </string-array>
 
+    <string-array name="share_sub_method">
+        <item>QRcode</item>
+        <item>Export to clipboard</item>
+    </string-array>
+
     <string-array name="routing_tag">
         <item>proxy URL or IP</item>
         <item>direct URL or IP</item>

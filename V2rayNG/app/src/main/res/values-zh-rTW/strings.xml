@@ -210,6 +210,11 @@
         <item>匯出完整組態至剪貼簿</item>
     </string-array>
 
+    <string-array name="share_sub_method">
+        <item>QR Code</item>
+        <item>匯出至剪貼簿</item>
+    </string-array>
+
     <string-array name="routing_tag">
         <item>Proxy URL 或 IP</item>
         <item>直接連線 URL 或 IP</item>

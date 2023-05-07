@@ -211,6 +211,11 @@
         <item>خروجی گرفتن پیکربندی کامل در کلیپ‌بورد</item>
     </string-array>
 
+    <string-array name="share_sub_method">
+        <item>QRcode</item>
+        <item>خروجی گرفتن در کلیپ‌بورد</item>
+    </string-array>
+
     <string-array name="routing_tag">
         <item>نشانی اینترنتی یا آی‌پی پروکسی</item>
         <item>نشانی اینترنتی یا آی‌پی مستقیم</item>
