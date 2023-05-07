@@ -558,8 +558,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      * read content from uri
      */
     private fun readContentFromUri(uri: Uri) {
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
         RxPermissions(this)
-                .request(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .request(permission)
                 .subscribe {
                     if (it) {
                         try {
