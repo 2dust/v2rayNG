@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:padding="0dp" android:orientation="vertical">
+    <com.farimarwat.supergaugeview.SuperGaugeView
+        android:id="@+id/gague_upload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:gaugeText="Upload Speed"
+        app:duration="5000"
+        app:progressBackground="gauge_keyhole_14"
+        app:gaugeTextColor="@color/colorText"
+
+        />
+    <com.farimarwat.supergaugeview.SuperGaugeView
+        android:id="@+id/gague_download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:gaugeText="Download Speed"
+        app:duration="500"
+        app:progressBackground="gauge_keyhole_14"
+        app:gaugeTextColor="@color/white"
+        />
+
+
+</LinearLayout>

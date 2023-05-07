@@ -51,6 +51,14 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.hiddify.ang.speedtest.SpeedTestActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/AppThemeDayNight.NoActionBar">
+
+
+        </activity>
+        <activity
             android:name=".ui.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"

@@ -16,5 +16,15 @@
         <item>🌎 سایر</item>
     </string-array>
 
+    <string-array name="speedtest_proxy_select" translatable="false">
+        <item>🗝️ با فیلترشکن</item>
+        <item>🔒 بدون فیلترشکن</item>
+        <item>🔐 هر دو</item>
+    </string-array>
 
+    <string-array name="speedtest_mode_select" translatable="false">
+        <item>⬆ آپلود</item>
+        <item>⬇ دانلود</item>
+        <item>⬇⬆ هردود</item>
+    </string-array>
 </resources>

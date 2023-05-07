@@ -39,4 +39,9 @@
     <string name="title_country">Country</string>
     <string name="proxyAppAndSites">Proxy App and Sites</string>
     <string name="hiddify_notification">Hiddify Notifications</string>
+    <string name="toast_services_failure_config_error">One config has error. Please remove it. It can be one of configs that has -1.</string>
+    <string name="speedtest">Speed Test</string>
+    <string name="title_speedtest_proxy_select">Speedtest</string>
+    <string name="title_speedtest_mode_select">Speedtest Mode</string>
+
 </resources>

@@ -152,6 +152,8 @@ object V2RayServiceManager {
                 v2rayPoint.runLoop(settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) ?: false)
             } catch (e: Exception) {
                 Log.d(ANG_PACKAGE, e.toString())
+                if (!v2rayPoint.isRunning)
+                    MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE_CONFIG_ERROR, "")
             }
 
             if (v2rayPoint.isRunning) {

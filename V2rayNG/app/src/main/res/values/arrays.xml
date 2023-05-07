@@ -194,4 +194,17 @@
         <item>cn</item>
         <item></item>
     </string-array>
+
+    <string-array name="speedtest_proxy_select" translatable="false">
+        <item>🗝️ With Proxy</item>
+        <item>🔒 Without Proxy</item>
+        <item>🔐 Both</item>
+    </string-array>
+
+
+    <string-array name="speedtest_mode_select" translatable="false">
+        <item>⬆ Upload</item>
+        <item>⬇ Download</item>
+        <item>⬇⬆ Both</item>
+    </string-array>
 </resources>

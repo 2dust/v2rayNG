@@ -96,4 +96,5 @@ object AppConfig {
 
 
     const val MSG_HIDDIFY_DO_TEST_PING = 1001
+    const val MSG_STATE_START_FAILURE_CONFIG_ERROR = 1002
 }

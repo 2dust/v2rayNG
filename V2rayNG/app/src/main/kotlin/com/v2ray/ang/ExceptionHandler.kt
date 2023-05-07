@@ -16,6 +16,6 @@ class ExceptionHandler(private val context: Context) : Thread.UncaughtExceptionH
         Log.e("MyApp", "An error occurred", throwable)
 
         // Call the default exception handler to terminate the app
-//        Thread.getDefaultUncaughtExceptionHandler()?.uncaughtException(thread, throwable)
+        Thread.getDefaultUncaughtExceptionHandler()?.uncaughtException(thread, throwable)
     }
 }

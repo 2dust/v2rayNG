@@ -25,6 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
+import com.hiddify.ang.SpeedTester
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
@@ -160,6 +161,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             binding.ping.text="..."
             hiddifyMainViewModel.testCurrentServerRealPing()
         }
+
         binding.importFromClipBoard.click {
             importClipboard()
             importConfigViaSub(HiddifyUtils.getSelectedSubId())

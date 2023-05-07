@@ -36,4 +36,9 @@
     <string name="title_country">کشور</string>
     <string name="proxyAppAndSites">پروکسی برنامه ها و سایت ها</string>
     <string name="hiddify_notification">پیام های هیدیفای</string>
+    <string name="toast_services_failure_config_error">یک پیکربندی دارای خطا است. لطفا آن را حذف کنید. می تواند یکی از پیکربندی هایی باشد که پینگ -1 دارد.</string>
+    <string name="speedtest">تست سرعت</string>
+    <string name="title_speedtest_proxy_select">تست سرعت</string>
+    <string name="title_speedtest_mode_select">نوع تست سرعت</string>
+
 </resources>

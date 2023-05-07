@@ -16,6 +16,26 @@
         android:fontFamily="@font/vazirmatn_regular"
         android:text="@string/advanced"/>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/speedtest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:backgroundTint="@color/colorBg"
+        app:backgroundTintMode="add"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_baseline_speed"
+        app:iconGravity="start"
+        app:iconTint="@color/colorText"
+        android:textAlignment="textStart"
+        android:text="@string/speedtest"
+        android:textColor="@color/colorText"
+        android:fontFamily="@font/vazirmatn_regular"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="16dp"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -6,6 +6,7 @@ plugins {
 }
 
 android {
+
     compileSdkVersion Integer.parseInt("$compileSdkVer")
     buildToolsVersion "$buildToolsVer"
 
@@ -19,8 +20,8 @@ android {
         minSdkVersion 21
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
-        versionCode 5100537 //hiddify when comes to version 5 change it
-        versionName "3.7.0" //hiddify
+        versionCode 5100540 //hiddify when comes to version 5 change it
+        versionName "4.0.0" //hiddify
     }
 
     buildTypes {
@@ -142,7 +143,21 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx'
+    implementation 'com.google.firebase:firebase-messaging-ktx'
+    implementation 'androidx.work:work-runtime:2.8.1'
+    implementation 'fr.bmartel:jspeedtest:1.32.1'
+    implementation 'com.github.hiddify:Super-Gauge-View:14314adde9'
+    // https://mvnrepository.com/artifact/org.achartengine/achartengine
+    //implementation("org.achartengine:achartengine:1.2.0")
+    implementation files('libs/achartengine-1.2.0.jar')
+
+
+
 
 
 }
 apply plugin: 'com.google.gms.google-services'
+
+
+

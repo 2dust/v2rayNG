@@ -255,6 +255,10 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                     getApplication<AngApplication>().toast(R.string.toast_services_failure)
                     isRunning.value = false
                 }
+                AppConfig.MSG_STATE_START_FAILURE_CONFIG_ERROR -> {
+                    getApplication<AngApplication>().toast(R.string.toast_services_failure_config_error)
+                    isRunning.value = false
+                }
                 AppConfig.MSG_STATE_STOP_SUCCESS -> {
                     isRunning.value = false
                 }

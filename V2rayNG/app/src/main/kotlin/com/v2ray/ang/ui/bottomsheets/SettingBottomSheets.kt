@@ -6,8 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import com.hiddify.ang.SpeedTester
+import com.hiddify.ang.speedtest.SpeedTestActivity
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.BottomsheetSettingBinding
+import com.v2ray.ang.extension.click
 import com.v2ray.ang.ui.PerAppProxyActivity
 import com.v2ray.ang.util.CallbackUtil
 import com.v2ray.ang.util.HiddifyUtils
@@ -59,7 +62,10 @@ class SettingBottomSheets(var mode: Int) : BaseExpandedBottomSheet() {
 
 
 
-
+        binding.speedtest.click{
+            //SpeedTester.showSpeedTestDialog(this)
+            startActivity(Intent(context, SpeedTestActivity::class.java))
+        }
 
         val perAppCheckId = when (HiddifyUtils.getPerAppProxyMode()) {
             HiddifyUtils.PerAppProxyMode.Foreign -> binding.externalSites.id
