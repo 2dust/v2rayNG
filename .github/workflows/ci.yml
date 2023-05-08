@@ -29,32 +29,46 @@ jobs:
 #           gradle-version: 7.2
           arguments: --no-daemon app:assembleDebug
           build-root-directory: V2rayNG
-
+      - name: release Build
+        if: success()
+        uses: gradle/gradle-build-action@v2
+        with:
+#           gradle-version: 7.2
+          arguments: --no-daemon app:assembleDebug
+          build-root-directory: V2rayNG
+      - name: apk files
+        run: |
+            find . -name "*.apk" 
       - name: Upload HiddifyNG_arm64-v8a to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: app/build/outputs/apk/debug/HiddifyNG_arm64-v8a.apk
+          name: HiddifyNG_arm64-v8a.apk
+          path: ./V2rayNG/app/build/outputs/apk/debug/HiddifyNG_arm64-v8a.apk
           retention-days: 5
       - name: Upload HiddifyNG_armeabi-v7a to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: app/build/outputs/apk/debug/HiddifyNG_armeabi-v7a.apk
+          name: HiddifyNG_armeabi-v7a.apk
+          path: ./V2rayNG/app/build/outputs/apk/debug/HiddifyNG_armeabi-v7a.apk
           retention-days: 5
       - name: Upload HiddifyNG_null to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: app/build/outputs/apk/debug/HiddifyNG_null.apk
+          name: HiddifyNG.apk
+          path: ./V2rayNG/app/build/outputs/apk/debug/HiddifyNG.apk
           retention-days: 5
             
       - name: Upload HiddifyNG_x86_64 to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: app/build/outputs/apk/debug/HiddifyNG_x86_64.apk
+          name: HiddifyNG_x86_64.apk
+          path: ./V2rayNG/app/build/outputs/apk/debug/HiddifyNG_x86_64.apk
           retention-days: 5
           
 
       - name: Upload HiddifyNG_x86 to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: app/build/outputs/apk/debug/HiddifyNG_x86.apk
+          name: HiddifyNG_x86.apk
+          path: ./V2rayNG/app/build/outputs/apk/debug/HiddifyNG_x86.apk
           retention-days: 5
