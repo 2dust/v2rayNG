@@ -1,0 +1,58 @@
+name: build_release
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    branches:
+      - main
+permissions:
+  contents: write
+jobs:
+  BuildRelease:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Checkout submodules
+        run: git submodule update --init --recursive --remote
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: 17
+
+      - name: release Build
+        if: success()
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: --no-daemon app:assembleDebug
+
+      - name: Upload HiddifyNG_arm64-v8a to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: app/build/outputs/apk/debug/HiddifyNG_arm64-v8a.apk
+          retention-days: 5
+      - name: Upload HiddifyNG_armeabi-v7a to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: app/build/outputs/apk/debug/HiddifyNG_armeabi-v7a.apk
+          retention-days: 5
+      - name: Upload HiddifyNG_null to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: app/build/outputs/apk/debug/HiddifyNG_null.apk
+          retention-days: 5
+            
+      - name: Upload HiddifyNG_x86_64 to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: app/build/outputs/apk/debug/HiddifyNG_x86_64.apk
+          retention-days: 5
+          
+
+      - name: Upload HiddifyNG_x86 to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: app/build/outputs/apk/debug/HiddifyNG_x86.apk
+          retention-days: 5
