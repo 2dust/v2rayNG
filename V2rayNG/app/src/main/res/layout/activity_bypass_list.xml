@@ -29,6 +29,7 @@
                 app:checkedButton="@id/filteredSites">
                 <com.google.android.material.button.MaterialButton
                     style="?attr/materialButtonOutlinedStyle"
+                    android:visibility="gone"
                     android:id="@+id/sitesAll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -54,7 +55,7 @@
                     android:textColor="@color/btn_text_color_selector"
                     app:cornerRadius="16dp"
                     android:fontFamily="@font/vazirmatn_regular"
-                    android:text="@string/filtered_sites" />
+                    android:text="@string/blocked_apps" />
 
                 <com.google.android.material.button.MaterialButton
                     style="?attr/materialButtonOutlinedStyle"
@@ -69,7 +70,7 @@
                     android:textColor="@color/btn_text_color_selector"
                     app:cornerRadius="20dp"
                     android:fontFamily="@font/vazirmatn_regular"
-                    android:text="@string/external_sites" />
+                    android:text="@string/opened_apps" />
 
 
             </com.google.android.material.button.MaterialButtonToggleGroup>

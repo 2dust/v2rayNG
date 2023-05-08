@@ -43,5 +43,7 @@
     <string name="speedtest">Speed Test</string>
     <string name="title_speedtest_proxy_select">Speedtest</string>
     <string name="title_speedtest_mode_select">Speedtest Mode</string>
+    <string name="blocked_apps">Blocked Apps</string>
+    <string name="opened_apps">Opened Apps</string>
 
 </resources>

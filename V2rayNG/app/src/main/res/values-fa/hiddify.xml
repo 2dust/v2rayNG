@@ -40,5 +40,7 @@
     <string name="speedtest">تست سرعت</string>
     <string name="title_speedtest_proxy_select">تست سرعت</string>
     <string name="title_speedtest_mode_select">نوع تست سرعت</string>
+    <string name="blocked_apps">برنامه های فیلتر</string>
+    <string name="opened_apps">برنامه های باز</string>
 
 </resources>
