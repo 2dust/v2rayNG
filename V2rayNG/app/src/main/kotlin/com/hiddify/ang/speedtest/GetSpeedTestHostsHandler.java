@@ -84,7 +84,8 @@ public class GetSpeedTestHostsHandler extends Thread {
         //Best server
         int count = 0;
         try {
-            URL url = new URL("https://www.speedtest.net/speedtest-servers-static.php");
+            //URL url = new URL("https://www.speedtest.net/speedtest-servers-static.php");
+            URL url = new URL("https://www.speedtest.net/api/js/servers?engine=js&search=Orange&https_functional=true&limit=100");
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             int code = urlConnection.getResponseCode();
 

@@ -282,8 +282,7 @@ class SpeedTestActivity : AppCompatActivity() {
                     var downloadTestFinished = false
                     var uploadTestStarted = false
                     var uploadTestFinished = false
-                    pingTestFinished=true
-                    pingTestStarted=true
+
 
                     if(testMode==0){
                         downloadTestStarted=true
@@ -295,7 +294,8 @@ class SpeedTestActivity : AppCompatActivity() {
                     }
 
                     //Init Test
-                    val pingTest = PingTest(info[6].replace(":8080", ""), 3)
+                    //val pingTest = PingTest(info[6].replace(":8080", ""), 3,useProxy=useProxy)
+                    val pingTest = PingTest(info[6], 10,useProxy=useProxy)
                     val downloadTest = HttpDownloadTest(
                         testAddr.replace(
                             testAddr.split("/".toRegex()).dropLastWhile { it.isEmpty() }
@@ -324,18 +324,18 @@ class SpeedTestActivity : AppCompatActivity() {
                         //Ping Test
                         if (pingTestFinished) {
                             //Failure
-                            if (pingTest.getAvgRtt() == 0.0) {
+                            if (pingTest.avgRtt == 0.0) {
                                 println("Ping error...")
                             } else {
                                 //Success
                                 runOnUiThread {
-                                    pingTextView.text = dec.format(pingTest.getAvgRtt()) + " ms"
+                                    pingTextView.text = dec.format(pingTest.avgRtt) + " ms"
                                 }
                             }
                         } else {
-                            pingRateList.add(pingTest.getInstantRtt())
+                            pingRateList.add(pingTest.instantRtt)
                             runOnUiThread {
-                                pingTextView.text = dec.format(pingTest.getInstantRtt()) + " ms"
+                                pingTextView.text = dec.format(pingTest.instantRtt) + " ms"
                             }
 
                             //Update chart
