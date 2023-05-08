@@ -42,28 +42,28 @@ jobs:
       - name: Upload HiddifyNG_arm64-v8a to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: app/debug/HiddifyNG_arm64-v8a.apk
+          path: ./V2rayNG/app/build/outputs/apk/debug/HiddifyNG_arm64-v8a.apk
           retention-days: 5
       - name: Upload HiddifyNG_armeabi-v7a to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: app/debug/HiddifyNG_armeabi-v7a.apk
+          path: ./V2rayNG/app/build/outputs/apk/debug/HiddifyNG_armeabi-v7a.apk
           retention-days: 5
       - name: Upload HiddifyNG_null to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: app/debug/HiddifyNG_null.apk
+          path: ./V2rayNG/app/build/outputs/apk/debug/HiddifyNG_null.apk
           retention-days: 5
             
       - name: Upload HiddifyNG_x86_64 to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: app/debug/HiddifyNG_x86_64.apk
+          path: ./V2rayNG/app/build/outputs/apk/debug/HiddifyNG_x86_64.apk
           retention-days: 5
           
 
       - name: Upload HiddifyNG_x86 to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: app/debug/HiddifyNG_x86.apk
+          path: ./V2rayNG/app/build/outputs/apk/debug/HiddifyNG_x86.apk
           retention-days: 5
