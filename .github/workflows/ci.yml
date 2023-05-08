@@ -3,7 +3,7 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     branches:
-      - main
+      - master
 permissions:
   contents: write
 jobs:
