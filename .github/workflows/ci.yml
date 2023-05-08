@@ -29,7 +29,16 @@ jobs:
 #           gradle-version: 7.2
           arguments: --no-daemon app:assembleDebug
           build-root-directory: V2rayNG
-
+      - name: release Build
+        if: success()
+        uses: gradle/gradle-build-action@v2
+        with:
+#           gradle-version: 7.2
+          arguments: --no-daemon app:assembleDebug
+          build-root-directory: V2rayNG
+      - name: apk files
+        run: |
+            find . -name "*.apk" 
       - name: Upload HiddifyNG_arm64-v8a to Artifacts
         uses: actions/upload-artifact@v3
         with:
