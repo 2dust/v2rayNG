@@ -26,6 +26,7 @@ jobs:
         if: success()
         uses: gradle/gradle-build-action@v2
         with:
+          gradle-version: 7.2
           arguments: --no-daemon app:assembleDebug
           build-root-directory: V2rayNG
 
