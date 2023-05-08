@@ -1,5 +1,16 @@
 package com.hiddify.ang.speedtest
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import com.v2ray.ang.AngApplication
+import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
+import com.v2ray.ang.extension.toast
+import com.v2ray.ang.service.V2RayServiceManager
+import com.v2ray.ang.util.MessageUtil
+import com.v2ray.ang.util.MmkvManager
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -20,6 +31,7 @@ class PingTest(serverIpAddress: String, pingTryCount: Int, useProxy:Boolean) : T
     var avgRtt = 0.0
     var isFinished = false
     var started = false
+    var done=0
 
     init {
         server = serverIpAddress
@@ -31,26 +43,56 @@ class PingTest(serverIpAddress: String, pingTryCount: Int, useProxy:Boolean) : T
 
     override fun run() {
         started=true
-        connectionTest()
-        isFinished = true
+//        if(useProxy)
+//            proxyConnectionTest()
+//        else {
+            connectionTest()
+//        }
     }
-    fun connectionTest(){
+    fun proxyConnectionTest(){
+        AngApplication.appContext.registerReceiver(mMsgReceiver, IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY))
+        MessageUtil.sendMsg2Service(AngApplication.appContext, AppConfig.MSG_MEASURE_DELAY, "")
+
+
+    }
+    private val mMsgReceiver = object : BroadcastReceiver() {
+        override fun onReceive(ctx: Context?, intent: Intent?) {
+            when (intent?.getIntExtra("key", 0)) {
+                AppConfig.MSG_MEASURE_DELAY_SUCCESS -> {
+                    done++
+
+                    val resultPair = intent.getSerializableExtra("content") as Pair<String, Long>
+                    instantRtt = resultPair.second.toDouble()
+                    if(resultPair.second>0) {
+                        avgRtt = (avgRtt/count + instantRtt/count)
+                        Thread.sleep(100)
+                    }else{
+                        Thread.sleep(500)
+                    }
+                    if(done>=count) {
+                        isFinished = true
+                    }else{
+
+                        MessageUtil.sendMsg2Service(AngApplication.appContext, AppConfig.MSG_MEASURE_DELAY, "")
+                    }
+                }
+                else -> {
+                }
+            }
+        }
+
+    }
+    fun connectionTest() {
 
         for (i in 0 until count) {
             try {
                 val startTime = System.nanoTime()
-                val serverSplt=server.split(":")
+                val serverSplt = server.split(":")
                 val socketAddr = InetSocketAddress(serverSplt[0], serverSplt[1].toInt())
-                var socket:Socket
-                if (useProxy) {
-                    val proxy = Proxy(Proxy.Type.SOCKS, InetSocketAddress("127.0.0.1", 10808))
-                    socket = Socket(proxy)
-                } else {
-                    socket = Socket()
-                }
+                var socket=Socket()
                 socket.connect(socketAddr, 10000)
+                var timeTaken=(System.nanoTime() - startTime) / 1e6f
 
-                val timeTaken = (System.nanoTime() - startTime) / 1e6f
                 instantRtt= timeTaken.toDouble()
                 avgRtt=(avgRtt*i+instantRtt)/(i+1)
                 Thread.sleep(100)
@@ -59,6 +101,7 @@ class PingTest(serverIpAddress: String, pingTryCount: Int, useProxy:Boolean) : T
                 Thread.sleep(500)
             }
         }
+        isFinished = true
     }
 
     fun ping() {
