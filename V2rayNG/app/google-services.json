@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "893105630252",
+    "project_id": "hiddifyng",
+    "storage_bucket": "hiddifyng.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:893105630252:android:d6e8792aeaeb8c0a997589",
+        "android_client_info": {
+          "package_name": "ang.hiddify.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "893105630252-ck13sj44o2udbu5tte1gfmi6t31ocie6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGNengiO4Q3jwvfzbypfBgMk8Z44YNuKQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "893105630252-ck13sj44o2udbu5tte1gfmi6t31ocie6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
