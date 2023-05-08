@@ -1,4 +1,4 @@
-name: build_release
+name: build_debug
 on:
   push:
     # Sequence of patterns matched against refs/tags
@@ -7,7 +7,7 @@ on:
 permissions:
   contents: write
 jobs:
-  BuildRelease:
+  BuildDebug:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: "zulu"
-          java-version: 17
+          java-version: 8
 
       - name: release Build
         if: success()
