@@ -251,4 +251,6 @@
     <string name="show">Show</string>
     <string name="profiles">Profiles</string>
     <string name="add_profile">Add Profile</string>
+    <string name="updated_sub_time">Updated %s %s ago</string>
+    <string name="title_sub_update_list">Updating subscriptions list</string>
 </resources>

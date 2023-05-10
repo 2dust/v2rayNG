@@ -21,6 +21,8 @@ class ProfilesBottomSheets : BaseExpandedBottomSheet() {
         fun onImportQrCode()
         fun onSelectSub(subid: String)
         fun onRemoveSelectSub(subid: String)
+        fun onUpdateSubList()
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +47,6 @@ class ProfilesBottomSheets : BaseExpandedBottomSheet() {
             dismiss()
         }
 
-
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = subAdapter
@@ -57,6 +58,11 @@ class ProfilesBottomSheets : BaseExpandedBottomSheet() {
 
         binding.scanQrCode.click {
             callback()?.onImportQrCode()
+            dismiss()
+        }
+
+        binding.updateSubList.click {
+            callback()?.onUpdateSubList()
             dismiss()
         }
     }

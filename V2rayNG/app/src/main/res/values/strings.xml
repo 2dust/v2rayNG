@@ -219,6 +219,8 @@
     <string name="no_sublink_found" translatable="false">Please select a group to add a new config or create a new group.</string>
     <string name="autoconfig_link_not_found">Autoconfig link not found</string>
     <string name="msg_enter_group_name">Enter group name</string>
+    <string name="updated_sub_time">Updated %s %s ago</string>
+    <string name="title_sub_update_list">Updating subscriptions list</string>
 
     <string-array name="share_method">
         <item>QRcode</item>

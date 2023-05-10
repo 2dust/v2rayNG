@@ -26,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
 import java.net.Proxy
+import java.util.*
 
 class HiddifyUtils {
     companion object {
@@ -123,6 +124,43 @@ class HiddifyUtils {
                         "Remain",
                         context.getColorEx(R.color.colorBorder)
                     ).colorlessTextPart("$diffInMillis days ", context.getColorEx(R.color.colorRed))
+            }
+        }
+
+        fun timeToRelativeTime(
+            time: Long,
+            context: Context
+        ): SpannableString {
+            if (time < 0)
+                return "".bold("")
+
+            val seconds = time / 1000
+            val minutes = seconds / 60
+            val hours = minutes / 60
+            val days = hours / 24
+
+            return if (getLocale(context).toString().startsWith("fa")) {
+                if (days > 0)
+                    String.format(context.getString(R.string.updated_sub_time), days, "روز").bold("")
+                else if (hours > 0)
+                    String.format(context.getString(R.string.updated_sub_time), hours, "ساعت").bold("")
+                else if (minutes > 0)
+                    String.format(context.getString(R.string.updated_sub_time), minutes, "دقیقه").bold("")
+                else if (seconds > 0)
+                    String.format(context.getString(R.string.updated_sub_time), seconds, "ثانیه").bold("")
+                else
+                    "".bold("")
+            } else {
+                if (days > 0)
+                    String.format(context.getString(R.string.updated_sub_time), days, "days").bold("")
+                else if (hours > 0)
+                    String.format(context.getString(R.string.updated_sub_time), hours, "hours").bold("")
+                else if (minutes > 0)
+                    String.format(context.getString(R.string.updated_sub_time), minutes, "minutes").bold("")
+                else if (seconds > 0)
+                    String.format(context.getString(R.string.updated_sub_time), seconds, "seconds").bold("")
+                else
+                    "".bold("")
             }
         }
 
@@ -322,6 +360,4 @@ class HiddifyUtils {
         Blocked,
         Foreign
     }
-
-
 }
