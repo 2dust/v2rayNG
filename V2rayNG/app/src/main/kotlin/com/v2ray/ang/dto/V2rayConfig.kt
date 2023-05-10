@@ -133,7 +133,7 @@ data class V2rayConfig(
                                       var realitySettings: TlsSettingsBean? = null,
                                       var grpcSettings: GrpcSettingsBean? = null,
                                       val dsSettings: Any? = null,
-                                      val sockopt: Any? = null
+                                      var sockopt: Sockopt? = null
         ) {
 
             data class TcpSettingsBean(var header: HeaderBean = HeaderBean(),
@@ -488,5 +488,8 @@ data class V2rayConfig(
     data class BalancerStrategyBean(var type: String?=null,var settings: BalancerStrategySetting?=null)
     open class BalancerStrategySetting{}
     data class OptimalBalancerStrategySetting(var timeout: Int?=10000,var interval: Int?=60000*10, var url: String?="https://cp.cloudflare.com", var count:Int?=3, var accept_little_diff:Boolean=true,val load_balancing:Boolean=false,var diff_percent:Double=0.5):BalancerStrategySetting()
+
+
+    data class Sockopt(var dialer_proxy:String?)
 
 }

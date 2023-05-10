@@ -87,6 +87,12 @@
         <item>sni</item>
     </string-array>
 
+    <string-array name="fragment_new" translatable="false">
+        <item></item>
+        <item>random</item>
+        <item>sni</item>
+    </string-array>
+
     <string-array name="allowinsecures" translatable="false">
         <item></item>
         <item>true</item>

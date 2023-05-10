@@ -101,6 +101,38 @@
         }
       }
     },
+    {
+      "tag": "fragment_random", // this tag name is used to pass to the dialerProxy above
+      "protocol": "freedom",
+      "settings": {
+        "fragment": {
+          "length": "10-100",
+          "interval": "50-250",
+          "packets": "1"
+        }
+      },
+      "streamSettings": {
+        "sockopt": {
+          "tcpNoDelay": true
+        }
+      }
+    },
+    {
+      "tag": "fragment_sni", // this tag name is used to pass to the dialerProxy above
+      "protocol": "freedom",
+      "settings": {
+        "fragment": {
+          "length": "5-30",
+          "interval": "50-100",
+          "packets": "1"
+        }
+      },
+      "streamSettings": {
+        "sockopt": {
+          "tcpNoDelay": true
+        }
+      }
+    },
   {
     "protocol": "blackhole",
     "tag": "block",

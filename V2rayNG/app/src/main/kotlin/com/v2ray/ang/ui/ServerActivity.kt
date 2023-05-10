@@ -57,6 +57,9 @@ class ServerActivity : BaseActivity() {
     private val fragmentTypes: Array<out String> by lazy {
         resources.getStringArray(R.array.fragment)
     }
+    private val fragmentNewTypes: Array<out String> by lazy {
+        resources.getStringArray(R.array.fragment_new)
+    }
 
     private val kcpAndQuicTypes: Array<out String> by lazy {
         resources.getStringArray(R.array.header_type_kcp_and_quic)
@@ -96,6 +99,7 @@ class ServerActivity : BaseActivity() {
     private val container_fingerprint: LinearLayout? by lazy { findViewById(R.id.l3) }
     private val sp_network: Spinner? by lazy { findViewById(R.id.sp_network) }
     private val sp_fragment: Spinner? by lazy { findViewById(R.id.sp_fragment) }
+    private val sp_fragment_new: Spinner? by lazy { findViewById(R.id.sp_fragment_new) }
     private val sp_header_type: Spinner? by lazy { findViewById(R.id.sp_header_type) }
     private val sp_header_type_title: TextView? by lazy { findViewById(R.id.sp_header_type_title) }
     private val et_request_host: EditText? by lazy { findViewById(R.id.et_request_host) }
@@ -266,6 +270,11 @@ class ServerActivity : BaseActivity() {
         if (network >= 0) {
             sp_network?.setSelection(network)
         }
+        if(streamSetting?.sockopt?.dialer_proxy!=null) {
+            sp_fragment?.setSelection(Utils.arrayFind(fragmentNewTypes, streamSetting?.sockopt?.dialer_proxy!!.replace("fragment_","")))
+        }else{
+            sp_fragment?.setSelection(0)
+        }
         return true
     }
 
@@ -285,6 +294,7 @@ class ServerActivity : BaseActivity() {
         et_request_host?.text = null
         et_path?.text = null
         sp_fragment?.setSelection(0)
+        sp_fragment_new?.setSelection(0)
         sp_stream_security?.setSelection(0)
         sp_allow_insecure?.setSelection(0)
         et_sni?.text = null
@@ -384,6 +394,7 @@ class ServerActivity : BaseActivity() {
         } else if (config.configType == EConfigType.TROJAN) {
             server.password = et_id.text.toString().trim()
         }
+
     }
 
     private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean) {
@@ -392,6 +403,7 @@ class ServerActivity : BaseActivity() {
         val requestHost = et_request_host?.text?.toString()?.trim() ?: return
         val path = et_path?.text?.toString()?.trim() ?: return
         val fragment=sp_fragment?.selectedItemPosition?:return
+        val fragment_new=sp_fragment_new?.selectedItemPosition?:return
         val sniField = et_sni?.text?.toString()?.trim() ?: return
         val allowInsecureField = sp_allow_insecure?.selectedItemPosition ?: return
         val streamSecurity = sp_stream_security?.selectedItemPosition ?: return
@@ -432,6 +444,8 @@ class ServerActivity : BaseActivity() {
                 shortId = shortId,
                 spiderX = spiderX
         )
+        if(!fragmentNewTypes[fragment_new].isNullOrEmpty())
+            streamSetting.sockopt=V2rayConfig.Sockopt("fragment_"+fragmentNewTypes[fragment_new])
     }
 
     private fun transportTypes(network: String?): Array<out String> {
