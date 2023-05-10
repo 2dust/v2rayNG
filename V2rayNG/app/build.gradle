@@ -36,6 +36,21 @@ android {
         }
     }
 
+    flavorDimensions "versions"
+
+    productFlavors {
+        dev {
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+        }
+        pre_release {
+            applicationIdSuffix = ".pre"
+            versionNameSuffix = "-pre-release"
+        }
+        prod {
+        }
+    }
+
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
