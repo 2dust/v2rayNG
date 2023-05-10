@@ -9,10 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -23,9 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
-import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
-import com.hiddify.ang.SpeedTester
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
@@ -955,6 +950,9 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         onSelectSub(subid,true)
     }
 
+    override fun onUpdateSubList() {
+        importConfigViaSub()
+    }
 
     fun onSelectSub(subid: String,do_ping:Boolean=true) {
         if (HiddifyUtils.getSelectedSubId()!=subid) {
@@ -985,6 +983,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                 if (subid==HiddifyUtils.getSelectedSubId())
                     HiddifyUtils.setSelectedSub("default")
                 hiddifyMainViewModel.reloadServerList()
+                hiddifyMainViewModel.reloadSubscriptionsState()
             }
             .show()
 
@@ -1038,6 +1037,9 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         val tv=TextView(context)
         tv.setText(R.string.no_sublink_found)
         ll.addView(tv)
+        val params = tv.layoutParams as ViewGroup.MarginLayoutParams
+        params.setMargins(24, 0, 24, 0)
+        tv.layoutParams = params
         ll.addView(actv)
         val customName=TextInputEditText(this)
         ll.addView(customName)

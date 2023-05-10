@@ -29,6 +29,7 @@
                 android:lines="1"
                 android:ellipsize="end"
                 android:textSize="14sp"
+                android:textAlignment="viewStart"
                 android:fontFamily="@font/vazir_bold"
                 android:textColor="@color/colorText"
                 tools:text="پروفایل یک"/>
@@ -41,14 +42,24 @@
                 android:layout_marginStart="4dp"
                 android:textSize="12sp"
                 android:visibility="gone"
+                android:textAlignment="viewEnd"
                 android:textColor="@color/colorDarkGray"
                 tools:text=". بروزرسانی در ۶ دقیقه پیش"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/icDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tint="@color/colorRed"
+                android:background="?selectableItemBackground"
+                android:layout_gravity="center_vertical"
+                android:layout_marginHorizontal="4dp"
+                app:srcCompat="@drawable/ic_delete_black_24dp"/>
 
             <TextView
                 android:id="@+id/time"

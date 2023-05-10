@@ -66,6 +66,23 @@
         android:layout_height="1dp"
         android:background="@color/colorBorder"/>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/update_sub_list"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/title_sub_update_list"
+        android:textColor="@color/colorPrimary2"
+        android:fontFamily="@font/vazirmatn_regular"
+        android:backgroundTint="@color/colorBright"
+        app:icon="@drawable/ic_refresh"
+        app:iconTint="@color/colorPrimary2"
+        app:iconGravity="start"
+        app:cornerRadius="16dp"
+        app:backgroundTint="@color/colorBright"
+        app:layout_constraintTop_toBottomOf="@id/progress"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"

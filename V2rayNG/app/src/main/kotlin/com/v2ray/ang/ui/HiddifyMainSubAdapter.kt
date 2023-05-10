@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
@@ -39,6 +40,10 @@ class HiddifyMainSubAdapter(val context: Context, val callback: (Int,Boolean) ->
                 HiddifyUtils.timeToRelativeDate(subItem.expire, subItem.total, subItem.used, context)
             time.showGone(subItem.expire > (0).toLong())
 
+            //todo: if lastUpdateTime have value u comment it
+            //lastUpdate.text = HiddifyUtils.timeToRelativeTime(subItem.lastUpdateTime, context)
+            //lastUpdate.showGone(subItem.lastUpdateTime > (0).toLong())
+
             consumerTrafficValue.text = HiddifyUtils.toTotalUsedGig(
                 subItem.total,
                 subItem.used,
@@ -61,6 +66,10 @@ class HiddifyMainSubAdapter(val context: Context, val callback: (Int,Boolean) ->
                 callback.invoke(bindingAdapterPosition,true)
                 return@setOnLongClickListener true
             }
+
+            icDelete.click {
+                callback.invoke(bindingAdapterPosition,true)
+            }
         }
     }
 
@@ -70,5 +79,7 @@ class HiddifyMainSubAdapter(val context: Context, val callback: (Int,Boolean) ->
         val consumerTrafficValue: TextView = itemView.findViewById(R.id.consumerTrafficValue)
         val progress: LinearProgressIndicator = itemView.findViewById(R.id.progress)
         val itemBg: CardView = itemView.findViewById(R.id.item_bg)
+        val icDelete: ImageView = itemView.findViewById(R.id.icDelete)
+        val lastUpdate: TextView = itemView.findViewById(R.id.lastUpdate)
     }
 }

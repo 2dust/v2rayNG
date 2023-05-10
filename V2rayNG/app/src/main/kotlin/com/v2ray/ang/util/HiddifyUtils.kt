@@ -1,13 +1,8 @@
 package com.v2ray.ang.util
 
-import android.app.Activity
-import android.app.Application
 import android.content.Context
 import android.net.Uri
-import android.provider.Settings.Global
 import android.text.SpannableString
-import android.util.Log
-import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
@@ -18,12 +13,7 @@ import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.*
 import com.v2ray.ang.util.Utils.getLocale
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.Base64
-import java.util.Locale
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.withContext
+import java.util.*
 
 class HiddifyUtils {
     companion object {
@@ -121,6 +111,43 @@ class HiddifyUtils {
                         "Remain",
                         context.getColorEx(R.color.colorBorder)
                     ).colorlessTextPart("$diffInMillis days ", context.getColorEx(R.color.colorRed))
+            }
+        }
+
+        fun timeToRelativeTime(
+            time: Long,
+            context: Context
+        ): SpannableString {
+            if (time < 0)
+                return "".bold("")
+
+            val seconds = time / 1000
+            val minutes = seconds / 60
+            val hours = minutes / 60
+            val days = hours / 24
+
+            return if (getLocale(context).toString().startsWith("fa")) {
+                if (days > 0)
+                    String.format(context.getString(R.string.updated_sub_time), days, "روز").bold("")
+                else if (hours > 0)
+                    String.format(context.getString(R.string.updated_sub_time), hours, "ساعت").bold("")
+                else if (minutes > 0)
+                    String.format(context.getString(R.string.updated_sub_time), minutes, "دقیقه").bold("")
+                else if (seconds > 0)
+                    String.format(context.getString(R.string.updated_sub_time), seconds, "ثانیه").bold("")
+                else
+                    "".bold("")
+            } else {
+                if (days > 0)
+                    String.format(context.getString(R.string.updated_sub_time), days, "days").bold("")
+                else if (hours > 0)
+                    String.format(context.getString(R.string.updated_sub_time), hours, "hours").bold("")
+                else if (minutes > 0)
+                    String.format(context.getString(R.string.updated_sub_time), minutes, "minutes").bold("")
+                else if (seconds > 0)
+                    String.format(context.getString(R.string.updated_sub_time), seconds, "seconds").bold("")
+                else
+                    "".bold("")
             }
         }
 

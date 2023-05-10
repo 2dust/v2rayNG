@@ -211,6 +211,8 @@
     <string name="no_sublink_found">لطفاً یک گروه را برای افزودن کانفیگ جدید انتخاب کنید یا یک گروه جدید ایجاد کنید.</string>
     <string name="autoconfig_link_not_found">لینک کانفیگ خودکار پیدا نشد.</string>
     <string name="msg_enter_group_name">نام گروه را وارد کنید</string>
+    <string name="updated_sub_time">بروزرسانی در %s %s پیش</string>
+    <string name="title_sub_update_list">به روز رسانی لیست اشتراک ها</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
