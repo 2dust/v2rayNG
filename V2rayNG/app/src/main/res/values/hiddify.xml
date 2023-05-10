@@ -13,7 +13,7 @@
     <string name="proxy">Proxy</string>
     <string name="connection_mode">Connection mode</string>
     <string name="filtered_sites">Blocked</string>
-    <string name="external_sites">Foreign</string>
+    <string name="external_sites">Exclude Unblocked</string>
     <string name="sites_all">Global</string>
     <string name="smart">Smart</string>
     <string name="load_balance">Load Balance</string>

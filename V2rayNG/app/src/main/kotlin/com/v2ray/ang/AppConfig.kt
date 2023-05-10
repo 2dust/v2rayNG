@@ -63,6 +63,7 @@ object AppConfig {
     const val TAG_AGENT = "proxy"
     const val TAG_DIRECT = "direct"
     const val TAG_BLOCKED = "block"
+    const val TAG_FRAGMENT = "fragment"
 
     const val androidpackagenamelistUrl = "https://raw.githubusercontent.com/hiddify/androidpackagenamelist/master/"
     const val v2rayCustomRoutingListUrl = "https://raw.githubusercontent.com/hiddify/v2rayCustomRoutingList/master/"

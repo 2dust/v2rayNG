@@ -30,7 +30,8 @@
       "enabled": true,
       "destOverride": [
         "http",
-        "tls"
+        "tls",
+        "quic"
       ]
     }
   },
@@ -84,6 +85,22 @@
     "settings": {},
     "tag": "direct"
   },
+    {
+      "tag": "fragment", // this tag name is used to pass to the dialerProxy above
+      "protocol": "freedom",
+      "settings": {
+        "fragment": {
+          "length": "10-30",
+          "interval": "50-250",
+          "packets": "1-2"
+        }
+      },
+      "streamSettings": {
+        "sockopt": {
+          "tcpNoDelay": true
+        }
+      }
+    },
   {
     "protocol": "blackhole",
     "tag": "block",

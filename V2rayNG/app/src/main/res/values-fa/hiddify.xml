@@ -18,7 +18,7 @@
     <string name="proxy">پروکسی</string>
     <string name="connection_mode">حالت اتصال</string>
     <string name="filtered_sites">فیلتر</string>
-    <string name="external_sites">خارجی</string>
+    <string name="external_sites">بجز فیلترنشده</string>
     <string name="sites_all">همه</string>
     <string name="smart">هوشمند</string>
     <string name="load_balance">لودبالانس</string>
