@@ -303,7 +303,7 @@ class PerAppProxyActivity : BaseActivity() {
     private fun selectProxyApp(content: String, force: Boolean): Boolean {
         try {
             val proxyApps = if (TextUtils.isEmpty(content)) {
-                Utils.readTextFromAssets(v2RayApplication, "proxy_packagename.txt")
+                Utils.readTextFromAssets(v2RayApplication, "applications_proxy_${HiddifyUtils.getCountry()}.txt")
             } else {
                 content
             }

@@ -45,5 +45,6 @@
     <string name="title_speedtest_mode_select">Speedtest Mode</string>
     <string name="blocked_apps">Blocked Apps</string>
     <string name="opened_apps">Opened Apps</string>
+    <string name="msg_downloading_content_failed_no_proxy">Download failed without proxy! Trying with proxy...</string>
 
 </resources>

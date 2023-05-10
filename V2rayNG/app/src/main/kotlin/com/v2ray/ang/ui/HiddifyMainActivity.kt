@@ -25,7 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
-import com.hiddify.ang.SpeedTester
+
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
@@ -93,8 +93,8 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         //binding.version.text = "v${BuildConfig.VERSION_NAME} (${SpeedtestUtil.getLibVersion()})"
 
         setupViewModel()
-        copyAssets()
-        migrateLegacy()
+
+
         init()
 
         showLangDialog()
@@ -302,45 +302,9 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         hiddifyMainViewModel.startListenBroadcast()
     }
 
-    private fun copyAssets() {
-        val extFolder = Utils.userAssetPath(this)
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val geo = arrayOf("geosite.dat", "geoip.dat")
-                assets.list("")
-                    ?.filter { geo.contains(it) }
-                    ?.filter { !File(extFolder, it).exists() }
-                    ?.forEach {
-                        val target = File(extFolder, it)
-                        assets.open(it).use { input ->
-                            FileOutputStream(target).use { output ->
-                                input.copyTo(output)
-                            }
-                        }
-                        Log.i(AppConfig.ANG_PACKAGE, "Copied from apk assets folder to ${target.absolutePath}")
-                    }
-            } catch (e: Exception) {
-                Log.e(AppConfig.ANG_PACKAGE, "asset copy failed", e)
-            }
-        }
-    }
 
-    private fun migrateLegacy() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val result = AngConfigManager.migrateLegacyConfig(this@HiddifyMainActivity)
-            if (result != null) {
-                launch(Dispatchers.Main) {
-                    if (result) {
-                        toast(getString(R.string.migration_success))
-                        hiddifyMainViewModel.reloadServerList()
-                        hiddifyMainViewModel.reloadSubscriptionsState()
-                    } else {
-                        toast(getString(R.string.migration_fail))
-                    }
-                }
-            }
-        }
-    }
+
+
 
     private fun startV2Ray() {
         if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {

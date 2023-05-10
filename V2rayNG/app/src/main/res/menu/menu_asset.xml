@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/add_file"
+        android:visible="false"
         android:icon="@drawable/ic_add_white_24dp"
         android:title="@string/menu_item_add_file"
         app:showAsAction="ifRoom" />

@@ -24,6 +24,7 @@
         app:backgroundTint="@color/colorBg"
         app:backgroundTintMode="add"
         app:cornerRadius="12dp"
+        android:visibility="gone"
         app:icon="@drawable/ic_baseline_speed"
         app:iconGravity="start"
         app:iconTint="@color/colorText"

@@ -152,11 +152,15 @@ dependencies {
     implementation 'com.google.firebase:firebase-inappmessaging-display-ktx'
     implementation 'com.google.firebase:firebase-messaging-ktx'
     implementation 'androidx.work:work-runtime:2.8.1'
-    implementation 'fr.bmartel:jspeedtest:1.32.1'
-    implementation 'com.github.hiddify:Super-Gauge-View:14314adde9'
-    // https://mvnrepository.com/artifact/org.achartengine/achartengine
-    //implementation("org.achartengine:achartengine:1.2.0")
+//    implementation 'fr.bmartel:jspeedtest:1.32.1'
+//    implementation 'com.github.hiddify:Super-Gauge-View:14314adde9'
+//     https://mvnrepository.com/artifact/org.achartengine/achartengine
+//    implementation("org.achartengine:achartengine:1.2.0")
     implementation files('libs/achartengine-1.2.0.jar')
+    implementation 'org.conscrypt:conscrypt-android:2.2.1'
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+
+
 
 
 

@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:padding="0dp" android:orientation="vertical">
+    <!--
     <com.farimarwat.supergaugeview.SuperGaugeView
         android:id="@+id/gague_upload"
         android:layout_width="match_parent"
@@ -30,5 +31,5 @@
         app:gaugeTextColor="@color/white"
         />
 
-
+-->
 </LinearLayout>

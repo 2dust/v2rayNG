@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.hiddify.ang.SpeedTester
+
 import com.hiddify.ang.speedtest.SpeedTestActivity
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.BottomsheetSettingBinding

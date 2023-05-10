@@ -102,9 +102,7 @@ object SpeedtestUtil {
                     "cp.cloudflare.com",
                     "/generate_204")
 
-            conn = url.openConnection(
-                    Proxy(Proxy.Type.HTTP,
-                            InetSocketAddress("127.0.0.1", port))) as HttpURLConnection
+            conn = url.openConnection(Proxy(Proxy.Type.HTTP,InetSocketAddress("127.0.0.1", port))) as HttpURLConnection
             conn.connectTimeout = 30000
             conn.readTimeout = 30000
             conn.setRequestProperty("Connection", "close")

@@ -24,6 +24,8 @@ import java.util.Base64
 import java.util.Locale
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.withContext
+import java.net.InetSocketAddress
+import java.net.Proxy
 
 class HiddifyUtils {
     companion object {
@@ -306,6 +308,13 @@ class HiddifyUtils {
             }
 
         }
+
+        fun socksPort(): Int {
+            return  Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+        }
+        fun socksProxy():Proxy{
+            return Proxy(Proxy.Type.SOCKS, InetSocketAddress("127.0.0.1", socksPort()))
+        }
     }
 
     enum class PerAppProxyMode{
@@ -313,4 +322,6 @@ class HiddifyUtils {
         Blocked,
         Foreign
     }
+
+
 }

@@ -42,5 +42,6 @@
     <string name="title_speedtest_mode_select">نوع تست سرعت</string>
     <string name="blocked_apps">برنامه های فیلتر</string>
     <string name="opened_apps">برنامه های باز</string>
+    <string name="msg_downloading_content_failed_no_proxy">دانلود بدون فیلترشکن با خطا مواجه شد. در حال دانلود با فیلترشکن...</string>
 
 </resources>

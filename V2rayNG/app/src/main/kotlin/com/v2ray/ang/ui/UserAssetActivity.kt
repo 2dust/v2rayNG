@@ -33,6 +33,7 @@ import java.net.HttpURLConnection
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.URL
+import java.nio.charset.Charset
 import java.text.DateFormat
 import java.util.*
 
@@ -161,9 +162,32 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun downloadGeo(name: String, timeout: Int, httpPort: Int): Boolean {
-        val url = AppConfig.geoUrl + name
+        var url = AppConfig.geoUrl + name
+        if(name=="geosite.dat")
+            url="https://github.com/hiddify/domain-list-community/releases/latest/download/hiddify-geosite.dat"
+
         val targetTemp = File(extDir, name + "_temp")
         val target = File(extDir, name)
+        if(true){
+            try {
+                val res = Utils.getUrlContentOkHttp(url,timeout=timeout.toLong())
+                if (res != null) {
+                    FileOutputStream(targetTemp).use { output ->
+                        output.bufferedWriter(Charsets.UTF_8).write(res.content)
+                        output.flush()
+                        output.close()
+                        targetTemp.renameTo(target)
+
+                    }
+                    return true
+                }
+            }catch (e:Exception){
+                toast(R.string.toast_failure)
+                Log.e("Hiddify",e.stackTraceToString())
+            }
+            return false
+
+        }
         var conn: HttpURLConnection? = null
         //Log.d(AppConfig.ANG_PACKAGE, url)
 

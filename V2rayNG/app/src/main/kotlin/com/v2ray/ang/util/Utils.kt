@@ -18,6 +18,7 @@ import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.BuildConfig
@@ -25,7 +26,12 @@ import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
 import java.net.*
 import com.v2ray.ang.service.V2RayServiceManager
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.conscrypt.Conscrypt
 import java.io.IOException
+import java.security.Security
+import java.util.concurrent.TimeUnit
 
 object Utils {
 
@@ -326,6 +332,8 @@ object Utils {
     }
 
     fun getUrlContext(url: String, timeout: Int): String {
+        if(true)
+            return getUrlContentOkHttp(url,timeout.toLong()).content?:""
         var result: String
         var conn: HttpURLConnection? = null
 
@@ -346,12 +354,57 @@ object Utils {
         return result
     }
 
+    fun getUrlContentOkHttp(urlStr: String?, timeout: Long=10000, direct:Boolean=true,proxy:Boolean=true): Response {
+        try {
+            Security.insertProviderAt(Conscrypt.newProvider(), 1);
+            // Create OkHttp Client
+            var clientBuilder = OkHttpClient.Builder()
+                .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+
+            if(!direct&&proxy) {
+                clientBuilder.proxy(HiddifyUtils.socksProxy())
+            }
+            val client=clientBuilder.build()
+
+
+            // Create URL
+            val url = URL(urlStr)
+            // Build request
+            val requestBuilder = Request.Builder().url(url).header("User-Agent", "HiddifyNG/${BuildConfig.VERSION_NAME}").header("Connection", "close")
+            url.userInfo?.let {
+                requestBuilder.header("Authorization", "Basic ${encode(urlDecode(it))}")
+            }
+            val request = requestBuilder.build()
+            // Execute request
+            val response = client.newCall(request).execute()
+            val headers = response.headers.toMultimap()
+
+            val content = response.body?.string() ?: ""
+
+            response.close()
+
+            return Response(headers, content, urlStr)
+        }catch (e:Exception){
+
+            if(direct&&proxy) {
+                AngApplication.appContext.toast(R.string.msg_downloading_content_failed_no_proxy)
+                return getUrlContentOkHttp(urlStr, timeout, direct = false, proxy = true)
+            }
+            throw e
+        }
+
+    }
     @Throws(IOException::class)
     fun getUrlContentWithCustomUserAgent(urlStr: String?): Response {
+
+        if(true)
+            return getUrlContentOkHttp(urlStr)
         val url = URL(urlStr)
         val conn = url.openConnection()
         conn.setRequestProperty("Connection", "close")
-        conn.setRequestProperty("User-agent", "v2rayNG/${BuildConfig.VERSION_NAME}")
+        conn.setRequestProperty("User-agent", "HiddifyNG/${BuildConfig.VERSION_NAME}")
         url.userInfo?.let {
             conn.setRequestProperty("Authorization",
                 "Basic ${encode(urlDecode(it))}")
