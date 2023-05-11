@@ -13,8 +13,8 @@
     <string name="proxy">Proxy</string>
     <string name="connection_mode">Connection mode</string>
     <string name="filtered_sites">Blocked</string>
-    <string name="external_sites">Exclude Unblocked</string>
-    <string name="sites_all">Global</string>
+    <string name="external_sites">Not Opened</string>
+    <string name="sites_all">All</string>
     <string name="smart">Smart</string>
     <string name="load_balance">Load Balance</string>
     <string name="manual">Manual</string>
@@ -37,7 +37,7 @@
     <string name="no_server_selected">No server is selected!</string>
     <string name="expired">Expired</string>
     <string name="title_country">Country</string>
-    <string name="proxyAppAndSites">Proxy App and Sites</string>
+    <string name="proxyAppAndSites">Proxy which applications and sites</string>
     <string name="hiddify_notification">Hiddify Notifications</string>
     <string name="toast_services_failure_config_error">One config has error. Please remove it. It can be one of configs that has -1.</string>
     <string name="speedtest">Speed Test</string>

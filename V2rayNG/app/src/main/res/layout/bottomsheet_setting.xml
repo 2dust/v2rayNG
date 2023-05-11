@@ -48,54 +48,57 @@
         android:id="@+id/proxyToggleButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:singleSelection="true"
-        app:selectionRequired="true"
         android:layout_marginTop="8dp"
-        app:checkedButton="@id/filteredSites">
+        app:checkedButton="@id/filteredSites"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
         <com.google.android.material.button.MaterialButton
-            style="?attr/materialButtonOutlinedStyle"
             android:id="@+id/sitesAll"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:lines="1"
-            android:ellipsize="end"
-            app:strokeColor="@color/btn_stroke_color_selector"
-            app:backgroundTint="@color/btn_bg_color_selector"
-            android:textColor="@color/btn_text_color_selector"
-            app:cornerRadius="20dp"
-            android:fontFamily="@font/vazirmatn_regular"
-            android:text="@string/sites_all" />
-        <com.google.android.material.button.MaterialButton
             style="?attr/materialButtonOutlinedStyle"
-            android:id="@+id/filteredSites"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:lines="1"
             android:ellipsize="end"
-            app:strokeColor="@color/btn_stroke_color_selector"
-            app:backgroundTint="@color/btn_bg_color_selector"
-            android:textColor="@color/btn_text_color_selector"
-            app:cornerRadius="16dp"
             android:fontFamily="@font/vazirmatn_regular"
-            android:text="@string/filtered_sites" />
+            android:lines="1"
+            android:text="@string/sites_all"
+            android:textColor="@color/btn_text_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            app:cornerRadius="20dp"
+            app:strokeColor="@color/btn_stroke_color_selector" />
+
 
         <com.google.android.material.button.MaterialButton
-            style="?attr/materialButtonOutlinedStyle"
             android:id="@+id/externalSites"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:lines="1"
-            android:ellipsize="end"
-            app:strokeColor="@color/btn_stroke_color_selector"
-            app:backgroundTint="@color/btn_bg_color_selector"
-            android:textColor="@color/btn_text_color_selector"
-            app:cornerRadius="20dp"
-            android:fontFamily="@font/vazirmatn_regular"
-            android:text="@string/external_sites" />
 
+            android:ellipsize="none"
+            android:fontFamily="@font/vazirmatn_regular"
+            android:singleLine="true"
+            android:text="@string/external_sites"
+            android:textColor="@color/btn_text_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            app:cornerRadius="20dp"
+            app:strokeColor="@color/btn_stroke_color_selector" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/filteredSites"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/vazirmatn_regular"
+            android:lines="1"
+            android:text="@string/filtered_sites"
+            android:textColor="@color/btn_text_color_selector"
+            app:backgroundTint="@color/btn_bg_color_selector"
+            app:cornerRadius="16dp"
+            app:strokeColor="@color/btn_stroke_color_selector" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 

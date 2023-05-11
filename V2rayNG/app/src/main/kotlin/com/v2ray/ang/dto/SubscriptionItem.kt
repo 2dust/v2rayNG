@@ -10,10 +10,13 @@ data class SubscriptionItem(
         var total: Long=-1,
         var expire: Long=-1,//in ms
         var home_link: String="",
-        var update_interval: Int=1
+        var update_interval: Int=1,
+        var dns: String?=null
         ) {
 
-        fun needUpdate(): Boolean {
+
+
+    fun needUpdate(): Boolean {
                 if (update_interval<0)return false
                 var hours = (System.currentTimeMillis() - lastUpdateTime) / (1000 * 60 * 60)
                 return (hours>=update_interval)

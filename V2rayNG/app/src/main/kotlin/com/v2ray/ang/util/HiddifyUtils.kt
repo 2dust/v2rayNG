@@ -26,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
 import java.net.Proxy
+import java.net.URLDecoder
 import java.util.*
 
 class HiddifyUtils {
@@ -185,7 +186,10 @@ class HiddifyUtils {
                     var sub = Gson().fromJson(json, SubscriptionItem::class.java)
                     sub.lastUpdateTime=System.currentTimeMillis()
                     var userinfo = response.headers.getOrDefault("Subscription-Userinfo", null)?.firstOrNull()
-
+                    var dns = response.headers.getOrDefault("DNS", null)?.firstOrNull()
+                    if(!dns.isNullOrEmpty()) {
+                        sub.dns = dns //URLDecoder.decode(dns)
+                    }
                     var newLink = response.headers.getOrDefault("Moved-Permanently-To", null)?.firstOrNull()
                     if(!newLink.isNullOrEmpty()) {
                         AngApplication.appContext.toast(R.string.sub_moved_to_another_address)

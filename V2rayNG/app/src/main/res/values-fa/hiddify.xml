@@ -18,7 +18,7 @@
     <string name="proxy">پروکسی</string>
     <string name="connection_mode">حالت اتصال</string>
     <string name="filtered_sites">فیلتر</string>
-    <string name="external_sites">بجز فیلترنشده</string>
+    <string name="external_sites">جز فیلترنشده</string>
     <string name="sites_all">همه</string>
     <string name="smart">هوشمند</string>
     <string name="load_balance">لودبالانس</string>
@@ -34,7 +34,7 @@
     <string name="no_server_selected">هیچ سروری انتخاب نشده است.</string>
     <string name="expired">منقضی شده</string>
     <string name="title_country">کشور</string>
-    <string name="proxyAppAndSites">پروکسی برنامه ها و سایت ها</string>
+    <string name="proxyAppAndSites">پروکسی کدام برنامه و سایت</string>
     <string name="hiddify_notification">پیام های هیدیفای</string>
     <string name="toast_services_failure_config_error">یک پیکربندی دارای خطا است. لطفا آن را حذف کنید. می تواند یکی از پیکربندی هایی باشد که پینگ -1 دارد.</string>
     <string name="speedtest">تست سرعت</string>
