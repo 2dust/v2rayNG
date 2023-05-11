@@ -27,9 +27,12 @@ jobs:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         run: |
           touch signing.properties
-          echo keystore.password="$SIGNING_STORE_PASSWORD" > signing.properties
+          echo $SIGNING_KEY | base64 -d > signing.keystore
+          echo "keystorePath=signing.keystore" > signing.properties
+          echo keystore.password="$SIGNING_STORE_PASSWORD" >> signing.properties
           echo key.alias="$SIGNING_KEY_ALIAS" >> signing.properties
           echo key.password="$SIGNING_KEY_PASSWORD" >> signing.properties
             
@@ -40,25 +43,19 @@ jobs:
         if: success()
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: --no-daemon app:assembleRelease
+          arguments: --no-daemon app:assembleRelease --signingConfig signing.properties
           build-root-directory: V2rayNG
-
-      - name: Assemble Release Bundle
-        run: |
-          cd V2rayNG
-          ./gradlew bundleRelease
-          cd ..
-          
-      - uses: Tlaster/android-sign@v1
-        name: Sign app APK
-        with:
-          releaseDirectory: |
-            ./V2rayNG/app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          output: ./V2rayNG/app/build/outputs/apk/signed
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+  
+#       - uses: Tlaster/android-sign@v1
+#         name: Sign app APK
+#         with:
+#           releaseDirectory: |
+#             ./V2rayNG/app/build/outputs/apk/release
+#           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+#           output: ./V2rayNG/app/build/outputs/apk/signed
+#           alias: ${{ secrets.ALIAS }}
+#           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+#           keyPassword: ${{ secrets.KEY_PASSWORD }}
         
       - name: Upload Release
         uses: softprops/action-gh-release@v1
@@ -67,9 +64,16 @@ jobs:
           # tag: ${{ github.ref_name }}
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
-          files: ./V2rayNG/app/build/outputs/apk/signed/*.apk
+          files: ./V2rayNG/app/build/outputs/apk/output/*.apk
           prerelease: false
           generate_release_notes: true
+
+
+      - name: Assemble Release Bundle
+        run: |
+          cd V2rayNG
+          ./gradlew bundleRelease --signingConfig signing.properties
+          cd ..
         
       - name: Create service_account.json
         run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
