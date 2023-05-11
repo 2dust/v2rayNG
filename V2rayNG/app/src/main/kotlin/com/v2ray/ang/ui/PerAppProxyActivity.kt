@@ -208,9 +208,10 @@ class PerAppProxyActivity : BaseActivity() {
     }
     override fun onPause() {
         super.onPause()
-        if(HiddifyUtils.getPerAppProxyMode()!=HiddifyUtils.PerAppProxyMode.Global)
-        adapter?.let {
-            defaultSharedPreferences.edit().putStringSet(getCurrentListKey(), it.blacklist).apply()
+        if(HiddifyUtils.getPerAppProxyMode()!=HiddifyUtils.PerAppProxyMode.Global) {
+            adapter?.let {
+                defaultSharedPreferences.edit().putStringSet(getCurrentListKey(), it.blacklist).apply()
+            }
         }
     }
 

@@ -184,17 +184,18 @@ class HiddifyUtils {
                 if (!json.isNullOrBlank()) {
                     var sub = Gson().fromJson(json, SubscriptionItem::class.java)
                     sub.lastUpdateTime=System.currentTimeMillis()
-                    var userinfo =
-                        response.headers.getOrDefault("Subscription-Userinfo", null)?.firstOrNull()
-                    var homepage =
-                        response.headers.getOrDefault("Profile-Web-Page-Url", null)?.firstOrNull()
-                    var content_disposition =
-                        response.headers.getOrDefault("Content-Disposition", null)?.firstOrNull()
-                    var profile_title =
-                        response.headers.getOrDefault("Profile-Title", null)?.firstOrNull()
-                    var profile_update_interval =
-                        response.headers.getOrDefault("Profile-Update-Interval", null)
-                            ?.firstOrNull()
+                    var userinfo = response.headers.getOrDefault("Subscription-Userinfo", null)?.firstOrNull()
+
+                    var newLink = response.headers.getOrDefault("Moved-Permanently-To", null)?.firstOrNull()
+                    if(!newLink.isNullOrEmpty()) {
+                        AngApplication.appContext.toast(R.string.sub_moved_to_another_address)
+                        sub.url = newLink
+                    }
+
+                    var homepage = response.headers.getOrDefault("Profile-Web-Page-Url", null)?.firstOrNull()
+                    var content_disposition = response.headers.getOrDefault("Content-Disposition", null)?.firstOrNull()
+                    var profile_title = response.headers.getOrDefault("Profile-Title", null)?.firstOrNull()
+                    var profile_update_interval = response.headers.getOrDefault("Profile-Update-Interval", null)?.firstOrNull()
                     if (!profile_update_interval.isNullOrEmpty()) {
                         sub.update_interval = profile_update_interval.toInt();
                     }
