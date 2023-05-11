@@ -34,6 +34,7 @@ jobs:
           echo key.password="$SIGNING_KEY_PASSWORD" >> signing.properties
             
           cp signing.properties V2rayNG/
+          cat signing.properties
 
       - name: release Build
         if: success()
@@ -42,6 +43,23 @@ jobs:
           arguments: --no-daemon app:assembleRelease
           build-root-directory: V2rayNG
 
+      - name: Assemble Release Bundle
+        run: |
+          cd V2rayNG
+          ./gradlew bundleRelease
+          cd ..
+          
+      - uses: Tlaster/android-sign@v1
+        name: Sign app APK
+        with:
+          releaseDirectory: |
+            ./V2rayNG/app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          output: ./V2rayNG/app/build/outputs/apk/signed
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+        
       - name: Upload Release
         uses: softprops/action-gh-release@v1
         if: ${{  success() }}
@@ -49,26 +67,13 @@ jobs:
           # tag: ${{ github.ref_name }}
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
-          files: ./V2rayNG/app/build/outputs/apk/release/*
+          files: ./V2rayNG/app/build/outputs/apk/signed/*.apk
           prerelease: false
           generate_release_notes: true
-          
-      - name: Assemble Release Bundle
-        run: |
-          cd V2rayNG
-          ./gradlew bundleRelease
-          cd ..
-          
-      - name: Sign Release
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: ./V2rayNG/app/build/outputs/bundle/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+        
       - name: Create service_account.json
         run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+        
       - name: Deploy to Internal Testers
         uses: r0adkll/upload-google-play@v1
         with:
