@@ -97,7 +97,6 @@
                             android:maxLines="2"
                             android:minLines="1"
                             android:paddingStart="16dp"
-
                             android:text="@string/connection_test_pending"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
                             android:textColor="@color/colorWhite" />

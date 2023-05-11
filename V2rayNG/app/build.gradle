@@ -6,7 +6,6 @@ plugins {
 }
 
 android {
-
     compileSdkVersion Integer.parseInt("$compileSdkVer")
     buildToolsVersion "$buildToolsVer"
 
@@ -20,8 +19,8 @@ android {
         minSdkVersion 21
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
-        versionCode 5100540 //hiddify when comes to version 5 change it
-        versionName "4.0.0" //hiddify
+        versionCode 5100541 //hiddify when comes to version 5 change it
+        versionName "4.1.0" //hiddify
     }
 
     buildTypes {

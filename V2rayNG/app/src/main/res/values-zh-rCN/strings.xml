@@ -209,6 +209,12 @@
         <item>导出至剪贴板</item>
         <item>导出完整配置至剪贴板</item>
     </string-array>
+
+    <string-array name="share_sub_method">
+        <item>二维码</item>
+        <item>导出至剪贴板</item>
+    </string-array>
+
     share_method
     <string-array name="routing_tag">
         <item>代理的网址或IP</item>

@@ -73,12 +73,13 @@
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="@dimen/layout_margin_spacing"
-                    android:visibility="invisible">
+                    >
 
                     <ImageView
                         android:layout_width="@dimen/png_height"
                         android:layout_height="@dimen/png_height"
-                        android:src="@drawable/ic_share_black_24dp" />
+                        android:src="@drawable/ic_share_black_24dp"
+                        app:tint="?attr/colorMainText"/>
 
                 </LinearLayout>
 

@@ -246,7 +246,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             BaseViewHolder(itemMainBinding.root), ItemTouchHelperViewHolder
 
     class FooterViewHolder(val itemFooterBinding: ItemRecyclerFooterBinding) :
-            BaseViewHolder(itemFooterBinding.root), ItemTouchHelperViewHolder
+            BaseViewHolder(itemFooterBinding.root)
 
     override fun onItemDismiss(position: Int) {
         val guid = mActivity.mainViewModel.serversCache.getOrNull(position)?.guid ?: return
