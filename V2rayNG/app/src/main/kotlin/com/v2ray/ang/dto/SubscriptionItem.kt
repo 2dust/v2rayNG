@@ -10,6 +10,7 @@ data class SubscriptionItem(
         var total: Long=-1,
         var expire: Long=-1,//in ms
         var home_link: String="",
+        var support_link: String="",
         var update_interval: Int=1,
         var dns: String?=null
         ) {

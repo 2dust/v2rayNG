@@ -290,11 +290,17 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                     binding.progress.progress = (subscription.second.used / 1000000000).toInt()
                     binding.progress.max = (subscription.second.total / 1000000000).toInt()
                     binding.progress.showGone(subscription.second.total > (0).toLong())
-
+                    binding.supportLink.showGone(!subscription.second.support_link.isNullOrEmpty())
                     binding.show.click {
                         if (subscription.second.home_link.isNullOrEmpty())
                             return@click
                         Utils.openUri(this,subscription.second.home_link)
+
+                    }
+                    binding.supportLink.click {
+                        if (subscription.second.support_link.isNullOrEmpty())
+                            return@click
+                        Utils.openUri(this,subscription.second.support_link)
 
                     }
                     binding.show.showGone(!subscription.second.home_link.isNullOrEmpty())

@@ -153,6 +153,22 @@
                             app:layout_constraintTop_toBottomOf="@id/consumerTrafficValue"/>
 
                         <com.google.android.material.button.MaterialButton
+                            android:id="@+id/supportLink"
+                            android:layout_width="55dp"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="8dp"
+                            android:backgroundTint="@color/colorBright"
+                            android:fontFamily="@font/vazirmatn_regular"
+                            android:text=""
+                            android:textColor="@color/colorPrimary2"
+                            app:backgroundTint="@color/colorBright"
+                            app:cornerRadius="16dp"
+                            app:icon="@drawable/ic_support"
+                            app:iconGravity="start"
+                            app:iconTint="@color/colorPrimary2"
+                            app:layout_constraintStart_toStartOf="@id/progress"
+                            app:layout_constraintTop_toBottomOf="@id/progress" />
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/show"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"

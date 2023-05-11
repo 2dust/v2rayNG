@@ -197,11 +197,18 @@ class HiddifyUtils {
                     }
 
                     var homepage = response.headers.getOrDefault("Profile-Web-Page-Url", null)?.firstOrNull()
+                    var supportLink = response.headers.getOrDefault("Support-Url", null)?.firstOrNull()
                     var content_disposition = response.headers.getOrDefault("Content-Disposition", null)?.firstOrNull()
                     var profile_title = response.headers.getOrDefault("Profile-Title", null)?.firstOrNull()
                     var profile_update_interval = response.headers.getOrDefault("Profile-Update-Interval", null)?.firstOrNull()
                     if (!profile_update_interval.isNullOrEmpty()) {
                         sub.update_interval = profile_update_interval.toInt();
+                    }
+                    if (!supportLink.isNullOrEmpty()) {
+                        sub.support_link = supportLink
+                    }
+                    if (!homepage.isNullOrEmpty()) {
+                        sub.home_link = homepage
                     }
                     if (!profile_title.isNullOrEmpty()){
 

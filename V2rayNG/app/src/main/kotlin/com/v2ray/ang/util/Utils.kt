@@ -476,8 +476,8 @@ object Utils {
         if (time<0)
             return ""
 
-        val now = System.currentTimeMillis()/1000
-        val diffInMillis = (time-now)/86400
+        val now = System.currentTimeMillis()
+        val diffInMillis = (time-now)/86400/1000
         val flags = DateUtils.FORMAT_SHOW_DATE// or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_ABBREV_MONTH
         if (diffInMillis<0)
             return "Expired"

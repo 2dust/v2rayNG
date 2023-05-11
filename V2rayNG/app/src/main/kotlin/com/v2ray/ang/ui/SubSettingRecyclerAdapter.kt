@@ -19,7 +19,6 @@ import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
-import com.v2ray.ang.util.Utils
 
 class SubSettingRecyclerAdapter(val activity: SubSettingActivity) :
     RecyclerView.Adapter<SubSettingRecyclerAdapter.MainViewHolder>() {
