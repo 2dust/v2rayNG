@@ -22,7 +22,6 @@ import com.v2ray.ang.util.AppManagerUtil
 import com.v2ray.ang.util.HiddifyUtils
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -112,7 +111,7 @@ class PerAppProxyActivity : BaseActivity() {
                     }
                 var mode = when (checkedId) {
                     binding.filteredSites.id -> HiddifyUtils.PerAppProxyMode.Blocked
-                    binding.externalSites.id -> HiddifyUtils.PerAppProxyMode.Foreign
+                    binding.notOpened.id -> HiddifyUtils.PerAppProxyMode.NotOpened
                     else -> HiddifyUtils.PerAppProxyMode.Global
                 }
                 HiddifyUtils.setPerAppProxyMode(mode)
@@ -122,7 +121,7 @@ class PerAppProxyActivity : BaseActivity() {
         var bypassMode=HiddifyUtils.getPerAppProxyMode()
         binding.sitesAll.isChecked = bypassMode== HiddifyUtils.PerAppProxyMode.Global
         binding.filteredSites.isChecked = bypassMode==HiddifyUtils.PerAppProxyMode.Blocked
-        binding.externalSites.isChecked = bypassMode==HiddifyUtils.PerAppProxyMode.Foreign
+        binding.notOpened.isChecked = bypassMode==HiddifyUtils.PerAppProxyMode.NotOpened
 
 
         /***
@@ -157,8 +156,8 @@ class PerAppProxyActivity : BaseActivity() {
     }
     fun getCurrentListKey(): String? {
         return when(HiddifyUtils.getPerAppProxyMode()){
-            HiddifyUtils.PerAppProxyMode.Blocked-> AppConfig.PREF_PER_APP_PROXY_SET_BLACK
-            HiddifyUtils.PerAppProxyMode.Foreign-> AppConfig.PREF_PER_APP_PROXY_SET_WHITE
+            HiddifyUtils.PerAppProxyMode.Blocked-> AppConfig.PREF_PER_APP_PROXY_SET_BLOCKED
+            HiddifyUtils.PerAppProxyMode.NotOpened-> AppConfig.PREF_PER_APP_PROXY_SET_OPENED
             else-> null
         }
 
@@ -319,18 +318,18 @@ class PerAppProxyActivity : BaseActivity() {
             adapter?.blacklist!!.clear()
 
 
-                adapter?.let {
-                    it.apps.forEach block@{
-                        val packageName = it.packageName
-                        Log.d(ANG_PACKAGE, packageName)
-                        if (!inProxyApps(proxyApps, packageName, force)) {
-                            adapter?.blacklist!!.add(packageName)
-                            println(packageName)
-                            return@block
-                        }
+            adapter?.let {
+                it.apps.forEach block@{
+                    val packageName = it.packageName
+                    Log.d(ANG_PACKAGE, packageName)
+                    if (inProxyApps(proxyApps, packageName, force)) {
+                        adapter?.blacklist!!.add(packageName)
+                        println(packageName)
+                        return@block
                     }
-                    it.notifyDataSetChanged()
                 }
+                it.notifyDataSetChanged()
+            }
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -341,12 +340,12 @@ class PerAppProxyActivity : BaseActivity() {
 
     private fun inProxyApps(proxyApps: String, packageName: String, force: Boolean): Boolean {
         if (force) {
-            if (packageName == "com.google.android.webview") {
-                return false
-            }
-            if (packageName.startsWith("com.google")) {
-                return true
-            }
+//            if (packageName == "com.google.android.webview") {
+//                return false
+//            }
+//            if (packageName.startsWith("com.google")) {
+//                return true
+//            }
         }
 
         return proxyApps.indexOf(packageName) >= 0

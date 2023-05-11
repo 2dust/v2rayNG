@@ -39,8 +39,8 @@ object AppConfig {
     const val PREF_V2RAY_ROUTING_BLOCKED = "pref_v2ray_routing_blocked"
     const val PREF_PER_APP_PROXY = "pref_per_app_proxy"
     const val PREF_PER_APP_PROXY_SET = "pref_per_app_proxy_set"
-    const val PREF_PER_APP_PROXY_SET_WHITE = "pref_per_app_proxy_set_white"//hiddify
-    const val PREF_PER_APP_PROXY_SET_BLACK = "pref_per_app_proxy_set_black"//hiddify
+    const val PREF_PER_APP_PROXY_SET_OPENED = "pref_per_app_proxy_set_white"//hiddify
+    const val PREF_PER_APP_PROXY_SET_BLOCKED = "pref_per_app_proxy_set_black"//hiddify
     const val PREF_BYPASS_APPS = "pref_bypass_apps"
     const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
     const val PREF_START_SCAN_IMMEDIATE = "pref_start_scan_immediate"

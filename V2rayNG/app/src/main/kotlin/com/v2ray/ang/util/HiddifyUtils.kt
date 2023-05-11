@@ -1,13 +1,8 @@
 package com.v2ray.ang.util
 
-import android.app.Activity
-import android.app.Application
 import android.content.Context
 import android.net.Uri
-import android.provider.Settings.Global
 import android.text.SpannableString
-import android.util.Log
-import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
@@ -18,15 +13,9 @@ import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.*
 import com.v2ray.ang.util.Utils.getLocale
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.Base64
 import java.util.Locale
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
 import java.net.Proxy
-import java.net.URLDecoder
 import java.util.*
 
 class HiddifyUtils {
@@ -264,7 +253,7 @@ class HiddifyUtils {
                 return PerAppProxyMode.Global
             if (!defaultSharedPreferences.getBoolean(AppConfig.PREF_BYPASS_APPS, false))
                 return PerAppProxyMode.Blocked
-            return PerAppProxyMode.Foreign
+            return PerAppProxyMode.NotOpened
         }
 
         fun setPerAppProxyMode(mode: PerAppProxyMode){ //1 disable 2: filtered , 3: foreign
@@ -272,13 +261,13 @@ class HiddifyUtils {
             defaultSharedPreferences.edit().putBoolean(AppConfig.PREF_PER_APP_PROXY, mode!=PerAppProxyMode.Global).apply()
             if(mode==PerAppProxyMode.Blocked) {
                 var blacklist=    defaultSharedPreferences.getStringSet(
-                    AppConfig.PREF_PER_APP_PROXY_SET_BLACK,
+                    AppConfig.PREF_PER_APP_PROXY_SET_BLOCKED,
                     null
                 )
                 if (blacklist==null){
                     blacklist= HashSet(Utils.readTextFromAssets(AngApplication.appContext, "applications_proxy").split("\n"))
                     defaultSharedPreferences.edit().putStringSet(
-                        AppConfig.PREF_PER_APP_PROXY_SET_BLACK,
+                        AppConfig.PREF_PER_APP_PROXY_SET_BLOCKED,
                         blacklist
                     ).apply()
                 }
@@ -286,20 +275,20 @@ class HiddifyUtils {
                 defaultSharedPreferences.edit().putStringSet(
                     AppConfig.PREF_PER_APP_PROXY_SET,
                     defaultSharedPreferences.getStringSet(
-                        AppConfig.PREF_PER_APP_PROXY_SET_BLACK,
+                        AppConfig.PREF_PER_APP_PROXY_SET_BLOCKED,
                         null
                     )
                 ).apply()
-            }else if (mode==PerAppProxyMode.Foreign){
+            }else if (mode==PerAppProxyMode.NotOpened){
                 defaultSharedPreferences.edit().putBoolean(AppConfig.PREF_BYPASS_APPS, true).apply()
                 var blacklist=    defaultSharedPreferences.getStringSet(
-                    AppConfig.PREF_PER_APP_PROXY_SET_WHITE,
+                    AppConfig.PREF_PER_APP_PROXY_SET_OPENED,
                     null
                 )
                 if (blacklist==null){
                     blacklist= HashSet(Utils.readTextFromAssets(AngApplication.appContext, "applications_direct").split("\n"))
                     defaultSharedPreferences.edit().putStringSet(
-                        AppConfig.PREF_PER_APP_PROXY_SET_WHITE,
+                        AppConfig.PREF_PER_APP_PROXY_SET_OPENED,
                         blacklist
                     ).apply()
                 }
@@ -307,7 +296,7 @@ class HiddifyUtils {
                 defaultSharedPreferences.edit().putStringSet(
                     AppConfig.PREF_PER_APP_PROXY_SET,
                     defaultSharedPreferences.getStringSet(
-                        AppConfig.PREF_PER_APP_PROXY_SET_WHITE,
+                        AppConfig.PREF_PER_APP_PROXY_SET_OPENED,
                         null
                     )
                 ).apply()
@@ -317,7 +306,7 @@ class HiddifyUtils {
 
         fun getProxyDataUrl(mode:PerAppProxyMode, sites: Boolean=false): String? {
             var url=if (sites)AppConfig.v2rayCustomRoutingListUrl else AppConfig.androidpackagenamelistUrl
-            if(mode==PerAppProxyMode.Foreign)
+            if(mode==PerAppProxyMode.NotOpened)
                 return url+"direct_"+ getCountry()
             if(mode==PerAppProxyMode.Blocked)
                 return url+"proxy_"+ getCountry()
@@ -325,7 +314,7 @@ class HiddifyUtils {
         }
         fun getProxyDataAssets(mode:PerAppProxyMode, sites: Boolean=false): String? {
             var url=if (sites)"custom_routing_" else "applications_"
-            if(mode==PerAppProxyMode.Foreign)
+            if(mode==PerAppProxyMode.NotOpened)
                 return url+"direct_"+ getCountry()
             if(mode==PerAppProxyMode.Blocked)
                 return url+"proxy_"+ getCountry()
@@ -336,8 +325,8 @@ class HiddifyUtils {
             var country= getCountry()
             mutableListOf("direct","proxy").forEach {
                 val app_key=when(it){
-                    "direct"->AppConfig.PREF_PER_APP_PROXY_SET_WHITE
-                    "proxy"->AppConfig.PREF_PER_APP_PROXY_SET_BLACK
+                    "direct"->AppConfig.PREF_PER_APP_PROXY_SET_OPENED
+                    "proxy"->AppConfig.PREF_PER_APP_PROXY_SET_BLOCKED
                     else->""
                 }
                 val routing_key=when(it){
@@ -370,6 +359,6 @@ class HiddifyUtils {
     enum class PerAppProxyMode{
         Global,
         Blocked,
-        Foreign
+        NotOpened
     }
 }

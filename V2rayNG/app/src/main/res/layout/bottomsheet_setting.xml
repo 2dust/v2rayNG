@@ -70,7 +70,7 @@
 
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/externalSites"
+            android:id="@+id/not_opened"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

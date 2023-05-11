@@ -59,7 +59,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     style="?attr/materialButtonOutlinedStyle"
-                    android:id="@+id/externalSites"
+                    android:id="@+id/not_opened"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

@@ -68,7 +68,7 @@ class SettingBottomSheets(var mode: Int) : BaseExpandedBottomSheet() {
         }
 
         val perAppCheckId = when (HiddifyUtils.getPerAppProxyMode()) {
-            HiddifyUtils.PerAppProxyMode.Foreign -> binding.externalSites.id
+            HiddifyUtils.PerAppProxyMode.NotOpened -> binding.notOpened.id
             HiddifyUtils.PerAppProxyMode.Blocked -> binding.filteredSites.id
             else -> binding.sitesAll.id
         }
@@ -79,13 +79,13 @@ class SettingBottomSheets(var mode: Int) : BaseExpandedBottomSheet() {
             true;
         }
         binding.sitesAll.setOnLongClickListener{
-            HiddifyUtils.setPerAppProxyMode(HiddifyUtils.PerAppProxyMode.Foreign)
+            HiddifyUtils.setPerAppProxyMode(HiddifyUtils.PerAppProxyMode.NotOpened)
             startActivity(Intent(activity, PerAppProxyActivity::class.java))
             dialog?.dismiss()
             true;
         }
-        binding.externalSites.setOnLongClickListener{
-            HiddifyUtils.setPerAppProxyMode(HiddifyUtils.PerAppProxyMode.Foreign)
+        binding.notOpened.setOnLongClickListener{
+            HiddifyUtils.setPerAppProxyMode(HiddifyUtils.PerAppProxyMode.NotOpened)
             startActivity(Intent(activity, PerAppProxyActivity::class.java))
             dialog?.dismiss()
             true;
@@ -99,7 +99,7 @@ class SettingBottomSheets(var mode: Int) : BaseExpandedBottomSheet() {
         binding.proxyToggleButton.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 val mode = when (checkId) {
-                    binding.externalSites.id->HiddifyUtils.PerAppProxyMode.Foreign
+                    binding.notOpened.id->HiddifyUtils.PerAppProxyMode.NotOpened
                     binding.filteredSites.id->HiddifyUtils.PerAppProxyMode.Blocked
                     else -> HiddifyUtils.PerAppProxyMode.Global
                 }
@@ -107,7 +107,7 @@ class SettingBottomSheets(var mode: Int) : BaseExpandedBottomSheet() {
             }else if (group.checkedButtonIds.isEmpty()) {
                 // No buttons are selected, select the first one by default
                 val perAppCheckId = when (HiddifyUtils.getPerAppProxyMode()) {
-                    HiddifyUtils.PerAppProxyMode.Foreign -> binding.externalSites.id
+                    HiddifyUtils.PerAppProxyMode.NotOpened -> binding.notOpened.id
                     HiddifyUtils.PerAppProxyMode.Blocked -> binding.filteredSites.id
                     else -> binding.sitesAll.id
                 }
