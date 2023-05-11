@@ -33,14 +33,14 @@ jobs:
           echo key.alias="$SIGNING_KEY_ALIAS" >> signing.properties
           echo key.password="$SIGNING_KEY_PASSWORD" >> signing.properties
             
-          echo "cat signing.properties"
-          cat signing.properties
+          cp signing.properties V2rayNG/
 
       - name: release Build
         if: success()
         uses: gradle/gradle-build-action@v2
         with:
           arguments: --no-daemon app:assembleRelease
+          build-root-directory: V2rayNG
 
       - name: Upload Release
         uses: softprops/action-gh-release@v1
@@ -49,17 +49,20 @@ jobs:
           # tag: ${{ github.ref_name }}
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
-          files: app/build/outputs/apk/release/*
+          files: ./V2rayNG/app/build/outputs/apk/release/*
           prerelease: false
           generate_release_notes: true
           
       - name: Assemble Release Bundle
         run: |
+          cd V2rayNG
           ./gradlew bundleRelease
+          cd ..
+          
       - name: Sign Release
         uses: r0adkll/sign-android-release@v1
         with:
-          releaseDirectory: app/build/outputs/bundle/release
+          releaseDirectory: ./V2rayNG/app/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -72,6 +75,6 @@ jobs:
           serviceAccountJson: service_account.json
           packageName: ang.hiddify.com
           releaseName: ${{ github.ref }}
-          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          releaseFiles: ./V2rayNG/app/build/outputs/bundle/release/app-release.aab
           track: internal
        
