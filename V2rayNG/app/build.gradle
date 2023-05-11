@@ -152,6 +152,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-inappmessaging-display-ktx'
     implementation 'com.google.firebase:firebase-messaging-ktx'
     implementation 'androidx.work:work-runtime:2.8.1'
+    implementation 'com.google.android.play:core-ktx:1.8.1'
+
 //    implementation 'fr.bmartel:jspeedtest:1.32.1'
 //    implementation 'com.github.hiddify:Super-Gauge-View:14314adde9'
 //     https://mvnrepository.com/artifact/org.achartengine/achartengine

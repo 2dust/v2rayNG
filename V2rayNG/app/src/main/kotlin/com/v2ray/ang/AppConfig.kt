@@ -45,6 +45,8 @@ object AppConfig {
     const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
     const val PREF_START_SCAN_IMMEDIATE = "pref_start_scan_immediate"
 
+    const val PREF_REVIEW_TIME = "pref_review_time"
+
     const val HTTP_PROTOCOL: String = "http://"
     const val HTTPS_PROTOCOL: String = "https://"
 
@@ -64,6 +66,7 @@ object AppConfig {
     const val TAG_DIRECT = "direct"
     const val TAG_BLOCKED = "block"
     const val TAG_FRAGMENT = "fragment"
+
 
     const val androidpackagenamelistUrl = "https://raw.githubusercontent.com/hiddify/androidpackagenamelist/master/"
     const val v2rayCustomRoutingListUrl = "https://raw.githubusercontent.com/hiddify/v2rayCustomRoutingList/master/"

@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 
@@ -105,6 +106,31 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
         }
 
     }
+
+    private fun showGooglePlayReview() {
+        if (settingsStorage?.containsKey(AppConfig.PREF_REVIEW_TIME)==true) {
+            return
+        }
+
+        settingsStorage?.encode(AppConfig.PREF_REVIEW_TIME, System.currentTimeMillis())
+        val manager = ReviewManagerFactory.create(this)
+        val request = manager.requestReviewFlow()
+        request.addOnCompleteListener { request ->
+            if (request.isSuccessful) {
+                // We got the ReviewInfo object
+                val reviewInfo = request.result
+                val flow = manager.launchReviewFlow(this, reviewInfo)
+                flow.addOnCompleteListener { _ ->
+                    // The flow has finished. The API does not indicate whether the user
+                    // reviewed or not, or even whether the review dialog was shown. Thus, no
+                    // matter the result, we continue our app flow.
+                }
+            } else {
+                // There was some problem, continue regardless of the result.
+            }
+        }
+    }
+
     fun showLangDialog(){
         if (settingsStorage?.containsKey(AppConfig.PREF_LANGUAGE)==true) {
             showCountryDialog()
@@ -229,6 +255,7 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
             adapter.isRunning = isRunning
             if (isRunning) {
                 updateCircleState("connected")
+                showGooglePlayReview()
                 hiddifyMainViewModel.testCurrentServerRealPing()//hiddify
             } else {
                 updateCircleState("disconnected")
