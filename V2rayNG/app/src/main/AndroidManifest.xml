@@ -109,8 +109,9 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="v2rayng"
-                    android:host="install-config" />
+                <data android:scheme="v2rayng"/>
+                <data android:host="install-config"/>
+                <data android:host="install-sub"/>
             </intent-filter>
         </activity>
 
