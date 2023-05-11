@@ -20,7 +20,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
 
+                >
             <TextView
                 android:id="@+id/profileName"
                 android:layout_width="0dp"
@@ -33,7 +37,17 @@
                 android:fontFamily="@font/vazir_bold"
                 android:textColor="@color/colorText"
                 tools:text="پروفایل یک"/>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/icDelete"
 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tint="@color/colorRed"
+                android:background="?selectableItemBackground"
+                android:layout_gravity="end"
+                android:layout_marginHorizontal="4dp"
+                app:srcCompat="@drawable/ic_delete_black_24dp"/>
+        </LinearLayout>
             <TextView
                 android:id="@+id/lastUpdate"
                 android:layout_width="0dp"
@@ -51,15 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/icDelete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:tint="@color/colorRed"
-                android:background="?selectableItemBackground"
-                android:layout_gravity="center_vertical"
-                android:layout_marginHorizontal="4dp"
-                app:srcCompat="@drawable/ic_delete_black_24dp"/>
+
 
             <TextView
                 android:id="@+id/time"

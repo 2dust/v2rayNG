@@ -270,7 +270,7 @@ class PerAppProxyActivity : BaseActivity() {
 
     private fun selectProxyApp() {
         toast(R.string.msg_downloading_content)
-        val url = AppConfig.androidpackagenamelistUrl
+        val url = HiddifyUtils.getProxyDataUrl(HiddifyUtils.getPerAppProxyMode())!!
         lifecycleScope.launch(Dispatchers.IO) {
             val content = Utils.getUrlContext(url, 5000)
             launch(Dispatchers.Main) {
@@ -302,8 +302,12 @@ class PerAppProxyActivity : BaseActivity() {
 
     private fun selectProxyApp(content: String, force: Boolean): Boolean {
         try {
+            val asset=if (HiddifyUtils.getPerAppProxyMode()==HiddifyUtils.PerAppProxyMode.Blocked)
+                            "applications_proxy_${HiddifyUtils.getCountry()}.txt"
+                        else
+                            "applications_direct_${HiddifyUtils.getCountry()}.txt"
             val proxyApps = if (TextUtils.isEmpty(content)) {
-                Utils.readTextFromAssets(v2RayApplication, "applications_proxy_${HiddifyUtils.getCountry()}.txt")
+                Utils.readTextFromAssets(v2RayApplication, asset)
             } else {
                 content
             }
@@ -313,7 +317,7 @@ class PerAppProxyActivity : BaseActivity() {
 
             adapter?.blacklist!!.clear()
 
-            if (HiddifyUtils.getPerAppProxyMode()==HiddifyUtils.PerAppProxyMode.Blocked) {
+
                 adapter?.let {
                     it.apps.forEach block@{
                         val packageName = it.packageName
@@ -326,20 +330,7 @@ class PerAppProxyActivity : BaseActivity() {
                     }
                     it.notifyDataSetChanged()
                 }
-            } else {
-                adapter?.let {
-                    it.apps.forEach block@{
-                        val packageName = it.packageName
-                        Log.d(ANG_PACKAGE, packageName)
-                        if (inProxyApps(proxyApps, packageName, force)) {
-                            adapter?.blacklist!!.add(packageName)
-                            println(packageName)
-                            return@block
-                        }
-                    }
-                    it.notifyDataSetChanged()
-                }
-            }
+
         } catch (e: Exception) {
             e.printStackTrace()
             return false
