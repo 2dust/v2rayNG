@@ -30,33 +30,33 @@ jobs:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         run: |
           touch signing.properties
-          echo $SIGNING_KEY | base64 -d > signing.keystore
-          echo "keystorePath=signing.keystore" > signing.properties
-          echo keystore.password="$SIGNING_STORE_PASSWORD" >> signing.properties
-          echo key.alias="$SIGNING_KEY_ALIAS" >> signing.properties
-          echo key.password="$SIGNING_KEY_PASSWORD" >> signing.properties
+          echo $SIGNING_KEY | base64 -d > release.keystore
+          echo "keystore.path=release.keystore" > release.properties
+          echo keystore.password="$SIGNING_STORE_PASSWORD" >> release.properties
+          echo key.alias="$SIGNING_KEY_ALIAS" >> release.properties
+          echo key.password="$SIGNING_KEY_PASSWORD" >> release.properties
             
-          cp signing.properties V2rayNG/
-          cat signing.properties
+          cp release.properties V2rayNG/
+          cat release.properties
 
       - name: release Build
         if: success()
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: --no-daemon app:assembleRelease --signingConfig signing.properties
+          arguments: --no-daemon app:assembleRelease
           build-root-directory: V2rayNG
-  
-#       - uses: Tlaster/android-sign@v1
-#         name: Sign app APK
-#         with:
-#           releaseDirectory: |
-#             ./V2rayNG/app/build/outputs/apk/release
-#           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-#           output: ./V2rayNG/app/build/outputs/apk/signed
-#           alias: ${{ secrets.ALIAS }}
-#           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-#           keyPassword: ${{ secrets.KEY_PASSWORD }}
-        
+
+      #       - uses: Tlaster/android-sign@v1
+      #         name: Sign app APK
+      #         with:
+      #           releaseDirectory: |
+      #             ./V2rayNG/app/build/outputs/apk/release
+      #           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+      #           output: ./V2rayNG/app/build/outputs/apk/signed
+      #           alias: ${{ secrets.ALIAS }}
+      #           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+      #           keyPassword: ${{ secrets.KEY_PASSWORD }}
+
       - name: Upload Release
         uses: softprops/action-gh-release@v1
         if: ${{  success() }}
@@ -68,16 +68,15 @@ jobs:
           prerelease: false
           generate_release_notes: true
 
-
       - name: Assemble Release Bundle
         run: |
           cd V2rayNG
-          ./gradlew bundleRelease --signingConfig signing.properties
+          ./gradlew bundleRelease
           cd ..
-        
+
       - name: Create service_account.json
         run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
-        
+
       - name: Deploy to Internal Testers
         uses: r0adkll/upload-google-play@v1
         with:
@@ -86,4 +85,3 @@ jobs:
           releaseName: ${{ github.ref }}
           releaseFiles: ./V2rayNG/app/build/outputs/bundle/release/app-release.aab
           track: internal
-       

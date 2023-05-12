@@ -3,3 +3,6 @@
 V2rayNG/app/release/output.json
 .idea/
 .gradle/
+release.properties
+V2rayNG/app/release/output-metadata.json
+

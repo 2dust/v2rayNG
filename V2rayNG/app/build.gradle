@@ -23,12 +23,30 @@ android {
         versionName "4.1.0" //hiddify
     }
 
+    signingConfigs {
+        release {
+            def properties = new Properties()
+            properties.load(new FileInputStream(rootProject.file('release.properties')))
+
+            keyAlias properties['key.alias']
+            keyPassword properties['key.password']
+            storeFile file(properties['keystore.path'])
+            storePassword properties['keystore.password']
+//            storeFile file("signing.keystore")
+//            def properties = new Properties()
+//            properties.load(new FileInputStream(rootProject.file('signing.properties')))
+//            storePassword System.getenv("SIGNING_STORE_PASSWORD")
+//            keyAlias System.getenv("SIGNING_KEY_ALIAS")
+//            keyPassword System.getenv("SIGNING_KEY_PASSWORD")
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             zipAlignEnabled false
             shrinkResources false
             ndk.abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+            signingConfig signingConfigs.release
         }
         debug {
             minifyEnabled false
@@ -47,6 +65,7 @@ android {
             java.srcDirs += 'src/main/kotlin'
         }
     }
+
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
