@@ -66,7 +66,7 @@ jobs:
           # tag: ${{ github.ref_name }}
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
-          files: ./V2rayNG/app/build/outputs/apk/output/*.apk
+          files: ./V2rayNG/app/build/outputs/apk/*.apk
           prerelease: false
           generate_release_notes: true
 
