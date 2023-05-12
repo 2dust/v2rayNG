@@ -36,7 +36,8 @@ jobs:
           echo keystore.password="$SIGNING_STORE_PASSWORD" >> release.properties
           echo key.alias="$SIGNING_KEY_ALIAS" >> release.properties
           echo key.password="$SIGNING_KEY_PASSWORD" >> release.properties
-            
+
+          cp  release.properties app/ 
           cat release.properties
           cd ..
 
