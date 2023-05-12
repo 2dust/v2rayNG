@@ -37,7 +37,7 @@ jobs:
           echo key.alias="$SIGNING_KEY_ALIAS" >> release.properties
           echo key.password="$SIGNING_KEY_PASSWORD" >> release.properties
 
-          cp  release.properties app/ 
+          cp  release.* app/ 
           cat release.properties
           cd ..
 
