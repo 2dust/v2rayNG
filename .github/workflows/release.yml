@@ -29,6 +29,7 @@ jobs:
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         run: |
+          cd V2rayNG
           touch signing.properties
           echo $SIGNING_KEY | base64 -d > release.keystore
           echo "keystore.path=release.keystore" > release.properties
@@ -36,8 +37,8 @@ jobs:
           echo key.alias="$SIGNING_KEY_ALIAS" >> release.properties
           echo key.password="$SIGNING_KEY_PASSWORD" >> release.properties
             
-          cp release.properties V2rayNG/
           cat release.properties
+          cd ..
 
       - name: release Build
         if: success()
