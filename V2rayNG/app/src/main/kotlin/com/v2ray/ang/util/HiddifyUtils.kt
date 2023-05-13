@@ -67,10 +67,14 @@ class HiddifyUtils {
         fun toTotalUsedGig(totalInBytes: Long, usedInBytes: Long, context: Context): String {
             val total = totalInBytes.toDouble() / 1073741824
             val used = usedInBytes.toDouble() / 1073741824
-            return if (getLocale(context) == Locale("fa"))
-                String.format("%.0f/%.0f G", used, total).toPersianDigit()
-            else
-                String.format("%.0f/%.0f G", used, total)
+            if(total>10000){
+                return String.format("%.0f G / ♾️", used).toPersianDigit(context)
+            }
+            return String.format("%.0f / %.0f G", used, total).toPersianDigit()
+//            return if (getLocale(context) == Locale("fa"))
+//                String.format("%.0f/%.0f G", used, total).toPersianDigit()
+//            else
+//                String.format("%.0f/%.0f G", used, total)
         }
 
         fun timeToRelativeDate(

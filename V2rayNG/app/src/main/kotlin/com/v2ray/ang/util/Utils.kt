@@ -389,10 +389,9 @@ object Utils {
 
             return Response(headers, content, urlStr)
         }catch (e:Exception){
-
             if(direct&&proxy) {
                 AngApplication.appContext.toast(R.string.msg_downloading_content_failed_no_proxy)
-                return getUrlContentOkHttp(urlStr, timeout, direct = false, proxy = true)
+                return getUrlContentOkHttp(urlStr, timeout, direct = false, proxy = true, tryold=tryold)
             }
             if(tryold)
                 return getUrlContentWithCustomUserAgent_old(urlStr,timeout)

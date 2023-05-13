@@ -9,6 +9,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -209,6 +210,8 @@ fun Context?.toast(s: String?, length : Int = Toast.LENGTH_SHORT) {
 }
 
 fun Context?.toast(i: Int?, length : Int = Toast.LENGTH_LONG) {
+    try {
+
 
     if (this is Activity) {
         if ((this.isFinishing || this.isDestroyed)) {
@@ -233,6 +236,9 @@ fun Context?.toast(i: Int?, length : Int = Toast.LENGTH_LONG) {
         toast.duration = length
         toast.view = layout
         toast.show()
+    }
+    }catch (e:Exception){
+        Log.e("Hiddify",e.toString())
     }
 }
 

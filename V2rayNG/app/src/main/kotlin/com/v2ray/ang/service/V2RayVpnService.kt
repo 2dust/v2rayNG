@@ -160,17 +160,18 @@ class V2RayVpnService : VpnService(), ServiceControl {
             val apps = settingsStorage?.decodeStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
             apps?.forEach {
                 try {
-                    if (it==BuildConfig.APPLICATION_ID)return@forEach;
-                    if (bypassApps)
-                        builder.addDisallowedApplication(it)
-                    else
-                        builder.addAllowedApplication(it)
+                    if (it!=BuildConfig.APPLICATION_ID) {
+                        if (bypassApps)
+                            builder.addDisallowedApplication(it)
+                        else
+                            builder.addAllowedApplication(it)
+                    }
                 } catch (e: PackageManager.NameNotFoundException) {
                     //Logger.d(e)
                 }
             }
         }
-        if (!perAppProxy || (perAppProxy&&bypassApps)) {
+        if (!perAppProxy || bypassApps) {
             builder.addDisallowedApplication(BuildConfig.APPLICATION_ID)
         }
         // Close the old interface since the parameters have been changed.
