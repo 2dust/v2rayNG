@@ -51,7 +51,7 @@ class AngApplication : MultiDexApplication() {
 
 
     private fun copyAssets() {
-        val extFolder = Utils.userAssetPath(this)
+            val extFolder = Utils.userAssetPath(this)
 //        lifecycleScope.launch(Dispatchers.IO){
             try {
                 val geo = arrayOf("geosite.dat", "geoip.dat")

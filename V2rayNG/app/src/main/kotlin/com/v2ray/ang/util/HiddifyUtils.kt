@@ -334,13 +334,14 @@ class HiddifyUtils {
                     else->""
                 }
                 var list=defaultSharedPreferences.getStringSet(app_key,null)
-                if(list==null||list.isEmpty()){
-                    list= HashSet(Utils.readTextFromAssets(AngApplication.appContext, "applications_${it}_${country}").split("\n"))
+                if(list==null||list.count()<2){
+                    list= HashSet(Utils.readTextFromAssets(AngApplication.appContext, "applications_${it}_${country}").split("\n").map { it.trim() })
+
                     defaultSharedPreferences.edit().putStringSet(app_key,list).apply()
                 }
                 var routings= settingsStorage?.decodeString(routing_key)
                 if(routings.isNullOrEmpty()){
-                    routings= Utils.readTextFromAssets(AngApplication.appContext, "applications_${it}_${country}").replace('\n',',')
+                    routings= Utils.readTextFromAssets(AngApplication.appContext, "custom_routing_${it}_${country}").split("\n").map{it.trim()}.joinToString(",")
                     settingsStorage?.encode(routing_key,routings)
                 }
             }
