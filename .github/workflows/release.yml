@@ -16,6 +16,18 @@ jobs:
       - name: Checkout submodules
         run: git submodule update --init --recursive --remote
 
+      - name: Download latest lists
+        run: |
+          curl -l -o ./V2rayNG/app/src/main/assets/applications_direct_ir https://github.com/hiddify/androidpackagenamelist/blob/master/direct_ir
+          curl -l -o ./V2rayNG/app/src/main/assets/applications_proxy_ir https://github.com/hiddify/androidpackagenamelist/blob/master/proxy_ir
+          curl -l -o ./V2rayNG/app/src/main/assets/applications_direct_cn https://github.com/hiddify/androidpackagenamelist/blob/master/direct_cn
+          curl -l -o ./V2rayNG/app/src/main/assets/applications_proxy_cn https://github.com/hiddify/androidpackagenamelist/blob/master/proxy_cn
+          curl -l -o ./V2rayNG/app/src/main/assets/geoip.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
+          curl -l -o ./V2rayNG/app/src/main/assets/geosite.dat https://github.com/hiddify/domain-list-community/releases/latest/download/hiddify-geosite.dat
+          curl -l -o ./V2rayNG/app/libs/libv2ray.aar https://github.com/hiddify/AndroidLibXrayLite/releases/latest/download/libv2ray.aar
+          curl -l -o ./V2rayNG/app/libs/libv2ray-sources.jar https://github.com/hiddify/AndroidLibXrayLite/releases/latest/download/libv2ray-sources.jar
+
+          
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
