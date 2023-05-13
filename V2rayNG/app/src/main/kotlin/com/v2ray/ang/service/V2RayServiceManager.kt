@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Build
+import android.os.Debug
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -126,6 +127,7 @@ object V2RayServiceManager {
     }
 
     fun startV2rayPoint() {
+        //Debug.waitForDebugger();
         val service = serviceControl?.get()?.getService() ?: return
         val guid = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER) ?: return
         val config = MmkvManager.decodeServerConfig(guid) ?: return
@@ -153,8 +155,10 @@ object V2RayServiceManager {
                 v2rayPoint.runLoop(settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) ?: false)
             } catch (e: Exception) {
                 Log.d(ANG_PACKAGE, e.toString())
+                Log.d(ANG_PACKAGE, e.stackTraceToString())
+                Log.d(ANG_PACKAGE, result.content)
                 if (!v2rayPoint.isRunning)
-                    MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE_CONFIG_ERROR, "")
+                    MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE_CONFIG_ERROR, e.toString())
             }
 
             if (v2rayPoint.isRunning) {

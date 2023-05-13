@@ -247,7 +247,6 @@ class HiddifyUtils {
             return settingsStorage?.decodeString(AppConfig.PREF_COUNTRY)!!
         }
 
-
         fun getPerAppProxyMode(): PerAppProxyMode {
             if(!defaultSharedPreferences.getBoolean(AppConfig.PREF_PER_APP_PROXY, false))
                 return PerAppProxyMode.Global

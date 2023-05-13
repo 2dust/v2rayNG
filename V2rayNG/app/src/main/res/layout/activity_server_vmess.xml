@@ -251,7 +251,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorRed"
-                android:text="@string/fragment" />
+                android:text="@string/fragment_old" />
 
             <Spinner
                 android:id="@+id/sp_fragment"

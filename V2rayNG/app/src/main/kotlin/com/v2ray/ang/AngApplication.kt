@@ -34,7 +34,7 @@ class AngApplication : MultiDexApplication() {
 //        LeakCanary.install(this)
         FirebaseApp.initializeApp(this);
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
-        Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(this))
+//        Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(this))
         Firebase.messaging.subscribeToTopic("all")
 
         val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)

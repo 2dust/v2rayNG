@@ -44,5 +44,6 @@
     <string name="opened_apps">برنامه های باز</string>
     <string name="msg_downloading_content_failed_no_proxy">دانلود بدون فیلترشکن با خطا مواجه شد. در حال دانلود با فیلترشکن...</string>
     <string name="sub_moved_to_another_address">ارائه دهنده لینک ساب، یک آدرس جدید را پیشنهاد کرد! آدرس را تغییر دادیم.</string>
+    <string name="fragment_old">فرگمنت v1 (قدیمی)</string>
 
 </resources>

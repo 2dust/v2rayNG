@@ -184,6 +184,23 @@
                 android:inputType="text" />
         </LinearLayout>
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_top_height"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fragment" />
+
+            <Spinner
+                android:id="@+id/sp_fragment_new"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edit_height"
+                android:entries="@array/fragment_new" />
+        </LinearLayout>
+        <LinearLayout
             android:id="@+id/hiddifyl4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -193,7 +210,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/fragment" />
+                android:textColor="@color/colorRed"
+                android:text="@string/fragment_old" />
 
             <Spinner
                 android:id="@+id/sp_fragment"

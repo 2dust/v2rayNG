@@ -16,6 +16,8 @@ import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_PORT
 import com.v2ray.ang.dto.V2rayConfig.Companion.TLS
+import com.v2ray.ang.extension.gone
+import com.v2ray.ang.extension.show
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.ID_MAIN
@@ -99,6 +101,7 @@ class ServerActivity : BaseActivity() {
     private val container_fingerprint: LinearLayout? by lazy { findViewById(R.id.l3) }
     private val sp_network: Spinner? by lazy { findViewById(R.id.sp_network) }
     private val sp_fragment: Spinner? by lazy { findViewById(R.id.sp_fragment) }
+    private val sp_fragment_label: LinearLayout? by lazy { findViewById(R.id.hiddifyl4) }
     private val sp_fragment_new: Spinner? by lazy { findViewById(R.id.sp_fragment_new) }
     private val sp_header_type: Spinner? by lazy { findViewById(R.id.sp_header_type) }
     private val sp_header_type_title: TextView? by lazy { findViewById(R.id.sp_header_type_title) }
@@ -271,10 +274,19 @@ class ServerActivity : BaseActivity() {
             sp_network?.setSelection(network)
         }
         if(streamSetting?.sockopt?.dialer_proxy!=null) {
-            sp_fragment?.setSelection(Utils.arrayFind(fragmentNewTypes, streamSetting?.sockopt?.dialer_proxy!!.replace("fragment_","")))
+            sp_fragment_new?.setSelection(Utils.arrayFind(fragmentNewTypes, streamSetting?.sockopt?.dialer_proxy!!.substringAfter("_","")))
+        }else{
+            sp_fragment_new?.setSelection(0)
+        }
+        if(streamSetting?.wsSettings?.fragmentation?.enabled==true){
+            sp_fragment?.setSelection(Utils.arrayFind(fragmentTypes, streamSetting?.wsSettings?.fragmentation?.strategy?:""))
         }else{
             sp_fragment?.setSelection(0)
         }
+        if(streamSetting.network!="ws")
+            sp_fragment_label?.gone()
+        else
+            sp_fragment_label?.show()
         return true
     }
 

@@ -47,5 +47,6 @@
     <string name="opened_apps">Opened Apps</string>
     <string name="msg_downloading_content_failed_no_proxy">Download failed without proxy! Trying with proxy...</string>
     <string name="sub_moved_to_another_address">Subscription Provider suggest a new address! Changing the Address</string>
+    <string name="fragment_old">Fragment v1 (old)</string>
 
 </resources>

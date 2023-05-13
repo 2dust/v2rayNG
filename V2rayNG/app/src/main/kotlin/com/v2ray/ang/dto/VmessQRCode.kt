@@ -15,5 +15,6 @@ data class VmessQRCode(var v: String = "",
                        var sni: String = "",
                        var alpn: String = "",
                        var fp: String = "",
-                       var fragment: String=""
+                       var fragment: String="",
+                       var fragment_v1: String=""
                        )

@@ -210,7 +210,7 @@ object AngConfigManager {
                         ) {
                             return R.string.toast_incorrect_protocol
                         }
-
+                        addFragmentOutbound(config.outboundBean?.streamSettings,vmessQRCode.fragment)
                         config.remarks = vmessQRCode.ps
                         config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
                             vnext.address = vmessQRCode.add
@@ -220,7 +220,7 @@ object AngConfigManager {
                             vnext.users[0].alterId = Utils.parseInt(vmessQRCode.aid)
                         }
                         val sni = streamSetting.populateTransportSettings(vmessQRCode.net, vmessQRCode.type, vmessQRCode.host,
-                                vmessQRCode.path, vmessQRCode.path, vmessQRCode.host, vmessQRCode.path, vmessQRCode.type, vmessQRCode.path,vmessQRCode.fragment)
+                                vmessQRCode.path, vmessQRCode.path, vmessQRCode.host, vmessQRCode.path, vmessQRCode.type, vmessQRCode.path,vmessQRCode.fragment_v1)
 
                         val fingerprint = vmessQRCode.fp ?: streamSetting.tlsSettings?.fingerprint
                         streamSetting.populateTlsSettings(vmessQRCode.tls, allowInsecure,
@@ -298,16 +298,17 @@ object AngConfigManager {
                 val uri = URI(Utils.fixIllegalUrl(str))
                 config = ServerConfig.create(EConfigType.TROJAN)
                 config.remarks = Utils.urlDecode(uri.fragment ?: "")
-
+                
                 var flow = ""
                 var fingerprint = config.outboundBean?.streamSettings?.tlsSettings?.fingerprint
                 if (uri.rawQuery != null) {
                     val queryParam = uri.rawQuery.split("&")
                         .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
+                    addFragmentOutbound(config.outboundBean?.streamSettings,queryParam["fragment"])
                     var allowInsecure=(queryParam["allowInsecure"]?:"")=="true"
                     val sni = config.outboundBean?.streamSettings?.populateTransportSettings(queryParam["type"] ?: "tcp", queryParam["headerType"],
                         queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
-                        queryParam["mode"], queryParam["serviceName"], queryParam["fragment"])
+                        queryParam["mode"], queryParam["serviceName"], queryParam["fragment_v1"])
                     fingerprint = queryParam["fp"] ?: ""
                     config.outboundBean?.streamSettings?.populateTlsSettings(queryParam["security"] ?: TLS,
                             allowInsecure, queryParam["sni"] ?: sni!!, fingerprint, queryParam["alpn"],
@@ -331,7 +332,7 @@ object AngConfigManager {
                 config = ServerConfig.create(EConfigType.VLESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
                 var fingerprint = streamSetting.tlsSettings?.fingerprint
-
+                addFragmentOutbound(config.outboundBean?.streamSettings, queryParam["fragment"])
                 config.remarks = Utils.urlDecode(uri.fragment ?: "")
                 config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
                     vnext.address = uri.idnHost
@@ -340,10 +341,10 @@ object AngConfigManager {
                     vnext.users[0].encryption = queryParam["encryption"] ?: "none"
                     vnext.users[0].flow =queryParam["flow"] ?: ""
                 }
-
+                var allowInsecure=(queryParam["allowInsecure"]?:"")=="true"
                 val sni = streamSetting.populateTransportSettings(queryParam["type"] ?: "tcp", queryParam["headerType"],
                         queryParam["host"], queryParam["path"], queryParam["seed"], queryParam["quicSecurity"], queryParam["key"],
-                        queryParam["mode"], queryParam["serviceName"], queryParam["fragment"])
+                        queryParam["mode"], queryParam["serviceName"], queryParam["fragment_v1"])
                 fingerprint = queryParam["fp"] ?: ""
                 val pbk = queryParam["pbk"] ?: ""
                 val sid = queryParam["sid"] ?: ""
@@ -370,7 +371,14 @@ object AngConfigManager {
         }
         return 0
     }
+    private fun addFragmentOutbound(streamSettingsBean: V2rayConfig.OutboundBean.StreamSettingsBean?,mode:String?){
+        if(mode.isNullOrEmpty()||streamSettingsBean==null)
+            return
+        if(!arrayListOf("sni","random").contains("mode"))
+            return
+        streamSettingsBean.sockopt=V2rayConfig.Sockopt(dialer_proxy = "fragment_$mode")
 
+    }
     private fun tryParseNewVmess(uriString: String, config: ServerConfig, allowInsecure_: Boolean): Boolean {
         return runCatching {
             val uri = URI(uriString)
@@ -382,7 +390,7 @@ object AngConfigManager {
             val tls = tlsStr.isNotBlank()
             val queryParam = uri.rawQuery.split("&")
                 .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
-
+            addFragmentOutbound(config.outboundBean?.streamSettings,queryParam["fragment"])
             val streamSetting = config.outboundBean?.streamSettings ?: return false
             config.remarks = Utils.urlDecode(uri.fragment ?: "")
             config.outboundBean.settings?.vnext?.get(0)?.let { vnext ->
@@ -393,12 +401,12 @@ object AngConfigManager {
                 vnext.users[0].alterId = alterId.toInt()
             }
             var fingerprint = streamSetting.tlsSettings?.fingerprint
-            var allowInsecure=(queryParam["allowInsecure"]?:"")=="true"
+            var allowInsecure2=allowInsecure_ ||(queryParam["allowInsecure"]?:"")=="true"
             val sni = streamSetting.populateTransportSettings(protocol, queryParam["type"],
                     queryParam["host"]?.split("|")?.get(0) ?: "",
                     queryParam["path"]?.takeIf { it.trim() != "/" } ?: "", queryParam["seed"], queryParam["security"],
-                    queryParam["key"], queryParam["mode"], queryParam["serviceName"], queryParam["fragment"])
-            streamSetting.populateTlsSettings(if (tls) TLS else "", allowInsecure, sni, fingerprint, null,
+                    queryParam["key"], queryParam["mode"], queryParam["serviceName"], queryParam["fragment_v1"])
+            streamSetting.populateTlsSettings(if (tls) TLS else "", allowInsecure2, sni, fingerprint, null,
                     null, null, null)
             true
         }.getOrElse { false }
@@ -494,12 +502,13 @@ object AngConfigManager {
                     vmessQRCode.sni = streamSetting.tlsSettings?.serverName.orEmpty()
                     vmessQRCode.alpn = Utils.removeWhiteSpace(streamSetting.tlsSettings?.alpn?.joinToString()).orEmpty()
                     vmessQRCode.fp = streamSetting.tlsSettings?.fingerprint.orEmpty()
+                    vmessQRCode.fragment=streamSetting.sockopt?.dialer_proxy?.substringAfter("_")?:""
                     outbound.getTransportSettingDetails()?.let { transportDetails ->
                         vmessQRCode.type = transportDetails[0]
                         vmessQRCode.host = transportDetails[1]
                         vmessQRCode.path = transportDetails[2]
                         if (transportDetails.count()>3)
-                            vmessQRCode.fragment = transportDetails[3]
+                            vmessQRCode.fragment_v1 = transportDetails[3]
                     }
                     val json = Gson().toJson(vmessQRCode)
                     Utils.encode(json)
@@ -545,7 +554,7 @@ object AngConfigManager {
                             }
                         }
                     }
-
+                    dicQuery["fragment"] =streamSetting.sockopt?.dialer_proxy?.substringAfter("_")?:""
                     dicQuery["security"] = streamSetting.security.ifEmpty { "none" }
                     (streamSetting.tlsSettings?: streamSetting.realitySettings)?.let { tlsSetting ->
                         if (!TextUtils.isEmpty(tlsSetting.serverName)) {
@@ -592,7 +601,7 @@ object AngConfigManager {
                                     dicQuery["path"] = Utils.urlEncode(transportDetails[2])
                                 }
                                 if (transportDetails.count()>3 && !TextUtils.isEmpty(transportDetails[3])) {
-                                    dicQuery["fragment"] = transportDetails[3]
+                                    dicQuery["fragment_v1"] = transportDetails[3]
                                 }
                             }
                             "http", "h2" -> {
