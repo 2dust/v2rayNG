@@ -11,10 +11,7 @@ object HiddifyUtils1 {
     fun toTotalUsedGig(totalInBytes: Long, usedInBytes: Long, context: Context): String {
         val total = totalInBytes.toDouble() / 1073741824
         val used = usedInBytes.toDouble() / 1073741824
-        return if (getLocale(context) == Locale("fa"))
-            String.format("%.0f/%.0f G", used, total).toPersianDigit()
-        else
-            String.format("%.0f/%.0f G", used, total)
+        return String.format("%.0f/%.0f G", used, total).toPersianDigit(context)
     }
 
     fun timeToRelativeDate(time: Long, totalInBytes: Long, usedInBytes: Long, context: Context): SpannableString {

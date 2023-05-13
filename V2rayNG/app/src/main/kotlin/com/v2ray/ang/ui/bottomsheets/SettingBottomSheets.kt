@@ -31,12 +31,12 @@ class SettingBottomSheets(var mode: Int) : BaseExpandedBottomSheet() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         inflater.inflate(R.layout.bottomsheet_setting, container, false)
         binding = BottomsheetSettingBinding.inflate(inflater, container, false)
-        val checkId = when (mode) {
+
+        binding.connectToggleButton.check(when (mode) {
             1 -> binding.smart.id
             2 -> binding.loadBalance.id
             else -> binding.manual.id
-        }
-        binding.connectToggleButton.check(checkId)
+        })
         binding.connectToggleButton.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 mode = when (checkedId) {
@@ -47,12 +47,12 @@ class SettingBottomSheets(var mode: Int) : BaseExpandedBottomSheet() {
                 callback()?.onModeChange(mode)
             }else if (group.checkedButtonIds.isEmpty()) {
                 // No buttons are selected, select the first one by default
-                val checkId = when (mode) {
+
+                group.check(when (mode) {
                     1 -> binding.smart.id
                     2 -> binding.loadBalance.id
                     else -> binding.manual.id
-                }
-                group.check(checkId)
+                })
             }
         }
 
@@ -67,12 +67,12 @@ class SettingBottomSheets(var mode: Int) : BaseExpandedBottomSheet() {
             startActivity(Intent(context, SpeedTestActivity::class.java))
         }
 
-        val perAppCheckId = when (HiddifyUtils.getPerAppProxyMode()) {
+
+        binding.proxyToggleButton.check(when (HiddifyUtils.getPerAppProxyMode()) {
             HiddifyUtils.PerAppProxyMode.NotOpened -> binding.notOpened.id
             HiddifyUtils.PerAppProxyMode.Blocked -> binding.filteredSites.id
             else -> binding.sitesAll.id
-        }
-        binding.proxyToggleButton.check(perAppCheckId)
+        })
         binding.proxyToggleButton.setOnLongClickListener{
             startActivity(Intent(activity, PerAppProxyActivity::class.java))
             dialog?.dismiss()
@@ -98,7 +98,7 @@ class SettingBottomSheets(var mode: Int) : BaseExpandedBottomSheet() {
         }
         binding.proxyToggleButton.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
-                val mode = when (checkId) {
+                val mode = when (checkedId) {
                     binding.notOpened.id->HiddifyUtils.PerAppProxyMode.NotOpened
                     binding.filteredSites.id->HiddifyUtils.PerAppProxyMode.Blocked
                     else -> HiddifyUtils.PerAppProxyMode.Global
@@ -106,12 +106,12 @@ class SettingBottomSheets(var mode: Int) : BaseExpandedBottomSheet() {
                 callback()?.onPerAppProxyModeChange(mode)
             }else if (group.checkedButtonIds.isEmpty()) {
                 // No buttons are selected, select the first one by default
-                val perAppCheckId = when (HiddifyUtils.getPerAppProxyMode()) {
+
+                group.check(when (HiddifyUtils.getPerAppProxyMode()) {
                     HiddifyUtils.PerAppProxyMode.NotOpened -> binding.notOpened.id
                     HiddifyUtils.PerAppProxyMode.Blocked -> binding.filteredSites.id
                     else -> binding.sitesAll.id
-                }
-                group.check(perAppCheckId)
+                })
             }
         }
         return binding.root
