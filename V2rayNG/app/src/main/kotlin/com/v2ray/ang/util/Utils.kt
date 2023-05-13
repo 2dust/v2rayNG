@@ -332,8 +332,10 @@ object Utils {
     }
 
     fun getUrlContext(url: String, timeout: Int): String {
-        if(true)
-            return getUrlContentOkHttp(url,timeout.toLong()).content?:""
+        if(true) {
+            val content = getUrlContentOkHttp(url, timeout.toLong()).content ?: ""
+            if(!content.isNullOrEmpty())return content
+        }
         var result: String
         var conn: HttpURLConnection? = null
 
@@ -354,7 +356,7 @@ object Utils {
         return result
     }
 
-    fun getUrlContentOkHttp(urlStr: String?, timeout: Long=10000, direct:Boolean=true,proxy:Boolean=true): Response {
+    fun getUrlContentOkHttp(urlStr: String?, timeout: Long=10000, direct:Boolean=true,proxy:Boolean=true,tryold:Boolean=true): Response {
         try {
             Security.insertProviderAt(Conscrypt.newProvider(), 1);
             // Create OkHttp Client
@@ -392,17 +394,22 @@ object Utils {
                 AngApplication.appContext.toast(R.string.msg_downloading_content_failed_no_proxy)
                 return getUrlContentOkHttp(urlStr, timeout, direct = false, proxy = true)
             }
+            if(tryold)
+                return getUrlContentWithCustomUserAgent_old(urlStr,timeout)
             throw e
         }
 
     }
     @Throws(IOException::class)
     fun getUrlContentWithCustomUserAgent(urlStr: String?): Response {
-
-        if(true)
-            return getUrlContentOkHttp(urlStr)
+        return getUrlContentOkHttp(urlStr)
+    }
+    @Throws(IOException::class)
+    fun getUrlContentWithCustomUserAgent_old(urlStr: String?,timeout:Long=10000): Response {
         val url = URL(urlStr)
         val conn = url.openConnection()
+        conn.connectTimeout = timeout.toInt()
+        conn.readTimeout = timeout.toInt()
         conn.setRequestProperty("Connection", "close")
         conn.setRequestProperty("User-agent", "HiddifyNG/${BuildConfig.VERSION_NAME}")
         url.userInfo?.let {
