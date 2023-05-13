@@ -234,5 +234,7 @@
         <item>VPN</item>
         <item>فقط پروکسی</item>
     </string-array>
+    <string name="import_subscription_success">اشتراک با موفقیت ذخیره شد</string>
+    <string name="import_subscription_failure">ذخیره اشتراک ناموفق بود</string>
 
 </resources>

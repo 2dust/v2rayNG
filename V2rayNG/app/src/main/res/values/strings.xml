@@ -212,6 +212,9 @@
     <string name="connection_connected">Connected, tap to check connection</string>
     <string name="connection_not_connected">Not connected</string>
 
+    <string name="import_subscription_success">Subscription imported Successfully</string>
+    <string name="import_subscription_failure">Import subscription failed</string>
+
     <string-array name="share_method">
         <item>QRcode</item>
         <item>Export to clipboard</item>
