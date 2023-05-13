@@ -288,7 +288,7 @@ object V2RayServiceManager {
 
         val channelId =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    createNotificationChannel()
+                    createNotificationChannel(service)
                 } else {
                     // If earlier version channel ID is not used
                     // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
@@ -314,7 +314,7 @@ object V2RayServiceManager {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(): String {
+    private fun createNotificationChannel(service:Service? = serviceControl?.get()?.getService()): String {
         val channelId = "RAY_NG_M_CH_ID"
         val channelName = "HiddifyNG Proxy Information"
         val chan = NotificationChannel(channelId,
@@ -322,7 +322,7 @@ object V2RayServiceManager {
         chan.lightColor = Color.DKGRAY
         chan.importance = NotificationManager.IMPORTANCE_NONE
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-        getNotificationManager()?.createNotificationChannel(chan)
+        getNotificationManager(service)?.createNotificationChannel(chan)
         return channelId
     }
 
@@ -351,9 +351,9 @@ object V2RayServiceManager {
         }
     }
 
-    private fun getNotificationManager(): NotificationManager? {
+    private fun getNotificationManager(service:Service? = serviceControl?.get()?.getService()): NotificationManager? {
         if (mNotificationManager == null) {
-            val service = serviceControl?.get()?.getService() ?: return null
+            if(service==null) return null
             mNotificationManager = service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         }
         return mNotificationManager
@@ -415,4 +415,5 @@ object V2RayServiceManager {
             updateNotification(currentConfig?.remarks, 0, 0)
         }
     }
+
 }

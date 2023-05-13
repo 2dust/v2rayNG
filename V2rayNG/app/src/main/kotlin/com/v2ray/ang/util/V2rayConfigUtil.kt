@@ -71,7 +71,7 @@ object V2rayConfigUtil {
         inbounds(v2rayConfig)
 
 
-        var serversConfigs=MmkvManager.getServerConfigs(proxyItem.subscriptionId?:"")
+        var serversConfigs=MmkvManager.getServerConfigs(proxyItem.subscriptionId?:"").shuffled()
 
         v2rayConfig.outbounds.clear()
         var balancerSelectors=ArrayList<String>()

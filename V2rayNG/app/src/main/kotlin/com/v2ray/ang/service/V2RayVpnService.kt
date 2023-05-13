@@ -84,13 +84,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     override fun onCreate() {
         super.onCreate()
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            V2RayServiceManager.showNotification(this)//we should show notification within 5 seconds
+        }
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         V2RayServiceManager.serviceControl = SoftReference(this)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            V2RayServiceManager.showNotification(this)
-        }
+
     }
 
     override fun onRevoke() {
