@@ -679,7 +679,12 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                 val configText = try {
                     Utils.getUrlContentWithCustomUserAgent(url)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    launch(Dispatchers.Main) {
+                        Log.e(packageName,e.toString())
+                        Log.e(packageName,e.stackTraceToString())
+                        toast(getString(R.string.toast_failure)+" "+e.toString())
+//                            toast("\"" + it.second.remarks + "\" " + getString(R.string.toast_failure))
+                    }
                     Utils.Response(null,"")
                 }
                 launch(Dispatchers.Main) {
@@ -719,9 +724,11 @@ class HiddifyMainActivity : BaseActivity(), /*NavigationView.OnNavigationItemSel
                     val configText = try {
                         Utils.getUrlContentWithCustomUserAgent(url)
                     } catch (e: Exception) {
-                        e.printStackTrace()
                         launch(Dispatchers.Main) {
-                            toast("\"" + it.second.remarks + "\" " + getString(R.string.toast_failure))
+                            Log.e(packageName,e.toString())
+                            Log.e(packageName,e.stackTraceToString())
+                            toast(getString(R.string.toast_failure)+" "+e.toString())
+//                            toast("\"" + it.second.remarks + "\" " + getString(R.string.toast_failure))
                         }
                         return@launch
                     }
