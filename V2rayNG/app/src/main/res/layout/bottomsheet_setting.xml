@@ -41,6 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/vazirmatn_regular"
+        android:textColor="@color/colorText"
         android:textSize="16sp"
         android:text="@string/proxyAppAndSites" />
 
@@ -107,6 +108,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/vazirmatn_regular"
         android:textSize="16sp"
+        android:textColor="@color/colorText"
         android:layout_marginTop="18dp"
         android:text="@string/connection_mode"/>
 

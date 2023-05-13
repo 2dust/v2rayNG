@@ -235,7 +235,6 @@ object V2rayConfigUtil {
                 ERoutingMode.FOREIGN_SITES.value -> {
 //                    routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
                     routingGeo("domain", HiddifyUtils.getCountry(), AppConfig.TAG_DIRECT, v2rayConfig)
-
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                     routingUserRule(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)?: "", AppConfig.TAG_DIRECT, v2rayConfig)
 

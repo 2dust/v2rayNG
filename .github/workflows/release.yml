@@ -78,7 +78,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
           files: ./V2rayNG/app/build/outputs/apk/release/*.apk
-          prerelease: false
+          prerelease: true
           generate_release_notes: true
 
       - name: Assemble Release Bundle

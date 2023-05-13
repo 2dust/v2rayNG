@@ -64,7 +64,8 @@ object V2RayServiceManager {
 
     fun startV2Ray(context: Context) {
         if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) == true) {
-            context.toast(R.string.toast_warning_pref_proxysharing_short)
+            if(Math.random()>0.9)
+                context.toast(R.string.toast_warning_pref_proxysharing_short)
         } else {
 //            context.toast(R.string.toast_services_start)
         }
