@@ -1,6 +1,7 @@
 package com.v2ray.ang.extension
 
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.graphics.Typeface
 import android.text.Spannable
@@ -14,11 +15,15 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.R
-import java.util.ArrayList
+import com.v2ray.ang.util.Utils
+import java.util.*
 
 
-fun String.toPersianDigit(): String {
+fun String.toPersianDigit(context:Context?=AngApplication.appContext): String {
+    if(context!=null &&!Utils.getLocale(context).toString().contains("fa"))
+        return this
 
     var number = this
     val persian = "۰۱۲۳۴۵۶۷۸۹"
@@ -179,7 +184,8 @@ fun SpannableString.colorlessTextPart(
 }
 
 fun Context?.toast(s: String?, length : Int = Toast.LENGTH_SHORT) {
-
+    if(this==null)
+        return
     if (this is Activity) {
         if ((this.isFinishing || this.isDestroyed)) {
             return

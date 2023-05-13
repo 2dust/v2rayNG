@@ -63,7 +63,7 @@ data class ServerConfig(
         var address = getProxyOutbound()?.getServerAddress().orEmpty()
         var port = getProxyOutbound()?.getServerPort()
         if (configType==EConfigType.LowestPing||configType==EConfigType.LoadBalance){
-            address="www.snapp.ir"
+            address="www.google.com"
             port=80
         }
         return if (Utils.isIpv6Address(address)) {
