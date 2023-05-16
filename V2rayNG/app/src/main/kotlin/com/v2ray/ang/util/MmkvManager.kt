@@ -5,6 +5,7 @@ import com.tencent.mmkv.MMKV
 import com.v2ray.ang.dto.ServerAffiliationInfo
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.SubscriptionItem
+import java.util.*
 
 object MmkvManager {
     const val ID_MAIN = "MAIN"
@@ -111,20 +112,49 @@ object MmkvManager {
         }
     }
 
-    fun importUrlAsSubscription(url: String): Int {
+//     fun importUrlAsSubscription(url: String): Int {
+//         val subscriptions = decodeSubscriptions()
+    
+//         subscriptions.forEach {
+//             if (it.second.url == url) {
+//                 return 0
+//             }
+//         }
+//         val subItem = SubscriptionItem()
+//         subItem.remarks = "import sub"
+//         subItem.url = url
+//         subStorage?.encode(Utils.getUuid(), Gson().toJson(subItem))
+//         return 1
+//     }
+    fun importUrlsAsSubscriptions(subs: List<String>): Int {
         val subscriptions = decodeSubscriptions()
-        subscriptions.forEach {
-            if (it.second.url == url) {
-                return 0
-            }
-        }
-        val subItem = SubscriptionItem()
-        subItem.remarks = "import sub"
-        subItem.url = url
-        subStorage?.encode(Utils.getUuid(), Gson().toJson(subItem))
-        return 1
-    }
+        var count = 0
 
+        subs.forEach { url ->
+            if (subscriptions.any { it.second.url == url }) {
+                return@forEach
+            }
+
+            val subItem = SubscriptionItem()
+            subItem.url = url
+
+            val subWordsList = url.split('/')
+            val wordCounts = subWordsList.groupingBy { it }.eachCount()
+            var title = "import sub"
+            wordCounts[title] = Int.MAX_VALUE
+            for ((word, count) in wordCounts) {
+                if (count / (word.length + 1) < wordCounts[title]?.div(title.length + 1) ?: 0) {
+                    title = word
+                }
+            }
+            subItem.remarks = title
+
+            subStorage?.encode(Utils.getUuid(), Gson().toJson(subItem))
+            count++
+        }
+
+        return count
+    }
     fun decodeSubscriptions(): List<Pair<String, SubscriptionItem>> {
         val subscriptions = mutableListOf<Pair<String, SubscriptionItem>>()
         subStorage?.allKeys()?.forEach { key ->
