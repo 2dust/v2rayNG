@@ -87,6 +87,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
     namespace 'com.v2ray.ang'
     testNamespace 'com.v2ray.angTest'

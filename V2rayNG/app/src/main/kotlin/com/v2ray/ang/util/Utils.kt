@@ -7,6 +7,7 @@ import android.util.Base64
 import java.util.*
 import android.content.ClipData
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
@@ -399,5 +400,9 @@ object Utils {
         return URL(url.protocol, IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED), url.port, url.file)
             .toExternalForm()
     }
+
+    fun isTv(context: Context): Boolean =
+        context.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
+
 }
 
