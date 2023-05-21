@@ -613,12 +613,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //    }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
+        if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_BUTTON_B) {
             moveTaskToBack(false)
             return true
         }
         return super.onKeyDown(keyCode, event)
     }
+
 
     fun showCircle() {
         binding.fabProgressCircle.show()

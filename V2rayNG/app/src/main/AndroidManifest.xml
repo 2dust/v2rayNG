@@ -11,6 +11,8 @@
 
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
     <!-- https://developer.android.com/about/versions/11/privacy/package-visibility -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
@@ -31,6 +33,7 @@
         android:name=".AngApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
+        android:banner="@mipmap/ic_banner"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppThemeDayNight"
@@ -45,6 +48,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
