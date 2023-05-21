@@ -10,7 +10,7 @@
     <string name="migration_fail">انتقال داده انجام نشد!</string>
 
     <!-- Notifications -->
-    <string name="notification_action_stop_v2ray">متوقف</string>
+    <string name="notification_action_stop_v2ray">توقف</string>
     <string name="toast_permission_denied">قادر به دریافت مجوز نیست</string>
     <string name="notification_action_more">برای اطلاعات بیشتر کلیک کنید</string>
     <string name="toast_services_start">شروع خدمات</string>
@@ -35,7 +35,7 @@
     <string name="menu_item_import_config_custom_local">پیکربندی سفارشی را به صورت محلی وارد کنید</string>
     <string name="menu_item_import_config_custom_url">پیکربندی سفارشی را از طریق نشانی اینترنتی وارد کنید</string>
     <string name="menu_item_import_config_custom_url_scan">نشانی اینترنتی اسکن پیکربندی سفارشی را وارد کنید</string>
-    <string name="del_config_comfirm">تایید حذف؟</string>
+    <string name="del_config_comfirm">حذف شود؟</string>
     <string name="server_lab_remarks">ملاحظات</string>
     <string name="server_lab_address">نشانی</string>
     <string name="server_lab_port">پورت</string>
@@ -112,8 +112,8 @@
     <string name="title_pref_fake_dns_enabled">فعال کردن DNS جعلی</string>
     <string name="summary_pref_fake_dns_enabled">DNS محلی آدرس IP جعلی را برمی‌گرداند (سریع‌تر می‌باشد، اما ممکن است برای برخی از برنامه‌ها کار نکند)</string>
 
-    <string name="title_pref_prefer_ipv6">IPv6 را ترجیح دهید</string>
-    <string name="summary_pref_prefer_ipv6">نشانی و مسیرهای IPv6 را ترجیح دهید</string>
+    <string name="title_pref_prefer_ipv6">ترجیح دادن IPv6</string>
+    <string name="summary_pref_prefer_ipv6">ترجیح دادن نشانی و مسیر های IPv6</string>
 
     <string name="title_pref_routing">مسیریابی</string>
     <string name="title_pref_routing_domain_strategy">استراتژی دامنه</string>
@@ -133,7 +133,7 @@
     <string name="toast_warning_pref_proxysharing_short">اتصالات از طریق LAN را مجاز کنید، مطمئن شوید که در یک شبکه قابل اعتماد هستید</string>
 
     <string name="title_pref_allow_insecure">allowInsecure</string>
-    <string name="summary_pref_allow_insecure">هنگامی که TLS، به طور پیش‌فرض allowInsecure</string>
+    <string name="summary_pref_allow_insecure">هنگام استفاده از TLS، به طور پیش‌فرض allowInsecure فعال است</string>
 
     <string name="title_pref_socks_port">پورت پروکسی SOCKS5</string>
     <string name="summary_pref_socks_port">پورت پروکسی SOCKS5</string>
@@ -151,7 +151,7 @@
     <string name="summary_pref_start_scan_immediate">دوربین را برای اسکن بلافاصله در هنگام راه اندازی باز کنید، در غیر این صورت می توانید کد را اسکن کنید یا عکسی را در نوار ابزار انتخاب کنید.</string>
 
     <string name="title_pref_feedback">بازخورد</string>
-    <string name="summary_pref_feedback">بهبودهای بازخورد یا اشکالات در گیت‌هاب</string>
+    <string name="summary_pref_feedback">بازخورد یا گزارش اشکالات در گیت‌هاب</string>
     <string name="summary_pref_tg_group">عضویت در گروه تلگرام</string>
     <string name="toast_tg_app_not_found">برنامه تلگرام پیدا نشد</string>
 
