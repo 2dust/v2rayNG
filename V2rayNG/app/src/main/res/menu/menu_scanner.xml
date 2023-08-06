@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/scan_code"
-        android:icon="@drawable/ic_scan_black_24dp"
+        android:icon="@drawable/ic_scan_white_24dp"
         android:title=""
         app:showAsAction="always" />
     <item
         android:id="@+id/select_photo"
-        android:icon="@drawable/ic_image_photo"
+        android:icon="@drawable/ic_image_photo_black"
         android:title=""
         app:showAsAction="always" />
 </menu>

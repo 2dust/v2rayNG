@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/save_routing"
-        android:icon="@drawable/ic_action_done"
+        android:icon="@drawable/ic_action_done_black"
         android:title="@string/routing_settings_save"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/del_routing"
-        android:icon="@drawable/ic_delete_white_24dp"
+        android:icon="@drawable/ic_delete_black_24dp"
         android:title="@string/routing_settings_delete"
         app:showAsAction="never" />
 
