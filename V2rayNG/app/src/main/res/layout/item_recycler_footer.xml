@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/summary_pref_promotion"
                 android:textAppearance="@style/TextAppearance.AppCompat.Tooltip"
-                android:textColor="@color/fab_orange_dark" />
+                android:textColor="@color/color_secondary" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

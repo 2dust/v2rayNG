@@ -65,7 +65,7 @@
                             android:paddingStart="16dp"
                             android:text="@string/connection_test_pending"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                            android:textColor="@color/colorWhite" />
+                            android:textColor="@color/colorText" />
 
                     </LinearLayout>
                 </LinearLayout>
