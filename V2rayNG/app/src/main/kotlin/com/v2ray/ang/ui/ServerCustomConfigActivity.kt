@@ -39,7 +39,9 @@ class ServerCustomConfigActivity : BaseActivity() {
         setContentView(view)
         title = getString(R.string.title_server)
 
-        binding.editor.colorScheme = EditorTheme.INTELLIJ_LIGHT
+        if (!Utils.getDarkModeStatus(this)) {
+            binding.editor.colorScheme = EditorTheme.INTELLIJ_LIGHT
+        }
         binding.editor.language = JsonLanguage()
         val config = MmkvManager.decodeServerConfig(editGuid)
         if (config != null) {
