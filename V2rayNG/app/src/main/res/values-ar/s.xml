@@ -96,71 +96,70 @@
 
 
     <!-- Preferences -->
-    <string name="title_settings">Settings</string>
-    <string name="title_advanced">Advanced Settings</string>
-    <string name="title_vpn_settings">VPN Settings</string>
-    <string name="title_pref_per_app_proxy">Per-app proxy</string>
-    <string name="summary_pref_per_app_proxy">General: Checked App is proxy, unchecked direct connection; \nbypass mode: checked app directly connected, unchecked proxy. \nThe option to automatically select the proxy application in the menu</string>
+   <string name="title_settings">الإعدادات</string>
+<string name="title_advanced">إعدادات متقدمة</string>
+<string name="title_vpn_settings">إعدادات VPN</string>
+<string name="title_pref_per_app_proxy">وكيل لكل تطبيق</string>
+<string name="summary_pref_per_app_proxy">عام: التطبيق المحدد هو الوكيل، الاتصال غير المحدد مباشر؛ \nوضع التجاوز: التطبيق المحدد متصل مباشرة، الوكيل غير المحدد. \nالخيار لتحديد التطبيق الوكيل تلقائيا في القائمة</string>
 
-    <string name="title_pref_mux_enabled">Enable Mux</string>
-    <string name="summary_pref_mux_enabled">Enable maybe speed up network and switch network maybe flash</string>
+<string name="title_pref_mux_enabled">تمكين Mux</string>
+<string name="summary_pref_mux_enabled">التمكين قد يسرع الشبكة والتبديل بين الشبكات قد يكون فلاش</string>
 
-    <string name="title_pref_speed_enabled">Enable speed display</string>
-    <string name="summary_pref_speed_enabled">Display current speed in the notification.\nNotification icon would change based on
-        usage.</string>
+<string name="title_pref_speed_enabled">تمكين عرض السرعة</string>
+<string name="summary_pref_speed_enabled">عرض السرعة الحالية في الإشعار.\nسيتغير رمز الإشعار استنادًا إلى الاستخدام.</string>
 
-    <string name="title_pref_sniffing_enabled">Enable Sniffing</string>
-    <string name="summary_pref_sniffing_enabled">Try sniff domain from the packet (default on)</string>
+<string name="title_pref_sniffing_enabled">تمكين Sniffing</string>
+<string name="summary_pref_sniffing_enabled">محاولة استخلاص النطاق من الحزمة (الافتراضي هو التشغيل)</string>
 
-    <string name="title_pref_local_dns_enabled">Enable local DNS</string>
-    <string name="summary_pref_local_dns_enabled">DNS processed by core‘s DNS module (Recommended, if need routing Bypassing LAN and
-        mainland address)</string>
+<string name="title_pref_local_dns_enabled">تمكين DNS المحلي</string>
+<string name="summary_pref_local_dns_enabled">DNS يتم معالجتها بواسطة وحدة DNS الأساسية (موصى بها، إذا كانت بحاجة إلى توجيه تجاوز الشبكة المحلية والعنوان الرئيسي)</string>
 
-    <string name="title_pref_fake_dns_enabled">Enable fake DNS</string>
-    <string name="summary_pref_fake_dns_enabled">local DNS returns fake IP address (faster, but it may not work for some apps)</string>
+<string name="title_pref_fake_dns_enabled">تمكين DNS الوهمي</string>
+<string name="summary_pref_fake_dns_enabled">DNS المحلي يعود بعنوان IP وهمي (أسرع، ولكن قد لا يعمل لبعض التطبيقات)</string>
 
-    <string name="title_pref_prefer_ipv6">Prefer IPv6</string>
-    <string name="summary_pref_prefer_ipv6">Prefer IPv6 address and routes</string>
+<string name="title_pref_prefer_ipv6">تفضيل IPv6</string>
+<string name="summary_pref_prefer_ipv6">تفضيل عنوان IPv6 والمسارات</string>
 
-    <string name="title_pref_routing">Routing</string>
-    <string name="title_pref_routing_domain_strategy">Domain strategy</string>
-    <string name="title_pref_routing_mode">Predefined rules</string>
-    <string name="title_pref_routing_custom">Custom rules</string>
+<string name="title_pref_routing">التوجيه</string>
+<string name="title_pref_routing_domain_strategy">استراتيجية النطاق</string>
+<string name="title_pref_routing_mode">قواعد محددة مسبقا</string>
+<string name="title_pref_routing_custom">قواعد مخصصة</string>
 
-    <string name="title_pref_remote_dns">Remote DNS (Optional)</string>
-    <string name="summary_pref_remote_dns">DNS</string>
+<string name="title_pref_remote_dns">DNS عن بُعد (اختياري)</string>
+<string name="summary_pref_remote_dns">DNS</string>
 
-    <string name="title_pref_vpn_dns">VPN DNS (only IPv4/v6)</string>
+<string name="title_pref_vpn_dns">DNS VPN (IPv4/v6 فقط)</string>
 
-    <string name="title_pref_domestic_dns">Domestic DNS (Optional)</string>
-    <string name="summary_pref_domestic_dns">DNS</string>
+<string name="title_pref_domestic_dns">DNS المحلي (اختياري)</string>
+<string name="summary_pref_domestic_dns">DNS</string>
 
-    <string name="title_pref_proxy_sharing_enabled">Allow connections from the LAN</string>
-    <string name="summary_pref_proxy_sharing_enabled">Other devices can connect to proxy by your ip address through socks/http, Only enable in trusted network to avoid unauthorized connection</string>
-    <string name="toast_warning_pref_proxysharing_short">Allow connections from the LAN, Make sure you are in a trusted network</string>
+<string name="title_pref_proxy_sharing_enabled">السماح بالاتصالات من الشبكة المحلية</string>
+<string name="summary_pref_proxy_sharing_enabled">يمكن للأجهزة الأخرى الاتصال بالوكيل عبر عنوان IP الخاص بك من خلال socks/http، فقط تمكين في الشبكة الموثوقة لتجنب الاتصال غير المصرح به</string>
+   
+<string name="toast_warning_pref_proxysharing_short">السماح بالاتصالات من الشبكة المحلية، تأكد من أنك في شبكة موثوقة</string>
 
-    <string name="title_pref_allow_insecure">allowInsecure</string>
-    <string name="summary_pref_allow_insecure">When TLS, the default allowInsecure</string>
+<string name="title_pref_allow_insecure">allowInsecure</string>
+<string name="summary_pref_allow_insecure">عند استخدام TLS، الافتراضي هو allowInsecure</string>
 
-    <string name="title_pref_socks_port">SOCKS5 proxy port</string>
-    <string name="summary_pref_socks_port">SOCKS5 proxy port</string>
+<string name="title_pref_socks_port">منفذ الوكيل SOCKS5</string>
+<string name="summary_pref_socks_port">منفذ الوكيل SOCKS5</string>
 
-    <string name="title_pref_http_port">HTTP proxy port</string>
-    <string name="summary_pref_http_port">HTTP proxy port</string>
+<string name="title_pref_http_port">منفذ الوكيل HTTP</string>
+<string name="summary_pref_http_port">منفذ الوكيل HTTP</string>
 
-    <string name="title_pref_local_dns_port">Local DNS port</string>
-    <string name="summary_pref_local_dns_port">Local DNS port</string>
+<string name="title_pref_local_dns_port">منفذ DNS المحلي</string>
+<string name="summary_pref_local_dns_port">منفذ DNS المحلي</string>
 
-    <string name="title_pref_confirm_remove">Delete configuration file confirmation</string>
-    <string name="summary_pref_confirm_remove">Whether to delete the configuration file requires a second confirmation by the user</string>
+<string name="title_pref_confirm_remove">تأكيد حذف ملف التكوين</string>
+<string name="summary_pref_confirm_remove">هل يتطلب حذف ملف التكوين تأكيدًا ثانيًا من المستخدم</string>
 
-    <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
-    <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
+<string name="title_pref_start_scan_immediate">بدء المسح فورا</string>
+<string name="summary_pref_start_scan_immediate">افتح الكاميرا للمسح فورا عند بدء التشغيل، وإلا يمكنك اختيار المسح الضوئي للرمز أو اختيار صورة في شريط الأدوات</string>
 
-    <string name="title_pref_feedback">Feedback</string>
-    <string name="summary_pref_feedback">Feedback enhancements or bugs to GitHub</string>
-    <string name="summary_pref_tg_group">Join Telegram Group</string>
-    <string name="toast_tg_app_not_found">Telegram app not found</string>
+<string name="title_pref_feedback">الملاحظات</string>
+<string name="summary_pref_feedback">إرسال ملاحظات عن التحسينات أو الأخطاء إلى GitHub</string>
+<string name="summary_pref_tg_group">الانضمام إلى مجموعة Telegram</string>
+<string name="toast_tg_app_not_found">لم يتم العثور على تطبيق Telegram</string>
 
     <string name="title_pref_promotion">Promotion</string>
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
