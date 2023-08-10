@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<plurals name="mtrl_badge_content_description"><item quantity="other">%d إشعار جديد</item><item quantity="zero">%d إشعار جديد</item><item quantity="one">إشعار جديد واحد (%d)</item><item quantity="two">إشعاران جديدان (%d)</item><item quantity="few">%d إشعارات جديدة</item><item quantity="many">%d إشعارًا جديدًا</item></plurals>
+</resources>
