@@ -164,84 +164,84 @@
     <string name="title_pref_promotion">Promotion</string>
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
 
-    <string name="title_core_loglevel">Log Level</string>
-    <string name="title_mode">Mode</string>
-    <string name="title_mode_help">Click me for more help</string>
-    <string name="title_language">Language</string>
-    <string name="title_ui_settings">UI settings</string>
+<string name="title_core_loglevel">مستوى السجل</string>
+<string name="title_mode">الوضع</string>
+<string name="title_mode_help">انقر علي للمزيد من المساعدة</string>
+<string name="title_language">اللغة</string>
+<string name="title_ui_settings">إعدادات واجهة المستخدم</string>
 
-    <string name="title_logcat">Logcat</string>
-    <string name="logcat_copy">Copy</string>
-    <string name="logcat_clear">Clear</string>
-    <string name="title_service_restart">Service restart</string>
-    <string name="title_del_all_config">Delete all config</string>
-    <string name="title_del_duplicate_config">Delete duplicate config</string>
-    <string name="title_del_invalid_config">Delete invalid config(Test first)</string>
-    <string name="title_export_all">Export non-custom configs to clipboard</string>
-    <string name="title_sub_setting">Subscription group setting</string>
-    <string name="sub_setting_remarks">remarks</string>
-    <string name="sub_setting_url">Optional URL</string>
-    <string name="sub_setting_enable">enable update</string>
-    <string name="title_sub_update">Update subscription</string>
-    <string name="title_ping_all_server">Tcping all configuration</string>
-    <string name="title_real_ping_all_server">Real delay all configuration</string>
-    <string name="title_user_asset_setting">Geo asset files</string>
-    <string name="title_sort_by_test_results">Sorting by test results</string>
-    <string name="title_filter_config">Filter configuration file</string>
-    <string name="filter_config_all">All subscription groups</string>
-    <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
+<string name="title_logcat">Logcat</string>
+<string name="logcat_copy">نسخ</string>
+<string name="logcat_clear">مسح</string>
+<string name="title_service_restart">إعادة تشغيل الخدمة</string>
+<string name="title_del_all_config">حذف كل التكوين</string>
+<string name="title_del_duplicate_config">حذف التكوين المكرر</string>
+<string name="title_del_invalid_config">حذف التكوين غير الصالح (اختبر أولا)</string>
+<string name="title_export_all">تصدير التكوينات غير المخصصة إلى الحافظة</string>
+<string name="title_sub_setting">إعدادات مجموعة الاشتراك</string>
+<string name="sub_setting_remarks">ملاحظات</string>
+<string name="sub_setting_url">URL اختياري</string>
+<string name="sub_setting_enable">تمكين التحديث</string>
+<string name="title_sub_update">تحديث الاشتراك</string>
+<string name="title_ping_all_server">Tcping كل التكوين</string>
+<string name="title_real_ping_all_server">تأخير الحقيقي لكل التكوين</string>
+<string name="title_user_asset_setting">ملفات الأصول الجغرافية</string>
+<string name="title_sort_by_test_results">الترتيب بناءً على نتائج الاختبار</string>
+<string name="title_filter_config">تصفية ملف التكوين</string>
+<string name="filter_config_all">جميع مجموعات الاشتراك</string>
+<string name="title_del_duplicate_config_count">حذف %d من التكوينات المكررة</string>
+   
+<string name="tasker_start_service">بدء الخدمة</string>
+<string name="tasker_setting_confirm">تأكيد</string>
 
-    <string name="tasker_start_service">Start Service</string>
-    <string name="tasker_setting_confirm">Confirm</string>
+<string name="routing_settings_title">إعدادات التوجيه</string>
+<string name="routing_settings_tips">مفصولة بفواصل (،)، تذكر الحفظ</string>
+<string name="routing_settings_save">حفظ</string>
+<string name="routing_settings_delete">مسح</string>
+<string name="routing_settings_scan_replace">مسح واستبدال</string>
+<string name="routing_settings_scan_append">مسح وإضافة</string>
+<string name="routing_settings_default_rules">تعيين قواعد التوجيه الافتراضية</string>
 
-    <string name="routing_settings_title">Routing Settings</string>
-    <string name="routing_settings_tips">Separated by commas(,),remember to save</string>
-    <string name="routing_settings_save">Save</string>
-    <string name="routing_settings_delete">Clear</string>
-    <string name="routing_settings_scan_replace">Scan and replace</string>
-    <string name="routing_settings_scan_append">Scan and append</string>
-    <string name="routing_settings_default_rules"> set default routing rules</string>
+<string name="connection_test_pending">فحص الاتصال</string>
+<string name="connection_test_testing">جارٍ الفحص...</string>
+<string name="connection_test_available">نجاح: استغرق الاتصال HTTP %dms</string>
+<string name="connection_test_error">فشل في اكتشاف الاتصال بالإنترنت: %s</string>
+<string name="connection_test_fail">الإنترنت غير متوفر</string>
+<string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
+<string name="connection_connected">متصل، اضغط لفحص الاتصال</string>
+<string name="connection_not_connected">غير متصل</string>
 
-    <string name="connection_test_pending">Check Connectivity</string>
-    <string name="connection_test_testing">Testing…</string>
-    <string name="connection_test_available">Success: HTTP connection took %dms</string>
-    <string name="connection_test_error">Fail to detect internet connection: %s</string>
-    <string name="connection_test_fail">Internet Unavailable</string>
-    <string name="connection_test_error_status_code">Error code: #%d</string>
-    <string name="connection_connected">Connected, tap to check connection</string>
-    <string name="connection_not_connected">Not connected</string>
 
-    <string name="import_subscription_success">Subscription imported Successfully</string>
-    <string name="import_subscription_failure">Import subscription failed</string>
+    <string name="import_subscription_success">تم استيراد الاشتراك بنجاح</string>
+<string name="import_subscription_failure">فشل استيراد الاشتراك</string>
 
-    <string-array name="share_method">
-        <item>QRcode</item>
-        <item>Export to clipboard</item>
-        <item>Export full configuration to clipboard</item>
-    </string-array>
+<string-array name="share_method">
+    <item>QRcode</item>
+    <item>تصدير إلى الحافظة</item>
+    <item>تصدير التكوين الكامل إلى الحافظة</item>
+</string-array>
 
-    <string-array name="share_sub_method">
-        <item>QRcode</item>
-        <item>Export to clipboard</item>
-    </string-array>
+<string-array name="share_sub_method">
+    <item>QRcode</item>
+    <item>تصدير إلى الحافظة</item>
+</string-array>
 
-    <string-array name="routing_tag">
-        <item>proxy URL or IP</item>
-        <item>direct URL or IP</item>
-        <item>blocked URL or IP</item>
-    </string-array>
+<string-array name="routing_tag">
+    <item>URL الوكيل أو IP</item>
+    <item>URL المباشر أو IP</item>
+    <item>URL المحظور أو IP</item>
+</string-array>
 
-    <string-array name="routing_mode">
-        <item>Global proxy</item>
-        <item>Bypassing the LAN address then proxy</item>
-        <item>Bypass mainland address then proxy</item>
-        <item>Bypassing LAN and mainland address then proxy</item>
-        <item>Global direct</item>
-    </string-array>
+<string-array name="routing_mode">
+    <item>وكيل عالمي</item>
+    <item>تجاوز عنوان الشبكة المحلية ثم الوكيل</item>
+    <item>تجاوز عنوان البر الرئيسي ثم الوكيل</item>
+    <item>تجاوز عنوان الشبكة المحلية والبر الرئيسي ثم الوكيل</item>
+    <item>مباشر عالمي</item>
+</string-array>
 
-    <string-array name="mode_entries">
-        <item>VPN</item>
-        <item>Proxy only</item>
-    </string-array>
-
+<string-array name="mode_entries">
+    <item>VPN</item>
+    <item>الوكيل فقط</item>
+</string-array>
 </resources>
