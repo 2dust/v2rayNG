@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_widget_name">Switch</string>
+    <string name="app_tile_name">Switch</string>
+    <string name="app_tile_first_use">First use of this feature, please use the app to add server</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="migration_success">Data migration success!</string>
+    <string name="migration_fail">Data migration failed!</string>
+
+    <!-- Notifications -->
+    <string name="notification_action_stop_v2ray">Stop</string>
+    <string name="toast_permission_denied">Unable to obtain the permission</string>
+    <string name="notification_action_more">click for more</string>
+    <string name="toast_services_start">Start Services</string>
+    <string name="toast_services_stop">Stop Services</string>
+    <string name="toast_services_success">Start Services Success</string>
+    <string name="toast_services_failure">Start Services Failure</string>
+
+    <!--ServerActivity-->
+    <string name="title_server">Configuration file</string>
+    <string name="menu_item_add_config">Add config</string>
+    <string name="menu_item_save_config">Save config</string>
+    <string name="menu_item_del_config">Delete config</string>
+    <string name="menu_item_import_config_qrcode">Import config from QRcode</string>
+    <string name="menu_item_import_config_clipboard">Import config from Clipboard</string>
+    <string name="menu_item_import_config_manually_vmess">Type manually[Vmess]</string>
+    <string name="menu_item_import_config_manually_vless">Type manually[VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">Type manually[Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">Type manually[Socks]</string>
+    <string name="menu_item_import_config_manually_trojan">Type manually[Trojan]</string>
+    <string name="menu_item_import_config_custom">Custom config</string>
+    <string name="menu_item_import_config_custom_clipboard">Import custom config from Clipboard</string>
+    <string name="menu_item_import_config_custom_local">Import custom config from locally</string>
+    <string name="menu_item_import_config_custom_url">Import custom config from URL</string>
+    <string name="menu_item_import_config_custom_url_scan">Import custom config scan URL</string>
+    <string name="del_config_comfirm">Confirm delete？</string>
+    <string name="server_lab_remarks">remarks</string>
+    <string name="server_lab_address">address</string>
+    <string name="server_lab_port">port</string>
+    <string name="server_lab_id">id</string>
+    <string name="server_lab_alterid">alterId</string>
+    <string name="server_lab_security">security</string>
+    <string name="server_lab_network">Network</string>
+    <string name="server_lab_more_function">Transport</string>
+    <string name="server_lab_head_type">head type</string>
+    <string name="server_lab_mode_type">gRPC mode</string>
+    <string name="server_lab_request_host">request host(host/ws host/h2 host)/QUIC security</string>
+    <string name="server_lab_path">path(ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
+    <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_fingerprint" translatable="false">Fingerprint</string>
+    <string name="server_lab_stream_alpn" translatable="false">Alpn</string>
+    <string name="server_lab_allow_insecure">allowInsecure</string>
+    <string name="server_lab_sni">SNI</string>
+    <string name="server_lab_address3">address</string>
+    <string name="server_lab_port3">port</string>
+    <string name="server_lab_id3">password</string>
+    <string name="server_lab_security3">security</string>
+    <string name="server_lab_id4">Password(Optional)</string>
+    <string name="server_lab_security4">User(Optional)</string>
+    <string name="server_lab_encryption">encryption</string>
+    <string name="server_lab_flow">flow</string>
+    <string name="server_lab_public_key" translatable="false">PublicKey</string>
+    <string name="server_lab_short_id" translatable="false">ShortId</string>
+    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
+    <string name="toast_success">Success</string>
+    <string name="toast_failure">Failure</string>
+    <string name="toast_none_data">There is nothing</string>
+    <string name="toast_incorrect_protocol">Incorrect protocol</string>
+    <string name="toast_decoding_failed">Decoding failed</string>
+    <string name="title_file_chooser">Select a Config File</string>
+    <string name="toast_require_file_manager">Please install a File Manager.</string>
+    <string name="server_customize_config">Customize Config</string>
+    <string name="toast_config_file_invalid">Invalid Config</string>
+    <string name="server_lab_content">Content</string>
+    <string name="toast_none_data_clipboard">There is no data in the clipboard</string>
+    <string name="toast_invalid_url">Invalid URL</string>
+    <string name="server_lab_need_inbound">Ensure inbounds port is consistent with the settings</string>
+    <string name="toast_malformed_josn">Config malformed</string>
+    <string name="server_lab_request_host6">Host(SNI)(Optional)</string>
+    <string name="toast_asset_copy_failed">File copy failed, please use File Manager</string>
+    <string name="menu_item_add_file">Add files</string>
+    <string name="menu_item_download_file">Download files</string>
+
+    <!-- PerAppProxyActivity -->
+    <string name="msg_dialog_progress">Loading</string>
+    <string name="menu_item_search">Search</string>
+    <string name="menu_item_select_all">Select all</string>
+    <string name="msg_enter_keywords">Enter keywords</string>
+    <string name="switch_bypass_apps_mode">Bypass Mode</string>
+    <string name="menu_item_select_proxy_app">Auto select proxy app</string>
+    <string name="msg_downloading_content">Downloading content</string>
+    <string name="menu_item_export_proxy_app">Export to Clipboard</string>
+    <string name="menu_item_import_proxy_app">Import from Clipboard</string>
+
+
+    <!-- Preferences -->
+    <string name="title_settings">Settings</string>
+    <string name="title_advanced">Advanced Settings</string>
+    <string name="title_vpn_settings">VPN Settings</string>
+    <string name="title_pref_per_app_proxy">Per-app proxy</string>
+    <string name="summary_pref_per_app_proxy">General: Checked App is proxy, unchecked direct connection; \nbypass mode: checked app directly connected, unchecked proxy. \nThe option to automatically select the proxy application in the menu</string>
+
+    <string name="title_pref_mux_enabled">Enable Mux</string>
+    <string name="summary_pref_mux_enabled">Enable maybe speed up network and switch network maybe flash</string>
+
+    <string name="title_pref_speed_enabled">Enable speed display</string>
+    <string name="summary_pref_speed_enabled">Display current speed in the notification.\nNotification icon would change based on
+        usage.</string>
+
+    <string name="title_pref_sniffing_enabled">Enable Sniffing</string>
+    <string name="summary_pref_sniffing_enabled">Try sniff domain from the packet (default on)</string>
+
+    <string name="title_pref_local_dns_enabled">Enable local DNS</string>
+    <string name="summary_pref_local_dns_enabled">DNS processed by core‘s DNS module (Recommended, if need routing Bypassing LAN and
+        mainland address)</string>
+
+    <string name="title_pref_fake_dns_enabled">Enable fake DNS</string>
+    <string name="summary_pref_fake_dns_enabled">local DNS returns fake IP address (faster, but it may not work for some apps)</string>
+
+    <string name="title_pref_prefer_ipv6">Prefer IPv6</string>
+    <string name="summary_pref_prefer_ipv6">Prefer IPv6 address and routes</string>
+
+    <string name="title_pref_routing">Routing</string>
+    <string name="title_pref_routing_domain_strategy">Domain strategy</string>
+    <string name="title_pref_routing_mode">Predefined rules</string>
+    <string name="title_pref_routing_custom">Custom rules</string>
+
+    <string name="title_pref_remote_dns">Remote DNS (Optional)</string>
+    <string name="summary_pref_remote_dns">DNS</string>
+
+    <string name="title_pref_vpn_dns">VPN DNS (only IPv4/v6)</string>
+
+    <string name="title_pref_domestic_dns">Domestic DNS (Optional)</string>
+    <string name="summary_pref_domestic_dns">DNS</string>
+
+    <string name="title_pref_proxy_sharing_enabled">Allow connections from the LAN</string>
+    <string name="summary_pref_proxy_sharing_enabled">Other devices can connect to proxy by your ip address through socks/http, Only enable in trusted network to avoid unauthorized connection</string>
+    <string name="toast_warning_pref_proxysharing_short">Allow connections from the LAN, Make sure you are in a trusted network</string>
+
+    <string name="title_pref_allow_insecure">allowInsecure</string>
+    <string name="summary_pref_allow_insecure">When TLS, the default allowInsecure</string>
+
+    <string name="title_pref_socks_port">SOCKS5 proxy port</string>
+    <string name="summary_pref_socks_port">SOCKS5 proxy port</string>
+
+    <string name="title_pref_http_port">HTTP proxy port</string>
+    <string name="summary_pref_http_port">HTTP proxy port</string>
+
+    <string name="title_pref_local_dns_port">Local DNS port</string>
+    <string name="summary_pref_local_dns_port">Local DNS port</string>
+
+    <string name="title_pref_confirm_remove">Delete configuration file confirmation</string>
+    <string name="summary_pref_confirm_remove">Whether to delete the configuration file requires a second confirmation by the user</string>
+
+    <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
+    <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
+
+    <string name="title_pref_feedback">Feedback</string>
+    <string name="summary_pref_feedback">Feedback enhancements or bugs to GitHub</string>
+    <string name="summary_pref_tg_group">Join Telegram Group</string>
+    <string name="toast_tg_app_not_found">Telegram app not found</string>
+
+    <string name="title_pref_promotion">Promotion</string>
+    <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
+
+    <string name="title_core_loglevel">Log Level</string>
+    <string name="title_mode">Mode</string>
+    <string name="title_mode_help">Click me for more help</string>
+    <string name="title_language">Language</string>
+    <string name="title_ui_settings">UI settings</string>
+
+    <string name="title_logcat">Logcat</string>
+    <string name="logcat_copy">Copy</string>
+    <string name="logcat_clear">Clear</string>
+    <string name="title_service_restart">Service restart</string>
+    <string name="title_del_all_config">Delete all config</string>
+    <string name="title_del_duplicate_config">Delete duplicate config</string>
+    <string name="title_del_invalid_config">Delete invalid config(Test first)</string>
+    <string name="title_export_all">Export non-custom configs to clipboard</string>
+    <string name="title_sub_setting">Subscription group setting</string>
+    <string name="sub_setting_remarks">remarks</string>
+    <string name="sub_setting_url">Optional URL</string>
+    <string name="sub_setting_enable">enable update</string>
+    <string name="title_sub_update">Update subscription</string>
+    <string name="title_ping_all_server">Tcping all configuration</string>
+    <string name="title_real_ping_all_server">Real delay all configuration</string>
+    <string name="title_user_asset_setting">Geo asset files</string>
+    <string name="title_sort_by_test_results">Sorting by test results</string>
+    <string name="title_filter_config">Filter configuration file</string>
+    <string name="filter_config_all">All subscription groups</string>
+    <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
+
+    <string name="tasker_start_service">Start Service</string>
+    <string name="tasker_setting_confirm">Confirm</string>
+
+    <string name="routing_settings_title">Routing Settings</string>
+    <string name="routing_settings_tips">Separated by commas(,),remember to save</string>
+    <string name="routing_settings_save">Save</string>
+    <string name="routing_settings_delete">Clear</string>
+    <string name="routing_settings_scan_replace">Scan and replace</string>
+    <string name="routing_settings_scan_append">Scan and append</string>
+    <string name="routing_settings_default_rules"> set default routing rules</string>
+
+    <string name="connection_test_pending">Check Connectivity</string>
+    <string name="connection_test_testing">Testing…</string>
+    <string name="connection_test_available">Success: HTTP connection took %dms</string>
+    <string name="connection_test_error">Fail to detect internet connection: %s</string>
+    <string name="connection_test_fail">Internet Unavailable</string>
+    <string name="connection_test_error_status_code">Error code: #%d</string>
+    <string name="connection_connected">Connected, tap to check connection</string>
+    <string name="connection_not_connected">Not connected</string>
+
+    <string name="import_subscription_success">Subscription imported Successfully</string>
+    <string name="import_subscription_failure">Import subscription failed</string>
+
+    <string-array name="share_method">
+        <item>QRcode</item>
+        <item>Export to clipboard</item>
+        <item>Export full configuration to clipboard</item>
+    </string-array>
+
+    <string-array name="share_sub_method">
+        <item>QRcode</item>
+        <item>Export to clipboard</item>
+    </string-array>
+
+    <string-array name="routing_tag">
+        <item>proxy URL or IP</item>
+        <item>direct URL or IP</item>
+        <item>blocked URL or IP</item>
+    </string-array>
+
+    <string-array name="routing_mode">
+        <item>Global proxy</item>
+        <item>Bypassing the LAN address then proxy</item>
+        <item>Bypass mainland address then proxy</item>
+        <item>Bypassing LAN and mainland address then proxy</item>
+        <item>Global direct</item>
+    </string-array>
+
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>Proxy only</item>
+    </string-array>
+
+</resources>
