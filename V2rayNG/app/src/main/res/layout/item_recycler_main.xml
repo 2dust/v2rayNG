@@ -29,7 +29,7 @@
 
             <LinearLayout
                 android:id="@+id/layout_indicator"
-                android:layout_width="10dp"
+                android:layout_width="6dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:orientation="vertical" />
@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:paddingStart="5dp">
+                android:paddingStart="9dp">
 
                 <TextView
                         android:id="@+id/tv_name"
@@ -179,7 +179,7 @@
                         android:layout_height="wrap_content"
                         android:lines="1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/color_secondary"
+                        android:textColor="@color/color_fab_orange"
                         android:textSize="10sp" />
                 </LinearLayout>
 

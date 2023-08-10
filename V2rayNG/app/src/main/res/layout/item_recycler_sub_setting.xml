@@ -29,7 +29,7 @@
 
             <LinearLayout
                     android:id="@+id/chk_enable"
-                    android:layout_width="10dp"
+                    android:layout_width="6dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:orientation="vertical" />
@@ -38,7 +38,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingStart="5dp"
+                android:paddingStart="9dp"
                 android:orientation="vertical">
 
                 <TextView

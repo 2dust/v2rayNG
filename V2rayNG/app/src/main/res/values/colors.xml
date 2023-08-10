@@ -2,6 +2,8 @@
 <resources>
     <color name="colorPing">#009966</color>
     <color name="colorPingRed">#FF0099</color>
+    <color name="color_fab_orange">#f97910</color>
+
     <color name="color_secondary">#727272</color>
     <color name="colorSelected">#000000</color>
     <color name="colorUnselected">#FFFFFF</color>

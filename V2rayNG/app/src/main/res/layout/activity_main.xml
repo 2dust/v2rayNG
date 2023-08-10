@@ -105,6 +105,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
+        app:itemIconTint="@color/colorAccent"
         app:menu="@menu/menu_drawer" >
 
         <LinearLayout
