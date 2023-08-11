@@ -34,17 +34,8 @@ jobs:
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
 
-    - name: Setup Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: 1.48.0
-        override: true
-
     - name: Setup Android environment
       uses: android-actions/setup-android@v2
-      with:
-        api-level: 30
-        target-platform: 'x86_64'
   
 
     - name: Build dependencies
