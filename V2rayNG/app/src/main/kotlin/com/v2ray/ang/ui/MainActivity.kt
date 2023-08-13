@@ -139,7 +139,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 binding.layoutTest.isFocusable = true
             } else {
                 if (!Utils.getDarkModeStatus(this)) {
-                    binding.fab.setImageResource(R.drawable.ic_stat_name_black)
+                    binding.fab.setImageResource(R.drawable.ic_stat_name)
                 }
                 binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_grey))
                 setTestState(getString(R.string.connection_not_connected))
