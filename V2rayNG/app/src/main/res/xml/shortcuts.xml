@@ -2,7 +2,7 @@
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
     <shortcut
         android:enabled="true"
-        android:icon="@drawable/ic_qu_switch_black_24dp"
+        android:icon="@drawable/ic_qu_switch_24dp"
         android:shortcutDisabledMessage="@string/app_widget_name"
         android:shortcutId="shortcuts_switch"
         android:shortcutLongLabel="@string/app_widget_name"
@@ -16,7 +16,7 @@
     </shortcut>
     <shortcut
         android:enabled="true"
-        android:icon="@drawable/ic_qu_scan_black_24dp"
+        android:icon="@drawable/ic_qu_scan_24dp"
         android:shortcutDisabledMessage="@string/menu_item_import_config_qrcode"
         android:shortcutId="shortcuts_scan"
         android:shortcutLongLabel="@string/menu_item_import_config_qrcode"
@@ -30,7 +30,7 @@
     </shortcut>
     <shortcut
         android:enabled="true"
-        android:icon="@drawable/ic_qu_settings_black_24dp"
+        android:icon="@drawable/ic_qu_settings_24dp"
         android:shortcutDisabledMessage="@string/title_settings"
         android:shortcutId="shortcuts_settings"
         android:shortcutLongLabel="@string/title_settings"
