@@ -126,6 +126,21 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Subscription">
+
+        <CheckBoxPreference
+            android:key="pref_auto_update_subscription"
+            android:summary="Update your subscriptions automatically with an interval in background"
+            android:title="Automatic update subscriptions" />
+
+        <EditTextPreference
+            android:key="pref_auto_update_interval"
+            android:summary="1440 min"
+            android:inputType="number"
+            android:title="Subscription Update Interval (Minutes)" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/title_ui_settings">
 
         <CheckBoxPreference

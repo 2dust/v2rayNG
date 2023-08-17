@@ -6,10 +6,21 @@ import android.text.TextUtils
 import android.view.View
 import androidx.activity.viewModels
 import androidx.preference.*
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
+import androidx.work.multiprocess.RemoteWorkManager
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.AngConfig
+import com.v2ray.ang.service.SubscriptionUpdater
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.SettingsViewModel
+import java.sql.Time
+import java.util.concurrent.TimeUnit
+import kotlin.time.toDuration
 
 class SettingsActivity : BaseActivity() {
     private val settingsViewModel: SettingsViewModel by viewModels()
@@ -31,12 +42,15 @@ class SettingsActivity : BaseActivity() {
         private val fakeDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_FAKE_DNS_ENABLED) }
         private val localDnsPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_LOCAL_DNS_PORT) }
         private val vpnDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_VPN_DNS) }
+
         //        val autoRestart by lazy { findPreference(PREF_AUTO_RESTART) as CheckBoxPreference }
         private val remoteDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_REMOTE_DNS) }
         private val domesticDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DOMESTIC_DNS) }
         private val socksPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS_PORT) }
         private val httpPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HTTP_PORT) }
         private val routingCustom by lazy { findPreference<Preference>(AppConfig.PREF_ROUTING_CUSTOM) }
+        private val autoUpdateCheck by lazy { findPreference<CheckBoxPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE) }
+        private val autoUpdateInterval by lazy { findPreference<EditTextPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL) }
         //        val licenses: Preference by lazy { findPreference(PREF_LICENSES) }
 //        val feedback: Preference by lazy { findPreference(PREF_FEEDBACK) }
 //        val tgGroup: Preference by lazy { findPreference(PREF_TG_GROUP) }
@@ -48,6 +62,24 @@ class SettingsActivity : BaseActivity() {
 
             routingCustom?.setOnPreferenceClickListener {
                 startActivity(Intent(activity, RoutingSettingsActivity::class.java))
+                false
+            }
+
+            autoUpdateCheck?.setOnPreferenceChangeListener { _, newValue ->
+                val value = newValue as Boolean
+                autoUpdateCheck?.isChecked = value
+                autoUpdateInterval?.isEnabled = value
+                autoUpdateInterval?.text?.toLong()?.let {
+                    if (newValue) configureUpdateTask(it) else cancelUpdateTask()
+                }
+                true
+            }
+
+            autoUpdateInterval?.setOnPreferenceChangeListener { _, any ->
+                val nval = any as String
+                autoUpdateInterval?.summary =
+                    if (TextUtils.isEmpty(nval) or (nval.toLong() < 15)) AppConfig.DEFAULT_UPDATE_INTERVAL else nval
+                configureUpdateTask(nval.toLong())
                 false
             }
 
@@ -92,13 +124,14 @@ class SettingsActivity : BaseActivity() {
                 true
             }
 
-            localDns?.setOnPreferenceChangeListener{ _, any ->
+            localDns?.setOnPreferenceChangeListener { _, any ->
                 updateLocalDns(any as Boolean)
                 true
             }
             localDnsPort?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                localDnsPort?.summary = if (TextUtils.isEmpty(nval)) AppConfig.PORT_LOCAL_DNS else nval
+                localDnsPort?.summary =
+                    if (TextUtils.isEmpty(nval)) AppConfig.PORT_LOCAL_DNS else nval
                 true
             }
             vpnDns?.setOnPreferenceChangeListener { _, any ->
@@ -125,14 +158,25 @@ class SettingsActivity : BaseActivity() {
 
         override fun onStart() {
             super.onStart()
-            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
+            val defaultSharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(requireActivity())
             updateMode(defaultSharedPreferences.getString(AppConfig.PREF_MODE, "VPN"))
             var remoteDnsString = defaultSharedPreferences.getString(AppConfig.PREF_REMOTE_DNS, "")
-            domesticDns?.summary = defaultSharedPreferences.getString(AppConfig.PREF_DOMESTIC_DNS, "")
+            domesticDns?.summary =
+                defaultSharedPreferences.getString(AppConfig.PREF_DOMESTIC_DNS, "")
 
-            localDnsPort?.summary = defaultSharedPreferences.getString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
-            socksPort?.summary = defaultSharedPreferences.getString(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
-            httpPort?.summary = defaultSharedPreferences.getString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
+            localDnsPort?.summary = defaultSharedPreferences.getString(
+                AppConfig.PREF_LOCAL_DNS_PORT,
+                AppConfig.PORT_LOCAL_DNS
+            )
+            socksPort?.summary =
+                defaultSharedPreferences.getString(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
+            httpPort?.summary =
+                defaultSharedPreferences.getString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
+            autoUpdateInterval?.summary = defaultSharedPreferences.getString(
+                AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,
+                AppConfig.DEFAULT_UPDATE_INTERVAL
+            )
 
             if (TextUtils.isEmpty(remoteDnsString)) {
                 remoteDnsString = AppConfig.DNS_AGENT
@@ -141,7 +185,8 @@ class SettingsActivity : BaseActivity() {
                 domesticDns?.summary = AppConfig.DNS_DIRECT
             }
             remoteDns?.summary = remoteDnsString
-            vpnDns?.summary = defaultSharedPreferences.getString(AppConfig.PREF_VPN_DNS, remoteDnsString)
+            vpnDns?.summary =
+                defaultSharedPreferences.getString(AppConfig.PREF_VPN_DNS, remoteDnsString)
 
             if (TextUtils.isEmpty(localDnsPort?.summary)) {
                 localDnsPort?.summary = AppConfig.PORT_LOCAL_DNS
@@ -155,17 +200,24 @@ class SettingsActivity : BaseActivity() {
         }
 
         private fun updateMode(mode: String?) {
-            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
+            val defaultSharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(requireActivity())
             val vpn = mode == "VPN"
             perAppProxy?.isEnabled = vpn
-            perAppProxy?.isChecked = PreferenceManager.getDefaultSharedPreferences(requireActivity())
+            perAppProxy?.isChecked =
+                PreferenceManager.getDefaultSharedPreferences(requireActivity())
                     .getBoolean(AppConfig.PREF_PER_APP_PROXY, false)
             localDns?.isEnabled = vpn
             fakeDns?.isEnabled = vpn
             localDnsPort?.isEnabled = vpn
             vpnDns?.isEnabled = vpn
             if (vpn) {
-                updateLocalDns(defaultSharedPreferences.getBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false))
+                updateLocalDns(
+                    defaultSharedPreferences.getBoolean(
+                        AppConfig.PREF_LOCAL_DNS_ENABLED,
+                        false
+                    )
+                )
             }
         }
 
@@ -173,6 +225,33 @@ class SettingsActivity : BaseActivity() {
             fakeDns?.isEnabled = enabled
             localDnsPort?.isEnabled = enabled
             vpnDns?.isEnabled = !enabled
+        }
+
+        private fun configureUpdateTask(interval: Long) {
+            val rw = RemoteWorkManager.getInstance(AngApplication.application)
+            rw.cancelUniqueWork(AppConfig.UPDATE_TASK_NAME)
+            rw.enqueueUniquePeriodicWork(
+                AppConfig.UPDATE_TASK_NAME,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                PeriodicWorkRequest.Builder(
+                    SubscriptionUpdater.UpdateTask::class.java,
+                    interval,
+                    TimeUnit.MINUTES
+                )
+                    .apply {
+                        setInitialDelay(interval, TimeUnit.MINUTES)
+                    }
+                    .setConstraints(
+                        Constraints(
+                            NetworkType.CONNECTED,
+                        )
+                    ).build()
+            )
+        }
+
+        private fun cancelUpdateTask() {
+            val rw = RemoteWorkManager.getInstance(AngApplication.application)
+            rw.cancelUniqueWork(AppConfig.UPDATE_TASK_NAME)
         }
     }
 

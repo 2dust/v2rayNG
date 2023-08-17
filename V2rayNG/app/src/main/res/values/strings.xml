@@ -183,6 +183,7 @@
     <string name="sub_setting_remarks">remarks</string>
     <string name="sub_setting_url">Optional URL</string>
     <string name="sub_setting_enable">enable update</string>
+    <string name="sub_auto_update">Auto update</string>
     <string name="title_sub_update">Update subscription</string>
     <string name="title_ping_all_server">Tcping all configuration</string>
     <string name="title_real_ping_all_server">Real delay all configuration</string>
