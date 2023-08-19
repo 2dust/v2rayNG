@@ -147,7 +147,7 @@
     <string name="summary_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình khi bạn xoá một cấu hình.</string>
 
     <string name="title_pref_start_scan_immediate">Bắt đầu quét mã QR ngay lập tức</string>
-    <string name="summary_pref_start_scan_immediate">Mở camera để quét ngay khi khởi động, nếu không bạn có thể chọn quét mã hoặc chọn ảnh trên thanh công cụ.</string>
+    <string name="summary_pref_start_scan_immediate">Mở camera để quét QR ngay khi khởi động, nếu không bạn có thể chọn quét mã hoặc chọn ảnh trên thanh công cụ.</string>
 
     <string name="title_pref_feedback">Phản hồi lỗi</string>
     <string name="summary_pref_feedback">Phản hồi cải tiến hoặc lỗi lên GitHub</string>
