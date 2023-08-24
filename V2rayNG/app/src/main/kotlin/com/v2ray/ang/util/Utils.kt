@@ -178,7 +178,7 @@ object Utils {
             //CIDR
             if (addr.indexOf("/") > 0) {
                 val arr = addr.split("/")
-                if (arr.count() == 2 && Integer.parseInt(arr[1]) > 0) {
+                if (arr.count() == 2 && Integer.parseInt(arr[1]) > -1) {
                     addr = arr[0]
                 }
             }
