@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/del_config"
-        android:icon="@drawable/ic_delete_white_24dp"
+        android:icon="@drawable/ic_delete_24dp"
         android:title="@string/menu_item_del_config"
         app:showAsAction="always" />
     <item

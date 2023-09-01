@@ -204,6 +204,9 @@
     <string name="connection_connected">Đã kết nối, hãy nhấn vào đây để kiểm tra kết nối mạng!</string>
     <string name="connection_not_connected">Chưa kết nối, hãy chọn một cấu hình để kết nối!</string>
 
+    <string name="import_subscription_success">Đăng ký đã nhập thành công</string>
+    <string name="import_subscription_failure">Nhập đăng ký không thành công</string>
+
     <string-array name="share_method">
         <item>Xuất ra mã QR (Chụp màn hình để lưu)</item>
         <item>Sao chép cấu hình này</item>

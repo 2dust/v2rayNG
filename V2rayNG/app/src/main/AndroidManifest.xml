@@ -9,6 +9,8 @@
         android:largeScreens="true"
         android:xlargeScreens="true"/>
 
+    <uses-sdk android:minSdkVersion="21" tools:overrideLibrary="com.blacksquircle.ui.editorkit"/>
+
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
     <uses-feature android:name="android.software.leanback" android:required="false" />

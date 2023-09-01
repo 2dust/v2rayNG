@@ -19,7 +19,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/routing_settings_tips"
-                android:textColor="@color/fab_orange_dark" />
+                android:textColor="@color/color_secondary" />
 
             <EditText
                 android:id="@+id/et_routing_content"

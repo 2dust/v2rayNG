@@ -8,8 +8,8 @@ android {
     buildToolsVersion "$buildToolsVer"
 
     compileOptions {
-        targetCompatibility = "8"
-        sourceCompatibility = "8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     defaultConfig {
@@ -127,9 +127,9 @@ dependencies {
     implementation 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'
     implementation 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
     implementation 'me.drakeet.support:toastcompat:1.1.0'
-    implementation 'com.blacksquircle.ui:editorkit:2.1.1'
-    implementation 'com.blacksquircle.ui:language-base:2.1.1'
-    implementation 'com.blacksquircle.ui:language-json:2.1.1'
+    implementation 'com.blacksquircle.ui:editorkit:2.8.0'
+    implementation 'com.blacksquircle.ui:language-base:2.8.0'
+    implementation 'com.blacksquircle.ui:language-json:2.8.0'
     implementation 'io.github.g00fy2.quickie:quickie-bundled:1.6.0'
     implementation 'com.google.zxing:core:3.5.1'
 }

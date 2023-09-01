@@ -9,7 +9,7 @@
 
     <item
         android:id="@+id/del_routing"
-        android:icon="@drawable/ic_delete_white_24dp"
+        android:icon="@drawable/ic_delete_24dp"
         android:title="@string/routing_settings_delete"
         app:showAsAction="never" />
 
