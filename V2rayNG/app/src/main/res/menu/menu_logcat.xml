@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/clear_all"
-        android:icon="@drawable/ic_delete_white_24dp"
+        android:icon="@drawable/ic_delete_24dp"
         android:title="@string/logcat_clear"
         app:showAsAction="always" />
     <item
         android:id="@+id/copy_all"
-        android:icon="@drawable/ic_copy_white"
+        android:icon="@drawable/ic_copy"
         android:title="@string/logcat_copy"
         app:showAsAction="always" />
 </menu>

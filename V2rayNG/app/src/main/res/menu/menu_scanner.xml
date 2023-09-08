@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/scan_code"
-        android:icon="@drawable/ic_scan_black_24dp"
+        android:icon="@drawable/ic_scan_24dp"
         android:title=""
         app:showAsAction="always" />
     <item

@@ -9,7 +9,7 @@ import android.content.ClipData
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.net.Uri
 import android.os.Build
 import android.os.LocaleList
@@ -178,7 +178,7 @@ object Utils {
             //CIDR
             if (addr.indexOf("/") > 0) {
                 val arr = addr.split("/")
-                if (arr.count() == 2 && Integer.parseInt(arr[1]) > 0) {
+                if (arr.count() == 2 && Integer.parseInt(arr[1]) > -1) {
                     addr = arr[0]
                 }
             }
@@ -356,7 +356,7 @@ object Utils {
 
     fun getDarkModeStatus(context: Context): Boolean {
         val mode = context.resources.configuration.uiMode and UI_MODE_NIGHT_MASK
-        return mode == UI_MODE_NIGHT_YES
+        return mode != UI_MODE_NIGHT_NO
     }
 
     fun getIpv6Address(address: String): String {
