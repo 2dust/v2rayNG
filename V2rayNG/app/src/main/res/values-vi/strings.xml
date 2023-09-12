@@ -146,8 +146,8 @@
     <string name="title_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình</string>
     <string name="summary_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình khi bạn xoá một cấu hình.</string>
 
-    <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
-    <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
+    <string name="title_pref_start_scan_immediate">Bắt đầu quét mã QR ngay lập tức</string>
+    <string name="summary_pref_start_scan_immediate">Mở camera để quét QR ngay khi khởi động, nếu không bạn có thể chọn quét mã hoặc chọn ảnh trên thanh công cụ.</string>
 
     <string name="title_pref_feedback">Phản hồi lỗi</string>
     <string name="summary_pref_feedback">Phản hồi cải tiến hoặc lỗi lên GitHub</string>
@@ -161,14 +161,14 @@
     <string name="title_mode">Chế độ kết nối</string>
     <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp!</string>
     <string name="title_language">Ngôn ngữ</string>
-    <string name="title_ui_settings">UI settings</string>
+    <string name="title_ui_settings">Cài đặt UI</string>
 
     <string name="title_logcat">Nhật ký hoạt động</string>
     <string name="logcat_copy">Sao chép nhật ký</string>
     <string name="logcat_clear">Xoá nhật ký</string>
     <string name="title_service_restart">Kết nối lại v2rayNG</string>
     <string name="title_del_all_config">Xoá tất cả cấu hình</string>
-    <string name="title_del_duplicate_config">Delete duplicate config</string>
+    <string name="title_del_duplicate_config">Xoá cấu hình trùng lặp</string>
     <string name="title_del_invalid_config">Xoá cấu hình lỗi (Kiểm tra trước)</string>
     <string name="title_export_all">Xuất và sao chép tất cả cấu hình</string>
     <string name="title_sub_setting">Các gói đăng ký</string>
@@ -182,7 +182,7 @@
     <string name="title_sort_by_test_results">Sắp xếp lại theo lần kiểm tra cuối cùng</string>
     <string name="title_filter_config">Lọc cấu hình theo các gói đăng ký</string>
     <string name="filter_config_all">Hiển thị tất cả các gói đăng ký</string>
-    <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
+    <string name="title_del_duplicate_config_count">Xoá %d cấu hình trùng lặp</string>
 
     <string name="tasker_start_service">Bắt đầu v2rayNG</string>
     <string name="tasker_setting_confirm">Xác nhận</string>
@@ -203,6 +203,9 @@
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
     <string name="connection_connected">Đã kết nối, hãy nhấn vào đây để kiểm tra kết nối mạng!</string>
     <string name="connection_not_connected">Chưa kết nối, hãy chọn một cấu hình để kết nối!</string>
+
+    <string name="import_subscription_success">Đăng ký đã nhập thành công</string>
+    <string name="import_subscription_failure">Nhập đăng ký không thành công</string>
 
     <string-array name="share_method">
         <item>Xuất ra mã QR (Chụp màn hình để lưu)</item>

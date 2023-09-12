@@ -16,6 +16,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
+                android:background="@color/colorPrimary"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:padding="@dimen/nav_header_vertical_spacing">
 
             <LinearLayout
@@ -52,7 +54,7 @@
                 <ImageView
                         android:layout_width="@dimen/png_height"
                         android:layout_height="@dimen/png_height"
-                        android:src="@drawable/ic_delete_black_24dp"
+                        android:src="@drawable/ic_delete_24dp"
                         app:tint="?attr/colorMainText" />
             </LinearLayout>
         </LinearLayout>

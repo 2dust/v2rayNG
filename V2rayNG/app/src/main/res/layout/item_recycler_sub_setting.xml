@@ -18,7 +18,8 @@
             android:id="@+id/info_container"
             android:clickable="true"
             android:focusable="true"
-            android:background="?android:attr/selectableItemBackground"
+            android:background="@color/colorPrimary"
+            android:foreground="?android:attr/selectableItemBackground"
             android:nextFocusRight="@+id/layout_edit"
             android:layout_width="match_parent"
             android:layout_height="@dimen/server_height"
@@ -28,7 +29,7 @@
 
             <LinearLayout
                     android:id="@+id/chk_enable"
-                    android:layout_width="10dp"
+                    android:layout_width="6dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:orientation="vertical" />
@@ -37,7 +38,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingStart="5dp"
+                android:paddingStart="9dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -78,7 +79,7 @@
                     <ImageView
                         android:layout_width="@dimen/png_height"
                         android:layout_height="@dimen/png_height"
-                        android:src="@drawable/ic_share_black_24dp"
+                        android:src="@drawable/ic_share_24dp"
                         app:tint="?attr/colorMainText"/>
 
                 </LinearLayout>
@@ -98,7 +99,7 @@
                     <ImageView
                         android:layout_width="@dimen/png_height"
                         android:layout_height="@dimen/png_height"
-                        android:src="@drawable/ic_edit_black_24dp"
+                        android:src="@drawable/ic_edit_24dp"
                         app:tint="?attr/colorMainText" />
 
                 </LinearLayout>

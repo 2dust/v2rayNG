@@ -165,6 +165,7 @@
         <item>Tiếng Việt</item>
         <item>Русский</item>
         <item>فارسی</item>
+        <item>عربي</item>
     </string-array>
 
 
@@ -176,5 +177,6 @@
         <item>vi</item>
         <item>ru</item>
         <item>fa</item>
+        <item>ar</item>
     </string-array>
 </resources>
