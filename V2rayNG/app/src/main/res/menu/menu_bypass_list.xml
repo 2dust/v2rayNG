@@ -3,31 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/search_view"
-        android:icon="@drawable/ic_description_white_24dp"
+        android:icon="@drawable/ic_description_24dp"
         android:title="@string/menu_item_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always"  />
     <item
         android:id="@+id/select_all"
-        android:icon="@drawable/ic_select_all_white_24dp"
+        android:icon="@drawable/ic_select_all_24dp"
         android:title="@string/menu_item_select_all"
         app:showAsAction="withText" />
 
     <item
         android:id="@+id/select_proxy_app"
-        android:icon="@drawable/ic_description_white_24dp"
+        android:icon="@drawable/ic_description_24dp"
         android:title="@string/menu_item_select_proxy_app"
         app:showAsAction="withText" />
 
     <item
         android:id="@+id/import_proxy_app"
-        android:icon="@drawable/ic_description_white_24dp"
+        android:icon="@drawable/ic_description_24dp"
         android:title="@string/menu_item_import_proxy_app"
         app:showAsAction="withText" />
 
     <item
         android:id="@+id/export_proxy_app"
-        android:icon="@drawable/ic_description_white_24dp"
+        android:icon="@drawable/ic_description_24dp"
         android:title="@string/menu_item_export_proxy_app"
         app:showAsAction="withText" />
 

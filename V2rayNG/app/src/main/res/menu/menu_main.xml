@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:icon="@drawable/ic_add_white_24dp"
+        android:icon="@drawable/ic_add_24dp"
         android:title="@string/menu_item_add_config"
         app:showAsAction="ifRoom">
         <menu>
@@ -61,7 +61,7 @@
     </item>
     <item
         android:id="@+id/filter_config"
-        android:icon="@drawable/ic_outline_filter_alt_white_24"
+        android:icon="@drawable/ic_outline_filter_alt_24"
         android:title="@string/title_filter_config"
         app:showAsAction="ifRoom" />
     <item
@@ -70,22 +70,22 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/del_all_config"
-        android:icon="@drawable/ic_delete_white_24dp"
+        android:icon="@drawable/ic_delete_24dp"
         android:title="@string/title_del_all_config"
         app:showAsAction="never" />
     <item
         android:id="@+id/del_duplicate_config"
-        android:icon="@drawable/ic_delete_white_24dp"
+        android:icon="@drawable/ic_delete_24dp"
         android:title="@string/title_del_duplicate_config"
         app:showAsAction="never" />
     <item
         android:id="@+id/del_invalid_config"
-        android:icon="@drawable/ic_delete_white_24dp"
+        android:icon="@drawable/ic_delete_24dp"
         android:title="@string/title_del_invalid_config"
         app:showAsAction="never" />
     <item
         android:id="@+id/export_all"
-        android:icon="@drawable/ic_share_white_24dp"
+        android:icon="@drawable/ic_share_24dp"
         android:title="@string/title_export_all"
         app:showAsAction="never" />
     <item

@@ -13,8 +13,7 @@
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
+            android:layout_height="wrap_content">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -65,7 +64,7 @@
                             android:paddingStart="16dp"
                             android:text="@string/connection_test_pending"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                            android:textColor="@color/colorWhite" />
+                            android:textColor="@color/colorText" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -106,6 +105,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
+        app:itemIconTint="@color/colorAccent"
         app:menu="@menu/menu_drawer" >
 
         <LinearLayout

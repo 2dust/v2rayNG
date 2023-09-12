@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="AppThemeDayNight" parent="Theme.AppCompat.DayNight.DarkActionBar">
+    <style name="AppThemeDayNight" parent="Theme.AppCompat.DayNight">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -8,6 +8,7 @@
         <item name="colorMainText">@color/colorText</item>
         <item name="android:statusBarColor">@color/colorPrimary</item>
         <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="colorControlNormal">@color/colorAccent</item>
     </style>
 
     <style name="AppThemeDayNight.NoActionBar" parent="AppThemeDayNight">
@@ -34,9 +35,4 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
 </resources>

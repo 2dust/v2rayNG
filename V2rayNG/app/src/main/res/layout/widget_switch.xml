@@ -8,6 +8,7 @@
         android:orientation="vertical">
 
     <ImageView
+            android:id="@+id/image_switch"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:padding="10dp"
