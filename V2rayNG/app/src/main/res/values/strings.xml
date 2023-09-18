@@ -238,6 +238,8 @@
         <item>Bypassing the LAN address then proxy</item>
         <item>Bypass mainland address then proxy</item>
         <item>Bypassing LAN and mainland address then proxy</item>
+        <item>Bypass Iran address then proxy</item>
+        <item>Bypassing LAN and Iran address then proxy</item>
         <item>Global direct</item>
     </string-array>
 

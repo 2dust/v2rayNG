@@ -228,6 +228,8 @@
         <item>دور زدن آدرس LAN و سپس پروکسی</item>
         <item>دور زذن آدرس mainland و سپس پروکسی</item>
         <item>دور زدن LAN و آدرس mainland و سپس پروکسی</item>
+        <item>دور زدن آدرس های ایران و سپس پروکسی</item>
+        <item>دور زدن LAN و آدرس های ایران و سپس پروکسی</item>
         <item>مستقیم سراسری</item>
     </string-array>
 

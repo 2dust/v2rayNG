@@ -174,6 +174,13 @@ object V2rayConfigUtil {
                     routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
+                ERoutingMode.BYPASS_IRAN.value -> {
+                    routingGeo("", "ir", AppConfig.TAG_DIRECT, v2rayConfig)
+                }
+                ERoutingMode.BYPASS_LAN_IRAN.value -> {
+                    routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("", "ir", AppConfig.TAG_DIRECT, v2rayConfig)
+                }
                 ERoutingMode.GLOBAL_DIRECT.value -> {
                     val globalDirect = V2rayConfig.RoutingBean.RulesBean(
                         type = "field",

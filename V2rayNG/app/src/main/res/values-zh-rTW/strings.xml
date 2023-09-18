@@ -227,6 +227,8 @@
         <item>略過區域網路的 Proxy</item>
         <item>略過中國大陸的 Proxy</item>
         <item>略過區域網路及中國大陸的 Proxy</item>
+        <item>繞過伊朗地址然後代理</item>
+        <item>繞過 LAN 和伊朗地址然後代理</item>
         <item>直接連線</item>
     </string-array>
 

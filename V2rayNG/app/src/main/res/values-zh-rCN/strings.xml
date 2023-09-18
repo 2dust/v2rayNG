@@ -228,6 +228,8 @@
         <item>绕过局域网地址而后代理</item>
         <item>绕过大陆地址而后代理</item>
         <item>绕过局域网及大陆地址而后代理</item>
+        <item>绕过伊朗地址，然后代理</item>
+        <item>绕过局域网和伊朗地址，然后代理</item>
         <item>全局直连</item>
     </string-array>
 
