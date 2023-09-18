@@ -115,6 +115,7 @@
     <string name="summary_pref_prefer_ipv6">App 優先使用 IPv6 位址連線伺服器，同时開啟 VPN 的 IPv6 路由</string>
 
     <string name="title_pref_routing">轉送設定</string>
+    <string name="title_pref_routing_assets_provider">地理資產提供商</string>
     <string name="title_pref_routing_domain_strategy">網域策略</string>
     <string name="title_pref_routing_mode">轉送模式</string>
     <string name="title_pref_routing_custom">自訂轉送</string>

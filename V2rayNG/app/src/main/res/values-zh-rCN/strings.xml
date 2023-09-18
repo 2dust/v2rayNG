@@ -115,6 +115,7 @@
     <string name="summary_pref_prefer_ipv6">App优先使用IPv6地址连接服务器,同时开启VPN的IPv6路由</string>
 
     <string name="title_pref_routing">路由设置</string>
+    <string name="title_pref_routing_assets_provider">地理资产提供商</string>
     <string name="title_pref_routing_domain_strategy">域名策略</string>
     <string name="title_pref_routing_mode">预定义规则</string>
     <string name="title_pref_routing_custom">自定义规则</string>

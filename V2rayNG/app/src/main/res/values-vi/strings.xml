@@ -115,6 +115,7 @@
     <string name="summary_pref_prefer_ipv6">Ưu tiên sử dụng địa chỉ IPv6 cho kết nối và lộ trình.</string>
 
     <string name="title_pref_routing">Lộ trình</string>
+    <string name="title_pref_routing_assets_provider">Nhà cung cấp tài sản địa lý</string>
     <string name="title_pref_routing_domain_strategy">Tùy chọn tên miền</string>
     <string name="title_pref_routing_mode">Tùy chỉnh quy tắc lộ trình</string>
     <string name="title_pref_routing_custom">Tùy chỉnh lộ trình</string>

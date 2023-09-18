@@ -109,6 +109,7 @@
 	<string name="title_pref_prefer_ipv6">تفضيل IPv6</string>
 	<string name="summary_pref_prefer_ipv6">تفضيل عنوان IPv6 والمسارات</string>
 	<string name="title_pref_routing">التوجيه</string>
+	<string name="title_pref_routing_assets_provider">موفر الأصول الجغرافية</string>
 	<string name="title_pref_routing_domain_strategy">استراتيجية النطاق</string>
 	<string name="title_pref_routing_mode">قواعد محددة مسبقا</string>
 	<string name="title_pref_routing_custom">قواعد مخصصة</string>

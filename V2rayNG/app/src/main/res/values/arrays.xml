@@ -87,6 +87,18 @@
         <item>false</item>
     </string-array>
 
+    <string-array name="routing_assets_provider" translatable="false">
+        <item>Official</item>
+        <item>Loyalsoldier</item>
+        <item>Chocolate4U/Iran-v2ray-rules</item>
+    </string-array>
+
+    <string-array name="routing_assets_provider_value" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
     <string-array name="routing_mode_value" translatable="false">
         <item>0</item>
         <item>1</item>

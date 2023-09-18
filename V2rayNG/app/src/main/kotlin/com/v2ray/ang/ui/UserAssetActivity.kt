@@ -161,8 +161,38 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun downloadGeo(name: String, timeout: Int, httpPort: Int): Boolean {
-        val url = AppConfig.geoUrl + name
-        val targetTemp = File(extDir, name + "_temp")
+        val assetName: String
+        val geoUrl: String
+        when (settingsStorage?.decodeString(AppConfig.PREF_ROUTING_ASSETS_PROVIDER)) {
+            "0" -> {
+                if (name == "geoip.dat") {
+                    assetName = name
+                    geoUrl = "https://raw.githubusercontent.com/v2fly/geoip/release/"
+                } else {
+                    assetName = "dlc.dat"
+                    geoUrl = "https://raw.githubusercontent.com/v2fly/domain-list-community/release/"
+                }
+            }
+            "1" -> {
+                assetName = name
+                geoUrl = "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/"
+            }
+            "2" -> {
+                assetName = name
+                geoUrl = "https://raw.githubusercontent.com/Chocolate4U/Iran-v2ray-rules/release/"
+            }
+            else -> {
+                if (name == "geoip.dat") {
+                    assetName = name
+                    geoUrl = "https://raw.githubusercontent.com/v2fly/geoip/release/"
+                } else {
+                    assetName = "dlc.dat"
+                    geoUrl = "https://raw.githubusercontent.com/v2fly/domain-list-community/release/"
+                }
+            }
+        }
+        val url = geoUrl + assetName
+        val targetTemp = File(extDir, assetName + "_temp")
         val target = File(extDir, name)
         var conn: HttpURLConnection? = null
         //Log.d(AppConfig.ANG_PACKAGE, url)

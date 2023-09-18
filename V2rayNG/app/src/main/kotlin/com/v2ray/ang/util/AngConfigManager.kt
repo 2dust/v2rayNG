@@ -79,6 +79,7 @@ object AngConfigManager {
             AppConfig.PREF_SOCKS_PORT,
             AppConfig.PREF_HTTP_PORT,
             AppConfig.PREF_LOGLEVEL,
+            AppConfig.PREF_ROUTING_ASSETS_PROVIDER,
             AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,
             AppConfig.PREF_ROUTING_MODE,
             AppConfig.PREF_V2RAY_ROUTING_AGENT,

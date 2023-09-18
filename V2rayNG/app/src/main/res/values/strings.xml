@@ -123,6 +123,7 @@
     <string name="summary_pref_prefer_ipv6">Prefer IPv6 address and routes</string>
 
     <string name="title_pref_routing">Routing</string>
+    <string name="title_pref_routing_assets_provider">Geo Assets Provider</string>
     <string name="title_pref_routing_domain_strategy">Domain strategy</string>
     <string name="title_pref_routing_mode">Predefined rules</string>
     <string name="title_pref_routing_custom">Custom rules</string>

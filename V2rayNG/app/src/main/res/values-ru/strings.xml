@@ -121,6 +121,7 @@
     <string name="summary_pref_prefer_ipv6">Предпочитать IPv6-адреса и маршрутизацию</string>
 
     <string name="title_pref_routing">Маршрутизация</string>
+    <string name="title_pref_routing_assets_provider">Поставщик геоактивов</string>
     <string name="title_pref_routing_domain_strategy">Доменная стратегия</string>
     <string name="title_pref_routing_mode">Режим маршрутизации</string>
     <string name="title_pref_routing_custom">Пользовательские правила</string>
