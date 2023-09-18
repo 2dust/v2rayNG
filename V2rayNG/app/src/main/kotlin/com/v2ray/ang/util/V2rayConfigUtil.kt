@@ -280,15 +280,33 @@ object V2rayConfigUtil {
      */
     private fun customLocalDns(v2rayConfig: V2rayConfig): Boolean {
         try {
+            val geoProvider = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_ASSETS_PROVIDER) ?: "0"
+            val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: ERoutingMode.GLOBAL_PROXY.value
+
+            val geosite = when {
+                (routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) -> arrayListOf("geosite:cn")
+
+                (routingMode == ERoutingMode.BYPASS_IRAN.value || routingMode == ERoutingMode.BYPASS_LAN_IRAN.value) -> arrayListOf("geosite:ir")
+
+                else -> {
+                    when {
+                        (geoProvider == "0" || geoProvider == "1") -> arrayListOf("geosite:cn")
+
+                        geoProvider == "2" -> arrayListOf("geosite:ir")
+
+                        else -> arrayListOf("geosite:cn")
+                    }
+                }
+            }
+
             if (settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
-                val geositeCn = arrayListOf("geosite:cn")
                 val proxyDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
                         ?: "")
                 val directDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
                         ?: "")
                 // fakedns with all domains to make it always top priority
                 v2rayConfig.dns.servers?.add(0,
-                        V2rayConfig.DnsBean.ServersBean(address = "fakedns", domains = geositeCn.plus(proxyDomain).plus(directDomain)))
+                        V2rayConfig.DnsBean.ServersBean(address = "fakedns", domains = geosite.plus(proxyDomain).plus(directDomain)))
             }
 
             // DNS inbound对象
@@ -353,16 +371,45 @@ object V2rayConfigUtil {
             // domestic DNS
             val directDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
                     ?: "")
+            val geosite: ArrayList<String>
+            val geoip: ArrayList<String>
+            val geoProvider = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_ASSETS_PROVIDER) ?: "0"
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: ERoutingMode.GLOBAL_PROXY.value
-            if (directDomain.size > 0 || routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
-                val domesticDns = Utils.getDomesticDnsServers()
-                val geositeCn = arrayListOf("geosite:cn")
-                val geoipCn = arrayListOf("geoip:cn")
-                if (directDomain.size > 0) {
-                    servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, directDomain, geoipCn))
+
+            when {
+                (routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) -> {
+                    geosite = arrayListOf("geosite:cn")
+                    geoip = arrayListOf("geoip:cn")
                 }
-                if (routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
-                    servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, geositeCn, geoipCn))
+                (routingMode == ERoutingMode.BYPASS_IRAN.value || routingMode == ERoutingMode.BYPASS_LAN_IRAN.value) -> {
+                    geosite = arrayListOf("geosite:ir")
+                    geoip = arrayListOf("geoip:ir")
+                }
+                else -> {
+                    when {
+                        (geoProvider == "0" || geoProvider == "1") -> {
+                            geosite = arrayListOf("geosite:cn")
+                            geoip = arrayListOf("geoip:cn")
+                        }
+                        geoProvider == "2" -> {
+                            geosite = arrayListOf("geosite:ir")
+                            geoip = arrayListOf("geoip:ir")
+                        }
+                        else -> {
+                            geosite = arrayListOf("geosite:cn")
+                            geoip = arrayListOf("geoip:cn")
+                        }
+                    }
+                }
+            }
+
+            if (directDomain.size > 0 || routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value || routingMode == ERoutingMode.BYPASS_IRAN.value || routingMode == ERoutingMode.BYPASS_LAN_IRAN.value) {
+                val domesticDns = Utils.getDomesticDnsServers()
+                if (directDomain.size > 0) {
+                    servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, directDomain, geoip))
+                }
+                if (routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value || routingMode == ERoutingMode.BYPASS_IRAN.value || routingMode == ERoutingMode.BYPASS_LAN_IRAN.value) {
+                    servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, geosite, geoip))
                 }
                 if (Utils.isPureIpAddress(domesticDns.first())) {
                     v2rayConfig.routing.rules.add(0, V2rayConfig.RoutingBean.RulesBean(
@@ -381,9 +428,11 @@ object V2rayConfigUtil {
                 hosts.putAll(blkDomain.map { it to "127.0.0.1" })
             }
 
-            // hardcode googleapi rule to fix play store problems
-            hosts["domain:googleapis.cn"] = "googleapis.com"
+            // if routing mode and provider is not related to iran, set googleapi rule to fix play store problems
 
+            if (geoProvider != "2" && routingMode != ERoutingMode.BYPASS_IRAN.value && routingMode != ERoutingMode.BYPASS_LAN_IRAN.value) {
+                hosts["domain:googleapis.cn"] = "googleapis.com"
+            }
             // DNS dns对象
             v2rayConfig.dns = V2rayConfig.DnsBean(
                     servers = servers,
