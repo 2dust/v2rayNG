@@ -141,13 +141,11 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun downloadGeoFiles() {
-        val httpPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT), AppConfig.PORT_HTTP.toInt())
-
         toast(R.string.msg_downloading_content)
         geofiles.forEach {
             //toast(getString(R.string.msg_downloading_content) + it)
             lifecycleScope.launch(Dispatchers.IO) {
-                val result = downloadGeo(it, 60000, httpPort)
+                val result = downloadGeo(it, 60000)
                 launch(Dispatchers.Main) {
                     if (result) {
                         toast(getString(R.string.toast_success) + " " + it)
@@ -160,7 +158,7 @@ class UserAssetActivity : BaseActivity() {
         }
     }
 
-    private fun downloadGeo(name: String, timeout: Int, httpPort: Int): Boolean {
+    private fun downloadGeo(name: String, timeout: Int): Boolean {
         val assetName: String
         val geoUrl: String
         when (settingsStorage?.decodeString(AppConfig.PREF_ROUTING_ASSETS_PROVIDER)) {
@@ -198,12 +196,7 @@ class UserAssetActivity : BaseActivity() {
         //Log.d(AppConfig.ANG_PACKAGE, url)
 
         try {
-            conn = URL(url).openConnection(
-                Proxy(
-                    Proxy.Type.HTTP,
-                    InetSocketAddress("127.0.0.1", httpPort)
-                )
-            ) as HttpURLConnection
+            conn = URL(url).openConnection() as HttpURLConnection
             conn.connectTimeout = timeout
             conn.readTimeout = timeout
             val inputStream = conn.inputStream
