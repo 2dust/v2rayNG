@@ -280,7 +280,7 @@ object V2rayConfigUtil {
      */
     private fun customLocalDns(v2rayConfig: V2rayConfig): Boolean {
         try {
-            val geoProvider = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_ASSETS_PROVIDER) ?: "0"
+            val geoProvider = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_ASSETS_PROVIDER) ?: "1"
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: ERoutingMode.GLOBAL_PROXY.value
 
             val geosite = when {
@@ -288,15 +288,7 @@ object V2rayConfigUtil {
 
                 (routingMode == ERoutingMode.BYPASS_IRAN.value || routingMode == ERoutingMode.BYPASS_LAN_IRAN.value) -> arrayListOf("geosite:ir")
 
-                else -> {
-                    when {
-                        (geoProvider == "0" || geoProvider == "1") -> arrayListOf("geosite:cn")
-
-                        geoProvider == "2" -> arrayListOf("geosite:ir")
-
-                        else -> arrayListOf("geosite:cn")
-                    }
-                }
+                else -> arrayListOf("geosite:${if (geoProvider == "2") "ir" else "cn"}")
             }
 
             if (settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
@@ -369,56 +361,31 @@ object V2rayConfigUtil {
             }
 
             // domestic DNS
-            val directDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                    ?: "")
-            val geosite: ArrayList<String>
-            val geoip: ArrayList<String>
-            val geoProvider = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_ASSETS_PROVIDER) ?: "0"
+            val directDomain = userRule2Domian(settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT) ?: "")
+            val geoProvider = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_ASSETS_PROVIDER) ?: "1"
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: ERoutingMode.GLOBAL_PROXY.value
-
-            when {
-                (routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) -> {
-                    geosite = arrayListOf("geosite:cn")
-                    geoip = arrayListOf("geoip:cn")
-                }
-                (routingMode == ERoutingMode.BYPASS_IRAN.value || routingMode == ERoutingMode.BYPASS_LAN_IRAN.value) -> {
-                    geosite = arrayListOf("geosite:ir")
-                    geoip = arrayListOf("geoip:ir")
-                }
-                else -> {
-                    when {
-                        (geoProvider == "0" || geoProvider == "1") -> {
-                            geosite = arrayListOf("geosite:cn")
-                            geoip = arrayListOf("geoip:cn")
-                        }
-                        geoProvider == "2" -> {
-                            geosite = arrayListOf("geosite:ir")
-                            geoip = arrayListOf("geoip:ir")
-                        }
-                        else -> {
-                            geosite = arrayListOf("geosite:cn")
-                            geoip = arrayListOf("geoip:cn")
-                        }
-                    }
-                }
+            val geosite = when {
+                (routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) -> arrayListOf("geosite:cn")
+                (routingMode == ERoutingMode.BYPASS_IRAN.value || routingMode == ERoutingMode.BYPASS_LAN_IRAN.value) -> arrayListOf("geosite:ir")
+                else -> arrayListOf("geosite:${if (geoProvider == "2") "ir" else "cn"}")
             }
-
-            if (directDomain.size > 0 || routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value || routingMode == ERoutingMode.BYPASS_IRAN.value || routingMode == ERoutingMode.BYPASS_LAN_IRAN.value) {
-                val domesticDns = Utils.getDomesticDnsServers()
-                if (directDomain.size > 0) {
-                    servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, directDomain, geoip))
+            val geoip = geosite.map { it.replace("geosite", "geoip") }
+            if (directDomain.isNotEmpty() || routingMode in listOf(ERoutingMode.BYPASS_MAINLAND.value, ERoutingMode.BYPASS_LAN_MAINLAND.value, ERoutingMode.BYPASS_IRAN.value, ERoutingMode.BYPASS_LAN_IRAN.value)) {
+                val domesticDns = Utils.getDomesticDnsServers().first()
+                if (directDomain.isNotEmpty()) {
+                    servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns, 53, directDomain, geoip))
                 }
-                if (routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value || routingMode == ERoutingMode.BYPASS_IRAN.value || routingMode == ERoutingMode.BYPASS_LAN_IRAN.value) {
-                    servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns.first(), 53, geosite, geoip))
+                if (routingMode in listOf(ERoutingMode.BYPASS_MAINLAND.value, ERoutingMode.BYPASS_LAN_MAINLAND.value, ERoutingMode.BYPASS_IRAN.value, ERoutingMode.BYPASS_LAN_IRAN.value)) {
+                    servers.add(V2rayConfig.DnsBean.ServersBean(domesticDns, 53, geosite, geoip))
                 }
-                if (Utils.isPureIpAddress(domesticDns.first())) {
+                if (Utils.isPureIpAddress(domesticDns)) {
                     v2rayConfig.routing.rules.add(0, V2rayConfig.RoutingBean.RulesBean(
-                            type = "field",
-                            outboundTag = AppConfig.TAG_DIRECT,
-                            port = "53",
-                            ip = arrayListOf(domesticDns.first()),
-                            domain = null)
-                    )
+                    type = "field",
+                    outboundTag = AppConfig.TAG_DIRECT,
+                    port = "53",
+                    ip = arrayListOf(domesticDns),
+                    domain = null
+                    ))
                 }
             }
 
@@ -428,9 +395,9 @@ object V2rayConfigUtil {
                 hosts.putAll(blkDomain.map { it to "127.0.0.1" })
             }
 
-            // if routing mode and provider is not related to iran, set googleapi rule to fix play store problems
+            // if routing mode or provider is set to China, set googleapi rule to fix play store problems
 
-            if (geoProvider != "2" && routingMode != ERoutingMode.BYPASS_IRAN.value && routingMode != ERoutingMode.BYPASS_LAN_IRAN.value) {
+            if (geoProvider in listOf("0", "1") || routingMode in listOf(ERoutingMode.BYPASS_MAINLAND.value, ERoutingMode.BYPASS_LAN_MAINLAND.value)) {
                 hosts["domain:googleapis.cn"] = "googleapis.com"
             }
             // DNS dns对象

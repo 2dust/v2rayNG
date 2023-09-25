@@ -162,30 +162,21 @@ class UserAssetActivity : BaseActivity() {
         val assetName: String
         val geoUrl: String
         when (settingsStorage?.decodeString(AppConfig.PREF_ROUTING_ASSETS_PROVIDER)) {
-            "0" -> {
-                if (name == "geoip.dat") {
-                    assetName = name
-                    geoUrl = "https://raw.githubusercontent.com/v2fly/geoip/release/"
-                } else {
-                    assetName = "dlc.dat"
-                    geoUrl = "https://raw.githubusercontent.com/v2fly/domain-list-community/release/"
-                }
-            }
             "1" -> {
                 assetName = name
-                geoUrl = "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/"
+                geoUrl = AppConfig.LoyalsoldierGeoURL
             }
             "2" -> {
                 assetName = name
-                geoUrl = "https://raw.githubusercontent.com/Chocolate4U/Iran-v2ray-rules/release/"
+                geoUrl = AppConfig.Chocolate4UGeoURL
             }
             else -> {
                 if (name == "geoip.dat") {
                     assetName = name
-                    geoUrl = "https://raw.githubusercontent.com/v2fly/geoip/release/"
+                    geoUrl = AppConfig.officialGeoIPUrl
                 } else {
                     assetName = "dlc.dat"
-                    geoUrl = "https://raw.githubusercontent.com/v2fly/domain-list-community/release/"
+                    geoUrl = AppConfig.officialGeoSiteURL
                 }
             }
         }

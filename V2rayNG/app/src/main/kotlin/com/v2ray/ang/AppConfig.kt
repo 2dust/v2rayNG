@@ -64,6 +64,10 @@ object AppConfig {
     const val v2rayNGIssues = "https://github.com/2dust/v2rayNG/issues"
     const val v2rayNGWikiMode = "https://github.com/2dust/v2rayNG/wiki/Mode"
     const val promotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
+    const val officialGeoIPUrl = "https://raw.githubusercontent.com/v2fly/geoip/release/"
+    const val officialGeoSiteURL = "https://raw.githubusercontent.com/v2fly/domain-list-community/release/"
+    const val LoyalsoldierGeoURL = "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/"
+    const val Chocolate4UGeoURL = "https://raw.githubusercontent.com/Chocolate4U/Iran-v2ray-rules/release/"
 
     const val DNS_AGENT = "1.1.1.1"
     const val DNS_DIRECT = "223.5.5.5"
