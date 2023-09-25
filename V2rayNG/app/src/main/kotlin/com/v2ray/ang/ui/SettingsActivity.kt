@@ -36,6 +36,8 @@ class SettingsActivity : BaseActivity() {
         private val domesticDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DOMESTIC_DNS) }
         private val socksPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS_PORT) }
         private val httpPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HTTP_PORT) }
+        private val routingAssetsProvider by lazy { findPreference<ListPreference>(AppConfig.PREF_ROUTING_ASSETS_PROVIDER) }
+        private val routingMode by lazy { findPreference<Preference>(AppConfig.PREF_ROUTING_MODE) }
         private val routingCustom by lazy { findPreference<Preference>(AppConfig.PREF_ROUTING_CUSTOM) }
         //        val licenses: Preference by lazy { findPreference(PREF_LICENSES) }
 //        val feedback: Preference by lazy { findPreference(PREF_FEEDBACK) }
@@ -45,6 +47,38 @@ class SettingsActivity : BaseActivity() {
 
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             addPreferencesFromResource(R.xml.pref_settings)
+
+            routingMode?.setOnPreferenceChangeListener { _, newValue ->
+                val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
+                if (newValue.toString() == "4" || newValue.toString() == "5") {
+                    domesticDns?.summary = AppConfig.DNS_AGENT
+                    defaultSharedPreferences.edit().putString(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_AGENT).apply()
+                    routingAssetsProvider?.let {
+                        it.value = "2"
+                        it.summary = it.entry
+                        defaultSharedPreferences.edit().putString(AppConfig.PREF_ROUTING_ASSETS_PROVIDER, "2").apply()
+                    }
+                } else {
+                    domesticDns?.summary = AppConfig.DNS_DIRECT
+                    defaultSharedPreferences.edit().putString(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT).apply()
+                    routingAssetsProvider?.let {
+                        it.value = "1"
+                        it.summary = it.entry
+                        defaultSharedPreferences.edit().putString(AppConfig.PREF_ROUTING_ASSETS_PROVIDER, "1").apply()
+                    }
+                }
+                true
+            }
+
+            routingAssetsProvider?.setOnPreferenceChangeListener { _, newValue ->
+                val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
+                routingAssetsProvider?.let {
+                    it.value = newValue.toString()
+                    it.summary = it.entry
+                    defaultSharedPreferences.edit().putString(AppConfig.PREF_ROUTING_ASSETS_PROVIDER, newValue.toString()).apply()
+                }
+                true
+            }
 
             routingCustom?.setOnPreferenceClickListener {
                 startActivity(Intent(activity, RoutingSettingsActivity::class.java))
