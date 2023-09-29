@@ -192,9 +192,9 @@
 		<item>تصدير إلى الحافظة</item>
 	</string-array>
 	<string-array name="routing_tag">
-		<item>URL الوكيل أو IP</item>
-		<item>URL المباشر أو IP</item>
-		<item>URL المحظور أو IP</item>
+		<item>مسار وكيل أو IP</item>
+		<item>مسار مباشر أو IP</item>
+		<item>مسار محظور أو IP</item>
 	</string-array>
 	<string-array name="routing_mode">
 		<item>وكيل عالمي</item>
