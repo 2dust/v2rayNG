@@ -25,13 +25,12 @@ class LogcatActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-       binding = ActivityLogcatBinding.inflate(layoutInflater)
-       val view = binding.root
-       setContentView(view)
+        binding = ActivityLogcatBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         title = getString(R.string.title_logcat)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         logcat(false)
     }
 

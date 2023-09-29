@@ -36,7 +36,6 @@ class SubEditActivity : BaseActivity() {
         } else {
             clearServer()
         }
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     /**
