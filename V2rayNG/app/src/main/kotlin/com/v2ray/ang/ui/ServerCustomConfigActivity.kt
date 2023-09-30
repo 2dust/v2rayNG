@@ -49,7 +49,6 @@ class ServerCustomConfigActivity : BaseActivity() {
         } else {
             clearServer()
         }
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     /**

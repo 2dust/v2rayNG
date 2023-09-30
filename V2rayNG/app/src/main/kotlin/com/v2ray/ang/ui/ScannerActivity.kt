@@ -31,16 +31,6 @@ class ScannerActivity : BaseActivity(){
         if (settingsStorage?.decodeBool(AppConfig.PREF_START_SCAN_IMMEDIATE) == true) {
             launchScan()
         }
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    public override fun onResume() {
-        super.onResume()
-    }
-
-    public override fun onPause() {
-        super.onPause()
     }
 
     private fun launchScan(){
