@@ -49,7 +49,6 @@ class UserAssetActivity : BaseActivity() {
         val view = binding.root
         setContentView(view)
         title = getString(R.string.title_user_asset_setting)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)

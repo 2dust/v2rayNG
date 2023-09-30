@@ -21,7 +21,6 @@ class RoutingSettingsActivity : BaseActivity() {
         setContentView(view)
 
         title = getString(R.string.title_pref_routing_custom)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val fragments = ArrayList<Fragment>()
         fragments.add(RoutingSettingsFragment().newInstance(AppConfig.PREF_V2RAY_ROUTING_AGENT))

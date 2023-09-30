@@ -20,8 +20,6 @@ class SettingsActivity : BaseActivity() {
 
         title = getString(R.string.title_settings)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         settingsViewModel.startListenPreferenceChange()
     }
 
