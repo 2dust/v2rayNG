@@ -147,19 +147,19 @@
 	<string name="logcat_copy">نسخ</string>
 	<string name="logcat_clear">مسح</string>
 	<string name="title_service_restart">إعادة تشغيل الخدمة</string>
-	<string name="title_del_all_config">حذف كل التكوين</string>
-	<string name="title_del_duplicate_config">حذف التكوين المكرر</string>
-	<string name="title_del_invalid_config">حذف التكوين غير الصالح (اختبر أولا)</string>
+	<string name="title_del_all_config">حذف الكل (قبل أول خطوة)</string>
+	<string name="title_del_duplicate_config">حذف المكررات (2)</string>
+	<string name="title_del_invalid_config">حذف العناوين العاطلة (بعد الاختبار؛ 4)</string>
 	<string name="title_export_all">تصدير التكوينات غير المخصصة إلى الحافظة</string>
 	<string name="title_sub_setting">إعدادات مجموعة الاشتراك</string>
 	<string name="sub_setting_remarks">ملاحظات</string>
 	<string name="sub_setting_url">URL اختياري</string>
 	<string name="sub_setting_enable">تمكين التحديث</string>
-	<string name="title_sub_update">تحديث الاشتراك</string>
+	<string name="title_sub_update">تحديث الاشتراك (1)</string>
 	<string name="title_ping_all_server">Tcping كل التكوين</string>
-	<string name="title_real_ping_all_server">تأخير الحقيقي لكل التكوين</string>
+	<string name="title_real_ping_all_server">اختبر كل العناوين (3)</string>
 	<string name="title_user_asset_setting">ملفات الأصول الجغرافية</string>
-	<string name="title_sort_by_test_results">الترتيب بناءً على نتائج الاختبار</string>
+	<string name="title_sort_by_test_results">ترتيب العناوين حسب نتائج الاختبار (5)</string>
 	<string name="title_filter_config">تصفية ملف التكوين</string>
 	<string name="filter_config_all">جميع مجموعات الاشتراك</string>
 	<string name="title_del_duplicate_config_count">حذف %d من التكوينات المكررة</string>
@@ -192,9 +192,9 @@
 		<item>تصدير إلى الحافظة</item>
 	</string-array>
 	<string-array name="routing_tag">
-		<item>URL الوكيل أو IP</item>
-		<item>URL المباشر أو IP</item>
-		<item>URL المحظور أو IP</item>
+		<item>مسار وكيل أو IP</item>
+		<item>مسار مباشر أو IP</item>
+		<item>مسار محظور أو IP</item>
 	</string-array>
 	<string-array name="routing_mode">
 		<item>وكيل عالمي</item>
