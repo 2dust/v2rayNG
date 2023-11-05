@@ -97,7 +97,15 @@
     <string name="summary_pref_per_app_proxy">- Chung: Ứng dụng đã chọn sẽ kết nối Proxy, chưa lựa chọn sẽ kết nối trực tiếp. \n- Bỏ qua kết nối: Ứng dụng được chọn sẽ trực tiếp kết nối, không lựa chọn sẽ kết nối qua Proxy. \n- Lựa chọn để tự động chọn ứng dụng Proxy trong Menu.</string>
 
     <string name="title_pref_mux_enabled">Cho phép Mux</string>
-    <string name="summary_pref_mux_enabled">Bật lên có thể làm tăng tốc độ mạng và chuyển mạng nhanh hơn.</string>
+    <string name="summary_pref_mux_enabled">Nhanh hơn nhưng có thể khiến kết nối không ổn định\nMux lưu lượng TCP với 8 kết nối mặc định, tùy chỉnh cách xử lý UDP và QUIC bên dưới</string>
+    <string name="title_pref_mux_xudp_concurency">Kết nối XUDP (phạm vi -1 đến 1024)</string>
+    <string name="title_pref_mux_xudp_quic">Xử lý QUIC trong đường hầm mux</string>
+    <string-array name="mux_xudp_quic_entries">
+        <item>từ chối</item>
+        <item>cho phép</item>
+        <item>nhảy</item>
+    </string-array>
+
 
     <string name="title_pref_speed_enabled">Cho phép hiển thị tốc độ mạng</string>
     <string name="summary_pref_speed_enabled">Hiển thị tốc độ mạng hiện tại trên thanh thông báo.\nBiểu tượng trên thanh trạng thái có thể thay đổi tùy vào mức sử dụng.</string>
