@@ -304,7 +304,11 @@ class ServerActivity : BaseActivity() {
         }
         val config = MmkvManager.decodeServerConfig(editGuid) ?: ServerConfig.create(createConfigType)
         if (config.configType != EConfigType.SOCKS && TextUtils.isEmpty(et_id.text.toString())) {
-            toast(R.string.server_lab_id)
+            if (config.configType == EConfigType.TROJAN || config.configType == EConfigType.SHADOWSOCKS) {
+                toast(R.string.server_lab_id3)
+            }else{
+                toast(R.string.server_lab_id)
+            }
             return false
         }
         sp_stream_security?.let {
