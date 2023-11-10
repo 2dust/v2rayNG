@@ -179,4 +179,10 @@
         <item>fa</item>
         <item>ar</item>
     </string-array>
+
+    <string-array name="mux_xudp_quic_value" translatable="false">
+        <item>reject</item>
+        <item>allow</item>
+        <item>skip</item>
+    </string-array>
 </resources>

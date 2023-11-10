@@ -97,7 +97,14 @@
 	<string name="title_pref_per_app_proxy">وكيل لكل تطبيق</string>
 	<string name="summary_pref_per_app_proxy">عام: التطبيق المحدد هو الوكيل، الاتصال غير المحدد مباشر؛ \nوضع التجاوز: التطبيق المحدد متصل مباشرة، الوكيل غير المحدد. \nالخيار لتحديد التطبيق الوكيل تلقائيا في القائمة</string>
 	<string name="title_pref_mux_enabled">تمكين Mux</string>
-	<string name="summary_pref_mux_enabled">التمكين قد يسرع الشبكة والتبديل بين الشبكات قد يكون فلاش</string>
+	<string name="summary_pref_mux_enabled">حركة مرور TCP مع 8 اتصالات افتراضية، قم بتخصيص كيفية التعامل مع UDP وQUIC أدناهn\أسرع، لكنه قد يسبب اتصالاً غير مستقر</string>
+	<string name="title_pref_mux_xudp_concurency">اتصالات XUDP (النطاق من -1 إلى 1024)</string>
+	<string name="title_pref_mux_xudp_quic">التعامل مع QUIC في نفق مكس</string>
+	<string-array name="mux_xudp_quic_entries">
+		<item>يرفض</item>
+		<item>مسموح</item>
+		<item>يتخطى</item>
+	</string-array>
 	<string name="title_pref_speed_enabled">تمكين عرض السرعة</string>
 	<string name="summary_pref_speed_enabled">عرض السرعة الحالية في الإشعار.\nسيتغير رمز الإشعار استنادًا إلى الاستخدام.</string>
 	<string name="title_pref_sniffing_enabled">تمكين Sniffing</string>
