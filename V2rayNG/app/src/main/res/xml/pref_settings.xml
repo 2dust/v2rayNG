@@ -2,10 +2,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="pref_sniffing_enabled"
-            android:summary="@string/summary_pref_sniffing_enabled"
-            android:title="@string/title_pref_sniffing_enabled" />
+        android:defaultValue="true"
+        android:key="pref_sniffing_enabled"
+        android:summary="@string/summary_pref_sniffing_enabled"
+        android:title="@string/title_pref_sniffing_enabled" />
 
     <CheckBoxPreference
         android:key="pref_mux_enabled"
@@ -33,25 +33,25 @@
             android:title="@string/title_pref_per_app_proxy" />
 
         <CheckBoxPreference
-                android:key="pref_local_dns_enabled"
-                android:summary="@string/summary_pref_local_dns_enabled"
-                android:title="@string/title_pref_local_dns_enabled" />
+            android:key="pref_local_dns_enabled"
+            android:summary="@string/summary_pref_local_dns_enabled"
+            android:title="@string/title_pref_local_dns_enabled" />
 
         <CheckBoxPreference
-                android:key="pref_fake_dns_enabled"
-                android:summary="@string/summary_pref_fake_dns_enabled"
-                android:title="@string/title_pref_fake_dns_enabled" />
+            android:key="pref_fake_dns_enabled"
+            android:summary="@string/summary_pref_fake_dns_enabled"
+            android:title="@string/title_pref_fake_dns_enabled" />
 
         <EditTextPreference
-                android:key="pref_local_dns_port"
-                android:summary="10853"
-                android:inputType="number"
-                android:title="@string/title_pref_local_dns_port" />
+            android:key="pref_local_dns_port"
+            android:summary="10853"
+            android:inputType="number"
+            android:title="@string/title_pref_local_dns_port" />
 
         <EditTextPreference
-                android:key="pref_vpn_dns"
-                android:summary="@string/summary_pref_remote_dns"
-                android:title="@string/title_pref_vpn_dns" />
+            android:key="pref_vpn_dns"
+            android:summary="@string/summary_pref_remote_dns"
+            android:title="@string/title_pref_vpn_dns" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_pref_routing">
@@ -76,6 +76,18 @@
             android:summary="%s"
             android:title="@string/title_pref_routing_mode" />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_sub_setting">
+        <CheckBoxPreference
+            android:key="pref_auto_update_subscription"
+            android:summary="@string/summary_pref_auto_update_subscription"
+            android:title="@string/title_pref_auto_update_subscription" />
+        <EditTextPreference
+            android:key="pref_auto_update_interval"
+            android:summary="1440"
+            android:inputType="number"
+            android:title="@string/title_pref_auto_update_interval" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_ui_settings">
@@ -141,9 +153,9 @@
             android:title="@string/title_pref_remote_dns" />
 
         <EditTextPreference
-                android:key="pref_domestic_dns"
-                android:summary="@string/summary_pref_domestic_dns"
-                android:title="@string/title_pref_domestic_dns" />
+            android:key="pref_domestic_dns"
+            android:summary="@string/summary_pref_domestic_dns"
+            android:title="@string/title_pref_domestic_dns" />
 
         <ListPreference
             android:defaultValue="warning"
@@ -154,50 +166,12 @@
             android:title="@string/title_core_loglevel" />
 
         <ListPreference
-                android:defaultValue="VPN"
-                android:entries="@array/mode_entries"
-                android:entryValues="@array/mode_value"
-                android:key="pref_mode"
-                android:summary="%s"
-                android:title="@string/title_mode" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="Subscription">
-
-        <CheckBoxPreference
-            android:key="pref_auto_update_subscription"
-            android:summary="Update your subscriptions automatically with an interval in background"
-            android:title="Automatic update subscriptions" />
-
-        <EditTextPreference
-            android:key="pref_auto_update_interval"
-            android:summary="1440 min"
-            android:inputType="number"
-            android:title="Subscription Update Interval (Minutes)" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/title_ui_settings">
-
-        <CheckBoxPreference
-            android:key="pref_confirm_remove"
-            android:summary="@string/summary_pref_confirm_remove"
-            android:title="@string/title_pref_confirm_remove" />
-
-        <CheckBoxPreference
-            android:key="pref_start_scan_immediate"
-            android:summary="@string/summary_pref_start_scan_immediate"
-            android:title="@string/title_pref_start_scan_immediate" />
-
-        <ListPreference
-            android:defaultValue="auto"
-            android:entries="@array/language_select"
-            android:entryValues="@array/language_select_value"
-            android:key="pref_language"
+            android:defaultValue="VPN"
+            android:entries="@array/mode_entries"
+            android:entryValues="@array/mode_value"
+            android:key="pref_mode"
             android:summary="%s"
-            android:title="@string/title_language" />
+            android:title="@string/title_mode" />
 
     </PreferenceCategory>
-
 </PreferenceScreen>

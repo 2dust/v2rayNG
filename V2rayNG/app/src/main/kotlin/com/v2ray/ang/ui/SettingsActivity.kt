@@ -14,13 +14,10 @@ import androidx.work.multiprocess.RemoteWorkManager
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.AngConfig
 import com.v2ray.ang.service.SubscriptionUpdater
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.SettingsViewModel
-import java.sql.Time
 import java.util.concurrent.TimeUnit
-import kotlin.time.toDuration
 
 class SettingsActivity : BaseActivity() {
     private val settingsViewModel: SettingsViewModel by viewModels()
@@ -81,7 +78,7 @@ class SettingsActivity : BaseActivity() {
             autoUpdateInterval?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
                 autoUpdateInterval?.summary =
-                    if (TextUtils.isEmpty(nval) or (nval.toLong() < 15)) AppConfig.DEFAULT_UPDATE_INTERVAL else nval
+                    if (TextUtils.isEmpty(nval) or (nval.toLong() < 15)) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
                 configureUpdateTask(nval.toLong())
                 false
             }
@@ -180,7 +177,7 @@ class SettingsActivity : BaseActivity() {
             httpPort?.summary = defaultSharedPreferences.getString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
             updateMux(defaultSharedPreferences.getBoolean(AppConfig.PREF_MUX_ENABLED, false))
             muxXudpConcurrency?.summary = defaultSharedPreferences.getString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
-            autoUpdateInterval?.summary = defaultSharedPreferences.getString(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,AppConfig.DEFAULT_UPDATE_INTERVAL)
+            autoUpdateInterval?.summary = defaultSharedPreferences.getString(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
 
             if (TextUtils.isEmpty(remoteDnsString)) {
                 remoteDnsString = AppConfig.DNS_AGENT
@@ -233,9 +230,9 @@ class SettingsActivity : BaseActivity() {
 
         private fun configureUpdateTask(interval: Long) {
             val rw = RemoteWorkManager.getInstance(AngApplication.application)
-            rw.cancelUniqueWork(AppConfig.UPDATE_TASK_NAME)
+            rw.cancelUniqueWork(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
             rw.enqueueUniquePeriodicWork(
-                AppConfig.UPDATE_TASK_NAME,
+                AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME,
                 ExistingPeriodicWorkPolicy.UPDATE,
                 PeriodicWorkRequest.Builder(
                     SubscriptionUpdater.UpdateTask::class.java,
@@ -255,7 +252,8 @@ class SettingsActivity : BaseActivity() {
 
         private fun cancelUpdateTask() {
             val rw = RemoteWorkManager.getInstance(AngApplication.application)
-            rw.cancelUniqueWork(AppConfig.UPDATE_TASK_NAME)
+            rw.cancelUniqueWork(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
+        }
             
         private fun updateMux(enabled: Boolean) {
             val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
