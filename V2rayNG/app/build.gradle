@@ -17,8 +17,8 @@ android {
         minSdkVersion 21
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
-        versionCode 519
-        versionName "1.8.7"
+        versionCode 523
+        versionName "1.8.9"
     }
 
     buildTypes {

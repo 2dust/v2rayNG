@@ -41,8 +41,6 @@ class PerAppProxyActivity : BaseActivity() {
         val view = binding.root
         setContentView(view)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         binding.recyclerView.addItemDecoration(dividerItemDecoration)
 

@@ -27,8 +27,6 @@ class SubSettingActivity : BaseActivity() {
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onResume() {

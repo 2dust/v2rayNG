@@ -98,7 +98,14 @@
     <string name="summary_pref_per_app_proxy">عمومی: برنامه بررسی شده پروکسی است، اتصال مستقیم بدون بررسی است. \nحالت bypass: برنامه بررسی شده مستقیما متصل است، پراکسی بررسی نشده است. \nگزینه‌ای برای انتخاب خودکار پروکسی برنامه در منو است</string>
 
     <string name="title_pref_mux_enabled">فعال کردن Mux</string>
-    <string name="summary_pref_mux_enabled">فعال کردن شاید سرعت بخشیدن به شبکه و تغییر شبکه شاید فلش، بهبود کند</string>
+    <string name="summary_pref_mux_enabled">سریعتر است، اما ممکن است باعث اتصال ناپایدار شود\nمخزن ترافیک TCP با 8 اتصال پیش‌فرض، نحوه مدیریت UDP و QUIC را در زیر سفارشی کنید</string>
+    <string name="title_pref_mux_xudp_concurency">اتصالات XUDP (محدوده -1 تا 1024)</string>
+    <string name="title_pref_mux_xudp_quic">مدیریت QUIC در تونل mux</string>
+    <string-array name="mux_xudp_quic_entries">
+        <item>رد کردن</item>
+        <item>مجاز</item>
+        <item>جست و خیز کردن</item>
+    </string-array>
 
     <string name="title_pref_speed_enabled">فعال کردن نمایش سرعت</string>
     <string name="summary_pref_speed_enabled">نمایش سرعت فعلی در قسمت آگاه‌سازی. \nآیکون آگاه‌سازی بر اساس استفاده تغییر می‌کند.</string>

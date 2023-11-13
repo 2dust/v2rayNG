@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-            android:key="pref_speed_enabled"
-            android:summary="@string/summary_pref_speed_enabled"
-            android:title="@string/title_pref_speed_enabled" />
 
     <CheckBoxPreference
             android:defaultValue="true"
@@ -11,16 +7,31 @@
             android:summary="@string/summary_pref_sniffing_enabled"
             android:title="@string/title_pref_sniffing_enabled" />
 
+    <CheckBoxPreference
+        android:key="pref_mux_enabled"
+        android:summary="@string/summary_pref_mux_enabled"
+        android:title="@string/title_pref_mux_enabled" />
+
+    <EditTextPreference
+        android:key="pref_mux_xudp_concurency"
+        android:summary="8"
+        android:inputType="number"
+        android:title="@string/title_pref_mux_xudp_concurency" />
+
+    <ListPreference
+        android:defaultValue="reject"
+        android:entries="@array/mux_xudp_quic_entries"
+        android:entryValues="@array/mux_xudp_quic_value"
+        android:key="pref_mux_xudp_quic"
+        android:summary="%s"
+        android:title="@string/title_pref_mux_xudp_quic" />
+
     <PreferenceCategory android:title="@string/title_vpn_settings">
         <CheckBoxPreference
             android:key="pref_per_app_proxy"
             android:summary="@string/summary_pref_per_app_proxy"
             android:title="@string/title_pref_per_app_proxy" />
 
-        <!--<CheckBoxPreference-->
-        <!--android:key="pref_mux_enabled"-->
-        <!--android:summary="@string/summary_pref_mux_enabled"-->
-        <!--android:title="@string/title_pref_mux_enabled" />-->
         <CheckBoxPreference
                 android:key="pref_local_dns_enabled"
                 android:summary="@string/summary_pref_local_dns_enabled"
@@ -64,6 +75,32 @@
             android:key="pref_routing_mode"
             android:summary="%s"
             android:title="@string/title_pref_routing_mode" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_ui_settings">
+        <CheckBoxPreference
+            android:key="pref_speed_enabled"
+            android:summary="@string/summary_pref_speed_enabled"
+            android:title="@string/title_pref_speed_enabled" />
+
+        <CheckBoxPreference
+            android:key="pref_confirm_remove"
+            android:summary="@string/summary_pref_confirm_remove"
+            android:title="@string/title_pref_confirm_remove" />
+
+        <CheckBoxPreference
+            android:key="pref_start_scan_immediate"
+            android:summary="@string/summary_pref_start_scan_immediate"
+            android:title="@string/title_pref_start_scan_immediate" />
+
+        <ListPreference
+            android:defaultValue="auto"
+            android:entries="@array/language_select"
+            android:entryValues="@array/language_select_value"
+            android:key="pref_language"
+            android:summary="%s"
+            android:title="@string/title_language" />
 
     </PreferenceCategory>
 
@@ -162,4 +199,5 @@
             android:title="@string/title_language" />
 
     </PreferenceCategory>
+
 </PreferenceScreen>
