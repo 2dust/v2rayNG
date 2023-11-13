@@ -5,14 +5,22 @@ import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
+import androidx.work.multiprocess.RemoteWorkManager
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubEditBinding
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.service.SubscriptionUpdater
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
+import java.util.concurrent.TimeUnit
 
 class SubEditActivity : BaseActivity() {
     private lateinit var binding: ActivitySubEditBinding
@@ -45,6 +53,7 @@ class SubEditActivity : BaseActivity() {
         binding.etRemarks.text = Utils.getEditable(subItem.remarks)
         binding.etUrl.text = Utils.getEditable(subItem.url)
         binding.chkEnable.isChecked = subItem.enabled
+        binding.autoUpdateCheck.isChecked = subItem.autoUpdate
         return true
     }
 
@@ -75,6 +84,7 @@ class SubEditActivity : BaseActivity() {
         subItem.remarks = binding.etRemarks.text.toString()
         subItem.url = binding.etUrl.text.toString()
         subItem.enabled = binding.chkEnable.isChecked
+        subItem.autoUpdate = binding.autoUpdateCheck.isChecked
 
         if (TextUtils.isEmpty(subItem.remarks)) {
             toast(R.string.sub_setting_remarks)
@@ -129,4 +139,5 @@ class SubEditActivity : BaseActivity() {
         }
         else -> super.onOptionsItemSelected(item)
     }
+
 }

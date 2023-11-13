@@ -90,4 +90,11 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG = 7
     const val MSG_MEASURE_CONFIG_SUCCESS = 71
     const val MSG_MEASURE_CONFIG_CANCEL = 72
+
+    // subscription settings
+    const val SUBSCRIPTION_AUTO_UPDATE = "pref_auto_update_subscription"
+    const val SUBSCRIPTION_AUTO_UPDATE_INTERVAL = "pref_auto_update_interval"
+    const val DEFAULT_UPDATE_INTERVAL = "1440" // 24 hours
+    const val UPDATE_TASK_NAME = "subscription-updater"
+
 }

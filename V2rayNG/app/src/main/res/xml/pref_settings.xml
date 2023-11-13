@@ -162,4 +162,42 @@
                 android:title="@string/title_mode" />
 
     </PreferenceCategory>
+
+    <PreferenceCategory android:title="Subscription">
+
+        <CheckBoxPreference
+            android:key="pref_auto_update_subscription"
+            android:summary="Update your subscriptions automatically with an interval in background"
+            android:title="Automatic update subscriptions" />
+
+        <EditTextPreference
+            android:key="pref_auto_update_interval"
+            android:summary="1440 min"
+            android:inputType="number"
+            android:title="Subscription Update Interval (Minutes)" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_ui_settings">
+
+        <CheckBoxPreference
+            android:key="pref_confirm_remove"
+            android:summary="@string/summary_pref_confirm_remove"
+            android:title="@string/title_pref_confirm_remove" />
+
+        <CheckBoxPreference
+            android:key="pref_start_scan_immediate"
+            android:summary="@string/summary_pref_start_scan_immediate"
+            android:title="@string/title_pref_start_scan_immediate" />
+
+        <ListPreference
+            android:defaultValue="auto"
+            android:entries="@array/language_select"
+            android:entryValues="@array/language_select_value"
+            android:key="pref_language"
+            android:summary="%s"
+            android:title="@string/title_language" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

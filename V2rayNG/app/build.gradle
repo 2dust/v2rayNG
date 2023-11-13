@@ -132,4 +132,9 @@ dependencies {
     implementation 'com.blacksquircle.ui:language-json:2.8.0'
     implementation 'io.github.g00fy2.quickie:quickie-bundled:1.6.0'
     implementation 'com.google.zxing:core:3.5.1'
+
+    def work_version = "2.8.1"
+
+    implementation "androidx.work:work-runtime-ktx:$work_version"
+    implementation "androidx.work:work-multiprocess:$work_version"
 }
