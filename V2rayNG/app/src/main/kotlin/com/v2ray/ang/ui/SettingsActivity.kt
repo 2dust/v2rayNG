@@ -78,9 +78,9 @@ class SettingsActivity : BaseActivity() {
             autoUpdateInterval?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
                 autoUpdateInterval?.summary =
-                    if (TextUtils.isEmpty(nval) or (nval.toLong() < 15)) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
+                    if (TextUtils.isEmpty(nval) or (nval.toLong() < 1)) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
                 configureUpdateTask(nval.toLong())
-                false
+                true
             }
 
 //            licenses.onClick {
@@ -178,6 +178,7 @@ class SettingsActivity : BaseActivity() {
             updateMux(defaultSharedPreferences.getBoolean(AppConfig.PREF_MUX_ENABLED, false))
             muxXudpConcurrency?.summary = defaultSharedPreferences.getString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
             autoUpdateInterval?.summary = defaultSharedPreferences.getString(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
+            autoUpdateInterval?.isEnabled = defaultSharedPreferences.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
 
             if (TextUtils.isEmpty(remoteDnsString)) {
                 remoteDnsString = AppConfig.DNS_AGENT
