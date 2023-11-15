@@ -165,7 +165,7 @@
     <string name="summary_pref_promotion">一些推广,点击查看详情(捐赠可去除)</string>
 
     <string name="title_pref_auto_update_subscription">自动更新订阅</string>
-    <string name="summary_pref_auto_update_subscription">在后台按一定时间间隔自动更新您的订阅</string>
+    <string name="summary_pref_auto_update_subscription">在后台按一定时间间隔自动更新您的订阅。受设备影响，此功能不一定总是有效</string>
     <string name="title_pref_auto_update_interval">订阅自动更新间隔（分钟）</string>
 
     <string name="title_core_loglevel">日志级别</string>
@@ -186,7 +186,7 @@
     <string name="sub_setting_remarks">备注</string>
     <string name="sub_setting_url">可选地址(url)</string>
     <string name="sub_setting_enable">启用更新</string>
-    <string name="sub_auto_update">自动更新</string>
+    <string name="sub_auto_update">启用自动更新</string>
     <string name="title_sub_update">更新订阅</string>
     <string name="title_ping_all_server">测试全部配置Tcping</string>
     <string name="title_real_ping_all_server">测试全部配置真连接</string>

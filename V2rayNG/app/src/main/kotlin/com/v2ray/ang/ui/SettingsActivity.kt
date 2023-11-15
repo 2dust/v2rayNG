@@ -243,11 +243,7 @@ class SettingsActivity : BaseActivity() {
                     .apply {
                         setInitialDelay(interval, TimeUnit.MINUTES)
                     }
-                    .setConstraints(
-                        Constraints(
-                            NetworkType.CONNECTED,
-                        )
-                    ).build()
+                    .build()
             )
         }
 
