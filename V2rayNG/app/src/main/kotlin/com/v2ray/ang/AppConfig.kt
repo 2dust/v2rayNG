@@ -40,6 +40,9 @@ object AppConfig {
     const val PREF_BYPASS_APPS = "pref_bypass_apps"
     const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
     const val PREF_START_SCAN_IMMEDIATE = "pref_start_scan_immediate"
+    const val PREF_MUX_ENABLED = "pref_mux_enabled"
+    const val PREF_MUX_XUDP_CONCURRENCY = "pref_mux_xudp_concurency"
+    const val PREF_MUX_XUDP_QUIC = "pref_mux_xudp_quic"
 
     const val HTTP_PROTOCOL: String = "http://"
     const val HTTPS_PROTOCOL: String = "https://"
@@ -91,7 +94,7 @@ object AppConfig {
     // subscription settings
     const val SUBSCRIPTION_AUTO_UPDATE = "pref_auto_update_subscription"
     const val SUBSCRIPTION_AUTO_UPDATE_INTERVAL = "pref_auto_update_interval"
-    const val DEFAULT_UPDATE_INTERVAL = "1440" // 24 hours
-    const val UPDATE_TASK_NAME = "subscription-updater"
+    const val SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL = "1440" // 24 hours
+    const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
 
 }

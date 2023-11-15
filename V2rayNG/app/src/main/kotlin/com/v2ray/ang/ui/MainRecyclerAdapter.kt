@@ -96,7 +96,8 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                     holder.itemMainBinding.tvType.text = config.configType.name.lowercase()
                 }
             }
-            holder.itemMainBinding.tvStatistics.text = "${outbound?.getServerAddress()} : ${outbound?.getServerPort()}"
+            val strState = "***${outbound?.getServerAddress()?.drop(3)} : ${outbound?.getServerPort()}"
+            holder.itemMainBinding.tvStatistics.text = strState
 
             holder.itemMainBinding.layoutShare.setOnClickListener {
                 AlertDialog.Builder(mActivity).setItems(shareOptions.toTypedArray()) { _, i ->

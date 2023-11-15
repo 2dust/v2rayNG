@@ -14,13 +14,10 @@ import androidx.work.multiprocess.RemoteWorkManager
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.AngConfig
 import com.v2ray.ang.service.SubscriptionUpdater
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.SettingsViewModel
-import java.sql.Time
 import java.util.concurrent.TimeUnit
-import kotlin.time.toDuration
 
 class SettingsActivity : BaseActivity() {
     private val settingsViewModel: SettingsViewModel by viewModels()
@@ -40,6 +37,11 @@ class SettingsActivity : BaseActivity() {
         private val fakeDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_FAKE_DNS_ENABLED) }
         private val localDnsPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_LOCAL_DNS_PORT) }
         private val vpnDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_VPN_DNS) }
+        
+        private val mux by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_MUX_ENABLED) }
+        private val muxXudpConcurrency by lazy { findPreference<EditTextPreference>(AppConfig.PREF_MUX_XUDP_CONCURRENCY) }
+        private val muxXudpQuic by lazy { findPreference<ListPreference>(AppConfig.PREF_MUX_XUDP_QUIC) }
+
 
         //        val autoRestart by lazy { findPreference(PREF_AUTO_RESTART) as CheckBoxPreference }
         private val remoteDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_REMOTE_DNS) }
@@ -76,9 +78,9 @@ class SettingsActivity : BaseActivity() {
             autoUpdateInterval?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
                 autoUpdateInterval?.summary =
-                    if (TextUtils.isEmpty(nval) or (nval.toLong() < 15)) AppConfig.DEFAULT_UPDATE_INTERVAL else nval
+                    if (TextUtils.isEmpty(nval) or (nval.toLong() < 1)) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
                 configureUpdateTask(nval.toLong())
-                false
+                true
             }
 
 //            licenses.onClick {
@@ -152,6 +154,14 @@ class SettingsActivity : BaseActivity() {
             }
             mode?.dialogLayoutResource = R.layout.preference_with_help_link
             //loglevel.summary = "LogLevel"
+            mux?.setOnPreferenceChangeListener { _, newValue ->
+                updateMux(newValue as Boolean)
+                true
+            }
+            muxXudpConcurrency?.setOnPreferenceChangeListener { _, newValue ->
+                updateMuxConcurrency(newValue as String)
+                true
+            }
         }
 
         override fun onStart() {
@@ -160,21 +170,15 @@ class SettingsActivity : BaseActivity() {
                 PreferenceManager.getDefaultSharedPreferences(requireActivity())
             updateMode(defaultSharedPreferences.getString(AppConfig.PREF_MODE, "VPN"))
             var remoteDnsString = defaultSharedPreferences.getString(AppConfig.PREF_REMOTE_DNS, "")
-            domesticDns?.summary =
-                defaultSharedPreferences.getString(AppConfig.PREF_DOMESTIC_DNS, "")
 
-            localDnsPort?.summary = defaultSharedPreferences.getString(
-                AppConfig.PREF_LOCAL_DNS_PORT,
-                AppConfig.PORT_LOCAL_DNS
-            )
-            socksPort?.summary =
-                defaultSharedPreferences.getString(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
-            httpPort?.summary =
-                defaultSharedPreferences.getString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
-            autoUpdateInterval?.summary = defaultSharedPreferences.getString(
-                AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,
-                AppConfig.DEFAULT_UPDATE_INTERVAL
-            )
+            domesticDns?.summary = defaultSharedPreferences.getString(AppConfig.PREF_DOMESTIC_DNS, "")
+            localDnsPort?.summary = defaultSharedPreferences.getString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
+            socksPort?.summary = defaultSharedPreferences.getString(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
+            httpPort?.summary = defaultSharedPreferences.getString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
+            updateMux(defaultSharedPreferences.getBoolean(AppConfig.PREF_MUX_ENABLED, false))
+            muxXudpConcurrency?.summary = defaultSharedPreferences.getString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
+            autoUpdateInterval?.summary = defaultSharedPreferences.getString(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
+            autoUpdateInterval?.isEnabled = defaultSharedPreferences.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
 
             if (TextUtils.isEmpty(remoteDnsString)) {
                 remoteDnsString = AppConfig.DNS_AGENT
@@ -227,9 +231,9 @@ class SettingsActivity : BaseActivity() {
 
         private fun configureUpdateTask(interval: Long) {
             val rw = RemoteWorkManager.getInstance(AngApplication.application)
-            rw.cancelUniqueWork(AppConfig.UPDATE_TASK_NAME)
+            rw.cancelUniqueWork(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
             rw.enqueueUniquePeriodicWork(
-                AppConfig.UPDATE_TASK_NAME,
+                AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME,
                 ExistingPeriodicWorkPolicy.UPDATE,
                 PeriodicWorkRequest.Builder(
                     SubscriptionUpdater.UpdateTask::class.java,
@@ -239,17 +243,32 @@ class SettingsActivity : BaseActivity() {
                     .apply {
                         setInitialDelay(interval, TimeUnit.MINUTES)
                     }
-                    .setConstraints(
-                        Constraints(
-                            NetworkType.CONNECTED,
-                        )
-                    ).build()
+                    .build()
             )
         }
 
         private fun cancelUpdateTask() {
             val rw = RemoteWorkManager.getInstance(AngApplication.application)
-            rw.cancelUniqueWork(AppConfig.UPDATE_TASK_NAME)
+            rw.cancelUniqueWork(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
+        }
+            
+        private fun updateMux(enabled: Boolean) {
+            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
+            muxXudpConcurrency?.isEnabled = enabled
+            muxXudpQuic?.isEnabled = enabled
+            if (enabled) {
+                updateMuxConcurrency(defaultSharedPreferences.getString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8"))
+            }
+        }
+
+        private fun updateMuxConcurrency(value: String?) {
+            if (value == null) {
+                muxXudpQuic?.isEnabled = true
+            } else {
+                val concurrency = value.toIntOrNull() ?: 8
+                muxXudpConcurrency?.summary = concurrency.toString()
+                muxXudpQuic?.isEnabled = concurrency >= 0
+            }
         }
     }
 

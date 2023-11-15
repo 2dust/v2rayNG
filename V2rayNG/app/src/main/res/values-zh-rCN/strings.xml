@@ -96,8 +96,15 @@
     <string name="title_pref_per_app_proxy">分应用代理</string>
     <string name="summary_pref_per_app_proxy">常规:勾选的App被代理,未勾选的直连;\n绕行模式:勾选的App直连,未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
 
-    <string name="title_pref_mux_enabled">启用Mux多路复用</string>
-    <string name="summary_pref_mux_enabled">开启可能会加速,关闭可能会减少断流</string>
+    <string name="title_pref_mux_enabled">启用 Mux 多路复用</string>
+    <string name="summary_pref_mux_enabled">减低延时，但可能会断流，建议不要启用。\nTCP 默认复用 8 个子链接，UDP 及 QUIC 流量处理方式下方可选。</string>
+    <string name="title_pref_mux_xudp_concurency">XUDP 复用子链接数（可填 -1 至 1024）</string>
+    <string name="title_pref_mux_xudp_quic">QUIC 流量处理方式</string>
+    <string-array name="mux_xudp_quic_entries">
+        <item>不代理</item>
+        <item>多路复用</item>
+        <item>原生</item>
+    </string-array>
 
     <string name="title_pref_speed_enabled">启用速度显示</string>
     <string name="summary_pref_speed_enabled">在通知中显示当前速度\n小图标显示流量的路由情况</string>
@@ -157,6 +164,10 @@
     <string name="title_pref_promotion">推广</string>
     <string name="summary_pref_promotion">一些推广,点击查看详情(捐赠可去除)</string>
 
+    <string name="title_pref_auto_update_subscription">自动更新订阅</string>
+    <string name="summary_pref_auto_update_subscription">在后台按一定时间间隔自动更新您的订阅。受设备影响，此功能不一定总是有效</string>
+    <string name="title_pref_auto_update_interval">订阅自动更新间隔（分钟）</string>
+
     <string name="title_core_loglevel">日志级别</string>
     <string name="title_mode">模式</string>
     <string name="title_mode_help">点此查看更多帮助</string>
@@ -175,6 +186,7 @@
     <string name="sub_setting_remarks">备注</string>
     <string name="sub_setting_url">可选地址(url)</string>
     <string name="sub_setting_enable">启用更新</string>
+    <string name="sub_auto_update">启用自动更新</string>
     <string name="title_sub_update">更新订阅</string>
     <string name="title_ping_all_server">测试全部配置Tcping</string>
     <string name="title_real_ping_all_server">测试全部配置真连接</string>
