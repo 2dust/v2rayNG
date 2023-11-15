@@ -402,11 +402,10 @@ object V2rayConfigUtil {
     private fun updateOutboundWithGlobalSettings(outbound: V2rayConfig.OutboundBean): Boolean {
         try {
             if (settingsStorage?.decodeBool(AppConfig.PREF_MUX_ENABLED) == true) {
-                outbound.mux = V2rayConfig.OutboundBean.MuxBean(enabled = true,
-                    concurrency = 8,
-                    xudpConcurrency = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_MUX_XUDP_CONCURRENCY), 8),
-                    xudpProxyUDP443 = settingsStorage?.decodeString(AppConfig.PREF_MUX_XUDP_QUIC) ?: "reject"
-                )
+                outbound.mux?.enabled = true
+                outbound.mux?.concurrency = 8
+                outbound.mux?.xudpConcurrency = settingsStorage?.decodeInt(AppConfig.PREF_MUX_XUDP_CONCURRENCY) ?: 8
+                outbound.mux?.xudpProxyUDP443 = settingsStorage?.decodeString(AppConfig.PREF_MUX_XUDP_QUIC) ?: "reject"
             } else {
                 outbound.mux?.enabled = false
             }
