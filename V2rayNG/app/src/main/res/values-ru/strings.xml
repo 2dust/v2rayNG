@@ -32,7 +32,7 @@
     <string name="menu_item_import_config_manually_trojan">Ручной ввод профиля Trojan</string>
     <string name="menu_item_import_config_custom">Пользовательский профиль</string>
     <string name="menu_item_import_config_custom_clipboard">Импорт из буфера обмена</string>
-    <string name="menu_item_import_config_custom_local">Импорт с устройства</string>
+    <string name="menu_item_import_config_custom_local">Импорт из файла</string>
     <string name="menu_item_import_config_custom_url">Импорт из URL</string>
     <string name="menu_item_import_config_custom_url_scan">Импорт сканированием URL</string>
     <string name="del_config_comfirm">Подтверждаете удаление?</string>
@@ -170,6 +170,10 @@
     <string name="title_pref_promotion">Содействие</string>
     <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации (пожертвование может быть удалено)</string>
 
+    <string name="title_pref_auto_update_subscription">Автоматическое обновление подписок</string>
+    <string name="summary_pref_auto_update_subscription">Автоматическое обновление подписок в фоновом режиме с указанным интервалом. В зависимости от устройства эта функция может работать не всегда.</string>
+    <string name="title_pref_auto_update_interval">Интервал автообновления (мин.)</string>
+
     <string name="title_core_loglevel">Подробность ведения журнала</string>
     <string name="title_mode">Режим</string>
     <string name="title_mode_help">Нажмите для получения дополнительной информации</string>
@@ -182,12 +186,13 @@
     <string name="title_service_restart">Перезапуск службы</string>
     <string name="title_del_all_config">Удалить все профили</string>
     <string name="title_del_duplicate_config">Удалить дубликаты профилей</string>
-    <string name="title_del_invalid_config">Удалить сбойные профили (после проверки)</string>
+    <string name="title_del_invalid_config">Удалить нерабочие профили (после проверки)</string>
     <string name="title_export_all">Экспорт всех профилей в буфер обмена</string>
     <string name="title_sub_setting">Группы</string>
     <string name="sub_setting_remarks">примечания</string>
     <string name="sub_setting_url">URL (необязательно)</string>
-    <string name="sub_setting_enable">использовать обновление</string>
+    <string name="sub_setting_enable">Использовать обновление</string>
+    <string name="sub_auto_update">Использовать автоматическое обновление</string>
     <string name="title_sub_update">Обновить подписку</string>
     <string name="title_ping_all_server">Проверка доступности профилей</string>
     <string name="title_real_ping_all_server">Время отклика профилей</string>
@@ -206,7 +211,7 @@
     <string name="routing_settings_delete">Очистить</string>
     <string name="routing_settings_scan_replace">Сканировать и заменить</string>
     <string name="routing_settings_scan_append">Сканировать и добавить</string>
-    <string name="routing_settings_default_rules"> Правила по умолчанию</string>
+    <string name="routing_settings_default_rules">Правила по умолчанию</string>
 
     <string name="connection_test_pending">Проверить подключение</string>
     <string name="connection_test_testing">Проверка…</string>
