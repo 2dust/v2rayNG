@@ -682,6 +682,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             R.id.logcat -> {
                 startActivity(Intent(this, LogcatActivity::class.java))
             }
+            R.id.privacy_policy-> {
+                Utils.openUri(this, AppConfig.v2rayNGPrivacyPolicy)
+            }
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true

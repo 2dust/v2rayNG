@@ -160,6 +160,7 @@
     <string name="summary_pref_feedback">前往 GitHub 回報錯誤</string>
     <string name="summary_pref_tg_group">加入 Telegram 群組</string>
     <string name="toast_tg_app_not_found">未找到 Telegram 應用程式</string>
+    <string name="title_privacy_policy">隱私權政策</string>
 
     <string name="title_pref_promotion">推廣</string>
     <string name="summary_pref_promotion">一些推廣，輕觸以檢視 (捐贈可去除)</string>
