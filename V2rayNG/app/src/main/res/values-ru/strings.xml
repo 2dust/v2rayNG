@@ -166,6 +166,7 @@
     <string name="summary_pref_feedback">Предложить улучшение или сообщить об ошибке на GitHub</string>
     <string name="summary_pref_tg_group">Присоединиться к группе в Telegram</string>
     <string name="toast_tg_app_not_found">Приложение Telegram не найдено</string>
+    <string name="title_privacy_policy">Политика конфиденциальности</string>
 
     <string name="title_pref_promotion">Содействие</string>
     <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации (пожертвование может быть удалено)</string>
