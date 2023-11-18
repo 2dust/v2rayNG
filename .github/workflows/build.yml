@@ -1,0 +1,64 @@
+name: Build APK
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      XRAY_CORE_VERSION:
+        description: 'Xray core version or commit hash'
+        required: false
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Golang
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.19.11'
+
+    - name: Install gomobile
+      run: |
+        go install golang.org/x/mobile/cmd/gomobile@latest
+        echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+
+    - name: Setup Android environment
+      uses: android-actions/setup-android@v2
+  
+
+    - name: Build dependencies
+      run: |
+        mkdir ${{ github.workspace }}/build
+        cd ${{ github.workspace }}/build
+        git clone --depth=1 -b main https://github.com/2dust/AndroidLibXrayLite.git
+        cd AndroidLibXrayLite
+        go get github.com/xtls/xray-core@${{ github.event.inputs.XRAY_CORE_VERSION }} || true
+        gomobile init
+        go mod tidy -v
+        gomobile bind -v -androidapi 19 -ldflags='-s -w' ./
+        cp *.aar ${{ github.workspace }}/V2rayNG/app/libs/
+
+    - name: Build APK
+      run: |
+        cd ${{ github.workspace }}/V2rayNG
+        chmod 777 *
+        sed -i 's/org.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8/org.gradle.jvmargs=-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8/' ${{ github.workspace }}/V2rayNG/gradle.properties
+        ./gradlew assembleDebug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: apk
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/
