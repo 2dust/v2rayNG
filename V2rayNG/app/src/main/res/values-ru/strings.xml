@@ -103,7 +103,14 @@
     <string name="summary_pref_per_app_proxy">Основной: выделенное приложение соединяется через прокси, не выделенное — напрямую; \n\nРежим обхода: выделенное приложение соединяется напрямую, не выделенное — через прокси.\n\nЕсть возможность автоматического выбора проксируемых приложений в меню.</string>
 
     <string name="title_pref_mux_enabled">Использовать мультиплексирование</string>
-    <string name="summary_pref_mux_enabled">Включение может ускорить работу и переключение сети</string>
+    <string name="summary_pref_mux_enabled">Быстрее, но это может привести к нестабильному соединению\nМультиплексор TCP-трафика с 8 соединениями по умолчанию, ниже можно настроить обработку UDP и QUIC.</string>
+    <string name="title_pref_mux_xudp_concurency">XUDP-соединения (диапазон от -1 до 1024)</string>
+    <string name="title_pref_mux_xudp_quic">Обработка QUIC в мультиплексорном туннеле</string>
+    <string-array name="mux_xudp_quic_entries">
+        <item>отклонять</item>
+        <item>допустимый</item>
+        <item>пропускать</item>
+    </string-array>
 
     <string name="title_pref_speed_enabled">Отображение скорости</string>
     <string name="summary_pref_speed_enabled">Показывать текущую скорость в уведомлении.\nЗначок будет меняться в зависимости от использования.</string>

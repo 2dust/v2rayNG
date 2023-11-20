@@ -96,8 +96,15 @@
     <string name="title_pref_per_app_proxy">分应用代理</string>
     <string name="summary_pref_per_app_proxy">常规:勾选的App被代理,未勾选的直连;\n绕行模式:勾选的App直连,未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
 
-    <string name="title_pref_mux_enabled">启用Mux多路复用</string>
-    <string name="summary_pref_mux_enabled">开启可能会加速,关闭可能会减少断流</string>
+    <string name="title_pref_mux_enabled">启用 Mux 多路复用</string>
+    <string name="summary_pref_mux_enabled">减低延时 但可能会断流\nTCP 默认复用 8 个子链接，UDP 及 QUIC 流量处理方式下方可选</string>
+    <string name="title_pref_mux_xudp_concurency">XUDP 复用子链接数（可填 -1 至 1024）</string>
+    <string name="title_pref_mux_xudp_quic">QUIC 流量处理方式</string>
+    <string-array name="mux_xudp_quic_entries">
+        <item>不代理</item>
+        <item>多路复用</item>
+        <item>原生</item>
+    </string-array>
 
     <string name="title_pref_speed_enabled">启用速度显示</string>
     <string name="summary_pref_speed_enabled">在通知中显示当前速度\n小图标显示流量的路由情况</string>
