@@ -172,6 +172,10 @@
     <string name="title_pref_promotion">Promotion</string>
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
 
+    <string name="title_pref_auto_update_subscription">Automatic update subscriptions</string>
+    <string name="summary_pref_auto_update_subscription">Update your subscriptions automatically with an interval in background. Depending on the device, this feature may not always work</string>
+    <string name="title_pref_auto_update_interval">Subscription Auto Update Interval (Minutes)</string>
+
     <string name="title_core_loglevel">Log Level</string>
     <string name="title_mode">Mode</string>
     <string name="title_mode_help">Click me for more help</string>
@@ -189,8 +193,8 @@
     <string name="title_sub_setting">Subscription group setting</string>
     <string name="sub_setting_remarks">remarks</string>
     <string name="sub_setting_url">Optional URL</string>
-    <string name="sub_setting_enable">enable update</string>
-    <string name="sub_auto_update">Auto update</string>
+    <string name="sub_setting_enable">Enable update</string>
+    <string name="sub_auto_update">Enable automatic update</string>
     <string name="title_sub_update">Update subscription</string>
     <string name="title_ping_all_server">Tcping all configuration</string>
     <string name="title_real_ping_all_server">Real delay all configuration</string>

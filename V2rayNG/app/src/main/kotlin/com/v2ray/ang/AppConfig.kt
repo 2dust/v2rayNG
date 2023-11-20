@@ -94,7 +94,7 @@ object AppConfig {
     // subscription settings
     const val SUBSCRIPTION_AUTO_UPDATE = "pref_auto_update_subscription"
     const val SUBSCRIPTION_AUTO_UPDATE_INTERVAL = "pref_auto_update_interval"
-    const val DEFAULT_UPDATE_INTERVAL = "1440" // 24 hours
-    const val UPDATE_TASK_NAME = "subscription-updater"
+    const val SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL = "1440" // 24 hours
+    const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
 
 }

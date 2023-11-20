@@ -401,17 +401,35 @@ object V2rayConfigUtil {
 
     private fun updateOutboundWithGlobalSettings(outbound: V2rayConfig.OutboundBean): Boolean {
         try {
-            if (settingsStorage?.decodeBool(AppConfig.PREF_MUX_ENABLED) == true) {
+            var muxEnabled = settingsStorage?.decodeBool(AppConfig.PREF_MUX_ENABLED, false)
+
+            val protocol = outbound.protocol
+            if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)
+                || protocol.equals(EConfigType.SOCKS.name, true)
+                || protocol.equals(EConfigType.TROJAN.name, true)
+            ) {
+                muxEnabled = false
+            } else if (protocol.equals(EConfigType.VLESS.name, true)
+                && outbound.settings?.vnext?.get(0)?.users?.get(0)?.flow?.isNotEmpty() == true
+            ) {
+                muxEnabled = false
+            }
+
+            if (muxEnabled == true) {
                 outbound.mux?.enabled = true
                 outbound.mux?.concurrency = 8
-                outbound.mux?.xudpConcurrency = settingsStorage?.decodeInt(AppConfig.PREF_MUX_XUDP_CONCURRENCY) ?: 8
-                outbound.mux?.xudpProxyUDP443 = settingsStorage?.decodeString(AppConfig.PREF_MUX_XUDP_QUIC) ?: "reject"
+                outbound.mux?.xudpConcurrency =
+                    settingsStorage?.decodeInt(AppConfig.PREF_MUX_XUDP_CONCURRENCY) ?: 8
+                outbound.mux?.xudpProxyUDP443 =
+                    settingsStorage?.decodeString(AppConfig.PREF_MUX_XUDP_QUIC) ?: "reject"
             } else {
                 outbound.mux?.enabled = false
+                outbound.mux?.concurrency = -1
             }
 
             if (outbound.streamSettings?.network == DEFAULT_NETWORK
-                    && outbound.streamSettings?.tcpSettings?.header?.type == HTTP) {
+                && outbound.streamSettings?.tcpSettings?.header?.type == HTTP
+            ) {
                 val path = outbound.streamSettings?.tcpSettings?.header?.request?.path
                 val host = outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host
 

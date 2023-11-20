@@ -40,6 +40,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_V2RAY_ROUTING_AGENT,
             AppConfig.PREF_V2RAY_ROUTING_BLOCKED,
             AppConfig.PREF_V2RAY_ROUTING_DIRECT,
+            AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,
             AppConfig.PREF_MUX_XUDP_QUIC, -> {
                 settingsStorage?.encode(key, sharedPreferences.getString(key, ""))
             }
@@ -53,6 +54,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_BYPASS_APPS,
             AppConfig.PREF_CONFIRM_REMOVE,
             AppConfig.PREF_START_SCAN_IMMEDIATE,
+            AppConfig.SUBSCRIPTION_AUTO_UPDATE,
             AppConfig.PREF_MUX_ENABLED, -> {
                 settingsStorage?.encode(key, sharedPreferences.getBoolean(key, false))
             }
