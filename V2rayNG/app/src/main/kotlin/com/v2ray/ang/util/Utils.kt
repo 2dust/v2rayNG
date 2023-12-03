@@ -13,6 +13,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.net.Uri
 import android.os.Build
 import android.os.LocaleList
+import android.provider.Settings
 import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
@@ -315,6 +316,11 @@ object Utils {
         val extDir = context.getExternalFilesDir(AppConfig.DIR_ASSETS)
                 ?: return context.getDir(AppConfig.DIR_ASSETS, 0).absolutePath
         return extDir.absolutePath
+    }
+
+    fun getDeviceIdForXUDPBaseKey(): String {
+        val androidId = Settings.Secure.ANDROID_ID.toByteArray(charset("UTF-8"))
+        return Base64.encodeToString(androidId.copyOf(32), Base64.NO_PADDING.or(Base64.URL_SAFE))
     }
 
     fun getUrlContext(url: String, timeout: Int): String {
