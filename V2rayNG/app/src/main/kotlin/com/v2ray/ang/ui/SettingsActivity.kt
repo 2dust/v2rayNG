@@ -76,10 +76,11 @@ class SettingsActivity : BaseActivity() {
             }
 
             autoUpdateInterval?.setOnPreferenceChangeListener { _, any ->
-                val nval = any as String
+                var nval = any as String
 
+                autoUpdateInterval?.summary = nval
                 // It must be greater than 15 minutes because WorkManager couldn't run tasks under 15 minutes intervals
-                autoUpdateInterval?.summary =
+                nval =
                     if (TextUtils.isEmpty(nval) or (nval.toLong() < 15)) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
                 configureUpdateTask(nval.toLong())
                 true

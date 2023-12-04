@@ -175,7 +175,7 @@
 
     <string name="title_pref_auto_update_subscription">Automatic update subscriptions</string>
     <string name="summary_pref_auto_update_subscription">Update your subscriptions automatically with an interval in background. Depending on the device, this feature may not always work</string>
-    <string name="title_pref_auto_update_interval">Subscription Auto Update Interval (Minutes)</string>
+    <string name="title_pref_auto_update_interval">Auto Update Interval (Minutes, Min value 15)</string>
 
     <string name="title_core_loglevel">Log Level</string>
     <string name="title_mode">Mode</string>

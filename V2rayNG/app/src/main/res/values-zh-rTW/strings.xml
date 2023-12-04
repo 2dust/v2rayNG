@@ -167,7 +167,7 @@
 
     <string name="title_pref_auto_update_subscription">自動更新訂閱</string>
     <string name="summary_pref_auto_update_subscription">在後台以一定時間間隔自動更新您的訂閱。受設備影響，此功能不一定總是有效</string>
-    <string name="title_pref_auto_update_interval">訂閱自動更新間隔（分鐘）</string>
+    <string name="title_pref_auto_update_interval">自動更新間隔（分鐘，最小值15）</string>
 
     <string name="title_core_loglevel">記錄層級</string>
     <string name="title_mode">模式</string>
