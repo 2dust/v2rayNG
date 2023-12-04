@@ -166,14 +166,14 @@
     <string name="summary_pref_feedback">Предложить улучшение или сообщить об ошибке на GitHub</string>
     <string name="summary_pref_tg_group">Присоединиться к группе в Telegram</string>
     <string name="toast_tg_app_not_found">Приложение Telegram не найдено</string>
-    <string name="title_privacy_policy">Политика конфиденциальности</string>
+    <string name="title_privacy_policy">Конфиденциальность</string>
 
     <string name="title_pref_promotion">Содействие</string>
     <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации (пожертвование может быть удалено)</string>
 
     <string name="title_pref_auto_update_subscription">Автоматическое обновление подписок</string>
     <string name="summary_pref_auto_update_subscription">Автоматическое обновление подписок в фоновом режиме с указанным интервалом. В зависимости от устройства эта функция может работать не всегда.</string>
-    <string name="title_pref_auto_update_interval">Интервал автообновления (мин.)</string>
+    <string name="title_pref_auto_update_interval">Интервал автообновления (мин., не менее 15)</string>
 
     <string name="title_core_loglevel">Подробность ведения журнала</string>
     <string name="title_mode">Режим</string>
