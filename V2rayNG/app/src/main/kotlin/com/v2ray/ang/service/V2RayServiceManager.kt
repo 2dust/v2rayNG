@@ -133,7 +133,11 @@ object V2RayServiceManager {
                 mFilter.addAction(Intent.ACTION_SCREEN_ON)
                 mFilter.addAction(Intent.ACTION_SCREEN_OFF)
                 mFilter.addAction(Intent.ACTION_USER_PRESENT)
-                service.registerReceiver(mMsgReceive, mFilter)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    service.registerReceiver(mMsgReceive, mFilter, Context.RECEIVER_EXPORTED)
+                } else {
+                    service.registerReceiver(mMsgReceive, mFilter)
+                }
             } catch (e: Exception) {
                 Log.d(ANG_PACKAGE, e.toString())
             }

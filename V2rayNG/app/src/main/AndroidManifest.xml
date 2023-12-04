@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingLeanbackLauncher">
 
     <supports-screens
         android:anyDensity="true"
@@ -26,6 +27,9 @@
     <!-- <useapplications-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"
+        android:minSdkVersion="34" />
     <!-- <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
@@ -127,6 +131,7 @@
             android:exported="false"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_VPN_SERVICE"
+            android:foregroundServiceType="dataSync"
             android:process=":RunSoLibV2RayDaemon">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
@@ -139,6 +144,7 @@
         <service android:name=".service.V2RayProxyOnlyService"
                 android:exported="false"
                 android:label="@string/app_name"
+                android:foregroundServiceType="dataSync"
                 android:process=":RunSoLibV2RayDaemon">
         </service>
 
