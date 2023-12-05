@@ -26,7 +26,7 @@ jobs:
     - name: Setup Golang
       uses: actions/setup-go@v4
       with:
-        go-version: '1.19.11'
+        go-version: '1.21.4'
 
     - name: Install gomobile
       run: |
