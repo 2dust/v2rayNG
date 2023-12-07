@@ -417,7 +417,8 @@ object V2rayConfigUtil {
 
             if (muxEnabled == true) {
                 outbound.mux?.enabled = true
-                outbound.mux?.concurrency = 8
+                outbound.mux?.concurrency =
+                    settingsStorage?.decodeInt(AppConfig.PREF_MUX_CONCURRENCY) ?: 8
                 outbound.mux?.xudpConcurrency =
                     settingsStorage?.decodeInt(AppConfig.PREF_MUX_XUDP_CONCURRENCY) ?: 8
                 outbound.mux?.xudpProxyUDP443 =

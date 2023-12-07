@@ -97,7 +97,8 @@
     <string name="summary_pref_per_app_proxy">常規：勾選的 App 啟用 Proxy，未勾選的直接連線；\n繞行模式：勾選的 App 直接連線，未勾選的啟用 Proxy。\n可在選單中選擇自動選中需 Proxy 應用</string>
 
     <string name="title_pref_mux_enabled">啟用 Mux 多路復用</string>
-    <string name="summary_pref_mux_enabled">減低延時 但可能會斷流\nTCP 默認復用 8 個子鏈接，UDP 及 QUIC 流量處理方式下方可選</string>
+    <string name="summary_pref_mux_enabled">減低延時 但可能會斷流\nTCP，UDP 及 QUIC 流量處理方式下方可選</string>
+    <string name="title_pref_mux_concurency">TCP 復用子鏈接數（可填 -1 至 1024）</string>
     <string name="title_pref_mux_xudp_concurency">XUDP 復用子鏈接數（可填 -1 至 1024）</string>
     <string name="title_pref_mux_xudp_quic">QUIC 流量處理方式</string>
     <string-array name="mux_xudp_quic_entries">

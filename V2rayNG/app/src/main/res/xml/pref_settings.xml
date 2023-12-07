@@ -13,6 +13,12 @@
         android:title="@string/title_pref_mux_enabled" />
 
     <EditTextPreference
+        android:key="pref_mux_concurency"
+        android:summary="8"
+        android:inputType="number"
+        android:title="@string/title_pref_mux_concurency" />
+
+    <EditTextPreference
         android:key="pref_mux_xudp_concurency"
         android:summary="8"
         android:inputType="number"

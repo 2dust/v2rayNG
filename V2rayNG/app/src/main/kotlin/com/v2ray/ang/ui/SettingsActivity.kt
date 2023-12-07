@@ -6,9 +6,7 @@ import android.text.TextUtils
 import android.view.View
 import androidx.activity.viewModels
 import androidx.preference.*
-import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.multiprocess.RemoteWorkManager
 import com.v2ray.ang.AngApplication
@@ -39,6 +37,7 @@ class SettingsActivity : BaseActivity() {
         private val vpnDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_VPN_DNS) }
         
         private val mux by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_MUX_ENABLED) }
+        private val muxConcurrency by lazy { findPreference<EditTextPreference>(AppConfig.PREF_MUX_CONCURRENCY) }
         private val muxXudpConcurrency by lazy { findPreference<EditTextPreference>(AppConfig.PREF_MUX_XUDP_CONCURRENCY) }
         private val muxXudpQuic by lazy { findPreference<ListPreference>(AppConfig.PREF_MUX_XUDP_QUIC) }
 
@@ -161,8 +160,12 @@ class SettingsActivity : BaseActivity() {
                 updateMux(newValue as Boolean)
                 true
             }
-            muxXudpConcurrency?.setOnPreferenceChangeListener { _, newValue ->
+            muxConcurrency?.setOnPreferenceChangeListener { _, newValue ->
                 updateMuxConcurrency(newValue as String)
+                true
+            }
+            muxXudpConcurrency?.setOnPreferenceChangeListener { _, newValue ->
+                updateMuxXudpConcurrency(newValue as String)
                 true
             }
         }
@@ -179,6 +182,7 @@ class SettingsActivity : BaseActivity() {
             socksPort?.summary = defaultSharedPreferences.getString(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
             httpPort?.summary = defaultSharedPreferences.getString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
             updateMux(defaultSharedPreferences.getBoolean(AppConfig.PREF_MUX_ENABLED, false))
+            muxConcurrency?.summary = defaultSharedPreferences.getString(AppConfig.PREF_MUX_CONCURRENCY, "8")
             muxXudpConcurrency?.summary = defaultSharedPreferences.getString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
             autoUpdateInterval?.summary = defaultSharedPreferences.getString(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
             autoUpdateInterval?.isEnabled = defaultSharedPreferences.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
@@ -257,14 +261,24 @@ class SettingsActivity : BaseActivity() {
             
         private fun updateMux(enabled: Boolean) {
             val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
+            muxConcurrency?.isEnabled = enabled
             muxXudpConcurrency?.isEnabled = enabled
             muxXudpQuic?.isEnabled = enabled
             if (enabled) {
-                updateMuxConcurrency(defaultSharedPreferences.getString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8"))
+                updateMuxConcurrency(defaultSharedPreferences.getString(AppConfig.PREF_MUX_CONCURRENCY, "8"))
+                updateMuxXudpConcurrency(defaultSharedPreferences.getString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8"))
             }
         }
 
         private fun updateMuxConcurrency(value: String?) {
+            if (value == null) {
+            } else {
+                val concurrency = value.toIntOrNull() ?: 8
+                muxConcurrency?.summary = concurrency.toString()
+            }
+        }
+
+        private fun updateMuxXudpConcurrency(value: String?) {
             if (value == null) {
                 muxXudpQuic?.isEnabled = true
             } else {

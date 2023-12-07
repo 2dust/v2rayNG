@@ -61,6 +61,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_SNIFFING_ENABLED -> {
                 settingsStorage?.encode(key, sharedPreferences.getBoolean(key, true))
             }
+            AppConfig.PREF_MUX_CONCURRENCY,
             AppConfig.PREF_MUX_XUDP_CONCURRENCY -> {
                 settingsStorage?.encode(key, sharedPreferences.getString(key, "8")?.toIntOrNull() ?: 8)
             }
