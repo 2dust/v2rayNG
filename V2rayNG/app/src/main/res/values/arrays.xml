@@ -76,8 +76,11 @@
 
     <string-array name="streamsecurity_alpn" translatable="false">
         <item></item>
+        <item>h3</item>
         <item>h2</item>
         <item>http/1.1</item>
+        <item>h3,h2,http/1.1</item>
+        <item>h3,h2</item>
         <item>h2,http/1.1</item>
     </string-array>
 
