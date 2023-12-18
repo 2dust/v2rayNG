@@ -97,18 +97,18 @@
     <string name="summary_pref_per_app_proxy">- Chung: Ứng dụng đã chọn sẽ kết nối Proxy, chưa lựa chọn sẽ kết nối trực tiếp. \n- Bỏ qua kết nối: Ứng dụng được chọn sẽ trực tiếp kết nối, không lựa chọn sẽ kết nối qua Proxy. \n- Lựa chọn để tự động chọn ứng dụng Proxy trong Menu.</string>
 
     <string name="title_pref_mux_enabled">Cho phép Mux</string>
-    <string name="summary_pref_mux_enabled">Nhanh hơn nhưng có thể khiến kết nối không ổn định\nMux lưu lượng TCP với 8 kết nối mặc định, tùy chỉnh cách xử lý UDP và QUIC bên dưới</string>
-    <string name="title_pref_mux_xudp_concurency">Kết nối XUDP (phạm vi -1 đến 1024)</string>
-    <string name="title_pref_mux_xudp_quic">Xử lý QUIC trong đường hầm mux</string>
+    <string name="summary_pref_mux_enabled">Nhanh hơn nhưng có thể khiến kết nối không ổn định. \nMux lưu lượng TCP với 8 kết nối mặc định, tùy chỉnh cách xử lý UDP và QUIC bên dưới.</string>
+    <string name="title_pref_mux_xudp_concurency">Kết nối XUDP (Phạm vi từ -1 đến 1024)</string>
+    <string name="title_pref_mux_xudp_quic">Xử lý QUIC trong đường hầm Mux</string>
     <string-array name="mux_xudp_quic_entries">
-        <item>từ chối</item>
-        <item>cho phép</item>
-        <item>nhảy</item>
+        <item>Từ chối</item>
+        <item>Cho phép</item>
+        <item>Nhảy</item>
     </string-array>
 
 
     <string name="title_pref_speed_enabled">Cho phép hiển thị tốc độ mạng</string>
-    <string name="summary_pref_speed_enabled">Hiển thị tốc độ mạng hiện tại trên thanh thông báo.\nBiểu tượng trên thanh trạng thái có thể thay đổi tùy vào mức sử dụng.</string>
+    <string name="summary_pref_speed_enabled">Hiển thị tốc độ mạng hiện tại trên thanh thông báo. \nBiểu tượng trên thanh trạng thái có thể thay đổi tùy vào mức sử dụng.</string>
 
     <string name="title_pref_sniffing_enabled">Bật tính năng phát hiện luồng</string>
     <string name="summary_pref_sniffing_enabled">Thử chuyển kết nối hiện tại của bạn qua trung gian để trung gian xử lý kết nối về lại cho bạn. (Mặc định là bật, hãy tắt nó nếu kết nối không ổn định)</string>
@@ -212,8 +212,8 @@
     <string name="connection_connected">Đã kết nối, hãy nhấn vào đây để kiểm tra kết nối mạng!</string>
     <string name="connection_not_connected">Chưa kết nối, hãy chọn một cấu hình để kết nối!</string>
 
-    <string name="import_subscription_success">Đăng ký đã nhập thành công</string>
-    <string name="import_subscription_failure">Nhập đăng ký không thành công</string>
+    <string name="import_subscription_success">Nhập gói đăng ký thành công!</string>
+    <string name="import_subscription_failure">Nhập gói đăng ký không thành công!</string>
 
     <string-array name="share_method">
         <item>Xuất ra mã QR (Chụp màn hình để lưu)</item>
