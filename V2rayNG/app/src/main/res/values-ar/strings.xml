@@ -28,6 +28,7 @@
 	<string name="menu_item_import_config_manually_ss">الكتابة يدويا [Shadowsocks]</string>
 	<string name="menu_item_import_config_manually_socks">الكتابة يدويا [Socks]</string>
 	<string name="menu_item_import_config_manually_trojan">الكتابة يدويا [Trojan]</string>
+	<string name="menu_item_import_config_manually_wireguard">[Wireguard] الكتابة يدويا</string>
 	<string name="menu_item_import_config_custom">تكوين مخصص</string>
 	<string name="menu_item_import_config_custom_clipboard">استيراد التكوين المخصص من الحافظة</string>
 	<string name="menu_item_import_config_custom_local">استيراد التكوين المخصص من ملف محلي</string>
@@ -62,6 +63,7 @@
 	<string name="server_lab_public_key" translatable="false">مفتاح عام</string>
 	<string name="server_lab_short_id" translatable="false">ShortId</string>
 	<string name="server_lab_spider_x" translatable="false">SpiderX</string>
+	<string name="server_lab_reserved">Reserved (اختياري)</string>
 	<string name="toast_success">نجاح</string>
 	<string name="toast_failure">فشل</string>
 	<string name="toast_none_data">لا يوجد شيء</string>

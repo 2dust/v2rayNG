@@ -253,6 +253,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             importManually(EConfigType.TROJAN.value)
             true
         }
+        R.id.import_manually_wireguard -> {
+            importManually(EConfigType.WIREGUARD.value)
+            true
+        }
         R.id.import_config_custom_clipboard -> {
             importConfigCustomClipboard()
             true

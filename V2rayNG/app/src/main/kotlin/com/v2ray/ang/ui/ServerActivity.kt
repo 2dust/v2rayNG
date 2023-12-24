@@ -103,6 +103,9 @@ class ServerActivity : BaseActivity() {
     private val container_short_id: LinearLayout? by lazy { findViewById(R.id.l7) }
     private val et_spider_x: EditText? by lazy { findViewById(R.id.et_spider_x) }
     private val container_spider_x: LinearLayout? by lazy { findViewById(R.id.l8) }
+    private val et_reserved1: EditText? by lazy { findViewById(R.id.et_reserved1) }
+    private val et_reserved2: EditText? by lazy { findViewById(R.id.et_reserved2) }
+    private val et_reserved3: EditText? by lazy { findViewById(R.id.et_reserved3) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,7 +119,7 @@ class ServerActivity : BaseActivity() {
             EConfigType.SOCKS -> setContentView(R.layout.activity_server_socks)
             EConfigType.VLESS -> setContentView(R.layout.activity_server_vless)
             EConfigType.TROJAN -> setContentView(R.layout.activity_server_trojan)
-            else -> setContentView(R.layout.activity_server_vmess)
+            EConfigType.WIREGUARD -> setContentView(R.layout.activity_server_wireguard)
         }
         sp_network?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -182,7 +185,6 @@ class ServerActivity : BaseActivity() {
      */
     private fun bindingServer(config: ServerConfig): Boolean {
         val outbound = config.getProxyOutbound() ?: return false
-        val streamSetting = config.outboundBean?.streamSettings ?: return false
 
         et_remarks.text = Utils.getEditable(config.remarks)
         et_address.text = Utils.getEditable(outbound.getServerAddress().orEmpty())
@@ -197,10 +199,16 @@ class ServerActivity : BaseActivity() {
             if (flow >= 0) {
                 sp_flow?.setSelection(flow)
             }
-        } else if (config.configType == EConfigType.TROJAN) {
-            val flow = Utils.arrayFind(flows, outbound.settings?.servers?.get(0)?.flow.orEmpty())
-            if (flow >= 0) {
-                sp_flow?.setSelection(flow)
+        } else if (config.configType == EConfigType.WIREGUARD) {
+            et_public_key?.text = Utils.getEditable(outbound.settings?.peers?.get(0)?.publicKey.orEmpty())
+            if (outbound.settings?.reserved == null) {
+                et_reserved1?.text = Utils.getEditable("0")
+                et_reserved2?.text = Utils.getEditable("0")
+                et_reserved3?.text = Utils.getEditable("0")
+            } else {
+                et_reserved1?.text = Utils.getEditable(outbound.settings?.reserved?.get(0).toString())
+                et_reserved2?.text = Utils.getEditable(outbound.settings?.reserved?.get(1).toString())
+                et_reserved3?.text = Utils.getEditable(outbound.settings?.reserved?.get(2).toString())
             }
         }
         val securityEncryptions = if (config.configType == EConfigType.SHADOWSOCKS) shadowsocksSecuritys else securitys
@@ -209,6 +217,7 @@ class ServerActivity : BaseActivity() {
             sp_security?.setSelection(security)
         }
 
+        val streamSetting = config.outboundBean?.streamSettings ?: return true
         val streamSecurity = Utils.arrayFind(streamSecuritys, streamSetting.security)
         if (streamSecurity >= 0) {
             sp_stream_security?.setSelection(streamSecurity)
@@ -282,6 +291,10 @@ class ServerActivity : BaseActivity() {
 
         //et_security.text = null
         sp_flow?.setSelection(0)
+        et_public_key?.text = null
+        et_reserved1?.text = Utils.getEditable("0")
+        et_reserved2?.text = Utils.getEditable("0")
+        et_reserved3?.text = Utils.getEditable("0")
         return true
     }
 
@@ -332,6 +345,10 @@ class ServerActivity : BaseActivity() {
         config.outboundBean?.settings?.servers?.get(0)?.let { server ->
             saveServers(server, port, config)
         }
+        val wireguard = config.outboundBean?.settings
+        wireguard?.peers?.get(0)?.let { _ ->
+            savePeer(wireguard, port)
+        }
         config.outboundBean?.streamSettings?.let {
             saveStreamSettings(it)
         }
@@ -375,6 +392,20 @@ class ServerActivity : BaseActivity() {
             }
         } else if (config.configType == EConfigType.TROJAN) {
             server.password = et_id.text.toString().trim()
+        }
+    }
+
+    private fun savePeer(wireguard: V2rayConfig.OutboundBean.OutSettingsBean, port: Int) {
+        wireguard.secretKey = et_id.text.toString().trim()
+        wireguard.peers?.get(0)?.publicKey = et_public_key?.text.toString().trim()
+        wireguard.peers?.get(0)?.endpoint = et_address.text.toString().trim() + ":" + port
+        val reserved1 = Utils.parseInt(et_reserved1?.text.toString())
+        val reserved2 = Utils.parseInt(et_reserved2?.text.toString())
+        val reserved3 = Utils.parseInt(et_reserved3?.text.toString())
+        if (reserved1 > 0 || reserved2 > 0 || reserved3 > 0) {
+            wireguard.reserved = listOf(reserved1, reserved2, reserved3)
+        }else {
+            wireguard.reserved = null
         }
     }
 

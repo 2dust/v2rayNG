@@ -19,23 +19,32 @@ data class ServerConfig(
             when(configType) {
                 EConfigType.VMESS, EConfigType.VLESS ->
                     return ServerConfig(
-                            configType = configType,
-                            outboundBean = V2rayConfig.OutboundBean(
-                                    protocol = configType.name.lowercase(),
-                                    settings = V2rayConfig.OutboundBean.OutSettingsBean(
-                                            vnext = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean(
-                                                    users = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean.UsersBean())))),
-                                    streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()))
-                EConfigType.CUSTOM, EConfigType.WIREGUARD ->
+                        configType = configType,
+                        outboundBean = V2rayConfig.OutboundBean(
+                            protocol = configType.name.lowercase(),
+                            settings = V2rayConfig.OutboundBean.OutSettingsBean(
+                                vnext = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean(
+                                    users = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean.UsersBean())))),
+                            streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()))
+                EConfigType.CUSTOM ->
                     return ServerConfig(configType = configType)
                 EConfigType.SHADOWSOCKS, EConfigType.SOCKS, EConfigType.TROJAN ->
                     return ServerConfig(
-                            configType = configType,
-                            outboundBean = V2rayConfig.OutboundBean(
-                                    protocol = configType.name.lowercase(),
-                                    settings = V2rayConfig.OutboundBean.OutSettingsBean(
-                                            servers = listOf(V2rayConfig.OutboundBean.OutSettingsBean.ServersBean())),
-                                    streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()))
+                        configType = configType,
+                        outboundBean = V2rayConfig.OutboundBean(
+                            protocol = configType.name.lowercase(),
+                            settings = V2rayConfig.OutboundBean.OutSettingsBean(
+                                servers = listOf(V2rayConfig.OutboundBean.OutSettingsBean.ServersBean())),
+                            streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()))
+                EConfigType.WIREGUARD ->
+                    return ServerConfig(
+                        configType = configType,
+                        outboundBean =  V2rayConfig.OutboundBean(
+                            protocol = configType.name.lowercase(),
+                            settings = V2rayConfig.OutboundBean.OutSettingsBean(
+                                secretKey = "",
+                                peers = listOf(V2rayConfig.OutboundBean.OutSettingsBean.WireGuardBean())
+                            )))
             }
         }
     }

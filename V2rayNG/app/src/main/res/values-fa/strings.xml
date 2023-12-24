@@ -30,6 +30,7 @@
     <string name="menu_item_import_config_manually_ss">تایپ دستی[Shadowsocks]</string>
     <string name="menu_item_import_config_manually_socks">تایپ دستی[Socks]</string>
     <string name="menu_item_import_config_manually_trojan">تایپ دستی[Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">[Wireguard]تایپ دستی</string>
     <string name="menu_item_import_config_custom">پیکربندی سفارشی</string>
     <string name="menu_item_import_config_custom_clipboard">پیکربندی سفارشی را از کلیپ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_custom_local">پیکربندی سفارشی را به صورت محلی وارد کنید</string>
@@ -59,6 +60,7 @@
     <string name="server_lab_security4">نام‌کاربری (اختیاری)</string>
     <string name="server_lab_encryption">رمزگذاری</string>
     <string name="server_lab_flow">جریان</string>
+    <string name="server_lab_reserved">Reserved (اختیاری)</string>
     <string name="toast_success">موفقیت</string>
     <string name="toast_failure">شکست</string>
     <string name="toast_none_data">چیزی نیست</string>
