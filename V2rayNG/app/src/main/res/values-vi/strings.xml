@@ -29,6 +29,7 @@
     <string name="menu_item_import_config_manually_ss">Nhập thủ công [Shadowsocks]</string>
     <string name="menu_item_import_config_manually_socks">Nhập thủ công [Socks]</string>
     <string name="menu_item_import_config_manually_trojan">Nhập thủ công [Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">Nhập thủ công [Wireguard]</string>
     <string name="menu_item_import_config_custom">Nâng cao / Cấu hình tùy chỉnh</string>
     <string name="menu_item_import_config_custom_clipboard">Nhập cấu hình tùy chỉnh từ Clipboard</string>
     <string name="menu_item_import_config_custom_local">Nhập cấu hình tùy chỉnh từ Tệp</string>
@@ -58,6 +59,7 @@
     <string name="server_lab_security4">Tên người dùng (Bổ sung)</string>
     <string name="server_lab_encryption">Mã hoá</string>
     <string name="server_lab_flow">Kiểm soát lưu lượng</string>
+    <string name="server_lab_reserved">Reserved (Bổ sung)</string>
     <string name="toast_success">Thành công!</string>
     <string name="toast_failure">Đã xảy ra lỗi, vui lòng thử lại!</string>
     <string name="toast_none_data">Không có gì ở đây</string>

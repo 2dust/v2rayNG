@@ -29,6 +29,7 @@
     <string name="menu_item_import_config_manually_ss">手动输入[Shadowsocks]</string>
     <string name="menu_item_import_config_manually_socks">手动输入[Socks]</string>
     <string name="menu_item_import_config_manually_trojan">手动输入[Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">手动输入[Wireguard]</string>
     <string name="menu_item_import_config_custom">自定义配置</string>
     <string name="menu_item_import_config_custom_clipboard">从剪贴板导入自定义配置</string>
     <string name="menu_item_import_config_custom_local">从本地导入自定义配置</string>
@@ -58,6 +59,7 @@
     <string name="server_lab_security4">用户名(可选)</string>
     <string name="server_lab_encryption">加密方式(encryption)</string>
     <string name="server_lab_flow">流控(flow)</string>
+    <string name="server_lab_reserved">Reserved(可选)</string>
     <string name="toast_success">成功</string>
     <string name="toast_failure">失败</string>
     <string name="toast_none_data">没有数据</string>
