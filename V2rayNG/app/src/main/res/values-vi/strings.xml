@@ -60,6 +60,8 @@
     <string name="server_lab_encryption">Mã hoá</string>
     <string name="server_lab_flow">Kiểm soát lưu lượng</string>
     <string name="server_lab_reserved">Reserved (Bổ sung)</string>
+    <string name="server_lab_local_v4_address">địa chỉ cục bộ IPv4(Bổ sung)</string>
+    <string name="server_lab_local_v6_address">địa chỉ cục bộ IPv6(Bổ sung, chỉ được sử dụng khi thích IPv6)</string>
     <string name="toast_success">Thành công!</string>
     <string name="toast_failure">Đã xảy ra lỗi, vui lòng thử lại!</string>
     <string name="toast_none_data">Không có gì ở đây</string>

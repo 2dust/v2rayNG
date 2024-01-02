@@ -69,10 +69,6 @@ data class ServerConfig(
     fun getV2rayPointDomainAndPort(): String {
         val address = getProxyOutbound()?.getServerAddress().orEmpty()
         val port = getProxyOutbound()?.getServerPort()
-        return if (Utils.isIpv6Address(address)) {
-            String.format("[%s]:%s", address, port)
-        } else {
-            String.format("%s:%s", address, port)
-        }
+        return Utils.getIpv6Address(address) + ":" + port
     }
 }

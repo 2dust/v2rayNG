@@ -366,7 +366,7 @@ object Utils {
     }
 
     fun getIpv6Address(address: String): String {
-        return if (isIpv6Address(address)) {
+        return if (isIpv6Address(address) && !address.contains('[') && !address.contains(']')) {
             String.format("[%s]", address)
         } else {
             address

@@ -60,6 +60,8 @@
     <string name="server_lab_encryption">加密方式(encryption)</string>
     <string name="server_lab_flow">流控(flow)</string>
     <string name="server_lab_reserved">Reserved(可选)</string>
+    <string name="server_lab_local_v4_address">本地 IPv4 地址(可选)</string>
+    <string name="server_lab_local_v6_address">本地 IPv6 地址(可选, 仅 IPv6 优先时使用)</string>
     <string name="toast_success">成功</string>
     <string name="toast_failure">失败</string>
     <string name="toast_none_data">没有数据</string>
