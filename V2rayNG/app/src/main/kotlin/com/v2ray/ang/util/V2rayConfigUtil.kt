@@ -427,9 +427,13 @@ object V2rayConfigUtil {
             }
 
             if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
-                val localTunAddr = mutableListOf("172.16.0.2/32")
-                if (settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) == true) {
-                    localTunAddr.add("2606:4700:110:8f81:d551:a0:532e:a2b3/128")
+                var localTunAddr = if (outbound.settings?.address == null) {
+                    listOf("172.16.0.2/32", "2606:4700:110:8f81:d551:a0:532e:a2b3/128")
+                } else {
+                    outbound.settings?.address as List<*>
+                }
+                if (settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) != true) {
+                    localTunAddr = listOf(localTunAddr.first())
                 }
                 outbound.settings?.address = localTunAddr
             }

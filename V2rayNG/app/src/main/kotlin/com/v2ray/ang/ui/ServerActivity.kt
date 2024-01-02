@@ -106,6 +106,9 @@ class ServerActivity : BaseActivity() {
     private val et_reserved1: EditText? by lazy { findViewById(R.id.et_reserved1) }
     private val et_reserved2: EditText? by lazy { findViewById(R.id.et_reserved2) }
     private val et_reserved3: EditText? by lazy { findViewById(R.id.et_reserved3) }
+    private val et_local_v4_address: EditText? by lazy { findViewById(R.id.et_local_v4_address) }
+    private val et_local_v6_address: EditText? by lazy { findViewById(R.id.et_local_v6_address) }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -210,6 +213,14 @@ class ServerActivity : BaseActivity() {
                 et_reserved2?.text = Utils.getEditable(outbound.settings?.reserved?.get(1).toString())
                 et_reserved3?.text = Utils.getEditable(outbound.settings?.reserved?.get(2).toString())
             }
+            if (outbound.settings?.address == null) {
+                et_local_v4_address?.text = Utils.getEditable("172.16.0.2/32")
+                et_local_v6_address?.text = Utils.getEditable("2606:4700:110:8f81:d551:a0:532e:a2b3/128")
+            } else {
+                val list = outbound.settings?.address as List<*>
+                et_local_v4_address?.text = Utils.getEditable(list.get(0).toString())
+                et_local_v6_address?.text = Utils.getEditable(list.get(1).toString())
+            }
         }
         val securityEncryptions = if (config.configType == EConfigType.SHADOWSOCKS) shadowsocksSecuritys else securitys
         val security = Utils.arrayFind(securityEncryptions, outbound.getSecurityEncryption().orEmpty())
@@ -295,6 +306,8 @@ class ServerActivity : BaseActivity() {
         et_reserved1?.text = Utils.getEditable("0")
         et_reserved2?.text = Utils.getEditable("0")
         et_reserved3?.text = Utils.getEditable("0")
+        et_local_v4_address?.text = Utils.getEditable("172.16.0.2/32")
+        et_local_v6_address?.text = Utils.getEditable("2606:4700:110:8f81:d551:a0:532e:a2b3/128")
         return true
     }
 
@@ -407,6 +420,8 @@ class ServerActivity : BaseActivity() {
         }else {
             wireguard.reserved = null
         }
+        wireguard.address = listOf(et_local_v4_address?.text.toString().trim(),
+            et_local_v6_address?.text.toString().trim())
     }
 
     private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean) {
