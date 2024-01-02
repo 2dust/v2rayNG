@@ -21,6 +21,7 @@ import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.ID_MAIN
 import com.v2ray.ang.util.MmkvManager.KEY_SELECTED_SERVER
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.Utils.getIpv6Address
 
 class ServerActivity : BaseActivity() {
 
@@ -411,7 +412,7 @@ class ServerActivity : BaseActivity() {
     private fun savePeer(wireguard: V2rayConfig.OutboundBean.OutSettingsBean, port: Int) {
         wireguard.secretKey = et_id.text.toString().trim()
         wireguard.peers?.get(0)?.publicKey = et_public_key?.text.toString().trim()
-        wireguard.peers?.get(0)?.endpoint = et_address.text.toString().trim() + ":" + port
+        wireguard.peers?.get(0)?.endpoint = getIpv6Address(et_address.text.toString().trim()) + ":" + port
         val reserved1 = Utils.parseInt(et_reserved1?.text.toString())
         val reserved2 = Utils.parseInt(et_reserved2?.text.toString())
         val reserved3 = Utils.parseInt(et_reserved3?.text.toString())
