@@ -140,9 +140,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         MmkvManager.clearAllTestDelayResults()
         updateListAction.value = -1 // update all
 
+        val serversCopy = serversCache.toList() // Create a copy of the list
+
         getApplication<AngApplication>().toast(R.string.connection_test_testing)
         viewModelScope.launch(Dispatchers.Default) { // without Dispatchers.Default viewModelScope will launch in main thread
-            for (item in serversCache) {
+            for (item in serversCopy) {
                 val config = V2rayConfigUtil.getV2rayConfig(getApplication(), item.guid)
                 if (config.status) {
                     MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG, Pair(item.guid, config.content))
