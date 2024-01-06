@@ -189,7 +189,7 @@
     <string name="title_del_invalid_config">Xoá cấu hình lỗi</string>
     <string name="title_export_all">Xuất và sao chép tất cả cấu hình</string>
     <string name="title_sub_setting">Các gói đăng ký</string>
-    <string name="sub_setting_remarks">Tên các gói đăng ký</string>
+    <string name="sub_setting_remarks">Tên gói đăng ký</string>
     <string name="sub_setting_url">URL gói đăng ký</string>
     <string name="sub_setting_enable">Sử dụng gói đăng ký này</string>
 	<string name="sub_auto_update">Bật tự động cập nhật</string>
