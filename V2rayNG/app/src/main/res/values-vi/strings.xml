@@ -104,7 +104,7 @@
     <string name="summary_pref_mux_enabled">Mux phân phối dữ liệu của nhiều kết nối TCP trên một kết nối TCP duy nhất, dùng để giảm độ trễ của kết nối TCP, không nên bật Mux để xem video, download hoặc chạy speedtest.</string>
     <string name="title_pref_mux_concurency">Số lượng kết nối con TCP Multiplexing (từ 1 đến 1024)</string>
     <string name="title_pref_mux_xudp_concurency">Số lượng kết nối con XUDP Multiplexing (từ 1 đến 1024)</string>
-    <string name="title_pref_mux_xudp_quic">Phương pháp xử lý cho QUIC traffic trong Mux tunnel.</string>
+    <string name="title_pref_mux_xudp_quic">Phương pháp xử lý QUIC traffic bên trong Mux tunnel.</string>
     <string-array name="mux_xudp_quic_entries">
         <item>Từ chối</item>
         <item>Cho phép</item>
