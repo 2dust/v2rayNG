@@ -41,8 +41,8 @@
     <string name="server_lab_port">Cổng</string>
     <string name="server_lab_id">ID</string>
     <string name="server_lab_alterid">ID thay thế</string>
-    <string name="server_lab_security">Bảo mật</string>
-    <string name="server_lab_network">Kiểu kết nối</string>
+    <string name="server_lab_security">Phương pháp Mã hóa</string>
+    <string name="server_lab_network">Giao thức truyền tải (network)</string>
     <string name="server_lab_more_function">Nâng cao</string>
     <string name="server_lab_head_type">Loại Head</string>
     <string name="server_lab_mode_type">Chế độ gRPC</string>
@@ -50,7 +50,7 @@
     <string name="server_lab_path">path(ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
-    <string name="server_lab_sni">Địa chỉ SNI</string>
+    <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">Địa chỉ</string>
     <string name="server_lab_port3">Cổng</string>
     <string name="server_lab_id3">Mật khẩu</string>
@@ -86,7 +86,7 @@
     <string name="menu_item_search">Tìm kiếm</string>
     <string name="menu_item_select_all">Chọn tất cả</string>
     <string name="msg_enter_keywords">Nhập từ khoá</string>
-    <string name="switch_bypass_apps_mode">Bỏ qua kết nối VPN</string>
+    <string name="switch_bypass_apps_mode">Chế độ Bypass</string>
     <string name="menu_item_select_proxy_app">Tự động chọn ứng dụng Proxy</string>
     <string name="msg_downloading_content">Đang tải xuống nội dung...</string>
     <string name="menu_item_export_proxy_app">Xuất và sao chép</string>
@@ -97,8 +97,8 @@
     <string name="title_settings">Cài đặt</string>
     <string name="title_advanced">Cài đặt nâng cao</string>
     <string name="title_vpn_settings">Cài đặt VPN</string>
-    <string name="title_pref_per_app_proxy">Proxy ứng dụng</string>
-    <string name="summary_pref_per_app_proxy">- Chung: Ứng dụng đã chọn sẽ kết nối Proxy, chưa lựa chọn sẽ kết nối trực tiếp. \n- Bỏ qua kết nối: Ứng dụng được chọn sẽ trực tiếp kết nối, không lựa chọn sẽ kết nối qua Proxy. \n- Lựa chọn để tự động chọn ứng dụng Proxy trong Menu.</string>
+    <string name="title_pref_per_app_proxy">Proxy Theo Ứng Dụng</string>
+    <string name="summary_pref_per_app_proxy">- Bình thường: Ứng dụng đã chọn sẽ kết nối thông qua Proxy, chưa lựa chọn sẽ kết nối trực tiếp. \n- Chế độ Bypass: Ứng dụng được chọn sẽ kết nối trực tiếp, không lựa chọn sẽ kết nối qua Proxy. \n- Nếu bạn ở China thì chọn "Tự động chọn ứng dụng Proxy" trong Menu.</string>
 
     <string name="title_pref_mux_enabled">Bật Mux</string>
     <string name="summary_pref_mux_enabled">Mux phân phối dữ liệu của nhiều kết nối TCP trên một kết nối TCP duy nhất, dùng để giảm độ trễ của kết nối TCP, không nên bật Mux để xem video, download hoặc chạy speedtest.</string>
@@ -112,40 +112,40 @@
     </string-array>
 
 
-    <string name="title_pref_speed_enabled">Cho phép hiển thị tốc độ mạng</string>
+    <string name="title_pref_speed_enabled">Bật Hiển thị tốc độ mạng</string>
     <string name="summary_pref_speed_enabled">Hiển thị tốc độ mạng hiện tại trên thanh thông báo. \nBiểu tượng trên thanh trạng thái có thể thay đổi tùy vào mức sử dụng.</string>
 
     <string name="title_pref_sniffing_enabled">Bật chế độ Sniffing</string>
-    <string name="summary_pref_sniffing_enabled">Thử kiểm tra domain từ gói tin để định tuyến (mặc định là bật, tắt để xài được Zalo)</string>
+    <string name="summary_pref_sniffing_enabled">Thử kiểm tra domain từ gói tin để phục vụ định tuyến (mặc định là bật, tắt để xài được Zalo)</string>
 
-    <string name="title_pref_local_dns_enabled">Bật DNS cục bộ</string>
+    <string name="title_pref_local_dns_enabled">Bật Local DNS</string>
     <string name="summary_pref_local_dns_enabled">DNS được xử lý bởi mô-đun DNS của xray-core (nếu cần định tuyến Bypassing LAN và địa chỉ trong nước)</string>
 
     <string name="title_pref_fake_dns_enabled">Bật FakeDNS</string>
     <string name="summary_pref_fake_dns_enabled">FakeDNS lấy tên miền mục tiêu bằng cách giả mạo DNS (nhanh hơn, nhưng có thể không hoạt động cho một số ứng dụng)</string>
 
     <string name="title_pref_prefer_ipv6">Ưu tiên IPv6</string>
-    <string name="summary_pref_prefer_ipv6">Ưu tiên sử dụng địa chỉ IPv6 cho kết nối và lộ trình.</string>
+    <string name="summary_pref_prefer_ipv6">Ưu tiên sử dụng địa chỉ IPv6 cho kết nối và định tuyến.</string>
 
-    <string name="title_pref_routing">Lộ trình</string>
+    <string name="title_pref_routing">Định tuyến</string>
     <string name="title_pref_routing_domain_strategy">Tùy chọn tên miền</string>
-    <string name="title_pref_routing_mode">Tùy chỉnh quy tắc lộ trình</string>
-    <string name="title_pref_routing_custom">Tùy chỉnh lộ trình</string>
+    <string name="title_pref_routing_mode">Tùy chỉnh quy tắc định tuyến</string>
+    <string name="title_pref_routing_custom">Tùy chỉnh định tuyến</string>
 
-    <string name="title_pref_remote_dns">Điều khiển DNS (Bổ sung)</string>
+    <string name="title_pref_remote_dns">Remote DNS (không bắt buộc)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (Chỉ IPv4/IPv6)</string>
 
-    <string name="title_pref_domestic_dns">DNS trong nước (Bổ sung)</string>
+    <string name="title_pref_domestic_dns">DNS trong nước (không bắt buộc)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
     <string name="title_pref_proxy_sharing_enabled">Cho phép kết nối từ mạng LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác có thể kết nối đến Proxy bởi địa chỉ IP thông qua Socks/HTTP, chỉ bật khi bạn tin tưởng kết nối đó.</string>
     <string name="toast_warning_pref_proxysharing_short">Cho phép kết nối từ mạng LAN, đảm bảo rằng bạn tin tưởng kết nối hiện tại!</string>
 
-    <string name="title_pref_allow_insecure">Cho phép đặt lại Bỏ qua xác minh chứng chỉ</string>
-    <string name="summary_pref_allow_insecure">Khi kết nối TLS, đặt cài đặt Bỏ qua xác minh chứng chỉ thành mặc định.</string>
+    <string name="title_pref_allow_insecure">Đặt "allowInsecure" mặc định là "true"</string>
+    <string name="summary_pref_allow_insecure">Mặc định bỏ qua xác minh chứng chỉ khi nhập cấu hình có bảo mật TLS</string>
 
     <string name="title_pref_socks_port">Cổng Proxy SOCKS5</string>
     <string name="summary_pref_socks_port">Cổng Proxy SOCKS5</string>
@@ -153,13 +153,13 @@
     <string name="title_pref_http_port">Cổng Proxy HTTP</string>
     <string name="summary_pref_http_port">Cổng Proxy HTTP</string>
 
-    <string name="title_pref_local_dns_port">Cổng DNS cục bộ</string>
-    <string name="summary_pref_local_dns_port">Cổng DNS cục bộ</string>
+    <string name="title_pref_local_dns_port">Cổng Local DNS</string>
+    <string name="summary_pref_local_dns_port">Cổng Local DNS</string>
 
-    <string name="title_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình</string>
-    <string name="summary_pref_confirm_remove">Hiển thị thông báo xác nhận xoá cấu hình khi bạn xoá một cấu hình.</string>
+    <string name="title_pref_confirm_remove">Xác nhận xóa tệp cấu hình</string>
+    <string name="summary_pref_confirm_remove">Việc xóa tệp cấu hình có yêu cầu xác nhận từ người dùng hay không.</string>
 
-    <string name="title_pref_start_scan_immediate">Bắt đầu quét mã QR ngay lập tức</string>
+    <string name="title_pref_start_scan_immediate">Quét mã QR ngay lập tức</string>
     <string name="summary_pref_start_scan_immediate">Mở camera để quét QR ngay khi khởi động, nếu không bạn có thể chọn quét mã hoặc chọn ảnh trên thanh công cụ.</string>
 
     <string name="title_pref_feedback">Phản hồi lỗi</string>
@@ -170,15 +170,19 @@
     <string name="title_pref_promotion">Quảng cáo Server</string>
     <string name="summary_pref_promotion">Quảng cáo, nhấn để biết thêm (Ủng hộ có thể được gỡ bỏ)</string>
 
+    <string name="title_pref_auto_update_subscription">Cập nhật tự động các gói đăng ký</string>
+    <string name="summary_pref_auto_update_subscription">Cập nhật các gói đăng ký của bạn tự động ở nền với khoảng thời gian cố định. Lưu ý rằng tùy thuộc vào thiết bị, tính năng này có thể không luôn hoạt động đúng như mong đợi.</string>
+    <string name="title_pref_auto_update_interval">Thời gian Cập nhật Tự động (Phút, Giá trị tối thiểu 15)</string>
+
     <string name="title_core_loglevel">Mức độ nhật ký</string>
     <string name="title_mode">Chế độ kết nối</string>
     <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp!</string>
     <string name="title_language">Ngôn ngữ</string>
     <string name="title_ui_settings">Cài đặt UI</string>
 
-    <string name="title_logcat">Nhật ký hoạt động</string>
-    <string name="logcat_copy">Sao chép nhật ký</string>
-    <string name="logcat_clear">Xoá nhật ký</string>
+    <string name="title_logcat">Logcat</string>
+    <string name="logcat_copy">Sao chép</string>
+    <string name="logcat_clear">Xoá</string>
     <string name="title_service_restart">Kết nối lại v2rayNG</string>
     <string name="title_del_all_config">Xoá tất cả cấu hình</string>
     <string name="title_del_duplicate_config">Xoá cấu hình trùng lặp</string>
@@ -190,7 +194,7 @@
     <string name="sub_setting_enable">Sử dụng gói đăng ký này</string>
     <string name="title_sub_update">Cập nhật các gói đăng ký</string>
     <string name="title_ping_all_server">Ping tất cả máy chủ</string>
-    <string name="title_real_ping_all_server">Kiểm tra máy chủ</string>
+    <string name="title_real_ping_all_server">Test HTTP tất cả máy chủ</string>
     <string name="title_user_asset_setting">Tệp Geo asset</string>
     <string name="title_sort_by_test_results">Sắp xếp lại theo lần kiểm tra cuối cùng</string>
     <string name="title_filter_config">Lọc cấu hình theo các gói đăng ký</string>
@@ -200,17 +204,17 @@
     <string name="tasker_start_service">Bắt đầu v2rayNG</string>
     <string name="tasker_setting_confirm">Xác nhận</string>
 
-    <string name="routing_settings_title">Cài đặt lộ trình</string>
+    <string name="routing_settings_title">Cài đặt định tuyến</string>
     <string name="routing_settings_tips">Được phân cách bằng dấu phẩy (,). Hãy nhớ nó để lưu lại!</string>
     <string name="routing_settings_save">Lưu lại</string>
     <string name="routing_settings_delete">Xoá</string>
     <string name="routing_settings_scan_replace">Quét và thay thế</string>
     <string name="routing_settings_scan_append">Quét và nối</string>
-    <string name="routing_settings_default_rules">Đặt luật cho lộ trình mặc định</string>
+    <string name="routing_settings_default_rules">Đặt luật cho định tuyến mặc định</string>
 
     <string name="connection_test_pending">Kiểm tra kết nối</string>
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng...</string>
-    <string name="connection_test_available">Thành công: Kết nối google.com mất %dms</string>
+    <string name="connection_test_available">Thành công: thử kết nối google.com mất %dms</string>
     <string name="connection_test_error">Lỗi kết nối mạng, hãy thử đổi cấu hình hoặc kiểm tra lại! Mã lỗi: %s</string>
     <string name="connection_test_fail">Không có kết nối mạng!</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
