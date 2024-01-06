@@ -99,4 +99,6 @@ object AppConfig {
     const val SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL = "1440" // 24 hours
     const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
 
+    const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"
+    const val CACHE_KEYWORD_FILTER = "cache_keyword_filter"
 }
