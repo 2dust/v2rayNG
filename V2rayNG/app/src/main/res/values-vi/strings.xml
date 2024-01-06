@@ -206,7 +206,7 @@
     <string name="tasker_setting_confirm">Xác nhận</string>
 
     <string name="routing_settings_title">Cài đặt định tuyến</string>
-    <string name="routing_settings_tips">Phân cách bằng dấu phẩy (,) /nCó thể tải xuống rules mặc định để tham khảo ở menu ba chấm</string>
+    <string name="routing_settings_tips">Phân cách bằng dấu phẩy (,). Có thể tải xuống rules mặc định để tham khảo ở menu ba chấm</string>
     <string name="routing_settings_save">Lưu lại</string>
     <string name="routing_settings_delete">Xoá</string>
     <string name="routing_settings_scan_replace">Quét QR và thay thế</string>
@@ -237,9 +237,9 @@
     </string-array>
 
     <string-array name="routing_tag">
-        <item>Proxy URL or IP</item>
-        <item>Direct URL or IP</item>
-        <item>Blocked URL or IP</item>
+        <item>Proxy</item>
+        <item>Direct</item>
+        <item>Blocked</item>
     </string-array>
 
     <string-array name="routing_mode">
