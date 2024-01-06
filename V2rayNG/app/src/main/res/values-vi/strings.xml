@@ -46,10 +46,10 @@
     <string name="server_lab_more_function">Nâng cao</string>
     <string name="server_lab_head_type">Loại Head</string>
     <string name="server_lab_mode_type">Chế độ gRPC</string>
-    <string name="server_lab_request_host">Yêu cầu host (Host/WS/H2) / Bảo mật QUIC</string>
-    <string name="server_lab_path">Đường dẫn (WS/H2) / Khóa QUIC / KCP seed / Dịch vụ gRPC</string>
+    <string name="server_lab_request_host">Yêu cầu host(host/ws host/h2 host)/QUIC security</string>
+    <string name="server_lab_path">path(ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
     <string name="server_lab_stream_security">TLS</string>
-    <string name="server_lab_allow_insecure">Bỏ qua xác minh chứng chỉ</string>
+    <string name="server_lab_allow_insecure">allowInsecure</string>
     <string name="server_lab_sni">Địa chỉ SNI</string>
     <string name="server_lab_address3">Địa chỉ</string>
     <string name="server_lab_port3">Cổng</string>
@@ -100,28 +100,29 @@
     <string name="title_pref_per_app_proxy">Proxy ứng dụng</string>
     <string name="summary_pref_per_app_proxy">- Chung: Ứng dụng đã chọn sẽ kết nối Proxy, chưa lựa chọn sẽ kết nối trực tiếp. \n- Bỏ qua kết nối: Ứng dụng được chọn sẽ trực tiếp kết nối, không lựa chọn sẽ kết nối qua Proxy. \n- Lựa chọn để tự động chọn ứng dụng Proxy trong Menu.</string>
 
-    <string name="title_pref_mux_enabled">Cho phép Mux</string>
-    <string name="summary_pref_mux_enabled">Nhanh hơn nhưng có thể khiến kết nối không ổn định. \nMux lưu lượng TCP với 8 kết nối mặc định, tùy chỉnh cách xử lý UDP và QUIC bên dưới.</string>
-    <string name="title_pref_mux_xudp_concurency">Kết nối XUDP (Phạm vi từ -1 đến 1024)</string>
-    <string name="title_pref_mux_xudp_quic">Xử lý QUIC trong đường hầm Mux</string>
+    <string name="title_pref_mux_enabled">Bật Mux</string>
+    <string name="summary_pref_mux_enabled">Mux phân phối dữ liệu của nhiều kết nối TCP trên một kết nối TCP duy nhất, dùng để giảm độ trễ của kết nối TCP, không nên bật Mux để xem video, download hoặc chạy speedtest.</string>
+    <string name="title_pref_mux_concurency">Số lượng kết nối con TCP Multiplexing (từ 1 đến 1024)</string>
+    <string name="title_pref_mux_xudp_concurency">Số lượng kết nối con XUDP Multiplexing (từ 1 đến 1024)</string>
+    <string name="title_pref_mux_xudp_quic">Phương pháp xử lý cho QUIC traffic trong Mux tunnel.</string>
     <string-array name="mux_xudp_quic_entries">
         <item>Từ chối</item>
         <item>Cho phép</item>
-        <item>Nhảy</item>
+        <item>Bỏ qua</item>
     </string-array>
 
 
     <string name="title_pref_speed_enabled">Cho phép hiển thị tốc độ mạng</string>
     <string name="summary_pref_speed_enabled">Hiển thị tốc độ mạng hiện tại trên thanh thông báo. \nBiểu tượng trên thanh trạng thái có thể thay đổi tùy vào mức sử dụng.</string>
 
-    <string name="title_pref_sniffing_enabled">Bật tính năng phát hiện luồng</string>
-    <string name="summary_pref_sniffing_enabled">Thử chuyển kết nối hiện tại của bạn qua trung gian để trung gian xử lý kết nối về lại cho bạn. (Mặc định là bật, hãy tắt nó nếu kết nối không ổn định)</string>
+    <string name="title_pref_sniffing_enabled">Bật chế độ Sniffing</string>
+    <string name="summary_pref_sniffing_enabled">Thử kiểm tra domain từ gói tin để định tuyến (mặc định là bật, tắt để xài được Zalo)</string>
 
-    <string name="title_pref_local_dns_enabled">Cho phép DNS cục bộ</string>
-    <string name="summary_pref_local_dns_enabled">DNS được xử lý bởi mô đun của lõi DNS. (Khuyến nghị, nếu cần định tuyến Bỏ qua mạng LAN và địa chỉ đất liền)</string>
+    <string name="title_pref_local_dns_enabled">Bật DNS cục bộ</string>
+    <string name="summary_pref_local_dns_enabled">DNS được xử lý bởi mô-đun DNS của xray-core (nếu cần định tuyến Bypassing LAN và địa chỉ trong nước)</string>
 
-    <string name="title_pref_fake_dns_enabled">Cho phép DNS giả</string>
-    <string name="summary_pref_fake_dns_enabled">DNS cục bộ trả về địa chỉ IP giả. (Nhanh hơn, nhưng có thể không hoạt động với một số ứng dụng)</string>
+    <string name="title_pref_fake_dns_enabled">Bật FakeDNS</string>
+    <string name="summary_pref_fake_dns_enabled">FakeDNS lấy tên miền mục tiêu bằng cách giả mạo DNS (nhanh hơn, nhưng có thể không hoạt động cho một số ứng dụng)</string>
 
     <string name="title_pref_prefer_ipv6">Ưu tiên IPv6</string>
     <string name="summary_pref_prefer_ipv6">Ưu tiên sử dụng địa chỉ IPv6 cho kết nối và lộ trình.</string>
@@ -209,12 +210,12 @@
 
     <string name="connection_test_pending">Kiểm tra kết nối</string>
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng...</string>
-    <string name="connection_test_available">Kiểm tra kết nối mạng thành công! Ping hiện tại là %d</string>
+    <string name="connection_test_available">Thành công: Kết nối google.com mất %dms</string>
     <string name="connection_test_error">Lỗi kết nối mạng, hãy thử đổi cấu hình hoặc kiểm tra lại! Mã lỗi: %s</string>
     <string name="connection_test_fail">Không có kết nối mạng!</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
-    <string name="connection_connected">Đã kết nối, hãy nhấn vào đây để kiểm tra kết nối mạng!</string>
-    <string name="connection_not_connected">Chưa kết nối, hãy chọn một cấu hình để kết nối!</string>
+    <string name="connection_connected">Đã kết nối, nhấn vào đây để kiểm tra kết nối mạng!</string>
+    <string name="connection_not_connected">Chưa kết nối</string>
 
     <string name="import_subscription_success">Nhập gói đăng ký thành công!</string>
     <string name="import_subscription_failure">Nhập gói đăng ký không thành công!</string>
