@@ -48,7 +48,7 @@
                         android:id="@+id/layout_test"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/connection_test_height"
-                        android:background="?attr/colorPrimary"
+                        android:background="@color/colorMainTestBg"
                         android:gravity="center|start"
                         android:nextFocusRight="@+id/fab"
                         android:clickable="true"

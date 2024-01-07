@@ -15,4 +15,5 @@
     <color name="colorAccent">#000000</color>
     <color name="colorBg">#FFFFFF</color>
     <color name="colorText">#000000</color>
+    <color name="colorMainTestBg">#F0F1F6</color>
 </resources>
