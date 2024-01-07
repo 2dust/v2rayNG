@@ -617,10 +617,13 @@ object AngConfigManager {
                 EConfigType.SOCKS -> {
                     val remark = "#" + Utils.urlEncode(config.remarks)
                     val pw =
-                        Utils.encode("${outbound.settings?.servers?.get(0)?.users?.get(0)?.user}:${outbound.getPassword()}")
+                        if (outbound.settings?.servers?.get(0)?.users?.get(0)?.user != null)
+                            "${outbound.settings?.servers?.get(0)?.users?.get(0)?.user}:${outbound.getPassword()}"
+                        else
+                            ":"
                     val url = String.format(
                         "%s@%s:%s",
-                        pw,
+                        Utils.encode(pw),
                         Utils.getIpv6Address(outbound.getServerAddress()!!),
                         outbound.getServerPort()
                     )
