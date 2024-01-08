@@ -18,7 +18,7 @@ android {
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
         versionCode 538
-        versionName "1.8.13.gai"
+        versionName "1.8.13.gai.2"
     }
 
     buildTypes {
