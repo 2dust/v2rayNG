@@ -67,7 +67,7 @@ object AppConfig {
     const val v2rayNGIssues = "https://github.com/2dust/v2rayNG/issues"
     const val v2rayNGWikiMode = "https://github.com/2dust/v2rayNG/wiki/Mode"
     const val v2rayNGPrivacyPolicy = "https://raw.githubusercontent.com/2dust/v2rayNG/master/CR.md"
-    const val promotionUrl = "https://www.youtube.com/@bulianglin"
+    const val promotionUrl = "aHR0cHM6Ly93d3cueW91dHViZS5jb20vQGJ1bGlhbmdsaW4"
     const val geoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
 
     const val DNS_AGENT = "9.9.9.9"
