@@ -1,7 +1,7 @@
 name: Build APK
 
 on:
-  push:
+#  push:
   workflow_dispatch:
     inputs:
       XRAY_CORE_VERSION:
@@ -42,7 +42,7 @@ jobs:
       run: |
         mkdir ${{ github.workspace }}/build
         cd ${{ github.workspace }}/build
-        git clone --depth=1 -b main https://github.com/2dust/AndroidLibXrayLite.git
+        git clone --depth=1 -b main  https://github.com/bian2022/AndroidLibXrayLite.git
         cd AndroidLibXrayLite
         go get github.com/xtls/xray-core@${{ github.event.inputs.XRAY_CORE_VERSION }} || true
         gomobile init
