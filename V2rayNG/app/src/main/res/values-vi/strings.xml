@@ -12,10 +12,10 @@
     <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
     <string name="toast_permission_denied">Vui lòng cấp quyền cần thiết cho v2rayNG! Bạn đã từ chối các quyền cần thiết như Camera hay Bộ nhớ?</string>
     <string name="notification_action_more">Nhấn để biết thêm</string>
-    <string name="toast_services_start">Đang bắt đầu v2rayNG...</string>
+    <string name="toast_services_start">Đang khởi động v2rayNG...</string>
     <string name="toast_services_stop">Đã dừng v2rayNG!</string>
-    <string name="toast_services_success">Đã bắt đầu v2rayNG!</string>
-    <string name="toast_services_failure">Không thể bắt đầu v2rayNG, kiểm tra lại cấu hình.</string>
+    <string name="toast_services_success">Đã khởi động v2rayNG!</string>
+    <string name="toast_services_failure">Không thể khởi động v2rayNG, kiểm tra lại cấu hình.</string>
 
     <!--ServerActivity-->
     <string name="title_server">v2rayNG</string>
@@ -41,7 +41,7 @@
     <string name="server_lab_port">Cổng</string>
     <string name="server_lab_id">ID</string>
     <string name="server_lab_alterid">alterId</string>
-    <string name="server_lab_security">Phương thức mã hóa</string>
+    <string name="server_lab_security">Thuận toán mã hóa</string>
     <string name="server_lab_network">Giao thức truyền tải (network)</string>
     <string name="server_lab_more_function">Nâng cao</string>
     <string name="server_lab_head_type">Kiểu ngụy trang (type)</string>
@@ -54,14 +54,14 @@
     <string name="server_lab_address3">Địa chỉ</string>
     <string name="server_lab_port3">Cổng</string>
     <string name="server_lab_id3">Mật khẩu</string>
-    <string name="server_lab_security3">Bảo mật</string>
-    <string name="server_lab_id4">Mật khẩu (Bổ sung)</string>
-    <string name="server_lab_security4">Tên người dùng (Bổ sung)</string>
-    <string name="server_lab_encryption">Mã hoá</string>
-    <string name="server_lab_flow">Kiểm soát lưu lượng</string>
-    <string name="server_lab_reserved">Reserved (Bổ sung)</string>
-    <string name="server_lab_local_v4_address">địa chỉ cục bộ IPv4(Bổ sung)</string>
-    <string name="server_lab_local_v6_address">địa chỉ cục bộ IPv6(Bổ sung, chỉ được sử dụng khi thích IPv6)</string>
+    <string name="server_lab_security3">Thuận toán mã hóa</string>
+    <string name="server_lab_id4">Mật khẩu (tùy chọn)</string>
+    <string name="server_lab_security4">Tên người dùng (tùy chọn)</string>
+    <string name="server_lab_encryption">Thuận toán mã hóa</string>
+    <string name="server_lab_flow">Kiểm soát lưu lượng (flow)</string>
+    <string name="server_lab_reserved">Reserved (tùy chọn)</string>
+    <string name="server_lab_local_v4_address">Địa chỉ cục bộ IPv4(tùy chọn)</string>
+    <string name="server_lab_local_v6_address">Địa chỉ cục bộ IPv6 (tùy chọn, chỉ sử dụng khi ưu tiên IPv6)</string>
     <string name="toast_success">Thành công!</string>
     <string name="toast_failure">Đã xảy ra lỗi, vui lòng thử lại!</string>
     <string name="toast_none_data">Không có gì ở đây</string>
@@ -76,7 +76,7 @@
     <string name="toast_invalid_url">URL không hợp lệ hoặc trống!</string>
     <string name="server_lab_need_inbound">Vui lòng đảm bảo cấu hình tùy chỉnh này không bị lỗi trước khi sử dụng!</string>
     <string name="toast_malformed_josn">Cấu hình không hợp lệ!</string>
-    <string name="server_lab_request_host6">Host (SNI) (Bổ sung)</string>
+    <string name="server_lab_request_host6">Host (SNI) (tùy chọn)</string>
     <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp!</string>
     <string name="menu_item_add_file">Thêm tệp</string>
     <string name="menu_item_download_file">Tải xuống tệp tin</string>
@@ -101,7 +101,7 @@
     <string name="summary_pref_per_app_proxy">- Bình thường: Ứng dụng đã chọn sẽ kết nối thông qua Proxy, chưa lựa chọn sẽ kết nối trực tiếp. \n- Chế độ Bypass: Ứng dụng được chọn sẽ kết nối trực tiếp, không lựa chọn sẽ kết nối qua Proxy. \n- Nếu bạn ở Trung Quốc thì chọn Tự động chọn ứng dụng Proxy trong Menu.</string>
 
     <string name="title_pref_mux_enabled">Bật Mux</string>
-    <string name="summary_pref_mux_enabled">Dùng để giảm độ trễ trong bước bắt tay của kết nối TCP, Mux phân phối dữ liệu từ nhiều kết nối TCP trên một TCP duy nhất. Không nên sử dụng Mux để xem video, download file hoặc chạy speedtest vì thường không hiệu quả.</string>
+    <string name="summary_pref_mux_enabled">Giảm độ trễ trong bước bắt tay của kết nối TCP. \nMux phân phối dữ liệu từ nhiều kết nối TCP trên một kết nối TCP duy nhất. \nKhông nên sử dụng Mux để xem video, download file hoặc chạy speedtest vì thường không hiệu quả.</string>
     <string name="title_pref_mux_concurency">TCP connections (từ 1 đến 1024)</string>
     <string name="title_pref_mux_xudp_concurency">XUDP connections (từ 1 đến 1024)</string>
     <string name="title_pref_mux_xudp_quic">Handling of QUIC traffic in mux tunnel.</string>
@@ -122,7 +122,7 @@
     <string name="summary_pref_local_dns_enabled">DNS được xử lý bởi mô-đun DNS của xray-core (dùng nếu cần định tuyến Bypassing LAN và địa chỉ nội địa)</string>
 
     <string name="title_pref_fake_dns_enabled">Bật FakeDNS</string>
-    <string name="summary_pref_fake_dns_enabled">FakeDNS lấy tên miền mục tiêu bằng cách giả mạo DNS (nhanh hơn, nhưng có thể không hoạt động cho một số ứng dụng)</string>
+    <string name="summary_pref_fake_dns_enabled">FakeDNS lấy tên miền mục tiêu bằng cách giả mạo DNS (nhanh hơn, có thể không hoạt động cho một số ứng dụng)</string>
 
     <string name="title_pref_prefer_ipv6">Ưu tiên IPv6</string>
     <string name="summary_pref_prefer_ipv6">Ưu tiên sử dụng địa chỉ IPv6 cho kết nối và định tuyến.</string>
@@ -141,8 +141,8 @@
     <string name="summary_pref_domestic_dns">DNS</string>
 
     <string name="title_pref_proxy_sharing_enabled">Cho phép kết nối từ mạng LAN</string>
-    <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác có thể kết nối đến Proxy bởi địa chỉ IP thông qua Socks/HTTP, chỉ bật khi bạn tin tưởng kết nối đó.</string>
-    <string name="toast_warning_pref_proxysharing_short">Cho phép kết nối từ mạng LAN, đảm bảo rằng bạn tin tưởng kết nối hiện tại!</string>
+    <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác trong cùng mạng LAN có thể kết nối đến SOCKS/HTTP proxy trên thiết bị của ban. \nChỉ bật tính năng này trong các mạng đáng tin cậy để tránh kết nối trái phép.</string>
+    <string name="toast_warning_pref_proxysharing_short">Đang bật cho phép kết nối từ mạng LAN</string>
 
     <string name="title_pref_allow_insecure">allowInsecure</string>
     <string name="summary_pref_allow_insecure">Khi nhập những cấu hình có bảo mật TLS, mặc định sẽ bỏ qua xác minh chứng chỉ (allowInsecure: true).</string>
@@ -171,19 +171,19 @@
     <string name="summary_pref_promotion">Quảng cáo, nhấn để biết thêm (Ủng hộ có thể được gỡ bỏ)</string>
 
     <string name="title_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký</string>
-    <string name="summary_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký của bạn ở trong nền với khoảng thời gian cố định. Lưu ý rằng tùy thuộc vào thiết bị, tính năng này có thể không luôn hoạt động đúng như mong đợi.</string>
+    <string name="summary_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký của bạn ở trong nền với khoảng thời gian cố định. Tùy thiết bị, tính năng này có thể không luôn hoạt động đúng như mong đợi.</string>
     <string name="title_pref_auto_update_interval">Thời gian Cập nhật tự động (Phút, Giá trị tối thiểu 15)</string>
 
     <string name="title_core_loglevel">Log level</string>
     <string name="title_mode">Chế độ kết nối</string>
     <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp!</string>
     <string name="title_language">Ngôn ngữ</string>
-    <string name="title_ui_settings">Cài đặt UI</string>
+    <string name="title_ui_settings">Cài đặt giao diện</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Sao chép</string>
     <string name="logcat_clear">Xoá</string>
-    <string name="title_service_restart">Kết nối lại v2rayNG</string>
+    <string name="title_service_restart">Khởi động lại dịch vụ lõi</string>
     <string name="title_del_all_config">Xoá tất cả cấu hình</string>
     <string name="title_del_duplicate_config">Xoá cấu hình trùng lặp</string>
     <string name="title_del_invalid_config">Xoá cấu hình lỗi</string>
@@ -192,7 +192,7 @@
     <string name="sub_setting_remarks">Tên gói đăng ký</string>
     <string name="sub_setting_url">URL gói đăng ký</string>
     <string name="sub_setting_enable">Sử dụng gói đăng ký này</string>
-	<string name="sub_auto_update">Bật tự động cập nhật</string>
+    <string name="sub_auto_update">Bật tự động cập nhật</string>
     <string name="title_sub_update">Cập nhật các gói đăng ký</string>
     <string name="title_ping_all_server">Ping tất cả máy chủ</string>
     <string name="title_real_ping_all_server">Test HTTP tất cả máy chủ</string>
@@ -202,7 +202,7 @@
     <string name="filter_config_all">Hiển thị tất cả các gói đăng ký</string>
     <string name="title_del_duplicate_config_count">Xoá %d cấu hình trùng lặp</string>
 
-    <string name="tasker_start_service">Bắt đầu v2rayNG</string>
+    <string name="tasker_start_service">Khởi động v2rayNG</string>
     <string name="tasker_setting_confirm">Xác nhận</string>
 
     <string name="routing_settings_title">Cài đặt định tuyến</string>
@@ -210,7 +210,7 @@
     <string name="routing_settings_save">Lưu lại</string>
     <string name="routing_settings_delete">Xoá</string>
     <string name="routing_settings_scan_replace">Quét QR và thay thế</string>
-    <string name="routing_settings_scan_append">Quét QR nối thêm</string>
+    <string name="routing_settings_scan_append">Quét QR và nối thêm</string>
     <string name="routing_settings_default_rules">Tải xuống rules mặc định cho China</string>
 
     <string name="connection_test_pending">Kiểm tra kết nối</string>
