@@ -41,7 +41,7 @@
     <string name="server_lab_port">Cổng</string>
     <string name="server_lab_id">ID</string>
     <string name="server_lab_alterid">alterId</string>
-    <string name="server_lab_security">Thuận toán mã hóa</string>
+    <string name="server_lab_security">Thuật toán mã hóa</string>
     <string name="server_lab_network">Giao thức truyền tải (network)</string>
     <string name="server_lab_more_function">Nâng cao</string>
     <string name="server_lab_head_type">Kiểu ngụy trang (type)</string>
@@ -54,7 +54,7 @@
     <string name="server_lab_address3">Địa chỉ</string>
     <string name="server_lab_port3">Cổng</string>
     <string name="server_lab_id3">Mật khẩu</string>
-    <string name="server_lab_security3">Thuận toán mã hóa</string>
+    <string name="server_lab_security3">Thuật toán mã hóa</string>
     <string name="server_lab_id4">Mật khẩu (không bắt buộc)</string>
     <string name="server_lab_security4">Tên người dùng (không bắt buộc)</string>
     <string name="server_lab_encryption">Mã hóa</string>
