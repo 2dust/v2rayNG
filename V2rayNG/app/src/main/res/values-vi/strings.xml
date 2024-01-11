@@ -55,13 +55,13 @@
     <string name="server_lab_port3">Cổng</string>
     <string name="server_lab_id3">Mật khẩu</string>
     <string name="server_lab_security3">Thuận toán mã hóa</string>
-    <string name="server_lab_id4">Mật khẩu (tùy chọn)</string>
-    <string name="server_lab_security4">Tên người dùng (tùy chọn)</string>
-    <string name="server_lab_encryption">Thuận toán mã hóa</string>
+    <string name="server_lab_id4">Mật khẩu (không bắt buộc)</string>
+    <string name="server_lab_security4">Tên người dùng (không bắt buộc)</string>
+    <string name="server_lab_encryption">Mã hóa</string>
     <string name="server_lab_flow">Kiểm soát lưu lượng (flow)</string>
-    <string name="server_lab_reserved">Reserved (tùy chọn)</string>
-    <string name="server_lab_local_v4_address">Địa chỉ cục bộ IPv4(tùy chọn)</string>
-    <string name="server_lab_local_v6_address">Địa chỉ cục bộ IPv6 (tùy chọn, chỉ sử dụng khi ưu tiên IPv6)</string>
+    <string name="server_lab_reserved">Reserved (không bắt buộc)</string>
+    <string name="server_lab_local_v4_address">Địa chỉ cục bộ IPv4(không bắt buộc)</string>
+    <string name="server_lab_local_v6_address">Địa chỉ cục bộ IPv6 (không bắt buộc, chỉ sử dụng khi ưu tiên IPv6)</string>
     <string name="toast_success">Thành công!</string>
     <string name="toast_failure">Đã xảy ra lỗi, vui lòng thử lại!</string>
     <string name="toast_none_data">Không có gì ở đây</string>
@@ -76,7 +76,7 @@
     <string name="toast_invalid_url">URL không hợp lệ hoặc trống!</string>
     <string name="server_lab_need_inbound">Vui lòng đảm bảo cấu hình tùy chỉnh này không bị lỗi trước khi sử dụng!</string>
     <string name="toast_malformed_josn">Cấu hình không hợp lệ!</string>
-    <string name="server_lab_request_host6">Host (SNI) (tùy chọn)</string>
+    <string name="server_lab_request_host6">Host (SNI) (không bắt buộc)</string>
     <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp!</string>
     <string name="menu_item_add_file">Thêm tệp</string>
     <string name="menu_item_download_file">Tải xuống tệp tin</string>
@@ -101,7 +101,7 @@
     <string name="summary_pref_per_app_proxy">- Bình thường: Ứng dụng đã chọn sẽ kết nối thông qua Proxy, chưa lựa chọn sẽ kết nối trực tiếp. \n- Chế độ Bypass: Ứng dụng được chọn sẽ kết nối trực tiếp, không lựa chọn sẽ kết nối qua Proxy. \n- Nếu bạn ở Trung Quốc thì chọn Tự động chọn ứng dụng Proxy trong Menu.</string>
 
     <string name="title_pref_mux_enabled">Bật Mux</string>
-    <string name="summary_pref_mux_enabled">Giảm độ trễ trong bước bắt tay của kết nối TCP. \nMux phân phối dữ liệu từ nhiều kết nối TCP trên một kết nối TCP duy nhất. \nKhông nên sử dụng Mux để xem video, download file hoặc chạy speedtest vì thường không hiệu quả.</string>
+    <string name="summary_pref_mux_enabled">Giảm độ trễ trong bước bắt tay của kết nối TCP. Mux phân phối dữ liệu từ nhiều kết nối TCP trên một kết nối TCP duy nhất. Không nên sử dụng Mux để xem video, download file hoặc chạy speedtest vì thường không hiệu quả.</string>
     <string name="title_pref_mux_concurency">TCP connections (từ 1 đến 1024)</string>
     <string name="title_pref_mux_xudp_concurency">XUDP connections (từ 1 đến 1024)</string>
     <string name="title_pref_mux_xudp_quic">Handling of QUIC traffic in mux tunnel.</string>
@@ -119,10 +119,10 @@
     <string name="summary_pref_sniffing_enabled">Nhận diện tên miền từ gói tin để phục vụ định tuyến. \n(phải tắt để xài Zalo)</string>
 
     <string name="title_pref_local_dns_enabled">Bật Local DNS</string>
-    <string name="summary_pref_local_dns_enabled">DNS được xử lý bởi mô-đun DNS của xray-core (dùng nếu cần định tuyến Bypassing LAN và địa chỉ nội địa)</string>
+    <string name="summary_pref_local_dns_enabled">DNS được xử lý bởi mô-đun DNS của xray-core (dùng nếu cần định tuyến bypass cho mạng LAN và địa chỉ nội địa)</string>
 
     <string name="title_pref_fake_dns_enabled">Bật FakeDNS</string>
-    <string name="summary_pref_fake_dns_enabled">FakeDNS lấy tên miền mục tiêu bằng cách giả mạo DNS (nhanh hơn, có thể không hoạt động cho một số ứng dụng)</string>
+    <string name="summary_pref_fake_dns_enabled">FakeDNS lấy tên miền mục tiêu bằng cách giả mạo DNS (nhanh hơn, nhưng có thể không hoạt động cho một số ứng dụng)</string>
 
     <string name="title_pref_prefer_ipv6">Ưu tiên IPv6</string>
     <string name="summary_pref_prefer_ipv6">Ưu tiên sử dụng địa chỉ IPv6 cho kết nối và định tuyến.</string>
