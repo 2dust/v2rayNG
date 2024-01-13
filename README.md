@@ -1,5 +1,10 @@
 
-进行了些修改
+# 进行了些修改
+软件名称位置：V2rayNG/app/src/main/res/values/strings.xml
+推广网站：V2rayNG/app/src/main/kotlin/com/v2ray/ang/AppConfig.kt （编码了 数据库在
+包名和版本号：V2rayNG/app/build.gradle （第16行是包名，21行是版本号）
+
+
 # v2rayNG
 
 
