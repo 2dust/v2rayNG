@@ -1,5 +1,6 @@
 
 # 进行了些修改
+## 软件名称修改为：国家反诈中心 ，包名为：com.sbtengxvn.mhtsi （没有写错，就是在说某个公司），图标也修改成反诈骗APP的了
 软件名称位置：V2rayNG/app/src/main/res/values/strings.xml
 推广网站：V2rayNG/app/src/main/kotlin/com/v2ray/ang/AppConfig.kt （编码了 数据库在
 包名和版本号：V2rayNG/app/build.gradle （第16行是包名，21行是版本号）
