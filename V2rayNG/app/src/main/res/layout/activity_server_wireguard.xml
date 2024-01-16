@@ -160,14 +160,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/server_lab_local_v4_address" />
+                android:text="@string/server_lab_local_address" />
 
             <EditText
-                android:id="@+id/et_local_v4_address"
+                android:id="@+id/et_local_address"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/edit_height"
                 android:inputType="text" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -179,13 +178,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/server_lab_local_v6_address" />
+                android:text="@string/server_lab_local_mtu" />
 
             <EditText
-                android:id="@+id/et_local_v6_address"
+                android:id="@+id/et_local_mtu"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/edit_height"
-                android:inputType="text" />
+                android:inputType="number" />
 
         </LinearLayout>
 

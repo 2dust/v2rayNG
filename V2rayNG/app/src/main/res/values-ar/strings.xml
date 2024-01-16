@@ -64,8 +64,8 @@
 	<string name="server_lab_short_id" translatable="false">ShortId</string>
 	<string name="server_lab_spider_x" translatable="false">SpiderX</string>
 	<string name="server_lab_reserved">Reserved (اختياري)</string>
-	<string name="server_lab_local_v4_address">العنوان المحلي IPv4(اختياري)</string>
-	<string name="server_lab_local_v6_address">العنوان المحلي IPv6(اختياري, يستخدم فقط عندما تفضل IPv6)</string>
+	<string name="server_lab_local_address">العنوان المحلي IPv4(اختياري)</string>
+	<string name="server_lab_local_mtu">Mtu(optional, default 1420)</string>
 	<string name="toast_success">نجاح</string>
 	<string name="toast_failure">فشل</string>
 	<string name="toast_none_data">لا يوجد شيء</string>

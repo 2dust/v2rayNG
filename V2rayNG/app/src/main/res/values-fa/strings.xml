@@ -61,8 +61,8 @@
     <string name="server_lab_encryption">رمزگذاری</string>
     <string name="server_lab_flow">جریان</string>
     <string name="server_lab_reserved">Reserved (اختیاری)</string>
-    <string name="server_lab_local_v4_address">آدرس محلی IPv4(اختیاری)</string>
-    <string name="server_lab_local_v6_address">آدرس محلی IPv6(اختیاری, فقط زمانی استفاده می شود که IPv6 را ترجیح می دهد)</string>
+    <string name="server_lab_local_address">آدرس محلی IPv4(اختیاری)</string>
+    <string name="server_lab_local_mtu">Mtu(optional, default 1420)</string>
     <string name="toast_success">موفقیت</string>
     <string name="toast_failure">شکست</string>
     <string name="toast_none_data">چیزی نیست</string>

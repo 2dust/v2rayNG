@@ -7,6 +7,8 @@ import com.google.gson.*
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
+import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ERoutingMode
@@ -428,7 +430,7 @@ object V2rayConfigUtil {
 
             if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
                 var localTunAddr = if (outbound.settings?.address == null) {
-                    listOf("172.16.0.2/32", "2606:4700:110:8f81:d551:a0:532e:a2b3/128")
+                    listOf(WIREGUARD_LOCAL_ADDRESS_V4, WIREGUARD_LOCAL_ADDRESS_V6)
                 } else {
                     outbound.settings?.address as List<*>
                 }

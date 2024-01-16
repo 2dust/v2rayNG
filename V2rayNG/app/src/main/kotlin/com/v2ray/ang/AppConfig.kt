@@ -62,8 +62,10 @@ object AppConfig {
     const val TAG_DIRECT = "direct"
     const val TAG_BLOCKED = "block"
 
-    const val androidpackagenamelistUrl = "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
-    const val v2rayCustomRoutingListUrl = "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
+    const val androidpackagenamelistUrl =
+        "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
+    const val v2rayCustomRoutingListUrl =
+        "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
     const val v2rayNGIssues = "https://github.com/2dust/v2rayNG/issues"
     const val v2rayNGWikiMode = "https://github.com/2dust/v2rayNG/wiki/Mode"
     const val v2rayNGPrivacyPolicy = "https://raw.githubusercontent.com/2dust/v2rayNG/master/CR.md"
@@ -76,6 +78,9 @@ object AppConfig {
     const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"
     const val PORT_HTTP = "10809"
+    const val WIREGUARD_LOCAL_ADDRESS_V4 = "172.16.0.2/32"
+    const val WIREGUARD_LOCAL_ADDRESS_V6 = "2606:4700:110:8f81:d551:a0:532e:a2b3/128"
+    const val WIREGUARD_LOCAL_MTU = "1420"
 
     const val MSG_REGISTER_CLIENT = 1
     const val MSG_STATE_RUNNING = 11
