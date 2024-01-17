@@ -60,8 +60,8 @@
     <string name="server_lab_encryption">Mã hóa</string>
     <string name="server_lab_flow">Kiểm soát lưu lượng (flow)</string>
     <string name="server_lab_reserved">Reserved (không bắt buộc)</string>
-    <string name="server_lab_local_address">Địa chỉ cục bộ IPv4(không bắt buộc)</string>
-    <string name="server_lab_local_mtu">Mtu(optional, default 1420)</string>
+    <string name="server_lab_local_address">Địa chỉ cục bộ (IPv4/IPv6, phân cách bằng dấu phẩy)</string>
+    <string name="server_lab_local_mtu">MTU (không bắt buộc, mặc định 1420)</string>
     <string name="toast_success">Thành công!</string>
     <string name="toast_failure">Đã xảy ra lỗi, vui lòng thử lại!</string>
     <string name="toast_none_data">Không có gì ở đây</string>
