@@ -1,258 +1,258 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_widget_name">开关</string>
-    <string name="app_tile_name">开关</string>
-    <string name="app_tile_first_use">初次使用此功能请先用APP添加配置</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="migration_success">数据迁移成功!</string>
-    <string name="migration_fail">数据迁移失败啦!</string>
+    <string name="app_widget_name">Kết nối ngay</string>
+    <string name="app_tile_name">Kết nối ngay</string>
+    <string name="app_tile_first_use">Vui lòng thêm một cấu hình vào v2rayNG để sử dụng!</string>
+    <string name="navigation_drawer_open">Mở Menu ứng dụng</string>
+    <string name="navigation_drawer_close">Đóng Menu ứng dụng</string>
+    <string name="migration_success">Đã chuyển dữ liệu!</string>
+    <string name="migration_fail">Không thể chuyển dữ liệu!</string>
 
     <!-- Notifications -->
-    <string name="notification_action_stop_v2ray">停止</string>
-    <string name="toast_permission_denied">无法取得权限</string>
-    <string name="notification_action_more">点击了解更多</string>
-    <string name="toast_services_start">启动服务中</string>
-    <string name="toast_services_stop">关闭中</string>
-    <string name="toast_services_success">启动服务成功</string>
-    <string name="toast_services_failure">启动服务失败</string>
+    <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
+    <string name="toast_permission_denied">Vui lòng cấp quyền cần thiết cho v2rayNG! Bạn đã từ chối các quyền cần thiết như Camera hay Bộ nhớ?</string>
+    <string name="notification_action_more">Nhấn để biết thêm</string>
+    <string name="toast_services_start">Đang khởi động v2rayNG...</string>
+    <string name="toast_services_stop">Đã dừng v2rayNG!</string>
+    <string name="toast_services_success">Đã khởi động v2rayNG!</string>
+    <string name="toast_services_failure">Không thể khởi động v2rayNG, kiểm tra lại cấu hình.</string>
 
     <!--ServerActivity-->
-    <string name="title_server">配置文件</string>
-    <string name="menu_item_add_config">添加配置</string>
-    <string name="menu_item_save_config">保存配置</string>
-    <string name="menu_item_del_config">删除配置</string>
-    <string name="menu_item_import_config_qrcode">扫描二维码</string>
-    <string name="menu_item_import_config_clipboard">从剪贴板导入</string>
-    <string name="menu_item_import_config_manually_vmess">手动输入[Vmess]</string>
-    <string name="menu_item_import_config_manually_vless">手动输入[VLESS]</string>
-    <string name="menu_item_import_config_manually_ss">手动输入[Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">手动输入[Socks]</string>
-    <string name="menu_item_import_config_manually_trojan">手动输入[Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">手动输入[Wireguard]</string>
-    <string name="menu_item_import_config_custom">自定义配置</string>
-    <string name="menu_item_import_config_custom_clipboard">从剪贴板导入自定义配置</string>
-    <string name="menu_item_import_config_custom_local">从本地导入自定义配置</string>
-    <string name="menu_item_import_config_custom_url">剪贴板URL导入自定义配置</string>
-    <string name="menu_item_import_config_custom_url_scan">扫描URL导入自定义配置</string>
-    <string name="del_config_comfirm">确认删除？</string>
-    <string name="server_lab_remarks">别名(remarks)</string>
-    <string name="server_lab_address">地址(address)</string>
-    <string name="server_lab_port">端口(port)</string>
-    <string name="server_lab_id">用户ID(id)</string>
-    <string name="server_lab_alterid">额外ID(alterId)</string>
-    <string name="server_lab_security">加密方式(security)</string>
-    <string name="server_lab_network">传输协议(network)</string>
-    <string name="server_lab_more_function">底层传输方式(transport)</string>
-    <string name="server_lab_head_type">伪装类型(type)</string>
-    <string name="server_lab_mode_type">gRPC 传输模式(mode)</string>
-    <string name="server_lab_request_host">伪装域名(host)(host/ws host/h2 host)/QUIC 加密方式</string>
-    <string name="server_lab_path">path(ws path/h2 path)/QUIC 加密密钥/kcp seed/gRPC serviceName</string>
-    <string name="server_lab_stream_security">传输层安全(TLS)</string>
-    <string name="server_lab_allow_insecure">跳过证书验证(allowInsecure)</string>
+    <string name="title_server">v2rayNG</string>
+    <string name="menu_item_add_config">Thêm cấu hình</string>
+    <string name="menu_item_save_config">Lưu cấu hình</string>
+    <string name="menu_item_del_config">Xoá cấu hình</string>
+    <string name="menu_item_import_config_qrcode">Nhập cấu hình từ mã QR</string>
+    <string name="menu_item_import_config_clipboard">Nhập cấu hình từ Clipboard</string>
+    <string name="menu_item_import_config_manually_vmess">Nhập thủ công [Vmess]</string>
+    <string name="menu_item_import_config_manually_vless">Nhập thủ công [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">Nhập thủ công [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">Nhập thủ công [Socks]</string>
+    <string name="menu_item_import_config_manually_trojan">Nhập thủ công [Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">Nhập thủ công [Wireguard]</string>
+    <string name="menu_item_import_config_custom">Nâng cao / Cấu hình tùy chỉnh</string>
+    <string name="menu_item_import_config_custom_clipboard">Nhập cấu hình tùy chỉnh từ Clipboard</string>
+    <string name="menu_item_import_config_custom_local">Nhập cấu hình tùy chỉnh từ Tệp</string>
+    <string name="menu_item_import_config_custom_url">Nhập cấu hình tùy chỉnh từ URL</string>
+    <string name="menu_item_import_config_custom_url_scan">Nhập cấu hình tùy chỉnh quét URL</string>
+    <string name="del_config_comfirm">Xác nhận xóa?</string>
+    <string name="server_lab_remarks">Tên cấu hình</string>
+    <string name="server_lab_address">Địa chỉ</string>
+    <string name="server_lab_port">Cổng</string>
+    <string name="server_lab_id">ID</string>
+    <string name="server_lab_alterid">alterId</string>
+    <string name="server_lab_security">Thuật toán mã hóa</string>
+    <string name="server_lab_network">Giao thức truyền tải (network)</string>
+    <string name="server_lab_more_function">Nâng cao</string>
+    <string name="server_lab_head_type">Kiểu ngụy trang (type)</string>
+    <string name="server_lab_mode_type">Chế độ gRPC</string>
+    <string name="server_lab_request_host">Yêu cầu host(host/ws host/h2 host)/QUIC security</string>
+    <string name="server_lab_path">path(ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
+    <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_allow_insecure">allowInsecure</string>
     <string name="server_lab_sni">SNI</string>
-    <string name="server_lab_address3">服务器地址</string>
-    <string name="server_lab_port3">服务器端口</string>
-    <string name="server_lab_id3">密码</string>
-    <string name="server_lab_security3">加密方式</string>
-    <string name="server_lab_id4">密码(可选)</string>
-    <string name="server_lab_security4">用户名(可选)</string>
-    <string name="server_lab_encryption">加密方式(encryption)</string>
-    <string name="server_lab_flow">流控(flow)</string>
-    <string name="server_lab_reserved">Reserved(可选)</string>
-    <string name="server_lab_local_address">本地地址(可选IPv4/IPv6，逗号隔开)</string>
-    <string name="server_lab_local_mtu">Mtu(可选, 默认1420)</string>
-    <string name="toast_success">成功</string>
-    <string name="toast_failure">失败</string>
-    <string name="toast_none_data">没有数据</string>
-    <string name="toast_incorrect_protocol">不正确的协议</string>
-    <string name="toast_decoding_failed">解码失败</string>
-    <string name="title_file_chooser">选择一个配置文件</string>
-    <string name="toast_require_file_manager">请安装一个文件管理器</string>
-    <string name="server_customize_config">自定义配置</string>
-    <string name="toast_config_file_invalid">无效的配置文件</string>
-    <string name="server_lab_content">内容</string>
-    <string name="toast_none_data_clipboard">剪贴板中没有数据</string>
-    <string name="toast_invalid_url">无效的网址</string>
-    <string name="server_lab_need_inbound">确保inbounds port和设置中的一致</string>
-    <string name="toast_malformed_josn">配置格式错误</string>
-    <string name="server_lab_request_host6">Host(SNI)(可选)</string>
-    <string name="toast_asset_copy_failed">失败, 请使用文件管理器</string>
-    <string name="menu_item_add_file">添加文件</string>
-    <string name="menu_item_download_file">下载文件</string>
-
+    <string name="server_lab_address3">Địa chỉ</string>
+    <string name="server_lab_port3">Cổng</string>
+    <string name="server_lab_id3">Mật khẩu</string>
+    <string name="server_lab_security3">Thuật toán mã hóa</string>
+    <string name="server_lab_id4">Mật khẩu (không bắt buộc)</string>
+    <string name="server_lab_security4">Tên người dùng (không bắt buộc)</string>
+    <string name="server_lab_encryption">Mã hóa</string>
+    <string name="server_lab_flow">Kiểm soát lưu lượng (flow)</string>
+    <string name="server_lab_reserved">Reserved (không bắt buộc)</string>
+    <string name="server_lab_local_address">Địa chỉ cục bộ (IPv4/IPv6, phân cách bằng dấu phẩy)</string>
+    <string name="server_lab_local_mtu">Mtu(optional, default 1420)</string>
+    <string name="toast_success">Thành công!</string>
+    <string name="toast_failure">Đã xảy ra lỗi, vui lòng thử lại!</string>
+    <string name="toast_none_data">Không có gì ở đây</string>
+    <string name="toast_incorrect_protocol">Không đúng Protocol</string>
+    <string name="toast_decoding_failed">Không thể giải mã</string>
+    <string name="title_file_chooser">Vui lòng chọn tệp cấu hình!</string>
+    <string name="toast_require_file_manager">Vui lòng cài đặt trình quản lý tệp để tiếp tục!</string>
+    <string name="server_customize_config">Cấu hình tùy chỉnh</string>
+    <string name="toast_config_file_invalid">Cấu hình không hợp lệ!</string>
+    <string name="server_lab_content">Nội dung</string>
+    <string name="toast_none_data_clipboard">Không có dữ liệu nào trong Clipboard!</string>
+    <string name="toast_invalid_url">URL không hợp lệ hoặc trống!</string>
+    <string name="server_lab_need_inbound">Vui lòng đảm bảo cấu hình tùy chỉnh này không bị lỗi trước khi sử dụng!</string>
+    <string name="toast_malformed_josn">Cấu hình không hợp lệ!</string>
+    <string name="server_lab_request_host6">Host (SNI) (không bắt buộc)</string>
+    <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp!</string>
+    <string name="menu_item_add_file">Thêm tệp</string>
+    <string name="menu_item_download_file">Tải xuống tệp tin</string>
 
     <!-- PerAppProxyActivity -->
-    <string name="msg_dialog_progress">正在加载</string>
-    <string name="menu_item_search">搜索</string>
-    <string name="menu_item_select_all">全选</string>
-    <string name="msg_enter_keywords">输入关键字</string>
-    <string name="switch_bypass_apps_mode">绕行模式</string>
-    <string name="menu_item_select_proxy_app">自动选中需代理应用</string>
-    <string name="msg_downloading_content">正在下载内容</string>
-    <string name="menu_item_export_proxy_app">导出至剪贴板</string>
-    <string name="menu_item_import_proxy_app">从剪贴板导入</string>
+    <string name="msg_dialog_progress">Đang tải...</string>
+    <string name="menu_item_search">Tìm kiếm</string>
+    <string name="menu_item_select_all">Chọn tất cả</string>
+    <string name="msg_enter_keywords">Nhập từ khoá</string>
+    <string name="switch_bypass_apps_mode">Chế độ Bypass</string>
+    <string name="menu_item_select_proxy_app">Tự động chọn ứng dụng Proxy</string>
+    <string name="msg_downloading_content">Đang tải xuống nội dung...</string>
+    <string name="menu_item_export_proxy_app">Xuất và sao chép</string>
+    <string name="menu_item_import_proxy_app">Nhập từ Clipboard</string>
+
 
     <!-- Preferences -->
-    <string name="title_settings">设置</string>
-    <string name="title_advanced">进阶设置</string>
-    <string name="title_vpn_settings">VPN 设置</string>
-    <string name="title_pref_per_app_proxy">分应用代理</string>
-    <string name="summary_pref_per_app_proxy">常规:勾选的App被代理,未勾选的直连;\n绕行模式:勾选的App直连,未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
+    <string name="title_settings">Cài đặt</string>
+    <string name="title_advanced">Cài đặt nâng cao</string>
+    <string name="title_vpn_settings">Cài đặt VPN</string>
+    <string name="title_pref_per_app_proxy">Proxy Theo Ứng Dụng</string>
+    <string name="summary_pref_per_app_proxy">- Bình thường: Ứng dụng đã chọn sẽ kết nối thông qua Proxy, chưa lựa chọn sẽ kết nối trực tiếp. \n- Chế độ Bypass: Ứng dụng được chọn sẽ kết nối trực tiếp, không lựa chọn sẽ kết nối qua Proxy. \n- Nếu bạn ở Trung Quốc thì chọn Tự động chọn ứng dụng Proxy trong Menu.</string>
 
-    <string name="title_pref_mux_enabled">启用 Mux 多路复用</string>
-    <string name="summary_pref_mux_enabled">减低延时，但可能会断流，建议不要启用。\nTCP，UDP 及 QUIC 流量处理方式下方可选。</string>
-    <string name="title_pref_mux_concurency">TCP 复用子链接数（可填 -1 至 1024）</string>
-    <string name="title_pref_mux_xudp_concurency">XUDP 复用子链接数（可填 -1 至 1024）</string>
-    <string name="title_pref_mux_xudp_quic">QUIC 流量处理方式</string>
+    <string name="title_pref_mux_enabled">Bật Mux</string>
+    <string name="summary_pref_mux_enabled">Giảm độ trễ trong bước bắt tay của kết nối TCP. Mux phân phối dữ liệu từ nhiều kết nối TCP trên một kết nối TCP duy nhất. Không nên sử dụng Mux để xem video, download file hoặc chạy speedtest vì thường không hiệu quả.</string>
+    <string name="title_pref_mux_concurency">TCP connections (từ 1 đến 1024)</string>
+    <string name="title_pref_mux_xudp_concurency">XUDP connections (từ 1 đến 1024)</string>
+    <string name="title_pref_mux_xudp_quic">Handling of QUIC traffic in mux tunnel.</string>
     <string-array name="mux_xudp_quic_entries">
-        <item>不代理</item>
-        <item>多路复用</item>
-        <item>原生</item>
+        <item>Từ chối</item>
+        <item>Cho phép</item>
+        <item>Bỏ qua</item>
     </string-array>
 
-    <string name="title_pref_speed_enabled">启用速度显示</string>
-    <string name="summary_pref_speed_enabled">在通知中显示当前速度\n小图标显示流量的路由情况</string>
 
-    <string name="title_pref_sniffing_enabled">启用流量探测</string>
-    <string name="summary_pref_sniffing_enabled">从流量中探测域名 (默认启用)</string>
+    <string name="title_pref_speed_enabled">Bật Hiển thị tốc độ mạng</string>
+    <string name="summary_pref_speed_enabled">Hiển thị tốc độ mạng hiện tại trên thanh thông báo. \nBiểu tượng trên thanh trạng thái có thể thay đổi tùy vào mức sử dụng.</string>
 
-    <string name="title_pref_local_dns_enabled">启用本地DNS</string>
-    <string name="summary_pref_local_dns_enabled">DNS 请求导入 core 由 DNS 模块处理（推荐启用 如果需要路由绕过局域网及大陆地址)</string>
+    <string name="title_pref_sniffing_enabled">Bật Sniffing</string>
+    <string name="summary_pref_sniffing_enabled">Nhận diện tên miền từ gói tin để phục vụ định tuyến. \n(phải tắt để xài Zalo)</string>
 
-    <string name="title_pref_fake_dns_enabled">启用虚拟DNS</string>
-    <string name="summary_pref_fake_dns_enabled">本地返回虚构解析结果 (减低延时 但个别应用可能无法使用)</string>
+    <string name="title_pref_local_dns_enabled">Bật Local DNS</string>
+    <string name="summary_pref_local_dns_enabled">DNS được xử lý bởi mô-đun DNS của xray-core (dùng nếu cần định tuyến bypass cho mạng LAN và địa chỉ nội địa)</string>
 
-    <string name="title_pref_prefer_ipv6">IPv6优先</string>
-    <string name="summary_pref_prefer_ipv6">App优先使用IPv6地址连接服务器,同时开启VPN的IPv6路由</string>
+    <string name="title_pref_fake_dns_enabled">Bật FakeDNS</string>
+    <string name="summary_pref_fake_dns_enabled">FakeDNS lấy tên miền mục tiêu bằng cách giả mạo DNS (nhanh hơn, nhưng có thể không hoạt động cho một số ứng dụng)</string>
 
-    <string name="title_pref_routing">路由设置</string>
-    <string name="title_pref_routing_domain_strategy">域名策略</string>
-    <string name="title_pref_routing_mode">预定义规则</string>
-    <string name="title_pref_routing_custom">自定义规则</string>
+    <string name="title_pref_prefer_ipv6">Ưu tiên IPv6</string>
+    <string name="summary_pref_prefer_ipv6">Ưu tiên sử dụng địa chỉ IPv6 cho kết nối và định tuyến.</string>
 
-    <string name="title_pref_remote_dns">远程DNS (可选)</string>
+    <string name="title_pref_routing">Định tuyến</string>
+    <string name="title_pref_routing_domain_strategy">Chiến lược tên miền (domainStrategy)</string>
+    <string name="title_pref_routing_mode">Quy tắc được định nghĩa trước</string>
+    <string name="title_pref_routing_custom">Quy tắc tùy chỉnh</string>
+
+    <string name="title_pref_remote_dns">DNS ngoại quốc (không bắt buộc)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
-    <string name="title_pref_vpn_dns">VPN DNS (仅支持 IPv4/v6)</string>
+    <string name="title_pref_vpn_dns">VPN DNS (Chỉ IPv4/IPv6)</string>
 
-    <string name="title_pref_domestic_dns">境内DNS (可选)</string>
+    <string name="title_pref_domestic_dns">DNS nội địa (không bắt buộc)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
-    <string name="title_pref_proxy_sharing_enabled">允许来自局域网的连接</string>
-    <string name="summary_pref_proxy_sharing_enabled">其他设备可以使用socks/http协议通过您的IP地址连接到代理,仅在受信任的网络中启用以避免未经授权的连接</string>
-    <string name="toast_warning_pref_proxysharing_short">允许来自局域网的连接，请确保处于受信网络</string>
+    <string name="title_pref_proxy_sharing_enabled">Cho phép kết nối từ mạng LAN</string>
+    <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác trong cùng mạng LAN có thể kết nối đến SOCKS/HTTP proxy trên thiết bị của ban. \nChỉ bật tính năng này trong các mạng đáng tin cậy để tránh kết nối trái phép.</string>
+    <string name="toast_warning_pref_proxysharing_short">Đang bật cho phép kết nối từ mạng LAN</string>
 
-    <string name="title_pref_allow_insecure">跳过证书验证(allowInsecure)</string>
-    <string name="summary_pref_allow_insecure">传输层安全选tls时，默认跳过证书验证(allowInsecure)</string>
+    <string name="title_pref_allow_insecure">allowInsecure</string>
+    <string name="summary_pref_allow_insecure">Khi nhập những cấu hình có bảo mật TLS, mặc định sẽ bỏ qua xác minh chứng chỉ (allowInsecure: true).</string>
 
-    <string name="title_pref_socks_port">SOCKS5代理端口</string>
-    <string name="summary_pref_socks_port">SOCKS5代理端口</string>
+    <string name="title_pref_socks_port">Cổng Proxy SOCKS5</string>
+    <string name="summary_pref_socks_port">Cổng Proxy SOCKS5</string>
 
-    <string name="title_pref_http_port">HTTP代理端口</string>
-    <string name="summary_pref_http_port">HTTP代理端口</string>
+    <string name="title_pref_http_port">Cổng Proxy HTTP</string>
+    <string name="summary_pref_http_port">Cổng Proxy HTTP</string>
 
-    <string name="title_pref_local_dns_port">本地DNS端口</string>
-    <string name="summary_pref_local_dns_port">本地DNS端口</string>
+    <string name="title_pref_local_dns_port">Cổng Local DNS</string>
+    <string name="summary_pref_local_dns_port">Cổng Local DNS</string>
 
-    <string name="title_pref_confirm_remove">删除配置文件确认</string>
-    <string name="summary_pref_confirm_remove">删除配置文件是否需要用户二次确认</string>
+    <string name="title_pref_confirm_remove">Xác nhận xóa tệp cấu hình</string>
+    <string name="summary_pref_confirm_remove">Yêu cầu xác nhận từ người dùng khi thực hiện xóa tệp cấu hình.</string>
 
-    <string name="title_pref_start_scan_immediate">立即启动扫码</string>
-    <string name="summary_pref_start_scan_immediate">启动时立即打开相机扫描，否则可在工具栏选择扫码或选照片</string>
+    <string name="title_pref_start_scan_immediate">Quét mã QR ngay lập tức</string>
+    <string name="summary_pref_start_scan_immediate">Mở camera để quét QR ngay khi khởi động, nếu không bạn có thể chọn quét mã hoặc chọn ảnh trên thanh công cụ.</string>
 
-    <string name="title_pref_feedback">反馈</string>
-    <string name="summary_pref_feedback">反馈改进或漏洞至 GitHub</string>
-    <string name="summary_pref_tg_group">加入Telegram Group</string>
-    <string name="toast_tg_app_not_found">未找到Telegram app</string>
-    <string name="title_privacy_policy">隐私权政策</string>
+    <string name="title_pref_feedback">Phản hồi lỗi</string>
+    <string name="summary_pref_feedback">Phản hồi cải tiến hoặc lỗi lên GitHub</string>
+    <string name="summary_pref_tg_group">Tham gia nhóm Telegram</string>
+    <string name="toast_tg_app_not_found">Không tìm thấy ứng dụng Telegram</string>
 
-    <string name="title_pref_promotion">推广</string>
-    <string name="summary_pref_promotion">一些推广,点击查看详情(捐赠可去除)</string>
+    <string name="title_pref_promotion">Quảng bá server</string>
+    <string name="summary_pref_promotion">Quảng cáo, nhấn để biết thêm (Ủng hộ có thể được gỡ bỏ)</string>
 
-    <string name="title_pref_auto_update_subscription">自动更新订阅</string>
-    <string name="summary_pref_auto_update_subscription">在后台按一定时间间隔自动更新您的订阅。受设备影响，此功能不一定总是有效</string>
-    <string name="title_pref_auto_update_interval">自动更新间隔（分钟，最小值15）</string>
+    <string name="title_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký</string>
+    <string name="summary_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký của bạn ở trong nền với khoảng thời gian cố định. Tùy thiết bị, tính năng này có thể không luôn hoạt động đúng như mong đợi.</string>
+    <string name="title_pref_auto_update_interval">Thời gian Cập nhật tự động (Phút, Giá trị tối thiểu 15)</string>
 
-    <string name="title_core_loglevel">日志级别</string>
-    <string name="title_mode">模式</string>
-    <string name="title_mode_help">点此查看更多帮助</string>
-    <string name="title_language">语言</string>
-    <string name="title_ui_settings">用户界面设置</string>
+    <string name="title_core_loglevel">Log level</string>
+    <string name="title_mode">Chế độ kết nối</string>
+    <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp!</string>
+    <string name="title_language">Ngôn ngữ</string>
+    <string name="title_ui_settings">Cài đặt giao diện</string>
 
     <string name="title_logcat">Logcat</string>
-    <string name="logcat_copy">复制</string>
-    <string name="logcat_clear">清除</string>
-    <string name="title_service_restart">服务重启</string>
-    <string name="title_del_all_config">删除全部配置</string>
-    <string name="title_del_duplicate_config">删除重复配置</string>
-    <string name="title_del_invalid_config">删除无效配置(先测试)</string>
-    <string name="title_export_all">导出全部(非自定义)配置至剪贴板</string>
-    <string name="title_sub_setting">订阅分组设置</string>
-    <string name="sub_setting_remarks">备注</string>
-    <string name="sub_setting_url">可选地址(url)</string>
-    <string name="sub_setting_enable">启用更新</string>
-    <string name="sub_auto_update">启用自动更新</string>
-    <string name="title_sub_update">更新订阅</string>
-    <string name="title_ping_all_server">测试全部配置Tcping</string>
-    <string name="title_real_ping_all_server">测试全部配置真连接</string>
-    <string name="title_user_asset_setting">Geo 资源文件</string>
-    <string name="title_sort_by_test_results">按测试结果排序</string>
-    <string name="title_filter_config">过滤配置文件</string>
-    <string name="filter_config_all">所有订阅分组</string>
-    <string name="title_del_duplicate_config_count">删除 %d 个重复配置</string>
+    <string name="logcat_copy">Sao chép</string>
+    <string name="logcat_clear">Xoá</string>
+    <string name="title_service_restart">Khởi động lại dịch vụ lõi</string>
+    <string name="title_del_all_config">Xoá tất cả cấu hình</string>
+    <string name="title_del_duplicate_config">Xoá cấu hình trùng lặp</string>
+    <string name="title_del_invalid_config">Xoá cấu hình lỗi</string>
+    <string name="title_export_all">Xuất và sao chép tất cả cấu hình</string>
+    <string name="title_sub_setting">Các gói đăng ký</string>
+    <string name="sub_setting_remarks">Tên gói đăng ký</string>
+    <string name="sub_setting_url">URL gói đăng ký</string>
+    <string name="sub_setting_enable">Sử dụng gói đăng ký này</string>
+    <string name="sub_auto_update">Bật tự động cập nhật</string>
+    <string name="title_sub_update">Cập nhật các gói đăng ký</string>
+    <string name="title_ping_all_server">Ping tất cả máy chủ</string>
+    <string name="title_real_ping_all_server">Test HTTP tất cả máy chủ</string>
+    <string name="title_user_asset_setting">Tệp Geo asset</string>
+    <string name="title_sort_by_test_results">Sắp xếp lại theo lần kiểm tra cuối cùng</string>
+    <string name="title_filter_config">Lọc cấu hình theo các gói đăng ký</string>
+    <string name="filter_config_all">Hiển thị tất cả các gói đăng ký</string>
+    <string name="title_del_duplicate_config_count">Xoá %d cấu hình trùng lặp</string>
 
-    <string name="tasker_start_service">启动服务</string>
-    <string name="tasker_setting_confirm">确定</string>
+    <string name="tasker_start_service">Khởi động v2rayNG</string>
+    <string name="tasker_setting_confirm">Xác nhận</string>
 
-    <string name="routing_settings_title">路由设置</string>
-    <string name="routing_settings_tips">用逗号(,)隔开,可以一行多个,记得保存</string>
-    <string name="routing_settings_save">保存</string>
-    <string name="routing_settings_delete">清空</string>
-    <string name="routing_settings_scan_replace">扫描并替换</string>
-    <string name="routing_settings_scan_append">扫描并追加</string>
-    <string name="routing_settings_default_rules">设置默认路由规则</string>
+    <string name="routing_settings_title">Cài đặt định tuyến</string>
+    <string name="routing_settings_tips">Phân cách bằng dấu phẩy (,). Có thể tải xuống rules mặc định để tham khảo ở menu ba chấm</string>
+    <string name="routing_settings_save">Lưu lại</string>
+    <string name="routing_settings_delete">Xoá</string>
+    <string name="routing_settings_scan_replace">Quét QR và thay thế</string>
+    <string name="routing_settings_scan_append">Quét QR và nối thêm</string>
+    <string name="routing_settings_default_rules">Tải xuống rules mặc định cho China</string>
 
-    <string name="connection_test_pending">"检查网络连接"</string>
-    <string name="connection_test_testing">"测试中…"</string>
-    <string name="connection_test_available">"连接成功：延时 %d 毫秒"</string>
-    <string name="connection_test_error">"失败：%s"</string>
-    <string name="connection_test_fail">"无互联网连接"</string>
-    <string name="connection_test_error_status_code">"状态码无效（#%d）"</string>
-    <string name="connection_connected">"已连接，点击测试连接"</string>
-    <string name="connection_not_connected">"未连接"</string>
+    <string name="connection_test_pending">Kiểm tra kết nối</string>
+    <string name="connection_test_testing">Đang kiểm tra kết nối mạng...</string>
+    <string name="connection_test_available">Test thành công: kết nối đến Google.com mất %d ms</string>
+    <string name="connection_test_error">Lỗi kết nối mạng, hãy thử đổi cấu hình hoặc kiểm tra lại! Mã lỗi: %s</string>
+    <string name="connection_test_fail">Không có kết nối mạng!</string>
+    <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
+    <string name="connection_connected">Đã kết nối, nhấn vào đây để kiểm tra kết nối mạng!</string>
+    <string name="connection_not_connected">Chưa kết nối</string>
+
+    <string name="import_subscription_success">Nhập gói đăng ký thành công!</string>
+    <string name="import_subscription_failure">Nhập gói đăng ký không thành công!</string>
 
     <string-array name="share_method">
-        <item>二维码</item>
-        <item>导出至剪贴板</item>
-        <item>导出完整配置至剪贴板</item>
+        <item>Xuất ra mã QR (Chụp màn hình để lưu)</item>
+        <item>Sao chép cấu hình này</item>
+        <item>Sao chép thành cấu hình tùy chỉnh</item>
     </string-array>
 
     <string-array name="share_sub_method">
-        <item>二维码</item>
-        <item>导出至剪贴板</item>
+        <item>Xuất ra mã QR (Chụp màn hình để lưu)</item>
+        <item>Sao chép cấu hình này</item>
     </string-array>
 
-    share_method
     <string-array name="routing_tag">
-        <item>代理的网址或IP</item>
-        <item>直连的网址或IP</item>
-        <item>阻止的网址或IP</item>
+        <item>Proxy</item>
+        <item>Direct</item>
+        <item>Blocked</item>
     </string-array>
 
     <string-array name="routing_mode">
-        <item>全局代理</item>
-        <item>绕过局域网地址而后代理</item>
-        <item>绕过大陆地址而后代理</item>
-        <item>绕过局域网及大陆地址而后代理</item>
-        <item>全局直连</item>
+        <item>Proxy toàn cầu</item>
+        <item>Bỏ qua địa chỉ LAN rồi Proxy</item>
+        <item>Bỏ qua địa chỉ nội địa rồi Proxy</item>
+        <item>Bỏ qua LAN và địa chỉ nội địa rồi Proxy</item>
+        <item>Kết nối trực tiếp toàn cầu</item>
     </string-array>
 
     <string-array name="mode_entries">
-        <item>VPN</item>
-        <item>仅代理</item>
+        <item>Chế độ VPN</item>
+        <item>Chế độ Proxy</item>
     </string-array>
-    <string name="import_subscription_success">订阅导入成功</string>
-    <string name="import_subscription_failure">导入订阅失败</string>
 
 </resources>
