@@ -12,6 +12,8 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_CONFIG
 import com.v2ray.ang.AppConfig.HTTPS_PROTOCOL
 import com.v2ray.ang.AppConfig.HTTP_PROTOCOL
+import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
+import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_MTU
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.*
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_SECURITY
@@ -432,6 +434,28 @@ object AngConfigManager {
                     queryParam["security"] ?: "", allowInsecure,
                     queryParam["sni"] ?: sni, fingerprint, queryParam["alpn"], pbk, sid, spx
                 )
+            } else if (str.startsWith(EConfigType.WIREGUARD.protocolScheme)) {
+                val uri = URI(Utils.fixIllegalUrl(str))
+                config = ServerConfig.create(EConfigType.WIREGUARD)
+                config.remarks = Utils.urlDecode(uri.fragment ?: "")
+
+                if (uri.rawQuery != null) {
+                    val queryParam = uri.rawQuery.split("&")
+                        .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
+
+                    config.outboundBean?.settings?.let { wireguard ->
+                        wireguard.secretKey = uri.userInfo
+                        wireguard.address =
+                            (queryParam["address"] ?: WIREGUARD_LOCAL_ADDRESS_V4).replace(" ", "")
+                                .split(",")
+                        wireguard.peers?.get(0)?.publicKey = queryParam["publickey"] ?: ""
+                        wireguard.peers?.get(0)?.endpoint = "${uri.idnHost}:${uri.port}"
+                        wireguard.mtu = Utils.parseInt(queryParam["mtu"] ?: WIREGUARD_LOCAL_MTU)
+                        wireguard.reserved =
+                            (queryParam["reserved"] ?: "0,0,0").replace(" ", "").split(",")
+                                .map { it.toInt() }
+                    }
+                }
             }
             if (config == null) {
                 return R.string.toast_incorrect_protocol
@@ -443,7 +467,8 @@ object AngConfigManager {
                     ?.getServerAddress() == removedSelectedServer.getProxyOutbound()
                     ?.getServerAddress() &&
                 config.getProxyOutbound()
-                    ?.getServerPort() == removedSelectedServer.getProxyOutbound()?.getServerPort()
+                    ?.getServerPort() == removedSelectedServer.getProxyOutbound()
+                    ?.getServerPort()
             ) {
                 mainStorage?.encode(KEY_SELECTED_SERVER, guid)
             }
@@ -680,7 +705,8 @@ object AngConfigManager {
                             dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX!!)
                         }
                     }
-                    dicQuery["type"] = streamSetting.network.ifEmpty { V2rayConfig.DEFAULT_NETWORK }
+                    dicQuery["type"] =
+                        streamSetting.network.ifEmpty { V2rayConfig.DEFAULT_NETWORK }
 
                     outbound.getTransportSettingDetails()?.let { transportDetails ->
                         when (streamSetting.network) {

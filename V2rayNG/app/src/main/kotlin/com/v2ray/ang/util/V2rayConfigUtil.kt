@@ -34,12 +34,12 @@ object V2rayConfigUtil {
                 } else {
                     raw
                 }
-                Log.d(ANG_PACKAGE, customConfig)
+                //Log.d(ANG_PACKAGE, customConfig)
                 return Result(true, customConfig)
             }
             val outbound = config.getProxyOutbound() ?: return Result(false, "")
             val result = getV2rayNonCustomConfig(context, outbound)
-            Log.d(ANG_PACKAGE, result.content)
+            //Log.d(ANG_PACKAGE, result.content)
             return result
         } catch (e: Exception) {
             e.printStackTrace()

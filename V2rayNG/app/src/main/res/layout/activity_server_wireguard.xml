@@ -88,11 +88,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/server_lab_public_key" />
-
+                android:text="@string/server_lab_secret_key" />
 
             <EditText
-                android:id="@+id/et_public_key"
+                android:id="@+id/et_id"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/edit_height"
                 android:inputType="text" />
@@ -108,10 +107,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/server_lab_secret_key" />
+                android:text="@string/server_lab_public_key" />
+
 
             <EditText
-                android:id="@+id/et_id"
+                android:id="@+id/et_public_key"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/edit_height"
                 android:inputType="text" />
