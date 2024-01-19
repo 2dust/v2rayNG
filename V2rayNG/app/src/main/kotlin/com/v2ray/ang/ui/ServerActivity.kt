@@ -19,6 +19,7 @@ import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_PORT
 import com.v2ray.ang.dto.V2rayConfig.Companion.TLS
+import com.v2ray.ang.extension.removeWhiteSpace
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.ID_MAIN
@@ -476,7 +477,7 @@ class ServerActivity : BaseActivity() {
         } else {
             wireguard.reserved = null
         }
-        wireguard.address = listOf(et_local_address?.text.toString().trim())
+        wireguard.address = et_local_address?.text.toString().removeWhiteSpace().split(",")
         wireguard.mtu = Utils.parseInt(et_local_mtu?.text.toString())
     }
 
