@@ -419,6 +419,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         if (count <= 0) {
             count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append)
         }
+        if (count <= 0) {
+            count = AngConfigManager.appendCustomConfigServer(server, subid2)
+        }
         if (count > 0) {
             toast(R.string.toast_success)
             mainViewModel.reloadServerList()

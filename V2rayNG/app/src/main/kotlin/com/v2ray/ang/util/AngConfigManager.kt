@@ -975,4 +975,24 @@ object AngConfigManager {
 
         return true
     }
+
+    fun appendCustomConfigServer(server: String?, subid: String): Int {
+        if (server == null) {
+            return 0
+        }
+        if (server.contains("inbounds")
+            && server.contains("outbounds")
+            && server.contains("routing")
+        ) {
+            val config = ServerConfig.create(EConfigType.CUSTOM)
+            config.remarks = System.currentTimeMillis().toString()
+            config.subscriptionId = subid
+            config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
+            val key = MmkvManager.encodeServerConfig("", config)
+            serverRawStorage?.encode(key, server)
+            return 1
+        } else {
+            return 0
+        }
+    }
 }
