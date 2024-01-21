@@ -254,5 +254,6 @@
         <item>Chế độ VPN</item>
         <item>Chế độ Proxy</item>
     </string-array>
+    <string name="send_through">Send through</string>
 
 </resources>

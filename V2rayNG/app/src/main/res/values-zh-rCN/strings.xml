@@ -254,5 +254,6 @@
     </string-array>
     <string name="import_subscription_success">订阅导入成功</string>
     <string name="import_subscription_failure">导入订阅失败</string>
+    <string name="send_through">发送 IP</string>
 
 </resources>

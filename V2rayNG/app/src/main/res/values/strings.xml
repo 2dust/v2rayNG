@@ -233,6 +233,7 @@
 
     <string name="import_subscription_success">Subscription imported Successfully</string>
     <string name="import_subscription_failure">Import subscription failed</string>
+    <string name="send_through">Send through</string>
 
     <string-array name="share_method">
         <item>QRcode</item>

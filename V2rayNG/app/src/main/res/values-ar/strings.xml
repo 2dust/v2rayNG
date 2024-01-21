@@ -218,4 +218,5 @@
 		<item>VPN</item>
 		<item>الوكيل فقط</item>
 	</string-array>
+    <string name="send_through">Send through</string>
 </resources>

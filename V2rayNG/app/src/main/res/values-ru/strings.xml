@@ -261,5 +261,6 @@
         <item>VPN</item>
         <item>Только прокси</item>
     </string-array>
+    <string name="send_through">Send through</string>
 
 </resources>

@@ -251,5 +251,6 @@
         <item>VPN</item>
         <item>僅 Proxy</item>
     </string-array>
+    <string name="send_through">髮送IP</string>
 
 </resources>

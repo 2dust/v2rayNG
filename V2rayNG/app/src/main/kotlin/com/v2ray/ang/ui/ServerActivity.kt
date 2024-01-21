@@ -2,10 +2,16 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.Spinner
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
@@ -26,6 +32,11 @@ import com.v2ray.ang.util.MmkvManager.ID_MAIN
 import com.v2ray.ang.util.MmkvManager.KEY_SELECTED_SERVER
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.Utils.getIpv6Address
+import java.net.Inet4Address
+import java.net.InetAddress
+import java.net.NetworkInterface
+import java.util.Collections
+
 
 class ServerActivity : BaseActivity() {
 
@@ -84,6 +95,8 @@ class ServerActivity : BaseActivity() {
         resources.getStringArray(R.array.streamsecurity_alpn)
     }
 
+    private lateinit var localEndpoints: Array<out String>
+
     // Kotlin synthetics was used, but since it is removed in 1.8. We switch to old manual approach.
     // We don't use AndroidViewBinding because, it is better to share similar logics for different
     // protocols. Use findViewById manually ensures the xml are de-coupled with the activity logic.
@@ -120,6 +133,8 @@ class ServerActivity : BaseActivity() {
     private val et_reserved3: EditText? by lazy { findViewById(R.id.et_reserved3) }
     private val et_local_address: EditText? by lazy { findViewById(R.id.et_local_address) }
     private val et_local_mtu: EditText? by lazy { findViewById(R.id.et_local_mtu) }
+
+    private val sp_send_through: Spinner? by lazy { findViewById(R.id.sp_send_through) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -201,11 +216,34 @@ class ServerActivity : BaseActivity() {
                 // do nothing
             }
         }
+
+        localEndpoints = getLocalEndPoint()
+        sp_send_through?.adapter = ArrayAdapter(this, R.layout.spinner_item_text, localEndpoints)
+        sp_send_through?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                if(position == 0){
+                    config?.getProxyOutbound()?.sendThrough =  null
+                }else {
+                    config?.getProxyOutbound()?.sendThrough = localEndpoints[position]
+                }
+            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                // do nothing
+            }
+        }
+
+
         if (config != null) {
             bindingServer(config)
         } else {
             clearServer()
         }
+
     }
 
     /**
@@ -323,6 +361,12 @@ class ServerActivity : BaseActivity() {
         if (network >= 0) {
             sp_network?.setSelection(network)
         }
+
+        val seendThrough = Utils.arrayFind(localEndpoints, outbound.sendThrough ?: "None")
+        if (seendThrough >= 0) {
+            sp_send_through?.setSelection(seendThrough)
+        }
+
         return true
     }
 
@@ -374,6 +418,7 @@ class ServerActivity : BaseActivity() {
             toast(R.string.server_lab_port)
             return false
         }
+
         val config =
             MmkvManager.decodeServerConfig(editGuid) ?: ServerConfig.create(createConfigType)
         if (config.configType != EConfigType.SOCKS && TextUtils.isEmpty(et_id.text.toString())) {
@@ -414,6 +459,13 @@ class ServerActivity : BaseActivity() {
         }
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId!!
+        }
+
+        sp_send_through?.let {
+            val value = it.selectedItem.toString()
+            if(value.isNotEmpty()){
+                config.outboundBean?.sendThrough = value
+            }
         }
 
         MmkvManager.encodeServerConfig(editGuid, config)
@@ -598,5 +650,25 @@ class ServerActivity : BaseActivity() {
         }
 
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun getLocalEndPoint(): Array<out String>{
+        val list= mutableListOf<String>()
+        list.add("None")
+        try {
+            val interfaces: List<NetworkInterface> =
+                Collections.list(NetworkInterface.getNetworkInterfaces())
+            for (face in interfaces) {
+                val endPoints: List<InetAddress> = Collections.list(face.inetAddresses)
+                for (address in endPoints) {
+                    if (!address.isLoopbackAddress) {
+                        list.add(address.hostAddress)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return list.toTypedArray()
     }
 }

@@ -53,7 +53,7 @@ data class ServerConfig(
         if (configType != EConfigType.CUSTOM) {
             return outboundBean
         }
-        return fullConfig?.getProxyOutbound()
+        return fullConfig?. getProxyOutbound()
     }
 
     fun getAllOutboundTags(): MutableList<String> {

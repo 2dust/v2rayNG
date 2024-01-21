@@ -65,7 +65,7 @@ data class V2rayConfig(
                             var settings: OutSettingsBean? = null,
                             var streamSettings: StreamSettingsBean? = null,
                             val proxySettings: Any? = null,
-                            val sendThrough: String? = null,
+                            var sendThrough: String? = null,
                             val mux: MuxBean? = MuxBean(false)) {
 
         data class OutSettingsBean(var vnext: List<VnextBean>? = null,
