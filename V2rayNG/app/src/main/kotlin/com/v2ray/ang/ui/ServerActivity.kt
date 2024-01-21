@@ -463,7 +463,7 @@ class ServerActivity : BaseActivity() {
 
         sp_send_through?.let {
             val value = it.selectedItem.toString()
-            if(value.isNotEmpty()){
+            if(value.isNotEmpty() && value != "None"){
                 config.outboundBean?.sendThrough = value
             }
         }
