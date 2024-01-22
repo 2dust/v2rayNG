@@ -218,7 +218,7 @@ class ServerActivity : BaseActivity() {
         }
 
         localEndpoints = getLocalEndPoint()
-        sp_send_through?.adapter = ArrayAdapter(this, R.layout.spinner_item_text, localEndpoints)
+        sp_send_through?.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, localEndpoints)
         sp_send_through?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -465,6 +465,8 @@ class ServerActivity : BaseActivity() {
             val value = it.selectedItem.toString()
             if(value.isNotEmpty() && value != "None"){
                 config.outboundBean?.sendThrough = value
+            }else{
+                config.outboundBean?.sendThrough = null
             }
         }
 
@@ -653,16 +655,15 @@ class ServerActivity : BaseActivity() {
     }
 
     private fun getLocalEndPoint(): Array<out String>{
-        val list= mutableListOf<String>()
-        list.add("None")
+        val list= mutableListOf("None", "127.0.0.1", "::")
         try {
             val interfaces: List<NetworkInterface> =
                 Collections.list(NetworkInterface.getNetworkInterfaces())
             for (face in interfaces) {
                 val endPoints: List<InetAddress> = Collections.list(face.inetAddresses)
                 for (address in endPoints) {
-                    if (!address.isLoopbackAddress) {
-                        list.add(address.hostAddress)
+                    if (!address.isLoopbackAddress && !address.isLinkLocalAddress) {
+                        address.hostAddress?.let { list.add(it) }
                     }
                 }
             }
