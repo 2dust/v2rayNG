@@ -408,6 +408,7 @@ object V2rayConfigUtil {
             if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)
                 || protocol.equals(EConfigType.SOCKS.name, true)
                 || protocol.equals(EConfigType.TROJAN.name, true)
+                || protocol.equals(EConfigType.WIREGUARD.name, true)
             ) {
                 muxEnabled = false
             } else if (protocol.equals(EConfigType.VLESS.name, true)
