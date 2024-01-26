@@ -18,7 +18,7 @@ android {
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
         versionCode 539
-        versionName "1.8.14"
+        versionName "1.8.14.2023"
     }
 
     buildTypes {
