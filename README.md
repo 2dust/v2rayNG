@@ -1,3 +1,7 @@
+基于原项目进行了简单修改
+V2rayNG/app/src/main/res/values/strings.xml   可以改软件名称
+app/bu...那个可以改包名和版本号
+
 # v2rayNG
 
 A V2Ray client for Android, support [Xray core](https://github.com/XTLS/Xray-core) and [v2fly core](https://github.com/v2fly/v2ray-core)
