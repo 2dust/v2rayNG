@@ -2,6 +2,10 @@
 V2rayNG/app/src/main/res/values/strings.xml   可以改软件名称
 app/bu...那个可以改包名和版本号
 
+软件名称位置：V2rayNG/app/src/main/res/values/strings.xml
+推广网站：V2rayNG/app/src/main/kotlin/com/v2ray/ang/AppConfig.kt （编码了 数据库在
+包名和版本号：V2rayNG/app/build.gradle （第16行是包名，21行是版本号）
+
 # v2rayNG
 
 A V2Ray client for Android, support [Xray core](https://github.com/XTLS/Xray-core) and [v2fly core](https://github.com/v2fly/v2ray-core)
