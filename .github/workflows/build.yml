@@ -57,8 +57,15 @@ jobs:
         sed -i 's/org.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8/org.gradle.jvmargs=-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8/' ${{ github.workspace }}/V2rayNG/gradle.properties
         ./gradlew assembleDebug
 
-    - name: Upload APK
+    - name: Upload APK to Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: apk
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/
+        
+    - name: Upload APK to Release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        file: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*.apk
+        tag: ${{ github.ref }}
+        file_glob: true
