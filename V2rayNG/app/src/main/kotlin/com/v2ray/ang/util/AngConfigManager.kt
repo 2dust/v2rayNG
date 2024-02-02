@@ -775,10 +775,11 @@ object AngConfigManager {
                     val dicQuery = HashMap<String, String>()
                     dicQuery["publickey"] =
                         Utils.urlEncode(outbound.settings?.peers?.get(0)?.publicKey.toString())
-                    dicQuery["reserved"] = Utils.urlEncode(
-                        Utils.removeWhiteSpace(outbound.settings?.reserved?.joinToString())
-                            .toString()
-                    )
+                    if (outbound.settings?.reserved != null) {
+                        dicQuery["reserved"] = Utils.urlEncode(
+                            Utils.removeWhiteSpace(outbound.settings?.reserved?.joinToString())
+                                .toString()
+                        )}
                     dicQuery["address"] = Utils.urlEncode(
                         Utils.removeWhiteSpace((outbound.settings?.address as List<*>).joinToString())
                             .toString()
