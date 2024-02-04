@@ -1,7 +1,7 @@
 package com.v2ray.ang.ui
 
 import android.Manifest
-import android.app.Activity.RESULT_OK
+import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -18,7 +18,6 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class RoutingSettingsFragment : Fragment() {

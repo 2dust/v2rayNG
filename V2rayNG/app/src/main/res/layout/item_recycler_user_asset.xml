@@ -17,7 +17,7 @@
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:background="@color/colorPrimary"
-                android:foreground="?android:attr/selectableItemBackground"
+                android:foreground="?attr/selectableItemBackground"
                 android:padding="@dimen/nav_header_vertical_spacing">
 
             <LinearLayout
@@ -46,7 +46,7 @@
                     android:id="@+id/layout_remove"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
+                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
                     android:padding="@dimen/nav_header_vertical_spacing">
@@ -54,7 +54,7 @@
                 <ImageView
                         android:layout_width="@dimen/png_height"
                         android:layout_height="@dimen/png_height"
-                        android:src="@drawable/ic_delete_24dp"
+                        app:srcCompat="@drawable/ic_delete_24dp"
                         app:tint="?attr/colorMainText" />
             </LinearLayout>
         </LinearLayout>

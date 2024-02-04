@@ -21,7 +21,6 @@ import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.util.AppManagerUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers

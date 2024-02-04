@@ -20,7 +20,7 @@
             android:focusable="true"
             android:nextFocusRight="@+id/layout_share"
             android:background="@color/colorPrimary"
-            android:foreground="?android:attr/selectableItemBackground"
+            android:foreground="?attr/selectableItemBackground"
             android:layout_width="match_parent"
             android:layout_height="@dimen/server_height"
             android:layout_gravity="center"
@@ -116,7 +116,7 @@
                         android:id="@+id/layout_share"
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/server_height"
-                        android:background="?android:attr/selectableItemBackground"
+                        android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
@@ -127,7 +127,7 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="@dimen/png_height"
-                            android:src="@drawable/ic_share_24dp"
+                            app:srcCompat="@drawable/ic_share_24dp"
                                 app:tint="?attr/colorMainText" />
 
                     </LinearLayout>
@@ -136,7 +136,7 @@
                         android:id="@+id/layout_edit"
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/server_height"
-                        android:background="?android:attr/selectableItemBackground"
+                        android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
@@ -146,7 +146,7 @@
                         <ImageView
                             android:layout_width="@dimen/png_height"
                             android:layout_height="@dimen/png_height"
-                            android:src="@drawable/ic_edit_24dp"
+                            app:srcCompat="@drawable/ic_edit_24dp"
                                 app:tint="?attr/colorMainText" />
 
                     </LinearLayout>
@@ -155,7 +155,7 @@
                         android:id="@+id/layout_remove"
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/server_height"
-                        android:background="?android:attr/selectableItemBackground"
+                        android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
@@ -165,7 +165,7 @@
                         <ImageView
                             android:layout_width="@dimen/png_height"
                             android:layout_height="@dimen/png_height"
-                            android:src="@drawable/ic_delete_24dp"
+                            app:srcCompat="@drawable/ic_delete_24dp"
                                 app:tint="?attr/colorMainText" />
 
                     </LinearLayout>
