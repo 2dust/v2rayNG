@@ -218,6 +218,9 @@
 
     <string name="import_subscription_success">اشتراک با موفقیت ذخیره شد</string>
     <string name="import_subscription_failure">ذخیره اشتراک ناموفق بود</string>
+    <string name="server_lab_fragment_packets">بسته‌های فرگمنت</string>
+    <string name="server_lab_fragment_length">اندازه فرگمنت (حداقل-حداکثر)</string>
+    <string name="server_lab_fragment_interval">فاصله‌ فرگمنت (حداقل-حداکثر)</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
