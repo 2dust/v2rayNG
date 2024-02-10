@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">تعویض</string>
     <string name="app_tile_name">تعویض</string>
     <string name="app_tile_first_use">برای اولین بار از این ویژگی استفاده می‌کنید، لطفا از برنامه برای افزودن سرور استفاده کنید</string>
@@ -103,6 +102,7 @@
 
     <string name="title_pref_mux_enabled">فعال کردن Mux</string>
     <string name="summary_pref_mux_enabled">سریعتر است، اما ممکن است باعث اتصال ناپایدار شود\nمخزن ترافیک TCP با 8 اتصال پیش‌فرض، نحوه مدیریت UDP و QUIC را در زیر سفارشی کنید</string>
+    <string name="title_pref_mux_concurency">اتصالات TCP (محدوده -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_concurency">اتصالات XUDP (محدوده -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_quic">مدیریت QUIC در تونل mux</string>
     <string-array name="mux_xudp_quic_entries">
@@ -166,9 +166,13 @@
     <string name="summary_pref_tg_group">عضویت در گروه تلگرام</string>
     <string name="toast_tg_app_not_found">برنامه تلگرام پیدا نشد</string>
 
+    <string name="title_privacy_policy">حریم خصوصی</string>
     <string name="title_pref_promotion">تبلیغات</string>
     <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف شود)</string>
 
+    <string name="title_pref_auto_update_subscription">به‌روزرسانی خودکار اشتراک ها</string>
+    <string name="summary_pref_auto_update_subscription">اشتراک های خود را به طور خودکار با فاصله زمانی در پس زمینه به روز کنید. بسته به دستگاه، این ویژگی ممکن است همیشه کار نکند</string>
+    <string name="title_pref_auto_update_interval">فاصله به‌روزرسانی خودکار (دقیقه، حداقل مقدار 15)</string>
     <string name="title_core_loglevel">سطح گزارشات</string>
     <string name="title_mode">حالت</string>
     <string name="title_mode_help">برای راهنمایی بیشتر روی این متن، کلیک کنید</string>
@@ -187,6 +191,7 @@
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">نشانی اینترنتی اختیاری</string>
     <string name="sub_setting_enable">فعال کردن به‌روزرسانی</string>
+    <string name="sub_auto_update">فعال سازی به‌روزرسانی خودکار</string>
     <string name="title_sub_update">به‌روزرسانی اشتراک</string>
     <string name="title_ping_all_server">Tcping همه کانفیگ</string>
     <string name="title_real_ping_all_server">تاخیر واقعی همه کانفیگ</string>

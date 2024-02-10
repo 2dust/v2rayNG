@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-	<string name="app_name" translatable="false">v2rayNG</string>
 	<string name="app_widget_name">التبديل</string>
 	<string name="app_tile_name">التبديل</string>
 	<string name="app_tile_first_use">أول استخدام لهذه الميزة، يرجى استخدام التطبيق لإضافة خادم</string>
@@ -48,8 +47,6 @@
 	<string name="server_lab_request_host">طلب الاستضافة (host/ws host/h2 host)/QUIC security</string>
 	<string name="server_lab_path">المسار (ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
 	<string name="server_lab_stream_security">TLS</string>
-	<string name="server_lab_stream_fingerprint" translatable="false">Fingerprint</string>
-	<string name="server_lab_stream_alpn" translatable="false">Alpn</string>
 	<string name="server_lab_allow_insecure">allowInsecure</string>
 	<string name="server_lab_sni">SNI</string>
 	<string name="server_lab_address3">العنوان</string>
@@ -102,6 +99,7 @@
 	<string name="summary_pref_per_app_proxy">عام: التطبيق المحدد هو الوكيل، الاتصال غير المحدد مباشر؛ \nوضع التجاوز: التطبيق المحدد متصل مباشرة، الوكيل غير المحدد. \nالخيار لتحديد التطبيق الوكيل تلقائيا في القائمة</string>
 	<string name="title_pref_mux_enabled">تمكين Mux</string>
 	<string name="summary_pref_mux_enabled">حركة مرور TCP مع 8 اتصالات افتراضية، قم بتخصيص كيفية التعامل مع UDP وQUIC أدناهn\أسرع، لكنه قد يسبب اتصالاً غير مستقر</string>
+	<string name="title_pref_mux_concurency">اتصالات TCP (النطاق من -1 إلى 1024)</string>
 	<string name="title_pref_mux_xudp_concurency">اتصالات XUDP (النطاق من -1 إلى 1024)</string>
 	<string name="title_pref_mux_xudp_quic">التعامل مع QUIC في نفق مكس</string>
 	<string-array name="mux_xudp_quic_entries">
@@ -147,8 +145,12 @@
 	<string name="summary_pref_feedback">إرسال ملاحظات عن التحسينات أو الأخطاء إلى GitHub</string>
 	<string name="summary_pref_tg_group">الانضمام إلى مجموعة Telegram</string>
 	<string name="toast_tg_app_not_found">لم يتم العثور على تطبيق Telegram</string>
+	<string name="title_privacy_policy">حریم خصوصی</string>
 	<string name="title_pref_promotion">ترقية</string>
 	<string name="summary_pref_promotion">ترقية، انقر للحصول على التفاصيل (يمكن إزالة التبرع)</string>
+	<string name="title_pref_auto_update_subscription">اشتراكات التحديث التلقائي</string>
+	<string name="summary_pref_auto_update_subscription">قم بتحديث اشتراكاتك تلقائيًا بفاصل زمني في الخلفية. اعتمادًا على الجهاز، قد لا تعمل هذه الميزة دائمًا</string>
+	<string name="title_pref_auto_update_interval">الفاصل الزمني للتحديث التلقائي (الدقائق، القيمة الدنيا 15)</string>
 	<string name="title_core_loglevel">مستوى السجل</string>
 	<string name="title_mode">الوضع</string>
 	<string name="title_mode_help">انقر علي للمزيد من المساعدة</string>
@@ -166,6 +168,7 @@
 	<string name="sub_setting_remarks">ملاحظات</string>
 	<string name="sub_setting_url">URL اختياري</string>
 	<string name="sub_setting_enable">تمكين التحديث</string>
+	<string name="sub_auto_update">تمكين التحديث التلقائي</string>
 	<string name="title_sub_update">تحديث الاشتراك (1)</string>
 	<string name="title_ping_all_server">Tcping كل التكوين</string>
 	<string name="title_real_ping_all_server">اختبر كل العناوين (3)</string>
