@@ -104,8 +104,8 @@ data class V2rayConfig(
             }
 
             data class FragmentBean(var packets: String = "",
-                                 var length: String = "10-20",
-                                 var interval: String = "10-20")
+                                 var length: String? = null,
+                                 var interval: String? = null)
 
             data class ServersBean(var address: String = "",
                                    var method: String = "chacha20-poly1305",
