@@ -780,7 +780,8 @@ object AngConfigManager {
                         dicQuery["reserved"] = Utils.urlEncode(
                             Utils.removeWhiteSpace(outbound.settings?.reserved?.joinToString())
                                 .toString()
-                        )}
+                        )
+                    }
                     dicQuery["address"] = Utils.urlEncode(
                         Utils.removeWhiteSpace((outbound.settings?.address as List<*>).joinToString())
                             .toString()
@@ -986,32 +987,40 @@ object AngConfigManager {
             && server.contains("outbounds")
             && server.contains("routing")
         ) {
-            val gson = GsonBuilder().setPrettyPrinting().create()
-            val serverList: Array<V2rayConfig> = Gson().fromJson(server, Array<V2rayConfig>::class.java)
-            if (serverList.size > 0) {
-                var count = 0
-                for (srv in serverList) {
-                    if (srv.inbounds != null && srv.outbounds != null && srv.routing != null) {
-                        var config = ServerConfig.create(EConfigType.CUSTOM)
-                        config.remarks = srv.remarks ?: "%04d-".format(count + 1) + System.currentTimeMillis().toString() 
-                        config.subscriptionId = subid
-                        config.fullConfig = srv
-                        var key = MmkvManager.encodeServerConfig("", config)
-                        serverRawStorage?.encode(key, gson.toJson(srv))
-                        count = count + 1
+            try {
+                val gson = GsonBuilder().setPrettyPrinting().create()
+                val serverList: Array<V2rayConfig> =
+                    Gson().fromJson(server, Array<V2rayConfig>::class.java)
+                if (serverList.isNotEmpty()) {
+                    var count = 0
+                    for (srv in serverList) {
+                        if (srv.inbounds != null && srv.outbounds != null && srv.routing != null) {
+                            val config = ServerConfig.create(EConfigType.CUSTOM)
+                            config.remarks = srv.remarks
+                                ?: ("%04d-".format(count + 1) + System.currentTimeMillis()
+                                    .toString())
+                            config.subscriptionId = subid
+                            config.fullConfig = srv
+                            val key = MmkvManager.encodeServerConfig("", config)
+                            serverRawStorage?.encode(key, gson.toJson(srv))
+                            count += 1
+                        }
                     }
+                    return count
                 }
-                return count
-            } else { // For compatibility
-                val config = ServerConfig.create(EConfigType.CUSTOM)
-                config.subscriptionId = subid
-                config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
-                config.remarks = System.currentTimeMillis().toString()
-                // config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
-                val key = MmkvManager.encodeServerConfig("", config)
-                serverRawStorage?.encode(key, server)
-                return 1
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
+
+            // For compatibility
+            val config = ServerConfig.create(EConfigType.CUSTOM)
+            config.subscriptionId = subid
+            config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
+            config.remarks = System.currentTimeMillis().toString()
+            // config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
+            val key = MmkvManager.encodeServerConfig("", config)
+            serverRawStorage?.encode(key, server)
+            return 1
         } else {
             return 0
         }
