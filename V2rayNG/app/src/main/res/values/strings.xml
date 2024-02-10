@@ -233,6 +233,9 @@
 
     <string name="import_subscription_success">Subscription imported Successfully</string>
     <string name="import_subscription_failure">Import subscription failed</string>
+    <string name="server_lab_fragment_packets">Fragment packets</string>
+    <string name="server_lab_fragment_length">Fragment length (min-max)</string>
+    <string name="server_lab_fragment_interval">Fragment interval (min-max)</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
