@@ -54,10 +54,16 @@
         <item></item>
         <item>tls</item>
     </string-array>
+
     <string-array name="streamsecurityxs" translatable="false">
         <item></item>
         <item>tls</item>
         <item>reality</item>
+    </string-array>
+
+    <string-array name="fragment_packets" translatable="false">
+        <item></item>
+        <item>tlshello</item>
     </string-array>
 
     <string-array name="streamsecurity_utls" translatable="false">
