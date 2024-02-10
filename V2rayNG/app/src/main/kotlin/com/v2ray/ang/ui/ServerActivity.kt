@@ -53,6 +53,9 @@ class ServerActivity : BaseActivity() {
     private val securitys: Array<out String> by lazy {
         resources.getStringArray(R.array.securitys)
     }
+    private val fragmentPackets: Array<out String> by lazy {
+        resources.getStringArray(R.array.fragment_packets)
+    }
     private val shadowsocksSecuritys: Array<out String> by lazy {
         resources.getStringArray(R.array.ss_securitys)
     }
@@ -100,6 +103,12 @@ class ServerActivity : BaseActivity() {
     private val container_allow_insecure: LinearLayout? by lazy { findViewById(R.id.l5) }
     private val et_sni: EditText? by lazy { findViewById(R.id.et_sni) }
     private val container_sni: LinearLayout? by lazy { findViewById(R.id.l2) }
+    private val sp_fragment_packets: Spinner? by lazy { findViewById(R.id.sp_fragment_packets) } //uTLS
+    private val container_fragment_packets: LinearLayout? by lazy { findViewById(R.id.l2_1) }
+    private val et_fragment_length: EditText? by lazy { findViewById(R.id.et_fragment_length) }
+    private val container_fragment_length: LinearLayout? by lazy { findViewById(R.id.l2_2) }
+    private val et_fragment_interval: EditText? by lazy { findViewById(R.id.et_fragment_interval) }
+    private val container_fragment_interval: LinearLayout? by lazy { findViewById(R.id.l2_3) }
     private val sp_stream_fingerprint: Spinner? by lazy { findViewById(R.id.sp_stream_fingerprint) } //uTLS
     private val container_fingerprint: LinearLayout? by lazy { findViewById(R.id.l3) }
     private val sp_network: Spinner? by lazy { findViewById(R.id.sp_network) }
@@ -172,6 +181,9 @@ class ServerActivity : BaseActivity() {
             ) {
                 if (streamSecuritys[position].isBlank()) {
                     container_sni?.visibility = View.GONE
+                    container_fragment_packets?.visibility = View.GONE
+                    container_fragment_length?.visibility = View.GONE
+                    container_fragment_interval?.visibility = View.GONE
                     container_fingerprint?.visibility = View.GONE
                     container_alpn?.visibility = View.GONE
                     container_allow_insecure?.visibility = View.GONE
@@ -180,6 +192,9 @@ class ServerActivity : BaseActivity() {
                     container_spider_x?.visibility = View.GONE
                 } else {
                     container_sni?.visibility = View.VISIBLE
+                    container_fragment_packets?.visibility = View.VISIBLE
+                    container_fragment_length?.visibility = View.VISIBLE
+                    container_fragment_interval?.visibility = View.VISIBLE
                     container_fingerprint?.visibility = View.VISIBLE
                     container_alpn?.visibility = View.VISIBLE
                     if (streamSecuritys[position] == TLS) {
@@ -270,17 +285,27 @@ class ServerActivity : BaseActivity() {
         }
 
         val streamSetting = config.outboundBean?.streamSettings ?: return true
+        val fragmentSetting = config.outboundBean?.settings?.fragment ?: V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean()
         val streamSecurity = Utils.arrayFind(streamSecuritys, streamSetting.security)
         if (streamSecurity >= 0) {
             sp_stream_security?.setSelection(streamSecurity)
             (streamSetting.tlsSettings ?: streamSetting.realitySettings)?.let { tlsSetting ->
                 container_sni?.visibility = View.VISIBLE
+                container_fragment_packets?.visibility = View.VISIBLE
+                container_fragment_length?.visibility = View.VISIBLE
+                container_fragment_interval?.visibility = View.VISIBLE
                 container_fingerprint?.visibility = View.VISIBLE
                 container_alpn?.visibility = View.VISIBLE
                 et_sni?.text = Utils.getEditable(tlsSetting.serverName)
                 tlsSetting.fingerprint?.let {
                     val utlsIndex = Utils.arrayFind(uTlsItems, tlsSetting.fingerprint)
                     sp_stream_fingerprint?.setSelection(utlsIndex)
+                }
+                fragmentSetting.packets.let {
+                    val packetsIndex = Utils.arrayFind(fragmentPackets, fragmentSetting.packets)
+                    sp_fragment_packets?.setSelection(packetsIndex)
+                    et_fragment_length?.text = Utils.getEditable(fragmentSetting.length.orEmpty())
+                    et_fragment_interval?.text = Utils.getEditable(fragmentSetting.interval.orEmpty())
                 }
                 tlsSetting.alpn?.let {
                     val alpnIndex = Utils.arrayFind(
@@ -311,6 +336,9 @@ class ServerActivity : BaseActivity() {
             }
             if (streamSetting.tlsSettings == null && streamSetting.realitySettings == null) {
                 container_sni?.visibility = View.GONE
+                container_fragment_packets?.visibility = View.GONE
+                container_fragment_length?.visibility = View.GONE
+                container_fragment_interval?.visibility = View.GONE
                 container_fingerprint?.visibility = View.GONE
                 container_alpn?.visibility = View.GONE
                 container_allow_insecure?.visibility = View.GONE
@@ -344,6 +372,9 @@ class ServerActivity : BaseActivity() {
         sp_stream_security?.setSelection(0)
         sp_allow_insecure?.setSelection(0)
         et_sni?.text = null
+        sp_fragment_packets?.setSelection(0)
+        et_fragment_length?.text = null
+        et_fragment_interval?.text = null
 
         //et_security.text = null
         sp_flow?.setSelection(0)
@@ -414,6 +445,19 @@ class ServerActivity : BaseActivity() {
         }
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId!!
+        }
+
+        if (config.configType == EConfigType.VLESS || config.configType == EConfigType.VMESS) {
+            val selectedFragmentPackets =
+                fragmentPackets[sp_fragment_packets?.selectedItemPosition ?: 0]
+            if (!TextUtils.isEmpty(selectedFragmentPackets)) {
+                config.outboundBean?.settings?.fragment =
+                    V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
+                        packets = selectedFragmentPackets,
+                        length = et_fragment_length?.text.toString().trim(),
+                        interval = et_fragment_interval?.text.toString().trim()
+                    )
+            }
         }
 
         MmkvManager.encodeServerConfig(editGuid, config)
