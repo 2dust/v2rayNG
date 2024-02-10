@@ -44,6 +44,66 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/edit_height"
             android:inputType="text"
+            android:nextFocusDown="@+id/sp_fragment_packets" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/l2_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_lab_fragment_packets" />
+
+        <Spinner
+            android:id="@+id/sp_fragment_packets"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/edit_height"
+            android:entries="@array/fragment_packets"
+            android:nextFocusDown="@+id/et_fragment_length" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/l2_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_lab_fragment_length" />
+
+        <EditText
+            android:id="@+id/et_fragment_length"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/edit_height"
+            android:inputType="text"
+            android:nextFocusDown="@+id/et_fragment_interval" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/l2_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_lab_fragment_interval" />
+
+        <EditText
+            android:id="@+id/et_fragment_interval"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/edit_height"
+            android:inputType="text"
             android:nextFocusDown="@+id/sp_stream_fingerprint" />
 
     </LinearLayout>
