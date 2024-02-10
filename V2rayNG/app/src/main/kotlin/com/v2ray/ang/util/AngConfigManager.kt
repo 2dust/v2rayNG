@@ -7,6 +7,7 @@ import android.text.TextUtils
 import android.util.Log
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_CONFIG
@@ -985,13 +986,32 @@ object AngConfigManager {
             && server.contains("outbounds")
             && server.contains("routing")
         ) {
-            val config = ServerConfig.create(EConfigType.CUSTOM)
-            config.remarks = System.currentTimeMillis().toString()
-            config.subscriptionId = subid
-            config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
-            val key = MmkvManager.encodeServerConfig("", config)
-            serverRawStorage?.encode(key, server)
-            return 1
+            val gson = GsonBuilder().setPrettyPrinting().create()
+            val serverList: Array<V2rayConfig> = Gson().fromJson(server, Array<V2rayConfig>::class.java)
+            if (serverList.size > 0) {
+                var count = 0
+                for (srv in serverList) {
+                    if (srv.inbounds != null && srv.outbounds != null && srv.routing != null) {
+                        var config = ServerConfig.create(EConfigType.CUSTOM)
+                        config.remarks = srv.remarks ?: "%04d-".format(count + 1) + System.currentTimeMillis().toString() 
+                        config.subscriptionId = subid
+                        config.fullConfig = srv
+                        var key = MmkvManager.encodeServerConfig("", config)
+                        serverRawStorage?.encode(key, gson.toJson(srv))
+                        count = count + 1
+                    }
+                }
+                return count
+            } else { // For compatibility
+                val config = ServerConfig.create(EConfigType.CUSTOM)
+                config.subscriptionId = subid
+                config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
+                config.remarks = System.currentTimeMillis().toString()
+                // config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
+                val key = MmkvManager.encodeServerConfig("", config)
+                serverRawStorage?.encode(key, server)
+                return 1
+            }
         } else {
             return 0
         }
