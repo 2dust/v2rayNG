@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.api.ApkVariantImpl
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -13,12 +11,9 @@ android {
         applicationId = "com.v2ray.ang"
         minSdk = 21
         targetSdk = 34
-        versionCode = 541
+        versionCode = 542
         versionName = "1.8.15"
         multiDexEnabled = true
-        ndk {
-            abiFilters += listOf("armeabi-v7a","arm64-v8a","x86","x86_64")
-        }
     }
 
     compileOptions {
@@ -50,7 +45,6 @@ android {
         abi {
             isEnable = true
             isUniversalApk = true
-            include("armeabi-v7a","arm64-v8a","x86","x86_64")
         }
     }
 
@@ -62,8 +56,8 @@ android {
         variant.outputs
             .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
             .forEach { output ->
-                val abi = if (output.getFilter(com.android.build.OutputFile.ABI) != null)
-                    output.getFilter(com.android.build.OutputFile.ABI)
+                val abi = if (output.getFilter("ABI") != null)
+                    output.getFilter("ABI")
                 else
                     "all"
 
