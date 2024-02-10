@@ -24,7 +24,8 @@ data class ServerConfig(
                             protocol = configType.name.lowercase(),
                             settings = V2rayConfig.OutboundBean.OutSettingsBean(
                                 vnext = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean(
-                                    users = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean.UsersBean())))),
+                                    users = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean.UsersBean()))),
+                                fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean()),
                             streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()))
                 EConfigType.CUSTOM ->
                     return ServerConfig(configType = configType)
