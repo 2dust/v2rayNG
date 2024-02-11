@@ -251,5 +251,7 @@
         <item>VPN</item>
         <item>僅 Proxy</item>
     </string-array>
+    <string name="import_subscription_success">訂閱導入成功</string>
+    <string name="import_subscription_failure">導入訂閱失敗</string>
 
 </resources>

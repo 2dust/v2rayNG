@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">Переключить</string>
     <string name="app_tile_name">Переключить</string>
     <string name="app_tile_first_use">Первое использование этой функции, пожалуйста, используйте приложение, чтобы добавить сервер</string>
@@ -62,10 +61,6 @@
     <string name="server_lab_security4">Пользователь (необязательно)</string>
     <string name="server_lab_encryption">Шифрование</string>
     <string name="server_lab_flow">Поток</string>
-    <string name="server_lab_public_key" translatable="false">PublicKey</string>
-    <string name="server_lab_short_id" translatable="false">ShortId</string>
-    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
-    <string name="server_lab_secret_key" translatable="false">SecretKey</string>
     <string name="server_lab_reserved">Reserved (необязательно)</string>
     <string name="server_lab_local_address">Локальный адрес (необязательно, IPv4/IPv6 через запятую)</string>
     <string name="server_lab_local_mtu">MTU (необязательно, по умолчанию 1420)</string>
