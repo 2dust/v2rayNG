@@ -254,5 +254,7 @@
     </string-array>
     <string name="import_subscription_success">订阅导入成功</string>
     <string name="import_subscription_failure">导入订阅失败</string>
+    <string name="menu_item_add_asset">添加</string>
+    <string name="menu_item_add_url">添加链接</string>
 
 </resources>

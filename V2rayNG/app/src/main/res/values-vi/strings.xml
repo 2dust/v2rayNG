@@ -255,5 +255,7 @@
         <item>Chế độ VPN</item>
         <item>Chế độ Proxy</item>
     </string-array>
+    <string name="menu_item_add_asset">Thêm vào</string>
+    <string name="menu_item_add_url">Thêm liên kết</string>
 
 </resources>

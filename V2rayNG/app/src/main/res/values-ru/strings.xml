@@ -256,5 +256,7 @@
         <item>VPN</item>
         <item>Только прокси</item>
     </string-array>
+    <string name="menu_item_add_asset">Добавлять</string>
+    <string name="menu_item_add_url">Добавить ссылку</string>
 
 </resources>

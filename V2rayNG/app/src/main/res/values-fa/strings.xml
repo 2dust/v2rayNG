@@ -253,5 +253,7 @@
         <item>VPN</item>
         <item>فقط پروکسی</item>
     </string-array>
+    <string name="menu_item_add_asset">افزودن</string>
+    <string name="menu_item_add_url">افزودن لینک</string>
 
 </resources>
