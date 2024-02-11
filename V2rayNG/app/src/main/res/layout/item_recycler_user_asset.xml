@@ -43,6 +43,22 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/layout_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="@dimen/nav_header_vertical_spacing">
+
+                <ImageView
+                    android:layout_width="@dimen/png_height"
+                    android:layout_height="@dimen/png_height"
+                    app:srcCompat="@drawable/ic_edit_24dp"
+                    app:tint="?attr/colorMainText" />
+            </LinearLayout>
+
+            <LinearLayout
                     android:id="@+id/layout_remove"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

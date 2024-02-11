@@ -2,6 +2,7 @@ package com.v2ray.ang.util
 
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.dto.ServerAffiliationInfo
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.SubscriptionItem
@@ -21,6 +22,7 @@ object MmkvManager {
     private val serverStorage by lazy { MMKV.mmkvWithID(ID_SERVER_CONFIG, MMKV.MULTI_PROCESS_MODE) }
     private val serverAffStorage by lazy { MMKV.mmkvWithID(ID_SERVER_AFF, MMKV.MULTI_PROCESS_MODE) }
     private val subStorage by lazy { MMKV.mmkvWithID(ID_SUB, MMKV.MULTI_PROCESS_MODE) }
+    private val assetStorage by lazy { MMKV.mmkvWithID(ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
 
     fun decodeServerList(): MutableList<String> {
         val json = mainStorage?.decodeString(KEY_ANG_CONFIGS)
@@ -141,6 +143,22 @@ object MmkvManager {
     fun removeSubscription(subid: String) {
         subStorage?.remove(subid)
         removeServerViaSubid(subid)
+    }
+
+    fun decodeAssetUrls(): List<Pair<String, AssetUrlItem>> {
+        val assetUrlItems = mutableListOf<Pair<String, AssetUrlItem>>()
+        assetStorage?.allKeys()?.forEach { key ->
+            val json = assetStorage?.decodeString(key)
+            if (!json.isNullOrBlank()) {
+                assetUrlItems.add(Pair(key, Gson().fromJson(json, AssetUrlItem::class.java)))
+            }
+        }
+        assetUrlItems.sortedBy { (_, value) -> value.addedTime }
+        return assetUrlItems
+    }
+
+    fun removeAssetUrl(assetid: String) {
+        assetStorage?.remove(assetid)
     }
 
     fun removeAllServer() {

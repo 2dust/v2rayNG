@@ -21,7 +21,8 @@ class UserAssetUrlActivity : BaseActivity() {
     var save_config: MenuItem? = null
 
     private val assetStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
-    private val editAssetId by lazy { intent.getStringExtra("assetUrlId").orEmpty() }
+    private val editAssetId by lazy { intent.getStringExtra("assetId").orEmpty() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityUserAssetUrlBinding.inflate(layoutInflater)
@@ -94,7 +95,7 @@ class UserAssetUrlActivity : BaseActivity() {
         if (editAssetId.isNotEmpty()) {
             AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    MmkvManager.removeSubscription(editAssetId)
+                    MmkvManager.removeAssetUrl(editAssetId)
                     finish()
                 }
                 .show()
