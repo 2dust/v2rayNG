@@ -6,13 +6,14 @@ import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.util.Utils
 
 data class ServerConfig(
-        val configVersion: Int = 3,
-        val configType: EConfigType,
-        var subscriptionId: String = "",
-        val addedTime: Long = System.currentTimeMillis(),
-        var remarks: String = "",
-        val outboundBean: V2rayConfig.OutboundBean? = null,
-        var fullConfig: V2rayConfig? = null
+    val configVersion: Int = 3,
+    val configType: EConfigType,
+    var subscriptionId: String = "",
+    val addedTime: Long = System.currentTimeMillis(),
+    var remarks: String = "",
+    val outboundBean: V2rayConfig.OutboundBean? = null,
+    var outboundFragmentBean: V2rayConfig.OutboundBean? = null,
+    var fullConfig: V2rayConfig? = null
 ) {
     companion object {
         fun create(configType: EConfigType): ServerConfig {
@@ -24,9 +25,13 @@ data class ServerConfig(
                             protocol = configType.name.lowercase(),
                             settings = V2rayConfig.OutboundBean.OutSettingsBean(
                                 vnext = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean(
-                                    users = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean.UsersBean()))),
-                                fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean()),
-                            streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()))
+                                    users = listOf(V2rayConfig.OutboundBean.OutSettingsBean.VnextBean.UsersBean())))),
+                            streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()),
+                        outboundFragmentBean = V2rayConfig.OutboundBean(
+                            tag = "fragment",
+                            protocol = "freedom",
+                            settings = V2rayConfig.OutboundBean.OutSettingsBean(
+                                fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean())))
                 EConfigType.CUSTOM ->
                     return ServerConfig(configType = configType)
                 EConfigType.SHADOWSOCKS, EConfigType.SOCKS, EConfigType.TROJAN ->
@@ -55,6 +60,13 @@ data class ServerConfig(
             return outboundBean
         }
         return fullConfig?.getProxyOutbound()
+    }
+
+    fun getFragmentOutbound(): V2rayConfig.OutboundBean? {
+        if (configType != EConfigType.CUSTOM) {
+            return outboundFragmentBean
+        }
+        return fullConfig?.getFragmentOutbound()
     }
 
     fun getAllOutboundTags(): MutableList<String> {

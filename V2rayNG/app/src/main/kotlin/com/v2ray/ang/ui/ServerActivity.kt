@@ -276,6 +276,7 @@ class ServerActivity : BaseActivity() {
                 et_local_mtu?.text = Utils.getEditable(outbound.settings?.mtu.toString())
             }
         }
+
         val securityEncryptions =
             if (config.configType == EConfigType.SHADOWSOCKS) shadowsocksSecuritys else securitys
         val security =
@@ -285,15 +286,16 @@ class ServerActivity : BaseActivity() {
         }
 
         val streamSetting = config.outboundBean?.streamSettings ?: return true
-        val fragmentSetting = config.outboundBean?.settings?.fragment ?: V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean()
         val streamSecurity = Utils.arrayFind(streamSecuritys, streamSetting.security)
         if (streamSecurity >= 0) {
             sp_stream_security?.setSelection(streamSecurity)
             (streamSetting.tlsSettings ?: streamSetting.realitySettings)?.let { tlsSetting ->
                 container_sni?.visibility = View.VISIBLE
-                container_fragment_packets?.visibility = View.VISIBLE
-                container_fragment_length?.visibility = View.VISIBLE
-                container_fragment_interval?.visibility = View.VISIBLE
+                if (config.configType == EConfigType.VMESS || config.configType == EConfigType.VLESS) {
+                    container_fragment_packets?.visibility = View.VISIBLE
+                    container_fragment_length?.visibility = View.VISIBLE
+                    container_fragment_interval?.visibility = View.VISIBLE
+                }
                 container_fingerprint?.visibility = View.VISIBLE
                 container_alpn?.visibility = View.VISIBLE
                 et_sni?.text = Utils.getEditable(tlsSetting.serverName)
@@ -301,11 +303,16 @@ class ServerActivity : BaseActivity() {
                     val utlsIndex = Utils.arrayFind(uTlsItems, tlsSetting.fingerprint)
                     sp_stream_fingerprint?.setSelection(utlsIndex)
                 }
-                fragmentSetting.packets.let {
-                    val packetsIndex = Utils.arrayFind(fragmentPackets, fragmentSetting.packets)
-                    sp_fragment_packets?.setSelection(packetsIndex)
-                    et_fragment_length?.text = Utils.getEditable(fragmentSetting.length.orEmpty())
-                    et_fragment_interval?.text = Utils.getEditable(fragmentSetting.interval.orEmpty())
+                if (config.configType == EConfigType.VMESS || config.configType == EConfigType.VLESS) {
+                    config.outboundFragmentBean?.settings?.fragment?.let {
+                        val packetsIndex =
+                            Utils.arrayFind(fragmentPackets, config.outboundFragmentBean?.settings?.fragment?.packets ?: "")
+                        sp_fragment_packets?.setSelection(packetsIndex)
+                        et_fragment_length?.text =
+                            Utils.getEditable(config.outboundFragmentBean?.settings?.fragment?.length.orEmpty())
+                        et_fragment_interval?.text =
+                            Utils.getEditable(config.outboundFragmentBean?.settings?.fragment?.interval.orEmpty())
+                    }
                 }
                 tlsSetting.alpn?.let {
                     val alpnIndex = Utils.arrayFind(
@@ -447,17 +454,22 @@ class ServerActivity : BaseActivity() {
             config.subscriptionId = subscriptionId!!
         }
 
-        if (config.configType == EConfigType.VLESS || config.configType == EConfigType.VMESS) {
-            val selectedFragmentPackets =
-                fragmentPackets[sp_fragment_packets?.selectedItemPosition ?: 0]
-            if (!TextUtils.isEmpty(selectedFragmentPackets)) {
-                config.outboundBean?.settings?.fragment =
-                    V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
+        val selectedFragmentPackets =
+            fragmentPackets[sp_fragment_packets?.selectedItemPosition ?: 0]
+        if (TextUtils.isEmpty(selectedFragmentPackets)) {
+            config.outboundFragmentBean = null
+        } else {
+            config.outboundFragmentBean = V2rayConfig.OutboundBean(
+                "fragment",
+                "freedom",
+                V2rayConfig.OutboundBean.OutSettingsBean(
+                    fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
                         packets = selectedFragmentPackets,
                         length = et_fragment_length?.text.toString().trim(),
                         interval = et_fragment_interval?.text.toString().trim()
                     )
-            }
+                )
+            )
         }
 
         MmkvManager.encodeServerConfig(editGuid, config)

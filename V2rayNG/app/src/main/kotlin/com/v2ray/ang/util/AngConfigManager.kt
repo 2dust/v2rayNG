@@ -261,6 +261,16 @@ object AngConfigManager {
                                 if (TextUtils.isEmpty(vmessQRCode.scy)) DEFAULT_SECURITY else vmessQRCode.scy
                             vnext.users[0].alterId = Utils.parseInt(vmessQRCode.aid)
                         }
+                        if (!TextUtils.isEmpty(vmessQRCode.fragment)) {
+                            val fragmentParts = vmessQRCode.fragment.split(",")
+                            if (fragmentParts.size == 3) {
+                                config.outboundFragmentBean?.settings?.fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
+                                    packets = fragmentParts[0],
+                                    length = fragmentParts[1],
+                                    interval = fragmentParts[2]
+                                )
+                            }
+                        }
                         val sni = streamSetting.populateTransportSettings(
                             vmessQRCode.net,
                             vmessQRCode.type,
@@ -506,6 +516,14 @@ object AngConfigManager {
                 vnext.users[0].security = DEFAULT_SECURITY
                 vnext.users[0].alterId = alterId.toInt()
             }
+            val fragmentParts = queryParam["fragment"]?.split(",")
+            if (fragmentParts?.size == 3) {
+                config.outboundFragmentBean?.settings?.fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
+                    packets = fragmentParts[0],
+                    length = fragmentParts[1],
+                    interval = fragmentParts[2]
+                )
+            }
             var fingerprint = streamSetting.tlsSettings?.fingerprint
             val sni = streamSetting.populateTransportSettings(protocol,
                 queryParam["type"],
@@ -598,6 +616,7 @@ object AngConfigManager {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ""
             val outbound = config.getProxyOutbound() ?: return ""
+            val fragmentOutbound = config.getFragmentOutbound()
             val streamSetting =
                 outbound.streamSettings ?: V2rayConfig.OutboundBean.StreamSettingsBean()
             if (config.configType != EConfigType.WIREGUARD) {
@@ -626,6 +645,9 @@ object AngConfigManager {
                         vmessQRCode.type = transportDetails[0]
                         vmessQRCode.host = transportDetails[1]
                         vmessQRCode.path = transportDetails[2]
+                    }
+                    fragmentOutbound?.settings?.fragment?.let { fragment ->
+                        vmessQRCode.fragment = "${fragment.packets},${fragment.length},${fragment.interval}"
                     }
                     val json = Gson().toJson(vmessQRCode)
                     Utils.encode(json)
@@ -685,10 +707,12 @@ object AngConfigManager {
                     }
 
                     dicQuery["security"] = streamSetting.security.ifEmpty { "none" }
-                    (streamSetting.tlsSettings
-                        ?: streamSetting.realitySettings)?.let { tlsSetting ->
+                    (streamSetting.tlsSettings ?: streamSetting.realitySettings)?.let { tlsSetting ->
                         if (!TextUtils.isEmpty(tlsSetting.serverName)) {
                             dicQuery["sni"] = tlsSetting.serverName
+                        }
+                        fragmentOutbound?.settings?.fragment?.let { fragment ->
+                            dicQuery["fragment"] = "${fragment.packets},${fragment.length},${fragment.interval}"
                         }
                         if (!tlsSetting.alpn.isNullOrEmpty() && tlsSetting.alpn.isNotEmpty()) {
                             dicQuery["alpn"] =

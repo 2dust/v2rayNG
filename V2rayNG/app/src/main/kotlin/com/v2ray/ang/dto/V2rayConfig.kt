@@ -474,6 +474,15 @@ data class V2rayConfig(
         return null
     }
 
+    fun getFragmentOutbound(): OutboundBean? {
+        outbounds.forEach { outbound ->
+            if (outbound.protocol == "freedom" && outbound.tag == "fragment") {
+                return outbound
+            }
+        }
+        return null
+    }
+
     fun toPrettyPrinting(): String {
         return GsonBuilder()
                 .setPrettyPrinting()
