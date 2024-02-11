@@ -9,3 +9,4 @@ data class SubscriptionItem(
     var autoUpdate: Boolean = false,
     val updateInterval: Int? = null,
 )
+

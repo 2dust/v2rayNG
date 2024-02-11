@@ -66,6 +66,11 @@ class UserAssetActivity : BaseActivity() {
             true
         }
 
+        R.id.add_url -> {
+            val intent = Intent(this, UserAssetUrlActivity::class.java)
+            startActivity(intent)
+            true
+        }
         R.id.download_file -> {
             downloadGeoFiles()
             true
