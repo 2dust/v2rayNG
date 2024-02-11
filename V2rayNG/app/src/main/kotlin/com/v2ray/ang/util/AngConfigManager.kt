@@ -438,6 +438,14 @@ object AngConfigManager {
                     queryParam["mode"],
                     queryParam["serviceName"]
                 )
+                val fragmentParts = queryParam["fragment"]?.split(",")
+                if (fragmentParts?.size == 3) {
+                    config.outboundFragmentBean?.settings?.fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
+                        packets = fragmentParts[0],
+                        length = fragmentParts[1],
+                        interval = fragmentParts[2]
+                    )
+                }
                 fingerprint = queryParam["fp"] ?: ""
                 val pbk = queryParam["pbk"] ?: ""
                 val sid = queryParam["sid"] ?: ""
@@ -515,14 +523,6 @@ object AngConfigManager {
                 vnext.users[0].id = uuid
                 vnext.users[0].security = DEFAULT_SECURITY
                 vnext.users[0].alterId = alterId.toInt()
-            }
-            val fragmentParts = queryParam["fragment"]?.split(",")
-            if (fragmentParts?.size == 3) {
-                config.outboundFragmentBean?.settings?.fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
-                    packets = fragmentParts[0],
-                    length = fragmentParts[1],
-                    interval = fragmentParts[2]
-                )
             }
             var fingerprint = streamSetting.tlsSettings?.fingerprint
             val sni = streamSetting.populateTransportSettings(protocol,
