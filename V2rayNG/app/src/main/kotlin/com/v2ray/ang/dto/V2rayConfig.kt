@@ -103,7 +103,7 @@ data class V2rayConfig(
                                      var flow: String = "")
             }
 
-            data class FragmentBean(var packets: String = "",
+            data class FragmentBean(var packets: String? = null,
                                  var length: String? = null,
                                  var interval: String? = null)
 
