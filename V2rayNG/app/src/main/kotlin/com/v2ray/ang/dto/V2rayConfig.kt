@@ -103,9 +103,9 @@ data class V2rayConfig(
                                      var flow: String = "")
             }
 
-            data class FragmentBean(var packets: String = "",
-                                 var length: String = "10-20",
-                                 var interval: String = "10-20")
+            data class FragmentBean(var packets: String? = null,
+                                 var length: String? = null,
+                                 var interval: String? = null)
 
             data class ServersBean(var address: String = "",
                                    var method: String = "chacha20-poly1305",
@@ -191,7 +191,8 @@ data class V2rayConfig(
                                    var tcpKeepAliveIdle: Int? = null,
                                    var tcpFastOpen: Boolean? = null,
                                    var tproxy: String? = null,
-                                   var mark: Int? = null)
+                                   var mark: Int? = null,
+                                   var dialerProxy: String? = null)
 
             data class TlsSettingsBean(var allowInsecure: Boolean = false,
                                        var serverName: String = "",
