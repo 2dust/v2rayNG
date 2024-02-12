@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
@@ -117,13 +118,27 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private val chooseFile =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { it ->
             val uri = it.data?.data
             if (it.resultCode == RESULT_OK && uri != null) {
+                val assetId = Utils.getUuid()
                 try {
+                    val assetItem = AssetUrlItem(
+                        getCursorName(uri) ?: uri.toString(),
+                        "file"
+                    )
+
+                    // check remarks unique
+                    val assetList = MmkvManager.decodeAssetUrls()
+                    if (assetList.any { it.second.remarks == assetItem.remarks && it.first != assetId }) {
+                        toast(R.string.msg_remark_is_duplicate)
+                        return@registerForActivityResult
+                    }
+                    assetStorage?.encode(assetId, Gson().toJson(assetItem))
                     copyFile(uri)
                 } catch (e: Exception) {
                     toast(R.string.toast_asset_copy_failed)
+                    MmkvManager.removeAssetUrl(assetId)
                 }
             }
         }
@@ -252,7 +267,7 @@ class UserAssetActivity : BaseActivity() {
                 holder.itemUserAssetBinding.layoutEdit.visibility = GONE
                 holder.itemUserAssetBinding.layoutRemove.visibility = GONE
             } else {
-                holder.itemUserAssetBinding.layoutEdit.visibility = VISIBLE
+                holder.itemUserAssetBinding.layoutEdit.visibility = item.second.url.let { if (it == "file") GONE else VISIBLE }
                 holder.itemUserAssetBinding.layoutRemove.visibility = VISIBLE
             }
 
@@ -262,7 +277,7 @@ class UserAssetActivity : BaseActivity() {
                 startActivity(intent)
             }
             holder.itemUserAssetBinding.layoutRemove.setOnClickListener {
-//                file.delete()
+                file?.delete()
                 MmkvManager.removeAssetUrl(item.first)
                 binding.recyclerView.adapter?.notifyItemRemoved(position)
             }

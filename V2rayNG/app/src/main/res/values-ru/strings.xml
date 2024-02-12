@@ -84,6 +84,7 @@
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">Добавить URL ресурса</string>
     <string name="msg_file_not_found">Файл не найден</string>
+    <string name="msg_remark_is_duplicate">Замечания уже есть</string>
     <string name="msg_dialog_progress">Загрузка…</string>
     <string name="menu_item_search">Поиск</string>
     <string name="menu_item_select_all">Выбрать все</string>

@@ -13,6 +13,7 @@ import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
+import java.io.File
 
 class UserAssetUrlActivity : BaseActivity() {
     private lateinit var binding: ActivityUserAssetUrlBinding
@@ -20,6 +21,7 @@ class UserAssetUrlActivity : BaseActivity() {
     var del_config: MenuItem? = null
     var save_config: MenuItem? = null
 
+    val extDir by lazy { File(Utils.userAssetPath(this)) }
     private val assetStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
     private val editAssetId by lazy { intent.getStringExtra("assetId").orEmpty() }
 
@@ -65,6 +67,12 @@ class UserAssetUrlActivity : BaseActivity() {
         var assetId = editAssetId
         if (!json.isNullOrBlank()) {
             assetItem = Gson().fromJson(json, AssetUrlItem::class.java)
+
+            // remove file associated with the asset
+            val file = extDir.resolve(assetItem.remarks)
+            if (file.exists()) {
+                file.delete()
+            }
         } else {
             assetId = Utils.getUuid()
             assetItem = AssetUrlItem()
@@ -72,6 +80,14 @@ class UserAssetUrlActivity : BaseActivity() {
 
         assetItem.remarks = binding.etRemarks.text.toString()
         assetItem.url = binding.etUrl.text.toString()
+
+        // check remarks unique
+        val assetList = MmkvManager.decodeAssetUrls()
+        if (assetList.any { it.second.remarks == assetItem.remarks && it.first != assetId }) {
+            toast(R.string.msg_remark_is_duplicate)
+            return false
+        }
+
 
         if (TextUtils.isEmpty(assetItem.remarks)) {
             toast(R.string.sub_setting_remarks)

@@ -81,6 +81,7 @@
 	<!-- PerAppProxyActivity -->
 	<string name="title_user_asset_add_url">أضف عنوان URL للأصل</string>
 	<string name="msg_file_not_found">لم يتم العثور على الملف</string>
+	<string name="msg_remark_is_duplicate">الملاحظات موجودة بالفعل</string>
 	<string name="msg_dialog_progress">جار التحميل</string>
 	<string name="menu_item_search">بحث</string>
 	<string name="menu_item_select_all">تحديد الكل</string>
