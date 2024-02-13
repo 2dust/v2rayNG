@@ -61,13 +61,13 @@ data class V2rayConfig(
                                 val metadataOnly: Boolean? = null)
     }
 
-    data class OutboundBean(val tag: String = "proxy",
+    data class OutboundBean(var tag: String = "proxy",
                             var protocol: String,
                             var settings: OutSettingsBean? = null,
                             var streamSettings: StreamSettingsBean? = null,
                             val proxySettings: Any? = null,
                             val sendThrough: String? = null,
-                            val mux: MuxBean? = MuxBean(false)) {
+                            var mux: MuxBean? = MuxBean(false)) {
 
         data class OutSettingsBean(var vnext: List<VnextBean>? = null,
                                    var fragment: FragmentBean? = null,
@@ -141,7 +141,7 @@ data class V2rayConfig(
                                       var realitySettings: TlsSettingsBean? = null,
                                       var grpcSettings: GrpcSettingsBean? = null,
                                       val dsSettings: Any? = null,
-                                      val sockopt: SockoptBean? = null
+                                      var sockopt: SockoptBean? = null
         ) {
 
             data class TcpSettingsBean(var header: HeaderBean = HeaderBean(),
