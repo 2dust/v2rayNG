@@ -38,7 +38,8 @@ object V2rayConfigUtil {
                 return Result(true, customConfig)
             }
             val outbound = config.getProxyOutbound() ?: return Result(false, "")
-            val result = getV2rayNonCustomConfig(context, outbound)
+            val fragmentOutbound = config.getFragmentOutbound() ?: V2rayConfig.OutboundBean(protocol = "freedom")
+            val result = getV2rayNonCustomConfig(context, outbound, fragmentOutbound)
             //Log.d(ANG_PACKAGE, result.content)
             return result
         } catch (e: Exception) {
@@ -50,7 +51,7 @@ object V2rayConfigUtil {
     /**
      * 生成v2ray的客户端配置文件
      */
-    private fun getV2rayNonCustomConfig(context: Context, outbound: V2rayConfig.OutboundBean): Result {
+    private fun getV2rayNonCustomConfig(context: Context, outbound: V2rayConfig.OutboundBean, fragmentOutbound: V2rayConfig.OutboundBean): Result {
         val result = Result(false, "")
         //取得默认配置
         val assets = Utils.readTextFromAssets(context, "v2ray_config.json")
@@ -66,9 +67,12 @@ object V2rayConfigUtil {
 
         inbounds(v2rayConfig)
 
-        updateOutboundWithGlobalSettings(outbound)
+        updateOutboundWithGlobalSettings(outbound, fragmentOutbound)
 
         v2rayConfig.outbounds[0] = outbound
+        if (fragmentOutbound.tag == "fragment") {
+            v2rayConfig.outbounds[1] = fragmentOutbound
+        }
 
         routing(v2rayConfig)
 
@@ -401,7 +405,7 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun updateOutboundWithGlobalSettings(outbound: V2rayConfig.OutboundBean): Boolean {
+    private fun updateOutboundWithGlobalSettings(outbound: V2rayConfig.OutboundBean, fragmentOutbound: V2rayConfig.OutboundBean): Boolean {
         try {
             var muxEnabled = settingsStorage?.decodeBool(AppConfig.PREF_MUX_ENABLED, false)
             val protocol = outbound.protocol
@@ -463,11 +467,29 @@ object V2rayConfigUtil {
                 outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host = host!!
             }
 
+            if(settingsStorage?.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == true) {
+                fragmentOutbound.tag = "fragment"
+                fragmentOutbound.mux = null
+                fragmentOutbound.settings = V2rayConfig.OutboundBean.OutSettingsBean(
+                    fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
+                        packets = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_PACKETS) ?: "tlshello",
+                        length = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_LENGTH) ?: "50-100",
+                        interval = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL) ?: "10-20"))
+                fragmentOutbound.streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean(
+                    sockopt = V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
+                        TcpNoDelay = true,
+                        mark = 255))
+            }
+            if (fragmentOutbound.tag == "fragment") {
+                val sockopt = outbound.streamSettings?.sockopt ?: V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean()
+                sockopt.dialerProxy = "fragment"
+                sockopt.mark = 255
+                outbound.streamSettings?.sockopt = sockopt
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             return false
         }
         return true
     }
-
 }
