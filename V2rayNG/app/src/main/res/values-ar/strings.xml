@@ -57,9 +57,6 @@
 	<string name="server_lab_security4">المستخدم (اختياري)</string>
 	<string name="server_lab_encryption">التشفير</string>
 	<string name="server_lab_flow">التدفق</string>
-	<string name="server_lab_public_key" translatable="false">مفتاح عام</string>
-	<string name="server_lab_short_id" translatable="false">ShortId</string>
-	<string name="server_lab_spider_x" translatable="false">SpiderX</string>
 	<string name="server_lab_reserved">Reserved (اختياري)</string>
 	<string name="server_lab_local_address">العنوان المحلي IPv4(اختياري)</string>
 	<string name="server_lab_local_mtu">Mtu(optional, default 1420)</string>
@@ -82,6 +79,9 @@
 	<string name="menu_item_add_file">إضافة ملفات</string>
 	<string name="menu_item_download_file">تحميل الملفات</string>
 	<!-- PerAppProxyActivity -->
+	<string name="title_user_asset_add_url">أضف عنوان URL للأصل</string>
+	<string name="msg_file_not_found">لم يتم العثور على الملف</string>
+	<string name="msg_remark_is_duplicate">الملاحظات موجودة بالفعل</string>
 	<string name="msg_dialog_progress">جار التحميل</string>
 	<string name="menu_item_search">بحث</string>
 	<string name="menu_item_select_all">تحديد الكل</string>
@@ -221,4 +221,6 @@
 		<item>VPN</item>
 		<item>الوكيل فقط</item>
 	</string-array>
+    <string name="menu_item_add_asset">يضيف</string>
+	<string name="menu_item_add_url">إضافة رابط</string>
 </resources>

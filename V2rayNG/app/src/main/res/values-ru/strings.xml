@@ -49,8 +49,6 @@
     <string name="server_lab_request_host">Запрос узла (WS/H2) / Шифрование QUIC</string>
     <string name="server_lab_path">Путь (WS/H2) / Ключ QUIC / Сид KCP / Сервис gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
-    <string name="server_lab_stream_fingerprint" translatable="false">Fingerprint</string>
-    <string name="server_lab_stream_alpn" translatable="false">Alpn</string>
     <string name="server_lab_allow_insecure">Разрешать небезопасные</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">Адрес</string>
@@ -84,6 +82,9 @@
     <string name="menu_item_download_file">Загрузить файлы</string>
 
     <!-- PerAppProxyActivity -->
+    <string name="title_user_asset_add_url">Добавить URL ресурса</string>
+    <string name="msg_file_not_found">Файл не найден</string>
+    <string name="msg_remark_is_duplicate">Замечания уже есть</string>
     <string name="msg_dialog_progress">Загрузка…</string>
     <string name="menu_item_search">Поиск</string>
     <string name="menu_item_select_all">Выбрать все</string>
@@ -256,5 +257,7 @@
         <item>VPN</item>
         <item>Только прокси</item>
     </string-array>
+    <string name="menu_item_add_asset">Добавлять</string>
+    <string name="menu_item_add_url">Добавить ссылку</string>
 
 </resources>

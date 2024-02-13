@@ -82,6 +82,9 @@
     <string name="menu_item_download_file">دانلود فایل‌ها</string>
 
     <!-- PerAppProxyActivity -->
+    <string name="title_user_asset_add_url">URL را اضافه کنید</string>
+    <string name="msg_file_not_found">فایل پیدا نشد</string>
+    <string name="msg_remark_is_duplicate">نام قبلاً وجود دارد</string>
     <string name="msg_dialog_progress">بارگذاری</string>
     <string name="menu_item_search">جستجو</string>
     <string name="menu_item_select_all">انتخاب همه</string>
@@ -253,5 +256,7 @@
         <item>VPN</item>
         <item>فقط پروکسی</item>
     </string-array>
+    <string name="menu_item_add_asset">افزودن</string>
+    <string name="menu_item_add_url">افزودن لینک</string>
 
 </resources>

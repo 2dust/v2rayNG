@@ -2,10 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/add_file"
         android:icon="@drawable/ic_add_24dp"
-        android:title="@string/menu_item_add_file"
-        app:showAsAction="ifRoom" />
+        android:title="@string/menu_item_add_asset"
+        app:showAsAction="ifRoom" >
+        <menu>
+            <item
+                android:id="@+id/add_file"
+                android:title="@string/menu_item_add_file"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/add_url"
+                android:title="@string/menu_item_add_url"
+                app:showAsAction="never" />
+        </menu>
+    </item>
     <item
         android:id="@+id/download_file"
         android:icon="@drawable/ic_cloud_download_24dp"

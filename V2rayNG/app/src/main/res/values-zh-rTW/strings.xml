@@ -82,6 +82,9 @@
     <string name="menu_item_download_file">下載檔案</string>
 
     <!-- PerAppProxyActivity -->
+    <string name="title_user_asset_add_url">新增資產網址</string>
+    <string name="msg_file_not_found">文件未找到</string>
+    <string name="msg_remark_is_duplicate">備註已經存在</string>
     <string name="msg_dialog_progress">載入</string>
     <string name="menu_item_search">搜尋</string>
     <string name="menu_item_select_all">全選</string>
@@ -253,5 +256,7 @@
     </string-array>
     <string name="import_subscription_success">訂閱導入成功</string>
     <string name="import_subscription_failure">導入訂閱失敗</string>
+    <string name="menu_item_add_asset">添加</string>
+    <string name="menu_item_add_url">添加連結</string>
 
 </resources>

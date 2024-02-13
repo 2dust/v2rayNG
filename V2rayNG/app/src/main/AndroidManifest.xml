@@ -93,6 +93,9 @@
         <activity
             android:exported="false"
             android:name=".ui.UserAssetActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.UserAssetUrlActivity" />
 
         <activity
             android:exported="false"

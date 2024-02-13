@@ -82,6 +82,9 @@
     <string name="menu_item_download_file">Tải xuống tệp tin</string>
 
     <!-- PerAppProxyActivity -->
+    <string name="title_user_asset_add_url">Thêm URL nội dung</string>
+    <string name="msg_file_not_found">Không tìm thấy tập tin</string>
+    <string name="msg_remark_is_duplicate">Nhận xét đã tồn tại</string>
     <string name="msg_dialog_progress">Đang tải...</string>
     <string name="menu_item_search">Tìm kiếm</string>
     <string name="menu_item_select_all">Chọn tất cả</string>
@@ -255,5 +258,7 @@
         <item>Chế độ VPN</item>
         <item>Chế độ Proxy</item>
     </string-array>
+    <string name="menu_item_add_asset">Thêm vào</string>
+    <string name="menu_item_add_url">Thêm liên kết</string>
 
 </resources>
