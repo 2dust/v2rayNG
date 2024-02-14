@@ -57,7 +57,7 @@ data class ServerConfig(
     }
 
     fun getFragmentOutbound(): V2rayConfig.OutboundBean? {
-        return fullConfig?.getProxyOutbound()
+        return null // TODO: fullConfig?.getFragmentOutbound()
     }
 
     fun getAllOutboundTags(): MutableList<String> {
