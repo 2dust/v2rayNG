@@ -24,7 +24,7 @@ jobs:
         java-version: '17'
 
     - name: Setup Golang
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: '1.21.4'
 
