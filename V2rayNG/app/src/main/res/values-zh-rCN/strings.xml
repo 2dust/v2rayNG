@@ -103,6 +103,7 @@
     <string name="title_pref_per_app_proxy">分应用代理</string>
     <string name="summary_pref_per_app_proxy">常规:勾选的App被代理,未勾选的直连;\n绕行模式:勾选的App直连,未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
 
+    <string name="title_mux_settings">Mux 多路复用 设置</string>
     <string name="title_pref_mux_enabled">启用 Mux 多路复用</string>
     <string name="summary_pref_mux_enabled">减低延时，但可能会断流，建议不要启用。\nTCP，UDP 及 QUIC 流量处理方式下方可选。</string>
     <string name="title_pref_mux_concurency">TCP 复用子链接数（可填 -1 至 1024）</string>
@@ -225,6 +226,16 @@
     <string name="connection_connected">"已连接，点击测试连接"</string>
     <string name="connection_not_connected">"未连接"</string>
 
+    <string name="import_subscription_success">订阅导入成功</string>
+    <string name="import_subscription_failure">导入订阅失败</string>
+    <string name="menu_item_add_asset">添加</string>
+    <string name="menu_item_add_url">添加链接</string>
+    <string name="title_fragment_settings">分片（fragment） 设置</string>
+    <string name="title_pref_fragment_packets">分片方式</string>
+    <string name="title_pref_fragment_length">分片包长（最小-最大）</string>
+    <string name="title_pref_fragment_interval">分片间隔（最小-最大）</string>
+    <string name="title_pref_fragment_enabled">启用分片（fragment）</string>
+
     <string-array name="share_method">
         <item>二维码</item>
         <item>导出至剪贴板</item>
@@ -255,9 +266,5 @@
         <item>VPN</item>
         <item>仅代理</item>
     </string-array>
-    <string name="import_subscription_success">订阅导入成功</string>
-    <string name="import_subscription_failure">导入订阅失败</string>
-    <string name="menu_item_add_asset">添加</string>
-    <string name="menu_item_add_url">添加链接</string>
 
 </resources>

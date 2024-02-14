@@ -103,6 +103,7 @@
     <string name="title_pref_per_app_proxy">Proxy 個別應用程式</string>
     <string name="summary_pref_per_app_proxy">常規：勾選的 App 啟用 Proxy，未勾選的直接連線；\n繞行模式：勾選的 App 直接連線，未勾選的啟用 Proxy。\n可在選單中選擇自動選中需 Proxy 應用</string>
 
+    <string name="title_mux_settings">Mux 設定</string>
     <string name="title_pref_mux_enabled">啟用 Mux 多路復用</string>
     <string name="summary_pref_mux_enabled">減低延時 但可能會斷流\nTCP，UDP 及 QUIC 流量處理方式下方可選</string>
     <string name="title_pref_mux_concurency">TCP 復用子鏈接數（可填 -1 至 1024）</string>
@@ -225,6 +226,16 @@
     <string name="connection_connected">"已連線，輕觸以檢查連線能力"</string>
     <string name="connection_not_connected">"未連線"</string>
 
+    <string name="import_subscription_success">訂閱導入成功</string>
+    <string name="import_subscription_failure">導入訂閱失敗</string>
+    <string name="menu_item_add_asset">添加</string>
+    <string name="menu_item_add_url">添加連結</string>
+    <string name="title_fragment_settings">分片（fragment） 設定</string>
+    <string name="title_pref_fragment_packets">分片方式</string>
+    <string name="title_pref_fragment_length">分片包长（最小-最大）</string>
+    <string name="title_pref_fragment_interval">分片间隔（最小-最大）</string>
+    <string name="title_pref_fragment_enabled">启用分片（fragment）</string>
+
     <string-array name="share_method">
         <item>QR Code</item>
         <item>匯出至剪貼簿</item>
@@ -254,9 +265,5 @@
         <item>VPN</item>
         <item>僅 Proxy</item>
     </string-array>
-    <string name="import_subscription_success">訂閱導入成功</string>
-    <string name="import_subscription_failure">導入訂閱失敗</string>
-    <string name="menu_item_add_asset">添加</string>
-    <string name="menu_item_add_url">添加連結</string>
 
 </resources>

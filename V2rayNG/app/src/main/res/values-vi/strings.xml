@@ -103,6 +103,7 @@
     <string name="title_pref_per_app_proxy">Proxy Theo Ứng Dụng</string>
     <string name="summary_pref_per_app_proxy">- Bình thường: Ứng dụng đã chọn sẽ kết nối thông qua Proxy, chưa chọn sẽ kết nối trực tiếp. \n- Chế độ Bypass: Ứng dụng đã chọn sẽ kết nối trực tiếp, chưa chọn sẽ kết nối qua Proxy. \n- Nếu bạn đang ở Trung Quốc thì vào Menu, chọn Tự động chọn ứng dụng Proxy.</string>
 
+    <string name="title_mux_settings">Mux Settings</string>
     <string name="title_pref_mux_enabled">Bật Mux</string>
     <string name="summary_pref_mux_enabled">Giảm độ trễ trong bước bắt tay của kết nối TCP. Mux phân phối dữ liệu từ nhiều kết nối TCP trên một kết nối TCP duy nhất. Không nên sử dụng Mux để xem video, download file hoặc chạy speedtest vì thường không hiệu quả.</string>
     <string name="title_pref_mux_concurency">TCP connections (từ 1 đến 1024)</string>
