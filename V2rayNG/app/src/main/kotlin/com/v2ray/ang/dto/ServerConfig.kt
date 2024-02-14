@@ -56,6 +56,10 @@ data class ServerConfig(
         return fullConfig?.getProxyOutbound()
     }
 
+    fun getFragmentOutbound(): V2rayConfig.OutboundBean? {
+        return fullConfig?.getFragmentOutbound()
+    }
+
     fun getAllOutboundTags(): MutableList<String> {
         if (configType != EConfigType.CUSTOM) {
             return mutableListOf(TAG_AGENT, TAG_DIRECT, TAG_BLOCKED)

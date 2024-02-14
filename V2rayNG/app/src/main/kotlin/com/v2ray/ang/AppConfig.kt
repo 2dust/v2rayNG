@@ -44,6 +44,10 @@ object AppConfig {
     const val PREF_MUX_CONCURRENCY = "pref_mux_concurency"
     const val PREF_MUX_XUDP_CONCURRENCY = "pref_mux_xudp_concurency"
     const val PREF_MUX_XUDP_QUIC = "pref_mux_xudp_quic"
+    const val PREF_FRAGMENT_ENABLED = "pref_fragment_enabled"
+    const val PREF_FRAGMENT_PACKETS = "pref_fragment_packets"
+    const val PREF_FRAGMENT_LENGTH = "pref_fragment_length"
+    const val PREF_FRAGMENT_INTERVAL = "pref_fragment_interval"
 
     const val HTTP_PROTOCOL: String = "http://"
     const val HTTPS_PROTOCOL: String = "https://"
