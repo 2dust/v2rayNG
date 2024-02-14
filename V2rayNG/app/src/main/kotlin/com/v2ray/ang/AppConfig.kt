@@ -49,8 +49,9 @@ object AppConfig {
     const val PREF_FRAGMENT_LENGTH = "pref_fragment_length"
     const val PREF_FRAGMENT_INTERVAL = "pref_fragment_interval"
 
-    const val HTTP_PROTOCOL: String = "http://"
-    const val HTTPS_PROTOCOL: String = "https://"
+    const val PROTOCOL_HTTP: String = "http://"
+    const val PROTOCOL_HTTPS: String = "https://"
+    const val PROTOCOL_FREEDOM: String = "freedom"
 
     const val BROADCAST_ACTION_SERVICE = "com.v2ray.ang.action.service"
     const val BROADCAST_ACTION_ACTIVITY = "com.v2ray.ang.action.activity"
@@ -65,6 +66,7 @@ object AppConfig {
     const val TAG_AGENT = "proxy"
     const val TAG_DIRECT = "direct"
     const val TAG_BLOCKED = "block"
+    const val TAG_FRAGMENT = "fragment"
 
     const val androidpackagenamelistUrl =
         "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"

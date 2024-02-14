@@ -25,8 +25,8 @@ class UrlSchemeActivity : BaseActivity() {
                     if ("text/plain" == type) {
                         intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
                             val uri = Uri.parse(it)
-                            if (uri.scheme?.startsWith(AppConfig.HTTPS_PROTOCOL) == true || uri.scheme?.startsWith(
-                                    AppConfig.HTTP_PROTOCOL
+                            if (uri.scheme?.startsWith(AppConfig.PROTOCOL_HTTPS) == true || uri.scheme?.startsWith(
+                                    AppConfig.PROTOCOL_HTTP
                                 ) == true
                             ) {
                                 val name = uri.getQueryParameter("name") ?: "Subscription"

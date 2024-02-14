@@ -11,8 +11,8 @@ import com.google.gson.GsonBuilder
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_CONFIG
-import com.v2ray.ang.AppConfig.HTTPS_PROTOCOL
-import com.v2ray.ang.AppConfig.HTTP_PROTOCOL
+import com.v2ray.ang.AppConfig.PROTOCOL_HTTPS
+import com.v2ray.ang.AppConfig.PROTOCOL_HTTP
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_MTU
 import com.v2ray.ang.R
@@ -24,7 +24,6 @@ import java.net.URI
 import java.util.*
 import com.v2ray.ang.extension.idnHost
 import com.v2ray.ang.extension.removeWhiteSpace
-import com.v2ray.ang.extension.toast
 
 object AngConfigManager {
     private val mainStorage by lazy {
@@ -216,8 +215,8 @@ object AngConfigManager {
             }
 
             //maybe sub
-            if (TextUtils.isEmpty(subid) && (str.startsWith(HTTP_PROTOCOL) || str.startsWith(
-                    HTTPS_PROTOCOL
+            if (TextUtils.isEmpty(subid) && (str.startsWith(PROTOCOL_HTTP) || str.startsWith(
+                    PROTOCOL_HTTPS
                 ))
             ) {
                 MmkvManager.importUrlAsSubscription(str)
