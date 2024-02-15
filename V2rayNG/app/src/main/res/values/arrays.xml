@@ -60,6 +60,10 @@
         <item>reality</item>
     </string-array>
 
+    <string-array name="fragment_packets" translatable="false">
+        <item>tlshello</item>
+    </string-array>
+
     <string-array name="streamsecurity_utls" translatable="false">
         <item></item>
         <item>chrome</item>

@@ -41,6 +41,10 @@ class SettingsActivity : BaseActivity() {
         private val muxXudpConcurrency by lazy { findPreference<EditTextPreference>(AppConfig.PREF_MUX_XUDP_CONCURRENCY) }
         private val muxXudpQuic by lazy { findPreference<ListPreference>(AppConfig.PREF_MUX_XUDP_QUIC) }
 
+        private val fragment by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_FRAGMENT_ENABLED) }
+        private val fragmentPackets by lazy { findPreference<ListPreference>(AppConfig.PREF_FRAGMENT_PACKETS) }
+        private val fragmentLength by lazy { findPreference<EditTextPreference>(AppConfig.PREF_FRAGMENT_LENGTH) }
+        private val fragmentInterval by lazy { findPreference<EditTextPreference>(AppConfig.PREF_FRAGMENT_INTERVAL) }
 
         //        val autoRestart by lazy { findPreference(PREF_AUTO_RESTART) as CheckBoxPreference }
         private val remoteDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_REMOTE_DNS) }
@@ -168,6 +172,23 @@ class SettingsActivity : BaseActivity() {
                 updateMuxXudpConcurrency(newValue as String)
                 true
             }
+
+            fragment?.setOnPreferenceChangeListener { _, newValue ->
+                updateFragment(newValue as Boolean)
+                true
+            }
+            fragmentPackets?.setOnPreferenceChangeListener { _, newValue ->
+                updateFragmentPackets(newValue as String)
+                true
+            }
+            fragmentLength?.setOnPreferenceChangeListener { _, newValue ->
+                updateFragmentLength(newValue as String)
+                true
+            }
+            fragmentInterval?.setOnPreferenceChangeListener { _, newValue ->
+                updateFragmentInterval(newValue as String)
+                true
+            }
         }
 
         override fun onStart() {
@@ -184,6 +205,10 @@ class SettingsActivity : BaseActivity() {
             updateMux(defaultSharedPreferences.getBoolean(AppConfig.PREF_MUX_ENABLED, false))
             muxConcurrency?.summary = defaultSharedPreferences.getString(AppConfig.PREF_MUX_CONCURRENCY, "8")
             muxXudpConcurrency?.summary = defaultSharedPreferences.getString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
+            updateFragment(defaultSharedPreferences.getBoolean(AppConfig.PREF_FRAGMENT_ENABLED, false))
+            fragmentPackets?.summary = defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello")
+            fragmentLength?.summary = defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
+            fragmentInterval?.summary = defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
             autoUpdateInterval?.summary = defaultSharedPreferences.getString(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
             autoUpdateInterval?.isEnabled = defaultSharedPreferences.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
 
@@ -261,9 +286,9 @@ class SettingsActivity : BaseActivity() {
             
         private fun updateMux(enabled: Boolean) {
             val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
-            muxConcurrency?.isEnabled = enabled
-            muxXudpConcurrency?.isEnabled = enabled
-            muxXudpQuic?.isEnabled = enabled
+            muxConcurrency?.isVisible = enabled
+            muxXudpConcurrency?.isVisible = enabled
+            muxXudpQuic?.isVisible = enabled
             if (enabled) {
                 updateMuxConcurrency(defaultSharedPreferences.getString(AppConfig.PREF_MUX_CONCURRENCY, "8"))
                 updateMuxXudpConcurrency(defaultSharedPreferences.getString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8"))
@@ -286,6 +311,27 @@ class SettingsActivity : BaseActivity() {
                 muxXudpConcurrency?.summary = concurrency.toString()
                 muxXudpQuic?.isEnabled = concurrency >= 0
             }
+        }
+
+        private fun updateFragment(enabled: Boolean) {
+            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
+            fragmentPackets?.isVisible = enabled
+            fragmentLength?.isVisible = enabled
+            fragmentInterval?.isVisible = enabled
+            if (enabled) {
+                updateFragmentPackets(defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello"))
+                updateFragmentLength(defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100"))
+                updateFragmentInterval(defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20"))
+            }
+        }
+        private fun updateFragmentPackets(value: String?) {
+            fragmentPackets?.summary = value.toString()
+        }
+        private fun updateFragmentLength(value: String?) {
+            fragmentLength?.summary = value.toString()
+        }
+        private fun updateFragmentInterval(value: String?) {
+            fragmentInterval?.summary = value.toString()
         }
     }
 

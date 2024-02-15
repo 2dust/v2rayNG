@@ -7,31 +7,6 @@
         android:summary="@string/summary_pref_sniffing_enabled"
         android:title="@string/title_pref_sniffing_enabled" />
 
-    <CheckBoxPreference
-        android:key="pref_mux_enabled"
-        android:summary="@string/summary_pref_mux_enabled"
-        android:title="@string/title_pref_mux_enabled" />
-
-    <EditTextPreference
-        android:key="pref_mux_concurency"
-        android:summary="8"
-        android:inputType="number"
-        android:title="@string/title_pref_mux_concurency" />
-
-    <EditTextPreference
-        android:key="pref_mux_xudp_concurency"
-        android:summary="8"
-        android:inputType="number"
-        android:title="@string/title_pref_mux_xudp_concurency" />
-
-    <ListPreference
-        android:defaultValue="reject"
-        android:entries="@array/mux_xudp_quic_entries"
-        android:entryValues="@array/mux_xudp_quic_value"
-        android:key="pref_mux_xudp_quic"
-        android:summary="%s"
-        android:title="@string/title_pref_mux_xudp_quic" />
-
     <PreferenceCategory android:title="@string/title_vpn_settings">
         <CheckBoxPreference
             android:key="pref_per_app_proxy"
@@ -83,6 +58,57 @@
             android:title="@string/title_pref_routing_mode" />
 
     </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_mux_settings">
+        <CheckBoxPreference
+            android:key="pref_mux_enabled"
+            android:summary="@string/summary_pref_mux_enabled"
+            android:title="@string/title_pref_mux_enabled" />
+
+        <EditTextPreference
+            android:key="pref_mux_concurency"
+            android:summary="8"
+            android:inputType="number"
+            android:title="@string/title_pref_mux_concurency" />
+
+        <EditTextPreference
+            android:key="pref_mux_xudp_concurency"
+            android:summary="8"
+            android:inputType="number"
+            android:title="@string/title_pref_mux_xudp_concurency" />
+
+        <ListPreference
+            android:defaultValue="reject"
+            android:entries="@array/mux_xudp_quic_entries"
+            android:entryValues="@array/mux_xudp_quic_value"
+            android:key="pref_mux_xudp_quic"
+            android:summary="%s"
+            android:title="@string/title_pref_mux_xudp_quic" />
+        </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_fragment_settings">
+    <CheckBoxPreference
+        android:key="pref_fragment_enabled"
+        android:title="@string/title_pref_fragment_enabled"/>
+
+    <ListPreference
+        android:key="pref_fragment_packets"
+        android:defaultValue="tlshello"
+        android:entries="@array/fragment_packets"
+        android:entryValues="@array/fragment_packets"
+        android:summary="%s"
+        android:title="@string/title_pref_fragment_packets" />
+
+    <EditTextPreference
+        android:key="pref_fragment_length"
+        android:summary="50-100"
+        android:title="@string/title_pref_fragment_length" />
+
+    <EditTextPreference
+        android:key="pref_fragment_interval"
+        android:summary="10-20"
+        android:title="@string/title_pref_fragment_interval" />
+</PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_sub_setting">
         <CheckBoxPreference
