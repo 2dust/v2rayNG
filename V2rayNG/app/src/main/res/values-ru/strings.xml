@@ -22,14 +22,14 @@
     <string name="menu_item_add_config">Добавить профиль</string>
     <string name="menu_item_save_config">Сохранить профиль</string>
     <string name="menu_item_del_config">Удалить профиль</string>
-    <string name="menu_item_import_config_qrcode">Импорт профиля из QR-кода</string>
-    <string name="menu_item_import_config_clipboard">Импорт профиля из буфера обмена</string>
-    <string name="menu_item_import_config_manually_vmess">Ручной ввод профиля Vmess</string>
-    <string name="menu_item_import_config_manually_vless">Ручной ввод профиля VLESS</string>
-    <string name="menu_item_import_config_manually_ss">Ручной ввод профиля Shadowsocks</string>
-    <string name="menu_item_import_config_manually_socks">Ручной ввод профиля Socks</string>
-    <string name="menu_item_import_config_manually_trojan">Ручной ввод профиля Trojan</string>
-    <string name="menu_item_import_config_manually_wireguard">Ручной ввод профиля Wireguard</string>
+    <string name="menu_item_import_config_qrcode">Импорт из QR-кода</string>
+    <string name="menu_item_import_config_clipboard">Импорт из буфера обмена</string>
+    <string name="menu_item_import_config_manually_vmess">Ручной ввод Vmess</string>
+    <string name="menu_item_import_config_manually_vless">Ручной ввод VLESS</string>
+    <string name="menu_item_import_config_manually_ss">Ручной ввод Shadowsocks</string>
+    <string name="menu_item_import_config_manually_socks">Ручной ввод Socks</string>
+    <string name="menu_item_import_config_manually_trojan">Ручной ввод Trojan</string>
+    <string name="menu_item_import_config_manually_wireguard">Ручной ввод Wireguard</string>
     <string name="menu_item_import_config_custom">Пользовательский профиль</string>
     <string name="menu_item_import_config_custom_clipboard">Импорт из буфера обмена</string>
     <string name="menu_item_import_config_custom_local">Импорт из файла</string>
@@ -78,13 +78,15 @@
     <string name="toast_malformed_josn">Профиль повреждён</string>
     <string name="server_lab_request_host6">Узел (SNI) (необязательно)</string>
     <string name="toast_asset_copy_failed">Невозможно скопировать файл, используйте файловый менеджер</string>
+    <string name="menu_item_add_asset">Добавить ресурс</string>
     <string name="menu_item_add_file">Добавить файлы</string>
+    <string name="menu_item_add_url">Добавить URL</string>
     <string name="menu_item_download_file">Загрузить файлы</string>
-
-    <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">Добавить URL ресурса</string>
     <string name="msg_file_not_found">Файл не найден</string>
-    <string name="msg_remark_is_duplicate">Замечания уже есть</string>
+    <string name="msg_remark_is_duplicate">Описание уже существует</string>
+
+    <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Загрузка…</string>
     <string name="menu_item_search">Поиск</string>
     <string name="menu_item_select_all">Выбрать все</string>
@@ -101,8 +103,9 @@
     <string name="title_advanced">Расширенные настройки</string>
     <string name="title_vpn_settings">Настройки VPN</string>
     <string name="title_pref_per_app_proxy">Прокси для выбранных приложений</string>
-    <string name="summary_pref_per_app_proxy">Основной: выделенное приложение соединяется через прокси, не выделенное — напрямую; \n\nРежим обхода: выделенное приложение соединяется напрямую, не выделенное — через прокси.\n\nЕсть возможность автоматического выбора проксируемых приложений в меню.</string>
+    <string name="summary_pref_per_app_proxy">Основной: выделенное приложение соединяется через прокси, не выделенное — напрямую;\n\nРежим обхода: выделенное приложение соединяется напрямую, не выделенное — через прокси.\n\nЕсть возможность автоматического выбора проксируемых приложений в меню.</string>
 
+    <string name="title_mux_settings">Настройки мультиплексирования</string>
     <string name="title_pref_mux_enabled">Использовать мультиплексирование</string>
     <string name="summary_pref_mux_enabled">Быстрее, но это может привести к нестабильному соединению.\nНиже можно настроить обработку TCP, UDP и QUIC.</string>
     <string name="title_pref_mux_concurency">TCP-соединения (диапазон от -1 до 1024)</string>
@@ -227,6 +230,11 @@
 
     <string name="import_subscription_success">Подписка импортирована</string>
     <string name="import_subscription_failure">Невозможно импортировать подписку</string>
+    <string name="title_fragment_settings">Настройки фрагментирования</string>
+    <string name="title_pref_fragment_packets">Фрагментирование пакетов</string>
+    <string name="title_pref_fragment_length">Длина фрагмента (от … до)</string>
+    <string name="title_pref_fragment_interval">Интервал фрагментов (от … до)</string>
+    <string name="title_pref_fragment_enabled">Использовать фрагментирование</string>
 
     <string-array name="share_method">
         <item>QR-код</item>
@@ -257,7 +265,5 @@
         <item>VPN</item>
         <item>Только прокси</item>
     </string-array>
-    <string name="menu_item_add_asset">Добавлять</string>
-    <string name="menu_item_add_url">Добавить ссылку</string>
 
 </resources>
