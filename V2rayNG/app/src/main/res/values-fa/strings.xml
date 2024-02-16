@@ -69,7 +69,7 @@
     <string name="toast_decoding_failed">رمزگشایی انجام نشد</string>
     <string name="title_file_chooser">انتخاب فایل کانفیگ</string>
     <string name="toast_require_file_manager">لطفا یک برنامه مدیریت فایل نصب کنید.</string>
-    <string name="server_customize_config">سفارشی‌سازی کانفیگ</string>
+    <string name="server_customize_config">کانفیگ سفارشی</string>
     <string name="toast_config_file_invalid">کانفیگ معتبر نیست</string>
     <string name="server_lab_content">محتوا</string>
     <string name="toast_none_data_clipboard">هیچ داده‌ای در کلیپ‌بورد وجود ندارد</string>
@@ -95,7 +95,6 @@
     <string name="menu_item_export_proxy_app">خروجی گرفتن در کلیپ‌بورد</string>
     <string name="menu_item_import_proxy_app">وارد کردن از کلیپ‌بورد</string>
 
-
     <!-- Preferences -->
     <string name="title_settings">تنظیمات</string>
     <string name="title_advanced">تنظیمات پیشرفته</string>
@@ -103,6 +102,7 @@
     <string name="title_pref_per_app_proxy">پروکسی به تفکیک برنامه</string>
     <string name="summary_pref_per_app_proxy">عمومی: برنامه بررسی شده پروکسی است، اتصال مستقیم بدون بررسی است. \nحالت bypass: برنامه بررسی شده مستقیما متصل است، پراکسی بررسی نشده است. \nگزینه‌ای برای انتخاب خودکار پروکسی برنامه در منو است</string>
 
+    <string name="title_mux_settings">تنظیمات Mux</string>
     <string name="title_pref_mux_enabled">فعال کردن Mux</string>
     <string name="summary_pref_mux_enabled">سریعتر است، اما ممکن است باعث اتصال ناپایدار شود\nمخزن ترافیک TCP با 8 اتصال پیش‌فرض، نحوه مدیریت UDP و QUIC را در زیر سفارشی کنید</string>
     <string name="title_pref_mux_concurency">اتصالات TCP (محدوده -1 تا 1024)</string>
@@ -111,7 +111,7 @@
     <string-array name="mux_xudp_quic_entries">
         <item>رد کردن</item>
         <item>مجاز</item>
-        <item>جست و خیز کردن</item>
+        <item>پریدن</item>
     </string-array>
 
     <string name="title_pref_speed_enabled">فعال کردن نمایش سرعت</string>
@@ -226,7 +226,11 @@
 
     <string name="import_subscription_success">اشتراک با موفقیت ذخیره شد</string>
     <string name="import_subscription_failure">ذخیره اشتراک ناموفق بود</string>
-
+    <string name="title_fragment_settings">تنظیمات Fragment</string>
+    <string name="title_pref_fragment_packets">Fragment Packets</string>
+    <string name="title_pref_fragment_length">Fragment Length (min-max)</string>
+    <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
+    <string name="title_pref_fragment_enabled">فعال کردن Fragment</string>
     <string-array name="share_method">
         <item>QRcode</item>
         <item>خروجی گرفتن در کلیپ‌بورد</item>
@@ -247,7 +251,7 @@
     <string-array name="routing_mode">
         <item>پروکسی سراسری</item>
         <item>دور زدن آدرس LAN و سپس پروکسی</item>
-        <item>دور زذن آدرس mainland و سپس پروکسی</item>
+        <item>دور زدن آدرس mainland و سپس پروکسی</item>
         <item>دور زدن LAN و آدرس mainland و سپس پروکسی</item>
         <item>مستقیم سراسری</item>
     </string-array>
