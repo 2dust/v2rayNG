@@ -15,16 +15,16 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       
     - name: Setup Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
 
     - name: Setup Golang
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: '1.21.4'
 
@@ -35,7 +35,7 @@ jobs:
 
 
     - name: Setup Android environment
-      uses: android-actions/setup-android@v2
+      uses: android-actions/setup-android@v3
   
 
     - name: Build dependencies
@@ -58,7 +58,7 @@ jobs:
         ./gradlew assembleDebug
 
     - name: Upload APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: apk
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/
