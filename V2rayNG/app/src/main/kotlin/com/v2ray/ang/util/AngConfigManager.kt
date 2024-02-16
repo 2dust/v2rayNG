@@ -486,7 +486,7 @@ object AngConfigManager {
         allowInsecure: Boolean
     ): Boolean {
         return runCatching {
-            val uri = URI(uriString)
+            val uri = URI(Utils.fixIllegalUrl(uriString))
             check(uri.scheme == "vmess")
             val (_, protocol, tlsStr, uuid, alterId) =
                 Regex("(tcp|http|ws|kcp|quic|grpc)(\\+tls)?:([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12})")

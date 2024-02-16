@@ -6,6 +6,7 @@ import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.dto.ServerAffiliationInfo
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.SubscriptionItem
+import java.net.URI
 
 object MmkvManager {
     const val ID_MAIN = "MAIN"
@@ -121,8 +122,9 @@ object MmkvManager {
                 return 0
             }
         }
+        val uri = URI(Utils.fixIllegalUrl(url))
         val subItem = SubscriptionItem()
-        subItem.remarks = "import sub"
+        subItem.remarks = Utils.urlDecode(uri.fragment ?: "import sub")
         subItem.url = url
         subStorage?.encode(Utils.getUuid(), Gson().toJson(subItem))
         return 1
