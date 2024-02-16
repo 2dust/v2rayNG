@@ -154,11 +154,13 @@ object V2rayConfigUtil {
 
     private fun fakedns(v2rayConfig: V2rayConfig) {
         if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true
-            || settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
+            || settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
+        ) {
             v2rayConfig.fakedns = listOf(V2rayConfig.FakednsBean())
-            v2rayConfig.outbounds.filter { it.protocol == PROTOCOL_FREEDOM && it.tag == TAG_DIRECT }.forEach {
-                it.settings?.domainStrategy = "UseIP"
-            }
+            v2rayConfig.outbounds.filter { it.protocol == PROTOCOL_FREEDOM && it.tag == TAG_DIRECT }
+                .forEach {
+                    it.settings?.domainStrategy = "UseIP"
+                }
         }
     }
 
@@ -564,33 +566,44 @@ object V2rayConfigUtil {
 
     private fun updateOutboundFragment(v2rayConfig: V2rayConfig): Boolean {
         try {
-            if (settingsStorage?.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == true) {
-                val fragmentOutbound =
-                    V2rayConfig.OutboundBean(protocol = PROTOCOL_FREEDOM, tag = TAG_FRAGMENT, mux = null)
-                fragmentOutbound.settings = V2rayConfig.OutboundBean.OutSettingsBean(
-                    fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
-                        packets = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_PACKETS)
-                            ?: "tlshello",
-                        length = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_LENGTH)
-                            ?: "50-100",
-                        interval = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL)
-                            ?: "10-20"
-                    )
-                )
-                fragmentOutbound.streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean(
-                    sockopt = V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
-                        TcpNoDelay = true,
-                        mark = 255
-                    )
-                )
-                v2rayConfig.outbounds.add(fragmentOutbound)
+            if (settingsStorage?.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == false) {
+                return true
+            }
+            if (v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.TLS
+                && v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.REALITY
+            ) {
+                return true
+            }
 
-                //proxy chain
-                v2rayConfig.outbounds[0].streamSettings?.sockopt =
+            val fragmentOutbound =
+                V2rayConfig.OutboundBean(
+                    protocol = PROTOCOL_FREEDOM,
+                    tag = TAG_FRAGMENT,
+                    mux = null
+                )
+            fragmentOutbound.settings = V2rayConfig.OutboundBean.OutSettingsBean(
+                fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
+                    packets = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_PACKETS)
+                        ?: "tlshello",
+                    length = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_LENGTH)
+                        ?: "50-100",
+                    interval = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL)
+                        ?: "10-20"
+                )
+            )
+            fragmentOutbound.streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean(
+                sockopt = V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
+                    TcpNoDelay = true,
+                    mark = 255
+                )
+            )
+            v2rayConfig.outbounds.add(fragmentOutbound)
+
+            //proxy chain
+            v2rayConfig.outbounds[0].streamSettings?.sockopt =
                 V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
                     dialerProxy = TAG_FRAGMENT
                 )
-            }
         } catch (e: Exception) {
             e.printStackTrace()
             return false
