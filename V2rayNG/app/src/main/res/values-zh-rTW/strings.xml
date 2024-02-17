@@ -230,11 +230,11 @@
     <string name="import_subscription_failure">導入訂閱失敗</string>
     <string name="menu_item_add_asset">添加</string>
     <string name="menu_item_add_url">添加連結</string>
-    <string name="title_fragment_settings">分片（fragment） 設定</string>
+    <string name="title_fragment_settings">分片（Fragment） 設定</string>
     <string name="title_pref_fragment_packets">分片方式</string>
     <string name="title_pref_fragment_length">分片包长（最小-最大）</string>
     <string name="title_pref_fragment_interval">分片间隔（最小-最大）</string>
-    <string name="title_pref_fragment_enabled">启用分片（fragment）</string>
+    <string name="title_pref_fragment_enabled">启用分片（Fragment）</string>
 
     <string-array name="share_method">
         <item>QR Code</item>

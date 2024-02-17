@@ -81,10 +81,10 @@ class SettingsActivity : BaseActivity() {
             autoUpdateInterval?.setOnPreferenceChangeListener { _, any ->
                 var nval = any as String
 
-                autoUpdateInterval?.summary = nval
                 // It must be greater than 15 minutes because WorkManager couldn't run tasks under 15 minutes intervals
                 nval =
-                    if (TextUtils.isEmpty(nval) or (nval.toLong() < 15)) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
+                    if (TextUtils.isEmpty(nval) || (nval.toLong() < 15)) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
+                autoUpdateInterval?.summary = nval
                 configureUpdateTask(nval.toLong())
                 true
             }
@@ -286,9 +286,9 @@ class SettingsActivity : BaseActivity() {
             
         private fun updateMux(enabled: Boolean) {
             val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
-            muxConcurrency?.isVisible = enabled
-            muxXudpConcurrency?.isVisible = enabled
-            muxXudpQuic?.isVisible = enabled
+            muxConcurrency?.isEnabled = enabled
+            muxXudpConcurrency?.isEnabled = enabled
+            muxXudpQuic?.isEnabled = enabled
             if (enabled) {
                 updateMuxConcurrency(defaultSharedPreferences.getString(AppConfig.PREF_MUX_CONCURRENCY, "8"))
                 updateMuxXudpConcurrency(defaultSharedPreferences.getString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8"))
@@ -315,9 +315,9 @@ class SettingsActivity : BaseActivity() {
 
         private fun updateFragment(enabled: Boolean) {
             val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
-            fragmentPackets?.isVisible = enabled
-            fragmentLength?.isVisible = enabled
-            fragmentInterval?.isVisible = enabled
+            fragmentPackets?.isEnabled = enabled
+            fragmentLength?.isEnabled = enabled
+            fragmentInterval?.isEnabled = enabled
             if (enabled) {
                 updateFragmentPackets(defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello"))
                 updateFragmentLength(defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100"))
