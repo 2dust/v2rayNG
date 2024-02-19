@@ -77,7 +77,7 @@ val URLConnection.responseLength: Long
     get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) contentLengthLong else contentLength.toLong()
 
 val URI.idnHost: String
-    get() = (host!!).replace("[", "").replace("]", "")
+    get() = host!!.replace("[", "").replace("]", "")
 
 fun String.removeWhiteSpace(): String {
     return this.replace(" ", "")
