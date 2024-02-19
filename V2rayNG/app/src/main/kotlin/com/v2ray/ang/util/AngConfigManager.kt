@@ -996,8 +996,8 @@ object AngConfigManager {
                         if (srv.inbounds != null && srv.outbounds != null && srv.routing != null) {
                             val config = ServerConfig.create(EConfigType.CUSTOM)
                             config.remarks = srv.remarks
-                                ?: ("%04d-".format(count + 1) + System.currentTimeMillis()
-                                    .toString())
+                                ?: "%04d-".format(count + 1) + System.currentTimeMillis()
+                                    .toString()
                             config.subscriptionId = subid
                             config.fullConfig = srv
                             val key = MmkvManager.encodeServerConfig("", config)
