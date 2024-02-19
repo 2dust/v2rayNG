@@ -50,7 +50,7 @@ class PerAppProxyActivity : BaseActivity() {
                 .map {
                     if (blacklist != null) {
                         it.forEach { one ->
-                            if ((blacklist.contains(one.packageName))) {
+                            if (blacklist.contains(one.packageName)) {
                                 one.isSelected = 1
                             } else {
                                 one.isSelected = 0
