@@ -210,7 +210,7 @@ object Utils {
     }
 
     fun isPureIpAddress(value: String): Boolean {
-        return (isIpv4Address(value) || isIpv6Address(value))
+        return isIpv4Address(value) || isIpv6Address(value)
     }
 
     fun isIpv4Address(value: String): Boolean {

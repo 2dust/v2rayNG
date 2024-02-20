@@ -368,7 +368,7 @@ object V2RayServiceManager {
                         }
                         val directUplink = v2rayPoint.queryStats(TAG_DIRECT, "uplink")
                         val directDownlink = v2rayPoint.queryStats(TAG_DIRECT, "downlink")
-                        val zeroSpeed = (proxyTotal == 0L && directUplink == 0L && directDownlink == 0L)
+                        val zeroSpeed = proxyTotal == 0L && directUplink == 0L && directDownlink == 0L
                         if (!zeroSpeed || !lastZeroSpeed) {
                             if (proxyTotal == 0L) {
                                 appendSpeedString(text, outboundTags?.firstOrNull(), 0.0, 0.0)
