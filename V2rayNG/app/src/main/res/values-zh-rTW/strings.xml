@@ -18,23 +18,23 @@
     <string name="toast_services_failure">啟動服務失敗</string>
 
     <!--ServerActivity-->
-    <string name="title_server">組態檔案</string>
-    <string name="menu_item_add_config">新增組態</string>
-    <string name="menu_item_save_config">儲存組態</string>
-    <string name="menu_item_del_config">刪除組態</string>
-    <string name="menu_item_import_config_qrcode">從 QR Code 匯入組態</string>
-    <string name="menu_item_import_config_clipboard">從剪貼簿匯入組態</string>
+    <string name="title_server">配置檔案</string>
+    <string name="menu_item_add_config">新增配置</string>
+    <string name="menu_item_save_config">儲存配置</string>
+    <string name="menu_item_del_config">刪除配置</string>
+    <string name="menu_item_import_config_qrcode">從 QR Code 匯入配置</string>
+    <string name="menu_item_import_config_clipboard">從剪貼簿匯入配置</string>
     <string name="menu_item_import_config_manually_vmess">手動鍵入 [Vmess]</string>
     <string name="menu_item_import_config_manually_vless">手動鍵入 [VLESS]</string>
     <string name="menu_item_import_config_manually_ss">手動鍵入 [Shadowsocks]</string>
     <string name="menu_item_import_config_manually_socks">手動鍵入 [Socks]</string>
     <string name="menu_item_import_config_manually_trojan">手動鍵入 [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">手動鍵入 [Wireguard]</string>
-    <string name="menu_item_import_config_custom">自訂組態</string>
-    <string name="menu_item_import_config_custom_clipboard">從剪貼簿匯入自訂組態</string>
-    <string name="menu_item_import_config_custom_local">從本地匯入自訂組態</string>
-    <string name="menu_item_import_config_custom_url">從 URL 匯入自訂組態</string>
-    <string name="menu_item_import_config_custom_url_scan">掃描 URL 匯入自訂組態</string>
+    <string name="menu_item_import_config_custom">自訂配置</string>
+    <string name="menu_item_import_config_custom_clipboard">從剪貼簿匯入自訂配置</string>
+    <string name="menu_item_import_config_custom_local">從本地匯入自訂配置</string>
+    <string name="menu_item_import_config_custom_url">從 URL 匯入自訂配置</string>
+    <string name="menu_item_import_config_custom_url_scan">掃描 URL 匯入自訂配置</string>
     <string name="del_config_comfirm">確定刪除？</string>
     <string name="server_lab_remarks">備註</string>
     <string name="server_lab_address">位址</string>
@@ -61,21 +61,21 @@
     <string name="server_lab_flow">流程 (flow)</string>
     <string name="server_lab_reserved">Reserved (可選)</string>
     <string name="server_lab_local_address">本機位址(可選IPv4/IPv6，逗號隔開)</string>
-    <string name="server_lab_local_mtu">Mtu(可選, 預設1420)</string>
+    <string name="server_lab_local_mtu">MTU(可選, 預設1420)</string>
     <string name="toast_success">成功</string>
     <string name="toast_failure">失敗</string>
     <string name="toast_none_data">無資料</string>
     <string name="toast_incorrect_protocol">通訊協定不正確</string>
     <string name="toast_decoding_failed">解碼失敗</string>
-    <string name="title_file_chooser">選取一個組態檔</string>
+    <string name="title_file_chooser">選取一個配置檔</string>
     <string name="toast_require_file_manager">請安裝檔案總管。</string>
-    <string name="server_customize_config">自訂組態</string>
-    <string name="toast_config_file_invalid">無效組態</string>
+    <string name="server_customize_config">自訂配置</string>
+    <string name="toast_config_file_invalid">無效配置</string>
     <string name="server_lab_content">內容</string>
     <string name="toast_none_data_clipboard">剪貼簿內無資料</string>
     <string name="toast_invalid_url">URL 無效</string>
     <string name="server_lab_need_inbound">​​確保 inbounds port 和設定中的一致</string>
-    <string name="toast_malformed_josn">組態格式不正確</string>
+    <string name="toast_malformed_josn">配置格式不正確</string>
     <string name="server_lab_request_host6">Host(SNI)(可選)</string>
     <string name="toast_asset_copy_failed">失敗，請使用檔案總管</string>
     <string name="menu_item_add_file">新增檔案</string>
@@ -159,8 +159,8 @@
     <string name="title_pref_local_dns_port">本機 DNS 埠</string>
     <string name="summary_pref_local_dns_port">本機 DNS 埠</string>
 
-    <string name="title_pref_confirm_remove">刪除配置文件確認</string>
-    <string name="summary_pref_confirm_remove">刪除配置文件是否需要用戶二次確認</string>
+    <string name="title_pref_confirm_remove">刪除配置檔案確認</string>
+    <string name="summary_pref_confirm_remove">刪除配置檔案是否需要用戶二次確認</string>
 
     <string name="title_pref_start_scan_immediate">立即啟動掃碼</string>
     <string name="summary_pref_start_scan_immediate">啟動時立即打開相機掃描，否則可在工具欄選擇掃碼或選照片</string>
@@ -182,27 +182,27 @@
     <string name="title_mode">模式</string>
     <string name="title_mode_help">輕觸以檢視說明</string>
     <string name="title_language">語言</string>
-    <string name="title_ui_settings">用戶界面設置</string>
+    <string name="title_ui_settings">使用者介面設定</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">複製</string>
     <string name="logcat_clear">清除</string>
-    <string name="title_service_restart">服務重啟</string>
-    <string name="title_del_all_config">刪除全部組態</string>
-    <string name="title_del_duplicate_config">刪除重複組態</string>
-    <string name="title_del_invalid_config">刪除無效組態 (先偵測)</string>
-    <string name="title_export_all">匯出全部 (非自訂) 組態至剪貼簿</string>
+    <string name="title_service_restart">重啟服務</string>
+    <string name="title_del_all_config">刪除全部配置</string>
+    <string name="title_del_duplicate_config">刪除重複配置</string>
+    <string name="title_del_invalid_config">刪除無效配置 (先偵測)</string>
+    <string name="title_export_all">匯出全部 (非自訂) 配置至剪貼簿</string>
     <string name="title_sub_setting">訂閱分組設定</string>
     <string name="sub_setting_remarks">備註</string>
     <string name="sub_setting_url">Optional URL</string>
     <string name="sub_setting_enable">啟用更新</string>
     <string name="sub_auto_update">啟用自動更新</string>
     <string name="title_sub_update">更新訂閱</string>
-    <string name="title_ping_all_server">偵測所有組態 Tcping</string>
-    <string name="title_real_ping_all_server">偵測所有組態真延遲</string>
+    <string name="title_ping_all_server">偵測所有配置 Tcping</string>
+    <string name="title_real_ping_all_server">偵測所有配置真延遲</string>
     <string name="title_user_asset_setting">Geo 資源檔案</string>
     <string name="title_sort_by_test_results">依偵測結果排序</string>
-    <string name="title_filter_config">過濾組態</string>
+    <string name="title_filter_config">過濾配置</string>
     <string name="filter_config_all">所有訂閱分組</string>
     <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
 
@@ -226,20 +226,20 @@
     <string name="connection_connected">"已連線，輕觸以檢查連線能力"</string>
     <string name="connection_not_connected">"未連線"</string>
 
-    <string name="import_subscription_success">訂閱導入成功</string>
-    <string name="import_subscription_failure">導入訂閱失敗</string>
+    <string name="import_subscription_success">匯入訂閱成功</string>
+    <string name="import_subscription_failure">匯入訂閱失敗</string>
     <string name="menu_item_add_asset">添加</string>
     <string name="menu_item_add_url">添加連結</string>
     <string name="title_fragment_settings">分片（Fragment） 設定</string>
     <string name="title_pref_fragment_packets">分片方式</string>
-    <string name="title_pref_fragment_length">分片包长（最小-最大）</string>
-    <string name="title_pref_fragment_interval">分片间隔（最小-最大）</string>
-    <string name="title_pref_fragment_enabled">启用分片（Fragment）</string>
+    <string name="title_pref_fragment_length">分片包長（最小-最大）</string>
+    <string name="title_pref_fragment_interval">分片間隔（最小-最大）</string>
+    <string name="title_pref_fragment_enabled">啟用分片（Fragment）</string>
 
     <string-array name="share_method">
         <item>QR Code</item>
         <item>匯出至剪貼簿</item>
-        <item>匯出完整組態至剪貼簿</item>
+        <item>匯出完整配置至剪貼簿</item>
     </string-array>
 
     <string-array name="share_sub_method">
