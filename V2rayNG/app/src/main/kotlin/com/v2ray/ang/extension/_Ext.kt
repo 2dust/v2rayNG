@@ -10,75 +10,62 @@ import java.net.URI
 import java.net.URLConnection
 
 /**
- * Some extensions
+ * Some extensions for the AngApplication
  */
 
+// Extension property to retrieve AngApplication instance from Context
 val Context.v2RayApplication: AngApplication
     get() = applicationContext as AngApplication
 
-fun Context.toast(message: Int): Toast = ToastCompat
-    .makeText(this, message, Toast.LENGTH_SHORT)
-    .apply {
-        show()
-    }
+// Extension functions to show a toast message for Int and CharSequence types
+fun Context.toast(message: Int, duration: Int = Toast.LENGTH_SHORT) = 
+    ToastCompat.makeText(this, message, duration).show()
 
-fun Context.toast(message: CharSequence): Toast = ToastCompat
-    .makeText(this, message, Toast.LENGTH_SHORT)
-    .apply {
-        show()
-    }
+fun Context.toast(message: CharSequence, duration: Int = Toast.LENGTH_SHORT) = 
+    ToastCompat.makeText(this, message, duration).show()
 
+// JSONObject Extensions to put a Pair or Map of data
 fun JSONObject.putOpt(pair: Pair<String, Any>) = putOpt(pair.first, pair.second)
-fun JSONObject.putOpt(pairs: Map<String, Any>) = pairs.forEach { putOpt(it.key to it.value) }
 
+fun JSONObject.putOpt(pairs: Map<String, Any>) = pairs.forEach { (key, value) ->
+    putOpt(key to value)
+}
+
+// Constants for traffic and speed conversions
 const val threshold = 1000
 const val divisor = 1024F
 
-fun Long.toSpeedString() = toTrafficString() + "/s"
+// Extension function to convert Long byte value to a string with speed units
+fun Long.toSpeedString() = "${toTrafficString()}/s"
 
-fun Long.toTrafficString(): String {
-    if (this == 0L)
-        return "\t\t\t0\t  B"
-
-    if (this < threshold)
-        return "${this.toFloat().toShortString()}\t  B"
-
-    val kib = this / divisor
-    if (kib < threshold)
-        return "${kib.toShortString()}\t KB"
-
-    val mib = kib / divisor
-    if (mib < threshold)
-        return "${mib.toShortString()}\t MB"
-
-    val gib = mib / divisor
-    if (gib < threshold)
-        return "${gib.toShortString()}\t GB"
-
-    val tib = gib / divisor
-    if (tib < threshold)
-        return "${tib.toShortString()}\t TB"
-
-    val pib = tib / divisor
-    if (pib < threshold)
-        return "${pib.toShortString()}\t PB"
-
-    return "∞"
+// Extension function to convert Long byte value to a string with traffic units
+fun Long.toTrafficString(): String = when {
+    this == 0L -> "0 B"
+    this < threshold -> "${this.formatBytes()} B"
+    else -> {
+        val (value, unit) = listOf(
+            divisor to "KB",
+            divisor * divisor to "MB",
+            divisor * divisor * divisor to "GB",
+            divisor * divisor * divisor * divisor to "TB",
+            divisor * divisor * divisor * divisor * divisor to "PB"
+        ).fold(this to "B") { (value, _), (div, unit) ->
+            if (value < threshold * divisor) return@fold value to unit
+            (value / divisor) to unit
+        }
+        "${value.formatBytes()} $unit"
+    }
 }
 
-private fun Float.toShortString(): String {
-    val s = "%.2f".format(this)
-    if (s.length <= 4)
-        return s
-    return s.substring(0, 4).removeSuffix(".")
-}
+private fun Long.formatBytes() = "%.2f".format(this / divisor).trimEnd('0').trimEnd('.')
 
+// URLConnection extension property to return the response length with backward compatibility
 val URLConnection.responseLength: Long
     get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) contentLengthLong else contentLength.toLong()
 
+// URI extension property to return an IDN Hostname
 val URI.idnHost: String
-    get() = host!!.replace("[", "").replace("]", "")
+    get() = host?.replace("[", "")?.replace("]", "") ?: ""
 
-fun String.removeWhiteSpace(): String {
-    return this.replace(" ", "")
-}
+// String extension function to remove all white spaces
+fun String.removeWhiteSpace() = replace(" ", "")
