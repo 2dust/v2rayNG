@@ -988,8 +988,8 @@ object AngConfigManager {
         ) {
             try {
                 val gson = GsonBuilder().setPrettyPrinting().create()
-                val serverList: Array<String> =
-                    Gson().fromJson(server, Array<String>::class.java)
+                val serverList: Array<V2rayConfig> =
+                    Gson().fromJson(server, Array<V2rayConfig>::class.java)
                 if (serverList.isNotEmpty()) {
                     var count = 0
                     for (srv in serverList) {
