@@ -103,7 +103,7 @@
     <string name="title_pref_per_app_proxy">Proxy Theo Ứng Dụng</string>
     <string name="summary_pref_per_app_proxy">- Bình thường: Ứng dụng đã chọn sẽ kết nối thông qua Proxy, chưa chọn sẽ kết nối trực tiếp. \n- Chế độ Bypass: Ứng dụng đã chọn sẽ kết nối trực tiếp, chưa chọn sẽ kết nối qua Proxy. \n- Nếu bạn đang ở Trung Quốc thì vào Menu, chọn Tự động chọn ứng dụng Proxy.</string>
 
-    <string name="title_mux_settings">Mux Settings</string>
+    <string name="title_mux_settings">Cài đặt Mux</string>
     <string name="title_pref_mux_enabled">Bật Mux</string>
     <string name="summary_pref_mux_enabled">Giảm độ trễ trong bước bắt tay của kết nối TCP. Mux phân phối dữ liệu từ nhiều kết nối TCP trên một kết nối TCP duy nhất. Không nên sử dụng Mux để xem video, download file hoặc chạy speedtest vì thường không hiệu quả.</string>
     <string name="title_pref_mux_concurency">TCP connections (từ 1 đến 1024)</string>
@@ -164,7 +164,7 @@
     <string name="summary_pref_confirm_remove">Yêu cầu xác nhận từ người dùng khi thực hiện xóa tệp cấu hình.</string>
 
     <string name="title_pref_start_scan_immediate">Quét mã QR ngay lập tức</string>
-    <string name="summary_pref_start_scan_immediate">Mở camera để quét QR ngay khi khởi động, nếu không bạn có thể chọn quét mã hoặc chọn ảnh trên thanh công cụ.</string>
+    <string name="summary_pref_start_scan_immediate">Mở camera để quét mã QR ngay khi khởi động, nếu không, bạn cũng có thể chọn quét mã hoặc chọn ảnh từ thanh công cụ.</string>
 
     <string name="title_pref_feedback">Phản hồi lỗi</string>
     <string name="summary_pref_feedback">Phản hồi cải tiến hoặc lỗi lên GitHub</string>
@@ -220,7 +220,7 @@
 
     <string name="connection_test_pending">Kiểm tra kết nối</string>
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng...</string>
-    <string name="connection_test_available">Test thành công: truy cập www.Google.com mất %d ms</string>
+    <string name="connection_test_available">Test thành công: Mất %d ms để truy cập Google.com</string>
     <string name="connection_test_error">Lỗi kết nối mạng, hãy thử đổi cấu hình hoặc kiểm tra lại! Mã lỗi: %s</string>
     <string name="connection_test_fail">Không có kết nối mạng!</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
@@ -238,7 +238,7 @@
 
     <string-array name="share_sub_method">
         <item>Xuất gói ra mã QR (Chụp màn hình để lưu)</item>
-        <item>Xuất gói đăng ký vào bảng nhớ tạm</item>
+        <item>Xuất gói vào bảng nhớ tạm</item>
     </string-array>
 
     <string-array name="routing_tag">
