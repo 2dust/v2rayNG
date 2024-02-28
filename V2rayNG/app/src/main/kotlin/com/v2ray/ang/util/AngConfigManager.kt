@@ -1001,7 +1001,7 @@ object AngConfigManager {
                             config.subscriptionId = subid
                             config.fullConfig = srv
                             val key = MmkvManager.encodeServerConfig("", config)
-                            serverRawStorage?.encode(key, gson.toJson(srv))
+                            serverRawStorage?.encode(key, Gson.toJson(srv))
                             count += 1
                         }
                     }
