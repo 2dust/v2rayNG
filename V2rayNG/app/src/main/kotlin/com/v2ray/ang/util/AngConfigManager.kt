@@ -987,7 +987,11 @@ object AngConfigManager {
             && server.contains("routing")
         ) {
             try {
-                val gson = GsonBuilder().setPrettyPrinting().create()
+                //val gson = GsonBuilder().setPrettyPrinting().create()
+                 val gson = new GsonBuilder()
+	            	.setLenient()
+	            	.setPrettyPrinting()
+                    .create();
                 val serverList: Array<V2rayConfig> =
                     Gson().fromJson(server, Array<V2rayConfig>::class.java)
                 if (serverList.isNotEmpty()) {
@@ -1001,7 +1005,7 @@ object AngConfigManager {
                             config.subscriptionId = subid
                             config.fullConfig = srv
                             val key = MmkvManager.encodeServerConfig("", config)
-                            serverRawStorage?.encode(key, Gson.toJson(srv))
+                            serverRawStorage?.encode(key, gson.toJson(srv))
                             count += 1
                         }
                     }
