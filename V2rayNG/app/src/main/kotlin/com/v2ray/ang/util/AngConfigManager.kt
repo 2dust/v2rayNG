@@ -990,7 +990,6 @@ object AngConfigManager {
                 //val gson = GsonBuilder().setPrettyPrinting().create()
                  val gson = GsonBuilder()
 			    .setLenient()
-			    .setPrettyPrinting()
 			    .create();
                 val serverList: Array<V2rayConfig> =
                     Gson().fromJson(server, Array<V2rayConfig>::class.java)
