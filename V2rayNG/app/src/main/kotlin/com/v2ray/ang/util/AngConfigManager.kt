@@ -1002,12 +1002,8 @@ object AngConfigManager {
                                     JsonSerializer { src: Double?, _: Type?, _: JsonSerializationContext? -> JsonPrimitive(src?.toInt()) }
                             )
                             .create()
-                    val serverList: Array<V2rayConfig> =
-                    Gson().fromJson(server, Array<V2rayConfig>::class.java)
-                //val gson = Gson()
-                // Assuming your JSON is an array of V2rayConfig objects
-                //val typeToken: Type = object : TypeToken<List<V2rayConfig>>() {}.type
-                //val serverList: List<V2rayConfig> = gson.fromJson<List<V2rayConfig>>(server, typeToken) // Use generics for clarity
+                val serverList: Array<V2rayConfig> =
+                Gson().fromJson(server, Array<V2rayConfig>::class.java)
 
                 if (serverList.isNotEmpty()) {
                     var count = 0
@@ -1034,8 +1030,8 @@ object AngConfigManager {
             val config = ServerConfig.create(EConfigType.CUSTOM)
             config.subscriptionId = subid
             config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
-            //config.remarks = System.currentTimeMillis().toString()
-            config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
+            config.remarks = System.currentTimeMillis().toString()
+            //config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
             val key = MmkvManager.encodeServerConfig("", config)
             serverRawStorage?.encode(key, server)
             return 1
