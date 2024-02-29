@@ -988,9 +988,13 @@ object AngConfigManager {
         ) {
             try {
                 //val gson = GsonBuilder().setPrettyPrinting().create()
-                 val gson = GsonBuilder().create();
-                val serverList: Array<V2rayConfig> =
-                    Gson().fromJson(server, Array<V2rayConfig>::class.java)
+                    //val serverList: Array<V2rayConfig> =
+                    //Gson().fromJson(server, Array<V2rayConfig>::class.java)
+                val gson = Gson()
+                // Assuming your JSON is an array of V2rayConfig objects
+                val typeToken: Type = object : TypeToken<List<V2rayConfig>>() {}.type
+                val serverList: List<V2rayConfig> = gson.fromJson(server, typeToken)
+
                 if (serverList.isNotEmpty()) {
                     var count = 0
                     for (srv in serverList) {
