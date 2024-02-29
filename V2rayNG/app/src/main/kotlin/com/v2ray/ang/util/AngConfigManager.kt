@@ -988,10 +988,10 @@ object AngConfigManager {
         ) {
             try {
                 //val gson = GsonBuilder().setPrettyPrinting().create()
-                 val gson = new GsonBuilder()
-	            	.setLenient()
-	            	.setPrettyPrinting()
-                    .create();
+                 val gson = GsonBuilder()
+			    .setLenient()
+			    .setPrettyPrinting()
+			    .create();
                 val serverList: Array<V2rayConfig> =
                     Gson().fromJson(server, Array<V2rayConfig>::class.java)
                 if (serverList.isNotEmpty()) {
