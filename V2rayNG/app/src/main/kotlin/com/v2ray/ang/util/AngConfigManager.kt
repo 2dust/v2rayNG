@@ -995,7 +995,7 @@ object AngConfigManager {
                 val gson = Gson()
                 // Assuming your JSON is an array of V2rayConfig objects
                 val typeToken: Type = object : TypeToken<List<V2rayConfig>>() {}.type
-                val serverList: List<V2rayConfig> = gson.fromJson(server, typeToken)
+                val serverList: List<V2rayConfig> = gson.fromJson<List<V2rayConfig>>(server, typeToken) // Use generics for clarity
 
                 if (serverList.isNotEmpty()) {
                     var count = 0
