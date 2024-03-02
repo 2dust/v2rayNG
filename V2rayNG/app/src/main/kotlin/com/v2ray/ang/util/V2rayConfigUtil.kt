@@ -581,10 +581,21 @@ object V2rayConfigUtil {
                     tag = TAG_FRAGMENT,
                     mux = null
                 )
+
+            var packets = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_PACKETS) ?: "tlshello"
+            if (v2rayConfig.outbounds[0].streamSettings?.security == V2rayConfig.REALITY
+                && packets == "tlshello"
+            ) {
+                packets = "1-3"
+            } else if (v2rayConfig.outbounds[0].streamSettings?.security == V2rayConfig.TLS
+                && packets != "tlshello"
+            ) {
+                packets = "tlshello"
+            }
+
             fragmentOutbound.settings = V2rayConfig.OutboundBean.OutSettingsBean(
                 fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
-                    packets = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_PACKETS)
-                        ?: "tlshello",
+                    packets = packets,
                     length = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_LENGTH)
                         ?: "50-100",
                     interval = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL)
