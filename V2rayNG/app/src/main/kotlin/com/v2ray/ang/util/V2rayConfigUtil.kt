@@ -49,7 +49,7 @@ object V2rayConfigUtil {
                 return Result(true, customConfig)
             }
             val outbound = config.getProxyOutbound() ?: return Result(false, "")
-            val result = getV2rayNonCustomConfig(context, outbound)
+            val result = getV2rayNonCustomConfig(context, outbound, config.remarks)
             //Log.d(ANG_PACKAGE, result.content)
             return result
         } catch (e: Exception) {
@@ -63,7 +63,8 @@ object V2rayConfigUtil {
      */
     private fun getV2rayNonCustomConfig(
         context: Context,
-        outbound: V2rayConfig.OutboundBean
+        outbound: V2rayConfig.OutboundBean,
+        remarks: String,
     ): Result {
         val result = Result(false, "")
         //取得默认配置
@@ -98,6 +99,9 @@ object V2rayConfigUtil {
             v2rayConfig.stats = null
             v2rayConfig.policy = null
         }
+
+        v2rayConfig.remarks = remarks
+
         result.status = true
         result.content = v2rayConfig.toPrettyPrinting()
         return result
