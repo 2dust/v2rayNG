@@ -1008,17 +1008,15 @@ object AngConfigManager {
                 if (serverList.isNotEmpty()) {
                     var count = 0
                     for (srv in serverList) {
-                        if (srv.inbounds != null && srv.outbounds != null && srv.routing != null) {
-                            val config = ServerConfig.create(EConfigType.CUSTOM)
-                            config.remarks = srv.remarks
-                                ?: "%04d-".format(count + 1) + System.currentTimeMillis()
-                                    .toString()
-                            config.subscriptionId = subid
-                            config.fullConfig = srv
-                            val key = MmkvManager.encodeServerConfig("", config)
-                            serverRawStorage?.encode(key, gson.toJson(srv))
-                            count += 1
-                        }
+                        val config = ServerConfig.create(EConfigType.CUSTOM)
+                        config.remarks = srv.remarks
+                            ?: ("%04d-".format(count + 1) + System.currentTimeMillis()
+                                .toString())
+                        config.subscriptionId = subid
+                        config.fullConfig = srv
+                        val key = MmkvManager.encodeServerConfig("", config)
+                        serverRawStorage?.encode(key, gson.toJson(srv))
+                        count += 1
                     }
                     return count
                 }
@@ -1030,8 +1028,7 @@ object AngConfigManager {
             val config = ServerConfig.create(EConfigType.CUSTOM)
             config.subscriptionId = subid
             config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
-            config.remarks = System.currentTimeMillis().toString()
-            //config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
+            config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
             val key = MmkvManager.encodeServerConfig("", config)
             serverRawStorage?.encode(key, server)
             return 1

@@ -91,7 +91,7 @@ class ServerCustomConfigActivity : BaseActivity() {
         }
 
         val config = MmkvManager.decodeServerConfig(editGuid) ?: ServerConfig.create(EConfigType.CUSTOM)
-        config.remarks = binding.etRemarks.text.toString().trim()
+        config.remarks = v2rayConfig.remarks ?: binding.etRemarks.text.toString().trim()
         config.fullConfig = v2rayConfig
 
         MmkvManager.encodeServerConfig(editGuid, config)
