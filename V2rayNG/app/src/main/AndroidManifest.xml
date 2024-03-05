@@ -44,6 +44,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppThemeDayNight"
         android:usesCleartextTraffic="true"
+        android:extractNativeLibs="true"
         tools:targetApi="m">
 
         <activity
