@@ -367,7 +367,8 @@ data class V2rayConfig(
         fun getTransportSettingDetails(): List<String>? {
             if (protocol.equals(EConfigType.VMESS.name, true)
                     || protocol.equals(EConfigType.VLESS.name, true)
-                    || protocol.equals(EConfigType.TROJAN.name, true)) {
+                    || protocol.equals(EConfigType.TROJAN.name, true)
+                    || protocol.equals(EConfigType.SHADOWSOCKS.name, true)) {
                 val transport = streamSettings?.network ?: return null
                 return when (transport) {
                     "tcp" -> {
