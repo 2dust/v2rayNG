@@ -64,7 +64,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         super.onCleared()
     }
 
-    fun reloadServerList() {
+    fun loadServerList() {
         serverList = MmkvManager.decodeServerList()
         updateCache()
         updateListAction.value = -1
@@ -118,7 +118,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         updateListAction.value = -1 // update all
 
         getApplication<AngApplication>().toast(R.string.connection_test_testing)
-        for (item in serversCache) {
+        val copyServers = serversCache.toList()
+        for (item in copyServers) {
             item.config.getProxyOutbound()?.let { outbound ->
                 val serverAddress = outbound.getServerAddress()
                 val serverPort = outbound.getServerPort()

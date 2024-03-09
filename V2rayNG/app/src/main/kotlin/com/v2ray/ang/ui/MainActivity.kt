@@ -63,6 +63,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
+        mainViewModel.loadServerList()
+
         title = getString(R.string.title_server)
         setSupportActionBar(binding.toolbar)
 
@@ -210,10 +213,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 }
     }
 
-    public override fun onResume() {
-        super.onResume()
-        mainViewModel.reloadServerList()
-    }
 
     public override fun onPause() {
         super.onPause()
