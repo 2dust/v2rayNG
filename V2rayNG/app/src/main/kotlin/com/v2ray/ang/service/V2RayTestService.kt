@@ -6,6 +6,11 @@ import android.os.IBinder
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG_CANCEL
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG_SUCCESS
+import com.v2ray.ang.AppConfig.MSG_MEASURE_IP
+import com.v2ray.ang.AppConfig.MSG_MEASURE_IP_CANCEL
+import com.v2ray.ang.AppConfig.MSG_MEASURE_IP_CANCELED
+import com.v2ray.ang.AppConfig.MSG_MEASURE_IP_SUCCESS
+import com.v2ray.ang.AppConfig.MSG_MEASURE_IP_TESTING
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.SpeedtestUtil
 import com.v2ray.ang.util.Utils
@@ -16,6 +21,7 @@ import java.util.concurrent.Executors
 
 class V2RayTestService : Service() {
     private val realTestScope by lazy { CoroutineScope(Executors.newFixedThreadPool(10).asCoroutineDispatcher()) }
+    private val findIpScope by lazy { CoroutineScope(Executors.newFixedThreadPool(10).asCoroutineDispatcher()) }
 
     override fun onCreate() {
         super.onCreate()
@@ -34,6 +40,18 @@ class V2RayTestService : Service() {
             }
             MSG_MEASURE_CONFIG_CANCEL -> {
                 realTestScope.coroutineContext[Job]?.cancelChildren()
+            }
+            MSG_MEASURE_IP -> {
+                val contentPair = intent.getSerializableExtra("content") as Pair<String, String>
+                findIpScope.launch {
+                    MessageUtil.sendMsg2UI(this@V2RayTestService, MSG_MEASURE_IP_TESTING, Pair(contentPair.first, 0))
+                    val result = SpeedtestUtil.realPing(contentPair.second)
+                    MessageUtil.sendMsg2UI(this@V2RayTestService, MSG_MEASURE_IP_SUCCESS, Pair(contentPair.first, result))
+                }
+            }
+            MSG_MEASURE_IP_CANCEL -> {
+                findIpScope.coroutineContext[Job]?.cancelChildren()
+                MessageUtil.sendMsg2UI(this@V2RayTestService, MSG_MEASURE_IP_CANCELED, "")
             }
         }
         return super.onStartCommand(intent, flags, startId)
