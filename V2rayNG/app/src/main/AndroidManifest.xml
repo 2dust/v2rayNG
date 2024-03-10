@@ -92,6 +92,12 @@
             android:name=".ui.SubSettingActivity" />
         <activity
             android:exported="false"
+            android:name=".ui.IpScannerSettingsActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.IpScannerActivity" />
+        <activity
+            android:exported="false"
             android:name=".ui.UserAssetActivity" />
         <activity
             android:exported="false"
