@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.MainActivity">
+
+    <LinearLayout
+        android:id="@+id/ll_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/layout_margin_top_height">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_top_height"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ip_scanner_cdn_provider" />
+
+            <Spinner
+                android:id="@+id/sp_cdn_provider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edit_height"
+                android:spinnerMode="dialog"
+                android:entries="@array/cdn_providers" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_top_height"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ip_scanner_max_latency" />
+
+            <EditText
+                android:id="@+id/et_max_latency"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edit_height"
+                android:text="@string/ip_scanner_max_latency_default"
+                android:inputType="number" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_top_height"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ip_scanner_max_ips" />
+
+            <EditText
+                android:id="@+id/et_max_ips"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edit_height"
+                android:text="@string/ip_scanner_max_ips_default"
+                android:inputType="number" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_top_height"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ip_scanner_selected_config" />
+
+            <EditText
+                android:id="@+id/et_selected_config"
+                android:layout_width="match_parent"
+                android:enabled="false"
+                android:layout_height="@dimen/edit_height"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
