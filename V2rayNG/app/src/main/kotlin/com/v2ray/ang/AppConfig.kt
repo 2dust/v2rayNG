@@ -103,6 +103,11 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG = 7
     const val MSG_MEASURE_CONFIG_SUCCESS = 71
     const val MSG_MEASURE_CONFIG_CANCEL = 72
+    const val MSG_MEASURE_IP = 8
+    const val MSG_MEASURE_IP_SUCCESS = 81
+    const val MSG_MEASURE_IP_TESTING = 82
+    const val MSG_MEASURE_IP_CANCEL = 83
+    const val MSG_MEASURE_IP_CANCELED = 84
 
     // subscription settings
     const val SUBSCRIPTION_AUTO_UPDATE = "pref_auto_update_subscription"
