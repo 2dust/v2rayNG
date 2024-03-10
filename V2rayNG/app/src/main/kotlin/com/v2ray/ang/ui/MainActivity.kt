@@ -680,6 +680,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             R.id.user_asset_setting -> {
                 startActivity(Intent(this, UserAssetActivity::class.java))
             }
+            R.id.ip_scanner -> {
+                startActivity(Intent(this, IpScannerSettingsActivity::class.java))
+            }
             R.id.feedback -> {
                 Utils.openUri(this, AppConfig.v2rayNGIssues)
             }
