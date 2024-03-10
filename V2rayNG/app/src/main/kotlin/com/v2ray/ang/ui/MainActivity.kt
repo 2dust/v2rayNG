@@ -64,7 +64,16 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         val view = binding.root
         setContentView(view)
 
-        mainViewModel.loadServerList()
+        if (mainViewModel.serverList.isNotEmpty())
+            mainViewModel.loadServerList()
+
+        binding.recyclerView.setHasFixedSize(true)
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = adapter
+
+        mainViewModel.serversCacheLiveData.observe(this) { servers ->
+            adapter.servers = servers
+        }
 
         title = getString(R.string.title_server)
         setSupportActionBar(binding.toolbar)
@@ -91,10 +100,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //                tv_test_state.text = getString(R.string.connection_test_fail)
             }
         }
-
-        binding.recyclerView.setHasFixedSize(true)
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = adapter
 
         val callback = SimpleItemTouchHelperCallback(adapter)
         mItemTouchHelper = ItemTouchHelper(callback)
@@ -183,7 +188,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 launch(Dispatchers.Main) {
                     if (result) {
                         toast(getString(R.string.migration_success))
-                        mainViewModel.reloadServerList()
+                        mainViewModel.loadServerList()
                     } else {
                         toast(getString(R.string.migration_fail))
                     }
@@ -311,7 +316,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         MmkvManager.removeAllServer()
-                        mainViewModel.reloadServerList()
+                        mainViewModel.loadServerList()
                     }
                     .show()
             true
@@ -328,14 +333,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     MmkvManager.removeInvalidServer()
-                    mainViewModel.reloadServerList()
+                    mainViewModel.loadServerList()
                 }
                 .show()
             true
         }
         R.id.sort_by_test_results -> {
             MmkvManager.sortByTestResults()
-            mainViewModel.reloadServerList()
+            mainViewModel.loadServerList()
             true
         }
         R.id.filter_config -> {
@@ -420,7 +425,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
         if (count > 0) {
             toast(R.string.toast_success)
-            mainViewModel.reloadServerList()
+            mainViewModel.loadServerList()
         } else {
             toast(R.string.toast_failure)
         }
@@ -598,7 +603,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 return
             }
             mainViewModel.appendCustomConfigServer(server)
-            mainViewModel.reloadServerList()
+            mainViewModel.loadServerList()
             toast(R.string.toast_success)
             //adapter.notifyItemInserted(mainViewModel.serverList.lastIndex)
         } catch (e: Exception) {

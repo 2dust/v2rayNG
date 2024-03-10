@@ -33,6 +33,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var keywordFilter: String = ""
         private set
     val serversCache = mutableListOf<ServersCache>()
+    val serversCacheLiveData: MutableLiveData<MutableList<ServersCache>> = MutableLiveData()
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
     val updateTestResultAction by lazy { MutableLiveData<String>() }
@@ -109,6 +110,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 serversCache.add(ServersCache(guid, config))
             }
         }
+        serversCacheLiveData.value = serversCache
     }
 
     fun testAllTcping() {
@@ -184,7 +186,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     subscriptions[position].first
                 }
                 keywordFilter = ivBinding.etKeyword.text.toString()
-                reloadServerList()
+                loadServerList()
 
                 dialogInterface?.dismiss()
             } catch (e: Exception) {
@@ -233,7 +235,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         for(it in deleteServer){
             MmkvManager.removeServer(it)
         }
-        reloadServerList()
+        loadServerList()
         getApplication<AngApplication>().toast(getApplication<AngApplication>().getString(R.string.title_del_duplicate_config_count, deleteServer.count()))
     }
 
