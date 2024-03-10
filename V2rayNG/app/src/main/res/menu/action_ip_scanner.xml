@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<!--    <item-->
+<!--        android:id="@+id/close_scanner"-->
+<!--        android:icon="@android:drawable/ic_menu_close_clear_cancel"-->
+<!--        android:title="@string/menu_item_cancel"-->
+<!--        app:showAsAction="always" />-->
+    <item
+        android:id="@+id/cancel_scan"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:title="@string/menu_item_cancel"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/copy_all"
+        android:icon="@drawable/ic_copy"
+        android:title="@string/menu_item_copy_all_ips"
+        app:showAsAction="always" />
+</menu>
