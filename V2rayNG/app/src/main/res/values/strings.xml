@@ -246,6 +246,22 @@
     <string name="title_pref_fragment_length">Fragment Length (min-max)</string>
     <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
     <string name="title_pref_fragment_enabled">Enable Fragment</string>
+    <string name="title_ip_scanner_setting">IP Scanner</string>
+    <string name="title_ip_scanner">IP Scanner</string>
+    <string name="menu_item_cancel">Cancel</string>
+    <string name="menu_item_copy_all_ips">Copy All IPs</string>
+    <string name="ip_scanner_max_latency">Max. Latency</string>
+    <string name="ip_scanner_max_ips">Max. IPs</string>
+    <string name="ip_scanner_max_ips_default">5</string>
+    <string name="ip_scanner_max_latency_default">700</string>
+    <string name="menu_item_start_scan">Start Scan</string>
+    <string name="ip_scanner_cdn_provider">CDN Provider</string>
+    <string name="ip_scanner_clean_ips">Clean IPs</string>
+    <string name="ip_scanner_testing">Testing IPs</string>
+    <string name="ip_scanner_preparing">Preparing IPs</string>
+    <string name="ip_scanner_selected_config">Selected Config</string>
+    <string name="title_clean_ips">Clean IPs</string>
+    <string name="ip_scanner_no_valid_config_is_selected">No valid config is selected!</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
