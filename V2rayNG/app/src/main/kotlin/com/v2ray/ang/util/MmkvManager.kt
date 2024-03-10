@@ -16,8 +16,12 @@ object MmkvManager {
     const val ID_SUB = "SUB"
     const val ID_ASSET = "ASSET"
     const val ID_SETTING = "SETTING"
+    const val ID_IP_SCANNER = "IP_SCANNER"
     const val KEY_SELECTED_SERVER = "SELECTED_SERVER"
     const val KEY_ANG_CONFIGS = "ANG_CONFIGS"
+    const val KEY_IP_SCANNER_MAX_IPS = "IP_SCANNER_MAX_IPS"
+    const val KEY_IP_SCANNER_MAX_LATENCY = "IP_SCANNER_MAX_LATENCY"
+    const val KEY_IP_SCANNER_CDN_PROVIDER = "IP_SCANNER_CDN_PROVIDER"
 
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val serverStorage by lazy { MMKV.mmkvWithID(ID_SERVER_CONFIG, MMKV.MULTI_PROCESS_MODE) }
