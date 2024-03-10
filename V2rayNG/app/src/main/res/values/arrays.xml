@@ -195,4 +195,8 @@
         <item>allow</item>
         <item>skip</item>
     </string-array>
+
+    <string-array name="cdn_providers" translatable="false">
+        <item>Cloudflare</item>
+    </string-array>
 </resources>
