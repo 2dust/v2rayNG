@@ -124,6 +124,11 @@
 
     <PreferenceCategory android:title="@string/title_ui_settings">
         <CheckBoxPreference
+            android:key="pref_dark_mode_enabled"
+            android:summary="@string/summary_pref_dark_mode_enabled"
+            android:title="@string/title_pref_dark_mode_enabled" />
+        
+        <CheckBoxPreference
             android:key="pref_speed_enabled"
             android:summary="@string/summary_pref_speed_enabled"
             android:title="@string/title_pref_speed_enabled" />
