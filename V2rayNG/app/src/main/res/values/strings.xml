@@ -178,6 +178,9 @@
     <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
     <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
 
+    <string name="title_pref_dark_mode_enabled">Enable dark mode</string>
+    <string name="summary_pref_dark_mode_enabled">Always use dark mode theme</string>
+
     <string name="title_pref_feedback">Feedback</string>
     <string name="summary_pref_feedback">Feedback enhancements or bugs to GitHub</string>
     <string name="summary_pref_tg_group">Join Telegram Group</string>
