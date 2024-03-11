@@ -40,6 +40,7 @@ object AppConfig {
     const val PREF_BYPASS_APPS = "pref_bypass_apps"
     const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
     const val PREF_START_SCAN_IMMEDIATE = "pref_start_scan_immediate"
+    const val PREF_DARK_MODE_ENABLED = "pref_dark_mode_enabled"
     const val PREF_MUX_ENABLED = "pref_mux_enabled"
     const val PREF_MUX_CONCURRENCY = "pref_mux_concurency"
     const val PREF_MUX_XUDP_CONCURRENCY = "pref_mux_xudp_concurency"
