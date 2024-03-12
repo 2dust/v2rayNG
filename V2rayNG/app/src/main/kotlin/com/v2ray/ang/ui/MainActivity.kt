@@ -15,12 +15,15 @@ import android.view.KeyEvent
 import com.v2ray.ang.AppConfig
 import android.content.res.ColorStateList
 import android.os.Build
+import android.os.Handler
+import android.os.HandlerThread
 import com.google.android.material.navigation.NavigationView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.recyclerview.widget.ItemTouchHelper
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -57,6 +60,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
     private var mItemTouchHelper: ItemTouchHelper? = null
     val mainViewModel: MainViewModel by viewModels()
+
+    private lateinit var handlerThread: HandlerThread
+    private lateinit var handler: Handler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -399,9 +405,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             : Boolean {
         try {
             val clipboard = Utils.getClipboard(this)
-            importBatchConfig(clipboard)
+            showProgressBar(true)
+            handlerThread = HandlerThread("BackgroundThread")
+            handlerThread.start()
+            handler = Handler(handlerThread.looper)
+            handler.post {
+                importBatchConfig(clipboard)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
+            runOnUiThread {
+                showProgressBar(false)
+            }
             return false
         }
         return true
@@ -420,10 +435,30 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append)
         }
         if (count > 0) {
-            toast(R.string.toast_success)
-            mainViewModel.reloadServerList()
+            runOnUiThread {
+                showProgressBar(false)
+                mainViewModel.reloadServerList()
+                toast(R.string.toast_success)
+            }
         } else {
-            toast(R.string.toast_failure)
+            runOnUiThread {
+                showProgressBar(false)
+                toast(R.string.toast_failure)
+            }
+        }
+    }
+
+    private fun showProgressBar(mustShow: Boolean) {
+        binding.root.let { rootView ->
+            var loadingView = rootView.findViewById<View>(R.id.loadingView)
+            if (loadingView == null && mustShow) {
+                loadingView =
+                    layoutInflater.inflate(R.layout.view_loading, rootView, false)
+                rootView.addView(loadingView)
+            } else {
+                rootView.removeView(loadingView)
+                loadingView == null
+            }
         }
     }
 
