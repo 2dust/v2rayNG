@@ -731,7 +731,7 @@ object AngConfigManager {
                                 }
                             }
 
-                            "ws" -> {
+                            "ws", "httpupgrade" -> {
                                 if (!TextUtils.isEmpty(transportDetails[1])) {
                                     dicQuery["host"] = Utils.urlEncode(transportDetails[1])
                                 }

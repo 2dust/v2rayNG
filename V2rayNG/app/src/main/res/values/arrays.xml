@@ -25,6 +25,7 @@
         <item>tcp</item>
         <item>kcp</item>
         <item>ws</item>
+        <item>httpupgrade</item>
         <item>h2</item>
         <item>quic</item>
         <item>grpc</item>

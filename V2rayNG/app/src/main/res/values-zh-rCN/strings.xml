@@ -46,8 +46,8 @@
     <string name="server_lab_more_function">底层传输方式(transport)</string>
     <string name="server_lab_head_type">伪装类型(type)</string>
     <string name="server_lab_mode_type">gRPC 传输模式(mode)</string>
-    <string name="server_lab_request_host">伪装域名(host)(host/ws host/h2 host)/QUIC 加密方式</string>
-    <string name="server_lab_path">path(ws path/h2 path)/QUIC 加密密钥/kcp seed/gRPC serviceName</string>
+    <string name="server_lab_request_host">伪装域名(host)(host/ws host/httpupgrade host/h2 host)/QUIC 加密方式</string>
+    <string name="server_lab_path">path(ws path/httpupgrade path/h2 path)/QUIC 加密密钥/kcp seed/gRPC serviceName</string>
     <string name="server_lab_stream_security">传输层安全(TLS)</string>
     <string name="server_lab_allow_insecure">跳过证书验证(allowInsecure)</string>
     <string name="server_lab_sni">SNI</string>
