@@ -46,7 +46,7 @@
     <string name="server_lab_more_function">Nâng cao</string>
     <string name="server_lab_head_type">Kiểu ngụy trang (type)</string>
     <string name="server_lab_mode_type">Chế độ gRPC</string>
-    <string name="server_lab_request_host">Yêu cầu host(host/ws host/h2 host)/QUIC security</string>
+    <string name="server_lab_request_host">Yêu cầu host(host/ws host/h2 host)/QUIC security/gRPC Authority</string>
     <string name="server_lab_path">path(ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
