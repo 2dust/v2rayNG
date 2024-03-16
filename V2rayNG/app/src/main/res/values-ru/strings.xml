@@ -30,7 +30,7 @@
     <string name="menu_item_import_config_manually_socks">Ручной ввод Socks</string>
     <string name="menu_item_import_config_manually_trojan">Ручной ввод Trojan</string>
     <string name="menu_item_import_config_manually_wireguard">Ручной ввод Wireguard</string>
-    <string name="menu_item_import_config_custom">Пользовательский профиль</string>
+    <string name="menu_item_import_config_custom">Другой профиль</string>
     <string name="menu_item_import_config_custom_clipboard">Импорт из буфера обмена</string>
     <string name="menu_item_import_config_custom_local">Импорт из файла</string>
     <string name="menu_item_import_config_custom_url">Импорт из URL</string>
@@ -46,8 +46,8 @@
     <string name="server_lab_more_function">Другие параметры</string>
     <string name="server_lab_head_type">Тип заголовка</string>
     <string name="server_lab_mode_type">Режим gRPC</string>
-    <string name="server_lab_request_host">Запрос узла (WS/H2) / Шифрование QUIC</string>
-    <string name="server_lab_path">Путь (WS/H2) / Ключ QUIC / Сид KCP / Сервис gRPC</string>
+    <string name="server_lab_request_host">Запрос узла (узел WS/HTTPUpgrade/H2) / Шифрование QUIC</string>
+    <string name="server_lab_path">Путь (путь WS/HTTPUpgrade/H2) / Ключ QUIC / Сид KCP / Сервис gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_allow_insecure">Разрешать небезопасные</string>
     <string name="server_lab_sni">SNI</string>
@@ -146,7 +146,7 @@
     <string name="summary_pref_domestic_dns">DNS</string>
 
     <string name="title_pref_proxy_sharing_enabled">Разрешать подключения из LAN</string>
-    <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться к прокси по вашему IP-адресу через протокол SOCKS/HTTP. Используйте только в надёжной сети, чтобы избежать несанкционированного подключения.</string>
+    <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться, используя ваш IP-адрес, чтобы использовать прокси по протоколам SOCKS/HTTP. Используйте только в доверенной сети, чтобы избежать несанкционированного подключения.</string>
     <string name="toast_warning_pref_proxysharing_short">Доступ из LAN разрешён, убедитесь, что вы находитесь в надёжной сети</string>
 
     <string name="title_pref_allow_insecure">Разрешать небезопасные</string>
@@ -178,7 +178,7 @@
 
     <string name="title_pref_auto_update_subscription">Автоматическое обновление подписок</string>
     <string name="summary_pref_auto_update_subscription">Автоматическое обновление подписок в фоновом режиме с указанным интервалом. В зависимости от устройства эта функция может работать не всегда.</string>
-    <string name="title_pref_auto_update_interval">Интервал автообновления (мин., не менее 15)</string>
+    <string name="title_pref_auto_update_interval">Интервал автообновления (минут, не менее 15)</string>
 
     <string name="title_core_loglevel">Подробность ведения журнала</string>
     <string name="title_mode">Режим</string>
@@ -186,7 +186,7 @@
     <string name="title_language">Язык</string>
     <string name="title_ui_settings">Настройки интерфейса</string>
 
-    <string name="title_logcat">Системный журнал</string>
+    <string name="title_logcat">Журнал</string>
     <string name="logcat_copy">Копировать</string>
     <string name="logcat_clear">Очистить</string>
     <string name="title_service_restart">Перезапуск службы</string>
@@ -195,7 +195,7 @@
     <string name="title_del_invalid_config">Удалить нерабочие профили (после проверки)</string>
     <string name="title_export_all">Экспорт всех профилей в буфер обмена</string>
     <string name="title_sub_setting">Группы</string>
-    <string name="sub_setting_remarks">примечания</string>
+    <string name="sub_setting_remarks">Название</string>
     <string name="sub_setting_url">URL (необязательно)</string>
     <string name="sub_setting_enable">Использовать обновление</string>
     <string name="sub_auto_update">Использовать автоматическое обновление</string>
@@ -204,7 +204,7 @@
     <string name="title_real_ping_all_server">Время отклика профилей</string>
     <string name="title_user_asset_setting">Файлы георесурсов</string>
     <string name="title_sort_by_test_results">Сортировка по результатам теста</string>
-    <string name="title_filter_config">Фильтр профилей</string>
+    <string name="title_filter_config">Фильтр групп</string>
     <string name="filter_config_all">Все группы</string>
     <string name="title_del_duplicate_config_count">Удалено дубликатов профилей: %d</string>
 
@@ -221,7 +221,7 @@
 
     <string name="connection_test_pending">Проверить подключение</string>
     <string name="connection_test_testing">Проверка…</string>
-    <string name="connection_test_available">Успешно: рукопожатие HTTP заняло %d мс</string>
+    <string name="connection_test_available">Успешно: HTTP-соединение заняло %d мс</string>
     <string name="connection_test_error">Сбой проверки интернет-соединения: %s</string>
     <string name="connection_test_fail">Интернет недоступен</string>
     <string name="connection_test_error_status_code">Код ошибки: #%d</string>
@@ -232,14 +232,14 @@
     <string name="import_subscription_failure">Невозможно импортировать подписку</string>
     <string name="title_fragment_settings">Настройки фрагментирования</string>
     <string name="title_pref_fragment_packets">Фрагментирование пакетов</string>
-    <string name="title_pref_fragment_length">Длина фрагмента (от … до)</string>
-    <string name="title_pref_fragment_interval">Интервал фрагментов (от … до)</string>
+    <string name="title_pref_fragment_length">Длина фрагмента (от - до)</string>
+    <string name="title_pref_fragment_interval">Интервал фрагментов (от - до)</string>
     <string name="title_pref_fragment_enabled">Использовать фрагментирование</string>
 
     <string-array name="share_method">
         <item>QR-код</item>
         <item>Экспорт в буфер обмена</item>
-        <item>Экспорт всего профиля в буфер обмена</item>
+        <item>Экспорт всей конфигурации в буфер обмена</item>
     </string-array>
 
     <string-array name="share_sub_method">
