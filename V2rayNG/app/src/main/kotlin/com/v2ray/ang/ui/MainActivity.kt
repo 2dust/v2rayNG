@@ -495,6 +495,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             if (loadingView == null && mustShow) {
                 loadingView =
                     layoutInflater.inflate(R.layout.view_loading, rootView, false)
+                if(emptyStateView != null){
+                    rootView.removeView(emptyStateView)
+                }
                 rootView.addView(loadingView)
             } else {
                 rootView.removeView(loadingView)
