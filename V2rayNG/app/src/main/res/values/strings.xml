@@ -47,7 +47,7 @@
     <string name="server_lab_more_function">Transport</string>
     <string name="server_lab_head_type">head type</string>
     <string name="server_lab_mode_type">gRPC mode</string>
-    <string name="server_lab_request_host">request host(host/ws host/httpupgrade host/h2 host)/QUIC security</string>
+    <string name="server_lab_request_host">request host(host/ws host/httpupgrade host/h2 host)/QUIC security/gRPC Authority</string>
     <string name="server_lab_path">path(ws path/httpupgrade path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint" translatable="false">Fingerprint</string>

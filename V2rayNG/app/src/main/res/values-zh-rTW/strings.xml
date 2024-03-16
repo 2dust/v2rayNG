@@ -46,7 +46,7 @@
     <string name="server_lab_more_function">底層傳輸方式 (transport)</string>
     <string name="server_lab_head_type">標頭類型</string>
     <string name="server_lab_mode_type">gRPC 傳輸模式 (mode)</string>
-    <string name="server_lab_request_host">要求主機 (host)(host/ws host/httpupgrade host/h2 host)/QUIC 加密方式</string>
+    <string name="server_lab_request_host">要求主機 (host)(host/ws host/httpupgrade host/h2 host)/QUIC 加密方式/gRPC Authority</string>
     <string name="server_lab_path">path(ws path/httpupgrade path/h2 path)/QUIC 加密金鑰/kcp seed/gRPC serviceName</string>
     <string name="server_lab_stream_security">傳輸層安全 (TLS)</string>
     <string name="server_lab_allow_insecure">跳過憑證驗證 (allowInsecure)</string>

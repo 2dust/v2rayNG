@@ -44,7 +44,7 @@
 	<string name="server_lab_more_function">النقل</string>
 	<string name="server_lab_head_type">نوع الرأس</string>
 	<string name="server_lab_mode_type">وضع gRPC</string>
-	<string name="server_lab_request_host">طلب الاستضافة (host/ws host/h2 host)/QUIC security</string>
+	<string name="server_lab_request_host">طلب الاستضافة (host/ws host/h2 host)/QUIC security/gRPC Authority</string>
 	<string name="server_lab_path">المسار (ws path/h2 path)/QUIC key/kcp seed/gRPC serviceName</string>
 	<string name="server_lab_stream_security">TLS</string>
 	<string name="server_lab_allow_insecure">allowInsecure</string>

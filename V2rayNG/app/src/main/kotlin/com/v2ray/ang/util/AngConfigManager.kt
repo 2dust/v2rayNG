@@ -176,7 +176,8 @@ object AngConfigManager {
                         vmessBean.requestHost,
                         vmessBean.path,
                         vmessBean.headerType,
-                        vmessBean.path
+                        vmessBean.path,
+                        vmessBean.requestHost,
                     )
                     val allowInsecure = if (vmessBean.allowInsecure.isBlank()) {
                         settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
@@ -275,7 +276,8 @@ object AngConfigManager {
                             vmessQRCode.host,
                             vmessQRCode.path,
                             vmessQRCode.type,
-                            vmessQRCode.path
+                            vmessQRCode.path,
+                            vmessQRCode.host
                         )
 
                         val fingerprint = vmessQRCode.fp ?: streamSetting.tlsSettings?.fingerprint
@@ -383,7 +385,8 @@ object AngConfigManager {
                         queryParam["quicSecurity"],
                         queryParam["key"],
                         queryParam["mode"],
-                        queryParam["serviceName"]
+                        queryParam["serviceName"],
+                        queryParam["authority"]
                     )
                     fingerprint = queryParam["fp"] ?: ""
                     config.outboundBean?.streamSettings?.populateTlsSettings(
@@ -411,7 +414,6 @@ object AngConfigManager {
                     .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
                 config = ServerConfig.create(EConfigType.VLESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
-                var fingerprint = streamSetting.tlsSettings?.fingerprint
 
                 config.remarks = Utils.urlDecode(uri.fragment ?: "")
                 config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
@@ -431,15 +433,18 @@ object AngConfigManager {
                     queryParam["quicSecurity"],
                     queryParam["key"],
                     queryParam["mode"],
-                    queryParam["serviceName"]
+                    queryParam["serviceName"],
+                    queryParam["authority"]
                 )
-                fingerprint = queryParam["fp"] ?: ""
-                val pbk = queryParam["pbk"] ?: ""
-                val sid = queryParam["sid"] ?: ""
-                val spx = Utils.urlDecode(queryParam["spx"] ?: "")
                 streamSetting.populateTlsSettings(
-                    queryParam["security"] ?: "", allowInsecure,
-                    queryParam["sni"] ?: sni, fingerprint, queryParam["alpn"], pbk, sid, spx
+                    queryParam["security"] ?: "",
+                    allowInsecure,
+                    queryParam["sni"] ?: sni,
+                    queryParam["fp"] ?: "",
+                    queryParam["alpn"],
+                    queryParam["pbk"] ?: "",
+                    queryParam["sid"] ?: "",
+                    queryParam["spx"] ?: ""
                 )
             } else if (str.startsWith(EConfigType.WIREGUARD.protocolScheme)) {
                 val uri = URI(Utils.fixIllegalUrl(str))
@@ -520,7 +525,8 @@ object AngConfigManager {
                 queryParam["security"],
                 queryParam["key"],
                 queryParam["mode"],
-                queryParam["serviceName"])
+                queryParam["serviceName"],
+                queryParam["authority"])
             streamSetting.populateTlsSettings(
                 if (tls) TLS else "", allowInsecure, sni, fingerprint, null,
                 null, null, null
@@ -758,7 +764,8 @@ object AngConfigManager {
 
                             "grpc" -> {
                                 dicQuery["mode"] = transportDetails[0]
-                                dicQuery["serviceName"] = transportDetails[2]
+                                dicQuery["authority"] = Utils.urlEncode(transportDetails[1])
+                                dicQuery["serviceName"] = Utils.urlEncode(transportDetails[2])
                             }
                         }
                     }
