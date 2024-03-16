@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.*
 import android.net.Uri
 import android.net.VpnService
@@ -24,6 +25,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.recyclerview.widget.ItemTouchHelper
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -64,6 +66,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private lateinit var handlerThread: HandlerThread
     private lateinit var handler: Handler
 
+    private var emptyStateView: View? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -71,6 +75,16 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         setContentView(view)
         title = getString(R.string.title_server)
         setSupportActionBar(binding.toolbar)
+
+        if (mainViewModel.isServerListEmpty) {
+            showEmptyState(mustShow = true, onActionClick = {
+                getFreeConfigs()
+                if (!mainViewModel.isServerListEmpty) {
+                    binding.root.removeView(emptyStateView)
+                    emptyStateView = null
+                }
+            })
+        }
 
         binding.fab.setOnClickListener {
             if (mainViewModel.isRunning.value == true) {
@@ -319,6 +333,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         MmkvManager.removeAllServer()
                         mainViewModel.reloadServerList()
+                        showEmptyState(mustShow = true, onActionClick = {
+                            getFreeConfigs()
+                            if (!mainViewModel.isServerListEmpty) {
+                                binding.root.removeView(emptyStateView)
+                                emptyStateView = null
+                            }
+                        })
                     }
                     .show()
             true
@@ -362,6 +383,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         )
     }
 
+    fun getFreeConfigs() {
+        importTextFormConfigsByUrl("https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/mixed_iran.txt")
+    }
     /**
      * import config from qrcode
      */
@@ -448,6 +472,23 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
     }
 
+   private fun showEmptyState(onActionClick: () -> Unit = {}, mustShow: Boolean) {
+        binding.root.let { rootView ->
+            if (emptyStateView == null && mustShow) {
+                emptyStateView =
+                    layoutInflater.inflate(R.layout.empty_state_view, rootView, false)
+                val btn = emptyStateView?.findViewById(R.id.get_configs_btn_main) as Button
+                btn.setOnClickListener {
+                    onActionClick()
+                }
+                rootView.addView(emptyStateView)
+            } else {
+                rootView.removeView(emptyStateView)
+                emptyStateView = null
+            }
+        }
+    }
+
     private fun showProgressBar(mustShow: Boolean) {
         binding.root.let { rootView ->
             var loadingView = rootView.findViewById<View>(R.id.loadingView)
@@ -503,6 +544,36 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         } catch (e: Exception) {
             e.printStackTrace()
             return false
+        }
+    }
+
+    /**
+     * import text form response(config) from url
+     */
+    private fun importTextFormConfigsByUrl(url: String) {
+        try {
+            if (!Utils.isValidUrl(url)) {
+                toast(R.string.toast_invalid_url)
+                return
+            }
+            lifecycleScope.launch(Dispatchers.IO) {
+                val configText = try {
+                    withContext(Dispatchers.Main) {
+                        showProgressBar(true)
+                        showEmptyState(mustShow = false)
+                    }
+                    Utils.getUrlContentWithCustomUserAgent(url)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    ""
+                }
+                importBatchConfig(configText)
+                withContext(Dispatchers.Main) {
+                    showProgressBar(false)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

@@ -39,6 +39,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
 
+    val isServerListEmpty: Boolean
+        get() = serverList.isEmpty() && serversCache.isEmpty()
+
     fun startListenBroadcast() {
         isRunning.value = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
