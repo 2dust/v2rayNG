@@ -606,7 +606,7 @@ object AngConfigManager {
                 var sni: String? = ""
                 if (queryPairs["plugin"] == "obfs-local" && queryPairs["obfs"] == "http") {
                     sni = config.outboundBean?.streamSettings?.populateTransportSettings(
-                        "tcp", "http", queryPairs["obfs-host"], queryPairs["path"], null, null, null, null, null
+                        "tcp", "http", queryPairs["obfs-host"], queryPairs["path"], null, null, null, null, null, null
                     )
                 } else if (queryPairs["plugin"] == "v2ray-plugin") {
                     var network = "ws";
@@ -614,7 +614,7 @@ object AngConfigManager {
                         network = "quic";
                     }
                     sni = config.outboundBean?.streamSettings?.populateTransportSettings(
-                        network, null, queryPairs["host"], queryPairs["path"], null, null, null, null, null
+                        network, null, queryPairs["host"], queryPairs["path"], null, null, null, null, null, null
                     )
                 }
                 if ("tls" in queryPairs) {
