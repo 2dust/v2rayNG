@@ -1,0 +1,78 @@
+name: Build v2rayNG APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      XRAY_CORE_VERSION:
+        description: 'xray version or commit hash'
+        required: true
+
+      V2RAYNG_VERSION:
+          description: 'v2rayNG version'
+          required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Golang
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21.1'
+
+    - name: Install gomobile
+      run: |
+        go install golang.org/x/mobile/cmd/gomobile@latest
+        echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+    - name: Setup Android environment
+      uses: android-actions/setup-android@v2
+
+    - name: Build dependencies
+      run: |
+        mkdir ${{ github.workspace }}/build
+        cd ${{ github.workspace }}/build
+        git clone --depth=1 -b main https://github.com/2dust/AndroidLibXrayLite.git
+        cd AndroidLibXrayLite
+        go get github.com/xtls/xray-core@${{ github.event.inputs.XRAY_CORE_VERSION }} || true
+        gomobile init
+        go mod tidy -v
+        gomobile bind -v -androidapi 19 -ldflags='-s -w' ./
+        cp *.aar ${{ github.workspace }}/V2rayNG/app/libs/
+    - name: Decode Keystore
+      id: decode_keystore
+      uses: timheuer/base64-to-file@v1.2
+      with:
+        fileName: 'android_keystore.jks'
+        fileDir: '/home/runner/work/v2rayNG/v2rayNG/V2rayNG/app/keystore/'
+        encodedString: ${{ secrets.SIGNING_KEY }}
+
+    - name: Build v2rayNG APK
+      env:
+        SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+        SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+      run: |
+        cd ${{ github.workspace }}/V2rayNG
+        chmod 777 *
+        sed -i 's/org.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8/org.gradle.jvmargs=-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8/' ${{ github.workspace }}/V2rayNG/gradle.properties
+        ./gradlew :app:assembleRelease -x test
+    - uses: actions/upload-artifact@v3.1.1
+      with:
+        name: APKs
+        path: /home/runner/work/v2rayNG/v2rayNG/V2rayNG/app/build/outputs/apk/release/*.apk
+
+    - name: Upload apk to release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: v2rayNG_${{ github.event.inputs.V2RAYNG_VERSION }}_${{ github.event.inputs.XRAY_CORE_VERSION }}
+        tag_name: v${{ github.event.inputs.V2RAYNG_VERSION }}_${{ github.event.inputs.XRAY_CORE_VERSION }}
+        files: /home/runner/work/v2rayNG/v2rayNG/V2rayNG/app/build/outputs/apk/release/*.apk
