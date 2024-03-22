@@ -50,11 +50,14 @@
             android:name=".ui.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
+            android:icon="@mipmap/ic_launcher"
+            android:banner="@mipmap/ic_banner"
+            android:label="@string/app_name"
             android:theme="@style/AppThemeDayNight.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-<!--                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>-->
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
