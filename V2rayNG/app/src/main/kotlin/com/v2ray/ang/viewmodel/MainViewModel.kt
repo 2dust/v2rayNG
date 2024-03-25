@@ -2,7 +2,6 @@ package com.v2ray.ang.viewmodel
 
 import android.app.Application
 import android.content.*
-import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ArrayAdapter
@@ -55,25 +54,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
 
-    fun startListenBroadcast() {
-        isRunning.value = false
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getApplication<AngApplication>().registerReceiver(
-                mMsgReceiver,
-                IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY),
-                Context.RECEIVER_EXPORTED
-            )
-        } else {
-            getApplication<AngApplication>().registerReceiver(
-                mMsgReceiver,
-                IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY)
-            )
-        }
-        MessageUtil.sendMsg2Service(getApplication(), AppConfig.MSG_REGISTER_CLIENT, "")
-    }
-
     override fun onCleared() {
-        getApplication<AngApplication>().unregisterReceiver(mMsgReceiver)
         tcpingTestScope.coroutineContext[Job]?.cancelChildren()
         SpeedtestUtil.closeAllTcpSockets()
         Log.i(ANG_PACKAGE, "Main ViewModel is cleared")
@@ -266,41 +247,4 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
-    private val mMsgReceiver = object : BroadcastReceiver() {
-        override fun onReceive(ctx: Context?, intent: Intent?) {
-            when (intent?.getIntExtra("key", 0)) {
-                AppConfig.MSG_STATE_RUNNING -> {
-                    isRunning.value = true
-                }
-
-                AppConfig.MSG_STATE_NOT_RUNNING -> {
-                    isRunning.value = false
-                }
-
-                AppConfig.MSG_STATE_START_SUCCESS -> {
-                    getApplication<AngApplication>().toast(R.string.toast_services_success)
-                    isRunning.value = true
-                }
-
-                AppConfig.MSG_STATE_START_FAILURE -> {
-                    getApplication<AngApplication>().toast(R.string.toast_services_failure)
-                    isRunning.value = false
-                }
-
-                AppConfig.MSG_STATE_STOP_SUCCESS -> {
-                    isRunning.value = false
-                }
-
-                AppConfig.MSG_MEASURE_DELAY_SUCCESS -> {
-                    updateTestResultAction.value = intent.getStringExtra("content")
-                }
-
-                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> {
-                    val resultPair = intent.getSerializableExtra("content") as Pair<String, Long>
-                    MmkvManager.encodeServerTestDelayMillis(resultPair.first, resultPair.second)
-                    updateListAction.value = getPosition(resultPair.first)
-                }
-            }
-        }
-    }
 }
