@@ -11,13 +11,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
-import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.DialogConfigFilterBinding
 import com.v2ray.ang.dto.*
-import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.*
 import com.v2ray.ang.util.MmkvManager.KEY_ANG_CONFIGS
 import kotlinx.coroutines.*
@@ -51,7 +49,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
     val updateTestResultAction by lazy { MutableLiveData<String>() }
-
+    val showMessageById by lazy { MutableLiveData<Int>() }
+    val deleteServerCount by lazy { MutableLiveData<Int>() }
     private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
 
     override fun onCleared() {
@@ -114,7 +113,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         MmkvManager.clearAllTestDelayResults()
         updateListAction.value = -1 // update all
 
-        getApplication<AngApplication>().toast(R.string.connection_test_testing)
+        showMessageById.value = R.string.connection_test_testing
         for (item in serversCache) {
             item.config.getProxyOutbound()?.let { outbound ->
                 val serverAddress = outbound.getServerAddress()
@@ -139,7 +138,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val serversCopy = serversCache.toList() // Create a copy of the list
 
-        getApplication<AngApplication>().toast(R.string.connection_test_testing)
+        showMessageById.value = R.string.connection_test_testing
         viewModelScope.launch(Dispatchers.Default) { // without Dispatchers.Default viewModelScope will launch in main thread
             for (item in serversCopy) {
                 val config = V2rayConfigUtil.getV2rayConfig(getApplication(), item.guid)
@@ -239,12 +238,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             MmkvManager.removeServer(it)
         }
         reloadServerList()
-        getApplication<AngApplication>().toast(
-            getApplication<AngApplication>().getString(
-                R.string.title_del_duplicate_config_count,
-                deleteServer.count()
-            )
-        )
+        deleteServerCount.value =  deleteServer.count()
     }
 
 }

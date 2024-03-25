@@ -198,6 +198,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         mainViewModel.isRunning.value = false
         startListenBroadcast()
         MessageUtil.sendMsg2Service(application, AppConfig.MSG_REGISTER_CLIENT, "")
+
+        mainViewModel.showMessageById.observe(this){ message ->
+            toast(message)
+        }
+        mainViewModel.deleteServerCount.observe(this){
+            toast(
+                getString(
+                    R.string.title_del_duplicate_config_count,
+                    it
+                )
+            )
+        }
     }
     fun startListenBroadcast() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
