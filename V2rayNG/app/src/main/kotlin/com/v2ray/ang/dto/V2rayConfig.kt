@@ -22,7 +22,9 @@ data class V2rayConfig(
         val transport: Any? = null,
         val reverse: Any? = null,
         var fakedns: Any? = null,
-        val browserForwarder: Any? = null) {
+        val browserForwarder: Any? = null,
+        var observatory: Any? = null,
+        var burstObservatory: Any? = null) {
     companion object {
         const val DEFAULT_PORT = 443
         const val DEFAULT_SECURITY = "auto"
