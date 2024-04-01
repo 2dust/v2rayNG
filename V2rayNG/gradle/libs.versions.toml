@@ -1,0 +1,99 @@
+[versions]
+kotlin = "1.9.23"
+androidPlugin = "8.2.2"
+
+constraintlayout = "2.1.4"
+androidxLegacy = "1.0.0"
+androidxAppcompat = "1.6.1"
+androidxCardview = "1.0.0"
+androidxRecyclerview = "1.3.2"
+androidxMultidex = "2.0.1"
+androidxViewpager2 = "1.1.0-beta02"
+
+androidxLifecycle = "2.7.0"
+
+androidxActivity = "1.8.2"
+androidxFragment = "1.6.2"
+androidxPreference = "1.2.1"
+
+androidxWork = "2.8.1"
+
+kotlinReflect = "1.9.23"
+kotlinCoroutines = "1.8.0"
+
+googleMaterial = "1.11.0"
+googleGson = "2.10.1"
+googleZxing = "3.5.3"
+
+rxJava = "1.3.8"
+rxAndroid = "1.2.1"
+rxPermissions = "0.9.4"
+
+mmkv = "1.3.3"
+
+fabProgress = "1.01"
+toast = "1.1.0"
+blacksquircle = "2.9.0"
+quickie = "1.9.0"
+
+junit = "4.13.2"
+
+[libraries]
+# AndroidX Core
+androidx-multidex = { group = "androidx.multidex", name = "multidex", version.ref = "androidxMultidex" }
+
+# AndroidX UI
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppcompat" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-cardview = { group = "androidx.cardview", name = "cardview", version.ref = "androidxCardview" }
+androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "androidxRecyclerview" }
+androidx-viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "androidxViewpager2" }
+androidx-legacy = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "androidxLegacy" }
+
+# AndroidX lifecycle
+androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
+androidx-lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "androidxLifecycle" }
+androidx-lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
+
+# AndroidX ktx
+androidx-activity = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidxActivity" }
+androidx-fragment = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "androidxFragment" }
+androidx-preference = { group = "androidx.preference", name = "preference-ktx", version.ref = "androidxPreference" }
+
+# AndroidX work
+androidx-work-runtime = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "androidxWork" }
+androidx-work-multiprocess = { group = "androidx.work", name = "work-multiprocess", version.ref = "androidxWork" }
+
+# Kotlin
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlinReflect" }
+kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinCoroutines" }
+kotlin-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinCoroutines" }
+
+# Google
+google-material = { group = "com.google.android.material", name = "material", version.ref = "googleMaterial" }
+google-gson = { group = "com.google.code.gson", name = "gson", version.ref = "googleGson" }
+google-zxing = { group = "com.google.zxing", name = "core", version.ref = "googleZxing" }
+
+# Rx
+rx-java = { group = "io.reactivex", name = "rxjava", version.ref = "rxJava" }
+rx-android = { group = "io.reactivex", name = "rxandroid", version.ref = "rxAndroid" }
+rx-permissions = { group = "com.tbruyelle.rxpermissions", name = "rxpermissions", version.ref = "rxPermissions" }
+
+# Storage
+tencent-mmkv = { group = "com.tencent", name = "mmkv-static", version.ref = "mmkv" }
+
+# UI
+ui-fabprogresscircle = { group = "com.github.jorgecastilloprz", name = "fabprogresscircle", version.ref = "fabProgress" }
+ui-toast = { group = "me.drakeet.support", name = "toastcompat", version.ref = "toast" }
+ui-blacksquircle-editorkit = { group = "com.blacksquircle.ui", name = "editorkit", version.ref = "blacksquircle" }
+ui-blacksquircle-base = { group = "com.blacksquircle.ui", name = "language-base", version.ref = "blacksquircle" }
+ui-blacksquircle-json = { group = "com.blacksquircle.ui", name = "language-json", version.ref = "blacksquircle" }
+ui-quickie = { group = "io.github.g00fy2.quickie", name = "quickie-bundled", version.ref = "quickie" }
+
+# Test
+test-junit = { group = "junit", name = "junit", version.ref = "junit" }
+
+[plugins]
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+android-application = { id = "com.android.application", version.ref = "androidPlugin" }
+android-library = { id = "com.android.library", version.ref = "androidPlugin" }
