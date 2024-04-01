@@ -2,6 +2,9 @@ name: Build APK
 
 on:
   push:
+    branches: ["master"]
+  release:
+    types: ["published"]
   workflow_dispatch:
     inputs:
       XRAY_CORE_VERSION:
@@ -62,3 +65,12 @@ jobs:
       with:
         name: apk
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/
+
+    - name: Upload to GitHub Release
+      uses: svenstaro/upload-release-action@v2
+      if: github.event_name == 'release'
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*.apk
+        overwrite: true
+        file_glob: true
