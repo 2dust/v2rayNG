@@ -361,7 +361,7 @@ object AngConfigManager {
                     server.port = match.groupValues[4].toInt()
                     val socksUsersBean =
                         V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
-                    socksUsersBean.user = match.groupValues[1].lowercase()
+                    socksUsersBean.user = match.groupValues[1]
                     socksUsersBean.pass = match.groupValues[2]
                     server.users = listOf(socksUsersBean)
                 }
