@@ -12,11 +12,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
@@ -36,7 +36,7 @@ jobs:
 
     - name: Setup Android environment
       uses: android-actions/setup-android@v3
-  
+
 
     - name: Build dependencies
       run: |
@@ -53,8 +53,7 @@ jobs:
     - name: Build APK
       run: |
         cd ${{ github.workspace }}/V2rayNG
-        chmod 777 *
-        sed -i 's/org.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8/org.gradle.jvmargs=-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8/' ${{ github.workspace }}/V2rayNG/gradle.properties
+        chmod 755 gradlew
         ./gradlew assembleDebug
 
     - name: Upload APK
