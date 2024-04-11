@@ -231,13 +231,14 @@ class UserAssetActivity : BaseActivity() {
     }
     private fun addBuiltInGeoItems(assets: List<Pair<String, AssetUrlItem>>): List<Pair<String, AssetUrlItem>> {
         val list = mutableListOf<Pair<String, AssetUrlItem>>()
-        builtInGeoFiles.forEach {
-            list.add(Utils.getUuid() to AssetUrlItem(
-                it,
-                AppConfig.geoUrl + it
-            )
-            )
-        }
+        builtInGeoFiles
+            .filter { geoFile -> assets.none { it.second.remarks == geoFile } }
+            .forEach { 
+                list.add(Utils.getUuid() to AssetUrlItem(
+                    it,
+                    AppConfig.geoUrl + it
+                ))
+            }
 
         return list + assets
     }
@@ -270,7 +271,7 @@ class UserAssetActivity : BaseActivity() {
                 holder.itemUserAssetBinding.assetProperties.text = getString(R.string.msg_file_not_found)
             }
 
-            if (item.second.remarks in builtInGeoFiles) {
+            if (item.second.remarks in builtInGeoFiles && item.second.url == AppConfig.geoUrl + item.second.remarks) {
                 holder.itemUserAssetBinding.layoutEdit.visibility = GONE
                 holder.itemUserAssetBinding.layoutRemove.visibility = GONE
             } else {
