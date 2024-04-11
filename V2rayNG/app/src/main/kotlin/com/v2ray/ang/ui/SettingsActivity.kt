@@ -120,7 +120,7 @@ class SettingsActivity : BaseActivity() {
             remoteDns?.setOnPreferenceChangeListener { _, any ->
                 // remoteDns.summary = any as String
                 val nval = any as String
-                remoteDns?.summary = if (nval == "") AppConfig.DNS_AGENT else nval
+                remoteDns?.summary = if (nval == "") AppConfig.DNS_PROXY else nval
                 true
             }
             domesticDns?.setOnPreferenceChangeListener { _, any ->
@@ -213,7 +213,7 @@ class SettingsActivity : BaseActivity() {
             autoUpdateInterval?.isEnabled = defaultSharedPreferences.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
 
             if (TextUtils.isEmpty(remoteDnsString)) {
-                remoteDnsString = AppConfig.DNS_AGENT
+                remoteDnsString = AppConfig.DNS_PROXY
             }
             if (TextUtils.isEmpty(domesticDns?.summary)) {
                 domesticDns?.summary = AppConfig.DNS_DIRECT

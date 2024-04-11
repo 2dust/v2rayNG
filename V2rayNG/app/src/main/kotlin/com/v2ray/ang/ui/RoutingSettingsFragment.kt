@@ -127,7 +127,7 @@ class RoutingSettingsFragment : Fragment() {
         var tag = ""
         when (requireArguments().getString(routing_arg)) {
             AppConfig.PREF_V2RAY_ROUTING_AGENT -> {
-                tag = AppConfig.TAG_AGENT
+                tag = AppConfig.TAG_PROXY
             }
             AppConfig.PREF_V2RAY_ROUTING_DIRECT -> {
                 tag = AppConfig.TAG_DIRECT

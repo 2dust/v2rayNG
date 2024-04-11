@@ -175,7 +175,7 @@ object V2rayConfigUtil {
         try {
             routingUserRule(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                    ?: "", AppConfig.TAG_AGENT, v2rayConfig
+                    ?: "", AppConfig.TAG_PROXY, v2rayConfig
             )
             routingUserRule(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
@@ -195,7 +195,7 @@ object V2rayConfigUtil {
 
             // Hardcode googleapis.cn
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
-                outboundTag = AppConfig.TAG_AGENT,
+                outboundTag = AppConfig.TAG_PROXY,
                 domain = arrayListOf("domain:googleapis.cn")
             )
 
@@ -225,6 +225,15 @@ object V2rayConfigUtil {
                     v2rayConfig.routing.rules.add(globalDirect)
                 }
             }
+
+            if(routingMode != ERoutingMode.GLOBAL_DIRECT.value) {
+                v2rayConfig.routing.rules.add(
+                    V2rayConfig.RoutingBean.RulesBean(
+                        outboundTag = AppConfig.TAG_PROXY,
+                        port = "0-65535"
+                    ))
+            }
+
         } catch (e: Exception) {
             e.printStackTrace()
             return false
@@ -340,7 +349,7 @@ object V2rayConfigUtil {
             val remoteDns = Utils.getRemoteDnsServers()
             if (v2rayConfig.inbounds.none { e -> e.protocol == "dokodemo-door" && e.tag == "dns-in" }) {
                 val dnsInboundSettings = V2rayConfig.InboundBean.InSettingsBean(
-                    address = if (Utils.isPureIpAddress(remoteDns.first())) remoteDns.first() else "1.1.1.1",
+                    address = if (Utils.isPureIpAddress(remoteDns.first())) remoteDns.first() else AppConfig.DNS_PROXY,
                     port = 53,
                     network = "tcp,udp"
                 )
@@ -477,7 +486,7 @@ object V2rayConfigUtil {
             if (Utils.isPureIpAddress(remoteDns.first())) {
                 v2rayConfig.routing.rules.add(
                     0, V2rayConfig.RoutingBean.RulesBean(
-                        outboundTag = AppConfig.TAG_AGENT,
+                        outboundTag = AppConfig.TAG_PROXY,
                         port = "53",
                         ip = arrayListOf(remoteDns.first()),
                         domain = null

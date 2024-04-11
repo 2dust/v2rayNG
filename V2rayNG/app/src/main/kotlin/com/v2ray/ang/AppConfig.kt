@@ -63,7 +63,7 @@ object AppConfig {
     const val TASKER_EXTRA_BUNDLE_GUID = "tasker_extra_bundle_guid"
     const val TASKER_DEFAULT_GUID = "Default"
 
-    const val TAG_AGENT = "proxy"
+    const val TAG_PROXY = "proxy"
     const val TAG_DIRECT = "direct"
     const val TAG_BLOCKED = "block"
     const val TAG_FRAGMENT = "fragment"
@@ -78,8 +78,9 @@ object AppConfig {
     const val promotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
     const val geoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
 
-    const val DNS_AGENT = "1.1.1.1"
+    const val DNS_PROXY = "1.1.1.1"
     const val DNS_DIRECT = "223.5.5.5"
+    const val DNS_VPN = "1.1.1.1"
 
     const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"

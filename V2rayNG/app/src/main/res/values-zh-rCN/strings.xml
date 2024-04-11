@@ -135,7 +135,7 @@
     <string name="title_pref_routing_mode">预定义规则</string>
     <string name="title_pref_routing_custom">自定义规则</string>
 
-    <string name="title_pref_remote_dns">远程DNS (可选)</string>
+    <string name="title_pref_remote_dns">远程DNS (udp/tcp/https/quic)(可选)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (仅支持 IPv4/v6)</string>
