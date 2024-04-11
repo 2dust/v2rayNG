@@ -177,7 +177,10 @@ class UserAssetActivity : BaseActivity() {
         assets.forEach {
             //toast(getString(R.string.msg_downloading_content) + it)
             lifecycleScope.launch(Dispatchers.IO) {
-                val result = downloadGeo(it.second, 60000, httpPort)
+                var result = downloadGeo(it.second, 60000, httpPort)
+                if (!result) {
+                    result = downloadGeo(it.second, 60000, 0)
+                }
                 launch(Dispatchers.Main) {
                     if (result) {
                         toast(getString(R.string.toast_success) + " " + it.second.remarks)
@@ -197,12 +200,16 @@ class UserAssetActivity : BaseActivity() {
         //Log.d(AppConfig.ANG_PACKAGE, url)
 
         try {
-            conn = URL(item.url).openConnection(
-                Proxy(
-                    Proxy.Type.HTTP,
-                    InetSocketAddress("127.0.0.1", httpPort)
-                )
-            ) as HttpURLConnection
+            conn = if (httpPort == 0) {
+                URL(item.url).openConnection() as HttpURLConnection
+            } else {
+                URL(item.url).openConnection(
+                    Proxy(
+                        Proxy.Type.HTTP,
+                        InetSocketAddress("127.0.0.1", httpPort)
+                    )
+                ) as HttpURLConnection
+            }
             conn.connectTimeout = timeout
             conn.readTimeout = timeout
             val inputStream = conn.inputStream
