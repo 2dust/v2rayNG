@@ -456,7 +456,7 @@ data class V2rayConfig(
                            var rules: ArrayList<RulesBean>,
                            val balancers: List<Any>? = null) {
 
-        data class RulesBean(var type: String = "",
+        data class RulesBean(
                              var ip: ArrayList<String>? = null,
                              var domain: ArrayList<String>? = null,
                              var outboundTag: String = "",
@@ -489,8 +489,8 @@ data class V2rayConfig(
                            var poolSize: Int = 10000) // roughly 10 times smaller than total ip pool
 
     fun getProxyOutbound(): OutboundBean? {
-        outbounds?.forEach { outbound ->
-            EConfigType.values().forEach {
+        outbounds.forEach { outbound ->
+            EConfigType.entries.forEach {
                 if (outbound.protocol.equals(it.name, true)) {
                     return outbound
                 }

@@ -195,7 +195,6 @@ object V2rayConfigUtil {
 
             // Hardcode googleapis.cn
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
-                type = "field",
                 outboundTag = AppConfig.TAG_AGENT,
                 domain = arrayListOf("domain:googleapis.cn")
             )
@@ -220,7 +219,6 @@ object V2rayConfigUtil {
 
                 ERoutingMode.GLOBAL_DIRECT.value -> {
                     val globalDirect = V2rayConfig.RoutingBean.RulesBean(
-                        type = "field",
                         outboundTag = AppConfig.TAG_DIRECT,
                         port = "0-65535"
                     )
@@ -245,7 +243,6 @@ object V2rayConfigUtil {
                 //IP
                 if (ipOrDomain == "ip" || ipOrDomain == "") {
                     val rulesIP = V2rayConfig.RoutingBean.RulesBean()
-                    rulesIP.type = "field"
                     rulesIP.outboundTag = tag
                     rulesIP.ip = ArrayList()
                     rulesIP.ip?.add("geoip:$code")
@@ -255,7 +252,6 @@ object V2rayConfigUtil {
                 if (ipOrDomain == "domain" || ipOrDomain == "") {
                     //Domain
                     val rulesDomain = V2rayConfig.RoutingBean.RulesBean()
-                    rulesDomain.type = "field"
                     rulesDomain.outboundTag = tag
                     rulesDomain.domain = ArrayList()
                     rulesDomain.domain?.add("geosite:$code")
@@ -272,13 +268,11 @@ object V2rayConfigUtil {
             if (!TextUtils.isEmpty(userRule)) {
                 //Domain
                 val rulesDomain = V2rayConfig.RoutingBean.RulesBean()
-                rulesDomain.type = "field"
                 rulesDomain.outboundTag = tag
                 rulesDomain.domain = ArrayList()
 
                 //IP
                 val rulesIP = V2rayConfig.RoutingBean.RulesBean()
-                rulesIP.type = "field"
                 rulesIP.outboundTag = tag
                 rulesIP.ip = ArrayList()
 
@@ -383,7 +377,6 @@ object V2rayConfigUtil {
             // DNS routing tag
             v2rayConfig.routing.rules.add(
                 0, V2rayConfig.RoutingBean.RulesBean(
-                    type = "field",
                     inboundTag = arrayListOf("dns-in"),
                     outboundTag = "dns-out",
                     domain = null
@@ -454,7 +447,6 @@ object V2rayConfigUtil {
                 if (Utils.isPureIpAddress(domesticDns.first())) {
                     v2rayConfig.routing.rules.add(
                         0, V2rayConfig.RoutingBean.RulesBean(
-                            type = "field",
                             outboundTag = AppConfig.TAG_DIRECT,
                             port = "53",
                             ip = arrayListOf(domesticDns.first()),
@@ -485,7 +477,6 @@ object V2rayConfigUtil {
             if (Utils.isPureIpAddress(remoteDns.first())) {
                 v2rayConfig.routing.rules.add(
                     0, V2rayConfig.RoutingBean.RulesBean(
-                        type = "field",
                         outboundTag = AppConfig.TAG_AGENT,
                         port = "53",
                         ip = arrayListOf(remoteDns.first()),
