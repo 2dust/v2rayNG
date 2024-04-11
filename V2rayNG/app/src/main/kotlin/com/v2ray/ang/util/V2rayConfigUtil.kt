@@ -191,7 +191,7 @@ object V2rayConfigUtil {
                     ?: "IPIfNonMatch"
 //            v2rayConfig.routing.domainMatcher = "mph"
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
-                ?: ERoutingMode.GLOBAL_PROXY.value
+                ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
 
             // Hardcode googleapis.cn
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
@@ -207,12 +207,14 @@ object V2rayConfigUtil {
 
                 ERoutingMode.BYPASS_MAINLAND.value -> {
                     routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("domain", "geolocation-cn", AppConfig.TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
 
                 ERoutingMode.BYPASS_LAN_MAINLAND.value -> {
                     routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
                     routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("domain", "geolocation-cn", AppConfig.TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
 
@@ -424,10 +426,10 @@ object V2rayConfigUtil {
                     ?: ""
             )
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
-                ?: ERoutingMode.GLOBAL_PROXY.value
+                ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
             if (directDomain.size > 0 || routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
                 val domesticDns = Utils.getDomesticDnsServers()
-                val geositeCn = arrayListOf("geosite:cn")
+                val geositeCn = arrayListOf("geosite:cn","geosite:geolocation-cn")
                 val geoipCn = arrayListOf("geoip:cn")
                 if (directDomain.size > 0) {
                     servers.add(
