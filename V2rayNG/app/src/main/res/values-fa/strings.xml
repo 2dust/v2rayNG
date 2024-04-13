@@ -170,6 +170,9 @@
     <string name="toast_tg_app_not_found">برنامه تلگرام پیدا نشد</string>
 
     <string name="title_privacy_policy">حریم خصوصی</string>
+    <string name="title_about">About</string>
+    <string name="title_source_code">Source code</string>
+    <string name="title_tg_channel">Telegram channel</string>
     <string name="title_pref_promotion">تبلیغات</string>
     <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف شود)</string>
 

@@ -172,6 +172,9 @@
     <string name="toast_tg_app_not_found">Không tìm thấy ứng dụng Telegram</string>
 
     <string name="title_privacy_policy">Chính sách bảo mật</string>
+    <string name="title_about">About</string>
+    <string name="title_source_code">Source code</string>
+    <string name="title_tg_channel">Telegram channel</string>
     <string name="title_pref_promotion">Quảng bá server</string>
     <string name="summary_pref_promotion">Quảng cáo, nhấn để biết thêm (Ủng hộ có thể được gỡ bỏ)</string>
 

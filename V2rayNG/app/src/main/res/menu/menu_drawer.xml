@@ -22,20 +22,16 @@
     <group android:id="@+id/group_id2">
         <item
             android:id="@+id/promotion"
-            android:icon="@drawable/ic_whatshot_24dp"
+            android:icon="@drawable/ic_promotion_24dp"
             android:title="@string/title_pref_promotion" />
         <item
             android:id="@+id/logcat"
             android:icon="@drawable/ic_logcat_24dp"
             android:title="@string/title_logcat" />
         <item
-            android:id="@+id/feedback"
-            android:icon="@drawable/ic_feedback_24dp"
-            android:title="@string/title_pref_feedback" />
-        <item
-                android:id="@+id/privacy_policy"
-            android:icon="@drawable/ic_info_24dp"
-            android:title="@string/title_privacy_policy" />
+            android:id="@+id/about"
+            android:icon="@drawable/ic_about_24dp"
+            android:title="@string/title_about" />
         <!-- place holder for version text at the bottom -->
         <item
             android:id="@+id/placeholder"

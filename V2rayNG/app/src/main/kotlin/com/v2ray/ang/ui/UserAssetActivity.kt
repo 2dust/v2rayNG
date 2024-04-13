@@ -236,7 +236,7 @@ class UserAssetActivity : BaseActivity() {
             .forEach { 
                 list.add(Utils.getUuid() to AssetUrlItem(
                     it,
-                    AppConfig.geoUrl + it
+                    AppConfig.GeoUrl + it
                 ))
             }
 
@@ -271,7 +271,7 @@ class UserAssetActivity : BaseActivity() {
                 holder.itemUserAssetBinding.assetProperties.text = getString(R.string.msg_file_not_found)
             }
 
-            if (item.second.remarks in builtInGeoFiles && item.second.url == AppConfig.geoUrl + item.second.remarks) {
+            if (item.second.remarks in builtInGeoFiles && item.second.url == AppConfig.GeoUrl + item.second.remarks) {
                 holder.itemUserAssetBinding.layoutEdit.visibility = GONE
                 holder.itemUserAssetBinding.layoutRemove.visibility = GONE
             } else {

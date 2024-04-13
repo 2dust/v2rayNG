@@ -183,6 +183,9 @@
     <string name="summary_pref_tg_group">Join Telegram Group</string>
     <string name="toast_tg_app_not_found">Telegram app not found</string>
     <string name="title_privacy_policy">Privacy policy</string>
+    <string name="title_about">About</string>
+    <string name="title_source_code">Source code</string>
+    <string name="title_tg_channel">Telegram channel</string>
 
     <string name="title_pref_promotion">Promotion</string>
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>

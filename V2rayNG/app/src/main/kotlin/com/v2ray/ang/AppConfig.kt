@@ -72,11 +72,13 @@ object AppConfig {
         "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
     const val v2rayCustomRoutingListUrl =
         "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
-    const val v2rayNGIssues = "https://github.com/2dust/v2rayNG/issues"
-    const val v2rayNGWikiMode = "https://github.com/2dust/v2rayNG/wiki/Mode"
+    const val v2rayNGUrl = "https://github.com/2dust/v2rayNG"
+    const val v2rayNGIssues = "$v2rayNGUrl/issues"
+    const val v2rayNGWikiMode = "$v2rayNGUrl/wiki/Mode"
     const val v2rayNGPrivacyPolicy = "https://raw.githubusercontent.com/2dust/v2rayNG/master/CR.md"
-    const val promotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
-    const val geoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
+    const val PromotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
+    const val GeoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
+    const val TgChannelUrl = "https://t.me/github_2dust"
 
     const val DNS_PROXY = "1.1.1.1"
     const val DNS_DIRECT = "223.5.5.5"
