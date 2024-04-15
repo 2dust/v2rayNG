@@ -115,14 +115,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     @Synchronized
     fun updateCache() {
         serversCache.clear()
-        for (guid in serverList) {
-            val config = MmkvManager.decodeServerConfig(guid) ?: continue
-            if (subscriptionId.isNotEmpty() && subscriptionId != config.subscriptionId) {
-                continue
-            }
+        viewModelScope.launch(Dispatchers.Default) {
+            for (guid in serverList) {
+                val config = MmkvManager.decodeServerConfig(guid) ?: continue
+                if (subscriptionId.isNotEmpty() && subscriptionId != config.subscriptionId) {
+                    continue
+                }
 
-            if (keywordFilter.isEmpty() || config.remarks.contains(keywordFilter)) {
-                serversCache.add(ServersCache(guid, config))
+                if (keywordFilter.isEmpty() || config.remarks.contains(keywordFilter)) {
+                    serversCache.add(ServersCache(guid, config))
+                }
             }
         }
     }
