@@ -173,6 +173,9 @@
     <string name="title_about">關於</string>
     <string name="title_source_code">原始碼</string>
     <string name="title_tg_channel">Telegram 頻道</string>
+    <string name="title_configuration_backup">備份配置</string>
+    <string name="summary_configuration_backup">備份儲存位置: [%s], 卸載App後備份將會清除</string>
+    <string name="title_configuration_restore">還原配置</string>
 
     <string name="title_pref_promotion">推廣</string>
     <string name="summary_pref_promotion">一些推廣，輕觸以檢視 (捐贈可去除)</string>

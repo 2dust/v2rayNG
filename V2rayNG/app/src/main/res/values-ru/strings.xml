@@ -175,6 +175,9 @@
     <string name="title_about">О приложении</string>
     <string name="title_source_code">Исходный код</string>
     <string name="title_tg_channel">Telegram-канал</string>
+    <string name="title_configuration_backup">Backup configuration</string>
+    <string name="summary_configuration_backup">Backup storage location: [%s], It will be cleared when the app is uninstalled</string>
+    <string name="title_configuration_restore">Restore configuration</string>
 
     <string name="title_pref_promotion">Содействие</string>
     <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации (пожертвование может быть удалено)</string>

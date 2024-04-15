@@ -173,6 +173,9 @@
     <string name="title_about">About</string>
     <string name="title_source_code">Source code</string>
     <string name="title_tg_channel">Telegram channel</string>
+    <string name="title_configuration_backup">Backup configuration</string>
+    <string name="summary_configuration_backup">Backup storage location: [%s], It will be cleared when the app is uninstalled</string>
+    <string name="title_configuration_restore">Restore configuration</string>
     <string name="title_pref_promotion">تبلیغات</string>
     <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف شود)</string>
 

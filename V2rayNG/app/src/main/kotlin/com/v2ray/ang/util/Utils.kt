@@ -1,11 +1,8 @@
 package com.v2ray.ang.util
 
+import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.text.Editable
-import android.util.Base64
-import java.util.*
-import android.content.ClipData
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
@@ -14,6 +11,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.LocaleList
 import android.provider.Settings
+import android.text.Editable
+import android.util.Base64
 import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
@@ -23,9 +22,10 @@ import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
-import java.net.*
 import com.v2ray.ang.service.V2RayServiceManager
 import java.io.IOException
+import java.net.*
+import java.util.*
 
 object Utils {
 
@@ -315,6 +315,14 @@ object Utils {
             return ""
         val extDir = context.getExternalFilesDir(AppConfig.DIR_ASSETS)
                 ?: return context.getDir(AppConfig.DIR_ASSETS, 0).absolutePath
+        return extDir.absolutePath
+    }
+
+    fun backupPath(context: Context?): String {
+        if (context == null)
+            return ""
+        val extDir = context.getExternalFilesDir(AppConfig.DIR_BACKUPS)
+            ?: return context.getDir(AppConfig.DIR_BACKUPS, 0).absolutePath
         return extDir.absolutePath
     }
 
