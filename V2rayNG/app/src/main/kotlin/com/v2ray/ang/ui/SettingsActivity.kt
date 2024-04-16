@@ -12,6 +12,7 @@ import androidx.work.multiprocess.RemoteWorkManager
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.service.AutoTestConnectWorker
 import com.v2ray.ang.service.SubscriptionUpdater
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.SettingsViewModel
@@ -54,6 +55,8 @@ class SettingsActivity : BaseActivity() {
         private val routingCustom by lazy { findPreference<Preference>(AppConfig.PREF_ROUTING_CUSTOM) }
         private val autoUpdateCheck by lazy { findPreference<CheckBoxPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE) }
         private val autoUpdateInterval by lazy { findPreference<EditTextPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL) }
+        private val autoTestConnect by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_AUTO_TEST_CONNECT) }
+
         //        val licenses: Preference by lazy { findPreference(PREF_LICENSES) }
 //        val feedback: Preference by lazy { findPreference(PREF_FEEDBACK) }
 //        val tgGroup: Preference by lazy { findPreference(PREF_TG_GROUP) }
@@ -86,6 +89,13 @@ class SettingsActivity : BaseActivity() {
                     if (TextUtils.isEmpty(nval) || nval.toLong() < 15) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
                 autoUpdateInterval?.summary = nval
                 configureUpdateTask(nval.toLong())
+                true
+            }
+
+            autoTestConnect?.setOnPreferenceChangeListener { _, newValue ->
+                val value = newValue as Boolean
+                autoTestConnect?.isChecked = value
+                if (newValue) configureAutoTestConnectWork(15) else cancelAutoTestConnectWork()
                 true
             }
 
@@ -283,7 +293,30 @@ class SettingsActivity : BaseActivity() {
             val rw = RemoteWorkManager.getInstance(AngApplication.application)
             rw.cancelUniqueWork(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
         }
-            
+
+        private fun configureAutoTestConnectWork(interval: Long) {
+            val rw = RemoteWorkManager.getInstance(AngApplication.application)
+            rw.cancelUniqueWork(AppConfig.PREF_AUTO_TEST_CONNECT_WORK_NAME)
+            rw.enqueueUniquePeriodicWork(
+                AppConfig.PREF_AUTO_TEST_CONNECT_WORK_NAME,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                PeriodicWorkRequest.Builder(
+                    AutoTestConnectWorker.UpdateTask::class.java,
+                    interval,
+                    TimeUnit.MINUTES
+                )
+                    .apply {
+                        setInitialDelay(interval, TimeUnit.MINUTES)
+                    }
+                    .build()
+            )
+        }
+
+        private fun cancelAutoTestConnectWork() {
+            val rw = RemoteWorkManager.getInstance(AngApplication.application)
+            rw.cancelUniqueWork(AppConfig.PREF_AUTO_TEST_CONNECT_WORK_NAME)
+        }
+
         private fun updateMux(enabled: Boolean) {
             val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
             muxConcurrency?.isEnabled = enabled

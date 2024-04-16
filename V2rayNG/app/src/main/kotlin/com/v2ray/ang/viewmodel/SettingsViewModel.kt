@@ -59,6 +59,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_START_SCAN_IMMEDIATE,
             AppConfig.SUBSCRIPTION_AUTO_UPDATE,
             AppConfig.PREF_FRAGMENT_ENABLED,
+            AppConfig.PREF_AUTO_TEST_CONNECT,
             AppConfig.PREF_MUX_ENABLED, -> {
                 settingsStorage?.encode(key, sharedPreferences.getBoolean(key, false))
             }

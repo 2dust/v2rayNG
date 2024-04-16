@@ -123,6 +123,9 @@
     <string name="title_pref_sniffing_enabled">Анализ пакетов</string>
     <string name="summary_pref_sniffing_enabled">Использовать анализ пакетов (по умолчанию включено)</string>
 
+    <string name="title_pref_auto_test_connect">Автоматическое тестирование и подключение</string>
+    <string name="summary_pref_auto_test_connect">Тестируйте каждые 15 минут, и если он не подключен, попробуйте подключиться к лучшей конфигурации, оценив реальные задержки.</string>
+
     <string name="title_pref_local_dns_enabled">Использовать локальную DNS</string>
     <string name="summary_pref_local_dns_enabled">Обслуживание выполняется DNS-модулем ядра (в настройках маршрутизации рекомендуется выбрать режим «Все, кроме LAN и Китая»)</string>
 

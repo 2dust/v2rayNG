@@ -149,6 +149,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_orange))
                 setTestState(getString(R.string.connection_connected))
                 binding.layoutTest.isFocusable = true
+
+                if (settingsStorage?.decodeBool(AppConfig.PREF_AUTO_TEST_CONNECT, false) == true) {
+                    mainViewModel.testCurrentServerRealPing()
+                }
             } else {
                 if (!Utils.getDarkModeStatus(this)) {
                     binding.fab.setImageResource(R.drawable.ic_stat_name)
@@ -158,6 +162,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 binding.layoutTest.isFocusable = false
             }
             hideCircle()
+        }
+        mainViewModel.autoConnectServer.observe(this) {
+            adapter.selectServerByGuid(it)
         }
         mainViewModel.startListenBroadcast()
     }

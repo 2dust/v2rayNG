@@ -52,6 +52,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
     val updateTestResultAction by lazy { MutableLiveData<String>() }
+    val autoConnectServer by lazy { MutableLiveData<String>() }
+    var isWaitingForAutoConnect: Boolean = false
 
     private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
 
@@ -151,7 +153,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun testAllRealPing() {
+    fun testAllRealPing(isAutoTest: Boolean = false) {
         MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG_CANCEL, "")
         MmkvManager.clearAllTestDelayResults()
         updateListAction.value = -1 // update all
@@ -299,6 +301,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val resultPair = intent.getSerializableExtra("content") as Pair<String, Long>
                     MmkvManager.encodeServerTestDelayMillis(resultPair.first, resultPair.second)
                     updateListAction.value = getPosition(resultPair.first)
+
+                    if (resultPair.second > 0L && isWaitingForAutoConnect) {
+                        isWaitingForAutoConnect = false
+                        autoConnectServer.value = resultPair.first
+                    }
+                }
+
+                AppConfig.MSG_AUTO_TEST_ALL_REAL_PING -> {
+                    isWaitingForAutoConnect = true
+                    testAllRealPing(true)
                 }
             }
         }

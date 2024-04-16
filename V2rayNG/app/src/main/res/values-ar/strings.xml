@@ -111,6 +111,8 @@
 	<string name="summary_pref_speed_enabled">عرض السرعة الحالية في الإشعار.\nسيتغير رمز الإشعار استنادًا إلى الاستخدام.</string>
 	<string name="title_pref_sniffing_enabled">تمكين Sniffing</string>
 	<string name="summary_pref_sniffing_enabled">محاولة استخلاص النطاق من الحزمة (الافتراضي هو التشغيل)</string>
+	<string name="title_pref_auto_test_connect">الاختبار التلقائي والاتصال</string>
+	<string name="summary_pref_auto_test_connect">قم بإجراء الاختبار كل 15 دقائق، وإذا لم يكن متصلاً، فحاول الاتصال بأفضل تكوين من خلال تقييم التأخيرات الحقيقية.</string>
 	<string name="title_pref_local_dns_enabled">تمكين DNS المحلي</string>
 	<string name="summary_pref_local_dns_enabled">DNS يتم معالجتها بواسطة وحدة DNS الأساسية (موصى بها، إذا كانت بحاجة إلى توجيه تجاوز الشبكة المحلية والعنوان الرئيسي)</string>
 	<string name="title_pref_fake_dns_enabled">تمكين DNS الوهمي</string>

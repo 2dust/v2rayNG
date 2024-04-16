@@ -152,24 +152,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             }
 
             holder.itemMainBinding.infoContainer.setOnClickListener {
-                val selected = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)
-                if (guid != selected) {
-                    mainStorage?.encode(MmkvManager.KEY_SELECTED_SERVER, guid)
-                    if (!TextUtils.isEmpty(selected)) {
-                        notifyItemChanged(mActivity.mainViewModel.getPosition(selected!!))
-                    }
-                    notifyItemChanged(mActivity.mainViewModel.getPosition(guid))
-                    if (isRunning) {
-                        mActivity.showCircle()
-                        Utils.stopVService(mActivity)
-                        Observable.timer(500, TimeUnit.MILLISECONDS)
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe {
-                                    V2RayServiceManager.startV2Ray(mActivity)
-                                    mActivity.hideCircle()
-                                }
-                    }
-                }
+                selectServerByGuid(guid)
             }
         }
         if (holder is FooterViewHolder) {
@@ -196,6 +179,27 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
         mActivity.mainViewModel.removeServer(guid)
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, mActivity.mainViewModel.serversCache.size)
+    }
+
+    fun selectServerByGuid(guid: String) {
+        val selected = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)
+        if (guid != selected) {
+            mainStorage?.encode(MmkvManager.KEY_SELECTED_SERVER, guid)
+            if (!TextUtils.isEmpty(selected)) {
+                notifyItemChanged(mActivity.mainViewModel.getPosition(selected!!))
+            }
+            notifyItemChanged(mActivity.mainViewModel.getPosition(guid))
+            if (isRunning) {
+                mActivity.showCircle()
+                Utils.stopVService(mActivity)
+                Observable.timer(500, TimeUnit.MILLISECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        V2RayServiceManager.startV2Ray(mActivity)
+                        mActivity.hideCircle()
+                    }
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
