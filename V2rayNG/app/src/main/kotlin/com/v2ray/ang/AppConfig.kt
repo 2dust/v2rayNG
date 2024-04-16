@@ -12,43 +12,58 @@ object AppConfig {
     // legacy
     const val ANG_CONFIG = "ang_config"
     const val PREF_INAPP_BUY_IS_PREMIUM = "pref_inapp_buy_is_premium"
-    const val PREF_ROUTING_CUSTOM = "pref_routing_custom"
 
     // Preferences mapped to MMKV
-    const val PREF_MODE = "pref_mode"
-    const val PREF_SPEED_ENABLED = "pref_speed_enabled"
     const val PREF_SNIFFING_ENABLED = "pref_sniffing_enabled"
-    const val PREF_PROXY_SHARING = "pref_proxy_sharing_enabled"
+    const val PREF_PER_APP_PROXY = "pref_per_app_proxy"
+    const val PREF_PER_APP_PROXY_SET = "pref_per_app_proxy_set"
+    const val PREF_BYPASS_APPS = "pref_bypass_apps"
     const val PREF_LOCAL_DNS_ENABLED = "pref_local_dns_enabled"
     const val PREF_FAKE_DNS_ENABLED = "pref_fake_dns_enabled"
-    const val PREF_VPN_DNS = "pref_vpn_dns"
-    const val PREF_REMOTE_DNS = "pref_remote_dns"
-    const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
     const val PREF_LOCAL_DNS_PORT = "pref_local_dns_port"
-    const val PREF_ALLOW_INSECURE = "pref_allow_insecure"
-    const val PREF_SOCKS_PORT = "pref_socks_port"
-    const val PREF_HTTP_PORT = "pref_http_port"
-    const val PREF_LOGLEVEL = "pref_core_loglevel"
-    const val PREF_LANGUAGE = "pref_language"
-    const val PREF_PREFER_IPV6 = "pref_prefer_ipv6"
+    const val PREF_VPN_DNS = "pref_vpn_dns"
+
     const val PREF_ROUTING_DOMAIN_STRATEGY = "pref_routing_domain_strategy"
     const val PREF_ROUTING_MODE = "pref_routing_mode"
     const val PREF_V2RAY_ROUTING_AGENT = "pref_v2ray_routing_agent"
     const val PREF_V2RAY_ROUTING_DIRECT = "pref_v2ray_routing_direct"
     const val PREF_V2RAY_ROUTING_BLOCKED = "pref_v2ray_routing_blocked"
-    const val PREF_PER_APP_PROXY = "pref_per_app_proxy"
-    const val PREF_PER_APP_PROXY_SET = "pref_per_app_proxy_set"
-    const val PREF_BYPASS_APPS = "pref_bypass_apps"
-    const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
-    const val PREF_START_SCAN_IMMEDIATE = "pref_start_scan_immediate"
+    const val PREF_ROUTING_CUSTOM = "pref_routing_custom"
+
     const val PREF_MUX_ENABLED = "pref_mux_enabled"
     const val PREF_MUX_CONCURRENCY = "pref_mux_concurency"
     const val PREF_MUX_XUDP_CONCURRENCY = "pref_mux_xudp_concurency"
     const val PREF_MUX_XUDP_QUIC = "pref_mux_xudp_quic"
+
     const val PREF_FRAGMENT_ENABLED = "pref_fragment_enabled"
     const val PREF_FRAGMENT_PACKETS = "pref_fragment_packets"
     const val PREF_FRAGMENT_LENGTH = "pref_fragment_length"
     const val PREF_FRAGMENT_INTERVAL = "pref_fragment_interval"
+
+    const val SUBSCRIPTION_AUTO_UPDATE = "pref_auto_update_subscription"
+    const val SUBSCRIPTION_AUTO_UPDATE_INTERVAL = "pref_auto_update_interval"
+    const val SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL = "1440" // 24 hours
+    const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
+
+    const val PREF_SPEED_ENABLED = "pref_speed_enabled"
+    const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
+    const val PREF_START_SCAN_IMMEDIATE = "pref_start_scan_immediate"
+    const val PREF_LANGUAGE = "pref_language"
+
+    const val PREF_PREFER_IPV6 = "pref_prefer_ipv6"
+    const val PREF_PROXY_SHARING = "pref_proxy_sharing_enabled"
+    const val PREF_ALLOW_INSECURE = "pref_allow_insecure"
+    const val PREF_SOCKS_PORT = "pref_socks_port"
+    const val PREF_HTTP_PORT = "pref_http_port"
+    const val PREF_REMOTE_DNS = "pref_remote_dns"
+    const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
+    const val PREF_LOGLEVEL = "pref_core_loglevel"
+    const val PREF_MODE = "pref_mode"
+
+    const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"
+    const val CACHE_KEYWORD_FILTER = "cache_keyword_filter"
+
+    //Preferences mapped to MMKV End
 
     const val PROTOCOL_HTTP: String = "http://"
     const val PROTOCOL_HTTPS: String = "https://"
@@ -107,13 +122,4 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG = 7
     const val MSG_MEASURE_CONFIG_SUCCESS = 71
     const val MSG_MEASURE_CONFIG_CANCEL = 72
-
-    // subscription settings
-    const val SUBSCRIPTION_AUTO_UPDATE = "pref_auto_update_subscription"
-    const val SUBSCRIPTION_AUTO_UPDATE_INTERVAL = "pref_auto_update_interval"
-    const val SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL = "1440" // 24 hours
-    const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
-
-    const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"
-    const val CACHE_KEYWORD_FILTER = "cache_keyword_filter"
 }

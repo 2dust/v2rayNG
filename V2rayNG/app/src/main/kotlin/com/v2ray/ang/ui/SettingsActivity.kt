@@ -9,10 +9,12 @@ import androidx.preference.*
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.multiprocess.RemoteWorkManager
+import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.service.SubscriptionUpdater
+import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.SettingsViewModel
 import java.util.concurrent.TimeUnit
@@ -30,12 +32,16 @@ class SettingsActivity : BaseActivity() {
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
+        private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
+
         private val perAppProxy by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_PER_APP_PROXY) }
         private val localDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_LOCAL_DNS_ENABLED) }
         private val fakeDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_FAKE_DNS_ENABLED) }
         private val localDnsPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_LOCAL_DNS_PORT) }
         private val vpnDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_VPN_DNS) }
-        
+
+        private val routingCustom by lazy { findPreference<Preference>(AppConfig.PREF_ROUTING_CUSTOM) }
+
         private val mux by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_MUX_ENABLED) }
         private val muxConcurrency by lazy { findPreference<EditTextPreference>(AppConfig.PREF_MUX_CONCURRENCY) }
         private val muxXudpConcurrency by lazy { findPreference<EditTextPreference>(AppConfig.PREF_MUX_XUDP_CONCURRENCY) }
@@ -46,18 +52,13 @@ class SettingsActivity : BaseActivity() {
         private val fragmentLength by lazy { findPreference<EditTextPreference>(AppConfig.PREF_FRAGMENT_LENGTH) }
         private val fragmentInterval by lazy { findPreference<EditTextPreference>(AppConfig.PREF_FRAGMENT_INTERVAL) }
 
-        //        val autoRestart by lazy { findPreference(PREF_AUTO_RESTART) as CheckBoxPreference }
-        private val remoteDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_REMOTE_DNS) }
-        private val domesticDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DOMESTIC_DNS) }
-        private val socksPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS_PORT) }
-        private val httpPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HTTP_PORT) }
-        private val routingCustom by lazy { findPreference<Preference>(AppConfig.PREF_ROUTING_CUSTOM) }
         private val autoUpdateCheck by lazy { findPreference<CheckBoxPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE) }
         private val autoUpdateInterval by lazy { findPreference<EditTextPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL) }
-        //        val licenses: Preference by lazy { findPreference(PREF_LICENSES) }
-//        val feedback: Preference by lazy { findPreference(PREF_FEEDBACK) }
-//        val tgGroup: Preference by lazy { findPreference(PREF_TG_GROUP) }
 
+        private val socksPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS_PORT) }
+        private val httpPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HTTP_PORT) }
+        private val remoteDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_REMOTE_DNS) }
+        private val domesticDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DOMESTIC_DNS) }
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
 
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
@@ -89,27 +90,6 @@ class SettingsActivity : BaseActivity() {
                 true
             }
 
-//            licenses.onClick {
-//                val fragment = LicensesDialogFragment.Builder(act)
-//                        .setNotices(R.raw.licenses)
-//                        .setIncludeOwnLicense(false)
-//                        .build()
-//                fragment.show((act as AppCompatActivity).supportFragmentManager, null)
-//            }
-//
-//            feedback.onClick {
-//                Utils.openUri(activity, "https://github.com/2dust/v2rayNG/issues")
-//            }
-//            tgGroup.onClick {
-//                //                Utils.openUri(activity, "https://t.me/v2rayN")
-//                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("tg:resolve?domain=v2rayN"))
-//                try {
-//                    startActivity(intent)
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                    toast(R.string.toast_tg_app_not_found)
-//                }
-//            }
 
             perAppProxy?.setOnPreferenceClickListener {
                 startActivity(Intent(activity, PerAppProxyActivity::class.java))
@@ -193,61 +173,76 @@ class SettingsActivity : BaseActivity() {
 
         override fun onStart() {
             super.onStart()
-            val defaultSharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(requireActivity())
-            updateMode(defaultSharedPreferences.getString(AppConfig.PREF_MODE, "VPN"))
-            var remoteDnsString = defaultSharedPreferences.getString(AppConfig.PREF_REMOTE_DNS, "")
+            initSharedPreference()
 
-            domesticDns?.summary = defaultSharedPreferences.getString(AppConfig.PREF_DOMESTIC_DNS, "")
-            localDnsPort?.summary = defaultSharedPreferences.getString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
-            socksPort?.summary = defaultSharedPreferences.getString(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
-            httpPort?.summary = defaultSharedPreferences.getString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
-            updateMux(defaultSharedPreferences.getBoolean(AppConfig.PREF_MUX_ENABLED, false))
-            muxConcurrency?.summary = defaultSharedPreferences.getString(AppConfig.PREF_MUX_CONCURRENCY, "8")
-            muxXudpConcurrency?.summary = defaultSharedPreferences.getString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
-            updateFragment(defaultSharedPreferences.getBoolean(AppConfig.PREF_FRAGMENT_ENABLED, false))
-            fragmentPackets?.summary = defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello")
-            fragmentLength?.summary = defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
-            fragmentInterval?.summary = defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
-            autoUpdateInterval?.summary = defaultSharedPreferences.getString(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
-            autoUpdateInterval?.isEnabled = defaultSharedPreferences.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
+            updateMode(settingsStorage.decodeString(AppConfig.PREF_MODE, "VPN"))
+            localDns?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
+            fakeDns?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_FAKE_DNS_ENABLED, false)
+            localDnsPort?.summary = settingsStorage.decodeString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
+            vpnDns?.summary  = settingsStorage.decodeString(AppConfig.PREF_VPN_DNS)?: settingsStorage.decodeString(AppConfig.PREF_REMOTE_DNS)?: AppConfig.DNS_VPN
 
-            if (TextUtils.isEmpty(remoteDnsString)) {
-                remoteDnsString = AppConfig.DNS_PROXY
-            }
-            if (TextUtils.isEmpty(domesticDns?.summary)) {
-                domesticDns?.summary = AppConfig.DNS_DIRECT
-            }
-            remoteDns?.summary = remoteDnsString
-            vpnDns?.summary =
-                defaultSharedPreferences.getString(AppConfig.PREF_VPN_DNS, remoteDnsString)
+            updateMux(settingsStorage.getBoolean(AppConfig.PREF_MUX_ENABLED, false))
+            mux?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_MUX_ENABLED, false)
+            muxConcurrency?.summary = settingsStorage.decodeString(AppConfig.PREF_MUX_CONCURRENCY, "8")
+            muxXudpConcurrency?.summary = settingsStorage.decodeString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
 
-            if (TextUtils.isEmpty(localDnsPort?.summary)) {
-                localDnsPort?.summary = AppConfig.PORT_LOCAL_DNS
+            updateFragment(settingsStorage.getBoolean(AppConfig.PREF_FRAGMENT_ENABLED, false))
+            fragment?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_FRAGMENT_ENABLED, false)
+            fragmentPackets?.summary = settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello")
+            fragmentLength?.summary = settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
+            fragmentInterval?.summary = settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
+
+            autoUpdateCheck?.isChecked = settingsStorage.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
+            autoUpdateInterval?.summary = settingsStorage.decodeString(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
+            autoUpdateInterval?.isEnabled = settingsStorage.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
+
+            socksPort?.summary = settingsStorage.decodeString(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
+            httpPort?.summary = settingsStorage.decodeString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
+            remoteDns?.summary = settingsStorage.decodeString(AppConfig.PREF_REMOTE_DNS, AppConfig.DNS_PROXY)
+            domesticDns?.summary = settingsStorage.decodeString(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
+        }
+
+        private fun initSharedPreference() {
+            listOf(
+                AppConfig.PREF_SNIFFING_ENABLED,
+                AppConfig.PREF_BYPASS_APPS,
+                AppConfig.PREF_SPEED_ENABLED,
+                AppConfig.PREF_CONFIRM_REMOVE,
+                AppConfig.PREF_START_SCAN_IMMEDIATE,
+                AppConfig.PREF_PREFER_IPV6,
+                AppConfig.PREF_PROXY_SHARING,
+                AppConfig.PREF_ALLOW_INSECURE
+            ).forEach { key ->
+                findPreference<CheckBoxPreference>(key)?.isChecked =
+                    settingsStorage.decodeBool(key, false)
             }
-            if (TextUtils.isEmpty(socksPort?.summary)) {
-                socksPort?.summary = AppConfig.PORT_SOCKS
-            }
-            if (TextUtils.isEmpty(httpPort?.summary)) {
-                httpPort?.summary = AppConfig.PORT_HTTP
+
+            listOf(
+                AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,
+                AppConfig.PREF_ROUTING_MODE,
+                AppConfig.PREF_MUX_XUDP_QUIC,
+                AppConfig.PREF_FRAGMENT_PACKETS,
+                AppConfig.PREF_LANGUAGE,
+                AppConfig.PREF_LOGLEVEL,
+                AppConfig.PREF_MODE
+            ).forEach { key ->
+                if (settingsStorage.decodeString(key) != null) {
+                    findPreference<ListPreference>(key)?.value = settingsStorage.decodeString(key)
+                }
             }
         }
 
         private fun updateMode(mode: String?) {
-            val defaultSharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(requireActivity())
             val vpn = mode == "VPN"
             perAppProxy?.isEnabled = vpn
-            perAppProxy?.isChecked =
-                PreferenceManager.getDefaultSharedPreferences(requireActivity())
-                    .getBoolean(AppConfig.PREF_PER_APP_PROXY, false)
+            perAppProxy?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_PER_APP_PROXY, false)
             localDns?.isEnabled = vpn
             fakeDns?.isEnabled = vpn
             localDnsPort?.isEnabled = vpn
             vpnDns?.isEnabled = vpn
             if (vpn) {
                 updateLocalDns(
-                    defaultSharedPreferences.getBoolean(
+                    settingsStorage.getBoolean(
                         AppConfig.PREF_LOCAL_DNS_ENABLED,
                         false
                     )
@@ -283,15 +278,14 @@ class SettingsActivity : BaseActivity() {
             val rw = RemoteWorkManager.getInstance(AngApplication.application)
             rw.cancelUniqueWork(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
         }
-            
+
         private fun updateMux(enabled: Boolean) {
-            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
             muxConcurrency?.isEnabled = enabled
             muxXudpConcurrency?.isEnabled = enabled
             muxXudpQuic?.isEnabled = enabled
             if (enabled) {
-                updateMuxConcurrency(defaultSharedPreferences.getString(AppConfig.PREF_MUX_CONCURRENCY, "8"))
-                updateMuxXudpConcurrency(defaultSharedPreferences.getString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8"))
+                updateMuxConcurrency(settingsStorage.decodeString(AppConfig.PREF_MUX_CONCURRENCY, "8"))
+                updateMuxXudpConcurrency(settingsStorage.decodeString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8"))
             }
         }
 
@@ -314,14 +308,13 @@ class SettingsActivity : BaseActivity() {
         }
 
         private fun updateFragment(enabled: Boolean) {
-            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
             fragmentPackets?.isEnabled = enabled
             fragmentLength?.isEnabled = enabled
             fragmentInterval?.isEnabled = enabled
             if (enabled) {
-                updateFragmentPackets(defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello"))
-                updateFragmentLength(defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100"))
-                updateFragmentInterval(defaultSharedPreferences.getString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20"))
+                updateFragmentPackets(settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello"))
+                updateFragmentLength(settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100"))
+                updateFragmentInterval(settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20"))
             }
         }
         private fun updateFragmentPackets(value: String?) {
