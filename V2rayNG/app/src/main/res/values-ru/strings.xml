@@ -176,7 +176,7 @@
     <string name="title_source_code">Исходный код</string>
     <string name="title_tg_channel">Telegram-канал</string>
     <string name="title_configuration_backup">Backup configuration</string>
-    <string name="summary_configuration_backup">Backup storage location: [%s], It will be cleared when the app is uninstalled</string>
+    <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
     <string name="title_configuration_restore">Restore configuration</string>
 
     <string name="title_pref_promotion">Содействие</string>

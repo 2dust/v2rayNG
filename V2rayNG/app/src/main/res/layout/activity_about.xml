@@ -47,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:maxLines="4"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Tooltip" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
             </LinearLayout>
 
@@ -110,7 +110,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:text="@string/title_source_code"
-                android:textAppearance="@style/TextAppearance.AppCompat.Tooltip" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
         </LinearLayout>
 
         <LinearLayout
@@ -136,7 +136,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:text="@string/title_pref_feedback"
-                android:textAppearance="@style/TextAppearance.AppCompat.Tooltip" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
         </LinearLayout>
 
 
@@ -163,7 +163,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:text="@string/title_tg_channel"
-                android:textAppearance="@style/TextAppearance.AppCompat.Tooltip" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
         </LinearLayout>
 
         <LinearLayout
@@ -189,7 +189,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:text="@string/title_privacy_policy"
-                android:textAppearance="@style/TextAppearance.AppCompat.Tooltip" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
         </LinearLayout>
 
         <LinearLayout
@@ -204,7 +204,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/title_about"
-                android:textAppearance="@style/TextAppearance.AppCompat.Tooltip" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
         </LinearLayout>
 
     </LinearLayout>
