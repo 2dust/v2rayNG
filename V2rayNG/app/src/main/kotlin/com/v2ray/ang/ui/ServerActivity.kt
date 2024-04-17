@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.PREF_ALLOW_INSECURE
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
@@ -209,7 +210,7 @@ class ServerActivity : BaseActivity() {
     }
 
     /**
-     * bingding seleced server config
+     * binding selected server config
      */
     private fun bindingServer(config: ServerConfig): Boolean {
         val outbound = config.getProxyOutbound() ?: return false
@@ -560,11 +561,16 @@ class ServerActivity : BaseActivity() {
                             MmkvManager.removeServer(editGuid)
                             finish()
                         }
+                        .setNegativeButton(android.R.string.no) { _, _ ->
+                            // do nothing
+                        }
                         .show()
                 } else {
                     MmkvManager.removeServer(editGuid)
                     finish()
                 }
+            } else {
+                application.toast(R.string.toast_action_not_allowed)
             }
         }
         return true

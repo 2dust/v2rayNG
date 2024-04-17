@@ -80,6 +80,7 @@
     <string name="toast_asset_copy_failed">کپی فایل انجام نشد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
     <string name="menu_item_add_file">افزودن فایل‌ها</string>
     <string name="menu_item_download_file">دانلود فایل‌ها</string>
+    <string name="toast_action_not_allowed">این عمل ممنوع است</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">URL را اضافه کنید</string>

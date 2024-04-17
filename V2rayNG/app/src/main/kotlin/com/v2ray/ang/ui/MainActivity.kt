@@ -326,6 +326,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         MmkvManager.removeAllServer()
                         mainViewModel.reloadServerList()
                     }
+                    .setNegativeButton(android.R.string.no) {_, _ ->
+                        //do noting
+                    }
                     .show()
             true
         }
@@ -333,6 +336,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     mainViewModel.removeDuplicateServer()
+                }
+                .setNegativeButton(android.R.string.no) {_, _ ->
+                    //do noting
                 }
                 .show()
             true
@@ -342,6 +348,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     MmkvManager.removeInvalidServer()
                     mainViewModel.reloadServerList()
+                }
+                .setNegativeButton(android.R.string.no) {_, _ ->
+                    //do noting
                 }
                 .show()
             true
