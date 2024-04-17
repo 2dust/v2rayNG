@@ -181,7 +181,7 @@ class SettingsActivity : BaseActivity() {
             localDns?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
             fakeDns?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_FAKE_DNS_ENABLED, false)
             localDnsPort?.summary = settingsStorage.decodeString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
-            vpnDns?.summary  = settingsStorage.decodeString(AppConfig.PREF_VPN_DNS)?: settingsStorage.decodeString(AppConfig.PREF_REMOTE_DNS)?: AppConfig.DNS_VPN
+            vpnDns?.summary  = settingsStorage.decodeString(AppConfig.PREF_VPN_DNS, AppConfig.DNS_VPN)
 
             updateMux(settingsStorage.getBoolean(AppConfig.PREF_MUX_ENABLED, false))
             mux?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_MUX_ENABLED, false)

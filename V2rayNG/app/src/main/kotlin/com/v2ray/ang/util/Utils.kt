@@ -148,9 +148,7 @@ object Utils {
     }
 
     fun getVpnDnsServers(): List<String> {
-        val vpnDns = settingsStorage?.decodeString(AppConfig.PREF_VPN_DNS)
-                ?: settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS)
-                ?: AppConfig.DNS_VPN
+        val vpnDns = settingsStorage?.decodeString(AppConfig.PREF_VPN_DNS)?:AppConfig.DNS_VPN
         return vpnDns.split(",").filter { isPureIpAddress(it) }
         // allow empty, in that case dns will use system default
     }
