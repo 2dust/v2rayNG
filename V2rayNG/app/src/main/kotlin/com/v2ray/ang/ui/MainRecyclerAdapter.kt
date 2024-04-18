@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AngApplication.Companion.application
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ItemQrcodeBinding
@@ -144,10 +145,15 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                             .setPositiveButton(android.R.string.ok) { _, _ ->
                                 removeServer(guid, position)
                             }
+                            .setNegativeButton(android.R.string.no) {_, _ ->
+                                //do noting
+                            }
                             .show()
                     } else {
                         removeServer(guid, position)
                     }
+                } else {
+                    application.toast(R.string.toast_action_not_allowed)
                 }
             }
 

@@ -78,6 +78,7 @@
 	<string name="toast_asset_copy_failed">فشل نسخ الملف، يرجى استخدام مدير الملفات</string>
 	<string name="menu_item_add_file">إضافة ملفات</string>
 	<string name="menu_item_download_file">تحميل الملفات</string>
+	<string name="toast_action_not_allowed">هذا الإجراء محظور</string>
 	<!-- PerAppProxyActivity -->
 	<string name="title_user_asset_add_url">أضف عنوان URL للأصل</string>
 	<string name="msg_file_not_found">لم يتم العثور على الملف</string>
