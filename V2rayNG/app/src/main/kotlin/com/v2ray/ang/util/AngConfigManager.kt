@@ -1064,18 +1064,18 @@ object AngConfigManager {
                         }
                     )
                     .create()
-                val serverList: Array<V2rayConfig> =
-                    Gson().fromJson(server, Array<V2rayConfig>::class.java)
+                val serverList: Array<Any> =
+                    Gson().fromJson(server, Array<Any>::class.java)
 
                 if (serverList.isNotEmpty()) {
                     var count = 0
                     for (srv in serverList) {
                         val config = ServerConfig.create(EConfigType.CUSTOM)
-                        config.remarks = srv.remarks
+                        config.fullConfig =  Gson().fromJson(Gson().toJson(srv), V2rayConfig::class.java)
+                        config.remarks = config.fullConfig?.remarks
                             ?: ("%04d-".format(count + 1) + System.currentTimeMillis()
                                 .toString())
                         config.subscriptionId = subid
-                        config.fullConfig = srv
                         val key = MmkvManager.encodeServerConfig("", config)
                         serverRawStorage?.encode(key, gson.toJson(srv))
                         count += 1
