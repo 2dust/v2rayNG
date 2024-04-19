@@ -189,7 +189,8 @@
     <string name="title_mode">模式</string>
     <string name="title_mode_help">輕觸以檢視說明</string>
     <string name="title_language">語言</string>
-    <string name="title_ui_settings">使用者介面設定</string>
+    <string name="title_ui_settings">介面顏色設定</string>
+    <string name="title_pref_ui_mode_night">UI mode settings</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">複製</string>
@@ -271,6 +272,12 @@
     <string-array name="mode_entries">
         <item>VPN</item>
         <item>僅 Proxy</item>
+    </string-array>
+
+    <string-array name="ui_mode_night">
+        <item>跟隨系統</item>
+        <item>淺色</item>
+        <item>深色</item>
     </string-array>
 
 </resources>

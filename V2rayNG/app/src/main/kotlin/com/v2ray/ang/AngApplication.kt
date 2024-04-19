@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.util.Utils
 
 class AngApplication : MultiDexApplication(), Configuration.Provider {
     companion object {
@@ -31,6 +32,8 @@ class AngApplication : MultiDexApplication(), Configuration.Provider {
 
         //Logger.init().logLevel(if (BuildConfig.DEBUG) LogLevel.FULL else LogLevel.NONE)
         MMKV.initialize(this)
+
+        Utils.setNightMode(application)
     }
 
     override fun getWorkManagerConfiguration(): Configuration {

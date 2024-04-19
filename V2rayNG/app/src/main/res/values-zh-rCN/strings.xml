@@ -190,6 +190,7 @@
     <string name="title_mode_help">点此查看更多帮助</string>
     <string name="title_language">语言</string>
     <string name="title_ui_settings">用户界面设置</string>
+    <string name="title_pref_ui_mode_night">界面颜色设置</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">复制</string>
@@ -272,6 +273,12 @@
     <string-array name="mode_entries">
         <item>VPN</item>
         <item>仅代理</item>
+    </string-array>
+
+    <string-array name="ui_mode_night">
+        <item>跟随系统</item>
+        <item>浅色</item>
+        <item>深色</item>
     </string-array>
 
 </resources>

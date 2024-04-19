@@ -163,6 +163,7 @@
 	<string name="title_mode_help">انقر علي للمزيد من المساعدة</string>
 	<string name="title_language">اللغة</string>
 	<string name="title_ui_settings">إعدادات واجهة المستخدم</string>
+	<string name="title_pref_ui_mode_night">UI mode settings</string>
 	<string name="title_logcat">Logcat</string>
 	<string name="logcat_copy">نسخ</string>
 	<string name="logcat_clear">مسح</string>
@@ -230,4 +231,10 @@
 	</string-array>
     <string name="menu_item_add_asset">يضيف</string>
 	<string name="menu_item_add_url">إضافة رابط</string>
+
+	<string-array name="ui_mode_night">
+		<item>Follow system</item>
+		<item>Light</item>
+		<item>Dark</item>
+	</string-array>
 </resources>

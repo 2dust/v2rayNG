@@ -192,6 +192,7 @@
     <string name="title_mode_help">Нажмите для получения дополнительной информации</string>
     <string name="title_language">Язык</string>
     <string name="title_ui_settings">Настройки интерфейса</string>
+    <string name="title_pref_ui_mode_night">UI mode settings</string>
 
     <string name="title_logcat">Журнал</string>
     <string name="logcat_copy">Копировать</string>
@@ -271,6 +272,12 @@
     <string-array name="mode_entries">
         <item>VPN</item>
         <item>Только прокси</item>
+    </string-array>
+
+    <string-array name="ui_mode_night">
+        <item>Follow system</item>
+        <item>Light</item>
+        <item>Dark</item>
     </string-array>
 
 </resources>

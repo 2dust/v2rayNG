@@ -68,52 +68,11 @@ class SettingsActivity : BaseActivity() {
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             addPreferencesFromResource(R.xml.pref_settings)
 
-            routingCustom?.setOnPreferenceClickListener {
-                startActivity(Intent(activity, RoutingSettingsActivity::class.java))
-                false
-            }
-
-            autoUpdateCheck?.setOnPreferenceChangeListener { _, newValue ->
-                val value = newValue as Boolean
-                autoUpdateCheck?.isChecked = value
-                autoUpdateInterval?.isEnabled = value
-                autoUpdateInterval?.text?.toLong()?.let {
-                    if (newValue) configureUpdateTask(it) else cancelUpdateTask()
-                }
-                true
-            }
-
-            autoUpdateInterval?.setOnPreferenceChangeListener { _, any ->
-                var nval = any as String
-
-                // It must be greater than 15 minutes because WorkManager couldn't run tasks under 15 minutes intervals
-                nval =
-                    if (TextUtils.isEmpty(nval) || nval.toLong() < 15) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
-                autoUpdateInterval?.summary = nval
-                configureUpdateTask(nval.toLong())
-                true
-            }
-
-
             perAppProxy?.setOnPreferenceClickListener {
                 startActivity(Intent(activity, PerAppProxyActivity::class.java))
                 perAppProxy?.isChecked = true
                 false
             }
-
-            remoteDns?.setOnPreferenceChangeListener { _, any ->
-                // remoteDns.summary = any as String
-                val nval = any as String
-                remoteDns?.summary = if (nval == "") AppConfig.DNS_PROXY else nval
-                true
-            }
-            domesticDns?.setOnPreferenceChangeListener { _, any ->
-                // domesticDns.summary = any as String
-                val nval = any as String
-                domesticDns?.summary = if (nval == "") AppConfig.DNS_DIRECT else nval
-                true
-            }
-
             localDns?.setOnPreferenceChangeListener { _, any ->
                 updateLocalDns(any as Boolean)
                 true
@@ -128,22 +87,12 @@ class SettingsActivity : BaseActivity() {
                 vpnDns?.summary = any as String
                 true
             }
-            socksPort?.setOnPreferenceChangeListener { _, any ->
-                val nval = any as String
-                socksPort?.summary = if (TextUtils.isEmpty(nval)) AppConfig.PORT_SOCKS else nval
-                true
+
+            routingCustom?.setOnPreferenceClickListener {
+                startActivity(Intent(activity, RoutingSettingsActivity::class.java))
+                false
             }
-            httpPort?.setOnPreferenceChangeListener { _, any ->
-                val nval = any as String
-                httpPort?.summary = if (TextUtils.isEmpty(nval)) AppConfig.PORT_HTTP else nval
-                true
-            }
-            mode?.setOnPreferenceChangeListener { _, newValue ->
-                updateMode(newValue.toString())
-                true
-            }
-            mode?.dialogLayoutResource = R.layout.preference_with_help_link
-            //loglevel.summary = "LogLevel"
+
             mux?.setOnPreferenceChangeListener { _, newValue ->
                 updateMux(newValue as Boolean)
                 true
@@ -173,6 +122,56 @@ class SettingsActivity : BaseActivity() {
                 updateFragmentInterval(newValue as String)
                 true
             }
+
+            autoUpdateCheck?.setOnPreferenceChangeListener { _, newValue ->
+                val value = newValue as Boolean
+                autoUpdateCheck?.isChecked = value
+                autoUpdateInterval?.isEnabled = value
+                autoUpdateInterval?.text?.toLong()?.let {
+                    if (newValue) configureUpdateTask(it) else cancelUpdateTask()
+                }
+                true
+            }
+            autoUpdateInterval?.setOnPreferenceChangeListener { _, any ->
+                var nval = any as String
+
+                // It must be greater than 15 minutes because WorkManager couldn't run tasks under 15 minutes intervals
+                nval =
+                    if (TextUtils.isEmpty(nval) || nval.toLong() < 15) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
+                autoUpdateInterval?.summary = nval
+                configureUpdateTask(nval.toLong())
+                true
+            }
+
+            remoteDns?.setOnPreferenceChangeListener { _, any ->
+                // remoteDns.summary = any as String
+                val nval = any as String
+                remoteDns?.summary = if (nval == "") AppConfig.DNS_PROXY else nval
+                true
+            }
+            domesticDns?.setOnPreferenceChangeListener { _, any ->
+                // domesticDns.summary = any as String
+                val nval = any as String
+                domesticDns?.summary = if (nval == "") AppConfig.DNS_DIRECT else nval
+                true
+            }
+            socksPort?.setOnPreferenceChangeListener { _, any ->
+                val nval = any as String
+                socksPort?.summary = if (TextUtils.isEmpty(nval)) AppConfig.PORT_SOCKS else nval
+                true
+            }
+            httpPort?.setOnPreferenceChangeListener { _, any ->
+                val nval = any as String
+                httpPort?.summary = if (TextUtils.isEmpty(nval)) AppConfig.PORT_HTTP else nval
+                true
+            }
+            mode?.setOnPreferenceChangeListener { _, newValue ->
+                updateMode(newValue.toString())
+                true
+            }
+            mode?.dialogLayoutResource = R.layout.preference_with_help_link
+            //loglevel.summary = "LogLevel"
+
         }
 
         override fun onStart() {
@@ -249,6 +248,7 @@ class SettingsActivity : BaseActivity() {
                 AppConfig.PREF_MUX_XUDP_QUIC,
                 AppConfig.PREF_FRAGMENT_PACKETS,
                 AppConfig.PREF_LANGUAGE,
+                AppConfig.PREF_UI_MODE_NIGHT,
                 AppConfig.PREF_LOGLEVEL,
                 AppConfig.PREF_MODE
             ).forEach { key ->

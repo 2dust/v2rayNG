@@ -191,6 +191,7 @@
     <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp!</string>
     <string name="title_language">Ngôn ngữ</string>
     <string name="title_ui_settings">Cài đặt giao diện</string>
+    <string name="title_pref_ui_mode_night">UI mode settings</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Sao chép</string>
@@ -268,5 +269,11 @@
     </string-array>
     <string name="menu_item_add_asset">Thêm vào</string>
     <string name="menu_item_add_url">Thêm liên kết</string>
+
+    <string-array name="ui_mode_night">
+        <item>Follow system</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
 
 </resources>

@@ -188,6 +188,7 @@
     <string name="title_mode_help">برای راهنمایی بیشتر روی این متن، کلیک کنید</string>
     <string name="title_language">زبان</string>
     <string name="title_ui_settings">تنظیمات رابط کاربری</string>
+    <string name="title_pref_ui_mode_night">UI mode settings</string>
 
     <string name="title_logcat">گزارشات</string>
     <string name="logcat_copy">کپی</string>
@@ -269,5 +270,11 @@
     </string-array>
     <string name="menu_item_add_asset">افزودن</string>
     <string name="menu_item_add_url">افزودن لینک</string>
+
+    <string-array name="ui_mode_night">
+        <item>Follow system</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
 
 </resources>
