@@ -82,15 +82,12 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
             AppConfig.PREF_MUX_CONCURRENCY,
             AppConfig.PREF_MUX_XUDP_CONCURRENCY -> {
-                settingsStorage?.encode(
-                    key,
-                    sharedPreferences.getString(key, "8")?.toIntOrNull() ?: 8
-                )
+                settingsStorage?.encode(key, sharedPreferences.getString(key, "8"))
             }
 
-            AppConfig.PREF_PER_APP_PROXY_SET -> {
-                settingsStorage?.encode(key, sharedPreferences.getStringSet(key, setOf()))
-            }
+//            AppConfig.PREF_PER_APP_PROXY_SET -> {
+//                settingsStorage?.encode(key, sharedPreferences.getStringSet(key, setOf()))
+//            }
         }
         if (key == AppConfig.PREF_UI_MODE_NIGHT) {
             Utils.setNightMode(getApplication())
