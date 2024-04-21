@@ -10,8 +10,8 @@
 
     <ImageView
             android:id="@+id/image_switch"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:padding="10dp"
             app:srcCompat="@drawable/ic_stat_name" />
 </LinearLayout>
