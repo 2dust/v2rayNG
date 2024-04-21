@@ -70,7 +70,7 @@
                 </LinearLayout>
 
 
-                <com.github.jorgecastilloprz.FABProgressCircle
+                <FrameLayout
                     android:id="@+id/fabProgressCircle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
                         android:src="@drawable/ic_stat_name"
                         app:layout_anchorGravity="bottom|right|end" />
 
-                </com.github.jorgecastilloprz.FABProgressCircle>
+                </FrameLayout>
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
         </RelativeLayout>
     </LinearLayout>

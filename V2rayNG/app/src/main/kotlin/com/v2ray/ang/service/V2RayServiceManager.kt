@@ -1,6 +1,9 @@
 package com.v2ray.ang.service
 
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -290,7 +293,7 @@ object V2RayServiceManager {
                 .setShowWhen(false)
                 .setOnlyAlertOnce(true)
                 .setContentIntent(contentPendingIntent)
-                .addAction(R.drawable.ic_close_grey_800_24dp,
+                .addAction(R.drawable.ic_delete_24dp,
                         service.getString(R.string.notification_action_stop_v2ray),
                         stopV2RayPendingIntent)
         //.build()
