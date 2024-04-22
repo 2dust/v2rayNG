@@ -164,7 +164,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             hideCircle()
         }
         mainViewModel.autoConnectServer.observe(this) {
-            adapter.selectServerByGuid(it)
+            adapter.notifyItemChanged(mainViewModel.getPosition(it.first!!))
+            adapter.notifyItemChanged(mainViewModel.getPosition(it.second))
         }
         mainViewModel.startListenBroadcast()
     }

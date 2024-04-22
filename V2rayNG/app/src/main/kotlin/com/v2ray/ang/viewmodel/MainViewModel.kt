@@ -19,10 +19,14 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.DialogConfigFilterBinding
 import com.v2ray.ang.dto.*
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.*
 import com.v2ray.ang.util.MmkvManager.KEY_ANG_CONFIGS
 import kotlinx.coroutines.*
+import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val mainStorage by lazy {
@@ -52,7 +56,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
     val updateTestResultAction by lazy { MutableLiveData<String>() }
-    val autoConnectServer by lazy { MutableLiveData<String>() }
+    val autoConnectServer by lazy { MutableLiveData<Pair<String?, String>>() }
     var isWaitingForAutoConnect: Boolean = false
 
     private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
@@ -160,7 +164,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val serversCopy = serversCache.toList() // Create a copy of the list
 
-        getApplication<AngApplication>().toast(R.string.connection_test_testing)
+        if (!isAutoTest) {
+            getApplication<AngApplication>().toast(R.string.connection_test_testing)
+        }
         viewModelScope.launch(Dispatchers.Default) { // without Dispatchers.Default viewModelScope will launch in main thread
             for (item in serversCopy) {
                 val config = V2rayConfigUtil.getV2rayConfig(getApplication(), item.guid)
@@ -304,7 +310,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                     if (resultPair.second > 0L && isWaitingForAutoConnect) {
                         isWaitingForAutoConnect = false
-                        autoConnectServer.value = resultPair.first
+
+                        val guid = resultPair.first
+                        val selected = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)
+                        if (guid != selected) {
+                            val context = getApplication<AngApplication>()
+                            mainStorage?.encode(MmkvManager.KEY_SELECTED_SERVER, guid)
+                            Utils.stopVService(context, true)
+                            Observable.timer(500, TimeUnit.MILLISECONDS)
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe {
+
+                                    V2RayServiceManager.startV2Ray(context)
+                                }
+                        }
+
+                        val pairOldNew = Pair(selected, guid)
+                        autoConnectServer.value = pairOldNew
                     }
                 }
 
