@@ -38,11 +38,11 @@ class WidgetProvider : AppWidgetProvider() {
             })
         remoteViews.setOnClickPendingIntent(R.id.layout_switch, pendingIntent)
         if (isRunning) {
-            remoteViews.setInt(R.id.image_switch, "setImageResource", R.drawable.ic_stat_name)
-            remoteViews.setInt(R.id.layout_switch, "setBackgroundResource", R.color.color_fab_orange)
+            remoteViews.setInt(R.id.image_switch, "setImageResource", R.drawable.ic_stop_24dp)
+            remoteViews.setInt(R.id.layout_background, "setBackgroundResource", R.drawable.ic_rounded_corner_active)
         } else {
-            remoteViews.setInt(R.id.image_switch, "setImageResource", R.drawable.ic_stat_name_black)
-            remoteViews.setInt(R.id.layout_switch, "setBackgroundResource", R.color.color_fab_grey)
+            remoteViews.setInt(R.id.image_switch, "setImageResource", R.drawable.ic_play_24dp)
+            remoteViews.setInt(R.id.layout_background, "setBackgroundResource", R.drawable.ic_rounded_corner_inactive)
         }
 
         for (appWidgetId in appWidgetIds) {
