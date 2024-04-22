@@ -320,7 +320,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             Observable.timer(500, TimeUnit.MILLISECONDS)
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe {
-
                                     V2RayServiceManager.startV2Ray(context)
                                 }
                         }
