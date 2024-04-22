@@ -1,49 +1,52 @@
 package com.v2ray.ang.ui
 
 import android.Manifest
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.net.VpnService
-import androidx.recyclerview.widget.LinearLayoutManager
-import android.view.Menu
-import android.view.MenuItem
-import com.tbruyelle.rxpermissions.RxPermissions
-import com.v2ray.ang.R
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.KeyEvent
-import com.v2ray.ang.AppConfig
-import android.content.res.ColorStateList
-import android.os.Build
-import com.google.android.material.navigation.NavigationView
-import androidx.core.content.ContextCompat
-import androidx.core.view.GravityCompat
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.recyclerview.widget.ItemTouchHelper
 import android.util.Log
+import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.navigation.NavigationView
+import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
-import com.v2ray.ang.BuildConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import java.util.concurrent.TimeUnit
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.service.V2RayServiceManager
-import com.v2ray.ang.util.*
+import com.v2ray.ang.util.AngConfigManager
+import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import me.drakeet.support.toast.ToastCompat
+import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
 import java.io.File
 import java.io.FileOutputStream
+import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var binding: ActivityMainBinding
@@ -104,11 +107,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         binding.navView.setNavigationItemSelectedListener(this)
-        "v${BuildConfig.VERSION_NAME} (${SpeedtestUtil.getLibVersion()})".also { binding.version.text = it }
+
 
         setupViewModel()
         copyAssets()
-        migrateLegacy()
+        //migrateLegacy()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             RxPermissions(this)
@@ -143,10 +146,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         mainViewModel.isRunning.observe(this) { isRunning ->
             adapter.isRunning = isRunning
             if (isRunning) {
-                if (!Utils.getDarkModeStatus(this)) {
-                    binding.fab.setImageResource(R.drawable.ic_stat_name)
-                }
-                binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_orange))
+                binding.fab.setImageResource(R.drawable.ic_stop_24dp)
+                binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_active))
                 setTestState(getString(R.string.connection_connected))
                 binding.layoutTest.isFocusable = true
 
@@ -154,14 +155,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     mainViewModel.testCurrentServerRealPing()
                 }
             } else {
-                if (!Utils.getDarkModeStatus(this)) {
-                    binding.fab.setImageResource(R.drawable.ic_stat_name)
-                }
-                binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_grey))
+                binding.fab.setImageResource(R.drawable.ic_play_24dp)
+                binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_inactive))
                 setTestState(getString(R.string.connection_not_connected))
                 binding.layoutTest.isFocusable = false
             }
-            hideCircle()
         }
         mainViewModel.autoConnectServer.observe(this) {
             adapter.notifyItemChanged(mainViewModel.getPosition(it.first!!))
@@ -193,30 +191,27 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
     }
 
-    private fun migrateLegacy() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val result = AngConfigManager.migrateLegacyConfig(this@MainActivity)
-            if (result != null) {
-                launch(Dispatchers.Main) {
-                    if (result) {
-                        toast(getString(R.string.migration_success))
-                        mainViewModel.reloadServerList()
-                    } else {
-                        toast(getString(R.string.migration_fail))
-                    }
-                }
-            }
-        }
-    }
+//    private fun migrateLegacy() {
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            val result = AngConfigManager.migrateLegacyConfig(this@MainActivity)
+//            if (result != null) {
+//                launch(Dispatchers.Main) {
+//                    if (result) {
+//                        toast(getString(R.string.migration_success))
+//                        mainViewModel.reloadServerList()
+//                    } else {
+//                        toast(getString(R.string.migration_fail))
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     fun startV2Ray() {
         if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
             return
         }
-        showCircle()
-//        toast(R.string.toast_services_start)
         V2RayServiceManager.startV2Ray(this)
-        hideCircle()
     }
 
     fun restartV2Ray() {
@@ -334,6 +329,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         MmkvManager.removeAllServer()
                         mainViewModel.reloadServerList()
                     }
+                    .setNegativeButton(android.R.string.no) {_, _ ->
+                        //do noting
+                    }
                     .show()
             true
         }
@@ -341,6 +339,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     mainViewModel.removeDuplicateServer()
+                }
+                .setNegativeButton(android.R.string.no) {_, _ ->
+                    //do noting
                 }
                 .show()
             true
@@ -350,6 +351,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     MmkvManager.removeInvalidServer()
                     mainViewModel.reloadServerList()
+                }
+                .setNegativeButton(android.R.string.no) {_, _ ->
+                    //do noting
                 }
                 .show()
             true
@@ -653,29 +657,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return super.onKeyDown(keyCode, event)
     }
 
-
-    fun showCircle() {
-        binding.fabProgressCircle.show()
-    }
-
-    fun hideCircle() {
-        try {
-            Observable.timer(300, TimeUnit.MILLISECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        try {
-                            if (binding.fabProgressCircle.isShown) {
-                                binding.fabProgressCircle.hide()
-                            }
-                        } catch (e: Exception) {
-                            Log.w(ANG_PACKAGE, e)
-                        }
-                    }
-        } catch (e: Exception) {
-            Log.d(ANG_PACKAGE, e.toString())
-        }
-    }
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
@@ -690,17 +671,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             R.id.user_asset_setting -> {
                 startActivity(Intent(this, UserAssetActivity::class.java))
             }
-            R.id.feedback -> {
-                Utils.openUri(this, AppConfig.v2rayNGIssues)
-            }
             R.id.promotion -> {
-                Utils.openUri(this, "${Utils.decode(AppConfig.promotionUrl)}?t=${System.currentTimeMillis()}")
+                Utils.openUri(this, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")
             }
             R.id.logcat -> {
                 startActivity(Intent(this, LogcatActivity::class.java))
             }
-            R.id.privacy_policy-> {
-                Utils.openUri(this, AppConfig.v2rayNGPrivacyPolicy)
+            R.id.about-> {
+                startActivity(Intent(this, AboutActivity::class.java))
             }
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START)

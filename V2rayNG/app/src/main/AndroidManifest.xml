@@ -127,6 +127,9 @@
                 <data android:host="install-sub"/>
             </intent-filter>
         </activity>
+        <activity
+            android:exported="false"
+            android:name=".ui.AboutActivity" />
 
         <service
             android:name=".service.V2RayVpnService"

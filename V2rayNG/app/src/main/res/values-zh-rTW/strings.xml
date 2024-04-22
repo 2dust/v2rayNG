@@ -80,6 +80,7 @@
     <string name="toast_asset_copy_failed">失敗，請使用檔案總管</string>
     <string name="menu_item_add_file">新增檔案</string>
     <string name="menu_item_download_file">下載檔案</string>
+    <string name="toast_action_not_allowed">禁止此項操作</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">新增資產網址</string>
@@ -138,7 +139,7 @@
     <string name="title_pref_routing_mode">轉送模式</string>
     <string name="title_pref_routing_custom">自訂轉送</string>
 
-    <string name="title_pref_remote_dns">遠端 DNS (可選)</string>
+    <string name="title_pref_remote_dns">遠端DNS (udp/tcp/https/quic)(可選)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (僅支援 IPv4/v6)</string>
@@ -173,6 +174,12 @@
     <string name="summary_pref_tg_group">加入 Telegram 群組</string>
     <string name="toast_tg_app_not_found">未找到 Telegram 應用程式</string>
     <string name="title_privacy_policy">隱私權政策</string>
+    <string name="title_about">關於</string>
+    <string name="title_source_code">原始碼</string>
+    <string name="title_tg_channel">Telegram 頻道</string>
+    <string name="title_configuration_backup">備份配置</string>
+    <string name="summary_configuration_backup">儲存位置: [%s], 卸載App或清除儲存後備份將被清除</string>
+    <string name="title_configuration_restore">還原配置</string>
 
     <string name="title_pref_promotion">推廣</string>
     <string name="summary_pref_promotion">一些推廣，輕觸以檢視 (捐贈可去除)</string>
@@ -185,7 +192,8 @@
     <string name="title_mode">模式</string>
     <string name="title_mode_help">輕觸以檢視說明</string>
     <string name="title_language">語言</string>
-    <string name="title_ui_settings">使用者介面設定</string>
+    <string name="title_ui_settings">介面顏色設定</string>
+    <string name="title_pref_ui_mode_night">UI mode settings</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">複製</string>
@@ -267,6 +275,12 @@
     <string-array name="mode_entries">
         <item>VPN</item>
         <item>僅 Proxy</item>
+    </string-array>
+
+    <string-array name="ui_mode_night">
+        <item>跟隨系統</item>
+        <item>淺色</item>
+        <item>深色</item>
     </string-array>
 
 </resources>

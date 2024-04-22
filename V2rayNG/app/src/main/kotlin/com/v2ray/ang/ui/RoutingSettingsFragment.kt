@@ -11,11 +11,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.tbruyelle.rxpermissions.RxPermissions
+import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.FragmentRoutingSettingsBinding
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
+import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,7 +28,7 @@ class RoutingSettingsFragment : Fragment() {
         private const val routing_arg = "routing_arg"
     }
 
-    val defaultSharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
+   private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -46,7 +48,7 @@ class RoutingSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val content = defaultSharedPreferences.getString(requireArguments().getString(routing_arg), "")
+        val content = settingsStorage?.getString(requireArguments().getString(routing_arg), "")
         binding.etRoutingContent.text = Utils.getEditable(content!!)
 
         setHasOptionsMenu(true)
@@ -83,7 +85,7 @@ class RoutingSettingsFragment : Fragment() {
 
     private fun saveRouting() {
         val content = binding.etRoutingContent.text.toString()
-        defaultSharedPreferences.edit().putString(requireArguments().getString(routing_arg), content).apply()
+        settingsStorage?.encode(requireArguments().getString(routing_arg), content)
         activity?.toast(R.string.toast_success)
     }
 
@@ -127,7 +129,7 @@ class RoutingSettingsFragment : Fragment() {
         var tag = ""
         when (requireArguments().getString(routing_arg)) {
             AppConfig.PREF_V2RAY_ROUTING_AGENT -> {
-                tag = AppConfig.TAG_AGENT
+                tag = AppConfig.TAG_PROXY
             }
             AppConfig.PREF_V2RAY_ROUTING_DIRECT -> {
                 tag = AppConfig.TAG_DIRECT

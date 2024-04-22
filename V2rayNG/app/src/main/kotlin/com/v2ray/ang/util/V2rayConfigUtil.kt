@@ -175,7 +175,7 @@ object V2rayConfigUtil {
         try {
             routingUserRule(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                    ?: "", AppConfig.TAG_AGENT, v2rayConfig
+                    ?: "", AppConfig.TAG_PROXY, v2rayConfig
             )
             routingUserRule(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
@@ -191,12 +191,11 @@ object V2rayConfigUtil {
                     ?: "IPIfNonMatch"
 //            v2rayConfig.routing.domainMatcher = "mph"
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
-                ?: ERoutingMode.GLOBAL_PROXY.value
+                ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
 
             // Hardcode googleapis.cn
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
-                type = "field",
-                outboundTag = AppConfig.TAG_AGENT,
+                outboundTag = AppConfig.TAG_PROXY,
                 domain = arrayListOf("domain:googleapis.cn")
             )
 
@@ -207,24 +206,34 @@ object V2rayConfigUtil {
 
                 ERoutingMode.BYPASS_MAINLAND.value -> {
                     routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("domain", "geolocation-cn", AppConfig.TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
 
                 ERoutingMode.BYPASS_LAN_MAINLAND.value -> {
                     routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
                     routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("domain", "geolocation-cn", AppConfig.TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
 
                 ERoutingMode.GLOBAL_DIRECT.value -> {
                     val globalDirect = V2rayConfig.RoutingBean.RulesBean(
-                        type = "field",
                         outboundTag = AppConfig.TAG_DIRECT,
                         port = "0-65535"
                     )
                     v2rayConfig.routing.rules.add(globalDirect)
                 }
             }
+
+            if(routingMode != ERoutingMode.GLOBAL_DIRECT.value) {
+                v2rayConfig.routing.rules.add(
+                    V2rayConfig.RoutingBean.RulesBean(
+                        outboundTag = AppConfig.TAG_PROXY,
+                        port = "0-65535"
+                    ))
+            }
+
         } catch (e: Exception) {
             e.printStackTrace()
             return false
@@ -243,7 +252,6 @@ object V2rayConfigUtil {
                 //IP
                 if (ipOrDomain == "ip" || ipOrDomain == "") {
                     val rulesIP = V2rayConfig.RoutingBean.RulesBean()
-                    rulesIP.type = "field"
                     rulesIP.outboundTag = tag
                     rulesIP.ip = ArrayList()
                     rulesIP.ip?.add("geoip:$code")
@@ -253,7 +261,6 @@ object V2rayConfigUtil {
                 if (ipOrDomain == "domain" || ipOrDomain == "") {
                     //Domain
                     val rulesDomain = V2rayConfig.RoutingBean.RulesBean()
-                    rulesDomain.type = "field"
                     rulesDomain.outboundTag = tag
                     rulesDomain.domain = ArrayList()
                     rulesDomain.domain?.add("geosite:$code")
@@ -270,13 +277,11 @@ object V2rayConfigUtil {
             if (!TextUtils.isEmpty(userRule)) {
                 //Domain
                 val rulesDomain = V2rayConfig.RoutingBean.RulesBean()
-                rulesDomain.type = "field"
                 rulesDomain.outboundTag = tag
                 rulesDomain.domain = ArrayList()
 
                 //IP
                 val rulesIP = V2rayConfig.RoutingBean.RulesBean()
-                rulesIP.type = "field"
                 rulesIP.outboundTag = tag
                 rulesIP.ip = ArrayList()
 
@@ -344,7 +349,7 @@ object V2rayConfigUtil {
             val remoteDns = Utils.getRemoteDnsServers()
             if (v2rayConfig.inbounds.none { e -> e.protocol == "dokodemo-door" && e.tag == "dns-in" }) {
                 val dnsInboundSettings = V2rayConfig.InboundBean.InSettingsBean(
-                    address = if (Utils.isPureIpAddress(remoteDns.first())) remoteDns.first() else "1.1.1.1",
+                    address = if (Utils.isPureIpAddress(remoteDns.first())) remoteDns.first() else AppConfig.DNS_PROXY,
                     port = 53,
                     network = "tcp,udp"
                 )
@@ -381,7 +386,6 @@ object V2rayConfigUtil {
             // DNS routing tag
             v2rayConfig.routing.rules.add(
                 0, V2rayConfig.RoutingBean.RulesBean(
-                    type = "field",
                     inboundTag = arrayListOf("dns-in"),
                     outboundTag = "dns-out",
                     domain = null
@@ -424,10 +428,10 @@ object V2rayConfigUtil {
                     ?: ""
             )
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
-                ?: ERoutingMode.GLOBAL_PROXY.value
+                ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
             if (directDomain.size > 0 || routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
                 val domesticDns = Utils.getDomesticDnsServers()
-                val geositeCn = arrayListOf("geosite:cn")
+                val geositeCn = arrayListOf("geosite:cn","geosite:geolocation-cn")
                 val geoipCn = arrayListOf("geoip:cn")
                 if (directDomain.size > 0) {
                     servers.add(
@@ -452,7 +456,6 @@ object V2rayConfigUtil {
                 if (Utils.isPureIpAddress(domesticDns.first())) {
                     v2rayConfig.routing.rules.add(
                         0, V2rayConfig.RoutingBean.RulesBean(
-                            type = "field",
                             outboundTag = AppConfig.TAG_DIRECT,
                             port = "53",
                             ip = arrayListOf(domesticDns.first()),
@@ -483,8 +486,7 @@ object V2rayConfigUtil {
             if (Utils.isPureIpAddress(remoteDns.first())) {
                 v2rayConfig.routing.rules.add(
                     0, V2rayConfig.RoutingBean.RulesBean(
-                        type = "field",
-                        outboundTag = AppConfig.TAG_AGENT,
+                        outboundTag = AppConfig.TAG_PROXY,
                         port = "53",
                         ip = arrayListOf(remoteDns.first()),
                         domain = null

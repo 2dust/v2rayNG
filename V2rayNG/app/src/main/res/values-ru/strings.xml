@@ -46,8 +46,8 @@
     <string name="server_lab_more_function">Другие параметры</string>
     <string name="server_lab_head_type">Тип заголовка</string>
     <string name="server_lab_mode_type">Режим gRPC</string>
-    <string name="server_lab_request_host">Запрос узла (WS/H2) / Шифрование QUIC/gRPC Authority</string>
-    <string name="server_lab_path">Путь (WS/H2) / Ключ QUIC / Сид KCP / Сервис gRPC</string>
+    <string name="server_lab_request_host">Запрос узла (WS/H2)/HTTPUpgrade/Шифрование QUIC/Полномочия gRPC</string>
+    <string name="server_lab_path">Путь (WS/H2)/HTTPUpgrade/Ключ QUIC/Сид KCP/Сервис gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_allow_insecure">Разрешать небезопасные</string>
     <string name="server_lab_sni">SNI</string>
@@ -85,6 +85,7 @@
     <string name="title_user_asset_add_url">Добавить URL ресурса</string>
     <string name="msg_file_not_found">Файл не найден</string>
     <string name="msg_remark_is_duplicate">Описание уже существует</string>
+    <string name="toast_action_not_allowed">Это действие запрещено</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Загрузка…</string>
@@ -108,8 +109,8 @@
     <string name="title_mux_settings">Настройки мультиплексирования</string>
     <string name="title_pref_mux_enabled">Использовать мультиплексирование</string>
     <string name="summary_pref_mux_enabled">Быстрее, но это может привести к нестабильному соединению.\nНиже можно настроить обработку TCP, UDP и QUIC.</string>
-    <string name="title_pref_mux_concurency">TCP-соединения (диапазон от -1 до 1024)</string>
-    <string name="title_pref_mux_xudp_concurency">XUDP-соединения (диапазон от -1 до 1024)</string>
+    <string name="title_pref_mux_concurency">TCP-соединения (диапазон от 1 до 1024)</string>
+    <string name="title_pref_mux_xudp_concurency">XUDP-соединения (диапазон от 1 до 1024)</string>
     <string name="title_pref_mux_xudp_quic">Обработка QUIC в мультиплексном туннеле</string>
     <string-array name="mux_xudp_quic_entries">
         <item>отклонять</item>
@@ -140,7 +141,7 @@
     <string name="title_pref_routing_mode">Режим маршрутизации</string>
     <string name="title_pref_routing_custom">Пользовательские правила</string>
 
-    <string name="title_pref_remote_dns">Удалённая DNS (необязательно)</string>
+    <string name="title_pref_remote_dns">Удалённая DNS (UDP/TCP/HTTPS/QUIC) (необязательно)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (только IPv4/v6)</string>
@@ -175,6 +176,12 @@
     <string name="summary_pref_tg_group">Присоединиться к группе в Telegram</string>
     <string name="toast_tg_app_not_found">Приложение Telegram не найдено</string>
     <string name="title_privacy_policy">Конфиденциальность</string>
+    <string name="title_about">О приложении</string>
+    <string name="title_source_code">Исходный код</string>
+    <string name="title_tg_channel">Telegram-канал</string>
+    <string name="title_configuration_backup">Резервирование</string>
+    <string name="summary_configuration_backup">Путь: [%s]. Резервная копия будет стёрта при удалении приложения или очистке хранилища.</string>
+    <string name="title_configuration_restore">Восстановление</string>
 
     <string name="title_pref_promotion">Содействие</string>
     <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации (пожертвование может быть удалено)</string>
@@ -188,6 +195,7 @@
     <string name="title_mode_help">Нажмите для получения дополнительной информации</string>
     <string name="title_language">Язык</string>
     <string name="title_ui_settings">Настройки интерфейса</string>
+    <string name="title_pref_ui_mode_night">Тема интерфейса</string>
 
     <string name="title_logcat">Журнал</string>
     <string name="logcat_copy">Копировать</string>
@@ -267,6 +275,12 @@
     <string-array name="mode_entries">
         <item>VPN</item>
         <item>Только прокси</item>
+    </string-array>
+
+    <string-array name="ui_mode_night">
+        <item>Как в системе</item>
+        <item>Светлая</item>
+        <item>Тёмная</item>
     </string-array>
 
 </resources>

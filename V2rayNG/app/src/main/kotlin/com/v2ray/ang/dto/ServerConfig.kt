@@ -1,6 +1,6 @@
 package com.v2ray.ang.dto
 
-import com.v2ray.ang.AppConfig.TAG_AGENT
+import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.AppConfig.TAG_BLOCKED
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.util.Utils
@@ -58,7 +58,7 @@ data class ServerConfig(
 
     fun getAllOutboundTags(): MutableList<String> {
         if (configType != EConfigType.CUSTOM) {
-            return mutableListOf(TAG_AGENT, TAG_DIRECT, TAG_BLOCKED)
+            return mutableListOf(TAG_PROXY, TAG_DIRECT, TAG_BLOCKED)
         }
         fullConfig?.let { config ->
             return config.outbounds.map { it.tag }.toMutableList()

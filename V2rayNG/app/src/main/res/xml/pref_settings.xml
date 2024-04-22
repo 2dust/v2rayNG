@@ -55,7 +55,7 @@
             android:title="@string/title_pref_routing_custom" />
 
         <ListPreference
-            android:defaultValue="0"
+            android:defaultValue="3"
             android:entries="@array/routing_mode"
             android:entryValues="@array/routing_mode_value"
             android:key="pref_routing_mode"
@@ -151,6 +151,13 @@
             android:summary="%s"
             android:title="@string/title_language" />
 
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/ui_mode_night"
+            android:entryValues="@array/ui_mode_night_value"
+            android:key="pref_ui_mode_night"
+            android:summary="%s"
+            android:title="@string/title_pref_ui_mode_night" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_advanced">

@@ -80,6 +80,7 @@
     <string name="toast_asset_copy_failed">کپی فایل انجام نشد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
     <string name="menu_item_add_file">افزودن فایل‌ها</string>
     <string name="menu_item_download_file">دانلود فایل‌ها</string>
+    <string name="toast_action_not_allowed">این عمل ممنوع است</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">URL را اضافه کنید</string>
@@ -173,6 +174,12 @@
     <string name="toast_tg_app_not_found">برنامه تلگرام پیدا نشد</string>
 
     <string name="title_privacy_policy">حریم خصوصی</string>
+    <string name="title_about">About</string>
+    <string name="title_source_code">Source code</string>
+    <string name="title_tg_channel">Telegram channel</string>
+    <string name="title_configuration_backup">Backup configuration</string>
+    <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
+    <string name="title_configuration_restore">Restore configuration</string>
     <string name="title_pref_promotion">تبلیغات</string>
     <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف شود)</string>
 
@@ -184,6 +191,7 @@
     <string name="title_mode_help">برای راهنمایی بیشتر روی این متن، کلیک کنید</string>
     <string name="title_language">زبان</string>
     <string name="title_ui_settings">تنظیمات رابط کاربری</string>
+    <string name="title_pref_ui_mode_night">UI mode settings</string>
 
     <string name="title_logcat">گزارشات</string>
     <string name="logcat_copy">کپی</string>
@@ -265,5 +273,11 @@
     </string-array>
     <string name="menu_item_add_asset">افزودن</string>
     <string name="menu_item_add_url">افزودن لینک</string>
+
+    <string-array name="ui_mode_night">
+        <item>Follow system</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
 
 </resources>

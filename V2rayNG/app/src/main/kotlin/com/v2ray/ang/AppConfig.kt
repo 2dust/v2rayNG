@@ -7,39 +7,29 @@ package com.v2ray.ang
 object AppConfig {
     const val ANG_PACKAGE = BuildConfig.APPLICATION_ID
     const val DIR_ASSETS = "assets"
+    const val DIR_BACKUPS = "backups"
 
     // legacy
     const val ANG_CONFIG = "ang_config"
     const val PREF_INAPP_BUY_IS_PREMIUM = "pref_inapp_buy_is_premium"
-    const val PREF_ROUTING_CUSTOM = "pref_routing_custom"
 
     // Preferences mapped to MMKV
-    const val PREF_MODE = "pref_mode"
-    const val PREF_SPEED_ENABLED = "pref_speed_enabled"
     const val PREF_SNIFFING_ENABLED = "pref_sniffing_enabled"
-    const val PREF_PROXY_SHARING = "pref_proxy_sharing_enabled"
+    const val PREF_PER_APP_PROXY = "pref_per_app_proxy"
+    const val PREF_PER_APP_PROXY_SET = "pref_per_app_proxy_set"
+    const val PREF_BYPASS_APPS = "pref_bypass_apps"
     const val PREF_LOCAL_DNS_ENABLED = "pref_local_dns_enabled"
     const val PREF_FAKE_DNS_ENABLED = "pref_fake_dns_enabled"
-    const val PREF_VPN_DNS = "pref_vpn_dns"
-    const val PREF_REMOTE_DNS = "pref_remote_dns"
-    const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
     const val PREF_LOCAL_DNS_PORT = "pref_local_dns_port"
-    const val PREF_ALLOW_INSECURE = "pref_allow_insecure"
-    const val PREF_SOCKS_PORT = "pref_socks_port"
-    const val PREF_HTTP_PORT = "pref_http_port"
-    const val PREF_LOGLEVEL = "pref_core_loglevel"
-    const val PREF_LANGUAGE = "pref_language"
-    const val PREF_PREFER_IPV6 = "pref_prefer_ipv6"
+    const val PREF_VPN_DNS = "pref_vpn_dns"
+
     const val PREF_ROUTING_DOMAIN_STRATEGY = "pref_routing_domain_strategy"
     const val PREF_ROUTING_MODE = "pref_routing_mode"
     const val PREF_V2RAY_ROUTING_AGENT = "pref_v2ray_routing_agent"
     const val PREF_V2RAY_ROUTING_DIRECT = "pref_v2ray_routing_direct"
     const val PREF_V2RAY_ROUTING_BLOCKED = "pref_v2ray_routing_blocked"
-    const val PREF_PER_APP_PROXY = "pref_per_app_proxy"
-    const val PREF_PER_APP_PROXY_SET = "pref_per_app_proxy_set"
-    const val PREF_BYPASS_APPS = "pref_bypass_apps"
-    const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
-    const val PREF_START_SCAN_IMMEDIATE = "pref_start_scan_immediate"
+    const val PREF_ROUTING_CUSTOM = "pref_routing_custom"
+
     const val PREF_MUX_ENABLED = "pref_mux_enabled"
     const val PREF_MUX_CONCURRENCY = "pref_mux_concurency"
     const val PREF_MUX_XUDP_CONCURRENCY = "pref_mux_xudp_concurency"
@@ -50,16 +40,34 @@ object AppConfig {
     const val PREF_FRAGMENT_LENGTH = "pref_fragment_length"
     const val PREF_FRAGMENT_INTERVAL = "pref_fragment_interval"
 
-    const val PREF_AUTO_TEST_CONNECT = "pref_auto_test_connect"
-    const val PREF_AUTO_TEST_CONNECT_WORK_NAME = "auto_test_connect_work"
-
     const val SUBSCRIPTION_AUTO_UPDATE = "pref_auto_update_subscription"
     const val SUBSCRIPTION_AUTO_UPDATE_INTERVAL = "pref_auto_update_interval"
     const val SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL = "1440" // 24 hours
     const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
 
+    const val PREF_SPEED_ENABLED = "pref_speed_enabled"
+    const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
+    const val PREF_START_SCAN_IMMEDIATE = "pref_start_scan_immediate"
+    const val PREF_LANGUAGE = "pref_language"
+    const val PREF_UI_MODE_NIGHT = "pref_ui_mode_night"
+
+    const val PREF_PREFER_IPV6 = "pref_prefer_ipv6"
+    const val PREF_PROXY_SHARING = "pref_proxy_sharing_enabled"
+    const val PREF_ALLOW_INSECURE = "pref_allow_insecure"
+    const val PREF_SOCKS_PORT = "pref_socks_port"
+    const val PREF_HTTP_PORT = "pref_http_port"
+    const val PREF_REMOTE_DNS = "pref_remote_dns"
+    const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
+    const val PREF_LOGLEVEL = "pref_core_loglevel"
+    const val PREF_MODE = "pref_mode"
+
     const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"
     const val CACHE_KEYWORD_FILTER = "cache_keyword_filter"
+
+    const val PREF_AUTO_TEST_CONNECT = "pref_auto_test_connect"
+    const val PREF_AUTO_TEST_CONNECT_WORK_NAME = "auto_test_connect_work"
+
+    //Preferences mapped to MMKV End
 
     const val PROTOCOL_HTTP: String = "http://"
     const val PROTOCOL_HTTPS: String = "https://"
@@ -75,7 +83,7 @@ object AppConfig {
     const val TASKER_EXTRA_BUNDLE_GUID = "tasker_extra_bundle_guid"
     const val TASKER_DEFAULT_GUID = "Default"
 
-    const val TAG_AGENT = "proxy"
+    const val TAG_PROXY = "proxy"
     const val TAG_DIRECT = "direct"
     const val TAG_BLOCKED = "block"
     const val TAG_FRAGMENT = "fragment"
@@ -84,14 +92,17 @@ object AppConfig {
         "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
     const val v2rayCustomRoutingListUrl =
         "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
-    const val v2rayNGIssues = "https://github.com/2dust/v2rayNG/issues"
-    const val v2rayNGWikiMode = "https://github.com/2dust/v2rayNG/wiki/Mode"
+    const val v2rayNGUrl = "https://github.com/2dust/v2rayNG"
+    const val v2rayNGIssues = "$v2rayNGUrl/issues"
+    const val v2rayNGWikiMode = "$v2rayNGUrl/wiki/Mode"
     const val v2rayNGPrivacyPolicy = "https://raw.githubusercontent.com/2dust/v2rayNG/master/CR.md"
-    const val promotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
-    const val geoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
+    const val PromotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
+    const val GeoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
+    const val TgChannelUrl = "https://t.me/github_2dust"
 
-    const val DNS_AGENT = "1.1.1.1"
+    const val DNS_PROXY = "1.1.1.1"
     const val DNS_DIRECT = "223.5.5.5"
+    const val DNS_VPN = "1.1.1.1"
 
     const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"

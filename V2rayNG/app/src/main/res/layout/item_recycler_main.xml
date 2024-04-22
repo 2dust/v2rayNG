@@ -184,7 +184,7 @@
                         android:layout_height="wrap_content"
                         android:lines="1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/color_fab_orange"
+                        android:textColor="@color/colorConfigType"
                         android:textSize="10sp" />
                 </LinearLayout>
 

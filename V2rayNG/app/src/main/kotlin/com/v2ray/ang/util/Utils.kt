@@ -1,11 +1,8 @@
 package com.v2ray.ang.util
 
+import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.text.Editable
-import android.util.Base64
-import java.util.*
-import android.content.ClipData
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
@@ -14,18 +11,22 @@ import android.net.Uri
 import android.os.Build
 import android.os.LocaleList
 import android.provider.Settings
+import android.text.Editable
+import android.util.Base64
 import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
+import androidx.appcompat.app.AppCompatDelegate
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
-import java.net.*
 import com.v2ray.ang.service.V2RayServiceManager
 import java.io.IOException
+import java.net.*
+import java.util.*
 
 object Utils {
 
@@ -139,18 +140,16 @@ object Utils {
      * get remote dns servers from preference
      */
     fun getRemoteDnsServers(): List<String> {
-        val remoteDns = settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_AGENT
+        val remoteDns = settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_PROXY
         val ret = remoteDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
         if (ret.isEmpty()) {
-            return listOf(AppConfig.DNS_AGENT)
+            return listOf(AppConfig.DNS_PROXY)
         }
         return ret
     }
 
     fun getVpnDnsServers(): List<String> {
-        val vpnDns = settingsStorage?.decodeString(AppConfig.PREF_VPN_DNS)
-                ?: settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS)
-                ?: AppConfig.DNS_AGENT
+        val vpnDns = settingsStorage?.decodeString(AppConfig.PREF_VPN_DNS)?:AppConfig.DNS_VPN
         return vpnDns.split(",").filter { isPureIpAddress(it) }
         // allow empty, in that case dns will use system default
     }
@@ -160,7 +159,7 @@ object Utils {
      */
     fun getDomesticDnsServers(): List<String> {
         val domesticDns = settingsStorage?.decodeString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
-        val ret = domesticDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
+        val ret = domesticDns.split(",").filter { isPureIpAddress(it) }
         if (ret.isEmpty()) {
             return listOf(AppConfig.DNS_DIRECT)
         }
@@ -318,6 +317,14 @@ object Utils {
         return extDir.absolutePath
     }
 
+    fun backupPath(context: Context?): String {
+        if (context == null)
+            return ""
+        val extDir = context.getExternalFilesDir(AppConfig.DIR_BACKUPS)
+            ?: return context.getDir(AppConfig.DIR_BACKUPS, 0).absolutePath
+        return extDir.absolutePath
+    }
+
     fun getDeviceIdForXUDPBaseKey(): String {
         val androidId = Settings.Secure.ANDROID_ID.toByteArray(charset("UTF-8"))
         return Base64.encodeToString(androidId.copyOf(32), Base64.NO_PADDING.or(Base64.URL_SAFE))
@@ -363,6 +370,14 @@ object Utils {
     fun getDarkModeStatus(context: Context): Boolean {
         val mode = context.resources.configuration.uiMode and UI_MODE_NIGHT_MASK
         return mode != UI_MODE_NIGHT_NO
+    }
+
+    fun setNightMode(context: Context) {
+        when (settingsStorage?.decodeString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
+            "0" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            "1" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            "2" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        }
     }
 
     fun getIpv6Address(address: String): String {

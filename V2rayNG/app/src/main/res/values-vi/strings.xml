@@ -80,6 +80,7 @@
     <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp!</string>
     <string name="menu_item_add_file">Thêm tệp</string>
     <string name="menu_item_download_file">Tải xuống tệp tin</string>
+    <string name="toast_action_not_allowed">Hành động này bị cấm</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">Thêm URL nội dung</string>
@@ -175,6 +176,12 @@
     <string name="toast_tg_app_not_found">Không tìm thấy ứng dụng Telegram</string>
 
     <string name="title_privacy_policy">Chính sách bảo mật</string>
+    <string name="title_about">About</string>
+    <string name="title_source_code">Source code</string>
+    <string name="title_tg_channel">Telegram channel</string>
+    <string name="title_configuration_backup">Backup configuration</string>
+    <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
+    <string name="title_configuration_restore">Restore configuration</string>
     <string name="title_pref_promotion">Quảng bá server</string>
     <string name="summary_pref_promotion">Quảng cáo, nhấn để biết thêm (Ủng hộ có thể được gỡ bỏ)</string>
 
@@ -187,6 +194,7 @@
     <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp!</string>
     <string name="title_language">Ngôn ngữ</string>
     <string name="title_ui_settings">Cài đặt giao diện</string>
+    <string name="title_pref_ui_mode_night">UI mode settings</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Sao chép</string>
@@ -264,5 +272,11 @@
     </string-array>
     <string name="menu_item_add_asset">Thêm vào</string>
     <string name="menu_item_add_url">Thêm liên kết</string>
+
+    <string-array name="ui_mode_night">
+        <item>Follow system</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
 
 </resources>

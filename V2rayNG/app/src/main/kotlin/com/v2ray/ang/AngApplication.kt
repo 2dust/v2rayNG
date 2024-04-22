@@ -2,13 +2,13 @@ package com.v2ray.ang
 
 import android.content.Context
 import androidx.multidex.MultiDexApplication
-import androidx.preference.PreferenceManager
 import androidx.work.Configuration
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.util.Utils
 
 class AngApplication : MultiDexApplication(), Configuration.Provider {
     companion object {
-        const val PREF_LAST_VERSION = "pref_last_version"
+        //const val PREF_LAST_VERSION = "pref_last_version"
         lateinit var application: AngApplication
     }
 
@@ -17,21 +17,23 @@ class AngApplication : MultiDexApplication(), Configuration.Provider {
         application = this
     }
 
-    var firstRun = false
-        private set
+    //var firstRun = false
+     //   private set
 
     override fun onCreate() {
         super.onCreate()
 
 //        LeakCanary.install(this)
 
-        val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        firstRun = defaultSharedPreferences.getInt(PREF_LAST_VERSION, 0) != BuildConfig.VERSION_CODE
-        if (firstRun)
-            defaultSharedPreferences.edit().putInt(PREF_LAST_VERSION, BuildConfig.VERSION_CODE).apply()
+//        val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+//        firstRun = defaultSharedPreferences.getInt(PREF_LAST_VERSION, 0) != BuildConfig.VERSION_CODE
+//        if (firstRun)
+//            defaultSharedPreferences.edit().putInt(PREF_LAST_VERSION, BuildConfig.VERSION_CODE).apply()
 
         //Logger.init().logLevel(if (BuildConfig.DEBUG) LogLevel.FULL else LogLevel.NONE)
         MMKV.initialize(this)
+
+        Utils.setNightMode(application)
     }
 
     override fun getWorkManagerConfiguration(): Configuration {
