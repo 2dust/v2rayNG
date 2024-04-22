@@ -50,6 +50,9 @@ object AppConfig {
     const val PREF_FRAGMENT_LENGTH = "pref_fragment_length"
     const val PREF_FRAGMENT_INTERVAL = "pref_fragment_interval"
 
+    const val PREF_AUTO_TEST_CONNECT = "pref_auto_test_connect"
+    const val PREF_AUTO_TEST_CONNECT_WORK_NAME = "auto_test_connect_work"
+
     const val SUBSCRIPTION_AUTO_UPDATE = "pref_auto_update_subscription"
     const val SUBSCRIPTION_AUTO_UPDATE_INTERVAL = "pref_auto_update_interval"
     const val SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL = "1440" // 24 hours
@@ -57,9 +60,6 @@ object AppConfig {
 
     const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"
     const val CACHE_KEYWORD_FILTER = "cache_keyword_filter"
-
-    const val PREF_AUTO_TEST_CONNECT = "pref_auto_test_connect"
-    const val PREF_AUTO_TEST_CONNECT_WORK_NAME = "auto_test_connect_work"
 
     const val PROTOCOL_HTTP: String = "http://"
     const val PROTOCOL_HTTPS: String = "https://"

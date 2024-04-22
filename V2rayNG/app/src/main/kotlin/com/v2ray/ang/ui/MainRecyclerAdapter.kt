@@ -162,10 +162,10 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                     if (isRunning) {
                         Utils.stopVService(mActivity)
                         Observable.timer(500, TimeUnit.MILLISECONDS)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe {
-                                V2RayServiceManager.startV2Ray(mActivity)
-                            }
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe {
+                                    V2RayServiceManager.startV2Ray(mActivity)
+                                }
                     }
                 }
             }
