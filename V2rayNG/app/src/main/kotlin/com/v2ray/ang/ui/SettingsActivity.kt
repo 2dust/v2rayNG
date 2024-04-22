@@ -57,10 +57,6 @@ class SettingsActivity : BaseActivity() {
         private val autoUpdateInterval by lazy { findPreference<EditTextPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL) }
         private val autoTestConnect by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_AUTO_TEST_CONNECT) }
 
-        //        val licenses: Preference by lazy { findPreference(PREF_LICENSES) }
-//        val feedback: Preference by lazy { findPreference(PREF_FEEDBACK) }
-//        val tgGroup: Preference by lazy { findPreference(PREF_TG_GROUP) }
-
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
 
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
@@ -98,28 +94,6 @@ class SettingsActivity : BaseActivity() {
                 if (newValue) configureAutoTestConnectWork(15) else cancelAutoTestConnectWork()
                 true
             }
-
-//            licenses.onClick {
-//                val fragment = LicensesDialogFragment.Builder(act)
-//                        .setNotices(R.raw.licenses)
-//                        .setIncludeOwnLicense(false)
-//                        .build()
-//                fragment.show((act as AppCompatActivity).supportFragmentManager, null)
-//            }
-//
-//            feedback.onClick {
-//                Utils.openUri(activity, "https://github.com/2dust/v2rayNG/issues")
-//            }
-//            tgGroup.onClick {
-//                //                Utils.openUri(activity, "https://t.me/v2rayN")
-//                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("tg:resolve?domain=v2rayN"))
-//                try {
-//                    startActivity(intent)
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                    toast(R.string.toast_tg_app_not_found)
-//                }
-//            }
 
             perAppProxy?.setOnPreferenceClickListener {
                 startActivity(Intent(activity, PerAppProxyActivity::class.java))

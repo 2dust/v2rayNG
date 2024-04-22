@@ -44,10 +44,22 @@ object AppConfig {
     const val PREF_MUX_CONCURRENCY = "pref_mux_concurency"
     const val PREF_MUX_XUDP_CONCURRENCY = "pref_mux_xudp_concurency"
     const val PREF_MUX_XUDP_QUIC = "pref_mux_xudp_quic"
+
     const val PREF_FRAGMENT_ENABLED = "pref_fragment_enabled"
     const val PREF_FRAGMENT_PACKETS = "pref_fragment_packets"
     const val PREF_FRAGMENT_LENGTH = "pref_fragment_length"
     const val PREF_FRAGMENT_INTERVAL = "pref_fragment_interval"
+
+    const val SUBSCRIPTION_AUTO_UPDATE = "pref_auto_update_subscription"
+    const val SUBSCRIPTION_AUTO_UPDATE_INTERVAL = "pref_auto_update_interval"
+    const val SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL = "1440" // 24 hours
+    const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
+
+    const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"
+    const val CACHE_KEYWORD_FILTER = "cache_keyword_filter"
+
+    const val PREF_AUTO_TEST_CONNECT = "pref_auto_test_connect"
+    const val PREF_AUTO_TEST_CONNECT_WORK_NAME = "auto_test_connect_work"
 
     const val PROTOCOL_HTTP: String = "http://"
     const val PROTOCOL_HTTPS: String = "https://"
@@ -104,16 +116,4 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG = 7
     const val MSG_MEASURE_CONFIG_SUCCESS = 71
     const val MSG_MEASURE_CONFIG_CANCEL = 72
-
-    // subscription settings
-    const val SUBSCRIPTION_AUTO_UPDATE = "pref_auto_update_subscription"
-    const val SUBSCRIPTION_AUTO_UPDATE_INTERVAL = "pref_auto_update_interval"
-    const val SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL = "1440" // 24 hours
-    const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
-
-    const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"
-    const val CACHE_KEYWORD_FILTER = "cache_keyword_filter"
-
-    const val PREF_AUTO_TEST_CONNECT = "pref_auto_test_connect"
-    const val PREF_AUTO_TEST_CONNECT_WORK_NAME = "auto_test_connect_work"
 }
