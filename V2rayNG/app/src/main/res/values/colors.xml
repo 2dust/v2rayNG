@@ -3,6 +3,7 @@
     <color name="colorPing">#009966</color>
     <color name="colorPingRed">#FF0099</color>
     <color name="colorConfigType">#f97910</color>
+    <color name="colorWidgetText">#FFFFFF</color>
 
     <color name="color_fab_active">#f97910</color>
     <color name="color_fab_inactive">#9C9C9C</color>
