@@ -17,36 +17,70 @@
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:background="@color/colorPrimary"
-                android:foreground="?android:attr/selectableItemBackground"
+                android:foreground="?attr/selectableItemBackground"
                 android:padding="@dimen/nav_header_vertical_spacing">
-
             <LinearLayout
-                    android:layout_width="0dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingStart="9dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical">
 
-                <TextView
+                    <TextView
                         android:id="@+id/asset_name"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:maxLines="2"
+                        android:minLines="1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                         tools:text="Placeholder.dat" />
 
-                <TextView
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
                         android:id="@+id/asset_properties"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAlignment="textEnd"
+                        android:lines="1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textSize="12sp"
                         tools:text="1MB . 2020.01.01" />
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="@dimen/nav_header_vertical_spacing">
+
+                <ImageView
+                    android:layout_width="@dimen/png_height"
+                    android:layout_height="@dimen/png_height"
+                    app:srcCompat="@drawable/ic_edit_24dp"
+                    app:tint="?attr/colorMainText" />
             </LinearLayout>
 
             <LinearLayout
                     android:id="@+id/layout_remove"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
+                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
                     android:padding="@dimen/nav_header_vertical_spacing">
@@ -54,7 +88,7 @@
                 <ImageView
                         android:layout_width="@dimen/png_height"
                         android:layout_height="@dimen/png_height"
-                        android:src="@drawable/ic_delete_24dp"
+                        app:srcCompat="@drawable/ic_delete_24dp"
                         app:tint="?attr/colorMainText" />
             </LinearLayout>
         </LinearLayout>

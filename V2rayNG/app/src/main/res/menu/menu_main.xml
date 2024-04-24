@@ -34,6 +34,10 @@
                 android:id="@+id/import_manually_trojan"
                 android:title="@string/menu_item_import_config_manually_trojan"
                 app:showAsAction="never" />
+            <item
+                android:id="@+id/import_manually_wireguard"
+                android:title="@string/menu_item_import_config_manually_wireguard"
+                app:showAsAction="never" />
 
             <item
                 android:title="@string/menu_item_import_config_custom"

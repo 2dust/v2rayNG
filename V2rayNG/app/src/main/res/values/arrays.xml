@@ -25,6 +25,7 @@
         <item>tcp</item>
         <item>kcp</item>
         <item>ws</item>
+        <item>httpupgrade</item>
         <item>h2</item>
         <item>quic</item>
         <item>grpc</item>
@@ -60,6 +61,13 @@
         <item>reality</item>
     </string-array>
 
+    <string-array name="fragment_packets" translatable="false">
+        <item>tlshello</item>
+        <item>1-2</item>
+        <item>1-3</item>
+        <item>1-5</item>
+    </string-array>
+
     <string-array name="streamsecurity_utls" translatable="false">
         <item></item>
         <item>chrome</item>
@@ -76,8 +84,11 @@
 
     <string-array name="streamsecurity_alpn" translatable="false">
         <item></item>
+        <item>h3</item>
         <item>h2</item>
         <item>http/1.1</item>
+        <item>h3,h2,http/1.1</item>
+        <item>h3,h2</item>
         <item>h2,http/1.1</item>
     </string-array>
 
@@ -178,5 +189,17 @@
         <item>ru</item>
         <item>fa</item>
         <item>ar</item>
+    </string-array>
+
+    <string-array name="mux_xudp_quic_value" translatable="false">
+        <item>reject</item>
+        <item>allow</item>
+        <item>skip</item>
+    </string-array>
+
+    <string-array name="ui_mode_night_value" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
 </resources>

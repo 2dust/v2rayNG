@@ -8,7 +8,7 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/select_photo"
-        android:icon="@drawable/ic_image_photo"
+        android:icon="@drawable/ic_image_24dp"
         android:title=""
         app:showAsAction="always" />
 </menu>

@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/layout_switch"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_switch"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/layout_background"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_gravity="center">
 
-    <ImageView
+        <ImageView
             android:id="@+id/image_switch"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_stat_name" />
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:padding="12dp"
+            app:srcCompat="@drawable/ic_stat_name" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textColor="@color/colorWidgetText"
+        android:textSize="10sp" />
 </LinearLayout>

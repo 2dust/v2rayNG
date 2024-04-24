@@ -1,7 +1,7 @@
 package com.v2ray.ang.ui
 
 import android.Manifest
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -45,7 +45,7 @@ class ScannerActivity : BaseActivity(){
 
     private fun handleResult(result: QRResult) {
         if (result is QRResult.QRSuccess ) {
-            finished(result.content.rawValue)
+            finished(result.content.rawValue!!)
         } else {
             finish()
         }
@@ -54,7 +54,7 @@ class ScannerActivity : BaseActivity(){
     private fun finished(text: String) {
         val intent = Intent()
         intent.putExtra("SCAN_RESULT", text)
-        setResult(Activity.RESULT_OK, intent)
+        setResult(AppCompatActivity.RESULT_OK, intent)
         finish()
     }
 

@@ -73,6 +73,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.0"
+                    android:text="@string/sub_auto_update" />
+
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/auto_update_check"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="6dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_top_height"
                 android:orientation="vertical">
 
                 <TextView
@@ -93,6 +115,7 @@
                     android:scrollbars="vertical" />
 
             </LinearLayout>
+
 
         </LinearLayout>
 

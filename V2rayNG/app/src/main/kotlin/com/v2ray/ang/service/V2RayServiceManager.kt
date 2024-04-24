@@ -1,6 +1,9 @@
 package com.v2ray.ang.service
 
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -50,7 +53,7 @@ object V2RayServiceManager {
         set(value) {
             field = value
             Seq.setContext(value?.get()?.getService()?.applicationContext)
-            Libv2ray.initV2Env(Utils.userAssetPath(value?.get()?.getService()))
+            Libv2ray.initV2Env(Utils.userAssetPath(value?.get()?.getService()), Utils.getDeviceIdForXUDPBaseKey())
         }
     var currentConfig: ServerConfig? = null
 
@@ -133,7 +136,11 @@ object V2RayServiceManager {
                 mFilter.addAction(Intent.ACTION_SCREEN_ON)
                 mFilter.addAction(Intent.ACTION_SCREEN_OFF)
                 mFilter.addAction(Intent.ACTION_USER_PRESENT)
-                service.registerReceiver(mMsgReceive, mFilter)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    service.registerReceiver(mMsgReceive, mFilter, Context.RECEIVER_EXPORTED)
+                } else {
+                    service.registerReceiver(mMsgReceive, mFilter)
+                }
             } catch (e: Exception) {
                 Log.d(ANG_PACKAGE, e.toString())
             }
@@ -286,7 +293,7 @@ object V2RayServiceManager {
                 .setShowWhen(false)
                 .setOnlyAlertOnce(true)
                 .setContentIntent(contentPendingIntent)
-                .addAction(R.drawable.ic_close_grey_800_24dp,
+                .addAction(R.drawable.ic_delete_24dp,
                         service.getString(R.string.notification_action_stop_v2ray),
                         stopV2RayPendingIntent)
         //.build()
@@ -364,7 +371,7 @@ object V2RayServiceManager {
                         }
                         val directUplink = v2rayPoint.queryStats(TAG_DIRECT, "uplink")
                         val directDownlink = v2rayPoint.queryStats(TAG_DIRECT, "downlink")
-                        val zeroSpeed = (proxyTotal == 0L && directUplink == 0L && directDownlink == 0L)
+                        val zeroSpeed = proxyTotal == 0L && directUplink == 0L && directDownlink == 0L
                         if (!zeroSpeed || !lastZeroSpeed) {
                             if (proxyTotal == 0L) {
                                 appendSpeedString(text, outboundTags?.firstOrNull(), 0.0, 0.0)

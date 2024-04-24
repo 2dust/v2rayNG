@@ -29,6 +29,7 @@
     <string name="menu_item_import_config_manually_ss">手动输入[Shadowsocks]</string>
     <string name="menu_item_import_config_manually_socks">手动输入[Socks]</string>
     <string name="menu_item_import_config_manually_trojan">手动输入[Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">手动输入[Wireguard]</string>
     <string name="menu_item_import_config_custom">自定义配置</string>
     <string name="menu_item_import_config_custom_clipboard">从剪贴板导入自定义配置</string>
     <string name="menu_item_import_config_custom_local">从本地导入自定义配置</string>
@@ -45,8 +46,8 @@
     <string name="server_lab_more_function">底层传输方式(transport)</string>
     <string name="server_lab_head_type">伪装类型(type)</string>
     <string name="server_lab_mode_type">gRPC 传输模式(mode)</string>
-    <string name="server_lab_request_host">伪装域名(host)(host/ws host/h2 host)/QUIC 加密方式</string>
-    <string name="server_lab_path">path(ws path/h2 path)/QUIC 加密密钥/kcp seed/gRPC serviceName</string>
+    <string name="server_lab_request_host">伪装域名(host)(host/ws host/httpupgrade host/h2 host)/QUIC 加密方式/gRPC Authority</string>
+    <string name="server_lab_path">path(ws path/httpupgrade path/h2 path)/QUIC 加密密钥/kcp seed/gRPC serviceName</string>
     <string name="server_lab_stream_security">传输层安全(TLS)</string>
     <string name="server_lab_allow_insecure">跳过证书验证(allowInsecure)</string>
     <string name="server_lab_sni">SNI</string>
@@ -58,6 +59,9 @@
     <string name="server_lab_security4">用户名(可选)</string>
     <string name="server_lab_encryption">加密方式(encryption)</string>
     <string name="server_lab_flow">流控(flow)</string>
+    <string name="server_lab_reserved">Reserved(可选)</string>
+    <string name="server_lab_local_address">本地地址(可选IPv4/IPv6，逗号隔开)</string>
+    <string name="server_lab_local_mtu">Mtu(可选, 默认1420)</string>
     <string name="toast_success">成功</string>
     <string name="toast_failure">失败</string>
     <string name="toast_none_data">没有数据</string>
@@ -76,9 +80,13 @@
     <string name="toast_asset_copy_failed">失败, 请使用文件管理器</string>
     <string name="menu_item_add_file">添加文件</string>
     <string name="menu_item_download_file">下载文件</string>
+    <string name="toast_action_not_allowed">禁止此项操作</string>
 
 
     <!-- PerAppProxyActivity -->
+    <string name="title_user_asset_add_url">添加资产网址</string>
+    <string name="msg_file_not_found">文件未找到</string>
+    <string name="msg_remark_is_duplicate">备注已经存在</string>
     <string name="msg_dialog_progress">正在加载</string>
     <string name="menu_item_search">搜索</string>
     <string name="menu_item_select_all">全选</string>
@@ -96,8 +104,17 @@
     <string name="title_pref_per_app_proxy">分应用代理</string>
     <string name="summary_pref_per_app_proxy">常规:勾选的App被代理,未勾选的直连;\n绕行模式:勾选的App直连,未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
 
-    <string name="title_pref_mux_enabled">启用Mux多路复用</string>
-    <string name="summary_pref_mux_enabled">开启可能会加速,关闭可能会减少断流</string>
+    <string name="title_mux_settings">Mux 多路复用 设置</string>
+    <string name="title_pref_mux_enabled">启用 Mux 多路复用</string>
+    <string name="summary_pref_mux_enabled">减低延时，但可能会断流，建议不要启用。\nTCP，UDP 及 QUIC 流量处理方式下方可选。</string>
+    <string name="title_pref_mux_concurency">TCP 复用子链接数（可填 -1 至 1024）</string>
+    <string name="title_pref_mux_xudp_concurency">XUDP 复用子链接数（可填 -1 至 1024）</string>
+    <string name="title_pref_mux_xudp_quic">QUIC 流量处理方式</string>
+    <string-array name="mux_xudp_quic_entries">
+        <item>不代理</item>
+        <item>多路复用</item>
+        <item>原生</item>
+    </string-array>
 
     <string name="title_pref_speed_enabled">启用速度显示</string>
     <string name="summary_pref_speed_enabled">在通知中显示当前速度\n小图标显示流量的路由情况</string>
@@ -119,7 +136,7 @@
     <string name="title_pref_routing_mode">预定义规则</string>
     <string name="title_pref_routing_custom">自定义规则</string>
 
-    <string name="title_pref_remote_dns">远程DNS (可选)</string>
+    <string name="title_pref_remote_dns">远程DNS (udp/tcp/https/quic)(可选)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (仅支持 IPv4/v6)</string>
@@ -153,15 +170,27 @@
     <string name="summary_pref_feedback">反馈改进或漏洞至 GitHub</string>
     <string name="summary_pref_tg_group">加入Telegram Group</string>
     <string name="toast_tg_app_not_found">未找到Telegram app</string>
+    <string name="title_privacy_policy">隐私权政策</string>
+    <string name="title_about">关于</string>
+    <string name="title_source_code">源代码</string>
+    <string name="title_tg_channel">Telegram 频道</string>
+    <string name="title_configuration_backup">备份配置</string>
+    <string name="summary_configuration_backup">存储位置: [%s], 卸载App或清除存储后备份将被清除</string>
+    <string name="title_configuration_restore">还原配置</string>
 
     <string name="title_pref_promotion">推广</string>
     <string name="summary_pref_promotion">一些推广,点击查看详情(捐赠可去除)</string>
+
+    <string name="title_pref_auto_update_subscription">自动更新订阅</string>
+    <string name="summary_pref_auto_update_subscription">在后台按一定时间间隔自动更新您的订阅。受设备影响，此功能不一定总是有效</string>
+    <string name="title_pref_auto_update_interval">自动更新间隔（分钟，最小值15）</string>
 
     <string name="title_core_loglevel">日志级别</string>
     <string name="title_mode">模式</string>
     <string name="title_mode_help">点此查看更多帮助</string>
     <string name="title_language">语言</string>
     <string name="title_ui_settings">用户界面设置</string>
+    <string name="title_pref_ui_mode_night">界面颜色设置</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">复制</string>
@@ -175,6 +204,7 @@
     <string name="sub_setting_remarks">备注</string>
     <string name="sub_setting_url">可选地址(url)</string>
     <string name="sub_setting_enable">启用更新</string>
+    <string name="sub_auto_update">启用自动更新</string>
     <string name="title_sub_update">更新订阅</string>
     <string name="title_ping_all_server">测试全部配置Tcping</string>
     <string name="title_real_ping_all_server">测试全部配置真连接</string>
@@ -203,6 +233,16 @@
     <string name="connection_test_error_status_code">"状态码无效（#%d）"</string>
     <string name="connection_connected">"已连接，点击测试连接"</string>
     <string name="connection_not_connected">"未连接"</string>
+
+    <string name="import_subscription_success">订阅导入成功</string>
+    <string name="import_subscription_failure">导入订阅失败</string>
+    <string name="menu_item_add_asset">添加</string>
+    <string name="menu_item_add_url">添加链接</string>
+    <string name="title_fragment_settings">分片（Fragment） 设置</string>
+    <string name="title_pref_fragment_packets">分片方式</string>
+    <string name="title_pref_fragment_length">分片包长（最小-最大）</string>
+    <string name="title_pref_fragment_interval">分片间隔（最小-最大）</string>
+    <string name="title_pref_fragment_enabled">启用分片（Fragment）</string>
 
     <string-array name="share_method">
         <item>二维码</item>
@@ -234,7 +274,11 @@
         <item>VPN</item>
         <item>仅代理</item>
     </string-array>
-    <string name="import_subscription_success">订阅导入成功</string>
-    <string name="import_subscription_failure">导入订阅失败</string>
+
+    <string-array name="ui_mode_night">
+        <item>跟随系统</item>
+        <item>浅色</item>
+        <item>深色</item>
+    </string-array>
 
 </resources>

@@ -28,18 +28,4 @@
             android:targetPackage="com.v2ray.ang" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
-    <shortcut
-        android:enabled="true"
-        android:icon="@drawable/ic_qu_settings_24dp"
-        android:shortcutDisabledMessage="@string/title_settings"
-        android:shortcutId="shortcuts_settings"
-        android:shortcutLongLabel="@string/title_settings"
-        android:shortcutShortLabel="@string/title_settings">
-
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:targetClass="com.v2ray.ang.ui.SettingsActivity"
-            android:targetPackage="com.v2ray.ang" />
-        <categories android:name="android.shortcut.conversation" />
-    </shortcut>
 </shortcuts>
