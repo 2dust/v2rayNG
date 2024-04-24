@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+	<string name="app_name" translatable="false">v2rayNG</string>
+<string name="server_lab_stream_fingerprint" translatable="false">بصمة</string>
+<string name="server_lab_stream_alpn" translatable="false">بروتوكول الطبقة الآخرى التالية (ALPN)</string>
+<string name="server_lab_public_key" translatable="false">المفتاح العام</string>
+<string name="server_lab_short_id" translatable="false">الهوية المختصرة</string>
+<string name="server_lab_spider_x" translatable="false">سبايدر إكس</string>
+<string name="server_lab_secret_key" translatable="false">المفتاح السري</string>
+<string name="title_url" translatable="false">رابط</string>
+<string name="title_mux_settings">إعدادات Mux</string>
+<string name="title_fragment_settings">إعدادات الكسر / fragment</string>
+<string name="title_pref_fragment_packets">حزم الكسر</string>
+<string name="title_pref_fragment_length">طول الكسر (الحد الأدنى - الحد الأقصى)</string>
+<string name="title_pref_fragment_interval">فاصل زمني للكسر (الحد الأدنى - الحد الأقصى)</string>
+<string name="title_pref_fragment_enabled">تمكين الكسر</string>
+	
 	<string name="app_widget_name">التبديل</string>
 	<string name="app_tile_name">التبديل</string>
 	<string name="app_tile_first_use">أول استخدام لهذه الميزة، يرجى استخدام التطبيق لإضافة خادم</string>
