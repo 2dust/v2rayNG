@@ -26,8 +26,7 @@
             <ImageView
                 android:layout_width="@dimen/png_height"
                 android:layout_height="@dimen/png_height"
-                app:srcCompat="@drawable/ic_backup_24dp"
-                app:tint="?attr/colorMainText" />
+                app:srcCompat="@drawable/ic_backup_24dp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -68,8 +67,7 @@
             <ImageView
                 android:layout_width="@dimen/png_height"
                 android:layout_height="@dimen/png_height"
-                app:srcCompat="@drawable/ic_restore_24dp"
-                app:tint="?attr/colorMainText" />
+                app:srcCompat="@drawable/ic_restore_24dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -102,8 +100,7 @@
             <ImageView
                 android:layout_width="@dimen/png_height"
                 android:layout_height="@dimen/png_height"
-                app:srcCompat="@drawable/ic_source_code_24dp"
-                app:tint="?attr/colorMainText" />
+                app:srcCompat="@drawable/ic_source_code_24dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -128,8 +125,7 @@
             <ImageView
                 android:layout_width="@dimen/png_height"
                 android:layout_height="@dimen/png_height"
-                app:srcCompat="@drawable/ic_feedback_24dp"
-                app:tint="?attr/colorMainText" />
+                app:srcCompat="@drawable/ic_feedback_24dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -155,8 +151,7 @@
             <ImageView
                 android:layout_width="@dimen/png_height"
                 android:layout_height="@dimen/png_height"
-                app:srcCompat="@drawable/ic_telegram_24dp"
-                app:tint="?attr/colorMainText" />
+                app:srcCompat="@drawable/ic_telegram_24dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -181,8 +176,7 @@
             <ImageView
                 android:layout_width="@dimen/png_height"
                 android:layout_height="@dimen/png_height"
-                app:srcCompat="@drawable/ic_privacy_24dp"
-                app:tint="?attr/colorMainText" />
+                app:srcCompat="@drawable/ic_privacy_24dp" />
 
             <TextView
                 android:layout_width="wrap_content"

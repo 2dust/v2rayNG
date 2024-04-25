@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            app:cardCornerRadius="5dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        app:cardCornerRadius="5dp">
 
         <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:background="@color/colorPrimary"
-                android:foreground="?attr/selectableItemBackground"
-                android:padding="@dimen/nav_header_vertical_spacing">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/nav_header_vertical_spacing">
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -72,24 +73,22 @@
                 <ImageView
                     android:layout_width="@dimen/png_height"
                     android:layout_height="@dimen/png_height"
-                    app:srcCompat="@drawable/ic_edit_24dp"
-                    app:tint="?attr/colorMainText" />
+                    app:srcCompat="@drawable/ic_edit_24dp" />
             </LinearLayout>
 
             <LinearLayout
-                    android:id="@+id/layout_remove"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:padding="@dimen/nav_header_vertical_spacing">
+                android:id="@+id/layout_remove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="@dimen/nav_header_vertical_spacing">
 
                 <ImageView
-                        android:layout_width="@dimen/png_height"
-                        android:layout_height="@dimen/png_height"
-                        app:srcCompat="@drawable/ic_delete_24dp"
-                        app:tint="?attr/colorMainText" />
+                    android:layout_width="@dimen/png_height"
+                    android:layout_height="@dimen/png_height"
+                    app:srcCompat="@drawable/ic_delete_24dp" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

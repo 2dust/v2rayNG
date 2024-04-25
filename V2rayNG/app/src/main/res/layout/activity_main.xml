@@ -48,7 +48,7 @@
                         android:id="@+id/layout_test"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/connection_test_height"
-                        android:background="@color/colorMainTestBg"
+                        android:background="@color/colorPrimary"
                         android:gravity="center|start"
                         android:nextFocusRight="@+id/fab"
                         android:clickable="true"
@@ -63,8 +63,7 @@
                             android:minLines="1"
                             android:paddingStart="16dp"
                             android:text="@string/connection_test_pending"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                            android:textColor="@color/colorText" />
+                            android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
 
                     </LinearLayout>
                 </LinearLayout>
