@@ -3,10 +3,7 @@
     <color name="color_fab_active">#f97910</color>
     <color name="color_fab_inactive">#646464</color>
     <color name="color_secondary">#BDBDBD</color>
-    <color name="colorSelected">#FFFFFF</color>
-    <color name="colorUnselected">#222222</color>
 
-    <color name="colorPrimary">#222222</color>
-    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorPrimary">#212121</color>
     <color name="colorAccent">#FFFFFF</color>
 </resources>

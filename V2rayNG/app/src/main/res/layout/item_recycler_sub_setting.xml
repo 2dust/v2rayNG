@@ -10,7 +10,7 @@
         android:id="@+id/item_cardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="2dp"
+        android:layout_margin="1dp"
         android:orientation="horizontal"
         card_view:cardCornerRadius="5dp">
 
@@ -19,7 +19,6 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/server_height"
             android:layout_gravity="center"
-            android:background="@color/colorPrimary"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"

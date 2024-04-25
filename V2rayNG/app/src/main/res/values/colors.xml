@@ -3,15 +3,11 @@
     <color name="colorPing">#009966</color>
     <color name="colorPingRed">#FF0099</color>
     <color name="colorConfigType">#f97910</color>
-    <color name="colorWidgetText">#FFFFFF</color>
 
     <color name="color_fab_active">#f97910</color>
     <color name="color_fab_inactive">#9C9C9C</color>
     <color name="color_secondary">#727272</color>
-    <color name="colorSelected">#000000</color>
-    <color name="colorUnselected">#FFFFFF</color>
 
-    <color name="colorPrimary">#FFFFFF</color>
-    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorPrimary">#F5F5F5</color>
     <color name="colorAccent">#000000</color>
 </resources>

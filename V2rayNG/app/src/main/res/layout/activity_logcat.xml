@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:paddingStart="10dp"
     android:paddingEnd="10dp"
-    tools:context=".ui.MainActivity">
+    tools:context=".ui.LogcatActivity">
 
     <ProgressBar
         android:id="@+id/pb_waiting"
