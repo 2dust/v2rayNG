@@ -11,8 +11,8 @@ android {
         applicationId = "com.v2ray.ang"
         minSdk = 21
         targetSdk = 34
-        versionCode = 557
-        versionName = "1.8.21"
+        versionCode = 558
+        versionName = "1.8.22"
         multiDexEnabled = true
     }
 
