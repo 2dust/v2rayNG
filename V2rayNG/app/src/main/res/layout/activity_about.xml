@@ -52,6 +52,30 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/layout_share"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/server_height"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center|start"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="@dimen/png_height"
+                android:layout_height="@dimen/png_height"
+                app:srcCompat="@drawable/ic_share_24dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:text="@string/title_configuration_share"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/layout_restore"
             android:layout_width="match_parent"
             android:layout_height="@dimen/server_height"

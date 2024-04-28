@@ -183,6 +183,7 @@
     <string name="title_configuration_backup">إعدادات النسخ الاحتياطي</string>
     <string name="summary_configuration_backup">مكان التخزين: [%s]، سيتم مسح النسخة الاحتياطية بعد إلغاء تثبيت التطبيق أو مسح مساحة التخزين</string>
     <string name="title_configuration_restore">استعادة الاعدادات</string>
+    <string name="title_configuration_share">Share configuration</string>
     <string name="title_pref_promotion">ترقية</string>
 
     <string name="summary_pref_promotion">ترقية، انقر للحصول على التفاصيل (يمكن إزالة التبرع)</string>

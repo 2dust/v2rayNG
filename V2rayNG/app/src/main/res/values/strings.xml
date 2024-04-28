@@ -190,6 +190,7 @@
     <string name="title_configuration_backup">Backup configuration</string>
     <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
     <string name="title_configuration_restore">Restore configuration</string>
+    <string name="title_configuration_share">Share configuration</string>
 
     <string name="title_pref_promotion">Promotion</string>
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>

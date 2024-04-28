@@ -177,6 +177,7 @@
     <string name="title_configuration_backup">備份配置</string>
     <string name="summary_configuration_backup">儲存位置: [%s], 卸載App或清除儲存後備份將被清除</string>
     <string name="title_configuration_restore">還原配置</string>
+    <string name="title_configuration_share">分享配置</string>
 
     <string name="title_pref_promotion">推廣</string>
     <string name="summary_pref_promotion">一些推廣，輕觸以檢視 (捐贈可去除)</string>

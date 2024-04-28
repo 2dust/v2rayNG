@@ -179,6 +179,7 @@
     <string name="title_configuration_backup">Backup configuration</string>
     <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
     <string name="title_configuration_restore">Restore configuration</string>
+    <string name="title_configuration_share">Share configuration</string>
     <string name="title_pref_promotion">Quảng bá server</string>
     <string name="summary_pref_promotion">Quảng cáo, nhấn để biết thêm (Ủng hộ có thể được gỡ bỏ)</string>
 
