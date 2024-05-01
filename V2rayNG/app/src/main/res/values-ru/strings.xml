@@ -179,7 +179,7 @@
     <string name="title_configuration_backup">Резервирование</string>
     <string name="summary_configuration_backup">Путь: [%s]. Резервная копия будет стёрта при удалении приложения или очистке хранилища.</string>
     <string name="title_configuration_restore">Восстановление</string>
-    <string name="title_configuration_share">Share configuration</string>
+    <string name="title_configuration_share">Поделиться</string>
 
     <string name="title_pref_promotion">Содействие</string>
     <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации (пожертвование может быть удалено)</string>
