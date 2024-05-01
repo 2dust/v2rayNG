@@ -226,7 +226,10 @@ data class V2rayConfig(
 
             data class GrpcSettingsBean(var serviceName: String = "",
                                         var authority: String? = null,
-                                        var multiMode: Boolean? = null)
+                                        var multiMode: Boolean? = null,
+                                        var idle_timeout: Int? = null,
+                                        var health_check_timeout: Int? = null
+                )
 
             fun populateTransportSettings(transport: String, headerType: String?, host: String?, path: String?, seed: String?,
                                           quicSecurity: String?, key: String?, mode: String?, serviceName: String?,
@@ -295,6 +298,8 @@ data class V2rayConfig(
                         grpcSetting.multiMode = mode == "multi"
                         grpcSetting.serviceName = serviceName ?: ""
                         grpcSetting.authority = authority ?: ""
+                        grpcSetting.idle_timeout = 60
+                        grpcSetting.health_check_timeout = 20
                         sni = authority ?: ""
                         grpcSettings = grpcSetting
                     }
