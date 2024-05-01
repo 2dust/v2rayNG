@@ -158,7 +158,7 @@ object V2rayConfigUtil {
 
     private fun fakedns(v2rayConfig: V2rayConfig) {
         if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true
-            || settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
+            && settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
         ) {
             v2rayConfig.fakedns = listOf(V2rayConfig.FakednsBean())
             v2rayConfig.outbounds.filter { it.protocol == PROTOCOL_FREEDOM && it.tag == TAG_DIRECT }
@@ -398,12 +398,13 @@ object V2rayConfigUtil {
         try {
             val hosts = mutableMapOf<String, String>()
             val servers = ArrayList<Any>()
+
+            //remote Dns
             val remoteDns = Utils.getRemoteDnsServers()
             val proxyDomain = userRule2Domian(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
                     ?: ""
             )
-
             remoteDns.forEach {
                 servers.add(it)
             }
@@ -419,48 +420,51 @@ object V2rayConfigUtil {
             }
 
             // domestic DNS
+            val domesticDns = Utils.getDomesticDnsServers()
             val directDomain = userRule2Domian(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
                     ?: ""
             )
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
                 ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
-            if (directDomain.size > 0 || routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
-                val domesticDns = Utils.getDomesticDnsServers()
-                val geositeCn = arrayListOf("geosite:cn","geosite:geolocation-cn")
-                val geoipCn = arrayListOf("geoip:cn")
-                if (directDomain.size > 0) {
-                    servers.add(
-                        V2rayConfig.DnsBean.ServersBean(
-                            domesticDns.first(),
-                            53,
-                            directDomain,
-                            geoipCn
-                        )
+            val isCnRoutingMode =
+                (routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value)
+            val geoipCn = arrayListOf("geoip:cn")
+
+            if (directDomain.size > 0) {
+                servers.add(
+                    V2rayConfig.DnsBean.ServersBean(
+                        domesticDns.first(),
+                        53,
+                        directDomain,
+                        if (isCnRoutingMode) geoipCn else null
                     )
-                }
-                if (routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
-                    servers.add(
-                        V2rayConfig.DnsBean.ServersBean(
-                            domesticDns.first(),
-                            53,
-                            geositeCn,
-                            geoipCn
-                        )
+                )
+            }
+            if (isCnRoutingMode) {
+                val geositeCn = arrayListOf("geosite:cn", "geosite:geolocation-cn")
+                servers.add(
+                    V2rayConfig.DnsBean.ServersBean(
+                        domesticDns.first(),
+                        53,
+                        geositeCn,
+                        geoipCn
                     )
-                }
-                if (Utils.isPureIpAddress(domesticDns.first())) {
-                    v2rayConfig.routing.rules.add(
-                        0, V2rayConfig.RoutingBean.RulesBean(
-                            outboundTag = AppConfig.TAG_DIRECT,
-                            port = "53",
-                            ip = arrayListOf(domesticDns.first()),
-                            domain = null
-                        )
-                    )
-                }
+                )
             }
 
+            if (Utils.isPureIpAddress(domesticDns.first())) {
+                v2rayConfig.routing.rules.add(
+                    0, V2rayConfig.RoutingBean.RulesBean(
+                        outboundTag = AppConfig.TAG_DIRECT,
+                        port = "53",
+                        ip = arrayListOf(domesticDns.first()),
+                        domain = null
+                    )
+                )
+            }
+
+            //block dns
             val blkDomain = userRule2Domian(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
                     ?: ""

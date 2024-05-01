@@ -159,7 +159,7 @@ object Utils {
      */
     fun getDomesticDnsServers(): List<String> {
         val domesticDns = settingsStorage?.decodeString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
-        val ret = domesticDns.split(",").filter { isPureIpAddress(it) }
+        val ret = domesticDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
         if (ret.isEmpty()) {
             return listOf(AppConfig.DNS_DIRECT)
         }
