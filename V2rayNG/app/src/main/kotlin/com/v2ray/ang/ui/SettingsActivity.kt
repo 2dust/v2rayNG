@@ -230,6 +230,7 @@ class SettingsActivity : BaseActivity() {
             }
 
             listOf(
+                AppConfig.PREF_ROUTE_ONLY_ENABLED,
                 AppConfig.PREF_BYPASS_APPS,
                 AppConfig.PREF_SPEED_ENABLED,
                 AppConfig.PREF_CONFIRM_REMOVE,

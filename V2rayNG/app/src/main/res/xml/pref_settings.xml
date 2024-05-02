@@ -8,6 +8,12 @@
         android:summary="@string/summary_pref_sniffing_enabled"
         android:title="@string/title_pref_sniffing_enabled" />
 
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_route_only_enabled"
+        android:summary="@string/summary_pref_route_only_enabled"
+        android:title="@string/title_pref_route_only_enabled" />
+
     <PreferenceCategory android:title="@string/title_vpn_settings">
         <CheckBoxPreference
             android:key="pref_per_app_proxy"

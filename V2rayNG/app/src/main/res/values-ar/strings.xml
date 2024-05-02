@@ -125,6 +125,9 @@
 
     <string name="summary_pref_speed_enabled">عرض السرعة الحالية في الإشعار.\nسيتغير رمز الإشعار استنادًا إلى الاستخدام.</string>
     <string name="title_pref_sniffing_enabled">تمكين Sniffing</string>
+    <string name="title_pref_route_only_enabled">Enable routeOnly</string>
+    <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and keep the target address as the IP address.</string>
+
 
     <string name="summary_pref_sniffing_enabled">محاولة استخلاص النطاق من الحزمة (مشغلة افتراضيًا)</string>
     <string name="title_pref_local_dns_enabled">تمكين DNS المحلي</string>

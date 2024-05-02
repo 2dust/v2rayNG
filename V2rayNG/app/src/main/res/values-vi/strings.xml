@@ -122,6 +122,9 @@
 
     <string name="title_pref_sniffing_enabled">Bật Sniffing</string>
     <string name="summary_pref_sniffing_enabled">Nhận diện tên miền từ gói tin để phục vụ định tuyến. \n(phải tắt để xài Zalo)</string>
+    <string name="title_pref_route_only_enabled">Enable routeOnly</string>
+    <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and keep the target address as the IP address.</string>
+
 
     <string name="title_pref_local_dns_enabled">Bật Local DNS</string>
     <string name="summary_pref_local_dns_enabled">DNS được xử lý bởi mô-đun DNS của xray-core (dùng nếu cần định tuyến bypass cho mạng LAN và địa chỉ nội địa)</string>

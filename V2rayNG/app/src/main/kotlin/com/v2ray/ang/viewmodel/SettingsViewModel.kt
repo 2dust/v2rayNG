@@ -59,6 +59,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 settingsStorage?.encode(key, sharedPreferences.getString(key, ""))
             }
 
+            AppConfig.PREF_ROUTE_ONLY_ENABLED,
             AppConfig.PREF_SPEED_ENABLED,
             AppConfig.PREF_PROXY_SHARING,
             AppConfig.PREF_LOCAL_DNS_ENABLED,

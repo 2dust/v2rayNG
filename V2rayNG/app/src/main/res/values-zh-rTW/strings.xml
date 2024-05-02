@@ -121,6 +121,9 @@
 
     <string name="title_pref_sniffing_enabled">啟用流量監聽</string>
     <string name="summary_pref_sniffing_enabled">從流量中監聽網域 (預設啟用)</string>
+    <string name="title_pref_route_only_enabled">啟用 routeOnly</string>
+    <string name="summary_pref_route_only_enabled">將嗅探得到的網域只用於路由，代理目標位址仍為 IP</string>
+
 
     <string name="title_pref_local_dns_enabled">啟用本機 DNS</string>
     <string name="summary_pref_local_dns_enabled">DNS 請求匯入 core 由 DNS 模塊處理 (建議啟用，如果需要轉送略過區域網路及中國大陸)</string>

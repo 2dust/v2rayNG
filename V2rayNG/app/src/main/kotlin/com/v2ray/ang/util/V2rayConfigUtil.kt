@@ -134,6 +134,7 @@ object V2rayConfigUtil {
                 settingsStorage?.decodeBool(AppConfig.PREF_SNIFFING_ENABLED, true)
                     ?: true
             v2rayConfig.inbounds[0].sniffing?.enabled = fakedns || sniffAllTlsAndHttp
+            v2rayConfig.inbounds[0].sniffing?.routeOnly = settingsStorage?.decodeBool(AppConfig.PREF_ROUTE_ONLY_ENABLED, false)
             if (!sniffAllTlsAndHttp) {
                 v2rayConfig.inbounds[0].sniffing?.destOverride?.clear()
             }

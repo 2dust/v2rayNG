@@ -60,7 +60,8 @@ data class V2rayConfig(
 
         data class SniffingBean(var enabled: Boolean,
                                 val destOverride: ArrayList<String>,
-                                val metadataOnly: Boolean? = null)
+                                val metadataOnly: Boolean? = null,
+                                var routeOnly: Boolean? = null)
     }
 
     data class OutboundBean(var tag: String = "proxy",

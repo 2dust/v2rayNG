@@ -121,6 +121,8 @@
 
     <string name="title_pref_sniffing_enabled">启用流量探测</string>
     <string name="summary_pref_sniffing_enabled">从流量中探测域名 (默认启用)</string>
+    <string name="title_pref_route_only_enabled">启用 routeOnly</string>
+    <string name="summary_pref_route_only_enabled">将嗅探得到的域名仅用于路由，代理目标地址仍为 IP</string>
 
     <string name="title_pref_local_dns_enabled">启用本地DNS</string>
     <string name="summary_pref_local_dns_enabled">DNS 请求导入 core 由 DNS 模块处理（推荐启用 如果需要路由绕过局域网及大陆地址)</string>

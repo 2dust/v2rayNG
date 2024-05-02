@@ -120,6 +120,9 @@
 
     <string name="title_pref_sniffing_enabled">فعال کردن Sniffing</string>
     <string name="summary_pref_sniffing_enabled">دامنه sniff را از بسته امتحان کنید (پیش‌فرض روشن)</string>
+    <string name="title_pref_route_only_enabled">Enable routeOnly</string>
+    <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and keep the target address as the IP address.</string>
+
 
     <string name="title_pref_local_dns_enabled">فعال کردن DNS محلی</string>
     <string name="summary_pref_local_dns_enabled">DNS پردازش شده توسط ماژول DNS هسته (توصیه می‌شود، در صورت نیاز به دور زدن LAN و نشانی mainland)</string>
