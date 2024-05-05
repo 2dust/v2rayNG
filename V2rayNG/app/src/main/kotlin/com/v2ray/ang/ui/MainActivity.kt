@@ -540,10 +540,22 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 }
                 Log.d(ANG_PACKAGE, url)
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val configText = try {
+                    var configText = try {
                         Utils.getUrlContentWithCustomUserAgent(url)
                     } catch (e: Exception) {
                         e.printStackTrace()
+                        ""
+                    }
+                    if(configText.isEmpty()) {
+                        configText = try {
+                            val httpPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT), AppConfig.PORT_HTTP.toInt())
+                            Utils.getUrlContentWithCustomUserAgent(url, httpPort)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            ""
+                        }
+                    }
+                    if(configText.isEmpty()) {
                         launch(Dispatchers.Main) {
                             toast("\"" + it.second.remarks + "\" " + getString(R.string.toast_failure))
                         }
