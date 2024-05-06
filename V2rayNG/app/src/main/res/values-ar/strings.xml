@@ -124,16 +124,14 @@
     <string name="title_pref_speed_enabled">تمكين عرض السرعة</string>
 
     <string name="summary_pref_speed_enabled">عرض السرعة الحالية في الإشعار.\nسيتغير رمز الإشعار استنادًا إلى الاستخدام.</string>
-    <string name="title_pref_sniffing_enabled">تمكين Sniffing</string>
-    <string name="title_pref_route_only_enabled">Enable routeOnly</string>
-    <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and keep the target address as the IP address.</string>
+    <string name="title_pref_sniffing_enabled">تفعيل  استخراج حزم البيانات(Sniffing)</string>
+    <string name="title_pref_route_only_enabled">تفعيل routeOnly</string>
+    <string name="summary_pref_route_only_enabled">استخدام اسم المجال المستخرج لأغراض التوجيه فقط، والحفاظ على عنوان الوجهة كعنوان IP</string>
+    <string name="summary_pref_sniffing_enabled">السماح للبرنامج بمحاولة استخراج اسم المجال من بيانات حركة المرور. (مشغلة افتراضيًا)</string>
+    <string name="title_pref_local_dns_enabled">تمكين DNS محلي</string>
 
-
-    <string name="summary_pref_sniffing_enabled">محاولة استخلاص النطاق من الحزمة (مشغلة افتراضيًا)</string>
-    <string name="title_pref_local_dns_enabled">تمكين DNS المحلي</string>
-
-    <string name="summary_pref_local_dns_enabled">DNS يتم معالجتها بواسطة وحدة DNS الأساسية (موصى بها، إذا كانت بحاجة إلى توجيه تجاوز الشبكة المحلية والعنوان الرئيسي)</string>
-    <string name="title_pref_fake_dns_enabled">تمكين DNS الوهمي</string>
+    <string name="summary_pref_local_dns_enabled">DNS يتم معالجتها بواسطة وحدة DNSالأساسية (موصى بها، إذا كانت بحاجة إلى توجيه تجاوز الشبكة المحلية والعنوان الرئيسي)</string>
+    <string name="title_pref_fake_dns_enabled">تمكين DNS وهمي</string>
 
     <string name="summary_pref_fake_dns_enabled">DNS المحلي يعود بعنوان IP وهمي (أسرع، ولكن قد لا يعمل لبعض التطبيقات)</string>
     <string name="title_pref_prefer_ipv6">تفضيل IPv6</string>
@@ -179,14 +177,14 @@
     <string name="summary_pref_feedback">إرسال ملاحظات عن التحسينات أو الأخطاء إلى GitHub</string>
     <string name="summary_pref_tg_group">الانضمام إلى مجموعة Telegram</string>
     <string name="toast_tg_app_not_found">لم يتم العثور على تطبيق تيليجرام</string>
-    <string name="title_privacy_policy">سياسة الخصوصية\nترجمة م. ابراهيم قاسم</string>
-    <string name="title_about">عن</string>
+    <string name="title_privacy_policy">سياسة الخصوصية</string>
+    <string name="title_about">عن\nترجمة م. ابراهيم قاسم</string>
     <string name="title_source_code">الكود المصدري</string>
     <string name="title_tg_channel">قناة تليجرام</string>
     <string name="title_configuration_backup">إعدادات النسخ الاحتياطي</string>
     <string name="summary_configuration_backup">مكان التخزين: [%s]، سيتم مسح النسخة الاحتياطية بعد إلغاء تثبيت التطبيق أو مسح مساحة التخزين</string>
     <string name="title_configuration_restore">استعادة الاعدادات</string>
-    <string name="title_configuration_share">Share configuration</string>
+    <string name="title_configuration_share">مشاركة الإعدادت</string>
     <string name="title_pref_promotion">ترقية</string>
 
     <string name="summary_pref_promotion">ترقية، انقر للحصول على التفاصيل (يمكن إزالة التبرع)</string>
