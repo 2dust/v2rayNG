@@ -177,14 +177,14 @@
     <string name="summary_pref_feedback">إرسال ملاحظات عن التحسينات أو الأخطاء إلى GitHub</string>
     <string name="summary_pref_tg_group">الانضمام إلى مجموعة Telegram</string>
     <string name="toast_tg_app_not_found">لم يتم العثور على تطبيق تيليجرام</string>
-    <string name="title_privacy_policy">سياسة الخصوصية\nترجمة م. ابراهيم قاسم</string>
-    <string name="title_about">عن</string>
+    <string name="title_privacy_policy">سياسة الخصوصية</string>
+    <string name="title_about">عن\nترجمة م. ابراهيم قاسم</string>
     <string name="title_source_code">الكود المصدري</string>
     <string name="title_tg_channel">قناة تليجرام</string>
     <string name="title_configuration_backup">إعدادات النسخ الاحتياطي</string>
     <string name="summary_configuration_backup">مكان التخزين: [%s]، سيتم مسح النسخة الاحتياطية بعد إلغاء تثبيت التطبيق أو مسح مساحة التخزين</string>
     <string name="title_configuration_restore">استعادة الاعدادات</string>
-    <string name="title_configuration_share">Share configuration</string>
+    <string name="title_configuration_share">مشاركة الإعدادت</string>
     <string name="title_pref_promotion">ترقية</string>
 
     <string name="summary_pref_promotion">ترقية، انقر للحصول على التفاصيل (يمكن إزالة التبرع)</string>
