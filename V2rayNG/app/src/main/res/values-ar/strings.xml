@@ -52,7 +52,7 @@
     <string name="server_lab_path">المسار (مسار ws/مسار httpupgrade/مسار h2)/مفتاح QUIC/بذرة kcp/خدمة gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint" translatable="false">البصمة</string>
-    <string name="server_lab_stream_alpn" translatable="false">Alpn</string>
+    <string name="server_lab_stream_alpn" translatable="false">بروتوكول الطبقة الآخرى التالية (ALPN)</string>
     <string name="server_lab_allow_insecure">السماح غير الآمن</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">العنوان</string>
