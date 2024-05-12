@@ -434,5 +434,9 @@ object Utils {
     fun isTv(context: Context): Boolean =
         context.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
 
+    fun getDelayTestUrl(): String {
+        val url = settingsStorage.decodeString(AppConfig.PREF_DELAY_TEST_URL)
+        return if (url.isNullOrEmpty()) AppConfig.DelayTestUrl else url
+    }
 }
 

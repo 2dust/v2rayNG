@@ -60,6 +60,7 @@ object AppConfig {
     const val PREF_HTTP_PORT = "pref_http_port"
     const val PREF_REMOTE_DNS = "pref_remote_dns"
     const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
+    const val PREF_DELAY_TEST_URL = "pref_delay_test_url"
     const val PREF_LOGLEVEL = "pref_core_loglevel"
     const val PREF_MODE = "pref_mode"
 
@@ -98,6 +99,7 @@ object AppConfig {
     const val PromotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
     const val GeoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
     const val TgChannelUrl = "https://t.me/github_2dust"
+    const val DelayTestUrl = "https://www.google.com/generate_204"
 
     const val DNS_PROXY = "1.1.1.1"
     const val DNS_DIRECT = "223.5.5.5"

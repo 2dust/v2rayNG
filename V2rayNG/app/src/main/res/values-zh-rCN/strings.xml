@@ -146,6 +146,9 @@
     <string name="title_pref_domestic_dns">境内DNS (可选)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
+    <string name="title_pref_delay_test_url">真连接延迟测试网址 (http/https)</string>
+    <string name="summary_pref_delay_test_url">Url</string>
+
     <string name="title_pref_proxy_sharing_enabled">允许来自局域网的连接</string>
     <string name="summary_pref_proxy_sharing_enabled">其他设备可以使用socks/http协议通过您的IP地址连接到代理,仅在受信任的网络中启用以避免未经授权的连接</string>
     <string name="toast_warning_pref_proxysharing_short">允许来自局域网的连接，请确保处于受信网络</string>

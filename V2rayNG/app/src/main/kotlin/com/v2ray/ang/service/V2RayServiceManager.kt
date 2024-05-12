@@ -237,7 +237,7 @@ object V2RayServiceManager {
             var errstr = ""
             if (v2rayPoint.isRunning) {
                 try {
-                    time = v2rayPoint.measureDelay()
+                    time = v2rayPoint.measureDelay(Utils.getDelayTestUrl())
                 } catch (e: Exception) {
                     Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
                     errstr = e.message?.substringAfter("\":") ?: "empty message"

@@ -148,6 +148,9 @@
     <string name="title_pref_domestic_dns">DNS nội địa (không bắt buộc)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
+    <string name="title_pref_delay_test_url">True delay test url (http/https)</string>
+    <string name="summary_pref_delay_test_url">Url</string>
+
     <string name="title_pref_proxy_sharing_enabled">Cho phép kết nối từ mạng LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác trong cùng mạng LAN có thể kết nối đến SOCKS/HTTP proxy trên thiết bị của bạn. \nChỉ bật tính năng này trong các mạng đáng tin cậy để tránh kết nối trái phép.</string>
     <string name="toast_warning_pref_proxysharing_short">Đang bật cho phép kết nối từ mạng LAN</string>

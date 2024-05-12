@@ -39,6 +39,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_VPN_DNS,
             AppConfig.PREF_REMOTE_DNS,
             AppConfig.PREF_DOMESTIC_DNS,
+            AppConfig.PREF_DELAY_TEST_URL,
             AppConfig.PREF_LOCAL_DNS_PORT,
             AppConfig.PREF_SOCKS_PORT,
             AppConfig.PREF_HTTP_PORT,

@@ -63,6 +63,7 @@ class SettingsActivity : BaseActivity() {
         private val httpPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HTTP_PORT) }
         private val remoteDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_REMOTE_DNS) }
         private val domesticDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DOMESTIC_DNS) }
+        private val delayTestUrl by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DELAY_TEST_URL) }
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
 
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
@@ -143,18 +144,6 @@ class SettingsActivity : BaseActivity() {
                 true
             }
 
-            remoteDns?.setOnPreferenceChangeListener { _, any ->
-                // remoteDns.summary = any as String
-                val nval = any as String
-                remoteDns?.summary = if (nval == "") AppConfig.DNS_PROXY else nval
-                true
-            }
-            domesticDns?.setOnPreferenceChangeListener { _, any ->
-                // domesticDns.summary = any as String
-                val nval = any as String
-                domesticDns?.summary = if (nval == "") AppConfig.DNS_DIRECT else nval
-                true
-            }
             socksPort?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
                 socksPort?.summary = if (TextUtils.isEmpty(nval)) AppConfig.PORT_SOCKS else nval
@@ -163,6 +152,21 @@ class SettingsActivity : BaseActivity() {
             httpPort?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
                 httpPort?.summary = if (TextUtils.isEmpty(nval)) AppConfig.PORT_HTTP else nval
+                true
+            }
+            remoteDns?.setOnPreferenceChangeListener { _, any ->
+                val nval = any as String
+                remoteDns?.summary = if (nval == "") AppConfig.DNS_PROXY else nval
+                true
+            }
+            domesticDns?.setOnPreferenceChangeListener { _, any ->
+                val nval = any as String
+                domesticDns?.summary = if (nval == "") AppConfig.DNS_DIRECT else nval
+                true
+            }
+            delayTestUrl?.setOnPreferenceChangeListener { _, any ->
+                val nval = any as String
+                delayTestUrl?.summary = if (nval == "") AppConfig.DelayTestUrl else nval
                 true
             }
             mode?.setOnPreferenceChangeListener { _, newValue ->
@@ -201,6 +205,7 @@ class SettingsActivity : BaseActivity() {
             httpPort?.summary = settingsStorage.decodeString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
             remoteDns?.summary = settingsStorage.decodeString(AppConfig.PREF_REMOTE_DNS, AppConfig.DNS_PROXY)
             domesticDns?.summary = settingsStorage.decodeString(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
+            delayTestUrl?.summary = settingsStorage.decodeString(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DelayTestUrl)
 
             initSharedPreference()
         }
@@ -217,7 +222,8 @@ class SettingsActivity : BaseActivity() {
                 socksPort,
                 httpPort,
                 remoteDns,
-                domesticDns
+                domesticDns,
+                delayTestUrl
             ).forEach { key ->
                 key?.text = key?.summary.toString()
             }
