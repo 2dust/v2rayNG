@@ -2,11 +2,16 @@ package com.v2ray.ang.util
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.google.zxing.*
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.BinaryBitmap
+import com.google.zxing.DecodeHintType
+import com.google.zxing.EncodeHintType
+import com.google.zxing.NotFoundException
+import com.google.zxing.RGBLuminanceSource
 import com.google.zxing.common.GlobalHistogramBinarizer
-import com.google.zxing.common.HybridBinarizer
+import com.google.zxing.qrcode.QRCodeReader
 import com.google.zxing.qrcode.QRCodeWriter
-import java.util.*
+import java.util.EnumMap
 
 /**
  * 描述:解析二维码图片
@@ -21,8 +26,10 @@ object QRCodeDecoder {
         try {
             val hints = HashMap<EncodeHintType, String>()
             hints[EncodeHintType.CHARACTER_SET] = "utf-8"
-            val bitMatrix = QRCodeWriter().encode(text,
-                BarcodeFormat.QR_CODE, size, size, hints)
+            val bitMatrix = QRCodeWriter().encode(
+                text,
+                BarcodeFormat.QR_CODE, size, size, hints
+            )
             val pixels = IntArray(size * size)
             for (y in 0 until size) {
                 for (x in 0 until size) {
@@ -34,8 +41,10 @@ object QRCodeDecoder {
 
                 }
             }
-            val bitmap = Bitmap.createBitmap(size, size,
-                Bitmap.Config.ARGB_8888)
+            val bitmap = Bitmap.createBitmap(
+                size, size,
+                Bitmap.Config.ARGB_8888
+            )
             bitmap.setPixels(pixels, 0, size, 0, 0, size, size)
             return bitmap
         } catch (e: Exception) {
@@ -61,24 +70,37 @@ object QRCodeDecoder {
      * @return 返回二维码图片里的内容 或 null
      */
     fun syncDecodeQRCode(bitmap: Bitmap?): String? {
+        if (bitmap == null) {
+            return null
+        }
         var source: RGBLuminanceSource? = null
         try {
-            val width = bitmap!!.width
+            val width = bitmap.width
             val height = bitmap.height
             val pixels = IntArray(width * height)
             bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
             source = RGBLuminanceSource(width, height, pixels)
-            return MultiFormatReader().decode(BinaryBitmap(HybridBinarizer(source)), HINTS).text
+            val qrReader = QRCodeReader()
+            try {
+                val result = try {
+                    qrReader.decode(
+                        BinaryBitmap(GlobalHistogramBinarizer(source)),
+                        mapOf(DecodeHintType.TRY_HARDER to true)
+                    )
+                } catch (e: NotFoundException) {
+                    qrReader.decode(
+                        BinaryBitmap(GlobalHistogramBinarizer(source.invert())),
+                        mapOf(DecodeHintType.TRY_HARDER to true)
+                    )
+                }
+                return result.text
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        if (source != null) {
-            try {
-                return MultiFormatReader().decode(BinaryBitmap(GlobalHistogramBinarizer(source)), HINTS).text
-            } catch (e2: Throwable) {
-                e2.printStackTrace()
-            }
-        }
+
         return null
     }
 
@@ -107,23 +129,24 @@ object QRCodeDecoder {
 
     init {
         val allFormats: List<BarcodeFormat> = arrayListOf(
-                BarcodeFormat.AZTEC
-                ,BarcodeFormat.CODABAR
-                ,BarcodeFormat.CODE_39
-                ,BarcodeFormat.CODE_93
-                ,BarcodeFormat.CODE_128
-                ,BarcodeFormat.DATA_MATRIX
-                ,BarcodeFormat.EAN_8
-                ,BarcodeFormat.EAN_13
-                ,BarcodeFormat.ITF
-                ,BarcodeFormat.MAXICODE
-                ,BarcodeFormat.PDF_417
-                ,BarcodeFormat.QR_CODE
-                ,BarcodeFormat.RSS_14
-                ,BarcodeFormat.RSS_EXPANDED
-                ,BarcodeFormat.UPC_A
-                ,BarcodeFormat.UPC_E
-                ,BarcodeFormat.UPC_EAN_EXTENSION)
+            BarcodeFormat.AZTEC,
+            BarcodeFormat.CODABAR,
+            BarcodeFormat.CODE_39,
+            BarcodeFormat.CODE_93,
+            BarcodeFormat.CODE_128,
+            BarcodeFormat.DATA_MATRIX,
+            BarcodeFormat.EAN_8,
+            BarcodeFormat.EAN_13,
+            BarcodeFormat.ITF,
+            BarcodeFormat.MAXICODE,
+            BarcodeFormat.PDF_417,
+            BarcodeFormat.QR_CODE,
+            BarcodeFormat.RSS_14,
+            BarcodeFormat.RSS_EXPANDED,
+            BarcodeFormat.UPC_A,
+            BarcodeFormat.UPC_E,
+            BarcodeFormat.UPC_EAN_EXTENSION
+        )
         HINTS[DecodeHintType.TRY_HARDER] = BarcodeFormat.QR_CODE
         HINTS[DecodeHintType.POSSIBLE_FORMATS] = allFormats
         HINTS[DecodeHintType.CHARACTER_SET] = "utf-8"
