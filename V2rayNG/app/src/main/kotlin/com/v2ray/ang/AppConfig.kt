@@ -99,7 +99,7 @@ object AppConfig {
     const val PromotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
     const val GeoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
     const val TgChannelUrl = "https://t.me/github_2dust"
-    const val DelayTestUrl = "https://www.google.com/generate_204"
+    const val DelayTestUrl = "https://www.gstatic.com/generate_204"
 
     const val DNS_PROXY = "1.1.1.1"
     const val DNS_DIRECT = "223.5.5.5"

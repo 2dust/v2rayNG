@@ -102,9 +102,7 @@ object SpeedtestUtil {
         var conn: HttpURLConnection? = null
 
         try {
-            val url = URL("https",
-                    "www.google.com",
-                    "/generate_204")
+            val url = URL(Utils.getDelayTestUrl())
 
             conn = url.openConnection(
                     Proxy(Proxy.Type.HTTP,
