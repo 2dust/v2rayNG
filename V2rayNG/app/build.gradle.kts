@@ -14,6 +14,15 @@ android {
         versionCode = 559
         versionName = "1.8.23"
         multiDexEnabled = true
+        splits.abi {
+            reset()
+            include(
+                "arm64-v8a",
+                "armeabi-v7a",
+                "x86_64",
+                "x86"
+            )
+        }
     }
 
     compileOptions {
@@ -91,15 +100,15 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
-    implementation("androidx.fragment:fragment-ktx:1.7.0")
+    implementation("androidx.fragment:fragment-ktx:1.7.1")
     implementation("androidx.multidex:multidex:2.0.1")
-    implementation("androidx.viewpager2:viewpager2:1.1.0-rc01")
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
 
     // Androidx ktx
     implementation("androidx.activity:activity-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
 
     //kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
