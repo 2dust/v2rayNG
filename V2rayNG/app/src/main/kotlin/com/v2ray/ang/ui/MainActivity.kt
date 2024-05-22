@@ -355,6 +355,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             mainViewModel.reloadServerList()
             true
         }
+        R.id.set_best_fragment_settings -> {
+            mainViewModel.findBestFragmentSettings()
+            true
+        }
         R.id.filter_config -> {
             mainViewModel.filterConfig(this)
             true
