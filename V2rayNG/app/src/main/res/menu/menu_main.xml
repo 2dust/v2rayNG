@@ -105,6 +105,10 @@
         android:title="@string/title_sort_by_test_results"
         app:showAsAction="never" />
     <item
+        android:id="@+id/set_best_fragment_settings"
+        android:title="@string/title_set_best_fragment_settings"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/sub_update"
         android:title="@string/title_sub_update"
         app:showAsAction="never" />
