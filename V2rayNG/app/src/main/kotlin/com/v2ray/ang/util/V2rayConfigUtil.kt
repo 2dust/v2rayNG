@@ -571,15 +571,35 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun updateOutboundFragment(v2rayConfig: V2rayConfig): Boolean {
+    fun updateOutboundFragment(v2rayConfig: V2rayConfig, fragmentParams: V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean? = null): Boolean {
         try {
-            if (settingsStorage?.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == false) {
-                return true
-            }
-            if (v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.TLS
-                && v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.REALITY
-            ) {
-                return true
+            var fragmentBean: V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean
+            if (fragmentParams?.packets.isNullOrEmpty()) {
+                if (!settingsStorage.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false)) {
+                    return true
+                }
+                if (v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.TLS
+                    && v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.REALITY
+                ) {
+                    return true
+                }
+                fragmentBean = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
+                    packets = settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_PACKETS)
+                        ?: "tlshello",
+                    length = settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_LENGTH)
+                        ?: "50-100",
+                    interval = settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL)
+                        ?: "10-20"
+                )
+            } else {
+                fragmentBean = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
+                    packets = fragmentParams?.packets
+                        ?: "tlshello",
+                    length = fragmentParams?.length
+                        ?: "50-100",
+                    interval = fragmentParams?.interval
+                        ?: "10-20"
+                )
             }
 
             val fragmentOutbound =
@@ -589,25 +609,18 @@ object V2rayConfigUtil {
                     mux = null
                 )
 
-            var packets = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_PACKETS) ?: "tlshello"
             if (v2rayConfig.outbounds[0].streamSettings?.security == V2rayConfig.REALITY
-                && packets == "tlshello"
+                && fragmentBean.packets == "tlshello"
             ) {
-                packets = "1-3"
+                fragmentBean.packets = "1-3"
             } else if (v2rayConfig.outbounds[0].streamSettings?.security == V2rayConfig.TLS
-                && packets != "tlshello"
+                && fragmentBean.packets != "tlshello"
             ) {
-                packets = "tlshello"
+                fragmentBean.packets = "tlshello"
             }
 
             fragmentOutbound.settings = V2rayConfig.OutboundBean.OutSettingsBean(
-                fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
-                    packets = packets,
-                    length = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_LENGTH)
-                        ?: "50-100",
-                    interval = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL)
-                        ?: "10-20"
-                )
+                fragment = fragmentBean
             )
             fragmentOutbound.streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean(
                 sockopt = V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
