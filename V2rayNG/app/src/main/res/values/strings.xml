@@ -260,6 +260,11 @@
     <string name="title_pref_fragment_length">Fragment Length (min-max)</string>
     <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
     <string name="title_pref_fragment_enabled">Enable Fragment</string>
+    <string name="title_set_best_fragment_settings">Find and set best fragment settings</string>
+    <string name="error_select_a_tls_config">Select a non-custom TLS config and try again!</string>
+    <string name="fragment_test_started">Looking for best fragment settings...</string>
+    <string name="fragment_test_done">Fragment test completed.</string>
+    <string name="fragment_test_failed">Fragment test failed!</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
