@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
+import android.util.Range
 import android.view.LayoutInflater
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
@@ -25,7 +26,10 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean
+import com.v2ray.ang.dto.FragmentsCache
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.KEY_ANG_CONFIGS
@@ -64,6 +68,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var keywordFilter: String = settingsStorage.decodeString(AppConfig.CACHE_KEYWORD_FILTER, "")!!
         private set
     val serversCache = mutableListOf<ServersCache>()
+    val fragmentsCache = mutableListOf<FragmentsCache>()
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
     val updateTestResultAction by lazy { MutableLiveData<String>() }
@@ -185,6 +190,86 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     )
                 }
             }
+        }
+    }
+
+    fun findBestFragmentSettings() {
+        MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_FRAGMENT_CANCEL, "")
+
+        val guid = mainStorage.decodeString(MmkvManager.KEY_SELECTED_SERVER) ?: ""
+        val config = MmkvManager.decodeServerConfig(guid)
+        if (config?.configType == EConfigType.VLESS || config?.configType == EConfigType.VMESS) {
+            if (config.outboundBean?.streamSettings?.security == "tls") {
+                getApplication<AngApplication>().toast(R.string.fragment_test_started)
+                val prefFragmentEnabled = settingsStorage.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false)
+                settingsStorage.putBoolean(AppConfig.PREF_FRAGMENT_ENABLED, false)
+                val configJson = V2rayConfigUtil.getV2rayConfig(getApplication(), guid).content
+                fragmentsCache.clear()
+                fragmentsCache.add(FragmentsCache(FragmentBean("")))
+                for (length in arrayOf(5, 7, 10, 12, 15, 20, 25, 30, 50)) {
+                    for (interval in arrayOf(2, 3, 5, 7, 10, 12, 15, 20, 30)) {
+                        fragmentsCache.add(FragmentsCache(FragmentBean(
+                            "tlshello",
+                            "${length}-${length * 2}",
+                            "${interval}-${interval * 2}",
+                        )))
+                    }
+                }
+                viewModelScope.launch(Dispatchers.Default) { // without Dispatchers.Default viewModelScope will launch in main thread
+                    for ((index, item) in fragmentsCache.withIndex()) {
+                        val v2rayConfig = Gson().fromJson(configJson, V2rayConfig::class.java)
+                        if (index > 0) {
+                            V2rayConfigUtil.updateOutboundFragment(v2rayConfig, item.fragmentBean)
+                        }
+                        MessageUtil.sendMsg2TestService(
+                            getApplication(),
+                            AppConfig.MSG_MEASURE_FRAGMENT,
+                            Pair(index, v2rayConfig.toPrettyPrinting())
+                        )
+                    }
+                }
+                settingsStorage.putBoolean(AppConfig.PREF_FRAGMENT_ENABLED, prefFragmentEnabled)
+                return
+            }
+        }
+        getApplication<AngApplication>().toast(R.string.error_select_a_tls_config)
+    }
+
+    fun checkAndSetBestFragmentSettings() {
+        if (fragmentsCache.any { it.ping == -2L }) {
+            return
+        }
+
+        var maxPing = 0L
+        var bestFragmentBean: FragmentBean? = null
+
+        for (item in fragmentsCache) {
+            if (item.ping < 0) {
+                continue
+            }
+
+            if (maxPing == 0L || item.ping < maxPing) {
+                maxPing = item.ping
+                bestFragmentBean = item.fragmentBean
+            }
+        }
+
+        if (maxPing > 0L) {
+            if (bestFragmentBean?.packets.isNullOrEmpty()) {
+                settingsStorage.putBoolean(AppConfig.PREF_FRAGMENT_ENABLED, false)
+            } else {
+                settingsStorage.putString(AppConfig.PREF_FRAGMENT_PACKETS, bestFragmentBean?.packets)
+                settingsStorage.putString(AppConfig.PREF_FRAGMENT_LENGTH, bestFragmentBean?.length)
+                settingsStorage.putString(AppConfig.PREF_FRAGMENT_INTERVAL, bestFragmentBean?.interval)
+                settingsStorage.putBoolean(AppConfig.PREF_FRAGMENT_ENABLED, true)
+            }
+            if (isRunning.value == true) {
+                Utils.stopVService(getApplication<Application>().applicationContext)
+                Utils.startVServiceFromToggle(getApplication<Application>().applicationContext)
+            }
+            getApplication<AngApplication>().toast(R.string.fragment_test_done)
+        } else {
+            getApplication<AngApplication>().toast(R.string.fragment_test_failed)
         }
     }
 
@@ -314,6 +399,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val resultPair = intent.getSerializableExtra("content") as Pair<String, Long>
                     MmkvManager.encodeServerTestDelayMillis(resultPair.first, resultPair.second)
                     updateListAction.value = getPosition(resultPair.first)
+                }
+
+                AppConfig.MSG_MEASURE_FRAGMENT_SUCCESS -> {
+                    val resultPair = intent.getSerializableExtra("content") as Pair<Int, Long>
+                    fragmentsCache[resultPair.first].ping = resultPair.second
+                    checkAndSetBestFragmentSettings()
                 }
             }
         }
