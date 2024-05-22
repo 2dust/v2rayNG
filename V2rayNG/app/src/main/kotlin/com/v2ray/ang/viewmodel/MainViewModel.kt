@@ -261,10 +261,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 settingsStorage.putString(AppConfig.PREF_FRAGMENT_INTERVAL, bestFragmentBean?.interval)
                 settingsStorage.putBoolean(AppConfig.PREF_FRAGMENT_ENABLED, true)
             }
-            if (isRunning.value == true) {
-                Utils.stopVService(getApplication<Application>().applicationContext)
-                Utils.startVServiceFromToggle(getApplication<Application>().applicationContext)
-            }
+            
             getApplication<AngApplication>().toast(R.string.fragment_test_done)
         } else {
             getApplication<AngApplication>().toast(R.string.fragment_test_failed)
