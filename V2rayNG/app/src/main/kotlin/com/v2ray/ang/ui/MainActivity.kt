@@ -629,16 +629,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 toast(R.string.toast_none_data)
                 return
             }
-            mainViewModel.appendCustomConfigServer(server)
-            mainViewModel.reloadServerList()
-            toast(R.string.toast_success)
+            if (mainViewModel.appendCustomConfigServer(server)) {
+                mainViewModel.reloadServerList()
+                toast(R.string.toast_success)
+            } else {
+                toast(R.string.toast_failure)
+            }
             //adapter.notifyItemInserted(mainViewModel.serverList.lastIndex)
         } catch (e: Exception) {
             ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
             e.printStackTrace()
             return
         }
-    }
 
     fun setTestState(content: String?) {
         binding.tvTestState.text = content

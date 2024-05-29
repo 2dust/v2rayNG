@@ -110,15 +110,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun appendCustomConfigServer(server: String) {
-        val config = ServerConfig.create(EConfigType.CUSTOM)
-        config.subscriptionId = subscriptionId
-        config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
-        config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
-        val key = MmkvManager.encodeServerConfig("", config)
-        serverRawStorage?.encode(key, server)
-        serverList.add(0, key)
-        serversCache.add(0, ServersCache(key, config))
+    fun appendCustomConfigServer(server: String): Boolean {
+        if (server.contains("inbounds")
+            && server.contains("outbounds")
+            && server.contains("routing")
+        ) {
+            try {
+                val config = ServerConfig.create(EConfigType.CUSTOM)
+                config.subscriptionId = subscriptionId
+                config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
+                config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
+                val key = MmkvManager.encodeServerConfig("", config)
+                serverRawStorage?.encode(key, server)
+                serverList.add(0, key)
+                serversCache.add(0, ServersCache(key, config))
+                return true
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        return false
     }
 
     fun swapServer(fromPosition: Int, toPosition: Int) {
