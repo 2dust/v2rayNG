@@ -217,11 +217,9 @@ object AngConfigManager {
                 return R.string.toast_none_data
             }
 
-            //maybe sub
-            if (TextUtils.isEmpty(subid) && (str.startsWith(PROTOCOL_HTTP) || str.startsWith(
-                    PROTOCOL_HTTPS
-                ))
-            ) {
+            //maybe Subscription
+            if (TextUtils.isEmpty(subid)
+                && (str.startsWith(PROTOCOL_HTTP) || str.startsWith(PROTOCOL_HTTPS))) {
                 MmkvManager.importUrlAsSubscription(str)
                 return 0
             }
@@ -1025,24 +1023,7 @@ object AngConfigManager {
         return 0
     }
 
-    fun importSubscription(remark: String, url: String, enabled: Boolean = true): Boolean {
-        val subId = Utils.getUuid()
-        val subItem = SubscriptionItem()
-
-
-        subItem.remarks = remark
-        subItem.url = url
-        subItem.enabled = enabled
-
-        if (TextUtils.isEmpty(subItem.remarks) || TextUtils.isEmpty(subItem.url)) {
-            return false
-        }
-        subStorage?.encode(subId, Gson().toJson(subItem))
-
-        return true
-    }
-
-    fun appendCustomConfigServer(server: String?, subid: String): Int {
+     fun appendCustomConfigServer(server: String?, subid: String): Int {
         if (server == null) {
             return 0
         }

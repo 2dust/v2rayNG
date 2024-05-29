@@ -641,6 +641,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             e.printStackTrace()
             return
         }
+    }
 
     fun setTestState(content: String?) {
         binding.tvTestState.text = content
