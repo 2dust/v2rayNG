@@ -67,7 +67,7 @@ object SubscriptionUpdater {
     }
 
     fun importBatchConfig(server: String?, subid: String = "") {
-        val append = subid.isEmpty()
+        val append = false
 
         val count = AngConfigManager.importBatchConfig(server, subid, append)
         if (count <= 0) {
