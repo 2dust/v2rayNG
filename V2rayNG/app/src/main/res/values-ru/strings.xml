@@ -149,8 +149,8 @@
     <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
-    <string name="title_pref_delay_test_url">True delay test url (http/https)</string>
-    <string name="summary_pref_delay_test_url">Url</string>
+    <string name="title_pref_delay_test_url">Сервис проверки времени отклика (HTTP/HTTPS)</string>
+    <string name="summary_pref_delay_test_url">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">Разрешать подключения из LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться, используя ваш IP-адрес, чтобы использовать прокси по протоколам SOCKS/HTTP. Используйте только в доверенной сети, чтобы избежать несанкционированного подключения.</string>
