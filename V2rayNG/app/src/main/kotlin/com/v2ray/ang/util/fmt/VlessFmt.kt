@@ -92,16 +92,16 @@ object VlessFmt {
                     Utils.removeWhiteSpace(tlsSetting.alpn.joinToString()).orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.fingerprint)) {
-                dicQuery["fp"] = tlsSetting.fingerprint!!
+                dicQuery["fp"] = tlsSetting.fingerprint?:""
             }
             if (!TextUtils.isEmpty(tlsSetting.publicKey)) {
-                dicQuery["pbk"] = tlsSetting.publicKey!!
+                dicQuery["pbk"] = tlsSetting.publicKey?:""
             }
             if (!TextUtils.isEmpty(tlsSetting.shortId)) {
-                dicQuery["sid"] = tlsSetting.shortId!!
+                dicQuery["sid"] = tlsSetting.shortId?:""
             }
             if (!TextUtils.isEmpty(tlsSetting.spiderX)) {
-                dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX!!)
+                dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX?:"")
             }
         }
         dicQuery["type"] =
@@ -162,7 +162,7 @@ object VlessFmt {
         val url = String.format(
             "%s@%s:%s",
             outbound.getPassword(),
-            Utils.getIpv6Address(outbound.getServerAddress()!!),
+            Utils.getIpv6Address(outbound.getServerAddress()),
             outbound.getServerPort()
         )
         return url + query + remark

@@ -61,7 +61,7 @@ object SocksFmt {
         val url = String.format(
             "%s@%s:%s",
             Utils.encode(pw),
-            Utils.getIpv6Address(outbound.getServerAddress()!!),
+            Utils.getIpv6Address(outbound.getServerAddress()),
             outbound.getServerPort()
         )
         return url + remark

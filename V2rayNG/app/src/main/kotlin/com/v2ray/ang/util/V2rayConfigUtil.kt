@@ -295,10 +295,10 @@ object V2rayConfigUtil {
                         rulesDomain.domain?.add(it)
                     }
                 }
-                if (rulesDomain.domain?.size!! > 0) {
+                if ((rulesDomain.domain?.size ?: 0) > 0) {
                     v2rayConfig.routing.rules.add(rulesDomain)
                 }
-                if (rulesIP.ip?.size!! > 0) {
+                if ((rulesIP.ip?.size ?: 0) > 0) {
                     v2rayConfig.routing.rules.add(rulesIP)
                 }
             }
@@ -560,7 +560,7 @@ object V2rayConfigUtil {
                     } else {
                         path
                     }
-                outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host = host!!
+                outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host = host
             }
 
 

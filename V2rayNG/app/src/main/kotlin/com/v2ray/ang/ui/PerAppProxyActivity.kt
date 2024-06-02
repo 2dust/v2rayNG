@@ -193,7 +193,7 @@ class PerAppProxyActivity : BaseActivity() {
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    filterProxyApp(newText!!)
+                    filterProxyApp(newText?:"")
                     return false
                 }
             })
@@ -209,12 +209,12 @@ class PerAppProxyActivity : BaseActivity() {
             if (it.blacklist.containsAll(pkgNames)) {
                 it.apps.forEach {
                     val packageName = it.packageName
-                    adapter?.blacklist!!.remove(packageName)
+                    adapter?.blacklist?.remove(packageName)
                 }
             } else {
                 it.apps.forEach {
                     val packageName = it.packageName
-                    adapter?.blacklist!!.add(packageName)
+                    adapter?.blacklist?.add(packageName)
                 }
             }
             it.notifyDataSetChanged()
@@ -278,7 +278,7 @@ class PerAppProxyActivity : BaseActivity() {
                 return false
             }
 
-            adapter?.blacklist!!.clear()
+            adapter?.blacklist?.clear()
 
             if (binding.switchBypassApps.isChecked) {
                 adapter?.let {
@@ -286,7 +286,7 @@ class PerAppProxyActivity : BaseActivity() {
                         val packageName = it.packageName
                         Log.d(ANG_PACKAGE, packageName)
                         if (!inProxyApps(proxyApps, packageName, force)) {
-                            adapter?.blacklist!!.add(packageName)
+                            adapter?.blacklist?.add(packageName)
                             println(packageName)
                             return@block
                         }
@@ -299,7 +299,7 @@ class PerAppProxyActivity : BaseActivity() {
                         val packageName = it.packageName
                         Log.d(ANG_PACKAGE, packageName)
                         if (inProxyApps(proxyApps, packageName, force)) {
-                            adapter?.blacklist!!.add(packageName)
+                            adapter?.blacklist?.add(packageName)
                             println(packageName)
                             return@block
                         }

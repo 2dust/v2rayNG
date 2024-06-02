@@ -58,7 +58,7 @@ object ShadowsocksFmt {
         val url = String.format(
             "%s@%s:%s",
             pw,
-            Utils.getIpv6Address(outbound.getServerAddress()!!),
+            Utils.getIpv6Address(outbound.getServerAddress()),
             outbound.getServerPort()
         )
         return url + remark

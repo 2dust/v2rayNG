@@ -49,7 +49,7 @@ class RoutingSettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val content = settingsStorage?.getString(requireArguments().getString(routing_arg), "")
-        binding.etRoutingContent.text = Utils.getEditable(content!!)
+        binding.etRoutingContent.text = Utils.getEditable(content)
 
         setHasOptionsMenu(true)
     }
@@ -113,7 +113,7 @@ class RoutingSettingsFragment : Fragment() {
     private val scanQRCodeForReplace = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
             val content = it.data?.getStringExtra("SCAN_RESULT")
-            binding.etRoutingContent.text = Utils.getEditable(content!!)
+            binding.etRoutingContent.text = Utils.getEditable(content)
         }
     }
 
@@ -145,7 +145,7 @@ class RoutingSettingsFragment : Fragment() {
             val content = Utils.getUrlContext(url, 5000)
             launch(Dispatchers.Main) {
                 val routingList = if (TextUtils.isEmpty(content)) {
-                    Utils.readTextFromAssets(activity?.v2RayApplication!!, "custom_routing_$tag")
+                    Utils.readTextFromAssets(activity?.v2RayApplication, "custom_routing_$tag")
                 } else {
                     content
                 }

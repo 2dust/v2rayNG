@@ -39,8 +39,8 @@ object Utils {
      * @param text
      * @return
      */
-    fun getEditable(text: String): Editable {
-        return Editable.Factory.getInstance().newEditable(text)
+    fun getEditable(text: String?): Editable {
+        return Editable.Factory.getInstance().newEditable(text?:"")
     }
 
     /**
@@ -101,16 +101,16 @@ object Utils {
     /**
      * base64 decode
      */
-    fun decode(text: String): String {
+    fun decode(text: String?): String {
         tryDecodeBase64(text)?.let { return it }
-        if (text.endsWith('=')) {
+        if (text?.endsWith('=')==true) {
             // try again for some loosely formatted base64
             tryDecodeBase64(text.trimEnd('='))?.let { return it }
         }
         return ""
     }
 
-    fun tryDecodeBase64(text: String): String? {
+    fun tryDecodeBase64(text: String?): String? {
         try {
             return Base64.decode(text, Base64.NO_WRAP).toString(charset("UTF-8"))
         } catch (e: Exception) {
@@ -302,7 +302,11 @@ object Utils {
     /**
      * readTextFromAssets
      */
-    fun readTextFromAssets(context: Context, fileName: String): String {
+    fun readTextFromAssets(context: Context?, fileName: String): String {
+        if(context == null)
+        {
+            return ""
+        }
         val content = context.assets.open(fileName).bufferedReader().use {
             it.readText()
         }
@@ -389,7 +393,10 @@ object Utils {
         }
     }
 
-    fun getIpv6Address(address: String): String {
+    fun getIpv6Address(address: String?): String {
+        if(address == null){
+            return ""
+        }
         return if (isIpv6Address(address) && !address.contains('[') && !address.contains(']')) {
             String.format("[%s]", address)
         } else {

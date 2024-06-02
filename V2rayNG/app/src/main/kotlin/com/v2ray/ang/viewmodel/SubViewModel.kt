@@ -83,7 +83,7 @@ class SubViewModel(application: Application) : AndroidViewModel(application) {
     fun importBatchConfig(server: String?, subid: String = "", append: Boolean): Int {
         var count = AngConfigManager.importBatchConfig(server, subid, append)
         if (count <= 0) {
-            count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid, append)
+            count = AngConfigManager.importBatchConfig(Utils.decode(server), subid, append)
         }
         if (count <= 0) {
             count = AngConfigManager.appendCustomConfigServer(server, subid)

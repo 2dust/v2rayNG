@@ -63,7 +63,7 @@ object WireguardFmt {
         val url = String.format(
             "%s@%s:%s",
             Utils.urlEncode(outbound.getPassword().toString()),
-            Utils.getIpv6Address(outbound.getServerAddress()!!),
+            Utils.getIpv6Address(outbound.getServerAddress()),
             outbound.getServerPort()
         )
         return url + query + remark

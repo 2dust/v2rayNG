@@ -45,7 +45,7 @@ class ScannerActivity : BaseActivity(){
 
     private fun handleResult(result: QRResult) {
         if (result is QRResult.QRSuccess ) {
-            finished(result.content.rawValue!!)
+            finished(result.content.rawValue?:"")
         } else {
             finish()
         }
@@ -110,7 +110,7 @@ class ScannerActivity : BaseActivity(){
             try {
                 val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
                 val text = QRCodeDecoder.syncDecodeQRCode(bitmap)
-                finished(text!!)
+                finished(text?:"")
             } catch (e: Exception) {
                 e.printStackTrace()
                 toast(e.message.toString())

@@ -44,7 +44,7 @@ class TaskerActivity : BaseActivity() {
         val adapter = ArrayAdapter(this,
                 android.R.layout.simple_list_item_single_choice, lstData)
         listview = findViewById<View>(R.id.listview) as ListView
-        listview!!.adapter = adapter
+        listview?.adapter = adapter
 
         init()
     }

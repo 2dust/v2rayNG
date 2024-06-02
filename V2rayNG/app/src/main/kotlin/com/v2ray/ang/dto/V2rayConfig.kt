@@ -157,7 +157,7 @@ data class V2rayConfig(
                                            var headers: HeadersBean = HeadersBean(),
                                            val version: String? = null,
                                            val method: String? = null) {
-                        data class HeadersBean(var Host: List<String> = ArrayList(),
+                        data class HeadersBean(var Host: List<String>? = ArrayList(),
                                                @SerializedName("User-Agent")
                                                val userAgent: List<String>? = null,
                                                @SerializedName("Accept-Encoding")
@@ -247,7 +247,7 @@ data class V2rayConfig(
                                 requestObj.headers.Host = (host ?: "").split(",").map { it.trim() }.filter { it.isNotEmpty() }
                                 requestObj.path = (path ?: "").split(",").map { it.trim() }.filter { it.isNotEmpty() }
                                 tcpSetting.header.request = requestObj
-                                sni = requestObj.headers.Host.getOrNull(0) ?: sni
+                                sni = requestObj.headers.Host?.getOrNull(0) ?: sni
                             }
                         } else {
                             tcpSetting.header.type = "none"
