@@ -71,8 +71,12 @@ jobs:
         path: /home/runner/work/v2rayNG/v2rayNG/V2rayNG/app/build/outputs/apk/release/*.apk
 
     - name: Upload apk to release
-      uses: softprops/action-gh-release@v1
+      uses: svenstaro/upload-release-action@v2
       with:
-        name: v2rayNG_${{ github.event.inputs.V2RAYNG_VERSION }}_${{ github.event.inputs.XRAY_CORE_VERSION }}
-        tag_name: v${{ github.event.inputs.V2RAYNG_VERSION }}_${{ github.event.inputs.XRAY_CORE_VERSION }}
-        files: /home/runner/work/v2rayNG/v2rayNG/V2rayNG/app/build/outputs/apk/release/*.apk
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: /home/runner/work/v2rayNG/v2rayNG/V2rayNG/app/build/outputs/apk/release/*.apk
+        file_glob: true
+        asset_name: v2rayNG_${{ github.event.inputs.V2RAYNG_VERSION }}_${{ github.event.inputs.XRAY_CORE_VERSION }}.apk
+        tag: build-v${{ github.event.inputs.V2RAYNG_VERSION }}_${{ github.event.inputs.XRAY_CORE_VERSION }}-${{ github.run_id }}
+        overwrite: true
+        body: ${{ github.event.head_commit.message }}
