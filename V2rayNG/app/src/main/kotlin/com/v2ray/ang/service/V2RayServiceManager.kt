@@ -248,6 +248,14 @@ object V2RayServiceManager {
                     Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
                     errstr = e.message?.substringAfter("\":") ?: "empty message"
                 }
+                if (time == -1L) {
+                    try {
+                        time = v2rayPoint.measureDelay(Utils.getDelayTestUrl(true))
+                    } catch (e: Exception) {
+                        Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
+                        errstr = e.message?.substringAfter("\":") ?: "empty message"
+                    }
+                }
             }
             val result = if (time == -1L) {
                 service.getString(R.string.connection_test_error, errstr)
