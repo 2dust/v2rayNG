@@ -40,7 +40,6 @@ import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
-import com.v2ray.ang.viewmodel.SubViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -64,7 +63,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
     private var mItemTouchHelper: ItemTouchHelper? = null
     val mainViewModel: MainViewModel by viewModels()
-    val subViewModel: SubViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -429,7 +427,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             .show()
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val count = subViewModel.importBatchConfig(server, mainViewModel.subscriptionId, true)
+            val count = AngConfigManager.importBatchConfig(server, mainViewModel.subscriptionId, true)
             delay(500L)
             launch(Dispatchers.Main) {
                 if (count > 0) {
@@ -524,7 +522,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             .show()
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val count = subViewModel.updateConfigViaSubAll()
+            val count = AngConfigManager.updateConfigViaSubAll()
             delay(500L)
             launch(Dispatchers.Main) {
                 if (count > 0) {

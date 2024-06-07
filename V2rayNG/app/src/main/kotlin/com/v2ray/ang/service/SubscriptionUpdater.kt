@@ -58,23 +58,11 @@ object SubscriptionUpdater {
                     "subscription automatic update: ---${subscription.remarks}"
                 )
                 val configs = Utils.getUrlContentWithCustomUserAgent(subscription.url)
-                importBatchConfig(configs, i.first)
+                AngConfigManager.importBatchConfig(configs, i.first, false)
                 notification.setContentText("Updating ${subscription.remarks}")
             }
             notificationManager.cancel(3)
             return Result.success()
-        }
-    }
-
-    fun importBatchConfig(server: String?, subid: String = "") {
-        val append = false
-
-        val count = AngConfigManager.importBatchConfig(server, subid, append)
-        if (count <= 0) {
-            AngConfigManager.importBatchConfig(Utils.decode(server), subid, append)
-        }
-        if (count <= 0) {
-            AngConfigManager.appendCustomConfigServer(server, subid)
         }
     }
 }

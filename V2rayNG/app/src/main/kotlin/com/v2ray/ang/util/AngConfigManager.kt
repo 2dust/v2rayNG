@@ -3,6 +3,7 @@ package com.v2ray.ang.util
 import android.content.Context
 import android.graphics.Bitmap
 import android.text.TextUtils
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonPrimitive
@@ -10,8 +11,7 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
 import com.tencent.mmkv.MMKV
-import com.v2ray.ang.AppConfig.PROTOCOL_HTTP
-import com.v2ray.ang.AppConfig.PROTOCOL_HTTPS
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.*
 import com.v2ray.ang.util.MmkvManager.KEY_SELECTED_SERVER
@@ -202,9 +202,9 @@ object AngConfigManager {
 //    }
 
     /**
-     * import config form qrcode or...
+     * parse config form qrcode or...
      */
-    private fun importConfig(
+    private fun parseConfig(
         str: String?,
         subid: String,
         removedSelectedServer: ServerConfig?
@@ -212,13 +212,6 @@ object AngConfigManager {
         try {
             if (str == null || TextUtils.isEmpty(str)) {
                 return R.string.toast_none_data
-            }
-
-            //maybe Subscription
-            if ((str.startsWith(PROTOCOL_HTTP) || str.startsWith(PROTOCOL_HTTPS))
-            ) {
-                MmkvManager.importUrlAsSubscription(str)
-                return 0
             }
 
             val config = if (str.startsWith(EConfigType.VMESS.protocolScheme)) {
@@ -259,21 +252,20 @@ object AngConfigManager {
         return 0
     }
 
-
     /**
      * share config
      */
     private fun shareConfig(guid: String): String {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ""
-           
+
             return config.configType.protocolScheme + when (config.configType) {
                 EConfigType.VMESS -> VmessFmt.toUri(config)
                 EConfigType.CUSTOM -> ""
-                EConfigType.SHADOWSOCKS ->  ShadowsocksFmt.toUri(config)
+                EConfigType.SHADOWSOCKS -> ShadowsocksFmt.toUri(config)
                 EConfigType.SOCKS -> SocksFmt.toUri(config)
-                EConfigType.VLESS-> VlessFmt.toUri(config)
-                EConfigType.TROJAN-> TrojanFmt.toUri(config)
+                EConfigType.VLESS -> VlessFmt.toUri(config)
+                EConfigType.TROJAN -> TrojanFmt.toUri(config)
                 EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
             }
         } catch (e: Exception) {
@@ -394,7 +386,44 @@ object AngConfigManager {
 //        }
 //    }
 
-    fun importBatchConfig(servers: String?, subid: String, append: Boolean): Int {
+    fun importBatchConfig(server: String?, subid: String, append: Boolean): Int {
+        var count = parseBatchConfig(server, subid, append)
+        if (count <= 0) {
+            count = parseBatchConfig(Utils.decode(server), subid, append)
+        }
+        if (count <= 0) {
+            count = parseCustomConfigServer(server, subid)
+        }
+
+        if (parseBatchSubscription(server, subid) > 0) {
+            updateConfigViaSubAll()
+            return 1
+        }
+        return count
+    }
+
+    fun parseBatchSubscription(servers: String?, subid: String): Int {
+        try {
+            if (servers == null) {
+                return 0
+            }
+
+            var count = 0
+            servers.lines()
+                .reversed()
+                .forEach { str ->
+                    if (str.startsWith(AppConfig.PROTOCOL_HTTP) || str.startsWith(AppConfig.PROTOCOL_HTTPS)) {
+                        count += MmkvManager.importUrlAsSubscription(str)
+                    }
+                }
+            return count
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return 0
+    }
+
+    fun parseBatchConfig(servers: String?, subid: String, append: Boolean): Int {
         try {
             if (servers == null) {
                 return 0
@@ -415,16 +444,12 @@ object AngConfigManager {
             if (!append) {
                 MmkvManager.removeServerViaSubid(subid)
             }
-//            var servers = server
-//            if (server.indexOf("vmess") >= 0 && server.indexOf("vmess") == server.lastIndexOf("vmess")) {
-//                servers = server.replace("\n", "")
-//            }
 
             var count = 0
             servers.lines()
                 .reversed()
                 .forEach {
-                    val resId = importConfig(it, subid, removedSelectedServer)
+                    val resId = parseConfig(it, subid, removedSelectedServer)
                     if (resId == 0) {
                         count++
                     }
@@ -436,7 +461,7 @@ object AngConfigManager {
         return 0
     }
 
-    fun appendCustomConfigServer(server: String?, subid: String): Int {
+    fun parseCustomConfigServer(server: String?, subid: String): Int {
         if (server == null) {
             return 0
         }
@@ -492,5 +517,73 @@ object AngConfigManager {
         } else {
             return 0
         }
+    }
+
+    fun updateConfigViaSubAll(): Int {
+        var count = 0
+        try {
+            MmkvManager.decodeSubscriptions().forEach {
+                count += updateConfigViaSub(it)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return 0
+        }
+        return count
+    }
+
+    private fun updateConfigViaSub(it: Pair<String, SubscriptionItem>): Int {
+        try {
+            if (TextUtils.isEmpty(it.first)
+                || TextUtils.isEmpty(it.second.remarks)
+                || TextUtils.isEmpty(it.second.url)
+            ) {
+                return 0
+            }
+            if (!it.second.enabled) {
+                return 0
+            }
+            val url = Utils.idnToASCII(it.second.url)
+            if (!Utils.isValidUrl(url)) {
+                return 0
+            }
+            Log.d(AppConfig.ANG_PACKAGE, url)
+            var configText = try {
+                Utils.getUrlContentWithCustomUserAgent(url)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ""
+            }
+            if (configText.isEmpty()) {
+                configText = try {
+                    val httpPort = Utils.parseInt(
+                        settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT),
+                        AppConfig.PORT_HTTP.toInt()
+                    )
+                    Utils.getUrlContentWithCustomUserAgent(url, httpPort)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    ""
+                }
+            }
+            if (configText.isEmpty()) {
+                return 0
+            }
+            return parseConfigViaSub(configText, it.first, false)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return 0
+        }
+    }
+
+    private fun parseConfigViaSub(server: String?, subid: String, append: Boolean): Int {
+        var count = parseBatchConfig(server, subid, append)
+        if (count <= 0) {
+            count = parseBatchConfig(Utils.decode(server), subid, append)
+        }
+        if (count <= 0) {
+            count = parseCustomConfigServer(server, subid)
+        }
+        return count
     }
 }
