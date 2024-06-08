@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.AssetManager
 import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
@@ -37,6 +38,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 import java.util.Collections
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -283,13 +286,38 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         for (it in deleteServer) {
             MmkvManager.removeServer(it)
         }
-        reloadServerList()
         getApplication<AngApplication>().toast(
             getApplication<AngApplication>().getString(
                 R.string.title_del_duplicate_config_count,
                 deleteServer.count()
             )
         )
+    }
+
+    fun copyAssets(assets: AssetManager) {
+        val extFolder = Utils.userAssetPath(getApplication<AngApplication>())
+        viewModelScope.launch(Dispatchers.Default) {
+            try {
+                val geo = arrayOf("geosite.dat", "geoip.dat")
+                assets.list("")
+                    ?.filter { geo.contains(it) }
+                    ?.filter { !File(extFolder, it).exists() }
+                    ?.forEach {
+                        val target = File(extFolder, it)
+                        assets.open(it).use { input ->
+                            FileOutputStream(target).use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                        Log.i(
+                            ANG_PACKAGE,
+                            "Copied from apk assets folder to ${target.absolutePath}"
+                        )
+                    }
+            } catch (e: Exception) {
+                Log.e(ANG_PACKAGE, "asset copy failed", e)
+            }
+        }
     }
 
     private val mMsgReceiver = object : BroadcastReceiver() {
