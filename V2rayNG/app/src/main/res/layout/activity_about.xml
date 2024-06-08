@@ -20,7 +20,7 @@
                 android:layout_height="wrap_content"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="16dp">
@@ -60,7 +60,7 @@
                 android:layout_height="@dimen/server_height"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="16dp">
@@ -84,7 +84,7 @@
                 android:layout_height="@dimen/server_height"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="16dp">
@@ -116,7 +116,7 @@
                 android:layout_height="@dimen/server_height"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="16dp">
@@ -140,7 +140,7 @@
                 android:layout_height="@dimen/server_height"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="16dp">
@@ -165,7 +165,7 @@
                 android:layout_height="@dimen/server_height"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="16dp">
@@ -189,7 +189,7 @@
                 android:layout_height="@dimen/server_height"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="16dp">
