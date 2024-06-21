@@ -194,10 +194,10 @@ object V2rayConfigUtil {
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
                 ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
 
-            // Hardcode googleapis.cn
+            // Hardcode googleapis.cn gstatic.com
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
                 outboundTag = AppConfig.TAG_PROXY,
-                domain = arrayListOf("domain:googleapis.cn")
+                domain = arrayListOf("domain:googleapis.cn", "domain:gstatic.com")
             )
 
             when (routingMode) {
