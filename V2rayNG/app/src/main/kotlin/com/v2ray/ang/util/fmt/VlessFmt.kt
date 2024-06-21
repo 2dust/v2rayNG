@@ -123,7 +123,7 @@ object VlessFmt {
                     }
                 }
 
-                "ws", "httpupgrade" -> {
+                "ws", "httpupgrade", "splithttp" -> {
                     if (!TextUtils.isEmpty(transportDetails[1])) {
                         dicQuery["host"] = Utils.urlEncode(transportDetails[1])
                     }

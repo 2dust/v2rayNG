@@ -48,8 +48,22 @@
     <string name="server_lab_more_function">النقل</string>
     <string name="server_lab_head_type">نوع الرأس</string>
     <string name="server_lab_mode_type">وضع gRPC</string>
-    <string name="server_lab_request_host">مضيف الطلب (مضيف/مضيف ws/مضيف httpupgrade/مضيف h2)/أمان QUIC/جهة gRPC</string>
-    <string name="server_lab_path">المسار (مسار ws/مسار httpupgrade/مسار h2)/مفتاح QUIC/بذرة kcp/خدمة gRPC</string>
+    <string name="server_lab_request_host">host</string>
+    <string name="server_lab_request_host_http">http host</string>
+    <string name="server_lab_request_host_ws">ws host</string>
+    <string name="server_lab_request_host_httpupgrade">httpupgrade host</string>
+    <string name="server_lab_request_host_splithttp">splithttp host</string>
+    <string name="server_lab_request_host_h2">h2 host</string>
+    <string name="server_lab_request_host_quic">QUIC security</string>
+    <string name="server_lab_request_host_grpc">gRPC Authority</string>
+    <string name="server_lab_path">path</string>
+    <string name="server_lab_path_ws">ws path</string>
+    <string name="server_lab_path_httpupgrade">httpupgrade path</string>
+    <string name="server_lab_path_splithttp">splithttp path</string>
+    <string name="server_lab_path_h2">h2 path</string>
+    <string name="server_lab_path_quic">QUIC key</string>
+    <string name="server_lab_path_kcp">kcp seed</string>
+    <string name="server_lab_path_grpc">gRPC serviceName</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint" translatable="false">البصمة</string>
     <string name="server_lab_stream_alpn" translatable="false">بروتوكول الطبقة الآخرى التالية (ALPN)</string>

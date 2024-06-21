@@ -110,7 +110,9 @@ class ServerActivity : BaseActivity() {
     private val sp_network: Spinner? by lazy { findViewById(R.id.sp_network) }
     private val sp_header_type: Spinner? by lazy { findViewById(R.id.sp_header_type) }
     private val sp_header_type_title: TextView? by lazy { findViewById(R.id.sp_header_type_title) }
+    private val tv_request_host: TextView? by lazy { findViewById(R.id.tv_request_host) }
     private val et_request_host: EditText? by lazy { findViewById(R.id.et_request_host) }
+    private val tv_path: TextView? by lazy { findViewById(R.id.tv_path) }
     private val et_path: EditText? by lazy { findViewById(R.id.et_path) }
     private val sp_stream_alpn: Spinner? by lazy { findViewById(R.id.sp_stream_alpn) } //uTLS
     private val container_alpn: LinearLayout? by lazy { findViewById(R.id.l4) }
@@ -162,6 +164,36 @@ class ServerActivity : BaseActivity() {
                     et_request_host?.text = Utils.getEditable(transportDetails[1])
                     et_path?.text = Utils.getEditable(transportDetails[2])
                 }
+
+                tv_request_host?.text = Utils.getEditable(
+                    getString(
+                        when (networks[position]) {
+                            "tcp" -> R.string.server_lab_request_host_http
+                            "ws" -> R.string.server_lab_request_host_ws
+                            "httpupgrade" -> R.string.server_lab_request_host_httpupgrade
+                            "splithttp" -> R.string.server_lab_request_host_splithttp
+                            "h2" -> R.string.server_lab_request_host_h2
+                            "quic" -> R.string.server_lab_request_host_quic
+                            "grpc" -> R.string.server_lab_request_host_grpc
+                            else -> R.string.server_lab_request_host
+                        }
+                    )
+                )
+
+                tv_path?.text = Utils.getEditable(
+                    getString(
+                        when (networks[position]) {
+                            "kcp" -> R.string.server_lab_path_kcp
+                            "ws" -> R.string.server_lab_path_ws
+                            "httpupgrade" -> R.string.server_lab_path_httpupgrade
+                            "splithttp" -> R.string.server_lab_path_splithttp
+                            "h2" -> R.string.server_lab_path_h2
+                            "quic" -> R.string.server_lab_path_quic
+                            "grpc" -> R.string.server_lab_path_grpc
+                            else -> R.string.server_lab_path
+                        }
+                    )
+                )
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

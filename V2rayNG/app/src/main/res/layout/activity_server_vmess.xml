@@ -192,6 +192,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tv_request_host"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/server_lab_request_host" />
@@ -211,6 +212,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tv_path"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/server_lab_path" />

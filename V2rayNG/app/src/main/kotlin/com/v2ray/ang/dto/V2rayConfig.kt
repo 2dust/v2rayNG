@@ -139,6 +139,7 @@ data class V2rayConfig(
                                       var kcpSettings: KcpSettingsBean? = null,
                                       var wsSettings: WsSettingsBean? = null,
                                       var httpupgradeSettings: HttpupgradeSettingsBean? = null,
+                                      var splithttpSettings: SplithttpSettingsBean? = null,
                                       var httpSettings: HttpSettingsBean? = null,
                                       var tlsSettings: TlsSettingsBean? = null,
                                       var quicSettings: QuicSettingBean? = null,
@@ -192,6 +193,10 @@ data class V2rayConfig(
                                                var host: String = "",
                                                val acceptProxyProtocol: Boolean? = null)
 
+            data class SplithttpSettingsBean(var path: String = "",
+                                             var host: String = "",
+                                             val maxUploadSize: Int? = null,
+                                             val maxConcurrentUploads: Int? = null)
             data class HttpSettingsBean(var host: List<String> = ArrayList(),
                                         var path: String = "")
 
@@ -278,6 +283,13 @@ data class V2rayConfig(
                         sni = httpupgradeSetting.host
                         httpupgradeSetting.path = path ?: "/"
                         httpupgradeSettings = httpupgradeSetting
+                    }
+                    "splithttp" -> {
+                        val splithttpSetting = SplithttpSettingsBean()
+                        splithttpSetting.host = host ?: ""
+                        sni = splithttpSetting.host
+                        splithttpSetting.path = path ?: "/"
+                        splithttpSettings = splithttpSetting
                     }
                     "h2", "http" -> {
                         network = "h2"
@@ -417,6 +429,12 @@ data class V2rayConfig(
                         listOf("",
                             httpupgradeSetting.host,
                             httpupgradeSetting.path)
+                    }
+                    "splithttp" -> {
+                        val splithttpSetting = streamSettings?.splithttpSettings ?: return null
+                        listOf("",
+                            splithttpSetting.host,
+                            splithttpSetting.path)
                     }
                     "h2" -> {
                         val h2Setting = streamSettings?.httpSettings ?: return null
