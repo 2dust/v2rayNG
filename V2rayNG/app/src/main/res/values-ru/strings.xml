@@ -46,22 +46,22 @@
     <string name="server_lab_more_function">Другие параметры</string>
     <string name="server_lab_head_type">Тип заголовка</string>
     <string name="server_lab_mode_type">Режим gRPC</string>
-    <string name="server_lab_request_host">host</string>
-    <string name="server_lab_request_host_http">http host</string>
-    <string name="server_lab_request_host_ws">ws host</string>
-    <string name="server_lab_request_host_httpupgrade">httpupgrade host</string>
-    <string name="server_lab_request_host_splithttp">splithttp host</string>
-    <string name="server_lab_request_host_h2">h2 host</string>
-    <string name="server_lab_request_host_quic">QUIC security</string>
-    <string name="server_lab_request_host_grpc">gRPC Authority</string>
-    <string name="server_lab_path">path</string>
-    <string name="server_lab_path_ws">ws path</string>
-    <string name="server_lab_path_httpupgrade">httpupgrade path</string>
-    <string name="server_lab_path_splithttp">splithttp path</string>
-    <string name="server_lab_path_h2">h2 path</string>
-    <string name="server_lab_path_quic">QUIC key</string>
-    <string name="server_lab_path_kcp">kcp seed</string>
-    <string name="server_lab_path_grpc">gRPC serviceName</string>
+    <string name="server_lab_request_host">Узел</string>
+    <string name="server_lab_request_host_http">Узел HTTP</string>
+    <string name="server_lab_request_host_ws">Узел WS</string>
+    <string name="server_lab_request_host_httpupgrade">Узел HTTPUpgrade</string>
+    <string name="server_lab_request_host_splithttp">Узел SplitHTTP</string>
+    <string name="server_lab_request_host_h2">Узел H2</string>
+    <string name="server_lab_request_host_quic">Шифрование QUIC</string>
+    <string name="server_lab_request_host_grpc">Полномочия gRPC</string>
+    <string name="server_lab_path">Путь</string>
+    <string name="server_lab_path_ws">Путь WS</string>
+    <string name="server_lab_path_httpupgrade">Путь HTTPUpgrade</string>
+    <string name="server_lab_path_splithttp">Путь SplitHTTP</string>
+    <string name="server_lab_path_h2">Путь H2</string>
+    <string name="server_lab_path_quic">Ключ QUIC</string>
+    <string name="server_lab_path_kcp">Сид KCP</string>
+    <string name="server_lab_path_grpc">Служба gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_allow_insecure">Разрешать небезопасные</string>
     <string name="server_lab_sni">SNI</string>
@@ -101,6 +101,7 @@
     <string name="msg_remark_is_duplicate">Описание уже существует</string>
     <string name="toast_action_not_allowed">Это действие запрещено</string>
 
+
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Загрузка…</string>
     <string name="menu_item_search">Поиск</string>
@@ -139,7 +140,6 @@
     <string name="summary_pref_sniffing_enabled">Использовать определение доменных имён в пакетах (по умолчанию включено)</string>
     <string name="title_pref_route_only_enabled">Домен только для маршрутизации</string>
     <string name="summary_pref_route_only_enabled">Использовать определённое доменное имя только для маршрутизации и сохранять целевой адрес в виде IP.</string>
-
 
     <string name="title_pref_local_dns_enabled">Использовать локальную DNS</string>
     <string name="summary_pref_local_dns_enabled">Обслуживание выполняется DNS-модулем ядра (в настройках маршрутизации рекомендуется выбрать режим «Все, кроме LAN и Китая»)</string>
@@ -192,7 +192,7 @@
     <string name="summary_pref_feedback">Предложить улучшение или сообщить об ошибке на GitHub</string>
     <string name="summary_pref_tg_group">Присоединиться к группе в Telegram</string>
     <string name="toast_tg_app_not_found">Приложение Telegram не найдено</string>
-    <string name="title_privacy_policy">Конфиденциальность</string>
+    <string name="title_privacy_policy">Политика конфиденциальности</string>
     <string name="title_about">О приложении</string>
     <string name="title_source_code">Исходный код</string>
     <string name="title_tg_channel">Telegram-канал</string>
