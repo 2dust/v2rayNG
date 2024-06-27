@@ -10,11 +10,11 @@ import java.net.URI
 
 object WireguardFmt {
     fun parseWireguard(str: String): ServerConfig? {
-        val config = ServerConfig.create(EConfigType.WIREGUARD)
         val uri = URI(Utils.fixIllegalUrl(str))
-        config.remarks = Utils.urlDecode(uri.fragment ?: "")
-
         if (uri.rawQuery != null) {
+            val config = ServerConfig.create(EConfigType.WIREGUARD)
+            config.remarks = Utils.urlDecode(uri.fragment ?: "")
+
             val queryParam = uri.rawQuery.split("&")
                 .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
 
@@ -31,9 +31,10 @@ object WireguardFmt {
                     (queryParam["reserved"] ?: "0,0,0").removeWhiteSpace().split(",")
                         .map { it.toInt() }
             }
+            return config
+        }else {
+            return null
         }
-
-        return config
     }
 
     fun toUri(config: ServerConfig): String {
