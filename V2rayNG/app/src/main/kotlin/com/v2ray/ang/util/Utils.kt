@@ -356,7 +356,7 @@ object Utils {
     }
 
     @Throws(IOException::class)
-    fun getUrlContentWithCustomUserAgent(urlStr: String?, httpPort: Int = 0): String {
+    fun getUrlContentWithCustomUserAgent(urlStr: String?, timeout: Int = 30000, httpPort: Int = 0): String {
         val url = URL(urlStr)
         val conn = if (httpPort == 0) {
             url.openConnection()
@@ -368,6 +368,8 @@ object Utils {
                 )
             )
         }
+        conn.connectTimeout = timeout
+        conn.readTimeout = timeout
         conn.setRequestProperty("Connection", "close")
         conn.setRequestProperty("User-agent", "v2rayNG/${BuildConfig.VERSION_NAME}")
         url.userInfo?.let {
