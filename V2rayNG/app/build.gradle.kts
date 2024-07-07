@@ -11,8 +11,8 @@ android {
         applicationId = "com.v2ray.ang"
         minSdk = 21
         targetSdk = 34
-        versionCode = 570
-        versionName = "1.8.27"
+        versionCode = 571
+        versionName = "1.8.28"
         multiDexEnabled = true
         splits.abi {
             reset()
@@ -60,7 +60,7 @@ android {
     applicationVariants.all {
         val variant = this
         val versionCodes =
-            mapOf("armeabi-v7a" to 4, "arm64-v8a" to 4, "x86" to 4, "x86_64" to 4, "all" to 4)
+            mapOf("armeabi-v7a" to 4, "arm64-v8a" to 4, "x86" to 4, "x86_64" to 4, "universal" to 4)
 
         variant.outputs
             .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
@@ -68,7 +68,7 @@ android {
                 val abi = if (output.getFilter("ABI") != null)
                     output.getFilter("ABI")
                 else
-                    "all"
+                    "universal"
 
                 output.outputFileName = "v2rayNG_${variant.versionName}_${abi}.apk"
                 if(versionCodes.containsKey(abi))
@@ -98,6 +98,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar","*.jar"))))
     testImplementation("junit:junit:4.13.2")
 
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
     // Androidx
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
@@ -112,9 +113,9 @@ dependencies {
 
     // Androidx ktx
     implementation("androidx.activity:activity-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.2")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
 
     //kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
