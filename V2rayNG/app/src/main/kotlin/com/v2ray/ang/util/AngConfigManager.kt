@@ -560,7 +560,7 @@ object AngConfigManager {
                         settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT),
                         AppConfig.PORT_HTTP.toInt()
                     )
-                    Utils.getUrlContentWithCustomUserAgent(url, httpPort)
+                    Utils.getUrlContentWithCustomUserAgent(url, 30000, httpPort)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     ""
