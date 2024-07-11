@@ -20,7 +20,7 @@ object VlessFmt {
     }
 
     fun parseVless(str: String): ServerConfig? {
-        val allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
+        var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
         val config = ServerConfig.create(EConfigType.VLESS)
 
         val uri = URI(Utils.fixIllegalUrl(str))
@@ -31,7 +31,7 @@ object VlessFmt {
         val streamSetting = config.outboundBean?.streamSettings ?: return null
 
         config.remarks = Utils.urlDecode(uri.fragment ?: "")
-        config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
+        config.outboundBean.settings?.vnext?.get(0)?.let { vnext ->
             vnext.address = uri.idnHost
             vnext.port = uri.port
             vnext.users[0].id = uri.userInfo
@@ -51,6 +51,7 @@ object VlessFmt {
             queryParam["serviceName"],
             queryParam["authority"]
         )
+        allowInsecure = if ((queryParam["allowInsecure"] ?: "") == "1") true else allowInsecure
         streamSetting.populateTlsSettings(
             queryParam["security"] ?: "",
             allowInsecure,
@@ -92,16 +93,16 @@ object VlessFmt {
                     Utils.removeWhiteSpace(tlsSetting.alpn.joinToString()).orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.fingerprint)) {
-                dicQuery["fp"] = tlsSetting.fingerprint?:""
+                dicQuery["fp"] = tlsSetting.fingerprint ?: ""
             }
             if (!TextUtils.isEmpty(tlsSetting.publicKey)) {
-                dicQuery["pbk"] = tlsSetting.publicKey?:""
+                dicQuery["pbk"] = tlsSetting.publicKey ?: ""
             }
             if (!TextUtils.isEmpty(tlsSetting.shortId)) {
-                dicQuery["sid"] = tlsSetting.shortId?:""
+                dicQuery["sid"] = tlsSetting.shortId ?: ""
             }
             if (!TextUtils.isEmpty(tlsSetting.spiderX)) {
-                dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX?:"")
+                dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX ?: "")
             }
         }
         dicQuery["type"] =

@@ -25,14 +25,15 @@ object WireguardFmt {
                         ?: AppConfig.WIREGUARD_LOCAL_ADDRESS_V4).removeWhiteSpace()
                         .split(",")
                 wireguard.peers?.get(0)?.publicKey = queryParam["publickey"] ?: ""
-                wireguard.peers?.get(0)?.endpoint = Utils.getIpv6Address(uri.idnHost) + ":${uri.port}"
+                wireguard.peers?.get(0)?.endpoint =
+                    Utils.getIpv6Address(uri.idnHost) + ":${uri.port}"
                 wireguard.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
                 wireguard.reserved =
                     (queryParam["reserved"] ?: "0,0,0").removeWhiteSpace().split(",")
                         .map { it.toInt() }
             }
             return config
-        }else {
+        } else {
             return null
         }
     }

@@ -142,7 +142,8 @@ object V2rayConfigUtil {
                 settingsStorage?.decodeBool(AppConfig.PREF_SNIFFING_ENABLED, true)
                     ?: true
             v2rayConfig.inbounds[0].sniffing?.enabled = fakedns || sniffAllTlsAndHttp
-            v2rayConfig.inbounds[0].sniffing?.routeOnly = settingsStorage?.decodeBool(AppConfig.PREF_ROUTE_ONLY_ENABLED, false)
+            v2rayConfig.inbounds[0].sniffing?.routeOnly =
+                settingsStorage?.decodeBool(AppConfig.PREF_ROUTE_ONLY_ENABLED, false)
             if (!sniffAllTlsAndHttp) {
                 v2rayConfig.inbounds[0].sniffing?.destOverride?.clear()
             }
@@ -188,7 +189,7 @@ object V2rayConfigUtil {
             )
             routingUserRule(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                    ?: "", AppConfig.TAG_DIRECT, v2rayConfig
+                    ?: "", TAG_DIRECT, v2rayConfig
             )
             routingUserRule(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
@@ -210,37 +211,38 @@ object V2rayConfigUtil {
 
             when (routingMode) {
                 ERoutingMode.BYPASS_LAN.value -> {
-                    routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("ip", "private", TAG_DIRECT, v2rayConfig)
                 }
 
                 ERoutingMode.BYPASS_MAINLAND.value -> {
-                    routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
-                    routingGeo("domain", "geolocation-cn", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("", "cn", TAG_DIRECT, v2rayConfig)
+                    routingGeo("domain", "geolocation-cn", TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
 
                 ERoutingMode.BYPASS_LAN_MAINLAND.value -> {
-                    routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
-                    routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
-                    routingGeo("domain", "geolocation-cn", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("ip", "private", TAG_DIRECT, v2rayConfig)
+                    routingGeo("", "cn", TAG_DIRECT, v2rayConfig)
+                    routingGeo("domain", "geolocation-cn", TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
 
                 ERoutingMode.GLOBAL_DIRECT.value -> {
                     val globalDirect = V2rayConfig.RoutingBean.RulesBean(
-                        outboundTag = AppConfig.TAG_DIRECT,
+                        outboundTag = TAG_DIRECT,
                         port = "0-65535"
                     )
                     v2rayConfig.routing.rules.add(globalDirect)
                 }
             }
 
-            if(routingMode != ERoutingMode.GLOBAL_DIRECT.value) {
+            if (routingMode != ERoutingMode.GLOBAL_DIRECT.value) {
                 v2rayConfig.routing.rules.add(
                     V2rayConfig.RoutingBean.RulesBean(
                         outboundTag = AppConfig.TAG_PROXY,
                         port = "0-65535"
-                    ))
+                    )
+                )
             }
 
         } catch (e: Exception) {
@@ -465,7 +467,7 @@ object V2rayConfigUtil {
             if (Utils.isPureIpAddress(domesticDns.first())) {
                 v2rayConfig.routing.rules.add(
                     0, V2rayConfig.RoutingBean.RulesBean(
-                        outboundTag = AppConfig.TAG_DIRECT,
+                        outboundTag = TAG_DIRECT,
                         port = "53",
                         ip = arrayListOf(domesticDns.first()),
                         domain = null
@@ -597,7 +599,8 @@ object V2rayConfigUtil {
                     mux = null
                 )
 
-            var packets = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_PACKETS) ?: "tlshello"
+            var packets =
+                settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_PACKETS) ?: "tlshello"
             if (v2rayConfig.outbounds[0].streamSettings?.security == V2rayConfig.REALITY
                 && packets == "tlshello"
             ) {

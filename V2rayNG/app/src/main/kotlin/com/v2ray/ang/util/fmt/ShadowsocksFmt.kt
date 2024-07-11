@@ -96,7 +96,7 @@ object ShadowsocksFmt {
                 for (pair in pairs) {
                     val idx = pair.indexOf("=")
                     if (idx == -1) {
-                        queryPairs[Utils.urlDecode(pair)] = "";
+                        queryPairs[Utils.urlDecode(pair)] = ""
                     } else {
                         queryPairs[Utils.urlDecode(pair.substring(0, idx))] =
                             Utils.urlDecode(pair.substring(idx + 1))
@@ -118,9 +118,9 @@ object ShadowsocksFmt {
                         null
                     )
                 } else if (queryPairs["plugin"] == "v2ray-plugin") {
-                    var network = "ws";
+                    var network = "ws"
                     if (queryPairs["mode"] == "quic") {
-                        network = "quic";
+                        network = "quic"
                     }
                     sni = config.outboundBean?.streamSettings?.populateTransportSettings(
                         network,

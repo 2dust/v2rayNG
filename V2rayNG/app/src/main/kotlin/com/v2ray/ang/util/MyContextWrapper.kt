@@ -7,7 +7,7 @@ import android.content.res.Resources
 import android.os.Build
 import android.os.LocaleList
 import androidx.annotation.RequiresApi
-import java.util.*
+import java.util.Locale
 
 open class MyContextWrapper(base: Context?) : ContextWrapper(base) {
     companion object {

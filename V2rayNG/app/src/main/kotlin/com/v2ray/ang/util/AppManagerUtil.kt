@@ -7,7 +7,6 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.v2ray.ang.dto.AppInfo
 import rx.Observable
-import java.util.*
 
 object AppManagerUtil {
     fun loadNetworkAppList(ctx: Context): ArrayList<AppInfo> {
@@ -31,9 +30,10 @@ object AppManagerUtil {
         return apps
     }
 
-    fun rxLoadNetworkAppList(ctx: Context): Observable<ArrayList<AppInfo>> = Observable.unsafeCreate {
-        it.onNext(loadNetworkAppList(ctx))
-    }
+    fun rxLoadNetworkAppList(ctx: Context): Observable<ArrayList<AppInfo>> =
+        Observable.unsafeCreate {
+            it.onNext(loadNetworkAppList(ctx))
+        }
 
     val PackageInfo.hasInternetPermission: Boolean
         get() {

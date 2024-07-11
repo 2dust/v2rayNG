@@ -20,7 +20,7 @@ object TrojanFmt {
     }
 
     fun parseTrojan(str: String): ServerConfig? {
-        val allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
+        var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
         val config = ServerConfig.create(EConfigType.TROJAN)
 
         val uri = URI(Utils.fixIllegalUrl(str))
@@ -28,35 +28,37 @@ object TrojanFmt {
 
         var flow = ""
         var fingerprint = config.outboundBean?.streamSettings?.tlsSettings?.fingerprint
-        if (uri.rawQuery.isNullOrEmpty()) {
-            config.outboundBean?.streamSettings?.populateTlsSettings(
-                V2rayConfig.TLS, allowInsecure, "",
-                fingerprint, null, null, null, null
-            )
-        } else {
-            val queryParam = uri.rawQuery.split("&")
-                .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
+        if (uri.rawQuery.isNullOrEmpty()) return null
 
-            val sni = config.outboundBean?.streamSettings?.populateTransportSettings(
-                queryParam["type"] ?: "tcp",
-                queryParam["headerType"],
-                queryParam["host"],
-                queryParam["path"],
-                queryParam["seed"],
-                queryParam["quicSecurity"],
-                queryParam["key"],
-                queryParam["mode"],
-                queryParam["serviceName"],
-                queryParam["authority"]
-            )
-            fingerprint = queryParam["fp"] ?: ""
-            config.outboundBean?.streamSettings?.populateTlsSettings(
-                queryParam["security"] ?: V2rayConfig.TLS,
-                allowInsecure, queryParam["sni"] ?: sni?:"", fingerprint, queryParam["alpn"],
-                null, null, null
-            )
-            flow = queryParam["flow"] ?: ""
-        }
+
+        val queryParam = uri.rawQuery.split("&")
+            .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
+
+        val sni = config.outboundBean?.streamSettings?.populateTransportSettings(
+            queryParam["type"] ?: "tcp",
+            queryParam["headerType"],
+            queryParam["host"],
+            queryParam["path"],
+            queryParam["seed"],
+            queryParam["quicSecurity"],
+            queryParam["key"],
+            queryParam["mode"],
+            queryParam["serviceName"],
+            queryParam["authority"]
+        )
+        fingerprint = queryParam["fp"] ?: ""
+        allowInsecure = if ((queryParam["allowInsecure"] ?: "") == "1") true else allowInsecure
+        config.outboundBean?.streamSettings?.populateTlsSettings(
+            queryParam["security"] ?: V2rayConfig.TLS,
+            allowInsecure,
+            queryParam["sni"] ?: sni ?: "",
+            fingerprint,
+            queryParam["alpn"],
+            null,
+            null,
+            null
+        )
+        flow = queryParam["flow"] ?: ""
 
         config.outboundBean?.settings?.servers?.get(0)?.let { server ->
             server.address = uri.idnHost
@@ -78,7 +80,6 @@ object TrojanFmt {
             if (!TextUtils.isEmpty(it)) {
                 dicQuery["flow"] = it
             }
-
         }
 
         dicQuery["security"] = streamSetting.security.ifEmpty { "none" }
@@ -92,16 +93,16 @@ object TrojanFmt {
                     Utils.removeWhiteSpace(tlsSetting.alpn.joinToString()).orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.fingerprint)) {
-                dicQuery["fp"] = tlsSetting.fingerprint?:""
+                dicQuery["fp"] = tlsSetting.fingerprint ?: ""
             }
             if (!TextUtils.isEmpty(tlsSetting.publicKey)) {
-                dicQuery["pbk"] = tlsSetting.publicKey?:""
+                dicQuery["pbk"] = tlsSetting.publicKey ?: ""
             }
             if (!TextUtils.isEmpty(tlsSetting.shortId)) {
-                dicQuery["sid"] = tlsSetting.shortId?:""
+                dicQuery["sid"] = tlsSetting.shortId ?: ""
             }
             if (!TextUtils.isEmpty(tlsSetting.spiderX)) {
-                dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX?:"")
+                dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX ?: "")
             }
         }
         dicQuery["type"] =

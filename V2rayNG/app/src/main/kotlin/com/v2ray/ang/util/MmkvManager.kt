@@ -179,7 +179,7 @@ object MmkvManager {
         }
     }
 
-    fun sortByTestResults( ) {
+    fun sortByTestResults() {
         data class ServerDelay(var guid: String, var testDelayMillis: Long)
 
         val serverDelays = mutableListOf<ServerDelay>()
