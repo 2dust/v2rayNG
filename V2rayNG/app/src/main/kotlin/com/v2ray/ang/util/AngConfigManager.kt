@@ -395,14 +395,18 @@ object AngConfigManager {
             count = parseCustomConfigServer(server, subid)
         }
 
-        if (parseBatchSubscription(server, subid) > 0) {
-            updateConfigViaSubAll()
-            return 1
+        var countSub = parseBatchSubscription(server)
+        if (countSub <= 0) {
+            countSub = parseBatchSubscription(Utils.decode(server))
         }
-        return count
+        if (countSub > 0) {
+            updateConfigViaSubAll()
+        }
+
+        return count + countSub
     }
 
-    fun parseBatchSubscription(servers: String?, subid: String): Int {
+    fun parseBatchSubscription(servers: String?): Int {
         try {
             if (servers == null) {
                 return 0
@@ -410,7 +414,6 @@ object AngConfigManager {
 
             var count = 0
             servers.lines()
-                .reversed()
                 .forEach { str ->
                     if (str.startsWith(AppConfig.PROTOCOL_HTTP) || str.startsWith(AppConfig.PROTOCOL_HTTPS)) {
                         count += MmkvManager.importUrlAsSubscription(str)
@@ -488,7 +491,7 @@ object AngConfigManager {
 
                 if (serverList.isNotEmpty()) {
                     var count = 0
-                    for (srv in serverList) {
+                    for (srv in serverList.reversed()) {
                         val config = ServerConfig.create(EConfigType.CUSTOM)
                         config.fullConfig =
                             Gson().fromJson(Gson().toJson(srv), V2rayConfig::class.java)
