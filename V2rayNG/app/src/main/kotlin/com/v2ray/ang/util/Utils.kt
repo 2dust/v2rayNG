@@ -236,7 +236,13 @@ object Utils {
      */
     fun isValidUrl(value: String?): Boolean {
         try {
-            if (value != null && Patterns.WEB_URL.matcher(value).matches() || URLUtil.isValidUrl(value)) {
+            if (value.isNullOrEmpty()) {
+                return false
+            }
+            if (Patterns.WEB_URL.matcher(value).matches()
+                || Patterns.DOMAIN_NAME.matcher(value).matches()
+                || URLUtil.isValidUrl(value)
+            ) {
                 return true
             }
         } catch (e: Exception) {

@@ -52,9 +52,11 @@ object V2rayConfigUtil {
             }
             val outbound = config.getProxyOutbound() ?: return Result(false, "")
             val address = outbound.getServerAddress() ?: return Result(false, "")
-            if (!Utils.isIpAddress(address) && !Utils.isValidUrl(address)) {
-                Log.d(ANG_PACKAGE, "$address is an invalid ip or domain")
-                return Result(false, "")
+            if (!Utils.isIpAddress(address)) {
+                if (!Utils.isValidUrl(address)) {
+                    Log.d(ANG_PACKAGE, "$address is an invalid ip or domain")
+                    return Result(false, "")
+                }
             }
 
             val result = getV2rayNonCustomConfig(context, outbound, config.remarks)
