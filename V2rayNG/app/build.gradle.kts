@@ -11,8 +11,8 @@ android {
         applicationId = "com.v2ray.ang"
         minSdk = 21
         targetSdk = 34
-        versionCode = 575
-        versionName = "1.8.31"
+        versionCode = 576
+        versionName = "1.8.32"
         multiDexEnabled = true
         splits.abi {
             reset()
