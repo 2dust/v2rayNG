@@ -173,10 +173,6 @@ object V2rayConfigUtil {
             && settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
         ) {
             v2rayConfig.fakedns = listOf(V2rayConfig.FakednsBean())
-            v2rayConfig.outbounds.filter { it.protocol == PROTOCOL_FREEDOM && it.tag == TAG_DIRECT }
-                .forEach {
-                    it.settings?.domainStrategy = "UseIP"
-                }
         }
     }
 

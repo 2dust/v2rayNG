@@ -81,7 +81,9 @@
   },
   {
     "protocol": "freedom",
-    "settings": {},
+    "settings": {
+      "domainStrategy": "UseIP"
+    },
     "tag": "direct"
   },
   {
