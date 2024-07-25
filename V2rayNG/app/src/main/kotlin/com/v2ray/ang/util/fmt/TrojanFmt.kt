@@ -28,38 +28,47 @@ object TrojanFmt {
 
         var flow = ""
         var fingerprint = config.outboundBean?.streamSettings?.tlsSettings?.fingerprint
-        if (uri.rawQuery.isNullOrEmpty()) return null
+        if (uri.rawQuery.isNullOrEmpty()) {
+            config.outboundBean?.streamSettings?.populateTlsSettings(
+                V2rayConfig.TLS,
+                allowInsecure,
+                "",
+                fingerprint,
+                null,
+                null,
+                null,
+                null
+            )
+        } else {
+            val queryParam = uri.rawQuery.split("&")
+                .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
 
-
-        val queryParam = uri.rawQuery.split("&")
-            .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
-
-        val sni = config.outboundBean?.streamSettings?.populateTransportSettings(
-            queryParam["type"] ?: "tcp",
-            queryParam["headerType"],
-            queryParam["host"],
-            queryParam["path"],
-            queryParam["seed"],
-            queryParam["quicSecurity"],
-            queryParam["key"],
-            queryParam["mode"],
-            queryParam["serviceName"],
-            queryParam["authority"]
-        )
-        fingerprint = queryParam["fp"] ?: ""
-        allowInsecure = if ((queryParam["allowInsecure"] ?: "") == "1") true else allowInsecure
-        config.outboundBean?.streamSettings?.populateTlsSettings(
-            queryParam["security"] ?: V2rayConfig.TLS,
-            allowInsecure,
-            queryParam["sni"] ?: sni ?: "",
-            fingerprint,
-            queryParam["alpn"],
-            null,
-            null,
-            null
-        )
-        flow = queryParam["flow"] ?: ""
-
+            val sni = config.outboundBean?.streamSettings?.populateTransportSettings(
+                queryParam["type"] ?: "tcp",
+                queryParam["headerType"],
+                queryParam["host"],
+                queryParam["path"],
+                queryParam["seed"],
+                queryParam["quicSecurity"],
+                queryParam["key"],
+                queryParam["mode"],
+                queryParam["serviceName"],
+                queryParam["authority"]
+            )
+            fingerprint = queryParam["fp"] ?: ""
+            allowInsecure = if ((queryParam["allowInsecure"] ?: "") == "1") true else allowInsecure
+            config.outboundBean?.streamSettings?.populateTlsSettings(
+                queryParam["security"] ?: V2rayConfig.TLS,
+                allowInsecure,
+                queryParam["sni"] ?: sni ?: "",
+                fingerprint,
+                queryParam["alpn"],
+                null,
+                null,
+                null
+            )
+            flow = queryParam["flow"] ?: ""
+        }
         config.outboundBean?.settings?.servers?.get(0)?.let { server ->
             server.address = uri.idnHost
             server.port = uri.port
