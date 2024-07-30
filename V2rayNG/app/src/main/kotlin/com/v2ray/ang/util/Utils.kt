@@ -228,7 +228,7 @@ object Utils {
     }
 
     private fun isCoreDNSAddress(s: String): Boolean {
-        return s.startsWith("https") || s.startsWith("tcp") || s.startsWith("quic")
+        return s.startsWith("https") || s.startsWith("tcp") || s.startsWith("quic") || s == "localhost"
     }
 
     /**
