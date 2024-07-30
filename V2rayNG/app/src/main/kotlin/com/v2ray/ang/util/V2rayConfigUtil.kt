@@ -315,7 +315,7 @@ object V2rayConfigUtil {
         }
     }
 
-    private fun userRule2Domian(userRule: String): ArrayList<String> {
+    private fun userRule2Domain(userRule: String): ArrayList<String> {
         val domain = ArrayList<String>()
         userRule.split(",").map { it.trim() }.forEach {
             if (it.startsWith("geosite:") || it.startsWith("domain:")) {
@@ -332,11 +332,11 @@ object V2rayConfigUtil {
         try {
             if (settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
                 val geositeCn = arrayListOf("geosite:cn")
-                val proxyDomain = userRule2Domian(
+                val proxyDomain = userRule2Domain(
                     settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
                         ?: ""
                 )
-                val directDomain = userRule2Domian(
+                val directDomain = userRule2Domain(
                     settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
                         ?: ""
                 )
@@ -410,7 +410,7 @@ object V2rayConfigUtil {
 
             //remote Dns
             val remoteDns = Utils.getRemoteDnsServers()
-            val proxyDomain = userRule2Domian(
+            val proxyDomain = userRule2Domain(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
                     ?: ""
             )
@@ -430,7 +430,7 @@ object V2rayConfigUtil {
 
             // domestic DNS
             val domesticDns = Utils.getDomesticDnsServers()
-            val directDomain = userRule2Domian(
+            val directDomain = userRule2Domain(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
                     ?: ""
             )
@@ -474,7 +474,7 @@ object V2rayConfigUtil {
             }
 
             //block dns
-            val blkDomain = userRule2Domian(
+            val blkDomain = userRule2Domain(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
                     ?: ""
             )
