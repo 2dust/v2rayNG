@@ -188,7 +188,7 @@ object V2rayConfigUtil {
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
                     ?: "", AppConfig.TAG_BLOCKED, v2rayConfig
             )
-            if (routingMode == ERoutingMode.GLOBAL_DIRECT.value) {
+            if (routingMode == ERoutingMode.GLOBAL_PROXY.value) {
                 routingUserRule(
                     settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
                         ?: "", AppConfig.TAG_PROXY, v2rayConfig
@@ -238,7 +238,7 @@ object V2rayConfigUtil {
 
                 ERoutingMode.GLOBAL_DIRECT.value -> {
                     val globalDirect = V2rayConfig.RoutingBean.RulesBean(
-                        outboundTag = TAG_DIRECT,
+                        outboundTag = TAG_DIRECT
                     )
                     if (v2rayConfig.routing.domainStrategy != "IPIfNonMatch") {
                         globalDirect.port = "0-65535"
@@ -251,7 +251,7 @@ object V2rayConfigUtil {
 
             if (routingMode != ERoutingMode.GLOBAL_DIRECT.value) {
                 val globalProxy = V2rayConfig.RoutingBean.RulesBean(
-                    outboundTag = AppConfig.TAG_PROXY,
+                    outboundTag = AppConfig.TAG_PROXY
                 )
                 if (v2rayConfig.routing.domainStrategy != "IPIfNonMatch") {
                     globalProxy.port = "0-65535"
