@@ -181,25 +181,36 @@ object V2rayConfigUtil {
      */
     private fun routing(v2rayConfig: V2rayConfig): Boolean {
         try {
-            routingUserRule(
-                settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                    ?: "", AppConfig.TAG_PROXY, v2rayConfig
-            )
-            routingUserRule(
-                settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                    ?: "", TAG_DIRECT, v2rayConfig
-            )
+            val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
+                ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
+
             routingUserRule(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
                     ?: "", AppConfig.TAG_BLOCKED, v2rayConfig
             )
+            if (routingMode == ERoutingMode.GLOBAL_DIRECT.value) {
+                routingUserRule(
+                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
+                        ?: "", AppConfig.TAG_PROXY, v2rayConfig
+                )
+                routingUserRule(
+                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
+                        ?: "", TAG_DIRECT, v2rayConfig
+                )
+            } else {
+                routingUserRule(
+                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
+                        ?: "", TAG_DIRECT, v2rayConfig
+                )
+                routingUserRule(
+                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
+                        ?: "", AppConfig.TAG_PROXY, v2rayConfig
+                )
+            }
 
             v2rayConfig.routing.domainStrategy =
                 settingsStorage?.decodeString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY)
                     ?: "IPIfNonMatch"
-//            v2rayConfig.routing.domainMatcher = "mph"
-            val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
-                ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
 
             // Hardcode googleapis.cn gstatic.com
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
@@ -228,27 +239,26 @@ object V2rayConfigUtil {
                 ERoutingMode.GLOBAL_DIRECT.value -> {
                     val globalDirect = V2rayConfig.RoutingBean.RulesBean(
                         outboundTag = TAG_DIRECT,
-                        if (v2rayConfig.routing.domainStrategy != "IPIfNonMatch") {
-                            port = "0-65535"
-                        } else {
-                            ip = arrayListOf("0.0.0.0/0", "::/0")
-                        }
                     )
+                    if (v2rayConfig.routing.domainStrategy != "IPIfNonMatch") {
+                        globalDirect.port = "0-65535"
+                    } else {
+                        globalDirect.ip = arrayListOf("0.0.0.0/0", "::/0")
+                    }
                     v2rayConfig.routing.rules.add(globalDirect)
                 }
             }
 
             if (routingMode != ERoutingMode.GLOBAL_DIRECT.value) {
-                v2rayConfig.routing.rules.add(
-                    V2rayConfig.RoutingBean.RulesBean(
-                        outboundTag = AppConfig.TAG_PROXY,
-                        if (v2rayConfig.routing.domainStrategy != "IPIfNonMatch") {
-                            port = "0-65535"
-                        } else {
-                            ip = arrayListOf("0.0.0.0/0", "::/0")
-                        }
-                    )
+                val globalProxy = V2rayConfig.RoutingBean.RulesBean(
+                    outboundTag = AppConfig.TAG_PROXY,
                 )
+                if (v2rayConfig.routing.domainStrategy != "IPIfNonMatch") {
+                    globalProxy.port = "0-65535"
+                } else {
+                    globalProxy.ip = arrayListOf("0.0.0.0/0", "::/0")
+                }
+                v2rayConfig.routing.rules.add(globalProxy)
             }
 
         } catch (e: Exception) {
