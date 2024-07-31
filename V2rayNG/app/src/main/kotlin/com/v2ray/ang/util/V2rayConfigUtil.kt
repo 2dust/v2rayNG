@@ -228,7 +228,11 @@ object V2rayConfigUtil {
                 ERoutingMode.GLOBAL_DIRECT.value -> {
                     val globalDirect = V2rayConfig.RoutingBean.RulesBean(
                         outboundTag = TAG_DIRECT,
-                        port = "0-65535"
+                        if (v2rayConfig.routing.domainStrategy != "IPIfNonMatch") {
+                            port = "0-65535"
+                        } else {
+                            ip = arrayListOf("0.0.0.0/0", "::/0")
+                        }
                     )
                     v2rayConfig.routing.rules.add(globalDirect)
                 }
@@ -238,7 +242,11 @@ object V2rayConfigUtil {
                 v2rayConfig.routing.rules.add(
                     V2rayConfig.RoutingBean.RulesBean(
                         outboundTag = AppConfig.TAG_PROXY,
-                        port = "0-65535"
+                        if (v2rayConfig.routing.domainStrategy != "IPIfNonMatch") {
+                            port = "0-65535"
+                        } else {
+                            ip = arrayListOf("0.0.0.0/0", "::/0")
+                        }
                     )
                 )
             }
