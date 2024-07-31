@@ -182,16 +182,16 @@ object V2rayConfigUtil {
     private fun routing(v2rayConfig: V2rayConfig): Boolean {
         try {
             routingUserRule(
-                settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                    ?: "", AppConfig.TAG_PROXY, v2rayConfig
+                settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
+                    ?: "", AppConfig.TAG_BLOCKED, v2rayConfig
             )
             routingUserRule(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
                     ?: "", TAG_DIRECT, v2rayConfig
             )
             routingUserRule(
-                settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
-                    ?: "", AppConfig.TAG_BLOCKED, v2rayConfig
+                settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
+                    ?: "", AppConfig.TAG_PROXY, v2rayConfig
             )
 
             v2rayConfig.routing.domainStrategy =
