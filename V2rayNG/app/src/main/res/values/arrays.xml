@@ -178,6 +178,7 @@
         <item>Русский</item>
         <item>فارسی</item>
         <item>عربي</item>
+        <item>বাংলা</item>
     </string-array>
 
 
@@ -190,6 +191,7 @@
         <item>ru</item>
         <item>fa</item>
         <item>ar</item>
+        <item>bn</item>
     </string-array>
 
     <string-array name="mux_xudp_quic_value" translatable="false">

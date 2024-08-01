@@ -412,7 +412,7 @@ object Utils {
         }
     }
 
-    fun getLocale(context: Context): Locale =
+    fun getLocale(): Locale =
         when (settingsStorage?.decodeString(AppConfig.PREF_LANGUAGE) ?: "auto") {
             "auto" ->  getSysLocale()
             "en" -> Locale("en")
@@ -421,6 +421,7 @@ object Utils {
             "vi" -> Locale("vi")
             "ru" -> Locale("ru")
             "fa" -> Locale("fa")
+            "bn" -> Locale("bn")
             else -> getSysLocale()
         }
 
