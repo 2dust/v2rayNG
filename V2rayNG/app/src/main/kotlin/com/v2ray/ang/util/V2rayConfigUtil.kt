@@ -8,8 +8,10 @@ import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.PROTOCOL_FREEDOM
+import com.v2ray.ang.AppConfig.TAG_BLOCKED
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.TAG_FRAGMENT
+import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
 import com.v2ray.ang.dto.EConfigType
@@ -186,25 +188,25 @@ object V2rayConfigUtil {
 
             routingUserRule(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
-                    ?: "", AppConfig.TAG_BLOCKED, v2rayConfig
+                    ?: "", TAG_BLOCKED, v2rayConfig
             )
             if (routingMode == ERoutingMode.GLOBAL_DIRECT.value) {
                 routingUserRule(
-                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                        ?: "", AppConfig.TAG_PROXY, v2rayConfig
-                )
-                routingUserRule(
                     settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
                         ?: "", TAG_DIRECT, v2rayConfig
+                )
+                routingUserRule(
+                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
+                        ?: "", TAG_PROXY, v2rayConfig
                 )
             } else {
                 routingUserRule(
-                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                        ?: "", TAG_DIRECT, v2rayConfig
+                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
+                        ?: "", TAG_PROXY, v2rayConfig
                 )
                 routingUserRule(
-                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                        ?: "", AppConfig.TAG_PROXY, v2rayConfig
+                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
+                        ?: "", TAG_DIRECT, v2rayConfig
                 )
             }
 
@@ -214,7 +216,7 @@ object V2rayConfigUtil {
 
             // Hardcode googleapis.cn gstatic.com
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
-                outboundTag = AppConfig.TAG_PROXY,
+                outboundTag = TAG_PROXY,
                 domain = arrayListOf("domain:googleapis.cn", "domain:gstatic.com")
             )
 
@@ -251,7 +253,7 @@ object V2rayConfigUtil {
 
             if (routingMode != ERoutingMode.GLOBAL_DIRECT.value) {
                 val globalProxy = V2rayConfig.RoutingBean.RulesBean(
-                    outboundTag = AppConfig.TAG_PROXY,
+                    outboundTag = TAG_PROXY,
                 )
                 if (v2rayConfig.routing.domainStrategy != "IPIfNonMatch") {
                     globalProxy.port = "0-65535"
@@ -513,7 +515,7 @@ object V2rayConfigUtil {
             if (Utils.isPureIpAddress(remoteDns.first())) {
                 v2rayConfig.routing.rules.add(
                     0, V2rayConfig.RoutingBean.RulesBean(
-                        outboundTag = AppConfig.TAG_PROXY,
+                        outboundTag = TAG_PROXY,
                         port = "53",
                         ip = arrayListOf(remoteDns.first()),
                         domain = null
