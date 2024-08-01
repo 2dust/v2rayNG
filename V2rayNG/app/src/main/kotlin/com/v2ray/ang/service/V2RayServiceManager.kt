@@ -270,52 +270,44 @@ object V2RayServiceManager {
     private fun showNotification() {
         val service = serviceControl?.get()?.getService() ?: return
         val startMainIntent = Intent(service, MainActivity::class.java)
-        val contentPendingIntent = PendingIntent.getActivity(service,
-                NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            } else {
-                PendingIntent.FLAG_UPDATE_CURRENT
-            })
+        val contentPendingIntent = getPendingIntent(service, NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent)
 
         val stopV2RayIntent = Intent(AppConfig.BROADCAST_ACTION_SERVICE)
         stopV2RayIntent.`package` = ANG_PACKAGE
         stopV2RayIntent.putExtra("key", AppConfig.MSG_STATE_STOP)
 
-        val stopV2RayPendingIntent = PendingIntent.getBroadcast(service,
-                NOTIFICATION_PENDING_INTENT_STOP_V2RAY, stopV2RayIntent,
+        val stopV2RayPendingIntent = PendingIntent.getBroadcast(
+            service,
+            NOTIFICATION_PENDING_INTENT_STOP_V2RAY,
+            stopV2RayIntent,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             } else {
                 PendingIntent.FLAG_UPDATE_CURRENT
-            })
+            }
+        )
 
-        val channelId =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    createNotificationChannel()
-                } else {
-                    // If earlier version channel ID is not used
-                    // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
-                    ""
-                }
+        val channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel()
+        } else {
+            ""
+        }
 
         mBuilder = NotificationCompat.Builder(service, channelId)
-                .setSmallIcon(R.drawable.ic_stat_name)
-                .setContentTitle(currentConfig?.remarks)
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setOngoing(true)
-                .setShowWhen(false)
-                .setOnlyAlertOnce(true)
-                .setContentIntent(contentPendingIntent)
-                .addAction(R.drawable.ic_delete_24dp,
-                        service.getString(R.string.notification_action_stop_v2ray),
-                        stopV2RayPendingIntent)
-        //.build()
-
-        //mBuilder?.setDefaults(NotificationCompat.FLAG_ONLY_ALERT_ONCE)  //取消震动,铃声其他都不好使
+            .setSmallIcon(R.drawable.ic_stat_name)
+            .setContentTitle(currentConfig?.remarks)
+            .setPriority(NotificationCompat.PRIORITY_MIN)
+            .setOngoing(true)
+            .setShowWhen(false)
+            .setOnlyAlertOnce(true)
+            .setContentIntent(contentPendingIntent)
+            .addAction(R.drawable.ic_delete_24dp,
+                service.getString(R.string.notification_action_stop_v2ray),
+                stopV2RayPendingIntent)
 
         service.startForeground(NOTIFICATION_ID, mBuilder?.build())
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(): String {
@@ -417,4 +409,22 @@ object V2RayServiceManager {
             updateNotification(currentConfig?.remarks, 0, 0)
         }
     }
+
+    private fun getPendingIntent(
+        context: Context,
+        requestCode: Int,
+        intent: Intent
+    ): PendingIntent {
+        return PendingIntent.getService(
+            context,
+            requestCode,
+            intent,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
+        )
+    }
+
 }
