@@ -27,8 +27,8 @@ import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
 import go.Seq
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import libv2ray.Libv2ray
 import libv2ray.V2RayPoint
@@ -175,7 +175,7 @@ object V2RayServiceManager {
         val service = serviceControl?.get()?.getService() ?: return
 
         if (v2rayPoint.isRunning) {
-            GlobalScope.launch(Dispatchers.Default) {
+            CoroutineScope(Dispatchers.IO).launch {
                 try {
                     v2rayPoint.stopLoop()
                 } catch (e: Exception) {
@@ -237,7 +237,7 @@ object V2RayServiceManager {
     }
 
     private fun measureV2rayDelay() {
-        GlobalScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             val service = serviceControl?.get()?.getService() ?: return@launch
             var time = -1L
             var errstr = ""
