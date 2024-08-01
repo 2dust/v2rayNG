@@ -112,12 +112,12 @@ object Utils {
 
     fun tryDecodeBase64(text: String?): String? {
         try {
-            return Base64.decode(text, Base64.NO_WRAP).toString(charset("UTF-8"))
+            return Base64.decode(text, Base64.NO_WRAP).toString(Charsets.UTF_8)
         } catch (e: Exception) {
             Log.i(ANG_PACKAGE, "Parse base64 standard failed $e")
         }
         try {
-            return Base64.decode(text, Base64.NO_WRAP.or(Base64.URL_SAFE)).toString(charset("UTF-8"))
+            return Base64.decode(text, Base64.NO_WRAP.or(Base64.URL_SAFE)).toString(Charsets.UTF_8)
         } catch (e: Exception) {
             Log.i(ANG_PACKAGE, "Parse base64 url safe failed $e")
         }
@@ -129,7 +129,7 @@ object Utils {
      */
     fun encode(text: String): String {
         return try {
-            Base64.encodeToString(text.toByteArray(charset("UTF-8")), Base64.NO_WRAP)
+            Base64.encodeToString(text.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
         } catch (e: Exception) {
             e.printStackTrace()
             ""
@@ -288,7 +288,7 @@ object Utils {
 
     fun urlDecode(url: String): String {
         return try {
-            URLDecoder.decode(url, "UTF-8")
+            URLDecoder.decode(url, Charsets.UTF_8.toString())
         } catch (e: Exception) {
             e.printStackTrace()
             url
@@ -297,7 +297,7 @@ object Utils {
 
     fun urlEncode(url: String): String {
         return try {
-            URLEncoder.encode(url, "UTF-8")
+            URLEncoder.encode(url, Charsets.UTF_8.toString())
         } catch (e: Exception) {
             e.printStackTrace()
             url
@@ -336,7 +336,7 @@ object Utils {
     }
 
     fun getDeviceIdForXUDPBaseKey(): String {
-        val androidId = Settings.Secure.ANDROID_ID.toByteArray(charset("UTF-8"))
+        val androidId = Settings.Secure.ANDROID_ID.toByteArray(Charsets.UTF_8)
         return Base64.encodeToString(androidId.copyOf(32), Base64.NO_PADDING.or(Base64.URL_SAFE))
     }
 
@@ -449,18 +449,14 @@ object Utils {
     fun isTv(context: Context): Boolean =
         context.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
 
-    fun getDelayTestUrl(): String {
-        val url = settingsStorage.decodeString(AppConfig.PREF_DELAY_TEST_URL)
-        return if (url.isNullOrEmpty()) AppConfig.DelayTestUrl else url
-    }
-
     fun getDelayTestUrl(second: Boolean = false): String {
         return if (second) {
             AppConfig.DelayTestUrl2
         } else {
-            val url = settingsStorage.decodeString(AppConfig.PREF_DELAY_TEST_URL)
-            if (url.isNullOrEmpty()) AppConfig.DelayTestUrl else url
+            settingsStorage.decodeString(AppConfig.PREF_DELAY_TEST_URL) ?: AppConfig.DelayTestUrl
         }
     }
+
+
 }
 
