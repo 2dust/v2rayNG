@@ -227,14 +227,12 @@ object V2rayConfigUtil {
 
                 ERoutingMode.BYPASS_MAINLAND.value -> {
                     routingGeo("", "cn", TAG_DIRECT, v2rayConfig)
-                    routingGeo("domain", "geolocation-cn", TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
 
                 ERoutingMode.BYPASS_LAN_MAINLAND.value -> {
                     routingGeo("ip", "private", TAG_DIRECT, v2rayConfig)
                     routingGeo("", "cn", TAG_DIRECT, v2rayConfig)
-                    routingGeo("domain", "geolocation-cn", TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
 
@@ -471,7 +469,7 @@ object V2rayConfigUtil {
                 )
             }
             if (isCnRoutingMode) {
-                val geositeCn = arrayListOf("geosite:cn", "geosite:geolocation-cn")
+                val geositeCn = arrayListOf("geosite:cn")
                 servers.add(
                     V2rayConfig.DnsBean.ServersBean(
                         domesticDns.first(),
