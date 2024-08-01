@@ -319,8 +319,8 @@ object V2RayServiceManager {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(): String {
-        val channelId = "RAY_NG_M_CH_ID"
-        val channelName = "V2rayNG Background Service"
+        val channelId = AppConfig.CHANNEL_ID
+        val channelName = AppConfig.CHANNEL_NAME
         val chan = NotificationChannel(channelId,
                 channelName, NotificationManager.IMPORTANCE_HIGH)
         chan.lightColor = Color.DKGRAY
@@ -376,15 +376,15 @@ object V2RayServiceManager {
                         var proxyTotal = 0L
                         val text = StringBuilder()
                         outboundTags?.forEach {
-                            val up = v2rayPoint.queryStats(it, "uplink")
-                            val down = v2rayPoint.queryStats(it, "downlink")
+                            val up = v2rayPoint.queryStats(it, AppConfig.UPLINK)
+                            val down = v2rayPoint.queryStats(it, AppConfig.DOWNLINK)
                             if (up + down > 0) {
                                 appendSpeedString(text, it, up / sinceLastQueryInSeconds, down / sinceLastQueryInSeconds)
                                 proxyTotal += up + down
                             }
                         }
-                        val directUplink = v2rayPoint.queryStats(TAG_DIRECT, "uplink")
-                        val directDownlink = v2rayPoint.queryStats(TAG_DIRECT, "downlink")
+                        val directUplink = v2rayPoint.queryStats(TAG_DIRECT,  AppConfig.UPLINK)
+                        val directDownlink = v2rayPoint.queryStats(TAG_DIRECT, AppConfig.DOWNLINK)
                         val zeroSpeed = proxyTotal == 0L && directUplink == 0L && directDownlink == 0L
                         if (!zeroSpeed || !lastZeroSpeed) {
                             if (proxyTotal == 0L) {
