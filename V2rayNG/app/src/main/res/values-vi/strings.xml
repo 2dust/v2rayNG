@@ -63,6 +63,8 @@
     <string name="server_lab_path_kcp">kcp seed</string>
     <string name="server_lab_path_grpc">gRPC serviceName</string>
     <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_fingerprint">Fingerprint</string>
+    <string name="server_lab_stream_alpn">Alpn</string>
     <string name="server_lab_allow_insecure">Bỏ qua xác minh chứng chỉ</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">Địa chỉ</string>
@@ -73,6 +75,10 @@
     <string name="server_lab_security4">Tên người dùng (Không bắt buộc)</string>
     <string name="server_lab_encryption">Mã hóa</string>
     <string name="server_lab_flow">Kiểm soát lưu lượng (Flow)</string>
+    <string name="server_lab_public_key">PublicKey</string>
+    <string name="server_lab_short_id">ShortId</string>
+    <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved (Không bắt buộc)</string>
     <string name="server_lab_local_address">Địa chỉ cục bộ (IPv4 / IPv6, phân cách bằng dấu phẩy)</string>
     <string name="server_lab_local_mtu">MTU (Không bắt buộc, mặc định là 1420)</string>
@@ -93,6 +99,7 @@
     <string name="server_lab_request_host6">Host (SNI) (Không bắt buộc)</string>
     <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp!</string>
     <string name="menu_item_add_file">Thêm tệp</string>
+    <string name="title_url">URL</string>
     <string name="menu_item_download_file">Tải xuống tệp tin</string>
     <string name="toast_action_not_allowed">Hành động này bị cấm!</string>
 
@@ -296,5 +303,10 @@
         <item>Sáng</item>
         <item>Tối</item>
     </string-array>
+    <string name="title_fragment_settings">Fragment Settings</string>
+    <string name="title_pref_fragment_packets">Fragment Packets</string>
+    <string name="title_pref_fragment_length">Fragment Length (min-max)</string>
+    <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
+    <string name="title_pref_fragment_enabled">Enable Fragment</string>
 
 </resources>

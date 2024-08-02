@@ -65,7 +65,7 @@
     <string name="server_lab_path_grpc">gRPC serviceName</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint" translatable="false">Fingerprint</string>
-    <string name="server_lab_stream_alpn" translatable="false">Alpn</string>
+    <string name="server_lab_stream_alpn">Alpn</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">address</string>
@@ -76,10 +76,10 @@
     <string name="server_lab_security4">User(Optional)</string>
     <string name="server_lab_encryption">encryption</string>
     <string name="server_lab_flow">flow</string>
-    <string name="server_lab_public_key" translatable="false">PublicKey</string>
-    <string name="server_lab_short_id" translatable="false">ShortId</string>
-    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
-    <string name="server_lab_secret_key" translatable="false">SecretKey</string>
+    <string name="server_lab_public_key">PublicKey</string>
+    <string name="server_lab_short_id">ShortId</string>
+    <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved(Optional)</string>
     <string name="server_lab_local_address">Local address (optional IPv4/IPv6, separated by commas)</string>
     <string name="server_lab_local_mtu">Mtu(optional, default 1420)</string>
@@ -102,7 +102,7 @@
     <string name="menu_item_add_asset">Add asset</string>
     <string name="menu_item_add_file">Add files</string>
     <string name="menu_item_add_url">Add URL</string>
-    <string name="title_url" translatable="false">URL</string>
+    <string name="title_url">URL</string>
     <string name="menu_item_download_file">Download files</string>
     <string name="title_user_asset_add_url">Add asset URL</string>
     <string name="msg_file_not_found">File not found</string>

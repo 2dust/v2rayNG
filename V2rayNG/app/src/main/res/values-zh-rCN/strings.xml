@@ -63,6 +63,8 @@
     <string name="server_lab_path_kcp">kcp seed</string>
     <string name="server_lab_path_grpc">gRPC serviceName</string>
     <string name="server_lab_stream_security">传输层安全(TLS)</string>
+    <string name="server_lab_stream_fingerprint">Fingerprint</string>
+    <string name="server_lab_stream_alpn">Alpn</string>
     <string name="server_lab_allow_insecure">跳过证书验证(allowInsecure)</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">服务器地址</string>
@@ -73,6 +75,10 @@
     <string name="server_lab_security4">用户名(可选)</string>
     <string name="server_lab_encryption">加密方式(encryption)</string>
     <string name="server_lab_flow">流控(flow)</string>
+    <string name="server_lab_public_key">PublicKey</string>
+    <string name="server_lab_short_id">ShortId</string>
+    <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved(可选)</string>
     <string name="server_lab_local_address">本地地址(可选IPv4/IPv6，逗号隔开)</string>
     <string name="server_lab_local_mtu">Mtu(可选, 默认1420)</string>
@@ -93,6 +99,7 @@
     <string name="server_lab_request_host6">Host(SNI)(可选)</string>
     <string name="toast_asset_copy_failed">失败, 请使用文件管理器</string>
     <string name="menu_item_add_file">添加文件</string>
+    <string name="title_url">URL</string>
     <string name="menu_item_download_file">下载文件</string>
     <string name="toast_action_not_allowed">禁止此项操作</string>
 

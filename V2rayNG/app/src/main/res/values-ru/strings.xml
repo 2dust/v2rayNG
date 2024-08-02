@@ -63,6 +63,8 @@
     <string name="server_lab_path_kcp">Сид KCP</string>
     <string name="server_lab_path_grpc">Служба gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_fingerprint">Fingerprint</string>
+    <string name="server_lab_stream_alpn">Alpn</string>
     <string name="server_lab_allow_insecure">Разрешать небезопасные</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">Адрес</string>
@@ -73,6 +75,10 @@
     <string name="server_lab_security4">Пользователь (необязательно)</string>
     <string name="server_lab_encryption">Шифрование</string>
     <string name="server_lab_flow">Поток</string>
+    <string name="server_lab_public_key">PublicKey</string>
+    <string name="server_lab_short_id">ShortId</string>
+    <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved (необязательно)</string>
     <string name="server_lab_local_address">Локальный адрес (необязательно, IPv4/IPv6 через запятую)</string>
     <string name="server_lab_local_mtu">MTU (необязательно, по умолчанию 1420)</string>
@@ -95,6 +101,7 @@
     <string name="menu_item_add_asset">Добавить ресурс</string>
     <string name="menu_item_add_file">Добавить файлы</string>
     <string name="menu_item_add_url">Добавить URL</string>
+    <string name="title_url">URL</string>
     <string name="menu_item_download_file">Загрузить файлы</string>
     <string name="title_user_asset_add_url">Добавить URL ресурса</string>
     <string name="msg_file_not_found">Файл не найден</string>
