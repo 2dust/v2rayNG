@@ -3,14 +3,11 @@ package com.v2ray.ang.viewmodel
 import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.AssetManager
 import android.os.Build
 import android.util.Log
-import android.view.LayoutInflater
-import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -21,7 +18,6 @@ import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.R
-import com.v2ray.ang.databinding.DialogConfigFilterBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.ServersCache
@@ -217,49 +213,50 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             listRemarks.count() - 1
         }
 
-        val ivBinding = DialogConfigFilterBinding.inflate(LayoutInflater.from(context))
-        ivBinding.spSubscriptionId.adapter = ArrayAdapter<String>(
-            context,
-            android.R.layout.simple_spinner_dropdown_item,
-            listRemarks
-        )
-        ivBinding.spSubscriptionId.setSelection(checkedItem)
-        ivBinding.etKeyword.text = Utils.getEditable(keywordFilter)
-        val builder = AlertDialog.Builder(context).setView(ivBinding.root)
-        builder.setTitle(R.string.title_filter_config)
-        builder.setPositiveButton(R.string.tasker_setting_confirm) { dialogInterface: DialogInterface?, _: Int ->
-            try {
-                val position = ivBinding.spSubscriptionId.selectedItemPosition
-                subscriptionId = if (listRemarks.count() - 1 == position) {
-                    ""
-                } else {
-                    subscriptions[position].first
-                }
-                keywordFilter = ivBinding.etKeyword.text.toString()
-                settingsStorage?.encode(AppConfig.CACHE_SUBSCRIPTION_ID, subscriptionId)
-                settingsStorage?.encode(AppConfig.CACHE_KEYWORD_FILTER, keywordFilter)
-                reloadServerList()
-
-                dialogInterface?.dismiss()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        builder.show()
-//        AlertDialog.Builder(context)
-//            .setSingleChoiceItems(listRemarks.toTypedArray(), checkedItem) { dialog, i ->
-//                try {
-//                    subscriptionId = if (listRemarks.count() - 1 == i) {
-//                        ""
-//                    } else {
-//                        subscriptions[i].first
-//                    }
-//                    reloadServerList()
-//                    dialog.dismiss()
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
+//        val ivBinding = DialogConfigFilterBinding.inflate(LayoutInflater.from(context))
+//        ivBinding.spSubscriptionId.adapter = ArrayAdapter<String>(
+//            context,
+//            android.R.layout.simple_spinner_dropdown_item,
+//            listRemarks
+//        )
+//        ivBinding.spSubscriptionId.setSelection(checkedItem)
+//        ivBinding.etKeyword.text = Utils.getEditable(keywordFilter)
+//        val builder = AlertDialog.Builder(context).setView(ivBinding.root)
+//        builder.setTitle(R.string.title_filter_config)
+//        builder.setPositiveButton(R.string.tasker_setting_confirm) { dialogInterface: DialogInterface?, _: Int ->
+//            try {
+//                val position = ivBinding.spSubscriptionId.selectedItemPosition
+//                subscriptionId = if (listRemarks.count() - 1 == position) {
+//                    ""
+//                } else {
+//                    subscriptions[position].first
 //                }
-//            }.show()
+//                keywordFilter = ivBinding.etKeyword.text.toString()
+//                settingsStorage?.encode(AppConfig.CACHE_SUBSCRIPTION_ID, subscriptionId)
+//                settingsStorage?.encode(AppConfig.CACHE_KEYWORD_FILTER, keywordFilter)
+//                reloadServerList()
+//
+//                dialogInterface?.dismiss()
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//            }
+//        }
+//        builder.show()
+        AlertDialog.Builder(context)
+            .setSingleChoiceItems(listRemarks.toTypedArray(), checkedItem) { dialog, i ->
+                try {
+                    subscriptionId = if (listRemarks.count() - 1 == i) {
+                        ""
+                    } else {
+                        subscriptions[i].first
+                    }
+                    settingsStorage?.encode(AppConfig.CACHE_SUBSCRIPTION_ID, subscriptionId)
+                    reloadServerList()
+                    dialog.dismiss()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }.show()
     }
 
     fun getPosition(guid: String): Int {
