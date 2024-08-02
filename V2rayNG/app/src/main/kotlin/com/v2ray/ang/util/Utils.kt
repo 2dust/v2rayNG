@@ -389,9 +389,9 @@ object Utils {
     }
 
     fun getDarkModeStatus(context: Context): Boolean {
-        val mode = context.resources.configuration.uiMode and UI_MODE_NIGHT_MASK
-        return mode != UI_MODE_NIGHT_NO
+        return context.resources.configuration.uiMode and UI_MODE_NIGHT_MASK != UI_MODE_NIGHT_NO
     }
+
 
     fun setNightMode(context: Context) {
         when (settingsStorage?.decodeString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
