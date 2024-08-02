@@ -319,8 +319,8 @@ object V2RayServiceManager {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(): String {
-        val channelId = AppConfig.CHANNEL_ID
-        val channelName = AppConfig.CHANNEL_NAME
+        val channelId = AppConfig.RAY_NG_CHANNEL_ID
+        val channelName = AppConfig.RAY_NG_CHANNEL_NAME
         val chan = NotificationChannel(channelId,
                 channelName, NotificationManager.IMPORTANCE_HIGH)
         chan.lightColor = Color.DKGRAY
