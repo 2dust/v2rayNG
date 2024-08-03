@@ -98,11 +98,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 }
             }
 
-            val strState = try{
-                "${outbound?.getServerAddress()?.dropLast(3)}*** : ${outbound?.getServerPort()}"
-            }catch(e: Exception){
-                ""
-            }
+            val strState = "${outbound?.getServerAddress()?.dropLast(3)}*** : ${outbound?.getServerPort() ?: ""}"
 
             holder.itemMainBinding.tvStatistics.text = strState
 
