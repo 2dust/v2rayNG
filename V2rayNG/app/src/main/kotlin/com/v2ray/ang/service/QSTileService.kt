@@ -67,7 +67,7 @@ class QSTileService : TileService() {
     private var mMsgReceive: BroadcastReceiver? = null
 
     private class ReceiveMessageHandler(context: QSTileService) : BroadcastReceiver() {
-        internal var mReference: SoftReference<QSTileService> = SoftReference(context)
+        var mReference: SoftReference<QSTileService> = SoftReference(context)
         override fun onReceive(ctx: Context?, intent: Intent?) {
             val context = mReference.get()
             when (intent?.getIntExtra("key", 0)) {
