@@ -63,14 +63,9 @@ object Utils {
     }
 
     fun parseInt(str: String?, default: Int): Int {
-        str ?: return default
-        return try {
-            Integer.parseInt(str)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            default
-        }
+        return str?.toIntOrNull() ?: default
     }
+
 
     /**
      * get text from clipboard
