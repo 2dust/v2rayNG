@@ -222,7 +222,7 @@ object V2rayConfigUtil {
 
             when (routingMode) {
                 ERoutingMode.BYPASS_LAN.value -> {
-                    routingGeo("ip", "private", TAG_DIRECT, v2rayConfig)
+                    routingGeo("", "private", TAG_DIRECT, v2rayConfig)
                 }
 
                 ERoutingMode.BYPASS_MAINLAND.value -> {
@@ -231,7 +231,7 @@ object V2rayConfigUtil {
                 }
 
                 ERoutingMode.BYPASS_LAN_MAINLAND.value -> {
-                    routingGeo("ip", "private", TAG_DIRECT, v2rayConfig)
+                    routingGeo("", "private", TAG_DIRECT, v2rayConfig)
                     routingGeo("", "cn", TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
