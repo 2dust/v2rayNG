@@ -97,13 +97,9 @@ object Utils {
      * base64 decode
      */
     fun decode(text: String?): String {
-        tryDecodeBase64(text)?.let { return it }
-        if (text?.endsWith('=')==true) {
-            // try again for some loosely formatted base64
-            tryDecodeBase64(text.trimEnd('='))?.let { return it }
-        }
-        return ""
+        return tryDecodeBase64(text) ?: text?.trimEnd('=')?.let { tryDecodeBase64(it) } ?: ""
     }
+
 
     fun tryDecodeBase64(text: String?): String? {
         try {
