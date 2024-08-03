@@ -204,59 +204,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun filterConfig(context: Context) {
         val subscriptions = MmkvManager.decodeSubscriptions()
-        val listId = subscriptions.map { it.first }.toList().toMutableList()
-        val listRemarks = subscriptions.map { it.second.remarks }.toList().toMutableList()
+        val listId = subscriptions.map { it.first }.toMutableList()
+        val listRemarks = subscriptions.map { it.second.remarks }.toMutableList()
         listRemarks += context.getString(R.string.filter_config_all)
-        val checkedItem = if (subscriptionId.isNotEmpty()) {
-            listId.indexOf(subscriptionId)
-        } else {
-            listRemarks.count() - 1
-        }
+        val checkedItem = listId.indexOf(subscriptionId).takeIf { it >= 0 } ?: listRemarks.count() - 1
 
-//        val ivBinding = DialogConfigFilterBinding.inflate(LayoutInflater.from(context))
-//        ivBinding.spSubscriptionId.adapter = ArrayAdapter<String>(
-//            context,
-//            android.R.layout.simple_spinner_dropdown_item,
-//            listRemarks
-//        )
-//        ivBinding.spSubscriptionId.setSelection(checkedItem)
-//        ivBinding.etKeyword.text = Utils.getEditable(keywordFilter)
-//        val builder = AlertDialog.Builder(context).setView(ivBinding.root)
-//        builder.setTitle(R.string.title_filter_config)
-//        builder.setPositiveButton(R.string.tasker_setting_confirm) { dialogInterface: DialogInterface?, _: Int ->
-//            try {
-//                val position = ivBinding.spSubscriptionId.selectedItemPosition
-//                subscriptionId = if (listRemarks.count() - 1 == position) {
-//                    ""
-//                } else {
-//                    subscriptions[position].first
-//                }
-//                keywordFilter = ivBinding.etKeyword.text.toString()
-//                settingsStorage?.encode(AppConfig.CACHE_SUBSCRIPTION_ID, subscriptionId)
-//                settingsStorage?.encode(AppConfig.CACHE_KEYWORD_FILTER, keywordFilter)
-//                reloadServerList()
-//
-//                dialogInterface?.dismiss()
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//            }
-//        }
-//        builder.show()
         AlertDialog.Builder(context)
             .setSingleChoiceItems(listRemarks.toTypedArray(), checkedItem) { dialog, i ->
                 try {
-                    subscriptionId = if (listRemarks.count() - 1 == i) {
-                        ""
-                    } else {
-                        subscriptions[i].first
-                    }
-                    settingsStorage?.encode(AppConfig.CACHE_SUBSCRIPTION_ID, subscriptionId)
+                    subscriptionId = if (listRemarks.count() - 1 == i) "" else subscriptions[i].first
+                    settingsStorage.encode(AppConfig.CACHE_SUBSCRIPTION_ID, subscriptionId)
                     reloadServerList()
                     dialog.dismiss()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            }.show()
+            }
+            .show()
     }
 
     fun getPosition(guid: String): Int {
