@@ -64,11 +64,6 @@
         </menu>
     </item>
     <item
-        android:id="@+id/filter_config"
-        android:icon="@drawable/ic_outline_filter_alt_24"
-        android:title="@string/title_filter_config"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/service_restart"
         android:title="@string/title_service_restart"
         app:showAsAction="never" />

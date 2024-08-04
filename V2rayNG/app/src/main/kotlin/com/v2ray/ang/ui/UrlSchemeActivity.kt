@@ -64,8 +64,8 @@ class UrlSchemeActivity : BaseActivity() {
         val decodedUrl = URLDecoder.decode(uriString, "UTF-8")
         val uri = Uri.parse(decodedUrl)
         if (uri != null) {
-            val count = AngConfigManager.importBatchConfig(decodedUrl, "", false)
-            if (count > 0) {
+            val (count, countSub) = AngConfigManager.importBatchConfig(decodedUrl, "", false)
+            if (count + countSub > 0) {
                 toast(R.string.import_subscription_success)
             } else {
                 toast(R.string.import_subscription_failure)

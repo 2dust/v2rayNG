@@ -8,7 +8,6 @@ import android.content.IntentFilter
 import android.content.res.AssetManager
 import android.os.Build
 import android.util.Log
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -60,7 +59,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     var serverList = MmkvManager.decodeServerList()
     var subscriptionId: String = settingsStorage.decodeString(AppConfig.CACHE_SUBSCRIPTION_ID, "")?:""
-    var keywordFilter: String = settingsStorage.decodeString(AppConfig.CACHE_KEYWORD_FILTER, "")?:""
+    //var keywordFilter: String = settingsStorage.decodeString(AppConfig.CACHE_KEYWORD_FILTER, "")?:""
         private set
     val serversCache = mutableListOf<ServersCache>()
     val isRunning by lazy { MutableLiveData<Boolean>() }
@@ -146,9 +145,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 continue
             }
 
-            if (keywordFilter.isEmpty() || config.remarks.contains(keywordFilter)) {
+//            if (keywordFilter.isEmpty() || config.remarks.contains(keywordFilter)) {
                 serversCache.add(ServersCache(guid, config))
-            }
+//            }
         }
     }
 
@@ -202,25 +201,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         MessageUtil.sendMsg2Service(getApplication(), AppConfig.MSG_MEASURE_DELAY, "")
     }
 
-    fun filterConfig(context: Context) {
-        val subscriptions = MmkvManager.decodeSubscriptions()
-        val listId = subscriptions.map { it.first }.toMutableList()
-        val listRemarks = subscriptions.map { it.second.remarks }.toMutableList()
-        listRemarks += context.getString(R.string.filter_config_all)
-        val checkedItem = listId.indexOf(subscriptionId).takeIf { it >= 0 } ?: listRemarks.count() - 1
+    fun subscriptionIdChanged(id: String) {
+        if (subscriptionId != id) {
+            subscriptionId = id
+            settingsStorage.encode(AppConfig.CACHE_SUBSCRIPTION_ID, subscriptionId)
+            reloadServerList()
+        }
+    }
 
-        AlertDialog.Builder(context)
-            .setSingleChoiceItems(listRemarks.toTypedArray(), checkedItem) { dialog, i ->
-                try {
-                    subscriptionId = if (listRemarks.count() - 1 == i) "" else subscriptions[i].first
-                    settingsStorage.encode(AppConfig.CACHE_SUBSCRIPTION_ID, subscriptionId)
-                    reloadServerList()
-                    dialog.dismiss()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-            .show()
+    fun getSubscriptions(context: Context) : Pair<MutableList<String>?, MutableList<String>?> {
+        val subscriptions = MmkvManager.decodeSubscriptions()
+        if (subscriptionId.isNotEmpty()
+            && !subscriptions.map { it.first }.contains(subscriptionId)
+        ) {
+            subscriptionIdChanged("")
+        }
+        if (subscriptions.isEmpty()) {
+            return null to null
+        }
+        val listId = subscriptions.map { it.first }.toMutableList()
+        listId.add(0, "")
+        val listRemarks = subscriptions.map { it.second.remarks }.toMutableList()
+        listRemarks.add(0, context.getString(R.string.filter_config_all))
+
+        return listId to listRemarks
     }
 
     fun getPosition(guid: String): Int {
