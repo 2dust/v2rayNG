@@ -107,7 +107,7 @@ object AppConfig {
 
     /** DNS server addresses. */
     const val DNS_PROXY = "1.1.1.1"
-    const val DNS_DIRECT = "223.5.5.5"
+    const val DNS_DIRECT = "localhost"
     const val DNS_VPN = "1.1.1.1"
 
     /** Ports and addresses for various services. */
