@@ -503,6 +503,11 @@ object V2rayConfigUtil {
             // hardcode googleapi rule to fix play store problems
             hosts["domain:googleapis.cn"] = "googleapis.com"
 
+            // hardcode popular Android Private DNS rule to fix localhost DNS problem
+            hosts["dns.alidns.com"] = arrayListOf("223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1")
+            hosts["one.one.one.one"] = arrayListOf("1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001")
+            hosts["dns.google"] = arrayListOf("8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844")
+
             // DNS dns对象
             v2rayConfig.dns = V2rayConfig.DnsBean(
                 servers = servers,
