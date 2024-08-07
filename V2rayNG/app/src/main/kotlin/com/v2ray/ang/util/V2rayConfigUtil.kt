@@ -423,7 +423,7 @@ object V2rayConfigUtil {
 
     private fun dns(v2rayConfig: V2rayConfig): Boolean {
         try {
-            val hosts = mutableMapOf<String, String>()
+            val hosts = mutableMapOf<String, Any>()
             val servers = ArrayList<Any>()
 
             //remote Dns
