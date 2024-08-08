@@ -33,6 +33,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.databinding.LayoutProgressBinding
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.extension.isNetworkConnected
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.service.V2RayServiceManager
@@ -200,10 +201,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     fun startV2Ray() {
-        if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
-            return
+        if (isNetworkConnected) {
+            if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
+                return
+            }
+            V2RayServiceManager.startV2Ray(this)
+        } else {
+            ToastCompat.makeText(this, getString(R.string.connection_test_fail), Toast.LENGTH_LONG).show()
         }
-        V2RayServiceManager.startV2Ray(this)
     }
 
     fun restartV2Ray() {
