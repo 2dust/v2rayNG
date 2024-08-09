@@ -54,7 +54,7 @@ recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "r
 preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
 rxandroid = { module = "io.reactivex:rxandroid", version.ref = "rxandroid" }
 rxjava = { module = "io.reactivex:rxjava", version.ref = "rxjava" }
-rxpermissions = { module = "com.tbruyelle.rxpermissions:rxpermissions", version.ref = "rxpermissions" }
+rxpermissions = { module = "io.github.mayampi01:com.tbruyelle.rxpermissions", version.ref = "rxpermissions" }
 toastcompat = { module = "me.drakeet.support:toastcompat", version.ref = "toastcompat" }
 viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 work-multiprocess = { module = "androidx.work:work-multiprocess", version.ref = "workRuntimeKtx" }
