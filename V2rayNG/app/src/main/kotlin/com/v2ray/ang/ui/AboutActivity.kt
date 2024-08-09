@@ -6,7 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
-import com.tbruyelle.rxpermissions.RxPermissions
+import com.tbruyelle.rxpermissions3.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig

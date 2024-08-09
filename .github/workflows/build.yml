@@ -2,6 +2,7 @@ name: Build APK
 
 on:
   push:
+  pull_request:
   workflow_dispatch:
     inputs:
       XRAY_CORE_VERSION:
