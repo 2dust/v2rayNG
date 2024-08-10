@@ -57,30 +57,27 @@ android {
         }
     }
 
-    applicationVariants.all {
-        val variant = this
-        val versionCodes =
-            mapOf("armeabi-v7a" to 4, "arm64-v8a" to 4, "x86" to 4, "x86_64" to 4, "universal" to 4)
+    applicationVariants.all { variant ->
+        val versionCodes = mapOf(
+            "armeabi-v7a" to 4,
+            "arm64-v8a" to 4,
+            "x86" to 4,
+            "x86_64" to 4,
+            "universal" to 4
+        )
 
         variant.outputs
-            .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
+            .filterIsInstance<com.android.build.gradle.internal.api.ApkVariantOutputImpl>()
             .forEach { output ->
-                val abi = if (output.getFilter("ABI") != null)
-                    output.getFilter("ABI")
-                else
-                    "universal"
+                val abi = output.filters.find { it.name == "ABI" }?.value ?: "universal"
 
                 output.outputFileName = "v2rayNG_${variant.versionName}_${abi}.apk"
-                if(versionCodes.containsKey(abi))
-                {
-                    output.versionCodeOverride = (1000000 * versionCodes[abi]!!).plus(variant.versionCode)
-                }
-                else
-                {
-                    return@forEach
+                versionCodes[abi]?.let { code ->
+                    output.versionCodeOverride = (1000000 * code) + variant.versionCode
                 }
             }
     }
+
 
     buildFeatures {
         viewBinding = true
