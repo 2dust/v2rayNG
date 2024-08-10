@@ -17,7 +17,7 @@ import com.v2ray.ang.databinding.ActivityTaskerBinding
 import com.v2ray.ang.util.MmkvManager
 
 class TaskerActivity : BaseActivity() {
-    private lateinit var binding: ActivityTaskerBinding
+    private val binding by lazy { ActivityTaskerBinding.inflate(layoutInflater) }
 
     private var listview: ListView? = null
     private var lstData: ArrayList<String> = ArrayList()
@@ -27,9 +27,7 @@ class TaskerActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityTaskerBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
 
         //add def value
         lstData.add("Default")

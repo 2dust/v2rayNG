@@ -19,16 +19,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SubSettingActivity : BaseActivity() {
-    private lateinit var binding: ActivitySubSettingBinding
+    private val binding by lazy { ActivitySubSettingBinding.inflate(layoutInflater) }
 
     var subscriptions: List<Pair<String, SubscriptionItem>> = listOf()
     private val adapter by lazy { SubSettingRecyclerAdapter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySubSettingBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
 
         title = getString(R.string.title_sub_setting)
 

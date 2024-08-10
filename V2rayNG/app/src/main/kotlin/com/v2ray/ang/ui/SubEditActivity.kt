@@ -23,7 +23,7 @@ import com.v2ray.ang.util.Utils
 import java.util.concurrent.TimeUnit
 
 class SubEditActivity : BaseActivity() {
-    private lateinit var binding: ActivitySubEditBinding
+    private val binding by lazy {ActivitySubEditBinding.inflate(layoutInflater)}
 
     var del_config: MenuItem? = null
     var save_config: MenuItem? = null
@@ -33,9 +33,7 @@ class SubEditActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySubEditBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
         title = getString(R.string.title_sub_setting)
 
         val json = subStorage?.decodeString(editSubId)
