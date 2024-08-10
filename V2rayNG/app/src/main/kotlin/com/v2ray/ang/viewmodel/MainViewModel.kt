@@ -67,7 +67,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val updateTestResultAction by lazy { MutableLiveData<String>() }
 
     private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
-
+    @Suppress("UnspecifiedRegisterReceiverFlag")
     fun startListenBroadcast() {
         isRunning.value = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

@@ -31,7 +31,7 @@ class QSTileService : TileService() {
 
         qsTile?.updateTile()
     }
-
+@Suppress("UnspecifiedRegisterReceiverFlag")
     override fun onStartListening() {
         super.onStartListening()
         setState(Tile.STATE_INACTIVE)
