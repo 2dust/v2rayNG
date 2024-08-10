@@ -17,6 +17,7 @@ import com.v2ray.ang.dto.ERoutingMode
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -244,7 +245,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         val path = File(applicationContext.filesDir, "sock_path").absolutePath
         Log.d(packageName, path)
 
-        GlobalScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             var tries = 0
             while (true) try {
                 Thread.sleep(50L shl tries)
