@@ -109,13 +109,13 @@
 
         <EditTextPreference
             android:inputType="number"
-            android:key="pref_mux_concurency"
+            android:key="pref_mux_concurrency"
             android:summary="8"
             android:title="@string/title_pref_mux_concurency" />
 
         <EditTextPreference
             android:inputType="number"
-            android:key="pref_mux_xudp_concurency"
+            android:key="pref_mux_xudp_concurrency"
             android:summary="8"
             android:title="@string/title_pref_mux_xudp_concurency" />
 
