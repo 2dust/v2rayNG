@@ -23,7 +23,7 @@ android {
                     "x86_64",
                     "x86"
                 )
-                universalApk = true
+                isUniversalApk = true
             }
         }
 
