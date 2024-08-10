@@ -199,14 +199,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.tabGroup.isVisible = true
     }
 
-    fun startV2Ray() {
+    private fun startV2Ray() {
         if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
             return
         }
         V2RayServiceManager.startV2Ray(this)
     }
 
-    fun restartV2Ray() {
+    private fun restartV2Ray() {
         if (mainViewModel.isRunning.value == true) {
             Utils.stopVService(this)
         }
