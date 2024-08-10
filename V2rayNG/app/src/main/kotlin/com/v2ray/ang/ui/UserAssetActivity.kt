@@ -39,7 +39,7 @@ import java.text.DateFormat
 import java.util.*
 
 class UserAssetActivity : BaseActivity() {
-    private lateinit var binding: ActivitySubSettingBinding
+    private val binding by lazy { ActivitySubSettingBinding.inflate(layoutInflater) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
     private val assetStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
 
@@ -49,9 +49,7 @@ class UserAssetActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySubSettingBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
         title = getString(R.string.title_user_asset_setting)
 
         binding.recyclerView.setHasFixedSize(true)

@@ -11,13 +11,11 @@ import com.v2ray.ang.util.AngConfigManager
 import java.net.URLDecoder
 
 class UrlSchemeActivity : BaseActivity() {
-    private lateinit var binding: ActivityLogcatBinding
+    private val binding by lazy { ActivityLogcatBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLogcatBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
 
         try {
             intent.apply {

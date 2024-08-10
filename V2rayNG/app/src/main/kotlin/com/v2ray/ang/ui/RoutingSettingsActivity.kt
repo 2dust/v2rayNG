@@ -8,7 +8,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.databinding.ActivityRoutingSettingsBinding
 
 class RoutingSettingsActivity : BaseActivity() {
-    private lateinit var binding: ActivityRoutingSettingsBinding
+    private val binding by lazy { ActivityRoutingSettingsBinding.inflate(layoutInflater) }
 
     private val titles: Array<out String> by lazy {
         resources.getStringArray(R.array.routing_tag)
@@ -16,9 +16,7 @@ class RoutingSettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityRoutingSettingsBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
 
         title = getString(R.string.title_pref_routing_custom)
 

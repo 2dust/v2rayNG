@@ -21,14 +21,12 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class AboutActivity : BaseActivity() {
-    private lateinit var binding: ActivityAboutBinding
+    private val binding by lazy {ActivityAboutBinding.inflate(layoutInflater)}
     private val extDir by lazy { File(Utils.backupPath(this)) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAboutBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
 
         title = getString(R.string.title_about)
 

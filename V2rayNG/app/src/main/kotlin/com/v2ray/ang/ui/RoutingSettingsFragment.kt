@@ -23,7 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class RoutingSettingsFragment : Fragment() {
-    private lateinit var binding: FragmentRoutingSettingsBinding
+    private val binding by lazy { FragmentRoutingSettingsBinding.inflate(layoutInflater) }
     companion object {
         private const val routing_arg = "routing_arg"
     }
@@ -33,7 +33,6 @@ class RoutingSettingsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        binding = FragmentRoutingSettingsBinding.inflate(layoutInflater)
         return binding.root// inflater.inflate(R.layout.fragment_routing_settings, container, false)
     }
 
