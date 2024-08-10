@@ -250,9 +250,7 @@ class PerAppProxyActivity : BaseActivity() {
 
     private fun importProxyApp() {
         val content = Utils.getClipboard(applicationContext)
-        if (TextUtils.isEmpty(content)) {
-            return
-        }
+        if (TextUtils.isEmpty(content)) return
         selectProxyApp(content, false)
         toast(R.string.toast_success)
     }
@@ -274,9 +272,7 @@ class PerAppProxyActivity : BaseActivity() {
             } else {
                 content
             }
-            if (TextUtils.isEmpty(proxyApps)) {
-                return false
-            }
+            if (TextUtils.isEmpty(proxyApps)) return false
 
             adapter?.blacklist?.clear()
 
@@ -316,12 +312,8 @@ class PerAppProxyActivity : BaseActivity() {
 
     private fun inProxyApps(proxyApps: String, packageName: String, force: Boolean): Boolean {
         if (force) {
-            if (packageName == "com.google.android.webview") {
-                return false
-            }
-            if (packageName.startsWith("com.google")) {
-                return true
-            }
+            if (packageName == "com.google.android.webview") return false
+            if (packageName.startsWith("com.google")) return true
         }
 
         return proxyApps.indexOf(packageName) >= 0
