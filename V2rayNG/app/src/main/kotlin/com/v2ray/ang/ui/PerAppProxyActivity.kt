@@ -193,7 +193,7 @@ class PerAppProxyActivity : BaseActivity() {
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    filterProxyApp(newText?:"")
+                    filterProxyApp(newText.orEmpty())
                     return false
                 }
             })

@@ -40,7 +40,7 @@ object Utils {
      * @return
      */
     fun getEditable(text: String?): Editable {
-        return Editable.Factory.getInstance().newEditable(text?:"")
+        return Editable.Factory.getInstance().newEditable(text.orEmpty())
     }
 
     /**
