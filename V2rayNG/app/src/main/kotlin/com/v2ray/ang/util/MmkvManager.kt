@@ -138,8 +138,7 @@ object MmkvManager {
                 subscriptions.add(Pair(key, Gson().fromJson(json, SubscriptionItem::class.java)))
             }
         }
-        subscriptions.sortedBy { (_, value) -> value.addedTime }
-        return subscriptions
+        return subscriptions.sortedBy { (_, value) -> value.addedTime }
     }
 
     fun removeSubscription(subid: String) {
@@ -155,8 +154,7 @@ object MmkvManager {
                 assetUrlItems.add(Pair(key, Gson().fromJson(json, AssetUrlItem::class.java)))
             }
         }
-        assetUrlItems.sortedBy { (_, value) -> value.addedTime }
-        return assetUrlItems
+        return assetUrlItems.sortedBy { (_, value) -> value.addedTime }
     }
 
     fun removeAssetUrl(assetid: String) {
