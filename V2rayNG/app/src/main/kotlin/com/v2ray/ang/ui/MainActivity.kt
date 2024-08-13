@@ -330,7 +330,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     mainViewModel.removeDuplicateServer()
-                    mainViewModel.reloadServerList()
                 }
                 .setNegativeButton(android.R.string.no) {_, _ ->
                     //do noting

@@ -26,8 +26,8 @@ import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
 import java.util.concurrent.TimeUnit
 
 class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<MainRecyclerAdapter.BaseViewHolder>()
@@ -51,7 +51,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         if (holder is MainViewHolder) {
             val guid = mActivity.mainViewModel.serversCache[position].guid
-            val config = mActivity.mainViewModel.serversCache[position].config
+            val profile = mActivity.mainViewModel.serversCache[position].profile
 //            //filter
 //            if (mActivity.mainViewModel.subscriptionId.isNotEmpty()
 //                && mActivity.mainViewModel.subscriptionId != config.subscriptionId
@@ -61,10 +61,9 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
 //                holder.itemMainBinding.cardView.visibility = View.VISIBLE
 //            }
 
-            val outbound = config.getProxyOutbound()
             val aff = MmkvManager.decodeServerAffiliationInfo(guid)
 
-            holder.itemMainBinding.tvName.text = config.remarks
+            holder.itemMainBinding.tvName.text = profile.remarks
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
             holder.itemMainBinding.tvTestResult.text = aff?.getTestDelayString() ?: ""
             if ((aff?.testDelayMillis ?: 0L) < 0L) {
@@ -78,27 +77,27 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 holder.itemMainBinding.layoutIndicator.setBackgroundResource(0)
             }
             holder.itemMainBinding.tvSubscription.text = ""
-            val json = subStorage?.decodeString(config.subscriptionId)
+            val json = subStorage?.decodeString(profile.subscriptionId)
             if (!json.isNullOrBlank()) {
                 val sub = Gson().fromJson(json, SubscriptionItem::class.java)
                 holder.itemMainBinding.tvSubscription.text = sub.remarks
             }
 
             var shareOptions = share_method.asList()
-            when (config.configType) {
+            when (profile.configType) {
                 EConfigType.CUSTOM -> {
                     holder.itemMainBinding.tvType.text = mActivity.getString(R.string.server_customize_config)
                     shareOptions = shareOptions.takeLast(1)
                 }
                 EConfigType.VLESS -> {
-                    holder.itemMainBinding.tvType.text = config.configType.name
+                    holder.itemMainBinding.tvType.text = profile.configType.name
                 }
                 else -> {
-                    holder.itemMainBinding.tvType.text = config.configType.name.lowercase()
+                    holder.itemMainBinding.tvType.text = profile.configType.name.lowercase()
                 }
             }
 
-            val strState = "${outbound?.getServerAddress()?.dropLast(3)}*** : ${outbound?.getServerPort() ?: ""}"
+            val strState = "${profile?.server?.dropLast(3)}*** : ${profile?.serverPort ?: ""}"
 
             holder.itemMainBinding.tvStatistics.text = strState
 
@@ -107,7 +106,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                     try {
                         when (i) {
                             0 -> {
-                                if (config.configType == EConfigType.CUSTOM) {
+                                if (profile.configType == EConfigType.CUSTOM) {
                                     shareFullContent(guid)
                                 } else {
                                     val ivBinding = ItemQrcodeBinding.inflate(LayoutInflater.from(mActivity))
@@ -134,7 +133,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             holder.itemMainBinding.layoutEdit.setOnClickListener {
                 val intent = Intent().putExtra("guid", guid)
                         .putExtra("isRunning", isRunning)
-                if (config.configType == EConfigType.CUSTOM) {
+                if (profile.configType == EConfigType.CUSTOM) {
                     mActivity.startActivity(intent.setClass(mActivity, ServerCustomConfigActivity::class.java))
                 } else {
                     mActivity.startActivity(intent.setClass(mActivity, ServerActivity::class.java))
