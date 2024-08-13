@@ -63,7 +63,7 @@
     <string name="server_lab_path_kcp">kcp seed</string>
     <string name="server_lab_path_grpc">gRPC serviceName</string>
     <string name="server_lab_stream_security">TLS</string>
-    <string name="server_lab_stream_fingerprint">Fingerprint</string>
+    <string name="server_lab_stream_fingerprint">اثرانگشت</string>
     <string name="server_lab_stream_alpn">Alpn</string>
     <string name="server_lab_allow_insecure">مجوز ناامن</string>
     <string name="server_lab_sni">SNI</string>
@@ -82,7 +82,7 @@
     <string name="server_lab_reserved">Reserved (اختیاری)</string>
     <string name="server_lab_local_address">آدرس محلی IPv4(اختیاری)</string>
     <string name="server_lab_local_mtu">Mtu(optional, default 1420)</string>
-    <string name="toast_success">موفقیت</string>
+    <string name="toast_success">با موفقیت انجام شد</string>
     <string name="toast_failure">شکست</string>
     <string name="toast_none_data">چیزی نیست</string>
     <string name="toast_incorrect_protocol">پروتکل نادرست</string>
@@ -198,7 +198,7 @@
     <string name="toast_tg_app_not_found">برنامه تلگرام پیدا نشد</string>
 
     <string name="title_privacy_policy">حریم خصوصی</string>
-    <string name="title_about">About</string>
+    <string name="title_about">درباره</string>
     <string name="title_source_code">Source code</string>
     <string name="title_tg_channel">Telegram channel</string>
     <string name="title_configuration_backup">Backup configuration</string>
