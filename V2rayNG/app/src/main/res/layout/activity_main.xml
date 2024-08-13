@@ -37,6 +37,14 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/pb_waiting"
+                        app:indicatorColor="@color/color_fab_active"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true"
+                        android:visibility="invisible" />
+
                     <com.google.android.material.tabs.TabLayout
                         android:id="@+id/tab_group"
                         app:tabMode="scrollable"
@@ -75,7 +83,6 @@
 
                     </LinearLayout>
                 </LinearLayout>
-
 
                 <FrameLayout
                     android:id="@+id/fabProgressCircle"

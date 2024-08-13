@@ -30,9 +30,7 @@ import com.tbruyelle.rxpermissions3.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.databinding.ActivityLogcatBinding
 import com.v2ray.ang.databinding.ActivityMainBinding
-import com.v2ray.ang.databinding.LayoutProgressBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.isNetworkConnected
 import com.v2ray.ang.extension.toast
@@ -42,12 +40,12 @@ import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.drakeet.support.toast.ToastCompat
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -421,10 +419,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private fun importBatchConfig(server: String?) {
-        val dialog = AlertDialog.Builder(this)
-            .setView(LayoutProgressBinding.inflate(layoutInflater).root)
-            .setCancelable(false)
-            .show()
+//        val dialog = AlertDialog.Builder(this)
+//            .setView(LayoutProgressBinding.inflate(layoutInflater).root)
+//            .setCancelable(false)
+//            .show()
+        binding.pbWaiting.show()
 
         lifecycleScope.launch(Dispatchers.IO) {
             val (count, countSub) = AngConfigManager.importBatchConfig(server, mainViewModel.subscriptionId, true)
@@ -438,7 +437,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 } else {
                     toast(R.string.toast_failure)
                 }
-                dialog.dismiss()
+                //dialog.dismiss()
+                binding.pbWaiting.hide()
             }
             }
     }
@@ -518,10 +518,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      * import config from sub
      */
     private fun importConfigViaSub() : Boolean {
-        val dialog = AlertDialog.Builder(this)
-            .setView(LayoutProgressBinding.inflate(layoutInflater).root)
-            .setCancelable(false)
-            .show()
+//        val dialog = AlertDialog.Builder(this)
+//            .setView(LayoutProgressBinding.inflate(layoutInflater).root)
+//            .setCancelable(false)
+//            .show()
+        binding.pbWaiting.show()
 
         lifecycleScope.launch(Dispatchers.IO) {
             val count = AngConfigManager.updateConfigViaSubAll()
@@ -533,7 +534,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 } else {
                     toast(R.string.toast_failure)
                 }
-                dialog.dismiss()
+                //dialog.dismiss()
+                binding.pbWaiting.hide()
             }
         }
         return true
