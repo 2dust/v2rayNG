@@ -23,6 +23,7 @@ import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.KEY_ANG_CONFIGS
@@ -170,6 +171,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+
+    fun exportAllServer() {
+        viewModelScope.launch(Dispatchers.Default) {
+            val serverListCopy =
+                if (subscriptionId.isNullOrEmpty()) {
+                    serverList
+                } else {
+                    serversCache.map { it.guid }.toList()
+                }
+
+            val ret = AngConfigManager.shareNonCustomConfigsToClipboard(
+                getApplication<AngApplication>(),
+                serverListCopy
+            )
+            launch(Dispatchers.Main) {
+                if (ret == 0)
+                    getApplication<AngApplication>().toast(R.string.toast_success)
+                else
+                    getApplication<AngApplication>().toast(R.string.toast_failure)
+            }
+        }
+    }
+
     fun testAllTcping() {
         tcpingTestScope.coroutineContext[Job]?.cancelChildren()
         SpeedtestUtil.closeAllTcpSockets()
@@ -256,14 +280,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun removeDuplicateServer() {
         viewModelScope.launch(Dispatchers.Default) {
+            val serversCacheCopy = mutableListOf<Pair<String, ServerConfig>>()
+            for (it in serversCache) {
+                val config = MmkvManager.decodeServerConfig(it.guid) ?: continue
+                serversCacheCopy.add(Pair(it.guid, config))
+            }
+
             val deleteServer = mutableListOf<String>()
-            serversCache.forEachIndexed { index, it ->
-                val outbound = MmkvManager.decodeServerConfig(it.guid)?.getProxyOutbound()
-                serversCache.forEachIndexed { index2, it2 ->
+            serversCacheCopy.forEachIndexed { index, it ->
+                val outbound = it.second.getProxyOutbound()
+                serversCacheCopy.forEachIndexed { index2, it2 ->
                     if (index2 > index) {
-                        val outbound2 = MmkvManager.decodeServerConfig(it2.guid)?.getProxyOutbound()
-                        if (outbound == outbound2 && !deleteServer.contains(it2.guid)) {
-                            deleteServer.add(it2.guid)
+                        val outbound2 = it2.second.getProxyOutbound()
+                        if (outbound == outbound2 && !deleteServer.contains(it2.first)) {
+                            deleteServer.add(it2.first)
                         }
                     }
                 }
@@ -283,6 +313,48 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         }
     }
+
+    fun removeAllServer() {
+        viewModelScope.launch(Dispatchers.Default) {
+            if (subscriptionId.isNullOrEmpty()) {
+                MmkvManager.removeAllServer()
+            } else {
+                val serversCopy = serversCache.toList()
+                for (item in serversCopy) {
+                    MmkvManager.removeServer(item.guid)
+                }
+            }
+            launch(Dispatchers.Main) {
+                reloadServerList()
+            }
+        }
+    }
+
+    fun removeInvalidServer() {
+        viewModelScope.launch(Dispatchers.Default) {
+            if (subscriptionId.isNullOrEmpty()) {
+                MmkvManager.removeInvalidServer("")
+            } else {
+                val serversCopy = serversCache.toList()
+                for (item in serversCopy) {
+                    MmkvManager.removeInvalidServer(item.guid)
+                }
+            }
+            launch(Dispatchers.Main) {
+                reloadServerList()
+            }
+        }
+    }
+
+    fun sortByTestResults() {
+        viewModelScope.launch(Dispatchers.Default) {
+            MmkvManager.sortByTestResults()
+            launch(Dispatchers.Main) {
+                reloadServerList()
+            }
+        }
+    }
+
 
     fun copyAssets(assets: AssetManager) {
         val extFolder = Utils.userAssetPath(getApplication<AngApplication>())

@@ -191,11 +191,19 @@ object MmkvManager {
         serverAffStorage?.clearAll()
     }
 
-    fun removeInvalidServer() {
-        serverAffStorage?.allKeys()?.forEach { key ->
-            decodeServerAffiliationInfo(key)?.let { aff ->
+    fun removeInvalidServer(guid: String) {
+        if (guid.isNotEmpty()) {
+            decodeServerAffiliationInfo(guid)?.let { aff ->
                 if (aff.testDelayMillis < 0L) {
-                    removeServer(key)
+                    removeServer(guid)
+                }
+            }
+        } else {
+            serverAffStorage?.allKeys()?.forEach { key ->
+                decodeServerAffiliationInfo(key)?.let { aff ->
+                    if (aff.testDelayMillis < 0L) {
+                        removeServer(key)
+                    }
                 }
             }
         }
