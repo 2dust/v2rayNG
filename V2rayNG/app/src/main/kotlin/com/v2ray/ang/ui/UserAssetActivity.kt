@@ -2,15 +2,19 @@ package com.v2ray.ang.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +26,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubSettingBinding
 import com.v2ray.ang.databinding.ItemRecyclerUserAssetBinding
+import com.v2ray.ang.databinding.LayoutProgressBinding
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
@@ -36,7 +41,7 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.URL
 import java.text.DateFormat
-import java.util.*
+import java.util.Date
 
 class UserAssetActivity : BaseActivity() {
     private val binding by lazy { ActivitySubSettingBinding.inflate(layoutInflater) }
@@ -166,9 +171,13 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun downloadGeoFiles() {
-        val httpPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT), AppConfig.PORT_HTTP.toInt())
-
+        val dialog = AlertDialog.Builder(this)
+            .setView(LayoutProgressBinding.inflate(layoutInflater).root)
+            .setCancelable(false)
+            .show()
         toast(R.string.msg_downloading_content)
+
+        val httpPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT), AppConfig.PORT_HTTP.toInt())
         var assets = MmkvManager.decodeAssetUrls()
         assets = addBuiltInGeoItems(assets)
 
@@ -186,6 +195,7 @@ class UserAssetActivity : BaseActivity() {
                     } else {
                         toast(getString(R.string.toast_failure) + " " + it.second.remarks)
                     }
+                    dialog.dismiss()
                 }
             }
         }
