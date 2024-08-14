@@ -20,12 +20,15 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.ServersCache
+import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.AngConfigManager
+import com.v2ray.ang.util.AngConfigManager.updateConfigViaSub
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.KEY_ANG_CONFIGS
+import com.v2ray.ang.util.MmkvManager.subStorage
 import com.v2ray.ang.util.SpeedtestUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
@@ -152,6 +155,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateConfigViaSubAll(): Int {
+        if (subscriptionId.isNullOrEmpty()) {
+            return AngConfigManager.updateConfigViaSubAll()
+        } else {
+            val json = subStorage?.decodeString(subscriptionId)
+            if (!json.isNullOrBlank()) {
+                return updateConfigViaSub(Pair(subscriptionId, Gson().fromJson(json, SubscriptionItem::class.java)))
+            } else {
+                return 0
+            }
+        }
+    }
 
     fun exportAllServer(): Int {
         val serverListCopy =

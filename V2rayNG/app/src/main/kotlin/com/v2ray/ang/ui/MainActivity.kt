@@ -589,7 +589,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.pbWaiting.show()
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val count = AngConfigManager.updateConfigViaSubAll()
+            val count = mainViewModel.updateConfigViaSubAll()
             delay(500L)
             launch(Dispatchers.Main) {
                 if (count > 0) {
