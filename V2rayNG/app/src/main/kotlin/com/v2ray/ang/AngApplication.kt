@@ -17,9 +17,6 @@ class AngApplication : MultiDexApplication(), Configuration.Provider {
         application = this
     }
 
-    //var firstRun = false
-     //   private set
-
     override fun onCreate() {
         super.onCreate()
 
