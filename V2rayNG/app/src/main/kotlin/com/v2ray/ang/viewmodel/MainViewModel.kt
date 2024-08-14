@@ -61,7 +61,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     var serverList = MmkvManager.decodeServerList()
     var subscriptionId: String = settingsStorage.decodeString(AppConfig.CACHE_SUBSCRIPTION_ID, "")?:""
-    //var keywordFilter: String = settingsStorage.decodeString(AppConfig.CACHE_KEYWORD_FILTER, "")?:""
+    var keywordFilter: String = settingsStorage.decodeString(AppConfig.CACHE_KEYWORD_FILTER, "")?:""
         private set
     val serversCache = mutableListOf<ServersCache>()
     val isRunning by lazy { MutableLiveData<Boolean>() }
@@ -166,8 +166,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 continue
             }
 
-//            if (keywordFilter.isEmpty() || config.remarks.contains(keywordFilter)) {
-            serversCache.add(ServersCache(guid, profile))
+            if (keywordFilter.isEmpty() || profile.remarks.contains(keywordFilter)) {
+                serversCache.add(ServersCache(guid, profile))
+            }
         }
     }
 
@@ -380,6 +381,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 Log.e(ANG_PACKAGE, "asset copy failed", e)
             }
         }
+    }
+
+    fun filterConfig(keyword: String) {
+        keywordFilter = keyword
+        settingsStorage.encode(AppConfig.CACHE_KEYWORD_FILTER, keywordFilter)
+        reloadServerList()
     }
 
     private val mMsgReceiver = object : BroadcastReceiver() {

@@ -18,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
@@ -232,7 +233,25 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-        return true
+
+        val searchItem = menu.findItem(R.id.search_view)
+        if (searchItem != null) {
+            val searchView = searchItem.actionView as SearchView
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    mainViewModel.filterConfig(query.orEmpty())
+                    return false
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean = false
+            })
+
+            searchView.setOnCloseListener {
+                mainViewModel.filterConfig("")
+                false
+            }
+        }
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
