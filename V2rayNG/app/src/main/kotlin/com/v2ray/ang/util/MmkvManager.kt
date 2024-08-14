@@ -147,7 +147,7 @@ object MmkvManager {
         }
         val uri = URI(Utils.fixIllegalUrl(url))
         val subItem = SubscriptionItem()
-        subItem.remarks = Utils.urlDecode(uri.fragment ?: "import sub")
+        subItem.remarks = uri.fragment ?: "import sub"
         subItem.url = url
         subStorage?.encode(Utils.getUuid(), Gson().toJson(subItem))
         return 1

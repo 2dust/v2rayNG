@@ -22,7 +22,7 @@ class UrlSchemeActivity : BaseActivity() {
                 if (action == Intent.ACTION_SEND) {
                     if ("text/plain" == type) {
                         intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-                            parseUri(it)
+                            parseUri(it, null)
                         }
                     }
                 } else if (action == Intent.ACTION_VIEW) {
@@ -30,13 +30,13 @@ class UrlSchemeActivity : BaseActivity() {
                         "install-config" -> {
                             val uri: Uri? = intent.data
                             val shareUrl = uri?.getQueryParameter("url") ?: ""
-                            parseUri(shareUrl)
+                            parseUri(shareUrl, uri?.fragment)
                         }
 
                         "install-sub" -> {
                             val uri: Uri? = intent.data
                             val shareUrl = uri?.getQueryParameter("url") ?: ""
-                            parseUri(shareUrl)
+                            parseUri(shareUrl, uri?.fragment)
                         }
 
                         else -> {
@@ -53,15 +53,19 @@ class UrlSchemeActivity : BaseActivity() {
         }
     }
 
-    private fun parseUri(uriString: String?) {
+    private fun parseUri(uriString: String?, fragment: String?) {
         if (uriString.isNullOrEmpty()) {
             return
         }
         Log.d("UrlScheme", uriString)
 
-        val decodedUrl = URLDecoder.decode(uriString, "UTF-8")
+        var decodedUrl = URLDecoder.decode(uriString, "UTF-8")
         val uri = Uri.parse(decodedUrl)
         if (uri != null) {
+            if (uri.fragment.isNullOrEmpty() && !fragment.isNullOrEmpty()) {
+                decodedUrl += "#${fragment}"
+            }
+            Log.d("UrlScheme-decodedUrl", decodedUrl)
             val (count, countSub) = AngConfigManager.importBatchConfig(decodedUrl, "", false)
             if (count + countSub > 0) {
                 toast(R.string.import_subscription_success)
