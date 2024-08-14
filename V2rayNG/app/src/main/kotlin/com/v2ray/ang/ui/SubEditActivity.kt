@@ -5,22 +5,17 @@ import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequest
-import androidx.work.multiprocess.RemoteWorkManager
+import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
-import com.v2ray.ang.AngApplication
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubEditBinding
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.service.SubscriptionUpdater
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SubEditActivity : BaseActivity() {
     private val binding by lazy {ActivitySubEditBinding.inflate(layoutInflater)}
@@ -106,8 +101,12 @@ class SubEditActivity : BaseActivity() {
         if (editSubId.isNotEmpty()) {
             AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                        MmkvManager.removeSubscription(editSubId)
-                        finish()
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            MmkvManager.removeSubscription(editSubId)
+                            launch(Dispatchers.Main) {
+                                finish()
+                            }
+                        }
                     }
                     .setNegativeButton(android.R.string.no) {_, _ ->
                         // do nothing

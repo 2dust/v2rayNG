@@ -173,27 +173,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun exportAllServer() {
-        viewModelScope.launch(Dispatchers.Default) {
-            val serverListCopy =
-                if (subscriptionId.isNullOrEmpty()) {
-                    serverList
-                } else {
-                    serversCache.map { it.guid }.toList()
-                }
-
-            val ret = AngConfigManager.shareNonCustomConfigsToClipboard(
-                getApplication<AngApplication>(),
-                serverListCopy
-            )
-            launch(Dispatchers.Main) {
-                if (ret == 0)
-                    getApplication<AngApplication>().toast(R.string.toast_success)
-                else
-                    getApplication<AngApplication>().toast(R.string.toast_failure)
+    fun exportAllServer() : Int {
+        val serverListCopy =
+            if (subscriptionId.isNullOrEmpty()) {
+                serverList
+            } else {
+                serversCache.map { it.guid }.toList()
             }
-        }
+
+        val ret = AngConfigManager.shareNonCustomConfigsToClipboard(
+            getApplication<AngApplication>(),
+            serverListCopy
+        )
+        return ret
     }
+
 
     fun testAllTcping() {
         tcpingTestScope.coroutineContext[Job]?.cancelChildren()
@@ -279,81 +273,56 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return -1
     }
 
-    fun removeDuplicateServer() {
-        viewModelScope.launch(Dispatchers.Default) {
-            val serversCacheCopy = mutableListOf<Pair<String, ServerConfig>>()
-            for (it in serversCache) {
-                val config = MmkvManager.decodeServerConfig(it.guid) ?: continue
-                serversCacheCopy.add(Pair(it.guid, config))
-            }
+    fun removeDuplicateServer() : Int {
+        val serversCacheCopy = mutableListOf<Pair<String, ServerConfig>>()
+        for (it in serversCache) {
+            val config = MmkvManager.decodeServerConfig(it.guid) ?: continue
+            serversCacheCopy.add(Pair(it.guid, config))
+        }
 
-            val deleteServer = mutableListOf<String>()
-            serversCacheCopy.forEachIndexed { index, it ->
-                val outbound = it.second.getProxyOutbound()
-                serversCacheCopy.forEachIndexed { index2, it2 ->
-                    if (index2 > index) {
-                        val outbound2 = it2.second.getProxyOutbound()
-                        if (outbound == outbound2 && !deleteServer.contains(it2.first)) {
-                            deleteServer.add(it2.first)
-                        }
+        val deleteServer = mutableListOf<String>()
+        serversCacheCopy.forEachIndexed { index, it ->
+            val outbound = it.second.getProxyOutbound()
+            serversCacheCopy.forEachIndexed { index2, it2 ->
+                if (index2 > index) {
+                    val outbound2 = it2.second.getProxyOutbound()
+                    if (outbound == outbound2 && !deleteServer.contains(it2.first)) {
+                        deleteServer.add(it2.first)
                     }
                 }
             }
-            for (it in deleteServer) {
-                MmkvManager.removeServer(it)
-            }
-            launch(Dispatchers.Main) {
-                reloadServerList()
-                getApplication<AngApplication>().toast(
-                    getApplication<AngApplication>().getString(
-                        R.string.title_del_duplicate_config_count,
-                        deleteServer.count()
-                    )
-                )
-            }
-
         }
+        for (it in deleteServer) {
+            MmkvManager.removeServer(it)
+        }
+
+        return deleteServer.count()
     }
 
     fun removeAllServer() {
-        viewModelScope.launch(Dispatchers.Default) {
-            if (subscriptionId.isNullOrEmpty()) {
-                MmkvManager.removeAllServer()
-            } else {
-                val serversCopy = serversCache.toList()
-                for (item in serversCopy) {
-                    MmkvManager.removeServer(item.guid)
-                }
-            }
-            launch(Dispatchers.Main) {
-                reloadServerList()
+        if (subscriptionId.isNullOrEmpty()) {
+            MmkvManager.removeAllServer()
+        } else {
+            val serversCopy = serversCache.toList()
+            for (item in serversCopy) {
+                MmkvManager.removeServer(item.guid)
             }
         }
     }
 
     fun removeInvalidServer() {
-        viewModelScope.launch(Dispatchers.Default) {
-            if (subscriptionId.isNullOrEmpty()) {
-                MmkvManager.removeInvalidServer("")
-            } else {
-                val serversCopy = serversCache.toList()
-                for (item in serversCopy) {
-                    MmkvManager.removeInvalidServer(item.guid)
-                }
-            }
-            launch(Dispatchers.Main) {
-                reloadServerList()
+        if (subscriptionId.isNullOrEmpty()) {
+            MmkvManager.removeInvalidServer("")
+        } else {
+            val serversCopy = serversCache.toList()
+            for (item in serversCopy) {
+                MmkvManager.removeInvalidServer(item.guid)
             }
         }
     }
 
     fun sortByTestResults() {
-        viewModelScope.launch(Dispatchers.Default) {
-            MmkvManager.sortByTestResults()
-            launch(Dispatchers.Main) {
-                reloadServerList()
-            }
-        }
+        MmkvManager.sortByTestResults()
     }
 
 
