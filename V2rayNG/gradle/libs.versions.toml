@@ -24,7 +24,7 @@ rxjava = "3.1.8"
 rxpermissions = "0.12"
 toastcompat = "1.1.0"
 viewpager2 = "1.1.0"
-workRuntimeKtx = "2.8.1"
+workRuntimeKtx = "2.9.1"
 
 [libraries]
 activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
