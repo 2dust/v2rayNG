@@ -3,21 +3,30 @@ package com.v2ray.ang
 import android.content.Context
 import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.util.Utils
 
-class AngApplication : MultiDexApplication(), Configuration.Provider {
-    companion object {
+class AngApplication : MultiDexApplication()
+{
+    companion object
+    {
         //const val PREF_LAST_VERSION = "pref_last_version"
         lateinit var application: AngApplication
     }
 
-    override fun attachBaseContext(base: Context?) {
+    override fun attachBaseContext(base: Context?)
+    {
         super.attachBaseContext(base)
         application = this
     }
 
-    override fun onCreate() {
+    private val workManagerConfiguration: Configuration = Configuration.Builder()
+        .setDefaultProcessName("${BuildConfig.APPLICATION_ID}:bg")
+        .build()
+
+    override fun onCreate()
+    {
         super.onCreate()
 
 //        LeakCanary.install(this)
@@ -31,11 +40,7 @@ class AngApplication : MultiDexApplication(), Configuration.Provider {
         MMKV.initialize(this)
 
         Utils.setNightMode(application)
-    }
-
-    override fun getWorkManagerConfiguration(): Configuration {
-        return Configuration.Builder()
-            .setDefaultProcessName("${BuildConfig.APPLICATION_ID}:bg")
-            .build()
+        // Initialize WorkManager with the custom configuration
+        WorkManager.initialize(this, workManagerConfiguration)
     }
 }
