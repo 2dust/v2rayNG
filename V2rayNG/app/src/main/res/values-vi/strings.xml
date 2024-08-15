@@ -36,6 +36,7 @@
     <string name="menu_item_import_config_custom_url">Nhập cấu hình tùy chỉnh từ URL</string>
     <string name="menu_item_import_config_custom_url_scan">Nhập cấu hình tùy chỉnh quét URL</string>
     <string name="del_config_comfirm">Xác nhận xóa?</string>
+    <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
     <string name="server_lab_remarks">Tên cấu hình</string>
     <string name="server_lab_address">Địa chỉ</string>
     <string name="server_lab_port">Cổng</string>

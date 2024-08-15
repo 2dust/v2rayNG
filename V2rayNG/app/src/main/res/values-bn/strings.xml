@@ -37,6 +37,7 @@
     <string name="menu_item_import_config_custom_url">URL থেকে কাস্টম কনফিগারেশন আমদানি করুন</string>
     <string name="menu_item_import_config_custom_url_scan">কাস্টম কনফিগারেশন স্ক্যান URL আমদানি করুন</string>
     <string name="del_config_comfirm">মুছে ফেলুন নিশ্চিত করুন？</string>
+    <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
     <string name="server_lab_remarks">মন্তব্য</string>
     <string name="server_lab_address">ঠিকানা</string>
     <string name="server_lab_port">পোর্ট</string>

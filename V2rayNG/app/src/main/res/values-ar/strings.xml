@@ -37,6 +37,7 @@
     <string name="menu_item_import_config_custom_url">استيراد تكوين مخصص من عنوان URL</string>
     <string name="menu_item_import_config_custom_url_scan">استيراد تكوين مخصص مسح عنوان URL</string>
     <string name="del_config_comfirm">تأكيد الحذف؟</string>
+    <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
     <string name="server_lab_remarks">ملاحظات</string>
     <string name="server_lab_address">العنوان</string>
     <string name="server_lab_port">المنفذ</string>
