@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.blacksquircle.ui.editorkit.utils.EditorTheme
 import com.blacksquircle.ui.language.json.JsonLanguage
-import com.google.gson.*
+import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityServerCustomConfigBinding
@@ -89,7 +89,7 @@ class ServerCustomConfigActivity : BaseActivity() {
         }
 
         val config = MmkvManager.decodeServerConfig(editGuid) ?: ServerConfig.create(EConfigType.CUSTOM)
-        config.remarks = v2rayConfig.remarks ?: binding.etRemarks.text.toString().trim()
+        config.remarks = if (binding.etRemarks.text.isNullOrEmpty()) v2rayConfig.remarks.orEmpty() else binding.etRemarks.text.toString()
         config.fullConfig = v2rayConfig
 
         MmkvManager.encodeServerConfig(editGuid, config)
