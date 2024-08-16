@@ -16,6 +16,7 @@ import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 import java.io.IOException
 import java.util.LinkedHashSet
@@ -44,8 +45,10 @@ class LogcatActivity : BaseActivity() {
                     val lst = LinkedHashSet<String>()
                     lst.add("logcat")
                     lst.add("-c")
-                    val process = Runtime.getRuntime().exec(lst.toTypedArray())
-                    process.waitFor()
+                    withContext(Dispatchers.IO) {
+                        val process = Runtime.getRuntime().exec(lst.toTypedArray())
+                        process.waitFor()
+                    }
                 }
                 val lst = LinkedHashSet<String>()
                 lst.add("logcat")
