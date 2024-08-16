@@ -67,7 +67,7 @@ object ShadowsocksFmt {
     private fun tryResolveResolveSip002(str: String, config: ServerConfig): Boolean {
         try {
             val uri = URI(Utils.fixIllegalUrl(str))
-            config.remarks = Utils.urlDecode(uri.fragment ?: "")
+            config.remarks = Utils.urlDecode(uri.fragment .orEmpty())
 
             val method: String
             val password: String
@@ -88,7 +88,7 @@ object ShadowsocksFmt {
                 password = base64Decode.substringAfter(":")
             }
 
-            val query = Utils.urlDecode(uri.query ?: "")
+            val query = Utils.urlDecode(uri.query .orEmpty())
             if (query != "") {
                 val queryPairs = HashMap<String, String>()
                 val pairs = query.split(";")
@@ -137,7 +137,7 @@ object ShadowsocksFmt {
                 }
                 if ("tls" in queryPairs) {
                     config.outboundBean?.streamSettings?.populateTlsSettings(
-                        "tls", false, sni ?: "", null, null, null, null, null
+                        "tls", false, sni .orEmpty(), null, null, null, null, null
                     )
                 }
 

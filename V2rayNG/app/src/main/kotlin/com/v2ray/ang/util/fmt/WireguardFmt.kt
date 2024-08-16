@@ -13,7 +13,7 @@ object WireguardFmt {
         val uri = URI(Utils.fixIllegalUrl(str))
         if (uri.rawQuery != null) {
             val config = ServerConfig.create(EConfigType.WIREGUARD)
-            config.remarks = Utils.urlDecode(uri.fragment ?: "")
+            config.remarks = Utils.urlDecode(uri.fragment .orEmpty())
 
             val queryParam = uri.rawQuery.split("&")
                 .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
@@ -24,7 +24,7 @@ object WireguardFmt {
                     (queryParam["address"]
                         ?: AppConfig.WIREGUARD_LOCAL_ADDRESS_V4).removeWhiteSpace()
                         .split(",")
-                wireguard.peers?.get(0)?.publicKey = queryParam["publickey"] ?: ""
+                wireguard.peers?.get(0)?.publicKey = queryParam["publickey"] .orEmpty()
                 wireguard.peers?.get(0)?.endpoint =
                     Utils.getIpv6Address(uri.idnHost) + ":${uri.port}"
                 wireguard.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)

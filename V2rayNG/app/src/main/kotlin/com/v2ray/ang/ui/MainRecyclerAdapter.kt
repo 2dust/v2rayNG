@@ -61,7 +61,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
 
             holder.itemMainBinding.tvName.text = profile.remarks
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
-            holder.itemMainBinding.tvTestResult.text = aff?.getTestDelayString() ?: ""
+            holder.itemMainBinding.tvTestResult.text = aff?.getTestDelayString() .orEmpty()
             if ((aff?.testDelayMillis ?: 0L) < 0L) {
                 holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(mActivity, R.color.colorPingRed))
             } else {
@@ -95,7 +95,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 }
             }
 
-            val strState = "${profile?.server?.dropLast(3)}*** : ${profile?.serverPort ?: ""}"
+            val strState = "${profile?.server?.dropLast(3)}*** : ${profile?.serverPort .orEmpty()}"
 
             holder.itemMainBinding.tvStatistics.text = strState
 

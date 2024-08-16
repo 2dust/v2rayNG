@@ -249,14 +249,14 @@ data class V2rayConfig(
                             tcpSetting.header.type = HTTP
                             if (!TextUtils.isEmpty(host) || !TextUtils.isEmpty(path)) {
                                 val requestObj = TcpSettingsBean.HeaderBean.RequestBean()
-                                requestObj.headers.Host = (host ?: "").split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                                requestObj.path = (path ?: "").split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                                requestObj.headers.Host = (host .orEmpty()).split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                                requestObj.path = (path .orEmpty()).split(",").map { it.trim() }.filter { it.isNotEmpty() }
                                 tcpSetting.header.request = requestObj
                                 sni = requestObj.headers.Host?.getOrNull(0) ?: sni
                             }
                         } else {
                             tcpSetting.header.type = "none"
-                            sni = host ?: ""
+                            sni = host .orEmpty()
                         }
                         tcpSettings = tcpSetting
                     }
@@ -272,21 +272,21 @@ data class V2rayConfig(
                     }
                     "ws" -> {
                         val wssetting = WsSettingsBean()
-                        wssetting.headers.Host = host ?: ""
+                        wssetting.headers.Host = host .orEmpty()
                         sni = wssetting.headers.Host
                         wssetting.path = path ?: "/"
                         wsSettings = wssetting
                     }
                     "httpupgrade" -> {
                         val httpupgradeSetting = HttpupgradeSettingsBean()
-                        httpupgradeSetting.host = host ?: ""
+                        httpupgradeSetting.host = host .orEmpty()
                         sni = httpupgradeSetting.host
                         httpupgradeSetting.path = path ?: "/"
                         httpupgradeSettings = httpupgradeSetting
                     }
                     "splithttp" -> {
                         val splithttpSetting = SplithttpSettingsBean()
-                        splithttpSetting.host = host ?: ""
+                        splithttpSetting.host = host .orEmpty()
                         sni = splithttpSetting.host
                         splithttpSetting.path = path ?: "/"
                         splithttpSettings = splithttpSetting
@@ -294,7 +294,7 @@ data class V2rayConfig(
                     "h2", "http" -> {
                         network = "h2"
                         val h2Setting = HttpSettingsBean()
-                        h2Setting.host = (host ?: "").split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                        h2Setting.host = (host .orEmpty()).split(",").map { it.trim() }.filter { it.isNotEmpty() }
                         sni = h2Setting.host.getOrNull(0) ?: sni
                         h2Setting.path = path ?: "/"
                         httpSettings = h2Setting
@@ -302,18 +302,18 @@ data class V2rayConfig(
                     "quic" -> {
                         val quicsetting = QuicSettingBean()
                         quicsetting.security = quicSecurity ?: "none"
-                        quicsetting.key = key ?: ""
+                        quicsetting.key = key .orEmpty()
                         quicsetting.header.type = headerType ?: "none"
                         quicSettings = quicsetting
                     }
                     "grpc" -> {
                         val grpcSetting = GrpcSettingsBean()
                         grpcSetting.multiMode = mode == "multi"
-                        grpcSetting.serviceName = serviceName ?: ""
-                        grpcSetting.authority = authority ?: ""
+                        grpcSetting.serviceName = serviceName .orEmpty()
+                        grpcSetting.authority = authority .orEmpty()
                         grpcSetting.idle_timeout = 60
                         grpcSetting.health_check_timeout = 20
-                        sni = authority ?: ""
+                        sni = authority .orEmpty()
                         grpcSettings = grpcSetting
                     }
                 }
@@ -451,7 +451,7 @@ data class V2rayConfig(
                     "grpc" -> {
                         val grpcSetting = streamSettings?.grpcSettings ?: return null
                         listOf(if (grpcSetting.multiMode == true) "multi" else "gun",
-                                grpcSetting.authority ?: "",
+                                grpcSetting.authority .orEmpty(),
                                 grpcSetting.serviceName)
                     }
                     else -> null

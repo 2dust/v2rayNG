@@ -30,13 +30,13 @@ object VlessFmt {
 
         val streamSetting = config.outboundBean?.streamSettings ?: return null
 
-        config.remarks = Utils.urlDecode(uri.fragment ?: "")
+        config.remarks = Utils.urlDecode(uri.fragment .orEmpty())
         config.outboundBean.settings?.vnext?.get(0)?.let { vnext ->
             vnext.address = uri.idnHost
             vnext.port = uri.port
             vnext.users[0].id = uri.userInfo
             vnext.users[0].encryption = queryParam["encryption"] ?: "none"
-            vnext.users[0].flow = queryParam["flow"] ?: ""
+            vnext.users[0].flow = queryParam["flow"] .orEmpty()
         }
 
         val sni = streamSetting.populateTransportSettings(
@@ -51,16 +51,16 @@ object VlessFmt {
             queryParam["serviceName"],
             queryParam["authority"]
         )
-        allowInsecure = if ((queryParam["allowInsecure"] ?: "") == "1") true else allowInsecure
+        allowInsecure = if ((queryParam["allowInsecure"] .orEmpty()) == "1") true else allowInsecure
         streamSetting.populateTlsSettings(
-            queryParam["security"] ?: "",
+            queryParam["security"] .orEmpty(),
             allowInsecure,
             queryParam["sni"] ?: sni,
-            queryParam["fp"] ?: "",
+            queryParam["fp"] .orEmpty(),
             queryParam["alpn"],
-            queryParam["pbk"] ?: "",
-            queryParam["sid"] ?: "",
-            queryParam["spx"] ?: ""
+            queryParam["pbk"] .orEmpty(),
+            queryParam["sid"] .orEmpty(),
+            queryParam["spx"] .orEmpty()
         )
 
         return config
@@ -93,16 +93,16 @@ object VlessFmt {
                     Utils.removeWhiteSpace(tlsSetting.alpn.joinToString()).orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.fingerprint)) {
-                dicQuery["fp"] = tlsSetting.fingerprint ?: ""
+                dicQuery["fp"] = tlsSetting.fingerprint .orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.publicKey)) {
-                dicQuery["pbk"] = tlsSetting.publicKey ?: ""
+                dicQuery["pbk"] = tlsSetting.publicKey .orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.shortId)) {
-                dicQuery["sid"] = tlsSetting.shortId ?: ""
+                dicQuery["sid"] = tlsSetting.shortId .orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.spiderX)) {
-                dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX ?: "")
+                dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX .orEmpty())
             }
         }
         dicQuery["type"] =

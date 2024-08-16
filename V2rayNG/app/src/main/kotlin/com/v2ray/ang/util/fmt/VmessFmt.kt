@@ -121,7 +121,7 @@ object VmessFmt {
 
         val streamSetting = config.outboundBean?.streamSettings ?: return null
 
-        config.remarks = Utils.urlDecode(uri.fragment ?: "")
+        config.remarks = Utils.urlDecode(uri.fragment .orEmpty())
         config.outboundBean.settings?.vnext?.get(0)?.let { vnext ->
             vnext.address = uri.idnHost
             vnext.port = uri.port
@@ -143,12 +143,12 @@ object VmessFmt {
             queryParam["authority"]
         )
 
-        allowInsecure = if ((queryParam["allowInsecure"] ?: "") == "1") true else allowInsecure
+        allowInsecure = if ((queryParam["allowInsecure"] .orEmpty()) == "1") true else allowInsecure
         streamSetting.populateTlsSettings(
-            queryParam["security"] ?: "",
+            queryParam["security"] .orEmpty(),
             allowInsecure,
             queryParam["sni"] ?: sni,
-            queryParam["fp"] ?: "",
+            queryParam["fp"] .orEmpty(),
             queryParam["alpn"],
             null,
             null,

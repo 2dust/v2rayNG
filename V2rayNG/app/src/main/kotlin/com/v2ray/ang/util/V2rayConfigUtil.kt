@@ -188,25 +188,25 @@ object V2rayConfigUtil {
 
             routingUserRule(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
-                    ?: "", TAG_BLOCKED, v2rayConfig
+                    .orEmpty(), TAG_BLOCKED, v2rayConfig
             )
             if (routingMode == ERoutingMode.GLOBAL_DIRECT.value) {
                 routingUserRule(
                     settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                        ?: "", TAG_DIRECT, v2rayConfig
+                        .orEmpty(), TAG_DIRECT, v2rayConfig
                 )
                 routingUserRule(
                     settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                        ?: "", TAG_PROXY, v2rayConfig
+                        .orEmpty(), TAG_PROXY, v2rayConfig
                 )
             } else {
                 routingUserRule(
                     settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                        ?: "", TAG_PROXY, v2rayConfig
+                        .orEmpty(), TAG_PROXY, v2rayConfig
                 )
                 routingUserRule(
                     settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                        ?: "", TAG_DIRECT, v2rayConfig
+                        .orEmpty(), TAG_DIRECT, v2rayConfig
                 )
             }
 
@@ -352,11 +352,11 @@ object V2rayConfigUtil {
                 val geositeCn = arrayListOf("geosite:cn")
                 val proxyDomain = userRule2Domain(
                     settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                        ?: ""
+                        .orEmpty()
                 )
                 val directDomain = userRule2Domain(
                     settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                        ?: ""
+                        .orEmpty()
                 )
                 // fakedns with all domains to make it always top priority
                 v2rayConfig.dns.servers?.add(
@@ -430,7 +430,7 @@ object V2rayConfigUtil {
             val remoteDns = Utils.getRemoteDnsServers()
             val proxyDomain = userRule2Domain(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                    ?: ""
+                    .orEmpty()
             )
             remoteDns.forEach {
                 servers.add(it)
@@ -450,7 +450,7 @@ object V2rayConfigUtil {
             val domesticDns = Utils.getDomesticDnsServers()
             val directDomain = userRule2Domain(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                    ?: ""
+                    .orEmpty()
             )
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
                 ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
@@ -494,7 +494,7 @@ object V2rayConfigUtil {
             //block dns
             val blkDomain = userRule2Domain(
                 settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
-                    ?: ""
+                    .orEmpty()
             )
             if (blkDomain.size > 0) {
                 hosts.putAll(blkDomain.map { it to "127.0.0.1" })
