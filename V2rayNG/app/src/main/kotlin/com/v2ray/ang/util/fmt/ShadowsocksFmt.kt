@@ -137,7 +137,7 @@ object ShadowsocksFmt {
                 }
                 if ("tls" in queryPairs) {
                     config.outboundBean?.streamSettings?.populateTlsSettings(
-                        "tls", false, sni .orEmpty(), null, null, null, null, null
+                        "tls", false, sni.orEmpty(), null, null, null, null, null
                     )
                 }
 

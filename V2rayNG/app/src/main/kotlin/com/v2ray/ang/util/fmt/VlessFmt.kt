@@ -36,7 +36,7 @@ object VlessFmt {
             vnext.port = uri.port
             vnext.users[0].id = uri.userInfo
             vnext.users[0].encryption = queryParam["encryption"] ?: "none"
-            vnext.users[0].flow = queryParam["flow"] .orEmpty()
+            vnext.users[0].flow = queryParam["flow"].orEmpty()
         }
 
         val sni = streamSetting.populateTransportSettings(
@@ -53,14 +53,14 @@ object VlessFmt {
         )
         allowInsecure = if ((queryParam["allowInsecure"] .orEmpty()) == "1") true else allowInsecure
         streamSetting.populateTlsSettings(
-            queryParam["security"] .orEmpty(),
+            queryParam["security"].orEmpty(),
             allowInsecure,
             queryParam["sni"] ?: sni,
-            queryParam["fp"] .orEmpty(),
+            queryParam["fp"].orEmpty(),
             queryParam["alpn"],
-            queryParam["pbk"] .orEmpty(),
-            queryParam["sid"] .orEmpty(),
-            queryParam["spx"] .orEmpty()
+            queryParam["pbk"].orEmpty(),
+            queryParam["sid"].orEmpty(),
+            queryParam["spx"].orEmpty()
         )
 
         return config
@@ -93,13 +93,13 @@ object VlessFmt {
                     Utils.removeWhiteSpace(tlsSetting.alpn.joinToString()).orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.fingerprint)) {
-                dicQuery["fp"] = tlsSetting.fingerprint .orEmpty()
+                dicQuery["fp"] = tlsSetting.fingerprint.orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.publicKey)) {
-                dicQuery["pbk"] = tlsSetting.publicKey .orEmpty()
+                dicQuery["pbk"] = tlsSetting.publicKey.orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.shortId)) {
-                dicQuery["sid"] = tlsSetting.shortId .orEmpty()
+                dicQuery["sid"] = tlsSetting.shortId.orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.spiderX)) {
                 dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX .orEmpty())

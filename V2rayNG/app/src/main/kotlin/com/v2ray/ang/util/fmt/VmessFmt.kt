@@ -145,10 +145,10 @@ object VmessFmt {
 
         allowInsecure = if ((queryParam["allowInsecure"] .orEmpty()) == "1") true else allowInsecure
         streamSetting.populateTlsSettings(
-            queryParam["security"] .orEmpty(),
+            queryParam["security"].orEmpty(),
             allowInsecure,
             queryParam["sni"] ?: sni,
-            queryParam["fp"] .orEmpty(),
+            queryParam["fp"].orEmpty(),
             queryParam["alpn"],
             null,
             null,

@@ -434,7 +434,7 @@ object AngConfigManager {
             val removedSelectedServer =
                 if (!TextUtils.isEmpty(subid) && !append) {
                     MmkvManager.decodeServerConfig(
-                        mainStorage?.decodeString(KEY_SELECTED_SERVER) .orEmpty()
+                        mainStorage?.decodeString(KEY_SELECTED_SERVER).orEmpty()
                     )?.let {
                         if (it.subscriptionId == subid) {
                             return@let it

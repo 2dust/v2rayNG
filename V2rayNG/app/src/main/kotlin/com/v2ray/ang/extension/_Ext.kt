@@ -54,7 +54,7 @@ val URLConnection.responseLength: Long
     }
 
 val URI.idnHost: String
-    get() = host?.replace("[", "")?.replace("]", "") .orEmpty()
+    get() = host?.replace("[", "")?.replace("]", "").orEmpty()
 
 fun String.removeWhiteSpace(): String = replace("\\s+".toRegex(), "")
 

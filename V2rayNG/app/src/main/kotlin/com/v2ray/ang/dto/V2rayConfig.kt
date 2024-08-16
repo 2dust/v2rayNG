@@ -256,7 +256,7 @@ data class V2rayConfig(
                             }
                         } else {
                             tcpSetting.header.type = "none"
-                            sni = host .orEmpty()
+                            sni = host.orEmpty()
                         }
                         tcpSettings = tcpSetting
                     }
@@ -272,21 +272,21 @@ data class V2rayConfig(
                     }
                     "ws" -> {
                         val wssetting = WsSettingsBean()
-                        wssetting.headers.Host = host .orEmpty()
+                        wssetting.headers.Host = host.orEmpty()
                         sni = wssetting.headers.Host
                         wssetting.path = path ?: "/"
                         wsSettings = wssetting
                     }
                     "httpupgrade" -> {
                         val httpupgradeSetting = HttpupgradeSettingsBean()
-                        httpupgradeSetting.host = host .orEmpty()
+                        httpupgradeSetting.host = host.orEmpty()
                         sni = httpupgradeSetting.host
                         httpupgradeSetting.path = path ?: "/"
                         httpupgradeSettings = httpupgradeSetting
                     }
                     "splithttp" -> {
                         val splithttpSetting = SplithttpSettingsBean()
-                        splithttpSetting.host = host .orEmpty()
+                        splithttpSetting.host = host.orEmpty()
                         sni = splithttpSetting.host
                         splithttpSetting.path = path ?: "/"
                         splithttpSettings = splithttpSetting
@@ -302,18 +302,18 @@ data class V2rayConfig(
                     "quic" -> {
                         val quicsetting = QuicSettingBean()
                         quicsetting.security = quicSecurity ?: "none"
-                        quicsetting.key = key .orEmpty()
+                        quicsetting.key = key.orEmpty()
                         quicsetting.header.type = headerType ?: "none"
                         quicSettings = quicsetting
                     }
                     "grpc" -> {
                         val grpcSetting = GrpcSettingsBean()
                         grpcSetting.multiMode = mode == "multi"
-                        grpcSetting.serviceName = serviceName .orEmpty()
-                        grpcSetting.authority = authority .orEmpty()
+                        grpcSetting.serviceName = serviceName.orEmpty()
+                        grpcSetting.authority = authority.orEmpty()
                         grpcSetting.idle_timeout = 60
                         grpcSetting.health_check_timeout = 20
-                        sni = authority .orEmpty()
+                        sni = authority.orEmpty()
                         grpcSettings = grpcSetting
                     }
                 }
@@ -451,7 +451,7 @@ data class V2rayConfig(
                     "grpc" -> {
                         val grpcSetting = streamSettings?.grpcSettings ?: return null
                         listOf(if (grpcSetting.multiMode == true) "multi" else "gun",
-                                grpcSetting.authority .orEmpty(),
+                                grpcSetting.authority.orEmpty(),
                                 grpcSetting.serviceName)
                     }
                     else -> null

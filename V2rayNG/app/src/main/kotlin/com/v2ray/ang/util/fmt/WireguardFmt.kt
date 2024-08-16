@@ -24,7 +24,7 @@ object WireguardFmt {
                     (queryParam["address"]
                         ?: AppConfig.WIREGUARD_LOCAL_ADDRESS_V4).removeWhiteSpace()
                         .split(",")
-                wireguard.peers?.get(0)?.publicKey = queryParam["publickey"] .orEmpty()
+                wireguard.peers?.get(0)?.publicKey = queryParam["publickey"].orEmpty()
                 wireguard.peers?.get(0)?.endpoint =
                     Utils.getIpv6Address(uri.idnHost) + ":${uri.port}"
                 wireguard.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
