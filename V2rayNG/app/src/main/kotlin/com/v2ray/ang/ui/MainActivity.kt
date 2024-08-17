@@ -236,12 +236,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         if (searchItem != null) {
             val searchView = searchItem.actionView as SearchView
             searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    mainViewModel.filterConfig(query.orEmpty())
+                override fun onQueryTextSubmit(query: String?): Boolean = false
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    mainViewModel.filterConfig(newText.orEmpty())
                     return false
                 }
-
-                override fun onQueryTextChange(newText: String?): Boolean = false
             })
 
             searchView.setOnCloseListener {

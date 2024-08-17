@@ -46,7 +46,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var subscriptionId: String = MmkvManager.settingsStorage.decodeString(AppConfig.CACHE_SUBSCRIPTION_ID, "").orEmpty()
 
     //var keywordFilter: String = MmkvManager.settingsStorage.decodeString(AppConfig.CACHE_KEYWORD_FILTER, "")?:""
-    private var keywordFilter = ""
+    var keywordFilter = ""
     val serversCache = mutableListOf<ServersCache>()
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
@@ -170,7 +170,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun exportAllServer(): Int {
         val serverListCopy =
-            if (subscriptionId.isNullOrEmpty()) {
+            if (subscriptionId.isNullOrEmpty() && keywordFilter.isNullOrEmpty()) {
                 serverList
             } else {
                 serversCache.map { it.guid }.toList()
@@ -295,7 +295,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeAllServer() {
-        if (subscriptionId.isNullOrEmpty()) {
+        if (subscriptionId.isNullOrEmpty() && keywordFilter.isNullOrEmpty()) {
             MmkvManager.removeAllServer()
         } else {
             val serversCopy = serversCache.toList()
@@ -306,7 +306,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeInvalidServer() {
-        if (subscriptionId.isNullOrEmpty()) {
+        if (subscriptionId.isNullOrEmpty() && keywordFilter.isNullOrEmpty()) {
             MmkvManager.removeInvalidServer("")
         } else {
             val serversCopy = serversCache.toList()
@@ -348,6 +348,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun filterConfig(keyword: String) {
+        if (keyword == keywordFilter) {
+            return
+        }
         keywordFilter = keyword
         MmkvManager.settingsStorage.encode(AppConfig.CACHE_KEYWORD_FILTER, keywordFilter)
         reloadServerList()
