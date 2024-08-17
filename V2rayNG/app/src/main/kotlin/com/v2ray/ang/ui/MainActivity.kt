@@ -199,14 +199,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     fun startV2Ray() {
-        if (isNetworkConnected) {
-            if (MmkvManager.mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
-                return
-            }
-            V2RayServiceManager.startV2Ray(this)
-        } else {
-            ToastCompat.makeText(this, getString(R.string.connection_test_fail), Toast.LENGTH_LONG).show()
+        if (MmkvManager.mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
+            return
         }
+        V2RayServiceManager.startV2Ray(this)
     }
 
     fun restartV2Ray() {
