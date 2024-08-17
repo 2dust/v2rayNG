@@ -68,12 +68,9 @@ android {
                     "universal"
 
                 output.outputFileName = "v2rayNG_${variant.versionName}_${abi}.apk"
-                if(versionCodes.containsKey(abi))
-                {
+                if (versionCodes.containsKey(abi)) {
                     output.versionCodeOverride = (1000000 * versionCodes[abi]!!).plus(variant.versionCode)
-                }
-                else
-                {
+                } else {
                     return@forEach
                 }
             }
@@ -92,7 +89,7 @@ android {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar","*.jar"))))
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar", "*.jar"))))
     testImplementation(libs.junit)
 
     implementation(libs.flexbox)

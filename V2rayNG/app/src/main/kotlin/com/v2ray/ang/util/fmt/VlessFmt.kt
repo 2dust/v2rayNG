@@ -30,7 +30,7 @@ object VlessFmt {
 
         val streamSetting = config.outboundBean?.streamSettings ?: return null
 
-        config.remarks = Utils.urlDecode(uri.fragment .orEmpty())
+        config.remarks = Utils.urlDecode(uri.fragment.orEmpty())
         config.outboundBean.settings?.vnext?.get(0)?.let { vnext ->
             vnext.address = uri.idnHost
             vnext.port = uri.port
@@ -51,7 +51,7 @@ object VlessFmt {
             queryParam["serviceName"],
             queryParam["authority"]
         )
-        allowInsecure = if ((queryParam["allowInsecure"] .orEmpty()) == "1") true else allowInsecure
+        allowInsecure = if ((queryParam["allowInsecure"].orEmpty()) == "1") true else allowInsecure
         streamSetting.populateTlsSettings(
             queryParam["security"].orEmpty(),
             allowInsecure,
@@ -102,7 +102,7 @@ object VlessFmt {
                 dicQuery["sid"] = tlsSetting.shortId.orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.spiderX)) {
-                dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX .orEmpty())
+                dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX.orEmpty())
             }
         }
         dicQuery["type"] =

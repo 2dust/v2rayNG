@@ -186,7 +186,7 @@
                 android:inputType="text" />
         </LinearLayout>
 
-        <include layout="@layout/tls_layout"  />
+        <include layout="@layout/tls_layout" />
 
         <LinearLayout
             android:layout_width="match_parent"

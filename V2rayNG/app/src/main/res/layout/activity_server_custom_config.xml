@@ -69,11 +69,11 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
             <com.blacksquircle.ui.editorkit.widget.TextProcessor
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="top|start"
-                    android:id="@+id/editor"
-                    android:layout_marginTop="@dimen/layout_margin_top_height" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="top|start"
+                android:id="@+id/editor"
+                android:layout_marginTop="@dimen/layout_margin_top_height" />
         </LinearLayout>
 
     </LinearLayout>

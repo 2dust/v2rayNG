@@ -129,11 +129,11 @@
 
 
             <EditText
-                    android:id="@+id/et_security"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/edit_height"
-                    android:inputType="text"
-                    android:text="none" />
+                android:id="@+id/et_security"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edit_height"
+                android:inputType="text"
+                android:text="none" />
 
         </LinearLayout>
 
@@ -225,7 +225,7 @@
                 android:inputType="text" />
         </LinearLayout>
 
-        <include layout="@layout/tls_layout"  />
+        <include layout="@layout/tls_layout" />
 
         <LinearLayout
             android:layout_width="match_parent"

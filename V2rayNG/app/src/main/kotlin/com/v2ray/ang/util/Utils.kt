@@ -140,7 +140,7 @@ object Utils {
     }
 
     fun getVpnDnsServers(): List<String> {
-        val vpnDns = settingsStorage?.decodeString(AppConfig.PREF_VPN_DNS)?:AppConfig.DNS_VPN
+        val vpnDns = settingsStorage?.decodeString(AppConfig.PREF_VPN_DNS) ?: AppConfig.DNS_VPN
         return vpnDns.split(",").filter { isPureIpAddress(it) }
         // allow empty, in that case dns will use system default
     }
@@ -204,7 +204,8 @@ object Utils {
     }
 
     fun isIpv4Address(value: String): Boolean {
-        val regV4 = Regex("^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$")
+        val regV4 =
+            Regex("^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$")
         return regV4.matches(value)
     }
 
@@ -214,7 +215,8 @@ object Utils {
             addr = addr.drop(1)
             addr = addr.dropLast(addr.count() - addr.lastIndexOf("]"))
         }
-        val regV6 = Regex("^((?:[0-9A-Fa-f]{1,4}))?((?::[0-9A-Fa-f]{1,4}))*::((?:[0-9A-Fa-f]{1,4}))?((?::[0-9A-Fa-f]{1,4}))*|((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4})){7}$")
+        val regV6 =
+            Regex("^((?:[0-9A-Fa-f]{1,4}))?((?::[0-9A-Fa-f]{1,4}))*::((?:[0-9A-Fa-f]{1,4}))?((?::[0-9A-Fa-f]{1,4}))*|((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4})){7}$")
         return regV6.matches(addr)
     }
 
@@ -300,8 +302,7 @@ object Utils {
      * readTextFromAssets
      */
     fun readTextFromAssets(context: Context?, fileName: String): String {
-        if(context == null)
-        {
+        if (context == null) {
             return ""
         }
         val content = context.assets.open(fileName).bufferedReader().use {
@@ -314,7 +315,7 @@ object Utils {
         if (context == null)
             return ""
         val extDir = context.getExternalFilesDir(AppConfig.DIR_ASSETS)
-                ?: return context.getDir(AppConfig.DIR_ASSETS, 0).absolutePath
+            ?: return context.getDir(AppConfig.DIR_ASSETS, 0).absolutePath
         return extDir.absolutePath
     }
 
@@ -370,8 +371,10 @@ object Utils {
         conn.setRequestProperty("Connection", "close")
         conn.setRequestProperty("User-agent", "v2rayNG/${BuildConfig.VERSION_NAME}")
         url.userInfo?.let {
-            conn.setRequestProperty("Authorization",
-                "Basic ${encode(urlDecode(it))}")
+            conn.setRequestProperty(
+                "Authorization",
+                "Basic ${encode(urlDecode(it))}"
+            )
         }
         conn.useCaches = false
         return conn.inputStream.use {
@@ -393,7 +396,7 @@ object Utils {
     }
 
     fun getIpv6Address(address: String?): String {
-        if(address == null){
+        if (address == null) {
             return ""
         }
         return if (isIpv6Address(address) && !address.contains('[') && !address.contains(']')) {
@@ -427,8 +430,8 @@ object Utils {
 
     fun fixIllegalUrl(str: String): String {
         return str
-            .replace(" ","%20")
-            .replace("|","%7C")
+            .replace(" ", "%20")
+            .replace("|", "%7C")
     }
 
     fun removeWhiteSpace(str: String?): String? {

@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class AboutActivity : BaseActivity() {
-    private val binding by lazy {ActivityAboutBinding.inflate(layoutInflater)}
+    private val binding by lazy { ActivityAboutBinding.inflate(layoutInflater) }
     private val extDir by lazy { File(Utils.backupPath(this)) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

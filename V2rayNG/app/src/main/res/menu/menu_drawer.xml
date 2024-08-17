@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group
-        android:id="@+id/group_main">
+    <group android:id="@+id/group_main">
         <item
             android:id="@+id/sub_setting"
             android:icon="@drawable/ic_subscriptions_24dp"
@@ -14,9 +13,9 @@
             android:icon="@drawable/ic_settings_24dp"
             android:title="@string/title_settings" />
         <item
-                android:id="@+id/user_asset_setting"
-                android:icon="@drawable/ic_file_24dp"
-                android:title="@string/title_user_asset_setting" />
+            android:id="@+id/user_asset_setting"
+            android:icon="@drawable/ic_file_24dp"
+            android:title="@string/title_user_asset_setting" />
     </group>
 
     <group android:id="@+id/group_id2">

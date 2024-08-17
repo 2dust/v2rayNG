@@ -4,7 +4,7 @@
     <item
         android:icon="@drawable/ic_add_24dp"
         android:title="@string/menu_item_add_asset"
-        app:showAsAction="ifRoom" >
+        app:showAsAction="ifRoom">
         <menu>
             <item
                 android:id="@+id/add_file"

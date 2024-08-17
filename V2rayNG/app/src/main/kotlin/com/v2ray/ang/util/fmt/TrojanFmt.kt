@@ -19,12 +19,12 @@ object TrojanFmt {
         )
     }
 
-    fun parseTrojan(str: String): ServerConfig? {
+    fun parseTrojan(str: String): ServerConfig {
         var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
         val config = ServerConfig.create(EConfigType.TROJAN)
 
         val uri = URI(Utils.fixIllegalUrl(str))
-        config.remarks = Utils.urlDecode(uri.fragment .orEmpty())
+        config.remarks = Utils.urlDecode(uri.fragment.orEmpty())
 
         var flow = ""
         var fingerprint = config.outboundBean?.streamSettings?.tlsSettings?.fingerprint
@@ -56,7 +56,7 @@ object TrojanFmt {
                 queryParam["authority"]
             )
             fingerprint = queryParam["fp"].orEmpty()
-            allowInsecure = if ((queryParam["allowInsecure"] .orEmpty()) == "1") true else allowInsecure
+            allowInsecure = if ((queryParam["allowInsecure"].orEmpty()) == "1") true else allowInsecure
             config.outboundBean?.streamSettings?.populateTlsSettings(
                 queryParam["security"] ?: V2rayConfig.TLS,
                 allowInsecure,
@@ -111,7 +111,7 @@ object TrojanFmt {
                 dicQuery["sid"] = tlsSetting.shortId.orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.spiderX)) {
-                dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX .orEmpty())
+                dicQuery["spx"] = Utils.urlEncode(tlsSetting.spiderX.orEmpty())
             }
         }
         dicQuery["type"] =

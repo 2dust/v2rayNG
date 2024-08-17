@@ -6,7 +6,7 @@
         android:icon="@drawable/ic_outline_filter_alt_24"
         android:title="@string/menu_item_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
-        app:showAsAction="always|collapseActionView"/>
+        app:showAsAction="always|collapseActionView" />
     <item
         android:icon="@drawable/ic_add_24dp"
         android:title="@string/menu_item_add_config"

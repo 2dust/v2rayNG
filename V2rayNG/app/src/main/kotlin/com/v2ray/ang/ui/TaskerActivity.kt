@@ -1,18 +1,16 @@
 package com.v2ray.ang.ui
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.ListView
-import java.util.ArrayList
-import com.v2ray.ang.R
 import android.content.Intent
+import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.ArrayAdapter
+import android.widget.ListView
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityTaskerBinding
 import com.v2ray.ang.util.MmkvManager
 
@@ -39,8 +37,10 @@ class TaskerActivity : BaseActivity() {
                 lstGuid.add(key)
             }
         }
-        val adapter = ArrayAdapter(this,
-                android.R.layout.simple_list_item_single_choice, lstData)
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_list_item_single_choice, lstData
+        )
         listview = findViewById<View>(R.id.listview) as ListView
         listview?.adapter = adapter
 
@@ -88,7 +88,7 @@ class TaskerActivity : BaseActivity() {
 
         intent.putExtra(AppConfig.TASKER_EXTRA_BUNDLE, extraBundle)
         intent.putExtra(AppConfig.TASKER_EXTRA_STRING_BLURB, blurb)
-        setResult(AppCompatActivity.RESULT_OK, intent)
+        setResult(RESULT_OK, intent)
         finish()
     }
 
@@ -103,10 +103,12 @@ class TaskerActivity : BaseActivity() {
         R.id.del_config -> {
             true
         }
+
         R.id.save_config -> {
             confirmFinish()
             true
         }
+
         else -> super.onOptionsItemSelected(item)
     }
 

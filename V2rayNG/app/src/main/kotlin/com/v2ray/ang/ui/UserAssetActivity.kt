@@ -83,6 +83,7 @@ class UserAssetActivity : BaseActivity() {
             startActivity(intent)
             true
         }
+
         R.id.download_file -> {
             downloadGeoFiles()
             true
@@ -100,24 +101,24 @@ class UserAssetActivity : BaseActivity() {
         RxPermissions(this)
             .request(permission)
             .subscribe {
-            if (it) {
-                val intent = Intent(Intent.ACTION_GET_CONTENT)
-                intent.type = "*/*"
-                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                if (it) {
+                    val intent = Intent(Intent.ACTION_GET_CONTENT)
+                    intent.type = "*/*"
+                    intent.addCategory(Intent.CATEGORY_OPENABLE)
 
-                try {
-                    chooseFile.launch(
-                        Intent.createChooser(
-                            intent,
-                            getString(R.string.title_file_chooser)
+                    try {
+                        chooseFile.launch(
+                            Intent.createChooser(
+                                intent,
+                                getString(R.string.title_file_chooser)
+                            )
                         )
-                    )
-                } catch (ex: android.content.ActivityNotFoundException) {
-                    toast(R.string.toast_require_file_manager)
-                }
-            } else
-                toast(R.string.toast_permission_denied)
-        }
+                    } catch (ex: android.content.ActivityNotFoundException) {
+                        toast(R.string.toast_require_file_manager)
+                    }
+                } else
+                    toast(R.string.toast_permission_denied)
+            }
     }
 
     private val chooseFile =
@@ -237,15 +238,18 @@ class UserAssetActivity : BaseActivity() {
             conn?.disconnect()
         }
     }
+
     private fun addBuiltInGeoItems(assets: List<Pair<String, AssetUrlItem>>): List<Pair<String, AssetUrlItem>> {
         val list = mutableListOf<Pair<String, AssetUrlItem>>()
         builtInGeoFiles
             .filter { geoFile -> assets.none { it.second.remarks == geoFile } }
-            .forEach { 
-                list.add(Utils.getUuid() to AssetUrlItem(
-                    it,
-                    AppConfig.GeoUrl + it
-                ))
+            .forEach {
+                list.add(
+                    Utils.getUuid() to AssetUrlItem(
+                        it,
+                        AppConfig.GeoUrl + it
+                    )
+                )
             }
 
         return list + assets
@@ -257,14 +261,15 @@ class UserAssetActivity : BaseActivity() {
                 ItemRecyclerUserAssetBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
-                    false)
+                    false
+                )
             )
         }
 
         @SuppressLint("SetTextI18n")
         override fun onBindViewHolder(holder: UserAssetViewHolder, position: Int) {
-            var assets = MmkvManager.decodeAssetUrls();
-            assets = addBuiltInGeoItems(assets);
+            var assets = MmkvManager.decodeAssetUrls()
+            assets = addBuiltInGeoItems(assets)
             val item = assets.getOrNull(position) ?: return
 //            file with name == item.second.remarks
             val file = extDir.listFiles()?.find { it.name == item.second.remarks }
@@ -300,8 +305,8 @@ class UserAssetActivity : BaseActivity() {
         }
 
         override fun getItemCount(): Int {
-            var assets = MmkvManager.decodeAssetUrls();
-            assets = addBuiltInGeoItems(assets);
+            var assets = MmkvManager.decodeAssetUrls()
+            assets = addBuiltInGeoItems(assets)
             return assets.size
         }
     }

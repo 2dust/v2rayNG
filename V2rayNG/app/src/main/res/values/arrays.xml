@@ -49,7 +49,7 @@
     <string-array name="mode_type_grpc" translatable="false">
         <item>gun</item>
         <item>multi</item>
- <!--Hide this option until core support it       <item>guna</item>-->
+        <!--Hide this option until core support it       <item>guna</item>-->
     </string-array>
 
     <string-array name="streamsecuritys" translatable="false">

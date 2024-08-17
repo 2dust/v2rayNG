@@ -28,13 +28,14 @@ abstract class BaseActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
             true
         }
+
         else -> super.onOptionsItemSelected(item)
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun attachBaseContext(newBase: Context?) {
         val context = newBase?.let {
-            MyContextWrapper.wrap(newBase,  Utils.getLocale())
+            MyContextWrapper.wrap(newBase, Utils.getLocale())
         }
         super.attachBaseContext(context)
     }

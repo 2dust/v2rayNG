@@ -29,8 +29,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import java.util.concurrent.TimeUnit
 
-class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<MainRecyclerAdapter.BaseViewHolder>()
-        , ItemTouchHelperAdapter {
+class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<MainRecyclerAdapter.BaseViewHolder>(), ItemTouchHelperAdapter {
     companion object {
         private const val VIEW_TYPE_ITEM = 1
         private const val VIEW_TYPE_FOOTER = 2
@@ -95,7 +94,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 }
             }
 
-            val strState = "${profile?.server?.dropLast(3)}*** : ${profile?.serverPort}"
+            val strState = "${profile.server?.dropLast(3)}*** : ${profile.serverPort}"
 
             holder.itemMainBinding.tvStatistics.text = strState
 

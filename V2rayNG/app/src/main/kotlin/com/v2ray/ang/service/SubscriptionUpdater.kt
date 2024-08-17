@@ -21,7 +21,6 @@ import com.v2ray.ang.util.Utils
 object SubscriptionUpdater {
 
 
-
     class UpdateTask(context: Context, params: WorkerParameters) :
         CoroutineWorker(context, params) {
 

@@ -67,7 +67,7 @@ object ShadowsocksFmt {
     private fun tryResolveResolveSip002(str: String, config: ServerConfig): Boolean {
         try {
             val uri = URI(Utils.fixIllegalUrl(str))
-            config.remarks = Utils.urlDecode(uri.fragment .orEmpty())
+            config.remarks = Utils.urlDecode(uri.fragment.orEmpty())
 
             val method: String
             val password: String
@@ -88,7 +88,7 @@ object ShadowsocksFmt {
                 password = base64Decode.substringAfter(":")
             }
 
-            val query = Utils.urlDecode(uri.query .orEmpty())
+            val query = Utils.urlDecode(uri.query.orEmpty())
             if (query != "") {
                 val queryPairs = HashMap<String, String>()
                 val pairs = query.split(";")

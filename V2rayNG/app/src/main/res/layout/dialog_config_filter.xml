@@ -18,7 +18,7 @@
             <Spinner
                 android:id="@+id/sp_subscriptionId"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/edit_height"/>
+                android:layout_height="@dimen/edit_height" />
         </LinearLayout>
 
 

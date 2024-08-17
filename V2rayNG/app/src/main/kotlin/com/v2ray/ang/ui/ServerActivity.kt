@@ -533,16 +533,16 @@ class ServerActivity : BaseActivity() {
         val spiderX = et_spider_x?.text?.toString()?.trim() ?: return
 
         var sni = streamSetting.populateTransportSettings(
-                transport = networks[network],
-                headerType = transportTypes(networks[network])[type],
-                host = requestHost,
-                path = path,
-                seed = path,
-                quicSecurity = requestHost,
-                key = path,
-                mode = transportTypes(networks[network])[type],
-                serviceName = path,
-                authority = requestHost,
+            transport = networks[network],
+            headerType = transportTypes(networks[network])[type],
+            host = requestHost,
+            path = path,
+            seed = path,
+            quicSecurity = requestHost,
+            key = path,
+            mode = transportTypes(networks[network])[type],
+            serviceName = path,
+            authority = requestHost,
         )
         if (sniField.isNotBlank()) {
             sni = sniField

@@ -51,7 +51,7 @@
                         app:tabTextAppearance="@style/TabLayoutTextStyle"
                         app:tabIndicatorFullWidth="false"
                         android:layout_height="wrap_content"
-                        android:layout_width="match_parent"/>
+                        android:layout_width="match_parent" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycler_view"
@@ -79,7 +79,7 @@
                             android:minLines="1"
                             android:paddingStart="16dp"
                             android:text="@string/connection_test_pending"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+                            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -120,7 +120,7 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
         app:itemIconTint="@color/colorAccent"
-        app:menu="@menu/menu_drawer" >
+        app:menu="@menu/menu_drawer">
 
     </com.google.android.material.navigation.NavigationView>
 

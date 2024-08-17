@@ -21,10 +21,10 @@ import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.util.AppManagerUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.Collator
 
 class PerAppProxyActivity : BaseActivity() {
@@ -46,32 +46,32 @@ class PerAppProxyActivity : BaseActivity() {
         val blacklist = settingsStorage?.decodeStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
 
         AppManagerUtil.rxLoadNetworkAppList(this)
-                .subscribeOn(Schedulers.io())
-                .map {
-                    if (blacklist != null) {
-                        it.forEach { one ->
-                            if (blacklist.contains(one.packageName)) {
-                                one.isSelected = 1
-                            } else {
-                                one.isSelected = 0
-                            }
+            .subscribeOn(Schedulers.io())
+            .map {
+                if (blacklist != null) {
+                    it.forEach { one ->
+                        if (blacklist.contains(one.packageName)) {
+                            one.isSelected = 1
+                        } else {
+                            one.isSelected = 0
                         }
-                        val comparator = Comparator<AppInfo> { p1, p2 ->
-                            when {
-                                p1.isSelected > p2.isSelected -> -1
-                                p1.isSelected == p2.isSelected -> 0
-                                else -> 1
-                            }
-                        }
-                        it.sortedWith(comparator)
-                    } else {
-                        val comparator = object : Comparator<AppInfo> {
-                            val collator = Collator.getInstance()
-                            override fun compare(o1: AppInfo, o2: AppInfo) = collator.compare(o1.appName, o2.appName)
-                        }
-                        it.sortedWith(comparator)
                     }
+                    val comparator = Comparator<AppInfo> { p1, p2 ->
+                        when {
+                            p1.isSelected > p2.isSelected -> -1
+                            p1.isSelected == p2.isSelected -> 0
+                            else -> 1
+                        }
+                    }
+                    it.sortedWith(comparator)
+                } else {
+                    val comparator = object : Comparator<AppInfo> {
+                        val collator = Collator.getInstance()
+                        override fun compare(o1: AppInfo, o2: AppInfo) = collator.compare(o1.appName, o2.appName)
+                    }
+                    it.sortedWith(comparator)
                 }
+            }
 //                .map {
 //                    val comparator = object : Comparator<AppInfo> {
 //                        val collator = Collator.getInstance()
@@ -79,13 +79,13 @@ class PerAppProxyActivity : BaseActivity() {
 //                    }
 //                    it.sortedWith(comparator)
 //                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    appsAll = it
-                    adapter = PerAppProxyAdapter(this, it, blacklist)
-                    binding.recyclerView.adapter = adapter
-                    binding.pbWaiting.visibility = View.GONE
-                }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                appsAll = it
+                adapter = PerAppProxyAdapter(this, it, blacklist)
+                binding.recyclerView.adapter = adapter
+                binding.pbWaiting.visibility = View.GONE
+            }
         /***
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
         var dst = 0
@@ -218,18 +218,22 @@ class PerAppProxyActivity : BaseActivity() {
             it.notifyDataSetChanged()
             true
         } ?: false
+
         R.id.select_proxy_app -> {
             selectProxyApp()
             true
         }
+
         R.id.import_proxy_app -> {
             importProxyApp()
             true
         }
+
         R.id.export_proxy_app -> {
             exportProxyApp()
             true
         }
+
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -324,7 +328,8 @@ class PerAppProxyActivity : BaseActivity() {
         if (key.isNotEmpty()) {
             appsAll?.forEach {
                 if (it.appName.uppercase().indexOf(key) >= 0
-                        || it.packageName.uppercase().indexOf(key) >= 0) {
+                    || it.packageName.uppercase().indexOf(key) >= 0
+                ) {
                     apps.add(it)
                 }
             }

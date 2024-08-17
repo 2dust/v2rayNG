@@ -1,8 +1,6 @@
 package com.v2ray.ang.extension
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Build
 import android.widget.Toast
 import com.v2ray.ang.AngApplication

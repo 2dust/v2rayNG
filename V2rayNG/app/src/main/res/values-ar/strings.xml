@@ -42,7 +42,7 @@
     <string name="server_lab_address">العنوان</string>
     <string name="server_lab_port">المنفذ</string>
     <string name="server_lab_id">المعرف</string>
-    <string name="server_lab_alterid">AlterId</string> 
+    <string name="server_lab_alterid">AlterId</string>
 
     <string name="server_lab_security">الأمان</string>
     <string name="server_lab_network">الشبكة</string>
@@ -110,7 +110,7 @@
     <string name="msg_file_not_found">الملف غير موجود</string>
     <string name="msg_remark_is_duplicate">الملاحظات موجودة بالفعل</string>
     <string name="toast_action_not_allowed">الإجراء غير مسموح به</string>
-    
+
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">جار التحميل</string>
     <string name="menu_item_search">بحث</string>

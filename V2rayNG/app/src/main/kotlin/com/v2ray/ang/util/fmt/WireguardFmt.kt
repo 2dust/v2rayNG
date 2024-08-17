@@ -13,7 +13,7 @@ object WireguardFmt {
         val uri = URI(Utils.fixIllegalUrl(str))
         if (uri.rawQuery != null) {
             val config = ServerConfig.create(EConfigType.WIREGUARD)
-            config.remarks = Utils.urlDecode(uri.fragment .orEmpty())
+            config.remarks = Utils.urlDecode(uri.fragment.orEmpty())
 
             val queryParam = uri.rawQuery.split("&")
                 .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }

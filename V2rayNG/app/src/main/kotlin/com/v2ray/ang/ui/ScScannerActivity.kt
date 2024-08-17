@@ -19,13 +19,13 @@ class ScScannerActivity : BaseActivity() {
 
     fun importQRcode(): Boolean {
         RxPermissions(this)
-                .request(Manifest.permission.CAMERA)
-                .subscribe {
-                    if (it)
-                        scanQRCode.launch(Intent(this, ScannerActivity::class.java))
-                    else
-                        toast(R.string.toast_permission_denied)
-                }
+            .request(Manifest.permission.CAMERA)
+            .subscribe {
+                if (it)
+                    scanQRCode.launch(Intent(this, ScannerActivity::class.java))
+                else
+                    toast(R.string.toast_permission_denied)
+            }
 
         return true
     }

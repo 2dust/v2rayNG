@@ -7,16 +7,13 @@ import androidx.work.WorkManager
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.util.Utils
 
-class AngApplication : MultiDexApplication()
-{
-    companion object
-    {
+class AngApplication : MultiDexApplication() {
+    companion object {
         //const val PREF_LAST_VERSION = "pref_last_version"
         lateinit var application: AngApplication
     }
 
-    override fun attachBaseContext(base: Context?)
-    {
+    override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
         application = this
     }
@@ -25,8 +22,7 @@ class AngApplication : MultiDexApplication()
         .setDefaultProcessName("${BuildConfig.APPLICATION_ID}:bg")
         .build()
 
-    override fun onCreate()
-    {
+    override fun onCreate() {
         super.onCreate()
 
 //        LeakCanary.install(this)

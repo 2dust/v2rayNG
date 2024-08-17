@@ -133,16 +133,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
                 <EditText
                     android:id="@+id/et_reserved1"
                     android:layout_width="60dp"
                     android:layout_height="@dimen/edit_height"
                     android:inputType="number" />
+
                 <EditText
                     android:id="@+id/et_reserved2"
                     android:layout_width="60dp"
                     android:layout_height="@dimen/edit_height"
                     android:inputType="number" />
+
                 <EditText
                     android:id="@+id/et_reserved3"
                     android:layout_width="60dp"

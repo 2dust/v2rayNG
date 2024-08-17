@@ -140,6 +140,7 @@ object AppConfig {
     const val RAY_NG_CHANNEL_NAME = "V2rayNG Background Service"
     const val SUBSCRIPTION_UPDATE_CHANNEL = "subscription_update_channel"
     const val SUBSCRIPTION_UPDATE_CHANNEL_NAME = "Subscription Update Service"
+
     /** Protocols Scheme **/
     const val VMESS = "vmess://"
     const val CUSTOM = ""

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/activity_horizontal_margin"
-        android:orientation="vertical">
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/l1"
@@ -27,6 +26,7 @@
             android:nextFocusDown="@+id/et_sni" />
 
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/l2"
         android:layout_width="match_parent"
@@ -47,6 +47,7 @@
             android:nextFocusDown="@+id/sp_stream_fingerprint" />
 
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/l3"
         android:layout_width="match_parent"
@@ -67,6 +68,7 @@
             android:nextFocusDown="@+id/sp_stream_alpn" />
 
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/l4"
         android:layout_width="match_parent"
@@ -87,11 +89,12 @@
             android:nextFocusDown="@+id/sp_allow_insecure" />
 
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/l5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
@@ -104,6 +107,7 @@
             android:layout_height="@dimen/edit_height"
             android:entries="@array/allowinsecures" />
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/l6"
         android:layout_width="match_parent"
@@ -124,6 +128,7 @@
             android:nextFocusDown="@+id/sp_stream_fingerprint" />
 
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/l7"
         android:layout_width="match_parent"
@@ -144,6 +149,7 @@
             android:nextFocusDown="@+id/sp_stream_fingerprint" />
 
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/l8"
         android:layout_width="match_parent"

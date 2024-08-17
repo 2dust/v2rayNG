@@ -386,7 +386,7 @@ object AngConfigManager {
 //        }
 //    }
 
-    fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int>   {
+    fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
         var count = parseBatchConfig(Utils.decode(server), subid, append)
         if (count <= 0) {
             count = parseBatchConfig(server, subid, append)
