@@ -491,7 +491,7 @@ class ServerActivity : BaseActivity() {
                 server.users = null
             } else {
                 val socksUsersBean =
-                    V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
+                    V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SOCKSUsersBean()
                 socksUsersBean.user = et_security?.text.toString().trim()
                 socksUsersBean.pass = et_id.text.toString().trim()
                 server.users = listOf(socksUsersBean)

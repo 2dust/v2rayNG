@@ -2,7 +2,8 @@
 <resources>
     <string name="app_widget_name">v2rayNG</string>
     <string name="app_tile_name">v2rayNG</string>
-    <string name="app_tile_first_use">Первое использование этой функции, пожалуйста, используйте приложение, чтобы добавить сервер</string>
+    <string name="app_tile_first_use">Первое использование этой функции, пожалуйста, используйте
+        приложение, чтобы добавить сервер</string>
     <string name="navigation_drawer_open">Открыть панель навигации</string>
     <string name="navigation_drawer_close">Закрыть панель навигации</string>
     <string name="migration_success">Успешный перенос данных!</string>
@@ -24,19 +25,20 @@
     <string name="menu_item_del_config">Удалить профиль</string>
     <string name="menu_item_import_config_qrcode">Импорт из QR-кода</string>
     <string name="menu_item_import_config_clipboard">Импорт из буфера обмена</string>
-    <string name="menu_item_import_config_manually_vmess">Ручной ввод Vmess</string>
+    <string name="menu_item_import_config_manually_vmess">Ручной ввод VMess</string>
     <string name="menu_item_import_config_manually_vless">Ручной ввод VLESS</string>
     <string name="menu_item_import_config_manually_ss">Ручной ввод Shadowsocks</string>
-    <string name="menu_item_import_config_manually_socks">Ручной ввод Socks</string>
+    <string name="menu_item_import_config_manually_socks">Ручной ввод SOCKS</string>
     <string name="menu_item_import_config_manually_trojan">Ручной ввод Trojan</string>
-    <string name="menu_item_import_config_manually_wireguard">Ручной ввод Wireguard</string>
+    <string name="menu_item_import_config_manually_wireguard">Ручной ввод WireGuard</string>
     <string name="menu_item_import_config_custom">Другой профиль</string>
     <string name="menu_item_import_config_custom_clipboard">Импорт из буфера обмена</string>
     <string name="menu_item_import_config_custom_local">Импорт из файла</string>
     <string name="menu_item_import_config_custom_url">Импорт из URL</string>
     <string name="menu_item_import_config_custom_url_scan">Импорт сканированием URL</string>
     <string name="del_config_comfirm">Подтверждаете удаление?</string>
-    <string name="del_invalid_config_comfirm">Выполните проверку перед удалением! Подтверждаете удаление?</string>
+    <string name="del_invalid_config_comfirm">Выполните проверку перед удалением! Подтверждаете
+        удаление?</string>
     <string name="server_lab_remarks">Описание</string>
     <string name="server_lab_address">Адрес</string>
     <string name="server_lab_port">Порт</string>
@@ -98,7 +100,8 @@
     <string name="server_lab_need_inbound">Убедитесь, что входящий порт соответствует настройкам</string>
     <string name="toast_malformed_josn">Профиль повреждён</string>
     <string name="server_lab_request_host6">Узел (SNI) (необязательно)</string>
-    <string name="toast_asset_copy_failed">Невозможно скопировать файл, используйте файловый менеджер</string>
+    <string name="toast_asset_copy_failed">Невозможно скопировать файл, используйте файловый
+        менеджер</string>
     <string name="menu_item_add_asset">Добавить ресурс</string>
     <string name="menu_item_add_file">Добавить файлы</string>
     <string name="menu_item_add_url">Добавить URL</string>
@@ -127,11 +130,15 @@
     <string name="title_advanced">Расширенные настройки</string>
     <string name="title_vpn_settings">Настройки VPN</string>
     <string name="title_pref_per_app_proxy">Прокси для выбранных приложений</string>
-    <string name="summary_pref_per_app_proxy">Основной: выделенное приложение соединяется через прокси, не выделенное — напрямую;\n\nРежим обхода: выделенное приложение соединяется напрямую, не выделенное — через прокси.\n\nЕсть возможность автоматического выбора проксируемых приложений в меню.</string>
+    <string name="summary_pref_per_app_proxy">Основной: выделенное приложение соединяется через
+        прокси, не выделенное — напрямую;\n\nРежим обхода: выделенное приложение соединяется
+        напрямую, не выделенное — через прокси.\n\nЕсть возможность автоматического выбора
+        проксируемых приложений в меню.</string>
 
     <string name="title_mux_settings">Настройки мультиплексирования</string>
     <string name="title_pref_mux_enabled">Использовать мультиплексирование</string>
-    <string name="summary_pref_mux_enabled">Быстрее, но это может привести к нестабильному соединению.\nНиже можно настроить обработку TCP, UDP и QUIC.</string>
+    <string name="summary_pref_mux_enabled">Быстрее, но это может привести к нестабильному
+        соединению.\nНиже можно настроить обработку TCP, UDP и QUIC.</string>
     <string name="title_pref_mux_concurency">TCP-соединения (диапазон от 1 до 1024)</string>
     <string name="title_pref_mux_xudp_concurency">XUDP-соединения (диапазон от 1 до 1024)</string>
     <string name="title_pref_mux_xudp_quic">Обработка QUIC в мультиплексном туннеле</string>
@@ -142,18 +149,23 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">Отображение скорости</string>
-    <string name="summary_pref_speed_enabled">Показывать текущую скорость в уведомлении.\nЗначок будет меняться в зависимости от использования.</string>
+    <string name="summary_pref_speed_enabled">Показывать текущую скорость в уведомлении.\nЗначок
+        будет меняться в зависимости от использования.</string>
 
     <string name="title_pref_sniffing_enabled">Анализ пакетов</string>
-    <string name="summary_pref_sniffing_enabled">Использовать определение доменных имён в пакетах (по умолчанию включено)</string>
+    <string name="summary_pref_sniffing_enabled">Использовать определение доменных имён в пакетах
+        (по умолчанию включено)</string>
     <string name="title_pref_route_only_enabled">Домен только для маршрутизации</string>
-    <string name="summary_pref_route_only_enabled">Использовать определённое доменное имя только для маршрутизации и сохранять целевой адрес в виде IP.</string>
+    <string name="summary_pref_route_only_enabled">Использовать определённое доменное имя только для
+        маршрутизации и сохранять целевой адрес в виде IP.</string>
 
     <string name="title_pref_local_dns_enabled">Использовать локальную DNS</string>
-    <string name="summary_pref_local_dns_enabled">Обслуживание выполняется DNS-модулем ядра (в настройках маршрутизации рекомендуется выбрать режим «Все, кроме LAN и Китая»)</string>
+    <string name="summary_pref_local_dns_enabled">Обслуживание выполняется DNS-модулем ядра (в
+        настройках маршрутизации рекомендуется выбрать режим «Все, кроме LAN и Китая»)</string>
 
     <string name="title_pref_fake_dns_enabled">Использовать поддельную DNS</string>
-    <string name="summary_pref_fake_dns_enabled">Локальная DNS возвращает поддельный IP-адрес (быстрее, но может не работать с некоторыми приложениями)</string>
+    <string name="summary_pref_fake_dns_enabled">Локальная DNS возвращает поддельный IP-адрес
+        (быстрее, но может не работать с некоторыми приложениями)</string>
 
     <string name="title_pref_prefer_ipv6">Предпочитать IPv6</string>
     <string name="summary_pref_prefer_ipv6">Предпочитать IPv6-адреса и маршрутизацию</string>
@@ -175,11 +187,15 @@
     <string name="summary_pref_delay_test_url">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">Разрешать подключения из LAN</string>
-    <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться, используя ваш IP-адрес, чтобы использовать прокси по протоколам SOCKS/HTTP. Используйте только в доверенной сети, чтобы избежать несанкционированного подключения.</string>
-    <string name="toast_warning_pref_proxysharing_short">Доступ из LAN разрешён, убедитесь, что вы находитесь в надёжной сети</string>
+    <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться,
+        используя ваш IP-адрес, чтобы использовать прокси по протоколам SOCKS/HTTP. Используйте
+        только в доверенной сети, чтобы избежать несанкционированного подключения.</string>
+    <string name="toast_warning_pref_proxysharing_short">Доступ из LAN разрешён, убедитесь, что вы
+        находитесь в надёжной сети</string>
 
     <string name="title_pref_allow_insecure">Разрешать небезопасные</string>
-    <string name="summary_pref_allow_insecure">Для TLS по умолчанию разрешены небезопасные соединения</string>
+    <string name="summary_pref_allow_insecure">Для TLS по умолчанию разрешены небезопасные
+        соединения</string>
 
     <string name="title_pref_socks_port">Порт SOCKS5-прокси</string>
     <string name="summary_pref_socks_port">Порт SOCKS5-прокси</string>
@@ -194,7 +210,9 @@
     <string name="summary_pref_confirm_remove">Требовать двойное подтверждение удаления профиля</string>
 
     <string name="title_pref_start_scan_immediate">Сканирование при запуске</string>
-    <string name="summary_pref_start_scan_immediate">Начинать сканирование сразу при запуске приложения или запускать функцию сканирования камерой или из изображения через панель инструментов</string>
+    <string name="summary_pref_start_scan_immediate">Начинать сканирование сразу при запуске
+        приложения или запускать функцию сканирования камерой или из изображения через панель
+        инструментов</string>
 
     <string name="title_pref_feedback">Обратная связь</string>
     <string name="summary_pref_feedback">Предложить улучшение или сообщить об ошибке на GitHub</string>
@@ -205,15 +223,19 @@
     <string name="title_source_code">Исходный код</string>
     <string name="title_tg_channel">Telegram-канал</string>
     <string name="title_configuration_backup">Резервирование конфигурации</string>
-    <string name="summary_configuration_backup">Путь: [%s]. Резервная копия будет стёрта при удалении приложения или очистке хранилища.</string>
+    <string name="summary_configuration_backup">Путь: [%s]. Резервная копия будет стёрта при
+        удалении приложения или очистке хранилища.</string>
     <string name="title_configuration_restore">Восстановление конфигурации</string>
     <string name="title_configuration_share">Поделиться конфигурацией</string>
 
     <string name="title_pref_promotion">Содействие</string>
-    <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации (пожертвование может быть удалено)</string>
+    <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации
+        (пожертвование может быть удалено)</string>
 
     <string name="title_pref_auto_update_subscription">Автоматическое обновление подписок</string>
-    <string name="summary_pref_auto_update_subscription">Автоматическое обновление подписок в фоновом режиме с указанным интервалом. В зависимости от устройства эта функция может работать не всегда.</string>
+    <string name="summary_pref_auto_update_subscription">Автоматическое обновление подписок в
+        фоновом режиме с указанным интервалом. В зависимости от устройства эта функция может
+        работать не всегда.</string>
     <string name="title_pref_auto_update_interval">Интервал автообновления (минут, не менее 15)</string>
 
     <string name="title_core_loglevel">Подробность ведения журнала</string>
@@ -249,7 +271,8 @@
     <string name="tasker_setting_confirm">Подтвердить</string>
 
     <string name="routing_settings_title">Настройки маршрутизации</string>
-    <string name="routing_settings_tips">Введите требуемые IP/URL через запятую. Не забудьте сохранить изменения.</string>
+    <string name="routing_settings_tips">Введите требуемые IP/URL через запятую. Не забудьте
+        сохранить изменения.</string>
     <string name="routing_settings_save">Сохранить</string>
     <string name="routing_settings_delete">Очистить</string>
     <string name="routing_settings_scan_replace">Сканировать и заменить</string>

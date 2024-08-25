@@ -5,8 +5,8 @@ import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.util.Utils
 
-object SocksFmt {
-    fun parseSocks(str: String): ServerConfig? {
+object SOCKSFmt {
+    fun parseSOCKS(str: String): ServerConfig? {
         val config = ServerConfig.create(EConfigType.SOCKS)
         var result = str.replace(EConfigType.SOCKS.protocolScheme, "")
         val indexSplit = result.indexOf("#")
@@ -41,7 +41,7 @@ object SocksFmt {
             server.address = match.groupValues[3].removeSurrounding("[", "]")
             server.port = match.groupValues[4].toInt()
             val socksUsersBean =
-                V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
+                V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SOCKSUsersBean()
             socksUsersBean.user = match.groupValues[1]
             socksUsersBean.pass = match.groupValues[2]
             server.users = listOf(socksUsersBean)

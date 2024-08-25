@@ -2,7 +2,8 @@
 <resources>
     <string name="app_widget_name">تعویض</string>
     <string name="app_tile_name">تعویض</string>
-    <string name="app_tile_first_use">برای اولین بار از این ویژگی استفاده می‌کنید، لطفا از برنامه برای افزودن سرور استفاده کنید</string>
+    <string name="app_tile_first_use">برای اولین بار از این ویژگی استفاده می‌کنید، لطفا از برنامه
+        برای افزودن سرور استفاده کنید</string>
     <string name="navigation_drawer_open">باز کردن منو کشویی</string>
     <string name="navigation_drawer_close">بستن منو کشویی</string>
     <string name="migration_success">موفقیت در انتقال داده</string>
@@ -24,17 +25,19 @@
     <string name="menu_item_del_config">حذف کانفیگ</string>
     <string name="menu_item_import_config_qrcode">کانفیگ را از QRcode وارد کنید</string>
     <string name="menu_item_import_config_clipboard">کانفیگ را از کلیپ‌بورد وارد کنید</string>
-    <string name="menu_item_import_config_manually_vmess">تایپ دستی[Vmess]</string>
+    <string name="menu_item_import_config_manually_vmess">تایپ دستی[VMess]</string>
     <string name="menu_item_import_config_manually_vless">تایپ دستی[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">تایپ دستی[Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">تایپ دستی[Socks]</string>
+    <string name="menu_item_import_config_manually_socks">تایپ دستی[SOCKS]</string>
     <string name="menu_item_import_config_manually_trojan">تایپ دستی[Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">[Wireguard]تایپ دستی</string>
+    <string name="menu_item_import_config_manually_wireguard">[WireGuard]تایپ دستی</string>
     <string name="menu_item_import_config_custom">کانفیگ سفارشی</string>
     <string name="menu_item_import_config_custom_clipboard">کانفیگ سفارشی را از کلیپ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_custom_local">کانفیگ سفارشی را به صورت محلی وارد کنید</string>
-    <string name="menu_item_import_config_custom_url">کانفیگ سفارشی را از طریق نشانی اینترنتی وارد کنید</string>
-    <string name="menu_item_import_config_custom_url_scan">نشانی اینترنتی اسکن کانفیگ سفارشی را وارد کنید</string>
+    <string name="menu_item_import_config_custom_url">کانفیگ سفارشی را از طریق نشانی اینترنتی وارد
+        کنید</string>
+    <string name="menu_item_import_config_custom_url_scan">نشانی اینترنتی اسکن کانفیگ سفارشی را وارد
+        کنید</string>
     <string name="del_config_comfirm">حذف شود؟</string>
     <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
     <string name="server_lab_remarks">ملاحظات</string>
@@ -98,7 +101,8 @@
     <string name="server_lab_need_inbound">اطمینان حاصل کنید که پورت ورودی با تنظیمات مطابقت دارد</string>
     <string name="toast_malformed_josn">کانفیگ درست نیست</string>
     <string name="server_lab_request_host6">میزبان (SNI) (اختیاری)</string>
-    <string name="toast_asset_copy_failed">کپی فایل انجام نشد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
+    <string name="toast_asset_copy_failed">کپی فایل انجام نشد، لطفا از برنامه مدیریت فایل استفاده
+        کنید</string>
     <string name="menu_item_add_file">افزودن فایل‌ها</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">دانلود فایل‌ها</string>
@@ -123,11 +127,14 @@
     <string name="title_advanced">تنظیمات پیشرفته</string>
     <string name="title_vpn_settings">تنظیمات VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی به تفکیک برنامه</string>
-    <string name="summary_pref_per_app_proxy">عمومی: برنامه بررسی شده پروکسی است، اتصال مستقیم بدون بررسی است. \nحالت bypass: برنامه بررسی شده مستقیما متصل است، پراکسی بررسی نشده است. \nگزینه‌ای برای انتخاب خودکار پروکسی برنامه در منو است</string>
+    <string name="summary_pref_per_app_proxy">عمومی: برنامه بررسی شده پروکسی است، اتصال مستقیم بدون
+        بررسی است. \nحالت bypass: برنامه بررسی شده مستقیما متصل است، پراکسی بررسی نشده است.
+        \nگزینه‌ای برای انتخاب خودکار پروکسی برنامه در منو است</string>
 
     <string name="title_mux_settings">تنظیمات Mux</string>
     <string name="title_pref_mux_enabled">فعال کردن Mux</string>
-    <string name="summary_pref_mux_enabled">سریعتر است، اما ممکن است باعث اتصال ناپایدار شود\nمخزن ترافیک TCP با 8 اتصال پیش‌فرض، نحوه مدیریت UDP و QUIC را در زیر سفارشی کنید</string>
+    <string name="summary_pref_mux_enabled">سریعتر است، اما ممکن است باعث اتصال ناپایدار شود\nمخزن
+        ترافیک TCP با 8 اتصال پیش‌فرض، نحوه مدیریت UDP و QUIC را در زیر سفارشی کنید</string>
     <string name="title_pref_mux_concurency">اتصالات TCP (محدوده -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_concurency">اتصالات XUDP (محدوده -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_quic">مدیریت QUIC در تونل mux</string>
@@ -138,19 +145,23 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">فعال کردن نمایش سرعت</string>
-    <string name="summary_pref_speed_enabled">نمایش سرعت فعلی در قسمت آگاه‌سازی. \nآیکون آگاه‌سازی بر اساس استفاده تغییر می‌کند.</string>
+    <string name="summary_pref_speed_enabled">نمایش سرعت فعلی در قسمت آگاه‌سازی. \nآیکون آگاه‌سازی
+        بر اساس استفاده تغییر می‌کند.</string>
 
     <string name="title_pref_sniffing_enabled">فعال کردن Sniffing</string>
     <string name="summary_pref_sniffing_enabled">دامنه sniff را از بسته امتحان کنید (پیش‌فرض روشن)</string>
     <string name="title_pref_route_only_enabled">Enable routeOnly</string>
-    <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and keep the target address as the IP address.</string>
+    <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and
+        keep the target address as the IP address.</string>
 
 
     <string name="title_pref_local_dns_enabled">فعال کردن DNS محلی</string>
-    <string name="summary_pref_local_dns_enabled">DNS پردازش شده توسط ماژول DNS هسته (توصیه می‌شود، در صورت نیاز به دور زدن LAN و نشانی mainland)</string>
+    <string name="summary_pref_local_dns_enabled">DNS پردازش شده توسط ماژول DNS هسته (توصیه می‌شود،
+        در صورت نیاز به دور زدن LAN و نشانی mainland)</string>
 
     <string name="title_pref_fake_dns_enabled">فعال کردن DNS جعلی</string>
-    <string name="summary_pref_fake_dns_enabled">DNS محلی آدرس IP جعلی را برمی‌گرداند (سریع‌تر می‌باشد، اما ممکن است برای برخی از برنامه‌ها کار نکند)</string>
+    <string name="summary_pref_fake_dns_enabled">DNS محلی آدرس IP جعلی را برمی‌گرداند (سریع‌تر
+        می‌باشد، اما ممکن است برای برخی از برنامه‌ها کار نکند)</string>
 
     <string name="title_pref_prefer_ipv6">ترجیح دادن IPv6</string>
     <string name="summary_pref_prefer_ipv6">ترجیح دادن نشانی و مسیر های IPv6</string>
@@ -172,11 +183,15 @@
     <string name="summary_pref_delay_test_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">اجازه اتصالات از طریق LAN</string>
-    <string name="summary_pref_proxy_sharing_enabled">دستگاه‌های دیگر می‌توانند از طریق socks/http به پراکسی توسط نشانی آی‌پی شما متصل شوند، فقط در شبکه مورد اعتماد فعال می‌شوند تا از اتصال غیرمجاز جلوگیری کنند</string>
-    <string name="toast_warning_pref_proxysharing_short">اتصالات از طریق LAN را مجاز کنید، مطمئن شوید که در یک شبکه قابل اعتماد هستید</string>
+    <string name="summary_pref_proxy_sharing_enabled">دستگاه‌های دیگر می‌توانند از طریق socks/http
+        به پراکسی توسط نشانی آی‌پی شما متصل شوند، فقط در شبکه مورد اعتماد فعال می‌شوند تا از اتصال
+        غیرمجاز جلوگیری کنند</string>
+    <string name="toast_warning_pref_proxysharing_short">اتصالات از طریق LAN را مجاز کنید، مطمئن
+        شوید که در یک شبکه قابل اعتماد هستید</string>
 
     <string name="title_pref_allow_insecure">allowInsecure</string>
-    <string name="summary_pref_allow_insecure">هنگام استفاده از TLS، به طور پیش‌فرض allowInsecure فعال است</string>
+    <string name="summary_pref_allow_insecure">هنگام استفاده از TLS، به طور پیش‌فرض allowInsecure
+        فعال است</string>
 
     <string name="title_pref_socks_port">پورت پروکسی SOCKS5</string>
     <string name="summary_pref_socks_port">پورت پروکسی SOCKS5</string>
@@ -188,10 +203,13 @@
     <string name="summary_pref_local_dns_port">پورت DNS محلی</string>
 
     <string name="title_pref_confirm_remove">تایید حذف فایل کانفیگ</string>
-    <string name="summary_pref_confirm_remove">آیا برای حذف فایل کانفیگ نیاز به تایید دوم توسط کاربر است</string>
+    <string name="summary_pref_confirm_remove">آیا برای حذف فایل کانفیگ نیاز به تایید دوم توسط کاربر
+        است</string>
 
     <string name="title_pref_start_scan_immediate">فورا اسکن را شروع کن</string>
-    <string name="summary_pref_start_scan_immediate">دوربین را برای اسکن بلافاصله در هنگام راه اندازی باز کنید، در غیر این صورت می توانید کد را اسکن کنید یا عکسی را در نوار ابزار انتخاب کنید.</string>
+    <string name="summary_pref_start_scan_immediate">دوربین را برای اسکن بلافاصله در هنگام راه
+        اندازی باز کنید، در غیر این صورت می توانید کد را اسکن کنید یا عکسی را در نوار ابزار انتخاب
+        کنید.</string>
 
     <string name="title_pref_feedback">بازخورد</string>
     <string name="summary_pref_feedback">بازخورد یا گزارش اشکالات در گیت‌هاب</string>
@@ -203,14 +221,17 @@
     <string name="title_source_code">Source code</string>
     <string name="title_tg_channel">Telegram channel</string>
     <string name="title_configuration_backup">Backup configuration</string>
-    <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
+    <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared
+        after uninstalling the app or clearing the storage</string>
     <string name="title_configuration_restore">Restore configuration</string>
     <string name="title_configuration_share">Share configuration</string>
     <string name="title_pref_promotion">تبلیغات</string>
-    <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف شود)</string>
+    <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف
+        شود)</string>
 
     <string name="title_pref_auto_update_subscription">به‌روزرسانی خودکار اشتراک ها</string>
-    <string name="summary_pref_auto_update_subscription">اشتراک های خود را به طور خودکار با فاصله زمانی در پس زمینه به روز کنید. بسته به دستگاه، این ویژگی ممکن است همیشه کار نکند</string>
+    <string name="summary_pref_auto_update_subscription">اشتراک های خود را به طور خودکار با فاصله
+        زمانی در پس زمینه به روز کنید. بسته به دستگاه، این ویژگی ممکن است همیشه کار نکند</string>
     <string name="title_pref_auto_update_interval">فاصله به‌روزرسانی خودکار (دقیقه، حداقل مقدار 15)</string>
     <string name="title_core_loglevel">سطح گزارشات</string>
     <string name="title_mode">حالت</string>
