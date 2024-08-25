@@ -179,7 +179,8 @@
         <service
             android:name=".service.V2RayTestService"
             android:exported="false"
-            android:process=":RunSoLibV2RayDaemon"></service>
+            android:process=":RunSoLibV2RayDaemon"
+            />
 
         <receiver
             android:exported="true"
