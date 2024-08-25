@@ -10,7 +10,8 @@
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
-    <string name="toast_permission_denied">Vui lòng cấp quyền cần thiết cho v2rayNG! Bạn đã từ chối các quyền cần thiết như Camera hay Bộ nhớ?</string>
+    <string name="toast_permission_denied">Vui lòng cấp quyền cần thiết cho v2rayNG! Bạn đã từ chối
+        các quyền cần thiết như Camera hay Bộ nhớ?</string>
     <string name="notification_action_more">Nhấn để biết thêm...</string>
     <string name="toast_services_start">Đang khởi động v2rayNG...</string>
     <string name="toast_services_stop">Đã dừng v2rayNG!</string>
@@ -26,8 +27,8 @@
     <string name="menu_item_import_config_clipboard">Nhập cấu hình từ Clipboard</string>
     <string name="menu_item_import_config_manually_vmess">Nhập thủ công [VMESS]</string>
     <string name="menu_item_import_config_manually_vless">Nhập thủ công [VLESS]</string>
-    <string name="menu_item_import_config_manually_ss">Nhập thủ công [ShadowSocks]</string>
-    <string name="menu_item_import_config_manually_socks">Nhập thủ công [Socks]</string>
+    <string name="menu_item_import_config_manually_ss">Nhập thủ công [ShadowSOCKS]</string>
+    <string name="menu_item_import_config_manually_socks">Nhập thủ công [SOCKS]</string>
     <string name="menu_item_import_config_manually_trojan">Nhập thủ công [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">Nhập thủ công [WireGuard]</string>
     <string name="menu_item_import_config_custom">Nâng cao / Cấu hình tùy chỉnh</string>
@@ -95,7 +96,8 @@
     <string name="server_lab_content">Nội dung</string>
     <string name="toast_none_data_clipboard">Không có dữ liệu nào trong Clipboard!</string>
     <string name="toast_invalid_url">URL không hợp lệ hoặc trống!</string>
-    <string name="server_lab_need_inbound">Vui lòng đảm bảo cấu hình tùy chỉnh này không bị lỗi trước khi sử dụng!</string>
+    <string name="server_lab_need_inbound">Vui lòng đảm bảo cấu hình tùy chỉnh này không bị lỗi
+        trước khi sử dụng!</string>
     <string name="toast_malformed_josn">Cấu hình không hợp lệ!</string>
     <string name="server_lab_request_host6">Host (SNI) (Không bắt buộc)</string>
     <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp!</string>
@@ -124,13 +126,19 @@
     <string name="title_advanced">Cài đặt nâng cao</string>
     <string name="title_vpn_settings">Cài đặt VPN</string>
     <string name="title_pref_per_app_proxy">Proxy theo Ứng dụng</string>
-    <string name="summary_pref_per_app_proxy">- Bình thường: Ứng dụng đã chọn sẽ kết nối thông qua Proxy, chưa chọn sẽ kết nối trực tiếp. \n- Chế độ Bypass: Ứng dụng đã chọn sẽ kết nối trực tiếp, chưa chọn sẽ kết nối qua Proxy. \n- Nếu bạn đang ở Trung Quốc thì vào Menu, chọn Tự động chọn ứng dụng Proxy.</string>
+    <string name="summary_pref_per_app_proxy">- Bình thường: Ứng dụng đã chọn sẽ kết nối thông qua
+        Proxy, chưa chọn sẽ kết nối trực tiếp. \n- Chế độ Bypass: Ứng dụng đã chọn sẽ kết nối trực
+        tiếp, chưa chọn sẽ kết nối qua Proxy. \n- Nếu bạn đang ở Trung Quốc thì vào Menu, chọn Tự
+        động chọn ứng dụng Proxy.</string>
 
     <string name="title_mux_settings">Cài đặt Mux</string>
     <string name="title_pref_mux_enabled">Bật Mux</string>
-    <string name="summary_pref_mux_enabled">Giảm độ trễ nhưng có thể làm gián đoạn luồng, vì vậy không nên kích hoạt nó. \nCác phương pháp xử lý lưu lượng truy cập TCP, UDP và QUIC có sẵn bên dưới.</string>
+    <string name="summary_pref_mux_enabled">Giảm độ trễ nhưng có thể làm gián đoạn luồng, vì vậy
+        không nên kích hoạt nó. \nCác phương pháp xử lý lưu lượng truy cập TCP, UDP và QUIC có sẵn
+        bên dưới.</string>
     <string name="title_pref_mux_concurency">Số lượng liên kết con tái sử dụng TCP (-1 đến 1024)</string>
-    <string name="title_pref_mux_xudp_concurency">Số lượng liên kết con tái sử dụng XUDP (-1 đến 1024)</string>
+    <string name="title_pref_mux_xudp_concurency">Số lượng liên kết con tái sử dụng XUDP (-1 đến
+        1024)</string>
     <string name="title_pref_mux_xudp_quic">Phương pháp xử lý lưu lượng QUIC</string>
     <string-array name="mux_xudp_quic_entries">
         <item>Từ chối</item>
@@ -140,19 +148,24 @@
 
 
     <string name="title_pref_speed_enabled">Hiển thị tốc độ mạng</string>
-    <string name="summary_pref_speed_enabled">Hiển thị tốc độ mạng hiện tại trên thanh thông báo. \nBiểu tượng trên thanh trạng thái có thể thay đổi tùy vào mức sử dụng.</string>
+    <string name="summary_pref_speed_enabled">Hiển thị tốc độ mạng hiện tại trên thanh thông báo.
+        \nBiểu tượng trên thanh trạng thái có thể thay đổi tùy vào mức sử dụng.</string>
 
     <string name="title_pref_sniffing_enabled">Bật Sniffing</string>
-    <string name="summary_pref_sniffing_enabled">Phát hiện tên miền từ lưu lượng truy cập (Được bật theo mặc định). \nỞ Việt Nam: tắt để sử dụng Zalo.</string>
+    <string name="summary_pref_sniffing_enabled">Phát hiện tên miền từ lưu lượng truy cập (Được bật
+        theo mặc định). \nỞ Việt Nam: tắt để sử dụng Zalo.</string>
     <string name="title_pref_route_only_enabled">Bật RouteOnly</string>
-    <string name="summary_pref_route_only_enabled">Chỉ sử dụng tên miền được đánh dấu để định tuyến và giữ địa chỉ đích làm địa chỉ IP.</string>
+    <string name="summary_pref_route_only_enabled">Chỉ sử dụng tên miền được đánh dấu để định tuyến
+        và giữ địa chỉ đích làm địa chỉ IP.</string>
 
 
     <string name="title_pref_local_dns_enabled">Bật Local DNS</string>
-    <string name="summary_pref_local_dns_enabled">DNS được xử lý bởi module DNS của Xray-Core (Dùng nếu cần định tuyến Bypass cho mạng LAN và Địa chỉ nội địa).</string>
+    <string name="summary_pref_local_dns_enabled">DNS được xử lý bởi module DNS của Xray-Core (Dùng
+        nếu cần định tuyến Bypass cho mạng LAN và Địa chỉ nội địa).</string>
 
     <string name="title_pref_fake_dns_enabled">Bật FakeDNS</string>
-    <string name="summary_pref_fake_dns_enabled">FakeDNS lấy tên miền mục tiêu bằng cách giả mạo DNS (Nhanh hơn, nhưng có thể không hoạt động cho một số ứng dụng).</string>
+    <string name="summary_pref_fake_dns_enabled">FakeDNS lấy tên miền mục tiêu bằng cách giả mạo DNS
+        (Nhanh hơn, nhưng có thể không hoạt động cho một số ứng dụng).</string>
 
     <string name="title_pref_prefer_ipv6">Ưu tiên IPv6</string>
     <string name="summary_pref_prefer_ipv6">Ưu tiên sử dụng địa chỉ IPv6 cho kết nối và định tuyến.</string>
@@ -174,11 +187,14 @@
     <string name="summary_pref_delay_test_url">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">Cho phép kết nối từ mạng LAN</string>
-    <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác trong cùng mạng LAN có thể kết nối đến SOCKS / HTTP proxy trên thiết bị của bạn. \nChỉ bật tính năng này trong các mạng đáng tin cậy để tránh kết nối trái phép.</string>
+    <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác trong cùng mạng LAN có thể
+        kết nối đến SOCKS / HTTP proxy trên thiết bị của bạn. \nChỉ bật tính năng này trong các mạng
+        đáng tin cậy để tránh kết nối trái phép.</string>
     <string name="toast_warning_pref_proxysharing_short">Đang bật cho phép kết nối từ mạng LAN</string>
 
     <string name="title_pref_allow_insecure">Bỏ qua xác minh chứng chỉ</string>
-    <string name="summary_pref_allow_insecure">Khi nhập những cấu hình có bảo mật TLS, mặc định sẽ không xác minh chứng chỉ.</string>
+    <string name="summary_pref_allow_insecure">Khi nhập những cấu hình có bảo mật TLS, mặc định sẽ
+        không xác minh chứng chỉ.</string>
 
     <string name="title_pref_socks_port">Cổng Proxy SOCKS5</string>
     <string name="summary_pref_socks_port">Cổng Proxy SOCKS5</string>
@@ -190,10 +206,12 @@
     <string name="summary_pref_local_dns_port">Cổng Local DNS</string>
 
     <string name="title_pref_confirm_remove">Xác nhận xóa tệp cấu hình</string>
-    <string name="summary_pref_confirm_remove">Yêu cầu xác nhận từ người dùng khi thực hiện xóa tệp cấu hình.</string>
+    <string name="summary_pref_confirm_remove">Yêu cầu xác nhận từ người dùng khi thực hiện xóa tệp
+        cấu hình.</string>
 
     <string name="title_pref_start_scan_immediate">Quét mã QR ngay lập tức</string>
-    <string name="summary_pref_start_scan_immediate">Mở camera để quét mã QR ngay khi khởi động, nếu không, bạn cũng có thể chọn quét mã hoặc chọn ảnh từ thanh công cụ.</string>
+    <string name="summary_pref_start_scan_immediate">Mở camera để quét mã QR ngay khi khởi động, nếu
+        không, bạn cũng có thể chọn quét mã hoặc chọn ảnh từ thanh công cụ.</string>
 
     <string name="title_pref_feedback">Phản hồi lỗi</string>
     <string name="summary_pref_feedback">Phản hồi cải tiến hoặc lỗi lên GitHub</string>
@@ -205,15 +223,19 @@
     <string name="title_source_code">Mã nguồn</string>
     <string name="title_tg_channel">Kênh Telegram</string>
     <string name="title_configuration_backup">Sao lưu cấu hình</string>
-    <string name="summary_configuration_backup">Nơi lưu trữ: [%s], bản backup sẽ được dọn dẹp sau khi xóa ứng dụng hoặc xóa bộ nhớ.</string>
+    <string name="summary_configuration_backup">Nơi lưu trữ: [%s], bản backup sẽ được dọn dẹp sau
+        khi xóa ứng dụng hoặc xóa bộ nhớ.</string>
     <string name="title_configuration_restore">Khôi phục cấu hình</string>
     <string name="title_configuration_share">Chia sẻ cấu hình</string>
     <string name="title_pref_promotion">Quảng bá server</string>
     <string name="summary_pref_promotion">Quảng cáo, nhấn để biết thêm (Ủng hộ có thể được gỡ bỏ)</string>
 
     <string name="title_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký</string>
-    <string name="summary_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký của bạn ở trong nền với khoảng thời gian cố định. Tùy thiết bị, tính năng này có thể không luôn hoạt động đúng như mong đợi.</string>
-    <string name="title_pref_auto_update_interval">Thời gian cập nhật tự động (Phút, giá trị tối thiểu là 15)</string>
+    <string name="summary_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký của bạn ở
+        trong nền với khoảng thời gian cố định. Tùy thiết bị, tính năng này có thể không luôn hoạt
+        động đúng như mong đợi.</string>
+    <string name="title_pref_auto_update_interval">Thời gian cập nhật tự động (Phút, giá trị tối
+        thiểu là 15)</string>
 
     <string name="title_core_loglevel">Cấp độ nhật ký</string>
     <string name="title_mode">Chế độ kết nối</string>
@@ -248,7 +270,8 @@
     <string name="tasker_setting_confirm">Xác nhận</string>
 
     <string name="routing_settings_title">Cài đặt định tuyến</string>
-    <string name="routing_settings_tips">Phân cách bằng dấu phẩy (,). Có thể tải xuống Rules mặc định để tham khảo ở menu ba chấm.</string>
+    <string name="routing_settings_tips">Phân cách bằng dấu phẩy (,). Có thể tải xuống Rules mặc
+        định để tham khảo ở menu ba chấm.</string>
     <string name="routing_settings_save">Lưu lại</string>
     <string name="routing_settings_delete">Xoá</string>
     <string name="routing_settings_scan_replace">Quét QR và Thay thế</string>
@@ -258,7 +281,8 @@
     <string name="connection_test_pending">Kiểm tra kết nối</string>
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng...</string>
     <string name="connection_test_available">Kiểm tra thành công: thời gian truy cập Google là %d ms</string>
-    <string name="connection_test_error">Lỗi kết nối mạng, hãy thử đổi cấu hình hoặc kiểm tra lại! Mã lỗi: %s</string>
+    <string name="connection_test_error">Lỗi kết nối mạng, hãy thử đổi cấu hình hoặc kiểm tra lại!
+        Mã lỗi: %s</string>
     <string name="connection_test_fail">Không có kết nối mạng!</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
     <string name="connection_connected">Đã kết nối, nhấn để kiểm tra kết nối mạng!</string>

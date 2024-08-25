@@ -1,6 +1,6 @@
 package com.v2ray.ang.dto
 
-data class VmessQRCode(
+data class VMessQRCode(
     var v: String = "",
     var ps: String = "",
     var add: String = "",

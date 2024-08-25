@@ -8,22 +8,22 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
-import com.v2ray.ang.dto.VmessQRCode
+import com.v2ray.ang.dto.VMessQRCode
 import com.v2ray.ang.extension.idnHost
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import java.net.URI
 
-object VmessFmt {
+object VMessFmt {
     private val settingsStorage by lazy {
         MMKV.mmkvWithID(
             MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE
         )
     }
 
-    fun parseVmess(str: String): ServerConfig? {
+    fun parseVMess(str: String): ServerConfig? {
         if (str.indexOf('?') > 0 && str.indexOf('&') > 0) {
-            return parseVmessStd(str)
+            return parseVMessStd(str)
         }
 
         val allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
@@ -35,8 +35,8 @@ object VmessFmt {
             Log.d(AppConfig.ANG_PACKAGE, "R.string.toast_decoding_failed")
             return null
         }
-        val vmessQRCode = Gson().fromJson(result, VmessQRCode::class.java)
-        // Although VmessQRCode fields are non null, looks like Gson may still create null fields
+        val vmessQRCode = Gson().fromJson(result, VMessQRCode::class.java)
+        // Although VMessQRCode fields are non null, looks like Gson may still create null fields
         if (TextUtils.isEmpty(vmessQRCode.add)
             || TextUtils.isEmpty(vmessQRCode.port)
             || TextUtils.isEmpty(vmessQRCode.id)
@@ -87,7 +87,7 @@ object VmessFmt {
         val outbound = config.getProxyOutbound() ?: return ""
         val streamSetting = outbound.streamSettings ?: V2rayConfig.OutboundBean.StreamSettingsBean()
 
-        val vmessQRCode = VmessQRCode()
+        val vmessQRCode = VMessQRCode()
         vmessQRCode.v = "2"
         vmessQRCode.ps = config.remarks
         vmessQRCode.add = outbound.getServerAddress().orEmpty()
@@ -110,7 +110,7 @@ object VmessFmt {
         return Utils.encode(json)
     }
 
-    fun parseVmessStd(str: String): ServerConfig? {
+    fun parseVMessStd(str: String): ServerConfig? {
         var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
         val config = ServerConfig.create(EConfigType.VMESS)
 

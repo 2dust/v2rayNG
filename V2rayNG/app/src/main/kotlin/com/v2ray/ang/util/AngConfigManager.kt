@@ -16,11 +16,11 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.*
 import com.v2ray.ang.util.MmkvManager.KEY_SELECTED_SERVER
 import com.v2ray.ang.util.fmt.ShadowsocksFmt
-import com.v2ray.ang.util.fmt.SocksFmt
+import com.v2ray.ang.util.fmt.SOCKSFmt
 import com.v2ray.ang.util.fmt.TrojanFmt
 import com.v2ray.ang.util.fmt.VlessFmt
-import com.v2ray.ang.util.fmt.VmessFmt
-import com.v2ray.ang.util.fmt.WireguardFmt
+import com.v2ray.ang.util.fmt.VMessFmt
+import com.v2ray.ang.util.fmt.WireGuardFmt
 import java.lang.reflect.Type
 import java.util.*
 
@@ -61,7 +61,7 @@ object AngConfigManager {
 //            }
 //
 //            copyLegacySettings(defaultSharedPreferences)
-//            migrateVmessBean(angConfig, defaultSharedPreferences)
+//            migrateVMessBean(angConfig, defaultSharedPreferences)
 //            migrateSubItemBean(angConfig)
 //
 //            defaultSharedPreferences.edit().remove(ANG_CONFIG).apply()
@@ -110,7 +110,7 @@ object AngConfigManager {
 //        )
 //    }
 //
-//    private fun migrateVmessBean(angConfig: AngConfig, sharedPreferences: SharedPreferences) {
+//    private fun migrateVMessBean(angConfig: AngConfig, sharedPreferences: SharedPreferences) {
 //        angConfig.vmess.forEachIndexed { index, vmessBean ->
 //            val type = EConfigType.fromInt(vmessBean.configType) ?: return@forEachIndexed
 //            val config = ServerConfig.create(type)
@@ -150,7 +150,7 @@ object AngConfigManager {
 //                            server.users = null
 //                        } else {
 //                            val socksUsersBean =
-//                                V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
+//                                V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SOCKSUsersBean()
 //                            socksUsersBean.user = vmessBean.security
 //                            socksUsersBean.pass = vmessBean.id
 //                            server.users = listOf(socksUsersBean)
@@ -215,17 +215,17 @@ object AngConfigManager {
             }
 
             val config = if (str.startsWith(EConfigType.VMESS.protocolScheme)) {
-                VmessFmt.parseVmess(str)
+                VMessFmt.parseVMess(str)
             } else if (str.startsWith(EConfigType.SHADOWSOCKS.protocolScheme)) {
                 ShadowsocksFmt.parseShadowsocks(str)
             } else if (str.startsWith(EConfigType.SOCKS.protocolScheme)) {
-                SocksFmt.parseSocks(str)
+                SOCKSFmt.parseSOCKS(str)
             } else if (str.startsWith(EConfigType.TROJAN.protocolScheme)) {
                 TrojanFmt.parseTrojan(str)
             } else if (str.startsWith(EConfigType.VLESS.protocolScheme)) {
                 VlessFmt.parseVless(str)
             } else if (str.startsWith(EConfigType.WIREGUARD.protocolScheme)) {
-                WireguardFmt.parseWireguard(str)
+                WireGuardFmt.parseWireGuard(str)
             } else {
                 null
             }
@@ -260,13 +260,13 @@ object AngConfigManager {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ""
 
             return config.configType.protocolScheme + when (config.configType) {
-                EConfigType.VMESS -> VmessFmt.toUri(config)
+                EConfigType.VMESS -> VMessFmt.toUri(config)
                 EConfigType.CUSTOM -> ""
                 EConfigType.SHADOWSOCKS -> ShadowsocksFmt.toUri(config)
-                EConfigType.SOCKS -> SocksFmt.toUri(config)
+                EConfigType.SOCKS -> SOCKSFmt.toUri(config)
                 EConfigType.VLESS -> VlessFmt.toUri(config)
                 EConfigType.TROJAN -> TrojanFmt.toUri(config)
-                EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
+                EConfigType.WIREGUARD -> WireGuardFmt.toUri(config)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -356,7 +356,7 @@ object AngConfigManager {
 //    /**
 //     * upgrade
 //     */
-//    private fun upgradeServerVersion(vmess: AngConfig.VmessBean): Int {
+//    private fun upgradeServerVersion(vmess: AngConfig.VMessBean): Int {
 //        try {
 //            if (vmess.configVersion == 2) {
 //                return 0

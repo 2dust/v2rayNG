@@ -98,7 +98,7 @@ data class V2rayConfig(
             val userLevel: Int? = null,
             /*Loopback*/
             val inboundTag: String? = null,
-            /*Wireguard*/
+            /*WireGuard*/
             var secretKey: String? = null,
             val peers: List<WireGuardBean>? = null,
             var reserved: List<Int>? = null,
@@ -137,11 +137,11 @@ data class V2rayConfig(
                 val email: String? = null,
                 var flow: String? = null,
                 val ivCheck: Boolean? = null,
-                var users: List<SocksUsersBean>? = null
+                var users: List<SOCKSUsersBean>? = null
             ) {
 
 
-                data class SocksUsersBean(
+                data class SOCKSUsersBean(
                     var user: String = "",
                     var pass: String = "",
                     var level: Int = DEFAULT_LEVEL

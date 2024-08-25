@@ -25,12 +25,12 @@
     <string name="menu_item_del_config">Delete config</string>
     <string name="menu_item_import_config_qrcode">Import config from QRcode</string>
     <string name="menu_item_import_config_clipboard">Import config from Clipboard</string>
-    <string name="menu_item_import_config_manually_vmess">Type manually[Vmess]</string>
+    <string name="menu_item_import_config_manually_vmess">Type manually[VMess]</string>
     <string name="menu_item_import_config_manually_vless">Type manually[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">Type manually[Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">Type manually[Socks]</string>
+    <string name="menu_item_import_config_manually_socks">Type manually[SOCKS]</string>
     <string name="menu_item_import_config_manually_trojan">Type manually[Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">Type manually[Wireguard]</string>
+    <string name="menu_item_import_config_manually_wireguard">Type manually[WireGuard]</string>
     <string name="menu_item_import_config_custom">Custom config</string>
     <string name="menu_item_import_config_custom_clipboard">Import custom config from Clipboard</string>
     <string name="menu_item_import_config_custom_local">Import custom config from locally</string>
@@ -128,11 +128,14 @@
     <string name="title_advanced">Advanced Settings</string>
     <string name="title_vpn_settings">VPN Settings</string>
     <string name="title_pref_per_app_proxy">Per-app proxy</string>
-    <string name="summary_pref_per_app_proxy">General: Checked App is proxy, unchecked direct connection; \nbypass mode: checked app directly connected, unchecked proxy. \nThe option to automatically select the proxy application in the menu</string>
+    <string name="summary_pref_per_app_proxy">General: Checked App is proxy, unchecked direct
+        connection; \nbypass mode: checked app directly connected, unchecked proxy. \nThe option to
+        automatically select the proxy application in the menu</string>
 
     <string name="title_mux_settings">Mux Settings</string>
     <string name="title_pref_mux_enabled">Enable Mux</string>
-    <string name="summary_pref_mux_enabled">Faster, but it may cause unstable connectivity\ncustomize how to handle TCP, UDP and QUIC below</string>
+    <string name="summary_pref_mux_enabled">Faster, but it may cause unstable
+        connectivity\ncustomize how to handle TCP, UDP and QUIC below</string>
     <string name="title_pref_mux_concurency">TCP connections（range -1 to 1024）</string>
     <string name="title_pref_mux_xudp_concurency">XUDP connections（range -1 to 1024）</string>
     <string name="title_pref_mux_xudp_quic">Handling of QUIC in mux tunnel</string>
@@ -143,20 +146,24 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">Enable speed display</string>
-    <string name="summary_pref_speed_enabled">Display current speed in the notification.\nNotification icon would change based on
+    <string name="summary_pref_speed_enabled">Display current speed in the
+        notification.\nNotification icon would change based on
         usage.</string>
 
     <string name="title_pref_sniffing_enabled">Enable Sniffing</string>
     <string name="summary_pref_sniffing_enabled">Try sniff domain from the packet (default on)</string>
     <string name="title_pref_route_only_enabled">Enable routeOnly</string>
-    <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and keep the target address as the IP address.</string>
+    <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and
+        keep the target address as the IP address.</string>
 
     <string name="title_pref_local_dns_enabled">Enable local DNS</string>
-    <string name="summary_pref_local_dns_enabled">DNS processed by core‘s DNS module (Recommended, if need routing Bypassing LAN and
+    <string name="summary_pref_local_dns_enabled">DNS processed by core‘s DNS module (Recommended,
+        if need routing Bypassing LAN and
         mainland address)</string>
 
     <string name="title_pref_fake_dns_enabled">Enable fake DNS</string>
-    <string name="summary_pref_fake_dns_enabled">local DNS returns fake IP address (faster, but it may not work for some apps)</string>
+    <string name="summary_pref_fake_dns_enabled">local DNS returns fake IP address (faster, but it
+        may not work for some apps)</string>
 
     <string name="title_pref_prefer_ipv6">Prefer IPv6</string>
     <string name="summary_pref_prefer_ipv6">Prefer IPv6 address and routes</string>
@@ -178,8 +185,10 @@
     <string name="summary_pref_delay_test_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">Allow connections from the LAN</string>
-    <string name="summary_pref_proxy_sharing_enabled">Other devices can connect to proxy by your ip address through socks/http, Only enable in trusted network to avoid unauthorized connection</string>
-    <string name="toast_warning_pref_proxysharing_short">Allow connections from the LAN, Make sure you are in a trusted network</string>
+    <string name="summary_pref_proxy_sharing_enabled">Other devices can connect to proxy by your ip
+        address through socks/http, Only enable in trusted network to avoid unauthorized connection</string>
+    <string name="toast_warning_pref_proxysharing_short">Allow connections from the LAN, Make sure
+        you are in a trusted network</string>
 
     <string name="title_pref_allow_insecure">allowInsecure</string>
     <string name="summary_pref_allow_insecure">When TLS, the default allowInsecure</string>
@@ -194,10 +203,12 @@
     <string name="summary_pref_local_dns_port">Local DNS port</string>
 
     <string name="title_pref_confirm_remove">Delete configuration file confirmation</string>
-    <string name="summary_pref_confirm_remove">Whether to delete the configuration file requires a second confirmation by the user</string>
+    <string name="summary_pref_confirm_remove">Whether to delete the configuration file requires a
+        second confirmation by the user</string>
 
     <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
-    <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
+    <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup,
+        otherwise you can choose to scan the code or select a photo in the toolbar</string>
 
     <string name="title_pref_feedback">Feedback</string>
     <string name="summary_pref_feedback">Feedback enhancements or bugs to GitHub</string>
@@ -208,7 +219,8 @@
     <string name="title_source_code">Source code</string>
     <string name="title_tg_channel">Telegram channel</string>
     <string name="title_configuration_backup">Backup configuration</string>
-    <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
+    <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared
+        after uninstalling the app or clearing the storage</string>
     <string name="title_configuration_restore">Restore configuration</string>
     <string name="title_configuration_share">Share configuration</string>
 
@@ -216,7 +228,8 @@
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
 
     <string name="title_pref_auto_update_subscription">Automatic update subscriptions</string>
-    <string name="summary_pref_auto_update_subscription">Update your subscriptions automatically with an interval in background. Depending on the device, this feature may not always work</string>
+    <string name="summary_pref_auto_update_subscription">Update your subscriptions automatically
+        with an interval in background. Depending on the device, this feature may not always work</string>
     <string name="title_pref_auto_update_interval">Auto Update Interval (Minutes, Min value 15)</string>
 
     <string name="title_core_loglevel">Log Level</string>

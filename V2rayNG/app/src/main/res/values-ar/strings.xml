@@ -25,12 +25,12 @@
     <string name="menu_item_del_config">حذف التكوين</string>
     <string name="menu_item_import_config_qrcode">استيراد التكوين من رمز الاستجابة السريعة (QRcode)</string>
     <string name="menu_item_import_config_clipboard">استيراد التكوين من الحافظة</string>
-    <string name="menu_item_import_config_manually_vmess">الكتابة يدويًا [Vmess]</string>
+    <string name="menu_item_import_config_manually_vmess">الكتابة يدويًا [VMess]</string>
     <string name="menu_item_import_config_manually_vless">الكتابة يدويًا [VLESS]</string>
     <string name="menu_item_import_config_manually_ss">الكتابة يدويًا [Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">الكتابة يدويًا [Socks]</string>
+    <string name="menu_item_import_config_manually_socks">الكتابة يدويًا [SOCKS]</string>
     <string name="menu_item_import_config_manually_trojan">الكتابة يدويًا [Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">الكتابة يدويًا [Wireguard]</string>
+    <string name="menu_item_import_config_manually_wireguard">الكتابة يدويًا [WireGuard]</string>
     <string name="menu_item_import_config_custom">تكوين مخصص</string>
     <string name="menu_item_import_config_custom_clipboard">استيراد تكوين مخصص من الحافظة</string>
     <string name="menu_item_import_config_custom_local">استيراد تكوين مخصص من الجهاز</string>
@@ -128,11 +128,14 @@
     <string name="title_advanced">إعدادات متقدمة</string>
     <string name="title_vpn_settings">إعدادات VPN</string>
     <string name="title_pref_per_app_proxy">الوكيل لكل تطبيق</string>
-    <string name="summary_pref_per_app_proxy">عام: التطبيق المحدد هو وكيل، غير المحدد اتصال مباشر؛ \nوضع التجاوز: التطبيق المحدد متصل مباشرة، غير المحدد وكيل. \nخيار تحديد تطبيق الوكيل تلقائيًا في القائمة</string>
+    <string name="summary_pref_per_app_proxy">عام: التطبيق المحدد هو وكيل، غير المحدد اتصال مباشر؛
+        \nوضع التجاوز: التطبيق المحدد متصل مباشرة، غير المحدد وكيل. \nخيار تحديد تطبيق الوكيل
+        تلقائيًا في القائمة</string>
 
     <string name="title_mux_settings">إعدادات Mux</string>
     <string name="title_pref_mux_enabled">تمكين Mux</string>
-    <string name="summary_pref_mux_enabled">أسرع، لكن قد يتسبب في اتصال غير مستقر\nتخصيص كيفية التعامل مع TCP و UDP و QUIC أدناه</string>
+    <string name="summary_pref_mux_enabled">أسرع، لكن قد يتسبب في اتصال غير مستقر\nتخصيص كيفية
+        التعامل مع TCP و UDP و QUIC أدناه</string>
     <string name="title_pref_mux_concurency">اتصالات TCP（النطاق من -1 إلى 1024）</string>
     <string name="title_pref_mux_xudp_concurency">اتصالات XUDP（النطاق من -1 إلى 1024）</string>
     <string name="title_pref_mux_xudp_quic">التعامل مع QUIC في نفق mux</string>
@@ -143,17 +146,21 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">تمكين عرض السرعة</string>
-    <string name="summary_pref_speed_enabled">عرض السرعة الحالية في الإشعار.\nستتغير أيقونة الإشعار بناءً على الاستخدام.</string>
+    <string name="summary_pref_speed_enabled">عرض السرعة الحالية في الإشعار.\nستتغير أيقونة الإشعار
+        بناءً على الاستخدام.</string>
     <string name="title_pref_sniffing_enabled">تفعيل استخراج الشبكة</string>
     <string name="summary_pref_sniffing_enabled">محاولة استخراج النطاق من الحزمة (مفعل افتراضيًا)</string>
     <string name="title_pref_route_only_enabled">تفعيل التوجيه فقط</string>
-    <string name="summary_pref_route_only_enabled">استخدم اسم النطاق الذي تم استخراجه للتوجيه فقط، واحتفظ بعنوان الوجهة كعنوان IP.</string>
+    <string name="summary_pref_route_only_enabled">استخدم اسم النطاق الذي تم استخراجه للتوجيه فقط،
+        واحتفظ بعنوان الوجهة كعنوان IP.</string>
 
     <string name="title_pref_local_dns_enabled">تفعيل DNS المحلي</string>
-    <string name="summary_pref_local_dns_enabled">يتم معالجة DNS بواسطة وحدة DNS الأساسية (موصى به، إذا لزم تجاوز التوجيه لشبكة LAN وعنوان البر الرئيسي)</string>
+    <string name="summary_pref_local_dns_enabled">يتم معالجة DNS بواسطة وحدة DNS الأساسية (موصى به،
+        إذا لزم تجاوز التوجيه لشبكة LAN وعنوان البر الرئيسي)</string>
 
     <string name="title_pref_fake_dns_enabled">تفعيل DNS وهمي</string>
-    <string name="summary_pref_fake_dns_enabled">يعيد DNS المحلي عنوان IP وهمي (أسرع، ولكنه قد لا يعمل مع بعض التطبيقات)</string>
+    <string name="summary_pref_fake_dns_enabled">يعيد DNS المحلي عنوان IP وهمي (أسرع، ولكنه قد لا
+        يعمل مع بعض التطبيقات)</string>
 
     <string name="title_pref_prefer_ipv6">تفضيل IPv6</string>
     <string name="summary_pref_prefer_ipv6">تفضيل عنوان IPv6 وطرق التوجيه</string>
@@ -175,8 +182,11 @@
     <string name="summary_pref_delay_test_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">السماح بالاتصالات من الشبكة المحلية</string>
-    <string name="summary_pref_proxy_sharing_enabled">يمكن للأجهزة الأخرى الاتصال بالبروكسي بواسطة عنوان IP الخاص بك من خلال socks/http، يتم التمكين فقط في الشبكة الموثوقة لتجنب الاتصال غير المصرح به</string>
-    <string name="toast_warning_pref_proxysharing_short">السماح بالاتصالات من الشبكة المحلية، تأكد من أنك في شبكة موثوقة</string>
+    <string name="summary_pref_proxy_sharing_enabled">يمكن للأجهزة الأخرى الاتصال بالبروكسي بواسطة
+        عنوان IP الخاص بك من خلال socks/http، يتم التمكين فقط في الشبكة الموثوقة لتجنب الاتصال غير
+        المصرح به</string>
+    <string name="toast_warning_pref_proxysharing_short">السماح بالاتصالات من الشبكة المحلية، تأكد
+        من أنك في شبكة موثوقة</string>
 
     <string name="title_pref_allow_insecure">السماح غير الآمن</string>
     <string name="summary_pref_allow_insecure">عند TLS، الافتراضي هو السماح غير الآمن</string>
@@ -191,10 +201,12 @@
     <string name="summary_pref_local_dns_port">منفذ DNS المحلي</string>
 
     <string name="title_pref_confirm_remove">تأكيد حذف ملف التكوين</string>
-    <string name="summary_pref_confirm_remove">ما إذا كان حذف ملف التكوين يتطلب تأكيدًا ثانيًا من قبل المستخدم</string>
+    <string name="summary_pref_confirm_remove">ما إذا كان حذف ملف التكوين يتطلب تأكيدًا ثانيًا من
+        قبل المستخدم</string>
 
     <string name="title_pref_start_scan_immediate">بدء المسح الضوئي على الفور</string>
-    <string name="summary_pref_start_scan_immediate">افتح الكاميرا لمسح الرمز ضوئيًا على الفور عند بدء التشغيل، وإلا يمكنك اختيار مسح الرمز ضوئيًا أو تحديد صورة في شريط الأدوات</string>
+    <string name="summary_pref_start_scan_immediate">افتح الكاميرا لمسح الرمز ضوئيًا على الفور عند
+        بدء التشغيل، وإلا يمكنك اختيار مسح الرمز ضوئيًا أو تحديد صورة في شريط الأدوات</string>
 
     <string name="title_pref_feedback">ملاحظات</string>
     <string name="summary_pref_feedback">ملاحظات التحسينات أو الأخطاء إلى GitHub</string>
@@ -205,7 +217,8 @@
     <string name="title_source_code">الكود المصدري</string>
     <string name="title_tg_channel">قناة Telegram</string>
     <string name="title_configuration_backup">نسخ التكوين احتياطيًا</string>
-    <string name="summary_configuration_backup">موقع التخزين: [%s]، سيتم مسح النسخة الاحتياطية بعد إلغاء تثبيت التطبيق أو مسح التخزين</string>
+    <string name="summary_configuration_backup">موقع التخزين: [%s]، سيتم مسح النسخة الاحتياطية بعد
+        إلغاء تثبيت التطبيق أو مسح التخزين</string>
     <string name="title_configuration_restore">استعادة التكوين</string>
     <string name="title_configuration_share">مشاركة التكوين</string>
 
@@ -213,8 +226,10 @@
     <string name="summary_pref_promotion">ترويج، انقر للحصول على التفاصيل (يمكن إزالة التبرع)</string>
 
     <string name="title_pref_auto_update_subscription">اشتراكات التحديث التلقائي</string>
-    <string name="summary_pref_auto_update_subscription">قم بتحديث اشتراكاتك تلقائيًا بفترة زمنية في الخلفية. اعتمادًا على الجهاز، قد لا تعمل هذه الميزة دائمًا</string>
-    <string name="title_pref_auto_update_interval">فاصل التحديث التلقائي (بالدقائق، الحد الأدنى للقيمة 15)</string>
+    <string name="summary_pref_auto_update_subscription">قم بتحديث اشتراكاتك تلقائيًا بفترة زمنية في
+        الخلفية. اعتمادًا على الجهاز، قد لا تعمل هذه الميزة دائمًا</string>
+    <string name="title_pref_auto_update_interval">فاصل التحديث التلقائي (بالدقائق، الحد الأدنى
+        للقيمة 15)</string>
 
     <string name="title_core_loglevel">مستوى السجل</string>
     <string name="title_mode">الوضع</string>

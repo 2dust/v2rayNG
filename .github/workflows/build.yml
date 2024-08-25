@@ -48,11 +48,11 @@ jobs:
         gomobile init
         go mod tidy -v
         gomobile bind -v -androidapi 21 -ldflags='-s -w' ./
-        cp *.aar ${{ github.workspace }}/V2rayNG/app/libs/
+        cp *.aar ${{ github.workspace }}/v2rayNG/app/libs/
 
     - name: Build APK
       run: |
-        cd ${{ github.workspace }}/V2rayNG
+        cd ${{ github.workspace }}/v2rayNG
         chmod 755 gradlew
         ./gradlew assembleDebug
 
@@ -60,4 +60,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: apk
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/
+        path: ${{ github.workspace }}/v2rayNG/app/build/outputs/apk/debug/
