@@ -38,6 +38,40 @@ object WireguardFmt {
         }
     }
 
+    fun parseWireguardConfFile(str: String): ServerConfig? {
+        val config = ServerConfig.create(EConfigType.WIREGUARD)
+        val queryParam: MutableMap<String, String> = mutableMapOf()
+
+        var currentSection: String? = null
+
+        str.lines().forEach { line ->
+            val trimmedLine = line.trim()
+
+            when {
+                trimmedLine.startsWith("[Interface]", ignoreCase = true) -> currentSection = "Interface"
+                trimmedLine.startsWith("[Peer]", ignoreCase = true) -> currentSection = "Peer"
+                trimmedLine.isBlank() || trimmedLine.startsWith("#") -> Unit  // Skip blank lines or comments
+                currentSection != null -> {
+                    val (key, value) = trimmedLine.split("=").map { it.trim() }
+                    queryParam[key.lowercase()] = value  // Store the key in lowercase for case-insensitivity
+                }
+            }
+        }
+
+        config.outboundBean?.settings?.let { wireguard ->
+            wireguard.secretKey = queryParam["privatekey"].orEmpty()
+            wireguard.address = (queryParam["address"] ?: AppConfig.WIREGUARD_LOCAL_ADDRESS_V4).removeWhiteSpace().split(",")
+            wireguard.peers?.getOrNull(0)?.publicKey = queryParam["publickey"].orEmpty()
+            wireguard.peers?.getOrNull(0)?.endpoint = queryParam["endpoint"].orEmpty()
+            wireguard.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
+            wireguard.reserved = (queryParam["reserved"] ?: "0,0,0").removeWhiteSpace().split(",").map { it.toInt() }
+        }
+
+        return config
+    }
+
+
+
     fun toUri(config: ServerConfig): String {
         val outbound = config.getProxyOutbound() ?: return ""
 
