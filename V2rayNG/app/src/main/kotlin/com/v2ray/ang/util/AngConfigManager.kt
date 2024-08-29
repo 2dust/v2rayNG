@@ -517,6 +517,13 @@ object AngConfigManager {
             val key = MmkvManager.encodeServerConfig("", config)
             serverRawStorage?.encode(key, server)
             return 1
+        } else if (server.startsWith("[Interface]") && server.contains("[Peer]")) {
+            val config = WireguardFmt.parseWireguardConfFile(server)
+                ?: return R.string.toast_incorrect_protocol
+            config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
+            val key = MmkvManager.encodeServerConfig("", config)
+            serverRawStorage?.encode(key, server)
+            return 1
         } else {
             return 0
         }
