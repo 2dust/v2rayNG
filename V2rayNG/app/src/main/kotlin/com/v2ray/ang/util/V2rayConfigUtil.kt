@@ -640,7 +640,11 @@ object V2rayConfigUtil {
                         ?: "50-100",
                     interval = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL)
                         ?: "10-20"
-                )
+                ),
+                noise = V2rayConfig.OutboundBean.OutSettingsBean.NoiseBean(
+                    packet = "rand:100-200",
+                    delay = "10-20",
+                ),
             )
             fragmentOutbound.streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean(
                 sockopt = V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
