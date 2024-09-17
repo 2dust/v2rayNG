@@ -17,6 +17,7 @@ import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.extension.toLongEx
 import com.v2ray.ang.service.SubscriptionUpdater
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
@@ -128,7 +129,7 @@ class SettingsActivity : BaseActivity() {
                 val value = newValue as Boolean
                 autoUpdateCheck?.isChecked = value
                 autoUpdateInterval?.isEnabled = value
-                autoUpdateInterval?.text?.toLong()?.let {
+                autoUpdateInterval?.text?.toLongEx()?.let {
                     if (newValue) configureUpdateTask(it) else cancelUpdateTask()
                 }
                 true
@@ -138,9 +139,9 @@ class SettingsActivity : BaseActivity() {
 
                 // It must be greater than 15 minutes because WorkManager couldn't run tasks under 15 minutes intervals
                 nval =
-                    if (TextUtils.isEmpty(nval) || nval.toLong() < 15) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
+                    if (TextUtils.isEmpty(nval) || nval.toLongEx() < 15) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
                 autoUpdateInterval?.summary = nval
-                configureUpdateTask(nval.toLong())
+                configureUpdateTask(nval.toLongEx())
                 true
             }
 
