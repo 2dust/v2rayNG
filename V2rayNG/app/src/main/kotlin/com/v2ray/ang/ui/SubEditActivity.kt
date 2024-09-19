@@ -47,6 +47,8 @@ class SubEditActivity : BaseActivity() {
         binding.etUrl.text = Utils.getEditable(subItem.url)
         binding.chkEnable.isChecked = subItem.enabled
         binding.autoUpdateCheck.isChecked = subItem.autoUpdate
+        binding.etPreProfile.text = Utils.getEditable(subItem.prevProfile)
+        binding.etNextProfile.text = Utils.getEditable(subItem.nextProfile)
         return true
     }
 
@@ -57,6 +59,8 @@ class SubEditActivity : BaseActivity() {
         binding.etRemarks.text = null
         binding.etUrl.text = null
         binding.chkEnable.isChecked = true
+        binding.etPreProfile.text = null
+        binding.etNextProfile.text = null
         return true
     }
 
@@ -78,6 +82,8 @@ class SubEditActivity : BaseActivity() {
         subItem.url = binding.etUrl.text.toString()
         subItem.enabled = binding.chkEnable.isChecked
         subItem.autoUpdate = binding.autoUpdateCheck.isChecked
+        subItem.prevProfile = binding.etPreProfile.text.toString()
+        subItem.nextProfile = binding.etNextProfile.text.toString()
 
         if (TextUtils.isEmpty(subItem.remarks)) {
             toast(R.string.sub_setting_remarks)

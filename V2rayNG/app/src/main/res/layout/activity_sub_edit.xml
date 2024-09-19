@@ -51,6 +51,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sub_setting_url" />
+
+
+                <EditText
+                    android:id="@+id/et_url"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:maxLines="10"
+                    android:minLines="2"
+                    android:scrollbars="vertical"
+                    tools:ignore="TextFields" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_top_height"
                 android:orientation="horizontal">
 
                 <TextView
@@ -98,25 +124,38 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sub_setting_url" />
-
+                    android:text="@string/sub_setting_pre_profile" />
 
                 <EditText
-                    android:id="@+id/et_url"
+                    android:id="@+id/et_pre_profile"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="top"
-                    android:inputType="textMultiLine"
-                    android:maxLines="10"
-                    android:minLines="5"
-                    android:scrollbars="vertical" />
+                    android:layout_height="@dimen/edit_height"
+                    android:inputType="text"
+                    android:hint="@string/sub_setting_pre_profile_tip" />
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:orientation="vertical">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sub_setting_next_profile" />
+
+                <EditText
+                    android:id="@+id/et_next_profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/edit_height"
+                    android:inputType="text"
+                    android:hint="@string/sub_setting_pre_profile_tip" />
+
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout

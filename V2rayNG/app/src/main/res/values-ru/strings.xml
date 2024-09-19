@@ -236,6 +236,9 @@
     <string name="sub_setting_url">URL (необязательно)</string>
     <string name="sub_setting_enable">Использовать обновление</string>
     <string name="sub_auto_update">Использовать автоматическое обновление</string>
+    <string name="sub_setting_pre_profile">Previous proxy remarks</string>
+    <string name="sub_setting_next_profile">Next proxy remarks</string>
+    <string name="sub_setting_pre_profile_tip">The remarks exists and is unique</string>
     <string name="title_sub_update">Обновить подписку группы</string>
     <string name="title_ping_all_server">Проверка профилей группы</string>
     <string name="title_real_ping_all_server">Время отклика профилей группы</string>
