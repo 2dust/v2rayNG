@@ -7,6 +7,7 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
+import com.v2ray.ang.util.Utils
 import java.lang.reflect.Type
 
 data class V2rayConfig(
@@ -447,6 +448,12 @@ data class V2rayConfig(
                 return settings?.peers?.get(0)?.endpoint?.substringAfterLast(":")?.toInt()
             }
             return null
+        }
+
+        fun getServerAddressAndPort(): String {
+            val address = getServerAddress().orEmpty()
+            val port = getServerPort()
+            return Utils.getIpv6Address(address) + ":" + port
         }
 
         fun getPassword(): String? {

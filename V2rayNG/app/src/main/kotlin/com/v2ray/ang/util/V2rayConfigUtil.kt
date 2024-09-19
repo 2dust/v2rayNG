@@ -25,20 +25,20 @@ object V2rayConfigUtil {
     private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
-    data class Result(var status: Boolean, var content: String)
+    data class Result(var status: Boolean, var content: String = "", var domainPort: String? = null)
 
     fun getV2rayConfig(context: Context, guid: String): Result {
         try {
-            val config = MmkvManager.decodeServerConfig(guid) ?: return Result(false, "")
+            val config = MmkvManager.decodeServerConfig(guid) ?: return Result(false)
             if (config.configType == EConfigType.CUSTOM) {
                 val raw = serverRawStorage?.decodeString(guid)
                 val customConfig = if (raw.isNullOrBlank()) {
-                    config.fullConfig?.toPrettyPrinting() ?: return Result(false, "")
+                    config.fullConfig?.toPrettyPrinting() ?: return Result(false)
                 } else {
                     raw
                 }
-                //Log.d(ANG_PACKAGE, customConfig)
-                return Result(true, customConfig)
+                val domainPort = config.getProxyOutbound()?.getServerAddressAndPort()
+                return Result(true, customConfig, domainPort)
             }
 
             val result = getV2rayNonCustomConfig(context, config)
@@ -46,12 +46,12 @@ object V2rayConfigUtil {
             return result
         } catch (e: Exception) {
             e.printStackTrace()
-            return Result(false, "")
+            return Result(false)
         }
     }
 
     private fun getV2rayNonCustomConfig(context: Context, config: ServerConfig): Result {
-        val result = Result(false, "")
+        val result = Result(false)
 
         val outbound = config.getProxyOutbound() ?: return result
         val address = outbound.getServerAddress() ?: return result
@@ -75,7 +75,7 @@ object V2rayConfigUtil {
 
         outbounds(v2rayConfig, outbound)
 
-        moreOutbounds(v2rayConfig, config.subscriptionId)
+        val retMore = moreOutbounds(v2rayConfig, config.subscriptionId)
 
         routing(v2rayConfig)
 
@@ -93,6 +93,7 @@ object V2rayConfigUtil {
 
         result.status = true
         result.content = v2rayConfig.toPrettyPrinting()
+        result.domainPort = if (retMore.first) retMore.second else outbound.getServerAddressAndPort()
         return result
     }
 
@@ -646,17 +647,20 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun moreOutbounds(v2rayConfig: V2rayConfig, subscriptionId: String): Boolean {
+    private fun moreOutbounds(v2rayConfig: V2rayConfig, subscriptionId: String): Pair<Boolean, String> {
+        val returnPair = Pair(false, "")
+        var domainPort: String = ""
+
         //fragment proxy
         if (settingsStorage?.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == true) {
-            return true
+            return returnPair
         }
 
         if (subscriptionId.isNullOrEmpty()) {
-            return true
+            return returnPair
         }
         try {
-            val subItem = MmkvManager.decodeSubscription(subscriptionId) ?: return false
+            val subItem = MmkvManager.decodeSubscription(subscriptionId) ?: return returnPair
 
             //current proxy
             val outbound = v2rayConfig.outbounds[0]
@@ -673,6 +677,7 @@ object V2rayConfigUtil {
                         V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
                             dialerProxy = prevOutbound.tag
                         )
+                    domainPort = prevOutbound.getServerAddressAndPort()
                 }
             }
 
@@ -684,7 +689,6 @@ object V2rayConfigUtil {
                     updateOutboundWithGlobalSettings(nextOutbound)
                     nextOutbound.tag = TAG_PROXY
                     v2rayConfig.outbounds.add(0, nextOutbound)
-
                     outbound.tag = TAG_PROXY + "1"
                     nextOutbound.streamSettings?.sockopt =
                         V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
@@ -694,9 +698,12 @@ object V2rayConfigUtil {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            return false
+            return returnPair
         }
 
-        return true
+        if (domainPort.isNotEmpty()) {
+            return Pair(true, domainPort)
+        }
+        return returnPair
     }
 }

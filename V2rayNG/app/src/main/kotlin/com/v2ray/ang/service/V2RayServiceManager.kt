@@ -153,7 +153,7 @@ object V2RayServiceManager {
         }
 
         v2rayPoint.configureFileContent = result.content
-        v2rayPoint.domainName = config.getV2rayPointDomainAndPort()
+        v2rayPoint.domainName = result.domainPort
         currentConfig = config
 
         try {
