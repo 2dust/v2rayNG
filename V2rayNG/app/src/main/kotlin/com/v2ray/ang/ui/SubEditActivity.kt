@@ -7,12 +7,12 @@ import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubEditBinding
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.MmkvManager.subStorage
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +23,6 @@ class SubEditActivity : BaseActivity() {
     var del_config: MenuItem? = null
     var save_config: MenuItem? = null
 
-    private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
     private val editSubId by lazy { intent.getStringExtra("subId").orEmpty() }
 
     override fun onCreate(savedInstanceState: Bundle?) {

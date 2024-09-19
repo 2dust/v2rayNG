@@ -4,7 +4,6 @@ import android.content.Context
 import android.text.TextUtils
 import android.util.Log
 import com.google.gson.Gson
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.PROTOCOL_FREEDOM
@@ -20,10 +19,9 @@ import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_NETWORK
 import com.v2ray.ang.dto.V2rayConfig.Companion.HTTP
+import com.v2ray.ang.util.MmkvManager.settingsStorage
 
 object V2rayConfigUtil {
-    private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
-    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     data class Result(var status: Boolean, var content: String = "", var domainPort: String? = null)
 
@@ -31,7 +29,7 @@ object V2rayConfigUtil {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return Result(false)
             if (config.configType == EConfigType.CUSTOM) {
-                val raw = serverRawStorage?.decodeString(guid)
+                val raw = MmkvManager.serverRawStorage?.decodeString(guid)
                 val customConfig = if (raw.isNullOrBlank()) {
                     config.fullConfig?.toPrettyPrinting() ?: return Result(false)
                 } else {

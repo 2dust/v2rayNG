@@ -10,11 +10,11 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.*
-import com.v2ray.ang.util.MmkvManager.KEY_SELECTED_SERVER
+import com.v2ray.ang.util.MmkvManager.serverRawStorage
+import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.fmt.ShadowsocksFmt
 import com.v2ray.ang.util.fmt.SocksFmt
 import com.v2ray.ang.util.fmt.TrojanFmt
@@ -25,25 +25,6 @@ import java.lang.reflect.Type
 import java.util.*
 
 object AngConfigManager {
-    private val mainStorage by lazy {
-        MMKV.mmkvWithID(
-            MmkvManager.ID_MAIN,
-            MMKV.MULTI_PROCESS_MODE
-        )
-    }
-    private val serverRawStorage by lazy {
-        MMKV.mmkvWithID(
-            MmkvManager.ID_SERVER_RAW,
-            MMKV.MULTI_PROCESS_MODE
-        )
-    }
-    private val settingsStorage by lazy {
-        MMKV.mmkvWithID(
-            MmkvManager.ID_SETTING,
-            MMKV.MULTI_PROCESS_MODE
-        )
-    }
-    private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
 
     /**
      * Legacy loading config
@@ -186,7 +167,7 @@ object AngConfigManager {
 //            }
 //            val key = MmkvManager.encodeServerConfig(vmessBean.guid, config)
 //            if (index == angConfig.index) {
-//                mainStorage?.encode(KEY_SELECTED_SERVER, key)
+//                mainStorage.encode(KEY_SELECTED_SERVER, key)
 //            }
 //        }
 //    }
@@ -243,7 +224,7 @@ object AngConfigManager {
                     ?.getServerPort() == removedSelectedServer.getProxyOutbound()
                     ?.getServerPort()
             ) {
-                mainStorage?.encode(KEY_SELECTED_SERVER, guid)
+                MmkvManager.setSelectServer(guid)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -434,7 +415,7 @@ object AngConfigManager {
             val removedSelectedServer =
                 if (!TextUtils.isEmpty(subid) && !append) {
                     MmkvManager.decodeServerConfig(
-                        mainStorage?.decodeString(KEY_SELECTED_SERVER).orEmpty()
+                        MmkvManager.getSelectServer().orEmpty()
                     )?.let {
                         if (it.subscriptionId == subid) {
                             return@let it

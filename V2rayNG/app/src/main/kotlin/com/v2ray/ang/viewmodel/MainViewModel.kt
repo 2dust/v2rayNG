@@ -26,7 +26,6 @@ import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.AngConfigManager.updateConfigViaSub
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.MmkvManager.KEY_ANG_CONFIGS
 import com.v2ray.ang.util.SpeedtestUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
@@ -123,7 +122,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun swapServer(fromPosition: Int, toPosition: Int) {
         Collections.swap(serverList, fromPosition, toPosition)
         Collections.swap(serversCache, fromPosition, toPosition)
-        MmkvManager.mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
+        MmkvManager.encodeServerList(serverList)
     }
 
     @Synchronized

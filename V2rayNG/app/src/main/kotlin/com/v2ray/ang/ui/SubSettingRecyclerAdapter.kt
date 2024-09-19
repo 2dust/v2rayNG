@@ -9,12 +9,11 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ItemQrcodeBinding
 import com.v2ray.ang.databinding.ItemRecyclerSubSettingBinding
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.MmkvManager.subStorage
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
 
@@ -22,7 +21,6 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) :
     RecyclerView.Adapter<SubSettingRecyclerAdapter.MainViewHolder>() {
 
     private var mActivity: SubSettingActivity = activity
-    private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
 
     private val share_method: Array<out String> by lazy {
         mActivity.resources.getStringArray(R.array.share_sub_method)

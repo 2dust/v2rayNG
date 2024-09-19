@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.ListView
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityTaskerBinding
@@ -21,8 +20,6 @@ class TaskerActivity : BaseActivity() {
     private var lstData: ArrayList<String> = ArrayList()
     private var lstGuid: ArrayList<String> = ArrayList()
 
-    private val serverStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_CONFIG, MMKV.MULTI_PROCESS_MODE) }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -31,7 +28,7 @@ class TaskerActivity : BaseActivity() {
         lstData.add("Default")
         lstGuid.add(AppConfig.TASKER_DEFAULT_GUID)
 
-        serverStorage?.allKeys()?.forEach { key ->
+        MmkvManager.serverStorage?.allKeys()?.forEach { key ->
             MmkvManager.decodeServerConfig(key)?.let { config ->
                 lstData.add(config.remarks)
                 lstGuid.add(key)
