@@ -171,6 +171,11 @@ object MmkvManager {
         removeServerViaSubid(subid)
     }
 
+    fun decodeSubscription(subscriptionId: String): SubscriptionItem? {
+        val json = subStorage.decodeString(subscriptionId) ?: return null
+        return Gson().fromJson(json, SubscriptionItem::class.java)
+    }
+
     fun decodeAssetUrls(): List<Pair<String, AssetUrlItem>> {
         val assetUrlItems = mutableListOf<Pair<String, AssetUrlItem>>()
         assetStorage?.allKeys()?.forEach { key ->
@@ -228,5 +233,19 @@ object MmkvManager {
         }
 
         mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
+    }
+
+    fun getServerViaRemarks(remarks: String?): ServerConfig? {
+        if (remarks == null) {
+            return null
+        }
+        val serverList = decodeServerList()
+        for (guid in serverList) {
+            val profile = decodeProfileConfig(guid)
+            if (profile != null && profile.remarks == remarks) {
+                return decodeServerConfig(guid)
+            }
+        }
+        return null
     }
 }

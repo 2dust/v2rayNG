@@ -16,29 +16,17 @@ import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ERoutingMode
+import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_NETWORK
 import com.v2ray.ang.dto.V2rayConfig.Companion.HTTP
 
 object V2rayConfigUtil {
-    private val serverRawStorage by lazy {
-        MMKV.mmkvWithID(
-            MmkvManager.ID_SERVER_RAW,
-            MMKV.MULTI_PROCESS_MODE
-        )
-    }
-    private val settingsStorage by lazy {
-        MMKV.mmkvWithID(
-            MmkvManager.ID_SETTING,
-            MMKV.MULTI_PROCESS_MODE
-        )
-    }
+    private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
+    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     data class Result(var status: Boolean, var content: String)
 
-    /**
-     * 生成v2ray的客户端配置文件
-     */
     fun getV2rayConfig(context: Context, guid: String): Result {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return Result(false, "")
@@ -52,16 +40,8 @@ object V2rayConfigUtil {
                 //Log.d(ANG_PACKAGE, customConfig)
                 return Result(true, customConfig)
             }
-            val outbound = config.getProxyOutbound() ?: return Result(false, "")
-            val address = outbound.getServerAddress() ?: return Result(false, "")
-            if (!Utils.isIpAddress(address)) {
-                if (!Utils.isValidUrl(address)) {
-                    Log.d(ANG_PACKAGE, "$address is an invalid ip or domain")
-                    return Result(false, "")
-                }
-            }
 
-            val result = getV2rayNonCustomConfig(context, outbound, config.remarks)
+            val result = getV2rayNonCustomConfig(context, config)
             //Log.d(ANG_PACKAGE, result.content)
             return result
         } catch (e: Exception) {
@@ -70,33 +50,32 @@ object V2rayConfigUtil {
         }
     }
 
-    /**
-     * 生成v2ray的客户端配置文件
-     */
-    private fun getV2rayNonCustomConfig(
-        context: Context,
-        outbound: V2rayConfig.OutboundBean,
-        remarks: String,
-    ): Result {
+    private fun getV2rayNonCustomConfig(context: Context, config: ServerConfig): Result {
         val result = Result(false, "")
+
+        val outbound = config.getProxyOutbound() ?: return result
+        val address = outbound.getServerAddress() ?: return result
+        if (!Utils.isIpAddress(address)) {
+            if (!Utils.isValidUrl(address)) {
+                Log.d(ANG_PACKAGE, "$address is an invalid ip or domain")
+                return result
+            }
+        }
+
         //取得默认配置
         val assets = Utils.readTextFromAssets(context, "v2ray_config.json")
         if (TextUtils.isEmpty(assets)) {
             return result
         }
-
-        //转成Json
         val v2rayConfig = Gson().fromJson(assets, V2rayConfig::class.java) ?: return result
-
-        v2rayConfig.log.loglevel = settingsStorage?.decodeString(AppConfig.PREF_LOGLEVEL)
-            ?: "warning"
+        v2rayConfig.log.loglevel = settingsStorage?.decodeString(AppConfig.PREF_LOGLEVEL) ?: "warning"
+        v2rayConfig.remarks = config.remarks
 
         inbounds(v2rayConfig)
 
-        updateOutboundWithGlobalSettings(outbound)
-        v2rayConfig.outbounds[0] = outbound
+        outbounds(v2rayConfig, outbound)
 
-        updateOutboundFragment(v2rayConfig)
+        moreOutbounds(v2rayConfig, config.subscriptionId)
 
         routing(v2rayConfig)
 
@@ -112,16 +91,11 @@ object V2rayConfigUtil {
             v2rayConfig.policy = null
         }
 
-        v2rayConfig.remarks = remarks
-
         result.status = true
         result.content = v2rayConfig.toPrettyPrinting()
         return result
     }
 
-    /**
-     *
-     */
     private fun inbounds(v2rayConfig: V2rayConfig): Boolean {
         try {
             val socksPort = Utils.parseInt(
@@ -170,6 +144,20 @@ object V2rayConfigUtil {
         return true
     }
 
+    private fun outbounds(v2rayConfig: V2rayConfig, outbound: V2rayConfig.OutboundBean): Boolean {
+        val ret = updateOutboundWithGlobalSettings(outbound)
+        if (!ret) return false
+
+        if (v2rayConfig.outbounds.isNotEmpty()) {
+            v2rayConfig.outbounds[0] = outbound
+        } else {
+            v2rayConfig.outbounds.add(outbound)
+        }
+
+        updateOutboundFragment(v2rayConfig)
+        return true
+    }
+
     private fun fakedns(v2rayConfig: V2rayConfig) {
         if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true
             && settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
@@ -178,9 +166,6 @@ object V2rayConfigUtil {
         }
     }
 
-    /**
-     * routing
-     */
     private fun routing(v2rayConfig: V2rayConfig): Boolean {
         try {
             val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
@@ -268,12 +253,7 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun routingGeo(
-        ipOrDomain: String,
-        code: String,
-        tag: String,
-        v2rayConfig: V2rayConfig
-    ) {
+    private fun routingGeo(ipOrDomain: String, code: String, tag: String, v2rayConfig: V2rayConfig) {
         try {
             if (!TextUtils.isEmpty(code)) {
                 //IP
@@ -343,9 +323,6 @@ object V2rayConfigUtil {
         return domain
     }
 
-    /**
-     * Custom Dns
-     */
     private fun customLocalDns(v2rayConfig: V2rayConfig): Boolean {
         try {
             if (settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
@@ -666,6 +643,60 @@ object V2rayConfigUtil {
             e.printStackTrace()
             return false
         }
+        return true
+    }
+
+    private fun moreOutbounds(v2rayConfig: V2rayConfig, subscriptionId: String): Boolean {
+        //fragment proxy
+        if (settingsStorage?.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == true) {
+            return true
+        }
+
+        if (subscriptionId.isNullOrEmpty()) {
+            return true
+        }
+        try {
+            val subItem = MmkvManager.decodeSubscription(subscriptionId) ?: return false
+
+            //current proxy
+            val outbound = v2rayConfig.outbounds[0]
+
+            //Previous proxy
+            val prevNode = MmkvManager.getServerViaRemarks(subItem.prevProfile)
+            if (prevNode != null) {
+                val prevOutbound = prevNode.getProxyOutbound()
+                if (prevOutbound != null) {
+                    updateOutboundWithGlobalSettings(prevOutbound)
+                    prevOutbound.tag = TAG_PROXY + "2"
+                    v2rayConfig.outbounds.add(prevOutbound)
+                    outbound.streamSettings?.sockopt =
+                        V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
+                            dialerProxy = prevOutbound.tag
+                        )
+                }
+            }
+
+            //Next proxy
+            val nextNode = MmkvManager.getServerViaRemarks(subItem.nextProfile)
+            if (nextNode != null) {
+                val nextOutbound = nextNode.getProxyOutbound()
+                if (nextOutbound != null) {
+                    updateOutboundWithGlobalSettings(nextOutbound)
+                    nextOutbound.tag = TAG_PROXY
+                    v2rayConfig.outbounds.add(0, nextOutbound)
+
+                    outbound.tag = TAG_PROXY + "1"
+                    nextOutbound.streamSettings?.sockopt =
+                        V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
+                            dialerProxy = outbound.tag
+                        )
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+
         return true
     }
 }
