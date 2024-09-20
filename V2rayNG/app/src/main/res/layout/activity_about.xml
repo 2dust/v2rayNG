@@ -34,7 +34,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingStart="16dp">
+                    android:paddingStart="@dimen/padding_start">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -73,7 +73,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
+                    android:paddingStart="@dimen/padding_start"
                     android:text="@string/title_configuration_share"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
@@ -97,7 +97,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
+                    android:paddingStart="@dimen/padding_start"
                     android:text="@string/title_configuration_restore"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
@@ -129,7 +129,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
+                    android:paddingStart="@dimen/padding_start"
                     android:text="@string/title_source_code"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
@@ -153,7 +153,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
+                    android:paddingStart="@dimen/padding_start"
                     android:text="@string/title_pref_feedback"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
@@ -178,7 +178,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
+                    android:paddingStart="@dimen/padding_start"
                     android:text="@string/title_tg_channel"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
@@ -202,7 +202,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
+                    android:paddingStart="@dimen/padding_start"
                     android:text="@string/title_privacy_policy"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>

@@ -11,9 +11,9 @@
         android:id="@+id/icon"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:paddingStart="10dp"
+        android:paddingStart="@dimen/padding_start"
         android:paddingLeft="10dp"
-        android:paddingEnd="10dp"
+        android:paddingEnd="@dimen/padding_end"
         android:paddingRight="10dp" />
 
     <LinearLayout
@@ -22,8 +22,8 @@
         android:layout_weight="1.0"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingStart="@dimen/layout_margin_right_height"
-        android:paddingEnd="@dimen/layout_margin_right_height">
+        android:paddingStart="@dimen/padding_start"
+        android:paddingEnd="@dimen/padding_end">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/name"
@@ -44,9 +44,9 @@
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"
-        android:paddingStart="2dp"
+        android:paddingStart="@dimen/padding_start"
         android:paddingLeft="2dp"
-        android:paddingEnd="6dp"
+        android:paddingEnd="@dimen/padding_end"
         android:paddingRight="6dp" />
 
 </LinearLayout>

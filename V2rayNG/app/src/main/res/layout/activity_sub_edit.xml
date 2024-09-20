@@ -86,12 +86,12 @@
                     android:text="@string/sub_setting_enable" />
 
 
-                <androidx.appcompat.widget.AppCompatCheckBox
+                <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/chk_enable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="6dp" />
+                    android:paddingStart="@dimen/padding_start"
+                    android:paddingEnd="@dimen/padding_end" />
 
             </LinearLayout>
 
@@ -108,12 +108,12 @@
                     android:text="@string/sub_auto_update" />
 
 
-                <androidx.appcompat.widget.AppCompatCheckBox
+                <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/auto_update_check"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="6dp" />
+                    android:paddingStart="@dimen/padding_start"
+                    android:paddingEnd="@dimen/padding_end" />
 
             </LinearLayout>
 

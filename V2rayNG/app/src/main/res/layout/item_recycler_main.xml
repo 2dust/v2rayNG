@@ -11,7 +11,7 @@
         android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="1dp"
+        android:layout_margin="@dimen/cardview_margin"
         app:cardCornerRadius="5dp">
 
         <LinearLayout
@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:paddingStart="9dp">
+                android:paddingStart="@dimen/padding_start">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -80,7 +80,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingEnd="5dp">
+                    android:paddingEnd="@dimen/padding_end">
 
                     <TextView
                         android:id="@+id/tv_subscription"
@@ -172,7 +172,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
                     android:orientation="vertical"
-                    android:paddingEnd="5dp">
+                    android:paddingEnd="@dimen/padding_end">
 
                     <TextView
                         android:id="@+id/tv_type"

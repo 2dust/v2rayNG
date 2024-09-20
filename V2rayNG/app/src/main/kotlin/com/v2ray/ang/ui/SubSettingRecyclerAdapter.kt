@@ -33,11 +33,7 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) :
         val subItem = mActivity.subscriptions[position].second
         holder.itemSubSettingBinding.tvName.text = subItem.remarks
         holder.itemSubSettingBinding.tvUrl.text = subItem.url
-        if (subItem.enabled) {
-            holder.itemSubSettingBinding.chkEnable.setBackgroundResource(R.color.colorAccent)
-        } else {
-            holder.itemSubSettingBinding.chkEnable.setBackgroundResource(0)
-        }
+        holder.itemSubSettingBinding.chkEnable.isChecked = subItem.enabled
         holder.itemView.setBackgroundColor(Color.TRANSPARENT)
 
         holder.itemSubSettingBinding.layoutEdit.setOnClickListener {
@@ -46,10 +42,10 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) :
                     .putExtra("subId", subId)
             )
         }
-        holder.itemSubSettingBinding.infoContainer.setOnClickListener {
-            subItem.enabled = !subItem.enabled
+
+        holder.itemSubSettingBinding.chkEnable.setOnCheckedChangeListener { _, isChecked ->
+            subItem.enabled = isChecked
             subStorage?.encode(subId, Gson().toJson(subItem))
-            notifyItemChanged(position)
         }
 
         if (TextUtils.isEmpty(subItem.url)) {
