@@ -7,7 +7,6 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.ServerAffiliationInfo
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.SubscriptionItem
-import java.net.URI
 
 object MmkvManager {
     private const val ID_MAIN = "MAIN"
@@ -152,21 +151,6 @@ object MmkvManager {
         }
     }
 
-    fun importUrlAsSubscription(url: String): Int {
-        val subscriptions = decodeSubscriptions()
-        subscriptions.forEach {
-            if (it.second.url == url) {
-                return 0
-            }
-        }
-        val uri = URI(Utils.fixIllegalUrl(url))
-        val subItem = SubscriptionItem()
-        subItem.remarks = uri.fragment ?: "import sub"
-        subItem.url = url
-        subStorage.encode(Utils.getUuid(), Gson().toJson(subItem))
-        return 1
-    }
-
     fun decodeSubscriptions(): List<Pair<String, SubscriptionItem>> {
         val subscriptions = mutableListOf<Pair<String, SubscriptionItem>>()
         subStorage.allKeys()?.forEach { key ->
@@ -226,25 +210,6 @@ object MmkvManager {
                 }
             }
         }
-    }
-
-    fun sortByTestResults() {
-        data class ServerDelay(var guid: String, var testDelayMillis: Long)
-
-        val serverDelays = mutableListOf<ServerDelay>()
-        val serverList = decodeServerList()
-        serverList.forEach { key ->
-            val delay = decodeServerAffiliationInfo(key)?.testDelayMillis ?: 0L
-            serverDelays.add(ServerDelay(key, if (delay <= 0L) 999999 else delay))
-        }
-        serverDelays.sortBy { it.testDelayMillis }
-
-        serverDelays.forEach {
-            serverList.remove(it.guid)
-            serverList.add(it.guid)
-        }
-
-        encodeServerList(serverList)
     }
 
     fun getServerViaRemarks(remarks: String?): ServerConfig? {

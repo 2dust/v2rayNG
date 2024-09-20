@@ -310,7 +310,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun sortByTestResults() {
-        MmkvManager.sortByTestResults()
+        data class ServerDelay(var guid: String, var testDelayMillis: Long)
+
+        val serverDelays = mutableListOf<ServerDelay>()
+        val serverList = MmkvManager.decodeServerList()
+        serverList.forEach { key ->
+            val delay = MmkvManager.decodeServerAffiliationInfo(key)?.testDelayMillis ?: 0L
+            serverDelays.add(ServerDelay(key, if (delay <= 0L) 999999 else delay))
+        }
+        serverDelays.sortBy { it.testDelayMillis }
+
+        serverDelays.forEach {
+            serverList.remove(it.guid)
+            serverList.add(it.guid)
+        }
+
+        MmkvManager.encodeServerList(serverList)
     }
 
 

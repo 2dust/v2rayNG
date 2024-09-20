@@ -15,6 +15,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.*
 import com.v2ray.ang.util.MmkvManager.serverRawStorage
 import com.v2ray.ang.util.MmkvManager.settingsStorage
+import com.v2ray.ang.util.MmkvManager.subStorage
 import com.v2ray.ang.util.fmt.ShadowsocksFmt
 import com.v2ray.ang.util.fmt.SocksFmt
 import com.v2ray.ang.util.fmt.TrojanFmt
@@ -22,6 +23,7 @@ import com.v2ray.ang.util.fmt.VlessFmt
 import com.v2ray.ang.util.fmt.VmessFmt
 import com.v2ray.ang.util.fmt.WireguardFmt
 import java.lang.reflect.Type
+import java.net.URI
 import java.util.*
 
 object AngConfigManager {
@@ -397,7 +399,7 @@ object AngConfigManager {
             servers.lines()
                 .forEach { str ->
                     if (str.startsWith(AppConfig.PROTOCOL_HTTP) || str.startsWith(AppConfig.PROTOCOL_HTTPS)) {
-                        count += MmkvManager.importUrlAsSubscription(str)
+                        count += importUrlAsSubscription(str)
                     }
                 }
             return count
@@ -576,5 +578,20 @@ object AngConfigManager {
             count = parseCustomConfigServer(server, subid)
         }
         return count
+    }
+
+    private fun importUrlAsSubscription(url: String): Int {
+        val subscriptions = MmkvManager.decodeSubscriptions()
+        subscriptions.forEach {
+            if (it.second.url == url) {
+                return 0
+            }
+        }
+        val uri = URI(Utils.fixIllegalUrl(url))
+        val subItem = SubscriptionItem()
+        subItem.remarks = uri.fragment ?: "import sub"
+        subItem.url = url
+        subStorage.encode(Utils.getUuid(), Gson().toJson(subItem))
+        return 1
     }
 }
