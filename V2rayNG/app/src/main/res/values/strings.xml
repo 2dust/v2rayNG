@@ -306,4 +306,10 @@
         <item>Dark</item>
     </string-array>
 
+    <string-array name="preset_rulesets">
+        <item>China Whitelist</item>
+        <item>China Blacklist</item>
+        <item>Global</item>
+    </string-array>
+
 </resources>

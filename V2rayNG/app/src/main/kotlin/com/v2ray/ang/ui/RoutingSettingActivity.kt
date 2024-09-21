@@ -29,6 +29,9 @@ class RoutingSettingActivity : BaseActivity() {
     private val routing_domain_strategy: Array<out String> by lazy {
         resources.getStringArray(R.array.routing_domain_strategy)
     }
+    private val preset_rulesets: Array<out String> by lazy {
+        resources.getStringArray(R.array.preset_rulesets)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,13 +79,21 @@ class RoutingSettingActivity : BaseActivity() {
         R.id.import_rulesets -> {
             AlertDialog.Builder(this).setMessage(R.string.routing_settings_import_rulesets_tip)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        SettingsManager.resetRoutingRulesets(this@RoutingSettingActivity)
-                        launch(Dispatchers.Main) {
-                            refreshData()
-                            toast(R.string.toast_success)
+                    AlertDialog.Builder(this).setItems(preset_rulesets.asList().toTypedArray()) { _, i ->
+                        try {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                SettingsManager.resetRoutingRulesets(this@RoutingSettingActivity, i)
+                                launch(Dispatchers.Main) {
+                                    refreshData()
+                                    toast(R.string.toast_success)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
-                    }
+                    }.show()
+
+
                 }
                 .setNegativeButton(android.R.string.no) { _, _ ->
                     //do noting

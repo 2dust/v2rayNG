@@ -2,32 +2,34 @@ package com.v2ray.ang.util
 
 import android.content.Context
 import android.text.TextUtils
-import android.util.Log
 import com.google.gson.Gson
 import com.v2ray.ang.dto.RulesetItem
 
 object SettingsManager {
 
-    fun initRoutingRulesets(context: Context) {
-        Log.d("=====", "initRoutingRuleset")
+    fun initRoutingRulesets(context: Context, index: Int = 0) {
         val exist = MmkvManager.decodeRoutingRulesets()
 
+        val fileName = when (index) {
+            0 -> "custom_routing_white"
+            1 -> "custom_routing_black"
+            2 -> "custom_routing_global"
+            else -> "custom_routing_white"
+        }
         if (exist.isNullOrEmpty()) {
-            Log.d("=====", "isNullOrEmpty")
-            val assets = Utils.readTextFromAssets(context, "custom_routing_white")
+            val assets = Utils.readTextFromAssets(context, fileName)
             if (TextUtils.isEmpty(assets)) {
                 return
             }
 
             val rulesetList = Gson().fromJson(assets, Array<RulesetItem>::class.java).toMutableList()
-            Log.d("=====", "rulesetList==" + rulesetList.count())
             MmkvManager.encodeRoutingRulesets(rulesetList)
         }
     }
 
-    fun resetRoutingRulesets(context: Context) {
+    fun resetRoutingRulesets(context: Context, index: Int) {
         MmkvManager.encodeRoutingRulesets(null)
-        initRoutingRulesets(context)
+        initRoutingRulesets(context, index)
     }
 
     fun getRoutingRuleset(index: Int): RulesetItem? {

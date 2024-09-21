@@ -295,4 +295,10 @@
         <item>深色</item>
     </string-array>
 
+    <string-array name="preset_rulesets">
+        <item>繞過大陸(Whitelist)</item>
+        <item>黑名單(Blacklist)</item>
+        <item>全域(Global)</item>
+    </string-array>
+
 </resources>
