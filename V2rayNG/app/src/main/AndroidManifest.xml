@@ -98,8 +98,10 @@
             android:name=".ui.LogcatActivity" />
         <activity
             android:exported="false"
-            android:name=".ui.RoutingSettingsActivity"
-            android:windowSoftInputMode="stateUnchanged" />
+            android:name=".ui.RoutingSettingActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.RoutingEditActivity" />
         <activity
             android:exported="false"
             android:name=".ui.SubSettingActivity" />

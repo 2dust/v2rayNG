@@ -158,11 +158,6 @@
     <string name="title_pref_prefer_ipv6">Предпочитать IPv6</string>
     <string name="summary_pref_prefer_ipv6">Предпочитать IPv6-адреса и маршрутизацию</string>
 
-    <string name="title_pref_routing">Маршрутизация</string>
-    <string name="title_pref_routing_domain_strategy">Доменная стратегия</string>
-    <string name="title_pref_routing_mode">Режим маршрутизации</string>
-    <string name="title_pref_routing_custom">Пользовательские правила</string>
-
     <string name="title_pref_remote_dns">Удалённая DNS (UDP/TCP/HTTPS/QUIC) (необязательно)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
@@ -251,13 +246,15 @@
     <string name="tasker_start_service">Запуск службы</string>
     <string name="tasker_setting_confirm">Подтвердить</string>
 
+    <string name="routing_settings_domain_strategy">Доменная стратегия</string>
     <string name="routing_settings_title">Настройки маршрутизации</string>
     <string name="routing_settings_tips">Введите требуемые IP/URL через запятую. Не забудьте сохранить изменения.</string>
     <string name="routing_settings_save">Сохранить</string>
     <string name="routing_settings_delete">Очистить</string>
-    <string name="routing_settings_scan_replace">Сканировать и заменить</string>
-    <string name="routing_settings_scan_append">Сканировать и добавить</string>
-    <string name="routing_settings_default_rules">Правила по умолчанию</string>
+    <string name="routing_settings_rule_title">Routing Rule Settings</string>
+    <string name="routing_settings_add_rule">Add rule</string>
+    <string name="routing_settings_import_rulesets">Import ruleset</string>
+    <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
 
     <string name="connection_test_pending">Проверить подключение</string>
     <string name="connection_test_testing">Проверка…</string>
@@ -285,20 +282,6 @@
     <string-array name="share_sub_method">
         <item>QR-код</item>
         <item>Экспорт в буфер обмена</item>
-    </string-array>
-
-    <string-array name="routing_tag">
-        <item>Проксируемые</item>
-        <item>Прямые</item>
-        <item>Блокируемые</item>
-    </string-array>
-
-    <string-array name="routing_mode">
-        <item>Все через прокси</item>
-        <item>Все, кроме LAN через прокси</item>
-        <item>Все, кроме Китая через прокси</item>
-        <item>Все, кроме LAN и Китая через прокси</item>
-        <item>Все напрямую</item>
     </string-array>
 
     <string-array name="mode_entries">

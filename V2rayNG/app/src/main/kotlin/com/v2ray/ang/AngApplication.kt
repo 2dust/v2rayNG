@@ -5,6 +5,7 @@ import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.util.SettingsManager
 import com.v2ray.ang.util.Utils
 
 class AngApplication : MultiDexApplication() {
@@ -38,5 +39,7 @@ class AngApplication : MultiDexApplication() {
         Utils.setNightMode(application)
         // Initialize WorkManager with the custom configuration
         WorkManager.initialize(this, workManagerConfiguration)
+
+        SettingsManager.initRoutingRulesets(this)
     }
 }

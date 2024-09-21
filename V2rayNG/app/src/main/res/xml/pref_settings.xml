@@ -42,30 +42,6 @@
             android:title="@string/title_pref_vpn_dns" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/title_pref_routing">
-        <ListPreference
-            android:defaultValue="IPIfNonMatch"
-            android:entries="@array/routing_domain_strategy"
-            android:entryValues="@array/routing_domain_strategy"
-            android:key="pref_routing_domain_strategy"
-            android:summary="%s"
-            android:title="@string/title_pref_routing_domain_strategy" />
-
-        <ListPreference
-            android:defaultValue="3"
-            android:entries="@array/routing_mode"
-            android:entryValues="@array/routing_mode_value"
-            android:key="pref_routing_mode"
-            android:summary="%s"
-            android:title="@string/title_pref_routing_mode" />
-
-        <Preference
-            android:key="pref_routing_custom"
-            android:summary="@string/title_pref_routing_custom"
-            android:title="@string/title_pref_routing_custom" />
-
-    </PreferenceCategory>
-
     <PreferenceCategory android:title="@string/title_ui_settings">
         <CheckBoxPreference
             android:key="pref_speed_enabled"

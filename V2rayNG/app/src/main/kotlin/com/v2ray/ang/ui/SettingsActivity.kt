@@ -43,8 +43,6 @@ class SettingsActivity : BaseActivity() {
         private val localDnsPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_LOCAL_DNS_PORT) }
         private val vpnDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_VPN_DNS) }
 
-        private val routingCustom by lazy { findPreference<Preference>(AppConfig.PREF_ROUTING_CUSTOM) }
-
         private val mux by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_MUX_ENABLED) }
         private val muxConcurrency by lazy { findPreference<EditTextPreference>(AppConfig.PREF_MUX_CONCURRENCY) }
         private val muxXudpConcurrency by lazy { findPreference<EditTextPreference>(AppConfig.PREF_MUX_XUDP_CONCURRENCY) }
@@ -86,11 +84,6 @@ class SettingsActivity : BaseActivity() {
             vpnDns?.setOnPreferenceChangeListener { _, any ->
                 vpnDns?.summary = any as String
                 true
-            }
-
-            routingCustom?.setOnPreferenceClickListener {
-                startActivity(Intent(activity, RoutingSettingsActivity::class.java))
-                false
             }
 
             mux?.setOnPreferenceChangeListener { _, newValue ->
@@ -251,7 +244,6 @@ class SettingsActivity : BaseActivity() {
 
             listOf(
                 AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,
-                AppConfig.PREF_ROUTING_MODE,
                 AppConfig.PREF_MUX_XUDP_QUIC,
                 AppConfig.PREF_FRAGMENT_PACKETS,
                 AppConfig.PREF_LANGUAGE,

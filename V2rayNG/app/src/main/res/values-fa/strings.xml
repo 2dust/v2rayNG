@@ -155,11 +155,6 @@
     <string name="title_pref_prefer_ipv6">ترجیح دادن IPv6</string>
     <string name="summary_pref_prefer_ipv6">ترجیح دادن نشانی و مسیر های IPv6</string>
 
-    <string name="title_pref_routing">مسیریابی</string>
-    <string name="title_pref_routing_domain_strategy">استراتژی دامنه</string>
-    <string name="title_pref_routing_mode">قوانین از پیش تعریف شده</string>
-    <string name="title_pref_routing_custom">قوانین سفارشی</string>
-
     <string name="title_pref_remote_dns">DNS از راه دور (اختیاری)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
@@ -247,13 +242,15 @@
     <string name="tasker_start_service">شروع خدمات</string>
     <string name="tasker_setting_confirm">تایید</string>
 
+    <string name="routing_settings_domain_strategy">استراتژی دامنه</string>
     <string name="routing_settings_title">تنظیمات مسیریابی</string>
     <string name="routing_settings_tips">با کاما (,) از هم جدا شوند، ذخیره کردن فراموش نشود</string>
     <string name="routing_settings_save">ذخیره</string>
     <string name="routing_settings_delete">پاک کردن</string>
-    <string name="routing_settings_scan_replace">اسکن و جایگزین کنید</string>
-    <string name="routing_settings_scan_append">اسکن و اضافه کنید</string>
-    <string name="routing_settings_default_rules">قوانین مسیریابی پیش‌فرض را تنظیم کنید</string>
+    <string name="routing_settings_rule_title">Routing Rule Settings</string>
+    <string name="routing_settings_add_rule">Add rule</string>
+    <string name="routing_settings_import_rulesets">Import ruleset</string>
+    <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
 
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
     <string name="connection_test_testing">در حال آزمایش...</string>
@@ -280,20 +277,6 @@
     <string-array name="share_sub_method">
         <item>QRcode</item>
         <item>خروجی گرفتن در کلیپ‌بورد</item>
-    </string-array>
-
-    <string-array name="routing_tag">
-        <item>نشانی اینترنتی یا آی‌پی پروکسی</item>
-        <item>نشانی اینترنتی یا آی‌پی مستقیم</item>
-        <item>نشانی اینترنتی یا آی‌پی مسدود شده</item>
-    </string-array>
-
-    <string-array name="routing_mode">
-        <item>پروکسی سراسری</item>
-        <item>دور زدن آدرس LAN و سپس پروکسی</item>
-        <item>دور زدن آدرس mainland و سپس پروکسی</item>
-        <item>دور زدن LAN و آدرس mainland و سپس پروکسی</item>
-        <item>مستقیم سراسری</item>
     </string-array>
 
     <string-array name="mode_entries">

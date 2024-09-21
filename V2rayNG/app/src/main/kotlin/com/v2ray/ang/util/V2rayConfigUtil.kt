@@ -14,11 +14,12 @@ import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.ERoutingMode
+import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_NETWORK
 import com.v2ray.ang.dto.V2rayConfig.Companion.HTTP
+import com.v2ray.ang.dto.V2rayConfig.RoutingBean.RulesBean
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 
 object V2rayConfigUtil {
@@ -40,7 +41,7 @@ object V2rayConfigUtil {
             }
 
             val result = getV2rayNonCustomConfig(context, config)
-            //Log.d(ANG_PACKAGE, result.content)
+            Log.d(ANG_PACKAGE, result.content)
             return result
         } catch (e: Exception) {
             e.printStackTrace()
@@ -167,84 +168,13 @@ object V2rayConfigUtil {
 
     private fun routing(v2rayConfig: V2rayConfig): Boolean {
         try {
-            val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
-                ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
 
-            routingUserRule(
-                settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
-                    .orEmpty(), TAG_BLOCKED, v2rayConfig
-            )
-            if (routingMode == ERoutingMode.GLOBAL_DIRECT.value) {
-                routingUserRule(
-                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                        .orEmpty(), TAG_DIRECT, v2rayConfig
-                )
-                routingUserRule(
-                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                        .orEmpty(), TAG_PROXY, v2rayConfig
-                )
-            } else {
-                routingUserRule(
-                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                        .orEmpty(), TAG_PROXY, v2rayConfig
-                )
-                routingUserRule(
-                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                        .orEmpty(), TAG_DIRECT, v2rayConfig
-                )
+            v2rayConfig.routing.domainStrategy = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY) ?: "IPIfNonMatch"
+
+            val rulesetItems = MmkvManager.decodeRoutingRulesets()
+            rulesetItems?.forEach { key ->
+                routingUserRule(key, v2rayConfig)
             }
-
-            v2rayConfig.routing.domainStrategy =
-                settingsStorage?.decodeString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY)
-                    ?: "IPIfNonMatch"
-
-            // Hardcode googleapis.cn gstatic.com
-            val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
-                outboundTag = TAG_PROXY,
-                domain = arrayListOf("domain:googleapis.cn", "domain:gstatic.com")
-            )
-
-            when (routingMode) {
-                ERoutingMode.BYPASS_LAN.value -> {
-                    routingGeo("", "private", TAG_DIRECT, v2rayConfig)
-                }
-
-                ERoutingMode.BYPASS_MAINLAND.value -> {
-                    routingGeo("", "cn", TAG_DIRECT, v2rayConfig)
-                    v2rayConfig.routing.rules.add(0, googleapisRoute)
-                }
-
-                ERoutingMode.BYPASS_LAN_MAINLAND.value -> {
-                    routingGeo("", "private", TAG_DIRECT, v2rayConfig)
-                    routingGeo("", "cn", TAG_DIRECT, v2rayConfig)
-                    v2rayConfig.routing.rules.add(0, googleapisRoute)
-                }
-
-                ERoutingMode.GLOBAL_DIRECT.value -> {
-                    val globalDirect = V2rayConfig.RoutingBean.RulesBean(
-                        outboundTag = TAG_DIRECT,
-                    )
-                    if (v2rayConfig.routing.domainStrategy != "IPIfNonMatch") {
-                        globalDirect.port = "0-65535"
-                    } else {
-                        globalDirect.ip = arrayListOf("0.0.0.0/0", "::/0")
-                    }
-                    v2rayConfig.routing.rules.add(globalDirect)
-                }
-            }
-
-            if (routingMode != ERoutingMode.GLOBAL_DIRECT.value) {
-                val globalProxy = V2rayConfig.RoutingBean.RulesBean(
-                    outboundTag = TAG_PROXY,
-                )
-                if (v2rayConfig.routing.domainStrategy != "IPIfNonMatch") {
-                    globalProxy.port = "0-65535"
-                } else {
-                    globalProxy.ip = arrayListOf("0.0.0.0/0", "::/0")
-                }
-                v2rayConfig.routing.rules.add(globalProxy)
-            }
-
         } catch (e: Exception) {
             e.printStackTrace()
             return false
@@ -252,73 +182,35 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun routingGeo(ipOrDomain: String, code: String, tag: String, v2rayConfig: V2rayConfig) {
+    private fun routingUserRule(item: RulesetItem?, v2rayConfig: V2rayConfig) {
         try {
-            if (!TextUtils.isEmpty(code)) {
-                //IP
-                if (ipOrDomain == "ip" || ipOrDomain == "") {
-                    val rulesIP = V2rayConfig.RoutingBean.RulesBean()
-                    rulesIP.outboundTag = tag
-                    rulesIP.ip = ArrayList()
-                    rulesIP.ip?.add("geoip:$code")
-                    v2rayConfig.routing.rules.add(rulesIP)
-                }
-
-                if (ipOrDomain == "domain" || ipOrDomain == "") {
-                    //Domain
-                    val rulesDomain = V2rayConfig.RoutingBean.RulesBean()
-                    rulesDomain.outboundTag = tag
-                    rulesDomain.domain = ArrayList()
-                    rulesDomain.domain?.add("geosite:$code")
-                    v2rayConfig.routing.rules.add(rulesDomain)
-                }
+            if (item == null || !item.enabled) {
+                return
             }
+
+            val rule = Gson().fromJson(Gson().toJson(item), RulesBean::class.java) ?: return
+
+            v2rayConfig.routing.rules.add(rule)
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private fun routingUserRule(userRule: String, tag: String, v2rayConfig: V2rayConfig) {
-        try {
-            if (!TextUtils.isEmpty(userRule)) {
-                //Domain
-                val rulesDomain = V2rayConfig.RoutingBean.RulesBean()
-                rulesDomain.outboundTag = tag
-                rulesDomain.domain = ArrayList()
+    private fun userRule2Domain(tag: String): ArrayList<String> {
+        val domain = ArrayList<String>()
 
-                //IP
-                val rulesIP = V2rayConfig.RoutingBean.RulesBean()
-                rulesIP.outboundTag = tag
-                rulesIP.ip = ArrayList()
-
-                userRule.split(",").map { it.trim() }.forEach {
-                    if (it.startsWith("ext:") && it.contains("geoip")) {
-                        rulesIP.ip?.add(it)
-                    } else if (Utils.isIpAddress(it) || it.startsWith("geoip:")) {
-                        rulesIP.ip?.add(it)
-                    } else if (it.isNotEmpty()) {
-                        rulesDomain.domain?.add(it)
+        val rulesetItems = MmkvManager.decodeRoutingRulesets()
+        rulesetItems?.forEach { key ->
+            if (key != null && key.enabled && key.outboundTag == tag && !key.domain.isNullOrEmpty()) {
+                key.domain?.forEach {
+                    if (it.startsWith("geosite:") || it.startsWith("domain:")) {
+                        domain.add(it)
                     }
                 }
-                if ((rulesDomain.domain?.size ?: 0) > 0) {
-                    v2rayConfig.routing.rules.add(rulesDomain)
-                }
-                if ((rulesIP.ip?.size ?: 0) > 0) {
-                    v2rayConfig.routing.rules.add(rulesIP)
-                }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
-    }
 
-    private fun userRule2Domain(userRule: String): ArrayList<String> {
-        val domain = ArrayList<String>()
-        userRule.split(",").map { it.trim() }.forEach {
-            if (it.startsWith("geosite:") || it.startsWith("domain:")) {
-                domain.add(it)
-            }
-        }
         return domain
     }
 
@@ -326,14 +218,8 @@ object V2rayConfigUtil {
         try {
             if (settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
                 val geositeCn = arrayListOf("geosite:cn")
-                val proxyDomain = userRule2Domain(
-                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                        .orEmpty()
-                )
-                val directDomain = userRule2Domain(
-                    settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                        .orEmpty()
-                )
+                val proxyDomain = userRule2Domain(TAG_PROXY)
+                val directDomain = userRule2Domain(TAG_DIRECT)
                 // fakedns with all domains to make it always top priority
                 v2rayConfig.dns.servers?.add(
                     0,
@@ -404,10 +290,7 @@ object V2rayConfigUtil {
 
             //remote Dns
             val remoteDns = Utils.getRemoteDnsServers()
-            val proxyDomain = userRule2Domain(
-                settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_AGENT)
-                    .orEmpty()
-            )
+            val proxyDomain = userRule2Domain(TAG_PROXY)
             remoteDns.forEach {
                 servers.add(it)
             }
@@ -424,16 +307,9 @@ object V2rayConfigUtil {
 
             // domestic DNS
             val domesticDns = Utils.getDomesticDnsServers()
-            val directDomain = userRule2Domain(
-                settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_DIRECT)
-                    .orEmpty()
-            )
-            val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
-                ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
-            val isCnRoutingMode =
-                (routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value)
+            val directDomain = userRule2Domain(TAG_DIRECT)
+            val isCnRoutingMode = directDomain.contains("geosite:cn")
             val geoipCn = arrayListOf("geoip:cn")
-
             if (directDomain.size > 0) {
                 servers.add(
                     V2rayConfig.DnsBean.ServersBean(
@@ -441,17 +317,6 @@ object V2rayConfigUtil {
                         53,
                         directDomain,
                         if (isCnRoutingMode) geoipCn else null
-                    )
-                )
-            }
-            if (isCnRoutingMode) {
-                val geositeCn = arrayListOf("geosite:cn")
-                servers.add(
-                    V2rayConfig.DnsBean.ServersBean(
-                        domesticDns.first(),
-                        53,
-                        geositeCn,
-                        geoipCn
                     )
                 )
             }
@@ -468,10 +333,7 @@ object V2rayConfigUtil {
             }
 
             //block dns
-            val blkDomain = userRule2Domain(
-                settingsStorage?.decodeString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED)
-                    .orEmpty()
-            )
+            val blkDomain = userRule2Domain(TAG_BLOCKED)
             if (blkDomain.size > 0) {
                 hosts.putAll(blkDomain.map { it to "127.0.0.1" })
             }

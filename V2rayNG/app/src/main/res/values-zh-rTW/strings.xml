@@ -156,11 +156,6 @@
     <string name="title_pref_prefer_ipv6">IPv6 偏好</string>
     <string name="summary_pref_prefer_ipv6">App 優先使用 IPv6 位址連線伺服器，同时開啟 VPN 的 IPv6 路由</string>
 
-    <string name="title_pref_routing">轉送設定</string>
-    <string name="title_pref_routing_domain_strategy">網域策略</string>
-    <string name="title_pref_routing_mode">轉送模式</string>
-    <string name="title_pref_routing_custom">自訂轉送</string>
-
     <string name="title_pref_remote_dns">遠端DNS (udp/tcp/https/quic)(可選)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
@@ -249,13 +244,15 @@
     <string name="tasker_start_service">啟動服務</string>
     <string name="tasker_setting_confirm">確定</string>
 
+    <string name="routing_settings_domain_strategy">網域策略</string>
     <string name="routing_settings_title">轉送設定</string>
-    <string name="routing_settings_tips">以半形逗號「,」分隔，並手動儲存</string>
+    <string name="routing_settings_tips">以半形逗號「,」分隔</string>
     <string name="routing_settings_save">儲存</string>
     <string name="routing_settings_delete">清除</string>
-    <string name="routing_settings_scan_replace">掃描並取代</string>
-    <string name="routing_settings_scan_append">掃描並附加</string>
-    <string name="routing_settings_default_rules">設定預設轉送規則</string>
+    <string name="routing_settings_rule_title">路由規則設定</string>
+    <string name="routing_settings_add_rule">新增規則</string>
+    <string name="routing_settings_import_rulesets">匯入預設規則集</string>
+    <string name="routing_settings_import_rulesets_tip">將刪除現有的規則集，是否確定繼續？ </string>
 
     <string name="connection_test_pending">"測試連線能力"</string>
     <string name="connection_test_testing">"測試中……"</string>
@@ -285,20 +282,6 @@
     <string-array name="share_sub_method">
         <item>QR Code</item>
         <item>匯出至剪貼簿</item>
-    </string-array>
-
-    <string-array name="routing_tag">
-        <item>Proxy URL 或 IP</item>
-        <item>直接連線 URL 或 IP</item>
-        <item>已封鎖的 URL 或 IP</item>
-    </string-array>
-
-    <string-array name="routing_mode">
-        <item>全域 Proxy</item>
-        <item>略過區域網路的 Proxy</item>
-        <item>略過中國大陸的 Proxy</item>
-        <item>略過區域網路及中國大陸的 Proxy</item>
-        <item>直接連線</item>
     </string-array>
 
     <string-array name="mode_entries">

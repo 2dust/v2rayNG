@@ -157,11 +157,6 @@
     <string name="title_pref_prefer_ipv6">Ưu tiên IPv6</string>
     <string name="summary_pref_prefer_ipv6">Ưu tiên sử dụng địa chỉ IPv6 cho kết nối và định tuyến.</string>
 
-    <string name="title_pref_routing">Định tuyến</string>
-    <string name="title_pref_routing_domain_strategy">Chiến lược tên miền (DomainStrategy)</string>
-    <string name="title_pref_routing_mode">Quy tắc được định nghĩa trước</string>
-    <string name="title_pref_routing_custom">Quy tắc tùy chỉnh</string>
-
     <string name="title_pref_remote_dns">DNS ngoại quốc (UDP / TCP / HTTPS / QUIC) (Không bắt buộc)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
@@ -250,13 +245,15 @@
     <string name="tasker_start_service">Khởi động v2rayNG</string>
     <string name="tasker_setting_confirm">Xác nhận</string>
 
+    <string name="routing_settings_domain_strategy">Chiến lược tên miền (DomainStrategy)</string>
     <string name="routing_settings_title">Cài đặt định tuyến</string>
     <string name="routing_settings_tips">Phân cách bằng dấu phẩy (,). Có thể tải xuống Rules mặc định để tham khảo ở menu ba chấm.</string>
     <string name="routing_settings_save">Lưu lại</string>
     <string name="routing_settings_delete">Xoá</string>
-    <string name="routing_settings_scan_replace">Quét QR và Thay thế</string>
-    <string name="routing_settings_scan_append">Quét QR và Nối thêm</string>
-    <string name="routing_settings_default_rules">Tải xuống Rules mặc định cho Trung Quốc</string>
+    <string name="routing_settings_rule_title">Routing Rule Settings</string>
+    <string name="routing_settings_add_rule">Add rule</string>
+    <string name="routing_settings_import_rulesets">Import ruleset</string>
+    <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
 
     <string name="connection_test_pending">Kiểm tra kết nối</string>
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng...</string>
@@ -279,20 +276,6 @@
     <string-array name="share_sub_method">
         <item>Xuất gói ra mã QR (Chụp màn hình để lưu)</item>
         <item>Xuất gói vào Clipboard</item>
-    </string-array>
-
-    <string-array name="routing_tag">
-        <item>Proxy</item>
-        <item>Direct</item>
-        <item>Blocked</item>
-    </string-array>
-
-    <string-array name="routing_mode">
-        <item>Proxy toàn cầu</item>
-        <item>Bỏ qua địa chỉ LAN rồi Proxy</item>
-        <item>Bỏ qua địa chỉ nội địa rồi Proxy</item>
-        <item>Bỏ qua LAN và địa chỉ nội địa rồi Proxy</item>
-        <item>Kết nối trực tiếp toàn cầu</item>
     </string-array>
 
     <string-array name="mode_entries">

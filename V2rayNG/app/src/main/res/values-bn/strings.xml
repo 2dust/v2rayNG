@@ -157,11 +157,6 @@
     <string name="title_pref_prefer_ipv6">IPv6 অগ্রাধিকার দিন</string>
     <string name="summary_pref_prefer_ipv6">IPv6 ঠিকানা এবং রুটকে অগ্রাধিকার দিন</string>
 
-    <string name="title_pref_routing">রাউটিং</string>
-    <string name="title_pref_routing_domain_strategy">ডোমেইন কৌশল</string>
-    <string name="title_pref_routing_mode">পূর্বনির্ধারিত নিয়ম</string>
-    <string name="title_pref_routing_custom">কাস্টম নিয়ম</string>
-
     <string name="title_pref_remote_dns">রিমোট DNS (udp/tcp/https/quic)(ঐচ্ছিক)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
@@ -248,13 +243,15 @@
     <string name="tasker_start_service">সার্ভিস শুরু করুন</string>
     <string name="tasker_setting_confirm">নিশ্চিত করুন</string>
 
+    <string name="routing_settings_domain_strategy">ডোমেইন কৌশল</string>
     <string name="routing_settings_title">রাউটিং সেটিংস</string>
     <string name="routing_settings_tips">কমা (,) দ্বারা আলাদা করুন, মনে রাখবেন সেভ করতে</string>
     <string name="routing_settings_save">সেভ করুন</string>
     <string name="routing_settings_delete">মুছে ফেলুন</string>
-    <string name="routing_settings_scan_replace">স্ক্যান করুন এবং প্রতিস্থাপন করুন</string>
-    <string name="routing_settings_scan_append">স্ক্যান করুন এবং যোগ করুন</string>
-    <string name="routing_settings_default_rules"> ডিফল্ট রাউটিং নিয়ম সেট করুন</string>
+    <string name="routing_settings_rule_title">Routing Rule Settings</string>
+    <string name="routing_settings_add_rule">Add rule</string>
+    <string name="routing_settings_import_rulesets">Import ruleset</string>
+    <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
 
     <string name="connection_test_pending">সংযোগ পরীক্ষা করুন</string>
     <string name="connection_test_testing">পরীক্ষা চলছে…</string>
@@ -281,20 +278,6 @@
     <string-array name="share_sub_method">
         <item>QR কোড</item>
         <item>ক্লিপবোর্ডে রপ্তানি করুন</item>
-    </string-array>
-
-    <string-array name="routing_tag">
-        <item>প্রক্সি URL বা IP</item>
-        <item>ডাইরেক্ট URL বা IP</item>
-        <item>ব্লকড URL বা IP</item>
-    </string-array>
-
-    <string-array name="routing_mode">
-        <item>গ্লোবাল প্রোক্সি</item>
-        <item>LAN ঠিকানা বাইপাস করে তারপর প্রোক্সি</item>
-        <item>মেইনল্যান্ড ঠিকানা বাইপাস করে তারপর প্রোক্সি</item>
-        <item>LAN এবং মেইনল্যান্ড ঠিকানা বাইপাস করে তারপর প্রোক্সি</item>
-        <item>গ্লোবাল ডাইরেক্ট</item>
     </string-array>
 
     <string-array name="mode_entries">

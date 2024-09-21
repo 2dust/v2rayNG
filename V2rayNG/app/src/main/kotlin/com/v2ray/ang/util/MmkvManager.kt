@@ -2,8 +2,10 @@ package com.v2ray.ang.util
 
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerAffiliationInfo
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.SubscriptionItem
@@ -224,5 +226,18 @@ object MmkvManager {
             }
         }
         return null
+    }
+
+    fun decodeRoutingRulesets(): MutableList<RulesetItem>? {
+        val ruleset = settingsStorage.decodeString(PREF_ROUTING_RULESET)
+        if (ruleset.isNullOrEmpty()) return null
+        return Gson().fromJson(ruleset, Array<RulesetItem>::class.java).toMutableList()
+    }
+
+    fun encodeRoutingRulesets(rulesetList: MutableList<RulesetItem>?) {
+        if (rulesetList.isNullOrEmpty())
+            settingsStorage.encode(PREF_ROUTING_RULESET, "")
+        else
+            settingsStorage.encode(PREF_ROUTING_RULESET, Gson().toJson(rulesetList))
     }
 }

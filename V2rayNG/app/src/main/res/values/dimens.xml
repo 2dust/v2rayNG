@@ -7,7 +7,7 @@
     <dimen name="edit_height">50dp</dimen>
     <dimen name="png_height">24dp</dimen>
     <dimen name="server_height">72dp</dimen>
-    <dimen name="sub_height">108dp</dimen>
+    <dimen name="sub_height">90dp</dimen>
     <dimen name="connection_test_height">60dp</dimen>
     <dimen name="padding_start">16dp</dimen>
     <dimen name="padding_end">16dp</dimen>

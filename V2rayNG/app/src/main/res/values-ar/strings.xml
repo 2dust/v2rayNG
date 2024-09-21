@@ -158,11 +158,6 @@
     <string name="title_pref_prefer_ipv6">تفضيل IPv6</string>
     <string name="summary_pref_prefer_ipv6">تفضيل عنوان IPv6 وطرق التوجيه</string>
 
-    <string name="title_pref_routing">التوجيه</string>
-    <string name="title_pref_routing_domain_strategy">استراتيجية النطاق</string>
-    <string name="title_pref_routing_mode">قواعد محددة مسبقًا</string>
-    <string name="title_pref_routing_custom">قواعد مخصصة</string>
-
     <string name="title_pref_remote_dns">DNS البعيد (udp/tcp/https/quic) (اختياري)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
@@ -251,13 +246,15 @@
     <string name="tasker_start_service">بدء الخدمة</string>
     <string name="tasker_setting_confirm">تأكيد</string>
 
+    <string name="routing_settings_domain_strategy">استراتيجية النطاق</string>
     <string name="routing_settings_title">إعدادات التوجيه</string>
     <string name="routing_settings_tips">مفصولة بفواصل (،)، تذكر الحفظ</string>
     <string name="routing_settings_save">حفظ</string>
     <string name="routing_settings_delete">مسح</string>
-    <string name="routing_settings_scan_replace">فحص واستبدال</string>
-    <string name="routing_settings_scan_append">فحص وإضافة</string>
-    <string name="routing_settings_default_rules"> تعيين قواعد توجيه افتراضية</string>
+    <string name="routing_settings_rule_title">Routing Rule Settings</string>
+    <string name="routing_settings_add_rule">Add rule</string>
+    <string name="routing_settings_import_rulesets">Import ruleset</string>
+    <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
 
     <string name="connection_test_pending">التحقق من الاتصال</string>
     <string name="connection_test_testing">يجري الاختبار…</string>
@@ -285,20 +282,6 @@
     <string-array name="share_sub_method">
         <item>رمز استجابة سريعة (QRcode)</item>
         <item>تصدير إلى الحافظة</item>
-    </string-array>
-
-    <string-array name="routing_tag">
-        <item>عنوان URL أو IP الوكيل</item>
-        <item>عنوان URL أو IP المباشر</item>
-        <item>عنوان URL أو IP المحظور</item>
-    </string-array>
-
-    <string-array name="routing_mode">
-        <item>وكيل عام</item>
-        <item>تجاوز عنوان الشبكة المحلية ثم الوكيل</item>
-        <item>تجاوز عنوان البر الرئيسي ثم الوكيل</item>
-        <item>تجاوز عنوان الشبكة المحلية والبر الرئيسي ثم الوكيل</item>
-        <item>مباشر عام</item>
     </string-array>
 
     <string-array name="mode_entries">

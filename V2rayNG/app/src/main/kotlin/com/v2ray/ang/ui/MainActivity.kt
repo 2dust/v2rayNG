@@ -707,9 +707,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 )
             }
 
-            R.id.user_asset_setting -> {
-                startActivity(Intent(this, UserAssetActivity::class.java))
+            R.id.routing_setting -> {
+                requestSubSettingActivity.launch(Intent(this, RoutingSettingActivity::class.java))
             }
+
 
             R.id.promotion -> {
                 Utils.openUri(this, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")

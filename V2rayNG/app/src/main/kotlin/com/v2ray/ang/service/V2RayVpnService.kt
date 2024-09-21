@@ -18,9 +18,9 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.ERoutingMode
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.MyContextWrapper
+import com.v2ray.ang.util.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -115,13 +115,11 @@ class V2RayVpnService : VpnService(), ServiceControl {
         val builder = Builder()
         //val enableLocalDns = defaultDPreference.getPrefBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
 
-        val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
-            ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
-
         builder.setMtu(VPN_MTU)
         builder.addAddress(PRIVATE_VLAN4_CLIENT, 30)
         //builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
-        if (routingMode == ERoutingMode.BYPASS_LAN.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
+        val bypassLan = SettingsManager.routingRulesetsBypassLan()
+        if (bypassLan) {
             resources.getStringArray(R.array.bypass_private_ip_address).forEach {
                 val addr = it.split('/')
                 builder.addRoute(addr[0], addr[1].toInt())
@@ -132,7 +130,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
         if (settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) == true) {
             builder.addAddress(PRIVATE_VLAN6_CLIENT, 126)
-            if (routingMode == ERoutingMode.BYPASS_LAN.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
+            if (bypassLan) {
                 builder.addRoute("2000::", 3) //currently only 1/8 of total ipV6 is in use
             } else {
                 builder.addRoute("::", 0)
