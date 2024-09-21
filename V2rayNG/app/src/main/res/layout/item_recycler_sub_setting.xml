@@ -44,14 +44,14 @@
                     android:id="@+id/tv_url"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/layout_margin_spacing"
                     android:lines="1"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/layout_margin_spacing"
                     android:orientation="horizontal">
 
                     <androidx.appcompat.widget.SwitchCompat

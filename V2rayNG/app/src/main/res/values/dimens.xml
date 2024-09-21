@@ -11,7 +11,8 @@
     <dimen name="connection_test_height">60dp</dimen>
     <dimen name="padding_start">16dp</dimen>
     <dimen name="padding_end">16dp</dimen>
-    <dimen name="cardview_margin">2dp</dimen>
+    <dimen name="padding">16dp</dimen>
+    <dimen name="cardview_margin">3dp</dimen>
 
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>

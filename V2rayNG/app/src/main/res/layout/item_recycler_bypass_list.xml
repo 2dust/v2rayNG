@@ -12,9 +12,7 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:paddingStart="@dimen/padding_start"
-        android:paddingLeft="10dp"
-        android:paddingEnd="@dimen/padding_end"
-        android:paddingRight="10dp" />
+        android:paddingEnd="@dimen/padding_end" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -44,9 +42,6 @@
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"
-        android:paddingStart="@dimen/padding_start"
-        android:paddingLeft="2dp"
-        android:paddingEnd="@dimen/padding_end"
-        android:paddingRight="6dp" />
+        android:paddingStart="@dimen/padding_start"/>
 
 </LinearLayout>

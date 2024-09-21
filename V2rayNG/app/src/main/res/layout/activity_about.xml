@@ -23,7 +23,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding">
 
                 <ImageView
                     android:layout_width="@dimen/png_height"
@@ -46,7 +46,7 @@
                         android:id="@+id/tv_backup_summary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="@dimen/layout_margin_top_height"
                         android:maxLines="4"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -63,7 +63,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding">
 
                 <ImageView
                     android:layout_width="@dimen/png_height"
@@ -87,7 +87,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding">
 
                 <ImageView
                     android:layout_width="@dimen/png_height"
@@ -108,7 +108,7 @@
             android:layout_height="match_parent"
             android:gravity="top"
             android:orientation="vertical"
-            android:paddingTop="16dp">
+            android:paddingTop="@dimen/padding_start">
 
             <LinearLayout
                 android:id="@+id/layout_soure_ccode"
@@ -119,7 +119,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding">
 
                 <ImageView
                     android:layout_width="@dimen/png_height"
@@ -143,7 +143,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding">
 
                 <ImageView
                     android:layout_width="@dimen/png_height"
@@ -168,7 +168,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding">
 
                 <ImageView
                     android:layout_width="@dimen/png_height"
@@ -192,7 +192,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding">
 
                 <ImageView
                     android:layout_width="@dimen/png_height"
@@ -212,7 +212,7 @@
                 android:layout_height="@dimen/server_height"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding">
 
                 <TextView
                     android:id="@+id/tv_version"

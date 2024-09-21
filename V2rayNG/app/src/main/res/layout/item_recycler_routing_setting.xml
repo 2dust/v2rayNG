@@ -44,7 +44,7 @@
                     android:id="@+id/domainIp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/layout_margin_spacing"
                     android:lines="1"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -52,12 +52,11 @@
                     android:id="@+id/outboundTag"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/layout_margin_spacing"
                     android:lines="1"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
             </LinearLayout>
-
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -88,7 +87,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/padding_start"
+                    android:layout_marginTop="@dimen/layout_margin_top_height"
                     android:orientation="horizontal">
 
                     <androidx.appcompat.widget.SwitchCompat

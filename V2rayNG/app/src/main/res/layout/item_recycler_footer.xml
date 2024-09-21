@@ -12,7 +12,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="5dp">
+        android:padding="@dimen/padding">
 
         <LinearLayout
             android:layout_width="match_parent"
