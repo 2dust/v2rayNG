@@ -99,14 +99,6 @@
         <item>false</item>
     </string-array>
 
-    <string-array name="routing_mode_value" translatable="false">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-    </string-array>
-
     <string-array name="routing_domain_strategy" translatable="false">
         <item>AsIs</item>
         <item>IPIfNonMatch</item>
@@ -204,5 +196,11 @@
         <item>0</item>
         <item>1</item>
         <item>2</item>
+    </string-array>
+
+    <string-array name="outbound_tag" translatable="false">
+        <item>proxy</item>
+        <item>direct</item>
+        <item>block</item>
     </string-array>
 </resources>

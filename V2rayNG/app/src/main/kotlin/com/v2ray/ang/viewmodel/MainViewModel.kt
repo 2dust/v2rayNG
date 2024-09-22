@@ -20,15 +20,12 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.ServersCache
-import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.AngConfigManager.updateConfigViaSub
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.MmkvManager.KEY_ANG_CONFIGS
-import com.v2ray.ang.util.MmkvManager.subStorage
 import com.v2ray.ang.util.SpeedtestUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
@@ -125,7 +122,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun swapServer(fromPosition: Int, toPosition: Int) {
         Collections.swap(serverList, fromPosition, toPosition)
         Collections.swap(serversCache, fromPosition, toPosition)
-        MmkvManager.mainStorage?.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
+        MmkvManager.encodeServerList(serverList)
     }
 
     @Synchronized
@@ -159,12 +156,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (subscriptionId.isNullOrEmpty()) {
             return AngConfigManager.updateConfigViaSubAll()
         } else {
-            val json = subStorage?.decodeString(subscriptionId)
-            if (!json.isNullOrBlank()) {
-                return updateConfigViaSub(Pair(subscriptionId, Gson().fromJson(json, SubscriptionItem::class.java)))
-            } else {
-                return 0
-            }
+            val subItem = MmkvManager.decodeSubscription(subscriptionId) ?: return 0
+            return updateConfigViaSub(Pair(subscriptionId, subItem))
         }
     }
 
@@ -317,7 +310,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun sortByTestResults() {
-        MmkvManager.sortByTestResults()
+        data class ServerDelay(var guid: String, var testDelayMillis: Long)
+
+        val serverDelays = mutableListOf<ServerDelay>()
+        val serverList = MmkvManager.decodeServerList()
+        serverList.forEach { key ->
+            val delay = MmkvManager.decodeServerAffiliationInfo(key)?.testDelayMillis ?: 0L
+            serverDelays.add(ServerDelay(key, if (delay <= 0L) 999999 else delay))
+        }
+        serverDelays.sortBy { it.testDelayMillis }
+
+        serverDelays.forEach {
+            serverList.remove(it.guid)
+            serverList.add(it.guid)
+        }
+
+        MmkvManager.encodeServerList(serverList)
     }
 
 

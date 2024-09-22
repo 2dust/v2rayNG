@@ -77,7 +77,7 @@
                             android:layout_height="wrap_content"
                             android:maxLines="2"
                             android:minLines="1"
-                            android:paddingStart="16dp"
+                            android:paddingStart="@dimen/padding_start"
                             android:text="@string/connection_test_pending"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 

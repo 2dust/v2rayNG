@@ -6,12 +6,12 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import com.google.gson.Gson
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityUserAssetUrlBinding
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.MmkvManager.assetStorage
 import com.v2ray.ang.util.Utils
 import java.io.File
 
@@ -22,7 +22,6 @@ class UserAssetUrlActivity : BaseActivity() {
     var save_config: MenuItem? = null
 
     val extDir by lazy { File(Utils.userAssetPath(this)) }
-    private val assetStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
     private val editAssetId by lazy { intent.getStringExtra("assetId").orEmpty() }
 
     override fun onCreate(savedInstanceState: Bundle?) {

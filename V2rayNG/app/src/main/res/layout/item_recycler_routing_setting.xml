@@ -35,58 +35,36 @@
                 android:paddingStart="@dimen/padding_start">
 
                 <TextView
-                    android:id="@+id/tv_name"
+                    android:id="@+id/remarks"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
                 <TextView
-                    android:id="@+id/tv_url"
+                    android:id="@+id/domainIp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/layout_margin_spacing"
                     android:lines="1"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/outboundTag"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/layout_margin_spacing"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/chk_enable"
-                        android:text="@string/sub_setting_enable"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
+                    android:lines="1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
             </LinearLayout>
-
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/sub_height"
                 android:gravity="center"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:id="@+id/layout_share"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="@dimen/layout_margin_spacing">
-
-                    <ImageView
-                        android:layout_width="@dimen/png_height"
-                        android:layout_height="@dimen/png_height"
-                        app:srcCompat="@drawable/ic_share_24dp" />
-
-                </LinearLayout>
+                android:paddingStart="@dimen/padding_start"
+                android:paddingEnd="@dimen/padding_end"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:id="@+id/layout_edit"
@@ -104,7 +82,18 @@
                         android:layout_width="@dimen/png_height"
                         android:layout_height="@dimen/png_height"
                         app:srcCompat="@drawable/ic_edit_24dp" />
+                </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_top_height"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/chk_enable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
             </LinearLayout>
 

@@ -3,7 +3,6 @@ package com.v2ray.ang.dto
 import com.v2ray.ang.AppConfig.TAG_BLOCKED
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.TAG_PROXY
-import com.v2ray.ang.util.Utils
 
 data class ServerConfig(
     val configVersion: Int = 3,
@@ -78,11 +77,5 @@ data class ServerConfig(
             return config.outbounds.map { it.tag }.toMutableList()
         }
         return mutableListOf()
-    }
-
-    fun getV2rayPointDomainAndPort(): String {
-        val address = getProxyOutbound()?.getServerAddress().orEmpty()
-        val port = getProxyOutbound()?.getServerPort()
-        return Utils.getIpv6Address(address) + ":" + port
     }
 }

@@ -13,12 +13,12 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.multiprocess.RemoteWorkManager
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.extension.toLongEx
 import com.v2ray.ang.service.SubscriptionUpdater
-import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.SettingsViewModel
 import java.util.concurrent.TimeUnit
@@ -36,15 +36,12 @@ class SettingsActivity : BaseActivity() {
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
-        private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
         private val perAppProxy by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_PER_APP_PROXY) }
         private val localDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_LOCAL_DNS_ENABLED) }
         private val fakeDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_FAKE_DNS_ENABLED) }
         private val localDnsPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_LOCAL_DNS_PORT) }
         private val vpnDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_VPN_DNS) }
-
-        private val routingCustom by lazy { findPreference<Preference>(AppConfig.PREF_ROUTING_CUSTOM) }
 
         private val mux by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_MUX_ENABLED) }
         private val muxConcurrency by lazy { findPreference<EditTextPreference>(AppConfig.PREF_MUX_CONCURRENCY) }
@@ -89,11 +86,6 @@ class SettingsActivity : BaseActivity() {
                 true
             }
 
-            routingCustom?.setOnPreferenceClickListener {
-                startActivity(Intent(activity, RoutingSettingsActivity::class.java))
-                false
-            }
-
             mux?.setOnPreferenceChangeListener { _, newValue ->
                 updateMux(newValue as Boolean)
                 true
@@ -128,7 +120,7 @@ class SettingsActivity : BaseActivity() {
                 val value = newValue as Boolean
                 autoUpdateCheck?.isChecked = value
                 autoUpdateInterval?.isEnabled = value
-                autoUpdateInterval?.text?.toLong()?.let {
+                autoUpdateInterval?.text?.toLongEx()?.let {
                     if (newValue) configureUpdateTask(it) else cancelUpdateTask()
                 }
                 true
@@ -138,9 +130,9 @@ class SettingsActivity : BaseActivity() {
 
                 // It must be greater than 15 minutes because WorkManager couldn't run tasks under 15 minutes intervals
                 nval =
-                    if (TextUtils.isEmpty(nval) || nval.toLong() < 15) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
+                    if (TextUtils.isEmpty(nval) || nval.toLongEx() < 15) AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL else nval
                 autoUpdateInterval?.summary = nval
-                configureUpdateTask(nval.toLong())
+                configureUpdateTask(nval.toLongEx())
                 true
             }
 
@@ -252,7 +244,6 @@ class SettingsActivity : BaseActivity() {
 
             listOf(
                 AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,
-                AppConfig.PREF_ROUTING_MODE,
                 AppConfig.PREF_MUX_XUDP_QUIC,
                 AppConfig.PREF_FRAGMENT_PACKETS,
                 AppConfig.PREF_LANGUAGE,

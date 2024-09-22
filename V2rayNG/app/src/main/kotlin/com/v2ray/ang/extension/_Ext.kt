@@ -55,3 +55,5 @@ val URI.idnHost: String
     get() = host?.replace("[", "")?.replace("]", "").orEmpty()
 
 fun String.removeWhiteSpace(): String = replace("\\s+".toRegex(), "")
+
+fun String.toLongEx(): Long = toLongOrNull() ?: 0

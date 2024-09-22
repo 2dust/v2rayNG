@@ -19,18 +19,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/title_server"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/layout_margin_top_height"
                 android:orientation="vertical">
 
@@ -44,7 +32,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/edit_height"
                     android:inputType="text" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -54,65 +41,30 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sub_setting_url" />
+                    android:text="@string/routing_settings_rule_title"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+            </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/routing_settings_domain" />
 
                 <EditText
-                    android:id="@+id/et_url"
+                    android:id="@+id/et_domain"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="top"
-                    android:inputType="textMultiLine"
                     android:maxLines="10"
-                    android:minLines="2"
-                    android:scrollbars="vertical"
-                    tools:ignore="TextFields" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_top_height"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
+                    android:hint="@string/routing_settings_tips"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.0"
-                    android:text="@string/sub_setting_enable" />
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/chk_enable"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_start"
-                    android:paddingEnd="@dimen/padding_end" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_top_height"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.0"
-                    android:text="@string/sub_auto_update" />
-
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/auto_update_check"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_start"
-                    android:paddingEnd="@dimen/padding_end" />
-
+                    android:inputType="textMultiLine" />
             </LinearLayout>
 
             <LinearLayout
@@ -124,15 +76,15 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sub_setting_pre_profile" />
+                    android:text="@string/routing_settings_ip" />
 
                 <EditText
-                    android:id="@+id/et_pre_profile"
+                    android:id="@+id/et_ip"
+                    android:maxLines="10"
+                    android:hint="@string/routing_settings_tips"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/edit_height"
-                    android:inputType="text"
-                    android:hint="@string/sub_setting_pre_profile_tip" />
-
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine" />
             </LinearLayout>
 
             <LinearLayout
@@ -144,16 +96,71 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sub_setting_next_profile" />
+                    android:text="@string/routing_settings_port" />
 
                 <EditText
-                    android:id="@+id/et_next_profile"
+                    android:id="@+id/et_port"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/edit_height"
-                    android:inputType="text"
-                    android:hint="@string/sub_setting_pre_profile_tip" />
-
+                    android:inputType="text" />
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/routing_settings_protocol" />
+
+                <EditText
+                    android:id="@+id/et_protocol"
+                    android:layout_width="match_parent"
+                    android:hint="@string/routing_settings_protocol_tip"
+                    android:layout_height="@dimen/edit_height"
+                    android:inputType="text" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/routing_settings_network" />
+
+                <EditText
+                    android:id="@+id/et_network"
+                    android:layout_width="match_parent"
+                    android:hint="@string/routing_settings_network_tip"
+                    android:layout_height="@dimen/edit_height"
+                    android:inputType="text" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/routing_settings_outbound_tag" />
+
+                <Spinner
+                    android:id="@+id/sp_outbound_tag"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/edit_height"
+                    android:entries="@array/outbound_tag" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout

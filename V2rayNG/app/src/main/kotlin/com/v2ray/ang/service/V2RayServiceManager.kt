@@ -13,7 +13,6 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
@@ -24,6 +23,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
 import go.Seq
@@ -46,8 +46,6 @@ object V2RayServiceManager {
 
     val v2rayPoint: V2RayPoint = Libv2ray.newV2RayPoint(V2RayCallback(), Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
     private val mMsgReceive = ReceiveMessageHandler()
-    private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
-    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -64,7 +62,7 @@ object V2RayServiceManager {
 
     fun startV2Ray(context: Context) {
         if (v2rayPoint.isRunning) return
-        val guid = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER) ?: return
+        val guid = MmkvManager.getSelectServer() ?: return
         val result = V2rayConfigUtil.getV2rayConfig(context, guid)
         if (!result.status) return
 
@@ -129,7 +127,7 @@ object V2RayServiceManager {
 
     fun startV2rayPoint() {
         val service = serviceControl?.get()?.getService() ?: return
-        val guid = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER) ?: return
+        val guid = MmkvManager.getSelectServer() ?: return
         val config = MmkvManager.decodeServerConfig(guid) ?: return
         if (v2rayPoint.isRunning) {
             return
@@ -153,7 +151,7 @@ object V2RayServiceManager {
         }
 
         v2rayPoint.configureFileContent = result.content
-        v2rayPoint.domainName = config.getV2rayPointDomainAndPort()
+        v2rayPoint.domainName = result.domainPort
         currentConfig = config
 
         try {
