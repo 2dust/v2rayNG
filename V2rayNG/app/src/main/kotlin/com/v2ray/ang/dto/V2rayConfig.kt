@@ -137,9 +137,9 @@ data class V2rayConfig(
 
             data class ServersBean(
                 var address: String = "",
-                var method: String = "chacha20-poly1305",
+                var method: String? = null,
                 var ota: Boolean = false,
-                var password: String = "",
+                var password: String? = null,
                 var port: Int = DEFAULT_PORT,
                 var level: Int = DEFAULT_LEVEL,
                 val email: String? = null,
@@ -425,6 +425,7 @@ data class V2rayConfig(
                 return settings?.vnext?.get(0)?.address
             } else if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)
                 || protocol.equals(EConfigType.SOCKS.name, true)
+                || protocol.equals(EConfigType.HTTP.name, true)
                 || protocol.equals(EConfigType.TROJAN.name, true)
             ) {
                 return settings?.servers?.get(0)?.address
@@ -441,6 +442,7 @@ data class V2rayConfig(
                 return settings?.vnext?.get(0)?.port
             } else if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)
                 || protocol.equals(EConfigType.SOCKS.name, true)
+                || protocol.equals(EConfigType.HTTP.name, true)
                 || protocol.equals(EConfigType.TROJAN.name, true)
             ) {
                 return settings?.servers?.get(0)?.port
@@ -465,7 +467,8 @@ data class V2rayConfig(
                 || protocol.equals(EConfigType.TROJAN.name, true)
             ) {
                 return settings?.servers?.get(0)?.password
-            } else if (protocol.equals(EConfigType.SOCKS.name, true)) {
+            } else if (protocol.equals(EConfigType.SOCKS.name, true)
+                || protocol.equals(EConfigType.HTTP.name, true)) {
                 return settings?.servers?.get(0)?.users?.get(0)?.pass
             } else if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
                 return settings?.secretKey

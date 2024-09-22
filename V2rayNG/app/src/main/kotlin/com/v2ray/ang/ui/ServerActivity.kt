@@ -130,6 +130,7 @@ class ServerActivity : BaseActivity() {
             EConfigType.CUSTOM -> return
             EConfigType.SHADOWSOCKS -> setContentView(R.layout.activity_server_shadowsocks)
             EConfigType.SOCKS -> setContentView(R.layout.activity_server_socks)
+            EConfigType.HTTP -> setContentView(R.layout.activity_server_socks)
             EConfigType.VLESS -> setContentView(R.layout.activity_server_vless)
             EConfigType.TROJAN -> setContentView(R.layout.activity_server_trojan)
             EConfigType.WIREGUARD -> setContentView(R.layout.activity_server_wireguard)
@@ -249,7 +250,9 @@ class ServerActivity : BaseActivity() {
         et_id.text = Utils.getEditable(outbound.getPassword().orEmpty())
         et_alterId?.text =
             Utils.getEditable(outbound.settings?.vnext?.get(0)?.users?.get(0)?.alterId.toString())
-        if (config.configType == EConfigType.SOCKS) {
+        if (config.configType == EConfigType.SOCKS
+            || config.configType == EConfigType.HTTP
+        ) {
             et_security?.text =
                 Utils.getEditable(outbound.settings?.servers?.get(0)?.users?.get(0)?.user.orEmpty())
         } else if (config.configType == EConfigType.VLESS) {
@@ -404,7 +407,10 @@ class ServerActivity : BaseActivity() {
         }
         val config =
             MmkvManager.decodeServerConfig(editGuid) ?: ServerConfig.create(createConfigType)
-        if (config.configType != EConfigType.SOCKS && TextUtils.isEmpty(et_id.text.toString())) {
+        if (config.configType != EConfigType.SOCKS
+            && config.configType != EConfigType.HTTP
+            && TextUtils.isEmpty(et_id.text.toString())
+        ) {
             if (config.configType == EConfigType.TROJAN || config.configType == EConfigType.SHADOWSOCKS) {
                 toast(R.string.server_lab_id3)
             } else {
@@ -477,7 +483,7 @@ class ServerActivity : BaseActivity() {
         if (config.configType == EConfigType.SHADOWSOCKS) {
             server.password = et_id.text.toString().trim()
             server.method = shadowsocksSecuritys[sp_security?.selectedItemPosition ?: 0]
-        } else if (config.configType == EConfigType.SOCKS) {
+        } else if (config.configType == EConfigType.SOCKS || config.configType == EConfigType.HTTP) {
             if (TextUtils.isEmpty(et_security?.text) && TextUtils.isEmpty(et_id.text)) {
                 server.users = null
             } else {

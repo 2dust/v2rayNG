@@ -28,6 +28,7 @@
     <string name="menu_item_import_config_manually_vless">手动输入[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">手动输入[Shadowsocks]</string>
     <string name="menu_item_import_config_manually_socks">手动输入[Socks]</string>
+    <string name="menu_item_import_config_manually_http">手动输入[HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">手动输入[Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">手动输入[Wireguard]</string>
     <string name="menu_item_import_config_custom">自定义配置</string>

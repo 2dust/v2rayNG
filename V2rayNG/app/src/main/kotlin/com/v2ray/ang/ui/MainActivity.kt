@@ -277,6 +277,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
+        R.id.import_manually_http -> {
+            importManually(EConfigType.HTTP.value)
+            true
+        }
+
         R.id.import_manually_trojan -> {
             importManually(EConfigType.TROJAN.value)
             true

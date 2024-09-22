@@ -28,6 +28,7 @@
     <string name="menu_item_import_config_manually_vless">تایپ دستی[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">تایپ دستی[Shadowsocks]</string>
     <string name="menu_item_import_config_manually_socks">تایپ دستی[Socks]</string>
+    <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">تایپ دستی[Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">[Wireguard]تایپ دستی</string>
     <string name="menu_item_import_config_custom">کانفیگ سفارشی</string>

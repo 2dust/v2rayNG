@@ -28,6 +28,7 @@
     <string name="menu_item_import_config_manually_vless">Nhập thủ công [VLESS]</string>
     <string name="menu_item_import_config_manually_ss">Nhập thủ công [ShadowSocks]</string>
     <string name="menu_item_import_config_manually_socks">Nhập thủ công [Socks]</string>
+    <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">Nhập thủ công [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">Nhập thủ công [WireGuard]</string>
     <string name="menu_item_import_config_custom">Nâng cao / Cấu hình tùy chỉnh</string>

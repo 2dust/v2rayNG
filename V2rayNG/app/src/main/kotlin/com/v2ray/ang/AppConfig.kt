@@ -142,6 +142,7 @@ object AppConfig {
     const val CUSTOM = ""
     const val SHADOWSOCKS = "ss://"
     const val SOCKS = "socks://"
+    const val HTTP = "http://"
     const val VLESS = "vless://"
     const val TROJAN = "trojan://"
     const val WIREGUARD = "wireguard://"

@@ -35,7 +35,10 @@ data class ServerConfig(
                 EConfigType.CUSTOM ->
                     return ServerConfig(configType = configType)
 
-                EConfigType.SHADOWSOCKS, EConfigType.SOCKS, EConfigType.TROJAN ->
+                EConfigType.SHADOWSOCKS,
+                EConfigType.SOCKS,
+                EConfigType.HTTP,
+                EConfigType.TROJAN ->
                     return ServerConfig(
                         configType = configType,
                         outboundBean = V2rayConfig.OutboundBean(

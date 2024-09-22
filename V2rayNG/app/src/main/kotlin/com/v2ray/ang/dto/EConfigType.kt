@@ -10,7 +10,8 @@ enum class EConfigType(val value: Int, val protocolScheme: String) {
     SOCKS(4, AppConfig.SOCKS),
     VLESS(5, AppConfig.VLESS),
     TROJAN(6, AppConfig.TROJAN),
-    WIREGUARD(7, AppConfig.WIREGUARD);
+    WIREGUARD(7, AppConfig.WIREGUARD),
+    HTTP(10, AppConfig.HTTP);
 
     companion object {
         fun fromInt(value: Int) = values().firstOrNull { it.value == value }
