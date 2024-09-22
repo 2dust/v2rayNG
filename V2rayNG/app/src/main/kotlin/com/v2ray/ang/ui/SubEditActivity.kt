@@ -6,13 +6,11 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
-import com.google.gson.Gson
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubEditBinding
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.MmkvManager.subStorage
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,9 +28,9 @@ class SubEditActivity : BaseActivity() {
         setContentView(binding.root)
         title = getString(R.string.title_sub_setting)
 
-        val json = subStorage?.decodeString(editSubId)
-        if (!json.isNullOrBlank()) {
-            bindingServer(Gson().fromJson(json, SubscriptionItem::class.java))
+        val subItem = MmkvManager.decodeSubscription(editSubId)
+        if (subItem != null) {
+            bindingServer(subItem)
         } else {
             clearServer()
         }
@@ -67,13 +65,7 @@ class SubEditActivity : BaseActivity() {
      * save server config
      */
     private fun saveServer(): Boolean {
-        val subItem: SubscriptionItem
-        val json = subStorage?.decodeString(editSubId)
-        if (!json.isNullOrBlank()) {
-            subItem = Gson().fromJson(json, SubscriptionItem::class.java)
-        } else {
-            subItem = SubscriptionItem()
-        }
+        val subItem = MmkvManager.decodeSubscription(editSubId)?:SubscriptionItem()
 
         subItem.remarks = binding.etRemarks.text.toString()
         subItem.url = binding.etUrl.text.toString()

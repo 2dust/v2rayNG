@@ -11,6 +11,9 @@ import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.SubscriptionItem
 
 object MmkvManager {
+
+    //region private
+
     private const val ID_MAIN = "MAIN"
     private const val ID_SERVER_CONFIG = "SERVER_CONFIG"
     private const val ID_PROFILE_CONFIG = "PROFILE_CONFIG"
@@ -25,12 +28,16 @@ object MmkvManager {
 
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
-    val serverStorage by lazy { MMKV.mmkvWithID(ID_SERVER_CONFIG, MMKV.MULTI_PROCESS_MODE) }
+    private val serverStorage by lazy { MMKV.mmkvWithID(ID_SERVER_CONFIG, MMKV.MULTI_PROCESS_MODE) }
     private val profileStorage by lazy { MMKV.mmkvWithID(ID_PROFILE_CONFIG, MMKV.MULTI_PROCESS_MODE) }
     private val serverAffStorage by lazy { MMKV.mmkvWithID(ID_SERVER_AFF, MMKV.MULTI_PROCESS_MODE) }
-    val subStorage by lazy { MMKV.mmkvWithID(ID_SUB, MMKV.MULTI_PROCESS_MODE) }
-    val assetStorage by lazy { MMKV.mmkvWithID(ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
-    val serverRawStorage by lazy { MMKV.mmkvWithID(ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
+    private val subStorage by lazy { MMKV.mmkvWithID(ID_SUB, MMKV.MULTI_PROCESS_MODE) }
+    private val assetStorage by lazy { MMKV.mmkvWithID(ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
+    private val serverRawStorage by lazy { MMKV.mmkvWithID(ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
+
+    //endregion
+
+    //region Server
 
     fun getSelectServer(): String? {
         return mainStorage.decodeString(KEY_SELECTED_SERVER)
@@ -82,7 +89,7 @@ object MmkvManager {
         if (!serverList.contains(key)) {
             serverList.add(0, key)
             encodeServerList(serverList)
-            if (MmkvManager.getSelectServer().isNullOrBlank()) {
+            if (getSelectServer().isNullOrBlank()) {
                 mainStorage.encode(KEY_SELECTED_SERVER, key)
             }
         }
@@ -101,7 +108,7 @@ object MmkvManager {
         if (guid.isBlank()) {
             return
         }
-        if (MmkvManager.getSelectServer() == guid) {
+        if (getSelectServer() == guid) {
             mainStorage.remove(KEY_SELECTED_SERVER)
         }
         val serverList = decodeServerList()
@@ -154,7 +161,44 @@ object MmkvManager {
         }
     }
 
-    fun initSubsList() {
+    fun removeAllServer() {
+        mainStorage.clearAll()
+        serverStorage.clearAll()
+        profileStorage.clearAll()
+        serverAffStorage.clearAll()
+    }
+
+    fun removeInvalidServer(guid: String) {
+        if (guid.isNotEmpty()) {
+            decodeServerAffiliationInfo(guid)?.let { aff ->
+                if (aff.testDelayMillis < 0L) {
+                    removeServer(guid)
+                }
+            }
+        } else {
+            serverAffStorage.allKeys()?.forEach { key ->
+                decodeServerAffiliationInfo(key)?.let { aff ->
+                    if (aff.testDelayMillis < 0L) {
+                        removeServer(key)
+                    }
+                }
+            }
+        }
+    }
+
+    fun encodeServerRaw(guid: String, config: String) {
+        serverRawStorage.encode(guid, config)
+    }
+
+    fun decodeServerRaw(guid: String): String? {
+        return serverRawStorage.decodeString(guid) ?: return null
+    }
+
+    //endregion
+
+    //region Subscriptions
+
+    private fun initSubsList() {
         val subsList = decodeSubsList()
         if (subsList.isNotEmpty()) {
             return
@@ -216,6 +260,10 @@ object MmkvManager {
         }
     }
 
+    //endregion
+
+    //region Asset
+
     fun decodeAssetUrls(): List<Pair<String, AssetUrlItem>> {
         val assetUrlItems = mutableListOf<Pair<String, AssetUrlItem>>()
         assetStorage.allKeys()?.forEach { key ->
@@ -231,44 +279,19 @@ object MmkvManager {
         assetStorage.remove(assetid)
     }
 
-    fun removeAllServer() {
-        mainStorage.clearAll()
-        serverStorage.clearAll()
-        profileStorage.clearAll()
-        serverAffStorage.clearAll()
+    fun encodeAsset(assetid: String, assetItem: AssetUrlItem) {
+        val key = assetid.ifBlank { Utils.getUuid() }
+        assetStorage.encode(key, Gson().toJson(assetItem))
     }
 
-    fun removeInvalidServer(guid: String) {
-        if (guid.isNotEmpty()) {
-            decodeServerAffiliationInfo(guid)?.let { aff ->
-                if (aff.testDelayMillis < 0L) {
-                    removeServer(guid)
-                }
-            }
-        } else {
-            serverAffStorage.allKeys()?.forEach { key ->
-                decodeServerAffiliationInfo(key)?.let { aff ->
-                    if (aff.testDelayMillis < 0L) {
-                        removeServer(key)
-                    }
-                }
-            }
-        }
+    fun decodeAsset(assetid: String): AssetUrlItem? {
+        val json = assetStorage.decodeString(assetid) ?: return null
+        return Gson().fromJson(json, AssetUrlItem::class.java)
     }
 
-    fun getServerViaRemarks(remarks: String?): ServerConfig? {
-        if (remarks == null) {
-            return null
-        }
-        val serverList = decodeServerList()
-        for (guid in serverList) {
-            val profile = decodeProfileConfig(guid)
-            if (profile != null && profile.remarks == remarks) {
-                return decodeServerConfig(guid)
-            }
-        }
-        return null
-    }
+    //endregion
+
+    //region Routing
 
     fun decodeRoutingRulesets(): MutableList<RulesetItem>? {
         val ruleset = settingsStorage.decodeString(PREF_ROUTING_RULESET)
@@ -282,4 +305,6 @@ object MmkvManager {
         else
             settingsStorage.encode(PREF_ROUTING_RULESET, Gson().toJson(rulesetList))
     }
+
+    //endregion
 }
