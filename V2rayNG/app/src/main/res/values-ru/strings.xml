@@ -298,7 +298,7 @@
     <string-array name="preset_rulesets">
         <item>Белый список Китая</item>
         <item>Чёрный список Китая</item>
-        <item>Общий</item>
+        <item>Общие</item>
     </string-array>
 
 </resources>
