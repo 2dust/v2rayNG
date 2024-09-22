@@ -25,10 +25,10 @@
     <string name="menu_item_del_config">Delete config</string>
     <string name="menu_item_import_config_qrcode">Import config from QRcode</string>
     <string name="menu_item_import_config_clipboard">Import config from Clipboard</string>
-    <string name="menu_item_import_config_manually_vmess">Type manually[Vmess]</string>
+    <string name="menu_item_import_config_manually_vmess">Type manually[VMess]</string>
     <string name="menu_item_import_config_manually_vless">Type manually[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">Type manually[Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">Type manually[Socks]</string>
+    <string name="menu_item_import_config_manually_socks">Type manually[SOCKS]</string>
     <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">Type manually[Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">Type manually[Wireguard]</string>

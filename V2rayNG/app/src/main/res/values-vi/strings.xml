@@ -24,10 +24,10 @@
     <string name="menu_item_del_config">Xoá cấu hình</string>
     <string name="menu_item_import_config_qrcode">Nhập cấu hình từ mã QR</string>
     <string name="menu_item_import_config_clipboard">Nhập cấu hình từ Clipboard</string>
-    <string name="menu_item_import_config_manually_vmess">Nhập thủ công [VMESS]</string>
+    <string name="menu_item_import_config_manually_vmess">Nhập thủ công [VMess]</string>
     <string name="menu_item_import_config_manually_vless">Nhập thủ công [VLESS]</string>
     <string name="menu_item_import_config_manually_ss">Nhập thủ công [ShadowSocks]</string>
-    <string name="menu_item_import_config_manually_socks">Nhập thủ công [Socks]</string>
+    <string name="menu_item_import_config_manually_socks">Nhập thủ công [SOCKS]</string>
     <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">Nhập thủ công [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">Nhập thủ công [WireGuard]</string>

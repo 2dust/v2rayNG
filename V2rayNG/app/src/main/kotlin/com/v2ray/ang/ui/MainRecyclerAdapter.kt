@@ -79,12 +79,8 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                     shareOptions = shareOptions.takeLast(1)
                 }
 
-                EConfigType.VLESS -> {
-                    holder.itemMainBinding.tvType.text = profile.configType.name
-                }
-
                 else -> {
-                    holder.itemMainBinding.tvType.text = profile.configType.name.lowercase()
+                    holder.itemMainBinding.tvType.text = profile.configType.name
                 }
             }
 
