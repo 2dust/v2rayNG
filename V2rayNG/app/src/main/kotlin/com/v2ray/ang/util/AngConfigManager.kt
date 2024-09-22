@@ -15,7 +15,6 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.*
 import com.v2ray.ang.util.MmkvManager.serverRawStorage
 import com.v2ray.ang.util.MmkvManager.settingsStorage
-import com.v2ray.ang.util.MmkvManager.subStorage
 import com.v2ray.ang.util.fmt.ShadowsocksFmt
 import com.v2ray.ang.util.fmt.SocksFmt
 import com.v2ray.ang.util.fmt.TrojanFmt
@@ -27,162 +26,6 @@ import java.net.URI
 import java.util.*
 
 object AngConfigManager {
-
-    /**
-     * Legacy loading config
-     */
-//    fun migrateLegacyConfig(c: Context): Boolean? {
-//        try {
-//            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(c)
-//            val context = defaultSharedPreferences.getString(ANG_CONFIG, "")
-//            if (context.isNullOrBlank()) {
-//                return null
-//            }
-//            val angConfig = Gson().fromJson(context, AngConfig::class.java)
-//            for (i in angConfig.vmess.indices) {
-//                upgradeServerVersion(angConfig.vmess[i])
-//            }
-//
-//            copyLegacySettings(defaultSharedPreferences)
-//            migrateVmessBean(angConfig, defaultSharedPreferences)
-//            migrateSubItemBean(angConfig)
-//
-//            defaultSharedPreferences.edit().remove(ANG_CONFIG).apply()
-//            return true
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
-//        return false
-//    }
-//
-//    private fun copyLegacySettings(sharedPreferences: SharedPreferences) {
-//        listOf(
-//            AppConfig.PREF_MODE,
-//            AppConfig.PREF_REMOTE_DNS,
-//            AppConfig.PREF_DOMESTIC_DNS,
-//            AppConfig.PREF_LOCAL_DNS_PORT,
-//            AppConfig.PREF_SOCKS_PORT,
-//            AppConfig.PREF_HTTP_PORT,
-//            AppConfig.PREF_LOGLEVEL,
-//            AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,
-//            AppConfig.PREF_V2RAY_ROUTING_AGENT,
-//            AppConfig.PREF_V2RAY_ROUTING_BLOCKED,
-//            AppConfig.PREF_V2RAY_ROUTING_DIRECT,
-//        ).forEach { key ->
-//            settingsStorage?.encode(key, sharedPreferences.getString(key, null))
-//        }
-//        listOf(
-//            AppConfig.PREF_SPEED_ENABLED,
-//            AppConfig.PREF_PROXY_SHARING,
-//            AppConfig.PREF_LOCAL_DNS_ENABLED,
-//            AppConfig.PREF_ALLOW_INSECURE,
-//            AppConfig.PREF_PREFER_IPV6,
-//            AppConfig.PREF_PER_APP_PROXY,
-//            AppConfig.PREF_BYPASS_APPS,
-//        ).forEach { key ->
-//            settingsStorage?.encode(key, sharedPreferences.getBoolean(key, false))
-//        }
-//        settingsStorage?.encode(
-//            AppConfig.PREF_SNIFFING_ENABLED,
-//            sharedPreferences.getBoolean(AppConfig.PREF_SNIFFING_ENABLED, true)
-//        )
-//        settingsStorage?.encode(
-//            AppConfig.PREF_PER_APP_PROXY_SET,
-//            sharedPreferences.getStringSet(AppConfig.PREF_PER_APP_PROXY_SET, setOf())
-//        )
-//    }
-//
-//    private fun migrateVmessBean(angConfig: AngConfig, sharedPreferences: SharedPreferences) {
-//        angConfig.vmess.forEachIndexed { index, vmessBean ->
-//            val type = EConfigType.fromInt(vmessBean.configType) ?: return@forEachIndexed
-//            val config = ServerConfig.create(type)
-//            config.remarks = vmessBean.remarks
-//            config.subscriptionId = vmessBean.subid
-//            if (type == EConfigType.CUSTOM) {
-//                val jsonConfig = sharedPreferences.getString(ANG_CONFIG + vmessBean.guid, "")
-//                val v2rayConfig = try {
-//                    Gson().fromJson(jsonConfig, V2rayConfig::class.java)
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                    return@forEachIndexed
-//                }
-//                config.fullConfig = v2rayConfig
-//                serverRawStorage?.encode(vmessBean.guid, jsonConfig)
-//            } else {
-//                config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
-//                    vnext.address = vmessBean.address
-//                    vnext.port = vmessBean.port
-//                    vnext.users[0].id = vmessBean.id
-//                    if (config.configType == EConfigType.VMESS) {
-//                        vnext.users[0].alterId = vmessBean.alterId
-//                        vnext.users[0].security = vmessBean.security
-//                    } else if (config.configType == EConfigType.VLESS) {
-//                        vnext.users[0].encryption = vmessBean.security
-//                        vnext.users[0].flow = vmessBean.flow
-//                    }
-//                }
-//                config.outboundBean?.settings?.servers?.get(0)?.let { server ->
-//                    server.address = vmessBean.address
-//                    server.port = vmessBean.port
-//                    if (config.configType == EConfigType.SHADOWSOCKS) {
-//                        server.password = vmessBean.id
-//                        server.method = vmessBean.security
-//                    } else if (config.configType == EConfigType.SOCKS) {
-//                        if (TextUtils.isEmpty(vmessBean.security) && TextUtils.isEmpty(vmessBean.id)) {
-//                            server.users = null
-//                        } else {
-//                            val socksUsersBean =
-//                                V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
-//                            socksUsersBean.user = vmessBean.security
-//                            socksUsersBean.pass = vmessBean.id
-//                            server.users = listOf(socksUsersBean)
-//                        }
-//                    } else if (config.configType == EConfigType.TROJAN) {
-//                        server.password = vmessBean.id
-//                    }
-//                }
-//                config.outboundBean?.streamSettings?.let { streamSetting ->
-//                    val sni = streamSetting.populateTransportSettings(
-//                        vmessBean.network,
-//                        vmessBean.headerType,
-//                        vmessBean.requestHost,
-//                        vmessBean.path,
-//                        vmessBean.path,
-//                        vmessBean.requestHost,
-//                        vmessBean.path,
-//                        vmessBean.headerType,
-//                        vmessBean.path,
-//                        vmessBean.requestHost,
-//                    )
-//                    val allowInsecure = if (vmessBean.allowInsecure.isBlank()) {
-//                        settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
-//                    } else {
-//                        vmessBean.allowInsecure.toBoolean()
-//                    }
-//                    var fingerprint = streamSetting.tlsSettings?.fingerprint
-//                    streamSetting.populateTlsSettings(
-//                        vmessBean.streamSecurity, allowInsecure,
-//                        vmessBean.sni.ifBlank { sni }, fingerprint, null, null, null, null
-//                    )
-//                }
-//            }
-//            val key = MmkvManager.encodeServerConfig(vmessBean.guid, config)
-//            if (index == angConfig.index) {
-//                mainStorage.encode(KEY_SELECTED_SERVER, key)
-//            }
-//        }
-//    }
-//
-//    private fun migrateSubItemBean(angConfig: AngConfig) {
-//        angConfig.subItem.forEach {
-//            val subItem = SubscriptionItem()
-//            subItem.remarks = it.remarks
-//            subItem.url = it.url
-//            subItem.enabled = it.enabled
-//            subStorage?.encode(it.id, Gson().toJson(subItem))
-//        }
-//    }
-
     /**
      * parse config form qrcode or...
      */
@@ -590,7 +433,7 @@ object AngConfigManager {
         val subItem = SubscriptionItem()
         subItem.remarks = uri.fragment ?: "import sub"
         subItem.url = url
-        subStorage.encode(Utils.getUuid(), Gson().toJson(subItem))
+        MmkvManager.encodeSubscription("", subItem)
         return 1
     }
 }

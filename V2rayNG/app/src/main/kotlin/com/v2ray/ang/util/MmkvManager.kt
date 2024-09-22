@@ -21,6 +21,7 @@ object MmkvManager {
     private const val ID_SETTING = "SETTING"
     private const val KEY_SELECTED_SERVER = "SELECTED_SERVER"
     private const val KEY_ANG_CONFIGS = "ANG_CONFIGS"
+    private const val KEY_SUB_IDS = "SUB_IDS"
 
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
@@ -153,25 +154,66 @@ object MmkvManager {
         }
     }
 
-    fun decodeSubscriptions(): List<Pair<String, SubscriptionItem>> {
-        val subscriptions = mutableListOf<Pair<String, SubscriptionItem>>()
+    fun initSubsList() {
+        val subsList = decodeSubsList()
+        if (subsList.isNotEmpty()) {
+            return
+        }
         subStorage.allKeys()?.forEach { key ->
+            subsList.add(key)
+        }
+        encodeSubsList(subsList)
+    }
+
+    fun decodeSubscriptions(): List<Pair<String, SubscriptionItem>> {
+        initSubsList()
+
+        val subscriptions = mutableListOf<Pair<String, SubscriptionItem>>()
+        decodeSubsList().forEach { key ->
             val json = subStorage.decodeString(key)
             if (!json.isNullOrBlank()) {
                 subscriptions.add(Pair(key, Gson().fromJson(json, SubscriptionItem::class.java)))
             }
         }
-        return subscriptions.sortedBy { (_, value) -> value.addedTime }
+        return subscriptions
     }
 
     fun removeSubscription(subid: String) {
         subStorage.remove(subid)
+        val subsList = decodeSubsList()
+        subsList.remove(subid)
+        encodeSubsList(subsList)
+
         removeServerViaSubid(subid)
+    }
+
+    fun encodeSubscription(guid: String, subItem: SubscriptionItem) {
+        val key = guid.ifBlank { Utils.getUuid() }
+        subStorage.encode(key, Gson().toJson(subItem))
+
+        val subsList = decodeSubsList()
+        if (!subsList.contains(key)) {
+            subsList.add(key)
+            encodeSubsList(subsList)
+        }
     }
 
     fun decodeSubscription(subscriptionId: String): SubscriptionItem? {
         val json = subStorage.decodeString(subscriptionId) ?: return null
         return Gson().fromJson(json, SubscriptionItem::class.java)
+    }
+
+    fun encodeSubsList(subsList: MutableList<String>) {
+        mainStorage.encode(KEY_SUB_IDS, Gson().toJson(subsList))
+    }
+
+    fun decodeSubsList(): MutableList<String> {
+        val json = mainStorage.decodeString(KEY_SUB_IDS)
+        return if (json.isNullOrBlank()) {
+            mutableListOf()
+        } else {
+            Gson().fromJson(json, Array<String>::class.java).toMutableList()
+        }
     }
 
     fun decodeAssetUrls(): List<Pair<String, AssetUrlItem>> {

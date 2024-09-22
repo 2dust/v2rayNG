@@ -69,11 +69,9 @@ class SubEditActivity : BaseActivity() {
     private fun saveServer(): Boolean {
         val subItem: SubscriptionItem
         val json = subStorage?.decodeString(editSubId)
-        var subId = editSubId
         if (!json.isNullOrBlank()) {
             subItem = Gson().fromJson(json, SubscriptionItem::class.java)
         } else {
-            subId = Utils.getUuid()
             subItem = SubscriptionItem()
         }
 
@@ -93,7 +91,7 @@ class SubEditActivity : BaseActivity() {
 //            return false
 //        }
 
-        subStorage?.encode(subId, Gson().toJson(subItem))
+        MmkvManager.encodeSubscription(editSubId, subItem)
         toast(R.string.toast_success)
         finish()
         return true
