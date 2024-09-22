@@ -289,7 +289,7 @@ object AngConfigManager {
                 sb.append(url)
                 sb.appendLine()
             }
-            if (sb.isNotEmpty()) {
+            if (sb.count() > 0) {
                 Utils.setClipboard(context, sb.toString())
             }
         } catch (e: Exception) {
