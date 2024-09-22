@@ -76,10 +76,10 @@
     <string name="server_lab_security4">Пользователь (необязательно)</string>
     <string name="server_lab_encryption">Шифрование</string>
     <string name="server_lab_flow">Поток</string>
-    <string name="server_lab_public_key">PublicKey</string>
+    <string name="server_lab_public_key">Открытый ключ</string>
     <string name="server_lab_short_id">ShortID</string>
     <string name="server_lab_spider_x">SpiderX</string>
-    <string name="server_lab_secret_key">SecretKey</string>
+    <string name="server_lab_secret_key">Закрытый ключ</string>
     <string name="server_lab_reserved">Reserved (необязательно)</string>
     <string name="server_lab_local_address">Локальный адрес (необязательно, IPv4/IPv6 через запятую)</string>
     <string name="server_lab_local_mtu">MTU (необязательно, по умолчанию 1420)</string>
@@ -251,10 +251,10 @@
     <string name="routing_settings_tips">Введите требуемые IP/URL через запятую. Не забудьте сохранить изменения.</string>
     <string name="routing_settings_save">Сохранить</string>
     <string name="routing_settings_delete">Очистить</string>
-    <string name="routing_settings_rule_title">Routing Rule Settings</string>
-    <string name="routing_settings_add_rule">Add rule</string>
-    <string name="routing_settings_import_rulesets">Import ruleset</string>
-    <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
+    <string name="routing_settings_rule_title">Настройка правил маршрутизации</string>
+    <string name="routing_settings_add_rule">Добавить правило</string>
+    <string name="routing_settings_import_rulesets">Импорт правил</string>
+    <string name="routing_settings_import_rulesets_tip">Существующие правила будут удалены. Продолжить?</string>
 
     <string name="connection_test_pending">Проверить подключение</string>
     <string name="connection_test_testing">Проверка…</string>
@@ -293,6 +293,12 @@
         <item>Как в системе</item>
         <item>Светлая</item>
         <item>Тёмная</item>
+    </string-array>
+
+    <string-array name="preset_rulesets">
+        <item>Белый список Китая</item>
+        <item>Чёрный список Китая</item>
+        <item>Общие</item>
     </string-array>
 
 </resources>
