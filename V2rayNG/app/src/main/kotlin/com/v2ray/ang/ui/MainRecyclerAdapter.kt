@@ -85,9 +85,8 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             }
 
             // 替换服务器地址的'.'之后的内容为'***'，例如将'1.23.45.67'替换为'1.23.45.***'
-            val parts = profile.server?.split('.')
-            val modifiedServer = parts?.dropLast(1)?.joinToString('.') + ".***"
-            val strState = "${modifiedServer} : ${profile.serverPort}"
+            val modifiedServer = profile.server?.split('.')?.dropLast(1)?.joinToString(".", postfix = ".***")
+            val strState = "$modifiedServer : ${profile.serverPort}"
 
 
             holder.itemMainBinding.tvStatistics.text = strState
