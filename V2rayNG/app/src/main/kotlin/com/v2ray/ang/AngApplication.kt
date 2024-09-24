@@ -33,7 +33,6 @@ class AngApplication : MultiDexApplication() {
 //        if (firstRun)
 //            defaultSharedPreferences.edit().putInt(PREF_LAST_VERSION, BuildConfig.VERSION_CODE).apply()
 
-        //Logger.init().logLevel(if (BuildConfig.DEBUG) LogLevel.FULL else LogLevel.NONE)
         MMKV.initialize(this)
 
         Utils.setNightMode(application)

@@ -17,6 +17,7 @@ import android.os.StrictMode
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.MyContextWrapper
@@ -150,9 +151,12 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
         builder.setSession(V2RayServiceManager.currentConfig?.remarks.orEmpty())
 
+        val selfPackageName = BuildConfig.APPLICATION_ID
         if (settingsStorage?.decodeBool(AppConfig.PREF_PER_APP_PROXY) == true) {
             val apps = settingsStorage?.decodeStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
             val bypassApps = settingsStorage?.decodeBool(AppConfig.PREF_BYPASS_APPS) ?: false
+            //process self package
+            if (bypassApps) apps?.add(selfPackageName) else apps?.remove(selfPackageName)
             apps?.forEach {
                 try {
                     if (bypassApps)
@@ -160,9 +164,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
                     else
                         builder.addAllowedApplication(it)
                 } catch (e: PackageManager.NameNotFoundException) {
-                    //Logger.d(e)
                 }
             }
+        } else {
+            builder.addDisallowedApplication(selfPackageName)
         }
 
         // Close the old interface since the parameters have been changed.

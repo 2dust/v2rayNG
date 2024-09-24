@@ -106,13 +106,11 @@ object V2RayServiceManager {
         }
 
         override fun onEmitStatus(l: Long, s: String?): Long {
-            //Logger.d(s)
             return 0
         }
 
         override fun setup(s: String): Long {
             val serviceControl = serviceControl?.get() ?: return -1
-            //Logger.d(s)
             return try {
                 serviceControl.startService()
                 lastQueryTime = System.currentTimeMillis()
@@ -197,7 +195,6 @@ object V2RayServiceManager {
             val serviceControl = serviceControl?.get() ?: return
             when (intent?.getIntExtra("key", 0)) {
                 AppConfig.MSG_REGISTER_CLIENT -> {
-                    //Logger.e("ReceiveMessageHandler", intent?.getIntExtra("key", 0).toString())
                     if (v2rayPoint.isRunning) {
                         MessageUtil.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_RUNNING, "")
                     } else {
