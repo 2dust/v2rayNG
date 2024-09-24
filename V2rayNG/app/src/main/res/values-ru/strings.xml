@@ -28,9 +28,9 @@
     <string name="menu_item_import_config_manually_vless">Ручной ввод VLESS</string>
     <string name="menu_item_import_config_manually_ss">Ручной ввод Shadowsocks</string>
     <string name="menu_item_import_config_manually_socks">Ручной ввод Socks</string>
-    <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
+    <string name="menu_item_import_config_manually_http">Ручной ввод HTTP</string>
     <string name="menu_item_import_config_manually_trojan">Ручной ввод Trojan</string>
-    <string name="menu_item_import_config_manually_wireguard">Ручной ввод Wireguard</string>
+    <string name="menu_item_import_config_manually_wireguard">Ручной ввод WireGuard</string>
     <string name="menu_item_import_config_custom">Другой профиль</string>
     <string name="menu_item_import_config_custom_clipboard">Импорт из буфера обмена</string>
     <string name="menu_item_import_config_custom_local">Импорт из файла</string>
