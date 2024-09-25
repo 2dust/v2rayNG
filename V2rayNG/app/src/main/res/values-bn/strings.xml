@@ -32,6 +32,7 @@
     <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">ম্যানুয়ালি টাইপ করুন [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">ম্যানুয়ালি টাইপ করুন [Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
     <string name="menu_item_import_config_custom">কাস্টম কনফিগারেশন</string>
     <string name="menu_item_import_config_custom_clipboard">ক্লিপবোর্ড থেকে কাস্টম কনফিগারেশন আমদানি করুন</string>
     <string name="menu_item_import_config_custom_local">স্থানীয়ভাবে কাস্টম কনফিগারেশন আমদানি করুন</string>

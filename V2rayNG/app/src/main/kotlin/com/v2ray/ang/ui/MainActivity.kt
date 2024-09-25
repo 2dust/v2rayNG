@@ -292,6 +292,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
+        R.id.import_manually_hysteria2 -> {
+            importManually(EConfigType.HYSTERIA2.value)
+            true
+        }
+
         R.id.import_config_custom_clipboard -> {
             importConfigCustomClipboard()
             true

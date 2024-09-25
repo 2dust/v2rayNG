@@ -31,6 +31,7 @@
     <string name="menu_item_import_config_manually_http">Ручной ввод HTTP</string>
     <string name="menu_item_import_config_manually_trojan">Ручной ввод Trojan</string>
     <string name="menu_item_import_config_manually_wireguard">Ручной ввод WireGuard</string>
+    <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
     <string name="menu_item_import_config_custom">Другой профиль</string>
     <string name="menu_item_import_config_custom_clipboard">Импорт из буфера обмена</string>
     <string name="menu_item_import_config_custom_local">Импорт из файла</string>

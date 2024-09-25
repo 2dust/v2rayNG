@@ -31,6 +31,7 @@
     <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">تایپ دستی[Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">[Wireguard]تایپ دستی</string>
+    <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
     <string name="menu_item_import_config_custom">کانفیگ سفارشی</string>
     <string name="menu_item_import_config_custom_clipboard">کانفیگ سفارشی را از کلیپ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_custom_local">کانفیگ سفارشی را به صورت محلی وارد کنید</string>

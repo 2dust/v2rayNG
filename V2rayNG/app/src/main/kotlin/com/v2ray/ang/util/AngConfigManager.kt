@@ -14,6 +14,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.*
 import com.v2ray.ang.util.MmkvManager.settingsStorage
+import com.v2ray.ang.util.fmt.Hysteria2Fmt
 import com.v2ray.ang.util.fmt.ShadowsocksFmt
 import com.v2ray.ang.util.fmt.SocksFmt
 import com.v2ray.ang.util.fmt.TrojanFmt
@@ -50,6 +51,8 @@ object AngConfigManager {
                 VlessFmt.parseVless(str)
             } else if (str.startsWith(EConfigType.WIREGUARD.protocolScheme)) {
                 WireguardFmt.parseWireguard(str)
+            } else if (str.startsWith(EConfigType.HYSTERIA2.protocolScheme)) {
+                Hysteria2Fmt.parseHysteria2(str)
             } else {
                 null
             }
@@ -92,6 +95,7 @@ object AngConfigManager {
                 EConfigType.VLESS -> VlessFmt.toUri(config)
                 EConfigType.TROJAN -> TrojanFmt.toUri(config)
                 EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
+                EConfigType.HYSTERIA2 -> Hysteria2Fmt.toUri(config)
             }
         } catch (e: Exception) {
             e.printStackTrace()

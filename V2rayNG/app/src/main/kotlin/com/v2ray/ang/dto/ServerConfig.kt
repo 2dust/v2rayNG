@@ -16,7 +16,8 @@ data class ServerConfig(
     companion object {
         fun create(configType: EConfigType): ServerConfig {
             when (configType) {
-                EConfigType.VMESS, EConfigType.VLESS ->
+                EConfigType.VMESS,
+                EConfigType.VLESS ->
                     return ServerConfig(
                         configType = configType,
                         outboundBean = V2rayConfig.OutboundBean(
@@ -38,7 +39,8 @@ data class ServerConfig(
                 EConfigType.SHADOWSOCKS,
                 EConfigType.SOCKS,
                 EConfigType.HTTP,
-                EConfigType.TROJAN ->
+                EConfigType.TROJAN,
+                EConfigType.HYSTERIA2 ->
                     return ServerConfig(
                         configType = configType,
                         outboundBean = V2rayConfig.OutboundBean(

@@ -380,6 +380,7 @@ object V2rayConfigUtil {
                 || protocol.equals(EConfigType.HTTP.name, true)
                 || protocol.equals(EConfigType.TROJAN.name, true)
                 || protocol.equals(EConfigType.WIREGUARD.name, true)
+                || protocol.equals(EConfigType.HYSTERIA2.name, true)
             ) {
                 muxEnabled = false
             } else if (protocol.equals(EConfigType.VLESS.name, true)

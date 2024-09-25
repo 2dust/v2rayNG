@@ -31,6 +31,7 @@
     <string name="menu_item_import_config_manually_http">手動鍵入 [HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">手動鍵入 [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">手動鍵入 [Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">手動鍵入 [Hysteria2]</string>
     <string name="menu_item_import_config_custom">自訂配置</string>
     <string name="menu_item_import_config_custom_clipboard">從剪貼簿匯入自訂配置</string>
     <string name="menu_item_import_config_custom_local">從本地匯入自訂配置</string>

@@ -51,7 +51,7 @@ object V2RayServiceManager {
         set(value) {
             field = value
             Seq.setContext(value?.get()?.getService()?.applicationContext)
-            Libv2ray.initV2Env(Utils.userAssetPath(value?.get()?.getService()), Utils.getDeviceIdForXUDPBaseKey())
+            Libv2ray.initV2Env(Utils.userAssetPath(value?.get()?.getService()))//, Utils.getDeviceIdForXUDPBaseKey())
         }
     var currentConfig: ServerConfig? = null
 
