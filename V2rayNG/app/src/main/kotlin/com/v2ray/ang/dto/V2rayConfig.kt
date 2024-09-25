@@ -512,8 +512,8 @@ data class V2rayConfig(
                         val tcpSetting = streamSettings?.tcpSettings ?: return null
                         listOf(
                             tcpSetting.header.type,
-                            tcpSetting.header.request?.headers?.Host?.joinToString().orEmpty(),
-                            tcpSetting.header.request?.path?.joinToString().orEmpty()
+                            tcpSetting.header.request?.headers?.Host?.joinToString(",").orEmpty(),
+                            tcpSetting.header.request?.path?.joinToString(",").orEmpty()
                         )
                     }
 
@@ -557,7 +557,7 @@ data class V2rayConfig(
                         val h2Setting = streamSettings?.httpSettings ?: return null
                         listOf(
                             "",
-                            h2Setting.host.joinToString(),
+                            h2Setting.host.joinToString(","),
                             h2Setting.path
                         )
                     }

@@ -54,7 +54,7 @@ object Hysteria2Fmt {
                 dicQuery["sni"] = tlsSetting.serverName
             }
             if (!tlsSetting.alpn.isNullOrEmpty() && tlsSetting.alpn.isNotEmpty()) {
-                dicQuery["alpn"] = Utils.removeWhiteSpace(tlsSetting.alpn.joinToString()).orEmpty()
+                dicQuery["alpn"] = Utils.removeWhiteSpace(tlsSetting.alpn.joinToString(",")).orEmpty()
             }
         }
 

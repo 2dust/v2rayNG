@@ -40,10 +40,10 @@ class RoutingEditActivity : BaseActivity() {
 
     private fun bindingServer(rulesetItem: RulesetItem): Boolean {
         binding.etRemarks.text = Utils.getEditable(rulesetItem.remarks)
-        binding.etDomain.text = Utils.getEditable(rulesetItem.domain?.joinToString())
-        binding.etIp.text = Utils.getEditable(rulesetItem.ip?.joinToString())
+        binding.etDomain.text = Utils.getEditable(rulesetItem.domain?.joinToString(","))
+        binding.etIp.text = Utils.getEditable(rulesetItem.ip?.joinToString(","))
         binding.etPort.text = Utils.getEditable(rulesetItem.port)
-        binding.etProtocol.text = Utils.getEditable(rulesetItem.protocol?.joinToString())
+        binding.etProtocol.text = Utils.getEditable(rulesetItem.protocol?.joinToString(","))
         binding.etNetwork.text = Utils.getEditable(rulesetItem.network)
         val outbound = Utils.arrayFind(outbound_tag, rulesetItem.outboundTag)
         binding.spOutboundTag.setSelection(outbound)

@@ -93,7 +93,7 @@ object VmessFmt {
         vmessQRCode.tls = streamSetting.security
         vmessQRCode.sni = streamSetting.tlsSettings?.serverName.orEmpty()
         vmessQRCode.alpn =
-            Utils.removeWhiteSpace(streamSetting.tlsSettings?.alpn?.joinToString()).orEmpty()
+            Utils.removeWhiteSpace(streamSetting.tlsSettings?.alpn?.joinToString(",")).orEmpty()
         vmessQRCode.fp = streamSetting.tlsSettings?.fingerprint.orEmpty()
         outbound.getTransportSettingDetails()?.let { transportDetails ->
             vmessQRCode.type = transportDetails[0]

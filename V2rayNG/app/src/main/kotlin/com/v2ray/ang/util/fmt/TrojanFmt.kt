@@ -92,7 +92,7 @@ object TrojanFmt {
             }
             if (!tlsSetting.alpn.isNullOrEmpty() && tlsSetting.alpn.isNotEmpty()) {
                 dicQuery["alpn"] =
-                    Utils.removeWhiteSpace(tlsSetting.alpn.joinToString()).orEmpty()
+                    Utils.removeWhiteSpace(tlsSetting.alpn.joinToString(",")).orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.fingerprint)) {
                 dicQuery["fp"] = tlsSetting.fingerprint.orEmpty()

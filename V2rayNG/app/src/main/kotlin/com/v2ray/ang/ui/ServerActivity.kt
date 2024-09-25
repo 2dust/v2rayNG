@@ -285,7 +285,7 @@ class ServerActivity : BaseActivity() {
                     Utils.getEditable("${WIREGUARD_LOCAL_ADDRESS_V4},${WIREGUARD_LOCAL_ADDRESS_V6}")
             } else {
                 val list = outbound.settings?.address as List<*>
-                et_local_address?.text = Utils.getEditable(list.joinToString())
+                et_local_address?.text = Utils.getEditable(list.joinToString(","))
             }
             if (outbound.settings?.mtu == null) {
                 et_local_mtu?.text = Utils.getEditable(WIREGUARD_LOCAL_MTU)
@@ -317,7 +317,7 @@ class ServerActivity : BaseActivity() {
                 tlsSetting.alpn?.let {
                     val alpnIndex = Utils.arrayFind(
                         alpns,
-                        Utils.removeWhiteSpace(tlsSetting.alpn.joinToString()).orEmpty()
+                        Utils.removeWhiteSpace(tlsSetting.alpn.joinToString(",")).orEmpty()
                     )
                     sp_stream_alpn?.setSelection(alpnIndex)
                 }
