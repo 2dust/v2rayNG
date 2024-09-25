@@ -138,12 +138,16 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
         }
 
+//        if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
+//            builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
+//        } else {
         Utils.getVpnDnsServers()
             .forEach {
                 if (Utils.isPureIpAddress(it)) {
                     builder.addDnsServer(it)
                 }
             }
+//        }
 
         builder.setSession(V2RayServiceManager.currentConfig?.remarks.orEmpty())
 
