@@ -72,4 +72,17 @@ object Hysteria2Fmt {
         )
         return url + query + remark
     }
+
+    fun toNativeConfig(config: ServerConfig, socksPort: Int): Hysteria2Bean? {
+        val outbound = config.getProxyOutbound() ?: return null
+        val bean = Hysteria2Bean(
+            server = outbound.getServerAddressAndPort(),
+            auth = outbound.getPassword(),
+            socks5 = Hysteria2Bean.Socks5Bean(
+                listen = "$LOOPBACK:${socksPort}"
+            ),
+            tls = Hysteria2Bean.TlsBean(outbound.getServerAddress())
+        )
+        return bean
+    }
 }

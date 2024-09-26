@@ -1,6 +1,9 @@
 package com.v2ray.ang.extension
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.widget.Toast
 import com.v2ray.ang.AngApplication
@@ -57,3 +60,25 @@ val URI.idnHost: String
 fun String.removeWhiteSpace(): String = replace("\\s+".toRegex(), "")
 
 fun String.toLongEx(): Long = toLongOrNull() ?: 0
+
+fun Context.listenForPackageChanges(onetime: Boolean = true, callback: () -> Unit) =
+    object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            callback()
+            if (onetime) context.unregisterReceiver(this)
+        }
+    }.apply {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(this, IntentFilter().apply {
+                addAction(Intent.ACTION_PACKAGE_ADDED)
+                addAction(Intent.ACTION_PACKAGE_REMOVED)
+                addDataScheme("package")
+            }, Context.RECEIVER_EXPORTED)
+        } else {
+            registerReceiver(this, IntentFilter().apply {
+                addAction(Intent.ACTION_PACKAGE_ADDED)
+                addAction(Intent.ACTION_PACKAGE_REMOVED)
+                addDataScheme("package")
+            })
+        }
+    }

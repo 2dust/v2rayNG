@@ -24,6 +24,7 @@ import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.settingsStorage
+import com.v2ray.ang.util.PluginUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
 import go.Seq
@@ -161,6 +162,8 @@ object V2RayServiceManager {
         if (v2rayPoint.isRunning) {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
             showNotification()
+
+            PluginUtil.runPlugin(service, config)
         } else {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
             cancelNotification()
@@ -188,6 +191,7 @@ object V2RayServiceManager {
         } catch (e: Exception) {
             Log.d(ANG_PACKAGE, e.toString())
         }
+        PluginUtil.stopPlugin()
     }
 
     private class ReceiveMessageHandler : BroadcastReceiver() {

@@ -6,6 +6,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.AppConfig.PROTOCOL_FREEDOM
 import com.v2ray.ang.AppConfig.TAG_BLOCKED
 import com.v2ray.ang.AppConfig.TAG_DIRECT
@@ -41,7 +42,7 @@ object V2rayConfigUtil {
             }
 
             val result = getV2rayNonCustomConfig(context, config)
-            Log.d(ANG_PACKAGE, result.content)
+            //Log.d(ANG_PACKAGE, result.content)
             return result
         } catch (e: Exception) {
             e.printStackTrace()
@@ -110,7 +111,7 @@ object V2rayConfigUtil {
             v2rayConfig.inbounds.forEach { curInbound ->
                 if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) != true) {
                     //bind all inbounds to localhost if the user requests
-                    curInbound.listen = "127.0.0.1"
+                    curInbound.listen = LOOPBACK
                 }
             }
             v2rayConfig.inbounds[0].port = socksPort
@@ -145,6 +146,28 @@ object V2rayConfigUtil {
     }
 
     private fun outbounds(v2rayConfig: V2rayConfig, outbound: V2rayConfig.OutboundBean): Boolean {
+        if (outbound.protocol.equals(EConfigType.HYSTERIA2.name, true)) {
+            val socksPort = 100 + Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+            val outboundNew = V2rayConfig.OutboundBean(
+                mux = null,
+                protocol = EConfigType.SOCKS.name.lowercase(),
+                settings = V2rayConfig.OutboundBean.OutSettingsBean(
+                    servers = listOf(
+                        V2rayConfig.OutboundBean.OutSettingsBean.ServersBean(
+                            address = LOOPBACK,
+                            port = socksPort
+                        )
+                    )
+                )
+            )
+            if (v2rayConfig.outbounds.isNotEmpty()) {
+                v2rayConfig.outbounds[0] = outboundNew
+            } else {
+                v2rayConfig.outbounds.add(outboundNew)
+            }
+            return true
+        }
+
         val ret = updateOutboundWithGlobalSettings(outbound)
         if (!ret) return false
 
@@ -247,7 +270,7 @@ object V2rayConfigUtil {
                     V2rayConfig.InboundBean(
                         tag = "dns-in",
                         port = localDnsPort,
-                        listen = "127.0.0.1",
+                        listen = LOOPBACK,
                         protocol = "dokodemo-door",
                         settings = dnsInboundSettings,
                         sniffing = null
@@ -335,7 +358,7 @@ object V2rayConfigUtil {
             //block dns
             val blkDomain = userRule2Domain(TAG_BLOCKED)
             if (blkDomain.size > 0) {
-                hosts.putAll(blkDomain.map { it to "127.0.0.1" })
+                hosts.putAll(blkDomain.map { it to LOOPBACK })
             }
 
             // hardcode googleapi rule to fix play store problems
