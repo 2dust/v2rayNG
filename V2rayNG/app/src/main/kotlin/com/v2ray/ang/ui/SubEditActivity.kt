@@ -42,6 +42,7 @@ class SubEditActivity : BaseActivity() {
     private fun bindingServer(subItem: SubscriptionItem): Boolean {
         binding.etRemarks.text = Utils.getEditable(subItem.remarks)
         binding.etUrl.text = Utils.getEditable(subItem.url)
+        binding.etFilter.text = Utils.getEditable(subItem.filter)
         binding.chkEnable.isChecked = subItem.enabled
         binding.autoUpdateCheck.isChecked = subItem.autoUpdate
         binding.etPreProfile.text = Utils.getEditable(subItem.prevProfile)
@@ -55,6 +56,7 @@ class SubEditActivity : BaseActivity() {
     private fun clearServer(): Boolean {
         binding.etRemarks.text = null
         binding.etUrl.text = null
+        binding.etFilter.text = null
         binding.chkEnable.isChecked = true
         binding.etPreProfile.text = null
         binding.etNextProfile.text = null
@@ -65,10 +67,11 @@ class SubEditActivity : BaseActivity() {
      * save server config
      */
     private fun saveServer(): Boolean {
-        val subItem = MmkvManager.decodeSubscription(editSubId)?:SubscriptionItem()
+        val subItem = MmkvManager.decodeSubscription(editSubId) ?: SubscriptionItem()
 
         subItem.remarks = binding.etRemarks.text.toString()
         subItem.url = binding.etUrl.text.toString()
+        subItem.filter = binding.etFilter.text.toString()
         subItem.enabled = binding.chkEnable.isChecked
         subItem.autoUpdate = binding.autoUpdateCheck.isChecked
         subItem.prevProfile = binding.etPreProfile.text.toString()

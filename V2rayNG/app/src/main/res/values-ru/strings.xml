@@ -231,6 +231,7 @@
     <string name="title_sub_setting">Группы</string>
     <string name="sub_setting_remarks">Название</string>
     <string name="sub_setting_url">URL (необязательно)</string>
+    <string name="sub_setting_filter">Remarks regular filter</string>
     <string name="sub_setting_enable">Использовать обновление</string>
     <string name="sub_auto_update">Использовать автоматическое обновление</string>
     <string name="sub_setting_pre_profile">Название предыдущего прокси</string>

@@ -32,6 +32,7 @@ object AngConfigManager {
     private fun parseConfig(
         str: String?,
         subid: String,
+        subItem: SubscriptionItem?,
         removedSelectedServer: ServerConfig?
     ): Int {
         try {
@@ -60,6 +61,13 @@ object AngConfigManager {
             if (config == null) {
                 return R.string.toast_incorrect_protocol
             }
+            //filter
+            if (subItem?.filter != null && subItem.filter?.isNotEmpty() == true && config.remarks.isNotEmpty()) {
+                val matched = Regex(pattern = subItem.filter ?: "")
+                    .containsMatchIn(input = config.remarks)
+                if (!matched) return -1
+            }
+
             config.subscriptionId = subid
             val guid = MmkvManager.encodeServerConfig("", config)
             if (removedSelectedServer != null &&
@@ -244,11 +252,12 @@ object AngConfigManager {
                 MmkvManager.removeServerViaSubid(subid)
             }
 
+            val subItem = MmkvManager.decodeSubscription(subid)
             var count = 0
             servers.lines()
                 .reversed()
                 .forEach {
-                    val resId = parseConfig(it, subid, removedSelectedServer)
+                    val resId = parseConfig(it, subid, subItem, removedSelectedServer)
                     if (resId == 0) {
                         count++
                     }

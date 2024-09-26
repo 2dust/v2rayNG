@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tbruyelle.rxpermissions3.RxPermissions
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubSettingBinding
 import com.v2ray.ang.databinding.ItemRecyclerUserAssetBinding
@@ -212,7 +213,7 @@ class UserAssetActivity : BaseActivity() {
                 URL(item.url).openConnection(
                     Proxy(
                         Proxy.Type.HTTP,
-                        InetSocketAddress("127.0.0.1", httpPort)
+                        InetSocketAddress(LOOPBACK, httpPort)
                     )
                 ) as HttpURLConnection
             }

@@ -113,6 +113,7 @@ object AppConfig {
     const val WIREGUARD_LOCAL_ADDRESS_V4 = "172.16.0.2/32"
     const val WIREGUARD_LOCAL_ADDRESS_V6 = "2606:4700:110:8f81:d551:a0:532e:a2b3/128"
     const val WIREGUARD_LOCAL_MTU = "1420"
+    const val LOOPBACK = "127.0.0.1"
 
     /** Message constants for communication. */
     const val MSG_REGISTER_CLIENT = 1

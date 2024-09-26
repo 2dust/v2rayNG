@@ -17,6 +17,7 @@ import android.os.StrictMode
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.util.MmkvManager.settingsStorage
@@ -207,7 +208,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             File(applicationContext.applicationInfo.nativeLibraryDir, TUN2SOCKS).absolutePath,
             "--netif-ipaddr", PRIVATE_VLAN4_ROUTER,
             "--netif-netmask", "255.255.255.252",
-            "--socks-server-addr", "127.0.0.1:${socksPort}",
+            "--socks-server-addr", "$LOOPBACK:${socksPort}",
             "--tunmtu", VPN_MTU.toString(),
             "--sock-path", "sock_path",//File(applicationContext.filesDir, "sock_path").absolutePath,
             "--enable-udprelay",
@@ -221,7 +222,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
             val localDnsPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_LOCAL_DNS_PORT), AppConfig.PORT_LOCAL_DNS.toInt())
             cmd.add("--dnsgw")
-            cmd.add("127.0.0.1:${localDnsPort}")
+            cmd.add("$LOOPBACK:${localDnsPort}")
         }
         Log.d(packageName, cmd.toString())
 
