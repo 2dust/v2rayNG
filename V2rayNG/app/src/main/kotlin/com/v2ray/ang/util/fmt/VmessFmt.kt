@@ -15,7 +15,7 @@ import java.net.URI
 
 object VmessFmt {
 
-    fun parseVmess(str: String): ServerConfig? {
+    fun parse(str: String): ServerConfig? {
         if (str.indexOf('?') > 0 && str.indexOf('&') > 0) {
             return parseVmessStd(str)
         }

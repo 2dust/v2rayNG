@@ -41,19 +41,19 @@ object AngConfigManager {
             }
 
             val config = if (str.startsWith(EConfigType.VMESS.protocolScheme)) {
-                VmessFmt.parseVmess(str)
+                VmessFmt.parse(str)
             } else if (str.startsWith(EConfigType.SHADOWSOCKS.protocolScheme)) {
-                ShadowsocksFmt.parseShadowsocks(str)
+                ShadowsocksFmt.parse(str)
             } else if (str.startsWith(EConfigType.SOCKS.protocolScheme)) {
-                SocksFmt.parseSocks(str)
+                SocksFmt.parse(str)
             } else if (str.startsWith(EConfigType.TROJAN.protocolScheme)) {
-                TrojanFmt.parseTrojan(str)
+                TrojanFmt.parse(str)
             } else if (str.startsWith(EConfigType.VLESS.protocolScheme)) {
-                VlessFmt.parseVless(str)
+                VlessFmt.parse(str)
             } else if (str.startsWith(EConfigType.WIREGUARD.protocolScheme)) {
-                WireguardFmt.parseWireguard(str)
+                WireguardFmt.parse(str)
             } else if (str.startsWith(EConfigType.HYSTERIA2.protocolScheme)) {
-                Hysteria2Fmt.parseHysteria2(str)
+                Hysteria2Fmt.parse(str)
             } else {
                 null
             }

@@ -9,7 +9,7 @@ import com.v2ray.ang.util.Utils
 import java.net.URI
 
 object ShadowsocksFmt {
-    fun parseShadowsocks(str: String): ServerConfig? {
+    fun parse(str: String): ServerConfig? {
         val config = ServerConfig.create(EConfigType.SHADOWSOCKS)
         if (!tryResolveResolveSip002(str, config)) {
             var result = str.replace(EConfigType.SHADOWSOCKS.protocolScheme, "")

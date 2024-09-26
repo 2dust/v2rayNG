@@ -2,7 +2,9 @@ package com.v2ray.ang.util.fmt
 
 import android.text.TextUtils
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.Hysteria2Bean
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.idnHost
@@ -12,7 +14,7 @@ import java.net.URI
 
 object Hysteria2Fmt {
 
-    fun parseHysteria2(str: String): ServerConfig {
+    fun parse(str: String): ServerConfig {
         var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
         val config = ServerConfig.create(EConfigType.HYSTERIA2)
 

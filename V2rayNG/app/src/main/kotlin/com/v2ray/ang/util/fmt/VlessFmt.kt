@@ -12,7 +12,7 @@ import java.net.URI
 
 object VlessFmt {
 
-    fun parseVless(str: String): ServerConfig? {
+    fun parse(str: String): ServerConfig? {
         var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
         val config = ServerConfig.create(EConfigType.VLESS)
 
