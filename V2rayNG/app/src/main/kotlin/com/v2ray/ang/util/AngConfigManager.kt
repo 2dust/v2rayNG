@@ -314,21 +314,31 @@ object AngConfigManager {
                 e.printStackTrace()
             }
 
-            // For compatibility
-            val config = ServerConfig.create(EConfigType.CUSTOM)
-            config.subscriptionId = subid
-            config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
-            config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
-            val key = MmkvManager.encodeServerConfig("", config)
-            MmkvManager.encodeServerRaw(key, server)
-            return 1
+            try {
+                // For compatibility
+                val config = ServerConfig.create(EConfigType.CUSTOM)
+                config.subscriptionId = subid
+                config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
+                config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
+                val key = MmkvManager.encodeServerConfig("", config)
+                MmkvManager.encodeServerRaw(key, server)
+                return 1
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return 0
         } else if (server.startsWith("[Interface]") && server.contains("[Peer]")) {
-            val config = WireguardFmt.parseWireguardConfFile(server)
-                ?: return R.string.toast_incorrect_protocol
-            config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
-            val key = MmkvManager.encodeServerConfig("", config)
-            MmkvManager.encodeServerRaw(key, server)
-            return 1
+            try {
+                val config = WireguardFmt.parseWireguardConfFile(server)
+                    ?: return R.string.toast_incorrect_protocol
+                config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
+                val key = MmkvManager.encodeServerConfig("", config)
+                MmkvManager.encodeServerRaw(key, server)
+                return 1
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return 0
         } else {
             return 0
         }
