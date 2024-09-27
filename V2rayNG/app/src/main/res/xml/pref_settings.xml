@@ -13,6 +13,10 @@
         android:key="pref_route_only_enabled"
         android:summary="@string/summary_pref_route_only_enabled"
         android:title="@string/title_pref_route_only_enabled" />
+    <CheckBoxPreference
+        android:key="pref_is_booted"
+        android:summary="@string/summary_pref_is_booted"
+        android:title="@string/title_pref_is_booted" />
 
     <PreferenceCategory android:title="@string/title_vpn_settings">
         <CheckBoxPreference
