@@ -19,6 +19,7 @@ import android.webkit.URLUtil
 import androidx.appcompat.app.AppCompatDelegate
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
@@ -359,7 +360,7 @@ object Utils {
             url.openConnection(
                 Proxy(
                     Proxy.Type.HTTP,
-                    InetSocketAddress("127.0.0.1", httpPort)
+                    InetSocketAddress(LOOPBACK, httpPort)
                 )
             )
         }

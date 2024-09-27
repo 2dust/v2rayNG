@@ -113,6 +113,7 @@ object AppConfig {
     const val WIREGUARD_LOCAL_ADDRESS_V4 = "172.16.0.2/32"
     const val WIREGUARD_LOCAL_ADDRESS_V6 = "2606:4700:110:8f81:d551:a0:532e:a2b3/128"
     const val WIREGUARD_LOCAL_MTU = "1420"
+    const val LOOPBACK = "127.0.0.1"
 
     /** Message constants for communication. */
     const val MSG_REGISTER_CLIENT = 1
@@ -133,7 +134,7 @@ object AppConfig {
 
     /** Notification channel IDs and names. */
     const val RAY_NG_CHANNEL_ID = "RAY_NG_M_CH_ID"
-    const val RAY_NG_CHANNEL_NAME = "V2rayNG Background Service"
+    const val RAY_NG_CHANNEL_NAME = "v2rayNG Background Service"
     const val SUBSCRIPTION_UPDATE_CHANNEL = "subscription_update_channel"
     const val SUBSCRIPTION_UPDATE_CHANNEL_NAME = "Subscription Update Service"
 
@@ -142,7 +143,10 @@ object AppConfig {
     const val CUSTOM = ""
     const val SHADOWSOCKS = "ss://"
     const val SOCKS = "socks://"
+    const val HTTP = "http://"
     const val VLESS = "vless://"
     const val TROJAN = "trojan://"
     const val WIREGUARD = "wireguard://"
+    const val TUIC = "tuic://"
+    const val HYSTERIA2 = "hysteria2://"
 }

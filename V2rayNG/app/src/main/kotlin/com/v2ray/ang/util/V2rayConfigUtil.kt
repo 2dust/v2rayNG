@@ -6,6 +6,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.AppConfig.PROTOCOL_FREEDOM
 import com.v2ray.ang.AppConfig.TAG_BLOCKED
 import com.v2ray.ang.AppConfig.TAG_DIRECT
@@ -30,7 +31,7 @@ object V2rayConfigUtil {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return Result(false)
             if (config.configType == EConfigType.CUSTOM) {
-                val raw = MmkvManager.serverRawStorage?.decodeString(guid)
+                val raw = MmkvManager.decodeServerRaw(guid)
                 val customConfig = if (raw.isNullOrBlank()) {
                     config.fullConfig?.toPrettyPrinting() ?: return Result(false)
                 } else {
@@ -41,7 +42,8 @@ object V2rayConfigUtil {
             }
 
             val result = getV2rayNonCustomConfig(context, config)
-            Log.d(ANG_PACKAGE, result.content)
+            //Log.d(ANG_PACKAGE, result.content)
+            Log.d(ANG_PACKAGE, result.domainPort?:"")
             return result
         } catch (e: Exception) {
             e.printStackTrace()
@@ -72,9 +74,10 @@ object V2rayConfigUtil {
 
         inbounds(v2rayConfig)
 
-        outbounds(v2rayConfig, outbound)
+        val isPlugin = outbound.protocol.equals(EConfigType.HYSTERIA2.name, true)
+        val retOut = outbounds(v2rayConfig, outbound, isPlugin)
 
-        val retMore = moreOutbounds(v2rayConfig, config.subscriptionId)
+        val retMore = moreOutbounds(v2rayConfig, config.subscriptionId, isPlugin)
 
         routing(v2rayConfig)
 
@@ -92,7 +95,7 @@ object V2rayConfigUtil {
 
         result.status = true
         result.content = v2rayConfig.toPrettyPrinting()
-        result.domainPort = if (retMore.first) retMore.second else outbound.getServerAddressAndPort()
+        result.domainPort = if (retMore.first) retMore.second else retOut.second
         return result
     }
 
@@ -110,7 +113,7 @@ object V2rayConfigUtil {
             v2rayConfig.inbounds.forEach { curInbound ->
                 if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) != true) {
                     //bind all inbounds to localhost if the user requests
-                    curInbound.listen = "127.0.0.1"
+                    curInbound.listen = LOOPBACK
                 }
             }
             v2rayConfig.inbounds[0].port = socksPort
@@ -144,9 +147,31 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun outbounds(v2rayConfig: V2rayConfig, outbound: V2rayConfig.OutboundBean): Boolean {
+    private fun outbounds(v2rayConfig: V2rayConfig, outbound: V2rayConfig.OutboundBean, isPlugin: Boolean): Pair<Boolean, String> {
+        if (isPlugin) {
+            val socksPort = 100 + Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+            val outboundNew = V2rayConfig.OutboundBean(
+                mux = null,
+                protocol = EConfigType.SOCKS.name.lowercase(),
+                settings = V2rayConfig.OutboundBean.OutSettingsBean(
+                    servers = listOf(
+                        V2rayConfig.OutboundBean.OutSettingsBean.ServersBean(
+                            address = LOOPBACK,
+                            port = socksPort
+                        )
+                    )
+                )
+            )
+            if (v2rayConfig.outbounds.isNotEmpty()) {
+                v2rayConfig.outbounds[0] = outboundNew
+            } else {
+                v2rayConfig.outbounds.add(outboundNew)
+            }
+            return Pair(true, outboundNew.getServerAddressAndPort())
+        }
+
         val ret = updateOutboundWithGlobalSettings(outbound)
-        if (!ret) return false
+        if (!ret) return Pair(false, "")
 
         if (v2rayConfig.outbounds.isNotEmpty()) {
             v2rayConfig.outbounds[0] = outbound
@@ -155,7 +180,7 @@ object V2rayConfigUtil {
         }
 
         updateOutboundFragment(v2rayConfig)
-        return true
+        return Pair(true, outbound.getServerAddressAndPort())
     }
 
     private fun fakedns(v2rayConfig: V2rayConfig) {
@@ -247,7 +272,7 @@ object V2rayConfigUtil {
                     V2rayConfig.InboundBean(
                         tag = "dns-in",
                         port = localDnsPort,
-                        listen = "127.0.0.1",
+                        listen = LOOPBACK,
                         protocol = "dokodemo-door",
                         settings = dnsInboundSettings,
                         sniffing = null
@@ -335,7 +360,7 @@ object V2rayConfigUtil {
             //block dns
             val blkDomain = userRule2Domain(TAG_BLOCKED)
             if (blkDomain.size > 0) {
-                hosts.putAll(blkDomain.map { it to "127.0.0.1" })
+                hosts.putAll(blkDomain.map { it to LOOPBACK })
             }
 
             // hardcode googleapi rule to fix play store problems
@@ -377,8 +402,10 @@ object V2rayConfigUtil {
             val protocol = outbound.protocol
             if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)
                 || protocol.equals(EConfigType.SOCKS.name, true)
+                || protocol.equals(EConfigType.HTTP.name, true)
                 || protocol.equals(EConfigType.TROJAN.name, true)
                 || protocol.equals(EConfigType.WIREGUARD.name, true)
+                || protocol.equals(EConfigType.HYSTERIA2.name, true)
             ) {
                 muxEnabled = false
             } else if (protocol.equals(EConfigType.VLESS.name, true)
@@ -507,10 +534,13 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun moreOutbounds(v2rayConfig: V2rayConfig, subscriptionId: String): Pair<Boolean, String> {
+    private fun moreOutbounds(v2rayConfig: V2rayConfig, subscriptionId: String, isPlugin: Boolean): Pair<Boolean, String> {
         val returnPair = Pair(false, "")
         var domainPort: String = ""
 
+        if (isPlugin) {
+            return returnPair
+        }
         //fragment proxy
         if (settingsStorage?.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == true) {
             return returnPair
@@ -526,7 +556,7 @@ object V2rayConfigUtil {
             val outbound = v2rayConfig.outbounds[0]
 
             //Previous proxy
-            val prevNode = MmkvManager.getServerViaRemarks(subItem.prevProfile)
+            val prevNode = SettingsManager.getServerViaRemarks(subItem.prevProfile)
             if (prevNode != null) {
                 val prevOutbound = prevNode.getProxyOutbound()
                 if (prevOutbound != null) {
@@ -542,7 +572,7 @@ object V2rayConfigUtil {
             }
 
             //Next proxy
-            val nextNode = MmkvManager.getServerViaRemarks(subItem.nextProfile)
+            val nextNode = SettingsManager.getServerViaRemarks(subItem.nextProfile)
             if (nextNode != null) {
                 val nextOutbound = nextNode.getProxyOutbound()
                 if (nextOutbound != null) {

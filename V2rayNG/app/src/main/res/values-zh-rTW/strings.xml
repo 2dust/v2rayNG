@@ -24,12 +24,14 @@
     <string name="menu_item_del_config">刪除配置</string>
     <string name="menu_item_import_config_qrcode">從 QR Code 匯入配置</string>
     <string name="menu_item_import_config_clipboard">從剪貼簿匯入配置</string>
-    <string name="menu_item_import_config_manually_vmess">手動鍵入 [Vmess]</string>
+    <string name="menu_item_import_config_manually_vmess">手動鍵入 [VMess]</string>
     <string name="menu_item_import_config_manually_vless">手動鍵入 [VLESS]</string>
     <string name="menu_item_import_config_manually_ss">手動鍵入 [Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">手動鍵入 [Socks]</string>
+    <string name="menu_item_import_config_manually_socks">手動鍵入 [SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">手動鍵入 [HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">手動鍵入 [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">手動鍵入 [Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">手動鍵入 [Hysteria2]</string>
     <string name="menu_item_import_config_custom">自訂配置</string>
     <string name="menu_item_import_config_custom_clipboard">從剪貼簿匯入自訂配置</string>
     <string name="menu_item_import_config_custom_local">從本地匯入自訂配置</string>
@@ -226,7 +228,8 @@
     <string name="title_export_all">匯出目前群組配置至剪貼簿</string>
     <string name="title_sub_setting">訂閱分組設定</string>
     <string name="sub_setting_remarks">備註</string>
-    <string name="sub_setting_url">Optional URL</string>
+    <string name="sub_setting_url">可選位址(url)</string>
+    <string name="sub_setting_filter">別名正規過濾</string>
     <string name="sub_setting_enable">啟用更新</string>
     <string name="sub_auto_update">啟用自動更新</string>
     <string name="sub_setting_pre_profile">前置代理别名</string>

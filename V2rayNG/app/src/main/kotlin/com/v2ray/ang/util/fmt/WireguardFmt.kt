@@ -9,7 +9,7 @@ import com.v2ray.ang.util.Utils
 import java.net.URI
 
 object WireguardFmt {
-    fun parseWireguard(str: String): ServerConfig? {
+    fun parse(str: String): ServerConfig? {
         val uri = URI(Utils.fixIllegalUrl(str))
         if (uri.rawQuery != null) {
             val config = ServerConfig.create(EConfigType.WIREGUARD)
@@ -81,12 +81,12 @@ object WireguardFmt {
             Utils.urlEncode(outbound.settings?.peers?.get(0)?.publicKey.toString())
         if (outbound.settings?.reserved != null) {
             dicQuery["reserved"] = Utils.urlEncode(
-                Utils.removeWhiteSpace(outbound.settings?.reserved?.joinToString())
+                Utils.removeWhiteSpace(outbound.settings?.reserved?.joinToString(","))
                     .toString()
             )
         }
         dicQuery["address"] = Utils.urlEncode(
-            Utils.removeWhiteSpace((outbound.settings?.address as List<*>).joinToString())
+            Utils.removeWhiteSpace((outbound.settings?.address as List<*>).joinToString(","))
                 .toString()
         )
         if (outbound.settings?.mtu != null) {

@@ -17,6 +17,8 @@ import android.os.StrictMode
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.LOOPBACK
+import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.MyContextWrapper
@@ -137,22 +139,25 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
         }
 
-        if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
-            builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
-        } else {
-            Utils.getVpnDnsServers()
-                .forEach {
-                    if (Utils.isPureIpAddress(it)) {
-                        builder.addDnsServer(it)
-                    }
+//        if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
+//            builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
+//        } else {
+        Utils.getVpnDnsServers()
+            .forEach {
+                if (Utils.isPureIpAddress(it)) {
+                    builder.addDnsServer(it)
                 }
-        }
+            }
+//        }
 
         builder.setSession(V2RayServiceManager.currentConfig?.remarks.orEmpty())
 
+        val selfPackageName = BuildConfig.APPLICATION_ID
         if (settingsStorage?.decodeBool(AppConfig.PREF_PER_APP_PROXY) == true) {
             val apps = settingsStorage?.decodeStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
             val bypassApps = settingsStorage?.decodeBool(AppConfig.PREF_BYPASS_APPS) ?: false
+            //process self package
+            if (bypassApps) apps?.add(selfPackageName) else apps?.remove(selfPackageName)
             apps?.forEach {
                 try {
                     if (bypassApps)
@@ -160,9 +165,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
                     else
                         builder.addAllowedApplication(it)
                 } catch (e: PackageManager.NameNotFoundException) {
-                    //Logger.d(e)
                 }
             }
+        } else {
+            builder.addDisallowedApplication(selfPackageName)
         }
 
         // Close the old interface since the parameters have been changed.
@@ -202,7 +208,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             File(applicationContext.applicationInfo.nativeLibraryDir, TUN2SOCKS).absolutePath,
             "--netif-ipaddr", PRIVATE_VLAN4_ROUTER,
             "--netif-netmask", "255.255.255.252",
-            "--socks-server-addr", "127.0.0.1:${socksPort}",
+            "--socks-server-addr", "$LOOPBACK:${socksPort}",
             "--tunmtu", VPN_MTU.toString(),
             "--sock-path", "sock_path",//File(applicationContext.filesDir, "sock_path").absolutePath,
             "--enable-udprelay",
@@ -216,7 +222,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
             val localDnsPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_LOCAL_DNS_PORT), AppConfig.PORT_LOCAL_DNS.toInt())
             cmd.add("--dnsgw")
-            cmd.add("127.0.0.1:${localDnsPort}")
+            cmd.add("$LOOPBACK:${localDnsPort}")
         }
         Log.d(packageName, cmd.toString())
 

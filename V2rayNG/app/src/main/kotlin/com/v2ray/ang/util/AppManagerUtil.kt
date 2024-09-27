@@ -1,21 +1,19 @@
 package com.v2ray.ang.util
 
-import android.Manifest
 import android.content.Context
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.v2ray.ang.dto.AppInfo
 import io.reactivex.rxjava3.core.Observable
 
 object AppManagerUtil {
-    fun loadNetworkAppList(ctx: Context): ArrayList<AppInfo> {
+    private fun loadNetworkAppList(ctx: Context): ArrayList<AppInfo> {
         val packageManager = ctx.packageManager
         val packages = packageManager.getInstalledPackages(PackageManager.GET_PERMISSIONS)
         val apps = ArrayList<AppInfo>()
 
         for (pkg in packages) {
-            if (!pkg.hasInternetPermission && pkg.packageName != "android") continue
+            //if (!pkg.hasInternetPermission && pkg.packageName != "android") continue
 
             val applicationInfo = pkg.applicationInfo
 
@@ -35,9 +33,9 @@ object AppManagerUtil {
             it.onNext(loadNetworkAppList(ctx))
         }
 
-    val PackageInfo.hasInternetPermission: Boolean
-        get() {
-            val permissions = requestedPermissions
-            return permissions?.any { it == Manifest.permission.INTERNET } ?: false
-        }
+//    val PackageInfo.hasInternetPermission: Boolean
+//        get() {
+//            val permissions = requestedPermissions
+//            return permissions?.any { it == Manifest.permission.INTERNET } ?: false
+//        }
 }

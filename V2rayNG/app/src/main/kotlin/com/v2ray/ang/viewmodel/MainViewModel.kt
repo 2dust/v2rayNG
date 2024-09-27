@@ -101,7 +101,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
                 config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
                 val key = MmkvManager.encodeServerConfig("", config)
-                MmkvManager.serverRawStorage?.encode(key, server)
+                MmkvManager.encodeServerRaw(key, server)
                 serverList.add(0, key)
                 val profile = ProfileItem(
                     configType = config.configType,

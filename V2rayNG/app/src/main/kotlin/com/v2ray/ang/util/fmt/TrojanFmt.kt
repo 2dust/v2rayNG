@@ -12,7 +12,7 @@ import java.net.URI
 
 object TrojanFmt {
 
-    fun parseTrojan(str: String): ServerConfig {
+    fun parse(str: String): ServerConfig {
         var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
         val config = ServerConfig.create(EConfigType.TROJAN)
 
@@ -92,7 +92,7 @@ object TrojanFmt {
             }
             if (!tlsSetting.alpn.isNullOrEmpty() && tlsSetting.alpn.isNotEmpty()) {
                 dicQuery["alpn"] =
-                    Utils.removeWhiteSpace(tlsSetting.alpn.joinToString()).orEmpty()
+                    Utils.removeWhiteSpace(tlsSetting.alpn.joinToString(",")).orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.fingerprint)) {
                 dicQuery["fp"] = tlsSetting.fingerprint.orEmpty()

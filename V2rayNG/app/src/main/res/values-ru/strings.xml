@@ -24,12 +24,14 @@
     <string name="menu_item_del_config">Удалить профиль</string>
     <string name="menu_item_import_config_qrcode">Импорт из QR-кода</string>
     <string name="menu_item_import_config_clipboard">Импорт из буфера обмена</string>
-    <string name="menu_item_import_config_manually_vmess">Ручной ввод Vmess</string>
+    <string name="menu_item_import_config_manually_vmess">Ручной ввод VMess</string>
     <string name="menu_item_import_config_manually_vless">Ручной ввод VLESS</string>
     <string name="menu_item_import_config_manually_ss">Ручной ввод Shadowsocks</string>
-    <string name="menu_item_import_config_manually_socks">Ручной ввод Socks</string>
+    <string name="menu_item_import_config_manually_socks">Ручной ввод SOCKS</string>
+    <string name="menu_item_import_config_manually_http">Ручной ввод HTTP</string>
     <string name="menu_item_import_config_manually_trojan">Ручной ввод Trojan</string>
-    <string name="menu_item_import_config_manually_wireguard">Ручной ввод Wireguard</string>
+    <string name="menu_item_import_config_manually_wireguard">Ручной ввод WireGuard</string>
+    <string name="menu_item_import_config_manually_hysteria2">Ручной ввод Hysteria2</string>
     <string name="menu_item_import_config_custom">Другой профиль</string>
     <string name="menu_item_import_config_custom_clipboard">Импорт из буфера обмена</string>
     <string name="menu_item_import_config_custom_local">Импорт из файла</string>
@@ -37,14 +39,14 @@
     <string name="menu_item_import_config_custom_url_scan">Импорт сканированием URL</string>
     <string name="del_config_comfirm">Подтверждаете удаление?</string>
     <string name="del_invalid_config_comfirm">Выполните проверку перед удалением! Подтверждаете удаление?</string>
-    <string name="server_lab_remarks">Описание</string>
+    <string name="server_lab_remarks">Название</string>
     <string name="server_lab_address">Адрес</string>
     <string name="server_lab_port">Порт</string>
     <string name="server_lab_id">ID</string>
     <string name="server_lab_alterid">Альтернативный ID</string>
     <string name="server_lab_security">Безопасность</string>
     <string name="server_lab_network">Сеть</string>
-    <string name="server_lab_more_function">Другие параметры</string>
+    <string name="server_lab_more_function">Транспорт</string>
     <string name="server_lab_head_type">Тип заголовка</string>
     <string name="server_lab_mode_type">Режим gRPC</string>
     <string name="server_lab_request_host">Узел</string>
@@ -76,10 +78,10 @@
     <string name="server_lab_security4">Пользователь (необязательно)</string>
     <string name="server_lab_encryption">Шифрование</string>
     <string name="server_lab_flow">Поток</string>
-    <string name="server_lab_public_key">PublicKey</string>
+    <string name="server_lab_public_key">Открытый ключ</string>
     <string name="server_lab_short_id">ShortID</string>
     <string name="server_lab_spider_x">SpiderX</string>
-    <string name="server_lab_secret_key">SecretKey</string>
+    <string name="server_lab_secret_key">Закрытый ключ</string>
     <string name="server_lab_reserved">Reserved (необязательно)</string>
     <string name="server_lab_local_address">Локальный адрес (необязательно, IPv4/IPv6 через запятую)</string>
     <string name="server_lab_local_mtu">MTU (необязательно, по умолчанию 1420)</string>
@@ -127,7 +129,7 @@
     <string name="title_advanced">Расширенные настройки</string>
     <string name="title_vpn_settings">Настройки VPN</string>
     <string name="title_pref_per_app_proxy">Прокси для выбранных приложений</string>
-    <string name="summary_pref_per_app_proxy">Основной: выделенное приложение соединяется через прокси, не выделенное — напрямую;\n\nРежим обхода: выделенное приложение соединяется напрямую, не выделенное — через прокси.\n\nЕсть возможность автоматического выбора проксируемых приложений в меню.</string>
+    <string name="summary_pref_per_app_proxy">Основной: выделенное приложение соединяется через прокси, не выделенное — напрямую;\nРежим обхода: выделенное приложение соединяется напрямую, не выделенное — через прокси.\nЕсть возможность автоматического выбора проксируемых приложений в меню.</string>
 
     <string name="title_mux_settings">Настройки мультиплексирования</string>
     <string name="title_pref_mux_enabled">Использовать мультиплексирование</string>
@@ -147,7 +149,7 @@
     <string name="title_pref_sniffing_enabled">Анализ пакетов</string>
     <string name="summary_pref_sniffing_enabled">Использовать определение доменных имён в пакетах (по умолчанию включено)</string>
     <string name="title_pref_route_only_enabled">Домен только для маршрутизации</string>
-    <string name="summary_pref_route_only_enabled">Использовать определённое доменное имя только для маршрутизации и сохранять целевой адрес в виде IP.</string>
+    <string name="summary_pref_route_only_enabled">Использовать доменное имя только для маршрутизации и сохранять целевой адрес в виде IP.</string>
 
     <string name="title_pref_local_dns_enabled">Использовать локальную DNS</string>
     <string name="summary_pref_local_dns_enabled">Обслуживание выполняется DNS-модулем ядра (в настройках маршрутизации рекомендуется выбрать режим «Все, кроме LAN и Китая»)</string>
@@ -171,7 +173,7 @@
 
     <string name="title_pref_proxy_sharing_enabled">Разрешать подключения из LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться, используя ваш IP-адрес, чтобы использовать прокси по протоколам SOCKS/HTTP. Используйте только в доверенной сети, чтобы избежать несанкционированного подключения.</string>
-    <string name="toast_warning_pref_proxysharing_short">Доступ из LAN разрешён, убедитесь, что вы находитесь в надёжной сети</string>
+    <string name="toast_warning_pref_proxysharing_short">Доступ из LAN разрешён, убедитесь, что вы находитесь в доверенной сети</string>
 
     <string name="title_pref_allow_insecure">Разрешать небезопасные</string>
     <string name="summary_pref_allow_insecure">Для TLS по умолчанию разрешены небезопасные соединения</string>
@@ -229,6 +231,7 @@
     <string name="title_sub_setting">Группы</string>
     <string name="sub_setting_remarks">Название</string>
     <string name="sub_setting_url">URL (необязательно)</string>
+    <string name="sub_setting_filter">Remarks regular filter</string>
     <string name="sub_setting_enable">Использовать обновление</string>
     <string name="sub_auto_update">Использовать автоматическое обновление</string>
     <string name="sub_setting_pre_profile">Название предыдущего прокси</string>
@@ -247,14 +250,22 @@
     <string name="tasker_setting_confirm">Подтвердить</string>
 
     <string name="routing_settings_domain_strategy">Доменная стратегия</string>
-    <string name="routing_settings_title">Настройки маршрутизации</string>
-    <string name="routing_settings_tips">Введите требуемые IP/URL через запятую. Не забудьте сохранить изменения.</string>
+    <string name="routing_settings_title">Маршрутизация</string>
+    <string name="routing_settings_tips">Введите требуемые значения через запятую</string>
     <string name="routing_settings_save">Сохранить</string>
     <string name="routing_settings_delete">Очистить</string>
-    <string name="routing_settings_rule_title">Routing Rule Settings</string>
-    <string name="routing_settings_add_rule">Add rule</string>
-    <string name="routing_settings_import_rulesets">Import ruleset</string>
-    <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
+    <string name="routing_settings_rule_title">Настройка правил маршрутизации</string>
+    <string name="routing_settings_add_rule">Добавить правило</string>
+    <string name="routing_settings_import_rulesets">Импорт правил</string>
+    <string name="routing_settings_import_rulesets_tip">Существующие правила будут удалены. Продолжить?</string>
+    <string name="routing_settings_domain">Домен</string>
+    <string name="routing_settings_ip">IP</string>
+    <string name="routing_settings_port">Порт</string>
+    <string name="routing_settings_protocol">Протокол</string>
+    <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
+    <string name="routing_settings_network">Сеть</string>"
+    <string name="routing_settings_network_tip">[udp|tcp]</string>
+    <string name="routing_settings_outbound_tag">Исходящее подключение</string>
 
     <string name="connection_test_pending">Проверить подключение</string>
     <string name="connection_test_testing">Проверка…</string>
@@ -286,13 +297,19 @@
 
     <string-array name="mode_entries">
         <item>VPN</item>
-        <item>Только прокси</item>
+        <item>Прокси</item>
     </string-array>
 
     <string-array name="ui_mode_night">
         <item>Как в системе</item>
         <item>Светлая</item>
         <item>Тёмная</item>
+    </string-array>
+
+    <string-array name="preset_rulesets">
+        <item>Белый список Китая</item>
+        <item>Чёрный список Китая</item>
+        <item>Общие</item>
     </string-array>
 
 </resources>

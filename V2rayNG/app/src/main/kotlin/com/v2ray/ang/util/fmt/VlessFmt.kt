@@ -12,7 +12,7 @@ import java.net.URI
 
 object VlessFmt {
 
-    fun parseVless(str: String): ServerConfig? {
+    fun parse(str: String): ServerConfig? {
         var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
         val config = ServerConfig.create(EConfigType.VLESS)
 
@@ -83,7 +83,7 @@ object VlessFmt {
             }
             if (!tlsSetting.alpn.isNullOrEmpty() && tlsSetting.alpn.isNotEmpty()) {
                 dicQuery["alpn"] =
-                    Utils.removeWhiteSpace(tlsSetting.alpn.joinToString()).orEmpty()
+                    Utils.removeWhiteSpace(tlsSetting.alpn.joinToString(",")).orEmpty()
             }
             if (!TextUtils.isEmpty(tlsSetting.fingerprint)) {
                 dicQuery["fp"] = tlsSetting.fingerprint.orEmpty()

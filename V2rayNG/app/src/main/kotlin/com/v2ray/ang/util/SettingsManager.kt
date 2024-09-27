@@ -4,6 +4,11 @@ import android.content.Context
 import android.text.TextUtils
 import com.google.gson.Gson
 import com.v2ray.ang.dto.RulesetItem
+import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.util.MmkvManager.decodeProfileConfig
+import com.v2ray.ang.util.MmkvManager.decodeServerConfig
+import com.v2ray.ang.util.MmkvManager.decodeServerList
+import java.util.Collections
 
 object SettingsManager {
 
@@ -71,5 +76,34 @@ object SettingsManager {
         return exist == true
     }
 
+    fun swapRoutingRuleset(fromPosition: Int, toPosition: Int) {
+        val rulesetList = MmkvManager.decodeRoutingRulesets()
+        if (rulesetList.isNullOrEmpty()) return
+
+        Collections.swap(rulesetList, fromPosition, toPosition)
+        MmkvManager.encodeRoutingRulesets(rulesetList)
+    }
+
+    fun swapSubscriptions(fromPosition: Int, toPosition: Int) {
+        val subsList = MmkvManager.decodeSubsList()
+        if (subsList.isNullOrEmpty()) return
+
+        Collections.swap(subsList, fromPosition, toPosition)
+        MmkvManager.encodeSubsList(subsList)
+    }
+
+    fun getServerViaRemarks(remarks: String?): ServerConfig? {
+        if (remarks == null) {
+            return null
+        }
+        val serverList = decodeServerList()
+        for (guid in serverList) {
+            val profile = decodeProfileConfig(guid)
+            if (profile != null && profile.remarks == remarks) {
+                return decodeServerConfig(guid)
+            }
+        }
+        return null
+    }
 
 }

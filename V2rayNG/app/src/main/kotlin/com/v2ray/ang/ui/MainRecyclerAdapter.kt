@@ -79,16 +79,15 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                     shareOptions = shareOptions.takeLast(1)
                 }
 
-                EConfigType.VLESS -> {
-                    holder.itemMainBinding.tvType.text = profile.configType.name
-                }
-
                 else -> {
-                    holder.itemMainBinding.tvType.text = profile.configType.name.lowercase()
+                    holder.itemMainBinding.tvType.text = profile.configType.name
                 }
             }
 
-            val strState = "${profile.server?.dropLast(3)}*** : ${profile.serverPort}"
+            // 替换服务器地址的'.'之后的内容为'***'，例如将'1.23.45.67'替换为'1.23.45.***'
+            val modifiedServer = profile.server?.split('.')?.dropLast(1)?.joinToString(".", postfix = ".***")
+            val strState = "$modifiedServer : ${profile.serverPort}"
+
 
             holder.itemMainBinding.tvStatistics.text = strState
 
@@ -230,31 +229,16 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     class FooterViewHolder(val itemFooterBinding: ItemRecyclerFooterBinding) :
         BaseViewHolder(itemFooterBinding.root)
 
-    override fun onItemDismiss(position: Int) {
-        val guid = mActivity.mainViewModel.serversCache.getOrNull(position)?.guid ?: return
-        if (guid != MmkvManager.getSelectServer()) {
-//            mActivity.alert(R.string.del_config_comfirm) {
-//                positiveButton(android.R.string.ok) {
-            mActivity.mainViewModel.removeServer(guid)
-            notifyItemRemoved(position)
-//                }
-//                show()
-//            }
-        }
-    }
-
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
         mActivity.mainViewModel.swapServer(fromPosition, toPosition)
         notifyItemMoved(fromPosition, toPosition)
-        // position is changed, since position is used by click callbacks, need to update range
-        if (toPosition > fromPosition)
-            notifyItemRangeChanged(fromPosition, toPosition - fromPosition + 1)
-        else
-            notifyItemRangeChanged(toPosition, fromPosition - toPosition + 1)
         return true
     }
 
     override fun onItemMoveCompleted() {
         // do nothing
+    }
+
+    override fun onItemDismiss(position: Int) {
     }
 }

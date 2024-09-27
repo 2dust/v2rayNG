@@ -112,10 +112,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 
-        val callback = SimpleItemTouchHelperCallback(adapter)
-        mItemTouchHelper = ItemTouchHelper(callback)
+        mItemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(adapter))
         mItemTouchHelper?.attachToRecyclerView(binding.recyclerView)
-
 
         val toggle = ActionBarDrawerToggle(
             this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
@@ -279,6 +277,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
+        R.id.import_manually_http -> {
+            importManually(EConfigType.HTTP.value)
+            true
+        }
+
         R.id.import_manually_trojan -> {
             importManually(EConfigType.TROJAN.value)
             true
@@ -286,6 +289,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         R.id.import_manually_wireguard -> {
             importManually(EConfigType.WIREGUARD.value)
+            true
+        }
+
+        R.id.import_manually_hysteria2 -> {
+            importManually(EConfigType.HYSTERIA2.value)
             true
         }
 

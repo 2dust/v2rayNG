@@ -25,12 +25,14 @@
     <string name="menu_item_del_config">কনফিগারেশন মুছুন</string>
     <string name="menu_item_import_config_qrcode">QR কোড থেকে কনফিগারেশন আমদানি করুন</string>
     <string name="menu_item_import_config_clipboard">ক্লিপবোর্ড থেকে কনফিগারেশন আমদানি করুন</string>
-    <string name="menu_item_import_config_manually_vmess">ম্যানুয়ালি টাইপ করুন [Vmess]</string>
+    <string name="menu_item_import_config_manually_vmess">ম্যানুয়ালি টাইপ করুন [VMess]</string>
     <string name="menu_item_import_config_manually_vless">ম্যানুয়ালি টাইপ করুন [VLESS]</string>
     <string name="menu_item_import_config_manually_ss">ম্যানুয়ালি টাইপ করুন [Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">ম্যানুয়ালি টাইপ করুন [Socks]</string>
+    <string name="menu_item_import_config_manually_socks">ম্যানুয়ালি টাইপ করুন [SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">ম্যানুয়ালি টাইপ করুন [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">ম্যানুয়ালি টাইপ করুন [Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
     <string name="menu_item_import_config_custom">কাস্টম কনফিগারেশন</string>
     <string name="menu_item_import_config_custom_clipboard">ক্লিপবোর্ড থেকে কাস্টম কনফিগারেশন আমদানি করুন</string>
     <string name="menu_item_import_config_custom_local">স্থানীয়ভাবে কাস্টম কনফিগারেশন আমদানি করুন</string>
@@ -227,6 +229,7 @@
     <string name="title_sub_setting">সাবস্ক্রিপশন গ্রুপ সেটিং</string>
     <string name="sub_setting_remarks">মন্তব্য</string>
     <string name="sub_setting_url">ঐচ্ছিক URL</string>
+    <string name="sub_setting_filter">Remarks regular filter</string>
     <string name="sub_setting_enable">আপডেট সক্রিয় করুন</string>
     <string name="sub_auto_update">স্বয়ংক্রিয় আপডেট সক্রিয় করুন</string>
     <string name="sub_setting_pre_profile">Previous proxy remarks</string>
