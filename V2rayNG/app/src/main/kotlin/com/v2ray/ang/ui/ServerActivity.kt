@@ -93,11 +93,11 @@ class ServerActivity : BaseActivity() {
     private val sp_security: Spinner? by lazy { findViewById(R.id.sp_security) }
     private val sp_stream_security: Spinner? by lazy { findViewById(R.id.sp_stream_security) }
     private val sp_allow_insecure: Spinner? by lazy { findViewById(R.id.sp_allow_insecure) }
-    private val container_allow_insecure: LinearLayout? by lazy { findViewById(R.id.l5) }
+    private val container_allow_insecure: LinearLayout? by lazy { findViewById(R.id.lay_allow_insecure) }
     private val et_sni: EditText? by lazy { findViewById(R.id.et_sni) }
-    private val container_sni: LinearLayout? by lazy { findViewById(R.id.l2) }
+    private val container_sni: LinearLayout? by lazy { findViewById(R.id.lay_sni) }
     private val sp_stream_fingerprint: Spinner? by lazy { findViewById(R.id.sp_stream_fingerprint) } //uTLS
-    private val container_fingerprint: LinearLayout? by lazy { findViewById(R.id.l3) }
+    private val container_fingerprint: LinearLayout? by lazy { findViewById(R.id.lay_stream_fingerprint) }
     private val sp_network: Spinner? by lazy { findViewById(R.id.sp_network) }
     private val sp_header_type: Spinner? by lazy { findViewById(R.id.sp_header_type) }
     private val sp_header_type_title: TextView? by lazy { findViewById(R.id.sp_header_type_title) }
@@ -106,13 +106,13 @@ class ServerActivity : BaseActivity() {
     private val tv_path: TextView? by lazy { findViewById(R.id.tv_path) }
     private val et_path: EditText? by lazy { findViewById(R.id.et_path) }
     private val sp_stream_alpn: Spinner? by lazy { findViewById(R.id.sp_stream_alpn) } //uTLS
-    private val container_alpn: LinearLayout? by lazy { findViewById(R.id.l4) }
+    private val container_alpn: LinearLayout? by lazy { findViewById(R.id.lay_stream_alpn) }
     private val et_public_key: EditText? by lazy { findViewById(R.id.et_public_key) }
-    private val container_public_key: LinearLayout? by lazy { findViewById(R.id.l6) }
+    private val container_public_key: LinearLayout? by lazy { findViewById(R.id.lay_public_key) }
     private val et_short_id: EditText? by lazy { findViewById(R.id.et_short_id) }
-    private val container_short_id: LinearLayout? by lazy { findViewById(R.id.l7) }
+    private val container_short_id: LinearLayout? by lazy { findViewById(R.id.lay_short_id) }
     private val et_spider_x: EditText? by lazy { findViewById(R.id.et_spider_x) }
-    private val container_spider_x: LinearLayout? by lazy { findViewById(R.id.l8) }
+    private val container_spider_x: LinearLayout? by lazy { findViewById(R.id.lay_spider_x) }
     private val et_reserved1: EditText? by lazy { findViewById(R.id.et_reserved1) }
     private val et_reserved2: EditText? by lazy { findViewById(R.id.et_reserved2) }
     private val et_reserved3: EditText? by lazy { findViewById(R.id.et_reserved3) }
