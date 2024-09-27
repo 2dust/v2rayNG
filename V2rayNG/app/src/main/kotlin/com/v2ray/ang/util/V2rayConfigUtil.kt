@@ -43,6 +43,7 @@ object V2rayConfigUtil {
 
             val result = getV2rayNonCustomConfig(context, config)
             //Log.d(ANG_PACKAGE, result.content)
+            Log.d(ANG_PACKAGE, result.domainPort?:"")
             return result
         } catch (e: Exception) {
             e.printStackTrace()
@@ -73,9 +74,10 @@ object V2rayConfigUtil {
 
         inbounds(v2rayConfig)
 
-        outbounds(v2rayConfig, outbound)
+        val isPlugin = outbound.protocol.equals(EConfigType.HYSTERIA2.name, true)
+        val retOut = outbounds(v2rayConfig, outbound, isPlugin)
 
-        val retMore = moreOutbounds(v2rayConfig, config.subscriptionId)
+        val retMore = moreOutbounds(v2rayConfig, config.subscriptionId, isPlugin)
 
         routing(v2rayConfig)
 
@@ -93,7 +95,7 @@ object V2rayConfigUtil {
 
         result.status = true
         result.content = v2rayConfig.toPrettyPrinting()
-        result.domainPort = if (retMore.first) retMore.second else outbound.getServerAddressAndPort()
+        result.domainPort = if (retMore.first) retMore.second else retOut.second
         return result
     }
 
@@ -145,8 +147,8 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun outbounds(v2rayConfig: V2rayConfig, outbound: V2rayConfig.OutboundBean): Boolean {
-        if (outbound.protocol.equals(EConfigType.HYSTERIA2.name, true)) {
+    private fun outbounds(v2rayConfig: V2rayConfig, outbound: V2rayConfig.OutboundBean, isPlugin: Boolean): Pair<Boolean, String> {
+        if (isPlugin) {
             val socksPort = 100 + Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
             val outboundNew = V2rayConfig.OutboundBean(
                 mux = null,
@@ -165,11 +167,11 @@ object V2rayConfigUtil {
             } else {
                 v2rayConfig.outbounds.add(outboundNew)
             }
-            return true
+            return Pair(true, outboundNew.getServerAddressAndPort())
         }
 
         val ret = updateOutboundWithGlobalSettings(outbound)
-        if (!ret) return false
+        if (!ret) return Pair(false, "")
 
         if (v2rayConfig.outbounds.isNotEmpty()) {
             v2rayConfig.outbounds[0] = outbound
@@ -178,7 +180,7 @@ object V2rayConfigUtil {
         }
 
         updateOutboundFragment(v2rayConfig)
-        return true
+        return Pair(true, outbound.getServerAddressAndPort())
     }
 
     private fun fakedns(v2rayConfig: V2rayConfig) {
@@ -532,10 +534,13 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun moreOutbounds(v2rayConfig: V2rayConfig, subscriptionId: String): Pair<Boolean, String> {
+    private fun moreOutbounds(v2rayConfig: V2rayConfig, subscriptionId: String, isPlugin: Boolean): Pair<Boolean, String> {
         val returnPair = Pair(false, "")
         var domainPort: String = ""
 
+        if (isPlugin) {
+            return returnPair
+        }
         //fragment proxy
         if (settingsStorage?.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == true) {
             return returnPair

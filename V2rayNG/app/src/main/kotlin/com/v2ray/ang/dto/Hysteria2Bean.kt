@@ -12,6 +12,7 @@ data class Hysteria2Bean(
     )
 
     data class TlsBean(
-        val sni: String?
+        val sni: String?,
+        val insecure: Boolean?,
     )
 }
