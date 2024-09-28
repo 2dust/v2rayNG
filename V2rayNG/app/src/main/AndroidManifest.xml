@@ -198,6 +198,7 @@
         </receiver>
         <receiver
             android:name=".receiver.BootReceiver"
+            android:exported="true"
             android:label="BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

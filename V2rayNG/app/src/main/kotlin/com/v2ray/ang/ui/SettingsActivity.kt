@@ -8,7 +8,6 @@ import androidx.activity.viewModels
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
-import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
@@ -221,7 +220,7 @@ class SettingsActivity : BaseActivity() {
             ).forEach { key ->
                 key?.text = key?.summary.toString()
             }
-            
+
             listOf(
                 AppConfig.PREF_SNIFFING_ENABLED,
             ).forEach { key ->
