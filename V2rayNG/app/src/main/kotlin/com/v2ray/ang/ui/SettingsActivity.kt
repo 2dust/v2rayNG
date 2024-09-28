@@ -221,9 +221,15 @@ class SettingsActivity : BaseActivity() {
             ).forEach { key ->
                 key?.text = key?.summary.toString()
             }
-
+            
             listOf(
                 AppConfig.PREF_SNIFFING_ENABLED,
+            ).forEach { key ->
+                findPreference<CheckBoxPreference>(key)?.isChecked =
+                    settingsStorage.decodeBool(key, true)
+            }
+
+            listOf(
                 AppConfig.PREF_ROUTE_ONLY_ENABLED,
                 AppConfig.PREF_IS_BOOTED,
                 AppConfig.PREF_BYPASS_APPS,
