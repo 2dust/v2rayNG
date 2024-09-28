@@ -19,9 +19,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import com.tbruyelle.rxpermissions3.RxPermissions
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubSettingBinding
 import com.v2ray.ang.databinding.ItemRecyclerUserAssetBinding
@@ -30,7 +30,6 @@ import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.MmkvManager.assetStorage
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
@@ -137,7 +136,7 @@ class UserAssetActivity : BaseActivity() {
                         toast(R.string.msg_remark_is_duplicate)
                         return@registerForActivityResult
                     }
-                    assetStorage?.encode(assetId, Gson().toJson(assetItem))
+                    MmkvManager.encodeAsset(assetId, assetItem)
                     copyFile(uri)
                 } catch (e: Exception) {
                     toast(R.string.toast_asset_copy_failed)
@@ -214,7 +213,7 @@ class UserAssetActivity : BaseActivity() {
                 URL(item.url).openConnection(
                     Proxy(
                         Proxy.Type.HTTP,
-                        InetSocketAddress("127.0.0.1", httpPort)
+                        InetSocketAddress(LOOPBACK, httpPort)
                     )
                 ) as HttpURLConnection
             }

@@ -25,6 +25,7 @@ import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.settingsStorage
+import com.v2ray.ang.util.PluginUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
 import go.Seq
@@ -107,13 +108,11 @@ object V2RayServiceManager {
         }
 
         override fun onEmitStatus(l: Long, s: String?): Long {
-            //Logger.d(s)
             return 0
         }
 
         override fun setup(s: String): Long {
             val serviceControl = serviceControl?.get() ?: return -1
-            //Logger.d(s)
             return try {
                 serviceControl.startService()
                 lastQueryTime = System.currentTimeMillis()
@@ -164,6 +163,8 @@ object V2RayServiceManager {
         if (v2rayPoint.isRunning) {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
             showNotification()
+
+            PluginUtil.runPlugin(service, config)
         } else {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
             cancelNotification()
@@ -191,6 +192,7 @@ object V2RayServiceManager {
         } catch (e: Exception) {
             Log.d(ANG_PACKAGE, e.toString())
         }
+        PluginUtil.stopPlugin()
     }
 
     private class ReceiveMessageHandler : BroadcastReceiver() {
@@ -198,7 +200,6 @@ object V2RayServiceManager {
             val serviceControl = serviceControl?.get() ?: return
             when (intent?.getIntExtra("key", 0)) {
                 AppConfig.MSG_REGISTER_CLIENT -> {
-                    //Logger.e("ReceiveMessageHandler", intent?.getIntExtra("key", 0).toString())
                     if (v2rayPoint.isRunning) {
                         MessageUtil.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_RUNNING, "")
                     } else {

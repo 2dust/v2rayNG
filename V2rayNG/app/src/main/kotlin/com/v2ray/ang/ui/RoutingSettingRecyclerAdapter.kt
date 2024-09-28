@@ -3,13 +3,18 @@ package com.v2ray.ang.ui
 import android.content.Intent
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.v2ray.ang.databinding.ItemRecyclerRoutingSettingBinding
+import com.v2ray.ang.helper.ItemTouchHelperAdapter
+import com.v2ray.ang.helper.ItemTouchHelperViewHolder
+import com.v2ray.ang.ui.MainRecyclerAdapter.BaseViewHolder
 import com.v2ray.ang.util.SettingsManager
 
-class RoutingSettingRecyclerAdapter(val activity: RoutingSettingActivity) :
-    RecyclerView.Adapter<RoutingSettingRecyclerAdapter.MainViewHolder>() {
+class RoutingSettingRecyclerAdapter(val activity: RoutingSettingActivity) : RecyclerView.Adapter<RoutingSettingRecyclerAdapter.MainViewHolder>(),
+    ItemTouchHelperAdapter {
 
     private var mActivity: RoutingSettingActivity = activity
     override fun getItemCount() = mActivity.rulesets.size
@@ -21,6 +26,7 @@ class RoutingSettingRecyclerAdapter(val activity: RoutingSettingActivity) :
         holder.itemRoutingSettingBinding.domainIp.text = (ruleset.domain ?: ruleset.ip ?: ruleset.port)?.toString()
         holder.itemRoutingSettingBinding.outboundTag.text = ruleset.outboundTag
         holder.itemRoutingSettingBinding.chkEnable.isChecked = ruleset.enabled
+        holder.itemRoutingSettingBinding.imgLocked.isVisible = ruleset.looked ?: false
         holder.itemView.setBackgroundColor(Color.TRANSPARENT)
 
         holder.itemRoutingSettingBinding.layoutEdit.setOnClickListener {
@@ -47,5 +53,28 @@ class RoutingSettingRecyclerAdapter(val activity: RoutingSettingActivity) :
     }
 
     class MainViewHolder(val itemRoutingSettingBinding: ItemRecyclerRoutingSettingBinding) :
-        RecyclerView.ViewHolder(itemRoutingSettingBinding.root)
+        BaseViewHolder(itemRoutingSettingBinding.root), ItemTouchHelperViewHolder
+
+    open class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        fun onItemSelected() {
+            itemView.setBackgroundColor(Color.LTGRAY)
+        }
+
+        fun onItemClear() {
+            itemView.setBackgroundColor(0)
+        }
+    }
+
+    override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
+        SettingsManager.swapRoutingRuleset(fromPosition, toPosition)
+        notifyItemMoved(fromPosition, toPosition)
+        return true
+    }
+
+    override fun onItemMoveCompleted() {
+        mActivity.refreshData()
+    }
+
+    override fun onItemDismiss(position: Int) {
+    }
 }

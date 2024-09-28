@@ -24,12 +24,14 @@
     <string name="menu_item_del_config">删除配置</string>
     <string name="menu_item_import_config_qrcode">扫描二维码</string>
     <string name="menu_item_import_config_clipboard">从剪贴板导入</string>
-    <string name="menu_item_import_config_manually_vmess">手动输入[Vmess]</string>
+    <string name="menu_item_import_config_manually_vmess">手动输入[VMess]</string>
     <string name="menu_item_import_config_manually_vless">手动输入[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">手动输入[Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">手动输入[Socks]</string>
+    <string name="menu_item_import_config_manually_socks">手动输入[SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">手动输入[HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">手动输入[Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">手动输入[Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">手动输入[Hysteria2]</string>
     <string name="menu_item_import_config_custom">自定义配置</string>
     <string name="menu_item_import_config_custom_clipboard">从剪贴板导入自定义配置</string>
     <string name="menu_item_import_config_custom_local">从本地导入自定义配置</string>
@@ -226,6 +228,7 @@
     <string name="title_sub_setting">订阅分组设置</string>
     <string name="sub_setting_remarks">备注</string>
     <string name="sub_setting_url">可选地址(url)</string>
+    <string name="sub_setting_filter">别名正则过滤</string>
     <string name="sub_setting_enable">启用更新</string>
     <string name="sub_auto_update">启用自动更新</string>
     <string name="sub_setting_pre_profile">前置代理别名</string>
@@ -245,13 +248,14 @@
 
     <string name="routing_settings_domain_strategy">域名策略</string>
     <string name="routing_settings_title">路由设置</string>
-    <string name="routing_settings_tips">用逗号(,)隔开,可以一行多个</string>
+    <string name="routing_settings_tips">用逗号(,)隔开,domain和ip二选一填写</string>
     <string name="routing_settings_save">保存</string>
     <string name="routing_settings_delete">清空</string>
     <string name="routing_settings_rule_title">路由规则设置</string>
     <string name="routing_settings_add_rule">添加规则</string>
     <string name="routing_settings_import_rulesets">导入预设规则集</string>
     <string name="routing_settings_import_rulesets_tip">将删除现有的规则集，是否确定继续？</string>
+    <string name="routing_settings_locked">锁定中，导入预设时不删除此规则</string>
 
     <string name="connection_test_pending">"检查网络连接"</string>
     <string name="connection_test_testing">"测试中…"</string>

@@ -6,7 +6,7 @@ import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.util.Utils
 
 object SocksFmt {
-    fun parseSocks(str: String): ServerConfig? {
+    fun parse(str: String): ServerConfig? {
         val config = ServerConfig.create(EConfigType.SOCKS)
         var result = str.replace(EConfigType.SOCKS.protocolScheme, "")
         val indexSplit = result.indexOf("#")

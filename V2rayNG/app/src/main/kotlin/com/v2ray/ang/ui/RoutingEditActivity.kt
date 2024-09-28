@@ -2,12 +2,10 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
-import com.google.gson.Gson
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityRoutingEditBinding
 import com.v2ray.ang.dto.RulesetItem
@@ -40,10 +38,11 @@ class RoutingEditActivity : BaseActivity() {
 
     private fun bindingServer(rulesetItem: RulesetItem): Boolean {
         binding.etRemarks.text = Utils.getEditable(rulesetItem.remarks)
-        binding.etDomain.text = Utils.getEditable(rulesetItem.domain?.joinToString())
-        binding.etIp.text = Utils.getEditable(rulesetItem.ip?.joinToString())
+        binding.chkLocked.isChecked = rulesetItem.looked ?: false
+        binding.etDomain.text = Utils.getEditable(rulesetItem.domain?.joinToString(","))
+        binding.etIp.text = Utils.getEditable(rulesetItem.ip?.joinToString(","))
         binding.etPort.text = Utils.getEditable(rulesetItem.port)
-        binding.etProtocol.text = Utils.getEditable(rulesetItem.protocol?.joinToString())
+        binding.etProtocol.text = Utils.getEditable(rulesetItem.protocol?.joinToString(","))
         binding.etNetwork.text = Utils.getEditable(rulesetItem.network)
         val outbound = Utils.arrayFind(outbound_tag, rulesetItem.outboundTag)
         binding.spOutboundTag.setSelection(outbound)
@@ -61,9 +60,10 @@ class RoutingEditActivity : BaseActivity() {
         val rulesetItem = SettingsManager.getRoutingRuleset(position) ?: RulesetItem()
 
         rulesetItem.remarks = binding.etRemarks.text.toString()
-        binding.etDomain.text.toString().let { rulesetItem.domain = if (it.isEmpty()) null else it.split(',') }
-        binding.etIp.text.toString().let { rulesetItem.ip = if (it.isEmpty()) null else it.split(',') }
-        binding.etProtocol.text.toString().let { rulesetItem.protocol = if (it.isEmpty()) null else it.split(',') }
+        rulesetItem.looked = binding.chkLocked.isChecked
+        binding.etDomain.text.toString().let { rulesetItem.domain = if (it.isEmpty()) null else it.split(",").map { itt -> itt.trim() }.filter { itt -> itt.isNotEmpty() } }
+        binding.etIp.text.toString().let { rulesetItem.ip = if (it.isEmpty()) null else it.split(",").map { itt -> itt.trim() }.filter { itt -> itt.isNotEmpty() } }
+        binding.etProtocol.text.toString().let { rulesetItem.protocol = if (it.isEmpty()) null else it.split(",").map { itt -> itt.trim() }.filter { itt -> itt.isNotEmpty() } }
         binding.etPort.text.toString().let { rulesetItem.port = it.ifEmpty { null } }
         binding.etNetwork.text.toString().let { rulesetItem.network = it.ifEmpty { null } }
         rulesetItem.outboundTag = outbound_tag[binding.spOutboundTag.selectedItemPosition]
@@ -73,7 +73,6 @@ class RoutingEditActivity : BaseActivity() {
             return false
         }
 
-        Log.d("====", Gson().toJson(rulesetItem))
         SettingsManager.saveRoutingRuleset(position, rulesetItem)
         toast(R.string.toast_success)
         finish()

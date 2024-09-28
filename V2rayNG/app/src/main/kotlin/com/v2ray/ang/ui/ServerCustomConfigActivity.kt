@@ -16,7 +16,6 @@ import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.MmkvManager.serverRawStorage
 import com.v2ray.ang.util.Utils
 import me.drakeet.support.toast.ToastCompat
 
@@ -52,7 +51,7 @@ class ServerCustomConfigActivity : BaseActivity() {
      */
     private fun bindingServer(config: ServerConfig): Boolean {
         binding.etRemarks.text = Utils.getEditable(config.remarks)
-        val raw = serverRawStorage?.decodeString(editGuid)
+        val raw = MmkvManager.decodeServerRaw(editGuid)
         if (raw.isNullOrBlank()) {
             binding.editor.setTextContent(Utils.getEditable(config.fullConfig?.toPrettyPrinting().orEmpty()))
         } else {
@@ -91,7 +90,7 @@ class ServerCustomConfigActivity : BaseActivity() {
         config.fullConfig = v2rayConfig
 
         MmkvManager.encodeServerConfig(editGuid, config)
-        serverRawStorage?.encode(editGuid, binding.editor.text.toString())
+        MmkvManager.encodeServerRaw(editGuid, binding.editor.text.toString())
         toast(R.string.toast_success)
         finish()
         return true
