@@ -2,6 +2,7 @@ package com.v2ray.ang.util
 
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.dto.ProfileItem
@@ -28,6 +29,7 @@ object MmkvManager {
 
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
+    val serverStorage by lazy { MMKV.mmkvWithID(ID_SERVER_CONFIG, MMKV.MULTI_PROCESS_MODE) }  
     private val serverStorage by lazy { MMKV.mmkvWithID(ID_SERVER_CONFIG, MMKV.MULTI_PROCESS_MODE) }
     private val profileStorage by lazy { MMKV.mmkvWithID(ID_PROFILE_CONFIG, MMKV.MULTI_PROCESS_MODE) }
     private val serverAffStorage by lazy { MMKV.mmkvWithID(ID_SERVER_AFF, MMKV.MULTI_PROCESS_MODE) }
@@ -49,6 +51,14 @@ object MmkvManager {
 
     fun encodeServerList(serverList: MutableList<String>) {
         mainStorage.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
+    }
+
+    fun encodeStartOnBoot(startOnBoot: Boolean) {
+        settingsStorage.encode(PREF_IS_BOOTED, startOnBoot)
+    }
+
+    fun decodeStartOnBoot(): Boolean {
+        return settingsStorage.decodeBool(PREF_IS_BOOTED, false)
     }
 
     fun decodeServerList(): MutableList<String> {
