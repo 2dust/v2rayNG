@@ -150,6 +150,7 @@ object AppConfig {
     const val WIREGUARD = "wireguard://"
     const val TUIC = "tuic://"
     const val HYSTERIA2 = "hysteria2://"
+    const val HY2 = "hy2://"
 
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"
