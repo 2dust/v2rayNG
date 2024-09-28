@@ -2,6 +2,7 @@ package com.v2ray.ang.util
 
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.dto.ProfileItem
@@ -307,4 +308,17 @@ object MmkvManager {
     }
 
     //endregion
+
+    //region Others
+
+    fun encodeStartOnBoot(startOnBoot: Boolean) {
+        settingsStorage.encode(PREF_IS_BOOTED, startOnBoot)
+    }
+
+    fun decodeStartOnBoot(): Boolean {
+        return settingsStorage.decodeBool(PREF_IS_BOOTED, false)
+    }
+
+    //endregion
+
 }

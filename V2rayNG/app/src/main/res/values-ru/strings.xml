@@ -130,6 +130,8 @@
     <string name="title_vpn_settings">Настройки VPN</string>
     <string name="title_pref_per_app_proxy">Прокси для выбранных приложений</string>
     <string name="summary_pref_per_app_proxy">Основной: выделенное приложение соединяется через прокси, не выделенное — напрямую;\nРежим обхода: выделенное приложение соединяется напрямую, не выделенное — через прокси.\nЕсть возможность автоматического выбора проксируемых приложений в меню.</string>
+    <string name="title_pref_is_booted">Auto connect at startup</string>
+    <string name="summary_pref_is_booted">Automatically connects to the selected server at startup, which may be unsuccessful</string>
 
     <string name="title_mux_settings">Настройки мультиплексирования</string>
     <string name="title_pref_mux_enabled">Использовать мультиплексирование</string>
@@ -231,7 +233,7 @@
     <string name="title_sub_setting">Группы</string>
     <string name="sub_setting_remarks">Название</string>
     <string name="sub_setting_url">URL (необязательно)</string>
-    <string name="sub_setting_filter">Remarks regular filter</string>
+    <string name="sub_setting_filter">Название фильтра</string>
     <string name="sub_setting_enable">Использовать обновление</string>
     <string name="sub_auto_update">Использовать автоматическое обновление</string>
     <string name="sub_setting_pre_profile">Название предыдущего прокси</string>
@@ -258,6 +260,7 @@
     <string name="routing_settings_add_rule">Добавить правило</string>
     <string name="routing_settings_import_rulesets">Импорт правил</string>
     <string name="routing_settings_import_rulesets_tip">Существующие правила будут удалены. Продолжить?</string>
+    <string name="routing_settings_locked">Locked, keep this rule when import presets</string>
     <string name="routing_settings_domain">Домен</string>
     <string name="routing_settings_ip">IP</string>
     <string name="routing_settings_port">Порт</string>

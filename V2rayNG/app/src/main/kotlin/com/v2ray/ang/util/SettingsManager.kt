@@ -12,29 +12,40 @@ import java.util.Collections
 
 object SettingsManager {
 
-    fun initRoutingRulesets(context: Context, index: Int = 0) {
+    fun initRoutingRulesets(context: Context) {
         val exist = MmkvManager.decodeRoutingRulesets()
+        if (exist.isNullOrEmpty()) {
+            val rulesetList = getPresetRoutingRulesets(context)
+            MmkvManager.encodeRoutingRulesets(rulesetList)
+        }
+    }
 
+    private fun getPresetRoutingRulesets(context: Context, index: Int = 0): MutableList<RulesetItem>? {
         val fileName = when (index) {
             0 -> "custom_routing_white"
             1 -> "custom_routing_black"
             2 -> "custom_routing_global"
             else -> "custom_routing_white"
         }
-        if (exist.isNullOrEmpty()) {
-            val assets = Utils.readTextFromAssets(context, fileName)
-            if (TextUtils.isEmpty(assets)) {
-                return
-            }
-
-            val rulesetList = Gson().fromJson(assets, Array<RulesetItem>::class.java).toMutableList()
-            MmkvManager.encodeRoutingRulesets(rulesetList)
+        val assets = Utils.readTextFromAssets(context, fileName)
+        if (TextUtils.isEmpty(assets)) {
+            return null
         }
+
+        return Gson().fromJson(assets, Array<RulesetItem>::class.java).toMutableList()
     }
 
     fun resetRoutingRulesets(context: Context, index: Int) {
-        MmkvManager.encodeRoutingRulesets(null)
-        initRoutingRulesets(context, index)
+        val rulesetNew: MutableList<RulesetItem> = mutableListOf()
+        MmkvManager.decodeRoutingRulesets()?.forEach { key ->
+            if (key.looked == true) {
+                rulesetNew.add(key)
+            }
+        }
+
+        val rulesetList = getPresetRoutingRulesets(context, index) ?: return
+        rulesetNew.addAll(rulesetList)
+        MmkvManager.encodeRoutingRulesets(rulesetNew)
     }
 
     fun getRoutingRuleset(index: Int): RulesetItem? {

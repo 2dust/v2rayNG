@@ -48,12 +48,12 @@ object AppConfig {
     const val PREF_ALLOW_INSECURE = "pref_allow_insecure"
     const val PREF_SOCKS_PORT = "pref_socks_port"
     const val PREF_HTTP_PORT = "pref_http_port"
-
     const val PREF_REMOTE_DNS = "pref_remote_dns"
     const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
     const val PREF_DELAY_TEST_URL = "pref_delay_test_url"
     const val PREF_LOGLEVEL = "pref_core_loglevel"
     const val PREF_MODE = "pref_mode"
+    const val PREF_IS_BOOTED = "pref_is_booted"
 
     /** Cache keys. */
     const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"
@@ -106,6 +106,7 @@ object AppConfig {
     const val DNS_DIRECT = "223.5.5.5"
     const val DNS_VPN = "1.1.1.1"
 
+
     /** Ports and addresses for various services. */
     const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"
@@ -149,4 +150,8 @@ object AppConfig {
     const val WIREGUARD = "wireguard://"
     const val TUIC = "tuic://"
     const val HYSTERIA2 = "hysteria2://"
+
+    /** Give a good name to this, IDK*/
+    const val VPN = "VPN"
+
 }

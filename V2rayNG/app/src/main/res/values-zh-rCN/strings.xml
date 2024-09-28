@@ -127,6 +127,8 @@
     <string name="title_vpn_settings">VPN 设置</string>
     <string name="title_pref_per_app_proxy">分应用代理</string>
     <string name="summary_pref_per_app_proxy">常规:勾选的App被代理,未勾选的直连;\n绕行模式:勾选的App直连,未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
+    <string name="title_pref_is_booted">开机时自动连接</string>
+    <string name="summary_pref_is_booted">开机时自动连接选择的服务器，可能会不成功</string>
 
     <string name="title_mux_settings">Mux 多路复用 设置</string>
     <string name="title_pref_mux_enabled">启用 Mux 多路复用</string>
@@ -248,13 +250,14 @@
 
     <string name="routing_settings_domain_strategy">域名策略</string>
     <string name="routing_settings_title">路由设置</string>
-    <string name="routing_settings_tips">用逗号(,)隔开,可以一行多个</string>
+    <string name="routing_settings_tips">用逗号(,)隔开,domain和ip二选一填写</string>
     <string name="routing_settings_save">保存</string>
     <string name="routing_settings_delete">清空</string>
     <string name="routing_settings_rule_title">路由规则设置</string>
     <string name="routing_settings_add_rule">添加规则</string>
     <string name="routing_settings_import_rulesets">导入预设规则集</string>
     <string name="routing_settings_import_rulesets_tip">将删除现有的规则集，是否确定继续？</string>
+    <string name="routing_settings_locked">锁定中，导入预设时不删除此规则</string>
 
     <string name="connection_test_pending">"检查网络连接"</string>
     <string name="connection_test_testing">"测试中…"</string>

@@ -8,13 +8,13 @@ import androidx.activity.viewModels
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
-import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.multiprocess.RemoteWorkManager
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toLongEx
 import com.v2ray.ang.service.SubscriptionUpdater
@@ -172,7 +172,7 @@ class SettingsActivity : BaseActivity() {
 
         override fun onStart() {
             super.onStart()
-            updateMode(settingsStorage.decodeString(AppConfig.PREF_MODE, "VPN"))
+            updateMode(settingsStorage.decodeString(AppConfig.PREF_MODE, VPN))
             localDns?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
             fakeDns?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_FAKE_DNS_ENABLED, false)
             localDnsPort?.summary = settingsStorage.decodeString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
@@ -230,6 +230,7 @@ class SettingsActivity : BaseActivity() {
 
             listOf(
                 AppConfig.PREF_ROUTE_ONLY_ENABLED,
+                AppConfig.PREF_IS_BOOTED,
                 AppConfig.PREF_BYPASS_APPS,
                 AppConfig.PREF_SPEED_ENABLED,
                 AppConfig.PREF_CONFIRM_REMOVE,
@@ -258,7 +259,7 @@ class SettingsActivity : BaseActivity() {
         }
 
         private fun updateMode(mode: String?) {
-            val vpn = mode == "VPN"
+            val vpn = mode == VPN
             perAppProxy?.isEnabled = vpn
             perAppProxy?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_PER_APP_PROXY, false)
             localDns?.isEnabled = vpn
