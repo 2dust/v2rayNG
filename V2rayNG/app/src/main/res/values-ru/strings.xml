@@ -258,6 +258,7 @@
     <string name="routing_settings_add_rule">Добавить правило</string>
     <string name="routing_settings_import_rulesets">Импорт правил</string>
     <string name="routing_settings_import_rulesets_tip">Существующие правила будут удалены. Продолжить?</string>
+    <string name="routing_settings_locked">Locked, keep this rule when import presets</string>
     <string name="routing_settings_domain">Домен</string>
     <string name="routing_settings_ip">IP</string>
     <string name="routing_settings_port">Порт</string>

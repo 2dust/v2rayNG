@@ -249,13 +249,14 @@
 
     <string name="routing_settings_domain_strategy">網域策略</string>
     <string name="routing_settings_title">轉送設定</string>
-    <string name="routing_settings_tips">以半形逗號「,」分隔</string>
+    <string name="routing_settings_tips">以半形逗號「,」分隔,domain和ip二選一填寫</string>
     <string name="routing_settings_save">儲存</string>
     <string name="routing_settings_delete">清除</string>
     <string name="routing_settings_rule_title">路由規則設定</string>
     <string name="routing_settings_add_rule">新增規則</string>
     <string name="routing_settings_import_rulesets">匯入預設規則集</string>
     <string name="routing_settings_import_rulesets_tip">將刪除現有的規則集，是否確定繼續？ </string>
+    <string name="routing_settings_locked">鎖定中，匯入預設時不刪除此規則</string>
 
     <string name="connection_test_pending">"測試連線能力"</string>
     <string name="connection_test_testing">"測試中……"</string>

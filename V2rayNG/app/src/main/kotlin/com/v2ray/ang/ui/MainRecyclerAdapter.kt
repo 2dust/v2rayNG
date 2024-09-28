@@ -85,11 +85,14 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             }
 
             // 隐藏主页服务器地址为xxx:xxx:***/xxx.xxx.xxx.***
-            val strState = "${profile.server?.let { 
-            if (it.contains(":")) 
-            it.split(":").take(2).joinToString(":") + ":***" 
-            else 
-            it.split('.').dropLast(1).joinToString(".", postfix = ".***") }} : ${profile.serverPort}"
+            val strState = "${
+                profile.server?.let {
+                    if (it.contains(":"))
+                        it.split(":").take(2).joinToString(":", postfix = ":***")
+                    else
+                        it.split('.').dropLast(1).joinToString(".", postfix = ".***")
+                }
+            } : ${profile.serverPort}"
 
             holder.itemMainBinding.tvStatistics.text = strState
 

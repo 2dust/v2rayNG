@@ -38,6 +38,7 @@ class RoutingEditActivity : BaseActivity() {
 
     private fun bindingServer(rulesetItem: RulesetItem): Boolean {
         binding.etRemarks.text = Utils.getEditable(rulesetItem.remarks)
+        binding.chkLocked.isChecked = rulesetItem.looked ?: false
         binding.etDomain.text = Utils.getEditable(rulesetItem.domain?.joinToString(","))
         binding.etIp.text = Utils.getEditable(rulesetItem.ip?.joinToString(","))
         binding.etPort.text = Utils.getEditable(rulesetItem.port)
@@ -59,6 +60,7 @@ class RoutingEditActivity : BaseActivity() {
         val rulesetItem = SettingsManager.getRoutingRuleset(position) ?: RulesetItem()
 
         rulesetItem.remarks = binding.etRemarks.text.toString()
+        rulesetItem.looked = binding.chkLocked.isChecked
         binding.etDomain.text.toString().let { rulesetItem.domain = if (it.isEmpty()) null else it.split(",").map { itt -> itt.trim() }.filter { itt -> itt.isNotEmpty() } }
         binding.etIp.text.toString().let { rulesetItem.ip = if (it.isEmpty()) null else it.split(",").map { itt -> itt.trim() }.filter { itt -> itt.isNotEmpty() } }
         binding.etProtocol.text.toString().let { rulesetItem.protocol = if (it.isEmpty()) null else it.split(",").map { itt -> itt.trim() }.filter { itt -> itt.isNotEmpty() } }

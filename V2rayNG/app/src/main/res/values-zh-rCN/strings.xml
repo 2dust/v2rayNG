@@ -248,13 +248,14 @@
 
     <string name="routing_settings_domain_strategy">域名策略</string>
     <string name="routing_settings_title">路由设置</string>
-    <string name="routing_settings_tips">用逗号(,)隔开,可以一行多个</string>
+    <string name="routing_settings_tips">用逗号(,)隔开,domain和ip二选一填写</string>
     <string name="routing_settings_save">保存</string>
     <string name="routing_settings_delete">清空</string>
     <string name="routing_settings_rule_title">路由规则设置</string>
     <string name="routing_settings_add_rule">添加规则</string>
     <string name="routing_settings_import_rulesets">导入预设规则集</string>
     <string name="routing_settings_import_rulesets_tip">将删除现有的规则集，是否确定继续？</string>
+    <string name="routing_settings_locked">锁定中，导入预设时不删除此规则</string>
 
     <string name="connection_test_pending">"检查网络连接"</string>
     <string name="connection_test_testing">"测试中…"</string>
