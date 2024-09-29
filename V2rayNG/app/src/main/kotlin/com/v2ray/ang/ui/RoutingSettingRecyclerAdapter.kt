@@ -36,7 +36,8 @@ class RoutingSettingRecyclerAdapter(val activity: RoutingSettingActivity) : Recy
             )
         }
 
-        holder.itemRoutingSettingBinding.chkEnable.setOnCheckedChangeListener { _, isChecked ->
+        holder.itemRoutingSettingBinding.chkEnable.setOnCheckedChangeListener { it, isChecked ->
+            if( !it.isPressed) return@setOnCheckedChangeListener
             ruleset.enabled = isChecked
             SettingsManager.saveRoutingRuleset(position, ruleset)
         }
