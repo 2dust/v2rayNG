@@ -257,6 +257,8 @@
     <string name="routing_settings_add_rule">添加规则</string>
     <string name="routing_settings_import_rulesets">导入预设规则集</string>
     <string name="routing_settings_import_rulesets_tip">将删除现有的规则集，是否确定继续？</string>
+    <string name="routing_settings_import_rulesets_from_clipboard">从剪贴板导入规则集</string>
+    <string name="routing_settings_export_rulesets_to_clipboard">导出规则集至剪贴板</string>
     <string name="routing_settings_locked">锁定中，导入预设时不删除此规则</string>
 
     <string name="connection_test_pending">"检查网络连接"</string>

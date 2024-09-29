@@ -36,6 +36,30 @@ object SettingsManager {
     }
 
     fun resetRoutingRulesets(context: Context, index: Int) {
+        val rulesetList = getPresetRoutingRulesets(context, index) ?: return
+        resetRoutingRulesetsCommon(rulesetList)
+    }
+
+    fun resetRoutingRulesetsFromClipboard(content: String?): Boolean {
+        if (content.isNullOrEmpty()) {
+            return false
+        }
+
+        try {
+            val rulesetList = Gson().fromJson(content, Array<RulesetItem>::class.java).toMutableList()
+            if (rulesetList.isNullOrEmpty()) {
+                return false
+            }
+
+            resetRoutingRulesetsCommon(rulesetList)
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+    }
+
+    private fun resetRoutingRulesetsCommon(rulesetList: MutableList<RulesetItem>) {
         val rulesetNew: MutableList<RulesetItem> = mutableListOf()
         MmkvManager.decodeRoutingRulesets()?.forEach { key ->
             if (key.looked == true) {
@@ -43,7 +67,6 @@ object SettingsManager {
             }
         }
 
-        val rulesetList = getPresetRoutingRulesets(context, index) ?: return
         rulesetNew.addAll(rulesetList)
         MmkvManager.encodeRoutingRulesets(rulesetNew)
     }
