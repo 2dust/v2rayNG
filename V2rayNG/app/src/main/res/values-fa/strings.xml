@@ -105,6 +105,7 @@
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">دانلود فایل‌ها</string>
     <string name="toast_action_not_allowed">این عمل ممنوع است</string>
+    <string name="server_obfs_password">Obfs password</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">URL را اضافه کنید</string>

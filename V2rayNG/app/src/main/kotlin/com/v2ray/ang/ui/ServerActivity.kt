@@ -118,6 +118,7 @@ class ServerActivity : BaseActivity() {
     private val et_reserved3: EditText? by lazy { findViewById(R.id.et_reserved3) }
     private val et_local_address: EditText? by lazy { findViewById(R.id.et_local_address) }
     private val et_local_mtu: EditText? by lazy { findViewById(R.id.et_local_mtu) }
+    private val et_obfs_password: EditText? by lazy { findViewById(R.id.et_obfs_password) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -292,7 +293,10 @@ class ServerActivity : BaseActivity() {
             } else {
                 et_local_mtu?.text = Utils.getEditable(outbound.settings?.mtu.toString())
             }
+        } else if (config.configType == EConfigType.HYSTERIA2) {
+            et_obfs_password?.text = Utils.getEditable(outbound.settings?.obfsPassword)
         }
+
         val securityEncryptions =
             if (config.configType == EConfigType.SHADOWSOCKS) shadowsocksSecuritys else securitys
         val security =
@@ -454,6 +458,9 @@ class ServerActivity : BaseActivity() {
         }
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()
+        }
+        if (config.configType == EConfigType.HYSTERIA2) {
+            config.outboundBean?.settings?.obfsPassword = et_obfs_password?.text?.toString()
         }
 
         MmkvManager.encodeServerConfig(editGuid, config)

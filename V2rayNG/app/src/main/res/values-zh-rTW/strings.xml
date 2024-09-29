@@ -105,6 +105,7 @@
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">下載檔案</string>
     <string name="toast_action_not_allowed">禁止此項操作</string>
+    <string name="server_obfs_password">混淆密碼</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">新增資產網址</string>

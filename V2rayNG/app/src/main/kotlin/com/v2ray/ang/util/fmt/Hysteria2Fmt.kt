@@ -40,6 +40,10 @@ object Hysteria2Fmt {
             server.port = uri.port
             server.password = uri.userInfo
         }
+        if (!queryParam["obfs-password"].isNullOrEmpty()) {
+            config.outboundBean?.settings?.obfsPassword = queryParam["obfs-password"]
+        }
+
         return config
     }
 
@@ -59,6 +63,10 @@ object Hysteria2Fmt {
                 dicQuery["alpn"] = Utils.removeWhiteSpace(tlsSetting.alpn.joinToString(",")).orEmpty()
             }
         }
+        if (!outbound.settings?.obfsPassword.isNullOrEmpty()) {
+            dicQuery["obfs"] = "salamander"
+            dicQuery["obfs-password"] = outbound.settings?.obfsPassword ?: ""
+        }
 
         val query = "?" + dicQuery.toList().joinToString(
             separator = "&",
@@ -76,9 +84,18 @@ object Hysteria2Fmt {
     fun toNativeConfig(config: ServerConfig, socksPort: Int): Hysteria2Bean? {
         val outbound = config.getProxyOutbound() ?: return null
         val tls = outbound.streamSettings?.tlsSettings
+        val obfs = if (outbound.settings?.obfsPassword.isNullOrEmpty()) null else
+            Hysteria2Bean.ObfsBean(
+                type = "salamander",
+                salamander = Hysteria2Bean.ObfsBean.SalamanderBean(
+                    password = outbound.settings?.obfsPassword
+                )
+            )
+
         val bean = Hysteria2Bean(
             server = outbound.getServerAddressAndPort(),
             auth = outbound.getPassword(),
+            obfs = obfs,
             socks5 = Hysteria2Bean.Socks5Bean(
                 listen = "$LOOPBACK:${socksPort}",
             ),

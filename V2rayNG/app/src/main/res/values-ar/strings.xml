@@ -112,6 +112,7 @@
     <string name="msg_file_not_found">الملف غير موجود</string>
     <string name="msg_remark_is_duplicate">الملاحظات موجودة بالفعل</string>
     <string name="toast_action_not_allowed">الإجراء غير مسموح به</string>
+    <string name="server_obfs_password">Obfs password</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">جار التحميل</string>
