@@ -26,7 +26,7 @@ object Hysteria2Fmt {
 
         config.outboundBean?.streamSettings?.populateTlsSettings(
             V2rayConfig.TLS,
-            if ((queryParam["allowInsecure"].orEmpty()) == "1") true else allowInsecure,
+            if ((queryParam["insecure"].orEmpty()) == "1") true else allowInsecure,
             queryParam["sni"] ?: uri.idnHost,
             null,
             queryParam["alpn"],
