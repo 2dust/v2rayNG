@@ -3,11 +3,14 @@ package com.v2ray.ang.util
 import android.content.Context
 import android.text.TextUtils
 import com.google.gson.Gson
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.util.MmkvManager.decodeProfileConfig
 import com.v2ray.ang.util.MmkvManager.decodeServerConfig
 import com.v2ray.ang.util.MmkvManager.decodeServerList
+import com.v2ray.ang.util.MmkvManager.settingsStorage
+import com.v2ray.ang.util.Utils.parseInt
 import java.util.Collections
 
 object SettingsManager {
@@ -138,6 +141,14 @@ object SettingsManager {
             }
         }
         return null
+    }
+
+    fun getSocksPort(): Int {
+        return parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+    }
+
+    fun getHttpPort(): Int {
+        return parseInt(settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT), AppConfig.PORT_HTTP.toInt())
     }
 
 }

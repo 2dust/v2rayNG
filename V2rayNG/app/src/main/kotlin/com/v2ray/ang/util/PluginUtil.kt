@@ -32,7 +32,7 @@ object PluginUtil {
         if (outbound.protocol.equals(EConfigType.HYSTERIA2.name, true)) {
             Log.d(packageName, "runPlugin $HYSTERIA2")
 
-            val socksPort = 100 + Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+            val socksPort = 100 + SettingsManager.getSocksPort()
             val hy2Config = Hysteria2Fmt.toNativeConfig(config, socksPort) ?: return
 
             val configFile = File(context.noBackupFilesDir, "hy2_${SystemClock.elapsedRealtime()}.json")

@@ -31,6 +31,7 @@ import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.settingsStorage
+import com.v2ray.ang.util.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -176,7 +177,7 @@ class UserAssetActivity : BaseActivity() {
             .show()
         toast(R.string.msg_downloading_content)
 
-        val httpPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT), AppConfig.PORT_HTTP.toInt())
+        val httpPort = SettingsManager.getHttpPort()
         var assets = MmkvManager.decodeAssetUrls()
         assets = addBuiltInGeoItems(assets)
 

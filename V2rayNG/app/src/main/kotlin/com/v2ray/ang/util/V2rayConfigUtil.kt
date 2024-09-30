@@ -101,14 +101,8 @@ object V2rayConfigUtil {
 
     private fun inbounds(v2rayConfig: V2rayConfig): Boolean {
         try {
-            val socksPort = Utils.parseInt(
-                settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT),
-                AppConfig.PORT_SOCKS.toInt()
-            )
-            val httpPort = Utils.parseInt(
-                settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT),
-                AppConfig.PORT_HTTP.toInt()
-            )
+            val socksPort = SettingsManager.getSocksPort()
+            val httpPort = SettingsManager.getHttpPort()
 
             v2rayConfig.inbounds.forEach { curInbound ->
                 if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) != true) {
@@ -149,7 +143,7 @@ object V2rayConfigUtil {
 
     private fun outbounds(v2rayConfig: V2rayConfig, outbound: V2rayConfig.OutboundBean, isPlugin: Boolean): Pair<Boolean, String> {
         if (isPlugin) {
-            val socksPort = 100 + Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+            val socksPort = 100 + SettingsManager.getSocksPort()
             val outboundNew = V2rayConfig.OutboundBean(
                 mux = null,
                 protocol = EConfigType.SOCKS.name.lowercase(),

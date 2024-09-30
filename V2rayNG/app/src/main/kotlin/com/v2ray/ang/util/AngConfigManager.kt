@@ -14,7 +14,6 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.HY2
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.*
-import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.fmt.Hysteria2Fmt
 import com.v2ray.ang.util.fmt.ShadowsocksFmt
 import com.v2ray.ang.util.fmt.SocksFmt
@@ -374,19 +373,17 @@ object AngConfigManager {
                 return 0
             }
             Log.d(AppConfig.ANG_PACKAGE, url)
+
             var configText = try {
-                Utils.getUrlContentWithCustomUserAgent(url)
+                val httpPort = SettingsManager.getHttpPort()
+                Utils.getUrlContentWithCustomUserAgent(url, 30000, httpPort)
             } catch (e: Exception) {
                 e.printStackTrace()
                 ""
             }
             if (configText.isEmpty()) {
                 configText = try {
-                    val httpPort = Utils.parseInt(
-                        settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT),
-                        AppConfig.PORT_HTTP.toInt()
-                    )
-                    Utils.getUrlContentWithCustomUserAgent(url, 30000, httpPort)
+                    Utils.getUrlContentWithCustomUserAgent(url)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     ""
