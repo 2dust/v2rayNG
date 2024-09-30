@@ -4,11 +4,9 @@ import android.content.Context
 import android.os.SystemClock
 import android.util.Log
 import com.google.gson.Gson
-import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
-import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.fmt.Hysteria2Fmt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,14 +23,15 @@ object PluginUtil {
 //        return PluginManager.init(name)!!
 //    }
 
-    fun runPlugin(context: Context, config: ServerConfig?) {
+    fun runPlugin(context: Context, config: ServerConfig?, domainPort: String?) {
         Log.d(packageName, "runPlugin")
 
         val outbound = config?.getProxyOutbound() ?: return
         if (outbound.protocol.equals(EConfigType.HYSTERIA2.name, true)) {
             Log.d(packageName, "runPlugin $HYSTERIA2")
 
-            val socksPort = 100 + SettingsManager.getSocksPort()
+            val socksPort = domainPort?.split(":")?.last()
+                .let { if (it.isNullOrEmpty()) return else it.toInt() }
             val hy2Config = Hysteria2Fmt.toNativeConfig(config, socksPort) ?: return
 
             val configFile = File(context.noBackupFilesDir, "hy2_${SystemClock.elapsedRealtime()}.json")

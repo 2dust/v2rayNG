@@ -43,7 +43,7 @@ object V2rayConfigUtil {
 
             val result = getV2rayNonCustomConfig(context, config)
             //Log.d(ANG_PACKAGE, result.content)
-            Log.d(ANG_PACKAGE, result.domainPort?:"")
+            Log.d(ANG_PACKAGE, result.domainPort ?: "")
             return result
         } catch (e: Exception) {
             e.printStackTrace()
@@ -143,7 +143,7 @@ object V2rayConfigUtil {
 
     private fun outbounds(v2rayConfig: V2rayConfig, outbound: V2rayConfig.OutboundBean, isPlugin: Boolean): Pair<Boolean, String> {
         if (isPlugin) {
-            val socksPort = 100 + SettingsManager.getSocksPort()
+            val socksPort = Utils.findFreePort(listOf(100 + SettingsManager.getSocksPort(), 0))
             val outboundNew = V2rayConfig.OutboundBean(
                 mux = null,
                 protocol = EConfigType.SOCKS.name.lowercase(),
