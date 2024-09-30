@@ -6,6 +6,7 @@ data class Hysteria2Bean(
     val lazy: Boolean? = true,
     val obfs: ObfsBean? = null,
     val socks5: Socks5Bean? = null,
+    val http: Socks5Bean? = null,
     val tls: TlsBean? = null,
 ) {
     data class ObfsBean(

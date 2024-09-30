@@ -11,7 +11,6 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
@@ -30,7 +29,6 @@ import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.SpeedtestUtil
 import com.v2ray.ang.util.Utils
-import com.v2ray.ang.util.V2rayConfigUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -213,14 +211,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         getApplication<AngApplication>().toast(R.string.connection_test_testing)
         viewModelScope.launch(Dispatchers.Default) { // without Dispatchers.Default viewModelScope will launch in main thread
             for (item in serversCopy) {
-                val config = V2rayConfigUtil.getV2rayConfig(getApplication(), item.guid)
-                if (config.status) {
-                    MessageUtil.sendMsg2TestService(
-                        getApplication(),
-                        AppConfig.MSG_MEASURE_CONFIG,
-                        JsonUtil.toJson(config)
-                    )
-                }
+                MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG, item.guid)
             }
         }
     }

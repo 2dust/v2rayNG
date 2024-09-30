@@ -99,6 +99,9 @@ object Hysteria2Fmt {
             socks5 = Hysteria2Bean.Socks5Bean(
                 listen = "$LOOPBACK:${socksPort}",
             ),
+            http = Hysteria2Bean.Socks5Bean(
+                listen = "$LOOPBACK:${socksPort}",
+            ),
             tls = Hysteria2Bean.TlsBean(
                 sni = tls?.serverName ?: outbound.getServerAddress(),
                 insecure = tls?.allowInsecure
