@@ -21,6 +21,7 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.AngConfigManager.updateConfigViaSub
@@ -216,7 +217,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     MessageUtil.sendMsg2TestService(
                         getApplication(),
                         AppConfig.MSG_MEASURE_CONFIG,
-                        Pair(item.guid, config.content)
+                        Gson().toJson(config)
                     )
                 }
             }
@@ -394,11 +395,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> {
-                    val resultPair: Pair<String, Long> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        intent.getSerializableExtra("content", Pair::class.java) as Pair<String, Long>
-                    } else {
-                        intent.getSerializableExtra("content") as Pair<String, Long>
-                    }
+                    val resultPair = intent.serializable<Pair<String, Long>>("content") ?: return
                     MmkvManager.encodeServerTestDelayMillis(resultPair.first, resultPair.second)
                     updateListAction.value = getPosition(resultPair.first)
                 }

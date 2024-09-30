@@ -14,6 +14,7 @@ import com.v2ray.ang.AppConfig.TAG_FRAGMENT
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
+import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerConfig
@@ -25,34 +26,32 @@ import com.v2ray.ang.util.MmkvManager.settingsStorage
 
 object V2rayConfigUtil {
 
-    data class Result(var status: Boolean, var content: String = "", var domainPort: String? = null)
-
-    fun getV2rayConfig(context: Context, guid: String): Result {
+    fun getV2rayConfig(context: Context, guid: String): ConfigResult {
         try {
-            val config = MmkvManager.decodeServerConfig(guid) ?: return Result(false)
+            val config = MmkvManager.decodeServerConfig(guid) ?: return ConfigResult(false)
             if (config.configType == EConfigType.CUSTOM) {
                 val raw = MmkvManager.decodeServerRaw(guid)
                 val customConfig = if (raw.isNullOrBlank()) {
-                    config.fullConfig?.toPrettyPrinting() ?: return Result(false)
+                    config.fullConfig?.toPrettyPrinting() ?: return ConfigResult(false)
                 } else {
                     raw
                 }
                 val domainPort = config.getProxyOutbound()?.getServerAddressAndPort()
-                return Result(true, customConfig, domainPort)
+                return ConfigResult(true, guid, customConfig, domainPort)
             }
 
             val result = getV2rayNonCustomConfig(context, config)
             //Log.d(ANG_PACKAGE, result.content)
-            Log.d(ANG_PACKAGE, result.domainPort ?: "")
+            result.guid = guid
             return result
         } catch (e: Exception) {
             e.printStackTrace()
-            return Result(false)
+            return ConfigResult(false)
         }
     }
 
-    private fun getV2rayNonCustomConfig(context: Context, config: ServerConfig): Result {
-        val result = Result(false)
+    private fun getV2rayNonCustomConfig(context: Context, config: ServerConfig): ConfigResult {
+        val result = ConfigResult(false)
 
         val outbound = config.getProxyOutbound() ?: return result
         val address = outbound.getServerAddress() ?: return result
