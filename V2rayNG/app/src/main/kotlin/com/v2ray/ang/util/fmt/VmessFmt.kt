@@ -2,13 +2,14 @@ package com.v2ray.ang.util.fmt
 
 import android.text.TextUtils
 import android.util.Log
-import com.google.gson.Gson
+
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.VmessQRCode
 import com.v2ray.ang.extension.idnHost
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import java.net.URI
@@ -29,7 +30,7 @@ object VmessFmt {
             Log.d(AppConfig.ANG_PACKAGE, "R.string.toast_decoding_failed")
             return null
         }
-        val vmessQRCode = Gson().fromJson(result, VmessQRCode::class.java)
+        val vmessQRCode = JsonUtil.fromJson(result, VmessQRCode::class.java)
         // Although VmessQRCode fields are non null, looks like Gson may still create null fields
         if (TextUtils.isEmpty(vmessQRCode.add)
             || TextUtils.isEmpty(vmessQRCode.port)
@@ -100,7 +101,7 @@ object VmessFmt {
             vmessQRCode.host = transportDetails[1]
             vmessQRCode.path = transportDetails[2]
         }
-        val json = Gson().toJson(vmessQRCode)
+        val json = JsonUtil.toJson(vmessQRCode)
         return Utils.encode(json)
     }
 

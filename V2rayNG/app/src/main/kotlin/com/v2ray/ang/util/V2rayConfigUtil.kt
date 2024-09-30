@@ -3,7 +3,7 @@ package com.v2ray.ang.util
 import android.content.Context
 import android.text.TextUtils
 import android.util.Log
-import com.google.gson.Gson
+
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.LOOPBACK
@@ -67,7 +67,7 @@ object V2rayConfigUtil {
         if (TextUtils.isEmpty(assets)) {
             return result
         }
-        val v2rayConfig = Gson().fromJson(assets, V2rayConfig::class.java) ?: return result
+        val v2rayConfig = JsonUtil.fromJson(assets, V2rayConfig::class.java) ?: return result
         v2rayConfig.log.loglevel = settingsStorage?.decodeString(AppConfig.PREF_LOGLEVEL) ?: "warning"
         v2rayConfig.remarks = config.remarks
 
@@ -206,7 +206,7 @@ object V2rayConfigUtil {
                 return
             }
 
-            val rule = Gson().fromJson(Gson().toJson(item), RulesBean::class.java) ?: return
+            val rule = JsonUtil.fromJson(JsonUtil.toJson(item), RulesBean::class.java) ?: return
 
             v2rayConfig.routing.rules.add(rule)
 
@@ -440,7 +440,7 @@ object V2rayConfigUtil {
                 val requestString: String by lazy {
                     """{"version":"1.1","method":"GET","headers":{"User-Agent":["Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36","Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_2 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/53.0.2785.109 Mobile/14A456 Safari/601.1.46"],"Accept-Encoding":["gzip, deflate"],"Connection":["keep-alive"],"Pragma":"no-cache"}}"""
                 }
-                outbound.streamSettings?.tcpSettings?.header?.request = Gson().fromJson(
+                outbound.streamSettings?.tcpSettings?.header?.request = JsonUtil.fromJson(
                     requestString,
                     V2rayConfig.OutboundBean.StreamSettingsBean.TcpSettingsBean.HeaderBean.RequestBean::class.java
                 )

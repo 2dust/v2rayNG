@@ -3,7 +3,7 @@ package com.v2ray.ang.util
 import android.content.Context
 import android.os.SystemClock
 import android.util.Log
-import com.google.gson.Gson
+
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
@@ -38,8 +38,8 @@ object PluginUtil {
             Log.d(packageName, "runPlugin ${configFile.absolutePath}")
 
             configFile.parentFile?.mkdirs()
-            configFile.writeText(Gson().toJson(hy2Config))
-            Log.d(packageName, Gson().toJson(hy2Config))
+            configFile.writeText(JsonUtil.toJson(hy2Config))
+            Log.d(packageName, JsonUtil.toJson(hy2Config))
 
             runHy2(context, configFile)
         }

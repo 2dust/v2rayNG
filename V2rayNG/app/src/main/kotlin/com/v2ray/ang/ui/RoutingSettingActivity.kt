@@ -10,13 +10,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.gson.Gson
+
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityRoutingSettingBinding
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.SettingsManager
@@ -141,7 +142,7 @@ class RoutingSettingActivity : BaseActivity() {
             if (rulesetList.isNullOrEmpty()) {
                 toast(R.string.toast_failure)
             } else {
-                Utils.setClipboard(this, Gson().toJson(rulesetList))
+                Utils.setClipboard(this, JsonUtil.toJson(rulesetList))
                 toast(R.string.toast_success)
             }
             true

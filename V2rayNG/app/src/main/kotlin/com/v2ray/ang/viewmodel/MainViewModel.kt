@@ -11,7 +11,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
+
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
@@ -25,6 +25,7 @@ import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.AngConfigManager.updateConfigViaSub
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.SpeedtestUtil
@@ -99,7 +100,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 val config = ServerConfig.create(EConfigType.CUSTOM)
                 config.subscriptionId = subscriptionId
-                config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
+                config.fullConfig = JsonUtil.fromJson(server, V2rayConfig::class.java)
                 config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
@@ -217,7 +218,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     MessageUtil.sendMsg2TestService(
                         getApplication(),
                         AppConfig.MSG_MEASURE_CONFIG,
-                        Gson().toJson(config)
+                        JsonUtil.toJson(config)
                     )
                 }
             }
