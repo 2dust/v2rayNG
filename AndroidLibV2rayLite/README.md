@@ -1,4 +1,4 @@
-# AndroidLibV2rayLite
+cccd6139fc9c2d2ad88172a8f8dfea44ba5ddf59# AndroidLibV2rayLite
 
 ### Preparation
 - latest Ubuntu environment
