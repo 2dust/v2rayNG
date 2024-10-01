@@ -110,7 +110,7 @@
     <string name="msg_file_not_found">Файл не найден</string>
     <string name="msg_remark_is_duplicate">Название уже существует</string>
     <string name="toast_action_not_allowed">Это действие запрещено</string>
-    <string name="server_obfs_password">Obfs password</string>
+    <string name="server_obfs_password">Пароль obfs</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Загрузка…</string>
@@ -253,15 +253,15 @@
 
     <string name="routing_settings_domain_strategy">Доменная стратегия</string>
     <string name="routing_settings_title">Маршрутизация</string>
-    <string name="routing_settings_tips">Введите требуемые значения через запятую</string>
+    <string name="routing_settings_tips">Введите требуемые домены/IP через запятую</string>
     <string name="routing_settings_save">Сохранить</string>
     <string name="routing_settings_delete">Очистить</string>
     <string name="routing_settings_rule_title">Настройка правил маршрутизации</string>
     <string name="routing_settings_add_rule">Добавить правило</string>
     <string name="routing_settings_import_rulesets">Импорт правил</string>
     <string name="routing_settings_import_rulesets_tip">Существующие правила будут удалены. Продолжить?</string>
-    <string name="routing_settings_import_rulesets_from_clipboard">Import ruleset from clipboard</string>
-    <string name="routing_settings_export_rulesets_to_clipboard">Export ruleset to clipboard</string>
+    <string name="routing_settings_import_rulesets_from_clipboard">Импорт правил из буфера обмена</string>
+    <string name="routing_settings_export_rulesets_to_clipboard">Экспорт правил в буфер обмена</string>
     <string name="routing_settings_locked">Постоянное (сохранится при импорте правил)</string>
     <string name="routing_settings_domain">Домен</string>
     <string name="routing_settings_ip">IP</string>
