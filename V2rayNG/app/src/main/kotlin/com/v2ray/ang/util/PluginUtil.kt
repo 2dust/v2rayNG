@@ -3,45 +3,33 @@ package com.v2ray.ang.util
 import android.content.Context
 import android.os.SystemClock
 import android.util.Log
-
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.service.ProcessService
 import com.v2ray.ang.util.fmt.Hysteria2Fmt
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 
 object PluginUtil {
     //private const val HYSTERIA2 = "hysteria2-plugin"
     private const val HYSTERIA2 = "libhysteria2.so"
-    private const val packageName = ANG_PACKAGE
-    private lateinit var process: Process
+    private const val TAG = ANG_PACKAGE
+    private lateinit var procService: ProcessService
 
 //    fun initPlugin(name: String): PluginManager.InitResult {
 //        return PluginManager.init(name)!!
 //    }
 
     fun runPlugin(context: Context, config: ServerConfig?, domainPort: String?) {
-        Log.d(packageName, "runPlugin")
+        Log.d(TAG, "runPlugin")
 
         val outbound = config?.getProxyOutbound() ?: return
         if (outbound.protocol.equals(EConfigType.HYSTERIA2.name, true)) {
-            Log.d(packageName, "runPlugin $HYSTERIA2")
+            val configFile = genConfigHy2(context, config, domainPort) ?: return
+            val cmd = genCmdHy2(context, configFile)
 
-            val socksPort = domainPort?.split(":")?.last()
-                .let { if (it.isNullOrEmpty()) return else it.toInt() }
-            val hy2Config = Hysteria2Fmt.toNativeConfig(config, socksPort) ?: return
-
-            val configFile = File(context.noBackupFilesDir, "hy2_${SystemClock.elapsedRealtime()}.json")
-            Log.d(packageName, "runPlugin ${configFile.absolutePath}")
-
-            configFile.parentFile?.mkdirs()
-            configFile.writeText(JsonUtil.toJson(hy2Config))
-            Log.d(packageName, JsonUtil.toJson(hy2Config))
-
-            runHy2(context, configFile)
+            procService = ProcessService()
+            procService.runProcess(context, cmd)
         }
     }
 
@@ -49,8 +37,46 @@ object PluginUtil {
         stopHy2()
     }
 
-    private fun runHy2(context: Context, configFile: File) {
-        val cmd = mutableListOf(
+    fun realPingHy2(context: Context, config: ServerConfig?): Long {
+        Log.d(TAG, "realPingHy2")
+        val retFailure = -1L
+
+        val outbound = config?.getProxyOutbound() ?: return retFailure
+        if (outbound.protocol.equals(EConfigType.HYSTERIA2.name, true)) {
+            val socksPort = Utils.findFreePort(listOf(0))
+            val configFile = genConfigHy2(context, config, "0:${socksPort}") ?: return retFailure
+            val cmd = genCmdHy2(context, configFile)
+
+            val proc = ProcessService()
+            proc.runProcess(context, cmd)
+            Thread.sleep(1000L)
+            val delay = SpeedtestUtil.testConnection(context, socksPort)
+            proc.stopProcess()
+
+            return delay.first
+        }
+        return retFailure
+    }
+
+    private fun genConfigHy2(context: Context, config: ServerConfig, domainPort: String?): File? {
+        Log.d(TAG, "runPlugin $HYSTERIA2")
+
+        val socksPort = domainPort?.split(":")?.last()
+            .let { if (it.isNullOrEmpty()) return null else it.toInt() }
+        val hy2Config = Hysteria2Fmt.toNativeConfig(config, socksPort) ?: return null
+
+        val configFile = File(context.noBackupFilesDir, "hy2_${SystemClock.elapsedRealtime()}.json")
+        Log.d(TAG, "runPlugin ${configFile.absolutePath}")
+
+        configFile.parentFile?.mkdirs()
+        configFile.writeText(JsonUtil.toJson(hy2Config))
+        Log.d(TAG, JsonUtil.toJson(hy2Config))
+
+        return configFile
+    }
+
+    private fun genCmdHy2(context: Context, configFile: File): MutableList<String> {
+        return mutableListOf(
             File(context.applicationInfo.nativeLibraryDir, HYSTERIA2).absolutePath,
             //initPlugin(HYSTERIA2).path,
             "--disable-update-check",
@@ -60,34 +86,14 @@ object PluginUtil {
             "warn",
             "client"
         )
-        Log.d(packageName, cmd.toString())
-
-        try {
-            val proBuilder = ProcessBuilder(cmd)
-            proBuilder.redirectErrorStream(true)
-            process = proBuilder
-                .directory(context.filesDir)
-                .start()
-
-            CoroutineScope(Dispatchers.IO).launch {
-                Thread.sleep(500L)
-                Log.d(packageName, "$HYSTERIA2 check")
-                process.waitFor()
-                Log.d(packageName, "$HYSTERIA2 exited")
-            }
-            Log.d(packageName, process.toString())
-
-        } catch (e: Exception) {
-            Log.d(packageName, e.toString())
-        }
     }
 
     private fun stopHy2() {
         try {
-            Log.d(packageName, "$HYSTERIA2 destroy")
-            process?.destroy()
+            Log.d(TAG, "$HYSTERIA2 destroy")
+            procService?.stopProcess()
         } catch (e: Exception) {
-            Log.d(packageName, e.toString())
+            Log.d(TAG, e.toString())
         }
     }
 }

@@ -3,7 +3,6 @@ package com.v2ray.ang.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG_CANCEL
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG_SUCCESS
@@ -59,17 +58,8 @@ class V2RayTestService : Service() {
 
         val server = MmkvManager.decodeServerConfig(guid) ?: return retFailure
         if (server.getProxyOutbound()?.protocol?.equals(EConfigType.HYSTERIA2.name, true) == true) {
-            val socksPort = Utils.findFreePort(listOf(0))
-            PluginUtil.runPlugin(this, server, "0:${socksPort}")
-            Thread.sleep(1000L)
-
-            var delay = SpeedtestUtil.testConnection(this, socksPort)
-            if (delay.first < 0) {
-                Thread.sleep(10L)
-                delay = SpeedtestUtil.testConnection(this, socksPort)
-            }
-            PluginUtil.stopPlugin()
-            return delay.first
+            val delay = PluginUtil.realPingHy2(this, server)
+            return delay
         } else {
             val config = V2rayConfigUtil.getV2rayConfig(this, guid)
             if (!config.status) {
