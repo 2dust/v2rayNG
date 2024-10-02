@@ -105,7 +105,10 @@ object AppConfig {
     const val DNS_PROXY = "1.1.1.1"
     const val DNS_DIRECT = "223.5.5.5"
     const val DNS_VPN = "1.1.1.1"
-
+    const val GEOSITE_PRIVATE = "geosite:private"
+    const val GEOSITE_CN = "geosite:cn"
+    const val GEOIP_PRIVATE = "geoip:private"
+    const val GEOIP_CN = "geoip:cn"
 
     /** Ports and addresses for various services. */
     const val PORT_LOCAL_DNS = "10853"

@@ -21,17 +21,17 @@
     ]
   },
   {
-    "remarks": "绕过局域网域名",
-    "outboundTag": "direct",
-    "domain": [
-      "geosite:private"
-    ]
-  },
-  {
     "remarks": "绕过局域网IP",
     "outboundTag": "direct",
     "ip": [
       "geoip:private"
+    ]
+  },
+  {
+    "remarks": "绕过局域网域名",
+    "outboundTag": "direct",
+    "domain": [
+      "geosite:private"
     ]
   },
   {
