@@ -95,9 +95,9 @@ object AppConfig {
     const val v2rayNGIssues = "$v2rayNGUrl/issues"
     const val v2rayNGWikiMode = "$v2rayNGUrl/wiki/Mode"
     const val v2rayNGPrivacyPolicy = "https://raw.githubusercontent.com/2dust/v2rayNG/master/CR.md"
-    const val PromotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
-    const val GeoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
-    const val TgChannelUrl = "https://t.me/github_2dust"
+    const val PromotionUrl = "aHR0cHM6Ly90Lm1lL1ZwbnJvX2JvdD9zdGFydD1wcm50Xzg1MDkxOTA3"
+    const val GeoUrl = "https://github.com/Chocolate4U/Iran-v2ray-rules/releases/latest/download/"
+    const val TgChannelUrl = "https://t.me/vpnro_bot"
     const val DelayTestUrl = "https://www.gstatic.com/generate_204"
     const val DelayTestUrl2 = "https://www.google.com/generate_204"
 
@@ -106,9 +106,9 @@ object AppConfig {
     const val DNS_DIRECT = "223.5.5.5"
     const val DNS_VPN = "1.1.1.1"
     const val GEOSITE_PRIVATE = "geosite:private"
-    const val GEOSITE_CN = "geosite:cn"
+    const val GEOSITE_CN = "geosite:ir"
     const val GEOIP_PRIVATE = "geoip:private"
-    const val GEOIP_CN = "geoip:cn"
+    const val GEOIP_CN = "geoip:ir"
 
     /** Ports and addresses for various services. */
     const val PORT_LOCAL_DNS = "10853"
