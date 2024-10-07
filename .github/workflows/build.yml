@@ -8,7 +8,6 @@ on:
         description: 'Xray core version or commit hash'
         required: false
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,23 +31,14 @@ jobs:
       run: |
         go install golang.org/x/mobile/cmd/gomobile@latest
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-
-
+        
     - name: Setup Android environment
       uses: android-actions/setup-android@v3
 
-
-    - name: Build dependencies
+    - name: Download libv2ray.aar
       run: |
-        mkdir ${{ github.workspace }}/build
-        cd ${{ github.workspace }}/build
-        git clone --depth=1 -b main https://github.com/2dust/AndroidLibXrayLite.git
-        cd AndroidLibXrayLite
-        go get github.com/xtls/xray-core@${{ github.event.inputs.XRAY_CORE_VERSION }} || true
-        gomobile init
-        go mod tidy -v
-        gomobile bind -v -androidapi 21 -ldflags='-s -w' ./
-        cp *.aar ${{ github.workspace }}/V2rayNG/app/libs/
+        mkdir -p ${{ github.workspace }}/V2rayNG/app/libs/
+        curl -L -o ${{ github.workspace }}/V2rayNG/app/libs/libv2ray.aar https://github.com/2dust/AndroidLibXrayLite/releases/latest/download/libv2ray.aar
 
     - name: Build APK
       run: |
