@@ -39,6 +39,7 @@
     "outboundTag": "direct",
     "domain": [
       "domain:dns.alidns.com",
+      "domain:dns.pub",
       "domain:doh.pub",
       "domain:dot.pub",
       "domain:doh.360.cn",
