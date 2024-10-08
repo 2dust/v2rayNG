@@ -6,6 +6,7 @@ import android.text.TextUtils
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.GEOIP_PRIVATE
 import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
+import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.util.MmkvManager.decodeProfileConfig
@@ -111,10 +112,8 @@ object SettingsManager {
 
     fun routingRulesetsBypassLan(): Boolean {
         val rulesetItems = MmkvManager.decodeRoutingRulesets()
-        val exist = rulesetItems?.any {
-            it.enabled
-                    && (it.domain?.contains(GEOSITE_PRIVATE) == true
-                    || it.ip?.contains(GEOIP_PRIVATE) == true)
+        val exist = rulesetItems?.filter { it.enabled && it.outboundTag == TAG_DIRECT }?.any {
+            it.domain?.contains(GEOSITE_PRIVATE) == true || it.ip?.contains(GEOIP_PRIVATE) == true
         }
         return exist == true
     }
