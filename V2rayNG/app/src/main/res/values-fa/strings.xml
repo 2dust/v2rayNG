@@ -301,4 +301,11 @@
         <item>Dark</item>
     </string-array>
 
+    <string-array name="preset_rulesets">
+        <item>لیست سفید چین</item>
+        <item>لیست سیاه چین</item>
+        <item>جهانی(Global)</item>
+        <item>ایران</item>
+    </string-array>
+    
 </resources>
