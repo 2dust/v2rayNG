@@ -31,6 +31,7 @@ object SettingsManager {
             0 -> "custom_routing_white"
             1 -> "custom_routing_black"
             2 -> "custom_routing_global"
+            3 -> "custom_routing_white_iran"
             else -> "custom_routing_white"
         }
         val assets = Utils.readTextFromAssets(context, fileName)
