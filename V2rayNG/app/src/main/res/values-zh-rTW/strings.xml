@@ -308,6 +308,7 @@
         <item>繞過大陸(Whitelist)</item>
         <item>黑名單(Blacklist)</item>
         <item>全域(Global)</item>
+        <item>伊朗(Iran)</item>
     </string-array>
 
 </resources>
