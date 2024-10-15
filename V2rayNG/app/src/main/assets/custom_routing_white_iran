@@ -35,14 +35,14 @@
     ]
   },
   {
-    "remarks": "Bpass Iran IP",
+    "remarks": "Bypass Iran IP",
     "outboundTag": "direct",
     "ip": [
        "geoip:ir"
     ]
   },
   {
-    "remarks": "最终代理",
+    "remarks": "Final Agent",
     "port": "0-65535",
     "outboundTag": "proxy"
   }
