@@ -1,77 +1,52 @@
 [
   {
-    "remarks": "Google cn",
-    "outboundTag": "proxy",
-    "domain": [
-      "domain:googleapis.cn",
-      "domain:gstatic.com"
-    ]
-  },
-  {
-    "remarks": "阻断udp443",
+    "remarks": "屏蔽 QUIC",
     "outboundTag": "block",
     "port": "443",
     "network": "udp"
   },
   {
-    "remarks": "阻断广告",
+    "remarks": "屏蔽广告",
     "outboundTag": "block",
     "domain": [
       "geosite:category-ads-all"
     ]
   },
   {
-    "remarks": "绕过局域网IP",
+    "remarks": "局域网 IP 规则",
     "outboundTag": "direct",
     "ip": [
       "geoip:private"
     ]
   },
   {
-    "remarks": "绕过局域网域名",
+    "remarks": "局域网 域名规则",
     "outboundTag": "direct",
     "domain": [
       "geosite:private"
     ]
   },
   {
-    "remarks": "绕过中国域名",
+    "remarks": "中国 IP 规则",
+    "outboundTag": "direct",
+    "ip": [
+      "geoip:cn"
+    ]
+  },
+  {
+    "remarks": "中国 域名规则",
     "outboundTag": "direct",
     "domain": [
-      "domain:dns.alidns.com",
-      "domain:dns.pub",
-      "domain:doh.pub",
-      "domain:dot.pub",
-      "domain:doh.360.cn",
-      "domain:dot.360.cn",
       "geosite:cn",
       "geosite:geolocation-cn"
     ]
   },
   {
-    "remarks": "绕过中国IP",
-    "outboundTag": "direct",
-    "ip": [
-      "223.5.5.5/32",
-      "223.6.6.6/32",
-      "2400:3200::1/128",
-      "2400:3200:baba::1/128",
-      "119.29.29.29/32",
-      "1.12.12.12/32",
-      "120.53.53.53/32",
-      "2402:4e00::/128",
-      "2402:4e00:1::/128",
-      "180.76.76.76/32",
-      "2400:da00::6666/128",
-      "114.114.114.114/32",
-      "114.114.115.115/32",
-      "180.184.1.1/32",
-      "180.184.2.2/32",
-      "101.226.4.6/32",
-      "218.30.118.6/32",
-      "123.125.81.6/32",
-      "140.207.198.6/32",
-      "geoip:cn"
+    "remarks": "Google CN 规则",
+    "outboundTag": "proxy",
+    "domain": [
+      "domain:googleapis.cn",
+      "domain:gstatic.com"
     ]
   },
   {
