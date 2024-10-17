@@ -14,7 +14,7 @@ import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import java.net.URI
 
-object VmessFmt {
+object VmessFmt : FmtBase() {
 
     fun parse(str: String): ServerConfig? {
         if (str.indexOf('?') > 0 && str.indexOf('&') > 0) {

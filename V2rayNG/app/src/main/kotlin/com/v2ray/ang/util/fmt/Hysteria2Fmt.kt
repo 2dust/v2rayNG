@@ -12,7 +12,7 @@ import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import java.net.URI
 
-object Hysteria2Fmt {
+object Hysteria2Fmt : FmtBase() {
 
     fun parse(str: String): ServerConfig {
         var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
@@ -51,7 +51,7 @@ object Hysteria2Fmt {
         val outbound = config.getProxyOutbound() ?: return ""
         val streamSetting = outbound.streamSettings ?: V2rayConfig.OutboundBean.StreamSettingsBean()
 
-        val remark = "#" + Utils.urlEncode(config.remarks)
+
         val dicQuery = HashMap<String, String>()
         dicQuery["security"] = streamSetting.security.ifEmpty { "none" }
         streamSetting.tlsSettings?.let { tlsSetting ->
@@ -68,17 +68,7 @@ object Hysteria2Fmt {
             dicQuery["obfs-password"] = outbound.settings?.obfsPassword ?: ""
         }
 
-        val query = "?" + dicQuery.toList().joinToString(
-            separator = "&",
-            transform = { it.first + "=" + it.second })
-
-        val url = String.format(
-            "%s@%s:%s",
-            outbound.getPassword(),
-            Utils.getIpv6Address(outbound.getServerAddress()),
-            outbound.getServerPort()
-        )
-        return url + query + remark
+        return toUri(outbound.getServerAddress(), outbound.getServerPort(), outbound.getPassword(), dicQuery, config.remarks)
     }
 
     fun toNativeConfig(config: ServerConfig, socksPort: Int): Hysteria2Bean? {
