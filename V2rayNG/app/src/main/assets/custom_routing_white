@@ -1,40 +1,40 @@
 [
   {
-    "remarks": "屏蔽 QUIC",
+    "remarks": "阻断udp443",
     "outboundTag": "block",
     "port": "443",
     "network": "udp"
   },
   {
-    "remarks": "屏蔽广告",
+    "remarks": "阻断广告",
     "outboundTag": "block",
     "domain": [
       "geosite:category-ads-all"
     ]
   },
   {
-    "remarks": "局域网 IP 规则",
+    "remarks": "绕过局域网IP",
     "outboundTag": "direct",
     "ip": [
       "geoip:private"
     ]
   },
   {
-    "remarks": "局域网 域名规则",
+    "remarks": "绕过局域网域名",
     "outboundTag": "direct",
     "domain": [
       "geosite:private"
     ]
   },
   {
-    "remarks": "中国 IP 规则",
+    "remarks": "绕过中国IP",
     "outboundTag": "direct",
     "ip": [
       "geoip:cn"
     ]
   },
   {
-    "remarks": "中国 域名规则",
+    "remarks": "绕过中国域名",
     "outboundTag": "direct",
     "domain": [
       "geosite:cn",
@@ -42,7 +42,7 @@
     ]
   },
   {
-    "remarks": "Google CN 规则",
+    "remarks": "Google CN",
     "outboundTag": "proxy",
     "domain": [
       "domain:googleapis.cn",
