@@ -8,13 +8,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.blacksquircle.ui.editorkit.utils.EditorTheme
 import com.blacksquircle.ui.language.json.JsonLanguage
-import com.google.gson.Gson
+
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityServerCustomConfigBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import me.drakeet.support.toast.ToastCompat
@@ -78,7 +79,7 @@ class ServerCustomConfigActivity : BaseActivity() {
         }
 
         val v2rayConfig = try {
-            Gson().fromJson(binding.editor.text.toString(), V2rayConfig::class.java)
+            JsonUtil.fromJson(binding.editor.text.toString(), V2rayConfig::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
             ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()

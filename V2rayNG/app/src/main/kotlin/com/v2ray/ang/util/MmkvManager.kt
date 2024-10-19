@@ -1,6 +1,6 @@
 package com.v2ray.ang.util
 
-import com.google.gson.Gson
+
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
@@ -49,7 +49,7 @@ object MmkvManager {
     }
 
     fun encodeServerList(serverList: MutableList<String>) {
-        mainStorage.encode(KEY_ANG_CONFIGS, Gson().toJson(serverList))
+        mainStorage.encode(KEY_ANG_CONFIGS, JsonUtil.toJson(serverList))
     }
 
     fun decodeServerList(): MutableList<String> {
@@ -57,7 +57,7 @@ object MmkvManager {
         return if (json.isNullOrBlank()) {
             mutableListOf()
         } else {
-            Gson().fromJson(json, Array<String>::class.java).toMutableList()
+            JsonUtil.fromJson(json, Array<String>::class.java).toMutableList()
         }
     }
 
@@ -69,7 +69,7 @@ object MmkvManager {
         if (json.isNullOrBlank()) {
             return null
         }
-        return Gson().fromJson(json, ServerConfig::class.java)
+        return JsonUtil.fromJson(json, ServerConfig::class.java)
     }
 
     fun decodeProfileConfig(guid: String): ProfileItem? {
@@ -80,12 +80,12 @@ object MmkvManager {
         if (json.isNullOrBlank()) {
             return null
         }
-        return Gson().fromJson(json, ProfileItem::class.java)
+        return JsonUtil.fromJson(json, ProfileItem::class.java)
     }
 
     fun encodeServerConfig(guid: String, config: ServerConfig): String {
         val key = guid.ifBlank { Utils.getUuid() }
-        serverStorage.encode(key, Gson().toJson(config))
+        serverStorage.encode(key, JsonUtil.toJson(config))
         val serverList = decodeServerList()
         if (!serverList.contains(key)) {
             serverList.add(0, key)
@@ -101,7 +101,7 @@ object MmkvManager {
             server = config.getProxyOutbound()?.getServerAddress(),
             serverPort = config.getProxyOutbound()?.getServerPort(),
         )
-        profileStorage.encode(key, Gson().toJson(profile))
+        profileStorage.encode(key, JsonUtil.toJson(profile))
         return key
     }
 
@@ -141,7 +141,7 @@ object MmkvManager {
         if (json.isNullOrBlank()) {
             return null
         }
-        return Gson().fromJson(json, ServerAffiliationInfo::class.java)
+        return JsonUtil.fromJson(json, ServerAffiliationInfo::class.java)
     }
 
     fun encodeServerTestDelayMillis(guid: String, testResult: Long) {
@@ -150,14 +150,14 @@ object MmkvManager {
         }
         val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
         aff.testDelayMillis = testResult
-        serverAffStorage.encode(guid, Gson().toJson(aff))
+        serverAffStorage.encode(guid, JsonUtil.toJson(aff))
     }
 
     fun clearAllTestDelayResults(keys: List<String>?) {
         keys?.forEach { key ->
             decodeServerAffiliationInfo(key)?.let { aff ->
                 aff.testDelayMillis = 0
-                serverAffStorage.encode(key, Gson().toJson(aff))
+                serverAffStorage.encode(key, JsonUtil.toJson(aff))
             }
         }
     }
@@ -217,7 +217,7 @@ object MmkvManager {
         decodeSubsList().forEach { key ->
             val json = subStorage.decodeString(key)
             if (!json.isNullOrBlank()) {
-                subscriptions.add(Pair(key, Gson().fromJson(json, SubscriptionItem::class.java)))
+                subscriptions.add(Pair(key, JsonUtil.fromJson(json, SubscriptionItem::class.java)))
             }
         }
         return subscriptions
@@ -234,7 +234,7 @@ object MmkvManager {
 
     fun encodeSubscription(guid: String, subItem: SubscriptionItem) {
         val key = guid.ifBlank { Utils.getUuid() }
-        subStorage.encode(key, Gson().toJson(subItem))
+        subStorage.encode(key, JsonUtil.toJson(subItem))
 
         val subsList = decodeSubsList()
         if (!subsList.contains(key)) {
@@ -245,11 +245,11 @@ object MmkvManager {
 
     fun decodeSubscription(subscriptionId: String): SubscriptionItem? {
         val json = subStorage.decodeString(subscriptionId) ?: return null
-        return Gson().fromJson(json, SubscriptionItem::class.java)
+        return JsonUtil.fromJson(json, SubscriptionItem::class.java)
     }
 
     fun encodeSubsList(subsList: MutableList<String>) {
-        mainStorage.encode(KEY_SUB_IDS, Gson().toJson(subsList))
+        mainStorage.encode(KEY_SUB_IDS, JsonUtil.toJson(subsList))
     }
 
     fun decodeSubsList(): MutableList<String> {
@@ -257,7 +257,7 @@ object MmkvManager {
         return if (json.isNullOrBlank()) {
             mutableListOf()
         } else {
-            Gson().fromJson(json, Array<String>::class.java).toMutableList()
+            JsonUtil.fromJson(json, Array<String>::class.java).toMutableList()
         }
     }
 
@@ -270,7 +270,7 @@ object MmkvManager {
         assetStorage.allKeys()?.forEach { key ->
             val json = assetStorage.decodeString(key)
             if (!json.isNullOrBlank()) {
-                assetUrlItems.add(Pair(key, Gson().fromJson(json, AssetUrlItem::class.java)))
+                assetUrlItems.add(Pair(key, JsonUtil.fromJson(json, AssetUrlItem::class.java)))
             }
         }
         return assetUrlItems.sortedBy { (_, value) -> value.addedTime }
@@ -282,12 +282,12 @@ object MmkvManager {
 
     fun encodeAsset(assetid: String, assetItem: AssetUrlItem) {
         val key = assetid.ifBlank { Utils.getUuid() }
-        assetStorage.encode(key, Gson().toJson(assetItem))
+        assetStorage.encode(key, JsonUtil.toJson(assetItem))
     }
 
     fun decodeAsset(assetid: String): AssetUrlItem? {
         val json = assetStorage.decodeString(assetid) ?: return null
-        return Gson().fromJson(json, AssetUrlItem::class.java)
+        return JsonUtil.fromJson(json, AssetUrlItem::class.java)
     }
 
     //endregion
@@ -297,14 +297,14 @@ object MmkvManager {
     fun decodeRoutingRulesets(): MutableList<RulesetItem>? {
         val ruleset = settingsStorage.decodeString(PREF_ROUTING_RULESET)
         if (ruleset.isNullOrEmpty()) return null
-        return Gson().fromJson(ruleset, Array<RulesetItem>::class.java).toMutableList()
+        return JsonUtil.fromJson(ruleset, Array<RulesetItem>::class.java).toMutableList()
     }
 
     fun encodeRoutingRulesets(rulesetList: MutableList<RulesetItem>?) {
         if (rulesetList.isNullOrEmpty())
             settingsStorage.encode(PREF_ROUTING_RULESET, "")
         else
-            settingsStorage.encode(PREF_ROUTING_RULESET, Gson().toJson(rulesetList))
+            settingsStorage.encode(PREF_ROUTING_RULESET, JsonUtil.toJson(rulesetList))
     }
 
     //endregion

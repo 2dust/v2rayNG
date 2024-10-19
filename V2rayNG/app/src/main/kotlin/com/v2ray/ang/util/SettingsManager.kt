@@ -2,12 +2,18 @@ package com.v2ray.ang.util
 
 import android.content.Context
 import android.text.TextUtils
-import com.google.gson.Gson
+
+import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.GEOIP_PRIVATE
+import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
+import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.util.MmkvManager.decodeProfileConfig
 import com.v2ray.ang.util.MmkvManager.decodeServerConfig
 import com.v2ray.ang.util.MmkvManager.decodeServerList
+import com.v2ray.ang.util.MmkvManager.settingsStorage
+import com.v2ray.ang.util.Utils.parseInt
 import java.util.Collections
 
 object SettingsManager {
@@ -25,6 +31,7 @@ object SettingsManager {
             0 -> "custom_routing_white"
             1 -> "custom_routing_black"
             2 -> "custom_routing_global"
+            3 -> "custom_routing_white_iran"
             else -> "custom_routing_white"
         }
         val assets = Utils.readTextFromAssets(context, fileName)
@@ -32,10 +39,34 @@ object SettingsManager {
             return null
         }
 
-        return Gson().fromJson(assets, Array<RulesetItem>::class.java).toMutableList()
+        return JsonUtil.fromJson(assets, Array<RulesetItem>::class.java).toMutableList()
     }
 
     fun resetRoutingRulesets(context: Context, index: Int) {
+        val rulesetList = getPresetRoutingRulesets(context, index) ?: return
+        resetRoutingRulesetsCommon(rulesetList)
+    }
+
+    fun resetRoutingRulesetsFromClipboard(content: String?): Boolean {
+        if (content.isNullOrEmpty()) {
+            return false
+        }
+
+        try {
+            val rulesetList = JsonUtil.fromJson(content, Array<RulesetItem>::class.java).toMutableList()
+            if (rulesetList.isNullOrEmpty()) {
+                return false
+            }
+
+            resetRoutingRulesetsCommon(rulesetList)
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+    }
+
+    private fun resetRoutingRulesetsCommon(rulesetList: MutableList<RulesetItem>) {
         val rulesetNew: MutableList<RulesetItem> = mutableListOf()
         MmkvManager.decodeRoutingRulesets()?.forEach { key ->
             if (key.looked == true) {
@@ -43,7 +74,6 @@ object SettingsManager {
             }
         }
 
-        val rulesetList = getPresetRoutingRulesets(context, index) ?: return
         rulesetNew.addAll(rulesetList)
         MmkvManager.encodeRoutingRulesets(rulesetNew)
     }
@@ -83,7 +113,9 @@ object SettingsManager {
 
     fun routingRulesetsBypassLan(): Boolean {
         val rulesetItems = MmkvManager.decodeRoutingRulesets()
-        val exist = rulesetItems?.any { it.enabled && it.domain?.contains(":private") == true }
+        val exist = rulesetItems?.filter { it.enabled && it.outboundTag == TAG_DIRECT }?.any {
+            it.domain?.contains(GEOSITE_PRIVATE) == true || it.ip?.contains(GEOIP_PRIVATE) == true
+        }
         return exist == true
     }
 
@@ -115,6 +147,14 @@ object SettingsManager {
             }
         }
         return null
+    }
+
+    fun getSocksPort(): Int {
+        return parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+    }
+
+    fun getHttpPort(): Int {
+        return parseInt(settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT), AppConfig.PORT_HTTP.toInt())
     }
 
 }

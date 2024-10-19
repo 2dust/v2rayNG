@@ -164,7 +164,7 @@ object V2RayServiceManager {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
             showNotification()
 
-            PluginUtil.runPlugin(service, config)
+            PluginUtil.runPlugin(service, config, result.domainPort)
         } else {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
             cancelNotification()

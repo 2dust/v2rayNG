@@ -44,7 +44,8 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
             )
         }
 
-        holder.itemSubSettingBinding.chkEnable.setOnCheckedChangeListener { _, isChecked ->
+        holder.itemSubSettingBinding.chkEnable.setOnCheckedChangeListener { it, isChecked ->
+            if( !it.isPressed) return@setOnCheckedChangeListener
             subItem.enabled = isChecked
             MmkvManager.encodeSubscription(subId, subItem)
 

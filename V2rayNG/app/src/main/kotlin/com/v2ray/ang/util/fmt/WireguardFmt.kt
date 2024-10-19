@@ -8,7 +8,7 @@ import com.v2ray.ang.extension.removeWhiteSpace
 import com.v2ray.ang.util.Utils
 import java.net.URI
 
-object WireguardFmt {
+object WireguardFmt : FmtBase() {
     fun parse(str: String): ServerConfig? {
         val uri = URI(Utils.fixIllegalUrl(str))
         if (uri.rawQuery != null) {
@@ -71,37 +71,22 @@ object WireguardFmt {
     }
 
 
-
     fun toUri(config: ServerConfig): String {
         val outbound = config.getProxyOutbound() ?: return ""
 
-        val remark = "#" + Utils.urlEncode(config.remarks)
+
         val dicQuery = HashMap<String, String>()
-        dicQuery["publickey"] =
-            Utils.urlEncode(outbound.settings?.peers?.get(0)?.publicKey.toString())
+        dicQuery["publickey"] = outbound.settings?.peers?.get(0)?.publicKey.toString()
         if (outbound.settings?.reserved != null) {
-            dicQuery["reserved"] = Utils.urlEncode(
-                Utils.removeWhiteSpace(outbound.settings?.reserved?.joinToString(","))
-                    .toString()
-            )
+            dicQuery["reserved"] = Utils.removeWhiteSpace(outbound.settings?.reserved?.joinToString(",")).toString()
+
         }
-        dicQuery["address"] = Utils.urlEncode(
-            Utils.removeWhiteSpace((outbound.settings?.address as List<*>).joinToString(","))
-                .toString()
-        )
+        dicQuery["address"] = Utils.removeWhiteSpace((outbound.settings?.address as List<*>).joinToString(",")).toString()
+
         if (outbound.settings?.mtu != null) {
             dicQuery["mtu"] = outbound.settings?.mtu.toString()
         }
-        val query = "?" + dicQuery.toList().joinToString(
-            separator = "&",
-            transform = { it.first + "=" + it.second })
 
-        val url = String.format(
-            "%s@%s:%s",
-            Utils.urlEncode(outbound.getPassword().toString()),
-            Utils.getIpv6Address(outbound.getServerAddress()),
-            outbound.getServerPort()
-        )
-        return url + query + remark
+        return toUri(outbound.getServerAddress(), outbound.getServerPort(), outbound.getPassword(), dicQuery, config.remarks)
     }
 }

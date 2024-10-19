@@ -105,6 +105,7 @@
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">دانلود فایل‌ها</string>
     <string name="toast_action_not_allowed">این عمل ممنوع است</string>
+    <string name="server_obfs_password">Obfs password</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">URL را اضافه کنید</string>
@@ -126,8 +127,8 @@
     <string name="title_vpn_settings">تنظیمات VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی به تفکیک برنامه</string>
     <string name="summary_pref_per_app_proxy">عمومی: برنامه بررسی شده پروکسی است، اتصال مستقیم بدون بررسی است. \nحالت bypass: برنامه بررسی شده مستقیما متصل است، پراکسی بررسی نشده است. \nگزینه‌ای برای انتخاب خودکار پروکسی برنامه در منو است</string>
-    <string name="title_pref_is_booted">Auto connect at startup</string>
-    <string name="summary_pref_is_booted">Automatically connects to the selected server at startup, which may be unsuccessful</string>
+    <string name="title_pref_is_booted">اتصال خودکار هنگام راه اندازی</string>
+    <string name="summary_pref_is_booted">هنگام راه اندازی به طور خودکار به سرور انتخابی متصل می شود که ممکن است ناموفق باشد</string>
 
     <string name="title_mux_settings">تنظیمات Mux</string>
     <string name="title_pref_mux_enabled">فعال کردن Mux</string>
@@ -146,8 +147,8 @@
 
     <string name="title_pref_sniffing_enabled">فعال کردن Sniffing</string>
     <string name="summary_pref_sniffing_enabled">دامنه sniff را از بسته امتحان کنید (پیش‌فرض روشن)</string>
-    <string name="title_pref_route_only_enabled">Enable routeOnly</string>
-    <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and keep the target address as the IP address.</string>
+    <string name="title_pref_route_only_enabled">فعال کردن routeOnly</string>
+    <string name="summary_pref_route_only_enabled">از نام دامنه sniffed فقط برای مسیریابی استفاده کنید و آدرس مورد نظر را به عنوان آدرس IP نگه دارید.</string>
 
 
     <string name="title_pref_local_dns_enabled">فعال کردن DNS محلی</string>
@@ -174,8 +175,8 @@
     <string name="summary_pref_proxy_sharing_enabled">دستگاه‌های دیگر می‌توانند از طریق socks/http به پراکسی توسط نشانی آی‌پی شما متصل شوند، فقط در شبکه مورد اعتماد فعال می‌شوند تا از اتصال غیرمجاز جلوگیری کنند</string>
     <string name="toast_warning_pref_proxysharing_short">اتصالات از طریق LAN را مجاز کنید، مطمئن شوید که در یک شبکه قابل اعتماد هستید</string>
 
-    <string name="title_pref_allow_insecure">allowInsecure</string>
-    <string name="summary_pref_allow_insecure">هنگام استفاده از TLS، به طور پیش‌فرض allowInsecure فعال است</string>
+    <string name="title_pref_allow_insecure">موز ناامن</string>
+    <string name="summary_pref_allow_insecure">هنگام استفاده از TLS، به طور پیش‌فرض مجوز ناامن فعال است</string>
 
     <string name="title_pref_socks_port">پورت پروکسی SOCKS5</string>
     <string name="summary_pref_socks_port">پورت پروکسی SOCKS5</string>
@@ -199,12 +200,12 @@
 
     <string name="title_privacy_policy">حریم خصوصی</string>
     <string name="title_about">درباره</string>
-    <string name="title_source_code">Source code</string>
-    <string name="title_tg_channel">Telegram channel</string>
-    <string name="title_configuration_backup">Backup configuration</string>
-    <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
-    <string name="title_configuration_restore">Restore configuration</string>
-    <string name="title_configuration_share">Share configuration</string>
+    <string name="title_source_code">کد منبع</string>
+    <string name="title_tg_channel">کانال تلگرام</string>
+    <string name="title_configuration_backup">پشتیبانگیری از پیکربندی</string>
+    <string name="summary_configuration_backup">محل ذخیره سازی: [%s], پس از حذف نصب برنامه یا پاک کردن فضای ذخیره سازی، نسخه پشتیبان پاک می شود</string>
+    <string name="title_configuration_restore">بازیابی پیکربندی</string>
+    <string name="title_configuration_share">اشتراکگذاری پیکربندی</string>
     <string name="title_pref_promotion">تبلیغات</string>
     <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف شود)</string>
 
@@ -251,12 +252,14 @@
     <string name="routing_settings_title">تنظیمات مسیریابی</string>
     <string name="routing_settings_tips">با کاما (,) از هم جدا شوند، ذخیره کردن فراموش نشود</string>
     <string name="routing_settings_save">ذخیره</string>
-    <string name="routing_settings_delete">پاک کردن</string>
-    <string name="routing_settings_rule_title">Routing Rule Settings</string>
-    <string name="routing_settings_add_rule">Add rule</string>
-    <string name="routing_settings_import_rulesets">Import ruleset</string>
-    <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
-    <string name="routing_settings_locked">Locked, keep this rule when import presets</string>
+    <string name="routing_settings_delete">حذف</string>
+    <string name="routing_settings_rule_title">تنظیمات قانون مسیریابی</string>
+    <string name="routing_settings_add_rule">اضافه کردن قانون</string>
+    <string name="routing_settings_import_rulesets">وارد کردن مجموعه قوانین</string>
+    <string name="routing_settings_import_rulesets_tip">مجموعه قوانین موجود حذف خواهند شد، آیا مطمئن هستید که ادامه می دهید؟</string>
+    <string name="routing_settings_import_rulesets_from_clipboard">وارد کردن مجموعه قوانین از کلیپ بورد</string>
+    <string name="routing_settings_export_rulesets_to_clipboard">صادر کردن مجموعه قوانین به کلیپ بورد</string>
+    <string name="routing_settings_locked">قفل است، این قانون را هنگام وارد کردن از پیش تنظیم‌ها حفظ کنید</string>
 
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
     <string name="connection_test_testing">در حال آزمایش...</string>
@@ -298,4 +301,11 @@
         <item>Dark</item>
     </string-array>
 
+    <string-array name="preset_rulesets">
+        <item>لیست سفید چین</item>
+        <item>لیست سیاه چین</item>
+        <item>جهانی(Global)</item>
+        <item>ایران</item>
+    </string-array>
+    
 </resources>

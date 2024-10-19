@@ -4,16 +4,16 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.text.TextUtils
 import android.util.Log
-import com.google.gson.Gson
+
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.HY2
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.*
-import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.fmt.Hysteria2Fmt
 import com.v2ray.ang.util.fmt.ShadowsocksFmt
 import com.v2ray.ang.util.fmt.SocksFmt
@@ -52,7 +52,7 @@ object AngConfigManager {
                 VlessFmt.parse(str)
             } else if (str.startsWith(EConfigType.WIREGUARD.protocolScheme)) {
                 WireguardFmt.parse(str)
-            } else if (str.startsWith(EConfigType.HYSTERIA2.protocolScheme)) {
+            } else if (str.startsWith(EConfigType.HYSTERIA2.protocolScheme) || str.startsWith(HY2)) {
                 Hysteria2Fmt.parse(str)
             } else {
                 null
@@ -278,34 +278,21 @@ object AngConfigManager {
             && server.contains("routing")
         ) {
             try {
-                //val gson = GsonBuilder().setPrettyPrinting().create()
-                val gson = GsonBuilder()
-                    .setPrettyPrinting()
-                    .disableHtmlEscaping()
-                    .registerTypeAdapter( // custom serialiser is needed here since JSON by default parse number as Double, core will fail to start
-                        object : TypeToken<Double>() {}.type,
-                        JsonSerializer { src: Double?, _: Type?, _: JsonSerializationContext? ->
-                            JsonPrimitive(
-                                src?.toInt()
-                            )
-                        }
-                    )
-                    .create()
                 val serverList: Array<Any> =
-                    Gson().fromJson(server, Array<Any>::class.java)
+                    JsonUtil.fromJson(server, Array<Any>::class.java)
 
                 if (serverList.isNotEmpty()) {
                     var count = 0
                     for (srv in serverList.reversed()) {
                         val config = ServerConfig.create(EConfigType.CUSTOM)
                         config.fullConfig =
-                            Gson().fromJson(Gson().toJson(srv), V2rayConfig::class.java)
+                            JsonUtil.fromJson(JsonUtil.toJson(srv), V2rayConfig::class.java)
                         config.remarks = config.fullConfig?.remarks
                             ?: ("%04d-".format(count + 1) + System.currentTimeMillis()
                                 .toString())
                         config.subscriptionId = subid
                         val key = MmkvManager.encodeServerConfig("", config)
-                        MmkvManager.encodeServerRaw(key, gson.toJson(srv))
+                        MmkvManager.encodeServerRaw(key, JsonUtil.toJsonPretty(srv))
                         count += 1
                     }
                     return count
@@ -318,7 +305,7 @@ object AngConfigManager {
                 // For compatibility
                 val config = ServerConfig.create(EConfigType.CUSTOM)
                 config.subscriptionId = subid
-                config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
+                config.fullConfig = JsonUtil.fromJson(server, V2rayConfig::class.java)
                 config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
@@ -373,19 +360,17 @@ object AngConfigManager {
                 return 0
             }
             Log.d(AppConfig.ANG_PACKAGE, url)
+
             var configText = try {
-                Utils.getUrlContentWithCustomUserAgent(url)
+                val httpPort = SettingsManager.getHttpPort()
+                Utils.getUrlContentWithCustomUserAgent(url, 30000, httpPort)
             } catch (e: Exception) {
                 e.printStackTrace()
                 ""
             }
             if (configText.isEmpty()) {
                 configText = try {
-                    val httpPort = Utils.parseInt(
-                        settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT),
-                        AppConfig.PORT_HTTP.toInt()
-                    )
-                    Utils.getUrlContentWithCustomUserAgent(url, 30000, httpPort)
+                    Utils.getUrlContentWithCustomUserAgent(url)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     ""

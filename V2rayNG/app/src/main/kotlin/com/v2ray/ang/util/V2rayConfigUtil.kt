@@ -3,10 +3,13 @@ package com.v2ray.ang.util
 import android.content.Context
 import android.text.TextUtils
 import android.util.Log
-import com.google.gson.Gson
+
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import com.v2ray.ang.AppConfig.GEOIP_CN
+import com.v2ray.ang.AppConfig.GEOSITE_CN
 import com.v2ray.ang.AppConfig.LOOPBACK
+import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
 import com.v2ray.ang.AppConfig.PROTOCOL_FREEDOM
 import com.v2ray.ang.AppConfig.TAG_BLOCKED
 import com.v2ray.ang.AppConfig.TAG_DIRECT
@@ -14,6 +17,7 @@ import com.v2ray.ang.AppConfig.TAG_FRAGMENT
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
+import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerConfig
@@ -25,34 +29,32 @@ import com.v2ray.ang.util.MmkvManager.settingsStorage
 
 object V2rayConfigUtil {
 
-    data class Result(var status: Boolean, var content: String = "", var domainPort: String? = null)
-
-    fun getV2rayConfig(context: Context, guid: String): Result {
+    fun getV2rayConfig(context: Context, guid: String): ConfigResult {
         try {
-            val config = MmkvManager.decodeServerConfig(guid) ?: return Result(false)
+            val config = MmkvManager.decodeServerConfig(guid) ?: return ConfigResult(false)
             if (config.configType == EConfigType.CUSTOM) {
                 val raw = MmkvManager.decodeServerRaw(guid)
                 val customConfig = if (raw.isNullOrBlank()) {
-                    config.fullConfig?.toPrettyPrinting() ?: return Result(false)
+                    config.fullConfig?.toPrettyPrinting() ?: return ConfigResult(false)
                 } else {
                     raw
                 }
                 val domainPort = config.getProxyOutbound()?.getServerAddressAndPort()
-                return Result(true, customConfig, domainPort)
+                return ConfigResult(true, guid, customConfig, domainPort)
             }
 
             val result = getV2rayNonCustomConfig(context, config)
             //Log.d(ANG_PACKAGE, result.content)
-            Log.d(ANG_PACKAGE, result.domainPort?:"")
+            result.guid = guid
             return result
         } catch (e: Exception) {
             e.printStackTrace()
-            return Result(false)
+            return ConfigResult(false)
         }
     }
 
-    private fun getV2rayNonCustomConfig(context: Context, config: ServerConfig): Result {
-        val result = Result(false)
+    private fun getV2rayNonCustomConfig(context: Context, config: ServerConfig): ConfigResult {
+        val result = ConfigResult(false)
 
         val outbound = config.getProxyOutbound() ?: return result
         val address = outbound.getServerAddress() ?: return result
@@ -68,7 +70,7 @@ object V2rayConfigUtil {
         if (TextUtils.isEmpty(assets)) {
             return result
         }
-        val v2rayConfig = Gson().fromJson(assets, V2rayConfig::class.java) ?: return result
+        val v2rayConfig = JsonUtil.fromJson(assets, V2rayConfig::class.java) ?: return result
         v2rayConfig.log.loglevel = settingsStorage?.decodeString(AppConfig.PREF_LOGLEVEL) ?: "warning"
         v2rayConfig.remarks = config.remarks
 
@@ -101,14 +103,8 @@ object V2rayConfigUtil {
 
     private fun inbounds(v2rayConfig: V2rayConfig): Boolean {
         try {
-            val socksPort = Utils.parseInt(
-                settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT),
-                AppConfig.PORT_SOCKS.toInt()
-            )
-            val httpPort = Utils.parseInt(
-                settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT),
-                AppConfig.PORT_HTTP.toInt()
-            )
+            val socksPort = SettingsManager.getSocksPort()
+            val httpPort = SettingsManager.getHttpPort()
 
             v2rayConfig.inbounds.forEach { curInbound ->
                 if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) != true) {
@@ -149,7 +145,7 @@ object V2rayConfigUtil {
 
     private fun outbounds(v2rayConfig: V2rayConfig, outbound: V2rayConfig.OutboundBean, isPlugin: Boolean): Pair<Boolean, String> {
         if (isPlugin) {
-            val socksPort = 100 + Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+            val socksPort = Utils.findFreePort(listOf(100 + SettingsManager.getSocksPort(), 0))
             val outboundNew = V2rayConfig.OutboundBean(
                 mux = null,
                 protocol = EConfigType.SOCKS.name.lowercase(),
@@ -213,7 +209,7 @@ object V2rayConfigUtil {
                 return
             }
 
-            val rule = Gson().fromJson(Gson().toJson(item), RulesBean::class.java) ?: return
+            val rule = JsonUtil.fromJson(JsonUtil.toJson(item), RulesBean::class.java) ?: return
 
             v2rayConfig.routing.rules.add(rule)
 
@@ -229,7 +225,9 @@ object V2rayConfigUtil {
         rulesetItems?.forEach { key ->
             if (key != null && key.enabled && key.outboundTag == tag && !key.domain.isNullOrEmpty()) {
                 key.domain?.forEach {
-                    if (it.startsWith("geosite:") || it.startsWith("domain:")) {
+                    if (it != GEOSITE_PRIVATE
+                        && (it.startsWith("geosite:") || it.startsWith("domain:"))
+                    ) {
                         domain.add(it)
                     }
                 }
@@ -242,7 +240,7 @@ object V2rayConfigUtil {
     private fun customLocalDns(v2rayConfig: V2rayConfig): Boolean {
         try {
             if (settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
-                val geositeCn = arrayListOf("geosite:cn")
+                val geositeCn = arrayListOf(GEOSITE_CN)
                 val proxyDomain = userRule2Domain(TAG_PROXY)
                 val directDomain = userRule2Domain(TAG_DIRECT)
                 // fakedns with all domains to make it always top priority
@@ -333,8 +331,8 @@ object V2rayConfigUtil {
             // domestic DNS
             val domesticDns = Utils.getDomesticDnsServers()
             val directDomain = userRule2Domain(TAG_DIRECT)
-            val isCnRoutingMode = directDomain.contains("geosite:cn")
-            val geoipCn = arrayListOf("geoip:cn")
+            val isCnRoutingMode = directDomain.contains(GEOSITE_CN)
+            val geoipCn = arrayListOf(GEOIP_CN)
             if (directDomain.size > 0) {
                 servers.add(
                     V2rayConfig.DnsBean.ServersBean(
@@ -447,7 +445,7 @@ object V2rayConfigUtil {
                 val requestString: String by lazy {
                     """{"version":"1.1","method":"GET","headers":{"User-Agent":["Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36","Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_2 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/53.0.2785.109 Mobile/14A456 Safari/601.1.46"],"Accept-Encoding":["gzip, deflate"],"Connection":["keep-alive"],"Pragma":"no-cache"}}"""
                 }
-                outbound.streamSettings?.tcpSettings?.header?.request = Gson().fromJson(
+                outbound.streamSettings?.tcpSettings?.header?.request = JsonUtil.fromJson(
                     requestString,
                     V2rayConfig.OutboundBean.StreamSettingsBean.TcpSettingsBean.HeaderBean.RequestBean::class.java
                 )

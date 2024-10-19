@@ -453,6 +453,17 @@ object Utils {
         }
     }
 
+    fun findFreePort(ports: List<Int>): Int {
+        for (port in ports) {
+            try {
+                return ServerSocket(port).use { it.localPort }
+            } catch (ex: IOException) {
+                continue  // try next port
+            }
+        }
 
+        // if the program gets here, no port in the range was found
+        throw IOException("no free port found")
+    }
 }
 

@@ -1,0 +1,49 @@
+[
+  {
+    "remarks": "Block udp443",
+    "outboundTag": "block",
+    "port": "443",
+    "network": "udp"
+  },
+  {
+    "remarks": "Block ads and trackers",
+    "outboundTag": "block",
+    "domain": [
+      "geosite:category-ads-all"
+    ]
+  },
+  {
+    "remarks": "Direct LAN IP",
+    "outboundTag": "direct",
+    "ip": [
+      "geoip:private"
+    ]
+  },
+  {
+    "remarks": "Direct LAN domains",
+    "outboundTag": "direct",
+    "domain": [
+      "geosite:private"
+    ]
+  },
+  {
+    "remarks": "Bypass Iran domains",
+    "outboundTag": "direct",
+    "domain": [
+      "domain:ir",
+      "geosite:category-ir"
+    ]
+  },
+  {
+    "remarks": "Bypass Iran IP",
+    "outboundTag": "direct",
+    "ip": [
+       "geoip:ir"
+    ]
+  },
+  {
+    "remarks": "Final Agent",
+    "port": "0-65535",
+    "outboundTag": "proxy"
+  }
+]

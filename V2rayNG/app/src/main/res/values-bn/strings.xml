@@ -111,6 +111,8 @@
     <string name="msg_file_not_found">ফাইল খুঁজে পাওয়া যায়নি</string>
     <string name="msg_remark_is_duplicate">মন্তব্য ইতিমধ্যে বিদ্যমান</string>
     <string name="toast_action_not_allowed">অ্যাকশন অনুমোদিত নয়</string>
+    <string name="server_obfs_password">Obfs password</string>
+
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">লোড হচ্ছে</string>
     <string name="menu_item_search">অনুসন্ধান করুন</string>
@@ -257,6 +259,8 @@
     <string name="routing_settings_add_rule">Add rule</string>
     <string name="routing_settings_import_rulesets">Import ruleset</string>
     <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
+    <string name="routing_settings_import_rulesets_from_clipboard">Import ruleset from clipboard</string>
+    <string name="routing_settings_export_rulesets_to_clipboard">Export ruleset to clipboard</string>
     <string name="routing_settings_locked">Locked, keep this rule when import presets</string>
 
     <string name="connection_test_pending">সংযোগ পরীক্ষা করুন</string>
