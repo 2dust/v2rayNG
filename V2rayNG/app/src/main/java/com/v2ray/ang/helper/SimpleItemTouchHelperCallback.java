@@ -37,7 +37,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     private static final float ALPHA_FULL = 1.0f;
-    private static final float SWIPE_THRESHOLD = 0.25f;
+    private static final float SWIPE_THRESHOLD = 0.1f;
     private static final long ANIMATION_DURATION = 200;
 
     private final ItemTouchHelperAdapter mAdapter;
