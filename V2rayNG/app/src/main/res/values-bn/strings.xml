@@ -300,4 +300,13 @@
         <item>লাইট</item>
         <item>ডার্ক</item>
     </string-array>
+    <string-array name="preset_rulesets">
+        <item>চায়না হোয়াইটলিস্ট</item>
+        <item>চায়না ব্ল্যাকলিস্ট</item>
+        <item>গ্লোবাল</item>
+        <item>ইরান হোয়াইটলিস্ট</item>
+    </string-array>
+
+
+
 </resources>
