@@ -6,10 +6,20 @@ import android.util.Log
 
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import com.v2ray.ang.AppConfig.DNS_ALIDNS_ADDRESSES
+import com.v2ray.ang.AppConfig.DNS_ALIDNS_DOMAIN
+import com.v2ray.ang.AppConfig.DNS_GOOGLE_ADDRESSES
+import com.v2ray.ang.AppConfig.DNS_GOOGLE_DOMAIN
+import com.v2ray.ang.AppConfig.DNS_ONE_ONE_ADDRESSES
+import com.v2ray.ang.AppConfig.DNS_ONE_ONE_DOMAIN
+import com.v2ray.ang.AppConfig.DNS_PUB_ADDRESSES
+import com.v2ray.ang.AppConfig.DNS_PUB_DOMAIN
 import com.v2ray.ang.AppConfig.GEOIP_CN
 import com.v2ray.ang.AppConfig.GEOSITE_CN
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
+import com.v2ray.ang.AppConfig.GOOGLEAPIS_CN_DOMAIN
+import com.v2ray.ang.AppConfig.GOOGLEAPIS_COM_DOMAIN
 import com.v2ray.ang.AppConfig.PROTOCOL_FREEDOM
 import com.v2ray.ang.AppConfig.TAG_BLOCKED
 import com.v2ray.ang.AppConfig.TAG_DIRECT
@@ -71,7 +81,8 @@ object V2rayConfigUtil {
             return result
         }
         val v2rayConfig = JsonUtil.fromJson(assets, V2rayConfig::class.java) ?: return result
-        v2rayConfig.log.loglevel = settingsStorage?.decodeString(AppConfig.PREF_LOGLEVEL) ?: "warning"
+        v2rayConfig.log.loglevel =
+            settingsStorage?.decodeString(AppConfig.PREF_LOGLEVEL) ?: "warning"
         v2rayConfig.remarks = config.remarks
 
         inbounds(v2rayConfig)
@@ -143,7 +154,11 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun outbounds(v2rayConfig: V2rayConfig, outbound: V2rayConfig.OutboundBean, isPlugin: Boolean): Pair<Boolean, String> {
+    private fun outbounds(
+        v2rayConfig: V2rayConfig,
+        outbound: V2rayConfig.OutboundBean,
+        isPlugin: Boolean
+    ): Pair<Boolean, String> {
         if (isPlugin) {
             val socksPort = Utils.findFreePort(listOf(100 + SettingsManager.getSocksPort(), 0))
             val outboundNew = V2rayConfig.OutboundBean(
@@ -190,7 +205,9 @@ object V2rayConfigUtil {
     private fun routing(v2rayConfig: V2rayConfig): Boolean {
         try {
 
-            v2rayConfig.routing.domainStrategy = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY) ?: "IPIfNonMatch"
+            v2rayConfig.routing.domainStrategy =
+                settingsStorage?.decodeString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY)
+                    ?: "IPIfNonMatch"
 
             val rulesetItems = MmkvManager.decodeRoutingRulesets()
             rulesetItems?.forEach { key ->
@@ -362,13 +379,14 @@ object V2rayConfigUtil {
             }
 
             // hardcode googleapi rule to fix play store problems
-            hosts["domain:googleapis.cn"] = "googleapis.com"
+            hosts[GOOGLEAPIS_CN_DOMAIN] = GOOGLEAPIS_COM_DOMAIN
 
             // hardcode popular Android Private DNS rule to fix localhost DNS problem
-            hosts["dns.pub"] = arrayListOf("1.12.12.12", "120.53.53.53")
-            hosts["dns.alidns.com"] = arrayListOf("223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1")
-            hosts["one.one.one.one"] = arrayListOf("1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001")
-            hosts["dns.google"] = arrayListOf("8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844")
+            hosts[DNS_PUB_DOMAIN] = DNS_PUB_ADDRESSES
+            hosts[DNS_ALIDNS_DOMAIN] = DNS_ALIDNS_ADDRESSES
+            hosts[DNS_ONE_ONE_DOMAIN] = DNS_ONE_ONE_ADDRESSES
+            hosts[DNS_GOOGLE_DOMAIN] = DNS_GOOGLE_ADDRESSES
+
 
             // DNS dns对象
             v2rayConfig.dns = V2rayConfig.DnsBean(
@@ -532,7 +550,11 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun moreOutbounds(v2rayConfig: V2rayConfig, subscriptionId: String, isPlugin: Boolean): Pair<Boolean, String> {
+    private fun moreOutbounds(
+        v2rayConfig: V2rayConfig,
+        subscriptionId: String,
+        isPlugin: Boolean
+    ): Pair<Boolean, String> {
         val returnPair = Pair(false, "")
         var domainPort: String = ""
 
