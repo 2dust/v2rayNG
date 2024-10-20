@@ -6,6 +6,10 @@ import android.text.TextUtils
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.GEOIP_PRIVATE
 import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
+import com.v2ray.ang.AppConfig.ROUTING_BLACK
+import com.v2ray.ang.AppConfig.ROUTING_GLOBAL
+import com.v2ray.ang.AppConfig.ROUTING_WHITE
+import com.v2ray.ang.AppConfig.ROUTING_WHITE_IRAN
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerConfig
@@ -28,11 +32,11 @@ object SettingsManager {
 
     private fun getPresetRoutingRulesets(context: Context, index: Int = 0): MutableList<RulesetItem>? {
         val fileName = when (index) {
-            0 -> "custom_routing_white"
-            1 -> "custom_routing_black"
-            2 -> "custom_routing_global"
-            3 -> "custom_routing_white_iran"
-            else -> "custom_routing_white"
+            0 -> ROUTING_WHITE
+            1 -> ROUTING_BLACK
+            2 -> ROUTING_GLOBAL
+            3 -> ROUTING_WHITE_IRAN
+            else -> ROUTING_WHITE
         }
         val assets = Utils.readTextFromAssets(context, fileName)
         if (TextUtils.isEmpty(assets)) {
@@ -41,6 +45,7 @@ object SettingsManager {
 
         return JsonUtil.fromJson(assets, Array<RulesetItem>::class.java).toMutableList()
     }
+
 
     fun resetRoutingRulesets(context: Context, index: Int) {
         val rulesetList = getPresetRoutingRulesets(context, index) ?: return

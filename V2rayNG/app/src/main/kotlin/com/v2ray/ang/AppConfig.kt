@@ -158,4 +158,10 @@ object AppConfig {
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"
 
+    const val ROUTING_WHITE = "custom_routing_white"
+    const val ROUTING_BLACK = "custom_routing_black"
+    const val ROUTING_GLOBAL = "custom_routing_global"
+    const val ROUTING_WHITE_IRAN = "custom_routing_white_iran"
+
+
 }
