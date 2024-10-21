@@ -11,6 +11,7 @@ import com.v2ray.ang.AppConfig.ROUTING_GLOBAL
 import com.v2ray.ang.AppConfig.ROUTING_WHITE
 import com.v2ray.ang.AppConfig.ROUTING_WHITE_IRAN
 import com.v2ray.ang.AppConfig.TAG_DIRECT
+import com.v2ray.ang.dto.RoutingType
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.util.MmkvManager.decodeProfileConfig
@@ -31,13 +32,7 @@ object SettingsManager {
     }
 
     private fun getPresetRoutingRulesets(context: Context, index: Int = 0): MutableList<RulesetItem>? {
-        val fileName = when (index) {
-            0 -> ROUTING_WHITE
-            1 -> ROUTING_BLACK
-            2 -> ROUTING_GLOBAL
-            3 -> ROUTING_WHITE_IRAN
-            else -> ROUTING_WHITE
-        }
+        val fileName = RoutingType.fromIndex(index).fileName
         val assets = Utils.readTextFromAssets(context, fileName)
         if (TextUtils.isEmpty(assets)) {
             return null
