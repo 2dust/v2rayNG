@@ -25,6 +25,8 @@ rxpermissions = "0.12"
 toastcompat = "1.1.0"
 viewpager2 = "1.1.0"
 workRuntimeKtx = "2.9.1"
+androidGradlePlugin = "8.4.2"
+androidKotlinPlugin = "1.9.23"
 
 [libraries]
 activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -61,3 +63,6 @@ work-multiprocess = { module = "androidx.work:work-multiprocess", version.ref = 
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 
 [plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+android-kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "androidKotlinPlugin" }
