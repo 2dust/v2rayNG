@@ -16,13 +16,13 @@
 
 package com.v2ray.ang.helper;
 
+import android.animation.ValueAnimator;
 import android.graphics.Canvas;
-
+import android.view.animation.DecelerateInterpolator;
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
-
-import org.jetbrains.annotations.NotNull;
 
 /**
  * An implementation of {@link ItemTouchHelper.Callback} that enables basic drag & drop and
@@ -36,9 +36,12 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
-    public static final float ALPHA_FULL = 1.0f;
+    private static final float ALPHA_FULL = 1.0f;
+    private static final float SWIPE_THRESHOLD = 0.25f;
+    private static final long ANIMATION_DURATION = 200;
 
     private final ItemTouchHelperAdapter mAdapter;
+    private ValueAnimator mReturnAnimator;
 
     public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
         mAdapter = adapter;
@@ -51,15 +54,14 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public boolean isItemViewSwipeEnabled() {
-        return false;
+        return true;
     }
 
     @Override
-    public int getMovementFlags(RecyclerView recyclerView, @NotNull RecyclerView.ViewHolder viewHolder) {
-        // Set movement flags based on the layout manager
+    public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
         if (recyclerView.getLayoutManager() instanceof GridLayoutManager) {
             final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
-            final int swipeFlags = 0;
+            final int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
             return makeMovementFlags(dragFlags, swipeFlags);
         } else {
             final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
@@ -69,61 +71,89 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     }
 
     @Override
-    public boolean onMove(@NotNull RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
+    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder source, @NonNull RecyclerView.ViewHolder target) {
         if (source.getItemViewType() != target.getItemViewType()) {
             return false;
         }
-
-        // Notify the adapter of the move
         mAdapter.onItemMove(source.getBindingAdapterPosition(), target.getBindingAdapterPosition());
         return true;
     }
 
     @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int i) {
-        // Notify the adapter of the dismissal
-        mAdapter.onItemDismiss(viewHolder.getBindingAdapterPosition());
+    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+        // 不执行删除操作，仅返回项目到原位
+        returnViewToOriginalPosition(viewHolder);
     }
 
     @Override
-    public void onChildDraw(@NotNull Canvas c, @NotNull RecyclerView recyclerView, @NotNull RecyclerView.ViewHolder viewHolder, float dX,
-                            float dY, int actionState, boolean isCurrentlyActive) {
+    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
+                        @NonNull RecyclerView.ViewHolder viewHolder,
+                        float dX, float dY, int actionState, boolean isCurrentlyActive) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-            // Fade out the view as it is swiped out of the parent's bounds
-            final float alpha = ALPHA_FULL - Math.abs(dX) / (float) viewHolder.itemView.getWidth();
+            float maxSwipeDistance = viewHolder.itemView.getWidth() * SWIPE_THRESHOLD;
+            float swipeAmount = Math.abs(dX);
+            float direction = Math.signum(dX);
+		
+            // 限制最大滑动距离
+            float translationX = Math.min(swipeAmount, maxSwipeDistance) * direction;
+            float alpha = ALPHA_FULL - Math.min(swipeAmount, maxSwipeDistance) / maxSwipeDistance;
+
+            viewHolder.itemView.setTranslationX(translationX);
             viewHolder.itemView.setAlpha(alpha);
-            viewHolder.itemView.setTranslationX(dX);
+
+            if (swipeAmount >= maxSwipeDistance && isCurrentlyActive) {
+                returnViewToOriginalPosition(viewHolder);
+            }
         } else {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
     }
 
+    private void returnViewToOriginalPosition(RecyclerView.ViewHolder viewHolder) {
+        if (mReturnAnimator != null && mReturnAnimator.isRunning()) {
+            mReturnAnimator.cancel();
+        }
+
+        mReturnAnimator = ValueAnimator.ofFloat(viewHolder.itemView.getTranslationX(), 0f);
+        mReturnAnimator.addUpdateListener(animation -> {
+            float value = (float) animation.getAnimatedValue();
+            viewHolder.itemView.setTranslationX(value);
+            viewHolder.itemView.setAlpha(1f - Math.abs(value) / (viewHolder.itemView.getWidth() * SWIPE_THRESHOLD));
+        });
+        mReturnAnimator.setInterpolator(new DecelerateInterpolator());
+        mReturnAnimator.setDuration(ANIMATION_DURATION);
+        mReturnAnimator.start();
+    }
+
     @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-        // We only want the active item to change
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
             if (viewHolder instanceof ItemTouchHelperViewHolder) {
-                // Let the view holder know that this item is being moved or dragged
                 ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
                 itemViewHolder.onItemSelected();
             }
         }
-
         super.onSelectedChanged(viewHolder, actionState);
     }
 
     @Override
-    public void clearView(@NotNull RecyclerView recyclerView, @NotNull RecyclerView.ViewHolder viewHolder) {
+    public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
-
-        mAdapter.onItemMoveCompleted();
-
         viewHolder.itemView.setAlpha(ALPHA_FULL);
-
         if (viewHolder instanceof ItemTouchHelperViewHolder) {
-            // Tell the view holder it's time to restore the idle state
             ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
             itemViewHolder.onItemClear();
         }
+        mAdapter.onItemMoveCompleted();
+    }
+
+    @Override
+    public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+        return 1.1f; // 设置一个大于1的值，确保不会触发默认的滑动删除操作
+    }
+
+    @Override
+    public float getSwipeEscapeVelocity(float defaultValue) {
+        return defaultValue * 10; // 增加滑动逃逸速度，使得更难触发滑动
     }
 }
