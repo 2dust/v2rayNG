@@ -81,10 +81,10 @@ class SubEditActivity : BaseActivity() {
             toast(R.string.sub_setting_remarks)
             return false
         }
-//        if (TextUtils.isEmpty(subItem.url)) {
-//            toast(R.string.sub_setting_url)
-//            return false
-//        }
+        if (!Utils.isValidSubUrl(subItem.url)) {
+            toast(R.string.toast_invalid_url)
+            return false
+        }
 
         MmkvManager.encodeSubscription(editSubId, subItem)
         toast(R.string.toast_success)

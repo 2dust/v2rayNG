@@ -60,8 +60,6 @@ object AppConfig {
     const val CACHE_KEYWORD_FILTER = "cache_keyword_filter"
 
     /** Protocol identifiers. */
-    const val PROTOCOL_HTTP: String = "http://"
-    const val PROTOCOL_HTTPS: String = "https://"
     const val PROTOCOL_FREEDOM: String = "freedom"
 
     /** Broadcast actions. */
