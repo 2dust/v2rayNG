@@ -26,7 +26,7 @@ toastcompat = "1.1.0"
 viewpager2 = "1.1.0"
 workRuntimeKtx = "2.9.1"
 androidGradlePlugin = "8.4.2"
-androidKotlinPlugin = "1.9.23"
+androidKotlinPlugin = "2.0.21"
 
 [libraries]
 activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
