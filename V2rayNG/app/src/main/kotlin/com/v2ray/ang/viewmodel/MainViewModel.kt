@@ -153,9 +153,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateConfigViaSubAll(): Int {
-        //subscriptionID will be never null cause we use
-        //.OrEmpty()
-        //So we can use isEmpty check only
         if (subscriptionId.isEmpty()) {
             return AngConfigManager.updateConfigViaSubAll()
         } else {
@@ -165,9 +162,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun exportAllServer(): Int {
-        //subscriptionID will be never null cause we use
-        //.OrEmpty()
-        //So we can use isEmpty check only
         val serverListCopy =
             if (subscriptionId.isEmpty() && keywordFilter.isNullOrEmpty()) {
                 serverList
@@ -287,9 +281,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeAllServer() {
-        //subscriptionID will be never null cause we use
-        //.OrEmpty()
-        //So we can use isEmpty check only
         if (subscriptionId.isEmpty() && keywordFilter.isNullOrEmpty()) {
             MmkvManager.removeAllServer()
         } else {
@@ -301,9 +292,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeInvalidServer() {
-        //subscriptionID will be never null cause we use
-        //.OrEmpty()
-        //So we can use isEmpty check only
         if (subscriptionId.isEmpty() && keywordFilter.isNullOrEmpty()) {
             MmkvManager.removeInvalidServer("")
         } else {
