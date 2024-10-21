@@ -158,14 +158,5 @@ object AppConfig {
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"
 
-    const val LANG_AUTO = "auto"
-    const val LANG_ENGLISH = "en"
-    const val LANG_CHINA = "zh-rCN"
-    const val LANG_TRADITIONAL_CHINESE = "zh-rTW"
-    const val LANG_VIETNAMESE = "vi"
-    const val LANG_RUSSIAN = "ru"
-    const val LANG_PERSIAN = "fa"
-    const val LANG_BANGLA = "bn"
-
 
 }

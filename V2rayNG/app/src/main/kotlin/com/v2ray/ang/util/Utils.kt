@@ -19,17 +19,10 @@ import android.webkit.URLUtil
 import androidx.appcompat.app.AppCompatDelegate
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
-import com.v2ray.ang.AppConfig.LANG_AUTO
-import com.v2ray.ang.AppConfig.LANG_BANGLA
-import com.v2ray.ang.AppConfig.LANG_CHINA
-import com.v2ray.ang.AppConfig.LANG_ENGLISH
-import com.v2ray.ang.AppConfig.LANG_PERSIAN
-import com.v2ray.ang.AppConfig.LANG_RUSSIAN
-import com.v2ray.ang.AppConfig.LANG_TRADITIONAL_CHINESE
-import com.v2ray.ang.AppConfig.LANG_VIETNAMESE
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.Language
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.MmkvManager.settingsStorage
@@ -413,19 +406,21 @@ object Utils {
     }
 
     fun getLocale(): Locale {
-        val lang = settingsStorage?.decodeString(AppConfig.PREF_LANGUAGE) ?: LANG_AUTO
-        return when (lang) {
-            LANG_AUTO -> getSysLocale()
-            LANG_ENGLISH -> Locale.ENGLISH
-            LANG_CHINA -> Locale.CHINA
-            LANG_TRADITIONAL_CHINESE -> Locale.TRADITIONAL_CHINESE
-            LANG_VIETNAMESE -> Locale("vi")
-            LANG_RUSSIAN -> Locale("ru")
-            LANG_PERSIAN -> Locale("fa")
-            LANG_BANGLA -> Locale("bn")
-            else -> getSysLocale()
+        val langCode = settingsStorage?.decodeString(AppConfig.PREF_LANGUAGE) ?: Language.AUTO.code
+        val language = Language.fromCode(langCode)
+
+        return when (language) {
+            Language.AUTO -> getSysLocale()
+            Language.ENGLISH -> Locale.ENGLISH
+            Language.CHINA -> Locale.CHINA
+            Language.TRADITIONAL_CHINESE -> Locale.TRADITIONAL_CHINESE
+            Language.VIETNAMESE -> Locale("vi")
+            Language.RUSSIAN -> Locale("ru")
+            Language.PERSIAN -> Locale("fa")
+            Language.BANGLA -> Locale("bn")
         }
     }
+
 
 
 
