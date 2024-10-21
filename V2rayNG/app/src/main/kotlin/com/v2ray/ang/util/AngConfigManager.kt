@@ -219,7 +219,7 @@ object AngConfigManager {
             var count = 0
             servers.lines()
                 .forEach { str ->
-                    if (str.startsWith(AppConfig.PROTOCOL_HTTP) || str.startsWith(AppConfig.PROTOCOL_HTTPS)) {
+                    if (Utils.isValidSubUrl(str)) {
                         count += importUrlAsSubscription(str)
                     }
                 }

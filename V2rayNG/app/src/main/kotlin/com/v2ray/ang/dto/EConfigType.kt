@@ -16,6 +16,6 @@ enum class EConfigType(val value: Int, val protocolScheme: String) {
     HTTP(10, AppConfig.HTTP);
 
     companion object {
-        fun fromInt(value: Int) = values().firstOrNull { it.value == value }
+        fun fromInt(value: Int) = entries.firstOrNull { it.value == value }
     }
 }

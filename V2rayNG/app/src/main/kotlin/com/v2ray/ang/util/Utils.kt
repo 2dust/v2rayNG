@@ -465,5 +465,17 @@ object Utils {
         // if the program gets here, no port in the range was found
         throw IOException("no free port found")
     }
+
+    fun isValidSubUrl(value: String?): Boolean {
+        try {
+            if (value.isNullOrEmpty()) return false
+            if (URLUtil.isHttpsUrl(value)) return true
+            if (URLUtil.isHttpUrl(value) && value.contains(LOOPBACK)) return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return false
+    }
+
 }
 

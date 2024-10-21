@@ -60,8 +60,6 @@ object AppConfig {
     const val CACHE_KEYWORD_FILTER = "cache_keyword_filter"
 
     /** Protocol identifiers. */
-    const val PROTOCOL_HTTP: String = "http://"
-    const val PROTOCOL_HTTPS: String = "https://"
     const val PROTOCOL_FREEDOM: String = "freedom"
 
     /** Broadcast actions. */
@@ -157,5 +155,20 @@ object AppConfig {
 
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"
+    // Google API rule constants
+    const val GOOGLEAPIS_CN_DOMAIN = "domain:googleapis.cn"
+    const val GOOGLEAPIS_COM_DOMAIN = "googleapis.com"
+
+    // Android Private DNS constants
+    const val DNS_PUB_DOMAIN = "dns.pub"
+    const val DNS_ALIDNS_DOMAIN = "dns.alidns.com"
+    const val DNS_ONE_ONE_DOMAIN = "one.one.one.one"
+    const val DNS_GOOGLE_DOMAIN = "dns.google"
+
+    val DNS_PUB_ADDRESSES = arrayListOf("1.12.12.12", "120.53.53.53")
+    val DNS_ALIDNS_ADDRESSES = arrayListOf("223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1")
+    val DNS_ONE_ONE_ADDRESSES = arrayListOf("1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001")
+    val DNS_GOOGLE_ADDRESSES = arrayListOf("8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844")
+
 
 }
