@@ -5,6 +5,7 @@ import android.os.SystemClock
 import android.text.TextUtils
 import android.util.Log
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.responseLength
 import kotlinx.coroutines.isActive
@@ -97,9 +98,9 @@ object SpeedtestUtil {
         }
     }
 
-    fun testConnection(context: Context, port: Int): String {
-        // return V2RayVpnService.measureV2rayDelay()
+    fun testConnection(context: Context, port: Int): Pair<Long, String> {
         var result: String
+        var elapsed = -1L
         var conn: HttpURLConnection? = null
 
         try {
@@ -108,7 +109,7 @@ object SpeedtestUtil {
             conn = url.openConnection(
                 Proxy(
                     Proxy.Type.HTTP,
-                    InetSocketAddress("127.0.0.1", port)
+                    InetSocketAddress(LOOPBACK, port)
                 )
             ) as HttpURLConnection
             conn.connectTimeout = 30000
@@ -119,7 +120,7 @@ object SpeedtestUtil {
 
             val start = SystemClock.elapsedRealtime()
             val code = conn.responseCode
-            val elapsed = SystemClock.elapsedRealtime() - start
+            elapsed = SystemClock.elapsedRealtime() - start
 
             if (code == 204 || code == 200 && conn.responseLength == 0L) {
                 result = context.getString(R.string.connection_test_available, elapsed)
@@ -133,10 +134,7 @@ object SpeedtestUtil {
             }
         } catch (e: IOException) {
             // network exception
-            Log.d(
-                AppConfig.ANG_PACKAGE,
-                "testConnection IOException: " + Log.getStackTraceString(e)
-            )
+            Log.d(AppConfig.ANG_PACKAGE, "testConnection IOException: " + Log.getStackTraceString(e))
             result = context.getString(R.string.connection_test_error, e.message)
         } catch (e: Exception) {
             // library exception, eg sumsung
@@ -146,7 +144,7 @@ object SpeedtestUtil {
             conn?.disconnect()
         }
 
-        return result
+        return Pair(elapsed, result)
     }
 
     fun getLibVersion(): String {

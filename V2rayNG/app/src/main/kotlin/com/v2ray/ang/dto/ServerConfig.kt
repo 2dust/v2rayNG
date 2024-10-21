@@ -3,7 +3,6 @@ package com.v2ray.ang.dto
 import com.v2ray.ang.AppConfig.TAG_BLOCKED
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.TAG_PROXY
-import com.v2ray.ang.util.Utils
 
 data class ServerConfig(
     val configVersion: Int = 3,
@@ -17,7 +16,8 @@ data class ServerConfig(
     companion object {
         fun create(configType: EConfigType): ServerConfig {
             when (configType) {
-                EConfigType.VMESS, EConfigType.VLESS ->
+                EConfigType.VMESS,
+                EConfigType.VLESS ->
                     return ServerConfig(
                         configType = configType,
                         outboundBean = V2rayConfig.OutboundBean(
@@ -36,7 +36,11 @@ data class ServerConfig(
                 EConfigType.CUSTOM ->
                     return ServerConfig(configType = configType)
 
-                EConfigType.SHADOWSOCKS, EConfigType.SOCKS, EConfigType.TROJAN ->
+                EConfigType.SHADOWSOCKS,
+                EConfigType.SOCKS,
+                EConfigType.HTTP,
+                EConfigType.TROJAN,
+                EConfigType.HYSTERIA2 ->
                     return ServerConfig(
                         configType = configType,
                         outboundBean = V2rayConfig.OutboundBean(
@@ -78,11 +82,5 @@ data class ServerConfig(
             return config.outbounds.map { it.tag }.toMutableList()
         }
         return mutableListOf()
-    }
-
-    fun getV2rayPointDomainAndPort(): String {
-        val address = getProxyOutbound()?.getServerAddress().orEmpty()
-        val port = getProxyOutbound()?.getServerPort()
-        return Utils.getIpv6Address(address) + ":" + port
     }
 }

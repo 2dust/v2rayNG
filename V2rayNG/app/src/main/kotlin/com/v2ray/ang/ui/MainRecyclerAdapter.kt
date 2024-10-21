@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import com.v2ray.ang.AngApplication.Companion.application
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -17,13 +16,13 @@ import com.v2ray.ang.databinding.ItemQrcodeBinding
 import com.v2ray.ang.databinding.ItemRecyclerFooterBinding
 import com.v2ray.ang.databinding.ItemRecyclerMainBinding
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
 import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -66,17 +65,12 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             } else {
                 holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(mActivity, R.color.colorPing))
             }
-            if (guid == MmkvManager.mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
+            if (guid == MmkvManager.getSelectServer()) {
                 holder.itemMainBinding.layoutIndicator.setBackgroundResource(R.color.colorAccent)
             } else {
                 holder.itemMainBinding.layoutIndicator.setBackgroundResource(0)
             }
-            holder.itemMainBinding.tvSubscription.text = ""
-            val json = MmkvManager.subStorage?.decodeString(profile.subscriptionId)
-            if (!json.isNullOrBlank()) {
-                val sub = Gson().fromJson(json, SubscriptionItem::class.java)
-                holder.itemMainBinding.tvSubscription.text = sub.remarks
-            }
+            holder.itemMainBinding.tvSubscription.text = MmkvManager.decodeSubscription(profile.subscriptionId)?.remarks ?: ""
 
             var shareOptions = share_method.asList()
             when (profile.configType) {
@@ -85,16 +79,20 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                     shareOptions = shareOptions.takeLast(1)
                 }
 
-                EConfigType.VLESS -> {
-                    holder.itemMainBinding.tvType.text = profile.configType.name
-                }
-
                 else -> {
-                    holder.itemMainBinding.tvType.text = profile.configType.name.lowercase()
+                    holder.itemMainBinding.tvType.text = profile.configType.name
                 }
             }
 
-            val strState = "${profile.server?.dropLast(3)}*** : ${profile.serverPort}"
+            // 隐藏主页服务器地址为xxx:xxx:***/xxx.xxx.xxx.***
+            val strState = "${
+                profile.server?.let {
+                    if (it.contains(":"))
+                        it.split(":").take(2).joinToString(":", postfix = ":***")
+                    else
+                        it.split('.').dropLast(1).joinToString(".", postfix = ".***")
+                }
+            } : ${profile.serverPort}"
 
             holder.itemMainBinding.tvStatistics.text = strState
 
@@ -139,8 +137,8 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 }
             }
             holder.itemMainBinding.layoutRemove.setOnClickListener {
-                if (guid != MmkvManager.mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
-                    if (MmkvManager.settingsStorage?.decodeBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
+                if (guid != MmkvManager.getSelectServer()) {
+                    if (settingsStorage?.decodeBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
                         AlertDialog.Builder(mActivity).setMessage(R.string.del_config_comfirm)
                             .setPositiveButton(android.R.string.ok) { _, _ ->
                                 removeServer(guid, position)
@@ -158,9 +156,9 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             }
 
             holder.itemMainBinding.infoContainer.setOnClickListener {
-                val selected = MmkvManager.mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)
+                val selected = MmkvManager.getSelectServer()
                 if (guid != selected) {
-                    MmkvManager.mainStorage?.encode(MmkvManager.KEY_SELECTED_SERVER, guid)
+                    MmkvManager.setSelectServer(guid)
                     if (!TextUtils.isEmpty(selected)) {
                         notifyItemChanged(mActivity.mainViewModel.getPosition(selected.orEmpty()))
                     }
@@ -236,31 +234,16 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     class FooterViewHolder(val itemFooterBinding: ItemRecyclerFooterBinding) :
         BaseViewHolder(itemFooterBinding.root)
 
-    override fun onItemDismiss(position: Int) {
-        val guid = mActivity.mainViewModel.serversCache.getOrNull(position)?.guid ?: return
-        if (guid != MmkvManager.mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
-//            mActivity.alert(R.string.del_config_comfirm) {
-//                positiveButton(android.R.string.ok) {
-            mActivity.mainViewModel.removeServer(guid)
-            notifyItemRemoved(position)
-//                }
-//                show()
-//            }
-        }
-    }
-
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
         mActivity.mainViewModel.swapServer(fromPosition, toPosition)
         notifyItemMoved(fromPosition, toPosition)
-        // position is changed, since position is used by click callbacks, need to update range
-        if (toPosition > fromPosition)
-            notifyItemRangeChanged(fromPosition, toPosition - fromPosition + 1)
-        else
-            notifyItemRangeChanged(toPosition, fromPosition - toPosition + 1)
         return true
     }
 
     override fun onItemMoveCompleted() {
         // do nothing
+    }
+
+    override fun onItemDismiss(position: Int) {
     }
 }

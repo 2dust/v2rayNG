@@ -6,9 +6,14 @@ import android.os.IBinder
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG_CANCEL
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG_SUCCESS
+import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.util.MessageUtil
+import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.PluginUtil
 import com.v2ray.ang.util.SpeedtestUtil
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.V2rayConfigUtil
 import go.Seq
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -30,10 +35,10 @@ class V2RayTestService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.getIntExtra("key", 0)) {
             MSG_MEASURE_CONFIG -> {
-                val contentPair = intent.getSerializableExtra("content") as Pair<String, String>
+                val guid = intent.serializable<String>("content") ?: ""
                 realTestScope.launch {
-                    val result = SpeedtestUtil.realPing(contentPair.second)
-                    MessageUtil.sendMsg2UI(this@V2RayTestService, MSG_MEASURE_CONFIG_SUCCESS, Pair(contentPair.first, result))
+                    val result = startRealPing(guid)
+                    MessageUtil.sendMsg2UI(this@V2RayTestService, MSG_MEASURE_CONFIG_SUCCESS, Pair(guid, result))
                 }
             }
 
@@ -46,5 +51,21 @@ class V2RayTestService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
+    }
+
+    private fun startRealPing(guid: String): Long {
+        val retFailure = -1L
+
+        val server = MmkvManager.decodeServerConfig(guid) ?: return retFailure
+        if (server.getProxyOutbound()?.protocol?.equals(EConfigType.HYSTERIA2.name, true) == true) {
+            val delay = PluginUtil.realPingHy2(this, server)
+            return delay
+        } else {
+            val config = V2rayConfigUtil.getV2rayConfig(this, guid)
+            if (!config.status) {
+                return retFailure
+            }
+            return SpeedtestUtil.realPing(config.content)
+        }
     }
 }

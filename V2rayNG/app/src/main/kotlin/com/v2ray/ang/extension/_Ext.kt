@@ -1,11 +1,16 @@
 package com.v2ray.ang.extension
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
+import android.os.Bundle
 import android.widget.Toast
 import com.v2ray.ang.AngApplication
 import me.drakeet.support.toast.ToastCompat
 import org.json.JSONObject
+import java.io.Serializable
 import java.net.URI
 import java.net.URLConnection
 
@@ -55,3 +60,37 @@ val URI.idnHost: String
     get() = host?.replace("[", "")?.replace("]", "").orEmpty()
 
 fun String.removeWhiteSpace(): String = replace("\\s+".toRegex(), "")
+
+fun String.toLongEx(): Long = toLongOrNull() ?: 0
+
+fun Context.listenForPackageChanges(onetime: Boolean = true, callback: () -> Unit) =
+    object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            callback()
+            if (onetime) context.unregisterReceiver(this)
+        }
+    }.apply {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(this, IntentFilter().apply {
+                addAction(Intent.ACTION_PACKAGE_ADDED)
+                addAction(Intent.ACTION_PACKAGE_REMOVED)
+                addDataScheme("package")
+            }, Context.RECEIVER_EXPORTED)
+        } else {
+            registerReceiver(this, IntentFilter().apply {
+                addAction(Intent.ACTION_PACKAGE_ADDED)
+                addAction(Intent.ACTION_PACKAGE_REMOVED)
+                addDataScheme("package")
+            })
+        }
+    }
+
+inline fun <reified T : Serializable> Bundle.serializable(key: String): T? = when {
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializable(key, T::class.java)
+    else -> @Suppress("DEPRECATION") getSerializable(key) as? T
+}
+
+inline fun <reified T : Serializable> Intent.serializable(key: String): T? = when {
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializableExtra(key, T::class.java)
+    else -> @Suppress("DEPRECATION") getSerializableExtra(key) as? T
+}

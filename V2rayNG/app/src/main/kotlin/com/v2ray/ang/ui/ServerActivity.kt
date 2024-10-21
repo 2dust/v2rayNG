@@ -12,7 +12,6 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.PREF_ALLOW_INSECURE
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
@@ -27,25 +26,17 @@ import com.v2ray.ang.dto.V2rayConfig.Companion.TLS
 import com.v2ray.ang.extension.removeWhiteSpace
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.MmkvManager.ID_MAIN
-import com.v2ray.ang.util.MmkvManager.KEY_SELECTED_SERVER
+import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.Utils.getIpv6Address
 
 class ServerActivity : BaseActivity() {
 
-    private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
-    private val settingsStorage by lazy {
-        MMKV.mmkvWithID(
-            MmkvManager.ID_SETTING,
-            MMKV.MULTI_PROCESS_MODE
-        )
-    }
     private val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
     private val isRunning by lazy {
         intent.getBooleanExtra("isRunning", false)
                 && editGuid.isNotEmpty()
-                && editGuid == mainStorage?.decodeString(KEY_SELECTED_SERVER)
+                && editGuid == MmkvManager.getSelectServer()
     }
     private val createConfigType by lazy {
         EConfigType.fromInt(intent.getIntExtra("createConfigType", EConfigType.VMESS.value))
@@ -102,11 +93,11 @@ class ServerActivity : BaseActivity() {
     private val sp_security: Spinner? by lazy { findViewById(R.id.sp_security) }
     private val sp_stream_security: Spinner? by lazy { findViewById(R.id.sp_stream_security) }
     private val sp_allow_insecure: Spinner? by lazy { findViewById(R.id.sp_allow_insecure) }
-    private val container_allow_insecure: LinearLayout? by lazy { findViewById(R.id.l5) }
+    private val container_allow_insecure: LinearLayout? by lazy { findViewById(R.id.lay_allow_insecure) }
     private val et_sni: EditText? by lazy { findViewById(R.id.et_sni) }
-    private val container_sni: LinearLayout? by lazy { findViewById(R.id.l2) }
+    private val container_sni: LinearLayout? by lazy { findViewById(R.id.lay_sni) }
     private val sp_stream_fingerprint: Spinner? by lazy { findViewById(R.id.sp_stream_fingerprint) } //uTLS
-    private val container_fingerprint: LinearLayout? by lazy { findViewById(R.id.l3) }
+    private val container_fingerprint: LinearLayout? by lazy { findViewById(R.id.lay_stream_fingerprint) }
     private val sp_network: Spinner? by lazy { findViewById(R.id.sp_network) }
     private val sp_header_type: Spinner? by lazy { findViewById(R.id.sp_header_type) }
     private val sp_header_type_title: TextView? by lazy { findViewById(R.id.sp_header_type_title) }
@@ -115,18 +106,19 @@ class ServerActivity : BaseActivity() {
     private val tv_path: TextView? by lazy { findViewById(R.id.tv_path) }
     private val et_path: EditText? by lazy { findViewById(R.id.et_path) }
     private val sp_stream_alpn: Spinner? by lazy { findViewById(R.id.sp_stream_alpn) } //uTLS
-    private val container_alpn: LinearLayout? by lazy { findViewById(R.id.l4) }
+    private val container_alpn: LinearLayout? by lazy { findViewById(R.id.lay_stream_alpn) }
     private val et_public_key: EditText? by lazy { findViewById(R.id.et_public_key) }
-    private val container_public_key: LinearLayout? by lazy { findViewById(R.id.l6) }
+    private val container_public_key: LinearLayout? by lazy { findViewById(R.id.lay_public_key) }
     private val et_short_id: EditText? by lazy { findViewById(R.id.et_short_id) }
-    private val container_short_id: LinearLayout? by lazy { findViewById(R.id.l7) }
+    private val container_short_id: LinearLayout? by lazy { findViewById(R.id.lay_short_id) }
     private val et_spider_x: EditText? by lazy { findViewById(R.id.et_spider_x) }
-    private val container_spider_x: LinearLayout? by lazy { findViewById(R.id.l8) }
+    private val container_spider_x: LinearLayout? by lazy { findViewById(R.id.lay_spider_x) }
     private val et_reserved1: EditText? by lazy { findViewById(R.id.et_reserved1) }
     private val et_reserved2: EditText? by lazy { findViewById(R.id.et_reserved2) }
     private val et_reserved3: EditText? by lazy { findViewById(R.id.et_reserved3) }
     private val et_local_address: EditText? by lazy { findViewById(R.id.et_local_address) }
     private val et_local_mtu: EditText? by lazy { findViewById(R.id.et_local_mtu) }
+    private val et_obfs_password: EditText? by lazy { findViewById(R.id.et_obfs_password) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -139,9 +131,11 @@ class ServerActivity : BaseActivity() {
             EConfigType.CUSTOM -> return
             EConfigType.SHADOWSOCKS -> setContentView(R.layout.activity_server_shadowsocks)
             EConfigType.SOCKS -> setContentView(R.layout.activity_server_socks)
+            EConfigType.HTTP -> setContentView(R.layout.activity_server_socks)
             EConfigType.VLESS -> setContentView(R.layout.activity_server_vless)
             EConfigType.TROJAN -> setContentView(R.layout.activity_server_trojan)
             EConfigType.WIREGUARD -> setContentView(R.layout.activity_server_wireguard)
+            EConfigType.HYSTERIA2 -> setContentView(R.layout.activity_server_hysteria2)
         }
         sp_network?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -258,7 +252,9 @@ class ServerActivity : BaseActivity() {
         et_id.text = Utils.getEditable(outbound.getPassword().orEmpty())
         et_alterId?.text =
             Utils.getEditable(outbound.settings?.vnext?.get(0)?.users?.get(0)?.alterId.toString())
-        if (config.configType == EConfigType.SOCKS) {
+        if (config.configType == EConfigType.SOCKS
+            || config.configType == EConfigType.HTTP
+        ) {
             et_security?.text =
                 Utils.getEditable(outbound.settings?.servers?.get(0)?.users?.get(0)?.user.orEmpty())
         } else if (config.configType == EConfigType.VLESS) {
@@ -290,14 +286,17 @@ class ServerActivity : BaseActivity() {
                     Utils.getEditable("${WIREGUARD_LOCAL_ADDRESS_V4},${WIREGUARD_LOCAL_ADDRESS_V6}")
             } else {
                 val list = outbound.settings?.address as List<*>
-                et_local_address?.text = Utils.getEditable(list.joinToString())
+                et_local_address?.text = Utils.getEditable(list.joinToString(","))
             }
             if (outbound.settings?.mtu == null) {
                 et_local_mtu?.text = Utils.getEditable(WIREGUARD_LOCAL_MTU)
             } else {
                 et_local_mtu?.text = Utils.getEditable(outbound.settings?.mtu.toString())
             }
+        } else if (config.configType == EConfigType.HYSTERIA2) {
+            et_obfs_password?.text = Utils.getEditable(outbound.settings?.obfsPassword)
         }
+
         val securityEncryptions =
             if (config.configType == EConfigType.SHADOWSOCKS) shadowsocksSecuritys else securitys
         val security =
@@ -322,7 +321,7 @@ class ServerActivity : BaseActivity() {
                 tlsSetting.alpn?.let {
                     val alpnIndex = Utils.arrayFind(
                         alpns,
-                        Utils.removeWhiteSpace(tlsSetting.alpn.joinToString()).orEmpty()
+                        Utils.removeWhiteSpace(tlsSetting.alpn.joinToString(",")).orEmpty()
                     )
                     sp_stream_alpn?.setSelection(alpnIndex)
                 }
@@ -413,8 +412,14 @@ class ServerActivity : BaseActivity() {
         }
         val config =
             MmkvManager.decodeServerConfig(editGuid) ?: ServerConfig.create(createConfigType)
-        if (config.configType != EConfigType.SOCKS && TextUtils.isEmpty(et_id.text.toString())) {
-            if (config.configType == EConfigType.TROJAN || config.configType == EConfigType.SHADOWSOCKS) {
+        if (config.configType != EConfigType.SOCKS
+            && config.configType != EConfigType.HTTP
+            && TextUtils.isEmpty(et_id.text.toString())
+        ) {
+            if (config.configType == EConfigType.TROJAN
+                || config.configType == EConfigType.SHADOWSOCKS
+                || config.configType == EConfigType.HYSTERIA2
+            ) {
                 toast(R.string.server_lab_id3)
             } else {
                 toast(R.string.server_lab_id)
@@ -446,11 +451,16 @@ class ServerActivity : BaseActivity() {
         wireguard?.peers?.get(0)?.let { _ ->
             savePeer(wireguard, port)
         }
+
         config.outboundBean?.streamSettings?.let {
-            saveStreamSettings(it)
+            val sni = saveStreamSettings(it)
+            saveTls(it, sni)
         }
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()
+        }
+        if (config.configType == EConfigType.HYSTERIA2) {
+            config.outboundBean?.settings?.obfsPassword = et_obfs_password?.text?.toString()
         }
 
         MmkvManager.encodeServerConfig(editGuid, config)
@@ -486,7 +496,7 @@ class ServerActivity : BaseActivity() {
         if (config.configType == EConfigType.SHADOWSOCKS) {
             server.password = et_id.text.toString().trim()
             server.method = shadowsocksSecuritys[sp_security?.selectedItemPosition ?: 0]
-        } else if (config.configType == EConfigType.SOCKS) {
+        } else if (config.configType == EConfigType.SOCKS || config.configType == EConfigType.HTTP) {
             if (TextUtils.isEmpty(et_security?.text) && TextUtils.isEmpty(et_id.text)) {
                 server.users = null
             } else {
@@ -496,7 +506,7 @@ class ServerActivity : BaseActivity() {
                 socksUsersBean.pass = et_id.text.toString().trim()
                 server.users = listOf(socksUsersBean)
             }
-        } else if (config.configType == EConfigType.TROJAN) {
+        } else if (config.configType == EConfigType.TROJAN || config.configType == EConfigType.HYSTERIA2) {
             server.password = et_id.text.toString().trim()
         }
     }
@@ -518,21 +528,13 @@ class ServerActivity : BaseActivity() {
         wireguard.mtu = Utils.parseInt(et_local_mtu?.text.toString())
     }
 
-    private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean) {
-        val network = sp_network?.selectedItemPosition ?: return
-        val type = sp_header_type?.selectedItemPosition ?: return
-        val requestHost = et_request_host?.text?.toString()?.trim() ?: return
-        val path = et_path?.text?.toString()?.trim() ?: return
-        val sniField = et_sni?.text?.toString()?.trim() ?: return
-        val allowInsecureField = sp_allow_insecure?.selectedItemPosition ?: return
-        val streamSecurity = sp_stream_security?.selectedItemPosition ?: return
-        val utlsIndex = sp_stream_fingerprint?.selectedItemPosition ?: return
-        val alpnIndex = sp_stream_alpn?.selectedItemPosition ?: return
-        val publicKey = et_public_key?.text?.toString()?.trim() ?: return
-        val shortId = et_short_id?.text?.toString()?.trim() ?: return
-        val spiderX = et_spider_x?.text?.toString()?.trim() ?: return
+    private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean): String? {
+        val network = sp_network?.selectedItemPosition ?: return null
+        val type = sp_header_type?.selectedItemPosition ?: return null
+        val requestHost = et_request_host?.text?.toString()?.trim() ?: return null
+        val path = et_path?.text?.toString()?.trim() ?: return null
 
-        var sni = streamSetting.populateTransportSettings(
+        val sni = streamSetting.populateTransportSettings(
             transport = networks[network],
             headerType = transportTypes(networks[network])[type],
             host = requestHost,
@@ -544,10 +546,21 @@ class ServerActivity : BaseActivity() {
             serviceName = path,
             authority = requestHost,
         )
-        if (sniField.isNotBlank()) {
-            sni = sniField
-        }
-        val allowInsecure = if (allowinsecures[allowInsecureField].isBlank()) {
+
+        return sni
+    }
+
+    private fun saveTls(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean, sni: String?) {
+        val streamSecurity = sp_stream_security?.selectedItemPosition ?: return
+        val sniField = et_sni?.text?.toString()?.trim()
+        val allowInsecureField = sp_allow_insecure?.selectedItemPosition
+        val utlsIndex = sp_stream_fingerprint?.selectedItemPosition ?: 0
+        val alpnIndex = sp_stream_alpn?.selectedItemPosition ?: 0
+        val publicKey = et_public_key?.text?.toString()
+        val shortId = et_short_id?.text?.toString()
+        val spiderX = et_spider_x?.text?.toString()
+
+        val allowInsecure = if (allowInsecureField == null || allowinsecures[allowInsecureField].isBlank()) {
             settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
         } else {
             allowinsecures[allowInsecureField].toBoolean()
@@ -556,7 +569,7 @@ class ServerActivity : BaseActivity() {
         streamSetting.populateTlsSettings(
             streamSecurity = streamSecuritys[streamSecurity],
             allowInsecure = allowInsecure,
-            sni = sni,
+            sni = sniField ?: sni ?: "",
             fingerprint = uTlsItems[utlsIndex],
             alpns = alpns[alpnIndex],
             publicKey = publicKey,
@@ -590,7 +603,7 @@ class ServerActivity : BaseActivity() {
      */
     private fun deleteServer(): Boolean {
         if (editGuid.isNotEmpty()) {
-            if (editGuid != mainStorage?.decodeString(KEY_SELECTED_SERVER)) {
+            if (editGuid != MmkvManager.getSelectServer()) {
                 if (settingsStorage?.decodeBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
                     AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                         .setPositiveButton(android.R.string.ok) { _, _ ->

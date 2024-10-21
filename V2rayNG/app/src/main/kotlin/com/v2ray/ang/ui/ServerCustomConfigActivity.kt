@@ -8,14 +8,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.blacksquircle.ui.editorkit.utils.EditorTheme
 import com.blacksquircle.ui.language.json.JsonLanguage
-import com.google.gson.Gson
-import com.tencent.mmkv.MMKV
+
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityServerCustomConfigBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import me.drakeet.support.toast.ToastCompat
@@ -23,13 +23,11 @@ import me.drakeet.support.toast.ToastCompat
 class ServerCustomConfigActivity : BaseActivity() {
     private val binding by lazy { ActivityServerCustomConfigBinding.inflate(layoutInflater) }
 
-    private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
-    private val serverRawStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
     private val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
     private val isRunning by lazy {
         intent.getBooleanExtra("isRunning", false)
                 && editGuid.isNotEmpty()
-                && editGuid == mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)
+                && editGuid == MmkvManager.getSelectServer()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +52,7 @@ class ServerCustomConfigActivity : BaseActivity() {
      */
     private fun bindingServer(config: ServerConfig): Boolean {
         binding.etRemarks.text = Utils.getEditable(config.remarks)
-        val raw = serverRawStorage?.decodeString(editGuid)
+        val raw = MmkvManager.decodeServerRaw(editGuid)
         if (raw.isNullOrBlank()) {
             binding.editor.setTextContent(Utils.getEditable(config.fullConfig?.toPrettyPrinting().orEmpty()))
         } else {
@@ -81,7 +79,7 @@ class ServerCustomConfigActivity : BaseActivity() {
         }
 
         val v2rayConfig = try {
-            Gson().fromJson(binding.editor.text.toString(), V2rayConfig::class.java)
+            JsonUtil.fromJson(binding.editor.text.toString(), V2rayConfig::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
             ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
@@ -93,7 +91,7 @@ class ServerCustomConfigActivity : BaseActivity() {
         config.fullConfig = v2rayConfig
 
         MmkvManager.encodeServerConfig(editGuid, config)
-        serverRawStorage?.encode(editGuid, binding.editor.text.toString())
+        MmkvManager.encodeServerRaw(editGuid, binding.editor.text.toString())
         toast(R.string.toast_success)
         finish()
         return true

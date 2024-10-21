@@ -15,6 +15,7 @@ import com.v2ray.ang.AppConfig.SUBSCRIPTION_UPDATE_CHANNEL
 import com.v2ray.ang.AppConfig.SUBSCRIPTION_UPDATE_CHANNEL_NAME
 import com.v2ray.ang.R
 import com.v2ray.ang.util.AngConfigManager
+import com.v2ray.ang.util.AngConfigManager.updateConfigViaSub
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 
@@ -40,8 +41,8 @@ object SubscriptionUpdater {
 
             val subs = MmkvManager.decodeSubscriptions().filter { it.second.autoUpdate }
 
-            for (i in subs) {
-                val subscription = i.second
+            for (sub in subs) {
+                val subItem = sub.second
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     notification.setChannelId(SUBSCRIPTION_UPDATE_CHANNEL)
@@ -56,11 +57,10 @@ object SubscriptionUpdater {
                 notificationManager.notify(3, notification.build())
                 Log.d(
                     AppConfig.ANG_PACKAGE,
-                    "subscription automatic update: ---${subscription.remarks}"
+                    "subscription automatic update: ---${subItem.remarks}"
                 )
-                val configs = Utils.getUrlContentWithCustomUserAgent(subscription.url)
-                AngConfigManager.importBatchConfig(configs, i.first, false)
-                notification.setContentText("Updating ${subscription.remarks}")
+                updateConfigViaSub(Pair(sub.first, subItem))
+                notification.setContentText("Updating ${subItem.remarks}")
             }
             notificationManager.cancel(3)
             return Result.success()

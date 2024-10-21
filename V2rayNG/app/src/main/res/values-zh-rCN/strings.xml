@@ -24,12 +24,14 @@
     <string name="menu_item_del_config">删除配置</string>
     <string name="menu_item_import_config_qrcode">扫描二维码</string>
     <string name="menu_item_import_config_clipboard">从剪贴板导入</string>
-    <string name="menu_item_import_config_manually_vmess">手动输入[Vmess]</string>
+    <string name="menu_item_import_config_manually_vmess">手动输入[VMess]</string>
     <string name="menu_item_import_config_manually_vless">手动输入[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">手动输入[Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">手动输入[Socks]</string>
+    <string name="menu_item_import_config_manually_socks">手动输入[SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">手动输入[HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">手动输入[Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">手动输入[Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">手动输入[Hysteria2]</string>
     <string name="menu_item_import_config_custom">自定义配置</string>
     <string name="menu_item_import_config_custom_clipboard">从剪贴板导入自定义配置</string>
     <string name="menu_item_import_config_custom_local">从本地导入自定义配置</string>
@@ -103,7 +105,7 @@
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">下载文件</string>
     <string name="toast_action_not_allowed">禁止此项操作</string>
-
+    <string name="server_obfs_password">混淆密码</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">添加资产网址</string>
@@ -125,6 +127,8 @@
     <string name="title_vpn_settings">VPN 设置</string>
     <string name="title_pref_per_app_proxy">分应用代理</string>
     <string name="summary_pref_per_app_proxy">常规:勾选的App被代理,未勾选的直连;\n绕行模式:勾选的App直连,未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
+    <string name="title_pref_is_booted">开机时自动连接</string>
+    <string name="summary_pref_is_booted">开机时自动连接选择的服务器，可能会不成功</string>
 
     <string name="title_mux_settings">Mux 多路复用 设置</string>
     <string name="title_pref_mux_enabled">启用 Mux 多路复用</string>
@@ -154,11 +158,6 @@
 
     <string name="title_pref_prefer_ipv6">IPv6优先</string>
     <string name="summary_pref_prefer_ipv6">App优先使用IPv6地址连接服务器,同时开启VPN的IPv6路由</string>
-
-    <string name="title_pref_routing">路由设置</string>
-    <string name="title_pref_routing_domain_strategy">域名策略</string>
-    <string name="title_pref_routing_mode">预定义规则</string>
-    <string name="title_pref_routing_custom">自定义规则</string>
 
     <string name="title_pref_remote_dns">远程DNS (udp/tcp/https/quic)(可选)</string>
     <string name="summary_pref_remote_dns">DNS</string>
@@ -231,8 +230,12 @@
     <string name="title_sub_setting">订阅分组设置</string>
     <string name="sub_setting_remarks">备注</string>
     <string name="sub_setting_url">可选地址(url)</string>
+    <string name="sub_setting_filter">别名正则过滤</string>
     <string name="sub_setting_enable">启用更新</string>
     <string name="sub_auto_update">启用自动更新</string>
+    <string name="sub_setting_pre_profile">前置代理别名</string>
+    <string name="sub_setting_next_profile">落地代理別名</string>
+    <string name="sub_setting_pre_profile_tip">请确保别名存在并唯一</string>
     <string name="title_sub_update">更新当前组订阅</string>
     <string name="title_ping_all_server">测试当前组配置Tcping</string>
     <string name="title_real_ping_all_server">测试当前组配置真连接</string>
@@ -245,13 +248,18 @@
     <string name="tasker_start_service">启动服务</string>
     <string name="tasker_setting_confirm">确定</string>
 
+    <string name="routing_settings_domain_strategy">域名策略</string>
     <string name="routing_settings_title">路由设置</string>
-    <string name="routing_settings_tips">用逗号(,)隔开,可以一行多个,记得保存</string>
+    <string name="routing_settings_tips">用逗号(,)隔开,domain和ip二选一填写</string>
     <string name="routing_settings_save">保存</string>
     <string name="routing_settings_delete">清空</string>
-    <string name="routing_settings_scan_replace">扫描并替换</string>
-    <string name="routing_settings_scan_append">扫描并追加</string>
-    <string name="routing_settings_default_rules">设置默认路由规则</string>
+    <string name="routing_settings_rule_title">路由规则设置</string>
+    <string name="routing_settings_add_rule">添加规则</string>
+    <string name="routing_settings_import_rulesets">导入预设规则集</string>
+    <string name="routing_settings_import_rulesets_tip">将删除现有的规则集，是否确定继续？</string>
+    <string name="routing_settings_import_rulesets_from_clipboard">从剪贴板导入规则集</string>
+    <string name="routing_settings_export_rulesets_to_clipboard">导出规则集至剪贴板</string>
+    <string name="routing_settings_locked">锁定中，导入预设时不删除此规则</string>
 
     <string name="connection_test_pending">"检查网络连接"</string>
     <string name="connection_test_testing">"测试中…"</string>
@@ -283,21 +291,6 @@
         <item>导出至剪贴板</item>
     </string-array>
 
-    share_method
-    <string-array name="routing_tag">
-        <item>代理的网址或IP</item>
-        <item>直连的网址或IP</item>
-        <item>阻止的网址或IP</item>
-    </string-array>
-
-    <string-array name="routing_mode">
-        <item>全局代理</item>
-        <item>绕过局域网地址而后代理</item>
-        <item>绕过大陆地址而后代理</item>
-        <item>绕过局域网及大陆地址而后代理</item>
-        <item>全局直连</item>
-    </string-array>
-
     <string-array name="mode_entries">
         <item>VPN</item>
         <item>仅代理</item>
@@ -307,6 +300,13 @@
         <item>跟随系统</item>
         <item>浅色</item>
         <item>深色</item>
+    </string-array>
+
+    <string-array name="preset_rulesets">
+        <item>绕过大陆(Whitelist)</item>
+        <item>黑名单(Blacklist)</item>
+        <item>全局(Global)</item>
+        <item>伊朗(Iran)</item>
     </string-array>
 
 </resources>

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:padding="@dimen/padding">
 
     <ProgressBar
         android:id="@+id/pb_waiting"

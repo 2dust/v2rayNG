@@ -2,26 +2,21 @@ package com.v2ray.ang.util.fmt
 
 import android.text.TextUtils
 import android.util.Log
-import com.google.gson.Gson
-import com.tencent.mmkv.MMKV
+
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.VmessQRCode
 import com.v2ray.ang.extension.idnHost
-import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import java.net.URI
 
-object VmessFmt {
-    private val settingsStorage by lazy {
-        MMKV.mmkvWithID(
-            MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE
-        )
-    }
+object VmessFmt : FmtBase() {
 
-    fun parseVmess(str: String): ServerConfig? {
+    fun parse(str: String): ServerConfig? {
         if (str.indexOf('?') > 0 && str.indexOf('&') > 0) {
             return parseVmessStd(str)
         }
@@ -35,7 +30,7 @@ object VmessFmt {
             Log.d(AppConfig.ANG_PACKAGE, "R.string.toast_decoding_failed")
             return null
         }
-        val vmessQRCode = Gson().fromJson(result, VmessQRCode::class.java)
+        val vmessQRCode = JsonUtil.fromJson(result, VmessQRCode::class.java)
         // Although VmessQRCode fields are non null, looks like Gson may still create null fields
         if (TextUtils.isEmpty(vmessQRCode.add)
             || TextUtils.isEmpty(vmessQRCode.port)
@@ -99,14 +94,14 @@ object VmessFmt {
         vmessQRCode.tls = streamSetting.security
         vmessQRCode.sni = streamSetting.tlsSettings?.serverName.orEmpty()
         vmessQRCode.alpn =
-            Utils.removeWhiteSpace(streamSetting.tlsSettings?.alpn?.joinToString()).orEmpty()
+            Utils.removeWhiteSpace(streamSetting.tlsSettings?.alpn?.joinToString(",")).orEmpty()
         vmessQRCode.fp = streamSetting.tlsSettings?.fingerprint.orEmpty()
         outbound.getTransportSettingDetails()?.let { transportDetails ->
             vmessQRCode.type = transportDetails[0]
             vmessQRCode.host = transportDetails[1]
             vmessQRCode.path = transportDetails[2]
         }
-        val json = Gson().toJson(vmessQRCode)
+        val json = JsonUtil.toJson(vmessQRCode)
         return Utils.encode(json)
     }
 

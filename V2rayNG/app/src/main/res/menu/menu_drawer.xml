@@ -13,9 +13,9 @@
             android:icon="@drawable/ic_settings_24dp"
             android:title="@string/title_settings" />
         <item
-            android:id="@+id/user_asset_setting"
-            android:icon="@drawable/ic_file_24dp"
-            android:title="@string/title_user_asset_setting" />
+            android:id="@+id/routing_setting"
+            android:icon="@drawable/ic_routing_24dp"
+            android:title="@string/routing_settings_title" />
     </group>
 
     <group android:id="@+id/group_id2">

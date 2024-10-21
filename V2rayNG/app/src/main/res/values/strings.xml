@@ -25,12 +25,14 @@
     <string name="menu_item_del_config">Delete config</string>
     <string name="menu_item_import_config_qrcode">Import config from QRcode</string>
     <string name="menu_item_import_config_clipboard">Import config from Clipboard</string>
-    <string name="menu_item_import_config_manually_vmess">Type manually[Vmess]</string>
+    <string name="menu_item_import_config_manually_vmess">Type manually[VMess]</string>
     <string name="menu_item_import_config_manually_vless">Type manually[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">Type manually[Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">Type manually[Socks]</string>
+    <string name="menu_item_import_config_manually_socks">Type manually[SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">Type manually[Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">Type manually[Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
     <string name="menu_item_import_config_custom">Custom config</string>
     <string name="menu_item_import_config_custom_clipboard">Import custom config from Clipboard</string>
     <string name="menu_item_import_config_custom_local">Import custom config from locally</string>
@@ -109,7 +111,7 @@
     <string name="msg_file_not_found">File not found</string>
     <string name="msg_remark_is_duplicate">The remarks already exists</string>
     <string name="toast_action_not_allowed">Action not allowed</string>
-
+    <string name="server_obfs_password">Obfs password</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Loading</string>
@@ -129,6 +131,8 @@
     <string name="title_vpn_settings">VPN Settings</string>
     <string name="title_pref_per_app_proxy">Per-app proxy</string>
     <string name="summary_pref_per_app_proxy">General: Checked App is proxy, unchecked direct connection; \nbypass mode: checked app directly connected, unchecked proxy. \nThe option to automatically select the proxy application in the menu</string>
+    <string name="title_pref_is_booted">Auto connect at startup</string>
+    <string name="summary_pref_is_booted">Automatically connects to the selected server at startup, which may be unsuccessful</string>
 
     <string name="title_mux_settings">Mux Settings</string>
     <string name="title_pref_mux_enabled">Enable Mux</string>
@@ -160,11 +164,6 @@
 
     <string name="title_pref_prefer_ipv6">Prefer IPv6</string>
     <string name="summary_pref_prefer_ipv6">Prefer IPv6 address and routes</string>
-
-    <string name="title_pref_routing">Routing</string>
-    <string name="title_pref_routing_domain_strategy">Domain strategy</string>
-    <string name="title_pref_routing_mode">Predefined rules</string>
-    <string name="title_pref_routing_custom">Custom rules</string>
 
     <string name="title_pref_remote_dns">Remote DNS (udp/tcp/https/quic)(Optional)</string>
     <string name="summary_pref_remote_dns">DNS</string>
@@ -237,8 +236,12 @@
     <string name="title_sub_setting">Subscription group setting</string>
     <string name="sub_setting_remarks">remarks</string>
     <string name="sub_setting_url">Optional URL</string>
+    <string name="sub_setting_filter">Remarks regular filter</string>
     <string name="sub_setting_enable">Enable update</string>
     <string name="sub_auto_update">Enable automatic update</string>
+    <string name="sub_setting_pre_profile">Previous proxy remarks</string>
+    <string name="sub_setting_next_profile">Next proxy remarks</string>
+    <string name="sub_setting_pre_profile_tip">The remarks exists and is unique</string>
     <string name="title_sub_update">Update current group subscription</string>
     <string name="title_ping_all_server">Tcping current group configuration</string>
     <string name="title_real_ping_all_server">Real delay current group configuration</string>
@@ -251,13 +254,26 @@
     <string name="tasker_start_service">Start Service</string>
     <string name="tasker_setting_confirm">Confirm</string>
 
+    <string name="routing_settings_domain_strategy">Domain strategy</string>
     <string name="routing_settings_title">Routing Settings</string>
-    <string name="routing_settings_tips">Separated by commas(,),remember to save</string>
+    <string name="routing_settings_tips">Separated by commas(,),choose domain or ip</string>
     <string name="routing_settings_save">Save</string>
     <string name="routing_settings_delete">Clear</string>
-    <string name="routing_settings_scan_replace">Scan and replace</string>
-    <string name="routing_settings_scan_append">Scan and append</string>
-    <string name="routing_settings_default_rules"> set default routing rules</string>
+    <string name="routing_settings_rule_title">Routing Rule Settings</string>
+    <string name="routing_settings_add_rule">Add rule</string>
+    <string name="routing_settings_import_rulesets">Import ruleset</string>
+    <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
+    <string name="routing_settings_import_rulesets_from_clipboard">Import ruleset from clipboard</string>
+    <string name="routing_settings_export_rulesets_to_clipboard">Export ruleset to clipboard</string>
+    <string name="routing_settings_locked">Locked, keep this rule when import presets</string>
+    <string name="routing_settings_domain" translatable="false">domain</string>
+    <string name="routing_settings_ip" translatable="false">ip</string>
+    <string name="routing_settings_port" translatable="false">port</string>
+    <string name="routing_settings_protocol" translatable="false">protocol</string>
+    <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
+    <string name="routing_settings_network" translatable="false">network</string>"[udp|tcp]"
+    <string name="routing_settings_network_tip" translatable="false">[udp|tcp]</string>
+    <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
     <string name="connection_test_pending">Check Connectivity</string>
     <string name="connection_test_testing">Testing…</string>
@@ -287,20 +303,6 @@
         <item>Export to clipboard</item>
     </string-array>
 
-    <string-array name="routing_tag">
-        <item>proxy URL or IP</item>
-        <item>direct URL or IP</item>
-        <item>blocked URL or IP</item>
-    </string-array>
-
-    <string-array name="routing_mode">
-        <item>Global proxy</item>
-        <item>Bypassing the LAN address then proxy</item>
-        <item>Bypass mainland address then proxy</item>
-        <item>Bypassing LAN and mainland address then proxy</item>
-        <item>Global direct</item>
-    </string-array>
-
     <string-array name="mode_entries">
         <item>VPN</item>
         <item>Proxy only</item>
@@ -310,6 +312,13 @@
         <item>Follow system</item>
         <item>Light</item>
         <item>Dark</item>
+    </string-array>
+
+    <string-array name="preset_rulesets">
+        <item>China Whitelist</item>
+        <item>China Blacklist</item>
+        <item>Global</item>
+        <item>Iran Whitelist</item>
     </string-array>
 
 </resources>

@@ -5,8 +5,6 @@ import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
-import com.google.gson.Gson
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityUserAssetUrlBinding
 import com.v2ray.ang.dto.AssetUrlItem
@@ -22,7 +20,6 @@ class UserAssetUrlActivity : BaseActivity() {
     var save_config: MenuItem? = null
 
     val extDir by lazy { File(Utils.userAssetPath(this)) }
-    private val assetStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
     private val editAssetId by lazy { intent.getStringExtra("assetId").orEmpty() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,9 +27,9 @@ class UserAssetUrlActivity : BaseActivity() {
         setContentView(binding.root)
         title = getString(R.string.title_user_asset_add_url)
 
-        val json = assetStorage?.decodeString(editAssetId)
-        if (!json.isNullOrBlank()) {
-            bindingAsset(Gson().fromJson(json, AssetUrlItem::class.java))
+        val assetItem = MmkvManager.decodeAsset(editAssetId)
+        if (assetItem != null) {
+            bindingAsset(assetItem)
         } else {
             clearAsset()
         }
@@ -60,12 +57,9 @@ class UserAssetUrlActivity : BaseActivity() {
      * save asset config
      */
     private fun saveServer(): Boolean {
-        val assetItem: AssetUrlItem
-        val json = assetStorage?.decodeString(editAssetId)
+        var assetItem = MmkvManager.decodeAsset(editAssetId)
         var assetId = editAssetId
-        if (!json.isNullOrBlank()) {
-            assetItem = Gson().fromJson(json, AssetUrlItem::class.java)
-
+        if (assetItem != null) {
             // remove file associated with the asset
             val file = extDir.resolve(assetItem.remarks)
             if (file.exists()) {
@@ -96,7 +90,7 @@ class UserAssetUrlActivity : BaseActivity() {
             return false
         }
 
-        assetStorage?.encode(assetId, Gson().toJson(assetItem))
+        MmkvManager.encodeAsset(assetId, assetItem)
         toast(R.string.toast_success)
         finish()
         return true

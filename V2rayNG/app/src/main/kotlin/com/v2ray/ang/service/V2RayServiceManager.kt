@@ -13,10 +13,10 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
+import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.extension.toSpeedString
@@ -24,6 +24,8 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.MmkvManager.settingsStorage
+import com.v2ray.ang.util.PluginUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.V2rayConfigUtil
 import go.Seq
@@ -46,8 +48,6 @@ object V2RayServiceManager {
 
     val v2rayPoint: V2RayPoint = Libv2ray.newV2RayPoint(V2RayCallback(), Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
     private val mMsgReceive = ReceiveMessageHandler()
-    private val mainStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
-    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -64,7 +64,7 @@ object V2RayServiceManager {
 
     fun startV2Ray(context: Context) {
         if (v2rayPoint.isRunning) return
-        val guid = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER) ?: return
+        val guid = MmkvManager.getSelectServer() ?: return
         val result = V2rayConfigUtil.getV2rayConfig(context, guid)
         if (!result.status) return
 
@@ -73,7 +73,7 @@ object V2RayServiceManager {
         } else {
             context.toast(R.string.toast_services_start)
         }
-        val intent = if ((settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN") == "VPN") {
+        val intent = if ((settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
             Intent(context.applicationContext, V2RayVpnService::class.java)
         } else {
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
@@ -108,13 +108,11 @@ object V2RayServiceManager {
         }
 
         override fun onEmitStatus(l: Long, s: String?): Long {
-            //Logger.d(s)
             return 0
         }
 
         override fun setup(s: String): Long {
             val serviceControl = serviceControl?.get() ?: return -1
-            //Logger.d(s)
             return try {
                 serviceControl.startService()
                 lastQueryTime = System.currentTimeMillis()
@@ -129,7 +127,7 @@ object V2RayServiceManager {
 
     fun startV2rayPoint() {
         val service = serviceControl?.get()?.getService() ?: return
-        val guid = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER) ?: return
+        val guid = MmkvManager.getSelectServer() ?: return
         val config = MmkvManager.decodeServerConfig(guid) ?: return
         if (v2rayPoint.isRunning) {
             return
@@ -153,7 +151,7 @@ object V2RayServiceManager {
         }
 
         v2rayPoint.configureFileContent = result.content
-        v2rayPoint.domainName = config.getV2rayPointDomainAndPort()
+        v2rayPoint.domainName = result.domainPort
         currentConfig = config
 
         try {
@@ -165,6 +163,8 @@ object V2RayServiceManager {
         if (v2rayPoint.isRunning) {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
             showNotification()
+
+            PluginUtil.runPlugin(service, config, result.domainPort)
         } else {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
             cancelNotification()
@@ -192,6 +192,7 @@ object V2RayServiceManager {
         } catch (e: Exception) {
             Log.d(ANG_PACKAGE, e.toString())
         }
+        PluginUtil.stopPlugin()
     }
 
     private class ReceiveMessageHandler : BroadcastReceiver() {
@@ -199,7 +200,6 @@ object V2RayServiceManager {
             val serviceControl = serviceControl?.get() ?: return
             when (intent?.getIntExtra("key", 0)) {
                 AppConfig.MSG_REGISTER_CLIENT -> {
-                    //Logger.e("ReceiveMessageHandler", intent?.getIntExtra("key", 0).toString())
                     if (v2rayPoint.isRunning) {
                         MessageUtil.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_RUNNING, "")
                     } else {

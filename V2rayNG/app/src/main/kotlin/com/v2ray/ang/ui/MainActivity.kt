@@ -29,6 +29,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
 import com.tbruyelle.rxpermissions3.RxPermissions
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.dto.EConfigType
@@ -37,6 +38,7 @@ import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -87,7 +89,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.fab.setOnClickListener {
             if (mainViewModel.isRunning.value == true) {
                 Utils.stopVService(this)
-            } else if ((MmkvManager.settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN") == "VPN") {
+            } else if ((settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
                 val intent = VpnService.prepare(this)
                 if (intent == null) {
                     startV2Ray()
@@ -111,10 +113,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 
-        val callback = SimpleItemTouchHelperCallback(adapter)
-        mItemTouchHelper = ItemTouchHelper(callback)
+        mItemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(adapter))
         mItemTouchHelper?.attachToRecyclerView(binding.recyclerView)
-
 
         val toggle = ActionBarDrawerToggle(
             this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
@@ -198,7 +198,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     fun startV2Ray() {
-        if (MmkvManager.mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
+        if (MmkvManager.getSelectServer().isNullOrEmpty()) {
+            toast(R.string.title_file_chooser)
             return
         }
         V2RayServiceManager.startV2Ray(this)
@@ -278,6 +279,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
+        R.id.import_manually_http -> {
+            importManually(EConfigType.HTTP.value)
+            true
+        }
+
         R.id.import_manually_trojan -> {
             importManually(EConfigType.TROJAN.value)
             true
@@ -285,6 +291,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         R.id.import_manually_wireguard -> {
             importManually(EConfigType.WIREGUARD.value)
+            true
+        }
+
+        R.id.import_manually_hysteria2 -> {
+            importManually(EConfigType.HYSTERIA2.value)
             true
         }
 
@@ -706,9 +717,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 )
             }
 
-            R.id.user_asset_setting -> {
-                startActivity(Intent(this, UserAssetActivity::class.java))
+            R.id.routing_setting -> {
+                requestSubSettingActivity.launch(Intent(this, RoutingSettingActivity::class.java))
             }
+
 
             R.id.promotion -> {
                 Utils.openUri(this, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")

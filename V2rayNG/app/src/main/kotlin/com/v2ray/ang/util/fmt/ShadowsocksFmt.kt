@@ -8,8 +8,8 @@ import com.v2ray.ang.extension.idnHost
 import com.v2ray.ang.util.Utils
 import java.net.URI
 
-object ShadowsocksFmt {
-    fun parseShadowsocks(str: String): ServerConfig? {
+object ShadowsocksFmt : FmtBase() {
+    fun parse(str: String): ServerConfig? {
         val config = ServerConfig.create(EConfigType.SHADOWSOCKS)
         if (!tryResolveResolveSip002(str, config)) {
             var result = str.replace(EConfigType.SHADOWSOCKS.protocolScheme, "")
@@ -52,16 +52,10 @@ object ShadowsocksFmt {
 
     fun toUri(config: ServerConfig): String {
         val outbound = config.getProxyOutbound() ?: return ""
-        val remark = "#" + Utils.urlEncode(config.remarks)
-        val pw =
-            Utils.encode("${outbound.getSecurityEncryption()}:${outbound.getPassword()}")
-        val url = String.format(
-            "%s@%s:%s",
-            pw,
-            Utils.getIpv6Address(outbound.getServerAddress()),
-            outbound.getServerPort()
-        )
-        return url + remark
+        
+        val pw = Utils.encode("${outbound.getSecurityEncryption()}:${outbound.getPassword()}")
+
+        return toUri(outbound.getServerAddress(), outbound.getServerPort(), pw, null, config.remarks)
     }
 
     private fun tryResolveResolveSip002(str: String, config: ServerConfig): Boolean {

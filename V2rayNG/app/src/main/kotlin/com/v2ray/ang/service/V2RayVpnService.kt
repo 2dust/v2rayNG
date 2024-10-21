@@ -16,12 +16,13 @@ import android.os.ParcelFileDescriptor
 import android.os.StrictMode
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.LOOPBACK
+import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.ERoutingMode
-import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.MyContextWrapper
+import com.v2ray.ang.util.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +40,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
         private const val TUN2SOCKS = "libtun2socks.so"
     }
 
-    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     private lateinit var mInterface: ParcelFileDescriptor
     private var isRunning = false
@@ -117,13 +117,11 @@ class V2RayVpnService : VpnService(), ServiceControl {
         val builder = Builder()
         //val enableLocalDns = defaultDPreference.getPrefBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
 
-        val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
-            ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
-
         builder.setMtu(VPN_MTU)
         builder.addAddress(PRIVATE_VLAN4_CLIENT, 30)
         //builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
-        if (routingMode == ERoutingMode.BYPASS_LAN.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
+        val bypassLan = SettingsManager.routingRulesetsBypassLan()
+        if (bypassLan) {
             resources.getStringArray(R.array.bypass_private_ip_address).forEach {
                 val addr = it.split('/')
                 builder.addRoute(addr[0], addr[1].toInt())
@@ -134,29 +132,32 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
         if (settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) == true) {
             builder.addAddress(PRIVATE_VLAN6_CLIENT, 126)
-            if (routingMode == ERoutingMode.BYPASS_LAN.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value) {
+            if (bypassLan) {
                 builder.addRoute("2000::", 3) //currently only 1/8 of total ipV6 is in use
             } else {
                 builder.addRoute("::", 0)
             }
         }
 
-        if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
-            builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
-        } else {
-            Utils.getVpnDnsServers()
-                .forEach {
-                    if (Utils.isPureIpAddress(it)) {
-                        builder.addDnsServer(it)
-                    }
+//        if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
+//            builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
+//        } else {
+        Utils.getVpnDnsServers()
+            .forEach {
+                if (Utils.isPureIpAddress(it)) {
+                    builder.addDnsServer(it)
                 }
-        }
+            }
+//        }
 
         builder.setSession(V2RayServiceManager.currentConfig?.remarks.orEmpty())
 
+        val selfPackageName = BuildConfig.APPLICATION_ID
         if (settingsStorage?.decodeBool(AppConfig.PREF_PER_APP_PROXY) == true) {
             val apps = settingsStorage?.decodeStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
             val bypassApps = settingsStorage?.decodeBool(AppConfig.PREF_BYPASS_APPS) ?: false
+            //process self package
+            if (bypassApps) apps?.add(selfPackageName) else apps?.remove(selfPackageName)
             apps?.forEach {
                 try {
                     if (bypassApps)
@@ -164,9 +165,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
                     else
                         builder.addAllowedApplication(it)
                 } catch (e: PackageManager.NameNotFoundException) {
-                    //Logger.d(e)
                 }
             }
+        } else {
+            builder.addDisallowedApplication(selfPackageName)
         }
 
         // Close the old interface since the parameters have been changed.
@@ -201,12 +203,12 @@ class V2RayVpnService : VpnService(), ServiceControl {
     }
 
     private fun runTun2socks() {
-        val socksPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+        val socksPort = SettingsManager.getSocksPort()
         val cmd = arrayListOf(
             File(applicationContext.applicationInfo.nativeLibraryDir, TUN2SOCKS).absolutePath,
             "--netif-ipaddr", PRIVATE_VLAN4_ROUTER,
             "--netif-netmask", "255.255.255.252",
-            "--socks-server-addr", "127.0.0.1:${socksPort}",
+            "--socks-server-addr", "$LOOPBACK:${socksPort}",
             "--tunmtu", VPN_MTU.toString(),
             "--sock-path", "sock_path",//File(applicationContext.filesDir, "sock_path").absolutePath,
             "--enable-udprelay",
@@ -220,7 +222,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
             val localDnsPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_LOCAL_DNS_PORT), AppConfig.PORT_LOCAL_DNS.toInt())
             cmd.add("--dnsgw")
-            cmd.add("127.0.0.1:${localDnsPort}")
+            cmd.add("$LOOPBACK:${localDnsPort}")
         }
         Log.d(packageName, cmd.toString())
 

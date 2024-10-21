@@ -4,17 +4,17 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.text.TextUtils
 import android.util.Log
-import com.google.gson.Gson
+
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.HY2
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.*
-import com.v2ray.ang.util.MmkvManager.KEY_SELECTED_SERVER
+import com.v2ray.ang.util.fmt.Hysteria2Fmt
 import com.v2ray.ang.util.fmt.ShadowsocksFmt
 import com.v2ray.ang.util.fmt.SocksFmt
 import com.v2ray.ang.util.fmt.TrojanFmt
@@ -22,191 +22,17 @@ import com.v2ray.ang.util.fmt.VlessFmt
 import com.v2ray.ang.util.fmt.VmessFmt
 import com.v2ray.ang.util.fmt.WireguardFmt
 import java.lang.reflect.Type
+import java.net.URI
 import java.util.*
 
 object AngConfigManager {
-    private val mainStorage by lazy {
-        MMKV.mmkvWithID(
-            MmkvManager.ID_MAIN,
-            MMKV.MULTI_PROCESS_MODE
-        )
-    }
-    private val serverRawStorage by lazy {
-        MMKV.mmkvWithID(
-            MmkvManager.ID_SERVER_RAW,
-            MMKV.MULTI_PROCESS_MODE
-        )
-    }
-    private val settingsStorage by lazy {
-        MMKV.mmkvWithID(
-            MmkvManager.ID_SETTING,
-            MMKV.MULTI_PROCESS_MODE
-        )
-    }
-    private val subStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SUB, MMKV.MULTI_PROCESS_MODE) }
-
-    /**
-     * Legacy loading config
-     */
-//    fun migrateLegacyConfig(c: Context): Boolean? {
-//        try {
-//            val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(c)
-//            val context = defaultSharedPreferences.getString(ANG_CONFIG, "")
-//            if (context.isNullOrBlank()) {
-//                return null
-//            }
-//            val angConfig = Gson().fromJson(context, AngConfig::class.java)
-//            for (i in angConfig.vmess.indices) {
-//                upgradeServerVersion(angConfig.vmess[i])
-//            }
-//
-//            copyLegacySettings(defaultSharedPreferences)
-//            migrateVmessBean(angConfig, defaultSharedPreferences)
-//            migrateSubItemBean(angConfig)
-//
-//            defaultSharedPreferences.edit().remove(ANG_CONFIG).apply()
-//            return true
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
-//        return false
-//    }
-//
-//    private fun copyLegacySettings(sharedPreferences: SharedPreferences) {
-//        listOf(
-//            AppConfig.PREF_MODE,
-//            AppConfig.PREF_REMOTE_DNS,
-//            AppConfig.PREF_DOMESTIC_DNS,
-//            AppConfig.PREF_LOCAL_DNS_PORT,
-//            AppConfig.PREF_SOCKS_PORT,
-//            AppConfig.PREF_HTTP_PORT,
-//            AppConfig.PREF_LOGLEVEL,
-//            AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,
-//            AppConfig.PREF_ROUTING_MODE,
-//            AppConfig.PREF_V2RAY_ROUTING_AGENT,
-//            AppConfig.PREF_V2RAY_ROUTING_BLOCKED,
-//            AppConfig.PREF_V2RAY_ROUTING_DIRECT,
-//        ).forEach { key ->
-//            settingsStorage?.encode(key, sharedPreferences.getString(key, null))
-//        }
-//        listOf(
-//            AppConfig.PREF_SPEED_ENABLED,
-//            AppConfig.PREF_PROXY_SHARING,
-//            AppConfig.PREF_LOCAL_DNS_ENABLED,
-//            AppConfig.PREF_ALLOW_INSECURE,
-//            AppConfig.PREF_PREFER_IPV6,
-//            AppConfig.PREF_PER_APP_PROXY,
-//            AppConfig.PREF_BYPASS_APPS,
-//        ).forEach { key ->
-//            settingsStorage?.encode(key, sharedPreferences.getBoolean(key, false))
-//        }
-//        settingsStorage?.encode(
-//            AppConfig.PREF_SNIFFING_ENABLED,
-//            sharedPreferences.getBoolean(AppConfig.PREF_SNIFFING_ENABLED, true)
-//        )
-//        settingsStorage?.encode(
-//            AppConfig.PREF_PER_APP_PROXY_SET,
-//            sharedPreferences.getStringSet(AppConfig.PREF_PER_APP_PROXY_SET, setOf())
-//        )
-//    }
-//
-//    private fun migrateVmessBean(angConfig: AngConfig, sharedPreferences: SharedPreferences) {
-//        angConfig.vmess.forEachIndexed { index, vmessBean ->
-//            val type = EConfigType.fromInt(vmessBean.configType) ?: return@forEachIndexed
-//            val config = ServerConfig.create(type)
-//            config.remarks = vmessBean.remarks
-//            config.subscriptionId = vmessBean.subid
-//            if (type == EConfigType.CUSTOM) {
-//                val jsonConfig = sharedPreferences.getString(ANG_CONFIG + vmessBean.guid, "")
-//                val v2rayConfig = try {
-//                    Gson().fromJson(jsonConfig, V2rayConfig::class.java)
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                    return@forEachIndexed
-//                }
-//                config.fullConfig = v2rayConfig
-//                serverRawStorage?.encode(vmessBean.guid, jsonConfig)
-//            } else {
-//                config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
-//                    vnext.address = vmessBean.address
-//                    vnext.port = vmessBean.port
-//                    vnext.users[0].id = vmessBean.id
-//                    if (config.configType == EConfigType.VMESS) {
-//                        vnext.users[0].alterId = vmessBean.alterId
-//                        vnext.users[0].security = vmessBean.security
-//                    } else if (config.configType == EConfigType.VLESS) {
-//                        vnext.users[0].encryption = vmessBean.security
-//                        vnext.users[0].flow = vmessBean.flow
-//                    }
-//                }
-//                config.outboundBean?.settings?.servers?.get(0)?.let { server ->
-//                    server.address = vmessBean.address
-//                    server.port = vmessBean.port
-//                    if (config.configType == EConfigType.SHADOWSOCKS) {
-//                        server.password = vmessBean.id
-//                        server.method = vmessBean.security
-//                    } else if (config.configType == EConfigType.SOCKS) {
-//                        if (TextUtils.isEmpty(vmessBean.security) && TextUtils.isEmpty(vmessBean.id)) {
-//                            server.users = null
-//                        } else {
-//                            val socksUsersBean =
-//                                V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
-//                            socksUsersBean.user = vmessBean.security
-//                            socksUsersBean.pass = vmessBean.id
-//                            server.users = listOf(socksUsersBean)
-//                        }
-//                    } else if (config.configType == EConfigType.TROJAN) {
-//                        server.password = vmessBean.id
-//                    }
-//                }
-//                config.outboundBean?.streamSettings?.let { streamSetting ->
-//                    val sni = streamSetting.populateTransportSettings(
-//                        vmessBean.network,
-//                        vmessBean.headerType,
-//                        vmessBean.requestHost,
-//                        vmessBean.path,
-//                        vmessBean.path,
-//                        vmessBean.requestHost,
-//                        vmessBean.path,
-//                        vmessBean.headerType,
-//                        vmessBean.path,
-//                        vmessBean.requestHost,
-//                    )
-//                    val allowInsecure = if (vmessBean.allowInsecure.isBlank()) {
-//                        settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
-//                    } else {
-//                        vmessBean.allowInsecure.toBoolean()
-//                    }
-//                    var fingerprint = streamSetting.tlsSettings?.fingerprint
-//                    streamSetting.populateTlsSettings(
-//                        vmessBean.streamSecurity, allowInsecure,
-//                        vmessBean.sni.ifBlank { sni }, fingerprint, null, null, null, null
-//                    )
-//                }
-//            }
-//            val key = MmkvManager.encodeServerConfig(vmessBean.guid, config)
-//            if (index == angConfig.index) {
-//                mainStorage?.encode(KEY_SELECTED_SERVER, key)
-//            }
-//        }
-//    }
-//
-//    private fun migrateSubItemBean(angConfig: AngConfig) {
-//        angConfig.subItem.forEach {
-//            val subItem = SubscriptionItem()
-//            subItem.remarks = it.remarks
-//            subItem.url = it.url
-//            subItem.enabled = it.enabled
-//            subStorage?.encode(it.id, Gson().toJson(subItem))
-//        }
-//    }
-
     /**
      * parse config form qrcode or...
      */
     private fun parseConfig(
         str: String?,
         subid: String,
+        subItem: SubscriptionItem?,
         removedSelectedServer: ServerConfig?
     ): Int {
         try {
@@ -215,17 +41,19 @@ object AngConfigManager {
             }
 
             val config = if (str.startsWith(EConfigType.VMESS.protocolScheme)) {
-                VmessFmt.parseVmess(str)
+                VmessFmt.parse(str)
             } else if (str.startsWith(EConfigType.SHADOWSOCKS.protocolScheme)) {
-                ShadowsocksFmt.parseShadowsocks(str)
+                ShadowsocksFmt.parse(str)
             } else if (str.startsWith(EConfigType.SOCKS.protocolScheme)) {
-                SocksFmt.parseSocks(str)
+                SocksFmt.parse(str)
             } else if (str.startsWith(EConfigType.TROJAN.protocolScheme)) {
-                TrojanFmt.parseTrojan(str)
+                TrojanFmt.parse(str)
             } else if (str.startsWith(EConfigType.VLESS.protocolScheme)) {
-                VlessFmt.parseVless(str)
+                VlessFmt.parse(str)
             } else if (str.startsWith(EConfigType.WIREGUARD.protocolScheme)) {
-                WireguardFmt.parseWireguard(str)
+                WireguardFmt.parse(str)
+            } else if (str.startsWith(EConfigType.HYSTERIA2.protocolScheme) || str.startsWith(HY2)) {
+                Hysteria2Fmt.parse(str)
             } else {
                 null
             }
@@ -233,6 +61,13 @@ object AngConfigManager {
             if (config == null) {
                 return R.string.toast_incorrect_protocol
             }
+            //filter
+            if (subItem?.filter != null && subItem.filter?.isNotEmpty() == true && config.remarks.isNotEmpty()) {
+                val matched = Regex(pattern = subItem.filter ?: "")
+                    .containsMatchIn(input = config.remarks)
+                if (!matched) return -1
+            }
+
             config.subscriptionId = subid
             val guid = MmkvManager.encodeServerConfig("", config)
             if (removedSelectedServer != null &&
@@ -243,7 +78,7 @@ object AngConfigManager {
                     ?.getServerPort() == removedSelectedServer.getProxyOutbound()
                     ?.getServerPort()
             ) {
-                mainStorage?.encode(KEY_SELECTED_SERVER, guid)
+                MmkvManager.setSelectServer(guid)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -264,9 +99,11 @@ object AngConfigManager {
                 EConfigType.CUSTOM -> ""
                 EConfigType.SHADOWSOCKS -> ShadowsocksFmt.toUri(config)
                 EConfigType.SOCKS -> SocksFmt.toUri(config)
+                EConfigType.HTTP -> ""
                 EConfigType.VLESS -> VlessFmt.toUri(config)
                 EConfigType.TROJAN -> TrojanFmt.toUri(config)
                 EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
+                EConfigType.HYSTERIA2 -> Hysteria2Fmt.toUri(config)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -353,39 +190,6 @@ object AngConfigManager {
         return 0
     }
 
-//    /**
-//     * upgrade
-//     */
-//    private fun upgradeServerVersion(vmess: AngConfig.VmessBean): Int {
-//        try {
-//            if (vmess.configVersion == 2) {
-//                return 0
-//            }
-//
-//            when (vmess.network) {
-//                "ws", "h2" -> {
-//                    var path = ""
-//                    var host = ""
-//                    val lstParameter = vmess.requestHost.split(";")
-//                    if (lstParameter.isNotEmpty()) {
-//                        path = lstParameter[0].trim()
-//                    }
-//                    if (lstParameter.size > 1) {
-//                        path = lstParameter[0].trim()
-//                        host = lstParameter[1].trim()
-//                    }
-//                    vmess.path = path
-//                    vmess.requestHost = host
-//                }
-//            }
-//            vmess.configVersion = 2
-//            return 0
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            return -1
-//        }
-//    }
-
     fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
         var count = parseBatchConfig(Utils.decode(server), subid, append)
         if (count <= 0) {
@@ -416,7 +220,7 @@ object AngConfigManager {
             servers.lines()
                 .forEach { str ->
                     if (str.startsWith(AppConfig.PROTOCOL_HTTP) || str.startsWith(AppConfig.PROTOCOL_HTTPS)) {
-                        count += MmkvManager.importUrlAsSubscription(str)
+                        count += importUrlAsSubscription(str)
                     }
                 }
             return count
@@ -434,7 +238,7 @@ object AngConfigManager {
             val removedSelectedServer =
                 if (!TextUtils.isEmpty(subid) && !append) {
                     MmkvManager.decodeServerConfig(
-                        mainStorage?.decodeString(KEY_SELECTED_SERVER).orEmpty()
+                        MmkvManager.getSelectServer().orEmpty()
                     )?.let {
                         if (it.subscriptionId == subid) {
                             return@let it
@@ -448,11 +252,12 @@ object AngConfigManager {
                 MmkvManager.removeServerViaSubid(subid)
             }
 
+            val subItem = MmkvManager.decodeSubscription(subid)
             var count = 0
             servers.lines()
                 .reversed()
                 .forEach {
-                    val resId = parseConfig(it, subid, removedSelectedServer)
+                    val resId = parseConfig(it, subid, subItem, removedSelectedServer)
                     if (resId == 0) {
                         count++
                     }
@@ -473,34 +278,21 @@ object AngConfigManager {
             && server.contains("routing")
         ) {
             try {
-                //val gson = GsonBuilder().setPrettyPrinting().create()
-                val gson = GsonBuilder()
-                    .setPrettyPrinting()
-                    .disableHtmlEscaping()
-                    .registerTypeAdapter( // custom serialiser is needed here since JSON by default parse number as Double, core will fail to start
-                        object : TypeToken<Double>() {}.type,
-                        JsonSerializer { src: Double?, _: Type?, _: JsonSerializationContext? ->
-                            JsonPrimitive(
-                                src?.toInt()
-                            )
-                        }
-                    )
-                    .create()
                 val serverList: Array<Any> =
-                    Gson().fromJson(server, Array<Any>::class.java)
+                    JsonUtil.fromJson(server, Array<Any>::class.java)
 
                 if (serverList.isNotEmpty()) {
                     var count = 0
                     for (srv in serverList.reversed()) {
                         val config = ServerConfig.create(EConfigType.CUSTOM)
                         config.fullConfig =
-                            Gson().fromJson(Gson().toJson(srv), V2rayConfig::class.java)
+                            JsonUtil.fromJson(JsonUtil.toJson(srv), V2rayConfig::class.java)
                         config.remarks = config.fullConfig?.remarks
                             ?: ("%04d-".format(count + 1) + System.currentTimeMillis()
                                 .toString())
                         config.subscriptionId = subid
                         val key = MmkvManager.encodeServerConfig("", config)
-                        serverRawStorage?.encode(key, gson.toJson(srv))
+                        MmkvManager.encodeServerRaw(key, JsonUtil.toJsonPretty(srv))
                         count += 1
                     }
                     return count
@@ -509,21 +301,31 @@ object AngConfigManager {
                 e.printStackTrace()
             }
 
-            // For compatibility
-            val config = ServerConfig.create(EConfigType.CUSTOM)
-            config.subscriptionId = subid
-            config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
-            config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
-            val key = MmkvManager.encodeServerConfig("", config)
-            serverRawStorage?.encode(key, server)
-            return 1
+            try {
+                // For compatibility
+                val config = ServerConfig.create(EConfigType.CUSTOM)
+                config.subscriptionId = subid
+                config.fullConfig = JsonUtil.fromJson(server, V2rayConfig::class.java)
+                config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
+                val key = MmkvManager.encodeServerConfig("", config)
+                MmkvManager.encodeServerRaw(key, server)
+                return 1
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return 0
         } else if (server.startsWith("[Interface]") && server.contains("[Peer]")) {
-            val config = WireguardFmt.parseWireguardConfFile(server)
-                ?: return R.string.toast_incorrect_protocol
-            config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
-            val key = MmkvManager.encodeServerConfig("", config)
-            serverRawStorage?.encode(key, server)
-            return 1
+            try {
+                val config = WireguardFmt.parseWireguardConfFile(server)
+                    ?: return R.string.toast_incorrect_protocol
+                config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
+                val key = MmkvManager.encodeServerConfig("", config)
+                MmkvManager.encodeServerRaw(key, server)
+                return 1
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return 0
         } else {
             return 0
         }
@@ -558,19 +360,17 @@ object AngConfigManager {
                 return 0
             }
             Log.d(AppConfig.ANG_PACKAGE, url)
+
             var configText = try {
-                Utils.getUrlContentWithCustomUserAgent(url)
+                val httpPort = SettingsManager.getHttpPort()
+                Utils.getUrlContentWithCustomUserAgent(url, 30000, httpPort)
             } catch (e: Exception) {
                 e.printStackTrace()
                 ""
             }
             if (configText.isEmpty()) {
                 configText = try {
-                    val httpPort = Utils.parseInt(
-                        settingsStorage?.decodeString(AppConfig.PREF_HTTP_PORT),
-                        AppConfig.PORT_HTTP.toInt()
-                    )
-                    Utils.getUrlContentWithCustomUserAgent(url, 30000, httpPort)
+                    Utils.getUrlContentWithCustomUserAgent(url)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     ""
@@ -595,5 +395,20 @@ object AngConfigManager {
             count = parseCustomConfigServer(server, subid)
         }
         return count
+    }
+
+    private fun importUrlAsSubscription(url: String): Int {
+        val subscriptions = MmkvManager.decodeSubscriptions()
+        subscriptions.forEach {
+            if (it.second.url == url) {
+                return 0
+            }
+        }
+        val uri = URI(Utils.fixIllegalUrl(url))
+        val subItem = SubscriptionItem()
+        subItem.remarks = uri.fragment ?: "import sub"
+        subItem.url = url
+        MmkvManager.encodeSubscription("", subItem)
+        return 1
     }
 }

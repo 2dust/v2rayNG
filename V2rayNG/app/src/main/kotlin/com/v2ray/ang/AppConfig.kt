@@ -25,11 +25,7 @@ object AppConfig {
     const val PREF_LOCAL_DNS_PORT = "pref_local_dns_port"
     const val PREF_VPN_DNS = "pref_vpn_dns"
     const val PREF_ROUTING_DOMAIN_STRATEGY = "pref_routing_domain_strategy"
-    const val PREF_ROUTING_MODE = "pref_routing_mode"
-    const val PREF_V2RAY_ROUTING_AGENT = "pref_v2ray_routing_agent"
-    const val PREF_V2RAY_ROUTING_DIRECT = "pref_v2ray_routing_direct"
-    const val PREF_V2RAY_ROUTING_BLOCKED = "pref_v2ray_routing_blocked"
-    const val PREF_ROUTING_CUSTOM = "pref_routing_custom"
+    const val PREF_ROUTING_RULESET = "pref_routing_ruleset"
     const val PREF_MUX_ENABLED = "pref_mux_enabled"
     const val PREF_MUX_CONCURRENCY = "pref_mux_concurrency"
     const val PREF_MUX_XUDP_CONCURRENCY = "pref_mux_xudp_concurrency"
@@ -52,12 +48,12 @@ object AppConfig {
     const val PREF_ALLOW_INSECURE = "pref_allow_insecure"
     const val PREF_SOCKS_PORT = "pref_socks_port"
     const val PREF_HTTP_PORT = "pref_http_port"
-
     const val PREF_REMOTE_DNS = "pref_remote_dns"
     const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
     const val PREF_DELAY_TEST_URL = "pref_delay_test_url"
     const val PREF_LOGLEVEL = "pref_core_loglevel"
     const val PREF_MODE = "pref_mode"
+    const val PREF_IS_BOOTED = "pref_is_booted"
 
     /** Cache keys. */
     const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"
@@ -109,6 +105,10 @@ object AppConfig {
     const val DNS_PROXY = "1.1.1.1"
     const val DNS_DIRECT = "223.5.5.5"
     const val DNS_VPN = "1.1.1.1"
+    const val GEOSITE_PRIVATE = "geosite:private"
+    const val GEOSITE_CN = "geosite:cn"
+    const val GEOIP_PRIVATE = "geoip:private"
+    const val GEOIP_CN = "geoip:cn"
 
     /** Ports and addresses for various services. */
     const val PORT_LOCAL_DNS = "10853"
@@ -117,6 +117,7 @@ object AppConfig {
     const val WIREGUARD_LOCAL_ADDRESS_V4 = "172.16.0.2/32"
     const val WIREGUARD_LOCAL_ADDRESS_V6 = "2606:4700:110:8f81:d551:a0:532e:a2b3/128"
     const val WIREGUARD_LOCAL_MTU = "1420"
+    const val LOOPBACK = "127.0.0.1"
 
     /** Message constants for communication. */
     const val MSG_REGISTER_CLIENT = 1
@@ -137,7 +138,7 @@ object AppConfig {
 
     /** Notification channel IDs and names. */
     const val RAY_NG_CHANNEL_ID = "RAY_NG_M_CH_ID"
-    const val RAY_NG_CHANNEL_NAME = "V2rayNG Background Service"
+    const val RAY_NG_CHANNEL_NAME = "v2rayNG Background Service"
     const val SUBSCRIPTION_UPDATE_CHANNEL = "subscription_update_channel"
     const val SUBSCRIPTION_UPDATE_CHANNEL_NAME = "Subscription Update Service"
 
@@ -146,7 +147,15 @@ object AppConfig {
     const val CUSTOM = ""
     const val SHADOWSOCKS = "ss://"
     const val SOCKS = "socks://"
+    const val HTTP = "http://"
     const val VLESS = "vless://"
     const val TROJAN = "trojan://"
     const val WIREGUARD = "wireguard://"
+    const val TUIC = "tuic://"
+    const val HYSTERIA2 = "hysteria2://"
+    const val HY2 = "hy2://"
+
+    /** Give a good name to this, IDK*/
+    const val VPN = "VPN"
+
 }

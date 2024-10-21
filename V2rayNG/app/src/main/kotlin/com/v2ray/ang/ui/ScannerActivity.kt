@@ -9,11 +9,10 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import com.tbruyelle.rxpermissions3.RxPermissions
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.QRCodeDecoder
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
@@ -22,7 +21,6 @@ import io.github.g00fy2.quickie.config.ScannerConfig
 class ScannerActivity : BaseActivity() {
 
     private val scanQrCode = registerForActivityResult(ScanCustomCode(), ::handleResult)
-    private val settingsStorage by lazy { MMKV.mmkvWithID(MmkvManager.ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
