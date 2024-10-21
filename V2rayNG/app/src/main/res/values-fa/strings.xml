@@ -175,7 +175,7 @@
     <string name="summary_pref_proxy_sharing_enabled">دستگاه‌های دیگر می‌توانند از طریق socks/http به پراکسی توسط نشانی آی‌پی شما متصل شوند، فقط در شبکه مورد اعتماد فعال می‌شوند تا از اتصال غیرمجاز جلوگیری کنند</string>
     <string name="toast_warning_pref_proxysharing_short">اتصالات از طریق LAN را مجاز کنید، مطمئن شوید که در یک شبکه قابل اعتماد هستید</string>
 
-    <string name="title_pref_allow_insecure">موز ناامن</string>
+    <string name="title_pref_allow_insecure">مجوز ناامن</string>
     <string name="summary_pref_allow_insecure">هنگام استفاده از TLS، به طور پیش‌فرض مجوز ناامن فعال است</string>
 
     <string name="title_pref_socks_port">پورت پروکسی SOCKS5</string>
@@ -202,10 +202,10 @@
     <string name="title_about">درباره</string>
     <string name="title_source_code">کد منبع</string>
     <string name="title_tg_channel">کانال تلگرام</string>
-    <string name="title_configuration_backup">پشتیبانگیری از پیکربندی</string>
+    <string name="title_configuration_backup">پشتیبان گیری از پیکربندی</string>
     <string name="summary_configuration_backup">محل ذخیره سازی: [%s], پس از حذف نصب برنامه یا پاک کردن فضای ذخیره سازی، نسخه پشتیبان پاک می شود</string>
     <string name="title_configuration_restore">بازیابی پیکربندی</string>
-    <string name="title_configuration_share">اشتراکگذاری پیکربندی</string>
+    <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
     <string name="title_pref_promotion">تبلیغات</string>
     <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف شود)</string>
 
