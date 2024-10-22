@@ -6,10 +6,6 @@ import android.text.TextUtils
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.GEOIP_PRIVATE
 import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
-import com.v2ray.ang.AppConfig.ROUTING_BLACK
-import com.v2ray.ang.AppConfig.ROUTING_GLOBAL
-import com.v2ray.ang.AppConfig.ROUTING_WHITE
-import com.v2ray.ang.AppConfig.ROUTING_WHITE_IRAN
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.dto.RoutingType
 import com.v2ray.ang.dto.RulesetItem
