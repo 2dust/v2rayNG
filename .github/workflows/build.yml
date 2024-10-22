@@ -33,10 +33,8 @@ jobs:
         go install golang.org/x/mobile/cmd/gomobile@latest
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
-
     - name: Setup Android environment
       uses: android-actions/setup-android@v3.2.1
-
 
     - name: Build dependencies
       run: |
@@ -47,7 +45,7 @@ jobs:
         go get github.com/xtls/xray-core@${{ github.event.inputs.XRAY_CORE_VERSION }} || true
         gomobile init
         go mod tidy -v
-        gomobile bind -v -androidapi 35 -ldflags='-s -w' ./
+        gomobile bind -v -androidapi 21 -ldflags='-s -w' ./
         cp *.aar ${{ github.workspace }}/V2rayNG/app/libs/
 
     - name: Build APK
@@ -56,8 +54,33 @@ jobs:
         chmod 755 gradlew
         ./gradlew assembleDebug
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v4.4.3
+    - name: Upload arm64-v8a APK
+      uses: actions/upload-artifact@v4
+      if: ${{  success() }}
       with:
-        name: apk
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/
+        name: arm64-v8a
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*arm64-v8a*.apk
+
+    - name: Upload armeabi-v7a APK
+      uses: actions/upload-artifact@v4
+      if: ${{  success() }}
+      with:
+        name: armeabi-v7a
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*armeabi-v7a*.apk
+
+    - name: Upload x86 APK
+      uses: actions/upload-artifact@v4
+      if: ${{  success() }}
+      with:
+        name: x86-apk
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*x86*.apk
+    
+    - name: Upload Other APKs
+      uses: actions/upload-artifact@v4
+      with:
+        name: others-apk
+        path: |
+          ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug
+          !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*arm64-v8a*.apk
+          !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*armeabi-v7a*.apk
+          !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*x86*.apk
