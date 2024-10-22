@@ -223,10 +223,10 @@
     <string name="logcat_copy">کپی</string>
     <string name="logcat_clear">پاک کردن</string>
     <string name="title_service_restart">راه‌اندازی مجدد خدمات</string>
-    <string name="title_del_all_config">حذف تمام کانفیگ</string>
-    <string name="title_del_duplicate_config">حذف کانفیگ های تکراری</string>
-    <string name="title_del_invalid_config">حذف کانفیگ‌های نامعتبر (ابتدا آزمایش کنید)</string>
-    <string name="title_export_all">خروجی گرفتن کانفیگ‌های غیرسفارشی در کلیپ‌بورد</string>
+    <string name="title_del_all_config">حذف تمام کانفیگ های گروه فعلی</string>
+    <string name="title_del_duplicate_config">حذف کانفیگ های تکراری گروه فعلی</string>
+    <string name="title_del_invalid_config">حذف کانفیگ های نامعتبر گروه فعلی (ابتدا آزمایش کنید)</string>
+    <string name="title_export_all">خروجی گرفتن کانفیگ های غیرسفارشی گروه فعلی در کلیپ‌بورد</string>
     <string name="title_sub_setting">تنظیمات گروه‌ اشتراک</string>
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">نشانی اینترنتی اختیاری</string>
@@ -236,9 +236,9 @@
     <string name="sub_setting_pre_profile">Previous proxy remarks</string>
     <string name="sub_setting_next_profile">Next proxy remarks</string>
     <string name="sub_setting_pre_profile_tip">The remarks exists and is unique</string>
-    <string name="title_sub_update">به‌روزرسانی اشتراک</string>
-    <string name="title_ping_all_server">Tcping همه کانفیگ</string>
-    <string name="title_real_ping_all_server">تاخیر واقعی همه کانفیگ</string>
+    <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
+    <string name="title_ping_all_server">Tcping کانفیگ های گروه فعلی</string>
+    <string name="title_real_ping_all_server">تاخیر واقعی کانفیگ های گروه فعلی</string>
     <string name="title_user_asset_setting">فایل‌های دارایی جغرافیا</string>
     <string name="title_sort_by_test_results">مرتب‌سازی بر اساس نتایج آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگ‌ها</string>
