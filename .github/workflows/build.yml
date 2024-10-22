@@ -21,7 +21,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '23.0.1'
+        java-version: '17'
 
     - name: Setup Golang
       uses: actions/setup-go@v5
