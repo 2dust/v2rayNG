@@ -310,7 +310,7 @@ object V2rayConfigUtil {
 
             // DNS routing tag
             v2rayConfig.routing.rules.add(
-                0, V2rayConfig.RoutingBean.RulesBean(
+                0, RulesBean(
                     inboundTag = arrayListOf("dns-in"),
                     outboundTag = "dns-out",
                     domain = null
@@ -363,7 +363,7 @@ object V2rayConfigUtil {
 
             if (Utils.isPureIpAddress(domesticDns.first())) {
                 v2rayConfig.routing.rules.add(
-                    0, V2rayConfig.RoutingBean.RulesBean(
+                    0, RulesBean(
                         outboundTag = TAG_DIRECT,
                         port = "53",
                         ip = arrayListOf(domesticDns.first()),
@@ -397,7 +397,7 @@ object V2rayConfigUtil {
             // DNS routing
             if (Utils.isPureIpAddress(remoteDns.first())) {
                 v2rayConfig.routing.rules.add(
-                    0, V2rayConfig.RoutingBean.RulesBean(
+                    0, RulesBean(
                         outboundTag = TAG_PROXY,
                         port = "53",
                         ip = arrayListOf(remoteDns.first()),
