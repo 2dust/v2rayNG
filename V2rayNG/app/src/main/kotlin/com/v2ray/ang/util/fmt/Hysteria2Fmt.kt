@@ -15,7 +15,7 @@ import java.net.URI
 object Hysteria2Fmt : FmtBase() {
 
     fun parse(str: String): ServerConfig {
-        var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
+        val allowInsecure = settingsStorage.decodeBool(AppConfig.PREF_ALLOW_INSECURE,false)
         val config = ServerConfig.create(EConfigType.HYSTERIA2)
 
         val uri = URI(Utils.fixIllegalUrl(str))
