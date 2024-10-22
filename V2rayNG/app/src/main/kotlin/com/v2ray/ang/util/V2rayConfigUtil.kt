@@ -566,7 +566,7 @@ object V2rayConfigUtil {
             return returnPair
         }
 
-        if (subscriptionId.isNullOrEmpty()) {
+        if (subscriptionId.isEmpty()) {
             return returnPair
         }
         try {
