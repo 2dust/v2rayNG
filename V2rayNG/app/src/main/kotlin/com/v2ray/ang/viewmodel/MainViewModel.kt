@@ -163,7 +163,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun exportAllServer(): Int {
         val serverListCopy =
-            if (subscriptionId.isEmpty() && keywordFilter.isNullOrEmpty()) {
+            if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
                 serverList
             } else {
                 serversCache.map { it.guid }.toList()
@@ -281,7 +281,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeAllServer() {
-        if (subscriptionId.isEmpty() && keywordFilter.isNullOrEmpty()) {
+        if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
             MmkvManager.removeAllServer()
         } else {
             val serversCopy = serversCache.toList()
@@ -292,7 +292,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeInvalidServer() {
-        if (subscriptionId.isEmpty() && keywordFilter.isNullOrEmpty()) {
+        if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
             MmkvManager.removeInvalidServer("")
         } else {
             val serversCopy = serversCache.toList()
