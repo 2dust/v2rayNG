@@ -227,7 +227,7 @@
     <string name="title_del_duplicate_config">حذف کانفیگ های تکراری</string>
     <string name="title_del_invalid_config">حذف کانفیگ‌های نامعتبر (ابتدا آزمایش کنید)</string>
     <string name="title_export_all">خروجی گرفتن کانفیگ‌های غیرسفارشی در کلیپ‌بورد</string>
-    <string name="title_sub_setting">تنظیم گروه‌ اشتراک</string>
+    <string name="title_sub_setting">تنظیمات گروه‌ اشتراک</string>
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">نشانی اینترنتی اختیاری</string>
     <string name="sub_setting_filter">Remarks regular filter</string>
