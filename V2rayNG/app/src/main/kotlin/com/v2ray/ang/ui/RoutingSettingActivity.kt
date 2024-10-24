@@ -24,6 +24,7 @@ import com.v2ray.ang.util.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RoutingSettingActivity : BaseActivity() {
     private val binding by lazy { ActivityRoutingSettingBinding.inflate(layoutInflater) }
@@ -113,29 +114,32 @@ class RoutingSettingActivity : BaseActivity() {
         R.id.import_rulesets_from_clipboard -> {
             AlertDialog.Builder(this).setMessage(R.string.routing_settings_import_rulesets_tip)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    try {
-                        val clipboard = Utils.getClipboard(this)
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            val ret = SettingsManager.resetRoutingRulesetsFromClipboard(clipboard)
-                            launch(Dispatchers.Main) {
-                                if (ret) {
-                                    refreshData()
-                                    toast(R.string.toast_success)
-                                } else {
-                                    toast(R.string.toast_failure)
-                                }
-                            }
-                        }
+                    val clipboard = try {
+                        Utils.getClipboard(this)
                     } catch (e: Exception) {
                         e.printStackTrace()
+                        toast(R.string.toast_failure)
+                        return@setPositiveButton
+                    }
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val result = SettingsManager.resetRoutingRulesetsFromClipboard(clipboard)
+                        withContext(Dispatchers.Main) {
+                            if (result) {
+                                refreshData()
+                                toast(R.string.toast_success)
+                            } else {
+                                toast(R.string.toast_failure)
+                            }
+                        }
                     }
                 }
                 .setNegativeButton(android.R.string.no) { _, _ ->
-                    //do noting
+                    //do nothing
                 }
                 .show()
             true
         }
+
 
         R.id.export_rulesets_to_clipboard -> {
             val rulesetList = MmkvManager.decodeRoutingRulesets()
