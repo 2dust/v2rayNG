@@ -59,21 +59,22 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
         fun bind(appInfo: AppInfo) {
             this.appInfo = appInfo
 
+            // Set app icon and name
             itemBypassBinding.icon.setImageDrawable(appInfo.appIcon)
-//            name.text = appInfo.appName
-
-            itemBypassBinding.checkBox.isChecked = inBlacklist
-            itemBypassBinding.packageName.text = appInfo.packageName
-            if (appInfo.isSystemApp) {
-                itemBypassBinding.name.text = String.format("** %1s", appInfo.appName)
-                //name.textColor = Color.RED
+            itemBypassBinding.name.text = if (appInfo.isSystemApp) {
+                String.format("** %s", appInfo.appName)
             } else {
-                itemBypassBinding.name.text = appInfo.appName
-                //name.textColor = Color.DKGRAY
+                appInfo.appName
             }
 
+            // Set package name and checkbox state
+            itemBypassBinding.packageName.text = appInfo.packageName
+            itemBypassBinding.checkBox.isChecked = inBlacklist
+
+            // Handle item click to toggle blacklist status
             itemView.setOnClickListener(this)
         }
+
 
         override fun onClick(v: View?) {
             if (inBlacklist) {
