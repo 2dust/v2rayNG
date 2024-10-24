@@ -26,8 +26,14 @@ jobs:
     - name: Setup Golang
       uses: actions/setup-go@v5
       with:
-        go-version: '1.22.4'
+        go-version: '1.23.2'
 
+    - name: Patch Go For 68285
+      #https://go.googlesource.com/go/+/1c588cf8bd4fbfef4072df76b3f66e44674bff8e
+      run: |
+        cd "$(go env GOROOT)"
+        curl "https://go-review.googlesource.com/changes/go~600296/revisions/1/patch" | base64 -d | patch --verbose -p 1
+        
     - name: Install gomobile
       run: |
         go install golang.org/x/mobile/cmd/gomobile@latest
