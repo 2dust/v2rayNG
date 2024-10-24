@@ -195,36 +195,20 @@ class ServerActivity : BaseActivity() {
             }
         }
         sp_stream_security?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                if (streamSecuritys[position].isBlank()) {
-                    container_sni?.visibility = View.GONE
-                    container_fingerprint?.visibility = View.GONE
-                    container_alpn?.visibility = View.GONE
-                    container_allow_insecure?.visibility = View.GONE
-                    container_public_key?.visibility = View.GONE
-                    container_short_id?.visibility = View.GONE
-                    container_spider_x?.visibility = View.GONE
-                } else {
-                    container_sni?.visibility = View.VISIBLE
-                    container_fingerprint?.visibility = View.VISIBLE
-                    container_alpn?.visibility = View.VISIBLE
-                    if (streamSecuritys[position] == TLS) {
-                        container_allow_insecure?.visibility = View.VISIBLE
-                        container_public_key?.visibility = View.GONE
-                        container_short_id?.visibility = View.GONE
-                        container_spider_x?.visibility = View.GONE
-                    } else {
-                        container_allow_insecure?.visibility = View.GONE
-                        container_alpn?.visibility = View.GONE
-                        container_public_key?.visibility = View.VISIBLE
-                        container_short_id?.visibility = View.VISIBLE
-                        container_spider_x?.visibility = View.VISIBLE
-                    }
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val isTls = streamSecuritys[position] == TLS
+                val visibilityMap = mapOf(
+                    container_sni to View.VISIBLE,
+                    container_fingerprint to View.VISIBLE,
+                    container_alpn to if (isTls) View.VISIBLE else View.GONE,
+                    container_allow_insecure to if (isTls) View.VISIBLE else View.GONE,
+                    container_public_key to if (!isTls) View.VISIBLE else View.GONE,
+                    container_short_id to if (!isTls) View.VISIBLE else View.GONE,
+                    container_spider_x to if (!isTls) View.VISIBLE else View.GONE
+                )
+
+                visibilityMap.forEach { (view, visibility) ->
+                    view?.visibility = visibility
                 }
             }
 
@@ -232,6 +216,7 @@ class ServerActivity : BaseActivity() {
                 // do nothing
             }
         }
+
         if (config != null) {
             bindingServer(config)
         } else {
