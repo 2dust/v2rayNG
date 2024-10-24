@@ -25,7 +25,7 @@ rxpermissions = "0.12"
 toastcompat = "1.1.0"
 viewpager2 = "1.1.0"
 workRuntimeKtx = "2.9.1"
-androidGradlePlugin = "8.7.0"
+androidGradlePlugin = "8.7.1"
 androidKotlinPlugin = "2.0.21"
 
 [libraries]
