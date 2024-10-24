@@ -74,18 +74,16 @@ class ScannerActivity : BaseActivity() {
             }
             RxPermissions(this)
                 .request(permission)
-                .subscribe {
-                    if (it) {
-                        try {
-                            showFileChooser()
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    } else
+                .subscribe { granted ->
+                    if (granted) {
+                        showFileChooser()
+                    } else {
                         toast(R.string.toast_permission_denied)
+                    }
                 }
             true
         }
+
 
         else -> super.onOptionsItemSelected(item)
     }
@@ -107,13 +105,21 @@ class ScannerActivity : BaseActivity() {
         val uri = it.data?.data
         if (it.resultCode == RESULT_OK && uri != null) {
             try {
-                val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
+                val inputStream = contentResolver.openInputStream(uri)
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream?.close()
+
                 val text = QRCodeDecoder.syncDecodeQRCode(bitmap)
-                finished(text.orEmpty())
+                if (text.isNullOrEmpty()) {
+                    toast(R.string.toast_decoding_failed)
+                } else {
+                    finished(text)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
-                toast(e.message.toString())
+                toast(R.string.toast_decoding_failed)
             }
         }
     }
+
 }
