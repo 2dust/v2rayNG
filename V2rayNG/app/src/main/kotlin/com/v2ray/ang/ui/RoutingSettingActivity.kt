@@ -152,7 +152,9 @@ class RoutingSettingActivity : BaseActivity() {
     }
 
     fun refreshData() {
-        rulesets = MmkvManager.decodeRoutingRulesets() ?: mutableListOf()
+        rulesets.clear()
+        rulesets.addAll(MmkvManager.decodeRoutingRulesets() ?: mutableListOf())
         adapter.notifyDataSetChanged()
     }
+
 }
