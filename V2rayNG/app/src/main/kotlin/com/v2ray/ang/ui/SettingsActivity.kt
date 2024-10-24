@@ -316,12 +316,10 @@ class SettingsActivity : BaseActivity() {
         }
 
         private fun updateMuxConcurrency(value: String?) {
-            if (value == null) {
-            } else {
-                val concurrency = value.toIntOrNull() ?: 8
-                muxConcurrency?.summary = concurrency.toString()
-            }
+            val concurrency = value?.toIntOrNull() ?: 8
+            muxConcurrency?.summary = concurrency.toString()
         }
+
 
         private fun updateMuxXudpConcurrency(value: String?) {
             if (value == null) {
