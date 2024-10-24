@@ -34,9 +34,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun attachBaseContext(newBase: Context?) {
-        val context = newBase?.let {
-            MyContextWrapper.wrap(newBase, Utils.getLocale())
-        }
-        super.attachBaseContext(context)
+        super.attachBaseContext(MyContextWrapper.wrap(newBase ?: return, Utils.getLocale()))
     }
 }
