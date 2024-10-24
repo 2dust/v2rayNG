@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.v2ray.ang"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 34
         versionCode = 602
         versionName = "1.9.8"
