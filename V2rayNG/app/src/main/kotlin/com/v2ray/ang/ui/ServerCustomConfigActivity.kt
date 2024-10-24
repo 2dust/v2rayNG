@@ -48,16 +48,14 @@ class ServerCustomConfigActivity : BaseActivity() {
     }
 
     /**
-     * bingding seleced server config
+     * Binding selected server config
      */
     private fun bindingServer(config: ServerConfig): Boolean {
         binding.etRemarks.text = Utils.getEditable(config.remarks)
         val raw = MmkvManager.decodeServerRaw(editGuid)
-        if (raw.isNullOrBlank()) {
-            binding.editor.setTextContent(Utils.getEditable(config.fullConfig?.toPrettyPrinting().orEmpty()))
-        } else {
-            binding.editor.setTextContent(Utils.getEditable(raw))
-        }
+        val configContent = raw ?: config.fullConfig?.toPrettyPrinting().orEmpty()
+
+        binding.editor.setTextContent(Utils.getEditable(configContent))
         return true
     }
 
