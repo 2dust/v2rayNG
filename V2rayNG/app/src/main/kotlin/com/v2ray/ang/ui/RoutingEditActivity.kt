@@ -59,16 +59,21 @@ class RoutingEditActivity : BaseActivity() {
     private fun saveServer(): Boolean {
         val rulesetItem = SettingsManager.getRoutingRuleset(position) ?: RulesetItem()
 
-        rulesetItem.remarks = binding.etRemarks.text.toString()
-        rulesetItem.looked = binding.chkLocked.isChecked
-        binding.etDomain.text.toString().let { rulesetItem.domain = if (it.isEmpty()) null else it.split(",").map { itt -> itt.trim() }.filter { itt -> itt.isNotEmpty() } }
-        binding.etIp.text.toString().let { rulesetItem.ip = if (it.isEmpty()) null else it.split(",").map { itt -> itt.trim() }.filter { itt -> itt.isNotEmpty() } }
-        binding.etProtocol.text.toString().let { rulesetItem.protocol = if (it.isEmpty()) null else it.split(",").map { itt -> itt.trim() }.filter { itt -> itt.isNotEmpty() } }
-        binding.etPort.text.toString().let { rulesetItem.port = it.ifEmpty { null } }
-        binding.etNetwork.text.toString().let { rulesetItem.network = it.ifEmpty { null } }
-        rulesetItem.outboundTag = outbound_tag[binding.spOutboundTag.selectedItemPosition]
+        rulesetItem.apply {
+            remarks = binding.etRemarks.text.toString()
+            looked = binding.chkLocked.isChecked
+            domain = binding.etDomain.text.toString().takeIf { it.isNotEmpty() }
+                ?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
+            ip = binding.etIp.text.toString().takeIf { it.isNotEmpty() }
+                ?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
+            protocol = binding.etProtocol.text.toString().takeIf { it.isNotEmpty() }
+                ?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
+            port = binding.etPort.text.toString().takeIf { it.isNotEmpty() }
+            network = binding.etNetwork.text.toString().takeIf { it.isNotEmpty() }
+            outboundTag = outbound_tag[binding.spOutboundTag.selectedItemPosition]
+        }
 
-        if (TextUtils.isEmpty(rulesetItem.remarks)) {
+        if (rulesetItem.remarks.isNullOrEmpty()) {
             toast(R.string.sub_setting_remarks)
             return false
         }
@@ -78,6 +83,7 @@ class RoutingEditActivity : BaseActivity() {
         finish()
         return true
     }
+
 
     private fun deleteServer(): Boolean {
         if (position >= 0) {
