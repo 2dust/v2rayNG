@@ -321,8 +321,8 @@ data class V2rayConfig(
                             tcpSetting.header.type = HTTP
                             if (!TextUtils.isEmpty(host) || !TextUtils.isEmpty(path)) {
                                 val requestObj = TcpSettingsBean.HeaderBean.RequestBean()
-                                requestObj.headers.Host = (host.orEmpty()).split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                                requestObj.path = (path.orEmpty()).split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                                requestObj.headers.Host = host.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                                requestObj.path = path.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
                                 tcpSetting.header.request = requestObj
                                 sni = requestObj.headers.Host?.getOrNull(0) ?: sni
                             }
@@ -371,7 +371,7 @@ data class V2rayConfig(
                     "h2", "http" -> {
                         network = "h2"
                         val h2Setting = HttpSettingsBean()
-                        h2Setting.host = (host.orEmpty()).split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                        h2Setting.host = host.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
                         sni = h2Setting.host.getOrNull(0) ?: sni
                         h2Setting.path = path ?: "/"
                         httpSettings = h2Setting
