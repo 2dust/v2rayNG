@@ -46,6 +46,7 @@ import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.drakeet.support.toast.ToastCompat
 import java.util.concurrent.TimeUnit
 
@@ -489,29 +490,33 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private fun importBatchConfig(server: String?) {
-//        val dialog = AlertDialog.Builder(this)
-//            .setView(LayoutProgressBinding.inflate(layoutInflater).root)
-//            .setCancelable(false)
-//            .show()
         binding.pbWaiting.show()
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val (count, countSub) = AngConfigManager.importBatchConfig(server, mainViewModel.subscriptionId, true)
-            delay(500L)
-            launch(Dispatchers.Main) {
-                if (count > 0) {
-                    toast(R.string.toast_success)
-                    mainViewModel.reloadServerList()
-                } else if (countSub > 0) {
-                    initGroupTab()
-                } else {
-                    toast(R.string.toast_failure)
+            try {
+                val (count, countSub) = AngConfigManager.importBatchConfig(server, mainViewModel.subscriptionId, true)
+                delay(500L)
+                withContext(Dispatchers.Main) {
+                    when {
+                        count > 0 -> {
+                            toast(R.string.toast_success)
+                            mainViewModel.reloadServerList()
+                        }
+                        countSub > 0 -> initGroupTab()
+                        else -> toast(R.string.toast_failure)
+                    }
+                    binding.pbWaiting.hide()
                 }
-                //dialog.dismiss()
-                binding.pbWaiting.hide()
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    toast(R.string.toast_failure)
+                    binding.pbWaiting.hide()
+                }
+                e.printStackTrace()
             }
         }
     }
+
 
     private fun importConfigCustomClipboard()
             : Boolean {
