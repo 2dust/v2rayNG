@@ -29,10 +29,10 @@ jobs:
         go-version: '1.23.2'
 
     - name: Patch Go use 600296
-      #https://go-review.googlesource.com/c/go/+/600296
+      #https://go-review.googlesource.com/1/go/+/600296
       run: |
         cd "$(go env GOROOT)"
-        curl "https://go-review.googlesource.com/changes/go~600296/revisions/2/patch" | base64 -d | patch --verbose -p 1
+        curl "https://go-review.googlesource.com/changes/go~600296/revisions/1/patch" | base64 -d | patch --verbose -p 1
         
     - name: Install gomobile
       run: |
