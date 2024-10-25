@@ -71,23 +71,11 @@ class UserAssetActivity : BaseActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.add_file -> {
-            showFileChooser()
-            true
-        }
-
-        R.id.add_url -> {
-            val intent = Intent(this, UserAssetUrlActivity::class.java)
-            startActivity(intent)
-            true
-        }
-
-        R.id.download_file -> {
-            downloadGeoFiles()
-            true
-        }
-
+    // Use when to streamline the option selection
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.add_file -> showFileChooser().let { true }
+        R.id.add_url -> startActivity(Intent(this, UserAssetUrlActivity::class.java)).let { true }
+        R.id.download_file -> downloadGeoFiles().let { true }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -120,31 +108,29 @@ class UserAssetActivity : BaseActivity() {
             }
     }
 
-    private val chooseFile =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { it ->
-            val uri = it.data?.data
-            if (it.resultCode == RESULT_OK && uri != null) {
-                val assetId = Utils.getUuid()
-                try {
-                    val assetItem = AssetUrlItem(
-                        getCursorName(uri) ?: uri.toString(),
-                        "file"
-                    )
+    val chooseFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val uri = result.data?.data
+        if (result.resultCode == RESULT_OK && uri != null) {
+            val assetId = Utils.getUuid()
+            runCatching {
+                val assetItem = AssetUrlItem(
+                    getCursorName(uri) ?: uri.toString(),
+                    "file"
+                )
 
-                    // check remarks unique
-                    val assetList = MmkvManager.decodeAssetUrls()
-                    if (assetList.any { it.second.remarks == assetItem.remarks && it.first != assetId }) {
-                        toast(R.string.msg_remark_is_duplicate)
-                        return@registerForActivityResult
-                    }
+                val assetList = MmkvManager.decodeAssetUrls()
+                if (assetList.any { it.second.remarks == assetItem.remarks && it.first != assetId }) {
+                    toast(R.string.msg_remark_is_duplicate)
+                } else {
                     MmkvManager.encodeAsset(assetId, assetItem)
                     copyFile(uri)
-                } catch (e: Exception) {
-                    toast(R.string.toast_asset_copy_failed)
-                    MmkvManager.removeAssetUrl(assetId)
                 }
+            }.onFailure {
+                toast(R.string.toast_asset_copy_failed)
+                MmkvManager.removeAssetUrl(assetId)
             }
         }
+    }
 
     private fun copyFile(uri: Uri): String {
         val targetFile = File(extDir, getCursorName(uri) ?: uri.toString())
