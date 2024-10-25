@@ -195,6 +195,7 @@ class ServerActivity : BaseActivity() {
             }
         }
         sp_stream_security?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+<<<<<<< Updated upstream
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val isTls = streamSecuritys[position] == TLS
                 val visibilityMap = mapOf(
@@ -209,7 +210,57 @@ class ServerActivity : BaseActivity() {
 
                 visibilityMap.forEach { (view, visibility) ->
                     view?.visibility = visibility
+=======
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val isBlank = streamSecuritys[position].isBlank()
+                val isTLS = streamSecuritys[position] == TLS
+
+                when {
+                    // Case 1: Null or blank
+                    isBlank -> {
+                        listOf(
+                            container_sni, container_fingerprint, container_alpn,
+                            container_allow_insecure, container_public_key,
+                            container_short_id, container_spider_x
+                        ).forEach { it?.visibility = View.GONE }
+                    }
+
+                    // Case 2: TLS value
+                    isTLS -> {
+                        listOf(
+                            container_sni,
+                            container_fingerprint,
+                            container_alpn
+                        ).forEach { it?.visibility = View.VISIBLE }
+                        container_allow_insecure?.visibility = View.VISIBLE
+                        listOf(
+                            container_public_key,
+                            container_short_id,
+                            container_spider_x
+                        ).forEach { it?.visibility = View.GONE }
+                    }
+
+                    // Case 3: Other reality values
+                    else -> {
+                        listOf(container_sni, container_fingerprint).forEach {
+                            it?.visibility = View.VISIBLE
+                        }
+                        container_alpn?.visibility = View.GONE
+                        container_allow_insecure?.visibility = View.GONE
+                        listOf(
+                            container_public_key,
+                            container_short_id,
+                            container_spider_x
+                        ).forEach { it?.visibility = View.VISIBLE }
+                    }
+>>>>>>> Stashed changes
                 }
+
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -545,11 +596,12 @@ class ServerActivity : BaseActivity() {
         val shortId = et_short_id?.text?.toString()
         val spiderX = et_spider_x?.text?.toString()
 
-        val allowInsecure = if (allowInsecureField == null || allowinsecures[allowInsecureField].isBlank()) {
-            settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
-        } else {
-            allowinsecures[allowInsecureField].toBoolean()
-        }
+        val allowInsecure =
+            if (allowInsecureField == null || allowinsecures[allowInsecureField].isBlank()) {
+                settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
+            } else {
+                allowinsecures[allowInsecureField].toBoolean()
+            }
 
         streamSetting.populateTlsSettings(
             streamSecurity = streamSecuritys[streamSecurity],
