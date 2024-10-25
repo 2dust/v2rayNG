@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import com.tbruyelle.rxpermissions3.RxPermissions
@@ -133,13 +134,15 @@ class AboutActivity : BaseActivity() {
     }
 
     private fun showFileChooser() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "*/*"
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "*/*"
+            addCategory(Intent.CATEGORY_OPENABLE)
+        }
 
         try {
             chooseFile.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
         } catch (ex: android.content.ActivityNotFoundException) {
+            Log.e(AppConfig.ANG_PACKAGE, "File chooser activity not found: ${ex.message}", ex)
             toast(R.string.toast_require_file_manager)
         }
     }
@@ -149,27 +152,23 @@ class AboutActivity : BaseActivity() {
             val uri = it.data?.data
             if (it.resultCode == RESULT_OK && uri != null) {
                 try {
-                    try {
-                        val targetFile =
-                            File(this.cacheDir.absolutePath, "${System.currentTimeMillis()}.zip")
-                        contentResolver.openInputStream(uri).use { input ->
-                            targetFile.outputStream().use { fileOut ->
-                                input?.copyTo(fileOut)
-                            }
+                    val targetFile =
+                        File(this.cacheDir.absolutePath, "${System.currentTimeMillis()}.zip")
+                    contentResolver.openInputStream(uri).use { input ->
+                        targetFile.outputStream().use { fileOut ->
+                            input?.copyTo(fileOut)
                         }
-                        if (restoreConfiguration(targetFile)) {
-                            toast(R.string.toast_success)
-                        } else {
-                            toast(R.string.toast_failure)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
                     }
-
+                    if (restoreConfiguration(targetFile)) {
+                        toast(R.string.toast_success)
+                    } else {
+                        toast(R.string.toast_failure)
+                    }
                 } catch (e: Exception) {
-                    e.printStackTrace()
-                    toast(e.message.toString())
+                    Log.e(AppConfig.ANG_PACKAGE, "Error during file restore: ${e.message}", e)
+                    toast(R.string.toast_failure)
                 }
             }
         }
+
 }
