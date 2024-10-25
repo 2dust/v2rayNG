@@ -428,10 +428,11 @@ object V2RayServiceManager {
     }
 
     private fun stopSpeedNotification() {
-        if (mDisposable != null) {
-            mDisposable?.dispose() //stop queryStats
+        mDisposable?.let {
+            it.dispose() //stop queryStats
             mDisposable = null
             updateNotification(currentConfig?.remarks, 0, 0)
         }
     }
+
 }
