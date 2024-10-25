@@ -33,45 +33,41 @@ class LogcatActivity : BaseActivity() {
     }
 
     private fun logcat(shouldFlushLog: Boolean) {
+        binding.pbWaiting.visibility = View.VISIBLE
 
-        try {
-            binding.pbWaiting.visibility = View.VISIBLE
-
-            lifecycleScope.launch(Dispatchers.Default) {
+        lifecycleScope.launch(Dispatchers.Default) {
+            try {
                 if (shouldFlushLog) {
-                    val lst = LinkedHashSet<String>()
-                    lst.add("logcat")
-                    lst.add("-c")
+                    val lst = linkedSetOf("logcat", "-c")
                     withContext(Dispatchers.IO) {
                         val process = Runtime.getRuntime().exec(lst.toTypedArray())
                         process.waitFor()
                     }
                 }
-                val lst = LinkedHashSet<String>()
-                lst.add("logcat")
-                lst.add("-d")
-                lst.add("-v")
-                lst.add("time")
-                lst.add("-s")
-                lst.add("GoLog,tun2socks,${ANG_PACKAGE},AndroidRuntime,System.err")
+                val lst = linkedSetOf(
+                    "logcat", "-d", "-v", "time", "-s",
+                    "GoLog,tun2socks,$ANG_PACKAGE,AndroidRuntime,System.err"
+                )
                 val process = withContext(Dispatchers.IO) {
                     Runtime.getRuntime().exec(lst.toTypedArray())
                 }
-//                val bufferedReader = BufferedReader(
-//                        InputStreamReader(process.inputStream))
-//                val allText = bufferedReader.use(BufferedReader::readText)
                 val allText = process.inputStream.bufferedReader().use { it.readText() }
-                launch(Dispatchers.Main) {
+                withContext(Dispatchers.Main) {
                     binding.tvLogcat.text = allText
                     binding.tvLogcat.movementMethod = ScrollingMovementMethod()
                     binding.pbWaiting.visibility = View.GONE
                     Handler(Looper.getMainLooper()).post { binding.svLogcat.fullScroll(View.FOCUS_DOWN) }
                 }
+            } catch (e: IOException) {
+                withContext(Dispatchers.Main) {
+                    binding.pbWaiting.visibility = View.GONE
+                    toast(R.string.toast_failure)
+                }
+                e.printStackTrace()
             }
-        } catch (e: IOException) {
-            e.printStackTrace()
         }
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_logcat, menu)
