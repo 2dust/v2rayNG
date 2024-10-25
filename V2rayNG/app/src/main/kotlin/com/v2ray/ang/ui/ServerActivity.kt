@@ -195,22 +195,6 @@ class ServerActivity : BaseActivity() {
             }
         }
         sp_stream_security?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-<<<<<<< Updated upstream
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val isTls = streamSecuritys[position] == TLS
-                val visibilityMap = mapOf(
-                    container_sni to View.VISIBLE,
-                    container_fingerprint to View.VISIBLE,
-                    container_alpn to if (isTls) View.VISIBLE else View.GONE,
-                    container_allow_insecure to if (isTls) View.VISIBLE else View.GONE,
-                    container_public_key to if (!isTls) View.VISIBLE else View.GONE,
-                    container_short_id to if (!isTls) View.VISIBLE else View.GONE,
-                    container_spider_x to if (!isTls) View.VISIBLE else View.GONE
-                )
-
-                visibilityMap.forEach { (view, visibility) ->
-                    view?.visibility = visibility
-=======
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -258,7 +242,6 @@ class ServerActivity : BaseActivity() {
                             container_spider_x
                         ).forEach { it?.visibility = View.VISIBLE }
                     }
->>>>>>> Stashed changes
                 }
 
             }
@@ -267,7 +250,6 @@ class ServerActivity : BaseActivity() {
                 // do nothing
             }
         }
-
         if (config != null) {
             bindingServer(config)
         } else {
