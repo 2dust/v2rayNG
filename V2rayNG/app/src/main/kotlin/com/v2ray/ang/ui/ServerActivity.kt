@@ -201,31 +201,49 @@ class ServerActivity : BaseActivity() {
                 position: Int,
                 id: Long
             ) {
-                if (streamSecuritys[position].isBlank()) {
-                    container_sni?.visibility = View.GONE
-                    container_fingerprint?.visibility = View.GONE
-                    container_alpn?.visibility = View.GONE
-                    container_allow_insecure?.visibility = View.GONE
-                    container_public_key?.visibility = View.GONE
-                    container_short_id?.visibility = View.GONE
-                    container_spider_x?.visibility = View.GONE
-                } else {
-                    container_sni?.visibility = View.VISIBLE
-                    container_fingerprint?.visibility = View.VISIBLE
-                    container_alpn?.visibility = View.VISIBLE
-                    if (streamSecuritys[position] == TLS) {
+                val isBlank = streamSecuritys[position].isBlank()
+                val isTLS = streamSecuritys[position] == TLS
+
+                when {
+                    // Case 1: Null or blank
+                    isBlank -> {
+                        listOf(
+                            container_sni, container_fingerprint, container_alpn,
+                            container_allow_insecure, container_public_key,
+                            container_short_id, container_spider_x
+                        ).forEach { it?.visibility = View.GONE }
+                    }
+
+                    // Case 2: TLS value
+                    isTLS -> {
+                        listOf(
+                            container_sni,
+                            container_fingerprint,
+                            container_alpn
+                        ).forEach { it?.visibility = View.VISIBLE }
                         container_allow_insecure?.visibility = View.VISIBLE
-                        container_public_key?.visibility = View.GONE
-                        container_short_id?.visibility = View.GONE
-                        container_spider_x?.visibility = View.GONE
-                    } else {
-                        container_allow_insecure?.visibility = View.GONE
+                        listOf(
+                            container_public_key,
+                            container_short_id,
+                            container_spider_x
+                        ).forEach { it?.visibility = View.GONE }
+                    }
+
+                    // Case 3: Other reality values
+                    else -> {
+                        listOf(container_sni, container_fingerprint).forEach {
+                            it?.visibility = View.VISIBLE
+                        }
                         container_alpn?.visibility = View.GONE
-                        container_public_key?.visibility = View.VISIBLE
-                        container_short_id?.visibility = View.VISIBLE
-                        container_spider_x?.visibility = View.VISIBLE
+                        container_allow_insecure?.visibility = View.GONE
+                        listOf(
+                            container_public_key,
+                            container_short_id,
+                            container_spider_x
+                        ).forEach { it?.visibility = View.VISIBLE }
                     }
                 }
+
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -560,11 +578,12 @@ class ServerActivity : BaseActivity() {
         val shortId = et_short_id?.text?.toString()
         val spiderX = et_spider_x?.text?.toString()
 
-        val allowInsecure = if (allowInsecureField == null || allowinsecures[allowInsecureField].isBlank()) {
-            settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
-        } else {
-            allowinsecures[allowInsecureField].toBoolean()
-        }
+        val allowInsecure =
+            if (allowInsecureField == null || allowinsecures[allowInsecureField].isBlank()) {
+                settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
+            } else {
+                allowinsecures[allowInsecureField].toBoolean()
+            }
 
         streamSetting.populateTlsSettings(
             streamSecurity = streamSecuritys[streamSecurity],
