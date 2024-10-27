@@ -99,6 +99,7 @@
     <string name="server_lab_content">المحتوى</string>
     <string name="toast_none_data_clipboard">لا توجد بيانات في الحافظة</string>
     <string name="toast_invalid_url">رابط URL غير صالح</string>
+    <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
     <string name="server_lab_need_inbound">تأكد من أن منفذ الاتصالات الواردة يتوافق مع الإعدادات</string>
     <string name="toast_malformed_josn">تكوين مشوه</string>
     <string name="server_lab_request_host6">مضيف (SNI) (اختياري)</string>

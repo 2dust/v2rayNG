@@ -97,6 +97,7 @@
     <string name="server_lab_content">Данные</string>
     <string name="toast_none_data_clipboard">В буфере обмена нет данных</string>
     <string name="toast_invalid_url">Неправильный URL</string>
+    <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
     <string name="server_lab_need_inbound">Убедитесь, что входящий порт соответствует настройкам</string>
     <string name="toast_malformed_josn">Профиль повреждён</string>
     <string name="server_lab_request_host6">Узел (SNI) (необязательно)</string>

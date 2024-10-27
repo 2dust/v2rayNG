@@ -97,6 +97,7 @@
     <string name="server_lab_content">內容</string>
     <string name="toast_none_data_clipboard">剪貼簿內無資料</string>
     <string name="toast_invalid_url">URL 無效</string>
+    <string name="toast_insecure_url_protocol">請不要使用不安全的HTTP協定訂閱位址</string>
     <string name="server_lab_need_inbound">​​確保 inbounds port 和設定中的一致</string>
     <string name="toast_malformed_josn">設定格式不正確</string>
     <string name="server_lab_request_host6">Host(SNI)(可選)</string>

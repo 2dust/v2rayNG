@@ -98,6 +98,7 @@
     <string name="server_lab_content">কনটেন্ট</string>
     <string name="toast_none_data_clipboard">ক্লিপবোর্ডে কোনও তথ্য নেই</string>
     <string name="toast_invalid_url">অবৈধ URL</string>
+    <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
     <string name="server_lab_need_inbound">ইনবাউন্ড পোর্ট নিশ্চিত করুন সেটিংসের সাথে সামঞ্জস্যপূর্ণ</string>
     <string name="toast_malformed_josn">কনফিগারেশন বিকৃত</string>
     <string name="server_lab_request_host6">হোস্ট (SNI) (ঐচ্ছিক)</string>

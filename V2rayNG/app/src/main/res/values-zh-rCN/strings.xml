@@ -97,6 +97,7 @@
     <string name="server_lab_content">内容</string>
     <string name="toast_none_data_clipboard">剪贴板中没有数据</string>
     <string name="toast_invalid_url">无效的网址</string>
+    <string name="toast_insecure_url_protocol">请不要使用不安全的HTTP协议订阅地址</string>
     <string name="server_lab_need_inbound">确保inbounds port和设置中的一致</string>
     <string name="toast_malformed_josn">配置格式错误</string>
     <string name="server_lab_request_host6">Host(SNI)(可选)</string>

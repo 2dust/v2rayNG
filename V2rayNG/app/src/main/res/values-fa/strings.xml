@@ -97,6 +97,7 @@
     <string name="server_lab_content">محتوا</string>
     <string name="toast_none_data_clipboard">هیچ داده‌ای در کلیپ‌بورد وجود ندارد</string>
     <string name="toast_invalid_url">نشانی اینترنتی معتبر نیست</string>
+    <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
     <string name="server_lab_need_inbound">اطمینان حاصل کنید که پورت ورودی با تنظیمات مطابقت دارد</string>
     <string name="toast_malformed_josn">کانفیگ درست نیست</string>
     <string name="server_lab_request_host6">میزبان (SNI) (اختیاری)</string>
