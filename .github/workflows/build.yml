@@ -33,6 +33,17 @@ jobs:
         go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20240806205939-81131f6468ab
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
+    - name: Create mod cache directory
+      run: mkdir -p /home/runner/go/pkg/mod
+
+    - name: Cache modules
+      uses: actions/cache@v2
+      with:
+        path: /home/runner/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
     - name: Setup Android environment
       uses: android-actions/setup-android@v3.2.1
 
