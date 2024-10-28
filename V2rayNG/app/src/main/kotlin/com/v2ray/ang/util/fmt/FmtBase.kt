@@ -58,6 +58,9 @@ open class FmtBase {
                     if (!TextUtils.isEmpty(transportDetails[1])) {
                         dicQuery["host"] = transportDetails[1]
                     }
+                    if (!TextUtils.isEmpty(transportDetails[2])) {
+                        dicQuery["path"] = transportDetails[2]
+                    }
                 }
 
                 "kcp" -> {
