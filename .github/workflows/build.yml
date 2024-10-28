@@ -34,7 +34,7 @@ jobs:
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
     - name: Setup Android environment
-      uses: android-actions/setup-android@v3
+      uses: android-actions/setup-android@v3.2.1
 
     - name: Build dependencies
       run: |
