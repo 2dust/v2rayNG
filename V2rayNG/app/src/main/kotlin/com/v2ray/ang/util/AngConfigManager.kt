@@ -365,7 +365,8 @@ object AngConfigManager {
                 val httpPort = SettingsManager.getHttpPort()
                 Utils.getUrlContentWithCustomUserAgent(url, 30000, httpPort)
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(AppConfig.ANG_PACKAGE, "Proxy not found or error")
+                //e.printStackTrace()
                 ""
             }
             if (configText.isEmpty()) {
