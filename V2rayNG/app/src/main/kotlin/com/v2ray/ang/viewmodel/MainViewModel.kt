@@ -23,7 +23,6 @@ import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.AngConfigManager
-import com.v2ray.ang.util.AngConfigManager.updateConfigViaSub
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
@@ -157,7 +156,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return AngConfigManager.updateConfigViaSubAll()
         } else {
             val subItem = MmkvManager.decodeSubscription(subscriptionId) ?: return 0
-            return updateConfigViaSub(Pair(subscriptionId, subItem))
+            return AngConfigManager.updateConfigViaSub(Pair(subscriptionId, subItem))
         }
     }
 
@@ -181,10 +180,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         tcpingTestScope.coroutineContext[Job]?.cancelChildren()
         SpeedtestUtil.closeAllTcpSockets()
         MmkvManager.clearAllTestDelayResults(serversCache.map { it.guid }.toList())
-        updateListAction.value = -1 // update all
+        //updateListAction.value = -1 // update all
 
-        getApplication<AngApplication>().toast(R.string.connection_test_testing)
-        for (item in serversCache) {
+        val serversCopy = serversCache.toList() // Create a copy of the list
+        for (item in serversCopy) {
             item.profile.let { outbound ->
                 val serverAddress = outbound.server
                 val serverPort = outbound.serverPort
@@ -207,8 +206,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         updateListAction.value = -1 // update all
 
         val serversCopy = serversCache.toList() // Create a copy of the list
-
-        getApplication<AngApplication>().toast(R.string.connection_test_testing)
         viewModelScope.launch(Dispatchers.Default) { // without Dispatchers.Default viewModelScope will launch in main thread
             for (item in serversCopy) {
                 MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG, item.guid)

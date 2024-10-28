@@ -342,11 +342,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.ping_all -> {
+            toast(R.string.connection_test_testing)
             mainViewModel.testAllTcping()
             true
         }
 
         R.id.real_ping_all -> {
+            toast(R.string.connection_test_testing)
             mainViewModel.testAllRealPing()
             true
         }
@@ -604,8 +606,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             delay(500L)
             launch(Dispatchers.Main) {
                 if (count > 0) {
-                    toast(R.string.toast_success)
+                    //toast(R.string.toast_success)
+                    toast(R.string.connection_test_testing)
                     mainViewModel.reloadServerList()
+                    mainViewModel.testAllRealPing()
                 } else {
                     toast(R.string.toast_failure)
                 }
