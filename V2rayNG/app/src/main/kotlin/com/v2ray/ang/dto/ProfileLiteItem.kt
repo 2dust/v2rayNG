@@ -1,6 +1,6 @@
 package com.v2ray.ang.dto
 
-data class ProfileItem(
+data class ProfileLiteItem(
     val configType: EConfigType,
     var subscriptionId: String = "",
     var remarks: String = "",

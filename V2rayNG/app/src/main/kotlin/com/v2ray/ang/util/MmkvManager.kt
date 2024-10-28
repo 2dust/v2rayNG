@@ -5,7 +5,7 @@ import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
 import com.v2ray.ang.dto.AssetUrlItem
-import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.ProfileLiteItem
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerAffiliationInfo
 import com.v2ray.ang.dto.ServerConfig
@@ -72,7 +72,7 @@ object MmkvManager {
         return JsonUtil.fromJson(json, ServerConfig::class.java)
     }
 
-    fun decodeProfileConfig(guid: String): ProfileItem? {
+    fun decodeProfileConfig(guid: String): ProfileLiteItem? {
         if (guid.isBlank()) {
             return null
         }
@@ -80,7 +80,7 @@ object MmkvManager {
         if (json.isNullOrBlank()) {
             return null
         }
-        return JsonUtil.fromJson(json, ProfileItem::class.java)
+        return JsonUtil.fromJson(json, ProfileLiteItem::class.java)
     }
 
     fun encodeServerConfig(guid: String, config: ServerConfig): String {
@@ -94,7 +94,7 @@ object MmkvManager {
                 mainStorage.encode(KEY_SELECTED_SERVER, key)
             }
         }
-        val profile = ProfileItem(
+        val profile = ProfileLiteItem(
             configType = config.configType,
             subscriptionId = config.subscriptionId,
             remarks = config.remarks,

@@ -16,7 +16,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.ProfileLiteItem
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.dto.V2rayConfig
@@ -102,7 +102,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
                 serverList.add(0, key)
-                val profile = ProfileItem(
+                val profile = ProfileLiteItem(
                     configType = config.configType,
                     subscriptionId = config.subscriptionId,
                     remarks = config.remarks,
@@ -131,7 +131,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             var profile = MmkvManager.decodeProfileConfig(guid)
             if (profile == null) {
                 val config = MmkvManager.decodeServerConfig(guid) ?: continue
-                profile = ProfileItem(
+                profile = ProfileLiteItem(
                     configType = config.configType,
                     subscriptionId = config.subscriptionId,
                     remarks = config.remarks,
