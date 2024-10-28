@@ -224,8 +224,7 @@
         <activity
             android:name=".ui.TaskerActivity"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name">
+            android:icon="@mipmap/ic_launcher">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
             </intent-filter>
@@ -234,7 +233,8 @@
         <receiver
             android:name=".receiver.TaskerReceiver"
             android:exported="true"
-            android:process=":RunSoLibV2RayDaemon">
+            android:process=":RunSoLibV2RayDaemon"
+            tools:ignore="ExportedReceiver">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
             </intent-filter>
