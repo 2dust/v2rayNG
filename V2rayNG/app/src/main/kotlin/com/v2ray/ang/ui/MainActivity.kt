@@ -713,37 +713,48 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        binding.drawerLayout.closeDrawer(GravityCompat.START)
+
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.sub_setting -> {
-                requestSubSettingActivity.launch(Intent(this, SubSettingActivity::class.java))
+            R.id.sub_setting -> {            
+                binding.drawerLayout.postDelayed({                
+                    requestSubSettingActivity.launch(Intent(this, SubSettingActivity::class.java))            
+                }, 180)        
             }
-
-            R.id.settings -> {
-                startActivity(
-                    Intent(this, SettingsActivity::class.java)
-                        .putExtra("isRunning", mainViewModel.isRunning.value == true)
-                )
+            R.id.settings -> {            
+                binding.drawerLayout.postDelayed({                
+                    startActivity(            
+                        Intent(this, SettingsActivity::class.java)                        
+                            .putExtra("isRunning", mainViewModel.isRunning.value == true)                
+                    )            
+                }, 180)        
             }
-
-            R.id.routing_setting -> {
-                requestSubSettingActivity.launch(Intent(this, RoutingSettingActivity::class.java))
+        
+            R.id.routing_setting -> {            
+                binding.drawerLayout.postDelayed({                
+                    requestSubSettingActivity.launch(Intent(this, RoutingSettingActivity::class.java))            
+                }, 180)
             }
-
 
             R.id.promotion -> {
-                Utils.openUri(this, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")
+                binding.drawerLayout.postDelayed({
+                    Utils.openUri(this, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")
+                }, 180)
             }
-
-            R.id.logcat -> {
-                startActivity(Intent(this, LogcatActivity::class.java))
+        
+            R.id.logcat -> {            
+                binding.drawerLayout.postDelayed({                
+                    startActivity(Intent(this, LogcatActivity::class.java))            
+                }, 180)                    
             }
-
-            R.id.about -> {
-                startActivity(Intent(this, AboutActivity::class.java))
+        
+            R.id.about -> {            
+                binding.drawerLayout.postDelayed({                
+                    startActivity(Intent(this, AboutActivity::class.java))            
+                }, 180)        
             }
         }
-        binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
 }
