@@ -365,7 +365,7 @@ object AngConfigManager {
                 val httpPort = SettingsManager.getHttpPort()
                 Utils.getUrlContentWithCustomUserAgent(url, 30000, httpPort)
             } catch (e: Exception) {
-                Log.e(AppConfig.ANG_PACKAGE, "Proxy not ready or other error")
+                Log.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error, try……")
                 //e.printStackTrace()
                 ""
             }
