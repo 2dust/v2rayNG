@@ -44,7 +44,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_FRAGMENT_LENGTH,
             AppConfig.PREF_FRAGMENT_INTERVAL,
             AppConfig.PREF_MUX_XUDP_QUIC,
-            -> {
+                -> {
                 settingsStorage?.encode(key, sharedPreferences.getString(key, ""))
             }
 
@@ -63,7 +63,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.SUBSCRIPTION_AUTO_UPDATE,
             AppConfig.PREF_FRAGMENT_ENABLED,
             AppConfig.PREF_MUX_ENABLED,
-            -> {
+                -> {
                 settingsStorage?.encode(key, sharedPreferences.getBoolean(key, false))
             }
 

@@ -64,7 +64,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             .build()
     }
 
-    private val connectivity by lazy { getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
+    private val connectivity by lazy { getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager }
 
     @delegate:RequiresApi(Build.VERSION_CODES.P)
     private val defaultNetworkCallback by lazy {
@@ -155,7 +155,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         val selfPackageName = BuildConfig.APPLICATION_ID
         if (settingsStorage?.decodeBool(AppConfig.PREF_PER_APP_PROXY) == true) {
             val apps = settingsStorage?.decodeStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
-            val bypassApps = settingsStorage?.decodeBool(AppConfig.PREF_BYPASS_APPS) ?: false
+            val bypassApps = settingsStorage?.decodeBool(AppConfig.PREF_BYPASS_APPS) == true
             //process self package
             if (bypassApps) apps?.add(selfPackageName) else apps?.remove(selfPackageName)
             apps?.forEach {

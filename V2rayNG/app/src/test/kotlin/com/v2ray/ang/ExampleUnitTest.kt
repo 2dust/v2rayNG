@@ -1,11 +1,4 @@
 import com.v2ray.ang.util.Utils
-import com.v2ray.ang.util.fmt.Hysteria2Fmt
-import com.v2ray.ang.util.fmt.ShadowsocksFmt
-import com.v2ray.ang.util.fmt.SocksFmt
-import com.v2ray.ang.util.fmt.TrojanFmt
-import com.v2ray.ang.util.fmt.VlessFmt
-import com.v2ray.ang.util.fmt.VmessFmt
-import com.v2ray.ang.util.fmt.WireguardFmt
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

@@ -42,6 +42,6 @@
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"
-        android:paddingStart="@dimen/padding_start"/>
+        android:paddingStart="@dimen/padding_start" />
 
 </LinearLayout>

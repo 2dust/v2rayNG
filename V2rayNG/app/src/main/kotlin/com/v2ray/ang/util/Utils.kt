@@ -422,8 +422,6 @@ object Utils {
     }
 
 
-
-
     private fun getSysLocale(): Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         LocaleList.getDefault()[0]
     } else {

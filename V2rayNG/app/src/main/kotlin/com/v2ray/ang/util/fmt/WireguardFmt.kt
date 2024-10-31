@@ -23,7 +23,7 @@ object WireguardFmt : FmtBase() {
         config.serverPort = uri.port.toString()
 
         config.secretKey = uri.userInfo
-        config.localAddress = (queryParam["address"] ?: AppConfig.WIREGUARD_LOCAL_ADDRESS_V4)
+        config.localAddress = (queryParam["address"] ?: WIREGUARD_LOCAL_ADDRESS_V4)
         config.publicKey = queryParam["publickey"].orEmpty()
         config.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
         config.reserved = (queryParam["reserved"] ?: "0,0,0")
@@ -52,7 +52,7 @@ object WireguardFmt : FmtBase() {
         }
 
         config.secretKey = queryParam["privatekey"].orEmpty()
-        config.localAddress = (queryParam["address"] ?: AppConfig.WIREGUARD_LOCAL_ADDRESS_V4)
+        config.localAddress = (queryParam["address"] ?: WIREGUARD_LOCAL_ADDRESS_V4)
         config.publicKey = queryParam["publickey"].orEmpty()
         config.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
         config.reserved = (queryParam["reserved"] ?: "0,0,0")

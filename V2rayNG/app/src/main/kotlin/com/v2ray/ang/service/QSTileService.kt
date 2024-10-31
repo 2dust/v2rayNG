@@ -37,7 +37,7 @@ class QSTileService : TileService() {
         setState(Tile.STATE_INACTIVE)
         mMsgReceive = ReceiveMessageHandler(this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(mMsgReceive, IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY), Context.RECEIVER_EXPORTED)
+            registerReceiver(mMsgReceive, IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY), RECEIVER_EXPORTED)
         } else {
             registerReceiver(mMsgReceive, IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY))
         }

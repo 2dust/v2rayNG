@@ -19,6 +19,7 @@ package com.v2ray.ang.helper;
 import android.animation.ValueAnimator;
 import android.graphics.Canvas;
 import android.view.animation.DecelerateInterpolator;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -87,13 +88,13 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
-                        @NonNull RecyclerView.ViewHolder viewHolder,
-                        float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                            @NonNull RecyclerView.ViewHolder viewHolder,
+                            float dX, float dY, int actionState, boolean isCurrentlyActive) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             float maxSwipeDistance = viewHolder.itemView.getWidth() * SWIPE_THRESHOLD;
             float swipeAmount = Math.abs(dX);
             float direction = Math.signum(dX);
-		
+
             // 限制最大滑动距离
             float translationX = Math.min(swipeAmount, maxSwipeDistance) * direction;
             float alpha = ALPHA_FULL - Math.min(swipeAmount, maxSwipeDistance) / maxSwipeDistance;

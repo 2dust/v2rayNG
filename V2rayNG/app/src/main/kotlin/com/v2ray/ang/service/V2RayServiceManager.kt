@@ -157,7 +157,7 @@ object V2RayServiceManager {
         currentConfig = config
 
         try {
-            v2rayPoint.runLoop(settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) ?: false)
+            v2rayPoint.runLoop(settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) == true)
         } catch (e: Exception) {
             Log.d(ANG_PACKAGE, e.toString())
         }

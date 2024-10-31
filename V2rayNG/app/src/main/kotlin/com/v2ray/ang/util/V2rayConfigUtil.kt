@@ -124,11 +124,9 @@ object V2rayConfigUtil {
                 }
             }
             v2rayConfig.inbounds[0].port = socksPort
-            val fakedns = settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED)
-                ?: false
+            val fakedns = settingsStorage?.decodeBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
             val sniffAllTlsAndHttp =
-                settingsStorage?.decodeBool(AppConfig.PREF_SNIFFING_ENABLED, true)
-                    ?: true
+                settingsStorage?.decodeBool(AppConfig.PREF_SNIFFING_ENABLED, true) != false
             v2rayConfig.inbounds[0].sniffing?.enabled = fakedns || sniffAllTlsAndHttp
             v2rayConfig.inbounds[0].sniffing?.routeOnly =
                 settingsStorage?.decodeBool(AppConfig.PREF_ROUTE_ONLY_ENABLED, false)

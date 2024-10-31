@@ -215,7 +215,7 @@ class PerAppProxyActivity : BaseActivity() {
             }
             it.notifyDataSetChanged()
             true
-        } ?: false
+        } == true
 
         R.id.select_proxy_app -> {
             selectProxyApp()

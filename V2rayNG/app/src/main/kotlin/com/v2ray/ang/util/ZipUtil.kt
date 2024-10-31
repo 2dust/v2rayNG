@@ -31,7 +31,7 @@ object ZipUtil {
                     }
                 }
             }
-            if (filesToCompress.isEmpty()) {
+            if (filesToCompress.isEmpty) {
                 return false
             }
 

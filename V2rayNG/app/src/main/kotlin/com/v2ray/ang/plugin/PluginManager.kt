@@ -43,6 +43,7 @@ import java.io.FileNotFoundException
 object PluginManager {
 
     class PluginNotFoundException(val plugin: String) : FileNotFoundException(plugin)
+
     private var receiver: BroadcastReceiver? = null
     private var cachedPlugins: PluginList? = null
     fun fetchPlugins() = synchronized(this) {
@@ -88,30 +89,34 @@ object PluginManager {
                 flags or PackageManager.MATCH_DIRECT_BOOT_UNAWARE or PackageManager.MATCH_DIRECT_BOOT_AWARE
         }
         var providers = AngApplication.application.packageManager.queryIntentContentProviders(
-            Intent(PluginContract.ACTION_NATIVE_PLUGIN, buildUri(pluginId, "com.github.dyhkwong.AngApplication")), flags)
+            Intent(PluginContract.ACTION_NATIVE_PLUGIN, buildUri(pluginId, "com.github.dyhkwong.AngApplication")), flags
+        )
             .filter { it.providerInfo.exported }
         if (providers.isEmpty()) {
             providers = AngApplication.application.packageManager.queryIntentContentProviders(
-            Intent(PluginContract.ACTION_NATIVE_PLUGIN, buildUri(pluginId, "io.nekohasekai.AngApplication")), flags)
-            .filter { it.providerInfo.exported }
+                Intent(PluginContract.ACTION_NATIVE_PLUGIN, buildUri(pluginId, "io.nekohasekai.AngApplication")), flags
+            )
+                .filter { it.providerInfo.exported }
         }
         if (providers.isEmpty()) {
             providers = AngApplication.application.packageManager.queryIntentContentProviders(
-            Intent(PluginContract.ACTION_NATIVE_PLUGIN, buildUri(pluginId, "moe.matsuri.lite")), flags)
-            .filter { it.providerInfo.exported }
+                Intent(PluginContract.ACTION_NATIVE_PLUGIN, buildUri(pluginId, "moe.matsuri.lite")), flags
+            )
+                .filter { it.providerInfo.exported }
         }
         if (providers.isEmpty()) {
             providers = AngApplication.application.packageManager.queryIntentContentProviders(
-            Intent(PluginContract.ACTION_NATIVE_PLUGIN, buildUri(pluginId, "fr.husi")), flags)
-            .filter { it.providerInfo.exported }
+                Intent(PluginContract.ACTION_NATIVE_PLUGIN, buildUri(pluginId, "fr.husi")), flags
+            )
+                .filter { it.providerInfo.exported }
         }
         if (providers.isEmpty()) {
             providers = AngApplication.application.packageManager.queryIntentContentProviders(
                 Intent(PluginContract.ACTION_NATIVE_PLUGIN), PackageManager.GET_META_DATA
             ).filter {
                 it.providerInfo.exported &&
-                it.providerInfo.metaData.containsKey(METADATA_KEY_ID) &&
-                it.providerInfo.metaData.getString(METADATA_KEY_ID) == pluginId
+                        it.providerInfo.metaData.containsKey(METADATA_KEY_ID) &&
+                        it.providerInfo.metaData.getString(METADATA_KEY_ID) == pluginId
             }
             if (providers.size > 1) {
                 providers = listOf(providers[0]) // What if there is more than one?
@@ -129,7 +134,7 @@ object PluginManager {
         try {
             initNativeFaster(provider)?.also { return InitResult(it) }
         } catch (t: Throwable) {
-         //   Logs.w("Initializing native plugin faster mode failed")
+            //   Logs.w("Initializing native plugin faster mode failed")
             failure = t
         }
 
@@ -138,19 +143,23 @@ object PluginManager {
             authority(provider.authority)
         }.build()
         try {
-            return initNativeFast(AngApplication.application.contentResolver,
+            return initNativeFast(
+                AngApplication.application.contentResolver,
                 pluginId,
-                uri)?.let { InitResult(it) }
+                uri
+            )?.let { InitResult(it) }
         } catch (t: Throwable) {
-          //  Logs.w("Initializing native plugin fast mode failed")
+            //  Logs.w("Initializing native plugin fast mode failed")
             failure?.also { t.addSuppressed(it) }
             failure = t
         }
 
         try {
-            return initNativeSlow(AngApplication.application.contentResolver,
+            return initNativeSlow(
+                AngApplication.application.contentResolver,
                 pluginId,
-                uri)?.let { InitResult(it) }
+                uri
+            )?.let { InitResult(it) }
         } catch (t: Throwable) {
             failure?.also { t.addSuppressed(it) }
             throw t
@@ -180,11 +189,13 @@ object PluginManager {
             throw IndexOutOfBoundsException("Plugin entry binary not found")
 
         val pluginDir = File(AngApplication.application.noBackupFilesDir, "plugin")
-        (cr.query(uri,
+        (cr.query(
+            uri,
             arrayOf(PluginContract.COLUMN_PATH, PluginContract.COLUMN_MODE),
             null,
             null,
-            null)
+            null
+        )
             ?: return null).use { cursor ->
             if (!cursor.moveToFirst()) entryNotFound()
             pluginDir.deleteRecursively()
@@ -197,11 +208,13 @@ object PluginManager {
                 cr.openInputStream(uri.buildUpon().path(path).build())!!.use { inStream ->
                     file.outputStream().use { outStream -> inStream.copyTo(outStream) }
                 }
-                Os.chmod(file.absolutePath, when (cursor.getType(1)) {
-                    Cursor.FIELD_TYPE_INTEGER -> cursor.getInt(1)
-                    Cursor.FIELD_TYPE_STRING -> cursor.getString(1).toInt(8)
-                    else -> throw IllegalArgumentException("File mode should be of type int")
-                })
+                Os.chmod(
+                    file.absolutePath, when (cursor.getType(1)) {
+                        Cursor.FIELD_TYPE_INTEGER -> cursor.getInt(1)
+                        Cursor.FIELD_TYPE_STRING -> cursor.getString(1).toInt(8)
+                        else -> throw IllegalArgumentException("File mode should be of type int")
+                    }
+                )
                 if (path == pluginId) initialized = true
             } while (cursor.moveToNext())
         }
@@ -213,6 +226,7 @@ object PluginManager {
         is String -> value
         is Int -> AngApplication.application.packageManager.getResourcesForApplication(applicationInfo)
             .getString(value)
+
         null -> null
         else -> error("meta-data $key has invalid type ${value.javaClass}")
     }

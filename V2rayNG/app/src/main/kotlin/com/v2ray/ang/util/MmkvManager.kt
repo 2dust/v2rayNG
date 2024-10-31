@@ -192,7 +192,7 @@ object MmkvManager {
     }
 
     fun decodeServerRaw(guid: String): String? {
-        return serverRawStorage.decodeString(guid) ?: return null
+        return serverRawStorage.decodeString(guid)
     }
 
     //endregion

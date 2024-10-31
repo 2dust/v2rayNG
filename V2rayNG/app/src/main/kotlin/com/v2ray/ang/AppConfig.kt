@@ -155,6 +155,7 @@ object AppConfig {
 
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"
+
     // Google API rule constants
     const val GOOGLEAPIS_CN_DOMAIN = "domain:googleapis.cn"
     const val GOOGLEAPIS_COM_DOMAIN = "googleapis.com"
