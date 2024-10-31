@@ -7,6 +7,9 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
+import com.v2ray.ang.AppConfig
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean.*
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean.VnextBean.*
 import com.v2ray.ang.util.Utils
 import java.lang.reflect.Type
 
@@ -27,16 +30,6 @@ data class V2rayConfig(
     var observatory: Any? = null,
     var burstObservatory: Any? = null
 ) {
-    companion object {
-        const val DEFAULT_PORT = 443
-        const val DEFAULT_SECURITY = "auto"
-        const val DEFAULT_LEVEL = 8
-        const val DEFAULT_NETWORK = "tcp"
-
-        const val TLS = "tls"
-        const val REALITY = "reality"
-        const val HTTP = "http"
-    }
 
     data class LogBean(
         val access: String,
@@ -82,6 +75,49 @@ data class V2rayConfig(
         val sendThrough: String? = null,
         var mux: MuxBean? = MuxBean(false)
     ) {
+        companion object {
+            fun create(configType: EConfigType): OutboundBean? {
+                return when (configType) {
+                    EConfigType.VMESS,
+                    EConfigType.VLESS ->
+                        return OutboundBean(
+                            protocol = configType.name.lowercase(),
+                            settings = OutSettingsBean(
+                                vnext = listOf(
+                                    VnextBean(
+                                        users = listOf(UsersBean())
+                                    )
+                                )
+                            ),
+                            streamSettings = StreamSettingsBean()
+                        )
+
+                    EConfigType.SHADOWSOCKS,
+                    EConfigType.SOCKS,
+                    EConfigType.HTTP,
+                    EConfigType.TROJAN,
+                    EConfigType.HYSTERIA2 ->
+                        return OutboundBean(
+                            protocol = configType.name.lowercase(),
+                            settings = OutSettingsBean(
+                                servers = listOf(ServersBean())
+                            ),
+                            streamSettings = StreamSettingsBean()
+                        )
+
+                    EConfigType.WIREGUARD ->
+                        return OutboundBean(
+                            protocol = configType.name.lowercase(),
+                            settings = OutSettingsBean(
+                                secretKey = "",
+                                peers = listOf(WireGuardBean())
+                            )
+                        )
+
+                    EConfigType.CUSTOM -> null
+                }
+            }
+        }
 
         data class OutSettingsBean(
             var vnext: List<VnextBean>? = null,
@@ -110,17 +146,17 @@ data class V2rayConfig(
 
             data class VnextBean(
                 var address: String = "",
-                var port: Int = DEFAULT_PORT,
+                var port: Int = AppConfig.DEFAULT_PORT,
                 var users: List<UsersBean>
             ) {
 
                 data class UsersBean(
                     var id: String = "",
                     var alterId: Int? = null,
-                    var security: String = DEFAULT_SECURITY,
-                    var level: Int = DEFAULT_LEVEL,
-                    var encryption: String = "",
-                    var flow: String = ""
+                    var security: String? = null,
+                    var level: Int = AppConfig.DEFAULT_LEVEL,
+                    var encryption: String? = null,
+                    var flow: String? = null
                 )
             }
 
@@ -141,8 +177,8 @@ data class V2rayConfig(
                 var method: String? = null,
                 var ota: Boolean = false,
                 var password: String? = null,
-                var port: Int = DEFAULT_PORT,
-                var level: Int = DEFAULT_LEVEL,
+                var port: Int = AppConfig.DEFAULT_PORT,
+                var level: Int = AppConfig.DEFAULT_LEVEL,
                 val email: String? = null,
                 var flow: String? = null,
                 val ivCheck: Boolean? = null,
@@ -151,7 +187,7 @@ data class V2rayConfig(
                 data class SocksUsersBean(
                     var user: String = "",
                     var pass: String = "",
-                    var level: Int = DEFAULT_LEVEL
+                    var level: Int = AppConfig.DEFAULT_LEVEL
                 )
             }
 
@@ -164,7 +200,7 @@ data class V2rayConfig(
         }
 
         data class StreamSettingsBean(
-            var network: String = DEFAULT_NETWORK,
+            var network: String = AppConfig.DEFAULT_NETWORK,
             var security: String = "",
             var tcpSettings: TcpSettingsBean? = null,
             var kcpSettings: KcpSettingsBean? = null,
@@ -224,7 +260,7 @@ data class V2rayConfig(
             }
 
             data class WsSettingsBean(
-                var path: String = "",
+                var path: String? = null,
                 var headers: HeadersBean = HeadersBean(),
                 val maxEarlyData: Int? = null,
                 val useBrowserForwarding: Boolean? = null,
@@ -234,21 +270,21 @@ data class V2rayConfig(
             }
 
             data class HttpupgradeSettingsBean(
-                var path: String = "",
-                var host: String = "",
+                var path: String? = null,
+                var host: String? = null,
                 val acceptProxyProtocol: Boolean? = null
             )
 
             data class SplithttpSettingsBean(
-                var path: String = "",
-                var host: String = "",
+                var path: String? = null,
+                var host: String? = null,
                 val maxUploadSize: Int? = null,
                 val maxConcurrentUploads: Int? = null
             )
 
             data class HttpSettingsBean(
                 var host: List<String> = ArrayList(),
-                var path: String = ""
+                var path: String? = null
             )
 
             data class SockoptBean(
@@ -262,7 +298,7 @@ data class V2rayConfig(
 
             data class TlsSettingsBean(
                 var allowInsecure: Boolean = false,
-                var serverName: String = "",
+                var serverName: String? = null,
                 val alpn: List<String>? = null,
                 val minVersion: String? = null,
                 val maxVersion: String? = null,
@@ -311,14 +347,14 @@ data class V2rayConfig(
                 transport: String, headerType: String?, host: String?, path: String?, seed: String?,
                 quicSecurity: String?, key: String?, mode: String?, serviceName: String?,
                 authority: String?
-            ): String {
-                var sni = ""
+            ): String? {
+                var sni: String? = null
                 network = transport
                 when (network) {
                     "tcp" -> {
                         val tcpSetting = TcpSettingsBean()
-                        if (headerType == HTTP) {
-                            tcpSetting.header.type = HTTP
+                        if (headerType == AppConfig.HEADER_TYPE_HTTP) {
+                            tcpSetting.header.type = AppConfig.HEADER_TYPE_HTTP
                             if (!TextUtils.isEmpty(host) || !TextUtils.isEmpty(path)) {
                                 val requestObj = TcpSettingsBean.HeaderBean.RequestBean()
                                 requestObj.headers.Host = host.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
@@ -400,7 +436,7 @@ data class V2rayConfig(
             }
 
             fun populateTlsSettings(
-                streamSecurity: String, allowInsecure: Boolean, sni: String, fingerprint: String?, alpns: String?,
+                streamSecurity: String, allowInsecure: Boolean, sni: String?, fingerprint: String?, alpns: String?,
                 publicKey: String?, shortId: String?, spiderX: String?
             ) {
                 security = streamSecurity
@@ -413,10 +449,10 @@ data class V2rayConfig(
                     shortId = shortId,
                     spiderX = spiderX
                 )
-                if (security == TLS) {
+                if (security == AppConfig.TLS) {
                     tlsSettings = tlsSetting
                     realitySettings = null
-                } else if (security == REALITY) {
+                } else if (security == AppConfig.REALITY) {
                     tlsSettings = null
                     realitySettings = tlsSetting
                 }
@@ -501,7 +537,7 @@ data class V2rayConfig(
             }
         }
 
-        fun getTransportSettingDetails(): List<String>? {
+        fun getTransportSettingDetails(): List<String?>? {
             if (protocol.equals(EConfigType.VMESS.name, true)
                 || protocol.equals(EConfigType.VLESS.name, true)
                 || protocol.equals(EConfigType.TROJAN.name, true)

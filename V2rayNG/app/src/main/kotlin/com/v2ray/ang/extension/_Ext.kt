@@ -94,3 +94,5 @@ inline fun <reified T : Serializable> Intent.serializable(key: String): T? = whe
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializableExtra(key, T::class.java)
     else -> @Suppress("DEPRECATION") getSerializableExtra(key) as? T
 }
+
+inline fun CharSequence?.isNotNullEmpty(): Boolean = (this != null && this.isNotEmpty())
