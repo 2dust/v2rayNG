@@ -18,7 +18,7 @@ import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.MainActivity
@@ -55,7 +55,7 @@ object V2RayServiceManager {
             Seq.setContext(value?.get()?.getService()?.applicationContext)
             Libv2ray.initV2Env(Utils.userAssetPath(value?.get()?.getService()), Utils.getDeviceIdForXUDPBaseKey())
         }
-    var currentConfig: ServerConfig? = null
+    var currentConfig: ProfileItem? = null
 
     private var lastQueryTime = 0L
     private var mBuilder: NotificationCompat.Builder? = null
@@ -65,8 +65,10 @@ object V2RayServiceManager {
     fun startV2Ray(context: Context) {
         if (v2rayPoint.isRunning) return
         val guid = MmkvManager.getSelectServer() ?: return
-        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
-        if (!result.status) return
+        val config = MmkvManager.decodeServerConfig(guid) ?: return
+        if (!Utils.isValidUrl(config.server) && !Utils.isValidUrl(config.server)) return
+//        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
+//        if (!result.status) return
 
         if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) == true) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)

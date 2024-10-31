@@ -1,64 +1,61 @@
 package com.v2ray.ang.util.fmt
 
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.ServerConfig
-import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean
+import com.v2ray.ang.extension.idnHost
+import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.util.Utils
+import java.net.URI
+import kotlin.text.orEmpty
 
 object SocksFmt : FmtBase() {
-    fun parse(str: String): ServerConfig? {
-        val config = ServerConfig.create(EConfigType.SOCKS)
-        var result = str.replace(EConfigType.SOCKS.protocolScheme, "")
-        val indexSplit = result.indexOf("#")
+    fun parse(str: String): ProfileItem? {
+        val config = ProfileItem.create(EConfigType.SOCKS)
 
-        if (indexSplit > 0) {
-            try {
-                config.remarks =
-                    Utils.urlDecode(result.substring(indexSplit + 1, result.length))
-            } catch (e: Exception) {
-                e.printStackTrace()
+        val uri = URI(Utils.fixIllegalUrl(str))
+        if (uri.idnHost.isEmpty()) return null
+
+        config.remarks = Utils.urlDecode(uri.fragment.orEmpty())
+        config.server = uri.idnHost
+        config.serverPort = uri.port.toString()
+
+        if (uri.userInfo?.isEmpty() == false) {
+            val result = Utils.decode(uri.userInfo).split(":")
+            if (result.count() == 2) {
+                config.username = result.first()
+                config.password = result.last()
             }
-
-            result = result.substring(0, indexSplit)
-        }
-
-        //part decode
-        val indexS = result.indexOf("@")
-        if (indexS > 0) {
-            result = Utils.decode(result.substring(0, indexS)) + result.substring(
-                indexS,
-                result.length
-            )
-        } else {
-            result = Utils.decode(result)
-        }
-
-        val legacyPattern = "^(.*):(.*)@(.+?):(\\d+?)$".toRegex()
-        val match =
-            legacyPattern.matchEntire(result) ?: return null
-
-        config.outboundBean?.settings?.servers?.get(0)?.let { server ->
-            server.address = match.groupValues[3].removeSurrounding("[", "]")
-            server.port = match.groupValues[4].toInt()
-            val socksUsersBean =
-                V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
-            socksUsersBean.user = match.groupValues[1]
-            socksUsersBean.pass = match.groupValues[2]
-            server.users = listOf(socksUsersBean)
         }
 
         return config
     }
 
-    fun toUri(config: ServerConfig): String {
-        val outbound = config.getProxyOutbound() ?: return ""
-        
+    fun toUri(config: ProfileItem): String {
         val pw =
-            if (outbound.settings?.servers?.get(0)?.users?.get(0)?.user != null)
-                "${outbound.settings?.servers?.get(0)?.users?.get(0)?.user}:${outbound.getPassword()}"
+            if (config.username.isNotNullEmpty())
+                "${config.username}:${config.password}"
             else
                 ":"
 
-        return toUri(outbound.getServerAddress(), outbound.getServerPort(), pw, null, config.remarks)
+        return toUri(config, pw, null)
     }
+
+    fun toOutbound(profileItem: ProfileItem): OutboundBean? {
+        val outboundBean = OutboundBean.create(EConfigType.SOCKS)
+
+        outboundBean?.settings?.servers?.get(0)?.let { server ->
+            server.address = profileItem.server.orEmpty()
+            server.port = profileItem.serverPort.orEmpty().toInt()
+            if (profileItem.username.isNotNullEmpty()) {
+                val socksUsersBean = OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
+                socksUsersBean.user = profileItem.username.orEmpty()
+                socksUsersBean.pass = profileItem.password.orEmpty()
+                server.users = listOf(socksUsersBean)
+            }
+        }
+
+        return outboundBean
+    }
+
 }

@@ -56,9 +56,9 @@ class V2RayTestService : Service() {
     private fun startRealPing(guid: String): Long {
         val retFailure = -1L
 
-        val server = MmkvManager.decodeServerConfig(guid) ?: return retFailure
-        if (server.getProxyOutbound()?.protocol?.equals(EConfigType.HYSTERIA2.name, true) == true) {
-            val delay = PluginUtil.realPingHy2(this, server)
+        val config = MmkvManager.decodeServerConfig(guid) ?: return retFailure
+        if (config.configType == EConfigType.HYSTERIA2) {
+            val delay = PluginUtil.realPingHy2(this, config)
             return delay
         } else {
             val config = V2rayConfigUtil.getV2rayConfig(this, guid)

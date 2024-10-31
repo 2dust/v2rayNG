@@ -5,7 +5,7 @@ import android.os.SystemClock
 import android.util.Log
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.service.ProcessService
 import com.v2ray.ang.util.fmt.Hysteria2Fmt
 import java.io.File
@@ -20,11 +20,10 @@ object PluginUtil {
 //        return PluginManager.init(name)!!
 //    }
 
-    fun runPlugin(context: Context, config: ServerConfig?, domainPort: String?) {
+    fun runPlugin(context: Context, config: ProfileItem?, domainPort: String?) {
         Log.d(TAG, "runPlugin")
 
-        val outbound = config?.getProxyOutbound() ?: return
-        if (outbound.protocol.equals(EConfigType.HYSTERIA2.name, true)) {
+        if (config?.configType?.equals(EConfigType.HYSTERIA2) == true) {
             val configFile = genConfigHy2(context, config, domainPort) ?: return
             val cmd = genCmdHy2(context, configFile)
 
@@ -37,12 +36,11 @@ object PluginUtil {
         stopHy2()
     }
 
-    fun realPingHy2(context: Context, config: ServerConfig?): Long {
+    fun realPingHy2(context: Context, config: ProfileItem?): Long {
         Log.d(TAG, "realPingHy2")
         val retFailure = -1L
 
-        val outbound = config?.getProxyOutbound() ?: return retFailure
-        if (outbound.protocol.equals(EConfigType.HYSTERIA2.name, true)) {
+        if (config?.configType?.equals(EConfigType.HYSTERIA2) == true) {
             val socksPort = Utils.findFreePort(listOf(0))
             val configFile = genConfigHy2(context, config, "0:${socksPort}") ?: return retFailure
             val cmd = genCmdHy2(context, configFile)
@@ -58,7 +56,7 @@ object PluginUtil {
         return retFailure
     }
 
-    private fun genConfigHy2(context: Context, config: ServerConfig, domainPort: String?): File? {
+    private fun genConfigHy2(context: Context, config: ProfileItem, domainPort: String?): File? {
         Log.d(TAG, "runPlugin $HYSTERIA2")
 
         val socksPort = domainPort?.split(":")?.last()

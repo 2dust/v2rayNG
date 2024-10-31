@@ -1,90 +1,76 @@
 package com.v2ray.ang.util.fmt
 
-import android.text.TextUtils
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.Hysteria2Bean
-import com.v2ray.ang.dto.ServerConfig
-import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.extension.idnHost
+import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import java.net.URI
 
 object Hysteria2Fmt : FmtBase() {
-
-    fun parse(str: String): ServerConfig {
-        val allowInsecure = settingsStorage.decodeBool(AppConfig.PREF_ALLOW_INSECURE,false)
-        val config = ServerConfig.create(EConfigType.HYSTERIA2)
+    fun parse(str: String): ProfileItem? {
+        var allowInsecure = settingsStorage.decodeBool(AppConfig.PREF_ALLOW_INSECURE,false)
+        val config = ProfileItem.create(EConfigType.HYSTERIA2)
 
         val uri = URI(Utils.fixIllegalUrl(str))
         config.remarks = Utils.urlDecode(uri.fragment.orEmpty())
+        config.server = uri.idnHost
+        config.serverPort = uri.port.toString()
+        config.password = uri.userInfo
+        config.security = AppConfig.TLS
 
-        val queryParam = uri.rawQuery.split("&")
-            .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
+        if (!uri.rawQuery.isNullOrEmpty()) {
+            val queryParam = getQueryParam(uri)
 
-        config.outboundBean?.streamSettings?.populateTlsSettings(
-            V2rayConfig.TLS,
-            if ((queryParam["insecure"].orEmpty()) == "1") true else allowInsecure,
-            queryParam["sni"] ?: uri.idnHost,
-            null,
-            queryParam["alpn"],
-            null,
-            null,
-            null
-        )
+            config.security = queryParam["security"] ?: AppConfig.TLS
+            config.insecure = if (queryParam["insecure"].isNullOrEmpty()) {
+                allowInsecure
+            } else {
+                queryParam["insecure"].orEmpty() == "1"
+            }
+            config.sni = queryParam["sni"]
+            config.alpn = queryParam["alpn"]
 
-        config.outboundBean?.settings?.servers?.get(0)?.let { server ->
-            server.address = uri.idnHost
-            server.port = uri.port
-            server.password = uri.userInfo
-        }
-        if (!queryParam["obfs-password"].isNullOrEmpty()) {
-            config.outboundBean?.settings?.obfsPassword = queryParam["obfs-password"]
+            config.obfsPassword = queryParam["obfs-password"]
         }
 
         return config
     }
 
-    fun toUri(config: ServerConfig): String {
-        val outbound = config.getProxyOutbound() ?: return ""
-        val streamSetting = outbound.streamSettings ?: V2rayConfig.OutboundBean.StreamSettingsBean()
-
-
+    fun toUri(config: ProfileItem): String {
         val dicQuery = HashMap<String, String>()
-        dicQuery["security"] = streamSetting.security.ifEmpty { "none" }
-        streamSetting.tlsSettings?.let { tlsSetting ->
-            dicQuery["insecure"] = if (tlsSetting.allowInsecure) "1" else "0"
-            if (!TextUtils.isEmpty(tlsSetting.serverName)) {
-                dicQuery["sni"] = tlsSetting.serverName
-            }
-            if (!tlsSetting.alpn.isNullOrEmpty() && tlsSetting.alpn.isNotEmpty()) {
-                dicQuery["alpn"] = Utils.removeWhiteSpace(tlsSetting.alpn.joinToString(",")).orEmpty()
-            }
-        }
-        if (!outbound.settings?.obfsPassword.isNullOrEmpty()) {
+
+        config.security.let { if (it != null) dicQuery["security"] = it }
+        config.sni.let { if (it.isNotNullEmpty()) dicQuery["sni"] = it.orEmpty() }
+        config.alpn.let { if (it.isNotNullEmpty()) dicQuery["alpn"] = it.orEmpty() }
+        config.insecure.let { dicQuery["insecure"] = if (it == true) "1" else "0" }
+
+        if (config.obfsPassword.isNotNullEmpty()) {
             dicQuery["obfs"] = "salamander"
-            dicQuery["obfs-password"] = outbound.settings?.obfsPassword ?: ""
+            dicQuery["obfs-password"] = config.obfsPassword.orEmpty()
         }
 
-        return toUri(outbound.getServerAddress(), outbound.getServerPort(), outbound.getPassword(), dicQuery, config.remarks)
+        return toUri(config, config.password, dicQuery)
     }
 
-    fun toNativeConfig(config: ServerConfig, socksPort: Int): Hysteria2Bean? {
-        val outbound = config.getProxyOutbound() ?: return null
-        val tls = outbound.streamSettings?.tlsSettings
-        val obfs = if (outbound.settings?.obfsPassword.isNullOrEmpty()) null else
+    fun toNativeConfig(config: ProfileItem, socksPort: Int): Hysteria2Bean? {
+
+        val obfs = if (config.obfsPassword.isNullOrEmpty()) null else
             Hysteria2Bean.ObfsBean(
                 type = "salamander",
                 salamander = Hysteria2Bean.ObfsBean.SalamanderBean(
-                    password = outbound.settings?.obfsPassword
+                    password = config.obfsPassword
                 )
             )
 
         val bean = Hysteria2Bean(
-            server = outbound.getServerAddressAndPort(),
-            auth = outbound.getPassword(),
+            server = config.getServerAddressAndPort(),
+            auth = config.password,
             obfs = obfs,
             socks5 = Hysteria2Bean.Socks5Bean(
                 listen = "$LOOPBACK:${socksPort}",
@@ -93,10 +79,17 @@ object Hysteria2Fmt : FmtBase() {
                 listen = "$LOOPBACK:${socksPort}",
             ),
             tls = Hysteria2Bean.TlsBean(
-                sni = tls?.serverName ?: outbound.getServerAddress(),
-                insecure = tls?.allowInsecure
+                sni = config.sni ?: config.server,
+                insecure = config.insecure
             )
         )
         return bean
     }
+
+
+    fun toOutbound(profileItem: ProfileItem): OutboundBean? {
+        val outboundBean = OutboundBean.create(EConfigType.HYSTERIA2)
+        return outboundBean
+    }
+
 }

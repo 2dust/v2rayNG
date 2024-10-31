@@ -15,19 +15,16 @@ import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.ProfileLiteItem
-import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.ServersCache
-import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.AngConfigManager
-import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.SpeedtestUtil
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.fmt.CustomFmt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -42,7 +39,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var subscriptionId: String = MmkvManager.settingsStorage.decodeString(AppConfig.CACHE_SUBSCRIPTION_ID, "").orEmpty()
 
     //var keywordFilter: String = MmkvManager.settingsStorage.decodeString(AppConfig.CACHE_KEYWORD_FILTER, "")?:""
-    var  keywordFilter = ""
+    var keywordFilter = ""
     val serversCache = mutableListOf<ServersCache>()
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
@@ -95,21 +92,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             && server.contains("routing")
         ) {
             try {
-                val config = ServerConfig.create(EConfigType.CUSTOM)
+                val config = CustomFmt.parse(server) ?: return false
                 config.subscriptionId = subscriptionId
-                config.fullConfig = JsonUtil.fromJson(server, V2rayConfig::class.java)
-                config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
                 serverList.add(0, key)
-                val profile = ProfileLiteItem(
-                    configType = config.configType,
-                    subscriptionId = config.subscriptionId,
-                    remarks = config.remarks,
-                    server = config.getProxyOutbound()?.getServerAddress(),
-                    serverPort = config.getProxyOutbound()?.getServerPort(),
-                )
-                serversCache.add(0, ServersCache(key, profile))
+//                val profile = ProfileLiteItem(
+//                    configType = config.configType,
+//                    subscriptionId = config.subscriptionId,
+//                    remarks = config.remarks,
+//                    server = config.getProxyOutbound()?.getServerAddress(),
+//                    serverPort = config.getProxyOutbound()?.getServerPort(),
+//                )
+                serversCache.add(0, ServersCache(key, config))
                 return true
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -128,18 +123,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun updateCache() {
         serversCache.clear()
         for (guid in serverList) {
-            var profile = MmkvManager.decodeProfileConfig(guid)
-            if (profile == null) {
-                val config = MmkvManager.decodeServerConfig(guid) ?: continue
-                profile = ProfileLiteItem(
-                    configType = config.configType,
-                    subscriptionId = config.subscriptionId,
-                    remarks = config.remarks,
-                    server = config.getProxyOutbound()?.getServerAddress(),
-                    serverPort = config.getProxyOutbound()?.getServerPort(),
-                )
-                MmkvManager.encodeServerConfig(guid, config)
-            }
+            var profile = MmkvManager.decodeServerConfig(guid) ?: continue
+//            var profile = MmkvManager.decodeProfileConfig(guid)
+//            if (profile == null) {
+//                val config = MmkvManager.decodeServerConfig(guid) ?: continue
+//                profile = ProfileLiteItem(
+//                    configType = config.configType,
+//                    subscriptionId = config.subscriptionId,
+//                    remarks = config.remarks,
+//                    server = config.getProxyOutbound()?.getServerAddress(),
+//                    serverPort = config.getProxyOutbound()?.getServerPort(),
+//                )
+//                MmkvManager.encodeServerConfig(guid, config)
+//            }
 
             if (subscriptionId.isNotEmpty() && subscriptionId != profile.subscriptionId) {
                 continue
@@ -189,7 +185,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val serverPort = outbound.serverPort
                 if (serverAddress != null && serverPort != null) {
                     tcpingTestScope.launch {
-                        val testResult = SpeedtestUtil.tcping(serverAddress, serverPort)
+                        val testResult = SpeedtestUtil.tcping(serverAddress, serverPort.toInt())
                         launch(Dispatchers.Main) {
                             MmkvManager.encodeServerTestDelayMillis(item.guid, testResult)
                             updateListAction.value = getPosition(item.guid)
@@ -252,7 +248,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeDuplicateServer(): Int {
-        val serversCacheCopy = mutableListOf<Pair<String, ServerConfig>>()
+        val serversCacheCopy = mutableListOf<Pair<String, ProfileItem>>()
         for (it in serversCache) {
             val config = MmkvManager.decodeServerConfig(it.guid) ?: continue
             serversCacheCopy.add(Pair(it.guid, config))
@@ -260,10 +256,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val deleteServer = mutableListOf<String>()
         serversCacheCopy.forEachIndexed { index, it ->
-            val outbound = it.second.getProxyOutbound()
+            val outbound = it.second.getKeyProperty()
             serversCacheCopy.forEachIndexed { index2, it2 ->
                 if (index2 > index) {
-                    val outbound2 = it2.second.getProxyOutbound()
+                    val outbound2 = it2.second.getKeyProperty()
                     if (outbound == outbound2 && !deleteServer.contains(it2.first)) {
                         deleteServer.add(it2.first)
                     }

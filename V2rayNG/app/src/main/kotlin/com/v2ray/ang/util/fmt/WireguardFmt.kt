@@ -1,45 +1,38 @@
 package com.v2ray.ang.util.fmt
 
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.extension.idnHost
-import com.v2ray.ang.extension.removeWhiteSpace
 import com.v2ray.ang.util.Utils
 import java.net.URI
+import kotlin.text.orEmpty
 
 object WireguardFmt : FmtBase() {
-    fun parse(str: String): ServerConfig? {
+    fun parse(str: String): ProfileItem? {
+        val config = ProfileItem.create(EConfigType.WIREGUARD)
+
         val uri = URI(Utils.fixIllegalUrl(str))
-        if (uri.rawQuery != null) {
-            val config = ServerConfig.create(EConfigType.WIREGUARD)
-            config.remarks = Utils.urlDecode(uri.fragment.orEmpty())
+        if (uri.rawQuery.isNullOrEmpty()) return null
+        val queryParam = getQueryParam(uri)
 
-            val queryParam = uri.rawQuery.split("&")
-                .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
+        config.remarks = Utils.urlDecode(uri.fragment.orEmpty())
+        config.server = uri.idnHost
+        config.serverPort = uri.port.toString()
 
-            config.outboundBean?.settings?.let { wireguard ->
-                wireguard.secretKey = uri.userInfo
-                wireguard.address =
-                    (queryParam["address"]
-                        ?: AppConfig.WIREGUARD_LOCAL_ADDRESS_V4).removeWhiteSpace()
-                        .split(",")
-                wireguard.peers?.get(0)?.publicKey = queryParam["publickey"].orEmpty()
-                wireguard.peers?.get(0)?.endpoint =
-                    Utils.getIpv6Address(uri.idnHost) + ":${uri.port}"
-                wireguard.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
-                wireguard.reserved =
-                    (queryParam["reserved"] ?: "0,0,0").removeWhiteSpace().split(",")
-                        .map { it.toInt() }
-            }
-            return config
-        } else {
-            return null
-        }
+        config.secretKey = uri.userInfo
+        config.localAddress = (queryParam["address"] ?: AppConfig.WIREGUARD_LOCAL_ADDRESS_V4)
+        config.publicKey = queryParam["publickey"].orEmpty()
+        config.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
+        config.reserved = (queryParam["reserved"] ?: "0,0,0")
+
+        return config
     }
 
-    fun parseWireguardConfFile(str: String): ServerConfig? {
-        val config = ServerConfig.create(EConfigType.WIREGUARD)
+    fun parseWireguardConfFile(str: String): ProfileItem? {
+        val config = ProfileItem.create(EConfigType.WIREGUARD)
         val queryParam: MutableMap<String, String> = mutableMapOf()
 
         var currentSection: String? = null
@@ -58,35 +51,45 @@ object WireguardFmt : FmtBase() {
             }
         }
 
-        config.outboundBean?.settings?.let { wireguard ->
-            wireguard.secretKey = queryParam["privatekey"].orEmpty()
-            wireguard.address = (queryParam["address"] ?: AppConfig.WIREGUARD_LOCAL_ADDRESS_V4).removeWhiteSpace().split(",")
-            wireguard.peers?.getOrNull(0)?.publicKey = queryParam["publickey"].orEmpty()
-            wireguard.peers?.getOrNull(0)?.endpoint = queryParam["endpoint"].orEmpty()
-            wireguard.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
-            wireguard.reserved = (queryParam["reserved"] ?: "0,0,0").removeWhiteSpace().split(",").map { it.toInt() }
-        }
+        config.secretKey = queryParam["privatekey"].orEmpty()
+        config.localAddress = (queryParam["address"] ?: AppConfig.WIREGUARD_LOCAL_ADDRESS_V4)
+        config.publicKey = queryParam["publickey"].orEmpty()
+        config.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
+        config.reserved = (queryParam["reserved"] ?: "0,0,0")
 
         return config
     }
 
 
-    fun toUri(config: ServerConfig): String {
-        val outbound = config.getProxyOutbound() ?: return ""
-
-
+    fun toUri(config: ProfileItem): String {
         val dicQuery = HashMap<String, String>()
-        dicQuery["publickey"] = outbound.settings?.peers?.get(0)?.publicKey.toString()
-        if (outbound.settings?.reserved != null) {
-            dicQuery["reserved"] = Utils.removeWhiteSpace(outbound.settings?.reserved?.joinToString(",")).toString()
 
+        dicQuery["publickey"] = config.publicKey.orEmpty()
+        if (config.reserved != null) {
+            dicQuery["reserved"] = Utils.removeWhiteSpace(config.reserved).orEmpty()
         }
-        dicQuery["address"] = Utils.removeWhiteSpace((outbound.settings?.address as List<*>).joinToString(",")).toString()
-
-        if (outbound.settings?.mtu != null) {
-            dicQuery["mtu"] = outbound.settings?.mtu.toString()
+        dicQuery["address"] = Utils.removeWhiteSpace(config.localAddress).orEmpty()
+        if (config.mtu != null) {
+            dicQuery["mtu"] = config.mtu.toString()
         }
 
-        return toUri(outbound.getServerAddress(), outbound.getServerPort(), outbound.getPassword(), dicQuery, config.remarks)
+        return toUri(config, config.secretKey, dicQuery)
     }
+
+    fun toOutbound(profileItem: ProfileItem): OutboundBean? {
+        val outboundBean = OutboundBean.create(EConfigType.WIREGUARD)
+
+        outboundBean?.settings?.let { wireguard ->
+            wireguard.secretKey = profileItem.secretKey
+            wireguard.address = (profileItem.localAddress ?: WIREGUARD_LOCAL_ADDRESS_V4).split(",")
+            wireguard.peers?.get(0)?.publicKey = profileItem.publicKey.orEmpty()
+            wireguard.peers?.get(0)?.endpoint = Utils.getIpv6Address(profileItem.server) + ":${profileItem.serverPort}"
+            wireguard.mtu = profileItem.mtu?.toInt()
+            wireguard.reserved = profileItem.reserved?.split(",")?.map { it.toInt() }
+        }
+
+        return outboundBean
+    }
+
+
 }

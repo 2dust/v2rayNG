@@ -37,6 +37,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.AngConfigManager
+import com.v2ray.ang.util.MigrateManager
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
@@ -126,6 +127,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         initGroupTab()
         setupViewModel()
+        migrateLegacy()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             RxPermissions(this)
@@ -173,6 +175,21 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
         mainViewModel.startListenBroadcast()
         mainViewModel.copyAssets(assets)
+    }
+
+    private fun migrateLegacy() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val result = MigrateManager.migrateServerConfig2Profile()
+            launch(Dispatchers.Main) {
+                if (result) {
+                    toast(getString(R.string.migration_success))
+                    mainViewModel.reloadServerList()
+                } else {
+                    //toast(getString(R.string.migration_fail))
+                }
+            }
+
+        }
     }
 
     private fun initGroupTab() {
@@ -504,6 +521,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                             toast(R.string.toast_success)
                             mainViewModel.reloadServerList()
                         }
+
                         countSub > 0 -> initGroupTab()
                         else -> toast(R.string.toast_failure)
                     }

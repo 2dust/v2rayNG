@@ -2,6 +2,7 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -13,22 +14,22 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.PREF_ALLOW_INSECURE
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_MTU
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.ServerConfig
-import com.v2ray.ang.dto.V2rayConfig
-import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_PORT
-import com.v2ray.ang.dto.V2rayConfig.Companion.TLS
-import com.v2ray.ang.extension.removeWhiteSpace
+import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.AppConfig.DEFAULT_PORT
+import com.v2ray.ang.AppConfig.REALITY
+import com.v2ray.ang.AppConfig.TLS
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
-import com.v2ray.ang.util.Utils.getIpv6Address
 
 class ServerActivity : BaseActivity() {
 
@@ -87,7 +88,6 @@ class ServerActivity : BaseActivity() {
     private val et_address: EditText by lazy { findViewById(R.id.et_address) }
     private val et_port: EditText by lazy { findViewById(R.id.et_port) }
     private val et_id: EditText by lazy { findViewById(R.id.et_id) }
-    private val et_alterId: EditText? by lazy { findViewById(R.id.et_alterId) }
     private val et_security: EditText? by lazy { findViewById(R.id.et_security) }
     private val sp_flow: Spinner? by lazy { findViewById(R.id.sp_flow) }
     private val sp_security: Spinner? by lazy { findViewById(R.id.sp_security) }
@@ -114,8 +114,6 @@ class ServerActivity : BaseActivity() {
     private val et_spider_x: EditText? by lazy { findViewById(R.id.et_spider_x) }
     private val container_spider_x: LinearLayout? by lazy { findViewById(R.id.lay_spider_x) }
     private val et_reserved1: EditText? by lazy { findViewById(R.id.et_reserved1) }
-    private val et_reserved2: EditText? by lazy { findViewById(R.id.et_reserved2) }
-    private val et_reserved3: EditText? by lazy { findViewById(R.id.et_reserved3) }
     private val et_local_address: EditText? by lazy { findViewById(R.id.et_local_address) }
     private val et_local_mtu: EditText? by lazy { findViewById(R.id.et_local_mtu) }
     private val et_obfs_password: EditText? by lazy { findViewById(R.id.et_obfs_password) }
@@ -153,12 +151,15 @@ class ServerActivity : BaseActivity() {
                 sp_header_type_title?.text = if (networks[position] == "grpc")
                     getString(R.string.server_lab_mode_type) else
                     getString(R.string.server_lab_head_type)
-                config?.getProxyOutbound()?.getTransportSettingDetails()?.let { transportDetails ->
-                    sp_header_type?.setSelection(Utils.arrayFind(types, transportDetails[0]))
-                    et_request_host?.text = Utils.getEditable(transportDetails[1])
-                    et_path?.text = Utils.getEditable(transportDetails[2])
+                config?.headerType?.let { it ->
+                    sp_header_type?.setSelection(Utils.arrayFind(types, it))
                 }
-
+                config?.host?.let { it ->
+                    et_request_host?.text = Utils.getEditable(it)
+                }
+                config?.path?.let { it ->
+                    et_path?.text = Utils.getEditable(it)
+                }
                 tv_request_host?.text = Utils.getEditable(
                     getString(
                         when (networks[position]) {
@@ -243,7 +244,6 @@ class ServerActivity : BaseActivity() {
                         ).forEach { it?.visibility = View.VISIBLE }
                     }
                 }
-
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -260,120 +260,96 @@ class ServerActivity : BaseActivity() {
     /**
      * binding selected server config
      */
-    private fun bindingServer(config: ServerConfig): Boolean {
-        val outbound = config.getProxyOutbound() ?: return false
+    private fun bindingServer(config: ProfileItem): Boolean {
 
         et_remarks.text = Utils.getEditable(config.remarks)
-        et_address.text = Utils.getEditable(outbound.getServerAddress().orEmpty())
-        et_port.text =
-            Utils.getEditable(outbound.getServerPort()?.toString() ?: DEFAULT_PORT.toString())
-        et_id.text = Utils.getEditable(outbound.getPassword().orEmpty())
-        et_alterId?.text =
-            Utils.getEditable(outbound.settings?.vnext?.get(0)?.users?.get(0)?.alterId.toString())
-        if (config.configType == EConfigType.SOCKS
-            || config.configType == EConfigType.HTTP
-        ) {
-            et_security?.text =
-                Utils.getEditable(outbound.settings?.servers?.get(0)?.users?.get(0)?.user.orEmpty())
+        et_address.text = Utils.getEditable(config.server.orEmpty())
+        et_port.text = Utils.getEditable(config.serverPort ?: DEFAULT_PORT.toString())
+        et_id.text = Utils.getEditable(config.password.orEmpty())
+
+        if (config.configType == EConfigType.SOCKS || config.configType == EConfigType.HTTP) {
+            et_security?.text = Utils.getEditable(config.username.orEmpty())
         } else if (config.configType == EConfigType.VLESS) {
-            et_security?.text = Utils.getEditable(outbound.getSecurityEncryption().orEmpty())
-            val flow = Utils.arrayFind(
-                flows,
-                outbound.settings?.vnext?.get(0)?.users?.get(0)?.flow.orEmpty()
-            )
+            et_security?.text = Utils.getEditable(config.method.orEmpty())
+            val flow = Utils.arrayFind(flows, config.flow.orEmpty())
             if (flow >= 0) {
                 sp_flow?.setSelection(flow)
             }
         } else if (config.configType == EConfigType.WIREGUARD) {
-            et_public_key?.text =
-                Utils.getEditable(outbound.settings?.peers?.get(0)?.publicKey.orEmpty())
-            if (outbound.settings?.reserved == null) {
-                et_reserved1?.text = Utils.getEditable("0")
-                et_reserved2?.text = Utils.getEditable("0")
-                et_reserved3?.text = Utils.getEditable("0")
+            et_id.text = Utils.getEditable(config.secretKey.orEmpty())
+            et_public_key?.text = Utils.getEditable(config.publicKey.orEmpty())
+            if (config.reserved == null) {
+                et_reserved1?.text = Utils.getEditable("0,0,0")
             } else {
-                et_reserved1?.text =
-                    Utils.getEditable(outbound.settings?.reserved?.get(0).toString())
-                et_reserved2?.text =
-                    Utils.getEditable(outbound.settings?.reserved?.get(1).toString())
-                et_reserved3?.text =
-                    Utils.getEditable(outbound.settings?.reserved?.get(2).toString())
+                et_reserved1?.text = Utils.getEditable(config.reserved?.toString())
             }
-            if (outbound.settings?.address == null) {
-                et_local_address?.text =
-                    Utils.getEditable("${WIREGUARD_LOCAL_ADDRESS_V4},${WIREGUARD_LOCAL_ADDRESS_V6}")
+            if (config.localAddress == null) {
+                et_local_address?.text = Utils.getEditable("${WIREGUARD_LOCAL_ADDRESS_V4},${WIREGUARD_LOCAL_ADDRESS_V6}")
             } else {
-                val list = outbound.settings?.address as List<*>
-                et_local_address?.text = Utils.getEditable(list.joinToString(","))
+                et_local_address?.text = Utils.getEditable(config.localAddress)
             }
-            if (outbound.settings?.mtu == null) {
+            if (config.mtu == null) {
                 et_local_mtu?.text = Utils.getEditable(WIREGUARD_LOCAL_MTU)
             } else {
-                et_local_mtu?.text = Utils.getEditable(outbound.settings?.mtu.toString())
+                et_local_mtu?.text = Utils.getEditable(config.mtu.toString())
             }
         } else if (config.configType == EConfigType.HYSTERIA2) {
-            et_obfs_password?.text = Utils.getEditable(outbound.settings?.obfsPassword)
+            et_obfs_password?.text = Utils.getEditable(config.obfsPassword)
         }
 
-        val securityEncryptions =
-            if (config.configType == EConfigType.SHADOWSOCKS) shadowsocksSecuritys else securitys
-        val security =
-            Utils.arrayFind(securityEncryptions, outbound.getSecurityEncryption().orEmpty())
+        val securityEncryptions = if (config.configType == EConfigType.SHADOWSOCKS) shadowsocksSecuritys else securitys
+        val security = Utils.arrayFind(securityEncryptions, config.method.orEmpty())
         if (security >= 0) {
             sp_security?.setSelection(security)
         }
 
-        val streamSetting = config.outboundBean?.streamSettings ?: return true
-        val streamSecurity = Utils.arrayFind(streamSecuritys, streamSetting.security)
+        val streamSecurity = Utils.arrayFind(streamSecuritys, config.security.orEmpty())
         if (streamSecurity >= 0) {
             sp_stream_security?.setSelection(streamSecurity)
-            (streamSetting.tlsSettings ?: streamSetting.realitySettings)?.let { tlsSetting ->
-                container_sni?.visibility = View.VISIBLE
-                container_fingerprint?.visibility = View.VISIBLE
-                container_alpn?.visibility = View.VISIBLE
-                et_sni?.text = Utils.getEditable(tlsSetting.serverName)
-                tlsSetting.fingerprint?.let {
-                    val utlsIndex = Utils.arrayFind(uTlsItems, tlsSetting.fingerprint)
-                    sp_stream_fingerprint?.setSelection(utlsIndex)
-                }
-                tlsSetting.alpn?.let {
-                    val alpnIndex = Utils.arrayFind(
-                        alpns,
-                        Utils.removeWhiteSpace(tlsSetting.alpn.joinToString(",")).orEmpty()
-                    )
-                    sp_stream_alpn?.setSelection(alpnIndex)
-                }
-                if (streamSetting.tlsSettings != null) {
-                    container_allow_insecure?.visibility = View.VISIBLE
-                    val allowinsecure =
-                        Utils.arrayFind(allowinsecures, tlsSetting.allowInsecure.toString())
-                    if (allowinsecure >= 0) {
-                        sp_allow_insecure?.setSelection(allowinsecure)
-                    }
-                    container_public_key?.visibility = View.GONE
-                    container_short_id?.visibility = View.GONE
-                    container_spider_x?.visibility = View.GONE
-                } else { // reality settings
-                    container_public_key?.visibility = View.VISIBLE
-                    et_public_key?.text = Utils.getEditable(tlsSetting.publicKey.orEmpty())
-                    container_short_id?.visibility = View.VISIBLE
-                    et_short_id?.text = Utils.getEditable(tlsSetting.shortId.orEmpty())
-                    container_spider_x?.visibility = View.VISIBLE
-                    et_spider_x?.text = Utils.getEditable(tlsSetting.spiderX.orEmpty())
-                    container_allow_insecure?.visibility = View.GONE
-                }
+            container_sni?.visibility = View.VISIBLE
+            container_fingerprint?.visibility = View.VISIBLE
+            container_alpn?.visibility = View.VISIBLE
+
+            et_sni?.text = Utils.getEditable(config.sni)
+            config.fingerPrint?.let {
+                val utlsIndex = Utils.arrayFind(uTlsItems, it)
+                sp_stream_fingerprint?.setSelection(utlsIndex)
             }
-            if (streamSetting.tlsSettings == null && streamSetting.realitySettings == null) {
-                container_sni?.visibility = View.GONE
-                container_fingerprint?.visibility = View.GONE
-                container_alpn?.visibility = View.GONE
-                container_allow_insecure?.visibility = View.GONE
+            config.alpn?.let {
+                val alpnIndex = Utils.arrayFind(alpns, it)
+                sp_stream_alpn?.setSelection(alpnIndex)
+            }
+            if (config.security == TLS) {
+                container_allow_insecure?.visibility = View.VISIBLE
+                val allowinsecure = Utils.arrayFind(allowinsecures, config.insecure.toString())
+                if (allowinsecure >= 0) {
+                    sp_allow_insecure?.setSelection(allowinsecure)
+                }
                 container_public_key?.visibility = View.GONE
                 container_short_id?.visibility = View.GONE
                 container_spider_x?.visibility = View.GONE
+            } else if (config.security == REALITY) { // reality settings
+                container_public_key?.visibility = View.VISIBLE
+                et_public_key?.text = Utils.getEditable(config.publicKey.orEmpty())
+                container_short_id?.visibility = View.VISIBLE
+                et_short_id?.text = Utils.getEditable(config.shortId.orEmpty())
+                container_spider_x?.visibility = View.VISIBLE
+                et_spider_x?.text = Utils.getEditable(config.spiderX.orEmpty())
+                container_allow_insecure?.visibility = View.GONE
             }
         }
-        val network = Utils.arrayFind(networks, streamSetting.network)
+
+        if (config.security.isNullOrEmpty()) {
+            container_sni?.visibility = View.GONE
+            container_fingerprint?.visibility = View.GONE
+            container_alpn?.visibility = View.GONE
+            container_allow_insecure?.visibility = View.GONE
+            container_public_key?.visibility = View.GONE
+            container_short_id?.visibility = View.GONE
+            container_spider_x?.visibility = View.GONE
+        }
+
+        val network = Utils.arrayFind(networks, config.network.orEmpty())
         if (network >= 0) {
             sp_network?.setSelection(network)
         }
@@ -388,7 +364,6 @@ class ServerActivity : BaseActivity() {
         et_address.text = null
         et_port.text = Utils.getEditable(DEFAULT_PORT.toString())
         et_id.text = null
-        et_alterId?.text = Utils.getEditable("0")
         sp_security?.setSelection(0)
         sp_network?.setSelection(0)
 
@@ -402,9 +377,7 @@ class ServerActivity : BaseActivity() {
         //et_security.text = null
         sp_flow?.setSelection(0)
         et_public_key?.text = null
-        et_reserved1?.text = Utils.getEditable("0")
-        et_reserved2?.text = Utils.getEditable("0")
-        et_reserved3?.text = Utils.getEditable("0")
+        et_reserved1?.text = Utils.getEditable("0,0,0")
         et_local_address?.text =
             Utils.getEditable("${WIREGUARD_LOCAL_ADDRESS_V4},${WIREGUARD_LOCAL_ADDRESS_V6}")
         et_local_mtu?.text = Utils.getEditable(WIREGUARD_LOCAL_MTU)
@@ -429,7 +402,7 @@ class ServerActivity : BaseActivity() {
             return false
         }
         val config =
-            MmkvManager.decodeServerConfig(editGuid) ?: ServerConfig.create(createConfigType)
+            MmkvManager.decodeServerConfig(editGuid) ?: ProfileItem.create(createConfigType)
         if (config.configType != EConfigType.SOCKS
             && config.configType != EConfigType.HTTP
             && TextUtils.isEmpty(et_id.text.toString())
@@ -450,125 +423,70 @@ class ServerActivity : BaseActivity() {
                 return false
             }
         }
-        et_alterId?.let {
-            val alterId = Utils.parseInt(it.text.toString())
-            if (alterId < 0) {
-                toast(R.string.server_lab_alterid)
-                return false
-            }
-        }
 
-        config.remarks = et_remarks.text.toString().trim()
-        config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
-            saveVnext(vnext, port, config)
-        }
-        config.outboundBean?.settings?.servers?.get(0)?.let { server ->
-            saveServers(server, port, config)
-        }
-        val wireguard = config.outboundBean?.settings
-        wireguard?.peers?.get(0)?.let { _ ->
-            savePeer(wireguard, port)
-        }
+        saveCommon(config)
+        saveStreamSettings(config)
+        saveTls(config)
 
-        config.outboundBean?.streamSettings?.let {
-            val sni = saveStreamSettings(it)
-            saveTls(it, sni)
-        }
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
-        if (config.configType == EConfigType.HYSTERIA2) {
-            config.outboundBean?.settings?.obfsPassword = et_obfs_password?.text?.toString()
-        }
-
+        Log.d(ANG_PACKAGE,  JsonUtil.toJsonPretty(config))
         MmkvManager.encodeServerConfig(editGuid, config)
         toast(R.string.toast_success)
         finish()
         return true
     }
 
-    private fun saveVnext(
-        vnext: V2rayConfig.OutboundBean.OutSettingsBean.VnextBean,
-        port: Int,
-        config: ServerConfig
-    ) {
-        vnext.address = et_address.text.toString().trim()
-        vnext.port = port
-        vnext.users[0].id = et_id.text.toString().trim()
+    private fun saveCommon(config: ProfileItem) {
+        config.remarks = et_remarks.text.toString().trim()
+        config.server = et_address.text.toString().trim()
+        config.serverPort = et_port.text.toString().trim()
+        config.password = et_id.text.toString().trim()
+
         if (config.configType == EConfigType.VMESS) {
-            vnext.users[0].alterId = Utils.parseInt(et_alterId?.text.toString())
-            vnext.users[0].security = securitys[sp_security?.selectedItemPosition ?: 0]
+            config.method = securitys[sp_security?.selectedItemPosition ?: 0]
         } else if (config.configType == EConfigType.VLESS) {
-            vnext.users[0].encryption = et_security?.text.toString().trim()
-            vnext.users[0].flow = flows[sp_flow?.selectedItemPosition ?: 0]
-        }
-    }
-
-    private fun saveServers(
-        server: V2rayConfig.OutboundBean.OutSettingsBean.ServersBean,
-        port: Int,
-        config: ServerConfig
-    ) {
-        server.address = et_address.text.toString().trim()
-        server.port = port
-        if (config.configType == EConfigType.SHADOWSOCKS) {
-            server.password = et_id.text.toString().trim()
-            server.method = shadowsocksSecuritys[sp_security?.selectedItemPosition ?: 0]
+            config.method = et_security?.text.toString().trim()
+            config.flow = flows[sp_flow?.selectedItemPosition ?: 0]
+        } else if (config.configType == EConfigType.SHADOWSOCKS) {
+            config.method = shadowsocksSecuritys[sp_security?.selectedItemPosition ?: 0]
         } else if (config.configType == EConfigType.SOCKS || config.configType == EConfigType.HTTP) {
-            if (TextUtils.isEmpty(et_security?.text) && TextUtils.isEmpty(et_id.text)) {
-                server.users = null
-            } else {
-                val socksUsersBean =
-                    V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
-                socksUsersBean.user = et_security?.text.toString().trim()
-                socksUsersBean.pass = et_id.text.toString().trim()
-                server.users = listOf(socksUsersBean)
+            if (!TextUtils.isEmpty(et_security?.text) || !TextUtils.isEmpty(et_id.text)) {
+                config.username = et_security?.text.toString().trim()
             }
-        } else if (config.configType == EConfigType.TROJAN || config.configType == EConfigType.HYSTERIA2) {
-            server.password = et_id.text.toString().trim()
+        } else if (config.configType == EConfigType.TROJAN) {
+        } else if (config.configType == EConfigType.WIREGUARD) {
+            config.secretKey = et_id.text.toString().trim()
+            config.publicKey = et_public_key?.text.toString().trim()
+            config.reserved = et_reserved1?.text.toString().trim()
+            config.localAddress = et_local_address?.text.toString().trim()
+            config.mtu = Utils.parseInt(et_local_mtu?.text.toString())
+        } else if (config.configType == EConfigType.HYSTERIA2) {
+            config.obfsPassword = et_obfs_password?.text?.toString()
         }
     }
 
-    private fun savePeer(wireguard: V2rayConfig.OutboundBean.OutSettingsBean, port: Int) {
-        wireguard.secretKey = et_id.text.toString().trim()
-        wireguard.peers?.get(0)?.publicKey = et_public_key?.text.toString().trim()
-        wireguard.peers?.get(0)?.endpoint =
-            getIpv6Address(et_address.text.toString().trim()) + ":" + port
-        val reserved1 = Utils.parseInt(et_reserved1?.text.toString())
-        val reserved2 = Utils.parseInt(et_reserved2?.text.toString())
-        val reserved3 = Utils.parseInt(et_reserved3?.text.toString())
-        if (reserved1 > 0 || reserved2 > 0 || reserved3 > 0) {
-            wireguard.reserved = listOf(reserved1, reserved2, reserved3)
-        } else {
-            wireguard.reserved = null
-        }
-        wireguard.address = et_local_address?.text.toString().removeWhiteSpace().split(",")
-        wireguard.mtu = Utils.parseInt(et_local_mtu?.text.toString())
+
+    private fun saveStreamSettings(profileItem: ProfileItem) {
+        val network = sp_network?.selectedItemPosition ?: return
+        val type = sp_header_type?.selectedItemPosition ?: return
+        val requestHost = et_request_host?.text?.toString()?.trim() ?: return
+        val path = et_path?.text?.toString()?.trim() ?: return
+
+        profileItem.network = networks[network]
+        profileItem.headerType = transportTypes(networks[network])[type]
+        profileItem.host = requestHost
+        profileItem.path = path
+        profileItem.seed = path
+        profileItem.quicSecurity = requestHost
+        profileItem.quicKey = path
+        profileItem.mode = transportTypes(networks[network])[type]
+        profileItem.serviceName = path
+        profileItem.authority = requestHost
     }
 
-    private fun saveStreamSettings(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean): String? {
-        val network = sp_network?.selectedItemPosition ?: return null
-        val type = sp_header_type?.selectedItemPosition ?: return null
-        val requestHost = et_request_host?.text?.toString()?.trim() ?: return null
-        val path = et_path?.text?.toString()?.trim() ?: return null
-
-        val sni = streamSetting.populateTransportSettings(
-            transport = networks[network],
-            headerType = transportTypes(networks[network])[type],
-            host = requestHost,
-            path = path,
-            seed = path,
-            quicSecurity = requestHost,
-            key = path,
-            mode = transportTypes(networks[network])[type],
-            serviceName = path,
-            authority = requestHost,
-        )
-
-        return sni
-    }
-
-    private fun saveTls(streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean, sni: String?) {
+    private fun saveTls(config: ProfileItem) {
         val streamSecurity = sp_stream_security?.selectedItemPosition ?: return
         val sniField = et_sni?.text?.toString()?.trim()
         val allowInsecureField = sp_allow_insecure?.selectedItemPosition
@@ -585,16 +503,14 @@ class ServerActivity : BaseActivity() {
                 allowinsecures[allowInsecureField].toBoolean()
             }
 
-        streamSetting.populateTlsSettings(
-            streamSecurity = streamSecuritys[streamSecurity],
-            allowInsecure = allowInsecure,
-            sni = sniField ?: sni ?: "",
-            fingerprint = uTlsItems[utlsIndex],
-            alpns = alpns[alpnIndex],
-            publicKey = publicKey,
-            shortId = shortId,
-            spiderX = spiderX
-        )
+        config.security = streamSecuritys[streamSecurity]
+        config.insecure = allowInsecure
+        config.sni = sniField
+        config.fingerPrint = uTlsItems[utlsIndex]
+        config.alpn = alpns[alpnIndex]
+        config.publicKey = publicKey
+        config.shortId = shortId
+        config.spiderX = spiderX
     }
 
     private fun transportTypes(network: String?): Array<out String> {
@@ -618,7 +534,7 @@ class ServerActivity : BaseActivity() {
     }
 
     /**
-     * save server config
+     * delete server config
      */
     private fun deleteServer(): Boolean {
         if (editGuid.isNotEmpty()) {

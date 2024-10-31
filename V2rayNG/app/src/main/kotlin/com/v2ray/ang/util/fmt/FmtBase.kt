@@ -1,11 +1,13 @@
 package com.v2ray.ang.util.fmt
 
-import android.text.TextUtils
-import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.AppConfig
+import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.util.Utils
+import java.net.URI
 
 open class FmtBase {
-    fun toUri(address: String?, port: Int?, userInfo: String?, dicQuery: HashMap<String, String>?, remark: String): String {
+    fun toUri(config: ProfileItem, userInfo: String?, dicQuery: HashMap<String, String>?): String {
         val query = if (dicQuery != null)
             ("?" + dicQuery.toList().joinToString(
                 separator = "&",
@@ -15,90 +17,68 @@ open class FmtBase {
         val url = String.format(
             "%s@%s:%s",
             Utils.urlEncode(userInfo ?: ""),
-            Utils.getIpv6Address(address),
-            port
+            Utils.getIpv6Address(config.server),
+            config.serverPort
         )
 
-        return "${url}${query}#${Utils.urlEncode(remark)}"
+        return "${url}${query}#${Utils.urlEncode(config.remarks)}"
     }
 
-    fun getStdTransport(outbound: V2rayConfig.OutboundBean, streamSetting: V2rayConfig.OutboundBean.StreamSettingsBean): HashMap<String, String> {
+    fun getQueryParam(uri: URI): Map<String, String> {
+        return uri.rawQuery.split("&")
+            .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
+    }
+
+    fun getQueryDic(config: ProfileItem): HashMap<String, String> {
         val dicQuery = HashMap<String, String>()
 
-        dicQuery["security"] = streamSetting.security.ifEmpty { "none" }
-        (streamSetting.tlsSettings
-            ?: streamSetting.realitySettings)?.let { tlsSetting ->
-            if (!TextUtils.isEmpty(tlsSetting.serverName)) {
-                dicQuery["sni"] = tlsSetting.serverName
+        dicQuery["security"] = config.security?.ifEmpty { "none" }.orEmpty()
+        config.sni.let { if (it.isNotNullEmpty()) dicQuery["sni"] = it.orEmpty() }
+        config.alpn.let { if (it.isNotNullEmpty()) dicQuery["alpn"] = it.orEmpty() }
+        config.fingerPrint.let { if (it.isNotNullEmpty()) dicQuery["fp"] = it.orEmpty() }
+        config.publicKey.let { if (it.isNotNullEmpty()) dicQuery["pbk"] = it.orEmpty() }
+        config.shortId.let { if (it.isNotNullEmpty()) dicQuery["sid"] = it.orEmpty() }
+        config.spiderX.let { if (it.isNotNullEmpty()) dicQuery["spx"] = it.orEmpty() }
+        config.flow.let { if (it.isNotNullEmpty()) dicQuery["flow"] = it.orEmpty() }
+
+        dicQuery["type"] = config.network?.ifEmpty { AppConfig.DEFAULT_NETWORK }.orEmpty()
+
+        when (config.network) {
+            "tcp" -> {
+                dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
+                config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
             }
-            if (!tlsSetting.alpn.isNullOrEmpty() && tlsSetting.alpn.isNotEmpty()) {
-                dicQuery["alpn"] =
-                    Utils.removeWhiteSpace(tlsSetting.alpn.joinToString(",")).orEmpty()
+
+            "kcp" -> {
+                dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
+                config.seed.let { if (it.isNotNullEmpty()) dicQuery["seed"] = it.orEmpty() }
             }
-            if (!TextUtils.isEmpty(tlsSetting.fingerprint)) {
-                dicQuery["fp"] = tlsSetting.fingerprint.orEmpty()
+
+            "ws", "httpupgrade", "splithttp" -> {
+                config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
+                config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
             }
-            if (!TextUtils.isEmpty(tlsSetting.publicKey)) {
-                dicQuery["pbk"] = tlsSetting.publicKey.orEmpty()
+
+            "http", "h2" -> {
+                dicQuery["type"] = "http"
+                config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
+                config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
             }
-            if (!TextUtils.isEmpty(tlsSetting.shortId)) {
-                dicQuery["sid"] = tlsSetting.shortId.orEmpty()
+
+            "quic" -> {
+                dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
+                config.quicSecurity.let { if (it.isNotNullEmpty()) dicQuery["quicSecurity"] = it.orEmpty() }
+                config.quicKey.let { if (it.isNotNullEmpty()) dicQuery["key"] = it.orEmpty() }
             }
-            if (!TextUtils.isEmpty(tlsSetting.spiderX)) {
-                dicQuery["spx"] = tlsSetting.spiderX.orEmpty()
+
+            "grpc" -> {
+                config.mode.let { if (it.isNotNullEmpty()) dicQuery["mode"] = it.orEmpty() }
+                config.authority.let { if (it.isNotNullEmpty()) dicQuery["authority"] = it.orEmpty() }
+                config.serviceName.let { if (it.isNotNullEmpty()) dicQuery["serviceName"] = it.orEmpty() }
             }
         }
-        dicQuery["type"] =
-            streamSetting.network.ifEmpty { V2rayConfig.DEFAULT_NETWORK }
 
-        outbound.getTransportSettingDetails()?.let { transportDetails ->
-            when (streamSetting.network) {
-                "tcp" -> {
-                    dicQuery["headerType"] = transportDetails[0].ifEmpty { "none" }
-                    if (!TextUtils.isEmpty(transportDetails[1])) {
-                        dicQuery["host"] = transportDetails[1]
-                    }
-                }
-
-                "kcp" -> {
-                    dicQuery["headerType"] = transportDetails[0].ifEmpty { "none" }
-                    if (!TextUtils.isEmpty(transportDetails[2])) {
-                        dicQuery["seed"] = transportDetails[2]
-                    }
-                }
-
-                "ws", "httpupgrade", "splithttp" -> {
-                    if (!TextUtils.isEmpty(transportDetails[1])) {
-                        dicQuery["host"] = transportDetails[1]
-                    }
-                    if (!TextUtils.isEmpty(transportDetails[2])) {
-                        dicQuery["path"] = transportDetails[2]
-                    }
-                }
-
-                "http", "h2" -> {
-                    dicQuery["type"] = "http"
-                    if (!TextUtils.isEmpty(transportDetails[1])) {
-                        dicQuery["host"] = transportDetails[1]
-                    }
-                    if (!TextUtils.isEmpty(transportDetails[2])) {
-                        dicQuery["path"] = transportDetails[2]
-                    }
-                }
-
-                "quic" -> {
-                    dicQuery["headerType"] = transportDetails[0].ifEmpty { "none" }
-                    dicQuery["quicSecurity"] = transportDetails[1]
-                    dicQuery["key"] = transportDetails[2]
-                }
-
-                "grpc" -> {
-                    dicQuery["mode"] = transportDetails[0]
-                    dicQuery["authority"] = transportDetails[1]
-                    dicQuery["serviceName"] = transportDetails[2]
-                }
-            }
-        }
         return dicQuery
     }
+
 }

@@ -1,90 +1,104 @@
 package com.v2ray.ang.util.fmt
 
-import android.text.TextUtils
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.extension.idnHost
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import java.net.URI
+import kotlin.text.orEmpty
 
 object TrojanFmt : FmtBase() {
-
-    fun parse(str: String): ServerConfig {
-        var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
-        val config = ServerConfig.create(EConfigType.TROJAN)
+    fun parse(str: String): ProfileItem? {
+        var allowInsecure = settingsStorage.decodeBool(AppConfig.PREF_ALLOW_INSECURE,false)
+        val config = ProfileItem.create(EConfigType.TROJAN)
 
         val uri = URI(Utils.fixIllegalUrl(str))
         config.remarks = Utils.urlDecode(uri.fragment.orEmpty())
+        config.server = uri.idnHost
+        config.serverPort = uri.port.toString()
+        config.password = uri.userInfo
 
-        var flow = ""
-        var fingerprint = config.outboundBean?.streamSettings?.tlsSettings?.fingerprint
         if (uri.rawQuery.isNullOrEmpty()) {
-            config.outboundBean?.streamSettings?.populateTlsSettings(
-                V2rayConfig.TLS,
-                allowInsecure,
-                "",
-                fingerprint,
-                null,
-                null,
-                null,
-                null
-            )
-        } else {
-            val queryParam = uri.rawQuery.split("&")
-                .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
+            config.security = AppConfig.TLS
+            config.insecure = allowInsecure
 
-            val sni = config.outboundBean?.streamSettings?.populateTransportSettings(
-                queryParam["type"] ?: "tcp",
-                queryParam["headerType"],
-                queryParam["host"],
-                queryParam["path"],
-                queryParam["seed"],
-                queryParam["quicSecurity"],
-                queryParam["key"],
-                queryParam["mode"],
-                queryParam["serviceName"],
-                queryParam["authority"]
-            )
-            fingerprint = queryParam["fp"].orEmpty()
-            allowInsecure = if ((queryParam["allowInsecure"].orEmpty()) == "1") true else allowInsecure
-            config.outboundBean?.streamSettings?.populateTlsSettings(
-                queryParam["security"] ?: V2rayConfig.TLS,
-                allowInsecure,
-                queryParam["sni"] ?: sni.orEmpty(),
-                fingerprint,
-                queryParam["alpn"],
-                null,
-                null,
-                null
-            )
-            flow = queryParam["flow"].orEmpty()
-        }
-        config.outboundBean?.settings?.servers?.get(0)?.let { server ->
-            server.address = uri.idnHost
-            server.port = uri.port
-            server.password = uri.userInfo
-            server.flow = flow
+        } else {
+            val queryParam = getQueryParam(uri)
+
+            config.network = queryParam["type"] ?: "tcp"
+            config.headerType = queryParam["headerType"]
+            config.host = queryParam["host"]
+            config.path = queryParam["path"]
+
+            config.seed = queryParam["seed"]
+            config.quicSecurity = queryParam["quicSecurity"]
+            config.quicKey = queryParam["key"]
+            config.mode = queryParam["mode"]
+            config.serviceName = queryParam["serviceName"]
+            config.authority = queryParam["authority"]
+
+            config.security = queryParam["security"]
+            config.insecure = if (queryParam["allowInsecure"].isNullOrEmpty()) {
+                allowInsecure
+            } else {
+                queryParam["allowInsecure"].orEmpty() == "1"
+            }
+            config.sni = queryParam["sni"]
+            config.fingerPrint = queryParam["fp"]
+            config.alpn = queryParam["alpn"]
+            config.publicKey = queryParam["pbk"]
+            config.shortId = queryParam["sid"]
+            config.spiderX = queryParam["spx"]
+            config.flow = queryParam["flow"]
         }
 
         return config
     }
 
-    fun toUri(config: ServerConfig): String {
-        val outbound = config.getProxyOutbound() ?: return ""
-        val streamSetting = outbound.streamSettings ?: V2rayConfig.OutboundBean.StreamSettingsBean()
+    fun toUri(config: ProfileItem): String {
+        val dicQuery = getQueryDic(config)
 
-        
-        val dicQuery = getStdTransport(outbound, streamSetting)
+        return toUri(config, config.password, dicQuery)
+    }
 
-        config.outboundBean?.settings?.servers?.get(0)?.flow?.let {
-            if (!TextUtils.isEmpty(it)) {
-                dicQuery["flow"] = it
-            }
+    fun toOutbound(profileItem: ProfileItem): OutboundBean? {
+        val outboundBean = OutboundBean.create(EConfigType.TROJAN)
+
+        outboundBean?.settings?.servers?.get(0)?.let { server ->
+            server.address = profileItem.server.orEmpty()
+            server.port = profileItem.serverPort.orEmpty().toInt()
+            server.password = profileItem.password
+            server.flow = profileItem.flow
         }
 
-        return toUri(outbound.getServerAddress(), outbound.getServerPort(), outbound.getPassword(), dicQuery, config.remarks)
+        outboundBean?.streamSettings?.populateTransportSettings(
+            profileItem.network.orEmpty(),
+            profileItem.headerType,
+            profileItem.host,
+            profileItem.path,
+            profileItem.seed,
+            profileItem.quicSecurity,
+            profileItem.quicKey,
+            profileItem.mode,
+            profileItem.serviceName,
+            profileItem.authority,
+        )
+
+        outboundBean?.streamSettings?.populateTlsSettings(
+            profileItem.security.orEmpty(),
+            profileItem.insecure == true,
+            profileItem.sni,
+            profileItem.fingerPrint,
+            profileItem.alpn,
+            profileItem.publicKey,
+            profileItem.shortId,
+            profileItem.spiderX,
+        )
+
+        return outboundBean
     }
 }

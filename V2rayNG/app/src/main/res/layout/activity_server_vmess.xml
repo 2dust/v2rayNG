@@ -39,26 +39,6 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_alterId"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/server_lab_alterid" />
-
-            <EditText
-                android:id="@+id/et_alterId"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/edit_height"
-                android:inputType="number" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/layout_margin_top_height"
-            android:orientation="vertical">
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/server_lab_security" />

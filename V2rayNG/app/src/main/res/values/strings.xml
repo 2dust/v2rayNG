@@ -83,7 +83,7 @@
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_secret_key">SecretKey</string>
-    <string name="server_lab_reserved">Reserved(Optional)</string>
+    <string name="server_lab_reserved">Reserved(Optional, separated by commas)</string>
     <string name="server_lab_local_address">Local address (optional IPv4/IPv6, separated by commas)</string>
     <string name="server_lab_local_mtu">Mtu(optional, default 1420)</string>
     <string name="toast_success">Success</string>

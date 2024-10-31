@@ -5,19 +5,18 @@ import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
 import com.v2ray.ang.dto.AssetUrlItem
-import com.v2ray.ang.dto.ProfileLiteItem
+import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerAffiliationInfo
-import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.SubscriptionItem
 
 object MmkvManager {
 
     //region private
 
+    //private const val ID_PROFILE_CONFIG = "PROFILE_CONFIG"
     private const val ID_MAIN = "MAIN"
-    private const val ID_SERVER_CONFIG = "SERVER_CONFIG"
-    private const val ID_PROFILE_CONFIG = "PROFILE_CONFIG"
+    private const val ID_PROFILE_FULL_CONFIG = "PROFILE_FULL_CONFIG"
     private const val ID_SERVER_RAW = "SERVER_RAW"
     private const val ID_SERVER_AFF = "SERVER_AFF"
     private const val ID_SUB = "SUB"
@@ -27,14 +26,14 @@ object MmkvManager {
     private const val KEY_ANG_CONFIGS = "ANG_CONFIGS"
     private const val KEY_SUB_IDS = "SUB_IDS"
 
+    //private val profileStorage by lazy { MMKV.mmkvWithID(ID_PROFILE_CONFIG, MMKV.MULTI_PROCESS_MODE) }
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
-    val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
-    private val serverStorage by lazy { MMKV.mmkvWithID(ID_SERVER_CONFIG, MMKV.MULTI_PROCESS_MODE) }
-    private val profileStorage by lazy { MMKV.mmkvWithID(ID_PROFILE_CONFIG, MMKV.MULTI_PROCESS_MODE) }
+    private val profileFullStorage by lazy { MMKV.mmkvWithID(ID_PROFILE_FULL_CONFIG, MMKV.MULTI_PROCESS_MODE) }
+    private val serverRawStorage by lazy { MMKV.mmkvWithID(ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
     private val serverAffStorage by lazy { MMKV.mmkvWithID(ID_SERVER_AFF, MMKV.MULTI_PROCESS_MODE) }
     private val subStorage by lazy { MMKV.mmkvWithID(ID_SUB, MMKV.MULTI_PROCESS_MODE) }
     private val assetStorage by lazy { MMKV.mmkvWithID(ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
-    private val serverRawStorage by lazy { MMKV.mmkvWithID(ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
+    val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     //endregion
 
@@ -61,31 +60,32 @@ object MmkvManager {
         }
     }
 
-    fun decodeServerConfig(guid: String): ServerConfig? {
+
+    fun decodeServerConfig(guid: String): ProfileItem? {
         if (guid.isBlank()) {
             return null
         }
-        val json = serverStorage.decodeString(guid)
+        val json = profileFullStorage.decodeString(guid)
         if (json.isNullOrBlank()) {
             return null
         }
-        return JsonUtil.fromJson(json, ServerConfig::class.java)
+        return JsonUtil.fromJson(json, ProfileItem::class.java)
     }
 
-    fun decodeProfileConfig(guid: String): ProfileLiteItem? {
-        if (guid.isBlank()) {
-            return null
-        }
-        val json = profileStorage.decodeString(guid)
-        if (json.isNullOrBlank()) {
-            return null
-        }
-        return JsonUtil.fromJson(json, ProfileLiteItem::class.java)
-    }
+//    fun decodeProfileConfig(guid: String): ProfileLiteItem? {
+//        if (guid.isBlank()) {
+//            return null
+//        }
+//        val json = profileStorage.decodeString(guid)
+//        if (json.isNullOrBlank()) {
+//            return null
+//        }
+//        return JsonUtil.fromJson(json, ProfileLiteItem::class.java)
+//    }
 
-    fun encodeServerConfig(guid: String, config: ServerConfig): String {
+    fun encodeServerConfig(guid: String, config: ProfileItem): String {
         val key = guid.ifBlank { Utils.getUuid() }
-        serverStorage.encode(key, JsonUtil.toJson(config))
+        profileFullStorage.encode(key, JsonUtil.toJson(config))
         val serverList = decodeServerList()
         if (!serverList.contains(key)) {
             serverList.add(0, key)
@@ -94,14 +94,14 @@ object MmkvManager {
                 mainStorage.encode(KEY_SELECTED_SERVER, key)
             }
         }
-        val profile = ProfileLiteItem(
-            configType = config.configType,
-            subscriptionId = config.subscriptionId,
-            remarks = config.remarks,
-            server = config.getProxyOutbound()?.getServerAddress(),
-            serverPort = config.getProxyOutbound()?.getServerPort(),
-        )
-        profileStorage.encode(key, JsonUtil.toJson(profile))
+//        val profile = ProfileLiteItem(
+//            configType = config.configType,
+//            subscriptionId = config.subscriptionId,
+//            remarks = config.remarks,
+//            server = config.getProxyOutbound()?.getServerAddress(),
+//            serverPort = config.getProxyOutbound()?.getServerPort(),
+//        )
+//        profileStorage.encode(key, JsonUtil.toJson(profile))
         return key
     }
 
@@ -115,8 +115,8 @@ object MmkvManager {
         val serverList = decodeServerList()
         serverList.remove(guid)
         encodeServerList(serverList)
-        serverStorage.remove(guid)
-        profileStorage.remove(guid)
+        profileFullStorage.remove(guid)
+        //profileStorage.remove(guid)
         serverAffStorage.remove(guid)
     }
 
@@ -124,7 +124,7 @@ object MmkvManager {
         if (subid.isBlank()) {
             return
         }
-        serverStorage.allKeys()?.forEach { key ->
+        profileFullStorage.allKeys()?.forEach { key ->
             decodeServerConfig(key)?.let { config ->
                 if (config.subscriptionId == subid) {
                     removeServer(key)
@@ -164,8 +164,8 @@ object MmkvManager {
 
     fun removeAllServer() {
         mainStorage.clearAll()
-        serverStorage.clearAll()
-        profileStorage.clearAll()
+        profileFullStorage.clearAll()
+        //profileStorage.clearAll()
         serverAffStorage.clearAll()
     }
 

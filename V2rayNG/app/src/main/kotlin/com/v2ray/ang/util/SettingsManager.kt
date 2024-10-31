@@ -2,20 +2,19 @@ package com.v2ray.ang.util
 
 import android.content.Context
 import android.text.TextUtils
-
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.GEOIP_PRIVATE
 import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
+import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RoutingType
 import com.v2ray.ang.dto.RulesetItem
-import com.v2ray.ang.dto.ServerConfig
-import com.v2ray.ang.util.MmkvManager.decodeProfileConfig
 import com.v2ray.ang.util.MmkvManager.decodeServerConfig
 import com.v2ray.ang.util.MmkvManager.decodeServerList
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils.parseInt
 import java.util.Collections
+import kotlin.Int
 
 object SettingsManager {
 
@@ -131,15 +130,15 @@ object SettingsManager {
         MmkvManager.encodeSubsList(subsList)
     }
 
-    fun getServerViaRemarks(remarks: String?): ServerConfig? {
+    fun getServerViaRemarks(remarks: String?): ProfileItem? {
         if (remarks == null) {
             return null
         }
         val serverList = decodeServerList()
         for (guid in serverList) {
-            val profile = decodeProfileConfig(guid)
+            val profile = decodeServerConfig(guid)
             if (profile != null && profile.remarks == remarks) {
-                return decodeServerConfig(guid)
+                return profile
             }
         }
         return null

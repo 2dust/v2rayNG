@@ -2,28 +2,28 @@ package com.v2ray.ang.util.fmt
 
 import android.text.TextUtils
 import android.util.Log
-
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.ServerConfig
-import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.dto.VmessQRCode
 import com.v2ray.ang.extension.idnHost
+import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import java.net.URI
+import kotlin.text.orEmpty
 
 object VmessFmt : FmtBase() {
-
-    fun parse(str: String): ServerConfig? {
+    fun parse(str: String): ProfileItem? {
         if (str.indexOf('?') > 0 && str.indexOf('&') > 0) {
             return parseVmessStd(str)
         }
 
-        val allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
-        val config = ServerConfig.create(EConfigType.VMESS)
-        val streamSetting = config.outboundBean?.streamSettings ?: return null
+        var allowInsecure = settingsStorage.decodeBool(AppConfig.PREF_ALLOW_INSECURE, false)
+        val config = ProfileItem.create(EConfigType.VMESS)
+
         var result = str.replace(EConfigType.VMESS.protocolScheme, "")
         result = Utils.decode(result)
         if (TextUtils.isEmpty(result)) {
@@ -42,114 +42,153 @@ object VmessFmt : FmtBase() {
         }
 
         config.remarks = vmessQRCode.ps
-        config.outboundBean.settings?.vnext?.get(0)?.let { vnext ->
-            vnext.address = vmessQRCode.add
-            vnext.port = Utils.parseInt(vmessQRCode.port)
-            vnext.users[0].id = vmessQRCode.id
-            vnext.users[0].security =
-                if (TextUtils.isEmpty(vmessQRCode.scy)) V2rayConfig.DEFAULT_SECURITY else vmessQRCode.scy
-            vnext.users[0].alterId = Utils.parseInt(vmessQRCode.aid)
-        }
-        val sni = streamSetting.populateTransportSettings(
-            vmessQRCode.net,
-            vmessQRCode.type,
-            vmessQRCode.host,
-            vmessQRCode.path,
-            vmessQRCode.path,
-            vmessQRCode.host,
-            vmessQRCode.path,
-            vmessQRCode.type,
-            vmessQRCode.path,
-            vmessQRCode.host
-        )
+        config.server = vmessQRCode.add
+        config.serverPort = vmessQRCode.port
+        config.password = vmessQRCode.id
+        config.method = if (TextUtils.isEmpty(vmessQRCode.scy)) AppConfig.DEFAULT_SECURITY else vmessQRCode.scy
 
-        val fingerprint = vmessQRCode.fp
-        streamSetting.populateTlsSettings(
-            vmessQRCode.tls,
-            allowInsecure,
-            if (TextUtils.isEmpty(vmessQRCode.sni)) sni else vmessQRCode.sni,
-            fingerprint,
-            vmessQRCode.alpn,
-            null,
-            null,
-            null
-        )
+        config.network = vmessQRCode.net ?: "tcp"
+        config.headerType = vmessQRCode.type
+        config.host = vmessQRCode.host
+        config.path = vmessQRCode.path
+
+        when (config.network) {
+            "kcp" -> {
+                config.seed = vmessQRCode.path
+            }
+
+            "quic" -> {
+                config.quicSecurity = vmessQRCode.host
+                config.quicKey = vmessQRCode.path
+            }
+
+            "grpc" -> {
+                config.mode = vmessQRCode.type
+                config.serviceName = vmessQRCode.path
+                config.authority = vmessQRCode.host
+            }
+        }
+        config.security = vmessQRCode.tls
+        config.insecure = allowInsecure
+        config.sni = vmessQRCode.sni
+        config.fingerPrint = vmessQRCode.fp
+        config.alpn = vmessQRCode.alpn
 
         return config
     }
 
-    fun toUri(config: ServerConfig): String {
-        val outbound = config.getProxyOutbound() ?: return ""
-        val streamSetting = outbound.streamSettings ?: V2rayConfig.OutboundBean.StreamSettingsBean()
-
+    fun toUri(config: ProfileItem): String {
         val vmessQRCode = VmessQRCode()
+
         vmessQRCode.v = "2"
         vmessQRCode.ps = config.remarks
-        vmessQRCode.add = outbound.getServerAddress().orEmpty()
-        vmessQRCode.port = outbound.getServerPort().toString()
-        vmessQRCode.id = outbound.getPassword().orEmpty()
-        vmessQRCode.aid = outbound.settings?.vnext?.get(0)?.users?.get(0)?.alterId.toString()
-        vmessQRCode.scy = outbound.settings?.vnext?.get(0)?.users?.get(0)?.security.toString()
-        vmessQRCode.net = streamSetting.network
-        vmessQRCode.tls = streamSetting.security
-        vmessQRCode.sni = streamSetting.tlsSettings?.serverName.orEmpty()
-        vmessQRCode.alpn =
-            Utils.removeWhiteSpace(streamSetting.tlsSettings?.alpn?.joinToString(",")).orEmpty()
-        vmessQRCode.fp = streamSetting.tlsSettings?.fingerprint.orEmpty()
-        outbound.getTransportSettingDetails()?.let { transportDetails ->
-            vmessQRCode.type = transportDetails[0]
-            vmessQRCode.host = transportDetails[1]
-            vmessQRCode.path = transportDetails[2]
+        vmessQRCode.add = config.server.orEmpty()
+        vmessQRCode.port = config.serverPort.orEmpty()
+        vmessQRCode.id = config.password.orEmpty()
+        vmessQRCode.scy = config.method.orEmpty()
+        vmessQRCode.aid = "0"
+
+        vmessQRCode.net = config.network.orEmpty()
+        vmessQRCode.type = config.headerType.orEmpty()
+        when (config.network) {
+            "kcp" -> {
+                vmessQRCode.path = config.seed.orEmpty()
+            }
+
+            "quic" -> {
+                vmessQRCode.host = config.quicSecurity.orEmpty()
+                vmessQRCode.path = config.quicKey.orEmpty()
+            }
+
+            "grpc" -> {
+                vmessQRCode.type = config.mode.orEmpty()
+                vmessQRCode.path = config.serviceName.orEmpty()
+                vmessQRCode.host = config.authority.orEmpty()
+            }
         }
+        config.host.let { if (it.isNotNullEmpty()) vmessQRCode.host = it.orEmpty() }
+        config.path.let { if (it.isNotNullEmpty()) vmessQRCode.path = it.orEmpty() }
+
+        vmessQRCode.tls = config.security.orEmpty()
+        vmessQRCode.sni = config.sni.orEmpty()
+        vmessQRCode.fp = config.fingerPrint.orEmpty()
+        vmessQRCode.alpn = config.alpn.orEmpty()
+
         val json = JsonUtil.toJson(vmessQRCode)
         return Utils.encode(json)
     }
 
-    fun parseVmessStd(str: String): ServerConfig? {
-        var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
-        val config = ServerConfig.create(EConfigType.VMESS)
+    fun parseVmessStd(str: String): ProfileItem? {
+        var allowInsecure = settingsStorage.decodeBool(AppConfig.PREF_ALLOW_INSECURE, false)
+        val config = ProfileItem.create(EConfigType.VMESS)
 
         val uri = URI(Utils.fixIllegalUrl(str))
         if (uri.rawQuery.isNullOrEmpty()) return null
-        val queryParam = uri.rawQuery.split("&")
-            .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
-
-        val streamSetting = config.outboundBean?.streamSettings ?: return null
+        val queryParam = getQueryParam(uri)
 
         config.remarks = Utils.urlDecode(uri.fragment.orEmpty())
-        config.outboundBean.settings?.vnext?.get(0)?.let { vnext ->
-            vnext.address = uri.idnHost
-            vnext.port = uri.port
-            vnext.users[0].id = uri.userInfo
-            vnext.users[0].security = V2rayConfig.DEFAULT_SECURITY
-            vnext.users[0].alterId = 0
+        config.server = uri.idnHost
+        config.serverPort = uri.port.toString()
+        config.password = uri.userInfo
+        config.method = AppConfig.DEFAULT_SECURITY
+
+        config.network = queryParam["type"] ?: "tcp"
+        config.headerType = queryParam["headerType"]
+        config.host = queryParam["host"]
+        config.path = queryParam["path"]
+
+        config.seed = queryParam["seed"]
+        config.quicSecurity = queryParam["quicSecurity"]
+        config.quicKey = queryParam["key"]
+        config.mode = queryParam["mode"]
+        config.serviceName = queryParam["serviceName"]
+        config.authority = queryParam["authority"]
+
+        config.security = queryParam["security"]
+        config.insecure = if ((queryParam["allowInsecure"].orEmpty()) == "1") true else allowInsecure
+        config.sni = queryParam["sni"]
+        config.fingerPrint = queryParam["fp"]
+        config.alpn = queryParam["alpn"]
+
+        return config
+    }
+
+
+    fun toOutbound(profileItem: ProfileItem): OutboundBean? {
+        val outboundBean = OutboundBean.create(EConfigType.VMESS)
+
+        outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
+            vnext.address = profileItem.server.orEmpty()
+            vnext.port = profileItem.serverPort.orEmpty().toInt()
+            vnext.users[0].id = profileItem.password.orEmpty()
+            vnext.users[0].security = profileItem.method
         }
 
-        val sni = streamSetting.populateTransportSettings(
-            queryParam["type"] ?: "tcp",
-            queryParam["headerType"],
-            queryParam["host"],
-            queryParam["path"],
-            queryParam["seed"],
-            queryParam["quicSecurity"],
-            queryParam["key"],
-            queryParam["mode"],
-            queryParam["serviceName"],
-            queryParam["authority"]
+        outboundBean?.streamSettings?.populateTransportSettings(
+            profileItem.network.orEmpty(),
+            profileItem.headerType,
+            profileItem.host,
+            profileItem.path,
+            profileItem.seed,
+            profileItem.quicSecurity,
+            profileItem.quicKey,
+            profileItem.mode,
+            profileItem.serviceName,
+            profileItem.authority,
         )
 
-        allowInsecure = if ((queryParam["allowInsecure"].orEmpty()) == "1") true else allowInsecure
-        streamSetting.populateTlsSettings(
-            queryParam["security"].orEmpty(),
-            allowInsecure,
-            queryParam["sni"] ?: sni,
-            queryParam["fp"].orEmpty(),
-            queryParam["alpn"],
+        outboundBean?.streamSettings?.populateTlsSettings(
+            profileItem.security.orEmpty(),
+            profileItem.insecure == true,
+            profileItem.sni,
+            profileItem.fingerPrint,
+            profileItem.alpn,
             null,
             null,
             null
         )
 
-        return config
+        return outboundBean
     }
+
 }

@@ -2,5 +2,5 @@ package com.v2ray.ang.dto
 
 data class ServersCache(
     val guid: String,
-    val profile: ProfileLiteItem
+    val profile: ProfileItem
 )

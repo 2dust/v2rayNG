@@ -1,10 +1,9 @@
 package com.v2ray.ang.util.fmt
 
-import android.text.TextUtils
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.ServerConfig
-import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.extension.idnHost
 import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
@@ -12,69 +11,94 @@ import java.net.URI
 
 object VlessFmt : FmtBase() {
 
-    fun parse(str: String): ServerConfig? {
-        var allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
-        val config = ServerConfig.create(EConfigType.VLESS)
+    fun parse(str: String): ProfileItem? {
+        var allowInsecure = settingsStorage.decodeBool(AppConfig.PREF_ALLOW_INSECURE,false)
+        val config = ProfileItem.create(EConfigType.VLESS)
 
         val uri = URI(Utils.fixIllegalUrl(str))
         if (uri.rawQuery.isNullOrEmpty()) return null
-        val queryParam = uri.rawQuery.split("&")
-            .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
-
-        val streamSetting = config.outboundBean?.streamSettings ?: return null
+        val queryParam = getQueryParam(uri)
 
         config.remarks = Utils.urlDecode(uri.fragment.orEmpty())
-        config.outboundBean.settings?.vnext?.get(0)?.let { vnext ->
-            vnext.address = uri.idnHost
-            vnext.port = uri.port
-            vnext.users[0].id = uri.userInfo
-            vnext.users[0].encryption = queryParam["encryption"] ?: "none"
-            vnext.users[0].flow = queryParam["flow"].orEmpty()
-        }
+        config.server = uri.idnHost
+        config.serverPort = uri.port.toString()
+        config.password = uri.userInfo
+        config.method = queryParam["encryption"] ?: "none"
 
-        val sni = streamSetting.populateTransportSettings(
-            queryParam["type"] ?: "tcp",
-            queryParam["headerType"],
-            queryParam["host"],
-            queryParam["path"],
-            queryParam["seed"],
-            queryParam["quicSecurity"],
-            queryParam["key"],
-            queryParam["mode"],
-            queryParam["serviceName"],
-            queryParam["authority"]
-        )
-        allowInsecure = if ((queryParam["allowInsecure"].orEmpty()) == "1") true else allowInsecure
-        streamSetting.populateTlsSettings(
-            queryParam["security"].orEmpty(),
-            allowInsecure,
-            queryParam["sni"] ?: sni,
-            queryParam["fp"].orEmpty(),
-            queryParam["alpn"],
-            queryParam["pbk"].orEmpty(),
-            queryParam["sid"].orEmpty(),
-            queryParam["spx"].orEmpty()
-        )
+        config.network = queryParam["type"] ?: "tcp"
+        config.headerType = queryParam["headerType"]
+        config.host = queryParam["host"]
+        config.path = queryParam["path"]
+
+        config.seed = queryParam["seed"]
+        config.quicSecurity = queryParam["quicSecurity"]
+        config.quicKey = queryParam["key"]
+        config.mode = queryParam["mode"]
+        config.serviceName = queryParam["serviceName"]
+        config.authority = queryParam["authority"]
+
+        config.security = queryParam["security"]
+        config.insecure = if (queryParam["allowInsecure"].isNullOrEmpty()) {
+            allowInsecure
+        } else {
+            queryParam["allowInsecure"].orEmpty() == "1"
+        }
+        config.sni = queryParam["sni"]
+        config.fingerPrint = queryParam["fp"]
+        config.alpn = queryParam["alpn"]
+        config.publicKey = queryParam["pbk"]
+        config.shortId = queryParam["sid"]
+        config.spiderX = queryParam["spx"]
+        config.flow = queryParam["flow"]
 
         return config
     }
 
-    fun toUri(config: ServerConfig): String {
-        val outbound = config.getProxyOutbound() ?: return ""
-        val streamSetting = outbound.streamSettings ?: V2rayConfig.OutboundBean.StreamSettingsBean()
+    fun toUri(config: ProfileItem): String {
+        val dicQuery = getQueryDic(config)
+        dicQuery["encryption"] = config.method ?: "none"
 
-        
-        val dicQuery = getStdTransport(outbound, streamSetting)
-
-        outbound.settings?.vnext?.get(0)?.users?.get(0)?.flow?.let {
-            if (!TextUtils.isEmpty(it)) {
-                dicQuery["flow"] = it
-            }
-        }
-        dicQuery["encryption"] =
-            if (outbound.getSecurityEncryption().isNullOrEmpty()) "none"
-            else outbound.getSecurityEncryption().orEmpty()
-
-        return toUri(outbound.getServerAddress(), outbound.getServerPort(), outbound.getPassword(), dicQuery, config.remarks)
+        return toUri(config, config.password, dicQuery)
     }
+
+
+    fun toOutbound(profileItem: ProfileItem): OutboundBean? {
+        val outboundBean = OutboundBean.create(EConfigType.VLESS)
+
+        outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
+            vnext.address = profileItem.server.orEmpty()
+            vnext.port = profileItem.serverPort.orEmpty().toInt()
+            vnext.users[0].id = profileItem.password.orEmpty()
+            vnext.users[0].encryption = profileItem.method
+            vnext.users[0].flow = profileItem.flow
+        }
+
+        outboundBean?.streamSettings?.populateTransportSettings(
+            profileItem.network.orEmpty(),
+            profileItem.headerType,
+            profileItem.host,
+            profileItem.path,
+            profileItem.seed,
+            profileItem.quicSecurity,
+            profileItem.quicKey,
+            profileItem.mode,
+            profileItem.serviceName,
+            profileItem.authority,
+        )
+
+        outboundBean?.streamSettings?.populateTlsSettings(
+            profileItem.security.orEmpty(),
+            profileItem.insecure == true,
+            profileItem.sni,
+            profileItem.fingerPrint,
+            profileItem.alpn,
+            profileItem.publicKey,
+            profileItem.shortId,
+            profileItem.spiderX,
+        )
+
+        return outboundBean
+    }
+
+
 }

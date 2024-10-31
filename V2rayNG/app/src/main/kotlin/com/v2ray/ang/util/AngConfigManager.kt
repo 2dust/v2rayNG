@@ -4,16 +4,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.text.TextUtils
 import android.util.Log
-
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonPrimitive
-import com.google.gson.JsonSerializationContext
-import com.google.gson.JsonSerializer
-import com.google.gson.reflect.TypeToken
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.HY2
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.*
+import com.v2ray.ang.util.fmt.CustomFmt
 import com.v2ray.ang.util.fmt.Hysteria2Fmt
 import com.v2ray.ang.util.fmt.ShadowsocksFmt
 import com.v2ray.ang.util.fmt.SocksFmt
@@ -21,9 +16,7 @@ import com.v2ray.ang.util.fmt.TrojanFmt
 import com.v2ray.ang.util.fmt.VlessFmt
 import com.v2ray.ang.util.fmt.VmessFmt
 import com.v2ray.ang.util.fmt.WireguardFmt
-import java.lang.reflect.Type
 import java.net.URI
-import java.util.*
 
 object AngConfigManager {
     /**
@@ -33,7 +26,7 @@ object AngConfigManager {
         str: String?,
         subid: String,
         subItem: SubscriptionItem?,
-        removedSelectedServer: ServerConfig?
+        removedSelectedServer: ProfileItem?
     ): Int {
         try {
             if (str == null || TextUtils.isEmpty(str)) {
@@ -71,12 +64,7 @@ object AngConfigManager {
             config.subscriptionId = subid
             val guid = MmkvManager.encodeServerConfig("", config)
             if (removedSelectedServer != null &&
-                config.getProxyOutbound()
-                    ?.getServerAddress() == removedSelectedServer.getProxyOutbound()
-                    ?.getServerAddress() &&
-                config.getProxyOutbound()
-                    ?.getServerPort() == removedSelectedServer.getProxyOutbound()
-                    ?.getServerPort()
+                config.server == removedSelectedServer.server && config.serverPort == removedSelectedServer.serverPort
             ) {
                 MmkvManager.setSelectServer(guid)
             }
@@ -284,12 +272,7 @@ object AngConfigManager {
                 if (serverList.isNotEmpty()) {
                     var count = 0
                     for (srv in serverList.reversed()) {
-                        val config = ServerConfig.create(EConfigType.CUSTOM)
-                        config.fullConfig =
-                            JsonUtil.fromJson(JsonUtil.toJson(srv), V2rayConfig::class.java)
-                        config.remarks = config.fullConfig?.remarks
-                            ?: ("%04d-".format(count + 1) + System.currentTimeMillis()
-                                .toString())
+                        val config = CustomFmt.parse(server) ?: continue
                         config.subscriptionId = subid
                         val key = MmkvManager.encodeServerConfig("", config)
                         MmkvManager.encodeServerRaw(key, JsonUtil.toJsonPretty(srv))
@@ -303,10 +286,8 @@ object AngConfigManager {
 
             try {
                 // For compatibility
-                val config = ServerConfig.create(EConfigType.CUSTOM)
+                val config = CustomFmt.parse(server) ?: return 0
                 config.subscriptionId = subid
-                config.fullConfig = JsonUtil.fromJson(server, V2rayConfig::class.java)
-                config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
                 return 1
@@ -316,9 +297,7 @@ object AngConfigManager {
             return 0
         } else if (server.startsWith("[Interface]") && server.contains("[Peer]")) {
             try {
-                val config = WireguardFmt.parseWireguardConfFile(server)
-                    ?: return R.string.toast_incorrect_protocol
-                config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
+                val config = WireguardFmt.parseWireguardConfFile(server) ?: return R.string.toast_incorrect_protocol
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
                 return 1

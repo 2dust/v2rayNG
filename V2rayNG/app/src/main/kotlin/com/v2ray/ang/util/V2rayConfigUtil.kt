@@ -3,9 +3,9 @@ package com.v2ray.ang.util
 import android.content.Context
 import android.text.TextUtils
 import android.util.Log
-
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import com.v2ray.ang.AppConfig.DEFAULT_NETWORK
 import com.v2ray.ang.AppConfig.DNS_ALIDNS_ADDRESSES
 import com.v2ray.ang.AppConfig.DNS_ALIDNS_DOMAIN
 import com.v2ray.ang.AppConfig.DNS_GOOGLE_ADDRESSES
@@ -16,10 +16,11 @@ import com.v2ray.ang.AppConfig.DNS_PUB_ADDRESSES
 import com.v2ray.ang.AppConfig.DNS_PUB_DOMAIN
 import com.v2ray.ang.AppConfig.GEOIP_CN
 import com.v2ray.ang.AppConfig.GEOSITE_CN
-import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
 import com.v2ray.ang.AppConfig.GOOGLEAPIS_CN_DOMAIN
 import com.v2ray.ang.AppConfig.GOOGLEAPIS_COM_DOMAIN
+import com.v2ray.ang.AppConfig.HEADER_TYPE_HTTP
+import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.AppConfig.PROTOCOL_FREEDOM
 import com.v2ray.ang.AppConfig.TAG_BLOCKED
 import com.v2ray.ang.AppConfig.TAG_DIRECT
@@ -29,13 +30,19 @@ import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
-import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.dto.V2rayConfig
-import com.v2ray.ang.dto.V2rayConfig.Companion.DEFAULT_NETWORK
-import com.v2ray.ang.dto.V2rayConfig.Companion.HTTP
 import com.v2ray.ang.dto.V2rayConfig.RoutingBean.RulesBean
 import com.v2ray.ang.util.MmkvManager.settingsStorage
+import com.v2ray.ang.util.fmt.HttpFmt
+import com.v2ray.ang.util.fmt.Hysteria2Fmt
+import com.v2ray.ang.util.fmt.ShadowsocksFmt
+import com.v2ray.ang.util.fmt.SocksFmt
+import com.v2ray.ang.util.fmt.TrojanFmt
+import com.v2ray.ang.util.fmt.VlessFmt
+import com.v2ray.ang.util.fmt.VmessFmt
+import com.v2ray.ang.util.fmt.WireguardFmt
 
 object V2rayConfigUtil {
 
@@ -43,18 +50,13 @@ object V2rayConfigUtil {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ConfigResult(false)
             if (config.configType == EConfigType.CUSTOM) {
-                val raw = MmkvManager.decodeServerRaw(guid)
-                val customConfig = if (raw.isNullOrBlank()) {
-                    config.fullConfig?.toPrettyPrinting() ?: return ConfigResult(false)
-                } else {
-                    raw
-                }
-                val domainPort = config.getProxyOutbound()?.getServerAddressAndPort()
-                return ConfigResult(true, guid, customConfig, domainPort)
+                val raw = MmkvManager.decodeServerRaw(guid) ?: return ConfigResult(false)
+                val domainPort = config.getServerAddressAndPort()
+                return ConfigResult(true, guid, raw, domainPort)
             }
 
             val result = getV2rayNonCustomConfig(context, config)
-            //Log.d(ANG_PACKAGE, result.content)
+            Log.d(ANG_PACKAGE, result.content)
             result.guid = guid
             return result
         } catch (e: Exception) {
@@ -63,11 +65,10 @@ object V2rayConfigUtil {
         }
     }
 
-    private fun getV2rayNonCustomConfig(context: Context, config: ServerConfig): ConfigResult {
+    private fun getV2rayNonCustomConfig(context: Context, config: ProfileItem): ConfigResult {
         val result = ConfigResult(false)
 
-        val outbound = config.getProxyOutbound() ?: return result
-        val address = outbound.getServerAddress() ?: return result
+        val address = config.server ?: return result
         if (!Utils.isIpAddress(address)) {
             if (!Utils.isValidUrl(address)) {
                 Log.d(ANG_PACKAGE, "$address is an invalid ip or domain")
@@ -87,9 +88,8 @@ object V2rayConfigUtil {
 
         inbounds(v2rayConfig)
 
-        val isPlugin = outbound.protocol.equals(EConfigType.HYSTERIA2.name, true)
-        val retOut = outbounds(v2rayConfig, outbound, isPlugin)
-
+        val isPlugin = config.configType == EConfigType.HYSTERIA2
+        val retOut = outbounds(v2rayConfig, config, isPlugin) ?: return result
         val retMore = moreOutbounds(v2rayConfig, config.subscriptionId, isPlugin)
 
         routing(v2rayConfig)
@@ -154,11 +154,7 @@ object V2rayConfigUtil {
         return true
     }
 
-    private fun outbounds(
-        v2rayConfig: V2rayConfig,
-        outbound: V2rayConfig.OutboundBean,
-        isPlugin: Boolean
-    ): Pair<Boolean, String> {
+    private fun outbounds(v2rayConfig: V2rayConfig, config: ProfileItem, isPlugin: Boolean): Pair<Boolean, String>? {
         if (isPlugin) {
             val socksPort = Utils.findFreePort(listOf(100 + SettingsManager.getSocksPort(), 0))
             val outboundNew = V2rayConfig.OutboundBean(
@@ -181,8 +177,9 @@ object V2rayConfigUtil {
             return Pair(true, outboundNew.getServerAddressAndPort())
         }
 
+        val outbound = getProxyOutbound(config) ?: return null
         val ret = updateOutboundWithGlobalSettings(outbound)
-        if (!ret) return Pair(false, "")
+        if (!ret) return null
 
         if (v2rayConfig.outbounds.isNotEmpty()) {
             v2rayConfig.outbounds[0] = outbound
@@ -191,7 +188,7 @@ object V2rayConfigUtil {
         }
 
         updateOutboundFragment(v2rayConfig)
-        return Pair(true, outbound.getServerAddressAndPort())
+        return Pair(true, config.getServerAddressAndPort())
     }
 
     private fun fakedns(v2rayConfig: V2rayConfig) {
@@ -455,7 +452,7 @@ object V2rayConfigUtil {
             }
 
             if (outbound.streamSettings?.network == DEFAULT_NETWORK
-                && outbound.streamSettings?.tcpSettings?.header?.type == HTTP
+                && outbound.streamSettings?.tcpSettings?.header?.type == HEADER_TYPE_HTTP
             ) {
                 val path = outbound.streamSettings?.tcpSettings?.header?.request?.path
                 val host = outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host
@@ -489,8 +486,8 @@ object V2rayConfigUtil {
             if (settingsStorage?.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == false) {
                 return true
             }
-            if (v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.TLS
-                && v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.REALITY
+            if (v2rayConfig.outbounds[0].streamSettings?.security != AppConfig.TLS
+                && v2rayConfig.outbounds[0].streamSettings?.security != AppConfig.REALITY
             ) {
                 return true
             }
@@ -504,11 +501,11 @@ object V2rayConfigUtil {
 
             var packets =
                 settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_PACKETS) ?: "tlshello"
-            if (v2rayConfig.outbounds[0].streamSettings?.security == V2rayConfig.REALITY
+            if (v2rayConfig.outbounds[0].streamSettings?.security == AppConfig.REALITY
                 && packets == "tlshello"
             ) {
                 packets = "1-3"
-            } else if (v2rayConfig.outbounds[0].streamSettings?.security == V2rayConfig.TLS
+            } else if (v2rayConfig.outbounds[0].streamSettings?.security == AppConfig.TLS
                 && packets != "tlshello"
             ) {
                 packets = "tlshello"
@@ -578,7 +575,7 @@ object V2rayConfigUtil {
             //Previous proxy
             val prevNode = SettingsManager.getServerViaRemarks(subItem.prevProfile)
             if (prevNode != null) {
-                val prevOutbound = prevNode.getProxyOutbound()
+                val prevOutbound = getProxyOutbound(prevNode)
                 if (prevOutbound != null) {
                     updateOutboundWithGlobalSettings(prevOutbound)
                     prevOutbound.tag = TAG_PROXY + "2"
@@ -587,14 +584,14 @@ object V2rayConfigUtil {
                         V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
                             dialerProxy = prevOutbound.tag
                         )
-                    domainPort = prevOutbound.getServerAddressAndPort()
+                    domainPort = prevNode.getServerAddressAndPort()
                 }
             }
 
             //Next proxy
             val nextNode = SettingsManager.getServerViaRemarks(subItem.nextProfile)
             if (nextNode != null) {
-                val nextOutbound = nextNode.getProxyOutbound()
+                val nextOutbound = getProxyOutbound(nextNode)
                 if (nextOutbound != null) {
                     updateOutboundWithGlobalSettings(nextOutbound)
                     nextOutbound.tag = TAG_PROXY
@@ -616,4 +613,20 @@ object V2rayConfigUtil {
         }
         return returnPair
     }
+
+    fun getProxyOutbound(profileItem: ProfileItem): V2rayConfig.OutboundBean? {
+        return when (profileItem.configType) {
+            EConfigType.VMESS -> VmessFmt.toOutbound(profileItem)
+            EConfigType.CUSTOM -> null
+            EConfigType.SHADOWSOCKS -> ShadowsocksFmt.toOutbound(profileItem)
+            EConfigType.SOCKS -> SocksFmt.toOutbound(profileItem)
+            EConfigType.VLESS -> VlessFmt.toOutbound(profileItem)
+            EConfigType.TROJAN -> TrojanFmt.toOutbound(profileItem)
+            EConfigType.WIREGUARD -> WireguardFmt.toOutbound(profileItem)
+            EConfigType.HYSTERIA2 -> Hysteria2Fmt.toOutbound(profileItem)
+            EConfigType.HTTP -> HttpFmt.toOutbound(profileItem)
+        }
+
+    }
+
 }
