@@ -91,6 +91,8 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar", "*.jar"))))
     testImplementation(libs.junit)
+    testImplementation(libs.org.mockito.mockito.inline)
+    testImplementation(libs.mockito.kotlin)
 
     implementation(libs.flexbox)
     // Androidx

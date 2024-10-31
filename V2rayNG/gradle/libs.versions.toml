@@ -27,6 +27,7 @@ viewpager2 = "1.1.0"
 workRuntimeKtx = "2.9.1"
 androidGradlePlugin = "8.7.1"
 androidKotlinPlugin = "2.0.21"
+mockitoMockitoInline = "4.0.0"
 
 [libraries]
 activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -61,6 +62,8 @@ toastcompat = { module = "me.drakeet.support:toastcompat", version.ref = "toastc
 viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 work-multiprocess = { module = "androidx.work:work-multiprocess", version.ref = "workRuntimeKtx" }
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoMockitoInline" }
+org-mockito-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoMockitoInline" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
