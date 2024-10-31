@@ -53,6 +53,8 @@ object MigrateManager {
             EConfigType.WIREGUARD.name.lowercase() -> migrate2ProfileWireguard(configOld)
             EConfigType.HYSTERIA2.name.lowercase() -> migrate2ProfileHysteria2(configOld)
 
+            EConfigType.CUSTOM.name.lowercase() -> migrate2ProfileCustom(configOld)
+
             else -> null
         }
     }
@@ -160,6 +162,18 @@ object MigrateManager {
 
         return config
     }
+
+    private fun migrate2ProfileCustom(configOld: ServerConfig): ProfileItem? {
+        val config = ProfileItem.create(EConfigType.CUSTOM)
+
+        val outbound = configOld.getProxyOutbound() ?: return null
+        config.remarks = configOld.remarks
+        config.server = outbound.getServerAddress()
+        config.serverPort = outbound.getServerPort().toString()
+
+        return config
+    }
+
 
     private fun decodeServerConfigOld(guid: String): ServerConfig? {
         if (guid.isBlank()) {
