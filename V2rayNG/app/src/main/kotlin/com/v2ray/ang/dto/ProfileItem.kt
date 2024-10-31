@@ -48,6 +48,9 @@ data class ProfileItem(
     var mtu: Int? = null,
 
     var obfsPassword: String? = null,
+    var portHopping: String? = null,
+    var portHoppingInterval: String? = null,
+    var pinSHA256: String? = null,
 
     ) {
     companion object {

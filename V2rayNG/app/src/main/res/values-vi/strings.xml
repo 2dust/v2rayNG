@@ -107,6 +107,9 @@
     <string name="menu_item_download_file">Tải xuống tệp tin</string>
     <string name="toast_action_not_allowed">Hành động này bị cấm!</string>
     <string name="server_obfs_password">Obfs password</string>
+    <string name="server_lab_port_hop">Port Hopping</string>
+    <string name="server_lab_port_hop_interval">Port Hopping Interval</string>
+    <string name="server_lab_stream_pinsha256">pinSHA256</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">Thêm URL nội dung</string>

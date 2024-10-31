@@ -14,7 +14,7 @@ import java.net.URI
 
 object Hysteria2Fmt : FmtBase() {
     fun parse(str: String): ProfileItem? {
-        var allowInsecure = settingsStorage.decodeBool(AppConfig.PREF_ALLOW_INSECURE,false)
+        var allowInsecure = settingsStorage.decodeBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.HYSTERIA2)
 
         val uri = URI(Utils.fixIllegalUrl(str))
@@ -37,6 +37,9 @@ object Hysteria2Fmt : FmtBase() {
             config.alpn = queryParam["alpn"]
 
             config.obfsPassword = queryParam["obfs-password"]
+            config.portHopping = queryParam["mport"]
+            config.pinSHA256 = queryParam["pinSHA256"]
+
         }
 
         return config
@@ -54,6 +57,12 @@ object Hysteria2Fmt : FmtBase() {
             dicQuery["obfs"] = "salamander"
             dicQuery["obfs-password"] = config.obfsPassword.orEmpty()
         }
+        if (config.portHopping.isNotNullEmpty()) {
+            dicQuery["mport"] = config.portHopping.orEmpty()
+        }
+        if (config.pinSHA256.isNotNullEmpty()) {
+            dicQuery["pinSHA256"] = config.pinSHA256.orEmpty()
+        }
 
         return toUri(config, config.password, dicQuery)
     }
@@ -68,10 +77,25 @@ object Hysteria2Fmt : FmtBase() {
                 )
             )
 
+        val transport = if (config.portHopping.isNullOrEmpty()) null else
+            Hysteria2Bean.TransportBean(
+                type = "udp",
+                udp = Hysteria2Bean.TransportBean.TransportUdpBean(
+                    hopInterval = (config.portHoppingInterval ?: "30") + "s"
+                )
+            )
+
+        val server =
+            if (config.portHopping.isNullOrEmpty())
+                config.getServerAddressAndPort()
+            else
+                Utils.getIpv6Address(config.server) + ":" + config.portHopping
+
         val bean = Hysteria2Bean(
-            server = config.getServerAddressAndPort(),
+            server = server,
             auth = config.password,
             obfs = obfs,
+            transport = transport,
             socks5 = Hysteria2Bean.Socks5Bean(
                 listen = "$LOOPBACK:${socksPort}",
             ),
@@ -80,7 +104,8 @@ object Hysteria2Fmt : FmtBase() {
             ),
             tls = Hysteria2Bean.TlsBean(
                 sni = config.sni ?: config.server,
-                insecure = config.insecure
+                insecure = config.insecure,
+                pinSHA256 = if (config.pinSHA256.isNullOrEmpty()) null else config.pinSHA256
             )
         )
         return bean

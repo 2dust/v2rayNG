@@ -130,6 +130,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             holder.itemMainBinding.layoutEdit.setOnClickListener {
                 val intent = Intent().putExtra("guid", guid)
                     .putExtra("isRunning", isRunning)
+                    .putExtra("createConfigType", profile.configType.value)
                 if (profile.configType == EConfigType.CUSTOM) {
                     mActivity.startActivity(intent.setClass(mActivity, ServerCustomConfigActivity::class.java))
                 } else {
