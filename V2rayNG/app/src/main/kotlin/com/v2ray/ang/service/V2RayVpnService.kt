@@ -20,9 +20,9 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.handler.MmkvManager.settingsStorage
-import com.v2ray.ang.util.MyContextWrapper
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -130,7 +130,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             builder.addRoute("0.0.0.0", 0)
         }
 
-        if (settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true) {
             builder.addAddress(PRIVATE_VLAN6_CLIENT, 126)
             if (bypassLan) {
                 builder.addRoute("2000::", 3) //currently only 1/8 of total ipV6 is in use
@@ -139,7 +139,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
         }
 
-//        if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
+//        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
 //            builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
 //        } else {
         Utils.getVpnDnsServers()
@@ -153,9 +153,9 @@ class V2RayVpnService : VpnService(), ServiceControl {
         builder.setSession(V2RayServiceManager.currentConfig?.remarks.orEmpty())
 
         val selfPackageName = BuildConfig.APPLICATION_ID
-        if (settingsStorage?.decodeBool(AppConfig.PREF_PER_APP_PROXY) == true) {
-            val apps = settingsStorage?.decodeStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
-            val bypassApps = settingsStorage?.decodeBool(AppConfig.PREF_BYPASS_APPS) == true
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY) == true) {
+            val apps = MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
+            val bypassApps = MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS) == true
             //process self package
             if (bypassApps) apps?.add(selfPackageName) else apps?.remove(selfPackageName)
             apps?.forEach {
@@ -215,12 +215,12 @@ class V2RayVpnService : VpnService(), ServiceControl {
             "--loglevel", "notice"
         )
 
-        if (settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true) {
             cmd.add("--netif-ip6addr")
             cmd.add(PRIVATE_VLAN6_ROUTER)
         }
-        if (settingsStorage?.decodeBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
-            val localDnsPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_LOCAL_DNS_PORT), AppConfig.PORT_LOCAL_DNS.toInt())
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
+            val localDnsPort = Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT), AppConfig.PORT_LOCAL_DNS.toInt())
             cmd.add("--dnsgw")
             cmd.add("$LOOPBACK:${localDnsPort}")
         }

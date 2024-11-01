@@ -26,9 +26,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.MmkvManager.settingsStorage
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 
 class ServerActivity : BaseActivity() {
@@ -507,7 +506,7 @@ class ServerActivity : BaseActivity() {
 
         val allowInsecure =
             if (allowInsecureField == null || allowinsecures[allowInsecureField].isBlank()) {
-                settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) == true
+                MmkvManager.decodeSettingsBool(PREF_ALLOW_INSECURE) == true
             } else {
                 allowinsecures[allowInsecureField].toBoolean()
             }
@@ -548,7 +547,7 @@ class ServerActivity : BaseActivity() {
     private fun deleteServer(): Boolean {
         if (editGuid.isNotEmpty()) {
             if (editGuid != MmkvManager.getSelectServer()) {
-                if (settingsStorage?.decodeBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
+                if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
                     AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
                             MmkvManager.removeServer(editGuid)

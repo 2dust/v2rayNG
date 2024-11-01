@@ -21,13 +21,12 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.V2rayConfigManager
 import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.util.MessageUtil
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.MmkvManager.settingsStorage
 import com.v2ray.ang.util.PluginUtil
 import com.v2ray.ang.util.Utils
-import com.v2ray.ang.handler.V2rayConfigManager
 import go.Seq
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -70,12 +69,12 @@ object V2RayServiceManager {
 //        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
 //        if (!result.status) return
 
-        if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING) == true) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)
         } else {
             context.toast(R.string.toast_services_start)
         }
-        val intent = if ((settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
+        val intent = if ((MmkvManager.decodeSettingsString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
             Intent(context.applicationContext, V2RayVpnService::class.java)
         } else {
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
@@ -157,7 +156,7 @@ object V2RayServiceManager {
         currentConfig = config
 
         try {
-            v2rayPoint.runLoop(settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) == true)
+            v2rayPoint.runLoop(MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true)
         } catch (e: Exception) {
             Log.d(ANG_PACKAGE, e.toString())
         }
@@ -380,7 +379,7 @@ object V2RayServiceManager {
     private fun startSpeedNotification() {
         if (mDisposable == null &&
             v2rayPoint.isRunning &&
-            settingsStorage?.decodeBool(AppConfig.PREF_SPEED_ENABLED) == true
+            MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) == true
         ) {
             var lastZeroSpeed = false
             val outboundTags = currentConfig?.getAllOutboundTags()
