@@ -6,8 +6,8 @@ import android.util.Log
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
-import com.v2ray.ang.service.ProcessService
 import com.v2ray.ang.fmt.Hysteria2Fmt
+import com.v2ray.ang.service.ProcessService
 import java.io.File
 
 object PluginUtil {

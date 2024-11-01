@@ -12,7 +12,7 @@ import com.tbruyelle.rxpermissions3.RxPermissions
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.handler.MmkvManager.settingsStorage
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.QRCodeDecoder
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
@@ -25,7 +25,7 @@ class ScannerActivity : BaseActivity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (settingsStorage?.decodeBool(AppConfig.PREF_START_SCAN_IMMEDIATE) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_START_SCAN_IMMEDIATE) == true) {
             launchScan()
         }
     }

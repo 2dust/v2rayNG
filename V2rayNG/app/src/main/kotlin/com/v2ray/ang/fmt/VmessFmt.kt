@@ -9,8 +9,8 @@ import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.dto.VmessQRCode
 import com.v2ray.ang.extension.idnHost
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.handler.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import java.net.URI
 import kotlin.text.orEmpty
@@ -21,7 +21,7 @@ object VmessFmt : FmtBase() {
             return parseVmessStd(str)
         }
 
-        var allowInsecure = settingsStorage.decodeBool(AppConfig.PREF_ALLOW_INSECURE, false)
+        var allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.VMESS)
 
         var result = str.replace(EConfigType.VMESS.protocolScheme, "")
@@ -119,7 +119,7 @@ object VmessFmt : FmtBase() {
     }
 
     fun parseVmessStd(str: String): ProfileItem? {
-        var allowInsecure = settingsStorage.decodeBool(AppConfig.PREF_ALLOW_INSECURE, false)
+        var allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.VMESS)
 
         val uri = URI(Utils.fixIllegalUrl(str))

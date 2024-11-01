@@ -26,7 +26,6 @@ import com.v2ray.ang.dto.Language
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.service.V2RayServiceManager
-import com.v2ray.ang.handler.MmkvManager.settingsStorage
 import java.io.IOException
 import java.net.*
 import java.util.*
@@ -131,7 +130,7 @@ object Utils {
      * get remote dns servers from preference
      */
     fun getRemoteDnsServers(): List<String> {
-        val remoteDns = settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_PROXY
+        val remoteDns = MmkvManager.decodeSettingsString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_PROXY
         val ret = remoteDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
         if (ret.isEmpty()) {
             return listOf(AppConfig.DNS_PROXY)
@@ -140,7 +139,7 @@ object Utils {
     }
 
     fun getVpnDnsServers(): List<String> {
-        val vpnDns = settingsStorage?.decodeString(AppConfig.PREF_VPN_DNS) ?: AppConfig.DNS_VPN
+        val vpnDns = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_DNS) ?: AppConfig.DNS_VPN
         return vpnDns.split(",").filter { isPureIpAddress(it) }
         // allow empty, in that case dns will use system default
     }
@@ -149,7 +148,7 @@ object Utils {
      * get remote dns servers from preference
      */
     fun getDomesticDnsServers(): List<String> {
-        val domesticDns = settingsStorage?.decodeString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
+        val domesticDns = MmkvManager.decodeSettingsString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
         val ret = domesticDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
         if (ret.isEmpty()) {
             return listOf(AppConfig.DNS_DIRECT)
@@ -388,7 +387,7 @@ object Utils {
 
 
     fun setNightMode(context: Context) {
-        when (settingsStorage?.decodeString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
+        when (MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
             "0" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             "1" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             "2" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -407,7 +406,7 @@ object Utils {
     }
 
     fun getLocale(): Locale {
-        val langCode = settingsStorage?.decodeString(AppConfig.PREF_LANGUAGE) ?: Language.AUTO.code
+        val langCode = MmkvManager.decodeSettingsString(AppConfig.PREF_LANGUAGE) ?: Language.AUTO.code
         val language = Language.fromCode(langCode)
 
         return when (language) {
@@ -452,7 +451,7 @@ object Utils {
         return if (second) {
             AppConfig.DelayTestUrl2
         } else {
-            settingsStorage.decodeString(AppConfig.PREF_DELAY_TEST_URL) ?: AppConfig.DelayTestUrl
+            MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL) ?: AppConfig.DelayTestUrl
         }
     }
 

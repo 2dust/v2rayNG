@@ -35,7 +35,7 @@ object MmkvManager {
     private val serverAffStorage by lazy { MMKV.mmkvWithID(ID_SERVER_AFF, MMKV.MULTI_PROCESS_MODE) }
     private val subStorage by lazy { MMKV.mmkvWithID(ID_SUB, MMKV.MULTI_PROCESS_MODE) }
     private val assetStorage by lazy { MMKV.mmkvWithID(ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
-    val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
+    private val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     //endregion
 
@@ -304,9 +304,51 @@ object MmkvManager {
 
     fun encodeRoutingRulesets(rulesetList: MutableList<RulesetItem>?) {
         if (rulesetList.isNullOrEmpty())
-            settingsStorage.encode(PREF_ROUTING_RULESET, "")
+            encodeSettings(PREF_ROUTING_RULESET, "")
         else
-            settingsStorage.encode(PREF_ROUTING_RULESET, JsonUtil.toJson(rulesetList))
+            encodeSettings(PREF_ROUTING_RULESET, JsonUtil.toJson(rulesetList))
+    }
+
+    //endregion
+    fun encodeSettings(key: String, value: String?): Boolean {
+        return settingsStorage.encode(key, value)
+    }
+
+    fun encodeSettings(key: String, value: Int): Boolean {
+        return settingsStorage.encode(key, value)
+    }
+
+    fun encodeSettings(key: String, value: Boolean): Boolean {
+        return settingsStorage.encode(key, value)
+    }
+
+    fun encodeSettings(key: String, value: MutableSet<String>): Boolean {
+        return settingsStorage.encode(key, value)
+    }
+
+
+    fun decodeSettingsString(key: String): String? {
+        return settingsStorage.decodeString(key)
+    }
+
+    fun decodeSettingsString(key: String, defaultValue: String?): String? {
+        return settingsStorage.decodeString(key, defaultValue)
+    }
+
+    fun decodeSettingsBool(key: String): Boolean {
+        return settingsStorage.decodeBool(key)
+    }
+
+    fun decodeSettingsBool(key: String, defaultValue: Boolean): Boolean {
+        return settingsStorage.decodeBool(key, defaultValue)
+    }
+
+    fun decodeSettingsInt(key: String, defaultValue: Int): Int {
+        return settingsStorage.decodeInt(key, defaultValue)
+    }
+
+    fun decodeSettingsStringSet(key: String): MutableSet<String>? {
+        return settingsStorage.decodeStringSet(key)
     }
 
     //endregion
@@ -314,11 +356,11 @@ object MmkvManager {
     //region Others
 
     fun encodeStartOnBoot(startOnBoot: Boolean) {
-        settingsStorage.encode(PREF_IS_BOOTED, startOnBoot)
+        MmkvManager.encodeSettings(PREF_IS_BOOTED, startOnBoot)
     }
 
     fun decodeStartOnBoot(): Boolean {
-        return settingsStorage.decodeBool(PREF_IS_BOOTED, false)
+        return decodeSettingsBool(PREF_IS_BOOTED, false)
     }
 
     //endregion
