@@ -38,7 +38,7 @@
     <string name="menu_item_import_config_custom_url">کانفیگ سفارشی را از طریق نشانی اینترنتی وارد کنید</string>
     <string name="menu_item_import_config_custom_url_scan">نشانی اینترنتی اسکن کانفیگ سفارشی را وارد کنید</string>
     <string name="del_config_comfirm">حذف شود؟</string>
-    <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
+    <string name="del_invalid_config_comfirm">لطفا قبل از حذف کانفیگ نامعتبر تایید کنید! حذف کانفیگ را تایید می کنید؟</string>
     <string name="server_lab_remarks">ملاحظات</string>
     <string name="server_lab_address">نشانی</string>
     <string name="server_lab_port">پورت</string>
@@ -75,7 +75,7 @@
     <string name="server_lab_id3">رمز عبور</string>
     <string name="server_lab_security3">امنیت</string>
     <string name="server_lab_id4">رمز عبور (اختیاری)</string>
-    <string name="server_lab_security4">نام‌کاربری (اختیاری)</string>
+    <string name="server_lab_security4">نام‌ کاربری (اختیاری)</string>
     <string name="server_lab_encryption">رمزنگاری</string>
     <string name="server_lab_flow">جریان</string>
     <string name="server_lab_public_key">PublicKey</string>
@@ -102,9 +102,9 @@
     <string name="toast_malformed_josn">کانفیگ درست نیست</string>
     <string name="server_lab_request_host6">میزبان (SNI) (اختیاری)</string>
     <string name="toast_asset_copy_failed">کپی فایل انجام نشد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
-    <string name="menu_item_add_file">افزودن فایل‌ها</string>
+    <string name="menu_item_add_file">افزودن فایل ‌ها</string>
     <string name="title_url">URL</string>
-    <string name="menu_item_download_file">دانلود فایل‌ها</string>
+    <string name="menu_item_download_file">دانلود فایل‌ ها</string>
     <string name="toast_action_not_allowed">این عمل ممنوع است</string>
     <string name="server_obfs_password">Obfs password</string>
     <string name="server_lab_port_hop">Port Hopping</string>
@@ -156,7 +156,7 @@
 
 
     <string name="title_pref_local_dns_enabled">فعال کردن DNS محلی</string>
-    <string name="summary_pref_local_dns_enabled">درخواست های DNS به هسته وارد شده و توسط ماژول DNS پردازش می شوند(توصیه می شود در صورت نیاز به مسیریابی برای دور زدن آدرس های LAN و سرزمین اصلی فعال شود)</string>
+    <string name="summary_pref_local_dns_enabled">درخواست های DNS به هسته وارد شده و توسط ماژول DNS پردازش می شوند (توصیه می شود در صورت نیاز به مسیریابی برای دور زدن آدرس های LAN و سرزمین اصلی فعال شود)</string>
 
     <string name="title_pref_fake_dns_enabled">فعال کردن DNS جعلی</string>
     <string name="summary_pref_fake_dns_enabled">محلی آدرس های آیپی فیک را بر می‌ گرداند(سریع تر می باشد اما ممکن است برای برخی از برنامه ها کار نکند) DNS</string>
@@ -243,7 +243,7 @@
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
     <string name="title_ping_all_server">Tcping کانفیگ های گروه فعلی</string>
     <string name="title_real_ping_all_server">تاخیر واقعی کانفیگ های گروه فعلی</string>
-    <string name="title_user_asset_setting">فایل‌های دارایی جغرافیا</string>
+    <string name="title_user_asset_setting">فایل ‌های دارایی جغرافیا</string>
     <string name="title_sort_by_test_results">مرتب‌ سازی بر اساس نتایج آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگ‌ها</string>
     <string name="filter_config_all">همه گروه‌های اشتراک</string>
