@@ -19,12 +19,12 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.AngConfigManager
+import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.util.MessageUtil
-import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.SpeedtestUtil
 import com.v2ray.ang.util.Utils
-import com.v2ray.ang.util.fmt.CustomFmt
+import com.v2ray.ang.fmt.CustomFmt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

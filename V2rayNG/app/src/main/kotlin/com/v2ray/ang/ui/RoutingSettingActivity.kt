@@ -18,9 +18,9 @@ import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.MmkvManager.settingsStorage
-import com.v2ray.ang.util.SettingsManager
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.MmkvManager.settingsStorage
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

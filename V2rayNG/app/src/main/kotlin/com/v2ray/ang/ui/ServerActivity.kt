@@ -27,8 +27,8 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.MmkvManager.settingsStorage
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 
 class ServerActivity : BaseActivity() {
