@@ -23,7 +23,7 @@
     <string name="menu_item_save_config">ذخیره کانفیگ</string>
     <string name="menu_item_del_config">حذف کانفیگ</string>
     <string name="menu_item_import_config_qrcode">کانفیگ را از QRcode وارد کنید</string>
-    <string name="menu_item_import_config_clipboard">کانفیگ را از کلیپ‌بورد وارد کنید</string>
+    <string name="menu_item_import_config_clipboard">کانفیگ را از کلیپ ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_manually_vmess">تایپ دستی[VMess]</string>
     <string name="menu_item_import_config_manually_vless">تایپ دستی[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">تایپ دستی[Shadowsocks]</string>
@@ -33,7 +33,7 @@
     <string name="menu_item_import_config_manually_wireguard">[Wireguard]تایپ دستی</string>
     <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
     <string name="menu_item_import_config_custom">کانفیگ سفارشی</string>
-    <string name="menu_item_import_config_custom_clipboard">کانفیگ سفارشی را از کلیپ‌بورد وارد کنید</string>
+    <string name="menu_item_import_config_custom_clipboard">کانفیگ سفارشی را از کلیپ ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_custom_local">کانفیگ سفارشی را به صورت محلی وارد کنید</string>
     <string name="menu_item_import_config_custom_url">کانفیگ سفارشی را از طریق نشانی اینترنتی وارد کنید</string>
     <string name="menu_item_import_config_custom_url_scan">نشانی اینترنتی اسکن کانفیگ سفارشی را وارد کنید</string>
@@ -95,7 +95,7 @@
     <string name="server_customize_config">کانفیگ سفارشی</string>
     <string name="toast_config_file_invalid">کانفیگ معتبر نیست</string>
     <string name="server_lab_content">محتوا</string>
-    <string name="toast_none_data_clipboard">هیچ داده‌ای در کلیپ‌بورد وجود ندارد</string>
+    <string name="toast_none_data_clipboard">هیچ داده‌ای در کلیپ ‌بورد وجود ندارد</string>
     <string name="toast_invalid_url">نشانی اینترنتی معتبر نیست</string>
     <string name="toast_insecure_url_protocol">لطفاً از آدرس اشتراک پروتکل HTTP ناامن استفاده نکنید</string>
     <string name="server_lab_need_inbound">اطمینان حاصل کنید که پورت ورودی با تنظیمات مطابقت دارد</string>
@@ -122,8 +122,8 @@
     <string name="switch_bypass_apps_mode">حالت Bypass</string>
     <string name="menu_item_select_proxy_app">انتخاب خودکار پروکسی برنامه</string>
     <string name="msg_downloading_content">در حال دانلود محتوا</string>
-    <string name="menu_item_export_proxy_app">خروجی گرفتن در کلیپ‌بورد</string>
-    <string name="menu_item_import_proxy_app">وارد کردن از کلیپ‌بورد</string>
+    <string name="menu_item_export_proxy_app">خروجی گرفتن در کلیپ‌ بورد</string>
+    <string name="menu_item_import_proxy_app">وارد کردن از کلیپ‌ بورد</string>
 
     <!-- Preferences -->
     <string name="title_settings">تنظیمات</string>
@@ -230,7 +230,7 @@
     <string name="title_del_all_config">حذف تمام کانفیگ های گروه فعلی</string>
     <string name="title_del_duplicate_config">حذف کانفیگ های تکراری گروه فعلی</string>
     <string name="title_del_invalid_config">حذف کانفیگ های نامعتبر گروه فعلی (ابتدا آزمایش کنید)</string>
-    <string name="title_export_all">خروجی گرفتن کانفیگ های غیرسفارشی گروه فعلی در کلیپ‌بورد</string>
+    <string name="title_export_all">خروجی گرفتن کانفیگ های غیرسفارشی گروه فعلی در کلیپ ‌بورد</string>
     <string name="title_sub_setting">تنظیمات گروه‌ اشتراک</string>
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">نشانی اینترنتی اختیاری</string>
@@ -289,7 +289,7 @@
 
     <string-array name="share_sub_method">
         <item>QRcode</item>
-        <item>خروجی گرفتن در کلیپ‌بورد</item>
+        <item>خروجی گرفتن در کلیپ‌ بورد</item>
     </string-array>
 
     <string-array name="mode_entries">
