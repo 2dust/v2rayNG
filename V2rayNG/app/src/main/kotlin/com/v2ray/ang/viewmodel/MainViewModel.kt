@@ -114,7 +114,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun swapServer(fromPosition: Int, toPosition: Int) {
-        Collections.swap(serverList, fromPosition, toPosition)
+        if (subscriptionId.isEmpty()) {
+            Collections.swap(serverList, fromPosition, toPosition)
+        } else {
+            val fromPosition2 = serverList.indexOf(serversCache[fromPosition].guid)
+            val toPosition2 = serverList.indexOf(serversCache[toPosition].guid)
+            Collections.swap(serverList, fromPosition2, toPosition2)
+        }
         Collections.swap(serversCache, fromPosition, toPosition)
         MmkvManager.encodeServerList(serverList)
     }
