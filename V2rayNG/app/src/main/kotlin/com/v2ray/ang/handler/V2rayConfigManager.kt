@@ -431,7 +431,7 @@ object V2rayConfigManager {
                 outbound.mux?.concurrency =
                     settingsStorage?.decodeInt(AppConfig.PREF_MUX_CONCURRENCY) ?: 8
                 outbound.mux?.xudpConcurrency =
-                    settingsStorage?.decodeInt(AppConfig.PREF_MUX_XUDP_CONCURRENCY) ?: 16
+                    settingsStorage?.decodeInt(AppConfig.PREF_MUX_XUDP_CONCURRENCY) ?: 8
                 outbound.mux?.xudpProxyUDP443 =
                     settingsStorage?.decodeString(AppConfig.PREF_MUX_XUDP_QUIC) ?: "reject"
             } else {
