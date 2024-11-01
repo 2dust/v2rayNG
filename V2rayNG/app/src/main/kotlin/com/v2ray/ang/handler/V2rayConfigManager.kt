@@ -430,7 +430,7 @@ object V2rayConfigManager {
                 outbound.mux?.concurrency =
                     MmkvManager.decodeSettingsInt(AppConfig.PREF_MUX_CONCURRENCY, 8)
                 outbound.mux?.xudpConcurrency =
-                    MmkvManager.decodeSettingsInt(AppConfig.PREF_MUX_XUDP_CONCURRENCY, 8)
+                    MmkvManager.decodeSettingsInt(AppConfig.PREF_MUX_XUDP_CONCURRENCY, 16)
                 outbound.mux?.xudpProxyUDP443 =
                     MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_QUIC) ?: "reject"
             } else {
