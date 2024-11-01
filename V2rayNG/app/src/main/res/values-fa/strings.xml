@@ -159,7 +159,7 @@
     <string name="summary_pref_local_dns_enabled">درخواست های DNS به هسته وارد شده و توسط ماژول DNS پردازش می شوند (توصیه می شود در صورت نیاز به مسیریابی برای دور زدن آدرس های LAN و سرزمین اصلی فعال شود)</string>
 
     <string name="title_pref_fake_dns_enabled">فعال کردن DNS جعلی</string>
-    <string name="summary_pref_fake_dns_enabled">محلی آدرس های آیپی فیک را بر می‌ گرداند(سریع تر می باشد اما ممکن است برای برخی از برنامه ها کار نکند) DNS</string>
+    <string name="summary_pref_fake_dns_enabled">DNS محلی آدرس های آیپی فیک را بر می گرداند (سریع تر می باشد اما ممکن است برای برخی از برنامه ها کار نکند)</string>
 
     <string name="title_pref_prefer_ipv6">ترجیح دادن IPv6</string>
     <string name="summary_pref_prefer_ipv6">ترجیح دادن نشانی و مسیر های IPv6</string>
