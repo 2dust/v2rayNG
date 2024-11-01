@@ -10,7 +10,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubEditBinding
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

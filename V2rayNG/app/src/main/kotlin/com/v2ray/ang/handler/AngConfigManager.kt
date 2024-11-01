@@ -1,4 +1,4 @@
-package com.v2ray.ang.util
+package com.v2ray.ang.handler
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -8,14 +8,17 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.HY2
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.*
-import com.v2ray.ang.util.fmt.CustomFmt
-import com.v2ray.ang.util.fmt.Hysteria2Fmt
-import com.v2ray.ang.util.fmt.ShadowsocksFmt
-import com.v2ray.ang.util.fmt.SocksFmt
-import com.v2ray.ang.util.fmt.TrojanFmt
-import com.v2ray.ang.util.fmt.VlessFmt
-import com.v2ray.ang.util.fmt.VmessFmt
-import com.v2ray.ang.util.fmt.WireguardFmt
+import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.util.QRCodeDecoder
+import com.v2ray.ang.util.Utils
+import com.v2ray.ang.fmt.CustomFmt
+import com.v2ray.ang.fmt.Hysteria2Fmt
+import com.v2ray.ang.fmt.ShadowsocksFmt
+import com.v2ray.ang.fmt.SocksFmt
+import com.v2ray.ang.fmt.TrojanFmt
+import com.v2ray.ang.fmt.VlessFmt
+import com.v2ray.ang.fmt.VmessFmt
+import com.v2ray.ang.fmt.WireguardFmt
 import java.net.URI
 
 object AngConfigManager {
@@ -165,7 +168,7 @@ object AngConfigManager {
     fun shareFullContent2Clipboard(context: Context, guid: String?): Int {
         try {
             if (guid == null) return -1
-            val result = V2rayConfigUtil.getV2rayConfig(context, guid)
+            val result = V2rayConfigManager.getV2rayConfig(context, guid)
             if (result.status) {
                 Utils.setClipboard(context, result.content)
             } else {

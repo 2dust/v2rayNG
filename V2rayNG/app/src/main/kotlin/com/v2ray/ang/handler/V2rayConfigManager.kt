@@ -1,4 +1,4 @@
-package com.v2ray.ang.util
+package com.v2ray.ang.handler
 
 import android.content.Context
 import android.text.TextUtils
@@ -34,17 +34,19 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.V2rayConfig.RoutingBean.RulesBean
-import com.v2ray.ang.util.MmkvManager.settingsStorage
-import com.v2ray.ang.util.fmt.HttpFmt
-import com.v2ray.ang.util.fmt.Hysteria2Fmt
-import com.v2ray.ang.util.fmt.ShadowsocksFmt
-import com.v2ray.ang.util.fmt.SocksFmt
-import com.v2ray.ang.util.fmt.TrojanFmt
-import com.v2ray.ang.util.fmt.VlessFmt
-import com.v2ray.ang.util.fmt.VmessFmt
-import com.v2ray.ang.util.fmt.WireguardFmt
+import com.v2ray.ang.handler.MmkvManager.settingsStorage
+import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.util.Utils
+import com.v2ray.ang.fmt.HttpFmt
+import com.v2ray.ang.fmt.Hysteria2Fmt
+import com.v2ray.ang.fmt.ShadowsocksFmt
+import com.v2ray.ang.fmt.SocksFmt
+import com.v2ray.ang.fmt.TrojanFmt
+import com.v2ray.ang.fmt.VlessFmt
+import com.v2ray.ang.fmt.VmessFmt
+import com.v2ray.ang.fmt.WireguardFmt
 
-object V2rayConfigUtil {
+object V2rayConfigManager {
 
     fun getV2rayConfig(context: Context, guid: String): ConfigResult {
         try {

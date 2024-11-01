@@ -24,8 +24,9 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.Language
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.service.V2RayServiceManager
-import com.v2ray.ang.util.MmkvManager.settingsStorage
+import com.v2ray.ang.handler.MmkvManager.settingsStorage
 import java.io.IOException
 import java.net.*
 import java.util.*

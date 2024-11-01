@@ -1,4 +1,4 @@
-package com.v2ray.ang.util.fmt
+package com.v2ray.ang.fmt
 
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4

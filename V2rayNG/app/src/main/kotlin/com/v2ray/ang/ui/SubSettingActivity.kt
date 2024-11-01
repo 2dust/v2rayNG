@@ -14,8 +14,8 @@ import com.v2ray.ang.databinding.LayoutProgressBinding
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
-import com.v2ray.ang.util.AngConfigManager
-import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.handler.MmkvManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

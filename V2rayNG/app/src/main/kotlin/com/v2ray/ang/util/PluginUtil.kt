@@ -7,7 +7,7 @@ import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.service.ProcessService
-import com.v2ray.ang.util.fmt.Hysteria2Fmt
+import com.v2ray.ang.fmt.Hysteria2Fmt
 import java.io.File
 
 object PluginUtil {

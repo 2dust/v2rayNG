@@ -9,7 +9,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityRoutingEditBinding
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.SettingsManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

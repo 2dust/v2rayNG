@@ -29,8 +29,8 @@ import com.v2ray.ang.databinding.LayoutProgressBinding
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.SettingsManager
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

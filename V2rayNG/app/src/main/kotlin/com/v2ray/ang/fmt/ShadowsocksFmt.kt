@@ -1,4 +1,4 @@
-package com.v2ray.ang.util.fmt
+package com.v2ray.ang.fmt
 
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
