@@ -623,10 +623,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             delay(500L)
             launch(Dispatchers.Main) {
                 if (count > 0) {
-                    //toast(R.string.toast_success)
-                    toast(R.string.connection_test_testing)
+                    toast(R.string.toast_success)
                     mainViewModel.reloadServerList()
-                    mainViewModel.testAllRealPing()
                 } else {
                     toast(R.string.toast_failure)
                 }

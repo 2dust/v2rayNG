@@ -333,10 +333,10 @@ object V2rayConfigManager {
             if (proxyDomain.size > 0) {
                 servers.add(
                     V2rayConfig.DnsBean.ServersBean(
-                        remoteDns.first(),
-                        53,
-                        proxyDomain,
-                        null
+                        address =  remoteDns.first(),
+                        port =  53,
+                        domains =  proxyDomain,
+                        expectIPs = null
                     )
                 )
             }
@@ -349,10 +349,11 @@ object V2rayConfigManager {
             if (directDomain.size > 0) {
                 servers.add(
                     V2rayConfig.DnsBean.ServersBean(
-                        domesticDns.first(),
-                        53,
-                        directDomain,
-                        if (isCnRoutingMode) geoipCn else null
+                        address = domesticDns.first(),
+                        port =  53,
+                        domains = directDomain,
+                        expectIPs = if (isCnRoutingMode) geoipCn else null,
+                        skipFallback = true
                     )
                 )
             }
