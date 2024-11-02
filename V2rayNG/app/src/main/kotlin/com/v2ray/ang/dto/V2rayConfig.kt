@@ -637,7 +637,8 @@ data class V2rayConfig(
             var port: Int? = null,
             var domains: List<String>? = null,
             var expectIPs: List<String>? = null,
-            val clientIp: String? = null
+            val clientIp: String? = null,
+            val skipFallback: Boolean? = null,
         )
     }
 
