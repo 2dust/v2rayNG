@@ -17,12 +17,14 @@ object AppManagerUtil {
 
             val applicationInfo = pkg.applicationInfo
 
-            val appName = applicationInfo.loadLabel(packageManager).toString()
-            val appIcon = applicationInfo.loadIcon(packageManager)
-            val isSystemApp = applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM > 0
+            if (applicationInfo != null){
+                val appName = applicationInfo.loadLabel(packageManager).toString()
+                val appIcon = applicationInfo.loadIcon(packageManager)
+                val isSystemApp = applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM > 0
 
-            val appInfo = AppInfo(appName, pkg.packageName, appIcon, isSystemApp, 0)
-            apps.add(appInfo)
+                val appInfo = AppInfo(appName, pkg.packageName, appIcon, isSystemApp, 0)
+                apps.add(appInfo)
+            }
         }
 
         return apps
