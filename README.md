@@ -8,7 +8,7 @@ A V2Ray client for Android, support [Xray core](https://github.com/XTLS/Xray-cor
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/m/2dust/v2rayNG)](https://github.com/2dust/v2rayNG/commits/master)
 [![CodeFactor](https://www.codefactor.io/repository/github/2dust/v2rayng/badge)](https://www.codefactor.io/repository/github/2dust/v2rayng)
 ![Contributors](https://img.shields.io/github/contributors/2dust/v2rayNG?logo=github)
-![Downloads](https://img.shields.io/github/downloads/2dust/v2rayNG/total?logo=download)
+![Downloads](https://img.shields.io/github/downloads/2dust/v2rayNG/total?logo=github)
 [![GitHub Releases](https://img.shields.io/github/downloads/2dust/v2rayNG/latest/total?logo=github)](https://github.com/2dust/v2rayNG/releases)
 ![Platform](https://img.shields.io/badge/Platform-Android-green?logo=android&logoColor=white)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?logo=git)
