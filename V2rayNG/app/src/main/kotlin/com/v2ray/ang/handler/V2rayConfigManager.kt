@@ -431,7 +431,7 @@ object V2rayConfigManager {
                 outbound.mux?.concurrency =
                     MmkvManager.decodeSettingsInt(AppConfig.PREF_MUX_CONCURRENCY, 8)
                 outbound.mux?.xudpConcurrency =
-                    MmkvManager.decodeSettingsInt(AppConfig.PREF_MUX_XUDP_CONCURRENCY, 8)
+                    MmkvManager.decodeSettingsInt(AppConfig.PREF_MUX_XUDP_CONCURRENCY, 16)
                 outbound.mux?.xudpProxyUDP443 =
                     MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_QUIC) ?: "reject"
             } else {
@@ -458,7 +458,7 @@ object V2rayConfigManager {
                 val host = outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host
 
                 val requestString: String by lazy {
-                    """{"version":"1.1","method":"GET","headers":{"User-Agent":["Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36","Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_2 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/53.0.2785.109 Mobile/14A456 Safari/601.1.46"],"Accept-Encoding":["gzip, deflate"],"Connection":["keep-alive"],"Pragma":"no-cache"}}"""
+                    """{"version":"1.1","method":"GET","headers":{"User-Agent":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.6478.122 Mobile Safari/537.36"Safari/537.36,"Accept-Encoding":["gzip, deflate"],"Connection":["keep-alive"],"Pragma":"no-cache"}}"""
                 }
                 outbound.streamSettings?.tcpSettings?.header?.request = JsonUtil.fromJson(
                     requestString,
@@ -522,8 +522,8 @@ object V2rayConfigManager {
                 noises = listOf(
                     V2rayConfig.OutboundBean.OutSettingsBean.NoiseBean(
                         type = "rand",
-                        packet = "100-200",
-                        delay = "10-20",
+                        packet = "50-150",
+                        delay = "10-16",
                     )
                 ),
             )
