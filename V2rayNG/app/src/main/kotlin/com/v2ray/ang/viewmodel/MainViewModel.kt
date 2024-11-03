@@ -266,7 +266,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             serversCacheCopy.forEachIndexed { index2, it2 ->
                 if (index2 > index) {
                     val outbound2 = it2.second.getKeyProperty()
-                    if (outbound == outbound2 && !deleteServer.contains(it2.first)) {
+                    if (outbound.equals(outbound2) && !deleteServer.contains(it2.first)) {
                         deleteServer.add(it2.first)
                     }
                 }

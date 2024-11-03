@@ -3,7 +3,6 @@ package com.v2ray.ang.dto
 import com.v2ray.ang.AppConfig.TAG_BLOCKED
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.TAG_PROXY
-import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 
 data class ProfileItem(
@@ -67,9 +66,10 @@ data class ProfileItem(
         return Utils.getIpv6Address(server) + ":" + serverPort
     }
 
-    fun getKeyProperty(): String {
-        subscriptionId = ""
-        addedTime = 0L
-        return JsonUtil.toJson(this)
+    fun getKeyProperty(): ProfileItem {
+        val copy = this.copy()
+        copy.subscriptionId = ""
+        copy.addedTime = 0L
+        return copy
     }
 }
