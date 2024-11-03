@@ -106,9 +106,9 @@
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">دانلود فایل‌ ها</string>
     <string name="toast_action_not_allowed">این عمل ممنوع است</string>
-    <string name="server_obfs_password">Obfs password</string>
-    <string name="server_lab_port_hop">Port Hopping</string>
-    <string name="server_lab_port_hop_interval">Port Hopping Interval</string>
+    <string name="server_obfs_password">رمز عبور Obfs</string>
+    <string name="server_lab_port_hop">پورت پرش (درگاه سرور را بازنویسی می کند)</string>
+    <string name="server_lab_port_hop_interval">فاصله پورت پرش (ثانیه)</string>
     <string name="server_lab_stream_pinsha256">pinSHA256</string>
 
     <!-- PerAppProxyActivity -->
