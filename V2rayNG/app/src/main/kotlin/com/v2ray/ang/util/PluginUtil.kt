@@ -14,7 +14,9 @@ object PluginUtil {
     //private const val HYSTERIA2 = "hysteria2-plugin"
     private const val HYSTERIA2 = "libhysteria2.so"
     private const val TAG = ANG_PACKAGE
-    private lateinit var procService: ProcessService
+    private val procService: ProcessService by lazy {
+        ProcessService()
+    }
 
 //    fun initPlugin(name: String): PluginManager.InitResult {
 //        return PluginManager.init(name)!!
@@ -27,7 +29,6 @@ object PluginUtil {
             val configFile = genConfigHy2(context, config, domainPort) ?: return
             val cmd = genCmdHy2(context, configFile)
 
-            procService = ProcessService()
             procService.runProcess(context, cmd)
         }
     }
