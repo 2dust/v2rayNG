@@ -522,7 +522,7 @@ object V2rayConfigManager {
                 noises = listOf(
                     V2rayConfig.OutboundBean.OutSettingsBean.NoiseBean(
                         type = "rand",
-                        packet = "50-150",
+                        packet = "10-20",
                         delay = "10-16",
                     )
                 ),
