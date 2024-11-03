@@ -8,9 +8,9 @@ A V2Ray client for Android, support [Xray core](https://github.com/XTLS/Xray-cor
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/m/2dust/v2rayNG)](https://github.com/2dust/v2rayNG/commits/master)
 [![CodeFactor](https://www.codefactor.io/repository/github/2dust/v2rayng/badge)](https://www.codefactor.io/repository/github/2dust/v2rayng)
 [![GitHub Releases](https://img.shields.io/github/downloads/2dust/v2rayNG/latest/total?logo=github)](https://github.com/2dust/v2rayNG/releases)
-![Contributors](https://img.shields.io/github/contributors/2dust/v2rayNG?style=for-the-badge&logo=github)
-![Downloads](https://img.shields.io/github/downloads/2dust/v2rayNG/total?style=for-the-badge&logo=download)
-![Platform](https://img.shields.io/badge/Platform-Android-green?style=for-the-badge&logo=android&logoColor=white)
+![Contributors](https://img.shields.io/github/contributors/2dust/v2rayNG?logo=github)
+![Downloads](https://img.shields.io/github/downloads/2dust/v2rayNG/total?logo=download)
+![Platform](https://img.shields.io/badge/Platform-Android-green?logo=android&logoColor=white)
 [![Chat on Telegram](https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg)](https://t.me/v2rayn)
 
 <a href="https://play.google.com/store/apps/details?id=com.v2ray.ang">
