@@ -112,8 +112,8 @@
     <string name="msg_remark_is_duplicate">Название уже существует</string>
     <string name="toast_action_not_allowed">Это действие запрещено</string>
     <string name="server_obfs_password">Пароль obfs</string>
-    <string name="server_lab_port_hop">Port Hopping</string>
-    <string name="server_lab_port_hop_interval">Port Hopping Interval</string>
+    <string name="server_lab_port_hop">Переключение портов</string>
+    <string name="server_lab_port_hop_interval">Интервал переключения портов</string>
     <string name="server_lab_stream_pinsha256">pinSHA256</string>
 
     <!-- PerAppProxyActivity -->
