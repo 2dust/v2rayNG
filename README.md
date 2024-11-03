@@ -11,9 +11,9 @@ A V2Ray client for Android, support [Xray core](https://github.com/XTLS/Xray-cor
 ![Downloads](https://img.shields.io/github/downloads/2dust/v2rayNG/total?logo=download)
 [![GitHub Releases](https://img.shields.io/github/downloads/2dust/v2rayNG/latest/total?logo=github)](https://github.com/2dust/v2rayNG/releases)
 ![Platform](https://img.shields.io/badge/Platform-Android-green?logo=android&logoColor=white)
-[![Chat on Telegram](https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg)](https://t.me/v2rayn)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?logo=git)
 ![Version](https://img.shields.io/github/v/release/2dust/v2rayNG?logo=semver&logoColor=white)
+[![Chat on Telegram](https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg)](https://t.me/v2rayn)
 
 <a href="https://play.google.com/store/apps/details?id=com.v2ray.ang">
 <img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="165" height="64" />
