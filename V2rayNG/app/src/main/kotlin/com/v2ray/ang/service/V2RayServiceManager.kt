@@ -65,7 +65,7 @@ object V2RayServiceManager {
         if (v2rayPoint.isRunning) return
         val guid = MmkvManager.getSelectServer() ?: return
         val config = MmkvManager.decodeServerConfig(guid) ?: return
-        if (!Utils.isValidUrl(config.server) && !Utils.isValidUrl(config.server)) return
+        if (!Utils.isValidUrl(config.server) && !Utils.isIpAddress(config.server)) return
 //        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
 //        if (!result.status) return
 

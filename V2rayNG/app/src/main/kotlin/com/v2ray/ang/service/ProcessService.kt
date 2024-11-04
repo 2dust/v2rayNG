@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 class ProcessService {
     private val TAG = ANG_PACKAGE
-    private lateinit var process: Process
+    private var process: Process? = null
 
     fun runProcess(context: Context, cmd: MutableList<String>) {
         Log.d(TAG, cmd.toString())
@@ -24,7 +24,7 @@ class ProcessService {
             CoroutineScope(Dispatchers.IO).launch {
                 Thread.sleep(50L)
                 Log.d(TAG, "runProcess check")
-                process.waitFor()
+                process?.waitFor()
                 Log.d(TAG, "runProcess exited")
             }
             Log.d(TAG, process.toString())

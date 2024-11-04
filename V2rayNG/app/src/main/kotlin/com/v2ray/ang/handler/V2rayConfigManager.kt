@@ -334,9 +334,7 @@ object V2rayConfigManager {
                 servers.add(
                     V2rayConfig.DnsBean.ServersBean(
                         address =  remoteDns.first(),
-                        port =  53,
                         domains =  proxyDomain,
-                        expectIPs = null
                     )
                 )
             }
@@ -350,7 +348,6 @@ object V2rayConfigManager {
                 servers.add(
                     V2rayConfig.DnsBean.ServersBean(
                         address = domesticDns.first(),
-                        port =  53,
                         domains = directDomain,
                         expectIPs = if (isCnRoutingMode) geoipCn else null,
                         skipFallback = true
@@ -522,7 +519,7 @@ object V2rayConfigManager {
                 noises = listOf(
                     V2rayConfig.OutboundBean.OutSettingsBean.NoiseBean(
                         type = "rand",
-                        packet = "50-150",
+                        packet = "10-20",
                         delay = "10-16",
                     )
                 ),
