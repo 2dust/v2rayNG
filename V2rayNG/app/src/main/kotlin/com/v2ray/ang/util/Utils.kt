@@ -159,8 +159,11 @@ object Utils {
     /**
      * is ip address
      */
-    fun isIpAddress(value: String): Boolean {
+    fun isIpAddress(value: String?): Boolean {
         try {
+            if (value.isNullOrEmpty()) {
+                return false
+            }
             var addr = value
             if (addr.isEmpty() || addr.isBlank()) {
                 return false

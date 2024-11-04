@@ -36,7 +36,7 @@ object MigrateManager {
 
             //check and remove old
             decodeServerConfig(guid) ?: continue
-            serverStorage.remove(guid)
+            //serverStorage.remove(guid)
             Log.d(ANG_PACKAGE, "migrateServerConfig2Profile-" + config.remarks)
         }
         Log.d(ANG_PACKAGE, "migrateServerConfig2Profile-end")

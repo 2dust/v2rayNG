@@ -22,16 +22,14 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.SpeedtestUtil
-import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
 import java.util.Collections
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -320,30 +318,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         MmkvManager.encodeServerList(serverList)
     }
 
-
-    fun copyAssets(assets: AssetManager) {
-        val extFolder = Utils.userAssetPath(getApplication<AngApplication>())
+    fun initAssets(assets: AssetManager) {
         viewModelScope.launch(Dispatchers.Default) {
-            try {
-                val geo = arrayOf("geosite.dat", "geoip.dat")
-                assets.list("")
-                    ?.filter { geo.contains(it) }
-                    ?.filter { !File(extFolder, it).exists() }
-                    ?.forEach {
-                        val target = File(extFolder, it)
-                        assets.open(it).use { input ->
-                            FileOutputStream(target).use { output ->
-                                input.copyTo(output)
-                            }
-                        }
-                        Log.i(
-                            ANG_PACKAGE,
-                            "Copied from apk assets folder to ${target.absolutePath}"
-                        )
-                    }
-            } catch (e: Exception) {
-                Log.e(ANG_PACKAGE, "asset copy failed", e)
-            }
+            SettingsManager.initAssets(getApplication<AngApplication>(), assets)
         }
     }
 

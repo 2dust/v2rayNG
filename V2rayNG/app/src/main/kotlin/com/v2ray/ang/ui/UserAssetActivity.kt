@@ -34,6 +34,7 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
@@ -239,6 +240,15 @@ class UserAssetActivity : BaseActivity() {
         return list + assets
     }
 
+    fun initAssets() {
+        lifecycleScope.launch(Dispatchers.Default) {
+            SettingsManager.initAssets(this@UserAssetActivity, assets)
+            withContext(Dispatchers.Main) {
+                binding.recyclerView.adapter?.notifyDataSetChanged()
+            }
+        }
+    }
+
     inner class UserAssetAdapter : RecyclerView.Adapter<UserAssetViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserAssetViewHolder {
             return UserAssetViewHolder(
@@ -270,10 +280,10 @@ class UserAssetActivity : BaseActivity() {
 
             if (item.second.remarks in builtInGeoFiles && item.second.url == AppConfig.GeoUrl + item.second.remarks) {
                 holder.itemUserAssetBinding.layoutEdit.visibility = GONE
-                holder.itemUserAssetBinding.layoutRemove.visibility = GONE
+                //holder.itemUserAssetBinding.layoutRemove.visibility = GONE
             } else {
                 holder.itemUserAssetBinding.layoutEdit.visibility = item.second.url.let { if (it == "file") GONE else VISIBLE }
-                holder.itemUserAssetBinding.layoutRemove.visibility = VISIBLE
+                //holder.itemUserAssetBinding.layoutRemove.visibility = VISIBLE
             }
 
             holder.itemUserAssetBinding.layoutEdit.setOnClickListener {
@@ -282,9 +292,16 @@ class UserAssetActivity : BaseActivity() {
                 startActivity(intent)
             }
             holder.itemUserAssetBinding.layoutRemove.setOnClickListener {
-                file?.delete()
-                MmkvManager.removeAssetUrl(item.first)
-                binding.recyclerView.adapter?.notifyItemRemoved(position)
+                AlertDialog.Builder(this@UserAssetActivity).setMessage(R.string.del_config_comfirm)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        file?.delete()
+                        MmkvManager.removeAssetUrl(item.first)
+                        initAssets()
+                    }
+                    .setNegativeButton(android.R.string.no) { _, _ ->
+                        //do noting
+                    }
+                    .show()
             }
         }
 
