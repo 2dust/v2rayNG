@@ -11,8 +11,8 @@ android {
         applicationId = "com.v2ray.ang"
         minSdk = 21
         targetSdk = 35
-        versionCode = 603
-        versionName = "1.9.9"
+        versionCode = 604
+        versionName = "1.9.10"
         multiDexEnabled = true
         splits {
             abi {
