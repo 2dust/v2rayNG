@@ -72,8 +72,8 @@ object MigrateManager {
         config.password = outbound.getPassword()
         config.flow = outbound?.settings?.vnext?.get(0)?.users?.get(0)?.flow ?: outbound?.settings?.servers?.get(0)?.flow
 
+        config.network = outbound?.streamSettings?.network ?: "tcp"
         outbound.getTransportSettingDetails()?.let { transportDetails ->
-            config.network = "tcp"
             config.headerType = transportDetails[0].orEmpty()
             config.host = transportDetails[1].orEmpty()
             config.path = transportDetails[2].orEmpty()
