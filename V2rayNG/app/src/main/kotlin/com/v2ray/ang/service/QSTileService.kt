@@ -12,7 +12,6 @@ import android.service.quicksettings.TileService
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import java.lang.ref.SoftReference
@@ -45,9 +44,9 @@ class QSTileService : TileService() {
         mMsgReceive = ReceiveMessageHandler(this)
         val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.registerReceiver(applicationContext,mMsgReceive,mFilter,ContextCompat.RECEIVER_EXPORTED)
+            ContextCompat.registerReceiver(applicationContext, mMsgReceive, mFilter, ContextCompat.RECEIVER_EXPORTED)
         } else {
-            ContextCompat.registerReceiver(applicationContext,mMsgReceive,mFilter,ContextCompat.RECEIVER_NOT_EXPORTED)
+            ContextCompat.registerReceiver(applicationContext, mMsgReceive, mFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
         }
 
         MessageUtil.sendMsg2Service(this, AppConfig.MSG_REGISTER_CLIENT, "")
@@ -56,8 +55,13 @@ class QSTileService : TileService() {
     override fun onStopListening() {
         super.onStopListening()
 
-        unregisterReceiver(mMsgReceive)
-        mMsgReceive = null
+        try {
+            unregisterReceiver(mMsgReceive)
+            mMsgReceive = null
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
 
     override fun onClick() {
