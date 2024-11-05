@@ -4,6 +4,7 @@ import android.text.TextUtils
 import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.dto.VmessQRCode
@@ -52,22 +53,24 @@ object VmessFmt : FmtBase() {
         config.host = vmessQRCode.host
         config.path = vmessQRCode.path
 
-        when (config.network) {
-            "kcp" -> {
+        when (NetworkType.fromString(config.network)) {
+            NetworkType.KCP -> {
                 config.seed = vmessQRCode.path
             }
 
-            "quic" -> {
+            NetworkType.QUIC -> {
                 config.quicSecurity = vmessQRCode.host
                 config.quicKey = vmessQRCode.path
             }
 
-            "grpc" -> {
+            NetworkType.GRPC -> {
                 config.mode = vmessQRCode.type
                 config.serviceName = vmessQRCode.path
                 config.authority = vmessQRCode.host
             }
+            else -> {}
         }
+
         config.security = vmessQRCode.tls
         config.insecure = allowInsecure
         config.sni = vmessQRCode.sni
@@ -90,22 +93,24 @@ object VmessFmt : FmtBase() {
 
         vmessQRCode.net = config.network.orEmpty()
         vmessQRCode.type = config.headerType.orEmpty()
-        when (config.network) {
-            "kcp" -> {
+        when (NetworkType.fromString(config.network)) {
+            NetworkType.KCP -> {
                 vmessQRCode.path = config.seed.orEmpty()
             }
 
-            "quic" -> {
+            NetworkType.QUIC -> {
                 vmessQRCode.host = config.quicSecurity.orEmpty()
                 vmessQRCode.path = config.quicKey.orEmpty()
             }
 
-            "grpc" -> {
+            NetworkType.GRPC -> {
                 vmessQRCode.type = config.mode.orEmpty()
                 vmessQRCode.path = config.serviceName.orEmpty()
                 vmessQRCode.host = config.authority.orEmpty()
             }
+            else -> {}
         }
+
         config.host.let { if (it.isNotNullEmpty()) vmessQRCode.host = it.orEmpty() }
         config.path.let { if (it.isNotNullEmpty()) vmessQRCode.path = it.orEmpty() }
 
@@ -119,7 +124,7 @@ object VmessFmt : FmtBase() {
     }
 
     fun parseVmessStd(str: String): ProfileItem? {
-        var allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
+        val allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.VMESS)
 
         val uri = URI(Utils.fixIllegalUrl(str))
@@ -132,7 +137,7 @@ object VmessFmt : FmtBase() {
         config.password = uri.userInfo
         config.method = AppConfig.DEFAULT_SECURITY
 
-        config.network = queryParam["type"] ?: "tcp"
+        config.network = NetworkType.fromString(queryParam["type"]).name
         config.headerType = queryParam["headerType"]
         config.host = queryParam["host"]
         config.path = queryParam["path"]
