@@ -17,6 +17,7 @@ import android.os.StrictMode
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
@@ -153,9 +154,9 @@ class V2RayVpnService : VpnService(), ServiceControl {
         builder.setSession(V2RayServiceManager.currentConfig?.remarks.orEmpty())
 
         val selfPackageName = BuildConfig.APPLICATION_ID
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY)) {
             val apps = MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
-            val bypassApps = MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS) == true
+            val bypassApps = MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS)
             //process self package
             if (bypassApps) apps?.add(selfPackageName) else apps?.remove(selfPackageName)
             apps?.forEach {
@@ -165,6 +166,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                     else
                         builder.addAllowedApplication(it)
                 } catch (e: PackageManager.NameNotFoundException) {
+                    Log.d(ANG_PACKAGE, "setup error : --${e.localizedMessage}")
                 }
             }
         } else {
@@ -215,11 +217,11 @@ class V2RayVpnService : VpnService(), ServiceControl {
             "--loglevel", "notice"
         )
 
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6)) {
             cmd.add("--netif-ip6addr")
             cmd.add(PRIVATE_VLAN6_ROUTER)
         }
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED)) {
             val localDnsPort = Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT), AppConfig.PORT_LOCAL_DNS.toInt())
             cmd.add("--dnsgw")
             cmd.add("$LOOPBACK:${localDnsPort}")
@@ -232,7 +234,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             process = proBuilder
                 .directory(applicationContext.filesDir)
                 .start()
-            Thread(Runnable {
+            Thread {
                 Log.d(packageName, "$TUN2SOCKS check")
                 process.waitFor()
                 Log.d(packageName, "$TUN2SOCKS exited")
@@ -240,7 +242,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                     Log.d(packageName, "$TUN2SOCKS restart")
                     runTun2socks()
                 }
-            }).start()
+            }.start()
             Log.d(packageName, process.toString())
 
             sendFd()
