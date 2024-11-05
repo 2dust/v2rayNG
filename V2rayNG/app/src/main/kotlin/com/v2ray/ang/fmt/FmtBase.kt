@@ -1,6 +1,7 @@
 package com.v2ray.ang.fmt
 
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.util.Utils
@@ -31,7 +32,6 @@ open class FmtBase {
 
     fun getQueryDic(config: ProfileItem): HashMap<String, String> {
         val dicQuery = HashMap<String, String>()
-
         dicQuery["security"] = config.security?.ifEmpty { "none" }.orEmpty()
         config.sni.let { if (it.isNotNullEmpty()) dicQuery["sni"] = it.orEmpty() }
         config.alpn.let { if (it.isNotNullEmpty()) dicQuery["alpn"] = it.orEmpty() }
@@ -41,37 +41,38 @@ open class FmtBase {
         config.spiderX.let { if (it.isNotNullEmpty()) dicQuery["spx"] = it.orEmpty() }
         config.flow.let { if (it.isNotNullEmpty()) dicQuery["flow"] = it.orEmpty() }
 
-        dicQuery["type"] = config.network?.ifEmpty { AppConfig.DEFAULT_NETWORK }.orEmpty()
+        val networkType = NetworkType.fromString(config.network)
+        dicQuery["type"] = networkType.type
 
-        when (config.network) {
-            "tcp" -> {
+        when (networkType) {
+            NetworkType.TCP -> {
                 dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
                 config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
             }
 
-            "kcp" -> {
+            NetworkType.KCP -> {
                 dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
                 config.seed.let { if (it.isNotNullEmpty()) dicQuery["seed"] = it.orEmpty() }
             }
 
-            "ws", "httpupgrade", "splithttp" -> {
+            NetworkType.WS, NetworkType.HTTP_UPGRADE, NetworkType.SPLIT_HTTP -> {
                 config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
                 config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
             }
 
-            "http", "h2" -> {
+            NetworkType.HTTP, NetworkType.H2 -> {
                 dicQuery["type"] = "http"
                 config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
                 config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
             }
 
-            "quic" -> {
+            NetworkType.QUIC -> {
                 dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
                 config.quicSecurity.let { if (it.isNotNullEmpty()) dicQuery["quicSecurity"] = it.orEmpty() }
                 config.quicKey.let { if (it.isNotNullEmpty()) dicQuery["key"] = it.orEmpty() }
             }
 
-            "grpc" -> {
+            NetworkType.GRPC -> {
                 config.mode.let { if (it.isNotNullEmpty()) dicQuery["mode"] = it.orEmpty() }
                 config.authority.let { if (it.isNotNullEmpty()) dicQuery["authority"] = it.orEmpty() }
                 config.serviceName.let { if (it.isNotNullEmpty()) dicQuery["serviceName"] = it.orEmpty() }
