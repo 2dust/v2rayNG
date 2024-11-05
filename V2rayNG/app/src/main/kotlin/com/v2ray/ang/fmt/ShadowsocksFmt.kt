@@ -19,9 +19,9 @@ object ShadowsocksFmt : FmtBase() {
         config.serverPort = uri.port.toString()
 
         val result = if (uri.userInfo.contains(":")) {
-            uri.userInfo.split(":")
+            uri.userInfo.split(":", limit = 2)
         } else {
-            Utils.decode(uri.userInfo).split(":")
+            Utils.decode(uri.userInfo).split(":", limit = 2)
         }
         if (result.count() == 2) {
             config.method = result.first()
