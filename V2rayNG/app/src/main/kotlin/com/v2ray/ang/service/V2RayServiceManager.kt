@@ -168,7 +168,7 @@ object V2RayServiceManager {
         currentConfig = config
 
         try {
-            v2rayPoint.runLoop(MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true)
+            v2rayPoint.runLoop(MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6))
         } catch (e: Exception) {
             Log.d(ANG_PACKAGE, e.toString())
         }
