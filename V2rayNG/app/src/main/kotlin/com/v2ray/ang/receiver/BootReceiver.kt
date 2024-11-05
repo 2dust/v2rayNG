@@ -8,11 +8,11 @@ import com.v2ray.ang.service.V2RayServiceManager
 
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (Intent.ACTION_BOOT_COMPLETED == intent?.action && MmkvManager.decodeStartOnBoot()) {
-            if (MmkvManager.getSelectServer().isNullOrEmpty()) {
-                return
-            }
-            V2RayServiceManager.startV2Ray(context!!)
-        }
+        //Check if context is not null and action is the one we want
+        if (context == null || intent?.action != Intent.ACTION_BOOT_COMPLETED) return
+        //Check if flag is true and a server is selected
+        if (!MmkvManager.decodeStartOnBoot() || MmkvManager.getSelectServer().isNullOrEmpty()) return
+        //Start v2ray
+        V2RayServiceManager.startV2Ray(context)
     }
 }
