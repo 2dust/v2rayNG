@@ -133,7 +133,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .request(Manifest.permission.POST_NOTIFICATIONS)
                 .subscribe {
                     if (!it)
-                        toast(R.string.toast_permission_denied)
+                        toast(R.string.toast_permission_denied_notification)
                 }
         }
 

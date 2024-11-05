@@ -12,6 +12,7 @@
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">বন্ধ করুন</string>
     <string name="toast_permission_denied">অনুমতি পাওয়া যাচ্ছে না</string>
+    <string name="toast_permission_denied_notification">Unable to obtain the notification permission</string>
     <string name="notification_action_more">আরও দেখতে ক্লিক করুন</string>
     <string name="toast_services_start">সার্ভিস শুরু করুন</string>
     <string name="toast_services_stop">সার্ভিস বন্ধ করুন</string>

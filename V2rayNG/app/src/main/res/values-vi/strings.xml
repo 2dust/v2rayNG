@@ -11,6 +11,7 @@
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
     <string name="toast_permission_denied">Vui lòng cấp quyền cần thiết cho v2rayNG! Bạn đã từ chối các quyền cần thiết như Camera hay Bộ nhớ?</string>
+    <string name="toast_permission_denied_notification">Unable to obtain the notification permission</string>
     <string name="notification_action_more">Nhấn để biết thêm...</string>
     <string name="toast_services_start">Đang khởi động v2rayNG...</string>
     <string name="toast_services_stop">Đã dừng v2rayNG!</string>
