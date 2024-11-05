@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.content.res.AssetManager
 import android.os.Build
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -44,18 +45,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val updateTestResultAction by lazy { MutableLiveData<String>() }
     private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
 
+    /**
+     * Refer to the official documentation for [registerReceiver](https://developer.android.com/reference/androidx/core/content/ContextCompat#registerReceiver(android.content.Context,android.content.BroadcastReceiver,android.content.IntentFilter,int):
+     * `registerReceiver(Context, BroadcastReceiver, IntentFilter, int)`.
+     */
+
     fun startListenBroadcast() {
         isRunning.value = false
+        val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getApplication<AngApplication>().registerReceiver(
-                mMsgReceiver,
-                IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY),
-                Context.RECEIVER_EXPORTED
+            ContextCompat.registerReceiver(
+                getApplication(), mMsgReceiver, mFilter,
+                ContextCompat.RECEIVER_EXPORTED
             )
         } else {
-            getApplication<AngApplication>().registerReceiver(
-                mMsgReceiver,
-                IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY)
+            ContextCompat.registerReceiver(
+                getApplication(), mMsgReceiver, mFilter,
+                ContextCompat.RECEIVER_NOT_EXPORTED
             )
         }
         MessageUtil.sendMsg2Service(getApplication(), AppConfig.MSG_REGISTER_CLIENT, "")

@@ -13,6 +13,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
@@ -126,6 +127,11 @@ object V2RayServiceManager {
         }
     }
 
+    /**
+     * Refer to the official documentation for [registerReceiver](https://developer.android.com/reference/androidx/core/content/ContextCompat#registerReceiver(android.content.Context,android.content.BroadcastReceiver,android.content.IntentFilter,int):
+     * `registerReceiver(Context, BroadcastReceiver, IntentFilter, int)`.
+     */
+
     fun startV2rayPoint() {
         val service = serviceControl?.get()?.getService() ?: return
         val guid = MmkvManager.getSelectServer() ?: return
@@ -143,9 +149,15 @@ object V2RayServiceManager {
             mFilter.addAction(Intent.ACTION_SCREEN_OFF)
             mFilter.addAction(Intent.ACTION_USER_PRESENT)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                service.registerReceiver(mMsgReceive, mFilter, Context.RECEIVER_EXPORTED)
+                ContextCompat.registerReceiver(
+                    service, mMsgReceive, mFilter,
+                    ContextCompat.RECEIVER_EXPORTED
+                )
             } else {
-                service.registerReceiver(mMsgReceive, mFilter)
+                ContextCompat.registerReceiver(
+                    service, mMsgReceive, mFilter,
+                    ContextCompat.RECEIVER_NOT_EXPORTED
+                )
             }
         } catch (e: Exception) {
             Log.d(ANG_PACKAGE, e.toString())
