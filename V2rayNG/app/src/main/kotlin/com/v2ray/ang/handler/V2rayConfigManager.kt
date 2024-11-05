@@ -455,7 +455,7 @@ object V2rayConfigManager {
                 val host = outbound.streamSettings?.tcpSettings?.header?.request?.headers?.Host
 
                 val requestString: String by lazy {
-                    """{"version":"1.1","method":"GET","headers":{"User-Agent":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.6478.122 Mobile Safari/537.36"Safari/537.36,"Accept-Encoding":["gzip, deflate"],"Connection":["keep-alive"],"Pragma":"no-cache"}}"""
+                    """{"version":"1.1","method":"GET","headers":{"User-Agent":["Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.6478.122 Mobile Safari/537.36"],"Accept-Encoding":["gzip, deflate"],"Connection":["keep-alive"],"Pragma":"no-cache"}}"""
                 }
                 outbound.streamSettings?.tcpSettings?.header?.request = JsonUtil.fromJson(
                     requestString,
