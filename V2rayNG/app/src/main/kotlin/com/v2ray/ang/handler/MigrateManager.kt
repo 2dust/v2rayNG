@@ -19,7 +19,7 @@ object MigrateManager {
         if (serverStorage.count().toInt() == 0) {
             return false
         }
-        var serverList = serverStorage.allKeys() ?: return false
+        val serverList = serverStorage.allKeys() ?: return false
         Log.d(ANG_PACKAGE, "migrateServerConfig2Profile-" + serverList.count())
 
         for (guid in serverList) {
@@ -70,7 +70,7 @@ object MigrateManager {
         config.serverPort = outbound.getServerPort().toString()
         config.method = outbound.getSecurityEncryption()
         config.password = outbound.getPassword()
-        config.flow = outbound?.settings?.vnext?.get(0)?.users[0]?.flow ?: outbound?.settings?.servers?.get(0)?.flow
+        config.flow = outbound?.settings?.vnext?.get(0)?.users?.get(0)?.flow ?: outbound?.settings?.servers?.get(0)?.flow
 
         outbound.getTransportSettingDetails()?.let { transportDetails ->
             config.network = "tcp"
