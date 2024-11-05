@@ -336,7 +336,7 @@ object MmkvManager {
     }
 
     fun decodeSettingsBool(key: String): Boolean {
-        return settingsStorage.decodeBool(key)
+        return settingsStorage.decodeBool(key,false)
     }
 
     fun decodeSettingsBool(key: String, defaultValue: Boolean): Boolean {
