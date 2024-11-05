@@ -17,7 +17,7 @@ import com.v2ray.ang.databinding.ActivityBypassListBinding
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
-import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.manager.MmkvManager
 import com.v2ray.ang.util.AppManagerUtil
 import com.v2ray.ang.util.Utils
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers

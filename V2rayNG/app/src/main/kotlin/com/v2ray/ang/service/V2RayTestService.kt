@@ -8,8 +8,8 @@ import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG_CANCEL
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG_SUCCESS
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.serializable
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.V2rayConfigManager
+import com.v2ray.ang.manager.MmkvManager
+import com.v2ray.ang.manager.V2rayConfigManager
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.PluginUtil
 import com.v2ray.ang.util.SpeedtestUtil

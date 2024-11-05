@@ -22,8 +22,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.V2rayConfigManager
+import com.v2ray.ang.manager.MmkvManager
+import com.v2ray.ang.manager.V2rayConfigManager
 import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.PluginUtil

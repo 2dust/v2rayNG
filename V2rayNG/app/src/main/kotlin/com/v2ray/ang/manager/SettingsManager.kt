@@ -1,4 +1,4 @@
-package com.v2ray.ang.handler
+package com.v2ray.ang.manager
 
 import android.content.Context
 import android.content.res.AssetManager
@@ -12,8 +12,8 @@ import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RoutingType
 import com.v2ray.ang.dto.RulesetItem
-import com.v2ray.ang.handler.MmkvManager.decodeServerConfig
-import com.v2ray.ang.handler.MmkvManager.decodeServerList
+import com.v2ray.ang.manager.MmkvManager.decodeServerConfig
+import com.v2ray.ang.manager.MmkvManager.decodeServerList
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.Utils.parseInt

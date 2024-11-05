@@ -1,4 +1,4 @@
-package com.v2ray.ang.handler
+package com.v2ray.ang.manager
 
 import android.content.Context
 import android.text.TextUtils

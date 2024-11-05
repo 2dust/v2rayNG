@@ -14,8 +14,8 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.SUBSCRIPTION_UPDATE_CHANNEL
 import com.v2ray.ang.AppConfig.SUBSCRIPTION_UPDATE_CHANNEL_NAME
 import com.v2ray.ang.R
-import com.v2ray.ang.handler.AngConfigManager.updateConfigViaSub
-import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.manager.AngConfigManager.updateConfigViaSub
+import com.v2ray.ang.manager.MmkvManager
 
 object SubscriptionUpdater {
 

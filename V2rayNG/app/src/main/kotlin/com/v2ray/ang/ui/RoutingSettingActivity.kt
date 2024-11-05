@@ -15,8 +15,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityRoutingSettingBinding
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.manager.MmkvManager
+import com.v2ray.ang.manager.SettingsManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils

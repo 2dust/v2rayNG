@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.v2ray.ang.databinding.ItemRecyclerRoutingSettingBinding
-import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.manager.SettingsManager
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
 

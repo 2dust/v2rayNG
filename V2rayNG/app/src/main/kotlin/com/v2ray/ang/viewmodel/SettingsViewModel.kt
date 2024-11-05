@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.preference.PreferenceManager
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.manager.MmkvManager
 import com.v2ray.ang.util.Utils
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application),

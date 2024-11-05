@@ -34,9 +34,9 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.handler.AngConfigManager
-import com.v2ray.ang.handler.MigrateManager
-import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.manager.AngConfigManager
+import com.v2ray.ang.manager.MigrateManager
+import com.v2ray.ang.manager.MmkvManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.Utils
