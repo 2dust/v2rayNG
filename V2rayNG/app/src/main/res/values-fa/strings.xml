@@ -10,9 +10,9 @@
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">توقف</string>
-    <string name="toast_permission_denied">قادر به دریافت مجوز نیست</string>
-    <string name="toast_permission_denied_notification">Unable to obtain the notification permission</string>
-    <string name="notification_action_more">برای اطلاعات بیشتر کلیک کنید</string>
+    <string name="toast_permission_denied">دریافت مجوز امکان پذیر نیست</string>
+    <string name="toast_permission_denied_notification">دریافت مجوز اعلان امکان پذیر نیست</string>
+    <string name="notification_action_more">برای کسب اطلاعات بیشتر کلیک کنید</string>
     <string name="toast_services_start">شروع خدمات</string>
     <string name="toast_services_stop">توقف خدمات</string>
     <string name="toast_services_success">شروع خدمات با موفقیت انجام شد</string>
@@ -160,7 +160,7 @@
     <string name="summary_pref_local_dns_enabled">درخواست های DNS به هسته وارد شده و توسط ماژول DNS پردازش می شوند (توصیه می شود در صورت نیاز به مسیریابی برای دور زدن آدرس های LAN و سرزمین اصلی فعال شود)</string>
 
     <string name="title_pref_fake_dns_enabled">فعال کردن DNS جعلی</string>
-    <string name="summary_pref_fake_dns_enabled">DNS محلی آدرس های آیپی فیک را بر می گرداند (سریع تر می باشد اما ممکن است برای برخی از برنامه ها کار نکند)</string>
+    <string name="summary_pref_fake_dns_enabled">دی ان اس محلی آدرس های آیپی جعلی را بر می گرداند (سریع تر می باشد و تاخیر را کاهش می دهد اما ممکن است برای برخی از برنامه ها کار نکند)</string>
 
     <string name="title_pref_prefer_ipv6">ترجیح دادن IPv6</string>
     <string name="summary_pref_prefer_ipv6">ترجیح دادن نشانی و مسیر های IPv6</string>
