@@ -16,9 +16,9 @@ class TaskerReceiver : BroadcastReceiver() {
         try {
             val bundle = intent?.getBundleExtra(AppConfig.TASKER_EXTRA_BUNDLE)
             val switch = bundle?.getBoolean(AppConfig.TASKER_EXTRA_BUNDLE_SWITCH, false)
-            val guid = bundle?.getString(AppConfig.TASKER_EXTRA_BUNDLE_GUID, "")
+            val guid = bundle?.getString(AppConfig.TASKER_EXTRA_BUNDLE_GUID).orEmpty()
 
-            if (switch == null || guid == null || TextUtils.isEmpty(guid)) {
+            if (switch == null || TextUtils.isEmpty(guid)) {
                 return
             } else if (switch) {
                 if (guid == AppConfig.TASKER_DEFAULT_GUID) {
