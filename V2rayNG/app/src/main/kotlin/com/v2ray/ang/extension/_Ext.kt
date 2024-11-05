@@ -63,26 +63,27 @@ fun String.removeWhiteSpace(): String = replace("\\s+".toRegex(), "")
 
 fun String.toLongEx(): Long = toLongOrNull() ?: 0
 
-fun Context.listenForPackageChanges(onetime: Boolean = true, callback: () -> Unit) {
-    val filter = IntentFilter().apply {
-        addAction(Intent.ACTION_PACKAGE_ADDED)
-        addAction(Intent.ACTION_PACKAGE_REMOVED)
-        addDataScheme("package")
-    }
-
-    val receiver = object : BroadcastReceiver() {
+fun Context.listenForPackageChanges(onetime: Boolean = true, callback: () -> Unit) =
+    object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             callback()
             if (onetime) context.unregisterReceiver(this)
         }
+    }.apply {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(this, IntentFilter().apply {
+                addAction(Intent.ACTION_PACKAGE_ADDED)
+                addAction(Intent.ACTION_PACKAGE_REMOVED)
+                addDataScheme("package")
+            }, Context.RECEIVER_EXPORTED)
+        } else {
+            registerReceiver(this, IntentFilter().apply {
+                addAction(Intent.ACTION_PACKAGE_ADDED)
+                addAction(Intent.ACTION_PACKAGE_REMOVED)
+                addDataScheme("package")
+            })
+        }
     }
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED)
-    } else {
-        registerReceiver(receiver, filter)
-    }
-}
 
 inline fun <reified T : Serializable> Bundle.serializable(key: String): T? = when {
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializable(key, T::class.java)

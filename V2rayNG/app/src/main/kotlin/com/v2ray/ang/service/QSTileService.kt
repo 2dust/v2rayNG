@@ -55,6 +55,7 @@ class QSTileService : TileService() {
 
     override fun onStopListening() {
         super.onStopListening()
+
         unregisterReceiver(mMsgReceive)
         mMsgReceive = null
     }
