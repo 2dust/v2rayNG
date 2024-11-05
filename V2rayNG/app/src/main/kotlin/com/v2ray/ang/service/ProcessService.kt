@@ -8,11 +8,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ProcessService {
-    private val TAG = ANG_PACKAGE
     private var process: Process? = null
 
     fun runProcess(context: Context, cmd: MutableList<String>) {
-        Log.d(TAG, cmd.toString())
+        Log.d(ANG_PACKAGE, cmd.toString())
 
         try {
             val proBuilder = ProcessBuilder(cmd)
@@ -23,23 +22,23 @@ class ProcessService {
 
             CoroutineScope(Dispatchers.IO).launch {
                 Thread.sleep(50L)
-                Log.d(TAG, "runProcess check")
+                Log.d(ANG_PACKAGE, "runProcess check")
                 process?.waitFor()
-                Log.d(TAG, "runProcess exited")
+                Log.d(ANG_PACKAGE, "runProcess exited")
             }
-            Log.d(TAG, process.toString())
+            Log.d(ANG_PACKAGE, process.toString())
 
         } catch (e: Exception) {
-            Log.d(TAG, e.toString())
+            Log.d(ANG_PACKAGE, e.toString())
         }
     }
 
     fun stopProcess() {
         try {
-            Log.d(TAG, "runProcess destroy")
+            Log.d(ANG_PACKAGE, "runProcess destroy")
             process?.destroy()
         } catch (e: Exception) {
-            Log.d(TAG, e.toString())
+            Log.d(ANG_PACKAGE, e.toString())
         }
     }
 }
