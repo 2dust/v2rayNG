@@ -148,17 +148,7 @@ object V2RayServiceManager {
             mFilter.addAction(Intent.ACTION_SCREEN_ON)
             mFilter.addAction(Intent.ACTION_SCREEN_OFF)
             mFilter.addAction(Intent.ACTION_USER_PRESENT)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                ContextCompat.registerReceiver(
-                    service, mMsgReceive, mFilter,
-                    ContextCompat.RECEIVER_EXPORTED
-                )
-            } else {
-                ContextCompat.registerReceiver(
-                    service, mMsgReceive, mFilter,
-                    ContextCompat.RECEIVER_NOT_EXPORTED
-                )
-            }
+            ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
         } catch (e: Exception) {
             Log.d(ANG_PACKAGE, e.toString())
         }

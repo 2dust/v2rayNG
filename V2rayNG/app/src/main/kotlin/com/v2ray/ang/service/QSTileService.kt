@@ -40,15 +40,11 @@ class QSTileService : TileService() {
 
     override fun onStartListening() {
         super.onStartListening()
+
         setState(Tile.STATE_INACTIVE)
         mMsgReceive = ReceiveMessageHandler(this)
         val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.registerReceiver(applicationContext, mMsgReceive, mFilter, ContextCompat.RECEIVER_EXPORTED)
-        } else {
-            ContextCompat.registerReceiver(applicationContext, mMsgReceive, mFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
-        }
-
+        ContextCompat.registerReceiver(applicationContext, mMsgReceive, mFilter, Utils.receiverFlags())
         MessageUtil.sendMsg2Service(this, AppConfig.MSG_REGISTER_CLIENT, "")
     }
 
@@ -56,7 +52,7 @@ class QSTileService : TileService() {
         super.onStopListening()
 
         try {
-            unregisterReceiver(mMsgReceive)
+            applicationContext.unregisterReceiver(mMsgReceive)
             mMsgReceive = null
         } catch (e: Exception) {
             e.printStackTrace()
