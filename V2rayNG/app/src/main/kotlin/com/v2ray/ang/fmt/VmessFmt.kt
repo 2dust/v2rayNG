@@ -150,7 +150,7 @@ object VmessFmt : FmtBase() {
         config.authority = queryParam["authority"]
 
         config.security = queryParam["security"]
-        config.insecure = if ((queryParam["allowInsecure"].orEmpty()) == "1") true else allowInsecure
+        config.insecure = if (queryParam["allowInsecure"].orEmpty() == "1") true else allowInsecure
         config.sni = queryParam["sni"]
         config.fingerPrint = queryParam["fp"]
         config.alpn = queryParam["alpn"]
