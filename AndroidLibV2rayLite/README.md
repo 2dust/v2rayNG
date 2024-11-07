@@ -3,7 +3,7 @@
 ### Prerequisites
 - Operating System: Latest Ubuntu
 - Disk Space: At least 30 GB free
-- Repository Cloning Clone the repository:
+- Clone the repository:
 - For V2ray:
 bash
 git clone https://github.com/2dust/AndroidLibV2rayLite.git
