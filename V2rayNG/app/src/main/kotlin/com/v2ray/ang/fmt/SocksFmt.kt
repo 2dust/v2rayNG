@@ -38,7 +38,7 @@ object SocksFmt : FmtBase() {
             else
                 ":"
 
-        return toUri(config, pw, null)
+        return toUri(config, Utils.encode(pw), null)
     }
 
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
