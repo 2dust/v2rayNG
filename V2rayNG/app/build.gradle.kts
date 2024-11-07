@@ -88,6 +88,7 @@ dependencies {
     testImplementation(libs.org.mockito.mockito.inline)
     testImplementation(libs.mockito.kotlin)
 
+    // Androidx
     implementation(libs.flexbox)
     implementation(libs.constraintlayout)
     implementation(libs.legacy.support.v4)
