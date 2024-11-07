@@ -1,10 +1,21 @@
-*.iml
+# IDE and build files
 .gradle
 /local.properties
 /.idea
-.DS_Store
 /build
+
+# macOS system files
+.DS_Store
+
+# Capture files
 /captures
+
+# Binary files
 *.apk
-signing.properties
 *.aar
+
+# Signing properties
+signing.properties
+
+# IntelliJ module files
+*.iml
