@@ -1,5 +1,10 @@
+# Data and keystore files
 *.dat
 *.jks
+
+# Project-specific files
 V2rayNG/app/release/output.json
+
+# IDE and build files
 .idea/
 .gradle/
