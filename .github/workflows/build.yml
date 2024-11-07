@@ -8,7 +8,6 @@ on:
         description: 'Xray core version or commit hash'
         required: false
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,26 +25,25 @@ jobs:
     - name: Setup Golang
       uses: actions/setup-go@v5
       with:
-        go-version: '1.23.2'
+        go-version: '1.23.3'
         cache: false
 
-    - name: Patch Go use 600296
-      #https://go-review.googlesource.com/c/go/+/600296
+    - name: Patch Go with Revision 600296
       run: |
         cd "$(go env GOROOT)"
         curl "https://go-review.googlesource.com/changes/go~600296/revisions/5/patch" | base64 -d | patch --verbose -p 1
 
     - name: Install gomobile
       run: |
-        go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20240806205939-81131f6468ab
+        go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20241105203220-2b9d635e74e5
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
     - name: Setup Android environment
       uses: android-actions/setup-android@v3
 
-    - name: Build dependencies
+    - name: Build Dependencies
       run: |
-        mkdir ${{ github.workspace }}/build
+        mkdir -p ${{ github.workspace }}/build
         cd ${{ github.workspace }}/build
         git clone --depth=1 -b main https://github.com/2dust/AndroidLibXrayLite.git
         cd AndroidLibXrayLite
@@ -58,26 +56,26 @@ jobs:
     - name: Build APK
       run: |
         cd ${{ github.workspace }}/V2rayNG
-        chmod 755 gradlew
+        chmod +x gradlew
         ./gradlew assembleDebug
 
     - name: Upload arm64-v8a APK
       uses: actions/upload-artifact@v4
-      if: ${{  success() }}
+      if: ${{ success() }}
       with:
         name: arm64-v8a
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*arm64-v8a*.apk
 
     - name: Upload armeabi-v7a APK
       uses: actions/upload-artifact@v4
-      if: ${{  success() }}
+      if: ${{ success() }}
       with:
         name: armeabi-v7a
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*armeabi-v7a*.apk
 
     - name: Upload x86 APK
       uses: actions/upload-artifact@v4
-      if: ${{  success() }}
+      if: ${{ success() }}
       with:
         name: x86-apk
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*x86*.apk
@@ -87,7 +85,7 @@ jobs:
       with:
         name: others-apk
         path: |
-          ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug
+          ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*
           !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*arm64-v8a*.apk
           !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*armeabi-v7a*.apk
           !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*x86*.apk
