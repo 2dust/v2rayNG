@@ -46,4 +46,4 @@ bash
 sudo apt install make
 
 - Review the Makefile to understand the build process: https://github.com/2dust/AndroidLibV2rayLite/blob/master/Makefile
-This refactored version organizes the steps into clear sections, uses consistent formatting, and provides command snippets for ease of use.
+- This refactored version organizes the steps into clear sections, uses consistent formatting, and provides command snippets for ease of use.
