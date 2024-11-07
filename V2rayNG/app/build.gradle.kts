@@ -14,33 +14,27 @@ android {
         versionCode = 609
         versionName = "1.9.13"
         multiDexEnabled = true
+
         splits {
             abi {
                 isEnable = true
-                include(
-                    "arm64-v8a",
-                    "armeabi-v7a",
-                    "x86_64",
-                    "x86"
-                )
+                include("arm64-v8a", "armeabi-v7a", "x86_64", "x86")
                 isUniversalApk = true
             }
         }
-
     }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     buildTypes {
         release {
             isMinifyEnabled = false
-
         }
         debug {
             isMinifyEnabled = false
-
         }
     }
 
@@ -54,26 +48,25 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
-    applicationVariants.all {
-        val variant = this
-        val versionCodes =
-            mapOf("armeabi-v7a" to 4, "arm64-v8a" to 4, "x86" to 4, "x86_64" to 4, "universal" to 4)
+    applicationVariants.all { variant ->
+        val versionCodes = mapOf(
+            "armeabi-v7a" to 4,
+            "arm64-v8a" to 4,
+            "x86" to 4,
+            "x86_64" to 4,
+            "universal" to 4
+        )
 
-        variant.outputs
-            .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
-            .forEach { output ->
-                val abi = if (output.getFilter("ABI") != null)
-                    output.getFilter("ABI")
-                else
-                    "universal"
+        variant.outputs.map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }.forEach { output ->
+            val abi = if (output.getFilter("ABI")!= null) output.getFilter("ABI") else "universal"
+            output.outputFileName = "v2rayNG_${variant.versionName}_${abi}.apk"
 
-                output.outputFileName = "v2rayNG_${variant.versionName}_${abi}.apk"
-                if (versionCodes.containsKey(abi)) {
-                    output.versionCodeOverride = (1000000 * versionCodes[abi]!!).plus(variant.versionCode)
-                } else {
-                    return@forEach
-                }
+            if (versionCodes.containsKey(abi)) {
+                output.versionCodeOverride = (1000000 * versionCodes[abi]!!).plus(variant.versionCode)
+            } else {
+                return@forEach
             }
+        }
     }
 
     buildFeatures {
@@ -90,12 +83,12 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar", "*.jar"))))
+
     testImplementation(libs.junit)
     testImplementation(libs.org.mockito.mockito.inline)
     testImplementation(libs.mockito.kotlin)
 
     implementation(libs.flexbox)
-    // Androidx
     implementation(libs.constraintlayout)
     implementation(libs.legacy.support.v4)
     implementation(libs.appcompat)
@@ -113,11 +106,12 @@ dependencies {
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.runtime.ktx)
 
-    //kotlin
+    // Kotlin
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
+    // Other libraries
     implementation(libs.mmkv.static)
     implementation(libs.gson)
     implementation(libs.rxjava)
