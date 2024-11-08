@@ -73,9 +73,9 @@ jobs:
       
     - name: Build hysteria2.so
       env:
-          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-      
-      if: startsWith(github.event.head_commit.message, 'up ')run: |
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}     
+      if: startsWith(github.event.head_commit.message, 'up ')
+      run: |
         cd ${{ github.workspace }}/build
         git clone --depth=1 -b master https://github.com/apernet/hysteria.git
         cd hysteria
