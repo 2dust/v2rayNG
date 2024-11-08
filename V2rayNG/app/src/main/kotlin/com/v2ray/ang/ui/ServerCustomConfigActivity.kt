@@ -12,10 +12,9 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityServerCustomConfigBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
-import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import me.drakeet.support.toast.ToastCompat
 
@@ -75,8 +74,8 @@ class ServerCustomConfigActivity : BaseActivity() {
             return false
         }
 
-        val v2rayConfig = try {
-            JsonUtil.fromJson(binding.editor.text.toString(), V2rayConfig::class.java)
+        val profileItem = try {
+            CustomFmt.parse(binding.editor.text.toString())
         } catch (e: Exception) {
             e.printStackTrace()
             ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
@@ -84,7 +83,11 @@ class ServerCustomConfigActivity : BaseActivity() {
         }
 
         val config = MmkvManager.decodeServerConfig(editGuid) ?: ProfileItem.create(EConfigType.CUSTOM)
-        config.remarks = if (binding.etRemarks.text.isNullOrEmpty()) v2rayConfig.remarks.orEmpty() else binding.etRemarks.text.toString()
+        binding.etRemarks.text.let {
+            config.remarks = if (it.isNullOrEmpty()) profileItem?.remarks.orEmpty() else it.toString()
+        }
+        config.server = profileItem?.server
+        config.serverPort = profileItem?.serverPort
 
         MmkvManager.encodeServerConfig(editGuid, config)
         MmkvManager.encodeServerRaw(editGuid, binding.editor.text.toString())

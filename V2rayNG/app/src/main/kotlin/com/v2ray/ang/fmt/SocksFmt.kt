@@ -15,6 +15,7 @@ object SocksFmt : FmtBase() {
 
         val uri = URI(Utils.fixIllegalUrl(str))
         if (uri.idnHost.isEmpty()) return null
+        if (uri.port <= 0) return null
 
         config.remarks = Utils.urlDecode(uri.fragment.orEmpty())
         config.server = uri.idnHost
