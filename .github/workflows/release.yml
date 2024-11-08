@@ -1,0 +1,130 @@
+name: Release apk
+
+on:
+  workflow_dispatch:
+    inputs:
+      XRAY_CORE_VERSION:
+        description: 'Xray core version or commit hash'
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+        
+    - name: Setup Golang
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23.3'
+        cache: false
+
+    - name: Patch Go use 600296
+      #https://go-review.googlesource.com/c/go/+/600296
+      run: |
+        cd "$(go env GOROOT)"
+        curl "https://go-review.googlesource.com/changes/go~600296/revisions/5/patch" | base64 -d | patch --verbose -p 1
+        
+    - name: Install gomobile
+      run: |
+        go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20240806205939-81131f6468ab
+        echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+    - name: Setup Android environment
+      uses: android-actions/setup-android@v3
+
+    - uses: nttld/setup-ndk@v1
+      id: setup-ndk
+      with:
+        ndk-version: r26b
+        add-to-path: false
+          
+    - name: Build dlc.dat
+      run: |
+        mkdir ${{ github.workspace }}/build
+        cd ${{ github.workspace }}/build
+        git clone https://github.com/v2fly/domain-list-community.git
+        cd domain-list-community
+        curl -sSL https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/china-list.txt -o china.txt
+        curl -sSL https://raw.githubusercontent.com/Loyalsoldier/geoip/release/geoip-only-cn-private.dat -o geoip.dat
+        cat china.txt >> data/cn
+        go mod download
+        go run ./
+      
+    - name: Build hysteria2.so
+      env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      run: |
+        cd ${{ github.workspace }}/build
+        git clone --depth=1 -b master https://github.com/apernet/hysteria.git
+        cd hysteria
+        export HY_APP_PLATFORMS="android/arm64,android/armv7,android/amd64,android/386"
+        python hyperbole.py build -r
+        mv ./build/hysteria-android-arm64 ${{ github.workspace }}/V2rayNG/app/libs/arm64-v8a/libhysteria2.so
+        mv ./build/hysteria-android-armv7 ${{ github.workspace }}/V2rayNG/app/libs/armeabi-v7a/libhysteria2.so
+        mv ./build/hysteria-android-amd64 ${{ github.workspace }}/V2rayNG/app/libs/x86_64/libhysteria2.so
+        mv ./build/hysteria-android-386 ${{ github.workspace }}/V2rayNG/app/libs/x86/libhysteria2.so
+            
+    - name: Build dependencies
+      run: |
+        cd ${{ github.workspace }}/build
+        git clone --depth=1 -b main https://github.com/2dust/AndroidLibXrayLite.git
+        mv ./domain-list-community/dlc.dat ./AndroidLibXrayLite/assets/geosite.dat
+        mv ./domain-list-community/geoip.dat ./AndroidLibXrayLite/assets/geoip.dat
+        cd AndroidLibXrayLite
+        go get github.com/xtls/xray-core@${{ github.event.inputs.XRAY_CORE_VERSION }} || true
+        gomobile init
+        go mod tidy -v
+        gomobile bind -v -androidapi 21 -ldflags='-s -w' ./
+        cp *.aar ${{ github.workspace }}/V2rayNG/app/libs/
+        
+    - name: Build APK
+      run: |
+        cd ${{ github.workspace }}/V2rayNG
+        chmod 755 gradlew
+        ./gradlew assembleRelease
+
+    - name: Upload arm64-v8a APK
+      uses: actions/upload-artifact@v4
+      if: ${{ success() }}
+      with:
+        name: arm64-v8a
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/release/*arm64-v8a*.apk
+
+    - name: Upload armeabi-v7a APK
+      uses: actions/upload-artifact@v4
+      if: ${{ success() }}
+      with:
+        name: armeabi-v7a
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/release/*armeabi-v7a*.apk
+
+    - name: Upload x86 APK
+      uses: actions/upload-artifact@v4
+      if: ${{ success() }}
+      with:
+        name: x86-apk
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/release/*x86*.apk
+    
+    - name: Upload Other APKs
+      uses: actions/upload-artifact@v4
+      with:
+        name: others-apk
+        path: |
+          ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/release
+          !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/release/*arm64-v8a*.apk
+          !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/release/*armeabi-v7a*.apk
+          !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/release/*x86*.apk
+          
