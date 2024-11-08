@@ -27,6 +27,7 @@ jobs:
         java-version: '21'
 
     - name: Setup Python
+      if: startsWith(github.event.head_commit.message, 'up ')
       uses: actions/setup-python@v5
       with:
         python-version: '3.13'
@@ -52,6 +53,7 @@ jobs:
       uses: android-actions/setup-android@v3
 
     - uses: nttld/setup-ndk@v1
+      if: startsWith(github.event.head_commit.message, 'up ')
       id: setup-ndk
       with:
         ndk-version: r26b
@@ -72,7 +74,8 @@ jobs:
     - name: Build hysteria2.so
       env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-      run: |
+      
+      if: startsWith(github.event.head_commit.message, 'up ')run: |
         cd ${{ github.workspace }}/build
         git clone --depth=1 -b master https://github.com/apernet/hysteria.git
         cd hysteria
