@@ -110,7 +110,7 @@ jobs:
       run: |
         cd ${{ github.workspace }}/V2rayNG
         chmod 755 gradlew
-        if [[ -n ${{inputs.COMPILE_TYPE}} && ${{inputs.COMPILE_TYPE}} == "release" ]]; then
+        if [[ -n "${{ inputs.COMPILE_TYPE }}" && "${{ inputs.COMPILE_TYPE }}" == "release" ]]; then
             echo "folder=release" >> $GITHUB_ENV
             ./gradlew assembleRelease
         else
