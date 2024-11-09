@@ -34,11 +34,11 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.handler.MigrateManager
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.service.V2RayServiceManager
-import com.v2ray.ang.util.AngConfigManager
-import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -46,6 +46,7 @@ import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.drakeet.support.toast.ToastCompat
 import java.util.concurrent.TimeUnit
 
@@ -89,7 +90,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.fab.setOnClickListener {
             if (mainViewModel.isRunning.value == true) {
                 Utils.stopVService(this)
-            } else if ((settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
+            } else if ((MmkvManager.decodeSettingsString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
                 val intent = VpnService.prepare(this)
                 if (intent == null) {
                     startV2Ray()
@@ -125,13 +126,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         initGroupTab()
         setupViewModel()
+        migrateLegacy()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             RxPermissions(this)
                 .request(Manifest.permission.POST_NOTIFICATIONS)
                 .subscribe {
                     if (!it)
-                        toast(R.string.toast_permission_denied)
+                        toast(R.string.toast_permission_denied_notification)
                 }
         }
 
@@ -171,7 +173,22 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
         }
         mainViewModel.startListenBroadcast()
-        mainViewModel.copyAssets(assets)
+        mainViewModel.initAssets(assets)
+    }
+
+    private fun migrateLegacy() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val result = MigrateManager.migrateServerConfig2Profile()
+            launch(Dispatchers.Main) {
+                if (result) {
+                    toast(getString(R.string.migration_success))
+                    mainViewModel.reloadServerList()
+                } else {
+                    //toast(getString(R.string.migration_fail))
+                }
+            }
+
+        }
     }
 
     private fun initGroupTab() {
@@ -199,6 +216,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     fun startV2Ray() {
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
+            toast(R.string.title_file_chooser)
             return
         }
         V2RayServiceManager.startV2Ray(this)
@@ -340,11 +358,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.ping_all -> {
+            toast(R.string.connection_test_testing)
             mainViewModel.testAllTcping()
             true
         }
 
         R.id.real_ping_all -> {
+            toast(R.string.connection_test_testing)
             mainViewModel.testAllRealPing()
             true
         }
@@ -488,29 +508,34 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private fun importBatchConfig(server: String?) {
-//        val dialog = AlertDialog.Builder(this)
-//            .setView(LayoutProgressBinding.inflate(layoutInflater).root)
-//            .setCancelable(false)
-//            .show()
         binding.pbWaiting.show()
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val (count, countSub) = AngConfigManager.importBatchConfig(server, mainViewModel.subscriptionId, true)
-            delay(500L)
-            launch(Dispatchers.Main) {
-                if (count > 0) {
-                    toast(R.string.toast_success)
-                    mainViewModel.reloadServerList()
-                } else if (countSub > 0) {
-                    initGroupTab()
-                } else {
-                    toast(R.string.toast_failure)
+            try {
+                val (count, countSub) = AngConfigManager.importBatchConfig(server, mainViewModel.subscriptionId, true)
+                delay(500L)
+                withContext(Dispatchers.Main) {
+                    when {
+                        count > 0 -> {
+                            toast(R.string.toast_success)
+                            mainViewModel.reloadServerList()
+                        }
+
+                        countSub > 0 -> initGroupTab()
+                        else -> toast(R.string.toast_failure)
+                    }
+                    binding.pbWaiting.hide()
                 }
-                //dialog.dismiss()
-                binding.pbWaiting.hide()
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    toast(R.string.toast_failure)
+                    binding.pbWaiting.hide()
+                }
+                e.printStackTrace()
             }
         }
     }
+
 
     private fun importConfigCustomClipboard()
             : Boolean {

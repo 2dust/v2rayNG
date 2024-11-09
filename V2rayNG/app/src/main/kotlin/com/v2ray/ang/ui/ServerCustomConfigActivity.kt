@@ -8,15 +8,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.blacksquircle.ui.editorkit.utils.EditorTheme
 import com.blacksquircle.ui.language.json.JsonLanguage
-
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityServerCustomConfigBinding
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.ServerConfig
-import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.fmt.CustomFmt
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.Utils
 import me.drakeet.support.toast.ToastCompat
 
@@ -48,16 +46,14 @@ class ServerCustomConfigActivity : BaseActivity() {
     }
 
     /**
-     * bingding seleced server config
+     * Binding selected server config
      */
-    private fun bindingServer(config: ServerConfig): Boolean {
+    private fun bindingServer(config: ProfileItem): Boolean {
         binding.etRemarks.text = Utils.getEditable(config.remarks)
         val raw = MmkvManager.decodeServerRaw(editGuid)
-        if (raw.isNullOrBlank()) {
-            binding.editor.setTextContent(Utils.getEditable(config.fullConfig?.toPrettyPrinting().orEmpty()))
-        } else {
-            binding.editor.setTextContent(Utils.getEditable(raw))
-        }
+        val configContent = raw.orEmpty()
+
+        binding.editor.setTextContent(Utils.getEditable(configContent))
         return true
     }
 
@@ -78,17 +74,20 @@ class ServerCustomConfigActivity : BaseActivity() {
             return false
         }
 
-        val v2rayConfig = try {
-            JsonUtil.fromJson(binding.editor.text.toString(), V2rayConfig::class.java)
+        val profileItem = try {
+            CustomFmt.parse(binding.editor.text.toString())
         } catch (e: Exception) {
             e.printStackTrace()
             ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
             return false
         }
 
-        val config = MmkvManager.decodeServerConfig(editGuid) ?: ServerConfig.create(EConfigType.CUSTOM)
-        config.remarks = if (binding.etRemarks.text.isNullOrEmpty()) v2rayConfig.remarks.orEmpty() else binding.etRemarks.text.toString()
-        config.fullConfig = v2rayConfig
+        val config = MmkvManager.decodeServerConfig(editGuid) ?: ProfileItem.create(EConfigType.CUSTOM)
+        binding.etRemarks.text.let {
+            config.remarks = if (it.isNullOrEmpty()) profileItem?.remarks.orEmpty() else it.toString()
+        }
+        config.server = profileItem?.server
+        config.serverPort = profileItem?.serverPort
 
         MmkvManager.encodeServerConfig(editGuid, config)
         MmkvManager.encodeServerRaw(editGuid, binding.editor.text.toString())

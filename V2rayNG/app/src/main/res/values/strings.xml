@@ -12,6 +12,7 @@
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">Stop</string>
     <string name="toast_permission_denied">Unable to obtain the permission</string>
+    <string name="toast_permission_denied_notification">Unable to obtain the notification permission</string>
     <string name="notification_action_more">click for more</string>
     <string name="toast_services_start">Start Services</string>
     <string name="toast_services_stop">Stop Services</string>
@@ -83,7 +84,7 @@
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_secret_key">SecretKey</string>
-    <string name="server_lab_reserved">Reserved(Optional)</string>
+    <string name="server_lab_reserved">Reserved(Optional, separated by commas)</string>
     <string name="server_lab_local_address">Local address (optional IPv4/IPv6, separated by commas)</string>
     <string name="server_lab_local_mtu">Mtu(optional, default 1420)</string>
     <string name="toast_success">Success</string>
@@ -98,6 +99,7 @@
     <string name="server_lab_content">Content</string>
     <string name="toast_none_data_clipboard">There is no data in the clipboard</string>
     <string name="toast_invalid_url">Invalid URL</string>
+    <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
     <string name="server_lab_need_inbound">Ensure inbounds port is consistent with the settings</string>
     <string name="toast_malformed_josn">Config malformed</string>
     <string name="server_lab_request_host6">Host(SNI)(Optional)</string>
@@ -112,6 +114,9 @@
     <string name="msg_remark_is_duplicate">The remarks already exists</string>
     <string name="toast_action_not_allowed">Action not allowed</string>
     <string name="server_obfs_password">Obfs password</string>
+    <string name="server_lab_port_hop">Port Hopping(will override the port)</string>
+    <string name="server_lab_port_hop_interval">Port Hopping Interval</string>
+    <string name="server_lab_stream_pinsha256">pinSHA256</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Loading</string>
@@ -318,6 +323,7 @@
         <item>China Whitelist</item>
         <item>China Blacklist</item>
         <item>Global</item>
+        <item>Iran Whitelist</item>
     </string-array>
 
 </resources>

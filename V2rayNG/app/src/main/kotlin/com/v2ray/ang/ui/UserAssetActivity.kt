@@ -29,12 +29,12 @@ import com.v2ray.ang.databinding.LayoutProgressBinding
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.MmkvManager.settingsStorage
-import com.v2ray.ang.util.SettingsManager
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
@@ -71,23 +71,11 @@ class UserAssetActivity : BaseActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.add_file -> {
-            showFileChooser()
-            true
-        }
-
-        R.id.add_url -> {
-            val intent = Intent(this, UserAssetUrlActivity::class.java)
-            startActivity(intent)
-            true
-        }
-
-        R.id.download_file -> {
-            downloadGeoFiles()
-            true
-        }
-
+    // Use when to streamline the option selection
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.add_file -> showFileChooser().let { true }
+        R.id.add_url -> startActivity(Intent(this, UserAssetUrlActivity::class.java)).let { true }
+        R.id.download_file -> downloadGeoFiles().let { true }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -120,31 +108,29 @@ class UserAssetActivity : BaseActivity() {
             }
     }
 
-    private val chooseFile =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { it ->
-            val uri = it.data?.data
-            if (it.resultCode == RESULT_OK && uri != null) {
-                val assetId = Utils.getUuid()
-                try {
-                    val assetItem = AssetUrlItem(
-                        getCursorName(uri) ?: uri.toString(),
-                        "file"
-                    )
+    val chooseFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val uri = result.data?.data
+        if (result.resultCode == RESULT_OK && uri != null) {
+            val assetId = Utils.getUuid()
+            runCatching {
+                val assetItem = AssetUrlItem(
+                    getCursorName(uri) ?: uri.toString(),
+                    "file"
+                )
 
-                    // check remarks unique
-                    val assetList = MmkvManager.decodeAssetUrls()
-                    if (assetList.any { it.second.remarks == assetItem.remarks && it.first != assetId }) {
-                        toast(R.string.msg_remark_is_duplicate)
-                        return@registerForActivityResult
-                    }
+                val assetList = MmkvManager.decodeAssetUrls()
+                if (assetList.any { it.second.remarks == assetItem.remarks && it.first != assetId }) {
+                    toast(R.string.msg_remark_is_duplicate)
+                } else {
                     MmkvManager.encodeAsset(assetId, assetItem)
                     copyFile(uri)
-                } catch (e: Exception) {
-                    toast(R.string.toast_asset_copy_failed)
-                    MmkvManager.removeAssetUrl(assetId)
                 }
+            }.onFailure {
+                toast(R.string.toast_asset_copy_failed)
+                MmkvManager.removeAssetUrl(assetId)
             }
         }
+    }
 
     private fun copyFile(uri: Uri): String {
         val targetFile = File(extDir, getCursorName(uri) ?: uri.toString())
@@ -254,6 +240,15 @@ class UserAssetActivity : BaseActivity() {
         return list + assets
     }
 
+    fun initAssets() {
+        lifecycleScope.launch(Dispatchers.Default) {
+            SettingsManager.initAssets(this@UserAssetActivity, assets)
+            withContext(Dispatchers.Main) {
+                binding.recyclerView.adapter?.notifyDataSetChanged()
+            }
+        }
+    }
+
     inner class UserAssetAdapter : RecyclerView.Adapter<UserAssetViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserAssetViewHolder {
             return UserAssetViewHolder(
@@ -285,10 +280,10 @@ class UserAssetActivity : BaseActivity() {
 
             if (item.second.remarks in builtInGeoFiles && item.second.url == AppConfig.GeoUrl + item.second.remarks) {
                 holder.itemUserAssetBinding.layoutEdit.visibility = GONE
-                holder.itemUserAssetBinding.layoutRemove.visibility = GONE
+                //holder.itemUserAssetBinding.layoutRemove.visibility = GONE
             } else {
                 holder.itemUserAssetBinding.layoutEdit.visibility = item.second.url.let { if (it == "file") GONE else VISIBLE }
-                holder.itemUserAssetBinding.layoutRemove.visibility = VISIBLE
+                //holder.itemUserAssetBinding.layoutRemove.visibility = VISIBLE
             }
 
             holder.itemUserAssetBinding.layoutEdit.setOnClickListener {
@@ -297,9 +292,16 @@ class UserAssetActivity : BaseActivity() {
                 startActivity(intent)
             }
             holder.itemUserAssetBinding.layoutRemove.setOnClickListener {
-                file?.delete()
-                MmkvManager.removeAssetUrl(item.first)
-                binding.recyclerView.adapter?.notifyItemRemoved(position)
+                AlertDialog.Builder(this@UserAssetActivity).setMessage(R.string.del_config_comfirm)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        file?.delete()
+                        MmkvManager.removeAssetUrl(item.first)
+                        initAssets()
+                    }
+                    .setNegativeButton(android.R.string.no) { _, _ ->
+                        //do noting
+                    }
+                    .show()
             }
         }
 

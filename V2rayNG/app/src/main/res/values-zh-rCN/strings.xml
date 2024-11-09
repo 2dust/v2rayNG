@@ -11,6 +11,7 @@
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">停止</string>
     <string name="toast_permission_denied">无法取得权限</string>
+    <string name="toast_permission_denied_notification">无法取得通知权限</string>
     <string name="notification_action_more">点击了解更多</string>
     <string name="toast_services_start">启动服务中</string>
     <string name="toast_services_stop">关闭中</string>
@@ -82,7 +83,7 @@
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_secret_key">SecretKey</string>
-    <string name="server_lab_reserved">Reserved(可选)</string>
+    <string name="server_lab_reserved">Reserved(可选，逗号隔开)</string>
     <string name="server_lab_local_address">本地地址(可选IPv4/IPv6，逗号隔开)</string>
     <string name="server_lab_local_mtu">Mtu(可选, 默认1420)</string>
     <string name="toast_success">成功</string>
@@ -97,6 +98,7 @@
     <string name="server_lab_content">内容</string>
     <string name="toast_none_data_clipboard">剪贴板中没有数据</string>
     <string name="toast_invalid_url">无效的网址</string>
+    <string name="toast_insecure_url_protocol">请不要使用不安全的HTTP协议订阅地址</string>
     <string name="server_lab_need_inbound">确保inbounds port和设置中的一致</string>
     <string name="toast_malformed_josn">配置格式错误</string>
     <string name="server_lab_request_host6">Host(SNI)(可选)</string>
@@ -106,6 +108,9 @@
     <string name="menu_item_download_file">下载文件</string>
     <string name="toast_action_not_allowed">禁止此项操作</string>
     <string name="server_obfs_password">混淆密码</string>
+    <string name="server_lab_port_hop">跳跃端口(会覆盖服务器端口)</string>
+    <string name="server_lab_port_hop_interval">端口跳跃间隔(秒)</string>
+    <string name="server_lab_stream_pinsha256">SHA256证书指纹</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">添加资产网址</string>
@@ -306,6 +311,7 @@
         <item>绕过大陆(Whitelist)</item>
         <item>黑名单(Blacklist)</item>
         <item>全局(Global)</item>
+        <item>伊朗(Iran)</item>
     </string-array>
 
 </resources>

@@ -17,8 +17,8 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toLongEx
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.service.SubscriptionUpdater
-import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.SettingsViewModel
 import java.util.concurrent.TimeUnit
@@ -172,33 +172,33 @@ class SettingsActivity : BaseActivity() {
 
         override fun onStart() {
             super.onStart()
-            updateMode(settingsStorage.decodeString(AppConfig.PREF_MODE, VPN))
-            localDns?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
-            fakeDns?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_FAKE_DNS_ENABLED, false)
-            localDnsPort?.summary = settingsStorage.decodeString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
-            vpnDns?.summary = settingsStorage.decodeString(AppConfig.PREF_VPN_DNS, AppConfig.DNS_VPN)
+            updateMode(MmkvManager.decodeSettingsString(AppConfig.PREF_MODE, VPN))
+            localDns?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
+            fakeDns?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED, false)
+            localDnsPort?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
+            vpnDns?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_DNS, AppConfig.DNS_VPN)
 
-            updateMux(settingsStorage.getBoolean(AppConfig.PREF_MUX_ENABLED, false))
-            mux?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_MUX_ENABLED, false)
-            muxConcurrency?.summary = settingsStorage.decodeString(AppConfig.PREF_MUX_CONCURRENCY, "8")
-            muxXudpConcurrency?.summary = settingsStorage.decodeString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
+            updateMux(MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false))
+            mux?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false)
+            muxConcurrency?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_CONCURRENCY, "8")
+            muxXudpConcurrency?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
 
-            updateFragment(settingsStorage.getBoolean(AppConfig.PREF_FRAGMENT_ENABLED, false))
-            fragment?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_FRAGMENT_ENABLED, false)
-            fragmentPackets?.summary = settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello")
-            fragmentLength?.summary = settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
-            fragmentInterval?.summary = settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
+            updateFragment(MmkvManager.decodeSettingsBool(AppConfig.PREF_FRAGMENT_ENABLED, false))
+            fragment?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_FRAGMENT_ENABLED, false)
+            fragmentPackets?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello")
+            fragmentLength?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
+            fragmentInterval?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
 
-            autoUpdateCheck?.isChecked = settingsStorage.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
+            autoUpdateCheck?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
             autoUpdateInterval?.summary =
-                settingsStorage.decodeString(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL, AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
-            autoUpdateInterval?.isEnabled = settingsStorage.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
+                MmkvManager.decodeSettingsString(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL, AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
+            autoUpdateInterval?.isEnabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
 
-            socksPort?.summary = settingsStorage.decodeString(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
-            httpPort?.summary = settingsStorage.decodeString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
-            remoteDns?.summary = settingsStorage.decodeString(AppConfig.PREF_REMOTE_DNS, AppConfig.DNS_PROXY)
-            domesticDns?.summary = settingsStorage.decodeString(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
-            delayTestUrl?.summary = settingsStorage.decodeString(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DelayTestUrl)
+            socksPort?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
+            httpPort?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
+            remoteDns?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_REMOTE_DNS, AppConfig.DNS_PROXY)
+            domesticDns?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
+            delayTestUrl?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DelayTestUrl)
 
             initSharedPreference()
         }
@@ -225,7 +225,7 @@ class SettingsActivity : BaseActivity() {
                 AppConfig.PREF_SNIFFING_ENABLED,
             ).forEach { key ->
                 findPreference<CheckBoxPreference>(key)?.isChecked =
-                    settingsStorage.decodeBool(key, true)
+                    MmkvManager.decodeSettingsBool(key, true)
             }
 
             listOf(
@@ -240,7 +240,7 @@ class SettingsActivity : BaseActivity() {
                 AppConfig.PREF_ALLOW_INSECURE
             ).forEach { key ->
                 findPreference<CheckBoxPreference>(key)?.isChecked =
-                    settingsStorage.decodeBool(key, false)
+                    MmkvManager.decodeSettingsBool(key, false)
             }
 
             listOf(
@@ -252,8 +252,8 @@ class SettingsActivity : BaseActivity() {
                 AppConfig.PREF_LOGLEVEL,
                 AppConfig.PREF_MODE
             ).forEach { key ->
-                if (settingsStorage.decodeString(key) != null) {
-                    findPreference<ListPreference>(key)?.value = settingsStorage.decodeString(key)
+                if (MmkvManager.decodeSettingsString(key) != null) {
+                    findPreference<ListPreference>(key)?.value = MmkvManager.decodeSettingsString(key)
                 }
             }
         }
@@ -261,14 +261,14 @@ class SettingsActivity : BaseActivity() {
         private fun updateMode(mode: String?) {
             val vpn = mode == VPN
             perAppProxy?.isEnabled = vpn
-            perAppProxy?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_PER_APP_PROXY, false)
+            perAppProxy?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY, false)
             localDns?.isEnabled = vpn
             fakeDns?.isEnabled = vpn
             localDnsPort?.isEnabled = vpn
             vpnDns?.isEnabled = vpn
             if (vpn) {
                 updateLocalDns(
-                    settingsStorage.getBoolean(
+                    MmkvManager.decodeSettingsBool(
                         AppConfig.PREF_LOCAL_DNS_ENABLED,
                         false
                     )
@@ -310,18 +310,16 @@ class SettingsActivity : BaseActivity() {
             muxXudpConcurrency?.isEnabled = enabled
             muxXudpQuic?.isEnabled = enabled
             if (enabled) {
-                updateMuxConcurrency(settingsStorage.decodeString(AppConfig.PREF_MUX_CONCURRENCY, "8"))
-                updateMuxXudpConcurrency(settingsStorage.decodeString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8"))
+                updateMuxConcurrency(MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_CONCURRENCY, "8"))
+                updateMuxXudpConcurrency(MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8"))
             }
         }
 
         private fun updateMuxConcurrency(value: String?) {
-            if (value == null) {
-            } else {
-                val concurrency = value.toIntOrNull() ?: 8
-                muxConcurrency?.summary = concurrency.toString()
-            }
+            val concurrency = value?.toIntOrNull() ?: 8
+            muxConcurrency?.summary = concurrency.toString()
         }
+
 
         private fun updateMuxXudpConcurrency(value: String?) {
             if (value == null) {
@@ -338,9 +336,9 @@ class SettingsActivity : BaseActivity() {
             fragmentLength?.isEnabled = enabled
             fragmentInterval?.isEnabled = enabled
             if (enabled) {
-                updateFragmentPackets(settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello"))
-                updateFragmentLength(settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100"))
-                updateFragmentInterval(settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20"))
+                updateFragmentPackets(MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello"))
+                updateFragmentLength(MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100"))
+                updateFragmentInterval(MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20"))
             }
         }
 

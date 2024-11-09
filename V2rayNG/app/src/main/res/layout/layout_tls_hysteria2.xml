@@ -65,6 +65,27 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/edit_height"
             android:entries="@array/allowinsecures" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/server_lab_stream_pinsha256" />
+
+            <EditText
+                android:id="@+id/et_pinsha256"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edit_height"
+                android:inputType="text" />
+
+        </LinearLayout>
     </LinearLayout>
+
 
 </LinearLayout>

@@ -8,6 +8,7 @@ data class Hysteria2Bean(
     val socks5: Socks5Bean? = null,
     val http: Socks5Bean? = null,
     val tls: TlsBean? = null,
+    val transport: TransportBean? = null,
 ) {
     data class ObfsBean(
         val type: String?,
@@ -25,5 +26,15 @@ data class Hysteria2Bean(
     data class TlsBean(
         val sni: String?,
         val insecure: Boolean?,
+        val pinSHA256: String?,
     )
+
+    data class TransportBean(
+        val type: String?,
+        val udp: TransportUdpBean?
+    ) {
+        data class TransportUdpBean(
+            val hopInterval: String?,
+        )
+    }
 }

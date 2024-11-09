@@ -13,21 +13,21 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.V2rayConfigManager
 import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.util.MessageUtil
-import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.MmkvManager.settingsStorage
 import com.v2ray.ang.util.PluginUtil
 import com.v2ray.ang.util.Utils
-import com.v2ray.ang.util.V2rayConfigUtil
 import go.Seq
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -55,7 +55,7 @@ object V2RayServiceManager {
             Seq.setContext(value?.get()?.getService()?.applicationContext)
             Libv2ray.initV2Env(Utils.userAssetPath(value?.get()?.getService()), Utils.getDeviceIdForXUDPBaseKey())
         }
-    var currentConfig: ServerConfig? = null
+    var currentConfig: ProfileItem? = null
 
     private var lastQueryTime = 0L
     private var mBuilder: NotificationCompat.Builder? = null
@@ -65,15 +65,17 @@ object V2RayServiceManager {
     fun startV2Ray(context: Context) {
         if (v2rayPoint.isRunning) return
         val guid = MmkvManager.getSelectServer() ?: return
-        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
-        if (!result.status) return
+        val config = MmkvManager.decodeServerConfig(guid) ?: return
+        if (!Utils.isValidUrl(config.server) && !Utils.isIpAddress(config.server)) return
+//        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
+//        if (!result.status) return
 
-        if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING) == true) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)
         } else {
             context.toast(R.string.toast_services_start)
         }
-        val intent = if ((settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
+        val intent = if ((MmkvManager.decodeSettingsString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
             Intent(context.applicationContext, V2RayVpnService::class.java)
         } else {
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
@@ -125,6 +127,11 @@ object V2RayServiceManager {
         }
     }
 
+    /**
+     * Refer to the official documentation for [registerReceiver](https://developer.android.com/reference/androidx/core/content/ContextCompat#registerReceiver(android.content.Context,android.content.BroadcastReceiver,android.content.IntentFilter,int):
+     * `registerReceiver(Context, BroadcastReceiver, IntentFilter, int)`.
+     */
+
     fun startV2rayPoint() {
         val service = serviceControl?.get()?.getService() ?: return
         val guid = MmkvManager.getSelectServer() ?: return
@@ -132,7 +139,7 @@ object V2RayServiceManager {
         if (v2rayPoint.isRunning) {
             return
         }
-        val result = V2rayConfigUtil.getV2rayConfig(service, guid)
+        val result = V2rayConfigManager.getV2rayConfig(service, guid)
         if (!result.status)
             return
 
@@ -141,11 +148,7 @@ object V2RayServiceManager {
             mFilter.addAction(Intent.ACTION_SCREEN_ON)
             mFilter.addAction(Intent.ACTION_SCREEN_OFF)
             mFilter.addAction(Intent.ACTION_USER_PRESENT)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                service.registerReceiver(mMsgReceive, mFilter, Context.RECEIVER_EXPORTED)
-            } else {
-                service.registerReceiver(mMsgReceive, mFilter)
-            }
+            ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
         } catch (e: Exception) {
             Log.d(ANG_PACKAGE, e.toString())
         }
@@ -155,7 +158,7 @@ object V2RayServiceManager {
         currentConfig = config
 
         try {
-            v2rayPoint.runLoop(settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) ?: false)
+            v2rayPoint.runLoop(MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6))
         } catch (e: Exception) {
             Log.d(ANG_PACKAGE, e.toString())
         }
@@ -378,7 +381,7 @@ object V2RayServiceManager {
     private fun startSpeedNotification() {
         if (mDisposable == null &&
             v2rayPoint.isRunning &&
-            settingsStorage?.decodeBool(AppConfig.PREF_SPEED_ENABLED) == true
+            MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) == true
         ) {
             var lastZeroSpeed = false
             val outboundTags = currentConfig?.getAllOutboundTags()
@@ -428,10 +431,11 @@ object V2RayServiceManager {
     }
 
     private fun stopSpeedNotification() {
-        if (mDisposable != null) {
-            mDisposable?.dispose() //stop queryStats
+        mDisposable?.let {
+            it.dispose() //stop queryStats
             mDisposable = null
             updateNotification(currentConfig?.remarks, 0, 0)
         }
     }
+
 }

@@ -7,7 +7,7 @@ import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.tencent.mmkv.MMKV
-import com.v2ray.ang.util.SettingsManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.Utils
 
 class AngApplication : MultiDexApplication() {

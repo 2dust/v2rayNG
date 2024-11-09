@@ -17,14 +17,16 @@ import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.Language
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.service.V2RayServiceManager
-import com.v2ray.ang.util.MmkvManager.settingsStorage
 import java.io.IOException
 import java.net.*
 import java.util.*
@@ -129,7 +131,7 @@ object Utils {
      * get remote dns servers from preference
      */
     fun getRemoteDnsServers(): List<String> {
-        val remoteDns = settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_PROXY
+        val remoteDns = MmkvManager.decodeSettingsString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_PROXY
         val ret = remoteDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
         if (ret.isEmpty()) {
             return listOf(AppConfig.DNS_PROXY)
@@ -138,7 +140,7 @@ object Utils {
     }
 
     fun getVpnDnsServers(): List<String> {
-        val vpnDns = settingsStorage?.decodeString(AppConfig.PREF_VPN_DNS) ?: AppConfig.DNS_VPN
+        val vpnDns = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_DNS) ?: AppConfig.DNS_VPN
         return vpnDns.split(",").filter { isPureIpAddress(it) }
         // allow empty, in that case dns will use system default
     }
@@ -147,7 +149,7 @@ object Utils {
      * get remote dns servers from preference
      */
     fun getDomesticDnsServers(): List<String> {
-        val domesticDns = settingsStorage?.decodeString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
+        val domesticDns = MmkvManager.decodeSettingsString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
         val ret = domesticDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
         if (ret.isEmpty()) {
             return listOf(AppConfig.DNS_DIRECT)
@@ -158,8 +160,11 @@ object Utils {
     /**
      * is ip address
      */
-    fun isIpAddress(value: String): Boolean {
+    fun isIpAddress(value: String?): Boolean {
         try {
+            if (value.isNullOrEmpty()) {
+                return false
+            }
             var addr = value
             if (addr.isEmpty() || addr.isBlank()) {
                 return false
@@ -386,7 +391,7 @@ object Utils {
 
 
     fun setNightMode(context: Context) {
-        when (settingsStorage?.decodeString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
+        when (MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
             "0" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             "1" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             "2" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -405,17 +410,18 @@ object Utils {
     }
 
     fun getLocale(): Locale {
-        val lang = settingsStorage?.decodeString(AppConfig.PREF_LANGUAGE) ?: "auto"
-        return when (lang) {
-            "auto" -> getSysLocale()
-            "en" -> Locale.ENGLISH
-            "zh-rCN" -> Locale.CHINA
-            "zh-rTW" -> Locale.TRADITIONAL_CHINESE
-            "vi" -> Locale("vi")
-            "ru" -> Locale("ru")
-            "fa" -> Locale("fa")
-            "bn" -> Locale("bn")
-            else -> getSysLocale()
+        val langCode = MmkvManager.decodeSettingsString(AppConfig.PREF_LANGUAGE) ?: Language.AUTO.code
+        val language = Language.fromCode(langCode)
+
+        return when (language) {
+            Language.AUTO -> getSysLocale()
+            Language.ENGLISH -> Locale.ENGLISH
+            Language.CHINA -> Locale.CHINA
+            Language.TRADITIONAL_CHINESE -> Locale.TRADITIONAL_CHINESE
+            Language.VIETNAMESE -> Locale("vi")
+            Language.RUSSIAN -> Locale("ru")
+            Language.PERSIAN -> Locale("fa")
+            Language.BANGLA -> Locale("bn")
         }
     }
 
@@ -449,7 +455,7 @@ object Utils {
         return if (second) {
             AppConfig.DelayTestUrl2
         } else {
-            settingsStorage.decodeString(AppConfig.PREF_DELAY_TEST_URL) ?: AppConfig.DelayTestUrl
+            MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL) ?: AppConfig.DelayTestUrl
         }
     }
 
@@ -465,5 +471,23 @@ object Utils {
         // if the program gets here, no port in the range was found
         throw IOException("no free port found")
     }
+
+    fun isValidSubUrl(value: String?): Boolean {
+        try {
+            if (value.isNullOrEmpty()) return false
+            if (URLUtil.isHttpsUrl(value)) return true
+            if (URLUtil.isHttpUrl(value) && value.contains(LOOPBACK)) return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return false
+    }
+
+    fun receiverFlags(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        ContextCompat.RECEIVER_EXPORTED
+    } else {
+        ContextCompat.RECEIVER_NOT_EXPORTED
+    }
+
 }
 

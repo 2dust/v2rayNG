@@ -11,6 +11,7 @@
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">Остановить</string>
     <string name="toast_permission_denied">Разрешение не получено</string>
+    <string name="toast_permission_denied_notification">Разрешение на отображение уведомлений не получено</string>
     <string name="notification_action_more">Ещё…</string>
     <string name="toast_services_start">Запуск служб</string>
     <string name="toast_services_stop">Остановка служб</string>
@@ -97,6 +98,7 @@
     <string name="server_lab_content">Данные</string>
     <string name="toast_none_data_clipboard">В буфере обмена нет данных</string>
     <string name="toast_invalid_url">Неправильный URL</string>
+    <string name="toast_insecure_url_protocol">Не используйте небезопасный HTTP-протокол в адресе подписки</string>
     <string name="server_lab_need_inbound">Убедитесь, что входящий порт соответствует настройкам</string>
     <string name="toast_malformed_josn">Профиль повреждён</string>
     <string name="server_lab_request_host6">Узел (SNI) (необязательно)</string>
@@ -111,6 +113,9 @@
     <string name="msg_remark_is_duplicate">Название уже существует</string>
     <string name="toast_action_not_allowed">Это действие запрещено</string>
     <string name="server_obfs_password">Пароль obfs</string>
+    <string name="server_lab_port_hop">Переключение портов</string>
+    <string name="server_lab_port_hop_interval">Интервал переключения портов</string>
+    <string name="server_lab_stream_pinsha256">pinSHA256</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Загрузка…</string>
@@ -315,6 +320,7 @@
         <item>Белый список Китая</item>
         <item>Чёрный список Китая</item>
         <item>Общие</item>
+        <item>Белый список Ирана</item>
     </string-array>
 
 </resources>

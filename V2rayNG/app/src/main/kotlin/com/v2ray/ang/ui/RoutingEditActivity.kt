@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
@@ -10,7 +9,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityRoutingEditBinding
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.SettingsManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,7 +37,7 @@ class RoutingEditActivity : BaseActivity() {
 
     private fun bindingServer(rulesetItem: RulesetItem): Boolean {
         binding.etRemarks.text = Utils.getEditable(rulesetItem.remarks)
-        binding.chkLocked.isChecked = rulesetItem.looked ?: false
+        binding.chkLocked.isChecked = rulesetItem.looked == true
         binding.etDomain.text = Utils.getEditable(rulesetItem.domain?.joinToString(","))
         binding.etIp.text = Utils.getEditable(rulesetItem.ip?.joinToString(","))
         binding.etPort.text = Utils.getEditable(rulesetItem.port)
@@ -59,16 +58,21 @@ class RoutingEditActivity : BaseActivity() {
     private fun saveServer(): Boolean {
         val rulesetItem = SettingsManager.getRoutingRuleset(position) ?: RulesetItem()
 
-        rulesetItem.remarks = binding.etRemarks.text.toString()
-        rulesetItem.looked = binding.chkLocked.isChecked
-        binding.etDomain.text.toString().let { rulesetItem.domain = if (it.isEmpty()) null else it.split(",").map { itt -> itt.trim() }.filter { itt -> itt.isNotEmpty() } }
-        binding.etIp.text.toString().let { rulesetItem.ip = if (it.isEmpty()) null else it.split(",").map { itt -> itt.trim() }.filter { itt -> itt.isNotEmpty() } }
-        binding.etProtocol.text.toString().let { rulesetItem.protocol = if (it.isEmpty()) null else it.split(",").map { itt -> itt.trim() }.filter { itt -> itt.isNotEmpty() } }
-        binding.etPort.text.toString().let { rulesetItem.port = it.ifEmpty { null } }
-        binding.etNetwork.text.toString().let { rulesetItem.network = it.ifEmpty { null } }
-        rulesetItem.outboundTag = outbound_tag[binding.spOutboundTag.selectedItemPosition]
+        rulesetItem.apply {
+            remarks = binding.etRemarks.text.toString()
+            looked = binding.chkLocked.isChecked
+            domain = binding.etDomain.text.toString().takeIf { it.isNotEmpty() }
+                ?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
+            ip = binding.etIp.text.toString().takeIf { it.isNotEmpty() }
+                ?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
+            protocol = binding.etProtocol.text.toString().takeIf { it.isNotEmpty() }
+                ?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
+            port = binding.etPort.text.toString().takeIf { it.isNotEmpty() }
+            network = binding.etNetwork.text.toString().takeIf { it.isNotEmpty() }
+            outboundTag = outbound_tag[binding.spOutboundTag.selectedItemPosition]
+        }
 
-        if (TextUtils.isEmpty(rulesetItem.remarks)) {
+        if (rulesetItem.remarks.isNullOrEmpty()) {
             toast(R.string.sub_setting_remarks)
             return false
         }
@@ -78,6 +82,7 @@ class RoutingEditActivity : BaseActivity() {
         finish()
         return true
     }
+
 
     private fun deleteServer(): Boolean {
         if (position >= 0) {

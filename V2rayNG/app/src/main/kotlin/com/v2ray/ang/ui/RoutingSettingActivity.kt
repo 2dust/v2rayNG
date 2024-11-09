@@ -10,20 +10,19 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityRoutingSettingBinding
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.util.MmkvManager
-import com.v2ray.ang.util.MmkvManager.settingsStorage
-import com.v2ray.ang.util.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RoutingSettingActivity : BaseActivity() {
     private val binding by lazy { ActivityRoutingSettingBinding.inflate(layoutInflater) }
@@ -51,14 +50,14 @@ class RoutingSettingActivity : BaseActivity() {
         mItemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(adapter))
         mItemTouchHelper?.attachToRecyclerView(binding.recyclerView)
 
-        val found = Utils.arrayFind(routing_domain_strategy, settingsStorage?.decodeString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY) ?: "")
+        val found = Utils.arrayFind(routing_domain_strategy, MmkvManager.decodeSettingsString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY) ?: "")
         found.let { binding.spDomainStrategy.setSelection(if (it >= 0) it else 0) }
         binding.spDomainStrategy.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                settingsStorage.encode(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, routing_domain_strategy[position])
+                MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, routing_domain_strategy[position])
             }
         }
     }
@@ -113,29 +112,32 @@ class RoutingSettingActivity : BaseActivity() {
         R.id.import_rulesets_from_clipboard -> {
             AlertDialog.Builder(this).setMessage(R.string.routing_settings_import_rulesets_tip)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    try {
-                        val clipboard = Utils.getClipboard(this)
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            val ret = SettingsManager.resetRoutingRulesetsFromClipboard(clipboard)
-                            launch(Dispatchers.Main) {
-                                if (ret) {
-                                    refreshData()
-                                    toast(R.string.toast_success)
-                                } else {
-                                    toast(R.string.toast_failure)
-                                }
-                            }
-                        }
+                    val clipboard = try {
+                        Utils.getClipboard(this)
                     } catch (e: Exception) {
                         e.printStackTrace()
+                        toast(R.string.toast_failure)
+                        return@setPositiveButton
+                    }
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val result = SettingsManager.resetRoutingRulesetsFromClipboard(clipboard)
+                        withContext(Dispatchers.Main) {
+                            if (result) {
+                                refreshData()
+                                toast(R.string.toast_success)
+                            } else {
+                                toast(R.string.toast_failure)
+                            }
+                        }
                     }
                 }
                 .setNegativeButton(android.R.string.no) { _, _ ->
-                    //do noting
+                    //do nothing
                 }
                 .show()
             true
         }
+
 
         R.id.export_rulesets_to_clipboard -> {
             val rulesetList = MmkvManager.decodeRoutingRulesets()
@@ -152,7 +154,9 @@ class RoutingSettingActivity : BaseActivity() {
     }
 
     fun refreshData() {
-        rulesets = MmkvManager.decodeRoutingRulesets() ?: mutableListOf()
+        rulesets.clear()
+        rulesets.addAll(MmkvManager.decodeRoutingRulesets() ?: mutableListOf())
         adapter.notifyDataSetChanged()
     }
+
 }

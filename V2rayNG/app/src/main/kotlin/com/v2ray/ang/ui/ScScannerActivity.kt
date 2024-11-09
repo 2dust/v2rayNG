@@ -7,7 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.tbruyelle.rxpermissions3.RxPermissions
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.AngConfigManager
+import com.v2ray.ang.handler.AngConfigManager
 
 class ScScannerActivity : BaseActivity() {
 
@@ -20,26 +20,31 @@ class ScScannerActivity : BaseActivity() {
     fun importQRcode(): Boolean {
         RxPermissions(this)
             .request(Manifest.permission.CAMERA)
-            .subscribe {
-                if (it)
+            .subscribe { granted ->
+                if (granted) {
                     scanQRCode.launch(Intent(this, ScannerActivity::class.java))
-                else
+                } else {
                     toast(R.string.toast_permission_denied)
+                }
             }
-
         return true
     }
 
+
     private val scanQRCode = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
-            val (count, countSub) = AngConfigManager.importBatchConfig(it.data?.getStringExtra("SCAN_RESULT"), "", false)
+            val scanResult = it.data?.getStringExtra("SCAN_RESULT").orEmpty()
+            val (count, countSub) = AngConfigManager.importBatchConfig(scanResult, "", false)
+
             if (count + countSub > 0) {
                 toast(R.string.toast_success)
             } else {
                 toast(R.string.toast_failure)
             }
+
             startActivity(Intent(this, MainActivity::class.java))
         }
         finish()
     }
+
 }

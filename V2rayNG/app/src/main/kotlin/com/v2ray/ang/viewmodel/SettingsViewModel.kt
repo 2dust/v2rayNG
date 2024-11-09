@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.preference.PreferenceManager
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.util.MmkvManager.settingsStorage
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.Utils
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application),
@@ -44,8 +44,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_FRAGMENT_LENGTH,
             AppConfig.PREF_FRAGMENT_INTERVAL,
             AppConfig.PREF_MUX_XUDP_QUIC,
-            -> {
-                settingsStorage?.encode(key, sharedPreferences.getString(key, ""))
+                -> {
+                MmkvManager.encodeSettings(key, sharedPreferences.getString(key, ""))
             }
 
             AppConfig.PREF_ROUTE_ONLY_ENABLED,
@@ -63,21 +63,21 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.SUBSCRIPTION_AUTO_UPDATE,
             AppConfig.PREF_FRAGMENT_ENABLED,
             AppConfig.PREF_MUX_ENABLED,
-            -> {
-                settingsStorage?.encode(key, sharedPreferences.getBoolean(key, false))
+                -> {
+                MmkvManager.encodeSettings(key, sharedPreferences.getBoolean(key, false))
             }
 
             AppConfig.PREF_SNIFFING_ENABLED -> {
-                settingsStorage?.encode(key, sharedPreferences.getBoolean(key, true))
+                MmkvManager.encodeSettings(key, sharedPreferences.getBoolean(key, true))
             }
 
             AppConfig.PREF_MUX_CONCURRENCY,
             AppConfig.PREF_MUX_XUDP_CONCURRENCY -> {
-                settingsStorage?.encode(key, sharedPreferences.getString(key, "8"))
+                MmkvManager.encodeSettings(key, sharedPreferences.getString(key, "8"))
             }
 
 //            AppConfig.PREF_PER_APP_PROXY_SET -> {
-//                settingsStorage?.encode(key, sharedPreferences.getStringSet(key, setOf()))
+//                MmkvManager.encodeSettings(key, sharedPreferences.getStringSet(key, setOf()))
 //            }
         }
         if (key == AppConfig.PREF_UI_MODE_NIGHT) {
