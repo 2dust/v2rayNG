@@ -36,7 +36,7 @@ object MigrateManager {
 
             //check and remove old
             decodeServerConfig(guid) ?: continue
-            //serverStorage.remove(guid)
+            serverStorage.remove(guid)
             Log.d(ANG_PACKAGE, "migrateServerConfig2Profile-" + config.remarks)
         }
         Log.d(ANG_PACKAGE, "migrateServerConfig2Profile-end")
@@ -70,7 +70,7 @@ object MigrateManager {
         config.serverPort = outbound.getServerPort().toString()
         config.method = outbound.getSecurityEncryption()
         config.password = outbound.getPassword()
-        config.flow = outbound?.settings?.vnext?.get(0)?.users?.get(0)?.flow ?: outbound?.settings?.servers?.get(0)?.flow
+        config.flow = outbound?.settings?.vnext?.first()?.users?.first()?.flow ?: outbound?.settings?.servers?.first()?.flow
 
         config.network = outbound?.streamSettings?.network ?: "tcp"
         outbound.getTransportSettingDetails()?.let { transportDetails ->
@@ -107,7 +107,7 @@ object MigrateManager {
         config.remarks = configOld.remarks
         config.server = outbound.getServerAddress()
         config.serverPort = outbound.getServerPort().toString()
-        config.username = outbound.settings?.servers?.get(0)?.users?.get(0)?.user
+        config.username = outbound.settings?.servers?.first()?.users?.first()?.user
         config.password = outbound.getPassword()
 
         return config
@@ -120,7 +120,7 @@ object MigrateManager {
         config.remarks = configOld.remarks
         config.server = outbound.getServerAddress()
         config.serverPort = outbound.getServerPort().toString()
-        config.username = outbound.settings?.servers?.get(0)?.users?.get(0)?.user
+        config.username = outbound.settings?.servers?.first()?.users?.first()?.user
         config.password = outbound.getPassword()
 
         return config

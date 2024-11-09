@@ -24,7 +24,7 @@ import libv2ray.Libv2ray
 import java.util.concurrent.Executors
 
 class V2RayTestService : Service() {
-    private val realTestScope by lazy { CoroutineScope(Executors.newFixedThreadPool(10).asCoroutineDispatcher()) }
+    private val realTestScope by lazy { CoroutineScope(Executors.newFixedThreadPool(2).asCoroutineDispatcher()) }
 
     override fun onCreate() {
         super.onCreate()
