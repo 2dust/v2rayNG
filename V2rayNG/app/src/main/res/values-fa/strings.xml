@@ -277,11 +277,11 @@
 
     <string name="import_subscription_success">اشتراک با موفقیت ذخیره شد</string>
     <string name="import_subscription_failure">ذخیره اشتراک ناموفق بود</string>
-    <string name="title_fragment_settings">تنظیمات Fragment</string>
-    <string name="title_pref_fragment_packets">Fragment Packets</string>
-    <string name="title_pref_fragment_length">Fragment Length (min-max)</string>
-    <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
-    <string name="title_pref_fragment_enabled">فعال کردن Fragment</string>
+    <string name="title_fragment_settings">تنظیمات فرگمنت</string>
+    <string name="title_pref_fragment_packets">بسته های فرگمنت</string>
+    <string name="title_pref_fragment_length">طول بسته های فرگمنت (حداقل-حداکثر)</string>
+    <string name="title_pref_fragment_interval">فاصله بین بسته های فرگمنت (حداقل-حداکثر)</string>
+    <string name="title_pref_fragment_enabled">فعال کردن فرگمنت</string>
     <string-array name="share_method">
         <item>QRcode</item>
         <item>خروجی گرفتن در کلیپ‌ بورد</item>
