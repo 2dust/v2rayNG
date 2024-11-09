@@ -94,7 +94,7 @@ object ShadowsocksFmt : FmtBase() {
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
         val outboundBean = OutboundBean.create(EConfigType.SHADOWSOCKS)
 
-        outboundBean?.settings?.servers?.get(0)?.let { server ->
+        outboundBean?.settings?.servers?.first()?.let { server ->
             server.address = profileItem.server.orEmpty()
             server.port = profileItem.serverPort.orEmpty().toInt()
             server.password = profileItem.password

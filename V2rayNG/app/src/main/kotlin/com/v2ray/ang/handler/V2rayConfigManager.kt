@@ -419,7 +419,7 @@ object V2rayConfigManager {
             ) {
                 muxEnabled = false
             } else if (protocol.equals(EConfigType.VLESS.name, true)
-                && outbound.settings?.vnext?.get(0)?.users?.get(0)?.flow?.isNotEmpty() == true
+                && outbound.settings?.vnext?.first()?.users?.first()?.flow?.isNotEmpty() == true
             ) {
                 muxEnabled = false
             }

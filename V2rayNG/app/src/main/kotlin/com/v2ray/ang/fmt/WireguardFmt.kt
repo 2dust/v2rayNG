@@ -82,8 +82,8 @@ object WireguardFmt : FmtBase() {
         outboundBean?.settings?.let { wireguard ->
             wireguard.secretKey = profileItem.secretKey
             wireguard.address = (profileItem.localAddress ?: WIREGUARD_LOCAL_ADDRESS_V4).split(",")
-            wireguard.peers?.get(0)?.publicKey = profileItem.publicKey.orEmpty()
-            wireguard.peers?.get(0)?.endpoint = Utils.getIpv6Address(profileItem.server) + ":${profileItem.serverPort}"
+            wireguard.peers?.first()?.publicKey = profileItem.publicKey.orEmpty()
+            wireguard.peers?.first()?.endpoint = Utils.getIpv6Address(profileItem.server) + ":${profileItem.serverPort}"
             wireguard.mtu = profileItem.mtu?.toInt()
             wireguard.reserved = profileItem.reserved?.split(",")?.map { it.toInt() }
         }

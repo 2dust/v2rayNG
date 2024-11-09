@@ -10,7 +10,7 @@ object HttpFmt : FmtBase() {
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
         val outboundBean = OutboundBean.create(EConfigType.HTTP)
 
-        outboundBean?.settings?.servers?.get(0)?.let { server ->
+        outboundBean?.settings?.servers?.first()?.let { server ->
             server.address = profileItem.server.orEmpty()
             server.port = profileItem.serverPort.orEmpty().toInt()
             if (profileItem.username.isNotNullEmpty()) {
