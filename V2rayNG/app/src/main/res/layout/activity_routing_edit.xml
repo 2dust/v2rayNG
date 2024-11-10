@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
     tools:context=".ui.SubSettingActivity">
 
@@ -45,7 +46,8 @@
                     android:id="@+id/chk_locked"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/routing_settings_locked" />
+                    android:text="@string/routing_settings_locked"
+                    app:theme="@style/BrandedSwitch" />
             </LinearLayout>
 
             <LinearLayout

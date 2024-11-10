@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
     tools:context=".ui.SubSettingActivity">
 
@@ -109,7 +110,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/padding_start"
-                    android:paddingEnd="@dimen/padding_end" />
+                    android:paddingEnd="@dimen/padding_end"
+                    app:theme="@style/BrandedSwitch" />
 
             </LinearLayout>
 
@@ -131,7 +133,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/padding_start"
-                    android:paddingEnd="@dimen/padding_end" />
+                    android:paddingEnd="@dimen/padding_end"
+                    app:theme="@style/BrandedSwitch" />
 
             </LinearLayout>
 
