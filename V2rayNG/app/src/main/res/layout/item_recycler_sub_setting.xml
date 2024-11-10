@@ -19,9 +19,9 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/sub_height"
             android:layout_gravity="center"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground"
             android:gravity="center"
             android:nextFocusRight="@+id/layout_edit"
             android:orientation="horizontal">
@@ -55,9 +55,10 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/chk_enable"
-                        android:text="@string/sub_setting_enable"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:text="@string/sub_setting_enable"
+                        app:theme="@style/BrandedSwitch" />
                 </LinearLayout>
 
             </LinearLayout>

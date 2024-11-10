@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
@@ -18,9 +19,9 @@
                 android:id="@+id/layout_backup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="@dimen/padding">
@@ -58,9 +59,9 @@
                 android:id="@+id/layout_share"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/server_height"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="@dimen/padding">
@@ -82,9 +83,9 @@
                 android:id="@+id/layout_restore"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/server_height"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="@dimen/padding">
@@ -114,9 +115,9 @@
                 android:id="@+id/layout_soure_ccode"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/server_height"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="@dimen/padding">
@@ -138,9 +139,9 @@
                 android:id="@+id/layout_feedback"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/server_height"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="@dimen/padding">
@@ -163,9 +164,9 @@
                 android:id="@+id/layout_tg_channel"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/server_height"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="@dimen/padding">
@@ -187,9 +188,9 @@
                 android:id="@+id/layout_privacy_policy"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/server_height"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackground"
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:padding="@dimen/padding">

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".ui.ServerCustomConfigActivity">
 
     <LinearLayout
@@ -13,8 +14,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_margin="@dimen/layout_margin_spacing">
+            android:layout_margin="@dimen/layout_margin_spacing"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -27,8 +28,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_margin="@dimen/layout_margin_spacing">
+            android:layout_margin="@dimen/layout_margin_spacing"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -69,11 +70,11 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
             <com.blacksquircle.ui.editorkit.widget.TextProcessor
+                android:id="@+id/editor"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="top|start"
-                android:id="@+id/editor"
-                android:layout_marginTop="@dimen/layout_margin_top_height" />
+                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:gravity="top|start" />
         </LinearLayout>
 
     </LinearLayout>

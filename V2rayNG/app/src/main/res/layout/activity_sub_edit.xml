@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true"
     tools:context=".ui.SubSettingActivity">
 
     <LinearLayout
@@ -108,7 +110,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/padding_start"
-                    android:paddingEnd="@dimen/padding_end" />
+                    android:paddingEnd="@dimen/padding_end"
+                    app:theme="@style/BrandedSwitch" />
 
             </LinearLayout>
 
@@ -130,7 +133,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/padding_start"
-                    android:paddingEnd="@dimen/padding_end" />
+                    android:paddingEnd="@dimen/padding_end"
+                    app:theme="@style/BrandedSwitch" />
 
             </LinearLayout>
 
@@ -149,8 +153,8 @@
                     android:id="@+id/et_pre_profile"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/edit_height"
-                    android:inputType="text"
-                    android:hint="@string/sub_setting_pre_profile_tip" />
+                    android:hint="@string/sub_setting_pre_profile_tip"
+                    android:inputType="text" />
 
             </LinearLayout>
 
@@ -169,8 +173,8 @@
                     android:id="@+id/et_next_profile"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/edit_height"
-                    android:inputType="text"
-                    android:hint="@string/sub_setting_pre_profile_tip" />
+                    android:hint="@string/sub_setting_pre_profile_tip"
+                    android:inputType="text" />
 
             </LinearLayout>
         </LinearLayout>
@@ -178,8 +182,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/layout_margin_top_height"
             android:layout_marginTop="@dimen/layout_margin_top_height"
+            android:layout_marginBottom="@dimen/layout_margin_top_height"
             android:orientation="vertical" />
 
     </LinearLayout>

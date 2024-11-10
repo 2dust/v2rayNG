@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
     android:padding="@dimen/padding"
     tools:context=".ui.TaskerActivity">
@@ -22,11 +23,11 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/switch_start_service"
             android:layout_toStartOf="@id/switch_start_service"
+            android:layout_toLeftOf="@id/switch_start_service"
             android:text="@string/tasker_start_service"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
