@@ -518,9 +518,9 @@ object V2rayConfigManager {
                 ),
                 noises = listOf(
                     V2rayConfig.OutboundBean.OutSettingsBean.NoiseBean(
-                        type = "rand",
-                        packet = "10-20",
-                        delay = "10-16",
+                        type:"base64",
+                        packet:"7nQBAAABAAAAAAAABnQtcmluZwZtc2VkZ2UDbmV0AAABAAE=",
+                        delay:"10-16"
                     )
                 ),
             )
