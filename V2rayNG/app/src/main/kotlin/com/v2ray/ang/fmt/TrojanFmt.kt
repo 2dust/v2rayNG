@@ -34,8 +34,6 @@ object TrojanFmt : FmtBase() {
             config.path = queryParam["path"]
 
             config.seed = queryParam["seed"]
-            config.quicSecurity = queryParam["quicSecurity"]
-            config.quicKey = queryParam["key"]
             config.mode = queryParam["mode"]
             config.serviceName = queryParam["serviceName"]
             config.authority = queryParam["authority"]
@@ -79,9 +77,7 @@ object TrojanFmt : FmtBase() {
             profileItem.headerType,
             profileItem.host,
             profileItem.path,
-            profileItem.seed,
-            profileItem.quicSecurity,
-            profileItem.quicKey,
+            ProfileItem seed,
             profileItem.mode,
             profileItem.serviceName,
             profileItem.authority,
