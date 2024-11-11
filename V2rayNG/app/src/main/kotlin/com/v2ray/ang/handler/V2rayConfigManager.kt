@@ -520,7 +520,7 @@ object V2rayConfigManager {
                     V2rayConfig.OutboundBean.OutSettingsBean.NoiseBean(
                         type = "base64",
                         packet = "7nQBAAABAAAAAAAABnQtcmluZwZtc2VkZ2UDbmV0AAABAAE=",
-                        delay: = 10-16"
+                        delay = "10-16"
                     )
                 ),
             )
