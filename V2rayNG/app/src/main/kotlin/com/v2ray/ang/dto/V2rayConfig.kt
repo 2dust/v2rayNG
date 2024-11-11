@@ -403,9 +403,7 @@ data class V2rayConfig(
                         h2Setting.host = host.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
                         sni = h2Setting.host.getOrNull(0) ?: sni
                         h2Setting.path = path ?: "/"
-                        httpSettings = h2Setting
-                    quicSettings = quicsetting
-                        
+                        httpSettings = h2Setting   
                     }
 
                     "grpc" -> {
