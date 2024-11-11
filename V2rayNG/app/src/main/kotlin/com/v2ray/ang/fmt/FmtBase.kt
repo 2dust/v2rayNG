@@ -63,13 +63,7 @@ open class FmtBase {
             NetworkType.HTTP, NetworkType.H2 -> {
                 dicQuery["type"] = "http"
                 config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
-                config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
-            }
-
-            NetworkType.QUIC -> {
-                dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
-                config.quicSecurity.let { if (it.isNotNullEmpty()) dicQuery["quicSecurity"] = it.orEmpty() }
-                config.quicKey.let { if (it.isNotNullEmpty()) dicQuery["key"] = it.orEmpty() }
+                config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() } 
             }
 
             NetworkType.GRPC -> {
