@@ -209,7 +209,6 @@ data class V2rayConfig(
             var splithttpSettings: SplithttpSettingsBean? = null,
             var httpSettings: HttpSettingsBean? = null,
             var tlsSettings: TlsSettingsBean? = null,
-            var quicSettings: QuicSettingBean? = null,
             var realitySettings: TlsSettingsBean? = null,
             var grpcSettings: GrpcSettingsBean? = null,
             var hy2steriaSettings: Hy2steriaSettingsBean? = null,
@@ -313,12 +312,6 @@ data class V2rayConfig(
                 var publicKey: String? = null,
                 var shortId: String? = null,
                 var spiderX: String? = null
-            )
-
-            data class QuicSettingBean(
-                var security: String = "none",
-                var key: String = "",
-                var header: HeaderBean = HeaderBean()
             ) {
                 data class HeaderBean(var type: String = "none")
             }
@@ -345,7 +338,7 @@ data class V2rayConfig(
 
             fun populateTransportSettings(
                 transport: String, headerType: String?, host: String?, path: String?, seed: String?,
-                quicSecurity: String?, key: String?, mode: String?, serviceName: String?,
+                key: String?, mode: String?, serviceName: String?,
                 authority: String?
             ): String? {
                 var sni: String? = null
@@ -411,14 +404,8 @@ data class V2rayConfig(
                         sni = h2Setting.host.getOrNull(0) ?: sni
                         h2Setting.path = path ?: "/"
                         httpSettings = h2Setting
-                    }
-
-                    "quic" -> {
-                        val quicsetting = QuicSettingBean()
-                        quicsetting.security = quicSecurity ?: "none"
-                        quicsetting.key = key.orEmpty()
-                        quicsetting.header.type = headerType ?: "none"
-                        quicSettings = quicsetting
+                    quicSettings = quicsetting
+                        
                     }
 
                     "grpc" -> {
@@ -596,15 +583,6 @@ data class V2rayConfig(
                             "",
                             h2Setting.host.joinToString(","),
                             h2Setting.path
-                        )
-                    }
-
-                    "quic" -> {
-                        val quicSetting = streamSettings?.quicSettings ?: return null
-                        listOf(
-                            quicSetting.header.type,
-                            quicSetting.security,
-                            quicSetting.key
                         )
                     }
 
