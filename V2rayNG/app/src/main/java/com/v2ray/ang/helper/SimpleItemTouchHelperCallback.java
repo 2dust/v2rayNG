@@ -27,13 +27,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * An implementation of {@link ItemTouchHelper.Callback} that enables basic drag & drop and
- * swipe-to-dismiss. Drag events are automatically started by an item long-press.<br/>
- * </br/>
- * Expects the <code>RecyclerView.Adapter</code> to listen for {@link
- * ItemTouchHelperAdapter} callbacks and the <code>RecyclerView.ViewHolder</code> to implement
- * {@link ItemTouchHelperViewHolder}.
+ * swipe-to-dismiss functionality. Drag events are automatically started by an item long-press.
  *
- * @author Paul Burke (ipaulpro)
+ * This class expects the <code>RecyclerView.Adapter</code> to listen for {@link ItemTouchHelperAdapter}
+ * callbacks and the <code>RecyclerView.ViewHolder</code> to implement {@link ItemTouchHelperViewHolder}.
  */
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
@@ -60,21 +57,20 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+        int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+
         if (recyclerView.getLayoutManager() instanceof GridLayoutManager) {
-            final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
-            final int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
-            return makeMovementFlags(dragFlags, swipeFlags);
-        } else {
-            final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-            final int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
-            return makeMovementFlags(dragFlags, swipeFlags);
+            dragFlags |= ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT; // Allow horizontal dragging in GridLayoutManager
         }
+        
+        return makeMovementFlags(dragFlags, swipeFlags);
     }
 
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder source, @NonNull RecyclerView.ViewHolder target) {
         if (source.getItemViewType() != target.getItemViewType()) {
-            return false;
+            return false; // Prevent moving items of different types
         }
         mAdapter.onItemMove(source.getBindingAdapterPosition(), target.getBindingAdapterPosition());
         return true;
@@ -82,7 +78,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-        // 不执行删除操作，仅返回项目到原位
+        // Do not perform delete operation; just return item to original position
         returnViewToOriginalPosition(viewHolder);
     }
 
@@ -91,22 +87,26 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
                             @NonNull RecyclerView.ViewHolder viewHolder,
                             float dX, float dY, int actionState, boolean isCurrentlyActive) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-            float maxSwipeDistance = viewHolder.itemView.getWidth() * SWIPE_THRESHOLD;
-            float swipeAmount = Math.abs(dX);
-            float direction = Math.signum(dX);
-
-            // 限制最大滑动距离
-            float translationX = Math.min(swipeAmount, maxSwipeDistance) * direction;
-            float alpha = ALPHA_FULL - Math.min(swipeAmount, maxSwipeDistance) / maxSwipeDistance;
-
-            viewHolder.itemView.setTranslationX(translationX);
-            viewHolder.itemView.setAlpha(alpha);
-
-            if (swipeAmount >= maxSwipeDistance && isCurrentlyActive) {
-                returnViewToOriginalPosition(viewHolder);
-            }
+            handleSwipe(c, viewHolder, dX);
         } else {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        }
+    }
+
+    private void handleSwipe(@NonNull Canvas c, @NonNull RecyclerView.ViewHolder viewHolder, float dX) {
+        float maxSwipeDistance = viewHolder.itemView.getWidth() * SWIPE_THRESHOLD;
+        float swipeAmount = Math.abs(dX);
+        float direction = Math.signum(dX);
+
+        // Limit maximum swipe distance
+        float translationX = Math.min(swipeAmount, maxSwipeDistance) * direction;
+        float alpha = ALPHA_FULL - Math.min(swipeAmount, maxSwipeDistance) / maxSwipeDistance;
+
+        viewHolder.itemView.setTranslationX(translationX);
+        viewHolder.itemView.setAlpha(alpha);
+
+        if (swipeAmount >= maxSwipeDistance && isCurrentlyActive) {
+            returnViewToOriginalPosition(viewHolder);
         }
     }
 
@@ -121,6 +121,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
             viewHolder.itemView.setTranslationX(value);
             viewHolder.itemView.setAlpha(1f - Math.abs(value) / (viewHolder.itemView.getWidth() * SWIPE_THRESHOLD));
         });
+        
         mReturnAnimator.setInterpolator(new DecelerateInterpolator());
         mReturnAnimator.setDuration(ANIMATION_DURATION);
         mReturnAnimator.start();
@@ -128,33 +129,33 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
-            if (viewHolder instanceof ItemTouchHelperViewHolder) {
-                ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
-                itemViewHolder.onItemSelected();
-            }
+        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE && viewHolder instanceof ItemTouchHelperViewHolder) {
+            ((ItemTouchHelperViewHolder) viewHolder).onItemSelected();
         }
+        
         super.onSelectedChanged(viewHolder, actionState);
     }
 
     @Override
     public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
+        
         viewHolder.itemView.setAlpha(ALPHA_FULL);
+        
         if (viewHolder instanceof ItemTouchHelperViewHolder) {
-            ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
-            itemViewHolder.onItemClear();
+            ((ItemTouchHelperViewHolder) viewHolder).onItemClear();
         }
+        
         mAdapter.onItemMoveCompleted();
     }
 
     @Override
     public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
-        return 1.1f; // 设置一个大于1的值，确保不会触发默认的滑动删除操作
+        return 1.1f; // Set a value greater than 1 to ensure default swipe delete does not trigger
     }
 
     @Override
     public float getSwipeEscapeVelocity(float defaultValue) {
-        return defaultValue * 10; // 增加滑动逃逸速度，使得更难触发滑动
+        return defaultValue * 10; // Increase escape velocity to make swiping harder to trigger delete
     }
 }
