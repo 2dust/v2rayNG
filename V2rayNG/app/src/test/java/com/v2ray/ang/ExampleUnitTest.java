@@ -1,15 +1,37 @@
 package com.v2ray.ang;
 
 import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 
 /**
- * To work on unit tests, switch the Test Artifact in the Build Variants view.
+ * Unit test class for testing basic arithmetic operations.
  */
 public class ExampleUnitTest {
+
+    /**
+     * Tests that the addition of two numbers is correct.
+     */
     @Test
-    public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
+    public void testAddition() {
+        // Given two numbers
+        int number1 = 2;
+        int number2 = 2;
+
+        // When adding the two numbers
+        int result = add(number1, number2);
+
+        // Then the result should equal 4
+        assertEquals(4, result);
+    }
+
+    /**
+     * Adds two integers and returns the sum.
+     *
+     * @param a First integer
+     * @param b Second integer
+     * @return The sum of a and b
+     */
+    private int add(int a, int b) {
+        return a + b;
     }
 }
