@@ -63,7 +63,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
         if (recyclerView.getLayoutManager() instanceof GridLayoutManager) {
             dragFlags |= ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT; // Allow horizontal dragging in GridLayoutManager
         }
-        
+
         return makeMovementFlags(dragFlags, swipeFlags);
     }
 
