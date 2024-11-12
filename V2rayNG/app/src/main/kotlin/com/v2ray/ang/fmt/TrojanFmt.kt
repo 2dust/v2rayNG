@@ -22,9 +22,9 @@ object TrojanFmt : FmtBase() {
         config.password = uri.userInfo
 
         if (uri.rawQuery.isNullOrEmpty()) {
+            config.network = "tcp"
             config.security = AppConfig.TLS
             config.insecure = allowInsecure
-
         } else {
             val queryParam = getQueryParam(uri)
 
@@ -40,7 +40,7 @@ object TrojanFmt : FmtBase() {
             config.serviceName = queryParam["serviceName"]
             config.authority = queryParam["authority"]
 
-            config.security = queryParam["security"]
+            config.security = queryParam["security"] ?: AppConfig.TLS
             config.insecure = if (queryParam["allowInsecure"].isNullOrEmpty()) {
                 allowInsecure
             } else {
