@@ -19,8 +19,8 @@ package com.v2ray.ang.helper;
 import androidx.recyclerview.widget.ItemTouchHelper;
 
 /**
- * Interface to notify an item ViewHolder of relevant callbacks from {@link
- * ItemTouchHelper.Callback}.
+ * Interface to notify a ViewHolder of relevant callbacks from {@link ItemTouchHelper.Callback}.
+ * This interface should be implemented by any class that wants to handle item touch events.
  *
  * @author Paul Burke (ipaulpro)
  */
@@ -28,14 +28,13 @@ public interface ItemTouchHelperViewHolder {
 
     /**
      * Called when the {@link ItemTouchHelper} first registers an item as being moved or swiped.
-     * Implementations should update the item view to indicate it's active state.
+     * Implementations should update the item view to indicate its active state.
      */
     void onItemSelected();
 
-
     /**
-     * Called when the {@link ItemTouchHelper} has completed the move or swipe, and the active item
-     * state should be cleared.
+     * Called when the {@link ItemTouchHelper} has completed the move or swipe,
+     * and the active item state should be cleared.
      */
     void onItemClear();
 }
