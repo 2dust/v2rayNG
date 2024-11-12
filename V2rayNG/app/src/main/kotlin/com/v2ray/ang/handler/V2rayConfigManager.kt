@@ -61,7 +61,7 @@ object V2rayConfigManager {
             }
 
             val result = getV2rayNonCustomConfig(context, config)
-            Log.d(ANG_PACKAGE, result.content)
+            //Log.d(ANG_PACKAGE, result.content)
             result.guid = guid
             return result
         } catch (e: Exception) {
