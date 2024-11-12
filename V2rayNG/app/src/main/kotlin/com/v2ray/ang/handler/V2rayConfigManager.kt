@@ -8,12 +8,16 @@ import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.DEFAULT_NETWORK
 import com.v2ray.ang.AppConfig.DNS_ALIDNS_ADDRESSES
 import com.v2ray.ang.AppConfig.DNS_ALIDNS_DOMAIN
+import com.v2ray.ang.AppConfig.DNS_CLOUDFLARE_ADDRESSES
+import com.v2ray.ang.AppConfig.DNS_CLOUDFLARE_DOMAIN
+import com.v2ray.ang.AppConfig.DNS_DNSPOD_ADDRESSES
+import com.v2ray.ang.AppConfig.DNS_DNSPOD_DOMAIN
 import com.v2ray.ang.AppConfig.DNS_GOOGLE_ADDRESSES
 import com.v2ray.ang.AppConfig.DNS_GOOGLE_DOMAIN
-import com.v2ray.ang.AppConfig.DNS_ONE_ONE_ADDRESSES
-import com.v2ray.ang.AppConfig.DNS_ONE_ONE_DOMAIN
-import com.v2ray.ang.AppConfig.DNS_PUB_ADDRESSES
-import com.v2ray.ang.AppConfig.DNS_PUB_DOMAIN
+import com.v2ray.ang.AppConfig.DNS_QUAD9_ADDRESSES
+import com.v2ray.ang.AppConfig.DNS_QUAD9_DOMAIN
+import com.v2ray.ang.AppConfig.DNS_YANDEX_ADDRESSES
+import com.v2ray.ang.AppConfig.DNS_YANDEX_DOMAIN
 import com.v2ray.ang.AppConfig.GEOIP_CN
 import com.v2ray.ang.AppConfig.GEOSITE_CN
 import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
@@ -376,10 +380,12 @@ object V2rayConfigManager {
             hosts[GOOGLEAPIS_CN_DOMAIN] = GOOGLEAPIS_COM_DOMAIN
 
             // hardcode popular Android Private DNS rule to fix localhost DNS problem
-            hosts[DNS_PUB_DOMAIN] = DNS_PUB_ADDRESSES
             hosts[DNS_ALIDNS_DOMAIN] = DNS_ALIDNS_ADDRESSES
-            hosts[DNS_ONE_ONE_DOMAIN] = DNS_ONE_ONE_ADDRESSES
+            hosts[DNS_CLOUDFLARE_DOMAIN] = DNS_CLOUDFLARE_ADDRESSES
+            hosts[DNS_DNSPOD_DOMAIN] = DNS_DNSPOD_ADDRESSES
             hosts[DNS_GOOGLE_DOMAIN] = DNS_GOOGLE_ADDRESSES
+            hosts[DNS_QUAD9_DOMAIN] = DNS_QUAD9_ADDRESSES
+            hosts[DNS_YANDEX_DOMAIN] = DNS_YANDEX_ADDRESSES
 
 
             // DNS dns对象
