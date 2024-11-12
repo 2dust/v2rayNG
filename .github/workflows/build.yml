@@ -28,6 +28,16 @@ jobs:
         go-version: '1.23.3'
         cache: false
 
+    - name: Cache Go modules
+      uses: actions/cache@v4.1.2
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/*.go') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
     - name: Patch Go with Revision 600296
       run: |
         cd "$(go env GOROOT)"
