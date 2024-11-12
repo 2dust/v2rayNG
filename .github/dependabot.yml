@@ -1,8 +1,4 @@
 version: 2
-registries:
-  google:
-    type: maven-repository
-    url: https://dl.google.com/dl/android/maven2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -18,5 +14,3 @@ updates:
       - "2dust"
     open-pull-requests-limit: 25
     rebase-strategy: "disabled"
-    registries:
-      - google
