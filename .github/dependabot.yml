@@ -9,7 +9,7 @@ updates:
     schedule:
       interval: "daily"
     assignees:
-      - "hfhbd
+      - "hfhbd"
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
