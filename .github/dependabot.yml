@@ -9,13 +9,13 @@ updates:
     schedule:
       interval: "daily"
     assignees:
-      - "hfhbd"
+      - "2dust"
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
       interval: "daily"
     assignees:
-      - "hfhbd"
+      - "2dust"
     open-pull-requests-limit: 25
     rebase-strategy: "disabled"
     registries:
