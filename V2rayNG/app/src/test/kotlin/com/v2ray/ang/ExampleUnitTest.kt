@@ -7,12 +7,13 @@ import org.junit.Test
 class UtilTest {
 
     @Test
-    fun test_parseInt() {
-        assertEquals(Utils.parseInt("1234"), 1234)
+    fun testParseInt() {
+        assertEquals(1234, Utils.parseInt("1234"))
     }
 
     @Test
-    fun test_isIpAddress() {
+    fun testIsIpAddress() {
+        // Invalid IP addresses
         assertFalse(Utils.isIpAddress("114.113.112.266"))
         assertFalse(Utils.isIpAddress("666.666.666.666"))
         assertFalse(Utils.isIpAddress("256.0.0.0"))
@@ -20,6 +21,7 @@ class UtilTest {
         assertFalse(Utils.isIpAddress("baidu.com"))
         assertFalse(Utils.isIpAddress(""))
 
+        // Valid IP addresses
         assertTrue(Utils.isIpAddress("127.0.0.1"))
         assertTrue(Utils.isIpAddress("127.0.0.1:80"))
         assertTrue(Utils.isIpAddress("0.0.0.0/0"))
@@ -38,101 +40,110 @@ class UtilTest {
         assertTrue(Utils.isIpAddress("240e:1234:abcd:12::/64"))
     }
 
-//    @Test
-//    fun test_fmtHysteria2Parse() {
-//        val url2 = "hysteria2://password2@127.0.0.1:443?obfs=salamander&obfs-password=obfs2&insecure=0#Hy22"
-//        var result2 = Hysteria2Fmt.parse(url2)
-//        assertTrue(result2 != null)
-//        assertTrue(result2?.server == "127.0.0.1")
-//        assertTrue(result2?.obfsPassword == "obfs2")
-//        assertTrue(result2?.security == "tls")
-//
-//        var url22 = Hysteria2Fmt.toUri(result2!!)
-//        assertTrue(url22.contains("obfs2"))
-//    }
-//
-//    @Test
-//    fun test_fmtSsParse() {
-//        val url2 = "ss://aa:bb@127.0.0.1:10000#sss"
-//        var result2 = ShadowsocksFmt.parse(url2)
-//        assertTrue(result2 != null)
-//        assertTrue(result2?.server == "127.0.0.1")
-//
-//        var result = ShadowsocksFmt.parse("ss://YWVzLTI1Ni1nY206cGFzc3dvcmQy@127.0.0.1:10000#sss")
-//        assertTrue(result != null)
-//        assertTrue(result?.server == "127.0.0.1")
-//    }
-//
-//    @Test
-//    fun test_fmtSocksParse() {
-//        val url2 = "socks://Og%3D%3D@127.0.0.1:1000#socks2"
-//        var result2 = SocksFmt.parse(url2)
-//        assertTrue(result2 != null)
-//        assertTrue(result2?.server == "127.0.0.1")
-//        var url22 = SocksFmt.toUri(result2!!)
-//        assertTrue(url2.contains(url22))
-//
-//        var result = SocksFmt.parse("socks://dXNlcjpwYXNz@127.0.0.1:1000#socks2")
-//        assertTrue(result != null)
-//        assertTrue(result?.server == "127.0.0.1")
-//    }
-//
-//    @Test
-//    fun test_fmtTrojanParse() {
-//        val url2 = "trojan://password2@127.0.0.1:443?flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#Trojan"
-//        var result2 = TrojanFmt.parse(url2)
-//        assertTrue(result2 != null)
-//        assertTrue(result2?.server == "127.0.0.1")
-//        assertTrue(result2?.flow == "xtls-rprx-vision")
-//
-//        val url = "trojan://password2@127.0.0.1:443#Trojan"
-//        var result = TrojanFmt.parse(url)
-//        assertTrue(result != null)
-//        assertTrue(result?.server == "127.0.0.1")
-//        assertTrue(result?.security == "tls")
-//
-//
-//    }
-//
-//    @Test
-//    fun test_fmtVlessParse() {
-//        val url2 =
-//            "vless://cae1dc39-0547-4b1d-9e7a-01132c7ae3a7@127.0.0.1:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=sni2&fp=chrome&pbk=publickkey&sid=123456&spx=%2F&type=ws&host=host2&path=path2#VLESS"
-//        var result2 = VlessFmt.parse(url2)
-//        assertTrue(result2 != null)
-//        assertTrue(result2?.server == "127.0.0.1")
-//        assertTrue(result2?.flow == "xtls-rprx-vision")
-//
-//
-//        var url22 = VlessFmt.toUri(result2!!)
-//        assertTrue(url22.contains("xtls-rprx-vision"))
-//
-//    }
-//
-//    @Test
-//    fun test_fmtVmessParse() {
-//        val url2 =
-//            "vmess://ew0KICAidiI6ICIyIiwNCiAgInBzIjogIlZtZXNzIiwNCiAgImFkZCI6ICIxMjcuMC4wLjEiLA0KICAicG9ydCI6ICIxMDAwMCIsDQogICJpZCI6ICJlYmI5MWM5OS1lZjA3LTRmZjUtOThhYS01OTAyYWI0ZDAyODYiLA0KICAiYWlkIjogIjEyMyIsDQogICJzY3kiOiAiYWVzLTEyOC1nY20iLA0KICAibmV0IjogInRjcCIsDQogICJ0eXBlIjogIm5vbmUiLA0KICAiaG9zdCI6ICJob3N0MiIsDQogICJwYXRoIjogInBhdGgyIiwNCiAgInRscyI6ICIiLA0KICAic25pIjogIiIsDQogICJhbHBuIjogIiINCn0="
-//        var result2 = VmessFmt.parse(url2)
-//        assertTrue(result2 != null)
-//        assertTrue(result2?.server == "127.0.0.1")
-//        assertTrue(result2?.method == "aes-128-gcm")
-//
-//    }
-//
-//
-//    @Test
-//    fun test_fmtWireguardParse() {
-//        val url2 = "wireguard://privatekey2@127.0.0.1:2000?publickey=publickey2&reserved=2%2C2%2C3&address=127.0.0.127&mtu=1250#WGG"
-//        var result2 = WireguardFmt.parse(url2)
-//        assertTrue(result2 != null)
-//        assertTrue(result2?.server == "127.0.0.1")
-//        assertTrue(result2?.publicKey == "publickey2")
-//        assertTrue(result2?.localAddress == "127.0.0.127")
-//
-//
-//        var url22 = WireguardFmt.toUri(result2!!)
-//        assertTrue(url22.contains("publickey2"))
-//    }
-}
+    // Uncomment and implement the following tests as needed
 
+    /*
+    @Test
+    fun testFmtHysteria2Parse() {
+        val url = "hysteria2://password2@127.0.0.1:443?obfs=salamander&obfs-password=obfs2&insecure=0#Hy22"
+        val result = Hysteria2Fmt.parse(url)
+        
+        assertTrue(result != null)
+        assertEquals("127.0.0.1", result?.server)
+        assertEquals("obfs2", result?.obfsPassword)
+        assertEquals("tls", result?.security)
+
+        val urlConverted = Hysteria2Fmt.toUri(result!!)
+        assertTrue(urlConverted.contains("obfs2"))
+    }
+
+    @Test
+    fun testFmtSsParse() {
+        val url = "ss://aa:bb@127.0.0.1:10000#sss"
+        val result = ShadowsocksFmt.parse(url)
+        
+        assertTrue(result != null)
+        assertEquals("127.0.0.1", result?.server)
+
+        val resultWithEncoded = ShadowsocksFmt.parse("ss://YWVzLTI1Ni1nY206cGFzc3dvcmQy@127.0.0.1:10000#sss")
+        
+        assertTrue(resultWithEncoded != null)
+        assertEquals("127.0.0.1", resultWithEncoded?.server)
+    }
+
+    @Test
+    fun testFmtSocksParse() {
+        val url = "socks://Og%3D%3D@127.0.0.1:1000#socks2"
+        val result = SocksFmt.parse(url)
+        
+        assertTrue(result != null)
+        assertEquals("127.0.0.1", result?.server)
+
+        val urlConverted = SocksFmt.toUri(result!!)
+        assertTrue(url.contains(urlConverted))
+
+        val resultWithEncoded = SocksFmt.parse("socks://dXNlcjpwYXNz@127.0.0.1:1000#socks2")
+        
+        assertTrue(resultWithEncoded != null)
+        assertEquals("127.0.0.1", resultWithEncoded?.server)
+    }
+
+    @Test
+    fun testFmtTrojanParse() {
+        val url = "trojan://password2@127.0.0.1:443?flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#Trojan"
+        val result = TrojanFmt.parse(url)
+        
+        assertTrue(result != null)
+        assertEquals("127.0.0.1", result?.server)
+        assertEquals("xtls-rprx-vision", result?.flow)
+
+        val simpleUrl = "trojan://password2@127.0.0.1:443#Trojan"
+        val simpleResult = TrojanFmt.parse(simpleUrl)
+        
+        assertTrue(simpleResult != null)
+        assertEquals("127.0.0.1", simpleResult?.server)
+        assertEquals("tls", simpleResult?.security)
+    }
+
+    @Test
+    fun testFmtVlessParse() {
+        val url = "vless://cae1dc39-0547-4b1d-9e7a-01132c7ae3a7@127.0.0.1:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=sni2&fp=chrome&pbk=publickkey&sid=123456&spx=%2F&type=ws&host=host2&path=path2#VLESS"
+        
+        val result = VlessFmt.parse(url)
+        
+        assertTrue(result != null)
+        assertEquals("127.0.0.1", result?.server)
+        assertEquals("xtls-rprx-vision", result?.flow)
+
+        val urlConverted = VlessFmt.toUri(result!!)
+        
+        assertTrue(urlConverted.contains("xtls-rprx-vision"))
+    }
+
+    @Test
+    fun testFmtVmessParse() {
+         val url = "vmess://ew0KICAidiI6ICIyIiwNCiAgInBzIjogIlZtZXNzIiwNCiAgImFkZCI6ICIxMjcuMC4wLjEiLA..."
+         
+         val result = VmessFmt.parse(url)
+
+         // Validate the parsed results
+         assertTrue(result != null)
+         // Add more assertions based on expected values here.
+         // Example:
+         //assertEquals(expectedValue, result?.someField) 
+     }
+
+     @Test
+     fun testFmtWireguardParse() {
+         val url = "wireguard://privatekey2@127.0.0.1:2000?publickey=publickey2&reserved=2%2C2%2C3&address=127..."
+         
+         val result = WireguardFmt.parse(url)
+
+         // Validate the parsed results
+         assertTrue(result != null)
+         // Add more assertions based on expected values here.
+         // Example:
+         //assertEquals(expectedValue, result?.someField) 
+     }
+     */
+}
