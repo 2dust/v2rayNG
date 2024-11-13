@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+
+    env:
+      GRADLE_OPTS: -Dorg.gradle.caching=true
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4.5.0
+        with:
+          distribution: 'temurin'
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+      - name: Build with Gradle
+        run: ./gradlew detekt build
+
+      - name: Upload SARIF to Github using the upload-sarif action
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: build/reports/detekt/detekt.sarif
+      - run: ./gradlew :clients:assembleClientsDebugXCFramework
+      - name: Build iOS app
+        run: swift build
+        working-directory: iosLib
