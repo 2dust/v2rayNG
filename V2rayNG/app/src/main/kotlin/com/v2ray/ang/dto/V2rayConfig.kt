@@ -278,8 +278,10 @@ data class V2rayConfig(
             data class SplithttpSettingsBean(
                 var path: String? = null,
                 var host: String? = null,
-                val maxUploadSize: Int? = null,
-                val maxConcurrentUploads: Int? = null
+                val scMaxConcurrentPosts: Int? = null,
+                val scMaxEachPostBytes: Int? = null,
+                val scMinPostsIntervalMs: Int? = null,
+                val xPaddingBytes: Int? = null
             )
 
             data class HttpSettingsBean(
@@ -462,7 +464,7 @@ data class V2rayConfig(
         data class MuxBean(
             var enabled: Boolean,
             var concurrency: Int = 8,
-            var xudpConcurrency: Int = 8,
+            var xudpConcurrency: Int = 16,
             var xudpProxyUDP443: String = "",
         )
 
