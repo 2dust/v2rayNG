@@ -34,7 +34,7 @@ interface ItemTouchHelperAdapter {
      * adjusting the underlying data to reflect this move.
      *
      * @param fromPosition The start position of the moved item.
-     * @param toPosition   Then resolved position of the moved item.
+     * @param toPosition   The resolved position of the moved item.
      * @return True if the item was moved to the new adapter position.
      * @see RecyclerView.getAdapterPositionFor
      * @see RecyclerView.ViewHolder.getAdapterPosition
