@@ -9,8 +9,6 @@ import org.junit.Test;
 public class ExampleUnitTest {
 
     /**
-     * Test method to verify that the addition of 2 + 2 equals 4.
-     * @throws Exception if any exception occurs during the test.
      */
     @Test
     public void addition_isCorrect() throws Exception {
