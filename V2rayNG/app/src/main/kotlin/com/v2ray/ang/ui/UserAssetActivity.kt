@@ -75,6 +75,7 @@ class UserAssetActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.add_file -> showFileChooser().let { true }
         R.id.add_url -> startActivity(Intent(this, UserAssetUrlActivity::class.java)).let { true }
+        R.id.add_qrcode -> importAssetFromQRcode().let { true }
         R.id.download_file -> downloadGeoFiles().let { true }
         else -> super.onOptionsItemSelected(item)
     }
@@ -154,6 +155,40 @@ class UserAssetActivity : BaseActivity() {
     } catch (e: Exception) {
         e.printStackTrace()
         null
+    }
+
+    private fun importAssetFromQRcode(): Boolean {
+        RxPermissions(this)
+            .request(Manifest.permission.CAMERA)
+            .subscribe {
+                if (it)
+                    scanQRCodeForAssetURL.launch(Intent(this, ScannerActivity::class.java))
+                else
+                    toast(R.string.toast_permission_denied)
+            }
+        return true
+    }
+
+    private val scanQRCodeForAssetURL = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            importAsset(it.data?.getStringExtra("SCAN_RESULT"))
+        }
+    }
+
+    private fun importAsset(url: String?): Boolean {
+        try {
+            if (!Utils.isValidUrl(url)) {
+                toast(R.string.toast_invalid_url)
+                return false
+            }
+            // Send URL to UserAssetUrlActivity for Processing
+            startActivity(Intent(this, UserAssetUrlActivity::class.java)
+                .putExtra(UserAssetUrlActivity.ASSET_URL_QRCODE, url))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+        return true
     }
 
     private fun downloadGeoFiles() {

@@ -108,6 +108,7 @@
     <string name="menu_item_add_asset">إضافة أصل</string>
     <string name="menu_item_add_file">إضافة ملفات</string>
     <string name="menu_item_add_url">إضافة URL</string>
+    <string name="menu_item_scan_qrcode">مسح رمز الاستجابة السريعة (QRcode)</string>
     <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">تنزيل الملفات</string>
     <string name="title_user_asset_add_url">إضافة عنوان URL للأصل</string>
