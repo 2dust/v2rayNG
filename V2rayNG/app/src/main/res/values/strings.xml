@@ -107,6 +107,7 @@
     <string name="menu_item_add_asset">Add asset</string>
     <string name="menu_item_add_file">Add files</string>
     <string name="menu_item_add_url">Add URL</string>
+    <string name="menu_item_scan_qrcode">Scan QRcode</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">Download files</string>
     <string name="title_user_asset_add_url">Add asset URL</string>

@@ -106,6 +106,7 @@
     <string name="menu_item_add_asset">Добавить ресурс</string>
     <string name="menu_item_add_file">Добавить файлы</string>
     <string name="menu_item_add_url">Добавить URL</string>
+    <string name="menu_item_scan_qrcode">Сканирование QR-кода</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">Загрузить файлы</string>
     <string name="title_user_asset_add_url">Добавить URL ресурса</string>

@@ -104,6 +104,7 @@
     <string name="server_lab_request_host6">Host(SNI)(可選)</string>
     <string name="toast_asset_copy_failed">失敗，請使用檔案總管</string>
     <string name="menu_item_add_file">新增檔案</string>
+    <string name="menu_item_scan_qrcode">掃描 QRcode</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">下載檔案</string>
     <string name="toast_action_not_allowed">禁止此項操作</string>

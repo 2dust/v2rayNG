@@ -104,6 +104,7 @@
     <string name="server_lab_request_host6">Host(SNI)(可选)</string>
     <string name="toast_asset_copy_failed">失败, 请使用文件管理器</string>
     <string name="menu_item_add_file">添加文件</string>
+    <string name="menu_item_scan_qrcode">扫描 QRcode</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">下载文件</string>
     <string name="toast_action_not_allowed">禁止此项操作</string>
