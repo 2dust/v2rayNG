@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
  * @author Paul Burke (ipaulpro)
  */
 interface ItemTouchHelperViewHolder {
-
+    
     /**
      * Called when the [ItemTouchHelper] first registers an item as being moved or swiped.
      * Implementations should update the item view to indicate it's active state.
