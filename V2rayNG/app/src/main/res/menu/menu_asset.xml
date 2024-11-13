@@ -14,6 +14,10 @@
                 android:id="@+id/add_url"
                 android:title="@string/menu_item_add_url"
                 app:showAsAction="never" />
+            <item
+                android:id="@+id/add_qrcode"
+                android:title="@string/menu_item_scan_qrcode"
+                app:showAsAction="never" />
         </menu>
     </item>
     <item

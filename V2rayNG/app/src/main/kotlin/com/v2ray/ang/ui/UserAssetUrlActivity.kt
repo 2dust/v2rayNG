@@ -14,6 +14,11 @@ import com.v2ray.ang.util.Utils
 import java.io.File
 
 class UserAssetUrlActivity : BaseActivity() {
+    // Receive QRcode URL from UserAssetActivity
+    companion object {
+        const val ASSET_URL_QRCODE = "ASSET_URL_QRCODE"
+    }
+
     private val binding by lazy { ActivityUserAssetUrlBinding.inflate(layoutInflater) }
 
     var del_config: MenuItem? = null
@@ -28,10 +33,15 @@ class UserAssetUrlActivity : BaseActivity() {
         title = getString(R.string.title_user_asset_add_url)
 
         val assetItem = MmkvManager.decodeAsset(editAssetId)
-        if (assetItem != null) {
-            bindingAsset(assetItem)
-        } else {
-            clearAsset()
+        val assetUrlQrcode = intent.getStringExtra(ASSET_URL_QRCODE)
+        val assetNameQrcode = File(assetUrlQrcode.toString()).name
+        when {
+            assetItem != null -> bindingAsset(assetItem)
+            assetUrlQrcode != null -> {
+                binding.etRemarks.setText(assetNameQrcode)
+                binding.etUrl.setText(assetUrlQrcode)
+            }
+            else -> clearAsset()
         }
     }
 

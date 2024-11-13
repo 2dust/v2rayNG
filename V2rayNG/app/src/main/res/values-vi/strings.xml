@@ -104,6 +104,7 @@
     <string name="server_lab_request_host6">Host (SNI) (Không bắt buộc)</string>
     <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp!</string>
     <string name="menu_item_add_file">Thêm tệp</string>
+    <string name="menu_item_scan_qrcode">Quét mã QR</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">Tải xuống tệp tin</string>
     <string name="toast_action_not_allowed">Hành động này bị cấm!</string>
