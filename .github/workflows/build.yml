@@ -91,4 +91,3 @@ jobs:
           !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*arm64-v8a*.apk
           !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*armeabi-v7a*.apk
           !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*x86*.apk
-          
