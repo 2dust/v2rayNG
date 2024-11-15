@@ -1,12 +1,14 @@
-# Ignore all .dat files
+# Ignore all DAT files
 *.dat
 
-# Ignore all .jks files
+# Ignore all JKS files (Java Key Store)
 *.jks
 
-# Ignore specific output file
+# Ignore the output JSON file from V2rayNG application
 V2rayNG/app/release/output.json
 
-# Ignore IDE and build directories
+# Ignore IDE configuration directory
 .idea/
+
+# Ignore Gradle build directory
 .gradle/
