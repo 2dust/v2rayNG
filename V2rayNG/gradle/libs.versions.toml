@@ -1,71 +1,63 @@
 [versions]
-activityKtx = "1.9.3"
-appcompat = "1.7.0"
-cardview = "1.0.0"
-constraintlayout = "2.2.0"
-core = "3.5.3"
-editorkit = "2.9.0"
-flexbox = "3.0.0"
-fragmentKtx = "1.8.5"
-gson = "2.11.0"
+agp = "8.7.2"
+kotlin = "2.0.21"
+coreKtx = "1.15.0"
 junit = "4.13.2"
-kotlinReflect = "2.0.21"
-kotlinxCoroutinesCore = "1.9.0"
-legacySupportV4 = "1.0.0"
-lifecycleViewmodelKtx = "2.8.7"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+appcompat = "1.7.0"
 material = "1.12.0"
+activity = "1.9.3"
+constraintlayout = "2.2.0"
 mmkvStatic = "1.3.9"
-multidex = "2.0.1"
-preferenceKtx = "1.2.1"
-quickieBundled = "1.10.0"
-recyclerview = "1.3.2"
-rxandroid = "3.0.2"
+gson = "2.11.0"
 rxjava = "3.1.9"
+rxandroid = "3.0.2"
 rxpermissions = "0.12"
 toastcompat = "1.1.0"
-viewpager2 = "1.1.0"
-workRuntimeKtx = "2.9.1"
-androidGradlePlugin = "8.7.2"
-androidKotlinPlugin = "2.0.21"
+editorkit = "2.9.0"
+quickieBundled = "1.10.0"
+core = "3.5.3"
+workRuntimeKtx = "2.10.0"
+lifecycleViewmodelKtx = "2.8.7"
+multidex = "2.0.1"
 mockitoMockitoInline = "4.0.0"
-
+flexbox = "3.0.0"
+preferenceKtx = "1.2.1"
+recyclerview = "1.3.2"
 [libraries]
-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
-cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
-core = { module = "com.google.zxing:core", version.ref = "core" }
-editorkit = { module = "com.blacksquircle.ui:editorkit", version.ref = "editorkit" }
-flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-junit = { module = "junit:junit", version.ref = "junit" }
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlinReflect" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesCore" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
-language-base = { module = "com.blacksquircle.ui:language-base", version.ref = "editorkit" }
-language-json = { module = "com.blacksquircle.ui:language-json", version.ref = "editorkit" }
-legacy-support-v4 = { module = "androidx.legacy:legacy-support-v4", version.ref = "legacySupportV4" }
-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleViewmodelKtx" }
-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleViewmodelKtx" }
-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
-material = { module = "com.google.android.material:material", version.ref = "material" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 mmkv-static = { module = "com.tencent:mmkv-static", version.ref = "mmkvStatic" }
-multidex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
-quickie-bundled = { module = "io.github.g00fy2.quickie:quickie-bundled", version.ref = "quickieBundled" }
-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
-rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "rxandroid" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava" }
+rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "rxandroid" }
 rxpermissions = { module = "com.github.tbruyelle:rxpermissions", version.ref = "rxpermissions" }
 toastcompat = { module = "me.drakeet.support:toastcompat", version.ref = "toastcompat" }
-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
-work-multiprocess = { module = "androidx.work:work-multiprocess", version.ref = "workRuntimeKtx" }
+editorkit = { module = "com.blacksquircle.ui:editorkit", version.ref = "editorkit" }
+language-base = { module = "com.blacksquircle.ui:language-base", version.ref = "editorkit" }
+language-json = { module = "com.blacksquircle.ui:language-json", version.ref = "editorkit" }
+quickie-bundled = { module = "io.github.g00fy2.quickie:quickie-bundled", version.ref = "quickieBundled" }
+core = { module = "com.google.zxing:core", version.ref = "core" }
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoMockitoInline" }
+work-multiprocess = { module = "androidx.work:work-multiprocess", version.ref = "workRuntimeKtx" }
+lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleViewmodelKtx" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleViewmodelKtx" }
+multidex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 org-mockito-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoMockitoInline" }
-
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoMockitoInline" }
+flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
+recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
+preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
 [plugins]
-android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
-android-kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "androidKotlinPlugin" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+
