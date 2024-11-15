@@ -1,2 +1,5 @@
-/build
-/google-services.json
+# Ignore the build directory and all its contents
+/build/
+
+# Ignore the google-services.json file
+google-services.json
