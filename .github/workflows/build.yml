@@ -8,86 +8,96 @@ on:
         description: 'Xray core version or commit hash'
         required: false
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Java
-      uses: actions/setup-java@v4.5.0
-      with:
-        distribution: 'temurin'
-        java-version: '21'
+      # Step 2: Setup Java environment
+      - name: Setup Java
+        uses: actions/setup-java@v4.5.0
+        with:
+          distribution: 'temurin'
+          java-version: '21'
 
-    - name: Setup Golang
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.23.3'
-        cache: false
+      # Step 3: Setup Golang environment
+      - name: Setup Golang
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.3'
+          cache: false
 
-    - name: Patch Go use 600296
-      #https://go-review.googlesource.com/c/go/+/600296
-      run: |
-        cd "$(go env GOROOT)"
-        curl "https://go-review.googlesource.com/changes/go~600296/revisions/5/patch" | base64 -d | patch --verbose -p 1
+      # Step 4: Patch Go using a specific revision
+      - name: Patch Go use 600296
+        run: |
+          cd "$(go env GOROOT)"
+          curl "https://go-review.googlesource.com/changes/go~600296/revisions/5/patch" | base64 -d | patch --verbose -p 1
 
-    - name: Install gomobile
-      run: |
-        go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20240806205939-81131f6468ab
-        echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+      # Step 5: Install gomobile
+      - name: Install gomobile
+        run: |
+          go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20240806205939-81131f6468ab
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
-    - name: Setup Android environment
-      uses: android-actions/setup-android@v3
+      # Step 6: Setup Android environment
+      - name: Setup Android environment
+        uses: android-actions/setup-android@v3
 
-    - name: Build dependencies
-      run: |
-        mkdir ${{ github.workspace }}/build
-        cd ${{ github.workspace }}/build
-        git clone --depth=1 -b main https://github.com/2dust/AndroidLibXrayLite.git
-        cd AndroidLibXrayLite
-        go get github.com/xtls/xray-core@${{ github.event.inputs.XRAY_CORE_VERSION }} || true
-        gomobile init
-        go mod tidy -v
-        gomobile bind -v -androidapi 21 -ldflags='-s -w' ./
-        cp *.aar ${{ github.workspace }}/V2rayNG/app/libs/
+      # Step 7: Build dependencies and bind mobile packages
+      - name: Build dependencies
+        run: |
+          mkdir ${{ github.workspace }}/build
+          cd ${{ github.workspace }}/build
+          git clone --depth=1 -b main https://github.com/2dust/AndroidLibXrayLite.git
+          cd AndroidLibXrayLite
+          go get github.com/xtls/xray-core@${{ github.event.inputs.XRAY_CORE_VERSION }} || true
+          gomobile init
+          go mod tidy -v
+          gomobile bind -v -androidapi 21 -ldflags='-s -w' ./
+          cp *.aar ${{ github.workspace }}/V2rayNG/app/libs/
 
-    - name: Build APK
-      run: |
-        cd ${{ github.workspace }}/V2rayNG
-        chmod 755 gradlew
-        ./gradlew assembleDebug
+      # Step 8: Build the APK using Gradle
+      - name: Build APK
+        run: |
+          cd ${{ github.workspace }}/V2rayNG
+          chmod +x gradlew   # Make gradlew executable
+          ./gradlew assembleDebug
 
-    - name: Upload arm64-v8a APK
-      uses: actions/upload-artifact@v4
-      if: ${{  success() }}
-      with:
-        name: arm64-v8a
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*arm64-v8a*.apk
+      # Step 9: Upload arm64-v8a APK artifact
+      - name: Upload arm64-v8a APK
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: arm64-v8a
+          path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*arm64-v8a*.apk
 
-    - name: Upload armeabi-v7a APK
-      uses: actions/upload-artifact@v4
-      if: ${{  success() }}
-      with:
-        name: armeabi-v7a
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*armeabi-v7a*.apk
+      # Step 10: Upload armeabi-v7a APK artifact
+      - name: Upload armeabi-v7a APK
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: armeabi-v7a
+          path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*armeabi-v7a*.apk
 
-    - name: Upload x86 APK
-      uses: actions/upload-artifact@v4
-      if: ${{  success() }}
-      with:
-        name: x86-apk
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*x86*.apk
-    
-    - name: Upload Other APKs
-      uses: actions/upload-artifact@v4
-      with:
-        name: others-apk
-        path: |
-          ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug
-          !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*arm64-v8a*.apk
-          !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*armeabi-v7a*.apk
-          !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*x86*.apk
+      # Step 11: Upload x86 APK artifact
+      - name: Upload x86 APK
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: x86-apk
+          path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*x86*.apk
+
+      # Step 12: Upload other APKs excluding specific architectures 
+      - name: Upload Other APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: others-apk
+          path: |
+            ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*
+            !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*arm64-v8a*.apk
+            !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*armeabi-v7a*.apk
+            !${{ github.workspace }}/V2rayNG/app/build/outputs/apk/debug/*x86*.apk 
