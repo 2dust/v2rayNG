@@ -171,6 +171,7 @@
         <item>فارسی</item>
         <item>عربي</item>
         <item>বাংলা</item>
+        <item>بختیاری</item>
     </string-array>
 
 
@@ -184,6 +185,7 @@
         <item>fa</item>
         <item>ar</item>
         <item>bn</item>
+        <item>bqi-rIR</item>
     </string-array>
 
     <string-array name="mux_xudp_quic_value" translatable="false">
