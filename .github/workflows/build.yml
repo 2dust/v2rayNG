@@ -29,7 +29,7 @@ jobs:
         go-version: '1.23.3'
         cache: false
 
-    - name: Patch Go use 600296
+    - name: Patch Go use 627156
       #https://go-review.googlesource.com/c/go/+/627156
       run: |
         cd "$(go env GOROOT)"
