@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="app_name" type="string">v2rayNG (DEV)</item>
+    <!-- Application name string resource -->
+    <string name="app_name">v2rayNG (DEV)</string>
 </resources>
