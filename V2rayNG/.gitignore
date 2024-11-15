@@ -1,10 +1,29 @@
+# Ignore IntelliJ IDEA module files
 *.iml
-.gradle
-/local.properties
-/.idea
+
+# Ignore Gradle build directory
+.gradle/
+
+# Ignore local properties file (contains local configurations)
+local.properties
+
+# Ignore IDE configuration directory
+/.idea/
+
+# Ignore macOS Finder metadata files
 .DS_Store
-/build
-/captures
+
+# Ignore build output directory
+/build/
+
+# Ignore capture directories (e.g., screenshots)
+captures/
+
+# Ignore Android APK files (Android Package)
 *.apk
+
+# Ignore signing properties file (for Android app signing)
 signing.properties
+
+# Ignore Android Archive files (AAR)
 *.aar
