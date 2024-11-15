@@ -1,6 +1,5 @@
 ### v2rayNG
 
-**Overview**  
 V2rayNG is a V2Ray client for Android that supports both the [Xray core](https://github.com/XTLS/Xray-core) and the [v2fly core](https://github.com/v2fly/v2ray-core).
 
 [![API](https://img.shields.io/badge/API-21%2B-yellow.svg?style=flat)](https://developer.android.com/about/versions/lollipop)
