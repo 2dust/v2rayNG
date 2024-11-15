@@ -278,8 +278,10 @@ data class V2rayConfig(
             data class SplithttpSettingsBean(
                 var path: String? = null,
                 var host: String? = null,
-                val maxUploadSize: Int? = null,
-                val maxConcurrentUploads: Int? = null
+                val scMaxConcurrentPosts: Int? = null,
+                val scMaxEachPostBytes: Int? = null,
+                val scMinPostsIntervalMs: Int? = null,
+                val xPaddingBytes: Int? = null
             )
 
             data class HttpSettingsBean(
