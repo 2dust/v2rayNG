@@ -131,7 +131,8 @@ object Utils {
      * get remote dns servers from preference
      */
     fun getRemoteDnsServers(): List<String> {
-        val remoteDns = MmkvManager.decodeSettingsString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_PROXY
+        val remoteDns =
+            MmkvManager.decodeSettingsString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_PROXY
         val ret = remoteDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
         if (ret.isEmpty()) {
             return listOf(AppConfig.DNS_PROXY)
@@ -149,7 +150,8 @@ object Utils {
      * get remote dns servers from preference
      */
     fun getDomesticDnsServers(): List<String> {
-        val domesticDns = MmkvManager.decodeSettingsString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
+        val domesticDns =
+            MmkvManager.decodeSettingsString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
         val ret = domesticDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
         if (ret.isEmpty()) {
             return listOf(AppConfig.DNS_DIRECT)
@@ -357,7 +359,11 @@ object Utils {
     }
 
     @Throws(IOException::class)
-    fun getUrlContentWithCustomUserAgent(urlStr: String?, timeout: Int = 30000, httpPort: Int = 0): String {
+    fun getUrlContentWithCustomUserAgent(
+        urlStr: String?,
+        timeout: Int = 30000,
+        httpPort: Int = 0
+    ): String {
         val url = URL(urlStr)
         val conn = if (httpPort == 0) {
             url.openConnection()
@@ -410,7 +416,8 @@ object Utils {
     }
 
     fun getLocale(): Locale {
-        val langCode = MmkvManager.decodeSettingsString(AppConfig.PREF_LANGUAGE) ?: Language.AUTO.code
+        val langCode =
+            MmkvManager.decodeSettingsString(AppConfig.PREF_LANGUAGE) ?: Language.AUTO.code
         val language = Language.fromCode(langCode)
 
         return when (language) {
@@ -422,6 +429,7 @@ object Utils {
             Language.RUSSIAN -> Locale("ru")
             Language.PERSIAN -> Locale("fa")
             Language.BANGLA -> Locale("bn")
+            Language.BAKHTIARI -> Locale("bqi", "IR")
         }
     }
 
@@ -455,7 +463,8 @@ object Utils {
         return if (second) {
             AppConfig.DelayTestUrl2
         } else {
-            MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL) ?: AppConfig.DelayTestUrl
+            MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL)
+                ?: AppConfig.DelayTestUrl
         }
     }
 

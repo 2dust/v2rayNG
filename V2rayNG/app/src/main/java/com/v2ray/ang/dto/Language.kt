@@ -8,7 +8,8 @@ enum class Language(val code: String) {
     VIETNAMESE("vi"),
     RUSSIAN("ru"),
     PERSIAN("fa"),
-    BANGLA("bn");
+    BANGLA("bn"),
+    BAKHTIARI("bqi-rIR");
 
     companion object {
         fun fromCode(code: String): Language {
