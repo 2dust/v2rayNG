@@ -66,10 +66,44 @@ data class ProfileItem(
         return Utils.getIpv6Address(server) + ":" + serverPort
     }
 
-    fun getKeyProperty(): ProfileItem {
-        val copy = this.copy()
-        copy.subscriptionId = ""
-        copy.addedTime = 0L
-        return copy
+    override fun equals(other: Any?): Boolean {
+        if (other == null) return false
+        val obj = other as ProfileItem
+
+        return (this.server == obj.server
+                && this.serverPort == obj.serverPort
+                && this.password == obj.password
+                && this.method == obj.method
+                && this.flow == obj.flow
+                && this.username == obj.username
+
+                && this.network == obj.network
+                && this.headerType == obj.headerType
+                && this.host == obj.host
+                && this.path == obj.path
+                && this.seed == obj.seed
+                && this.quicSecurity == obj.quicSecurity
+                && this.quicKey == obj.quicKey
+                && this.mode == obj.mode
+                && this.serviceName == obj.serviceName
+                && this.authority == obj.authority
+
+                && this.security == obj.security
+                && this.sni == obj.sni
+                && this.alpn == obj.alpn
+                && this.fingerPrint == obj.fingerPrint
+                && this.publicKey == obj.publicKey
+                && this.shortId == obj.shortId
+
+                && this.secretKey == obj.secretKey
+                && this.localAddress == obj.localAddress
+                && this.reserved == obj.reserved
+                && this.mtu == obj.mtu
+
+                && this.obfsPassword == obj.obfsPassword
+                && this.portHopping == obj.portHopping
+                && this.portHoppingInterval == obj.portHoppingInterval
+                && this.pinSHA256 == obj.pinSHA256
+                )
     }
 }

@@ -257,10 +257,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val deleteServer = mutableListOf<String>()
         serversCacheCopy.forEachIndexed { index, it ->
-            val outbound = it.second.getKeyProperty()
+            val outbound = it.second
             serversCacheCopy.forEachIndexed { index2, it2 ->
                 if (index2 > index) {
-                    val outbound2 = it2.second.getKeyProperty()
+                    val outbound2 = it2.second
                     if (outbound.equals(outbound2) && !deleteServer.contains(it2.first)) {
                         deleteServer.add(it2.first)
                     }
