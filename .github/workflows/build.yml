@@ -40,7 +40,7 @@ jobs:
       # Step 5: Install gomobile
       - name: Install gomobile
         run: |
-          go install golang.org/x/mobile/cmd/gomobile@lastet
+          go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20241108191957-fa514ef75a0f
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
       # Step 6: Setup Android environment
