@@ -15,7 +15,7 @@ jobs:
     steps:
       # Step 1: Checkout the code
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       # Step 2: Setup Java environment
       - name: Setup Java
@@ -26,7 +26,7 @@ jobs:
 
       # Step 3: Setup Golang environment
       - name: Setup Golang
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v5.1.0
         with:
           go-version: '1.23.3'
           cache: false
@@ -45,7 +45,7 @@ jobs:
 
       # Step 6: Setup Android environment
       - name: Setup Android environment
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v3.2.2
 
       # Step 7: Build dependencies and bind mobile packages
       - name: Build dependencies
@@ -69,7 +69,7 @@ jobs:
 
       # Step 9: Upload arm64-v8a APK artifact
       - name: Upload arm64-v8a APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.3
         if: success()
         with:
           name: arm64-v8a
@@ -77,7 +77,7 @@ jobs:
 
       # Step 10: Upload armeabi-v7a APK artifact
       - name: Upload armeabi-v7a APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.3
         if: success()
         with:
           name: armeabi-v7a
@@ -85,7 +85,7 @@ jobs:
 
       # Step 11: Upload x86 APK artifact
       - name: Upload x86 APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.3
         if: success()
         with:
           name: x86-apk
@@ -93,7 +93,7 @@ jobs:
 
       # Step 12: Upload other APKs excluding specific architectures 
       - name: Upload Other APKs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: others-apk
           path: |
