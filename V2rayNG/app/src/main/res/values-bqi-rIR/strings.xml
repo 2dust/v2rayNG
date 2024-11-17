@@ -3,7 +3,7 @@
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">آلشت</string>
     <string name="app_tile_name">آلشت</string>
-    <string name="app_tile_first_use">سی کرت ٱولی و کار بوردن ای ویژیی, ز برنومه سی ازاف کردن سرور استفاڌه کۊنین</string>
+    <string name="app_tile_first_use">سی کرت ٱولی و کار بوردن ای ویژیی، ز برنومه سی ازاف کردن سرور استفاڌه کۊنین</string>
     <string name="navigation_drawer_open">گۊشیڌن نومگه کشاری</string>
     <string name="navigation_drawer_close">بستن نومگه کشاری</string>
     <string name="migration_success">مووفقیت من جاگورویی داده</string>
@@ -86,7 +86,7 @@
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved(اختیاری, وا کاما ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_address">آدرس مهلی (اختیاری IPv4/IPv6, وا کاما ز یک جوڌا ابۊن)</string>
-    <string name="server_lab_local_mtu">Mtu(اختیاری, خوتکار 1420)</string>
+    <string name="server_lab_local_mtu">Mtu(اختیاری، خوتکار 1420)</string>
     <string name="toast_success">وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_failure">شکست خرد</string>
     <string name="toast_none_data">هیچ داده ای وۊجۊڌ نڌاره</string>
