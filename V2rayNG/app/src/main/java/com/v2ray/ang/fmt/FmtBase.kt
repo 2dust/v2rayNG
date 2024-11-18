@@ -55,7 +55,7 @@ open class FmtBase {
                 config.seed.let { if (it.isNotNullEmpty()) dicQuery["seed"] = it.orEmpty() }
             }
 
-            NetworkType.WS, NetworkType.HTTP_UPGRADE, NetworkType.SPLIT_HTTP -> {
+            NetworkType.WS, NetworkType.HTTP_UPGRADE, NetworkType.SPLIT_HTTP, NetworkType.XHTTP -> {
                 config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
                 config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
             }
@@ -66,11 +66,11 @@ open class FmtBase {
                 config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
             }
 
-            NetworkType.QUIC -> {
-                dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
-                config.quicSecurity.let { if (it.isNotNullEmpty()) dicQuery["quicSecurity"] = it.orEmpty() }
-                config.quicKey.let { if (it.isNotNullEmpty()) dicQuery["key"] = it.orEmpty() }
-            }
+//            NetworkType.QUIC -> {
+//                dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
+//                config.quicSecurity.let { if (it.isNotNullEmpty()) dicQuery["quicSecurity"] = it.orEmpty() }
+//                config.quicKey.let { if (it.isNotNullEmpty()) dicQuery["key"] = it.orEmpty() }
+//            }
 
             NetworkType.GRPC -> {
                 config.mode.let { if (it.isNotNullEmpty()) dicQuery["mode"] = it.orEmpty() }
