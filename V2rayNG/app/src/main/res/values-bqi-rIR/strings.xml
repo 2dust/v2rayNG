@@ -55,14 +55,14 @@
     <string name="server_lab_request_host_http">هاست http</string>
     <string name="server_lab_request_host_ws">هاست ws</string>
     <string name="server_lab_request_host_httpupgrade">هاست httpupgrade</string>
-    <string name="server_lab_request_host_splithttp">هاست splithttp</string>
+    <string name="server_lab_request_host_xhttp">هاست xhttp</string>
     <string name="server_lab_request_host_h2">هاست h2</string>
     <string name="server_lab_request_host_quic">ٱمنیت QUIC</string>
     <string name="server_lab_request_host_grpc">اختیار gRPC</string>
     <string name="server_lab_path">تور</string>
     <string name="server_lab_path_ws">تور ws</string>
     <string name="server_lab_path_httpupgrade">تور httpupgrade</string>
-    <string name="server_lab_path_splithttp">تور splithttp</string>
+    <string name="server_lab_path_xhttp">تور xhttp</string>
     <string name="server_lab_path_h2">تور h2</string>
     <string name="server_lab_path_quic">کیلیت QUIC</string>
     <string name="server_lab_path_kcp">سید kcp</string>

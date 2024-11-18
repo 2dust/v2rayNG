@@ -81,7 +81,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 //            }
         }
         if (key == AppConfig.PREF_UI_MODE_NIGHT) {
-            Utils.setNightMode(getApplication())
+            Utils.setNightMode()
         }
     }
 }
