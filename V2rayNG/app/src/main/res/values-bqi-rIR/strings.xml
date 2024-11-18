@@ -117,6 +117,7 @@
     <string name="server_lab_port_hop">پورت گوم (درگا سرورن ز نۊ هؽل اکونه)</string>
     <string name="server_lab_port_hop_interval">فاسله پورت گوم (سانیه)</string>
     <string name="server_lab_stream_pinsha256">pinSHA256</string>
+    <string name="server_lab_xhttp_mode">XHTTP Mode</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">هون بارونی بۊ</string>

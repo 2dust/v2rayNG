@@ -30,6 +30,7 @@ data class ProfileItem(
     var mode: String? = null,
     var serviceName: String? = null,
     var authority: String? = null,
+    var xhttpMode: String? = null,
 
     var security: String? = null,
     var sni: String? = null,
@@ -87,6 +88,7 @@ data class ProfileItem(
                 && this.mode == obj.mode
                 && this.serviceName == obj.serviceName
                 && this.authority == obj.authority
+                && this.xhttpMode == obj.xhttpMode
 
                 && this.security == obj.security
                 && this.sni == obj.sni
