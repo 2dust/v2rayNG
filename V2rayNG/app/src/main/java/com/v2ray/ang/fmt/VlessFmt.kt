@@ -36,6 +36,7 @@ object VlessFmt : FmtBase() {
         config.mode = queryParam["mode"]
         config.serviceName = queryParam["serviceName"]
         config.authority = queryParam["authority"]
+        config.xhttpMode = queryParam["mode"]
 
         config.security = queryParam["security"]
         config.insecure = if (queryParam["allowInsecure"].isNullOrEmpty()) {
@@ -85,6 +86,7 @@ object VlessFmt : FmtBase() {
             profileItem.serviceName,
             profileItem.authority,
         )
+        outboundBean?.streamSettings?.xhttpSettings?.mode = profileItem.xhttpMode
 
         outboundBean?.streamSettings?.populateTlsSettings(
             profileItem.security.orEmpty(),

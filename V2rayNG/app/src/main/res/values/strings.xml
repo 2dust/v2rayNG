@@ -118,6 +118,7 @@
     <string name="server_lab_port_hop">Port Hopping(will override the port)</string>
     <string name="server_lab_port_hop_interval">Port Hopping Interval</string>
     <string name="server_lab_stream_pinsha256">pinSHA256</string>
+    <string name="server_lab_xhttp_mode">XHTTP Mode</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Loading</string>
