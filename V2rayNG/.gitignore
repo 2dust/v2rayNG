@@ -1,10 +1,17 @@
+# Ignore IntelliJ IDEA project files
 *.iml
-.gradle
-/local.properties
-/.idea
-.DS_Store
-/build
-/captures
+/.idea/
+
+# Ignore Gradle files
+.gradle/
+local.properties
+
+# Ignore build artifacts
+/build/
+captures/
 *.apk
 signing.properties
 *.aar
+
+# Ignore macOS system files
+.DS_Store
