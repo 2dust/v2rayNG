@@ -57,14 +57,12 @@
     <string name="server_lab_request_host_httpupgrade">httpupgrade হোস্ট</string>
     <string name="server_lab_request_host_xhttp">xhttp হোস্ট</string>
     <string name="server_lab_request_host_h2">h2 হোস্ট</string>
-    <string name="server_lab_request_host_quic">QUIC নিরাপত্তা</string>
     <string name="server_lab_request_host_grpc">gRPC কর্তৃপক্ষ</string>
     <string name="server_lab_path">পথ</string>
     <string name="server_lab_path_ws">ws পথ</string>
     <string name="server_lab_path_httpupgrade">httpupgrade পথ</string>
     <string name="server_lab_path_xhttp">xhttp পথ</string>
     <string name="server_lab_path_h2">h2 পথ</string>
-    <string name="server_lab_path_quic">QUIC কী</string>
     <string name="server_lab_path_kcp">kcp বীজ</string>
     <string name="server_lab_path_grpc">gRPC সেবার নাম</string>
     <string name="server_lab_stream_security">TLS</string>
