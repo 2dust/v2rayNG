@@ -8,7 +8,7 @@ enum class NetworkType(val type: String) {
     SPLIT_HTTP("splithttp"),
     HTTP("http"),
     H2("h2"),
-    QUIC("quic"),
+    //QUIC("quic"),
     GRPC("grpc");
 
     companion object {

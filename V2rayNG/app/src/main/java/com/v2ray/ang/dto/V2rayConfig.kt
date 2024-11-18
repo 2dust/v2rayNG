@@ -413,13 +413,13 @@ data class V2rayConfig(
                         httpSettings = h2Setting
                     }
 
-                    "quic" -> {
-                        val quicsetting = QuicSettingBean()
-                        quicsetting.security = quicSecurity ?: "none"
-                        quicsetting.key = key.orEmpty()
-                        quicsetting.header.type = headerType ?: "none"
-                        quicSettings = quicsetting
-                    }
+//                    "quic" -> {
+//                        val quicsetting = QuicSettingBean()
+//                        quicsetting.security = quicSecurity ?: "none"
+//                        quicsetting.key = key.orEmpty()
+//                        quicsetting.header.type = headerType ?: "none"
+//                        quicSettings = quicsetting
+//                    }
 
                     "grpc" -> {
                         val grpcSetting = GrpcSettingsBean()
@@ -599,14 +599,14 @@ data class V2rayConfig(
                         )
                     }
 
-                    "quic" -> {
-                        val quicSetting = streamSettings?.quicSettings ?: return null
-                        listOf(
-                            quicSetting.header.type,
-                            quicSetting.security,
-                            quicSetting.key
-                        )
-                    }
+//                    "quic" -> {
+//                        val quicSetting = streamSettings?.quicSettings ?: return null
+//                        listOf(
+//                            quicSetting.header.type,
+//                            quicSetting.security,
+//                            quicSetting.key
+//                        )
+//                    }
 
                     "grpc" -> {
                         val grpcSetting = streamSettings?.grpcSettings ?: return null
