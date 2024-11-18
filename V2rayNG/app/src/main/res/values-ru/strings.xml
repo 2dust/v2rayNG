@@ -56,14 +56,12 @@
     <string name="server_lab_request_host_httpupgrade">Узел HTTPUpgrade</string>
     <string name="server_lab_request_host_xhttp">Узел SplitHTTP</string>
     <string name="server_lab_request_host_h2">Узел H2</string>
-    <string name="server_lab_request_host_quic">Шифрование QUIC</string>
     <string name="server_lab_request_host_grpc">Полномочия gRPC</string>
     <string name="server_lab_path">Путь</string>
     <string name="server_lab_path_ws">Путь WS</string>
     <string name="server_lab_path_httpupgrade">Путь HTTPUpgrade</string>
     <string name="server_lab_path_xhttp">Путь SplitHTTP</string>
     <string name="server_lab_path_h2">Путь H2</string>
-    <string name="server_lab_path_quic">Ключ QUIC</string>
     <string name="server_lab_path_kcp">Сид KCP</string>
     <string name="server_lab_path_grpc">Служба gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
