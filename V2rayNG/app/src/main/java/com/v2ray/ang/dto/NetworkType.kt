@@ -6,9 +6,10 @@ enum class NetworkType(val type: String) {
     WS("ws"),
     HTTP_UPGRADE("httpupgrade"),
     SPLIT_HTTP("splithttp"),
+    XHTTP("xhttp"),
     HTTP("http"),
     H2("h2"),
-    QUIC("quic"),
+    //QUIC("quic"),
     GRPC("grpc");
 
     companion object {
