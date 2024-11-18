@@ -278,8 +278,7 @@ data class V2rayConfig(
             data class XhttpSettingsBean(
                 var path: String? = null,
                 var host: String? = null,
-                val maxUploadSize: Int? = null,
-                val maxConcurrentUploads: Int? = null
+                var mode: String? = null,
             )
 
             data class HttpSettingsBean(
