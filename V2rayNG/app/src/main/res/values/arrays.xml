@@ -205,4 +205,10 @@
         <item>direct</item>
         <item>block</item>
     </string-array>
+
+    <string-array name="xhttp_mode" translatable="false">
+        <item>auto</item>
+        <item>packet-up</item>
+        <item>stream-up</item>
+    </string-array>
 </resources>
