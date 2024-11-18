@@ -206,7 +206,7 @@ data class V2rayConfig(
             var kcpSettings: KcpSettingsBean? = null,
             var wsSettings: WsSettingsBean? = null,
             var httpupgradeSettings: HttpupgradeSettingsBean? = null,
-            var splithttpSettings: SplithttpSettingsBean? = null,
+            var xhttpSettings: XhttpSettingsBean? = null,
             var httpSettings: HttpSettingsBean? = null,
             var tlsSettings: TlsSettingsBean? = null,
             var quicSettings: QuicSettingBean? = null,
@@ -275,7 +275,7 @@ data class V2rayConfig(
                 val acceptProxyProtocol: Boolean? = null
             )
 
-            data class SplithttpSettingsBean(
+            data class XhttpSettingsBean(
                 var path: String? = null,
                 var host: String? = null,
                 val maxUploadSize: Int? = null,
@@ -396,12 +396,12 @@ data class V2rayConfig(
                         httpupgradeSettings = httpupgradeSetting
                     }
 
-                    "splithttp" -> {
-                        val splithttpSetting = SplithttpSettingsBean()
-                        splithttpSetting.host = host.orEmpty()
-                        sni = splithttpSetting.host
-                        splithttpSetting.path = path ?: "/"
-                        splithttpSettings = splithttpSetting
+                    "splithttp","xhttp" -> {
+                        val xhttpSetting = XhttpSettingsBean()
+                        xhttpSetting.host = host.orEmpty()
+                        sni = xhttpSetting.host
+                        xhttpSetting.path = path ?: "/"
+                        xhttpSettings = xhttpSetting
                     }
 
                     "h2", "http" -> {
@@ -581,12 +581,12 @@ data class V2rayConfig(
                         )
                     }
 
-                    "splithttp" -> {
-                        val splithttpSetting = streamSettings?.splithttpSettings ?: return null
+                    "splithttp" ,"xhttp"-> {
+                        val xhttpSettings = streamSettings?.xhttpSettings ?: return null
                         listOf(
                             "",
-                            splithttpSetting.host,
-                            splithttpSetting.path
+                            xhttpSettings.host,
+                            xhttpSettings.path
                         )
                     }
 

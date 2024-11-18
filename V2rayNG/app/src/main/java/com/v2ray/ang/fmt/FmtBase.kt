@@ -55,7 +55,7 @@ open class FmtBase {
                 config.seed.let { if (it.isNotNullEmpty()) dicQuery["seed"] = it.orEmpty() }
             }
 
-            NetworkType.WS, NetworkType.HTTP_UPGRADE, NetworkType.SPLIT_HTTP -> {
+            NetworkType.WS, NetworkType.HTTP_UPGRADE, NetworkType.SPLIT_HTTP, NetworkType.XHTTP -> {
                 config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
                 config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
             }
