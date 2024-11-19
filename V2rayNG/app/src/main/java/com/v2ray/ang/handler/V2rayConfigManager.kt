@@ -255,20 +255,37 @@ object V2rayConfigManager {
     }
 
     private fun customLocalDns(v2rayConfig: V2rayConfig): Boolean {
-        try {
-            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
-                val geositeCn = arrayListOf(GEOSITE_CN)
-                val proxyDomain = userRule2Domain(TAG_PROXY)
-                val directDomain = userRule2Domain(TAG_DIRECT)
-                // fakedns with all domains to make it always top priority
-                v2rayConfig.dns.servers?.add(
-                    0,
-                    V2rayConfig.DnsBean.ServersBean(
-                        address = "fakedns",
-                        domains = geositeCn.plus(proxyDomain).plus(directDomain)
-                    )
+    return try {
+        // Check if fake DNS is enabled
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
+            val geositeCn = arrayListOf(GEOSITE_CN)
+            val proxyDomain = userRule2Domain(TAG_PROXY)
+            val directDomain = userRule2Domain(TAG_DIRECT)
+
+            // Add fake DNS server with high priority
+            val fakeDnsServer = V2rayConfig.DnsBean.ServersBean(
+                address = "fakedns",
+                domains = geositeCn + proxyDomain + directDomain
+            )
+
+            // Ensure the fake DNS server is at the top of the list
+            v2rayConfig.dns.servers?.add(0, fakeDnsServer)
+
+            // Additional DNS settings
+            v2rayConfig.dns.clientIp = "0.0.0.0" // Use local IP
+            v2rayConfig.dns.servers?.add(
+                V2rayConfig.DnsBean.ServersBean(
+                    address = "8.8.8.8", // Google DNS as a backup
+                    domains = listOf("*") // All domains
                 )
-            }
+            )
+        }
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    }
+}
 
             // DNS inbound对象
             val remoteDns = Utils.getRemoteDnsServers()
