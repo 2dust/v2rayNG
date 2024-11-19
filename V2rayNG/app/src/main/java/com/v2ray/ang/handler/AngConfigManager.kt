@@ -280,7 +280,7 @@ object AngConfigManager {
                         val config = CustomFmt.parse(JsonUtil.toJson(srv)) ?: continue
                         config.subscriptionId = subid
                         val key = MmkvManager.encodeServerConfig("", config)
-                        MmkvManager.encodeServerRaw(key, JsonUtil.toJsonPretty(srv))
+                        MmkvManager.encodeServerRaw(key, JsonUtil.toJsonPretty(srv)?:"")
                         count += 1
                     }
                     return count

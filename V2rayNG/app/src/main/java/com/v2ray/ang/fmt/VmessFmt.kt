@@ -137,23 +137,7 @@ object VmessFmt : FmtBase() {
         config.password = uri.userInfo
         config.method = AppConfig.DEFAULT_SECURITY
 
-        config.network = NetworkType.fromString(queryParam["type"]).name
-        config.headerType = queryParam["headerType"]
-        config.host = queryParam["host"]
-        config.path = queryParam["path"]
-
-        config.seed = queryParam["seed"]
-        config.quicSecurity = queryParam["quicSecurity"]
-        config.quicKey = queryParam["key"]
-        config.mode = queryParam["mode"]
-        config.serviceName = queryParam["serviceName"]
-        config.authority = queryParam["authority"]
-
-        config.security = queryParam["security"]
-        config.insecure = if ((queryParam["allowInsecure"].orEmpty()) == "1") true else allowInsecure
-        config.sni = queryParam["sni"]
-        config.fingerPrint = queryParam["fp"]
-        config.alpn = queryParam["alpn"]
+        getItemFormQuery(config, queryParam, allowInsecure)
 
         return config
     }
