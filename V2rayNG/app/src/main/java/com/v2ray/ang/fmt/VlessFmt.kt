@@ -6,6 +6,7 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.extension.idnHost
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import java.net.URI
 
@@ -37,6 +38,7 @@ object VlessFmt : FmtBase() {
         config.serviceName = queryParam["serviceName"]
         config.authority = queryParam["authority"]
         config.xhttpMode = queryParam["mode"]
+        config.xhttpExtra = queryParam["extra"]
 
         config.security = queryParam["security"]
         config.insecure = if (queryParam["allowInsecure"].isNullOrEmpty()) {
@@ -87,6 +89,7 @@ object VlessFmt : FmtBase() {
             profileItem.authority,
         )
         outboundBean?.streamSettings?.xhttpSettings?.mode = profileItem.xhttpMode
+        outboundBean?.streamSettings?.xhttpSettings?.extra = JsonUtil.parseString(profileItem.xhttpExtra)
 
         outboundBean?.streamSettings?.populateTlsSettings(
             profileItem.security.orEmpty(),

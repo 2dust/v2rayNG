@@ -63,6 +63,7 @@ open class FmtBase {
                 config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
                 config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
                 config.xhttpMode.let { if (it.isNotNullEmpty()) dicQuery["mode"] = it.orEmpty() }
+                config.xhttpExtra.let { if (it.isNotNullEmpty()) dicQuery["extra"] = it.orEmpty() }
             }
 
             NetworkType.HTTP, NetworkType.H2 -> {
