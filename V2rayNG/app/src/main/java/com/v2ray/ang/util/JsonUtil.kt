@@ -42,7 +42,11 @@ object JsonUtil {
     fun parseString(src: String?): JsonObject? {
         if (src == null)
             return null
-        return JsonParser.parseString(src).getAsJsonObject()
+        try {
+            return JsonParser.parseString(src).getAsJsonObject()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
     }
-
 }

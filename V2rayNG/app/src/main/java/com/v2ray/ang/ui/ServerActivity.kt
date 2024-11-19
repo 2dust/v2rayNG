@@ -26,6 +26,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.JsonUtil
@@ -168,7 +169,7 @@ class ServerActivity : BaseActivity() {
                         types,
                         when (networks[position]) {
                             NetworkType.GRPC.type -> config?.mode
-                            NetworkType.SPLIT_HTTP.type,  NetworkType.XHTTP.type -> config?.xhttpMode
+                            NetworkType.SPLIT_HTTP.type, NetworkType.XHTTP.type -> config?.xhttpMode
                             else -> config?.headerType
                         }.orEmpty()
                     )
@@ -221,7 +222,7 @@ class ServerActivity : BaseActivity() {
                 )
                 et_extra?.text = Utils.getEditable(
                     when (networks[position]) {
-                        NetworkType.SPLIT_HTTP.type, NetworkType.XHTTP.type -> JsonUtil.toJsonPretty(JsonUtil.parseString(config?.xhttpExtra))
+                        NetworkType.SPLIT_HTTP.type, NetworkType.XHTTP.type -> config?.xhttpExtra
                         else -> null
                     }.orEmpty()
                 )
@@ -468,6 +469,12 @@ class ServerActivity : BaseActivity() {
                 return false
             }
         }
+        if (et_extra?.text?.toString().isNotNullEmpty()) {
+            if (JsonUtil.parseString(et_extra?.text?.toString()) == null) {
+                toast(R.string.server_lab_xhttp_extra)
+                return false
+            }
+        }
 
         saveCommon(config)
         saveStreamSettings(config)
@@ -577,7 +584,7 @@ class ServerActivity : BaseActivity() {
                 grpcModes
             }
 
-            NetworkType.SPLIT_HTTP.type,  NetworkType.XHTTP.type -> {
+            NetworkType.SPLIT_HTTP.type, NetworkType.XHTTP.type -> {
                 xhttpMode
             }
 
