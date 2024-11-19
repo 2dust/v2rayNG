@@ -112,8 +112,8 @@
     <string name="server_lab_port_hop">پورت پرش (درگاه سرور را بازنویسی می کند)</string>
     <string name="server_lab_port_hop_interval">فاصله پورت پرش (ثانیه)</string>
     <string name="server_lab_stream_pinsha256">pinSHA256</string>
-    <string name="server_lab_xhttp_mode">XHTTP Mode</string>
-    <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
+    <string name="server_lab_xhttp_mode">حالت XHTTP</string>
+    <string name="server_lab_xhttp_extra">جیسون خام XHTTP Extra، فرمت: { XHTTPObject }</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">URL را اضافه کنید</string>
