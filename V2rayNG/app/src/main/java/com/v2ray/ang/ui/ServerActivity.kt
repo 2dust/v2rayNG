@@ -123,6 +123,8 @@ class ServerActivity : BaseActivity() {
     private val et_port_hop: EditText? by lazy { findViewById(R.id.et_port_hop) }
     private val et_port_hop_interval: EditText? by lazy { findViewById(R.id.et_port_hop_interval) }
     private val et_pinsha256: EditText? by lazy { findViewById(R.id.et_pinsha256) }
+    private val et_extra: EditText? by lazy { findViewById(R.id.et_extra) }
+    private val layout_extra: LinearLayout? by lazy { findViewById(R.id.layout_extra) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -216,6 +218,18 @@ class ServerActivity : BaseActivity() {
                         }
                     )
                 )
+                et_extra?.text = Utils.getEditable(
+                    when (networks[position]) {
+                        "splithttp", "xhttp" -> JsonUtil.toJsonPretty(JsonUtil.parseString(config?.xhttpExtra))
+                        else -> null
+                    }.orEmpty()
+                )
+
+                layout_extra?.visibility =
+                    when (networks[position]) {
+                        "splithttp", "xhttp" -> View.VISIBLE
+                        else -> View.GONE
+                    }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -461,7 +475,7 @@ class ServerActivity : BaseActivity() {
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
-        Log.d(ANG_PACKAGE, JsonUtil.toJsonPretty(config))
+        Log.d(ANG_PACKAGE, JsonUtil.toJsonPretty(config)?:"")
         MmkvManager.encodeServerConfig(editGuid, config)
         toast(R.string.toast_success)
         finish()
@@ -518,6 +532,7 @@ class ServerActivity : BaseActivity() {
         profileItem.serviceName = path
         profileItem.authority = requestHost
         profileItem.xhttpMode = transportTypes(networks[network])[type]
+        profileItem.xhttpExtra = et_extra?.text?.toString()?.trim()
     }
 
     private fun saveTls(config: ProfileItem) {

@@ -28,31 +28,8 @@ object TrojanFmt : FmtBase() {
         } else {
             val queryParam = getQueryParam(uri)
 
-            config.network = queryParam["type"] ?: "tcp"
-            config.headerType = queryParam["headerType"]
-            config.host = queryParam["host"]
-            config.path = queryParam["path"]
-
-            config.seed = queryParam["seed"]
-            config.quicSecurity = queryParam["quicSecurity"]
-            config.quicKey = queryParam["key"]
-            config.mode = queryParam["mode"]
-            config.serviceName = queryParam["serviceName"]
-            config.authority = queryParam["authority"]
-
+            getItemFormQuery(config, queryParam, allowInsecure)
             config.security = queryParam["security"] ?: AppConfig.TLS
-            config.insecure = if (queryParam["allowInsecure"].isNullOrEmpty()) {
-                allowInsecure
-            } else {
-                queryParam["allowInsecure"].orEmpty() == "1"
-            }
-            config.sni = queryParam["sni"]
-            config.fingerPrint = queryParam["fp"]
-            config.alpn = queryParam["alpn"]
-            config.publicKey = queryParam["pbk"]
-            config.shortId = queryParam["sid"]
-            config.spiderX = queryParam["spx"]
-            config.flow = queryParam["flow"]
         }
 
         return config

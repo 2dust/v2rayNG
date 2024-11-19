@@ -31,6 +31,7 @@ data class ProfileItem(
     var serviceName: String? = null,
     var authority: String? = null,
     var xhttpMode: String? = null,
+    var xhttpExtra: String? = null,
 
     var security: String? = null,
     var sni: String? = null,

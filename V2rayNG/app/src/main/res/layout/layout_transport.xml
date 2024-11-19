@@ -92,4 +92,26 @@
             android:inputType="text" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/layout_extra"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/layout_margin_top_height"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_lab_xhttp_extra" />
+
+        <EditText
+            android:id="@+id/et_extra"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:maxLines="20"
+            android:minLines="4" />
+    </LinearLayout>
+
 </LinearLayout>
