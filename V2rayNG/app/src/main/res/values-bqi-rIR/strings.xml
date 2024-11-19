@@ -37,7 +37,7 @@
     <string name="menu_item_import_config_custom">کانفیگ سفارشی</string>
     <string name="menu_item_import_config_custom_clipboard">کانفیگ سفارشین ز کلیپ بورد و من بیار</string>
     <string name="menu_item_import_config_custom_local">کانفیگ سفارشین ز مهلی و من بیار</string>
-    <string name="menu_item_import_config_custom_url">کانفیگ سفارشین ز آدرس اینترنتی و من  بیار</string>
+    <string name="menu_item_import_config_custom_url">کانفیگ سفارشین ز آدرس اینترنتی و من بیار</string>
     <string name="menu_item_import_config_custom_url_scan">نشۊوی اینترنتی اسکن کانفیگ سفارشین بزݩ</string>
     <string name="del_config_comfirm">پاک بۊ؟</string>
     <string name="del_invalid_config_comfirm">پؽش ز پاک کردن کانفیگ نا موئتبر قوۊل کوݩ! پاک کردن کانفیگن قوۊل اکۊنی؟</string>
@@ -107,7 +107,7 @@
     <string name="menu_item_add_asset">ازاف کردن دارایی</string>
     <string name="menu_item_add_file">ازاف کردن فایل</string>
     <string name="menu_item_add_url">ازاف کردن آدرس اینترنتی</string>
-    <string name="menu_item_scan_qrcode">Scan QRcode</string>
+    <string name="menu_item_scan_qrcode">اسکن QRcode</string>
     <string name="title_url">آدرس اینترنتی</string>
     <string name="menu_item_download_file">دانلود فایلا</string>
     <string name="title_user_asset_add_url">آدرس اینترنتی دارایین ازاف کۊنین</string>
@@ -118,8 +118,8 @@
     <string name="server_lab_port_hop">پورت گوم (درگا سرورن ز نۊ هؽل اکونه)</string>
     <string name="server_lab_port_hop_interval">فاسله پورت گوم (سانیه)</string>
     <string name="server_lab_stream_pinsha256">pinSHA256</string>
-    <string name="server_lab_xhttp_mode">XHTTP Mode</string>
-    <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
+    <string name="server_lab_xhttp_mode">هالت XHTTP</string>
+    <string name="server_lab_xhttp_extra">XHTTP قلوه خام JSON، قالوو: { XHTTPObject }</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">هون بارونی بۊ</string>
