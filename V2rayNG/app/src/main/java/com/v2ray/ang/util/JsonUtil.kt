@@ -2,6 +2,8 @@ package com.v2ray.ang.util
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
@@ -15,11 +17,13 @@ object JsonUtil {
         return gson.toJson(src)
     }
 
-    fun <T> fromJson(json: String, cls: Class<T>): T {
-        return gson.fromJson(json, cls)
+    fun <T> fromJson(src: String, cls: Class<T>): T {
+        return gson.fromJson(src, cls)
     }
 
-    fun toJsonPretty(src: Any?): String {
+    fun toJsonPretty(src: Any?): String? {
+        if (src == null)
+            return null
         val gsonPre = GsonBuilder()
             .setPrettyPrinting()
             .disableHtmlEscaping()
@@ -34,4 +38,11 @@ object JsonUtil {
             .create()
         return gsonPre.toJson(src)
     }
+
+    fun parseString(src: String?): JsonObject? {
+        if (src == null)
+            return null
+        return JsonParser.parseString(src).getAsJsonObject()
+    }
+
 }

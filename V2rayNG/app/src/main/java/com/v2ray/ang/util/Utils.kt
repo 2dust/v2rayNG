@@ -295,7 +295,7 @@ object Utils {
 
     fun urlEncode(url: String): String {
         return try {
-            URLEncoder.encode(url, Charsets.UTF_8.toString())
+            URLEncoder.encode(url, Charsets.UTF_8.toString()).replace("+", "%20")
         } catch (e: Exception) {
             e.printStackTrace()
             url
