@@ -267,9 +267,10 @@
     <string name="routing_settings_delete">روفتن</string>
     <string name="routing_settings_rule_title">سامووا قانۉݩ تور جوستن</string>
     <string name="routing_settings_add_rule">ازاف کردن قانۉݩ</string>
-    <string name="routing_settings_import_rulesets">و من ٱووردن قانووا</string>
+    <string name="routing_settings_import_predefined_rulesets">و من ٱووردن قانووا</string>
     <string name="routing_settings_import_rulesets_tip">قانووایی ک هیم سکو هڌسۉݩ پاک ابۊن، هنی هم اخۊی پاکسۉݩ کۊنی؟</string>
     <string name="routing_settings_import_rulesets_from_clipboard">و من ٱووردن قانووا ز کلیپ بورد</string>
+    <string name="routing_settings_import_rulesets_from_qrcode">و من ٱووردن قانووا ز QRcode</string>
     <string name="routing_settings_export_rulesets_to_clipboard">و در کشیڌن قانووا وو زفت من کلیپ بورد</string>
     <string name="routing_settings_locked">چفت هڌ، ای قانؤنن مجال و من ٱووردن ز پؽش سامووا زفت کۊنین</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
