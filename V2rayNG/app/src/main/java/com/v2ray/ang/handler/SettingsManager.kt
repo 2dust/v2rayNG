@@ -43,12 +43,12 @@ object SettingsManager {
     }
 
 
-    fun resetRoutingRulesets(context: Context, index: Int) {
+    fun resetRoutingRulesetsFromPresets(context: Context, index: Int) {
         val rulesetList = getPresetRoutingRulesets(context, index) ?: return
         resetRoutingRulesetsCommon(rulesetList)
     }
 
-    fun resetRoutingRulesetsFromClipboard(content: String?): Boolean {
+    fun resetRoutingRulesets(content: String?): Boolean {
         if (content.isNullOrEmpty()) {
             return false
         }
