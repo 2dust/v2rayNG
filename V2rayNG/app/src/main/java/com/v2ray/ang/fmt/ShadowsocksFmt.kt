@@ -1,6 +1,7 @@
 package com.v2ray.ang.fmt
 
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.extension.idnHost
@@ -38,7 +39,7 @@ object ShadowsocksFmt : FmtBase() {
             val queryParam = getQueryParam(uri)
 
             if (queryParam["plugin"] == "obfs-local" && queryParam["obfs"] == "http") {
-                config.network = "tcp"
+                config.network = NetworkType.TCP.type
                 config.headerType = "http"
                 config.host = queryParam["obfs-host"]
                 config.path = queryParam["path"]

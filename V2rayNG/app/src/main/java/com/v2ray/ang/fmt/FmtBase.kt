@@ -1,6 +1,5 @@
 package com.v2ray.ang.fmt
 
-import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.isNotNullEmpty
@@ -31,7 +30,9 @@ open class FmtBase {
     }
 
     fun getItemFormQuery(config: ProfileItem, queryParam: Map<String, String>, allowInsecure: Boolean) {
-        config.network = queryParam["type"] ?: "tcp"
+        config.network = queryParam["type"] ?: NetworkType.TCP.type
+        //TODO
+        if (config.network == NetworkType.SPLIT_HTTP.type) config.network = NetworkType.XHTTP.type
         config.headerType = queryParam["headerType"]
         config.host = queryParam["host"]
         config.path = queryParam["path"]

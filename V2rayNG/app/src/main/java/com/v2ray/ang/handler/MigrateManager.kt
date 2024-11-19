@@ -5,6 +5,7 @@ import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.ServerConfig
 import com.v2ray.ang.handler.MmkvManager.decodeServerConfig
@@ -72,7 +73,7 @@ object MigrateManager {
         config.password = outbound.getPassword()
         config.flow = outbound?.settings?.vnext?.first()?.users?.first()?.flow ?: outbound?.settings?.servers?.first()?.flow
 
-        config.network = outbound?.streamSettings?.network ?: "tcp"
+        config.network = outbound?.streamSettings?.network ?: NetworkType.TCP.type
         outbound.getTransportSettingDetails()?.let { transportDetails ->
             config.headerType = transportDetails[0].orEmpty()
             config.host = transportDetails[1].orEmpty()

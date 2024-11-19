@@ -24,6 +24,7 @@ import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_MTU
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
@@ -158,16 +159,16 @@ class ServerActivity : BaseActivity() {
                 sp_header_type?.adapter = adapter
                 sp_header_type_title?.text =
                     when (networks[position]) {
-                        "grpc" -> getString(R.string.server_lab_mode_type)
-                        "xhttp" -> getString(R.string.server_lab_xhttp_mode)
+                        NetworkType.GRPC.type -> getString(R.string.server_lab_mode_type)
+                        NetworkType.SPLIT_HTTP.type, NetworkType.XHTTP.type -> getString(R.string.server_lab_xhttp_mode)
                         else -> getString(R.string.server_lab_head_type)
                     }.orEmpty()
                 sp_header_type?.setSelection(
                     Utils.arrayFind(
                         types,
                         when (networks[position]) {
-                            "grpc" -> config?.mode
-                            "xhttp" -> config?.xhttpMode
+                            NetworkType.GRPC.type -> config?.mode
+                            NetworkType.SPLIT_HTTP.type,  NetworkType.XHTTP.type -> config?.xhttpMode
                             else -> config?.headerType
                         }.orEmpty()
                     )
@@ -176,15 +177,15 @@ class ServerActivity : BaseActivity() {
                 et_request_host?.text = Utils.getEditable(
                     when (networks[position]) {
                         //"quic" -> config?.quicSecurity
-                        "grpc" -> config?.authority
+                        NetworkType.GRPC.type -> config?.authority
                         else -> config?.host
                     }.orEmpty()
                 )
                 et_path?.text = Utils.getEditable(
                     when (networks[position]) {
-                        "kcp" -> config?.seed
+                        NetworkType.KCP.type -> config?.seed
                         //"quic" -> config?.quicKey
-                        "grpc" -> config?.serviceName
+                        NetworkType.GRPC.type -> config?.serviceName
                         else -> config?.path
                     }.orEmpty()
                 )
@@ -192,13 +193,13 @@ class ServerActivity : BaseActivity() {
                 tv_request_host?.text = Utils.getEditable(
                     getString(
                         when (networks[position]) {
-                            "tcp" -> R.string.server_lab_request_host_http
-                            "ws" -> R.string.server_lab_request_host_ws
-                            "httpupgrade" -> R.string.server_lab_request_host_httpupgrade
-                            "splithttp", "xhttp" -> R.string.server_lab_request_host_xhttp
-                            "h2" -> R.string.server_lab_request_host_h2
+                            NetworkType.TCP.type -> R.string.server_lab_request_host_http
+                            NetworkType.WS.type -> R.string.server_lab_request_host_ws
+                            NetworkType.HTTP_UPGRADE.type -> R.string.server_lab_request_host_httpupgrade
+                            NetworkType.SPLIT_HTTP.type, NetworkType.XHTTP.type -> R.string.server_lab_request_host_xhttp
+                            NetworkType.H2.type -> R.string.server_lab_request_host_h2
                             //"quic" -> R.string.server_lab_request_host_quic
-                            "grpc" -> R.string.server_lab_request_host_grpc
+                            NetworkType.GRPC.type -> R.string.server_lab_request_host_grpc
                             else -> R.string.server_lab_request_host
                         }
                     )
@@ -207,27 +208,27 @@ class ServerActivity : BaseActivity() {
                 tv_path?.text = Utils.getEditable(
                     getString(
                         when (networks[position]) {
-                            "kcp" -> R.string.server_lab_path_kcp
-                            "ws" -> R.string.server_lab_path_ws
-                            "httpupgrade" -> R.string.server_lab_path_httpupgrade
-                            "splithttp", "xhttp" -> R.string.server_lab_path_xhttp
-                            "h2" -> R.string.server_lab_path_h2
+                            NetworkType.KCP.type -> R.string.server_lab_path_kcp
+                            NetworkType.WS.type -> R.string.server_lab_path_ws
+                            NetworkType.HTTP_UPGRADE.type -> R.string.server_lab_path_httpupgrade
+                            NetworkType.SPLIT_HTTP.type, NetworkType.XHTTP.type -> R.string.server_lab_path_xhttp
+                            NetworkType.H2.type -> R.string.server_lab_path_h2
                             //"quic" -> R.string.server_lab_path_quic
-                            "grpc" -> R.string.server_lab_path_grpc
+                            NetworkType.GRPC.type -> R.string.server_lab_path_grpc
                             else -> R.string.server_lab_path
                         }
                     )
                 )
                 et_extra?.text = Utils.getEditable(
                     when (networks[position]) {
-                        "splithttp", "xhttp" -> JsonUtil.toJsonPretty(JsonUtil.parseString(config?.xhttpExtra))
+                        NetworkType.SPLIT_HTTP.type, NetworkType.XHTTP.type -> JsonUtil.toJsonPretty(JsonUtil.parseString(config?.xhttpExtra))
                         else -> null
                     }.orEmpty()
                 )
 
                 layout_extra?.visibility =
                     when (networks[position]) {
-                        "splithttp", "xhttp" -> View.VISIBLE
+                        NetworkType.SPLIT_HTTP.type, NetworkType.XHTTP.type -> View.VISIBLE
                         else -> View.GONE
                     }
             }
@@ -475,7 +476,7 @@ class ServerActivity : BaseActivity() {
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
-        Log.d(ANG_PACKAGE, JsonUtil.toJsonPretty(config)?:"")
+        Log.d(ANG_PACKAGE, JsonUtil.toJsonPretty(config) ?: "")
         MmkvManager.encodeServerConfig(editGuid, config)
         toast(R.string.toast_success)
         finish()
@@ -564,19 +565,19 @@ class ServerActivity : BaseActivity() {
 
     private fun transportTypes(network: String?): Array<out String> {
         return when (network) {
-            "tcp" -> {
+            NetworkType.TCP.type -> {
                 tcpTypes
             }
 
-            "kcp" -> {
+            NetworkType.KCP.type -> {
                 kcpAndQuicTypes
             }
 
-            "grpc" -> {
+            NetworkType.GRPC.type -> {
                 grpcModes
             }
 
-            "xhttp" -> {
+            NetworkType.SPLIT_HTTP.type,  NetworkType.XHTTP.type -> {
                 xhttpMode
             }
 

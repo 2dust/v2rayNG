@@ -48,7 +48,7 @@ object VmessFmt : FmtBase() {
         config.password = vmessQRCode.id
         config.method = if (TextUtils.isEmpty(vmessQRCode.scy)) AppConfig.DEFAULT_SECURITY else vmessQRCode.scy
 
-        config.network = vmessQRCode.net ?: "tcp"
+        config.network = vmessQRCode.net ?: NetworkType.TCP.type
         config.headerType = vmessQRCode.type
         config.host = vmessQRCode.host
         config.path = vmessQRCode.path

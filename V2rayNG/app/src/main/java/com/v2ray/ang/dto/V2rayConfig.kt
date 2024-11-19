@@ -344,14 +344,21 @@ data class V2rayConfig(
             }
 
             fun populateTransportSettings(
-                transport: String, headerType: String?, host: String?, path: String?, seed: String?,
-                quicSecurity: String?, key: String?, mode: String?, serviceName: String?,
+                transport: String,
+                headerType: String?,
+                host: String?,
+                path: String?,
+                seed: String?,
+                quicSecurity: String?,
+                key: String?,
+                mode: String?,
+                serviceName: String?,
                 authority: String?
             ): String? {
                 var sni: String? = null
                 network = transport
                 when (network) {
-                    "tcp" -> {
+                    NetworkType.TCP.type -> {
                         val tcpSetting = TcpSettingsBean()
                         if (headerType == AppConfig.HEADER_TYPE_HTTP) {
                             tcpSetting.header.type = AppConfig.HEADER_TYPE_HTTP
@@ -369,7 +376,7 @@ data class V2rayConfig(
                         tcpSettings = tcpSetting
                     }
 
-                    "kcp" -> {
+                    NetworkType.KCP.type -> {
                         val kcpsetting = KcpSettingsBean()
                         kcpsetting.header.type = headerType ?: "none"
                         if (seed.isNullOrEmpty()) {
@@ -380,7 +387,7 @@ data class V2rayConfig(
                         kcpSettings = kcpsetting
                     }
 
-                    "ws" -> {
+                    NetworkType.WS.type -> {
                         val wssetting = WsSettingsBean()
                         wssetting.headers.Host = host.orEmpty()
                         sni = wssetting.headers.Host
@@ -388,7 +395,7 @@ data class V2rayConfig(
                         wsSettings = wssetting
                     }
 
-                    "httpupgrade" -> {
+                    NetworkType.HTTP_UPGRADE.type -> {
                         val httpupgradeSetting = HttpupgradeSettingsBean()
                         httpupgradeSetting.host = host.orEmpty()
                         sni = httpupgradeSetting.host
@@ -396,7 +403,7 @@ data class V2rayConfig(
                         httpupgradeSettings = httpupgradeSetting
                     }
 
-                    "splithttp","xhttp" -> {
+                    NetworkType.SPLIT_HTTP.type, NetworkType.XHTTP.type -> {
                         val xhttpSetting = XhttpSettingsBean()
                         xhttpSetting.host = host.orEmpty()
                         sni = xhttpSetting.host
@@ -404,8 +411,8 @@ data class V2rayConfig(
                         xhttpSettings = xhttpSetting
                     }
 
-                    "h2", "http" -> {
-                        network = "h2"
+                    NetworkType.H2.type, NetworkType.HTTP.type -> {
+                        network = NetworkType.H2.type
                         val h2Setting = HttpSettingsBean()
                         h2Setting.host = host.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
                         sni = h2Setting.host.getOrNull(0) ?: sni
@@ -421,7 +428,7 @@ data class V2rayConfig(
 //                        quicSettings = quicsetting
 //                    }
 
-                    "grpc" -> {
+                    NetworkType.GRPC.type -> {
                         val grpcSetting = GrpcSettingsBean()
                         grpcSetting.multiMode = mode == "multi"
                         grpcSetting.serviceName = serviceName.orEmpty()
@@ -436,8 +443,14 @@ data class V2rayConfig(
             }
 
             fun populateTlsSettings(
-                streamSecurity: String, allowInsecure: Boolean, sni: String?, fingerprint: String?, alpns: String?,
-                publicKey: String?, shortId: String?, spiderX: String?
+                streamSecurity: String,
+                allowInsecure: Boolean,
+                sni: String?,
+                fingerprint: String?,
+                alpns: String?,
+                publicKey: String?,
+                shortId: String?,
+                spiderX: String?
             ) {
                 security = streamSecurity
                 val tlsSetting = TlsSettingsBean(
@@ -545,7 +558,7 @@ data class V2rayConfig(
             ) {
                 val transport = streamSettings?.network ?: return null
                 return when (transport) {
-                    "tcp" -> {
+                    NetworkType.TCP.type -> {
                         val tcpSetting = streamSettings?.tcpSettings ?: return null
                         listOf(
                             tcpSetting.header.type,
@@ -554,7 +567,7 @@ data class V2rayConfig(
                         )
                     }
 
-                    "kcp" -> {
+                    NetworkType.KCP.type -> {
                         val kcpSetting = streamSettings?.kcpSettings ?: return null
                         listOf(
                             kcpSetting.header.type,
@@ -563,7 +576,7 @@ data class V2rayConfig(
                         )
                     }
 
-                    "ws" -> {
+                    NetworkType.WS.type -> {
                         val wsSetting = streamSettings?.wsSettings ?: return null
                         listOf(
                             "",
@@ -572,7 +585,7 @@ data class V2rayConfig(
                         )
                     }
 
-                    "httpupgrade" -> {
+                    NetworkType.HTTP_UPGRADE.type -> {
                         val httpupgradeSetting = streamSettings?.httpupgradeSettings ?: return null
                         listOf(
                             "",
@@ -581,7 +594,7 @@ data class V2rayConfig(
                         )
                     }
 
-                    "splithttp" ,"xhttp"-> {
+                    NetworkType.SPLIT_HTTP.type, NetworkType.XHTTP.type -> {
                         val xhttpSettings = streamSettings?.xhttpSettings ?: return null
                         listOf(
                             "",
@@ -590,7 +603,7 @@ data class V2rayConfig(
                         )
                     }
 
-                    "h2" -> {
+                    NetworkType.H2.type -> {
                         val h2Setting = streamSettings?.httpSettings ?: return null
                         listOf(
                             "",
@@ -608,7 +621,7 @@ data class V2rayConfig(
 //                        )
 //                    }
 
-                    "grpc" -> {
+                    NetworkType.GRPC.type -> {
                         val grpcSetting = streamSettings?.grpcSettings ?: return null
                         listOf(
                             if (grpcSetting.multiMode == true) "multi" else "gun",
