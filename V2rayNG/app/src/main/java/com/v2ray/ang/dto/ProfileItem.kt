@@ -44,6 +44,7 @@ data class ProfileItem(
     var spiderX: String? = null,
 
     var secretKey: String? = null,
+    var preSharedKey: String? = null,
     var localAddress: String? = null,
     var reserved: String? = null,
     var mtu: Int? = null,
