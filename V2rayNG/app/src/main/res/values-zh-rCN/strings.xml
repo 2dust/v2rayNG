@@ -113,6 +113,7 @@
     <string name="server_lab_port_hop_interval">端口跳跃间隔(秒)</string>
     <string name="server_lab_stream_pinsha256">SHA256证书指纹</string>
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
+    <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">添加资产网址</string>
