@@ -54,14 +54,14 @@
     <string name="server_lab_request_host_http">Узел HTTP</string>
     <string name="server_lab_request_host_ws">Узел WS</string>
     <string name="server_lab_request_host_httpupgrade">Узел HTTPUpgrade</string>
-    <string name="server_lab_request_host_xhttp">Узел SplitHTTP</string>
+    <string name="server_lab_request_host_xhttp">Узел XHTTP</string>
     <string name="server_lab_request_host_h2">Узел H2</string>
     <string name="server_lab_request_host_quic">Шифрование QUIC</string>
     <string name="server_lab_request_host_grpc">Полномочия gRPC</string>
     <string name="server_lab_path">Путь</string>
     <string name="server_lab_path_ws">Путь WS</string>
     <string name="server_lab_path_httpupgrade">Путь HTTPUpgrade</string>
-    <string name="server_lab_path_xhttp">Путь SplitHTTP</string>
+    <string name="server_lab_path_xhttp">Путь XHTTP</string>
     <string name="server_lab_path_h2">Путь H2</string>
     <string name="server_lab_path_quic">Ключ QUIC</string>
     <string name="server_lab_path_kcp">Сид KCP</string>
@@ -83,7 +83,7 @@
     <string name="server_lab_short_id">ShortID</string>
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_secret_key">Закрытый ключ</string>
-    <string name="server_lab_reserved">Reserved (необязательно)</string>
+    <string name="server_lab_reserved">Reserved (необязательно, через запятую)</string>
     <string name="server_lab_local_address">Локальный адрес (необязательно, IPv4/IPv6 через запятую)</string>
     <string name="server_lab_local_mtu">MTU (необязательно, по умолчанию 1420)</string>
     <string name="toast_success">Успешно</string>
@@ -106,7 +106,7 @@
     <string name="menu_item_add_asset">Добавить ресурс</string>
     <string name="menu_item_add_file">Добавить файлы</string>
     <string name="menu_item_add_url">Добавить URL</string>
-    <string name="menu_item_scan_qrcode">Сканирование QR-кода</string>
+    <string name="menu_item_scan_qrcode">Сканировать QR-код</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">Загрузить файлы</string>
     <string name="title_user_asset_add_url">Добавить URL ресурса</string>
@@ -114,11 +114,11 @@
     <string name="msg_remark_is_duplicate">Название уже существует</string>
     <string name="toast_action_not_allowed">Это действие запрещено</string>
     <string name="server_obfs_password">Пароль obfs</string>
-    <string name="server_lab_port_hop">Переключение портов</string>
-    <string name="server_lab_port_hop_interval">Интервал переключения портов</string>
+    <string name="server_lab_port_hop">Смена портов (переопределяет порт)</string>
+    <string name="server_lab_port_hop_interval">Интервал смены портов</string>
     <string name="server_lab_stream_pinsha256">pinSHA256</string>
-    <string name="server_lab_xhttp_mode">XHTTP Mode</string>
-    <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
+    <string name="server_lab_xhttp_mode">Режим XHTTP</string>
+    <string name="server_lab_xhttp_extra">Необработанный JSON XHTTP Extra, формат: { XHTTPObject }</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Загрузка…</string>
