@@ -113,6 +113,7 @@ class ServerActivity : BaseActivity() {
     private val sp_stream_alpn: Spinner? by lazy { findViewById(R.id.sp_stream_alpn) } //uTLS
     private val container_alpn: LinearLayout? by lazy { findViewById(R.id.lay_stream_alpn) }
     private val et_public_key: EditText? by lazy { findViewById(R.id.et_public_key) }
+    private val et_preshared_key: EditText? by lazy { findViewById(R.id.et_preshared_key) }
     private val container_public_key: LinearLayout? by lazy { findViewById(R.id.lay_public_key) }
     private val et_short_id: EditText? by lazy { findViewById(R.id.et_short_id) }
     private val container_short_id: LinearLayout? by lazy { findViewById(R.id.lay_short_id) }
@@ -150,7 +151,7 @@ class ServerActivity : BaseActivity() {
                 parent: AdapterView<*>?,
                 view: View?,
                 position: Int,
-                id: Long
+                id: Long,
             ) {
                 val types = transportTypes(networks[position])
                 sp_header_type?.isEnabled = types.size > 1
@@ -243,7 +244,7 @@ class ServerActivity : BaseActivity() {
                 parent: AdapterView<*>?,
                 view: View?,
                 position: Int,
-                id: Long
+                id: Long,
             ) {
                 val isBlank = streamSecuritys[position].isBlank()
                 val isTLS = streamSecuritys[position] == TLS
@@ -321,29 +322,21 @@ class ServerActivity : BaseActivity() {
         } else if (config.configType == EConfigType.WIREGUARD) {
             et_id.text = Utils.getEditable(config.secretKey.orEmpty())
             et_public_key?.text = Utils.getEditable(config.publicKey.orEmpty())
-            if (config.reserved == null) {
-                et_reserved1?.text = Utils.getEditable("0,0,0")
-            } else {
-                et_reserved1?.text = Utils.getEditable(config.reserved?.toString())
-            }
-            if (config.localAddress == null) {
-                et_local_address?.text = Utils.getEditable("${WIREGUARD_LOCAL_ADDRESS_V4},${WIREGUARD_LOCAL_ADDRESS_V6}")
-            } else {
-                et_local_address?.text = Utils.getEditable(config.localAddress)
-            }
-            if (config.mtu == null) {
-                et_local_mtu?.text = Utils.getEditable(WIREGUARD_LOCAL_MTU)
-            } else {
-                et_local_mtu?.text = Utils.getEditable(config.mtu.toString())
-            }
+            et_preshared_key?.visibility = View.VISIBLE
+            et_preshared_key?.text = Utils.getEditable(config.preSharedKey.orEmpty())
+            et_reserved1?.text = Utils.getEditable(config.reserved ?: "0,0,0")
+            et_local_address?.text = Utils.getEditable(
+                config.localAddress ?: "$WIREGUARD_LOCAL_ADDRESS_V4,$WIREGUARD_LOCAL_ADDRESS_V6"
+            )
+            et_local_mtu?.text = Utils.getEditable(config.mtu?.toString() ?: WIREGUARD_LOCAL_MTU)
         } else if (config.configType == EConfigType.HYSTERIA2) {
             et_obfs_password?.text = Utils.getEditable(config.obfsPassword)
             et_port_hop?.text = Utils.getEditable(config.portHopping)
             et_port_hop_interval?.text = Utils.getEditable(config.portHoppingInterval)
             et_pinsha256?.text = Utils.getEditable(config.pinSHA256)
         }
-
-        val securityEncryptions = if (config.configType == EConfigType.SHADOWSOCKS) shadowsocksSecuritys else securitys
+        val securityEncryptions =
+            if (config.configType == EConfigType.SHADOWSOCKS) shadowsocksSecuritys else securitys
         val security = Utils.arrayFind(securityEncryptions, config.method.orEmpty())
         if (security >= 0) {
             sp_security?.setSelection(security)
@@ -374,7 +367,7 @@ class ServerActivity : BaseActivity() {
                 container_public_key?.visibility = View.GONE
                 container_short_id?.visibility = View.GONE
                 container_spider_x?.visibility = View.GONE
-            } else if (config.security == REALITY) { // reality settings
+            } else if (config.security == REALITY) {
                 container_public_key?.visibility = View.VISIBLE
                 et_public_key?.text = Utils.getEditable(config.publicKey.orEmpty())
                 container_short_id?.visibility = View.VISIBLE
@@ -394,7 +387,6 @@ class ServerActivity : BaseActivity() {
             container_short_id?.visibility = View.GONE
             container_spider_x?.visibility = View.GONE
         }
-
         val network = Utils.arrayFind(networks, config.network.orEmpty())
         if (network >= 0) {
             sp_network?.setSelection(network)
@@ -448,7 +440,8 @@ class ServerActivity : BaseActivity() {
                 return false
             }
         }
-        val config = MmkvManager.decodeServerConfig(editGuid) ?: ProfileItem.create(createConfigType)
+        val config =
+            MmkvManager.decodeServerConfig(editGuid) ?: ProfileItem.create(createConfigType)
         if (config.configType != EConfigType.SOCKS
             && config.configType != EConfigType.HTTP
             && TextUtils.isEmpty(et_id.text.toString())
@@ -511,6 +504,7 @@ class ServerActivity : BaseActivity() {
         } else if (config.configType == EConfigType.WIREGUARD) {
             config.secretKey = et_id.text.toString().trim()
             config.publicKey = et_public_key?.text.toString().trim()
+            config.preSharedKey = et_preshared_key?.text.toString().trim()
             config.reserved = et_reserved1?.text.toString().trim()
             config.localAddress = et_local_address?.text.toString().trim()
             config.mtu = Utils.parseInt(et_local_mtu?.text.toString())
@@ -555,7 +549,7 @@ class ServerActivity : BaseActivity() {
 
         val allowInsecure =
             if (allowInsecureField == null || allowinsecures[allowInsecureField].isBlank()) {
-                MmkvManager.decodeSettingsBool(PREF_ALLOW_INSECURE) == true
+                MmkvManager.decodeSettingsBool(PREF_ALLOW_INSECURE)
             } else {
                 allowinsecures[allowInsecureField].toBoolean()
             }
