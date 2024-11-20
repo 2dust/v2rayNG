@@ -266,9 +266,10 @@
     <string name="routing_settings_delete">Очистить</string>
     <string name="routing_settings_rule_title">Настройка правил маршрутизации</string>
     <string name="routing_settings_add_rule">Добавить правило</string>
-    <string name="routing_settings_import_rulesets">Импорт правил</string>
+    <string name="routing_settings_import_predefined_rulesets">Импорт предопределенных наборов правил</string>
     <string name="routing_settings_import_rulesets_tip">Существующие правила будут удалены. Продолжить?</string>
     <string name="routing_settings_import_rulesets_from_clipboard">Импорт правил из буфера обмена</string>
+    <string name="routing_settings_import_rulesets_from_qrcode">Импорт набора правил из QRcode</string>
     <string name="routing_settings_export_rulesets_to_clipboard">Экспорт правил в буфер обмена</string>
     <string name="routing_settings_locked">Постоянное (сохранится при импорте правил)</string>
     <string name="routing_settings_domain">Домен</string>

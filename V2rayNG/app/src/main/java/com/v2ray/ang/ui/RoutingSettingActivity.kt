@@ -1,15 +1,18 @@
 package com.v2ray.ang.ui
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.tbruyelle.rxpermissions3.RxPermissions
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityRoutingSettingBinding
@@ -83,13 +86,13 @@ class RoutingSettingActivity : BaseActivity() {
             true
         }
 
-        R.id.import_rulesets -> {
+        R.id.import_predefined_rulesets -> {
             AlertDialog.Builder(this).setMessage(R.string.routing_settings_import_rulesets_tip)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     AlertDialog.Builder(this).setItems(preset_rulesets.asList().toTypedArray()) { _, i ->
                         try {
                             lifecycleScope.launch(Dispatchers.IO) {
-                                SettingsManager.resetRoutingRulesets(this@RoutingSettingActivity, i)
+                                SettingsManager.resetRoutingRulesetsFromPresets(this@RoutingSettingActivity, i)
                                 launch(Dispatchers.Main) {
                                     refreshData()
                                     toast(R.string.toast_success)
@@ -120,7 +123,7 @@ class RoutingSettingActivity : BaseActivity() {
                         return@setPositiveButton
                     }
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val result = SettingsManager.resetRoutingRulesetsFromClipboard(clipboard)
+                        val result = SettingsManager.resetRoutingRulesets(clipboard)
                         withContext(Dispatchers.Main) {
                             if (result) {
                                 refreshData()
@@ -138,6 +141,18 @@ class RoutingSettingActivity : BaseActivity() {
             true
         }
 
+        R.id.import_rulesets_from_qrcode -> {
+            RxPermissions(this)
+                .request(Manifest.permission.CAMERA)
+                .subscribe {
+                    if (it)
+                        scanQRcodeForRulesets.launch(Intent(this, ScannerActivity::class.java))
+                    else
+                        toast(R.string.toast_permission_denied)
+                }
+            true
+        }
+
 
         R.id.export_rulesets_to_clipboard -> {
             val rulesetList = MmkvManager.decodeRoutingRulesets()
@@ -151,6 +166,34 @@ class RoutingSettingActivity : BaseActivity() {
         }
 
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private val scanQRcodeForRulesets = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            importRulesetsFromQRcode(it.data?.getStringExtra("SCAN_RESULT"))
+        }
+    }
+
+    private fun importRulesetsFromQRcode(qrcode: String?): Boolean {
+        AlertDialog.Builder(this).setMessage(R.string.routing_settings_import_rulesets_tip)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val result = SettingsManager.resetRoutingRulesets(qrcode)
+                    withContext(Dispatchers.Main) {
+                        if (result) {
+                            refreshData()
+                            toast(R.string.toast_success)
+                        } else {
+                            toast(R.string.toast_failure)
+                        }
+                    }
+                }
+            }
+            .setNegativeButton(android.R.string.no) { _, _ ->
+                //do nothing
+            }
+            .show()
+        return true
     }
 
     fun refreshData() {
