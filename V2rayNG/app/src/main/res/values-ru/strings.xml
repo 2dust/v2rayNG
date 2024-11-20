@@ -80,6 +80,7 @@
     <string name="server_lab_encryption">Шифрование</string>
     <string name="server_lab_flow">Поток</string>
     <string name="server_lab_public_key">Открытый ключ</string>
+    <string name="server_lab_preshared_key">Дополнительный ключ шифрования (необязательно)</string>
     <string name="server_lab_short_id">ShortID</string>
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_secret_key">Закрытый ключ</string>
@@ -266,10 +267,10 @@
     <string name="routing_settings_delete">Очистить</string>
     <string name="routing_settings_rule_title">Настройка правил маршрутизации</string>
     <string name="routing_settings_add_rule">Добавить правило</string>
-    <string name="routing_settings_import_predefined_rulesets">Импорт предопределенных наборов правил</string>
+    <string name="routing_settings_import_predefined_rulesets">Импорт набора правил</string>
     <string name="routing_settings_import_rulesets_tip">Существующие правила будут удалены. Продолжить?</string>
     <string name="routing_settings_import_rulesets_from_clipboard">Импорт правил из буфера обмена</string>
-    <string name="routing_settings_import_rulesets_from_qrcode">Импорт набора правил из QRcode</string>
+    <string name="routing_settings_import_rulesets_from_qrcode">Импорт правил из QR-кода</string>
     <string name="routing_settings_export_rulesets_to_clipboard">Экспорт правил в буфер обмена</string>
     <string name="routing_settings_locked">Постоянное (сохранится при импорте правил)</string>
     <string name="routing_settings_domain">Домен</string>
