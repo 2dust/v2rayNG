@@ -80,12 +80,12 @@
     <string name="server_lab_security4">نوم من توری (اختیاری)</string>
     <string name="server_lab_encryption">رزم نگاری</string>
     <string name="server_lab_flow">جریان</string>
-    <string name="server_lab_public_key">PublicKey</string>
+    <string name="server_lab_public_key">کیلیت پوی وولاتی</string>
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x">SpiderX</string>
-    <string name="server_lab_secret_key">SecretKey</string>
-    <string name="server_lab_reserved">Reserved(اختیاری, وا کاما ز یک جوڌا ابۊن)</string>
-    <string name="server_lab_local_address">آدرس مهلی (اختیاری IPv4/IPv6, وا کاما ز یک جوڌا ابۊن)</string>
+    <string name="server_lab_secret_key">کیلیت سیخومی</string>
+    <string name="server_lab_reserved">Reserved(اختیاری، وا کاما ز یک جوڌا ابۊن)</string>
+    <string name="server_lab_local_address">آدرس مهلی (اختیاری IPv4/IPv6، وا کاما ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_mtu">Mtu(اختیاری، خوتکار 1420)</string>
     <string name="toast_success">وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_failure">شکست خرد</string>
@@ -217,8 +217,8 @@
     <string name="title_configuration_restore">وورگندن کانفیگ</string>
     <string name="title_configuration_share">یک رسۊوی کانفیگ</string>
 
-    <string name="title_pref_promotion">تبلیغات</string>
-    <string name="summary_pref_promotion">تبلیغات، سی نیشتن جوزیات بیشتر کیلیک کۊنین. (هیاری مالی کۊنین تا پاک بۊ)</string>
+    <string name="title_pref_promotion">تبلیقات</string>
+    <string name="summary_pref_promotion">تبلیقات، سی نیشتن جوزیات بیشتر کیلیک کۊنین. (هیاری مالی کۊنین تا پاک بۊ)</string>
 
     <string name="title_pref_auto_update_subscription">ورۊ کردن خوتکار اشتراکا</string>
     <string name="summary_pref_auto_update_subscription">اشتراکا خوتۉ ن و تۉر خوتکار وا فاسله زمۊوی من پس زمینه ورۊ کۊنین. ای ویژیی من پوی دسگایل گاشڌ همیشه کار نکونه</string>
@@ -262,7 +262,7 @@
 
     <string name="routing_settings_domain_strategy">نشقه دامنه</string>
     <string name="routing_settings_title">سامووا تور جوستن</string>
-    <string name="routing_settings_tips">وا کاما ز یک جوڌا ابۊن (,) پسند دامنه یا آی پی</string>
+    <string name="routing_settings_tips">وا کاما ز یک جوڌا ابۊن (،) پسند دامنه یا آی پی</string>
     <string name="routing_settings_save">زفت کردن</string>
     <string name="routing_settings_delete">روفتن</string>
     <string name="routing_settings_rule_title">سامووا قانۉݩ تور جوستن</string>
