@@ -79,10 +79,11 @@
     <string name="server_lab_security4">نام‌ کاربری (اختیاری)</string>
     <string name="server_lab_encryption">رمزنگاری</string>
     <string name="server_lab_flow">جریان</string>
-    <string name="server_lab_public_key">PublicKey</string>
+    <string name="server_lab_public_key">کلید عمومی</string>
+    <string name="server_lab_preshared_key">کلید رمزگذاری اضافی (اختیاری)</string>
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x">SpiderX</string>
-    <string name="server_lab_secret_key">SecretKey</string>
+    <string name="server_lab_secret_key">کلید خصوصی</string>
     <string name="server_lab_reserved">Reserved (اختیاری)</string>
     <string name="server_lab_local_address">آدرس محلی IPv4(اختیاری)</string>
     <string name="server_lab_local_mtu">Mtu(optional, default 1420)</string>
@@ -96,7 +97,7 @@
     <string name="server_customize_config">کانفیگ سفارشی</string>
     <string name="toast_config_file_invalid">کانفیگ معتبر نیست</string>
     <string name="server_lab_content">محتوا</string>
-    <string name="toast_none_data_clipboard">هیچ داده‌ای در کلیپ ‌بورد وجود ندارد</string>
+    <string name="toast_none_data_clipboard">هیچ داده‌ ای در کلیپ ‌بورد وجود ندارد</string>
     <string name="toast_invalid_url">نشانی اینترنتی معتبر نیست</string>
     <string name="toast_insecure_url_protocol">لطفاً از آدرس اشتراک پروتکل HTTP ناامن استفاده نکنید</string>
     <string name="server_lab_need_inbound">اطمینان حاصل کنید که پورت ورودی با تنظیمات مطابقت دارد</string>
