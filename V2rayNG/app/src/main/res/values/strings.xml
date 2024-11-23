@@ -214,6 +214,7 @@
     <string name="title_privacy_policy">Privacy policy</string>
     <string name="title_about">About</string>
     <string name="title_source_code">Source code</string>
+    <string name="title_oss_license">Open Source licenses</string>
     <string name="title_tg_channel">Telegram channel</string>
     <string name="title_configuration_backup">Backup configuration</string>
     <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
