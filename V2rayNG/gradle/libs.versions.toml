@@ -11,6 +11,8 @@ activity = "1.9.3"
 constraintlayout = "2.2.0"
 mmkvStatic = "1.3.9"
 gson = "2.11.0"
+ossLicensesPlugin = "0.10.6"
+playServicesOssLicenses = "17.1.0"
 rxjava = "3.1.9"
 rxandroid = "3.0.2"
 rxpermissions = "0.12"
@@ -36,6 +38,8 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 mmkv-static = { module = "com.tencent:mmkv-static", version.ref = "mmkvStatic" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+oss-licenses-plugin = { module = "com.google.android.gms:oss-licenses-plugin", version.ref = "ossLicensesPlugin" }
+play-services-oss-licenses = { module = "com.google.android.gms:play-services-oss-licenses", version.ref = "playServicesOssLicenses" }
 rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava" }
 rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "rxandroid" }
 rxpermissions = { module = "com.github.tbruyelle:rxpermissions", version.ref = "rxpermissions" }
