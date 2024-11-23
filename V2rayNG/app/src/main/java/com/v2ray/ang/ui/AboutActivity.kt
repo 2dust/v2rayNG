@@ -20,6 +20,8 @@ import com.v2ray.ang.util.ZipUtil
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+
 
 class AboutActivity : BaseActivity() {
     private val binding by lazy { ActivityAboutBinding.inflate(layoutInflater) }
@@ -86,6 +88,9 @@ class AboutActivity : BaseActivity() {
 
         binding.layoutFeedback.setOnClickListener {
             Utils.openUri(this, AppConfig.v2rayNGIssues)
+        }
+        binding.layoutOssLicenses.setOnClickListener{
+            startActivity(Intent(this, OssLicensesMenuActivity::class.java))
         }
 
         binding.layoutTgChannel.setOnClickListener {

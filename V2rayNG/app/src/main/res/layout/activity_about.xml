@@ -136,6 +136,30 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/layout_oss_licenses"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/server_height"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center|start"
+                android:orientation="horizontal"
+                android:padding="@dimen/padding">
+
+                <ImageView
+                    android:layout_width="@dimen/png_height"
+                    android:layout_height="@dimen/png_height"
+                    app:srcCompat="@drawable/license_24px" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/padding_start"
+                    android:text="@string/title_oss_license"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/layout_feedback"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/server_height"
