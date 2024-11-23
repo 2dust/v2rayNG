@@ -102,6 +102,30 @@ object ShadowsocksFmt : FmtBase() {
             server.method = profileItem.method
         }
 
+        outboundBean?.streamSettings?.populateTransportSettings(
+            profileItem.network.orEmpty(),
+            profileItem.headerType,
+            profileItem.host,
+            profileItem.path,
+            profileItem.seed,
+            profileItem.quicSecurity,
+            profileItem.quicKey,
+            profileItem.mode,
+            profileItem.serviceName,
+            profileItem.authority,
+        )
+
+        outboundBean?.streamSettings?.populateTlsSettings(
+            profileItem.security.orEmpty(),
+            profileItem.insecure == true,
+            profileItem.sni,
+            profileItem.fingerPrint,
+            profileItem.alpn,
+            profileItem.publicKey,
+            profileItem.shortId,
+            profileItem.spiderX,
+        )
+
         return outboundBean
     }
 
