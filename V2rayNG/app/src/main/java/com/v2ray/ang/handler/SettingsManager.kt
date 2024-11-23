@@ -95,7 +95,7 @@ object SettingsManager {
         if (rulesetList.isNullOrEmpty()) return
 
         if (index < 0 || index >= rulesetList.count()) {
-            rulesetList.add(ruleset)
+            rulesetList.add(0, ruleset)
         } else {
             rulesetList[index] = ruleset
         }
