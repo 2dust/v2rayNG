@@ -138,13 +138,13 @@
     <string name="title_advanced">سامووا پؽش رئڌه</string>
     <string name="title_vpn_settings">سامووا VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی و ری برنومه</string>
-    <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه واجۊری بیڌه پروکسی هڌ، منپیز موستقیم بؽ نشووه هڌ. /n هالت دور زیڌن: برنومه نشووک ناڌه موستقیمن منپیز هڌ، پروکسی نشووک زیڌه نؽڌ. /n گۊزینه پسند خوتکار برنومه پروکسی من نومگه</string>
+    <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه واجۊری بیڌه پروکسی هڌ، منپیز موستقیم بؽ نشووه هڌ. هالت دور زیڌن: برنومه نشووک ناڌه موستقیمن منپیز هڌ، پروکسی نشووک زیڌه نؽڌ. گۊزینه پسند خوتکار برنومه پروکسی من نومگه</string>
     <string name="title_pref_is_booted">منپیز خوتکار مجال ره ونی</string>
-    <string name="summary_pref_is_booted">مجال ره وندن خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
+    <string name="summary_pref_is_booted">مجال ره وندن، خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
 
     <string name="title_mux_settings">سامووا Mux</string>
     <string name="title_pref_mux_enabled">ره وندن Mux</string>
-    <string name="summary_pref_mux_enabled">زل تر، ٱما گاشڌ منپیز زی قت بۊ /n بارت دؽوۉداری، TCP، UDP و QUIC ن ای لم سفارشی کۊنین.</string>
+    <string name="summary_pref_mux_enabled">زل تر، ٱما گاشڌ منپیز زی قت بۊ بارت دؽوۉداری، TCP، UDP و QUIC ن ای لم سفارشی کۊنین.</string>
     <string name="title_pref_mux_concurency">منپیزا TCP (تلایه منجا 1-1024)</string>
     <string name="title_pref_mux_xudp_concurency">منپیزا XUDP (تلایه منجا 1-1024)</string>
     <string name="title_pref_mux_xudp_quic">دؽوۉداری QUIC من تونل mux</string>
@@ -155,7 +155,7 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">ره وندن نشۉݩ داڌن سورعت</string>
-    <string name="summary_pref_speed_enabled">نشۉݩ داڌن سورعت هیم سکویی من وارسۊویا./nنماڌ وارسۊوی و ری و کار گرؽڌن آلشت ابۊ.</string>
+    <string name="summary_pref_speed_enabled">نشۉݩ داڌن سورعت هیم سکویی من وارسۊویا. نماڌ وارسۊوی و ری و کار گرؽڌن آلشت ابۊ.</string>
 
     <string name="title_pref_sniffing_enabled">ره وندن Sniffing</string>
     <string name="summary_pref_sniffing_enabled">دامنه sniff ن ز کتن امتهۉݩ کۊنین (پؽش فرز رۊشن)</string>
@@ -171,7 +171,7 @@
     <string name="title_pref_prefer_ipv6">ترجی IPv6</string>
     <string name="summary_pref_prefer_ipv6">ترجی داڌن نشۊوی وو تورا IPv6</string>
 
-    <string name="title_pref_remote_dns">DNS ز ره دیر (اختیاری) (udp/tcp/https/quic)(اختیاری)</string>
+    <string name="title_pref_remote_dns">DNS ز ره دیر (اختیاری) (udp/tcp/https/quic) (اختیاری)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (تینا IPv4/v6)</string>
@@ -180,7 +180,7 @@
     <string name="summary_pref_domestic_dns">DNS</string>
 
     <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تئخیر واقعی (http/https)</string>
-    <string name="summary_pref_delay_test_url">Url</string>
+    <string name="summary_pref_delay_test_url">نشۊوی اینترنتی</string>
 
     <string name="title_pref_proxy_sharing_enabled">هشتن منپیزا ز LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا آدرس IP ایسا، ز ره socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل اعتماد فعال بۊ تا ز منپیز ؛یر موجاز جلو گری بۊ.</string>
@@ -211,6 +211,7 @@
     <string name="title_privacy_policy">هریم سیخومی</string>
     <string name="title_about">زبار</string>
     <string name="title_source_code">کود بونچک</string>
+    <string name="title_oss_license">موجوزا کود بونچک</string>
     <string name="title_tg_channel">تورگه تلگرام</string>
     <string name="title_configuration_backup">لادراری گرؽڌن ز کانفیگ</string>
     <string name="summary_configuration_backup">جاگه زفت کردن: [%s]، بعڌ پاک کردن برنومه یا پاک کردن جاگه زفت کردن، نوسخه لادرار هم پاک ابۊ.</string>
@@ -248,7 +249,7 @@
     <string name="sub_setting_pre_profile">نیشتنا پروکسی پؽشی</string>
     <string name="sub_setting_next_profile">نیشتنا پروکسی نیایی</string>
     <string name="sub_setting_pre_profile_tip">نیشتنا هڌسۉݩ وو هرف نارن</string>
-    <string name="title_sub_update">به‌روزرسانی اشتراک گروه فعلی</string>
+    <string name="title_sub_update">ورۊ کردن اشتراک جرگه سکویی</string>
     <string name="title_ping_all_server">Tcping کانفیگا جرگه سکویی</string>
     <string name="title_real_ping_all_server">تئخیر واقعی کانفیگا جرگه سکویی</string>
     <string name="title_user_asset_setting">فایلا دارایی جوقرافیایی</string>
@@ -316,7 +317,7 @@
     </string-array>
 
     <string-array name="ui_mode_night">
-        <item>و دین کردن سیستم</item>
+        <item>و دین کردن سیستوم</item>
         <item>رۊشنا</item>
         <item>تاریک</item>
     </string-array>
