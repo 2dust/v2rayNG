@@ -210,7 +210,7 @@
     <string name="title_privacy_policy">حریم خصوصی</string>
     <string name="title_about">درباره</string>
     <string name="title_source_code">کد منبع</string>
-    <string name="title_oss_license">مجوزهای منبع باز</string>
+    <string name="title_oss_license">مجوز های منبع باز</string>
     <string name="title_tg_channel">کانال تلگرام</string>
     <string name="title_configuration_backup">پشتیبان گیری از پیکربندی</string>
     <string name="summary_configuration_backup">محل ذخیره سازی: [%s], پس از حذف نصب برنامه یا پاک کردن فضای ذخیره سازی، نسخه پشتیبان پاک می شود</string>
@@ -233,7 +233,7 @@
     <string name="logcat_copy">کپی</string>
     <string name="logcat_clear">پاک کردن</string>
     <string name="title_service_restart">راه‌اندازی مجدد خدمات</string>
-    <string name="titfle_del_all_config">حذف تمام کانفیگ های گروه فعلی</string>
+    <string name="title_del_all_config">حذف تمام کانفیگ های گروه فعلی</string>
     <string name="title_del_duplicate_config">حذف کانفیگ های تکراری گروه فعلی</string>
     <string name="title_del_invalid_config">حذف کانفیگ های نامعتبر گروه فعلی (ابتدا آزمایش کنید)</string>
     <string name="title_export_all">خروجی گرفتن کانفیگ های غیرسفارشی گروه فعلی در کلیپ ‌بورد</string>
