@@ -69,7 +69,7 @@
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">اثرانگشت</string>
     <string name="server_lab_stream_alpn">Alpn</string>
-    <string name="server_lab_allow_insecure">مجوز ناامن</string>
+    <string name="server_lab_allow_insecure">اعطای مجوز ناامن</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">نشانی</string>
     <string name="server_lab_port3">پورت</string>
@@ -86,7 +86,7 @@
     <string name="server_lab_secret_key">کلید خصوصی</string>
     <string name="server_lab_reserved">Reserved (اختیاری)</string>
     <string name="server_lab_local_address">آدرس محلی IPv4(اختیاری)</string>
-    <string name="server_lab_local_mtu">Mtu(optional, default 1420)</string>
+    <string name="server_lab_local_mtu">Mtu (اختیاری، پیش فرض: 1420)</string>
     <string name="toast_success">با موفقیت انجام شد</string>
     <string name="toast_failure">شکست</string>
     <string name="toast_none_data">هیچ داده ای وجود ندارد</string>
@@ -219,9 +219,9 @@
     <string name="title_pref_promotion">تبلیغات</string>
     <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف شود)</string>
 
-    <string name="title_pref_auto_update_subscription">به‌روزرسانی خودکار اشتراک ها</string>
+    <string name="title_pref_auto_update_subscription">به‌ روزرسانی خودکار اشتراک ها</string>
     <string name="summary_pref_auto_update_subscription">اشتراک های خود را به طور خودکار با فاصله زمانی در پس زمینه به روز کنید. بسته به دستگاه، این ویژگی ممکن است همیشه کار نکند.</string>
-    <string name="title_pref_auto_update_interval">فاصله به‌روزرسانی خودکار (دقیقه، حداقل مقدار 15)</string>
+    <string name="title_pref_auto_update_interval">فاصله به‌ روزرسانی خودکار ( حداقل مقدار ، 15 دقیقه )</string>
     <string name="title_core_loglevel">سطح گزارشات</string>
     <string name="title_mode">حالت</string>
     <string name="title_mode_help">برای راهنمایی بیشتر روی این متن، کلیک کنید</string>
@@ -270,7 +270,7 @@
     <string name="routing_settings_import_rulesets_from_clipboard">وارد کردن مجموعه قوانین از کلیپ بورد</string>
     <string name="routing_settings_import_rulesets_from_qrcode">وارد کردن مجموعه قوانین از QRcode</string>
     <string name="routing_settings_export_rulesets_to_clipboard">صادر کردن مجموعه قوانین به کلیپ بورد</string>
-    <string name="routing_settings_locked">قفل است، این قانون را هنگام وارد کردن از پیش تنظیم‌ها حفظ کنید</string>
+    <string name="routing_settings_locked">قفل است، این قانون را هنگام وارد کردن از پیش تنظیم‌ ها حفظ کنید</string>
 
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
     <string name="connection_test_testing">در حال آزمایش...</string>
