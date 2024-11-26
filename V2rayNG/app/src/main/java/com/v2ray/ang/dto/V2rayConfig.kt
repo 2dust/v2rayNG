@@ -202,7 +202,7 @@ data class V2rayConfig(
 
         data class StreamSettingsBean(
             var network: String = AppConfig.DEFAULT_NETWORK,
-            var security: String = "",
+            var security: String? = null,
             var tcpSettings: TcpSettingsBean? = null,
             var kcpSettings: KcpSettingsBean? = null,
             var wsSettings: WsSettingsBean? = null,
@@ -357,7 +357,7 @@ data class V2rayConfig(
                 authority: String?
             ): String? {
                 var sni: String? = null
-                network = transport
+                network = if (transport.isEmpty()) NetworkType.TCP.type else transport
                 when (network) {
                     NetworkType.TCP.type -> {
                         val tcpSetting = TcpSettingsBean()
@@ -453,7 +453,8 @@ data class V2rayConfig(
                 shortId: String?,
                 spiderX: String?
             ) {
-                security = streamSecurity
+                security = if (streamSecurity.isEmpty()) null else streamSecurity
+                if (security == null) return
                 val tlsSetting = TlsSettingsBean(
                     allowInsecure = allowInsecure,
                     serverName = sni,
