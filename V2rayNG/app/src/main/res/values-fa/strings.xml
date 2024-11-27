@@ -60,7 +60,7 @@
     <string name="server_lab_request_host_grpc">GRPC Authority</string>
     <string name="server_lab_path">PATH</string>
     <string name="server_lab_path_ws">WS PATH</string>
-    <string name="server_lab_path_HTTPUPGRADE">httpupgrade path</string>
+    <string name="server_lab_path_httpupgrade">HTTPUPGRADE PATH</string>
     <string name="server_lab_path_XHTTP">XHTTP PATH</string>
     <string name="server_lab_path_h2">H2 PATH</string>
     <string name="server_lab_path_quic">QUIC key</string>
