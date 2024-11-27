@@ -61,13 +61,13 @@
     <string name="server_lab_path">PATH</string>
     <string name="server_lab_path_ws">WS PATH</string>
     <string name="server_lab_path_httpupgrade">HTTPUPGRADE PATH</string>
-    <string name="server_lab_path_XHTTP">XHTTP PATH</string>
+    <string name="server_lab_path_xhttp">XHTTP PATH</string>
     <string name="server_lab_path_h2">H2 PATH</string>
     <string name="server_lab_path_quic">QUIC key</string>
     <string name="server_lab_path_kcp">KCP SEED</string>
     <string name="server_lab_path_grpc">GRPC SERVICENAME</string>
     <string name="server_lab_stream_security">TLS</string>
-    <string name="server_lab_stream_FINGERPRINT">اثرانگشت</string>
+    <string name="server_lab_stream_fingerprint">اثرانگشت</string>
     <string name="server_lab_stream_alpn">AlPN</string>
     <string name="server_lab_allow_insecure">اعطای مجوز ناامن</string>
     <string name="server_lab_sni">SNI</string>
