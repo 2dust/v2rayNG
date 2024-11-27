@@ -23,16 +23,16 @@
     <string name="menu_item_add_config">افزودن کانفیگ</string>
     <string name="menu_item_save_config">ذخیره کانفیگ</string>
     <string name="menu_item_del_config">حذف کانفیگ</string>
-    <string name="menu_item_import_config_qrcode">کانفیگ را از QRcode وارد کنید</string>
+    <string name="menu_item_import_config_qrcode">کانفیگ را از QRCODE وارد کنید</string>
     <string name="menu_item_import_config_clipboard">کانفیگ را از کلیپ ‌بورد وارد کنید</string>
-    <string name="menu_item_import_config_manually_vmess">تایپ دستی[VMess]</string>
+    <string name="menu_item_import_config_manually_vmess">تایپ دستی[VMESS]</string>
     <string name="menu_item_import_config_manually_vless">تایپ دستی[VLESS]</string>
-    <string name="menu_item_import_config_manually_ss">تایپ دستی[Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_ss">تایپ دستی[SHADOWSOCKS]</string>
     <string name="menu_item_import_config_manually_socks">تایپ دستی[SOCKS]</string>
     <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
-    <string name="menu_item_import_config_manually_trojan">تایپ دستی[Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">[Wireguard]تایپ دستی</string>
-    <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
+    <string name="menu_item_import_config_manually_trojan">تایپ دستی[TROJAN]</string>
+    <string name="menu_item_import_config_manually_wireguard">WIREGUARD]تایپ دستی</string>
+    <string name="menu_item_import_config_manually_hysteria2">TYPE MANUALLY[HYSTERIA2]</string>
     <string name="menu_item_import_config_custom">کانفیگ سفارشی</string>
     <string name="menu_item_import_config_custom_clipboard">کانفیگ سفارشی را از کلیپ ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_custom_local">کانفیگ سفارشی را به صورت محلی وارد کنید</string>
@@ -48,28 +48,28 @@
     <string name="server_lab_security">امنیت</string>
     <string name="server_lab_network">شبکه</string>
     <string name="server_lab_more_function">انتقال</string>
-    <string name="server_lab_head_type">نوع head</string>
-    <string name="server_lab_mode_type">حالت gRPC</string>
-    <string name="server_lab_request_host">host</string>
-    <string name="server_lab_request_host_http">http host</string>
-    <string name="server_lab_request_host_ws">ws host</string>
-    <string name="server_lab_request_host_httpupgrade">httpupgrade host</string>
-    <string name="server_lab_request_host_xhttp">xhttp host</string>
-    <string name="server_lab_request_host_h2">h2 host</string>
+    <string name="server_lab_head_type">نوع HEAD</string>
+    <string name="server_lab_mode_type">حالت GRPC</string>
+    <string name="server_lab_request_host">HOST</string>
+    <string name="server_lab_request_host_http">HTTP HOST</string>
+    <string name="server_lab_request_host_ws">WS HOST</string>
+    <string name="server_lab_request_host_httpupgrade">HTTPUPGRADE HOST</string>
+    <string name="server_lab_request_host_xhttp">XHTTP HOST</string>
+    <string name="server_lab_request_host_h2">H2 HOST</string>
     <string name="server_lab_request_host_quic">QUIC security</string>
-    <string name="server_lab_request_host_grpc">gRPC Authority</string>
-    <string name="server_lab_path">path</string>
-    <string name="server_lab_path_ws">ws path</string>
-    <string name="server_lab_path_httpupgrade">httpupgrade path</string>
-    <string name="server_lab_path_xhttp">xhttp path </string>
-    <string name="server_lab_path_h2">h2 path</string>
+    <string name="server_lab_request_host_grpc">GRPC Authority</string>
+    <string name="server_lab_path">PATH</string>
+    <string name="server_lab_path_ws">WS PATH</string>
+    <string name="server_lab_path_httpupgrade">HTTPUPGRADE PATH</string>
+    <string name="server_lab_path_xhttp">XHTTP PATH</string>
+    <string name="server_lab_path_h2">H2 PATH</string>
     <string name="server_lab_path_quic">QUIC key</string>
-    <string name="server_lab_path_kcp">kcp seed</string>
-    <string name="server_lab_path_grpc">gRPC serviceName</string>
+    <string name="server_lab_path_kcp">KCP SEED</string>
+    <string name="server_lab_path_grpc">GRPC SERVICENAME</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">اثرانگشت</string>
-    <string name="server_lab_stream_alpn">Alpn</string>
-    <string name="server_lab_allow_insecure">مجوز ناامن</string>
+    <string name="server_lab_stream_alpn">AlPN</string>
+    <string name="server_lab_allow_insecure">اعطای مجوز ناامن</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">نشانی</string>
     <string name="server_lab_port3">پورت</string>
@@ -81,12 +81,12 @@
     <string name="server_lab_flow">جریان</string>
     <string name="server_lab_public_key">کلید عمومی</string>
     <string name="server_lab_preshared_key">کلید رمزگذاری اضافی (اختیاری)</string>
-    <string name="server_lab_short_id">ShortId</string>
-    <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_short_id">SHORTID</string>
+    <string name="server_lab_spider_x">SPIDERX</string>
     <string name="server_lab_secret_key">کلید خصوصی</string>
     <string name="server_lab_reserved">Reserved (اختیاری)</string>
-    <string name="server_lab_local_address">آدرس محلی IPv4(اختیاری)</string>
-    <string name="server_lab_local_mtu">Mtu(optional, default 1420)</string>
+    <string name="server_lab_local_address">آدرس محلی IPV4(اختیاری)</string>
+    <string name="server_lab_local_mtu">MTU (اختیاری، پیش فرض: 1420)</string>
     <string name="toast_success">با موفقیت انجام شد</string>
     <string name="toast_failure">شکست</string>
     <string name="toast_none_data">هیچ داده ای وجود ندارد</string>
@@ -105,19 +105,19 @@
     <string name="server_lab_request_host6">میزبان (SNI) (اختیاری)</string>
     <string name="toast_asset_copy_failed">کپی فایل انجام نشد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
     <string name="menu_item_add_file">افزودن فایل ‌ها</string>
-    <string name="menu_item_scan_qrcode">اسکن QRcode</string>
+    <string name="menu_item_scan_qrcode">اسکن QRCODE</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">دانلود فایل‌ ها</string>
     <string name="toast_action_not_allowed">این عمل ممنوع است</string>
-    <string name="server_obfs_password">رمز عبور Obfs</string>
+    <string name="server_obfs_password">رمز عبور OBFS</string>
     <string name="server_lab_port_hop">پورت پرش (درگاه سرور را بازنویسی می کند)</string>
     <string name="server_lab_port_hop_interval">فاصله پورت پرش (ثانیه)</string>
-    <string name="server_lab_stream_pinsha256">pinSHA256</string>
+    <string name="server_lab_stream_pinsha256">PINSHA256</string>
     <string name="server_lab_xhttp_mode">حالت XHTTP</string>
-    <string name="server_lab_xhttp_extra">جیسون خام XHTTP Extra، فرمت: { XHTTPObject }</string>
+    <string name="server_lab_xhttp_extra">جیسون خام XHTTP EXTRA، فرمت: { XHTTPObject }</string>
 
     <!-- PerAppProxyActivity -->
-    <string name="title_user_asset_add_url">URL را اضافه کنید</string>
+    <string name="title_user_asset_add_url">نشانی آدرس اینترنتی را اضافه کنید</string>
     <string name="msg_file_not_found">فایل پیدا نشد</string>
     <string name="msg_remark_is_duplicate">نام قبلاً وجود دارد</string>
     <string name="msg_dialog_progress">بارگذاری</string>
@@ -139,12 +139,12 @@
     <string name="title_pref_is_booted">اتصال خودکار هنگام راه اندازی</string>
     <string name="summary_pref_is_booted">هنگام راه اندازی به طور خودکار به سرور انتخابی متصل می شود که ممکن است ناموفق باشد.</string>
 
-    <string name="title_mux_settings">تنظیمات Mux</string>
-    <string name="title_pref_mux_enabled">فعال کردن Mux</string>
+    <string name="title_mux_settings">تنظیمات MUX</string>
+    <string name="title_pref_mux_enabled">فعال کردن MUX</string>
     <string name="summary_pref_mux_enabled">سریعتر است، اما ممکن است باعث اتصال ناپایدار شود\nمخزن ترافیک TCP با 8 اتصال پیش‌فرض، نحوه مدیریت UDP و QUIC را در زیر سفارشی کنید.</string>
     <string name="title_pref_mux_concurency">اتصالات TCP (محدوده -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_concurency">اتصالات XUDP (محدوده -1 تا 1024)</string>
-    <string name="title_pref_mux_xudp_quic">مدیریت QUIC در تونل mux</string>
+    <string name="title_pref_mux_xudp_quic">مدیریت QUIC در تونل MUX</string>
     <string-array name="mux_xudp_quic_entries">
         <item>رد کردن</item>
         <item>مجاز</item>
@@ -154,10 +154,10 @@
     <string name="title_pref_speed_enabled">فعال کردن نمایش سرعت</string>
     <string name="summary_pref_speed_enabled">نمایش سرعت فعلی در قسمت آگاه‌سازی. \nآیکون آگاه‌سازی بر اساس استفاده تغییر می‌کند.</string>
 
-    <string name="title_pref_sniffing_enabled">فعال کردن Sniffing</string>
-    <string name="summary_pref_sniffing_enabled">دامنه sniff را از بسته امتحان کنید (پیش‌فرض روشن)</string>
-    <string name="title_pref_route_only_enabled">فعال کردن routeOnly</string>
-    <string name="summary_pref_route_only_enabled">از نام دامنه sniffed فقط برای مسیریابی استفاده کنید و آدرس مورد نظر را به عنوان آدرس IP نگه دارید.</string>
+    <string name="title_pref_sniffing_enabled">فعال کردن SNIFFING</string>
+    <string name="summary_pref_sniffing_enabled">دامنه SNIFF را از بسته امتحان کنید (پیش‌فرض روشن)</string>
+    <string name="title_pref_route_only_enabled">فعال کردن ROUTEONLY</string>
+    <string name="summary_pref_route_only_enabled">از نام دامنه SNIFFED فقط برای مسیریابی استفاده کنید و آدرس مورد نظر را به عنوان آدرس IP نگه دارید.</string>
 
 
     <string name="title_pref_local_dns_enabled">فعال کردن DNS محلی</string>
@@ -166,10 +166,10 @@
     <string name="title_pref_fake_dns_enabled">فعال کردن DNS جعلی</string>
     <string name="summary_pref_fake_dns_enabled">دی ان اس محلی آدرس های آیپی جعلی را بر می گرداند (سریع تر می باشد و تاخیر را کاهش می دهد اما ممکن است برای برخی از برنامه ها کار نکند)</string>
 
-    <string name="title_pref_prefer_ipv6">ترجیح دادن IPv6</string>
+    <string name="title_pref_prefer_ipv6">ترجیح دادن IPV6</string>
     <string name="summary_pref_prefer_ipv6">ترجیح دادن نشانی و مسیر های IPv6</string>
 
-    <string name="title_pref_remote_dns">DNS از راه دور (اختیاری)</string>
+    <string name="title_pref_remote_dns">DNS از راه دور (اختیاری) (udp/tcp/https/quic)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (فقط IPv4/v6)</string>
@@ -177,8 +177,8 @@
     <string name="title_pref_domestic_dns">DNS داخلی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
-    <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تاخیر واقعی کانفیگ ها (http/https)</string>
-    <string name="summary_pref_delay_test_url">Url</string>
+    <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تاخیر واقعی کانفیگ ها (HTTP/HTTPS)</string>
+    <string name="summary_pref_delay_test_url">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">اجازه اتصالات از طریق LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">دستگاه‌ های دیگر می‌توانند از طریق socks/http به پراکسی توسط نشانی آی‌پی شما متصل شوند، فقط در شبکه مورد اعتماد فعال می‌شوند تا از اتصال غیرمجاز جلوگیری کنند.</string>
@@ -210,6 +210,7 @@
     <string name="title_privacy_policy">حریم خصوصی</string>
     <string name="title_about">درباره</string>
     <string name="title_source_code">کد منبع</string>
+    <string name="title_oss_license">مجوز های منبع باز</string>
     <string name="title_tg_channel">کانال تلگرام</string>
     <string name="title_configuration_backup">پشتیبان گیری از پیکربندی</string>
     <string name="summary_configuration_backup">محل ذخیره سازی: [%s], پس از حذف نصب برنامه یا پاک کردن فضای ذخیره سازی، نسخه پشتیبان پاک می شود</string>
@@ -218,9 +219,9 @@
     <string name="title_pref_promotion">تبلیغات</string>
     <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف شود)</string>
 
-    <string name="title_pref_auto_update_subscription">به‌روزرسانی خودکار اشتراک ها</string>
+    <string name="title_pref_auto_update_subscription">به‌ روزرسانی خودکار اشتراک ها</string>
     <string name="summary_pref_auto_update_subscription">اشتراک های خود را به طور خودکار با فاصله زمانی در پس زمینه به روز کنید. بسته به دستگاه، این ویژگی ممکن است همیشه کار نکند.</string>
-    <string name="title_pref_auto_update_interval">فاصله به‌روزرسانی خودکار (دقیقه، حداقل مقدار 15)</string>
+    <string name="title_pref_auto_update_interval">فاصله به‌ روزرسانی خودکار ( حداقل مقدار ، 15 دقیقه )</string>
     <string name="title_core_loglevel">سطح گزارشات</string>
     <string name="title_mode">حالت</string>
     <string name="title_mode_help">برای راهنمایی بیشتر روی این متن، کلیک کنید</string>
@@ -239,14 +240,14 @@
     <string name="title_sub_setting">تنظیمات گروه‌ اشتراک</string>
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">نشانی اینترنتی اختیاری</string>
-    <string name="sub_setting_filter">Remarks regular filter</string>
+    <string name="sub_setting_filter">REMARKS REGULAR FILTER</string>
     <string name="sub_setting_enable">فعال کردن به‌روزرسانی</string>
     <string name="sub_auto_update">فعال سازی به‌روزرسانی خودکار</string>
     <string name="sub_setting_pre_profile">Previous proxy remarks</string>
     <string name="sub_setting_next_profile">Next proxy remarks</string>
     <string name="sub_setting_pre_profile_tip">The remarks exists and is unique</string>
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
-    <string name="title_ping_all_server">Tcping کانفیگ های گروه فعلی</string>
+    <string name="title_ping_all_server">TCPING کانفیگ های گروه فعلی</string>
     <string name="title_real_ping_all_server">تاخیر واقعی کانفیگ های گروه فعلی</string>
     <string name="title_user_asset_setting">فایل ‌های دارایی جغرافیا</string>
     <string name="title_sort_by_test_results">مرتب‌ سازی بر اساس نتایج آزمایش</string>
@@ -269,7 +270,7 @@
     <string name="routing_settings_import_rulesets_from_clipboard">وارد کردن مجموعه قوانین از کلیپ بورد</string>
     <string name="routing_settings_import_rulesets_from_qrcode">وارد کردن مجموعه قوانین از QRcode</string>
     <string name="routing_settings_export_rulesets_to_clipboard">صادر کردن مجموعه قوانین به کلیپ بورد</string>
-    <string name="routing_settings_locked">قفل است، این قانون را هنگام وارد کردن از پیش تنظیم‌ها حفظ کنید</string>
+    <string name="routing_settings_locked">قفل است، این قانون را هنگام وارد کردن از پیش تنظیم‌ ها حفظ کنید</string>
 
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
     <string name="connection_test_testing">در حال آزمایش...</string>
@@ -288,7 +289,7 @@
     <string name="title_pref_fragment_interval">فاصله بین بسته های فرگمنت (حداقل-حداکثر)</string>
     <string name="title_pref_fragment_enabled">فعال کردن فرگمنت</string>
     <string-array name="share_method">
-        <item>QRcode</item>
+        <item>QRCODE</item>
         <item>خروجی گرفتن در کلیپ‌ بورد</item>
         <item>خروجی گرفتن کانفیگ کامل در کلیپ بورد</item>
     </string-array>
@@ -314,7 +315,7 @@
     <string-array name="preset_rulesets">
         <item>لیست سفید چین</item>
         <item>لیست سیاه چین</item>
-        <item>جهانی(Global)</item>
+        <item>جهانی(GLOBAL)</item>
         <item>ایران</item>
     </string-array>
 
