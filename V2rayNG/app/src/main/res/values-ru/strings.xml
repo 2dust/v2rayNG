@@ -204,8 +204,8 @@
     <string name="title_pref_start_scan_immediate">Сканирование при запуске</string>
     <string name="summary_pref_start_scan_immediate">Начинать сканирование сразу при запуске приложения или запускать функцию сканирования камерой или из изображения через панель инструментов</string>
 
-    <string name="title_pref_append_http_proxy">Append HTTP Proxy to VPN</string>
-    <string name="summary_pref_append_http_proxy">HTTP proxy will be used directly from (browser/ some supported apps), without going through the virtual NIC device (Android 10+)</string>
+    <string name="title_pref_append_http_proxy">Дополнительный HTTP-прокси</string>
+    <string name="summary_pref_append_http_proxy">HTTP-прокси будет использоваться напрямую (из браузера и других поддерживающих приложений), минуя виртуальный сетевой адаптер (Android 10+)</string>
 
     <string name="title_pref_feedback">Обратная связь</string>
     <string name="summary_pref_feedback">Предложить улучшение или сообщить об ошибке на GitHub</string>
@@ -214,6 +214,7 @@
     <string name="title_privacy_policy">Политика конфиденциальности</string>
     <string name="title_about">О приложении</string>
     <string name="title_source_code">Исходный код</string>
+    <string name="title_oss_license">Лицензии открытого исходного кода</string>
     <string name="title_tg_channel">Telegram-канал</string>
     <string name="title_configuration_backup">Резервирование конфигурации</string>
     <string name="summary_configuration_backup">Путь: [%s]. Резервная копия будет стёрта при удалении приложения или очистке хранилища.</string>
@@ -281,7 +282,7 @@
     <string name="routing_settings_port">Порт</string>
     <string name="routing_settings_protocol">Протокол</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
-    <string name="routing_settings_network">Сеть</string>"
+    <string name="routing_settings_network">Сеть</string>
     <string name="routing_settings_network_tip">[udp|tcp]</string>
     <string name="routing_settings_outbound_tag">Исходящее подключение</string>
 
