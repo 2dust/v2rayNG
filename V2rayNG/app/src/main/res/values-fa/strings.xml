@@ -274,6 +274,14 @@
     <string name="routing_settings_import_rulesets_from_qrcode">وارد کردن مجموعه قوانین از QRcode</string>
     <string name="routing_settings_export_rulesets_to_clipboard">صادر کردن مجموعه قوانین به کلیپ بورد</string>
     <string name="routing_settings_locked">قفل است، این قانون را هنگام وارد کردن از پیش تنظیم‌ ها حفظ کنید</string>
+    <string name="routing_settings_domain">دامنه</string>
+    <string name="routing_settings_ip">آیپی</string>
+    <string name="routing_settings_port">پورت</string>
+    <string name="routing_settings_protocol">پورتکل</string>
+    <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
+    <string name="routing_settings_network">شبکه</string>
+    <string name="routing_settings_network_tip">[udp|tcp]</string>
+    <string name="routing_settings_outbound_tag">برچسب خروجی</string>
 
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
     <string name="connection_test_testing">در حال آزمایش...</string>
