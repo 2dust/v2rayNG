@@ -34,6 +34,11 @@
             android:summary="@string/summary_pref_fake_dns_enabled"
             android:title="@string/title_pref_fake_dns_enabled" />
 
+        <CheckBoxPreference
+            android:key="pref_append_http_proxy"
+            android:summary="@string/summary_pref_append_http_proxy"
+            android:title="@string/title_pref_append_http_proxy" />
+
         <EditTextPreference
             android:inputType="number"
             android:key="pref_local_dns_port"

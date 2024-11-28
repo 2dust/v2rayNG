@@ -204,6 +204,9 @@
     <string name="title_pref_start_scan_immediate">بدء المسح الضوئي على الفور</string>
     <string name="summary_pref_start_scan_immediate">افتح الكاميرا لمسح الرمز ضوئيًا على الفور عند بدء التشغيل، وإلا يمكنك اختيار مسح الرمز ضوئيًا أو تحديد صورة في شريط الأدوات</string>
 
+    <string name="title_pref_append_http_proxy">Append HTTP Proxy to VPN</string>
+    <string name="summary_pref_append_http_proxy">HTTP proxy will be used directly from (browser/ some supported apps), without going through the virtual NIC device (Android 10+)</string>
+
     <string name="title_pref_feedback">ملاحظات</string>
     <string name="summary_pref_feedback">ملاحظات التحسينات أو الأخطاء إلى GitHub</string>
     <string name="summary_pref_tg_group">الانضمام إلى مجموعة Telegram</string>

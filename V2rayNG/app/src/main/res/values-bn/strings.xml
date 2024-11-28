@@ -203,6 +203,10 @@
 
     <string name="title_pref_start_scan_immediate">তাত্ক্ষণিক স্ক্যান শুরু করুন</string>
     <string name="summary_pref_start_scan_immediate">শুরুতে তাত্ক্ষণিকভাবে স্ক্যান করতে ক্যামেরা খুলুন, অন্যথায় আপনি কোড স্ক্যান বা টুলবারে একটি ছবি নির্বাচন করতে পারেন</string>
+
+    <string name="title_pref_append_http_proxy">Append HTTP Proxy to VPN</string>
+    <string name="summary_pref_append_http_proxy">HTTP proxy will be used directly from (browser/ some supported apps), without going through the virtual NIC device (Android 10+)</string>
+
     <string name="title_pref_feedback">মতামত</string>
     <string name="summary_pref_feedback">মতামত উন্নয়ন বা বাগগুলি GitHub-এ পাঠান</string>
     <string name="summary_pref_tg_group">টেলিগ্রাম গ্রুপে যোগদান করুন</string>

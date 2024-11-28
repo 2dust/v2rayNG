@@ -22,6 +22,7 @@ object AppConfig {
     const val PREF_BYPASS_APPS = "pref_bypass_apps"
     const val PREF_LOCAL_DNS_ENABLED = "pref_local_dns_enabled"
     const val PREF_FAKE_DNS_ENABLED = "pref_fake_dns_enabled"
+    const val PREF_APPEND_HTTP_PROXY = "pref_append_http_proxy"
     const val PREF_LOCAL_DNS_PORT = "pref_local_dns_port"
     const val PREF_VPN_DNS = "pref_vpn_dns"
     const val PREF_ROUTING_DOMAIN_STRATEGY = "pref_routing_domain_strategy"

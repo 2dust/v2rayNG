@@ -54,6 +54,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_PROXY_SHARING,
             AppConfig.PREF_LOCAL_DNS_ENABLED,
             AppConfig.PREF_FAKE_DNS_ENABLED,
+            AppConfig.PREF_APPEND_HTTP_PROXY,
             AppConfig.PREF_ALLOW_INSECURE,
             AppConfig.PREF_PREFER_IPV6,
             AppConfig.PREF_PER_APP_PROXY,
