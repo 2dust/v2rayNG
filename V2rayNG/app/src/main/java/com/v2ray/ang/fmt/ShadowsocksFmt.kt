@@ -37,12 +37,18 @@ object ShadowsocksFmt : FmtBase() {
 
         if (!uri.rawQuery.isNullOrEmpty()) {
             val queryParam = getQueryParam(uri)
-
-            if (queryParam["plugin"] == "obfs-local" && queryParam["obfs"] == "http") {
+            if (queryParam["plugin"]?.contains("obfs=http") == true) {
+                val queryPairs = HashMap<String, String>()
+                for (pair in queryParam["plugin"]?.split(";") ?: listOf()) {
+                    val idx = pair.split("=")
+                    if (idx.count() == 2) {
+                        queryPairs.put(idx.first(), idx.last())
+                    }
+                }
                 config.network = NetworkType.TCP.type
                 config.headerType = "http"
-                config.host = queryParam["obfs-host"]
-                config.path = queryParam["path"]
+                config.host = queryPairs["obfs-host"]
+                config.path = queryPairs["path"]
             }
         }
 
@@ -102,7 +108,7 @@ object ShadowsocksFmt : FmtBase() {
             server.method = profileItem.method
         }
 
-        outboundBean?.streamSettings?.populateTransportSettings(
+        val sni = outboundBean?.streamSettings?.populateTransportSettings(
             profileItem.network.orEmpty(),
             profileItem.headerType,
             profileItem.host,
@@ -118,7 +124,7 @@ object ShadowsocksFmt : FmtBase() {
         outboundBean?.streamSettings?.populateTlsSettings(
             profileItem.security.orEmpty(),
             profileItem.insecure == true,
-            profileItem.sni,
+            if (profileItem.sni.isNullOrEmpty()) sni else profileItem.sni,
             profileItem.fingerPrint,
             profileItem.alpn,
             profileItem.publicKey,

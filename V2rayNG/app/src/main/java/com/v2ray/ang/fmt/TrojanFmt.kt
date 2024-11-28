@@ -52,7 +52,7 @@ object TrojanFmt : FmtBase() {
             server.flow = profileItem.flow
         }
 
-        outboundBean?.streamSettings?.populateTransportSettings(
+        val sni = outboundBean?.streamSettings?.populateTransportSettings(
             profileItem.network.orEmpty(),
             profileItem.headerType,
             profileItem.host,
@@ -68,7 +68,7 @@ object TrojanFmt : FmtBase() {
         outboundBean?.streamSettings?.populateTlsSettings(
             profileItem.security.orEmpty(),
             profileItem.insecure == true,
-            profileItem.sni,
+            if (profileItem.sni.isNullOrEmpty()) sni else profileItem.sni,
             profileItem.fingerPrint,
             profileItem.alpn,
             profileItem.publicKey,

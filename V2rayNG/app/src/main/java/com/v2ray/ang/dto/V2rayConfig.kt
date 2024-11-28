@@ -368,11 +368,11 @@ data class V2rayConfig(
                                 requestObj.headers.Host = host.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
                                 requestObj.path = path.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
                                 tcpSetting.header.request = requestObj
-                                sni = requestObj.headers.Host?.getOrNull(0) ?: sni
+                                sni = requestObj.headers.Host?.getOrNull(0)
                             }
                         } else {
                             tcpSetting.header.type = "none"
-                            sni = host.orEmpty()
+                            sni = host
                         }
                         tcpSettings = tcpSetting
                     }
@@ -391,7 +391,7 @@ data class V2rayConfig(
                     NetworkType.WS.type -> {
                         val wssetting = WsSettingsBean()
                         wssetting.headers.Host = host.orEmpty()
-                        sni = wssetting.headers.Host
+                        sni = host
                         wssetting.path = path ?: "/"
                         wsSettings = wssetting
                     }
@@ -399,7 +399,7 @@ data class V2rayConfig(
                     NetworkType.HTTP_UPGRADE.type -> {
                         val httpupgradeSetting = HttpupgradeSettingsBean()
                         httpupgradeSetting.host = host.orEmpty()
-                        sni = httpupgradeSetting.host
+                        sni = host
                         httpupgradeSetting.path = path ?: "/"
                         httpupgradeSettings = httpupgradeSetting
                     }
@@ -407,7 +407,7 @@ data class V2rayConfig(
                     NetworkType.SPLIT_HTTP.type, NetworkType.XHTTP.type -> {
                         val xhttpSetting = XhttpSettingsBean()
                         xhttpSetting.host = host.orEmpty()
-                        sni = xhttpSetting.host
+                        sni = host
                         xhttpSetting.path = path ?: "/"
                         xhttpSettings = xhttpSetting
                     }
@@ -416,7 +416,7 @@ data class V2rayConfig(
                         network = NetworkType.H2.type
                         val h2Setting = HttpSettingsBean()
                         h2Setting.host = host.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                        sni = h2Setting.host.getOrNull(0) ?: sni
+                        sni = h2Setting.host.getOrNull(0)
                         h2Setting.path = path ?: "/"
                         httpSettings = h2Setting
                     }
@@ -436,7 +436,7 @@ data class V2rayConfig(
                         grpcSetting.authority = authority.orEmpty()
                         grpcSetting.idle_timeout = 60
                         grpcSetting.health_check_timeout = 20
-                        sni = authority.orEmpty()
+                        sni = authority
                         grpcSettings = grpcSetting
                     }
                 }
@@ -457,12 +457,12 @@ data class V2rayConfig(
                 if (security == null) return
                 val tlsSetting = TlsSettingsBean(
                     allowInsecure = allowInsecure,
-                    serverName = sni,
-                    fingerprint = fingerprint,
+                    serverName = if (sni.isNullOrEmpty()) null else sni,
+                    fingerprint = if (fingerprint.isNullOrEmpty()) null else fingerprint,
                     alpn = if (alpns.isNullOrEmpty()) null else alpns.split(",").map { it.trim() }.filter { it.isNotEmpty() },
-                    publicKey = publicKey,
-                    shortId = shortId,
-                    spiderX = spiderX
+                    publicKey = if (publicKey.isNullOrEmpty()) null else publicKey,
+                    shortId = if (shortId.isNullOrEmpty()) null else shortId,
+                    spiderX = if (spiderX.isNullOrEmpty()) null else spiderX,
                 )
                 if (security == AppConfig.TLS) {
                     tlsSettings = tlsSetting

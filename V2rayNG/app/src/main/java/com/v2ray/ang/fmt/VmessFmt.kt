@@ -153,7 +153,7 @@ object VmessFmt : FmtBase() {
             vnext.users[0].security = profileItem.method
         }
 
-        outboundBean?.streamSettings?.populateTransportSettings(
+        val sni = outboundBean?.streamSettings?.populateTransportSettings(
             profileItem.network.orEmpty(),
             profileItem.headerType,
             profileItem.host,
@@ -169,7 +169,7 @@ object VmessFmt : FmtBase() {
         outboundBean?.streamSettings?.populateTlsSettings(
             profileItem.security.orEmpty(),
             profileItem.insecure == true,
-            profileItem.sni,
+            if (profileItem.sni.isNullOrEmpty()) sni else profileItem.sni,
             profileItem.fingerPrint,
             profileItem.alpn,
             null,

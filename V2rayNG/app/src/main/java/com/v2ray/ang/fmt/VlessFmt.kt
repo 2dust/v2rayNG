@@ -26,7 +26,7 @@ object VlessFmt : FmtBase() {
         config.password = uri.userInfo
         config.method = queryParam["encryption"] ?: "none"
 
-       getItemFormQuery(config, queryParam, allowInsecure)
+        getItemFormQuery(config, queryParam, allowInsecure)
 
         return config
     }
@@ -50,7 +50,7 @@ object VlessFmt : FmtBase() {
             vnext.users[0].flow = profileItem.flow
         }
 
-        outboundBean?.streamSettings?.populateTransportSettings(
+        val sni = outboundBean?.streamSettings?.populateTransportSettings(
             profileItem.network.orEmpty(),
             profileItem.headerType,
             profileItem.host,
@@ -68,7 +68,7 @@ object VlessFmt : FmtBase() {
         outboundBean?.streamSettings?.populateTlsSettings(
             profileItem.security.orEmpty(),
             profileItem.insecure == true,
-            profileItem.sni,
+            if (profileItem.sni.isNullOrEmpty()) sni else profileItem.sni,
             profileItem.fingerPrint,
             profileItem.alpn,
             profileItem.publicKey,
