@@ -24,7 +24,7 @@
     <string name="menu_item_add_config">افزودن کانفیگ</string>
     <string name="menu_item_save_config">ذخیره کانفیگ</string>
     <string name="menu_item_del_config">حذف کانفیگ</string>
-    <string name="menu_item_import_config_qrcode">کانفیگ را از QRCODE وارد کنید</string>
+    <string name="menu_item_import_config_qrcode">کانفیگ را از QRcode وارد کنید</string>
     <string name="menu_item_import_config_clipboard">کانفیگ را از کلیپ ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_manually_vmess">تایپ دستی[VMESS]</string>
     <string name="menu_item_import_config_manually_vless">تایپ دستی[VLESS]</string>
@@ -106,7 +106,7 @@
     <string name="server_lab_request_host6">میزبان (SNI) (اختیاری)</string>
     <string name="toast_asset_copy_failed">کپی فایل انجام نشد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
     <string name="menu_item_add_file">افزودن فایل ‌ها</string>
-    <string name="menu_item_scan_qrcode">اسکن QRCODE</string>
+    <string name="menu_item_scan_qrcode">اسکن QRcode</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">دانلود فایل‌ ها</string>
     <string name="toast_action_not_allowed">این عمل ممنوع است</string>
@@ -118,7 +118,7 @@
     <string name="server_lab_xhttp_extra">جیسون خام XHTTP EXTRA، فرمت: { XHTTPObject }</string>
 
     <!-- PerAppProxyActivity -->
-    <string name="title_user_asset_add_url">نشانی آدرس اینترنتی را اضافه کنید</string>
+    <string name="title_user_asset_add_url">آدرس اینترنتی را اضافه کنید</string>
     <string name="msg_file_not_found">فایل پیدا نشد</string>
     <string name="msg_remark_is_duplicate">نام قبلاً وجود دارد</string>
     <string name="msg_dialog_progress">بارگذاری</string>
@@ -301,7 +301,7 @@
     <string name="title_pref_fragment_interval">فاصله بین بسته های فرگمنت (حداقل-حداکثر)</string>
     <string name="title_pref_fragment_enabled">فعال کردن فرگمنت</string>
     <string-array name="share_method">
-        <item>QRCODE</item>
+        <item>QRcode</item>
         <item>خروجی گرفتن در کلیپ‌ بورد</item>
         <item>خروجی گرفتن کانفیگ کامل در کلیپ بورد</item>
     </string-array>
