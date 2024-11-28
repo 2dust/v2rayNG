@@ -200,6 +200,9 @@
     <string name="title_pref_start_scan_immediate">立即启动扫码</string>
     <string name="summary_pref_start_scan_immediate">启动时立即打开相机扫描，否则可在工具栏选择扫码或选照片</string>
 
+    <string name="title_pref_append_http_proxy">追加 HTTP 代理至 VPN</string>
+    <string name="summary_pref_append_http_proxy">浏览器 / 一些支持的应用 将直接使用 HTTP 代理, 而不经过虚拟网卡设备 (Android 10+)</string>
+
     <string name="title_pref_feedback">反馈</string>
     <string name="summary_pref_feedback">反馈改进或漏洞至 GitHub</string>
     <string name="summary_pref_tg_group">加入Telegram Group</string>
