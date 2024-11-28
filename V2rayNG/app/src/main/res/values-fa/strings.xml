@@ -118,7 +118,7 @@
     <string name="server_lab_xhttp_extra">جیسون خام XHTTP EXTRA، فرمت: { XHTTPObject }</string>
 
     <!-- PerAppProxyActivity -->
-    <string name="title_user_asset_add_url">نشانی آدرس اینترنتی را اضافه کنید</string>
+    <string name="title_user_asset_add_url">آدرس اینترنتی را اضافه کنید</string>
     <string name="msg_file_not_found">فایل پیدا نشد</string>
     <string name="msg_remark_is_duplicate">نام قبلاً وجود دارد</string>
     <string name="msg_dialog_progress">بارگذاری</string>
