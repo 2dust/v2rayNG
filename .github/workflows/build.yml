@@ -37,7 +37,7 @@ jobs:
 
     - name: Install gomobile
       run: |
-        go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20240806205939-81131f6468ab
+        go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20241108191957-fa514ef75a0f
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
     - name: Setup Android environment
