@@ -1,40 +1,40 @@
 [
   {
-    "remarks": "阻断udp443",
+    "remarks": "Block udp443",
     "outboundTag": "block",
     "port": "443",
     "network": "udp"
   },
   {
-    "remarks": "绕过bittorrent",
+    "remarks": "Block bittorrent",
     "outboundTag": "block",
     "protocol": [
       "bittorrent"
     ]
   },
   {
-    "remarks": "阻断广告",
+    "remarks": "block ads",
     "outboundTag": "block",
     "domain": [
       "geosite:category-ads-all"
     ]
   },
   {
-    "remarks": "绕过局域网IP",
+    "remarks": "Bypass LAN IP",
     "outboundTag": "direct",
     "ip": [
       "geoip:private"
     ]
   },
   {
-    "remarks": "绕过局域网域名",
+    "remarks": "Bypass LAN domain name",
     "outboundTag": "direct",
     "domain": [
       "geosite:private"
     ]
   },
   {
-    "remarks": "代理海外公共DNSIP",
+    "remarks": "Proxy overseas public DNSIP",
     "outboundTag": "proxy",
     "ip": [
       "1.1.1.1",
@@ -100,7 +100,7 @@
     ]
   },
   {
-    "remarks": "代理海外公共DNS域名",
+    "remarks": "Proxy overseas public DNS domain names",
     "outboundTag": "proxy",
     "domain": [
       "domain:cloudflare-dns.com",
@@ -114,7 +114,7 @@
     ]
   },
   {
-    "remarks": "最终代理",
+    "remarks": "final agent",
     "port": "0-65535",
     "outboundTag": "proxy"
   }
