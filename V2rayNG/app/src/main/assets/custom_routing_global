@@ -7,7 +7,7 @@
   },
   {
     "remarks": "绕过bittorrent",
-    "outboundTag": "direct",
+    "outboundTag": "block",
     "protocol": [
       "bittorrent"
     ]
