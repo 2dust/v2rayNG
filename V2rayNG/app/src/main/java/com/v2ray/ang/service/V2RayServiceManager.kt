@@ -44,6 +44,7 @@ object V2RayServiceManager {
     private const val NOTIFICATION_ID = 1
     private const val NOTIFICATION_PENDING_INTENT_CONTENT = 0
     private const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 1
+    private const val NOTIFICATION_PENDING_INTENT_RESTART_V2RAY = 2
     private const val NOTIFICATION_ICON_THRESHOLD = 3000
 
     val v2rayPoint: V2RayPoint = Libv2ray.newV2RayPoint(V2RayCallback(), Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
@@ -219,11 +220,15 @@ object V2RayServiceManager {
                 }
 
                 AppConfig.MSG_STATE_STOP -> {
+                    Log.d(ANG_PACKAGE, "Stop Service")
                     serviceControl.stopService()
                 }
 
                 AppConfig.MSG_STATE_RESTART -> {
-                    startV2rayPoint()
+                    Log.d(ANG_PACKAGE, "Restart Service")
+                    serviceControl.stopService()
+                    Thread.sleep(500L)
+                    startV2Ray(serviceControl.getService())
                 }
 
                 AppConfig.MSG_MEASURE_DELAY -> {
@@ -278,30 +283,24 @@ object V2RayServiceManager {
 
     private fun showNotification() {
         val service = serviceControl?.get()?.getService() ?: return
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+
         val startMainIntent = Intent(service, MainActivity::class.java)
-        val contentPendingIntent = PendingIntent.getActivity(
-            service,
-            NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            } else {
-                PendingIntent.FLAG_UPDATE_CURRENT
-            }
-        )
+        val contentPendingIntent = PendingIntent.getActivity(service, NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent, flags)
 
         val stopV2RayIntent = Intent(AppConfig.BROADCAST_ACTION_SERVICE)
         stopV2RayIntent.`package` = ANG_PACKAGE
         stopV2RayIntent.putExtra("key", AppConfig.MSG_STATE_STOP)
+        val stopV2RayPendingIntent = PendingIntent.getBroadcast(service, NOTIFICATION_PENDING_INTENT_STOP_V2RAY, stopV2RayIntent, flags)
 
-        val stopV2RayPendingIntent = PendingIntent.getBroadcast(
-            service,
-            NOTIFICATION_PENDING_INTENT_STOP_V2RAY, stopV2RayIntent,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            } else {
-                PendingIntent.FLAG_UPDATE_CURRENT
-            }
-        )
+        val restartV2RayIntent = Intent(AppConfig.BROADCAST_ACTION_SERVICE)
+        restartV2RayIntent.`package` = ANG_PACKAGE
+        restartV2RayIntent.putExtra("key", AppConfig.MSG_STATE_RESTART)
+        val restartV2RayPendingIntent = PendingIntent.getBroadcast(service, NOTIFICATION_PENDING_INTENT_RESTART_V2RAY, restartV2RayIntent, flags)
 
         val channelId =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -324,6 +323,11 @@ object V2RayServiceManager {
                 R.drawable.ic_delete_24dp,
                 service.getString(R.string.notification_action_stop_v2ray),
                 stopV2RayPendingIntent
+            )
+            .addAction(
+                R.drawable.ic_delete_24dp,
+                service.getString(R.string.title_service_restart),
+                restartV2RayPendingIntent
             )
         //.build()
 
