@@ -32,8 +32,6 @@ open class FmtBase {
 
     fun getItemFormQuery(config: ProfileItem, queryParam: Map<String, String>, allowInsecure: Boolean) {
         config.network = queryParam["type"] ?: NetworkType.TCP.type
-        //TODO
-        if (config.network == NetworkType.SPLIT_HTTP.type) config.network = NetworkType.XHTTP.type
         config.headerType = queryParam["headerType"]
         config.host = queryParam["host"]
         config.path = queryParam["path"]
@@ -95,7 +93,7 @@ open class FmtBase {
                 config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
             }
 
-            NetworkType.SPLIT_HTTP, NetworkType.XHTTP -> {
+             NetworkType.XHTTP -> {
                 config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
                 config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
                 config.xhttpMode.let { if (it.isNotNullEmpty()) dicQuery["mode"] = it.orEmpty() }
