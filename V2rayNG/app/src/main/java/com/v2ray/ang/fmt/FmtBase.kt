@@ -1,5 +1,6 @@
 package com.v2ray.ang.fmt
 
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.isNotNullEmpty
@@ -47,6 +48,9 @@ open class FmtBase {
         config.xhttpExtra = queryParam["extra"]
 
         config.security = queryParam["security"]
+        if (config.security != AppConfig.TLS && config.security != AppConfig.REALITY) {
+            config.security = null
+        }
         config.insecure = if (queryParam["allowInsecure"].isNullOrEmpty()) {
             allowInsecure
         } else {
