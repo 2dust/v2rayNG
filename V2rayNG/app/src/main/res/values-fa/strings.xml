@@ -30,10 +30,10 @@
     <string name="menu_item_import_config_manually_vless">تایپ دستی[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">تایپ دستی[SHADOWSOCKS]</string>
     <string name="menu_item_import_config_manually_socks">تایپ دستی[SOCKS]</string>
-    <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
+    <string name="menu_item_import_config_manually_http">تایپ دستی[HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">تایپ دستی[TROJAN]</string>
-    <string name="menu_item_import_config_manually_wireguard">WIREGUARD]تایپ دستی</string>
-    <string name="menu_item_import_config_manually_hysteria2">TYPE MANUALLY[HYSTERIA2]</string>
+    <string name="menu_item_import_config_manually_wireguard">‌تایپ دستی[WIREGUARD]</string>
+    <string name="menu_item_import_config_manually_hysteria2">تایپ دستی[HYSTERIA2]</string>
     <string name="menu_item_import_config_custom">کانفیگ سفارشی</string>
     <string name="menu_item_import_config_custom_clipboard">کانفیگ سفارشی را از کلیپ ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_custom_local">کانفیگ سفارشی را به صورت محلی وارد کنید</string>
@@ -185,7 +185,7 @@
     <string name="summary_pref_proxy_sharing_enabled">دستگاه‌ های دیگر می‌توانند از طریق socks/http به پراکسی توسط نشانی آی‌پی شما متصل شوند، فقط در شبکه مورد اعتماد فعال می‌شوند تا از اتصال غیرمجاز جلوگیری کنند.</string>
     <string name="toast_warning_pref_proxysharing_short">اتصالات از طریق LAN را مجاز کنید، مطمئن شوید که در یک شبکه قابل اعتماد هستید</string>
 
-    <string name="title_pref_allow_insecure">مجوز ناامن</string>
+    <string name="title_pref_allow_insecure">اعطای مجوز ناامن</string>
     <string name="summary_pref_allow_insecure">هنگام استفاده از TLS، به طور پیش‌ فرض مجوز ناامن فعال است.</string>
 
     <string name="title_pref_socks_port">پورت پروکسی SOCKS5</string>
