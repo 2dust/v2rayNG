@@ -5,7 +5,6 @@ enum class NetworkType(val type: String) {
     KCP("kcp"),
     WS("ws"),
     HTTP_UPGRADE("httpupgrade"),
-    SPLIT_HTTP("splithttp"),
     XHTTP("xhttp"),
     HTTP("http"),
     H2("h2"),
