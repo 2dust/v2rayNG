@@ -27,7 +27,6 @@
         <item>ws</item>
         <item>httpupgrade</item>
         <item>xhttp</item>
-        <item>splithttp</item>
         <item>h2</item>
         <item>grpc</item>
     </string-array>
