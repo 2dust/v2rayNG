@@ -209,5 +209,6 @@
         <item>auto</item>
         <item>packet-up</item>
         <item>stream-up</item>
+        <item>stream-one</item>
     </string-array>
 </resources>
