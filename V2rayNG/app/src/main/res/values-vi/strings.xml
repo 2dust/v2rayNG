@@ -191,9 +191,6 @@
     <string name="title_pref_socks_port">Cổng Proxy SOCKS5</string>
     <string name="summary_pref_socks_port">Cổng Proxy SOCKS5</string>
 
-    <string name="title_pref_http_port">Cổng Proxy HTTP</string>
-    <string name="summary_pref_http_port">Cổng Proxy HTTP</string>
-
     <string name="title_pref_local_dns_port">Cổng Local DNS</string>
     <string name="summary_pref_local_dns_port">Cổng Local DNS</string>
 

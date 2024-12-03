@@ -188,9 +188,6 @@
     <string name="title_pref_socks_port">SOCKS5代理端口</string>
     <string name="summary_pref_socks_port">SOCKS5代理端口</string>
 
-    <string name="title_pref_http_port">HTTP代理端口</string>
-    <string name="summary_pref_http_port">HTTP代理端口</string>
-
     <string name="title_pref_local_dns_port">本地DNS端口</string>
     <string name="summary_pref_local_dns_port">本地DNS端口</string>
 

@@ -34,7 +34,6 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_DELAY_TEST_URL,
             AppConfig.PREF_LOCAL_DNS_PORT,
             AppConfig.PREF_SOCKS_PORT,
-            AppConfig.PREF_HTTP_PORT,
             AppConfig.PREF_LOGLEVEL,
             AppConfig.PREF_LANGUAGE,
             AppConfig.PREF_UI_MODE_NIGHT,

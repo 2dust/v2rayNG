@@ -58,7 +58,6 @@ class SettingsActivity : BaseActivity() {
         private val autoUpdateInterval by lazy { findPreference<EditTextPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL) }
 
         private val socksPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS_PORT) }
-        private val httpPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HTTP_PORT) }
         private val remoteDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_REMOTE_DNS) }
         private val domesticDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DOMESTIC_DNS) }
         private val delayTestUrl by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DELAY_TEST_URL) }
@@ -142,11 +141,7 @@ class SettingsActivity : BaseActivity() {
                 socksPort?.summary = if (TextUtils.isEmpty(nval)) AppConfig.PORT_SOCKS else nval
                 true
             }
-            httpPort?.setOnPreferenceChangeListener { _, any ->
-                val nval = any as String
-                httpPort?.summary = if (TextUtils.isEmpty(nval)) AppConfig.PORT_HTTP else nval
-                true
-            }
+
             remoteDns?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
                 remoteDns?.summary = if (nval == "") AppConfig.DNS_PROXY else nval
@@ -197,7 +192,6 @@ class SettingsActivity : BaseActivity() {
             autoUpdateInterval?.isEnabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
 
             socksPort?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
-            httpPort?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
             remoteDns?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_REMOTE_DNS, AppConfig.DNS_PROXY)
             domesticDns?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
             delayTestUrl?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DelayTestUrl)
@@ -215,7 +209,6 @@ class SettingsActivity : BaseActivity() {
                 fragmentInterval,
                 autoUpdateInterval,
                 socksPort,
-                httpPort,
                 remoteDns,
                 domesticDns,
                 delayTestUrl

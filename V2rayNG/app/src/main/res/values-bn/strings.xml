@@ -192,9 +192,6 @@
     <string name="title_pref_socks_port">SOCKS5 প্রক্সি পোর্ট</string>
     <string name="summary_pref_socks_port">SOCKS5 প্রক্সি পোর্ট</string>
 
-    <string name="title_pref_http_port">HTTP প্রক্সি পোর্ট</string>
-    <string name="summary_pref_http_port">HTTP প্রক্সি পোর্ট</string>
-
     <string name="title_pref_local_dns_port">স্থানীয় DNS পোর্ট</string>
     <string name="summary_pref_local_dns_port">স্থানীয় DNS পোর্ট</string>
 
