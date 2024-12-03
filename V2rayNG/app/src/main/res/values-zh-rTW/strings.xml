@@ -190,9 +190,6 @@
     <string name="title_pref_socks_port">SOCKS5 Proxy 埠</string>
     <string name="summary_pref_socks_port">SOCKS5 Proxy 埠</string>
 
-    <string name="title_pref_http_port">HTTP Proxy 埠</string>
-    <string name="summary_pref_http_port">HTTP Proxy 埠</string>
-
     <string name="title_pref_local_dns_port">本機 DNS 埠</string>
     <string name="summary_pref_local_dns_port">本機 DNS 埠</string>
 

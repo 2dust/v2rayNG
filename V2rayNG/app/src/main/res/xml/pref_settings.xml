@@ -181,12 +181,6 @@
             android:title="@string/title_pref_socks_port" />
 
         <EditTextPreference
-            android:inputType="number"
-            android:key="pref_http_port"
-            android:summary="10809"
-            android:title="@string/title_pref_http_port" />
-
-        <EditTextPreference
             android:key="pref_remote_dns"
             android:summary="@string/summary_pref_remote_dns"
             android:title="@string/title_pref_remote_dns" />

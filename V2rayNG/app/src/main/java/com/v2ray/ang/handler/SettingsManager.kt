@@ -155,7 +155,7 @@ object SettingsManager {
     }
 
     fun getHttpPort(): Int {
-        return parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_HTTP_PORT), AppConfig.PORT_HTTP.toInt())
+        return getSocksPort() + (if (Utils.isXray()) 0 else 1)
     }
 
     fun initAssets(context: Context, assets: AssetManager) {

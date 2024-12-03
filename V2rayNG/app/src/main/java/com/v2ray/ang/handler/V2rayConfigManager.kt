@@ -120,7 +120,6 @@ object V2rayConfigManager {
     private fun inbounds(v2rayConfig: V2rayConfig): Boolean {
         try {
             val socksPort = SettingsManager.getSocksPort()
-            val httpPort = SettingsManager.getHttpPort()
 
             v2rayConfig.inbounds.forEach { curInbound ->
                 if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING) != true) {
@@ -142,14 +141,13 @@ object V2rayConfigManager {
                 v2rayConfig.inbounds[0].sniffing?.destOverride?.add("fakedns")
             }
 
-            v2rayConfig.inbounds[1].port = httpPort
+            if (Utils.isXray()) {
+                v2rayConfig.inbounds.removeAt(1)
+            } else {
+                val httpPort = SettingsManager.getHttpPort()
+                v2rayConfig.inbounds[1].port = httpPort
+            }
 
-//            if (httpPort > 0) {
-//                val httpCopy = v2rayConfig.inbounds[0].copy()
-//                httpCopy.port = httpPort
-//                httpCopy.protocol = "http"
-//                v2rayConfig.inbounds.add(httpCopy)
-//            }
         } catch (e: Exception) {
             e.printStackTrace()
             return false
@@ -337,8 +335,8 @@ object V2rayConfigManager {
             if (proxyDomain.size > 0) {
                 servers.add(
                     V2rayConfig.DnsBean.ServersBean(
-                        address =  remoteDns.first(),
-                        domains =  proxyDomain,
+                        address = remoteDns.first(),
+                        domains = proxyDomain,
                     )
                 )
             }

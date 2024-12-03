@@ -195,9 +195,6 @@
     <string name="title_pref_socks_port">SOCKS5 proxy port</string>
     <string name="summary_pref_socks_port">SOCKS5 proxy port</string>
 
-    <string name="title_pref_http_port">HTTP proxy port</string>
-    <string name="summary_pref_http_port">HTTP proxy port</string>
-
     <string name="title_pref_local_dns_port">Local DNS port</string>
     <string name="summary_pref_local_dns_port">Local DNS port</string>
 
