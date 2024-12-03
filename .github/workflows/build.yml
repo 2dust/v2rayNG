@@ -26,7 +26,7 @@ jobs:
     - name: Setup Golang
       uses: actions/setup-go@v5
       with:
-        go-version: '1.23.2'
+        go-version: '1.23.3'
         cache: false
 
     - name: Patch Go use 600296
