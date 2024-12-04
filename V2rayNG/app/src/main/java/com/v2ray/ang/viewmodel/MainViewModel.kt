@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.AssetManager
-import android.os.Build
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
@@ -274,26 +273,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return deleteServer.count()
     }
 
-    fun removeAllServer() {
-        if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
-            MmkvManager.removeAllServer()
-        } else {
-            val serversCopy = serversCache.toList()
-            for (item in serversCopy) {
-                MmkvManager.removeServer(item.guid)
+    fun removeAllServer(): Int {
+        val count =
+            if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
+                MmkvManager.removeAllServer()
+            } else {
+                val serversCopy = serversCache.toList()
+                for (item in serversCopy) {
+                    MmkvManager.removeServer(item.guid)
+                }
+                serversCache.toList().count()
             }
-        }
+        return count
     }
 
-    fun removeInvalidServer() {
+    fun removeInvalidServer(): Int {
+        var count = 0
         if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
-            MmkvManager.removeInvalidServer("")
+            count += MmkvManager.removeInvalidServer("")
         } else {
             val serversCopy = serversCache.toList()
             for (item in serversCopy) {
-                MmkvManager.removeInvalidServer(item.guid)
+                count += MmkvManager.removeInvalidServer(item.guid)
             }
         }
+        return count
     }
 
     fun sortByTestResults() {
