@@ -253,9 +253,12 @@
     <string name="title_sort_by_test_results">依偵測結果排序</string>
     <string name="title_filter_config">過濾設定</string>
     <string name="filter_config_all">所有分組</string>
-    <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
+    <string name="title_del_duplicate_config_count">删除 %d 个重复配置</string>
 
-    <string name="title_del_config_count">Delete %d configurations</string>
+    <string name="title_del_config_count">删除 %d 个配置</string>
+    <string name="title_import_config_count">导入 %d 个配置</string>
+    <string name="title_export_config_count">导出 %d 个配置</string>
+    <string name="title_update_config_count">更新 %d 个配置</string>
     <string name="tasker_start_service">啟動服務</string>
     <string name="tasker_setting_confirm">確定</string>
 

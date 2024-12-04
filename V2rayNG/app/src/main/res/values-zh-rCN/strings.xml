@@ -254,6 +254,9 @@
     <string name="title_del_duplicate_config_count">删除 %d 个重复配置</string>
 
     <string name="title_del_config_count">删除 %d 个配置</string>
+    <string name="title_import_config_count">导入 %d 个配置</string>
+    <string name="title_export_config_count">导出 %d 个配置</string>
+    <string name="title_update_config_count">更新 %d 个配置</string>
     <string name="tasker_start_service">启动服务</string>
     <string name="tasker_setting_confirm">确定</string>
 
