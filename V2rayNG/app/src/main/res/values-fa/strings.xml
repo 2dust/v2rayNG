@@ -256,7 +256,7 @@
     <string name="filter_config_all">همه گروه‌های اشتراک</string>
     <string name="title_del_duplicate_config_count">حذف %d کانفیگ تکراری</string>
 
-    <string name="title_del_config_count">Delete %d configurations</string>
+    <string name="title_del_config_count">حذف %d کانفیگ</string>
     <string name="tasker_start_service">شروع خدمات</string>
     <string name="tasker_setting_confirm">تایید</string>
 
