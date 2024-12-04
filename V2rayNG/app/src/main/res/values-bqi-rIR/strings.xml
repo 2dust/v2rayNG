@@ -14,10 +14,10 @@
     <string name="toast_permission_denied">گرؽڌن موجوز مومکن نؽڌ</string>
     <string name="toast_permission_denied_notification">گرؽڌن موجوز وارسۊوی مومکن نؽڌ</string>
     <string name="notification_action_more">سی گرؽڌن دۉسمندیا بیشتر کیلیک کوݩ</string>
-    <string name="toast_services_start">ره وستن خدمات</string>
+    <string name="toast_services_start">ر وستن خدمات</string>
     <string name="toast_services_stop">واڌاشتن خدمات</string>
-    <string name="toast_services_success">ره وستن خدمات وا مووفقیت ٱنجوم وابی</string>
-    <string name="toast_services_failure">ره وستن خدمات وا مووفقیت ٱنجوم نوابی</string>
+    <string name="toast_services_success">ر وستن خدمات وا مووفقیت ٱنجوم وابی</string>
+    <string name="toast_services_failure">ر وستن خدمات وا مووفقیت ٱنجوم نوابی</string>
 
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
@@ -81,7 +81,7 @@
     <string name="server_lab_encryption">رزم نگاری</string>
     <string name="server_lab_flow">جریان</string>
     <string name="server_lab_public_key">کیلیت پوی وولاتی</string>
-    <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
+    <string name="server_lab_preshared_key">کیلیت رمز ناهاڌن ازاف (اختیاری)</string>
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_secret_key">کیلیت سیخومی</string>
@@ -123,7 +123,7 @@
     <string name="server_lab_xhttp_extra">XHTTP قلوه خام JSON، قالوو: { XHTTPObject }</string>
 
     <!-- PerAppProxyActivity -->
-    <string name="msg_dialog_progress">هون بارونی بۊ</string>
+    <string name="msg_dialog_progress">هون بار ونی بۊ</string>
     <string name="menu_item_search">پیتینیڌن</string>
     <string name="menu_item_select_all">پسند پوی</string>
     <string name="msg_enter_keywords">رزمان بزنین</string>
@@ -140,11 +140,11 @@
     <string name="title_vpn_settings">سامووا VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی و ری برنومه</string>
     <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه واجۊری بیڌه پروکسی هڌ، منپیز موستقیم بؽ نشووه هڌ. هالت دور زیڌن: برنومه نشووک ناڌه موستقیمن منپیز هڌ، پروکسی نشووک زیڌه نؽڌ. گۊزینه پسند خوتکار برنومه پروکسی من نومگه</string>
-    <string name="title_pref_is_booted">منپیز خوتکار مجال ره ونی</string>
-    <string name="summary_pref_is_booted">مجال ره وندن، خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
+    <string name="title_pref_is_booted">منپیز خوتکار مجال ر ونی</string>
+    <string name="summary_pref_is_booted">مجال ر وندن، خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
 
     <string name="title_mux_settings">سامووا Mux</string>
-    <string name="title_pref_mux_enabled">ره وندن Mux</string>
+    <string name="title_pref_mux_enabled">ر وندن Mux</string>
     <string name="summary_pref_mux_enabled">زل تر، ٱما گاشڌ منپیز زی قت بۊ بارت دؽوۉداری، TCP، UDP و QUIC ن ای لم سفارشی کۊنین.</string>
     <string name="title_pref_mux_concurency">منپیزا TCP (تلایه منجا 1-1024)</string>
     <string name="title_pref_mux_xudp_concurency">منپیزا XUDP (تلایه منجا 1-1024)</string>
@@ -155,24 +155,24 @@
         <item>گوم زیڌن</item>
     </string-array>
 
-    <string name="title_pref_speed_enabled">ره وندن نشۉݩ داڌن سورعت</string>
+    <string name="title_pref_speed_enabled">ر وندن نشۉݩ داڌن سورعت</string>
     <string name="summary_pref_speed_enabled">نشۉݩ داڌن سورعت هیم سکویی من وارسۊویا. نماڌ وارسۊوی و ری و کار گرؽڌن آلشت ابۊ.</string>
 
-    <string name="title_pref_sniffing_enabled">ره وندن Sniffing</string>
+    <string name="title_pref_sniffing_enabled">ر وندن Sniffing</string>
     <string name="summary_pref_sniffing_enabled">دامنه sniff ن ز کتن امتهۉݩ کۊنین (پؽش فرز رۊشن)</string>
-    <string name="title_pref_route_only_enabled">ره وندن routeOnly</string>
+    <string name="title_pref_route_only_enabled">ر وندن routeOnly</string>
     <string name="summary_pref_route_only_enabled">ز نوم دامنه sniffed تینا سی تور جوستن استفاڌه کۊنین وو آدرس مورد نزرن و عونوان آدرس IP ووردارین.</string>
 
-    <string name="title_pref_local_dns_enabled">ره وندن DNS مهلی</string>
+    <string name="title_pref_local_dns_enabled">ر وندن DNS مهلی</string>
     <string name="summary_pref_local_dns_enabled">DNS پردازشت وابیڌه و دس هسته ماژول DNS (پؽشنهاڌ ابۊ، ٱر نیاز هڌ ک جوستن تور وو ولات ٱسلین دور زنی)</string>
 
-    <string name="title_pref_fake_dns_enabled">ره وندن DNS جئلی</string>
+    <string name="title_pref_fake_dns_enabled">ر وندن DNS جئلی</string>
     <string name="summary_pref_fake_dns_enabled">DNS مهلی آدرسا IP جئلی ن وورگنه (زل تر، ٱما گاشڌ من یقرد ز برنومیل کار نکونه)</string>
 
     <string name="title_pref_prefer_ipv6">ترجی IPv6</string>
     <string name="summary_pref_prefer_ipv6">ترجی داڌن نشۊوی وو تورا IPv6</string>
 
-    <string name="title_pref_remote_dns">DNS ز ره دیر (اختیاری) (udp/tcp/https/quic) (اختیاری)</string>
+    <string name="title_pref_remote_dns">DNS ز ر دیر (اختیاری) (udp/tcp/https/quic) (اختیاری)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (تینا IPv4/v6)</string>
@@ -184,7 +184,7 @@
     <string name="summary_pref_delay_test_url">نشۊوی اینترنتی</string>
 
     <string name="title_pref_proxy_sharing_enabled">هشتن منپیزا ز LAN</string>
-    <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا آدرس IP ایسا، ز ره socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل اعتماد فعال بۊ تا ز منپیز ؛یر موجاز جلو گری بۊ.</string>
+    <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا آدرس IP ایسا، ز ر socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل اعتماد فعال بۊ تا ز منپیز ؛یر موجاز جلو گری بۊ.</string>
     <string name="toast_warning_pref_proxysharing_short">منپیزا ز LAN ن موجار کۊنین، موتمعن بۊین ک من ی شبکه قابل ائتماڌ هڌین.</string>
 
     <string name="title_pref_allow_insecure">اجازه نا ٱمن</string>
@@ -199,8 +199,8 @@
     <string name="title_pref_confirm_remove">قوۊل کردن پاک کردن کانفیگ</string>
     <string name="summary_pref_confirm_remove">سی پاک وابیڌن فایل کانفیگ نیاز به قوۊل کردن دووارته ز سمت منتور هڌ</string>
 
-    <string name="title_pref_start_scan_immediate">زی اسکنن ره ون</string>
-    <string name="summary_pref_start_scan_immediate">شؽواتگرن سی اسکن، زی مجال ره وندن بۊگۊشین، اندی ترین کودن اسکن کۊنین یا شؽواتی ن منه نوار ٱوزار پسند کۊنین.</string>
+    <string name="title_pref_start_scan_immediate">زی اسکنن ر ون</string>
+    <string name="summary_pref_start_scan_immediate">شؽواتگرن سی اسکن، زی مجال ر وندن بۊگۊشین، اندی ترین کودن اسکن کۊنین یا شؽواتی ن منه نوار ٱوزار پسند کۊنین.</string>
 
     <string name="title_pref_append_http_proxy">پروکسی HTTP ن و VPN ازاف کۊنین</string>
     <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موسقیمن ز (مۊرۊرگر/ی قرد ز برنومیل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
@@ -236,7 +236,7 @@
     <string name="title_logcat">داسووا</string>
     <string name="logcat_copy">لف گیری</string>
     <string name="logcat_clear">روفتن</string>
-    <string name="title_service_restart">ره وندن دووارته خدمات</string>
+    <string name="title_service_restart">ر وندن دووارته خدمات</string>
     <string name="title_del_all_config">پاک کردن پوی کانفیگا جرگه سکویی</string>
     <string name="title_del_duplicate_config">پاک کردن کانفیگا تکراری جرگه سکویی</string>
     <string name="title_del_invalid_config">پاک کردن کانفیگا نا موئتبر جرگه سکویی</string>
@@ -259,11 +259,11 @@
     <string name="filter_config_all">پوی جرگیل</string>
     <string name="title_del_duplicate_config_count">پاک کردن %d کانفیگ تکراری</string>
 
-    <string name="title_del_config_count">Delete %d configurations</string>
-    <string name="title_import_config_count">Import %d configurations</string>
-    <string name="title_export_config_count">Export %d configurations</string>
-    <string name="title_update_config_count">Update %d configurations</string>
-    <string name="tasker_start_service">ره وندن خدمات</string>
+    <string name="title_del_config_count">پاک کردن %d کانفیگ</string>
+    <string name="title_import_config_count">و من ٱووردن %d کانفیگ</string>
+    <string name="title_export_config_count">و در کشیڌن %d کانفیگ</string>
+    <string name="title_update_config_count">ورۊ کردن %d کانفیگ</string>
+    <string name="tasker_start_service">ر وندن خدمات</string>
     <string name="tasker_setting_confirm">قوۊل</string>
 
     <string name="routing_settings_domain_strategy">نشقه دامنه</string>
@@ -290,7 +290,7 @@
 
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>
-    <string name="connection_test_testing_count">Testing %d configurations…</string>
+    <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ...</string>
     <string name="connection_test_available">مووفق بی: منپیز HTTP %dms تۊل کشی</string>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
@@ -304,7 +304,7 @@
     <string name="title_pref_fragment_packets">Fragment Packets</string>
     <string name="title_pref_fragment_length">Fragment Length (min-max)</string>
     <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
-    <string name="title_pref_fragment_enabled">فعال کردن Fragment</string>
+    <string name="title_pref_fragment_enabled">ر وندن Fragment</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
