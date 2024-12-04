@@ -82,6 +82,7 @@
     <string name="server_lab_encryption">التشفير</string>
     <string name="server_lab_flow">التدفق</string>
     <string name="server_lab_public_key" translatable="false">المفتاح العام</string>
+    <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
     <string name="server_lab_short_id" translatable="false">المعرّف القصير</string>
     <string name="server_lab_spider_x" translatable="false">SpiderX</string>
     <string name="server_lab_secret_key" translatable="false">المفتاح السري</string>
@@ -211,6 +212,7 @@
     <string name="title_privacy_policy">سياسة الخصوصية</string>
     <string name="title_about">حول\nترجمة م. ابراهيم قاسم</string>
     <string name="title_source_code">الكود المصدري</string>
+    <string name="title_oss_license">Open Source licenses</string>
     <string name="title_tg_channel">قناة Telegram</string>
     <string name="title_configuration_backup">نسخ التكوين احتياطيًا</string>
     <string name="summary_configuration_backup">موقع التخزين: [%s]، سيتم مسح النسخة الاحتياطية بعد إلغاء تثبيت التطبيق أو مسح التخزين</string>
@@ -258,6 +260,9 @@
     <string name="title_del_duplicate_config_count">حذف %d من الإعدادات المكررة</string>
 
     <string name="title_del_config_count">Delete %d configurations</string>
+    <string name="title_import_config_count">Import %d configurations</string>
+    <string name="title_export_config_count">Export %d configurations</string>
+    <string name="title_update_config_count">Update %d configurations</string>
     <string name="tasker_start_service">بدء الخدمة</string>
     <string name="tasker_setting_confirm">تأكيد</string>
 
@@ -277,6 +282,7 @@
 
     <string name="connection_test_pending">التحقق من الاتصال</string>
     <string name="connection_test_testing">يجري الاختبار…</string>
+    <string name="connection_test_testing_count">Testing %d configurations…</string>
     <string name="connection_test_available">نجاح: استغرق اتصال HTTP %dms</string>
     <string name="connection_test_error">فشل اكتشاف اتصال الإنترنت: %s</string>
     <string name="connection_test_fail">الإنترنت غير متاح</string>

@@ -346,8 +346,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             lifecycleScope.launch(Dispatchers.IO) {
                 val ret = mainViewModel.exportAllServer()
                 launch(Dispatchers.Main) {
-                    if (ret == 0)
-                        toast(R.string.toast_success)
+                    if (ret > 0)
+                        toast(getString(R.string.title_export_config_count, ret))
                     else
                         toast(R.string.toast_failure)
                     binding.pbWaiting.hide()
@@ -358,13 +358,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.ping_all -> {
-            toast(R.string.connection_test_testing)
+            toast(getString(R.string.connection_test_testing_count, mainViewModel.serversCache.count()))
             mainViewModel.testAllTcping()
             true
         }
 
         R.id.real_ping_all -> {
-            toast(R.string.connection_test_testing)
+            toast(getString(R.string.connection_test_testing_count, mainViewModel.serversCache.count()))
             mainViewModel.testAllRealPing()
             true
         }
@@ -519,7 +519,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 withContext(Dispatchers.Main) {
                     when {
                         count > 0 -> {
-                            toast(R.string.toast_success)
+                            toast(getString(R.string.title_import_config_count, count))
                             mainViewModel.reloadServerList()
                         }
 
@@ -625,7 +625,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             delay(500L)
             launch(Dispatchers.Main) {
                 if (count > 0) {
-                    toast(R.string.toast_success)
+                    toast(getString(R.string.title_update_config_count, count))
                     mainViewModel.reloadServerList()
                 } else {
                     toast(R.string.toast_failure)
