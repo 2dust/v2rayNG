@@ -81,6 +81,7 @@
     <string name="server_lab_encryption">رزم نگاری</string>
     <string name="server_lab_flow">جریان</string>
     <string name="server_lab_public_key">کیلیت پوی وولاتی</string>
+    <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_secret_key">کیلیت سیخومی</string>
@@ -259,6 +260,9 @@
     <string name="title_del_duplicate_config_count">پاک کردن %d کانفیگ تکراری</string>
 
     <string name="title_del_config_count">Delete %d configurations</string>
+    <string name="title_import_config_count">Import %d configurations</string>
+    <string name="title_export_config_count">Export %d configurations</string>
+    <string name="title_update_config_count">Update %d configurations</string>
     <string name="tasker_start_service">ره وندن خدمات</string>
     <string name="tasker_setting_confirm">قوۊل</string>
 
@@ -286,6 +290,7 @@
 
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>
+    <string name="connection_test_testing_count">Testing %d configurations…</string>
     <string name="connection_test_available">مووفق بی: منپیز HTTP %dms تۊل کشی</string>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>

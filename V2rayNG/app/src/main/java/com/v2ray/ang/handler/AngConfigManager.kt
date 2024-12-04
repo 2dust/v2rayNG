@@ -138,11 +138,11 @@ object AngConfigManager {
             if (sb.count() > 0) {
                 Utils.setClipboard(context, sb.toString())
             }
+            return sb.lines().count()
         } catch (e: Exception) {
             e.printStackTrace()
             return -1
         }
-        return 0
     }
 
     /**
