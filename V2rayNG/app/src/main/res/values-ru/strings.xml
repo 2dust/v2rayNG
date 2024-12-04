@@ -258,6 +258,7 @@
     <string name="filter_config_all">Все группы</string>
     <string name="title_del_duplicate_config_count">Удалено дубликатов профилей: %d</string>
 
+    <string name="title_del_config_count">Delete %d configurations</string>
     <string name="tasker_start_service">Запуск службы</string>
     <string name="tasker_setting_confirm">Подтвердить</string>
 

@@ -260,6 +260,7 @@
     <string name="title_filter_config">Filter configuration file</string>
     <string name="filter_config_all">All groups</string>
     <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
+    <string name="title_del_config_count">Delete %d configurations</string>
 
     <string name="tasker_start_service">Start Service</string>
     <string name="tasker_setting_confirm">Confirm</string>

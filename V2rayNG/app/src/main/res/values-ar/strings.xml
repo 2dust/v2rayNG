@@ -257,6 +257,7 @@
     <string name="filter_config_all">جميع مجموعات الاشتراك</string>
     <string name="title_del_duplicate_config_count">حذف %d من الإعدادات المكررة</string>
 
+    <string name="title_del_config_count">Delete %d configurations</string>
     <string name="tasker_start_service">بدء الخدمة</string>
     <string name="tasker_setting_confirm">تأكيد</string>
 

@@ -164,18 +164,22 @@ object MmkvManager {
         }
     }
 
-    fun removeAllServer() {
+    fun removeAllServer(): Int {
+        val count = profileFullStorage.allKeys()?.count() ?: 0
         mainStorage.clearAll()
         profileFullStorage.clearAll()
         //profileStorage.clearAll()
         serverAffStorage.clearAll()
+        return count
     }
 
-    fun removeInvalidServer(guid: String) {
+    fun removeInvalidServer(guid: String): Int {
+        var count = 0
         if (guid.isNotEmpty()) {
             decodeServerAffiliationInfo(guid)?.let { aff ->
                 if (aff.testDelayMillis < 0L) {
                     removeServer(guid)
+                    count++
                 }
             }
         } else {
@@ -183,10 +187,12 @@ object MmkvManager {
                 decodeServerAffiliationInfo(key)?.let { aff ->
                     if (aff.testDelayMillis < 0L) {
                         removeServer(key)
+                        count++
                     }
                 }
             }
         }
+        return count
     }
 
     fun encodeServerRaw(guid: String, config: String) {
@@ -336,7 +342,7 @@ object MmkvManager {
     }
 
     fun decodeSettingsBool(key: String): Boolean {
-        return settingsStorage.decodeBool(key,false)
+        return settingsStorage.decodeBool(key, false)
     }
 
     fun decodeSettingsBool(key: String, defaultValue: Boolean): Boolean {

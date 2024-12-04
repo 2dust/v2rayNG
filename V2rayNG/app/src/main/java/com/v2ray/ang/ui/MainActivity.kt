@@ -379,9 +379,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     binding.pbWaiting.show()
                     lifecycleScope.launch(Dispatchers.IO) {
-                        mainViewModel.removeAllServer()
+                        val ret = mainViewModel.removeAllServer()
                         launch(Dispatchers.Main) {
                             mainViewModel.reloadServerList()
+                            toast(getString(R.string.title_del_config_count, ret))
                             binding.pbWaiting.hide()
                         }
                     }
@@ -418,9 +419,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     binding.pbWaiting.show()
                     lifecycleScope.launch(Dispatchers.IO) {
-                        mainViewModel.removeInvalidServer()
+                        val ret = mainViewModel.removeInvalidServer()
                         launch(Dispatchers.Main) {
                             mainViewModel.reloadServerList()
+                            toast(getString(R.string.title_del_config_count, ret))
                             binding.pbWaiting.hide()
                         }
                     }

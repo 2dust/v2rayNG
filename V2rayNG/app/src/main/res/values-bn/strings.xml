@@ -256,6 +256,7 @@
     <string name="title_filter_config">কনফিগারেশন ফাইল ফিল্টার করুন</string>
     <string name="filter_config_all">সব সাবস্ক্রিপশন গ্রুপ</string>
     <string name="title_del_duplicate_config_count">%d ডুপ্লিকেট কনফিগারেশন মুছে ফেলুন</string>
+    <string name="title_del_config_count">Delete %d configurations</string>
     <string name="tasker_start_service">সার্ভিস শুরু করুন</string>
     <string name="tasker_setting_confirm">নিশ্চিত করুন</string>
 
