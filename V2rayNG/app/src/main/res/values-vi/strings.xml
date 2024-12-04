@@ -256,6 +256,7 @@
     <string name="filter_config_all">Hiển thị tất cả các gói đăng ký</string>
     <string name="title_del_duplicate_config_count">Xoá %d cấu hình trùng lặp</string>
 
+    <string name="title_del_config_count">Delete %d configurations</string>
     <string name="tasker_start_service">Khởi động v2rayNG</string>
     <string name="tasker_setting_confirm">Xác nhận</string>
 

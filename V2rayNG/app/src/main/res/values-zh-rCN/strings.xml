@@ -253,6 +253,7 @@
     <string name="filter_config_all">所有分组</string>
     <string name="title_del_duplicate_config_count">删除 %d 个重复配置</string>
 
+    <string name="title_del_config_count">删除 %d 个配置</string>
     <string name="tasker_start_service">启动服务</string>
     <string name="tasker_setting_confirm">确定</string>
 

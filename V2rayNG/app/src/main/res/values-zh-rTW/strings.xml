@@ -255,6 +255,7 @@
     <string name="filter_config_all">所有分組</string>
     <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
 
+    <string name="title_del_config_count">Delete %d configurations</string>
     <string name="tasker_start_service">啟動服務</string>
     <string name="tasker_setting_confirm">確定</string>
 
