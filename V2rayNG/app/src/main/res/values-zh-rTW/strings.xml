@@ -188,8 +188,8 @@
     <string name="title_pref_allow_insecure">跳過憑證驗證 (allowInsecure)</string>
     <string name="summary_pref_allow_insecure">傳輸層安全選 tls 時，預設跳過憑證驗證 (allowInsecure)</string>
 
-    <string name="title_pref_socks_port">SOCKS5 Proxy 埠</string>
-    <string name="summary_pref_socks_port">SOCKS5 Proxy 埠</string>
+    <string name="title_pref_socks_port">本地 Proxy 埠</string>
+    <string name="summary_pref_socks_port">本地 Proxy 埠</string>
 
     <string name="title_pref_local_dns_port">本機 DNS 埠</string>
     <string name="summary_pref_local_dns_port">本機 DNS 埠</string>

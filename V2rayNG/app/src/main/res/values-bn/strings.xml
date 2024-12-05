@@ -190,8 +190,8 @@
     <string name="title_pref_allow_insecure">allowInsecure</string>
     <string name="summary_pref_allow_insecure">যখন TLS, ডিফল্টভাবে allowInsecure</string>
 
-    <string name="title_pref_socks_port">SOCKS5 প্রক্সি পোর্ট</string>
-    <string name="summary_pref_socks_port">SOCKS5 প্রক্সি পোর্ট</string>
+    <string name="title_pref_socks_port">Local প্রক্সি পোর্ট</string>
+    <string name="summary_pref_socks_port">Local প্রক্সি পোর্ট</string>
 
     <string name="title_pref_local_dns_port">স্থানীয় DNS পোর্ট</string>
     <string name="summary_pref_local_dns_port">স্থানীয় DNS পোর্ট</string>

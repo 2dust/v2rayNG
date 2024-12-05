@@ -192,8 +192,8 @@
     <string name="title_pref_allow_insecure">allowInsecure</string>
     <string name="summary_pref_allow_insecure">When TLS, the default allowInsecure</string>
 
-    <string name="title_pref_socks_port">SOCKS5 proxy port</string>
-    <string name="summary_pref_socks_port">SOCKS5 proxy port</string>
+    <string name="title_pref_socks_port">Local proxy port</string>
+    <string name="summary_pref_socks_port">Local proxy port</string>
 
     <string name="title_pref_local_dns_port">Local DNS port</string>
     <string name="summary_pref_local_dns_port">Local DNS port</string>

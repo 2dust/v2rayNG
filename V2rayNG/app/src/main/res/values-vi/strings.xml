@@ -189,8 +189,8 @@
     <string name="title_pref_allow_insecure">Bỏ qua xác minh chứng chỉ</string>
     <string name="summary_pref_allow_insecure">Khi nhập những cấu hình có bảo mật TLS, mặc định sẽ không xác minh chứng chỉ.</string>
 
-    <string name="title_pref_socks_port">Cổng Proxy SOCKS5</string>
-    <string name="summary_pref_socks_port">Cổng Proxy SOCKS5</string>
+    <string name="title_pref_socks_port">Cổng Proxy Local</string>
+    <string name="summary_pref_socks_port">Cổng Proxy Local</string>
 
     <string name="title_pref_local_dns_port">Cổng Local DNS</string>
     <string name="summary_pref_local_dns_port">Cổng Local DNS</string>

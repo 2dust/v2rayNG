@@ -190,8 +190,8 @@
     <string name="title_pref_allow_insecure">السماح غير الآمن</string>
     <string name="summary_pref_allow_insecure">عند TLS، الافتراضي هو السماح غير الآمن</string>
 
-    <string name="title_pref_socks_port">منفذ بروكسي SOCKS5</string>
-    <string name="summary_pref_socks_port">منفذ بروكسي SOCKS5</string>
+    <string name="title_pref_socks_port">منفذ بروكسي Local</string>
+    <string name="summary_pref_socks_port">منفذ بروكسي Local</string>
 
     <string name="title_pref_local_dns_port">منفذ DNS المحلي</string>
     <string name="summary_pref_local_dns_port">منفذ DNS المحلي</string>

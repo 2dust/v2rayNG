@@ -186,8 +186,8 @@
     <string name="title_pref_allow_insecure">跳过证书验证(allowInsecure)</string>
     <string name="summary_pref_allow_insecure">传输层安全选tls时，默认跳过证书验证(allowInsecure)</string>
 
-    <string name="title_pref_socks_port">SOCKS5代理端口</string>
-    <string name="summary_pref_socks_port">SOCKS5代理端口</string>
+    <string name="title_pref_socks_port">本地代理端口</string>
+    <string name="summary_pref_socks_port">本地代理端口</string>
 
     <string name="title_pref_local_dns_port">本地DNS端口</string>
     <string name="summary_pref_local_dns_port">本地DNS端口</string>
