@@ -37,7 +37,7 @@ class RoutingEditActivity : BaseActivity() {
 
     private fun bindingServer(rulesetItem: RulesetItem): Boolean {
         binding.etRemarks.text = Utils.getEditable(rulesetItem.remarks)
-        binding.chkLocked.isChecked = rulesetItem.looked == true
+        binding.chkLocked.isChecked = rulesetItem.locked == true
         binding.etDomain.text = Utils.getEditable(rulesetItem.domain?.joinToString(","))
         binding.etIp.text = Utils.getEditable(rulesetItem.ip?.joinToString(","))
         binding.etPort.text = Utils.getEditable(rulesetItem.port)
@@ -60,7 +60,7 @@ class RoutingEditActivity : BaseActivity() {
 
         rulesetItem.apply {
             remarks = binding.etRemarks.text.toString()
-            looked = binding.chkLocked.isChecked
+            locked = binding.chkLocked.isChecked
             domain = binding.etDomain.text.toString().takeIf { it.isNotEmpty() }
                 ?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
             ip = binding.etIp.text.toString().takeIf { it.isNotEmpty() }

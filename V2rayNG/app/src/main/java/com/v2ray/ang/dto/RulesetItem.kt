@@ -9,5 +9,5 @@ data class RulesetItem(
     var network: String? = null,
     var protocol: List<String>? = null,
     var enabled: Boolean = true,
-    var looked: Boolean? = false,
+    var locked: Boolean? = false,
 )

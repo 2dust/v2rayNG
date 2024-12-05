@@ -25,7 +25,7 @@ class RoutingSettingRecyclerAdapter(val activity: RoutingSettingActivity) : Recy
         holder.itemRoutingSettingBinding.domainIp.text = (ruleset.domain ?: ruleset.ip ?: ruleset.port)?.toString()
         holder.itemRoutingSettingBinding.outboundTag.text = ruleset.outboundTag
         holder.itemRoutingSettingBinding.chkEnable.isChecked = ruleset.enabled
-        holder.itemRoutingSettingBinding.imgLocked.isVisible = ruleset.looked == true
+        holder.itemRoutingSettingBinding.imgLocked.isVisible = ruleset.locked == true
         holder.itemView.setBackgroundColor(Color.TRANSPARENT)
 
         holder.itemRoutingSettingBinding.layoutEdit.setOnClickListener {

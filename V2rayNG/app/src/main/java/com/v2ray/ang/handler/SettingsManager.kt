@@ -70,7 +70,7 @@ object SettingsManager {
     private fun resetRoutingRulesetsCommon(rulesetList: MutableList<RulesetItem>) {
         val rulesetNew: MutableList<RulesetItem> = mutableListOf()
         MmkvManager.decodeRoutingRulesets()?.forEach { key ->
-            if (key.looked == true) {
+            if (key.locked == true) {
                 rulesetNew.add(key)
             }
         }
