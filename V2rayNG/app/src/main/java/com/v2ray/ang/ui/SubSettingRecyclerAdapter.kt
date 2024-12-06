@@ -120,4 +120,7 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
 
     override fun onItemDismiss(position: Int) {
     }
+    
+    override fun onSwipeItem(position: Int, direction: Float) {
+    }
 }
