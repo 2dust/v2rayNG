@@ -144,7 +144,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                                 removeServer(guid, position)
                             }
                             .setNegativeButton(android.R.string.no) { _, _ ->
-                                //do noting
+                                //do nothing
                             }
                             .show()
                     } else {
@@ -245,5 +245,32 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     }
 
     override fun onItemDismiss(position: Int) {
+    }
+
+    override fun onSwipeItem(position: Int, direction: Float) {
+        val serverConfig = mActivity.mainViewModel.serversCache.getOrNull(position) ?: return
+        val subscriptionId = serverConfig.profile.subscriptionId
+    
+        MmkvManager.decodeSubscription(subscriptionId)?.let { subscription ->
+            val currentServerRemarks = serverConfig.profile.remarks
+        
+            val (targetProfile, toastMessage) = when {
+                direction > 0 -> subscription::prevProfile to "前置"
+                direction < 0 -> subscription::nextProfile to "落地"
+                else -> return
+            }
+        
+            if (targetProfile.get() != currentServerRemarks) {
+                try {
+                    targetProfile.set(currentServerRemarks)
+                    MmkvManager.encodeSubscription(subscriptionId, subscription)
+                    mActivity.toast("设置${toastMessage}代理：$currentServerRemarks")
+                } catch (e: Exception) {
+                    mActivity.toast("代理设置失败")
+                }
+            } else {
+                mActivity.toast("已经是${toastMessage}代理")
+            }
+        }
     }
 }
