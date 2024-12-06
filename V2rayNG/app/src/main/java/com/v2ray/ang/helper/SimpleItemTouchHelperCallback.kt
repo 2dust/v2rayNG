@@ -15,8 +15,9 @@
  */
 package com.v2ray.ang.helper
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
-import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.graphics.Canvas
 import android.view.animation.DecelerateInterpolator
 import androidx.recyclerview.widget.GridLayoutManager
@@ -35,7 +36,15 @@ import kotlin.math.sign
  *
  * @author Paul Burke (ipaulpro)
  */
-class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter) : ItemTouchHelper.Callback() {
+class SimpleItemTouchHelperCallback(
+    private val mAdapter: ItemTouchHelperAdapter
+) : ItemTouchHelper.Callback() {
+
+    private var isSwipeProcessed = false
+    private var lastSwipeTime = 0L
+    private val SWIPE_INTERVAL = 500L // 防抖动间隔时间
+    private var currentPosition = RecyclerView.NO_POSITION
+
     private var mReturnAnimator: ValueAnimator? = null
 
     override fun isLongPressDragEnabled(): Boolean = true
@@ -77,9 +86,13 @@ class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter
     }
 
     override fun onChildDraw(
-        c: Canvas, recyclerView: RecyclerView,
+        c: Canvas,
+        recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
-        dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean
     ) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             val maxSwipeDistance = viewHolder.itemView.width * SWIPE_THRESHOLD
@@ -93,7 +106,23 @@ class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter
             viewHolder.itemView.translationX = translationX
             viewHolder.itemView.alpha = alpha
 
-            if (swipeAmount >= maxSwipeDistance && isCurrentlyActive) {
+            val currentTime = System.currentTimeMillis()
+            val currentPosition = viewHolder.bindingAdapterPosition
+
+            // 增加多重条件判断，防止重复触发
+            if (swipeAmount >= maxSwipeDistance
+                && isCurrentlyActive
+                && !isSwipeProcessed
+                && currentTime - lastSwipeTime > SWIPE_INTERVAL
+                && currentPosition != RecyclerView.NO_POSITION
+            ) {
+                // 标记已处理
+                isSwipeProcessed = true
+                lastSwipeTime = currentTime
+                this.currentPosition = currentPosition
+
+                // 执行滑动操作
+                mAdapter.onSwipeItem(currentPosition, direction)
                 returnViewToOriginalPosition(viewHolder)
             }
         } else {
@@ -110,6 +139,16 @@ class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter
                 viewHolder.itemView.translationX = value
                 viewHolder.itemView.alpha = (1f - abs(value) / (viewHolder.itemView.width * SWIPE_THRESHOLD))
             }
+            
+            // 添加动画监听器，确保状态重置
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    // 重置状态
+                    isSwipeProcessed = false
+                    currentPosition = RecyclerView.NO_POSITION
+                }
+            })
+
             interpolator = DecelerateInterpolator()
             duration = ANIMATION_DURATION
             start()
@@ -142,7 +181,7 @@ class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter
 
     companion object {
         private const val ALPHA_FULL = 1.0f
-        private const val SWIPE_THRESHOLD = 0.25f
+        private const val SWIPE_THRESHOLD = 0.6f
         private const val ANIMATION_DURATION: Long = 200
     }
 }
