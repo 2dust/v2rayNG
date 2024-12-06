@@ -77,4 +77,7 @@ class RoutingSettingRecyclerAdapter(val activity: RoutingSettingActivity) : Recy
 
     override fun onItemDismiss(position: Int) {
     }
+
+    override fun onSwipeItem(position: Int, direction: Float) {
+    }
 }
