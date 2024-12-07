@@ -248,6 +248,9 @@
     <string name="sub_setting_next_profile">Next proxy remarks</string>
     <string name="sub_setting_pre_profile_tip">The remarks exists and is unique</string>
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
+    <string name="sub_setting_pre_next">Setting %s : %s </string>
+    <string name="sub_setting_pre_next_already">Already is %s</string>
+    <string name="sub_setting_pre_next_failed">Setting %s failed</string>
     <string name="title_ping_all_server">TCPING کانفیگ های گروه فعلی</string>
     <string name="title_real_ping_all_server">تاخیر واقعی کانفیگ های گروه فعلی</string>
     <string name="title_user_asset_setting">فایل ‌های دارایی جغرافیا</string>

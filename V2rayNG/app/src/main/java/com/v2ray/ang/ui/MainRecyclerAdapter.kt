@@ -255,8 +255,8 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             val currentServerRemarks = serverConfig.profile.remarks
         
             val (targetProfile, toastMessage) = when {
-                direction > 0 -> subscription::prevProfile to "前置"
-                direction < 0 -> subscription::nextProfile to "落地"
+                direction > 0 -> subscription::prevProfile to mActivity.getString(R.string.sub_setting_pre_profile)
+                direction < 0 -> subscription::nextProfile to mActivity.getString(R.string.sub_setting_next_profile)
                 else -> return
             }
         
@@ -264,12 +264,12 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 try {
                     targetProfile.set(currentServerRemarks)
                     MmkvManager.encodeSubscription(subscriptionId, subscription)
-                    mActivity.toast("设置${toastMessage}代理：$currentServerRemarks")
+                    mActivity.toast(mActivity.getString(R.string.sub_setting_pre_next, toastMessage, currentServerRemarks))
                 } catch (e: Exception) {
-                    mActivity.toast("代理设置失败")
+                    mActivity.toast(mActivity.getString(R.string.sub_setting_pre_next_failed, toastMessage))
                 }
             } else {
-                mActivity.toast("已经是${toastMessage}代理")
+                mActivity.toast(mActivity.getString(R.string.sub_setting_pre_next_already, toastMessage))
             }
         }
     }

@@ -248,6 +248,9 @@
     <string name="sub_setting_pre_profile_tip">请确保别名存在并唯一</string>
     <string name="title_sub_update">更新当前组订阅</string>
     <string name="title_ping_all_server">测试当前组配置Tcping</string>
+    <string name="sub_setting_pre_next">设置%s: %s </string>
+    <string name="sub_setting_pre_next_already">已经是%s</string>
+    <string name="sub_setting_pre_next_failed">设置%s失败</string>
     <string name="title_real_ping_all_server">测试当前组配置真连接</string>
     <string name="title_user_asset_setting">Geo 资源文件</string>
     <string name="title_sort_by_test_results">按测试结果排序</string>

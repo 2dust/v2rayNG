@@ -248,6 +248,9 @@
     <string name="sub_auto_update">Использовать автообновление</string>
     <string name="sub_setting_pre_profile">Название предыдущего прокси</string>
     <string name="sub_setting_next_profile">Название следующего прокси</string>
+    <string name="sub_setting_pre_next">Setting %s : %s </string>
+    <string name="sub_setting_pre_next_already">Already is %s</string>
+    <string name="sub_setting_pre_next_failed">Setting %s failed</string>
     <string name="sub_setting_pre_profile_tip">Название должно существовать и быть уникальным</string>
     <string name="title_sub_update">Обновить подписку группы</string>
     <string name="title_ping_all_server">Проверка профилей группы</string>
