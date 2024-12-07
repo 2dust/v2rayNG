@@ -186,7 +186,7 @@
     <string name="summary_pref_delay_test_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">Allow connections from the LAN</string>
-    <string name="summary_pref_proxy_sharing_enabled">Other devices can connect to proxy by your ip address through socks/http, Only enable in trusted network to avoid unauthorized connection</string>
+    <string name="summary_pref_proxy_sharing_enabled">Other devices can connect to proxy by your ip address through local proxy, Only enable in trusted network to avoid unauthorized connection</string>
     <string name="toast_warning_pref_proxysharing_short">Allow connections from the LAN, Make sure you are in a trusted network</string>
 
     <string name="title_pref_allow_insecure">allowInsecure</string>

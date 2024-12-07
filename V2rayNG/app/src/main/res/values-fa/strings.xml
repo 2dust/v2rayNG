@@ -182,7 +182,7 @@
     <string name="summary_pref_delay_test_url">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">اجازه اتصالات از طریق LAN</string>
-    <string name="summary_pref_proxy_sharing_enabled">دستگاه‌ های دیگر می‌توانند از طریق socks/http به پراکسی توسط نشانی آی‌پی شما متصل شوند، فقط در شبکه مورد اعتماد فعال می‌شوند تا از اتصال غیرمجاز جلوگیری کنند.</string>
+    <string name="summary_pref_proxy_sharing_enabled">سایر دستگاه‌ها می‌توانند با آدرس آی‌پی شما از طریق پراکسی محلی به پروکسی متصل شوند، فقط در شبکه قابل اعتماد فعال شود تا از اتصال غیرمجاز جلوگیری شود.</string>
     <string name="toast_warning_pref_proxysharing_short">اتصالات از طریق LAN را مجاز کنید، مطمئن شوید که در یک شبکه قابل اعتماد هستید</string>
 
     <string name="title_pref_allow_insecure">اعطای مجوز ناامن</string>
