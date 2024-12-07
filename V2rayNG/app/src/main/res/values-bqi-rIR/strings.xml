@@ -190,8 +190,8 @@
     <string name="title_pref_allow_insecure">اجازه نا ٱمن</string>
     <string name="summary_pref_allow_insecure">مجال و کار بردن TLS ب تۉر پؽش فرز، موجوز نا ٱمن فعال هڌ.</string>
 
-    <string name="title_pref_socks_port">پورت پروکسی Local</string>
-    <string name="summary_pref_socks_port">پورت پروکسی Local</string>
+    <string name="title_pref_socks_port">پورت پروکسی مهلی</string>
+    <string name="summary_pref_socks_port">پورت پروکسی مهلی</string>
 
     <string name="title_pref_local_dns_port">پورت DNS مهلی</string>
     <string name="summary_pref_local_dns_port">پورت DNS مهلی</string>
