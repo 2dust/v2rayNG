@@ -409,7 +409,7 @@ object Utils {
             return ""
         }
         return if (isIpv6Address(address) && !address.contains('[') && !address.contains(']')) {
-            String.format("[%s]", address)
+            String.format(Utils.getSysLocale(),"[%s]", address)
         } else {
             address
         }
@@ -434,7 +434,7 @@ object Utils {
     }
 
 
-    private fun getSysLocale(): Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    fun getSysLocale(): Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         LocaleList.getDefault()[0]
     } else {
         Locale.getDefault()

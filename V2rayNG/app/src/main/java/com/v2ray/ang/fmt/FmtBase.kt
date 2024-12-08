@@ -15,7 +15,7 @@ open class FmtBase {
                 transform = { it.first + "=" + Utils.urlEncode(it.second) }))
         else ""
 
-        val url = String.format(
+        val url = String.format(Utils.getSysLocale(),
             "%s@%s:%s",
             Utils.urlEncode(userInfo ?: ""),
             Utils.getIpv6Address(config.server),

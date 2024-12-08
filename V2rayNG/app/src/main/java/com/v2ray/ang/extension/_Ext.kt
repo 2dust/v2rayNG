@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import com.v2ray.ang.AngApplication
+import com.v2ray.ang.util.Utils
 import me.drakeet.support.toast.ToastCompat
 import org.json.JSONObject
 import java.io.Serializable
@@ -46,7 +47,7 @@ fun Long.toTrafficString(): String {
         size /= DIVISOR
         unitIndex++
     }
-    return String.format("%.1f %s", size, units[unitIndex])
+    return String.format(Utils.getSysLocale(), "%.1f %s", size, units[unitIndex])
 }
 
 val URLConnection.responseLength: Long
@@ -91,7 +92,11 @@ inline fun <reified T : Serializable> Bundle.serializable(key: String): T? = whe
 }
 
 inline fun <reified T : Serializable> Intent.serializable(key: String): T? = when {
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializableExtra(key, T::class.java)
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializableExtra(
+        key,
+        T::class.java
+    )
+
     else -> @Suppress("DEPRECATION") getSerializableExtra(key) as? T
 }
 

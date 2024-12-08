@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ItemRecyclerBypassListBinding
 import com.v2ray.ang.dto.AppInfo
+import com.v2ray.ang.util.Utils
 
 class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, blacklist: MutableSet<String>?) :
     RecyclerView.Adapter<PerAppProxyAdapter.BaseViewHolder>() {
@@ -62,7 +63,7 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
             // Set app icon and name
             itemBypassBinding.icon.setImageDrawable(appInfo.appIcon)
             itemBypassBinding.name.text = if (appInfo.isSystemApp) {
-                String.format("** %s", appInfo.appName)
+                String.format(Utils.getSysLocale(),"** %s", appInfo.appName)
             } else {
                 appInfo.appName
             }
