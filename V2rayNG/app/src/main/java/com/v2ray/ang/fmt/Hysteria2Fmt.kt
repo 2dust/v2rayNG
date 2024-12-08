@@ -14,7 +14,7 @@ import java.net.URI
 
 object Hysteria2Fmt : FmtBase() {
     fun parse(str: String): ProfileItem? {
-        var allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
+        val allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.HYSTERIA2)
 
         val uri = URI(Utils.fixIllegalUrl(str))
@@ -35,11 +35,19 @@ object Hysteria2Fmt : FmtBase() {
             }
             config.sni = queryParam["sni"]
             config.alpn = queryParam["alpn"]
-
             config.obfsPassword = queryParam["obfs-password"]
             config.portHopping = queryParam["mport"]
-            config.pinSHA256 = queryParam["pinSHA256"]
 
+            // Validate and set pinSHA256
+            val pin = queryParam["pinSHA256"]
+            if (!pin.isNullOrEmpty()) {
+                if (isValidPinSHA256(pin)) {
+                    config.pinSHA256 = pin
+                } else {
+                    // reject invalid configuration and return
+                    return null
+                }
+            }
         }
 
         return config
@@ -48,10 +56,10 @@ object Hysteria2Fmt : FmtBase() {
     fun toUri(config: ProfileItem): String {
         val dicQuery = HashMap<String, String>()
 
-        config.security.let { if (it != null) dicQuery["security"] = it }
-        config.sni.let { if (it.isNotNullEmpty()) dicQuery["sni"] = it.orEmpty() }
-        config.alpn.let { if (it.isNotNullEmpty()) dicQuery["alpn"] = it.orEmpty() }
-        config.insecure.let { dicQuery["insecure"] = if (it == true) "1" else "0" }
+        config.security?.let { dicQuery["security"] = it }
+        config.sni?.let { if (it.isNotNullEmpty()) dicQuery["sni"] = it }
+        config.alpn?.let { if (it.isNotNullEmpty()) dicQuery["alpn"] = it }
+        dicQuery["insecure"] = if (config.insecure == true) "1" else "0"
 
         if (config.obfsPassword.isNotNullEmpty()) {
             dicQuery["obfs"] = "salamander"
@@ -68,7 +76,6 @@ object Hysteria2Fmt : FmtBase() {
     }
 
     fun toNativeConfig(config: ProfileItem, socksPort: Int): Hysteria2Bean? {
-
         val obfs = if (config.obfsPassword.isNullOrEmpty()) null else
             Hysteria2Bean.ObfsBean(
                 type = "salamander",
@@ -111,10 +118,17 @@ object Hysteria2Fmt : FmtBase() {
         return bean
     }
 
-
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
         val outboundBean = OutboundBean.create(EConfigType.HYSTERIA2)
         return outboundBean
     }
 
+    /**
+     * validates the provided pin SHA256 string.
+     * it should follow the pattern "sha256/<Base64-Encoded Value>".
+     */
+    private fun isValidPinSHA256(pin: String): Boolean {
+        val regex = Regex("^sha256/[A-Za-z0-9+/=]{43}==$")
+        return regex.matches(pin)
+    }
 }
