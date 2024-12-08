@@ -22,9 +22,6 @@ class AngApplication : MultiDexApplication() {
         application = this
     }
 
-    private val workManagerConfiguration: Configuration = Configuration.Builder()
-        .setDefaultProcessName("${ANG_PACKAGE}:bg")
-        .build()
 
     override fun onCreate() {
         super.onCreate()
@@ -35,14 +32,7 @@ class AngApplication : MultiDexApplication() {
 //        firstRun = defaultSharedPreferences.getInt(PREF_LAST_VERSION, 0) != BuildConfig.VERSION_CODE
 //        if (firstRun)
 //            defaultSharedPreferences.edit().putInt(PREF_LAST_VERSION, BuildConfig.VERSION_CODE).apply()
-
-        MMKV.initialize(this)
-
-        Utils.setNightMode()
-        // Initialize WorkManager with the custom configuration
-        WorkManager.initialize(this, workManagerConfiguration)
-
-        SettingsManager.initRoutingRulesets(this)
+        Utils.initializeAng(application)
     }
 
     fun getPackageInfo(packageName: String) = packageManager.getPackageInfo(

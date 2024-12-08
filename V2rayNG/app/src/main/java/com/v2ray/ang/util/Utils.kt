@@ -18,6 +18,10 @@ import android.util.Patterns
 import android.webkit.URLUtil
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.work.Configuration
+import androidx.work.WorkManager
+import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.LOOPBACK
@@ -26,6 +30,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.Language
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.service.V2RayServiceManager
 import java.io.IOException
 import java.net.*
@@ -92,6 +97,24 @@ object Utils {
             e.printStackTrace()
         }
     }
+
+
+    /**
+     * Initialize the application at startup.
+     *
+     * @param application The application instance to initialize.
+     */
+    fun initializeAng(application: AngApplication) {
+        MMKV.initialize(application)
+        WorkManager.initialize(
+            application, Configuration.Builder()
+                .setDefaultProcessName("${ANG_PACKAGE}:bg")
+                .build()
+        )
+        setNightMode()
+        SettingsManager.initRoutingRulesets(application)
+    }
+
 
     /**
      * base64 decode
