@@ -45,9 +45,4 @@ class AngApplication : MultiDexApplication() {
         SettingsManager.initRoutingRulesets(this)
     }
 
-    fun getPackageInfo(packageName: String) = packageManager.getPackageInfo(
-        packageName, if (Build.VERSION.SDK_INT >= 28) PackageManager.GET_SIGNING_CERTIFICATES
-        else @Suppress("DEPRECATION") PackageManager.GET_SIGNATURES
-    )!!
-
 }
