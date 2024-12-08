@@ -155,7 +155,7 @@ object SettingsManager {
     }
 
     fun getHttpPort(): Int {
-        return getSocksPort() + (if (Utils.isXray()) 0 else 1)
+        return getSocksPort() + if (Utils.isXray()) 0 else 1
     }
 
     fun initAssets(context: Context, assets: AssetManager) {
