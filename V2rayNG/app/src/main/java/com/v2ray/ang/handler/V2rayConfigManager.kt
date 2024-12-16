@@ -34,6 +34,7 @@ import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.V2rayConfig
@@ -425,6 +426,8 @@ object V2rayConfigManager {
             } else if (protocol.equals(EConfigType.VLESS.name, true)
                 && outbound.settings?.vnext?.first()?.users?.first()?.flow?.isNotEmpty() == true
             ) {
+                muxEnabled = false
+            } else if (outbound.streamSettings?.network == NetworkType.XHTTP.type) {
                 muxEnabled = false
             }
             if (muxEnabled == true) {
