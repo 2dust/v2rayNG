@@ -60,7 +60,7 @@ android {
     applicationVariants.all {
         val variant = this
         val versionCodes =
-            mapOf("armeabi-v7a" to 8, "arm64-v8a" to 7, "x86" to 6, "x86_64" to 5, "universal" to 4)
+            mapOf("arm64-v8a" to 1, "armeabi-v7a" to 2, "x86_64" to 3, "x86" to 4, "universal" to 0)
 
         variant.outputs
             .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
@@ -73,7 +73,7 @@ android {
                 output.outputFileName = "v2rayNG_${variant.versionName}_${abi}.apk"
                 if (versionCodes.containsKey(abi)) {
                     output.versionCodeOverride =
-                        (1000000 * versionCodes[abi]!!).plus(variant.versionCode)
+                        (100 * variant.versionCode + versionCodes[abi]!!).plus(5000000)
                 } else {
                     return@forEach
                 }
