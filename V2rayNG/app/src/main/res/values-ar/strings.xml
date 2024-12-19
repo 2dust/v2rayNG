@@ -180,6 +180,9 @@
     <string name="title_pref_domestic_dns">DNS المحلي (اختياري)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
+    <string name="title_pref_dns_hosts">DNS hosts (Format: domain:address,…)</string>
+    <string name="summary_pref_dns_hosts">domain:address,…</string>
+
     <string name="title_pref_delay_test_url">True delay test url (http/https)</string>
     <string name="summary_pref_delay_test_url">Url</string>
 

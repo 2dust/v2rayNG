@@ -175,8 +175,8 @@
 
     <string name="title_pref_vpn_dns">VPN DNS (僅支援 IPv4/v6)</string>
 
-    <string name="title_pref_domestic_dns">國內 DNS (可選)</string>
-    <string name="summary_pref_domestic_dns">DNS</string>
+    <string name="title_pref_dns_hosts">DNS hosts (格式: 網域:位址,…)</string>
+    <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">真連線延遲測試網址 (http/https)</string>
     <string name="summary_pref_delay_test_url">Url</string>

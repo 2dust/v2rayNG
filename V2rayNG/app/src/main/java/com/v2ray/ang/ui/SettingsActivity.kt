@@ -60,6 +60,7 @@ class SettingsActivity : BaseActivity() {
         private val socksPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS_PORT) }
         private val remoteDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_REMOTE_DNS) }
         private val domesticDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DOMESTIC_DNS) }
+        private val dnsHosts by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DNS_HOSTS) }
         private val delayTestUrl by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DELAY_TEST_URL) }
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
 
@@ -152,6 +153,11 @@ class SettingsActivity : BaseActivity() {
                 domesticDns?.summary = if (nval == "") AppConfig.DNS_DIRECT else nval
                 true
             }
+            dnsHosts?.setOnPreferenceChangeListener { _, any ->
+                val nval = any as String
+                dnsHosts?.summary = nval
+                true
+            }
             delayTestUrl?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
                 delayTestUrl?.summary = if (nval == "") AppConfig.DelayTestUrl else nval
@@ -194,6 +200,7 @@ class SettingsActivity : BaseActivity() {
             socksPort?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
             remoteDns?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_REMOTE_DNS, AppConfig.DNS_PROXY)
             domesticDns?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
+            dnsHosts?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DNS_HOSTS)
             delayTestUrl?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DelayTestUrl)
 
             initSharedPreference()

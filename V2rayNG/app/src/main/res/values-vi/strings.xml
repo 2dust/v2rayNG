@@ -179,6 +179,9 @@
     <string name="title_pref_domestic_dns">DNS nội địa (Không bắt buộc)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
+    <string name="title_pref_dns_hosts">DNS hosts (Format: domain:address,…)</string>
+    <string name="summary_pref_dns_hosts">domain:address,…</string>
+
     <string name="title_pref_delay_test_url">URL kiểm tra độ trễ thực (HTTP / HTTPS)</string>
     <string name="summary_pref_delay_test_url">URL</string>
 

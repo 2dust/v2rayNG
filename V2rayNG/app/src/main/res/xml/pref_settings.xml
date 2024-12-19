@@ -191,6 +191,11 @@
             android:title="@string/title_pref_domestic_dns" />
 
         <EditTextPreference
+            android:key="pref_dns_hosts"
+            android:summary="@string/summary_pref_dns_hosts"
+            android:title="@string/title_pref_dns_hosts" />
+
+        <EditTextPreference
             android:key="pref_delay_test_url"
             android:summary="@string/summary_pref_delay_test_url"
             android:title="@string/title_pref_delay_test_url" />

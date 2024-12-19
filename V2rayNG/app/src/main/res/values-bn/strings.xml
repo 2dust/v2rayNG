@@ -180,6 +180,9 @@
     <string name="title_pref_domestic_dns">ঘরোয়া DNS (ঐচ্ছিক)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
+    <string name="title_pref_dns_hosts">DNS hosts (Format: domain:address,…)</string>
+    <string name="summary_pref_dns_hosts">domain:address,…</string>
+
     <string name="title_pref_delay_test_url">সঠিক বিলম্ব পরীক্ষা ইউআরএল (http/https)</string>
     <string name="summary_pref_delay_test_url">ইউআরএল</string>
 

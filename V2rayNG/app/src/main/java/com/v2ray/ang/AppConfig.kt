@@ -50,6 +50,7 @@ object AppConfig {
     const val PREF_SOCKS_PORT = "pref_socks_port"
     const val PREF_REMOTE_DNS = "pref_remote_dns"
     const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
+    const val PREF_DNS_HOSTS = "pref_dns_hosts"
     const val PREF_DELAY_TEST_URL = "pref_delay_test_url"
     const val PREF_LOGLEVEL = "pref_core_loglevel"
     const val PREF_MODE = "pref_mode"
