@@ -115,7 +115,7 @@
     <string name="server_lab_port_hop_interval">فاصله پورت پرش (ثانیه)</string>
     <string name="server_lab_stream_pinsha256">PINSHA256</string>
     <string name="server_lab_xhttp_mode">حالت XHTTP</string>
-    <string name="server_lab_xhttp_extra">جیسون خام XHTTP EXTRA، فرمت: { XHTTPObject }</string>
+    <string name="server_lab_xhttp_extra">خام JSON XHTTP Extra، قالب: { XHTTPObject }</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">آدرس اینترنتی را اضافه کنید</string>
@@ -178,8 +178,8 @@
     <string name="title_pref_domestic_dns">DNS داخلی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
-    <string name="title_pref_dns_hosts">DNS hosts (Format: domain:address,…)</string>
-    <string name="summary_pref_dns_hosts">domain:address,…</string>
+    <string name="title_pref_dns_hosts">DNS مستقیم هاست(فرمت: دامنه: آدرس،…)</string>
+    <string name="summary_pref_dns_hosts">دامنه: آدرس، …</string>
 
     <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تاخیر واقعی کانفیگ ها (HTTP/HTTPS)</string>
     <string name="summary_pref_delay_test_url">URL</string>
