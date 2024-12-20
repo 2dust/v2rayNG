@@ -50,6 +50,7 @@ android {
 
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -125,7 +126,7 @@ dependencies {
     implementation(libs.language.json)
 
     // Intent and Utility Libraries
-    implementation(libs.quickie.bundled)
+    implementation(libs.quickie.foss)
     implementation(libs.core)
 
     // AndroidX Lifecycle and Architecture Components
@@ -148,4 +149,5 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     // Oss Licenses
     implementation(libs.play.services.oss.licenses)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
