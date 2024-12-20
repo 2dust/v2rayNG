@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.android.gms.oss-licenses-plugin")
+    id("com.jaredsburrows.license")
 }
 
 android {
@@ -146,6 +146,4 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.org.mockito.mockito.inline)
     testImplementation(libs.mockito.kotlin)
-    // Oss Licenses
-    implementation(libs.play.services.oss.licenses)
 }
