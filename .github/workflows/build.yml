@@ -61,9 +61,7 @@ jobs:
       run: |
         cd ${{ github.workspace }}/V2rayNG
         chmod 755 gradlew
-        sed -i '/flavorDimensions\.add("distribution")/d' app/build.gradle.kts
-        sed -i '/productFlavors {/,/^    }\s*$/d' app/build.gradle.kts
-        ./gradlew licenseReleaseReport
+        ./gradlew licenseFdroidReleaseReport
         ./gradlew assembleRelease -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
 
     - name: Upload arm64-v8a APK
@@ -71,18 +69,18 @@ jobs:
       if: ${{  success() }}
       with:
         name: arm64-v8a
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/release/*arm64-v8a*.apk
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*arm64-v8a*.apk
 
     - name: Upload armeabi-v7a APK
       uses: actions/upload-artifact@v4
       if: ${{  success() }}
       with:
         name: armeabi-v7a
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/release/*armeabi-v7a*.apk
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*armeabi-v7a*.apk
 
     - name: Upload x86 APK
       uses: actions/upload-artifact@v4
       if: ${{  success() }}
       with:
         name: x86-apk
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/release/*x86*.apk
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*x86*.apk
