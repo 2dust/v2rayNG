@@ -1,5 +1,6 @@
 [versions]
 agp = "8.7.2"
+desugar_jdk_libs = "2.1.4"
 gradleLicensePlugin = "0.9.8"
 kotlin = "2.1.0"
 coreKtx = "1.15.0"
@@ -12,6 +13,7 @@ activity = "1.9.3"
 constraintlayout = "2.2.0"
 mmkvStatic = "1.3.11"
 gson = "2.11.0"
+quickieFoss = "1.13.1"
 rxjava = "3.1.9"
 rxandroid = "3.0.2"
 rxpermissions = "0.12"
@@ -27,6 +29,7 @@ preferenceKtx = "1.2.1"
 recyclerview = "1.3.2"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 gradle-license-plugin = { module = "com.jaredsburrows:gradle-license-plugin", version.ref = "gradleLicensePlugin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -37,6 +40,7 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 mmkv-static = { module = "com.tencent:mmkv-static", version.ref = "mmkvStatic" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+quickie-foss = { module = "com.github.T8RIN.QuickieExtended:quickie-foss", version.ref = "quickieFoss" }
 rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava" }
 rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "rxandroid" }
 rxpermissions = { module = "com.github.tbruyelle:rxpermissions", version.ref = "rxpermissions" }
