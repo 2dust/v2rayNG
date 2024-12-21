@@ -20,7 +20,6 @@ import com.v2ray.ang.util.ZipUtil
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
 
 class AboutActivity : BaseActivity() {
@@ -90,7 +89,12 @@ class AboutActivity : BaseActivity() {
             Utils.openUri(this, AppConfig.v2rayNGIssues)
         }
         binding.layoutOssLicenses.setOnClickListener{
-            startActivity(Intent(this, OssLicensesMenuActivity::class.java))
+            val webView = android.webkit.WebView(this);
+            webView.loadUrl("file:///android_asset/open_source_licenses.html");
+            android.app.AlertDialog.Builder(this)
+                .setTitle("Open source licenses")
+                .setView(webView)
+                .setPositiveButton("OK", android.content.DialogInterface.OnClickListener { dialog, whichButton -> dialog.dismiss() }).show()
         }
 
         binding.layoutTgChannel.setOnClickListener {
