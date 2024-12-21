@@ -16,23 +16,22 @@ android {
         versionName = "1.9.26"
         multiDexEnabled = true
 
+        val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')
         splits {
             abi {
                 isEnable = true
-                include(
-                    "arm64-v8a",
-                    "armeabi-v7a",
-                    "x86_64",
-                    "x86"
-                )
-                isUniversalApk = true
-            }
-        }
-
-        val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')
-        if (abiFilterList != null) {
-            ndk {
-                abiFilters.addAll(abiFilterList)
+                reset()
+                if (abiFilterList != null && abiFilterList.isNotEmpty()) {
+                    include(*abiFilterList.toTypedArray())
+                } else {
+                    include(
+                        "arm64-v8a",
+                        "armeabi-v7a",
+                        "x86_64",
+                        "x86"
+                    )
+                }
+                isUniversalApk = abiFilterList.isNullOrEmpty()
             }
         }
 
