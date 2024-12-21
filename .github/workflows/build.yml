@@ -20,7 +20,7 @@ jobs:
     - name: Fetch AndroidLibV2rayLite
       run: |
         cd ${{ github.workspace }}/build
-        git clone --depth=1 -b master https://github.com/UjuiUjuMandan/AndroidLibV2rayLite.git
+        git clone --depth=1 -b master https://github.com/2dust/AndroidLibV2rayLite.git
         cd AndroidLibV2rayLite
         git submodule update --init
 
