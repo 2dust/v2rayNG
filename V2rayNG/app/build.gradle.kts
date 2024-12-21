@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.jaredsburrows.license")
+    alias(libs.plugins.license.plugin)
 }
 
 android {
@@ -70,7 +70,7 @@ android {
 
 
     compileOptions {
-        isCoreLibraryDesugaringEnabled = true
+
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -84,7 +84,7 @@ android {
         if (isFdroid) {
             val versionCodes =
                 mapOf("armeabi-v7a" to 2, "arm64-v8a" to 1, "x86" to 4, "x86_64" to 3, "universal" to 0
-            )
+                )
 
             variant.outputs
                 .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
@@ -166,7 +166,7 @@ dependencies {
     implementation(libs.language.json)
 
     // Intent and Utility Libraries
-    implementation(libs.quickie.foss)
+    implementation(libs.quickie.unbundled)
     implementation(libs.core)
 
     // AndroidX Lifecycle and Architecture Components
