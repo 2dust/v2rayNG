@@ -17,7 +17,6 @@ rxandroid = "3.0.2"
 rxpermissions = "0.12"
 toastcompat = "1.1.0"
 editorkit = "2.9.0"
-quickieBundled = "1.10.0"
 core = "3.5.3"
 workRuntimeKtx = "2.10.0"
 lifecycleViewmodelKtx = "2.8.7"
@@ -45,7 +44,6 @@ toastcompat = { module = "me.drakeet.support:toastcompat", version.ref = "toastc
 editorkit = { module = "com.blacksquircle.ui:editorkit", version.ref = "editorkit" }
 language-base = { module = "com.blacksquircle.ui:language-base", version.ref = "editorkit" }
 language-json = { module = "com.blacksquircle.ui:language-json", version.ref = "editorkit" }
-quickie-bundled = { module = "io.github.g00fy2.quickie:quickie-bundled", version.ref = "quickieBundled" }
 core = { module = "com.google.zxing:core", version.ref = "core" }
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 work-multiprocess = { module = "androidx.work:work-multiprocess", version.ref = "workRuntimeKtx" }
