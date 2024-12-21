@@ -52,7 +52,7 @@ android {
     productFlavors {
         create("fdroid") {
             dimension = "distribution"
-            versionNameSuffix = "-fdroid"
+            applicationIdSuffix = ".fdroid"
             buildConfigField("String", "DISTRIBUTION", "\"F-Droid\"")
         }
         create("playstore") {
@@ -89,7 +89,7 @@ android {
                 .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
                 .forEach { output ->
                     val abi = output.getFilter("ABI") ?: "universal"
-                    output.outputFileName = "v2rayNG_${variant.versionName}_${abi}.apk"
+                    output.outputFileName = "v2rayNG_${variant.versionName}-fdroid_${abi}.apk"
                     if (versionCodes.containsKey(abi)) {
                         output.versionCodeOverride =
                             (100 * variant.versionCode + versionCodes[abi]!!).plus(5000000)
