@@ -95,4 +95,4 @@ inline fun <reified T : Serializable> Intent.serializable(key: String): T? = whe
     else -> @Suppress("DEPRECATION") getSerializableExtra(key) as? T
 }
 
-inline fun CharSequence?.isNotNullEmpty(): Boolean = (this != null && this.isNotEmpty())
+fun CharSequence?.isNotNullEmpty(): Boolean = (this != null && this.isNotEmpty())

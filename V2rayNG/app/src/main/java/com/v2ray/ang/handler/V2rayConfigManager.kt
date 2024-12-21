@@ -240,7 +240,7 @@ object V2rayConfigManager {
 
         val rulesetItems = MmkvManager.decodeRoutingRulesets()
         rulesetItems?.forEach { key ->
-            if (key != null && key.enabled && key.outboundTag == tag && !key.domain.isNullOrEmpty()) {
+            if (key.enabled && key.outboundTag == tag && !key.domain.isNullOrEmpty()) {
                 key.domain?.forEach {
                     if (it != GEOSITE_PRIVATE
                         && (it.startsWith("geosite:") || it.startsWith("domain:"))

@@ -387,7 +387,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         }
                     }
                 }
-                .setNegativeButton(android.R.string.no) { _, _ ->
+                .setNegativeButton(android.R.string.cancel) { _, _ ->
                     //do noting
                 }
                 .show()
@@ -407,7 +407,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         }
                     }
                 }
-                .setNegativeButton(android.R.string.no) { _, _ ->
+                .setNegativeButton(android.R.string.cancel) { _, _ ->
                     //do noting
                 }
                 .show()
@@ -427,7 +427,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         }
                     }
                 }
-                .setNegativeButton(android.R.string.no) { _, _ ->
+                .setNegativeButton(android.R.string.cancel) { _, _ ->
                     //do noting
                 }
                 .show()

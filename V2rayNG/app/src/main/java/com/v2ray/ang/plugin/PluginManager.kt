@@ -222,7 +222,7 @@ object PluginManager {
         return File(pluginDir, pluginId).absolutePath
     }
 
-    fun ComponentInfo.loadString(key: String) = when (val value = metaData.get(key)) {
+    fun ComponentInfo.loadString(key: String) = when (val value = metaData.getString(key)) {
         is String -> value
         is Int -> AngApplication.application.packageManager.getResourcesForApplication(applicationInfo)
             .getString(value)

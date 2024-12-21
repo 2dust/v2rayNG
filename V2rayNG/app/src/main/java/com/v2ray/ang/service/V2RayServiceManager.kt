@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -353,7 +354,12 @@ object V2RayServiceManager {
 
     fun cancelNotification() {
         val service = serviceControl?.get()?.getService() ?: return
-        service.stopForeground(true)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            service.stopForeground(Service.STOP_FOREGROUND_REMOVE)
+        } else {
+            service.stopForeground(true)
+        }
+
         mBuilder = null
         mDisposable?.dispose()
         mDisposable = null
