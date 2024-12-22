@@ -79,13 +79,6 @@ jobs:
         go-version: '1.23.4'
         cache: false
 
-    - name: Patch Go use 600296
-      if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
-      #https://go-review.googlesource.com/c/go/+/600296
-      run: |
-        cd "$(go env GOROOT)"
-        curl "https://go-review.googlesource.com/changes/go~600296/revisions/5/patch" | base64 -d | patch --verbose -p 1
-
     - name: Install gomobile
       if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
       run: |
