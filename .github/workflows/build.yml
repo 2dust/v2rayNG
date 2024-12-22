@@ -89,7 +89,7 @@ jobs:
     - name: Install gomobile
       if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
       run: |
-        go install github.com/sagernet/gomobile/cmd/gomobile@v0.1.4
+        CGO_ENABLED=0 go install -trimpath -ldflags="-w -s" github.com/sagernet/gomobile/cmd/gomobile@v0.1.4
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
     - name: Build libv2ray
@@ -98,7 +98,7 @@ jobs:
         cd ${{ github.workspace }}/build/AndroidLibXrayLite
         gomobile init
         go mod tidy -v
-        gomobile bind -v -androidapi 21 -ldflags='-s -w' ./
+        gomobile bind -trimpath -buildvcs=false -v -androidapi 21 -ldflags='-s -w -buildid=' ./
 
     - name: Save libv2ray
       if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
