@@ -120,7 +120,7 @@
     <string name="server_lab_port_hop_interval">فاسله پورت گوم (سانیه)</string>
     <string name="server_lab_stream_pinsha256">pinSHA256</string>
     <string name="server_lab_xhttp_mode">هالت XHTTP</string>
-    <string name="server_lab_xhttp_extra">XHTTP قلوه خام JSON، قالوو: { XHTTPObject }</string>
+    <string name="server_lab_xhttp_extra">XHTTP Extra خام JSON، قالوو: { XHTTPObject }</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">هون بار ونی بۊ</string>
@@ -180,8 +180,8 @@
     <string name="title_pref_domestic_dns">DNS منی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
-    <string name="title_pref_dns_hosts">DNS hosts (Format: domain:address,…)</string>
-    <string name="summary_pref_dns_hosts">domain:address,…</string>
+    <string name="title_pref_dns_hosts">DNS هاست موستقیم (قالوو: دامنه: آدرس،...)</string>
+    <string name="summary_pref_dns_hosts">دامنه:آدرس،...</string>
 
     <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تئخیر واقعی (http/https)</string>
     <string name="summary_pref_delay_test_url">نشۊوی اینترنتی</string>
