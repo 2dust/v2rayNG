@@ -498,7 +498,7 @@ object Utils {
         ContextCompat.RECEIVER_NOT_EXPORTED
     }
 
-    fun isXray(): Boolean = (ANG_PACKAGE == "com.v2ray.ang")
+    fun isXray(): Boolean = (ANG_PACKAGE.startsWith("com.v2ray.ang"))
 
 }
 
