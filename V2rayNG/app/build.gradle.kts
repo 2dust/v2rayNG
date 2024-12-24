@@ -98,7 +98,7 @@ android {
                 }
         } else {
             val versionCodes =
-                mapOf("armeabi-v7a" to 4, "arm64-v8a" to 4, "x86" to 3 )
+                mapOf("armeabi-v7a" to 4, "arm64-v8a" to 4, "x86" to 3)
 
             variant.outputs
                 .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
