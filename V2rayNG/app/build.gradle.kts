@@ -81,7 +81,7 @@ android {
         val isFdroid = variant.productFlavors.any { it.name == "fdroid" }
         if (isFdroid) {
             val versionCodes =
-                mapOf("armeabi-v7a" to 2, "arm64-v8a" to 1, "x86" to 3} 
+                mapOf("armeabi-v7a" to 2, "arm64-v8a" to 1, "x86" to 3
             )
 
             variant.outputs
