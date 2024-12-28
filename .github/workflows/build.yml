@@ -50,6 +50,9 @@ jobs:
       # Same version as https://gitlab.com/fdroid/fdroiddata/metadata/com.v2ray.ang.yml
       with:
         ndk-version: r27
+        add-to-path: true
+        link-to-sdk: true
+        local-cache: true
 
     - name: Build libtun2socks
       if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
