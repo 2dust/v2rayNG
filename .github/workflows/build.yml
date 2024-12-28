@@ -54,6 +54,17 @@ jobs:
         link-to-sdk: true
         local-cache: true
 
+    - name: Restore Android Symlinks
+      if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true' || steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
+      run: |
+        directory="${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin"
+        find "$directory" -type l | while read link; do
+            current_target=$(readlink "$link")
+            new_target="$directory/$(basename "$current_target")"
+            ln -sf "$new_target" "$link"
+            echo "Changed $(basename "$link") from $current_target to $new_target"
+        done
+
     - name: Build libtun2socks
       if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
       run: |
