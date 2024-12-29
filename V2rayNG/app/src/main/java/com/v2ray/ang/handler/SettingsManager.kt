@@ -116,24 +116,9 @@ object SettingsManager {
         MmkvManager.encodeRoutingRulesets(rulesetList)
     }
 
-    fun routingRulesetsBypassLan(): Boolean {
-        val guid = MmkvManager.getSelectServer() ?: return false
-        val config = MmkvManager.decodeServerConfig(guid) ?: return false
-        if (config.configType == EConfigType.CUSTOM) {
-            val raw = MmkvManager.decodeServerRaw(guid) ?: return false
-            val v2rayConfig = JsonUtil.fromJson(raw, V2rayConfig::class.java)
-            val exist = v2rayConfig.routing.rules.filter { it.outboundTag == TAG_DIRECT }?.any {
-                it.domain?.contains(GEOSITE_PRIVATE) == true || it.ip?.contains(GEOIP_PRIVATE) == true
-            }
-            return exist == true
-        }
-
-        val rulesetItems = MmkvManager.decodeRoutingRulesets()
-        val exist = rulesetItems?.filter { it.enabled && it.outboundTag == TAG_DIRECT }?.any {
-            it.domain?.contains(GEOSITE_PRIVATE) == true || it.ip?.contains(GEOIP_PRIVATE) == true
-        }
-        return exist == true
-        }
+    fun routingRulesetsBypassLan(): Boolean {        
+        return false
+    }
 
     fun swapRoutingRuleset(fromPosition: Int, toPosition: Int) {
         val rulesetList = MmkvManager.decodeRoutingRulesets()
