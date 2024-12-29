@@ -34,7 +34,11 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}/build/AndroidLibV2rayLite/libs
-        key: libtun2socks-${{ runner.os }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/refs/heads/master') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
+        key: >
+          libtun2socks - ${{ runner.os }}
+          - ${{ hashFiles('build/AndroidLibV2rayLite/.git/refs/heads/master') }}
+          - ${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}
+          - ${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
 
     - name: Setup Android NDK
       if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
@@ -73,7 +77,11 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: ${{ github.workspace }}/build/AndroidLibV2rayLite/libs
-        key: libtun2socks-${{ runner.os }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/refs/heads/master') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
+        key: >
+          libtun2socks - ${{ runner.os }}
+          - ${{ hashFiles('build/AndroidLibV2rayLite/.git/refs/heads/master') }}
+          - ${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}
+          - ${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
 
     - name: Copy libtun2socks
       run: |
@@ -108,7 +116,10 @@ jobs:
         cd ${{ github.workspace }}/V2rayNG
         chmod 755 gradlew
         ./gradlew licenseFdroidReleaseReport
-        ./gradlew assembleRelease -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
+        ./gradlew assembleRelease -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} \
+        -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} \
+        -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} \
+        -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
 
     - name: Upload arm64-v8a APK
       uses: actions/upload-artifact@v4
@@ -131,11 +142,23 @@ jobs:
         name: x86-apk
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*x86*.apk
 
+    - name: Setup release tag
+      if: (startsWith(github.event.head_commit.message, 'up ') && github.actor == github.repository_owner) ||
+         github.event.inputs.release_tag != ''
+      run: |
+        if [[ -n "${{ github.event.inputs.release_tag }}" ]]; then
+          TAG="${{ github.event.inputs.release_tag }}"
+        elif [[ "${{ github.event.head_commit.message }}" =~ ^up\ [0-9.]+$ ]]; then
+          TAG=$(echo "${{ github.event.head_commit.message }}" | grep -oP 'up \K[0-9.]+')
+        fi
+        VER=$(grep 'versionName =' ${{ github.workspace }}/V2rayNG/app/build.gradle.kts | sed 's/.*versionName = "\(.*\)"/\1/')
+        [[ "$VER" != "$TAG" ]] && exit 1
+        echo "TAG=$TAG" >> $GITHUB_ENV
+
     - name: Upload to release
-      uses: svenstaro/upload-release-action@v2
-      if: github.event.inputs.release_tag != ''
+      uses: softprops/action-gh-release@v2
+      if: ${{ env.TAG != '' }}
       with:
-        file: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*playstore*/release/*.apk
-        tag: ${{ github.event.inputs.release_tag }}
-        file_glob: true
+        files: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*playstore*/release/*apk
+        tag_name: ${{ env.TAG }}
         prerelease: true
