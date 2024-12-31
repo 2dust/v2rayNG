@@ -40,10 +40,5 @@
     "ip": [
        "geoip:ir"
     ]
-  },
-  {
-    "remarks": "Final Agent",
-    "port": "0-65535",
-    "outboundTag": "proxy"
   }
 ]
