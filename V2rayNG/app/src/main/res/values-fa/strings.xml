@@ -338,7 +338,7 @@
     </string-array>
 
     <string-array name="vpn_bypass_lan">
-        <item>طبق پیش فرض کانفیگ</item>
+        <item>پیش فرض کانفیگ</item>
         <item>بایپس شود</item>
         <item>بایپس نشود</item>
     </string-array>
