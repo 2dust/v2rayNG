@@ -140,7 +140,6 @@
     <string name="title_pref_is_booted">اتصال خودکار هنگام راه اندازی</string>
     <string name="summary_pref_is_booted">هنگام راه اندازی به طور خودکار به سرور انتخابی متصل می شود که ممکن است ناموفق باشد.</string>
     
-    <string name="title_pref_is_booted">اتصال خودکار هنگام راه اندازی</string>
     <string name="title_mux_settings">تنظیمات MUX</string>
     <string name="title_pref_mux_enabled">فعال کردن MUX</string>
     <string name="summary_pref_mux_enabled">سریعتر است، اما ممکن است باعث اتصال ناپایدار شود\nمخزن ترافیک TCP با 8 اتصال پیش‌فرض، نحوه مدیریت UDP و QUIC را در زیر سفارشی کنید.</string>
