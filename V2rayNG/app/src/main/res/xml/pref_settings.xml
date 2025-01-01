@@ -49,6 +49,14 @@
             android:key="pref_vpn_dns"
             android:summary="@string/summary_pref_remote_dns"
             android:title="@string/title_pref_vpn_dns" />
+
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/vpn_bypass_lan"
+            android:entryValues="@array/vpn_bypass_lan_value"
+            android:key="pref_vpn_bypass_lan"
+            android:summary="%s"
+            android:title="@string/title_pref_vpn_bypass_lan" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_ui_settings">

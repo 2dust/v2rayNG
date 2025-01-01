@@ -176,6 +176,7 @@
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (শুধুমাত্র IPv4/v6)</string>
+    <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
 
     <string name="title_pref_domestic_dns">ঘরোয়া DNS (ঐচ্ছিক)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -327,5 +328,10 @@
         <item>ইরান হোয়াইটলিস্ট</item>
     </string-array>
 
+    <string-array name="vpn_bypass_lan">
+        <item>Follow config</item>
+        <item>Bypass</item>
+        <item>Not Bypass</item>
+    </string-array>
 
 </resources>

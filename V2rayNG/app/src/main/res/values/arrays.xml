@@ -211,4 +211,11 @@
         <item>stream-up</item>
         <item>stream-one</item>
     </string-array>
+
+    <string-array name="vpn_bypass_lan_value" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
 </resources>

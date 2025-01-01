@@ -178,6 +178,7 @@
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (only IPv4/v6)</string>
+    <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
 
     <string name="title_pref_domestic_dns">Domestic DNS (Optional)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -338,6 +339,12 @@
         <item>China Blacklist</item>
         <item>Global</item>
         <item>Iran Whitelist</item>
+    </string-array>
+
+    <string-array name="vpn_bypass_lan">
+        <item>Follow config</item>
+        <item>Bypass</item>
+        <item>Not Bypass</item>
     </string-array>
 
 </resources>

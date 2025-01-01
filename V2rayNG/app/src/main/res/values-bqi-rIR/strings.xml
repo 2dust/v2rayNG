@@ -176,6 +176,7 @@
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (تینا IPv4/v6)</string>
+    <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
 
     <string name="title_pref_domestic_dns">DNS منی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -336,6 +337,12 @@
         <item>نومگه شه چین</item>
         <item>جهۊوی (Global)</item>
         <item>نومگه اسبؽڌ ایران</item>
+    </string-array>
+
+    <string-array name="vpn_bypass_lan">
+        <item>Follow config</item>
+        <item>Bypass</item>
+        <item>Not Bypass</item>
     </string-array>
 
 </resources>

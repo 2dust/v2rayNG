@@ -117,6 +117,14 @@ object SettingsManager {
     }
 
     fun routingRulesetsBypassLan(): Boolean {
+        val vpnBypassLan = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_BYPASS_LAN) ?: "0"
+        if (vpnBypassLan == "1") {
+            return true
+        } else if (vpnBypassLan == "2") {
+            return false
+        }
+
+        //Follow config
         val guid = MmkvManager.getSelectServer() ?: return false
         val config = MmkvManager.decodeServerConfig(guid) ?: return false
         if (config.configType == EConfigType.CUSTOM) {
@@ -133,7 +141,7 @@ object SettingsManager {
             it.domain?.contains(GEOSITE_PRIVATE) == true || it.ip?.contains(GEOIP_PRIVATE) == true
         }
         return exist == true
-        }
+    }
 
     fun swapRoutingRuleset(fromPosition: Int, toPosition: Int) {
         val rulesetList = MmkvManager.decodeRoutingRulesets()

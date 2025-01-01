@@ -176,6 +176,7 @@
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (IPv4/v6 فقط)</string>
+    <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
 
     <string name="title_pref_domestic_dns">DNS المحلي (اختياري)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -321,6 +322,12 @@
         <item>اتبع النظام</item>
         <item>فاتح</item>
         <item>داكن</item>
+    </string-array>
+
+    <string-array name="vpn_bypass_lan">
+        <item>Follow config</item>
+        <item>Bypass</item>
+        <item>Not Bypass</item>
     </string-array>
 
 </resources>

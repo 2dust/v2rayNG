@@ -175,6 +175,7 @@
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (только IPv4/v6)</string>
+    <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
 
     <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -335,6 +336,12 @@
         <item>Чёрный список Китая</item>
         <item>Общие</item>
         <item>Белый список Ирана</item>
+    </string-array>
+
+    <string-array name="vpn_bypass_lan">
+        <item>Follow config</item>
+        <item>Bypass</item>
+        <item>Not Bypass</item>
     </string-array>
 
 </resources>
