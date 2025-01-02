@@ -1,0 +1,72 @@
+name: Setup
+description: Setup libs
+
+runs:
+  using: composite
+  steps:
+    - name: Fetch AndroidLibV2rayLite
+      shell: bash
+      run: |
+        cd ${{ github.workspace }}/build
+        git clone --depth=1 -b master https://github.com/2dust/AndroidLibV2rayLite.git
+        cd AndroidLibV2rayLite
+        git submodule update --init
+
+    - name: Restore cached libtun2socks
+      id: cache-libtun2socks-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ github.workspace }}/build/AndroidLibV2rayLite/libs
+        key: libtun2socks-${{ runner.os }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/refs/heads/master') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
+
+    - name: Setup Android NDK
+      uses: nttld/setup-ndk@v1
+      id: setup-ndk
+      # Same version as https://gitlab.com/fdroid/fdroiddata/metadata/com.v2ray.ang.yml
+      with:
+        ndk-version: r27
+        add-to-path: true
+        link-to-sdk: true
+        local-cache: true
+
+    - name: Restore Android Symlinks
+      shell: bash
+      run: |
+        directory="${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin"
+        find "$directory" -type l | while read link; do
+            current_target=$(readlink "$link")
+            new_target="$directory/$(basename "$current_target")"
+            ln -sf "$new_target" "$link"
+            echo "Changed $(basename "$link") from $current_target to $new_target"
+        done
+
+    - name: Build libtun2socks
+      if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        cd ${{ github.workspace }}/build/AndroidLibV2rayLite
+        bash compile-tun2socks.sh
+        tar -xvzf libtun2socks.so.tgz
+        cp -r libs/* ${{ github.workspace }}/V2rayNG/app/libs/
+      env:
+        NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+
+    - name: Save libtun2socks
+      if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ github.workspace }}/build/AndroidLibV2rayLite/libs
+        key: libtun2socks-${{ runner.os }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/refs/heads/master') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
+
+    - name: Copy libtun2socks
+      shell: bash
+      run: |
+        cp -r ${{ github.workspace }}/build/AndroidLibV2rayLite/libs/* ${{ github.workspace }}/V2rayNG/app/libs/
+
+    - name: Download libv2ray
+      uses: robinraju/release-downloader@v1
+      with:
+        repository: '2dust/AndroidLibXrayLite'
+        latest: true
+        fileName: 'libv2ray.aar'
+        out-file-path: V2rayNG/app/libs/
