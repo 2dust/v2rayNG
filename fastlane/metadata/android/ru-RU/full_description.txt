@@ -1,0 +1,27 @@
+<p>Клиент V2Ray для Android, поддерживающий <a href="https://github.com/XTLS/Xray-core">ядро Xray</a> и <a href="https://github.com/v2fly/v2ray-core">ядро v2fly</a></p>
+
+<h3>Telegram-канал</h3>
+
+<p><a href="https://t.me/github_2dust">github_2dust</a></p>
+
+<h3>Использование</h3>
+
+<h4>Geoip и Geosite</h4>
+
+<ul>
+<li>файлы geoip.dat и geosite.dat располагаются в <code>Android/data/com.v2ray.ang/files/assets</code> (путь может отличаться на некоторых устройствах Android)</li>
+<li>функция загрузки скачивает расширенную версию из этого <a href="https://github.com/Loyalsoldier/v2ray-rules-dat">репозитория</a> (учтите, что может потребоваться рабочий прокси)</li>
+<li>последний официальный <a href="https://github.com/v2fly/domain-list-community">список доменов</a> и <a href="https://github.com/v2fly/geoip">список ip</a> можно импортировать вручную</li>
+<li>можно использовать сторонний dat-файл в той же папке, например <a href="https://guide.v2fly.org/en_US/routing/sitedata.html#external-domains-list-file">h2y</a></li>
+</ul>
+
+<h3>Подробнее в нашем <a href="https://github.com/2dust/v2rayNG/wiki">wiki</a></h3>
+
+<h3>Руководство разработчика</h3>
+
+<p>Проект для Android в папке V2rayNG можно скомпилировать непосредственно в Android Studio или с помощью оболочки Gradle. Но ядро ​​v2ray внутри aar (вероятно) устарело.
+Aar можно скомпилировать из проекта Golang <a href="https://github.com/2dust/AndroidLibV2rayLite">AndroidLibV2rayLite</a> или <a href="https://github.com/2dust/AndroidLibXrayLite">AndroidLibXrayLite</a>.
+Для быстрого начала ознакомьтесь с руководствами <a href="https://github.com/golang/go/wiki/Mobile">Go Mobile</a> и <a href="https://tutorialedge.net/golang/makefiles-for-go-developers/">Makefiles для Go-разработчиков</a>.</p>
+
+<p>v2rayNG может работать на эмуляторах Android. Для WSA разрешение VPN должно быть предоставлено с помощью
+<code>appops set [package name] ACTIVATE_VPN allow</code></p>
