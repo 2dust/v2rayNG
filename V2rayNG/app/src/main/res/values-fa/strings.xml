@@ -125,7 +125,7 @@
     <string name="menu_item_search">جستجو</string>
     <string name="menu_item_select_all">انتخاب همه</string>
     <string name="msg_enter_keywords">کلیدواژه‌ ها را وارد کنید</string>
-    <string name="switch_bypass_apps_mode">حالت Bypass</string>
+    <string name="switch_bypass_apps_mode">حالت دور زدن</string>
     <string name="menu_item_select_proxy_app">انتخاب خودکار پروکسی برنامه</string>
     <string name="msg_downloading_content">در حال دانلود محتوا</string>
     <string name="menu_item_export_proxy_app">خروجی گرفتن در کلیپ‌ بورد</string>
@@ -136,7 +136,7 @@
     <string name="title_advanced">تنظیمات پیشرفته</string>
     <string name="title_vpn_settings">تنظیمات VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی به تفکیک برنامه</string>
-    <string name="summary_pref_per_app_proxy">عمومی: برنامه بررسی شده پروکسی است، اتصال مستقیم بدون بررسی است. \nحالت bypass: برنامه بررسی شده مستقیما متصل است، پراکسی بررسی نشده است. \nگزینه‌ای برای انتخاب خودکار پروکسی برنامه در منو است.</string>
+    <string name="summary_pref_per_app_proxy">عمومی: برنامه بررسی شده پروکسی است، اتصال مستقیم بدون بررسی است. \nحالت دور زدن: برنامه بررسی شده مستقیما متصل است، پراکسی بررسی نشده است. \nگزینه‌ای برای انتخاب خودکار پروکسی برنامه در منو است.</string>
     <string name="title_pref_is_booted">اتصال خودکار هنگام راه اندازی</string>
     <string name="summary_pref_is_booted">هنگام راه اندازی به طور خودکار به سرور انتخابی متصل می شود که ممکن است ناموفق باشد.</string>
 
@@ -174,7 +174,7 @@
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (فقط IPv4/v6)</string>
-    <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
+    <string name="title_pref_vpn_bypass_lan">آیا VPN از LAN ؟عبور کند</string>
 
     <string name="title_pref_domestic_dns">DNS داخلی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -338,9 +338,9 @@
     </string-array>
 
     <string-array name="vpn_bypass_lan">
-        <item>Follow config</item>
-        <item>Bypass</item>
-        <item>Not Bypass</item>
+        <item>پیش فرض کانفیگ</item>
+        <item>دور زده شود</item>
+        <item>دور زده نشود</item>
     </string-array>
 
 </resources>
