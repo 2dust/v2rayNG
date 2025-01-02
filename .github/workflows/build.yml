@@ -37,7 +37,6 @@ jobs:
         key: libtun2socks-${{ runner.os }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/refs/heads/master') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
 
     - name: Setup Android NDK
-      if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
       uses: nttld/setup-ndk@v1
       id: setup-ndk
       # Same version as https://gitlab.com/fdroid/fdroiddata/metadata/com.v2ray.ang.yml
@@ -48,7 +47,6 @@ jobs:
         local-cache: true
 
     - name: Restore Android Symlinks
-      if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
       run: |
         directory="${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin"
         find "$directory" -type l | while read link; do
@@ -109,6 +107,8 @@ jobs:
         chmod 755 gradlew
         ./gradlew licenseFdroidReleaseReport
         ./gradlew assembleRelease -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
+      env:
+        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
     - name: Upload arm64-v8a APK
       uses: actions/upload-artifact@v4
