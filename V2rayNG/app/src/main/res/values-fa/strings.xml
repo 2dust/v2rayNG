@@ -153,12 +153,12 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">فعال کردن نمایش سرعت</string>
-    <string name="summary_pref_speed_enabled">نمایش سرعت فعلی در قسمت آگاه‌سازی. \nآیکون آگاه‌سازی بر اساس استفاده تغییر می‌کند.</string>
+    <string name="summary_pref_speed_enabled">نمایش سرعت فعلی در قسمت اعلان. \nآیکون اعلان بر اساس استفاده تغییر می‌کند.</string>
 
-    <string name="title_pref_sniffing_enabled">فعال کردن SNIFFING</string>
+    <string name="title_pref_sniffing_enabled">فعال کردن تجزیه و تحلیل بسته ها (SNIFFING)</string>
     <string name="summary_pref_sniffing_enabled">استفاده از تشخیص نام دامنه (Sniff) در بسته ها (به طور پیش فرض فعال است)</string>
-    <string name="title_pref_route_only_enabled">فعال کردن ROUTEONLY</string>
-    <string name="summary_pref_route_only_enabled">از نام دامنه SNIFFED فقط برای مسیریابی استفاده کنید و آدرس مورد نظر را به عنوان آدرس IP نگه دارید.</string>
+    <string name="title_pref_route_only_enabled">فعال کردن دامنه فقط مسیر یابی (RouteOnly)</string>
+    <string name="summary_pref_route_only_enabled">از نام دامنه (Snnifed) فقط برای مسیریابی استفاده کنید و آدرس مقصد را به عنوان IP ذخیره کنید.</string>
 
 
     <string name="title_pref_local_dns_enabled">فعال کردن DNS محلی</string>
