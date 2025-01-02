@@ -86,7 +86,7 @@
     <string name="server_lab_spider_x">SPIDERX</string>
     <string name="server_lab_secret_key">کلید خصوصی</string>
     <string name="server_lab_reserved">Reserved (اختیاری، جدا شده با کاما)</string>
-    <string name="server_lab_local_address">آدرس محلی IPV4(اختیاری)</string>
+    <string name="server_lab_local_address">آدرس محلی IPV4 (اختیاری)</string>
     <string name="server_lab_local_mtu">MTU (اختیاری، پیش فرض: 1420)</string>
     <string name="toast_success">با موفقیت انجام شد</string>
     <string name="toast_failure">شکست</string>
