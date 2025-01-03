@@ -17,6 +17,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: 'true'
 
     - name: Prepare build dir
       run: |
@@ -62,7 +64,6 @@ jobs:
         cd ${{ github.workspace }}/build/AndroidLibV2rayLite
         bash compile-tun2socks.sh
         tar -xvzf libtun2socks.so.tgz
-        cp -r libs/* ${{ github.workspace }}/V2rayNG/app/libs/
       env:
         NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
@@ -75,7 +76,7 @@ jobs:
 
     - name: Copy libtun2socks
       run: |
-        cp -r ${{ github.workspace }}/build/AndroidLibV2rayLite/libs/* ${{ github.workspace }}/V2rayNG/app/libs/
+        cp -r ${{ github.workspace }}/build/AndroidLibV2rayLite/libs ${{ github.workspace }}/V2rayNG/app
 
     - name: Download libv2ray
       uses: robinraju/release-downloader@v1
@@ -84,6 +85,44 @@ jobs:
         latest: true
         fileName: 'libv2ray.aar'
         out-file-path: V2rayNG/app/libs/
+
+    - name: Restore cached libhysteria2
+      id: cache-libhysteria2-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ github.workspace }}/hysteria/libs
+        key: libhysteria2-${{ runner.os }}-${{ hashFiles('.git/modules/hysteria/HEAD') }}-${{ hashFiles('libhysteria.sh') }}
+
+    - name: Fetch Go version from AndroidLibXrayLite
+      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
+      run: |
+        GO_VERSION=$(curl -sL https://github.com/2dust/AndroidLibXrayLite/raw/refs/heads/main/go.mod | sed -n -E 's/.*go ([0-9]+\.[0-9]+\.[0-9]+).*/\1/p')
+        echo "Go version: $GO_VERSION"
+        echo "GO_VERSION=$GO_VERSION" >> $GITHUB_ENV
+
+    - name: Setup Golang
+      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
+      uses: actions/setup-go@v5
+      with:
+        go-version: '${{ env.GO_VERSION }}'
+
+    - name: Build libhysteria2
+      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
+      run: |
+        bash libhysteria2.sh
+      env:
+        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+
+    - name: Save libhysteria2
+      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ github.workspace }}/hysteria/libs
+        key: libhysteria2-${{ runner.os }}-${{ hashFiles('.git/modules/hysteria/HEAD') }}-${{ hashFiles('libhysteria.sh') }}
+
+    - name: Copy libhysteria2
+      run: |
+        cp -r ${{ github.workspace }}/hysteria/libs ${{ github.workspace }}/V2rayNG/app
 
     - name: Setup Java
       uses: actions/setup-java@v4
