@@ -1,0 +1,3 @@
+[submodule "hysteria"]
+	path = hysteria
+	url = https://github.com/apernet/hysteria
