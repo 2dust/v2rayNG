@@ -78,11 +78,19 @@ jobs:
       run: |
         cp -r ${{ github.workspace }}/build/AndroidLibV2rayLite/libs ${{ github.workspace }}/V2rayNG/app
 
+    - name: Fetch AndroidLibXrayLite tag
+      run: |
+        pushd AndroidLibXrayLite
+        CURRENT_TAG=$(git describe --tags --abbrev=0 || echo "none")
+        echo "Current tag in this repo: $CURRENT_TAG"
+        echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
+        popd
+
     - name: Download libv2ray
       uses: robinraju/release-downloader@v1
       with:
         repository: '2dust/AndroidLibXrayLite'
-        latest: true
+        tag: ${{ env.CURRENT_TAG }}
         fileName: 'libv2ray.aar'
         out-file-path: V2rayNG/app/libs/
 
@@ -93,18 +101,11 @@ jobs:
         path: ${{ github.workspace }}/hysteria/libs
         key: libhysteria2-${{ runner.os }}-${{ hashFiles('.git/modules/hysteria/HEAD') }}-${{ hashFiles('libhysteria.sh') }}
 
-    - name: Fetch Go version from AndroidLibXrayLite
-      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
-      run: |
-        GO_VERSION=$(curl -sL https://github.com/2dust/AndroidLibXrayLite/raw/refs/heads/main/go.mod | sed -n -E 's/.*go ([0-9]+\.[0-9]+\.[0-9]+).*/\1/p')
-        echo "Go version: $GO_VERSION"
-        echo "GO_VERSION=$GO_VERSION" >> $GITHUB_ENV
-
     - name: Setup Golang
       if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
       uses: actions/setup-go@v5
       with:
-        go-version: '${{ env.GO_VERSION }}'
+        go-mod-file: 'AndroidLibXrayLite/go.mod'
 
     - name: Build libhysteria2
       if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'

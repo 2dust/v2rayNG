@@ -1,3 +1,6 @@
 [submodule "hysteria"]
 	path = hysteria
 	url = https://github.com/apernet/hysteria
+[submodule "AndroidLibXrayLite"]
+	path = AndroidLibXrayLite
+	url = https://github.com/2dust/AndroidLibXrayLite
