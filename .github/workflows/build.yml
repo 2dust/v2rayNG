@@ -71,7 +71,7 @@ jobs:
     - name: Fetch AndroidLibXrayLite tag
       run: |
         pushd AndroidLibXrayLite
-        CURRENT_TAG=$(git describe --tags --abbrev=0 || echo "none")
+        CURRENT_TAG=$(git describe --tags --abbrev=0)
         echo "Current tag in this repo: $CURRENT_TAG"
         echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
         popd
