@@ -25,7 +25,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}/AndroidLibV2rayLite/libs
-        key: libtun2socks-${{ runner.os }}-${{ hashFiles('AndroidLibV2rayLite/.git/refs/heads/master') }}-${{ hashFiles('AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}-${{ hashFiles('AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
+        key: libtun2socks-${{ runner.os }}-${{ hashFiles('.git/modules/AndroidLibV2rayLite/HEAD') }}
 
     - name: Setup Android NDK
       uses: nttld/setup-ndk@v1
@@ -61,7 +61,7 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: ${{ github.workspace }}/AndroidLibV2rayLite/libs
-        key: libtun2socks-${{ runner.os }}-${{ hashFiles('AndroidLibV2rayLite/.git/refs/heads/master') }}-${{ hashFiles('AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}-${{ hashFiles('AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
+        key: libtun2socks-${{ runner.os }}-${{ hashFiles('.git/modules/AndroidLibV2rayLite/HEAD') }}
 
     - name: Copy libtun2socks
       run: |
