@@ -19,6 +19,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: 'recursive'
+        fetch-depth: '0'
 
     - name: Restore cached libtun2socks
       id: cache-libtun2socks-restore
