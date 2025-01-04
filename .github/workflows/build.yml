@@ -18,25 +18,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        submodules: 'true'
-
-    - name: Prepare build dir
-      run: |
-        mkdir ${{ github.workspace }}/build
-
-    - name: Fetch AndroidLibV2rayLite
-      run: |
-        cd ${{ github.workspace }}/build
-        git clone --depth=1 -b master https://github.com/2dust/AndroidLibV2rayLite.git
-        cd AndroidLibV2rayLite
-        git submodule update --init
+        submodules: 'recursive'
 
     - name: Restore cached libtun2socks
       id: cache-libtun2socks-restore
       uses: actions/cache/restore@v4
       with:
-        path: ${{ github.workspace }}/build/AndroidLibV2rayLite/libs
-        key: libtun2socks-${{ runner.os }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/refs/heads/master') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
+        path: ${{ github.workspace }}/AndroidLibV2rayLite/libs
+        key: libtun2socks-${{ runner.os }}-${{ hashFiles('AndroidLibV2rayLite/.git/refs/heads/master') }}-${{ hashFiles('AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}-${{ hashFiles('AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
 
     - name: Setup Android NDK
       uses: nttld/setup-ndk@v1
@@ -61,7 +50,7 @@ jobs:
     - name: Build libtun2socks
       if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
       run: |
-        cd ${{ github.workspace }}/build/AndroidLibV2rayLite
+        cd ${{ github.workspace }}/AndroidLibV2rayLite
         bash compile-tun2socks.sh
         tar -xvzf libtun2socks.so.tgz
       env:
@@ -71,12 +60,12 @@ jobs:
       if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
       with:
-        path: ${{ github.workspace }}/build/AndroidLibV2rayLite/libs
-        key: libtun2socks-${{ runner.os }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/refs/heads/master') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}-${{ hashFiles('build/AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
+        path: ${{ github.workspace }}/AndroidLibV2rayLite/libs
+        key: libtun2socks-${{ runner.os }}-${{ hashFiles('AndroidLibV2rayLite/.git/refs/heads/master') }}-${{ hashFiles('AndroidLibV2rayLite/.git/modules/badvpn/HEAD') }}-${{ hashFiles('AndroidLibV2rayLite/.git/modules/libancillary/HEAD') }}
 
     - name: Copy libtun2socks
       run: |
-        cp -r ${{ github.workspace }}/build/AndroidLibV2rayLite/libs ${{ github.workspace }}/V2rayNG/app
+        cp -r ${{ github.workspace }}/AndroidLibV2rayLite/libs ${{ github.workspace }}/V2rayNG/app
 
     - name: Fetch AndroidLibXrayLite tag
       run: |
