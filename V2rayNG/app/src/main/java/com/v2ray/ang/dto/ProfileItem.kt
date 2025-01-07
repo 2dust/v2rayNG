@@ -1,5 +1,7 @@
 package com.v2ray.ang.dto
 
+import com.v2ray.ang.AppConfig.LOOPBACK
+import com.v2ray.ang.AppConfig.PORT_SOCKS
 import com.v2ray.ang.AppConfig.TAG_BLOCKED
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.TAG_PROXY
@@ -66,6 +68,9 @@ data class ProfileItem(
     }
 
     fun getServerAddressAndPort(): String {
+        if (server.isNullOrEmpty() && configType == EConfigType.CUSTOM) {
+            return "$LOOPBACK:$PORT_SOCKS"
+        }
         return Utils.getIpv6Address(server) + ":" + serverPort
     }
 

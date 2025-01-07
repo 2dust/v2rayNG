@@ -20,6 +20,7 @@ import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.extension.toast
@@ -68,7 +69,10 @@ object V2RayServiceManager {
         if (v2rayPoint.isRunning) return
         val guid = MmkvManager.getSelectServer() ?: return
         val config = MmkvManager.decodeServerConfig(guid) ?: return
-        if (!Utils.isValidUrl(config.server) && !Utils.isIpAddress(config.server)) return
+        if (config.configType != EConfigType.CUSTOM
+            && !Utils.isValidUrl(config.server)
+            && !Utils.isIpAddress(config.server)
+        ) return
 //        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
 //        if (!result.status) return
 
