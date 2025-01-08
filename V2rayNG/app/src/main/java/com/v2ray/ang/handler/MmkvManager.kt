@@ -349,10 +349,6 @@ object MmkvManager {
         return settingsStorage.decodeBool(key, defaultValue)
     }
 
-    fun decodeSettingsInt(key: String, defaultValue: Int): Int {
-        return settingsStorage.decodeInt(key, defaultValue)
-    }
-
     fun decodeSettingsStringSet(key: String): MutableSet<String>? {
         return settingsStorage.decodeStringSet(key)
     }

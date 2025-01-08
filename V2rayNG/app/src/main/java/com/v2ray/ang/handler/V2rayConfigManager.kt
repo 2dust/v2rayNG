@@ -438,21 +438,18 @@ object V2rayConfigManager {
                 || protocol.equals(EConfigType.HYSTERIA2.name, true)
             ) {
                 muxEnabled = false
-            } else if (protocol.equals(EConfigType.VLESS.name, true)
-                && outbound.settings?.vnext?.first()?.users?.first()?.flow?.isNotEmpty() == true
-            ) {
-                muxEnabled = false
             } else if (outbound.streamSettings?.network == NetworkType.XHTTP.type) {
                 muxEnabled = false
             }
+
             if (muxEnabled == true) {
                 outbound.mux?.enabled = true
-                outbound.mux?.concurrency =
-                    MmkvManager.decodeSettingsInt(AppConfig.PREF_MUX_CONCURRENCY, 8)
-                outbound.mux?.xudpConcurrency =
-                    MmkvManager.decodeSettingsInt(AppConfig.PREF_MUX_XUDP_CONCURRENCY, 16)
-                outbound.mux?.xudpProxyUDP443 =
-                    MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_QUIC) ?: "reject"
+                outbound.mux?.concurrency = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_CONCURRENCY, "8").orEmpty().toInt()
+                outbound.mux?.xudpConcurrency = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "16").orEmpty().toInt()
+                outbound.mux?.xudpProxyUDP443 = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_QUIC,"reject")
+                if (protocol.equals(EConfigType.VLESS.name, true) && outbound.settings?.vnext?.first()?.users?.first()?.flow?.isNotEmpty() == true) {
+                    outbound.mux?.concurrency = -1
+                }
             } else {
                 outbound.mux?.enabled = false
                 outbound.mux?.concurrency = -1
