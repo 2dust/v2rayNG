@@ -98,6 +98,7 @@ jobs:
         go-mod-file: 'AndroidLibXrayLite/go.mod'
 
     - name: Patch Go use 600296
+      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
       #https://go-review.googlesource.com/c/go/+/600296
       run: |
        cd "$(go env GOROOT)"
