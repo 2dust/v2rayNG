@@ -95,7 +95,14 @@ jobs:
       if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
       uses: actions/setup-go@v5
       with:
-        go-mod-file: 'AndroidLibXrayLite/go.mod'
+        go-version-file: 'AndroidLibXrayLite/go.mod'
+
+    - name: Patch Go use 600296
+      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
+      #https://go-review.googlesource.com/c/go/+/600296
+      run: |
+       cd "$(go env GOROOT)"
+       curl "https://go-review.googlesource.com/changes/go~600296/revisions/5/patch" | base64 -d | patch --verbose -p 1
 
     - name: Build libhysteria2
       if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
