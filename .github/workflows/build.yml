@@ -68,7 +68,7 @@ jobs:
       if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
       run: |
         cd ${{ github.workspace }}/AndroidLibXrayLite
-        bash compile-tun2socks.sh
+        bash compile-tun2socks.sh {{ matrix.abi }}
         tar -xvzf libtun2socks.so.tgz
       env:
         NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
