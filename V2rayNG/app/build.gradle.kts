@@ -19,11 +19,19 @@ android {
         val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')
         splits {
             abi {
+                isEnable = true
+                reset()
                 if (abiFilterList != null && abiFilterList.isNotEmpty()) {
-                    isEnable = true
-                    reset()
                     include(*abiFilterList.toTypedArray())
+                } else {
+                    include(
+                        "arm64-v8a",
+                        "armeabi-v7a",
+                        "x86_64",
+                        "x86"
+                    )
                 }
+                isUniversalApk = abiFilterList.isNullOrEmpty()
             }
         }
 
