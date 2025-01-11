@@ -23,7 +23,6 @@ android {
                     isEnable = true
                     reset()
                     include(*abiFilterList.toTypedArray())
-                    isUniversalApk = true
                 }
             }
         }

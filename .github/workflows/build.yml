@@ -144,7 +144,6 @@ jobs:
     - name: Build APK
       run: |
         cd ${{ github.workspace }}/V2rayNG
-        sed -i -e 's/isUniversalApk.*/isUniversalApk = false/' app/build.gradle.kts
         chmod 755 gradlew
         ./gradlew licenseFdroidReleaseReport
         ./gradlew assembleRelease -PABI_FILTERS=${{ matrix.abi }} -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
