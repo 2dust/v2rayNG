@@ -16,19 +16,6 @@ jobs:
     strategy:
       matrix:
         abi: [arm64-v8a, armeabi-v7a, x86_64, x86]
-        include:
-          - abi: arm64-v8a
-            ndk_target: aarch64-linux-android21
-            goarch: arm64
-          - abi: armeabi-v7a
-            ndk_target: armv7a-linux-androideabi21
-            goarch: arm
-          - abi: x86_64
-            ndk_target: x86_64-linux-android21
-            goarch: amd64
-          - abi: x86
-            ndk_target: i686-linux-android21
-            goarch: 386
 
     steps:
     - name: Checkout code
