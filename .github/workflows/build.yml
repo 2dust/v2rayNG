@@ -99,6 +99,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version-file: 'AndroidLibXrayLite/go.mod'
+        cache-dependency-path: 'hysteria/app/go.sum'
 
     - name: Patch Go use 600296
       if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
