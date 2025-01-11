@@ -123,13 +123,7 @@ jobs:
     - name: Build libhysteria2
       if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
       run: |
-        cd hysteria
-        echo "Building for ${{ matrix.abi }} with ${{ matrix.ndk_target }} (${{ matrix.goarch }})"
-        CC="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.ndk_target }}-clang" \
-        CGO_ENABLED=1 \
-        CGO_LDFLAGS="-Wl,-z,max-page-size=16384" \
-        GOOS=android GOARCH=${{ matrix.goarch }} \
-        go build -o libs/${{ matrix.abi }}/libhysteria2.so -trimpath -ldflags "-s -w -buildid=" -buildvcs=false ./app
+        bash libhysteria2.sh {{ matrix.abi }}
       env:
         ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 

@@ -7,6 +7,28 @@ targets=(
   "i686-linux-android21 386 x86"
 )
 
+if [ "$#" -eq 1 ]; then
+  abi_filter=$1
+  case $abi_filter in
+    arm64-v8a|armeabi-v7a|x86_64|x86)
+      filtered_targets=()
+      for target in "${targets[@]}"; do
+        IFS=' ' read -r _ _ abi <<< "$target"
+        if [ "$abi" == "$abi_filter" ]; then
+          filtered_targets+=("$target")
+          break
+        fi
+      done
+      targets=("${filtered_targets[@]}")
+      ;;
+    *)
+      echo "Invalid ABI specified: $abi_filter"
+      echo "Valid options are: arm64-v8a, armeabi-v7a, x86_64, x86"
+      exit 1
+      ;;
+  esac
+fi
+
 cd "hysteria" || exit
 
 for target in "${targets[@]}"; do
