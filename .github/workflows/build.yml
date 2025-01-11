@@ -55,7 +55,7 @@ jobs:
       if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
       run: |
         cd ${{ github.workspace }}/AndroidLibXrayLite
-        bash compile-tun2socks.sh {{ matrix.abi }}
+        bash compile-tun2socks.sh ${{ matrix.abi }}
         tar -xvzf libtun2socks.so.tgz
       env:
         NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
@@ -110,7 +110,7 @@ jobs:
     - name: Build libhysteria2
       if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
       run: |
-        bash libhysteria2.sh {{ matrix.abi }}
+        bash libhysteria2.sh ${{ matrix.abi }}
       env:
         ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
