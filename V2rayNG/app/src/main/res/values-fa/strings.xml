@@ -69,7 +69,7 @@
     <string name="server_lab_path_grpc">gRPC ServiceName</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">اثرانگشت</string>
-    <string name="server_lab_stream_alpn">AlPN</string>
+    <string name="server_lab_stream_alpn">Alpn</string>
     <string name="server_lab_allow_insecure">اعطای مجوز ناامن</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">نشانی</string>
@@ -155,7 +155,7 @@
     <string name="title_pref_speed_enabled">فعال کردن نمایش سرعت</string>
     <string name="summary_pref_speed_enabled">نمایش سرعت فعلی در قسمت اعلان. \nآیکون اعلان بر اساس استفاده تغییر می‌کند.</string>
 
-    <string name="title_pref_sniffing_enabled">فعال کردن تجزیه و تحلیل بسته ها (SNIFFING)</string>
+    <string name="title_pref_sniffing_enabled">فعال کردن تجزیه و تحلیل بسته ها (Sniffing)</string>
     <string name="summary_pref_sniffing_enabled">استفاده از تشخیص نام دامنه (Sniff) در بسته ها (به طور پیش فرض فعال است)</string>
     <string name="title_pref_route_only_enabled">فعال کردن دامنه فقط مسیر یابی (RouteOnly)</string>
     <string name="summary_pref_route_only_enabled">از نام دامنه (Snnifed) فقط برای مسیریابی استفاده کنید و آدرس مقصد را به عنوان IP ذخیره کنید.</string>
@@ -179,8 +179,8 @@
     <string name="title_pref_domestic_dns">DNS داخلی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
-    <string name="title_pref_dns_hosts">DNS مستقیم هاست(فرمت: دامنه: آدرس،…)</string>
-    <string name="summary_pref_dns_hosts">دامنه: آدرس، …</string>
+    <string name="title_pref_dns_hosts">DNS مستقیم هاست (فرمت: دامنه:آدرس،…)</string>
+    <string name="summary_pref_dns_hosts">دامنه:آدرس،…</string>
 
     <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تاخیر واقعی کانفیگ ها (HTTP/HTTPS)</string>
     <string name="summary_pref_delay_test_url">URL</string>
