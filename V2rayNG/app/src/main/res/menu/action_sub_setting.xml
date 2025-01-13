@@ -5,10 +5,10 @@
         android:id="@+id/add_config"
         android:icon="@drawable/ic_add_24dp"
         android:title="@string/menu_item_add_config"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/sub_update"
         android:icon="@drawable/ic_restore_24dp"
         android:title="@string/title_sub_update"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 </menu>
