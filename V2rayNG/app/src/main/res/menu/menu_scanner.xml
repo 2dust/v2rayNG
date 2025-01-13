@@ -5,10 +5,10 @@
         android:id="@+id/scan_code"
         android:icon="@drawable/ic_scan_24dp"
         android:title=""
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/select_photo"
         android:icon="@drawable/ic_image_24dp"
         android:title=""
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 </menu>

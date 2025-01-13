@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:paddingStart="@dimen/padding_start"
-    android:paddingEnd="@dimen/padding_end"
     tools:context=".ui.LogcatActivity">
 
     <ProgressBar
@@ -16,25 +15,13 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
 
-    <ScrollView
-        android:id="@+id/sv_logcat"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:fillViewport="false"
-        android:foregroundGravity="bottom">
+        android:layout_height="match_parent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-        <TextView
-            android:id="@+id/tv_logcat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="bottom"
-            android:maxLines="65536"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-    </ScrollView>
 </RelativeLayout>
 
 

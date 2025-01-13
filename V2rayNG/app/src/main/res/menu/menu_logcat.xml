@@ -2,13 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/search_view"
+        android:icon="@drawable/ic_outline_filter_alt_24"
+        android:title="@string/menu_item_search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
+    <item
         android:id="@+id/clear_all"
         android:icon="@drawable/ic_delete_24dp"
         android:title="@string/logcat_clear"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/copy_all"
         android:icon="@drawable/ic_copy"
         android:title="@string/logcat_copy"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 </menu>

@@ -5,10 +5,10 @@
         android:id="@+id/del_config"
         android:icon="@drawable/ic_delete_24dp"
         android:title="@string/menu_item_del_config"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/save_config"
         android:icon="@drawable/ic_action_done"
         android:title="@string/menu_item_save_config"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 </menu>

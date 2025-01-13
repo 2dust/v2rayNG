@@ -55,7 +55,7 @@
 
             <item
                 android:title="@string/menu_item_import_config_custom"
-                app:showAsAction="always">
+                app:showAsAction="ifRoom">
                 <menu>
                     <item
                         android:id="@+id/import_config_custom_clipboard"
