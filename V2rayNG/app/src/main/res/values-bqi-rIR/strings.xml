@@ -8,6 +8,7 @@
     <string name="navigation_drawer_close">بستن نومگه کشاری</string>
     <string name="migration_success">مووفقیت من جاگورویی داده</string>
     <string name="migration_fail">جاگورویی داده ٱنجوم نگرؽڌ</string>
+    <string name="pull_down_to_refresh">Please pull down to refresh!</string>
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">واڌاشتن</string>

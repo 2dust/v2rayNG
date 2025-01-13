@@ -7,6 +7,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="migration_success">数据迁移成功!</string>
     <string name="migration_fail">数据迁移失败啦!</string>
+    <string name="pull_down_to_refresh">请下拉刷新!</string>
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">停止</string>
