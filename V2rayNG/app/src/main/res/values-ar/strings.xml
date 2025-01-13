@@ -8,6 +8,7 @@
     <string name="navigation_drawer_close">إغلاق درج التنقل</string>
     <string name="migration_success">نجحت عملية ترحيل البيانات!</string>
     <string name="migration_fail">فشلت عملية ترحيل البيانات!</string>
+    <string name="pull_down_to_refresh">Please pull down to refresh!</string>
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">إيقاف</string>
