@@ -12,8 +12,8 @@ android {
         applicationId = "com.v2ray.ang"
         minSdk = 21
         targetSdk = 35
-        versionCode = 627
-        versionName = "1.9.31"
+        versionCode = 628
+        versionName = "1.9.32"
         multiDexEnabled = true
 
         val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')
@@ -144,6 +144,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.preference.ktx)
     implementation(libs.recyclerview)
+    implementation(libs.androidx.swiperefreshlayout)
 
     // UI Libraries
     implementation(libs.material)
