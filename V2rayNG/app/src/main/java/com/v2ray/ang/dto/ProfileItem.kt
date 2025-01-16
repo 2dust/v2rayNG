@@ -55,6 +55,8 @@ data class ProfileItem(
     var portHopping: String? = null,
     var portHoppingInterval: String? = null,
     var pinSHA256: String? = null,
+    var bandwidthDown: String? = null,
+    var bandwidthUp: String? = null,
 
     ) {
     companion object {

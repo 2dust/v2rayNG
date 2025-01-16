@@ -9,6 +9,7 @@ data class Hysteria2Bean(
     val http: Socks5Bean? = null,
     val tls: TlsBean? = null,
     val transport: TransportBean? = null,
+    val bandwidth: BandwidthBean? = null,
 ) {
     data class ObfsBean(
         val type: String?,
@@ -37,4 +38,9 @@ data class Hysteria2Bean(
             val hopInterval: String?,
         )
     }
+
+    data class BandwidthBean(
+        val down: String?,
+        val up: String?,
+    )
 }

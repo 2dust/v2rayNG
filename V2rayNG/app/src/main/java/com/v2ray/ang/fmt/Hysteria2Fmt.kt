@@ -85,6 +85,12 @@ object Hysteria2Fmt : FmtBase() {
                 )
             )
 
+        val bandwidth = if (config.bandwidthDown.isNullOrEmpty() || config.bandwidthUp.isNullOrEmpty()) null else
+            Hysteria2Bean.BandwidthBean(
+                down = config.bandwidthDown,
+                up = config.bandwidthUp,
+            )
+
         val server =
             if (config.portHopping.isNullOrEmpty())
                 config.getServerAddressAndPort()
@@ -96,6 +102,7 @@ object Hysteria2Fmt : FmtBase() {
             auth = config.password,
             obfs = obfs,
             transport = transport,
+            bandwidth = bandwidth,
             socks5 = Hysteria2Bean.Socks5Bean(
                 listen = "$LOOPBACK:${socksPort}",
             ),

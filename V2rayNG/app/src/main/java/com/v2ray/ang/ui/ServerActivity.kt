@@ -126,6 +126,8 @@ class ServerActivity : BaseActivity() {
     private val et_port_hop: EditText? by lazy { findViewById(R.id.et_port_hop) }
     private val et_port_hop_interval: EditText? by lazy { findViewById(R.id.et_port_hop_interval) }
     private val et_pinsha256: EditText? by lazy { findViewById(R.id.et_pinsha256) }
+    private val et_bandwidth_down: EditText? by lazy { findViewById(R.id.et_bandwidth_down) }
+    private val et_bandwidth_up: EditText? by lazy { findViewById(R.id.et_bandwidth_up) }
     private val et_extra: EditText? by lazy { findViewById(R.id.et_extra) }
     private val layout_extra: LinearLayout? by lazy { findViewById(R.id.layout_extra) }
 
@@ -334,6 +336,8 @@ class ServerActivity : BaseActivity() {
             et_port_hop?.text = Utils.getEditable(config.portHopping)
             et_port_hop_interval?.text = Utils.getEditable(config.portHoppingInterval)
             et_pinsha256?.text = Utils.getEditable(config.pinSHA256)
+            et_bandwidth_down?.text = Utils.getEditable(config.bandwidthDown)
+            et_bandwidth_up?.text = Utils.getEditable(config.bandwidthUp)
         }
         val securityEncryptions =
             if (config.configType == EConfigType.SHADOWSOCKS) shadowsocksSecuritys else securitys
@@ -513,6 +517,8 @@ class ServerActivity : BaseActivity() {
             config.portHopping = et_port_hop?.text?.toString()
             config.portHoppingInterval = et_port_hop_interval?.text?.toString()
             config.pinSHA256 = et_pinsha256?.text?.toString()
+            config.bandwidthDown = et_bandwidth_down?.text?.toString()
+            config.bandwidthUp = et_bandwidth_up?.text?.toString()
         }
     }
 
