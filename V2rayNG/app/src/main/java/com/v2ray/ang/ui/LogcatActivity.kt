@@ -59,7 +59,7 @@ class LogcatActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
                     Runtime.getRuntime().exec(lst.toTypedArray())
                 }
 
-                val allText = process.inputStream.bufferedReader().use { it.readLines() }
+                val allText = process.inputStream.bufferedReader().use { it.readLines() }.reversed()
                 launch(Dispatchers.Main) {
                     logsetsAll = allText.toMutableList()
                     logsets = allText.toMutableList()
