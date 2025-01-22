@@ -120,8 +120,8 @@
     <string name="server_lab_port_hop">پورت گوم (درگا سرورن ز نۊ هؽل اکونه)</string>
     <string name="server_lab_port_hop_interval">فاسله پورت گوم (سانیه)</string>
     <string name="server_lab_stream_pinsha256">pinSHA256</string>
-    <string name="server_lab_bandwidth_down">Bandwidth down (units)</string>
-    <string name="server_lab_bandwidth_up">Bandwidth up (units)</string>
+    <string name="server_lab_bandwidth_down">ب لم ٱووڌن پئنا باند (واهڌ)</string>
+    <string name="server_lab_bandwidth_up">وا روء رئڌن پئنا باند (واهڌ)</string>
     <string name="server_lab_xhttp_mode">هالت XHTTP</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra خام JSON، قالوو: { XHTTPObject }</string>
 
@@ -191,11 +191,11 @@
     <string name="summary_pref_delay_test_url">نشۊوی اینترنتی</string>
 
     <string name="title_pref_proxy_sharing_enabled">هشتن منپیزا ز شبکه مهلی</string>
-    <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا آدرس IP ایسا، ز ر socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل اعتماد فعال بۊ تا ز منپیز ؛یر موجاز جلو گری بۊ.</string>
+    <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا آدرس IP ایسا، ز ر socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل اعتماد فعال بۊ تا ز منپیز غیر موجاز جلو گری بۊ.</string>
     <string name="toast_warning_pref_proxysharing_short">منپیزا ز شبکه مهلی ن موجار کۊنین، موتمعن بۊین ک من ی شبکه قابل ائتماڌ هڌین.</string>
 
     <string name="title_pref_allow_insecure">اجازه نا ٱمن</string>
-    <string name="summary_pref_allow_insecure">مجال و کار بردن TLS ب تۉر پؽش فرز، موجوز نا ٱمن فعال هڌ.</string>
+    <string name="summary_pref_allow_insecure">مجال و کار بوردن TLS ب تۉر پؽش فرز، موجوز نا ٱمن فعال هڌ.</string>
 
     <string name="title_pref_socks_port">پورت پروکسی مهلی</string>
     <string name="summary_pref_socks_port">پورت پروکسی مهلی</string>
