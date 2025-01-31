@@ -53,6 +53,8 @@ TUN2SOCKS_SOURCES := \
         system/BTime.c \
         system/BUnixSignal.c \
         system/BNetwork.c \
+        system/BDatagram_common.c \
+        system/BDatagram_unix.c \
         flow/StreamRecvInterface.c \
         flow/PacketRecvInterface.c \
         flow/PacketPassInterface.c \
@@ -102,10 +104,10 @@ TUN2SOCKS_SOURCES := \
         base/DebugObject.c \
         base/BLog.c \
         base/BPending.c \
-		system/BDatagram_unix.c \
         flowextra/PacketPassInactivityMonitor.c \
         tun2socks/SocksUdpGwClient.c \
-        udpgw_client/UdpGwClient.c
+        udpgw_client/UdpGwClient.c \
+        socks_udp_client/SocksUdpClient.c
 LOCAL_MODULE := tun2socks
 LOCAL_LDLIBS := -ldl -llog
 LOCAL_SRC_FILES := $(addprefix badvpn/, $(TUN2SOCKS_SOURCES))
