@@ -6,7 +6,7 @@
 	url = https://github.com/2dust/AndroidLibXrayLite
 [submodule "badvpn"]
 	path = badvpn
-	url = https://github.com/XTLS/badvpn
+	url = https://github.com/XTLS/badvpn/tree/new
 [submodule "libancillary"]
 	path = libancillary
 	url = https://github.com/shadowsocks/libancillary
