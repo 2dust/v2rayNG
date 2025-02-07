@@ -15,16 +15,17 @@
 #
 LOCAL_PATH := $(call my-dir)
 ROOT_PATH := $(LOCAL_PATH)
+
 ########################################################
 ## libancillary
 ########################################################
 include $(CLEAR_VARS)
 ANCILLARY_SOURCE := fd_recv.c fd_send.c
 LOCAL_MODULE := libancillary
-#LOCAL_CFLAGS += -I$(LOCAL_PATH)/libancillary
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/libancillary
 LOCAL_SRC_FILES := $(addprefix libancillary/, $(ANCILLARY_SOURCE))
 include $(BUILD_STATIC_LIBRARY)
+
 ########################################################
 ## tun2socks
 ########################################################
@@ -33,9 +34,7 @@ LOCAL_CFLAGS := -std=gnu99
 LOCAL_CFLAGS += -DBADVPN_THREADWORK_USE_PTHREAD -DBADVPN_LINUX -DBADVPN_BREACTOR_BADVPN -D_GNU_SOURCE
 LOCAL_CFLAGS += -DBADVPN_USE_SIGNALFD -DBADVPN_USE_EPOLL
 LOCAL_CFLAGS += -DBADVPN_LITTLE_ENDIAN -DBADVPN_THREAD_SAFE
-LOCAL_CFLAGS += -DNDEBUG -DANDROID
-LOCAL_CFLAGS += -I
-LOCAL_STATIC_LIBRARIES := libancillary
+LOCAL_CFLAGS += -DNDEBUG
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/badvpn/libancillary \
         $(LOCAL_PATH)/badvpn/lwip/src/include/ipv4 \
@@ -44,6 +43,7 @@ LOCAL_C_INCLUDES := \
         $(LOCAL_PATH)/badvpn/lwip/custom \
         $(LOCAL_PATH)/badvpn \
 	$(LOCAL_PATH)/libancillary
+
 TUN2SOCKS_SOURCES := \
         base/BLog_syslog.c \
         system/BReactor_badvpn.c \
@@ -108,17 +108,8 @@ TUN2SOCKS_SOURCES := \
         tun2socks/SocksUdpGwClient.c \
         udpgw_client/UdpGwClient.c \
         socks_udp_client/SocksUdpClient.c
+
 LOCAL_MODULE := tun2socks
 LOCAL_LDLIBS := -ldl -llog
 LOCAL_SRC_FILES := $(addprefix badvpn/, $(TUN2SOCKS_SOURCES))
-LOCAL_BUILD_SCRIPT := BUILD_EXECUTABLE
-LOCAL_MAKEFILE     := $(local-makefile)
-$(call check-defined-LOCAL_MODULE,$(LOCAL_BUILD_SCRIPT))
-$(call check-LOCAL_MODULE,$(LOCAL_MAKEFILE))
-$(call check-LOCAL_MODULE_FILENAME)
-# we are building target objects
-my := TARGET_
-$(call handle-module-filename,lib,$(TARGET_SONAME_EXTENSION))
-$(call handle-module-built)
-LOCAL_MODULE_CLASS := EXECUTABLE
-include $(BUILD_SYSTEM)/build-module.mk
+include $(BUILD_EXECUTABLE)
