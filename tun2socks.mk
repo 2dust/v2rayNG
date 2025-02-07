@@ -22,12 +22,13 @@ LWIP_PATH   := $(BADVPN_PATH)/lwip
 
 ########################################################
 ## libancillary
+# Provides helper functions for sending and receiving file descriptors
 ########################################################
 include $(CLEAR_VARS)
 LOCAL_MODULE := libancillary
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/libancillary
-ANCILLARY_SOURCE := fd_recv.c fd_send.c
-LOCAL_SRC_FILES := $(addprefix libancillary/, $(ANCILLARY_SOURCE))
+LOCAL_SRC_FILES := libancillary/fd_recv.c libancillary/fd_send.c
+LOCAL_C_INCLUDES := $(LOCAL_PATH) # Include path for libancillary headers
+
 include $(BUILD_STATIC_LIBRARY)
 
 ########################################################
