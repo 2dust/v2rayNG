@@ -25,7 +25,7 @@ if ! command -v ndk-build &> /dev/null; then
 fi
 
 # Create temporary directory
-TMPDIR=$(mktemp -d -t tun2socks_build)
+TMPDIR=$(mktemp -d -t tun2socks_build.XXXXXXXXXX)
 
 # Cleanup function
 clear_tmp() {
