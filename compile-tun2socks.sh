@@ -11,6 +11,8 @@ __base="$(basename ${__file} .sh)"
 # Constants
 NDK_HOME_DIR="$NDK_HOME"
 APP_PLATFORM_VERSION="android-19"
+SOURCE_DIR="/home/runner/work/v2rayNG/v2rayNG/libs"
+DEST_DIR="/home/runner/work/v2rayNG/v2rayNG/V2rayNG/app"
 
 # Check if NDK_HOME is set
 if [[ -z "$NDK_HOME_DIR" ]]; then
@@ -83,4 +85,23 @@ echo "Cleaning up temporary directory..."
 popd
 clear_tmp
 
-echo "Build completed. Libraries are in $__dir"
+# Check and create directories
+if [ ! -d "$SOURCE_DIR" ]; then
+    echo "Source directory does not exist. Creating..."
+    mkdir -p "$SOURCE_DIR"
+else
+    echo "Source directory exists."
+fi
+
+if [ ! -d "$DEST_DIR" ]; then
+    echo "Destination directory does not exist. Creating..."
+    mkdir -p "$DEST_DIR"
+else
+    echo "Destination directory exists."
+fi
+
+# Copy the directory
+echo "Copying libraries..."
+cp -r "$SOURCE_DIR" "$DEST_DIR"
+
+echo "Build completed. Libraries are in $__dir and copied to $DEST_DIR"
