@@ -16,7 +16,7 @@
 LOCAL_PATH := $(call my-dir)
 ROOT_PATH := $(LOCAL_PATH)
 
-# Common paths
+# Common Paths
 BADVPN_PATH := $(LOCAL_PATH)/badvpn
 LWIP_PATH   := $(BADVPN_PATH)/lwip
 
@@ -36,14 +36,14 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE := tun2socks
 
-# Compiler flags
+# Compiler Flags
 LOCAL_CFLAGS := -std=gnu99
 LOCAL_CFLAGS += -DBADVPN_THREADWORK_USE_PTHREAD -DBADVPN_LINUX -DBADVPN_BREACTOR_BADVPN -D_GNU_SOURCE
 LOCAL_CFLAGS += -DBADVPN_USE_SIGNALFD -DBADVPN_USE_EPOLL
 LOCAL_CFLAGS += -DBADVPN_LITTLE_ENDIAN -DBADVPN_THREAD_SAFE
 LOCAL_CFLAGS += -DNDEBUG -DANDROID
 
-# Include paths
+# Include Paths
 LOCAL_C_INCLUDES := \
     $(BADVPN_PATH)/libancillary \
     $(LWIP_PATH)/src/include/ipv4 \
@@ -53,7 +53,7 @@ LOCAL_C_INCLUDES := \
     $(BADVPN_PATH) \
     $(LOCAL_PATH)/libancillary
 
-# Source files
+# Source Files
 TUN2SOCKS_SOURCES := \
     base/BLog_syslog.c \
     system/BReactor_badvpn.c \
