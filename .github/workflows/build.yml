@@ -123,13 +123,6 @@ jobs:
     - name: Setup Android environment
       uses: android-actions/setup-android@v3
 
-    - name: Decode Keystore
-      uses: timheuer/base64-to-file@v1
-      id: android_keystore
-      with:
-        fileName: "android_keystore.jks"
-        encodedString: ${{ secrets.APP_KEYSTORE_BASE64 }}
-
     - name: Build APK
       run: |
         cd ${{ github.workspace }}/V2rayNG
