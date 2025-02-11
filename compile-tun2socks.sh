@@ -1,56 +1,33 @@
-# Copyright (C) 2009 The Android Open Source Project
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in
-# distributed under the License is distributed on an "AS
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
-# See the License for the specific language governing permissions
-# limitations under the License.
-#
-#
-LOCAL_PATH := $(call my-dir)
-ROOT_PATH := $(LOCAL_PATH)
-########################################################
-## libancillary
-########################################################
-include $(CLEAR_VARS)
-ANCILLARY_SOURCE := fd_recv.c fd_send.c
-LOCAL_MODULE := libancillary
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/libancillary
-LOCAL_SRC_FILES := $(addprefix libancillary/, $(ANCILLARY_SOURCE))
-include $(BUILD_STATIC_LIBRARY)
-########################################################
-## tun2socks
-########################################################
-include $(CLEAR_VARS)
-LOCAL_CFLAGS := -std=gnu99
-LOCAL_CFLAGS += -DBADVPN_THREADWORK_USE_PTHREAD -DBADVPN_LINUX -DBADVPN_BREACTOR_BADVPN -D_GNU_SOURCE
-LOCAL_CFLAGS += -DBADVPN_USE_SIGNALFD -DBADVPN_USE_EPOLL
-LOCAL_CFLAGS += -DBADVPN_LITTLE_ENDIAN -DBADVPN_THREAD_SAFE
-LOCAL_CFLAGS += -DNDEBUG -DANDROID
-LOCAL_C_INCLUDES := \
-$(LOCAL_PATH)/badvpn/libancillary \
-$(LOCAL_PATH)/badvpn/lwip/src/include/ipv4 \
-$(LOCAL_PATH)/badvpn/lwip/src/include/ipv6 \
-$(LOCAL_PATH)/badvpn/lwip/src/include \
-$(LOCAL_PATH)/badvpn/lwip/custom \
-$(LOCAL_PATH)/badvpn \
-$(LOCAL_PATH)/libancillary
-TUN2SOCKS_SOURCES := \
-base/BLog_syslog.c \
-system/BReactor_badvpn.c \
-system/BSignal.c \
-system/BConnection_common.c \
-system/BConnection_unix.c \
-system/BTime.c \
-system/BUnixSignal.c \
-system/BNetwork.c \
-system/BDatagram_common.c \
-system/BDatagram_unix.c \
-flow/StreamRecvInterface.c \
-flow/PacketRecvInterface.c \
+#!/bin/bash
+set -o errexit
+set -o pipefail
+set -o nounset
+# Set magic variables for current file & dir
+__dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+__file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
+__base="$(basename ${__file} .sh)"
+if [[ ! -d $NDK_HOME ]]; then
+  echo "Android NDK: NDK_HOME not found. please set env \$NDK_HOME"
+  exit 1
+fi
+TMPDIR=$(mktemp -d)
+clear_tmp () {
+  rm -rf $TMPDIR
+}
+trap 'echo -e "Aborted, error $? in command: $BASH_COMMAND"; clear_tmp' EXIT
+install -m644 $__dir/tun2socks.mk $TMPDIR/
+pushd $TMPDIR
+ln -s $__dir/badvpn badvpn
+ln -s $__dir/libancillary libancillary
+$NDK_HOME/ndk-build \
+NDK_PROJECT_PATH=. \
+APP_BUILD_SCRIPT=./tun2socks.mk \
+APP_ABI=all \
+APP_PLATFORM=android-19 \
+NDK_LIBS_OUT=$TMPDIR/libs \
+NDK_OUT=$TMPDIR/tmp \
+APP_SHORT_COMMANDS=false LOCAL_SHORT_COMMANDS=false -B -j4 \
+LOCAL_LDFLAGS=-Wl,--build-id=none
+tar cvfz $__dir/libtun2socks.so.tgz libs
+popd
+rm -rf $TMPDIR
