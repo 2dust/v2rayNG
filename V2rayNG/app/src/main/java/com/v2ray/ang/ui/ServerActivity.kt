@@ -358,7 +358,6 @@ class ServerActivity : BaseActivity() {
                 val utlsIndex = Utils.arrayFind(uTlsItems, it)
                 sp_stream_fingerprint?.run { setSelection(if (utlsIndex >= 0) utlsIndex else 0) }
             }
-
             config.alpn?.let {
                 val alpnIndex = Utils.arrayFind(alpns, it)
                 sp_stream_alpn?.run { setSelection(if (alpnIndex >= 0) alpnIndex else 0) }
