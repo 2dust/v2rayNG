@@ -356,11 +356,11 @@ class ServerActivity : BaseActivity() {
             et_sni?.text = Utils.getEditable(config.sni)
             config.fingerPrint?.let {
                 val utlsIndex = Utils.arrayFind(uTlsItems, it)
-                sp_stream_fingerprint?.setSelection(utlsIndex)
+                utlsIndex.let { sp_stream_fingerprint?.setSelection(if (it >= 0) it else 0) }
             }
             config.alpn?.let {
                 val alpnIndex = Utils.arrayFind(alpns, it)
-                sp_stream_alpn?.setSelection(alpnIndex)
+                alpnIndex.let { sp_stream_alpn?.setSelection(if (it >= 0) it else 0) }
             }
             if (config.security == TLS) {
                 container_allow_insecure?.visibility = View.VISIBLE
