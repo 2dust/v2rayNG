@@ -46,6 +46,13 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+        // extractNativeLibs (useLegacyPackaging) set to false
+        // run `bundlePlaystoreStore` task to generate Play Store bundle
+        register("store") {
+            initWith(getByName("release"))
+            matchingFallbacks.add("release")
+        }
     }
 
     flavorDimensions.add("distribution")
@@ -131,6 +138,12 @@ android {
         }
     }
 
+}
+
+androidComponents {
+    onVariants(selector().withBuildType("store")) { variant ->
+        variant.packaging.jniLibs.useLegacyPackaging = false
+    }
 }
 
 dependencies {
