@@ -25,8 +25,8 @@ jobs:
       id: cache-libtun2socks-restore
       uses: actions/cache/restore@v4
       with:
-        path: ${{ github.workspace }}/AndroidLibXrayLite/libs
-        key: libtun2socks-${{ runner.os }}-${{ hashFiles('.git/modules/badvpn/refs/heads/main') }}-${{ hashFiles('.git/modules/libancillary/refs/heads/shadowsocks-android') }}
+        path: ${{ github.workspace }}/libs
+        key: libtun2socks-${{ runner.os }}-${{ hashFiles('.git/modules/badvpn/HEAD') }}-${{ hashFiles('.git/modules/libancillary/HEAD') }}
 
     - name: Setup Android NDK
       uses: nttld/setup-ndk@v1
@@ -61,7 +61,7 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: ${{ github.workspace }}/libs
-        key: libtun2socks-${{ runner.os }}-${{ hashFiles('.git/modules/badvpn/refs/heads/main') }}-${{ hashFiles('.git/modules/libancillary/refs/heads/shadowsocks-android') }}
+        key: libtun2socks-${{ runner.os }}-${{ hashFiles('.git/modules/badvpn/HEAD') }}-${{ hashFiles('.git/modules/libancillary/HEAD') }}
 
     - name: Copy libtun2socks
       run: |
