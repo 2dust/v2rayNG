@@ -157,9 +157,8 @@ dependencies {
     implementation(libs.gson)
 
     // Reactive and Utility Libraries
-    implementation(libs.rxjava)
-    implementation(libs.rxandroid)
-    implementation(libs.rxpermissions)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
 
     // Language and Processing Libraries
     implementation(libs.language.base)

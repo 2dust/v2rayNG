@@ -5,15 +5,16 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.tbruyelle.rxpermissions3.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityAboutBinding
-import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.SpeedtestUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.ZipUtil
@@ -21,10 +22,23 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-
 class AboutActivity : BaseActivity() {
+
     private val binding by lazy { ActivityAboutBinding.inflate(layoutInflater) }
     private val extDir by lazy { File(Utils.backupPath(this)) }
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                try {
+                    showFileChooser()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            } else {
+                toast(R.string.toast_permission_denied)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +47,7 @@ class AboutActivity : BaseActivity() {
         title = getString(R.string.title_about)
 
         binding.tvBackupSummary.text = this.getString(R.string.summary_configuration_backup, extDir)
+
         binding.layoutBackup.setOnClickListener {
             val ret = backupConfiguration(extDir.absolutePath)
             if (ret.first) {
@@ -50,7 +65,8 @@ class AboutActivity : BaseActivity() {
                         Intent(Intent.ACTION_SEND).setType("application/zip")
                             .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                             .putExtra(
-                                Intent.EXTRA_STREAM, FileProvider.getUriForFile(
+                                Intent.EXTRA_STREAM,
+                                FileProvider.getUriForFile(
                                     this, BuildConfig.APPLICATION_ID + ".cache", File(ret.second)
                                 )
                             ), getString(R.string.title_configuration_share)
@@ -62,23 +78,22 @@ class AboutActivity : BaseActivity() {
         }
 
         binding.layoutRestore.setOnClickListener {
-            val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Manifest.permission.READ_MEDIA_IMAGES
-            } else {
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            }
-            RxPermissions(this)
-                .request(permission)
-                .subscribe {
-                    if (it) {
-                        try {
-                            showFileChooser()
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    } else
-                        toast(R.string.toast_permission_denied)
+            val permission =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    Manifest.permission.READ_MEDIA_IMAGES
+                } else {
+                    Manifest.permission.READ_EXTERNAL_STORAGE
                 }
+
+            if (ContextCompat.checkSelfPermission(this, permission) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                try {
+                    showFileChooser()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            } else {
+                requestPermissionLauncher.launch(permission)
+            }
         }
 
         binding.layoutSoureCcode.setOnClickListener {
@@ -88,13 +103,15 @@ class AboutActivity : BaseActivity() {
         binding.layoutFeedback.setOnClickListener {
             Utils.openUri(this, AppConfig.v2rayNGIssues)
         }
-        binding.layoutOssLicenses.setOnClickListener{
+
+        binding.layoutOssLicenses.setOnClickListener {
             val webView = android.webkit.WebView(this);
-            webView.loadUrl("file:///android_asset/open_source_licenses.html");
+            webView.loadUrl("file:///android_asset/open_source_licenses.html")
             android.app.AlertDialog.Builder(this)
                 .setTitle("Open source licenses")
                 .setView(webView)
-                .setPositiveButton("OK", android.content.DialogInterface.OnClickListener { dialog, whichButton -> dialog.dismiss() }).show()
+                .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+                .show()
         }
 
         binding.layoutTgChannel.setOnClickListener {
@@ -157,9 +174,9 @@ class AboutActivity : BaseActivity() {
     }
 
     private val chooseFile =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            val uri = it.data?.data
-            if (it.resultCode == RESULT_OK && uri != null) {
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val uri = result.data?.data
+            if (result.resultCode == RESULT_OK && uri != null) {
                 try {
                     val targetFile =
                         File(this.cacheDir.absolutePath, "${System.currentTimeMillis()}.zip")
@@ -180,4 +197,7 @@ class AboutActivity : BaseActivity() {
             }
         }
 
+    private fun toast(messageResId: Int) {
+        Toast.makeText(this, getString(messageResId), Toast.LENGTH_SHORT).show()
+    }
 }
