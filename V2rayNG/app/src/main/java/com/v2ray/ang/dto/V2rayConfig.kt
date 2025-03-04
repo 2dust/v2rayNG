@@ -257,7 +257,9 @@ data class V2rayConfig(
                 var header: HeaderBean = HeaderBean(),
                 var seed: String? = null
             ) {
-                data class HeaderBean(var type: String = "none")
+                data class HeaderBean(
+                    var type: String = "none",
+                    var domain: String? = null)
             }
 
             data class WsSettingsBean(
@@ -384,6 +386,11 @@ data class V2rayConfig(
                             kcpsetting.seed = null
                         } else {
                             kcpsetting.seed = seed
+                        }
+                        if (host.isNullOrEmpty()) {
+                            kcpsetting.header.domain = null
+                        } else {
+                            kcpsetting.header.domain = host
                         }
                         kcpSettings = kcpsetting
                     }
