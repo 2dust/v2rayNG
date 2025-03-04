@@ -3,6 +3,7 @@ package com.v2ray.ang.ui
 import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.net.VpnService
@@ -27,7 +28,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
-import com.tbruyelle.rxpermissions3.RxPermissions
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
@@ -41,8 +41,6 @@ import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -80,6 +78,60 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
     private var mItemTouchHelper: ItemTouchHelper? = null
     val mainViewModel: MainViewModel by viewModels()
+
+    // register activity result for requesting permission
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                when (pendingAction) {
+                    Action.IMPORT_QR_CODE_CONFIG ->
+                        scanQRCodeForConfig.launch(Intent(this, ScannerActivity::class.java))
+                    Action.IMPORT_QR_CODE_URL ->
+                        scanQRCodeForUrlToCustomConfig.launch(Intent(this, ScannerActivity::class.java))
+                    Action.READ_CONTENT_FROM_URI ->
+                        chooseFileForCustomConfig.launch(Intent.createChooser(Intent(Intent.ACTION_GET_CONTENT).apply {
+                            type = "*/*"
+                            addCategory(Intent.CATEGORY_OPENABLE)
+                        }, getString(R.string.title_file_chooser)))
+                    Action.POST_NOTIFICATIONS -> {}
+                    else -> {}
+                }
+            } else {
+                toast(R.string.toast_permission_denied)
+            }
+            pendingAction = Action.NONE
+        }
+
+    private var pendingAction: Action = Action.NONE
+
+    enum class Action {
+        NONE,
+        IMPORT_QR_CODE_CONFIG,
+        IMPORT_QR_CODE_URL,
+        READ_CONTENT_FROM_URI,
+        POST_NOTIFICATIONS
+    }
+
+    private val chooseFileForCustomConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        val uri = it.data?.data
+        if (it.resultCode == RESULT_OK && uri != null) {
+            readContentFromUri(uri)
+        }
+    }
+
+    private val scanQRCodeForConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            importBatchConfig(it.data?.getStringExtra("SCAN_RESULT"))
+        }
+    }
+
+    private val scanQRCodeForUrlToCustomConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            importConfigCustomUrl(it.data?.getStringExtra("SCAN_RESULT"))
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,12 +181,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         migrateLegacy()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            RxPermissions(this)
-                .request(Manifest.permission.POST_NOTIFICATIONS)
-                .subscribe {
-                    if (!it)
-                        toast(R.string.toast_permission_denied_notification)
-                }
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                pendingAction = Action.POST_NOTIFICATIONS
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
         }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -226,11 +276,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         if (mainViewModel.isRunning.value == true) {
             Utils.stopVService(this)
         }
-        Observable.timer(500, TimeUnit.MILLISECONDS)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                startV2Ray()
-            }
+        lifecycleScope.launch {
+            delay(500)
+            startV2Ray()
+        }
     }
 
     public override fun onResume() {
@@ -462,36 +511,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      * import config from qrcode
      */
     private fun importQRcode(forConfig: Boolean): Boolean {
-//        try {
-//            startActivityForResult(Intent("com.google.zxing.client.android.SCAN")
-//                    .addCategory(Intent.CATEGORY_DEFAULT)
-//                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP), requestCode)
-//        } catch (e: Exception) {
-        RxPermissions(this)
-            .request(Manifest.permission.CAMERA)
-            .subscribe {
-                if (it)
-                    if (forConfig)
-                        scanQRCodeForConfig.launch(Intent(this, ScannerActivity::class.java))
-                    else
-                        scanQRCodeForUrlToCustomConfig.launch(Intent(this, ScannerActivity::class.java))
-                else
-                    toast(R.string.toast_permission_denied)
+        val permission = Manifest.permission.CAMERA
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+            if (forConfig) {
+                scanQRCodeForConfig.launch(Intent(this, ScannerActivity::class.java))
+            } else {
+                scanQRCodeForUrlToCustomConfig.launch(Intent(this, ScannerActivity::class.java))
             }
-//        }
+        } else {
+            pendingAction = if (forConfig) Action.IMPORT_QR_CODE_CONFIG else Action.IMPORT_QR_CODE_URL
+            requestPermissionLauncher.launch(permission)
+        }
         return true
-    }
-
-    private val scanQRCodeForConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == RESULT_OK) {
-            importBatchConfig(it.data?.getStringExtra("SCAN_RESULT"))
-        }
-    }
-
-    private val scanQRCodeForUrlToCustomConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == RESULT_OK) {
-            importConfigCustomUrl(it.data?.getStringExtra("SCAN_RESULT"))
-        }
     }
 
     /**
@@ -614,10 +645,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      * import config from sub
      */
     private fun importConfigViaSub(): Boolean {
-//        val dialog = AlertDialog.Builder(this)
-//            .setView(LayoutProgressBinding.inflate(layoutInflater).root)
-//            .setCancelable(false)
-//            .show()
         binding.pbWaiting.show()
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -630,7 +657,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 } else {
                     toast(R.string.toast_failure)
                 }
-                //dialog.dismiss()
                 binding.pbWaiting.hide()
             }
         }
@@ -645,17 +671,17 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         intent.type = "*/*"
         intent.addCategory(Intent.CATEGORY_OPENABLE)
 
-        try {
-            chooseFileForCustomConfig.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
-        } catch (ex: ActivityNotFoundException) {
-            toast(R.string.toast_require_file_manager)
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
         }
-    }
 
-    private val chooseFileForCustomConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        val uri = it.data?.data
-        if (it.resultCode == RESULT_OK && uri != null) {
-            readContentFromUri(uri)
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+            pendingAction = Action.READ_CONTENT_FROM_URI
+            chooseFileForCustomConfig.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
+        } else {
+            requestPermissionLauncher.launch(permission)
         }
     }
 
@@ -668,20 +694,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         } else {
             Manifest.permission.READ_EXTERNAL_STORAGE
         }
-        RxPermissions(this)
-            .request(permission)
-            .subscribe {
-                if (it) {
-                    try {
-                        contentResolver.openInputStream(uri).use { input ->
-                            importCustomizeConfig(input?.bufferedReader()?.readText())
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                } else
-                    toast(R.string.toast_permission_denied)
+
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+            try {
+                contentResolver.openInputStream(uri).use { input ->
+                    importCustomizeConfig(input?.bufferedReader()?.readText())
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
+        } else {
+            requestPermissionLauncher.launch(permission)
+        }
     }
 
     /**
