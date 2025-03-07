@@ -43,6 +43,7 @@
         <item>wechat-video</item>
         <item>dtls</item>
         <item>wireguard</item>
+        <item>dns</item>
     </string-array>
 
     <string-array name="mode_type_grpc" translatable="false">
