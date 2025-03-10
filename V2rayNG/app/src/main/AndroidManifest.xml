@@ -55,6 +55,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppThemeDayNight"
         android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="m">
 
         <activity
