@@ -364,7 +364,7 @@ object Utils {
         timeout: Int = 30000,
         httpPort: Int = 0
     ): String {
-        var currentUrl = urlStr ?: throw IOException("URL is null")
+        var currentUrl = urlStr
         var redirects = 0
         val maxRedirects = 5
 
@@ -376,7 +376,7 @@ object Utils {
                 url.openConnection(
                     Proxy(
                         Proxy.Type.HTTP,
-                        InetSocketAddress("127.0.0.1", httpPort)
+                        InetSocketAddress(LOOPBACK, httpPort)
                     )
                 )
             } as HttpURLConnection
