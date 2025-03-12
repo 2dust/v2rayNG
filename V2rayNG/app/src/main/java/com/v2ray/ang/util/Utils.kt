@@ -364,31 +364,58 @@ object Utils {
         timeout: Int = 30000,
         httpPort: Int = 0
     ): String {
-        val url = URL(urlStr)
-        val conn = if (httpPort == 0) {
-            url.openConnection()
-        } else {
-            url.openConnection(
-                Proxy(
-                    Proxy.Type.HTTP,
-                    InetSocketAddress(LOOPBACK, httpPort)
+        var currentUrl = urlStr
+        var redirects = 0
+        val maxRedirects = 5
+
+        while (redirects < maxRedirects) {
+            val url = URL(currentUrl)
+            val conn = if (httpPort == 0) {
+                url.openConnection()
+            } else {
+                url.openConnection(
+                    Proxy(
+                        Proxy.Type.HTTP,
+                        InetSocketAddress(LOOPBACK, httpPort)
+                    )
                 )
-            )
+            } as HttpURLConnection
+
+            conn.connectTimeout = timeout
+            conn.readTimeout = timeout
+            conn.setRequestProperty("Connection", "close")
+            conn.setRequestProperty("User-agent", "v2rayNG/${BuildConfig.VERSION_NAME}")
+            url.userInfo?.let {
+                conn.setRequestProperty(
+                    "Authorization",
+                    "Basic ${encode(urlDecode(it))}"
+                )
+            }
+            conn.useCaches = false
+            conn.instanceFollowRedirects = false
+
+            conn.connect()
+
+            val responseCode = conn.responseCode
+            when (responseCode) {
+                in 300..399 -> {
+                    val location = conn.getHeaderField("Location")
+                    conn.disconnect()
+                    if (location.isNullOrEmpty()) {
+                        throw IOException("Redirect location not found")
+                    }
+                    currentUrl = location
+                    redirects++
+                    continue
+                }
+                else -> try {
+                    return conn.inputStream.use { it.bufferedReader().readText() }
+                } finally {
+                    conn.disconnect()
+                }
+            }
         }
-        conn.connectTimeout = timeout
-        conn.readTimeout = timeout
-        conn.setRequestProperty("Connection", "close")
-        conn.setRequestProperty("User-agent", "v2rayNG/${BuildConfig.VERSION_NAME}")
-        url.userInfo?.let {
-            conn.setRequestProperty(
-                "Authorization",
-                "Basic ${encode(urlDecode(it))}"
-            )
-        }
-        conn.useCaches = false
-        return conn.inputStream.use {
-            it.bufferedReader().readText()
-        }
+        throw IOException("Too many redirects")
     }
 
     fun getDarkModeStatus(context: Context): Boolean {
