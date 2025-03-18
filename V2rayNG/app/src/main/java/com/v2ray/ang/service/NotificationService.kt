@@ -25,7 +25,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import libv2ray.V2RayPoint
 import kotlin.math.min
 
 object NotificationService {
@@ -41,9 +40,9 @@ object NotificationService {
     private var mNotificationManager: NotificationManager? = null
 
 
-    fun startSpeedNotification(currentConfig: ProfileItem?, v2rayPoint: V2RayPoint) {
+    fun startSpeedNotification(currentConfig: ProfileItem?) {
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) != true) return
-        if (speedNotificationJob != null || v2rayPoint.isRunning == false) return
+        if (speedNotificationJob != null || V2RayServiceManager.isRunning() == false) return
 
         lastQueryTime = System.currentTimeMillis()
         var lastZeroSpeed = false
@@ -57,15 +56,15 @@ object NotificationService {
                 var proxyTotal = 0L
                 val text = StringBuilder()
                 outboundTags?.forEach {
-                    val up = v2rayPoint.queryStats(it, AppConfig.UPLINK)
-                    val down = v2rayPoint.queryStats(it, AppConfig.DOWNLINK)
+                    val up = V2RayServiceManager.queryStats(it, AppConfig.UPLINK)
+                    val down = V2RayServiceManager.queryStats(it, AppConfig.DOWNLINK)
                     if (up + down > 0) {
                         appendSpeedString(text, it, up / sinceLastQueryInSeconds, down / sinceLastQueryInSeconds)
                         proxyTotal += up + down
                     }
                 }
-                val directUplink = v2rayPoint.queryStats(TAG_DIRECT, AppConfig.UPLINK)
-                val directDownlink = v2rayPoint.queryStats(TAG_DIRECT, AppConfig.DOWNLINK)
+                val directUplink = V2RayServiceManager.queryStats(TAG_DIRECT, AppConfig.UPLINK)
+                val directDownlink = V2RayServiceManager.queryStats(TAG_DIRECT, AppConfig.DOWNLINK)
                 val zeroSpeed = proxyTotal == 0L && directUplink == 0L && directDownlink == 0L
                 if (!zeroSpeed || !lastZeroSpeed) {
                     if (proxyTotal == 0L) {

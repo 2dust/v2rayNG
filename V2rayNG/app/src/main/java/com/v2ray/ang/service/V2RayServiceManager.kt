@@ -1,5 +1,6 @@
 package com.v2ray.ang.service
 
+import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -29,8 +30,9 @@ import java.lang.ref.SoftReference
 
 object V2RayServiceManager {
 
-    val v2rayPoint: V2RayPoint = Libv2ray.newV2RayPoint(V2RayCallback(), Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
+    private val v2rayPoint: V2RayPoint = Libv2ray.newV2RayPoint(V2RayCallback(), Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
     private val mMsgReceive = ReceiveMessageHandler()
+    private var currentConfig: ProfileItem? = null
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -38,7 +40,6 @@ object V2RayServiceManager {
             Seq.setContext(value?.get()?.getService()?.applicationContext)
             Libv2ray.initV2Env(Utils.userAssetPath(value?.get()?.getService()), Utils.getDeviceIdForXUDPBaseKey())
         }
-    var currentConfig: ProfileItem? = null
 
     fun startVServiceFromToggle(context: Context): Boolean {
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
@@ -60,6 +61,10 @@ object V2RayServiceManager {
         context.toast(R.string.toast_services_stop)
         MessageUtil.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
     }
+
+    fun isRunning() = v2rayPoint.isRunning
+
+    fun getRunningServerName() = currentConfig?.remarks.orEmpty()
 
     private fun startContextService(context: Context) {
         if (v2rayPoint.isRunning) return
@@ -89,52 +94,13 @@ object V2RayServiceManager {
         }
     }
 
-    private class V2RayCallback : V2RayVPNServiceSupportsSet {
-        override fun shutdown(): Long {
-            val serviceControl = serviceControl?.get() ?: return -1
-            // called by go
-            return try {
-                serviceControl.stopService()
-                0
-            } catch (e: Exception) {
-                Log.d(ANG_PACKAGE, e.toString())
-                -1
-            }
-        }
-
-        override fun prepare(): Long {
-            return 0
-        }
-
-        override fun protect(l: Long): Boolean {
-            val serviceControl = serviceControl?.get() ?: return true
-            return serviceControl.vpnProtect(l.toInt())
-        }
-
-        override fun onEmitStatus(l: Long, s: String?): Long {
-            return 0
-        }
-
-        override fun setup(s: String): Long {
-            val serviceControl = serviceControl?.get() ?: return -1
-            return try {
-                serviceControl.startService()
-                NotificationService.startSpeedNotification(currentConfig, v2rayPoint)
-                0
-            } catch (e: Exception) {
-                Log.d(ANG_PACKAGE, e.toString())
-                -1
-            }
-        }
-    }
-
     /**
      * Refer to the official documentation for [registerReceiver](https://developer.android.com/reference/androidx/core/content/ContextCompat#registerReceiver(android.content.Context,android.content.BroadcastReceiver,android.content.IntentFilter,int):
      * `registerReceiver(Context, BroadcastReceiver, IntentFilter, int)`.
      */
 
     fun startV2rayPoint() {
-        val service = serviceControl?.get()?.getService() ?: return
+        val service = getService() ?: return
         val guid = MmkvManager.getSelectServer() ?: return
         val config = MmkvManager.decodeServerConfig(guid) ?: return
         if (v2rayPoint.isRunning) {
@@ -176,7 +142,7 @@ object V2RayServiceManager {
     }
 
     fun stopV2rayPoint() {
-        val service = serviceControl?.get()?.getService() ?: return
+        val service = getService() ?: return
 
         if (v2rayPoint.isRunning) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -197,6 +163,84 @@ object V2RayServiceManager {
             Log.d(ANG_PACKAGE, e.toString())
         }
         PluginUtil.stopPlugin()
+    }
+
+    fun queryStats(tag: String, link: String): Long {
+        return v2rayPoint.queryStats(tag, link)
+    }
+
+    private fun measureV2rayDelay() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val service = getService() ?: return@launch
+            var time = -1L
+            var errstr = ""
+            if (v2rayPoint.isRunning) {
+                try {
+                    time = v2rayPoint.measureDelay(Utils.getDelayTestUrl())
+                } catch (e: Exception) {
+                    Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
+                    errstr = e.message?.substringAfter("\":") ?: "empty message"
+                }
+                if (time == -1L) {
+                    try {
+                        time = v2rayPoint.measureDelay(Utils.getDelayTestUrl(true))
+                    } catch (e: Exception) {
+                        Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
+                        errstr = e.message?.substringAfter("\":") ?: "empty message"
+                    }
+                }
+            }
+            val result = if (time == -1L) {
+                service.getString(R.string.connection_test_error, errstr)
+            } else {
+                service.getString(R.string.connection_test_available, time)
+            }
+
+            MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, result)
+        }
+    }
+
+    private fun getService(): Service? {
+        return serviceControl?.get()?.getService()
+    }
+
+    private class V2RayCallback : V2RayVPNServiceSupportsSet {
+        override fun shutdown(): Long {
+            val serviceControl = serviceControl?.get() ?: return -1
+            // called by go
+            return try {
+                serviceControl.stopService()
+                0
+            } catch (e: Exception) {
+                Log.d(ANG_PACKAGE, e.toString())
+                -1
+            }
+        }
+
+        override fun prepare(): Long {
+            return 0
+        }
+
+        override fun protect(l: Long): Boolean {
+            val serviceControl = serviceControl?.get() ?: return true
+            return serviceControl.vpnProtect(l.toInt())
+        }
+
+        override fun onEmitStatus(l: Long, s: String?): Long {
+            return 0
+        }
+
+        override fun setup(s: String): Long {
+            val serviceControl = serviceControl?.get() ?: return -1
+            return try {
+                serviceControl.startService()
+                NotificationService.startSpeedNotification(currentConfig)
+                0
+            } catch (e: Exception) {
+                Log.d(ANG_PACKAGE, e.toString())
+                -1
+            }
+        }
     }
 
     private class ReceiveMessageHandler : BroadcastReceiver() {
@@ -244,41 +288,9 @@ object V2RayServiceManager {
 
                 Intent.ACTION_SCREEN_ON -> {
                     Log.d(ANG_PACKAGE, "SCREEN_ON, start querying stats")
-                    NotificationService.startSpeedNotification(currentConfig, v2rayPoint)
+                    NotificationService.startSpeedNotification(currentConfig)
                 }
             }
         }
     }
-
-    private fun measureV2rayDelay() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val service = serviceControl?.get()?.getService() ?: return@launch
-            var time = -1L
-            var errstr = ""
-            if (v2rayPoint.isRunning) {
-                try {
-                    time = v2rayPoint.measureDelay(Utils.getDelayTestUrl())
-                } catch (e: Exception) {
-                    Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
-                    errstr = e.message?.substringAfter("\":") ?: "empty message"
-                }
-                if (time == -1L) {
-                    try {
-                        time = v2rayPoint.measureDelay(Utils.getDelayTestUrl(true))
-                    } catch (e: Exception) {
-                        Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
-                        errstr = e.message?.substringAfter("\":") ?: "empty message"
-                    }
-                }
-            }
-            val result = if (time == -1L) {
-                service.getString(R.string.connection_test_error, errstr)
-            } else {
-                service.getString(R.string.connection_test_available, time)
-            }
-
-            MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, result)
-        }
-    }
-
 }

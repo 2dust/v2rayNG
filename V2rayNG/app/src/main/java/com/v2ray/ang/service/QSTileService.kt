@@ -26,7 +26,7 @@ class QSTileService : TileService() {
             qsTile?.icon = Icon.createWithResource(applicationContext, R.drawable.ic_stat_name)
         } else if (state == Tile.STATE_ACTIVE) {
             qsTile?.state = Tile.STATE_ACTIVE
-            qsTile?.label = V2RayServiceManager.currentConfig?.remarks
+            qsTile?.label = V2RayServiceManager.getRunningServerName()
             qsTile?.icon = Icon.createWithResource(applicationContext, R.drawable.ic_stat_name)
         }
 

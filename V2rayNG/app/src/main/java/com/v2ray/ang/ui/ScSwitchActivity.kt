@@ -11,7 +11,7 @@ class ScSwitchActivity : BaseActivity() {
 
         setContentView(R.layout.activity_none)
 
-        if (V2RayServiceManager.v2rayPoint.isRunning) {
+        if (V2RayServiceManager.isRunning()) {
             V2RayServiceManager.stopVService(this)
         } else {
             V2RayServiceManager.startVServiceFromToggle(this)

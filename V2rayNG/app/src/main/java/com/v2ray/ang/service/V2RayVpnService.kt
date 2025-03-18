@@ -190,7 +190,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
 //        }
 
-        builder.setSession(V2RayServiceManager.currentConfig?.remarks.orEmpty())
+        builder.setSession(V2RayServiceManager.getRunningServerName())
 
         val selfPackageName = BuildConfig.APPLICATION_ID
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY)) {

@@ -18,7 +18,7 @@ class WidgetProvider : AppWidgetProvider() {
      */
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
-        updateWidgetBackground(context, appWidgetManager, appWidgetIds, V2RayServiceManager.v2rayPoint.isRunning)
+        updateWidgetBackground(context, appWidgetManager, appWidgetIds, V2RayServiceManager.isRunning())
     }
 
 
@@ -56,7 +56,7 @@ class WidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (AppConfig.BROADCAST_ACTION_WIDGET_CLICK == intent.action) {
-            if (V2RayServiceManager.v2rayPoint.isRunning) {
+            if (V2RayServiceManager.isRunning()) {
                 V2RayServiceManager.stopVService(context)
             } else {
                 V2RayServiceManager.startVServiceFromToggle(context)
