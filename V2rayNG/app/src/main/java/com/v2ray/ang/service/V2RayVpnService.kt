@@ -105,7 +105,37 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     override fun onDestroy() {
         super.onDestroy()
-        V2RayServiceManager.cancelNotification()
+        NotificationService.cancelNotification()
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        V2RayServiceManager.startV2rayPoint()
+        return START_STICKY
+        //return super.onStartCommand(intent, flags, startId)
+    }
+
+    override fun getService(): Service {
+        return this
+    }
+
+    override fun startService() {
+        setup()
+    }
+
+    override fun stopService() {
+        stopV2Ray(true)
+    }
+
+    override fun vpnProtect(socket: Int): Boolean {
+        return protect(socket)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    override fun attachBaseContext(newBase: Context?) {
+        val context = newBase?.let {
+            MyContextWrapper.wrap(newBase, Utils.getLocale())
+        }
+        super.attachBaseContext(context)
     }
 
     private fun setup() {
@@ -114,6 +144,14 @@ class V2RayVpnService : VpnService(), ServiceControl {
             return
         }
 
+        if (setupVpnService() != true) {
+            return
+        }
+
+        runTun2socks()
+    }
+
+    private fun setupVpnService(): Boolean {
         // If the old interface has exactly the same parameters, use it!
         // Configure a builder while parsing the parameters.
         val builder = Builder()
@@ -200,12 +238,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
         try {
             mInterface = builder.establish()!!
             isRunning = true
-            runTun2socks()
+            return true
         } catch (e: Exception) {
             // non-nullable lateinit var
             e.printStackTrace()
             stopV2Ray()
         }
+        return false
     }
 
     private fun runTun2socks() {
@@ -279,12 +318,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        V2RayServiceManager.startV2rayPoint()
-        return START_STICKY
-        //return super.onStartCommand(intent, flags, startId)
-    }
-
     private fun stopV2Ray(isForced: Boolean = true) {
 //        val configName = defaultDPreference.getPrefString(PREF_CURR_CONFIG_GUID, "")
 //        val emptyInfo = VpnNetworkInfo()
@@ -324,27 +357,4 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
     }
 
-    override fun getService(): Service {
-        return this
-    }
-
-    override fun startService() {
-        setup()
-    }
-
-    override fun stopService() {
-        stopV2Ray(true)
-    }
-
-    override fun vpnProtect(socket: Int): Boolean {
-        return protect(socket)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.N)
-    override fun attachBaseContext(newBase: Context?) {
-        val context = newBase?.let {
-            MyContextWrapper.wrap(newBase, Utils.getLocale())
-        }
-        super.attachBaseContext(context)
-    }
 }
