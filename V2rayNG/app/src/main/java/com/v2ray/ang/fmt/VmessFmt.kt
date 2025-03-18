@@ -14,7 +14,6 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import java.net.URI
-import kotlin.text.orEmpty
 
 object VmessFmt : FmtBase() {
     fun parse(str: String): ProfileItem? {

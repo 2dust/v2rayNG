@@ -22,7 +22,6 @@ import com.v2ray.ang.util.Utils.parseInt
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Collections
-import kotlin.Int
 
 object SettingsManager {
 

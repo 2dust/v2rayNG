@@ -1,8 +1,6 @@
 package com.v2ray.ang
 
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
 import androidx.work.WorkManager

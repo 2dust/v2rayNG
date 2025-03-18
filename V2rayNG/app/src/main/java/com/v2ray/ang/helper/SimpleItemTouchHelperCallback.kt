@@ -16,7 +16,6 @@
 package com.v2ray.ang.helper
 
 import android.animation.ValueAnimator
-import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.graphics.Canvas
 import android.view.animation.DecelerateInterpolator
 import androidx.recyclerview.widget.GridLayoutManager

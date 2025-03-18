@@ -19,12 +19,12 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.AppManagerUtil
+import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.Collator
-import com.v2ray.ang.util.HttpUtil
 
 class PerAppProxyActivity : BaseActivity() {
     private val binding by lazy {

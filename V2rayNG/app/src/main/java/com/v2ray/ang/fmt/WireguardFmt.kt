@@ -8,7 +8,6 @@ import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.extension.idnHost
 import com.v2ray.ang.util.Utils
 import java.net.URI
-import kotlin.text.orEmpty
 
 object WireguardFmt : FmtBase() {
     fun parse(str: String): ProfileItem? {

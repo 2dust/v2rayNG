@@ -4,7 +4,6 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.extension.isNotNullEmpty
-import kotlin.text.orEmpty
 
 object HttpFmt : FmtBase() {
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {

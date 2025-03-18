@@ -7,7 +7,6 @@ import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.responseLength
-import com.v2ray.ang.util.HttpUtil
 import kotlinx.coroutines.isActive
 import libv2ray.Libv2ray
 import java.io.IOException
