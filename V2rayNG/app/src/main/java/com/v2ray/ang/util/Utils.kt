@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
-import android.net.Uri
 import android.os.Build
 import android.os.LocaleList
 import android.provider.Settings
@@ -18,17 +17,18 @@ import android.util.Patterns
 import android.webkit.URLUtil
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.LOOPBACK
-import com.v2ray.ang.R
 import com.v2ray.ang.dto.Language
-import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.service.V2RayServiceManager
 import java.io.IOException
-import java.net.*
-import java.util.*
+import java.net.ServerSocket
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.util.Locale
+import java.util.UUID
 
 object Utils {
 
@@ -207,13 +207,13 @@ object Utils {
         return isIpv4Address(value) || isIpv6Address(value)
     }
 
-    fun isIpv4Address(value: String): Boolean {
+    private fun isIpv4Address(value: String): Boolean {
         val regV4 =
             Regex("^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$")
         return regV4.matches(value)
     }
 
-    fun isIpv6Address(value: String): Boolean {
+    private fun isIpv6Address(value: String): Boolean {
         var addr = value
         if (addr.indexOf("[") == 0 && addr.lastIndexOf("]") > 0) {
             addr = addr.drop(1)
@@ -225,7 +225,10 @@ object Utils {
     }
 
     private fun isCoreDNSAddress(s: String): Boolean {
-        return s.startsWith("https") || s.startsWith("tcp") || s.startsWith("quic") || s == "localhost"
+        return s.startsWith("https")
+                || s.startsWith("tcp")
+                || s.startsWith("quic")
+                || s == "localhost"
     }
 
     /**
@@ -249,25 +252,9 @@ object Utils {
         return false
     }
 
-    fun startVServiceFromToggle(context: Context): Boolean {
-        if (MmkvManager.getSelectServer().isNullOrEmpty()) {
-            context.toast(R.string.app_tile_first_use)
-            return false
-        }
-        V2RayServiceManager.startV2Ray(context)
-        return true
-    }
-
-    /**
-     * stopVService
-     */
-    fun stopVService(context: Context) {
-        context.toast(R.string.toast_services_stop)
-        MessageUtil.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
-    }
 
     fun openUri(context: Context, uriString: String) {
-        val uri = Uri.parse(uriString)
+        val uri = uriString.toUri()
         context.startActivity(Intent(Intent.ACTION_VIEW, uri))
     }
 

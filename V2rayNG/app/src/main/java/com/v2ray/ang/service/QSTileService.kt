@@ -64,11 +64,11 @@ class QSTileService : TileService() {
         super.onClick()
         when (qsTile.state) {
             Tile.STATE_INACTIVE -> {
-                Utils.startVServiceFromToggle(this)
+                V2RayServiceManager.startVServiceFromToggle(this)
             }
 
             Tile.STATE_ACTIVE -> {
-                Utils.stopVService(this)
+                V2RayServiceManager.stopVService(this)
             }
         }
     }

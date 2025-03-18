@@ -66,7 +66,28 @@ object V2RayServiceManager {
     private var speedNotificationJob: Job? = null
     private var mNotificationManager: NotificationManager? = null
 
-    fun startV2Ray(context: Context) {
+    fun startVServiceFromToggle(context: Context): Boolean {
+        if (MmkvManager.getSelectServer().isNullOrEmpty()) {
+            context.toast(R.string.app_tile_first_use)
+            return false
+        }
+        startContextService(context)
+        return true
+    }
+
+    fun startVService(context: Context, guid: String? = null) {
+        if (guid != null) {
+            MmkvManager.setSelectServer(guid)
+        }
+        startContextService(context)
+    }
+
+    fun stopVService(context: Context) {
+        context.toast(R.string.toast_services_stop)
+        MessageUtil.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
+    }
+
+    private fun startContextService(context: Context) {
         if (v2rayPoint.isRunning) return
         val guid = MmkvManager.getSelectServer() ?: return
         val config = MmkvManager.decodeServerConfig(guid) ?: return
@@ -234,7 +255,7 @@ object V2RayServiceManager {
                     Log.d(ANG_PACKAGE, "Restart Service")
                     serviceControl.stopService()
                     Thread.sleep(500L)
-                    startV2Ray(serviceControl.getService())
+                    startVService(serviceControl.getService())
                 }
 
                 AppConfig.MSG_MEASURE_DELAY -> {
@@ -449,7 +470,7 @@ object V2RayServiceManager {
 
     private fun stopSpeedNotification() {
         speedNotificationJob?.let {
-            it.cancel() 
+            it.cancel()
             speedNotificationJob = null
             updateNotification(currentConfig?.remarks, 0, 0)
         }

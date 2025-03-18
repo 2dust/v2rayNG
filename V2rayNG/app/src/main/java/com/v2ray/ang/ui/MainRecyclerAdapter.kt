@@ -26,7 +26,6 @@ import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
 
 class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<MainRecyclerAdapter.BaseViewHolder>(), ItemTouchHelperAdapter {
     companion object {
@@ -165,11 +164,11 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                     }
                     notifyItemChanged(mActivity.mainViewModel.getPosition(guid))
                     if (isRunning) {
-                        Utils.stopVService(mActivity)
+                        V2RayServiceManager.stopVService(mActivity)
                         mActivity.lifecycleScope.launch {
                             try {
                                 delay(500)
-                                V2RayServiceManager.startV2Ray(mActivity)
+                                V2RayServiceManager.startVService(mActivity)
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }

@@ -140,7 +140,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         binding.fab.setOnClickListener {
             if (mainViewModel.isRunning.value == true) {
-                Utils.stopVService(this)
+                V2RayServiceManager.stopVService(this)
             } else if ((MmkvManager.decodeSettingsString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
                 val intent = VpnService.prepare(this)
                 if (intent == null) {
@@ -269,12 +269,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             toast(R.string.title_file_chooser)
             return
         }
-        V2RayServiceManager.startV2Ray(this)
+        V2RayServiceManager.startVService(this)
     }
 
     fun restartV2Ray() {
         if (mainViewModel.isRunning.value == true) {
-            Utils.stopVService(this)
+            V2RayServiceManager.stopVService(this)
         }
         lifecycleScope.launch {
             delay(500)

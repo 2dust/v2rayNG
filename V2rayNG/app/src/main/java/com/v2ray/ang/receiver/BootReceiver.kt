@@ -13,6 +13,6 @@ class BootReceiver : BroadcastReceiver() {
         //Check if flag is true and a server is selected
         if (!MmkvManager.decodeStartOnBoot() || MmkvManager.getSelectServer().isNullOrEmpty()) return
         //Start v2ray
-        V2RayServiceManager.startV2Ray(context)
+        V2RayServiceManager.startVService(context)
     }
 }

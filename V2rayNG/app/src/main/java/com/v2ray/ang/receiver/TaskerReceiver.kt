@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.service.V2RayServiceManager
-import com.v2ray.ang.util.Utils
 
 class TaskerReceiver : BroadcastReceiver() {
 
@@ -22,13 +20,12 @@ class TaskerReceiver : BroadcastReceiver() {
                 return
             } else if (switch) {
                 if (guid == AppConfig.TASKER_DEFAULT_GUID) {
-                    Utils.startVServiceFromToggle(context)
+                    V2RayServiceManager.startVServiceFromToggle(context)
                 } else {
-                    MmkvManager.setSelectServer(guid)
-                    V2RayServiceManager.startV2Ray(context)
+                    V2RayServiceManager.startVService(context, guid)
                 }
             } else {
-                Utils.stopVService(context)
+                V2RayServiceManager.stopVService(context)
             }
         } catch (e: Exception) {
             e.printStackTrace()
