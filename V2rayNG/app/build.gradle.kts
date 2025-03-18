@@ -12,7 +12,7 @@ android {
         applicationId = "com.v2ray.ang"
         minSdk = 21
         targetSdk = 35
-        versionCode = 636
+        versionCode = 638
         versionName = "1.9.39"
         multiDexEnabled = true
 
