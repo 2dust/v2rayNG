@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui
 
 import android.Manifest
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
@@ -39,6 +38,7 @@ import com.v2ray.ang.handler.MigrateManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.service.V2RayServiceManager
+import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +46,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.drakeet.support.toast.ToastCompat
-import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     private val binding by lazy {
@@ -626,7 +625,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             lifecycleScope.launch(Dispatchers.IO) {
                 val configText = try {
-                    Utils.getUrlContentWithCustomUserAgent(url)
+                    HttpUtil.getUrlContentWithUserAgent(url)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     ""

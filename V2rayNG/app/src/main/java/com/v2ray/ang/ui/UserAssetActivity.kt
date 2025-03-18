@@ -20,7 +20,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubSettingBinding
 import com.v2ray.ang.databinding.ItemRecyclerUserAssetBinding
@@ -30,6 +29,7 @@ import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,9 +37,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
-import java.net.InetSocketAddress
-import java.net.Proxy
-import java.net.URL
 import java.text.DateFormat
 import java.util.Date
 
@@ -186,8 +183,10 @@ class UserAssetActivity : BaseActivity() {
                 return false
             }
             // Send URL to UserAssetUrlActivity for Processing
-            startActivity(Intent(this, UserAssetUrlActivity::class.java)
-                .putExtra(UserAssetUrlActivity.ASSET_URL_QRCODE, url))
+            startActivity(
+                Intent(this, UserAssetUrlActivity::class.java)
+                    .putExtra(UserAssetUrlActivity.ASSET_URL_QRCODE, url)
+            )
         } catch (e: Exception) {
             e.printStackTrace()
             return false
@@ -229,22 +228,10 @@ class UserAssetActivity : BaseActivity() {
     private fun downloadGeo(item: AssetUrlItem, timeout: Int, httpPort: Int): Boolean {
         val targetTemp = File(extDir, item.remarks + "_temp")
         val target = File(extDir, item.remarks)
-        var conn: HttpURLConnection? = null
         //Log.d(AppConfig.ANG_PACKAGE, url)
 
+        val conn = HttpUtil.createProxyConnection(item.url, httpPort, timeout, timeout, needStream = true) ?: return false
         try {
-            conn = if (httpPort == 0) {
-                URL(item.url).openConnection() as HttpURLConnection
-            } else {
-                URL(item.url).openConnection(
-                    Proxy(
-                        Proxy.Type.HTTP,
-                        InetSocketAddress(LOOPBACK, httpPort)
-                    )
-                ) as HttpURLConnection
-            }
-            conn.connectTimeout = timeout
-            conn.readTimeout = timeout
             val inputStream = conn.inputStream
             val responseCode = conn.responseCode
             if (responseCode == HttpURLConnection.HTTP_OK) {

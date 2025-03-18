@@ -21,7 +21,6 @@ import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.LOOPBACK
-import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.Language
 import com.v2ray.ang.extension.toast
@@ -337,87 +336,6 @@ object Utils {
         return Base64.encodeToString(androidId.copyOf(32), Base64.NO_PADDING.or(Base64.URL_SAFE))
     }
 
-    fun getUrlContext(url: String, timeout: Int): String {
-        var result: String
-        var conn: HttpURLConnection? = null
-
-        try {
-            conn = URL(url).openConnection() as HttpURLConnection
-            conn.connectTimeout = timeout
-            conn.readTimeout = timeout
-            conn.setRequestProperty("Connection", "close")
-            conn.instanceFollowRedirects = false
-            conn.useCaches = false
-            //val code = conn.responseCode
-            result = conn.inputStream.bufferedReader().readText()
-        } catch (e: Exception) {
-            result = ""
-        } finally {
-            conn?.disconnect()
-        }
-        return result
-    }
-
-    @Throws(IOException::class)
-    fun getUrlContentWithCustomUserAgent(
-        urlStr: String?,
-        timeout: Int = 30000,
-        httpPort: Int = 0
-    ): String {
-        var currentUrl = urlStr
-        var redirects = 0
-        val maxRedirects = 5
-
-        while (redirects < maxRedirects) {
-            val url = URL(currentUrl)
-            val conn = if (httpPort == 0) {
-                url.openConnection()
-            } else {
-                url.openConnection(
-                    Proxy(
-                        Proxy.Type.HTTP,
-                        InetSocketAddress(LOOPBACK, httpPort)
-                    )
-                )
-            } as HttpURLConnection
-
-            conn.connectTimeout = timeout
-            conn.readTimeout = timeout
-            conn.setRequestProperty("Connection", "close")
-            conn.setRequestProperty("User-agent", "v2rayNG/${BuildConfig.VERSION_NAME}")
-            url.userInfo?.let {
-                conn.setRequestProperty(
-                    "Authorization",
-                    "Basic ${encode(urlDecode(it))}"
-                )
-            }
-            conn.useCaches = false
-            conn.instanceFollowRedirects = false
-
-            conn.connect()
-
-            val responseCode = conn.responseCode
-            when (responseCode) {
-                in 300..399 -> {
-                    val location = conn.getHeaderField("Location")
-                    conn.disconnect()
-                    if (location.isNullOrEmpty()) {
-                        throw IOException("Redirect location not found")
-                    }
-                    currentUrl = location
-                    redirects++
-                    continue
-                }
-                else -> try {
-                    return conn.inputStream.use { it.bufferedReader().readText() }
-                } finally {
-                    conn.disconnect()
-                }
-            }
-        }
-        throw IOException("Too many redirects")
-    }
-
     fun getDarkModeStatus(context: Context): Boolean {
         return context.resources.configuration.uiMode and UI_MODE_NIGHT_MASK != UI_MODE_NIGHT_NO
     }
@@ -475,12 +393,6 @@ object Utils {
 
     fun removeWhiteSpace(str: String?): String? {
         return str?.replace(" ", "")
-    }
-
-    fun idnToASCII(str: String): String {
-        val url = URL(str)
-        return URL(url.protocol, IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED), url.port, url.file)
-            .toExternalForm()
     }
 
     fun isTv(context: Context): Boolean =

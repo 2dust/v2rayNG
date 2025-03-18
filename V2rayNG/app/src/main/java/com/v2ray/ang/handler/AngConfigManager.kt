@@ -16,6 +16,7 @@ import com.v2ray.ang.fmt.TrojanFmt
 import com.v2ray.ang.fmt.VlessFmt
 import com.v2ray.ang.fmt.VmessFmt
 import com.v2ray.ang.fmt.WireguardFmt
+import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
@@ -346,7 +347,7 @@ object AngConfigManager {
             if (!it.second.enabled) {
                 return 0
             }
-            val url = Utils.idnToASCII(it.second.url)
+            val url = HttpUtil.idnToASCII(it.second.url)
             if (!Utils.isValidUrl(url)) {
                 return 0
             }
@@ -354,7 +355,7 @@ object AngConfigManager {
 
             var configText = try {
                 val httpPort = SettingsManager.getHttpPort()
-                Utils.getUrlContentWithCustomUserAgent(url, 30000, httpPort)
+                HttpUtil.getUrlContentWithUserAgent(url, 30000, httpPort)
             } catch (e: Exception) {
                 Log.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error, try……")
                 //e.printStackTrace()
@@ -362,7 +363,7 @@ object AngConfigManager {
             }
             if (configText.isEmpty()) {
                 configText = try {
-                    Utils.getUrlContentWithCustomUserAgent(url)
+                    HttpUtil.getUrlContentWithUserAgent(url)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     ""

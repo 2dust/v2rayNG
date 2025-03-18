@@ -24,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.Collator
+import com.v2ray.ang.util.HttpUtil
 
 class PerAppProxyActivity : BaseActivity() {
     private val binding by lazy {
@@ -154,7 +155,7 @@ class PerAppProxyActivity : BaseActivity() {
         toast(R.string.msg_downloading_content)
         val url = AppConfig.androidpackagenamelistUrl
         lifecycleScope.launch(Dispatchers.IO) {
-            val content = Utils.getUrlContext(url, 5000)
+            val content = HttpUtil.getUrlContent(url, 5000)
             launch(Dispatchers.Main) {
                 Log.d(ANG_PACKAGE, content)
                 selectProxyApp(content, true)
