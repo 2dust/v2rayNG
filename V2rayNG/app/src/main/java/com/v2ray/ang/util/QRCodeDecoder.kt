@@ -14,13 +14,17 @@ import com.google.zxing.qrcode.QRCodeWriter
 import java.util.EnumMap
 
 /**
- * 描述:解析二维码图片
+ * QR code decoder utility.
  */
 object QRCodeDecoder {
     val HINTS: MutableMap<DecodeHintType, Any?> = EnumMap(DecodeHintType::class.java)
 
     /**
-     * create qrcode using zxing
+     * Creates a QR code bitmap from the given text.
+     *
+     * @param text The text to encode in the QR code.
+     * @param size The size of the QR code bitmap.
+     * @return The generated QR code bitmap, or null if an error occurs.
      */
     fun createQRCode(text: String, size: Int = 800): Bitmap? {
         return runCatching {
@@ -35,22 +39,21 @@ object QRCodeDecoder {
         }.getOrNull()
     }
 
-
     /**
-     * 同步解析本地图片二维码。该方法是耗时操作，请在子线程中调用。
+     * Decodes a QR code from a local image file. This method is time-consuming and should be called in a background thread.
      *
-     * @param picturePath 要解析的二维码图片本地路径
-     * @return 返回二维码图片里的内容 或 null
+     * @param picturePath The local path of the image file to decode.
+     * @return The content of the QR code, or null if decoding fails.
      */
     fun syncDecodeQRCode(picturePath: String): String? {
         return syncDecodeQRCode(getDecodeAbleBitmap(picturePath))
     }
 
     /**
-     * 同步解析bitmap二维码。该方法是耗时操作，请在子线程中调用。
+     * Decodes a QR code from a bitmap. This method is time-consuming and should be called in a background thread.
      *
-     * @param bitmap 要解析的二维码图片
-     * @return 返回二维码图片里的内容 或 null
+     * @param bitmap The bitmap to decode.
+     * @return The content of the QR code, or null if decoding fails.
      */
     fun syncDecodeQRCode(bitmap: Bitmap?): String? {
         return bitmap?.let {
@@ -70,12 +73,11 @@ object QRCodeDecoder {
         }
     }
 
-
     /**
-     * 将本地图片文件转换成可解码二维码的 Bitmap。为了避免图片太大，这里对图片进行了压缩。感谢 https://github.com/devilsen 提的 PR
+     * Converts a local image file to a bitmap that can be decoded as a QR code. The image is compressed to avoid being too large.
      *
-     * @param picturePath 本地图片文件路径
-     * @return
+     * @param picturePath The local path of the image file.
+     * @return The decoded bitmap, or null if an error occurs.
      */
     private fun getDecodeAbleBitmap(picturePath: String): Bitmap? {
         return try {

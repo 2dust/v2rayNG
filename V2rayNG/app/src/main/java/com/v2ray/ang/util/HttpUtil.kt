@@ -10,11 +10,24 @@ import java.util.*
 
 object HttpUtil {
 
+    /**
+     * Converts a URL string to its ASCII representation.
+     *
+     * @param str The URL string to convert.
+     * @return The ASCII representation of the URL.
+     */
     fun idnToASCII(str: String): String {
         val url = URL(str)
         return URL(url.protocol, IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED), url.port, url.file).toExternalForm()
     }
 
+    /**
+     * Retrieves the content of a URL as a string.
+     *
+     * @param url The URL to fetch content from.
+     * @param timeout The timeout value in milliseconds.
+     * @return The content of the URL as a string.
+     */
     fun getUrlContent(url: String, timeout: Int): String {
         var result: String = ""
         val conn = createProxyConnection(url, 0, timeout, timeout) ?: return result
@@ -27,6 +40,15 @@ object HttpUtil {
         return result
     }
 
+    /**
+     * Retrieves the content of a URL as a string with a custom User-Agent header.
+     *
+     * @param url The URL to fetch content from.
+     * @param timeout The timeout value in milliseconds.
+     * @param httpPort The HTTP port to use.
+     * @return The content of the URL as a string.
+     * @throws IOException If an I/O error occurs.
+     */
     @Throws(IOException::class)
     fun getUrlContentWithUserAgent(url: String?, timeout: Int = 30000, httpPort: Int = 0): String {
         var currentUrl = url
@@ -65,11 +87,10 @@ object HttpUtil {
      * Creates an HttpURLConnection object connected through a proxy.
      *
      * @param urlStr The target URL address.
-     * @param ip The IP address of the proxy server.
      * @param port The port of the proxy server.
      * @param connectTimeout The connection timeout in milliseconds (default is 30000 ms).
      * @param readTimeout The read timeout in milliseconds (default is 30000 ms).
-     * @param needStream
+     * @param needStream Whether the connection needs to support streaming.
      * @return Returns a configured HttpURLConnection object, or null if it fails.
      */
     fun createProxyConnection(

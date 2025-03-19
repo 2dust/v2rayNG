@@ -13,6 +13,14 @@ import java.util.zip.ZipOutputStream
 object ZipUtil {
     private const val BUFFER_SIZE = 4096
 
+    /**
+     * Zip the contents of a folder.
+     *
+     * @param folderPath The path to the folder to zip.
+     * @param outputZipFilePath The path to the output zip file.
+     * @return True if the operation is successful, false otherwise.
+     * @throws IOException If an I/O error occurs.
+     */
     @Throws(IOException::class)
     fun zipFromFolder(folderPath: String, outputZipFilePath: String): Boolean {
         val buffer = ByteArray(BUFFER_SIZE)
@@ -59,6 +67,14 @@ object ZipUtil {
         return true
     }
 
+    /**
+     * Unzip the contents of a zip file to a folder.
+     *
+     * @param zipFile The zip file to unzip.
+     * @param destDirectory The destination directory.
+     * @return True if the operation is successful, false otherwise.
+     * @throws IOException If an I/O error occurs.
+     */
     @Throws(IOException::class)
     fun unzipToFolder(zipFile: File, destDirectory: String): Boolean {
         File(destDirectory).run {
@@ -72,10 +88,8 @@ object ZipUtil {
                     zip.getInputStream(entry).use { input ->
                         val filePath = destDirectory + File.separator + entry.name
                         if (!entry.isDirectory) {
-                            // if the entry is a file, extracts it
                             extractFile(input, filePath)
                         } else {
-                            // if the entry is a directory, make the directory
                             val dir = File(filePath)
                             dir.mkdir()
                         }
@@ -89,6 +103,13 @@ object ZipUtil {
         return true
     }
 
+    /**
+     * Extract a file from an input stream.
+     *
+     * @param inputStream The input stream to read from.
+     * @param destFilePath The destination file path.
+     * @throws IOException If an I/O error occurs.
+     */
     @Throws(IOException::class)
     private fun extractFile(inputStream: InputStream, destFilePath: String) {
         val bos = BufferedOutputStream(FileOutputStream(destFilePath))

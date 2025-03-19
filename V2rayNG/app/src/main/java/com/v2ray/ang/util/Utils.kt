@@ -30,17 +30,21 @@ import java.util.UUID
 object Utils {
 
     /**
-     * convert string to editalbe for kotlin
+     * Convert string to editable for Kotlin.
      *
-     * @param text
-     * @return
+     * @param text The string to convert.
+     * @return An Editable instance containing the text.
      */
     fun getEditable(text: String?): Editable {
         return Editable.Factory.getInstance().newEditable(text.orEmpty())
     }
 
     /**
-     * find value in array position
+     * Find the position of a value in an array.
+     *
+     * @param array The array to search.
+     * @param value The value to find.
+     * @return The index of the value in the array, or -1 if not found.
      */
     fun arrayFind(array: Array<out String>, value: String): Int {
         for (i in array.indices) {
@@ -52,19 +56,31 @@ object Utils {
     }
 
     /**
-     * parseInt
+     * Parse a string to an integer.
+     *
+     * @param str The string to parse.
+     * @return The parsed integer, or 0 if parsing fails.
      */
     fun parseInt(str: String): Int {
         return parseInt(str, 0)
     }
 
+    /**
+     * Parse a string to an integer with a default value.
+     *
+     * @param str The string to parse.
+     * @param default The default value if parsing fails.
+     * @return The parsed integer, or the default value if parsing fails.
+     */
     fun parseInt(str: String?, default: Int): Int {
         return str?.toIntOrNull() ?: default
     }
 
-
     /**
-     * get text from clipboard
+     * Get text from the clipboard.
+     *
+     * @param context The context to use.
+     * @return The text from the clipboard, or an empty string if an error occurs.
      */
     fun getClipboard(context: Context): String {
         return try {
@@ -77,7 +93,10 @@ object Utils {
     }
 
     /**
-     * set text to clipboard
+     * Set text to the clipboard.
+     *
+     * @param context The context to use.
+     * @param content The text to set to the clipboard.
      */
     fun setClipboard(context: Context, content: String) {
         try {
@@ -90,13 +109,21 @@ object Utils {
     }
 
     /**
-     * base64 decode
+     * Decode a base64 encoded string.
+     *
+     * @param text The base64 encoded string.
+     * @return The decoded string, or an empty string if decoding fails.
      */
     fun decode(text: String?): String {
         return tryDecodeBase64(text) ?: text?.trimEnd('=')?.let { tryDecodeBase64(it) }.orEmpty()
     }
 
-
+    /**
+     * Try to decode a base64 encoded string.
+     *
+     * @param text The base64 encoded string.
+     * @return The decoded string, or null if decoding fails.
+     */
     fun tryDecodeBase64(text: String?): String? {
         try {
             return Base64.decode(text, Base64.NO_WRAP).toString(Charsets.UTF_8)
@@ -112,7 +139,10 @@ object Utils {
     }
 
     /**
-     * base64 encode
+     * Encode a string to base64.
+     *
+     * @param text The string to encode.
+     * @return The base64 encoded string, or an empty string if encoding fails.
      */
     fun encode(text: String): String {
         return try {
@@ -123,9 +153,11 @@ object Utils {
         }
     }
 
-
     /**
-     * is ip address
+     * Check if a string is a valid IP address.
+     *
+     * @param value The string to check.
+     * @return True if the string is a valid IP address, false otherwise.
      */
     fun isIpAddress(value: String?): Boolean {
         try {
@@ -169,16 +201,34 @@ object Utils {
         }
     }
 
+    /**
+     * Check if a string is a pure IP address (IPv4 or IPv6).
+     *
+     * @param value The string to check.
+     * @return True if the string is a pure IP address, false otherwise.
+     */
     fun isPureIpAddress(value: String): Boolean {
         return isIpv4Address(value) || isIpv6Address(value)
     }
 
+    /**
+     * Check if a string is a valid IPv4 address.
+     *
+     * @param value The string to check.
+     * @return True if the string is a valid IPv4 address, false otherwise.
+     */
     private fun isIpv4Address(value: String): Boolean {
         val regV4 =
             Regex("^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$")
         return regV4.matches(value)
     }
 
+    /**
+     * Check if a string is a valid IPv6 address.
+     *
+     * @param value The string to check.
+     * @return True if the string is a valid IPv6 address, false otherwise.
+     */
     private fun isIpv6Address(value: String): Boolean {
         var addr = value
         if (addr.indexOf("[") == 0 && addr.lastIndexOf("]") > 0) {
@@ -190,6 +240,12 @@ object Utils {
         return regV6.matches(addr)
     }
 
+    /**
+     * Check if a string is a CoreDNS address.
+     *
+     * @param s The string to check.
+     * @return True if the string is a CoreDNS address, false otherwise.
+     */
     fun isCoreDNSAddress(s: String): Boolean {
         return s.startsWith("https")
                 || s.startsWith("tcp")
@@ -198,7 +254,10 @@ object Utils {
     }
 
     /**
-     * is valid url
+     * Check if a string is a valid URL.
+     *
+     * @param value The string to check.
+     * @return True if the string is a valid URL, false otherwise.
      */
     fun isValidUrl(value: String?): Boolean {
         try {
@@ -218,14 +277,21 @@ object Utils {
         return false
     }
 
-
+    /**
+     * Open a URI in a browser.
+     *
+     * @param context The context to use.
+     * @param uriString The URI string to open.
+     */
     fun openUri(context: Context, uriString: String) {
         val uri = uriString.toUri()
         context.startActivity(Intent(Intent.ACTION_VIEW, uri))
     }
 
     /**
-     * uuid
+     * Generate a UUID.
+     *
+     * @return A UUID string without dashes.
      */
     fun getUuid(): String {
         return try {
@@ -236,6 +302,12 @@ object Utils {
         }
     }
 
+    /**
+     * Decode a URL-encoded string.
+     *
+     * @param url The URL-encoded string.
+     * @return The decoded string, or the original string if decoding fails.
+     */
     fun urlDecode(url: String): String {
         return try {
             URLDecoder.decode(url, Charsets.UTF_8.toString())
@@ -245,6 +317,12 @@ object Utils {
         }
     }
 
+    /**
+     * Encode a string to URL-encoded format.
+     *
+     * @param url The string to encode.
+     * @return The URL-encoded string, or the original string if encoding fails.
+     */
     fun urlEncode(url: String): String {
         return try {
             URLEncoder.encode(url, Charsets.UTF_8.toString()).replace("+", "%20")
@@ -254,9 +332,12 @@ object Utils {
         }
     }
 
-
     /**
-     * readTextFromAssets
+     * Read text from an asset file.
+     *
+     * @param context The context to use.
+     * @param fileName The name of the asset file.
+     * @return The content of the asset file as a string.
      */
     fun readTextFromAssets(context: Context?, fileName: String): String {
         if (context == null) {
@@ -268,6 +349,12 @@ object Utils {
         return content
     }
 
+    /**
+     * Get the path to the user asset directory.
+     *
+     * @param context The context to use.
+     * @return The path to the user asset directory.
+     */
     fun userAssetPath(context: Context?): String {
         if (context == null)
             return ""
@@ -276,6 +363,12 @@ object Utils {
         return extDir.absolutePath
     }
 
+    /**
+     * Get the path to the backup directory.
+     *
+     * @param context The context to use.
+     * @return The path to the backup directory.
+     */
     fun backupPath(context: Context?): String {
         if (context == null)
             return ""
@@ -284,15 +377,32 @@ object Utils {
         return extDir.absolutePath
     }
 
+    /**
+     * Get the device ID for XUDP base key.
+     *
+     * @return The device ID for XUDP base key.
+     */
     fun getDeviceIdForXUDPBaseKey(): String {
         val androidId = Settings.Secure.ANDROID_ID.toByteArray(Charsets.UTF_8)
         return Base64.encodeToString(androidId.copyOf(32), Base64.NO_PADDING.or(Base64.URL_SAFE))
     }
 
+    /**
+     * Get the dark mode status.
+     *
+     * @param context The context to use.
+     * @return True if dark mode is enabled, false otherwise.
+     */
     fun getDarkModeStatus(context: Context): Boolean {
         return context.resources.configuration.uiMode and UI_MODE_NIGHT_MASK != UI_MODE_NIGHT_NO
     }
 
+    /**
+     * Get the IPv6 address in a formatted string.
+     *
+     * @param address The IPv6 address.
+     * @return The formatted IPv6 address, or the original address if not valid.
+     */
     fun getIpv6Address(address: String?): String {
         if (address == null) {
             return ""
@@ -304,25 +414,55 @@ object Utils {
         }
     }
 
+    /**
+     * Get the system locale.
+     *
+     * @return The system locale.
+     */
     fun getSysLocale(): Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         LocaleList.getDefault()[0]
     } else {
         Locale.getDefault()
     }
 
+    /**
+     * Fix illegal characters in a URL.
+     *
+     * @param str The URL string.
+     * @return The URL string with illegal characters replaced.
+     */
     fun fixIllegalUrl(str: String): String {
         return str
             .replace(" ", "%20")
             .replace("|", "%7C")
     }
 
+    /**
+     * Remove white space from a string.
+     *
+     * @param str The string to process.
+     * @return The string without white space.
+     */
     fun removeWhiteSpace(str: String?): String? {
         return str?.replace(" ", "")
     }
 
+    /**
+     * Check if the device is a TV.
+     *
+     * @param context The context to use.
+     * @return True if the device is a TV, false otherwise.
+     */
     fun isTv(context: Context): Boolean =
         context.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
 
+    /**
+     * Find a free port from a list of ports.
+     *
+     * @param ports The list of ports to check.
+     * @return The first free port found.
+     * @throws IOException If no free port is found.
+     */
     fun findFreePort(ports: List<Int>): Int {
         for (port in ports) {
             try {
@@ -336,6 +476,12 @@ object Utils {
         throw IOException("no free port found")
     }
 
+    /**
+     * Check if a string is a valid subscription URL.
+     *
+     * @param value The string to check.
+     * @return True if the string is a valid subscription URL, false otherwise.
+     */
     fun isValidSubUrl(value: String?): Boolean {
         try {
             if (value.isNullOrEmpty()) return false
@@ -347,12 +493,22 @@ object Utils {
         return false
     }
 
+    /**
+     * Get the receiver flags based on the Android version.
+     *
+     * @return The receiver flags.
+     */
     fun receiverFlags(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         ContextCompat.RECEIVER_EXPORTED
     } else {
         ContextCompat.RECEIVER_NOT_EXPORTED
     }
 
+    /**
+     * Check if the package is Xray.
+     *
+     * @return True if the package is Xray, false otherwise.
+     */
     fun isXray(): Boolean = (ANG_PACKAGE.startsWith("com.v2ray.ang"))
 
 }

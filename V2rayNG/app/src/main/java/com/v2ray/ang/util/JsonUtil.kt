@@ -13,14 +13,33 @@ import java.lang.reflect.Type
 object JsonUtil {
     private var gson = Gson()
 
+    /**
+     * Converts an object to its JSON representation.
+     *
+     * @param src The object to convert.
+     * @return The JSON representation of the object.
+     */
     fun toJson(src: Any?): String {
         return gson.toJson(src)
     }
 
+    /**
+     * Parses a JSON string into an object of the specified class.
+     *
+     * @param src The JSON string to parse.
+     * @param cls The class of the object to parse into.
+     * @return The parsed object.
+     */
     fun <T> fromJson(src: String, cls: Class<T>): T {
         return gson.fromJson(src, cls)
     }
 
+    /**
+     * Converts an object to its pretty-printed JSON representation.
+     *
+     * @param src The object to convert.
+     * @return The pretty-printed JSON representation of the object, or null if the object is null.
+     */
     fun toJsonPretty(src: Any?): String? {
         if (src == null)
             return null
@@ -39,6 +58,12 @@ object JsonUtil {
         return gsonPre.toJson(src)
     }
 
+    /**
+     * Parses a JSON string into a JsonObject.
+     *
+     * @param src The JSON string to parse.
+     * @return The parsed JsonObject, or null if parsing fails.
+     */
     fun parseString(src: String?): JsonObject? {
         if (src == null)
             return null
