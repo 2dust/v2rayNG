@@ -10,10 +10,13 @@ import com.v2ray.ang.handler.SettingsManager
 
 class AngApplication : MultiDexApplication() {
     companion object {
-        //const val PREF_LAST_VERSION = "pref_last_version"
         lateinit var application: AngApplication
     }
 
+    /**
+     * Attaches the base context to the application.
+     * @param base The base context.
+     */
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
         application = this
@@ -23,15 +26,11 @@ class AngApplication : MultiDexApplication() {
         .setDefaultProcessName("${ANG_PACKAGE}:bg")
         .build()
 
+    /**
+     * Initializes the application.
+     */
     override fun onCreate() {
         super.onCreate()
-
-//        LeakCanary.install(this)
-
-//        val defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-//        firstRun = defaultSharedPreferences.getInt(PREF_LAST_VERSION, 0) != BuildConfig.VERSION_CODE
-//        if (firstRun)
-//            defaultSharedPreferences.edit().putInt(PREF_LAST_VERSION, BuildConfig.VERSION_CODE).apply()
 
         MMKV.initialize(this)
 
@@ -41,5 +40,4 @@ class AngApplication : MultiDexApplication() {
 
         SettingsManager.initRoutingRulesets(this)
     }
-
 }

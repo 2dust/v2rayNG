@@ -12,11 +12,17 @@ import com.v2ray.ang.handler.SettingsManager
 class SettingsViewModel(application: Application) : AndroidViewModel(application),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
+    /**
+     * Starts listening for preference changes.
+     */
     fun startListenPreferenceChange() {
         PreferenceManager.getDefaultSharedPreferences(getApplication())
             .registerOnSharedPreferenceChangeListener(this)
     }
 
+    /**
+     * Called when the ViewModel is cleared.
+     */
     override fun onCleared() {
         PreferenceManager.getDefaultSharedPreferences(getApplication())
             .unregisterOnSharedPreferenceChangeListener(this)
@@ -24,6 +30,11 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         super.onCleared()
     }
 
+    /**
+     * Called when a shared preference is changed.
+     * @param sharedPreferences The shared preferences.
+     * @param key The key of the changed preference.
+     */
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         Log.d(AppConfig.ANG_PACKAGE, "Observe settings changed: $key")
         when (key) {
@@ -77,10 +88,6 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_MUX_XUDP_CONCURRENCY -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getString(key, "8"))
             }
-
-//            AppConfig.PREF_PER_APP_PROXY_SET -> {
-//                MmkvManager.encodeSettings(key, sharedPreferences.getStringSet(key, setOf()))
-//            }
         }
         if (key == AppConfig.PREF_UI_MODE_NIGHT) {
             SettingsManager.setNightMode()
