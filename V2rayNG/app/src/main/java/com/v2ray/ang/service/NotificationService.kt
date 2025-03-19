@@ -39,7 +39,10 @@ object NotificationService {
     private var speedNotificationJob: Job? = null
     private var mNotificationManager: NotificationManager? = null
 
-
+    /**
+     * Starts the speed notification.
+     * @param currentConfig The current profile configuration.
+     */
     fun startSpeedNotification(currentConfig: ProfileItem?) {
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) != true) return
         if (speedNotificationJob != null || V2RayServiceManager.isRunning() == false) return
@@ -83,6 +86,10 @@ object NotificationService {
         }
     }
 
+    /**
+     * Shows the notification.
+     * @param currentConfig The current profile configuration.
+     */
     fun showNotification(currentConfig: ProfileItem?) {
         val service = getService() ?: return
         val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -131,13 +138,15 @@ object NotificationService {
                 service.getString(R.string.title_service_restart),
                 restartV2RayPendingIntent
             )
-        //.build()
 
-        //mBuilder?.setDefaults(NotificationCompat.FLAG_ONLY_ALERT_ONCE)  //取消震动,铃声其他都不好使
+        //mBuilder?.setDefaults(NotificationCompat.FLAG_ONLY_ALERT_ONCE)
 
         service.startForeground(NOTIFICATION_ID, mBuilder?.build())
     }
 
+    /**
+     * Cancels the notification.
+     */
     fun cancelNotification() {
         val service = getService() ?: return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -151,6 +160,10 @@ object NotificationService {
         speedNotificationJob = null
     }
 
+    /**
+     * Stops the speed notification.
+     * @param currentConfig The current profile configuration.
+     */
     fun stopSpeedNotification(currentConfig: ProfileItem?) {
         speedNotificationJob?.let {
             it.cancel()
@@ -159,6 +172,10 @@ object NotificationService {
         }
     }
 
+    /**
+     * Creates a notification channel for Android O and above.
+     * @return The channel ID.
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(): String {
         val channelId = AppConfig.RAY_NG_CHANNEL_ID
@@ -174,6 +191,12 @@ object NotificationService {
         return channelId
     }
 
+    /**
+     * Updates the notification with the given content text and traffic data.
+     * @param contentText The content text.
+     * @param proxyTraffic The proxy traffic.
+     * @param directTraffic The direct traffic.
+     */
     private fun updateNotification(contentText: String?, proxyTraffic: Long, directTraffic: Long) {
         if (mBuilder != null) {
             if (proxyTraffic < NOTIFICATION_ICON_THRESHOLD && directTraffic < NOTIFICATION_ICON_THRESHOLD) {
@@ -184,11 +207,15 @@ object NotificationService {
                 mBuilder?.setSmallIcon(R.drawable.ic_stat_direct)
             }
             mBuilder?.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-            mBuilder?.setContentText(contentText) // Emui4.1 need content text even if style is set as BigTextStyle
+            mBuilder?.setContentText(contentText)
             getNotificationManager()?.notify(NOTIFICATION_ID, mBuilder?.build())
         }
     }
 
+    /**
+     * Gets the notification manager.
+     * @return The notification manager.
+     */
     private fun getNotificationManager(): NotificationManager? {
         if (mNotificationManager == null) {
             val service = getService() ?: return null
@@ -197,6 +224,13 @@ object NotificationService {
         return mNotificationManager
     }
 
+    /**
+     * Appends the speed string to the given text.
+     * @param text The text to append to.
+     * @param name The name of the tag.
+     * @param up The uplink speed.
+     * @param down The downlink speed.
+     */
     private fun appendSpeedString(text: StringBuilder, name: String?, up: Double, down: Double) {
         var n = name ?: "no tag"
         n = n.substring(0, min(n.length, 6))
@@ -207,8 +241,11 @@ object NotificationService {
         text.append("•  ${up.toLong().toSpeedString()}↑  ${down.toLong().toSpeedString()}↓\n")
     }
 
+    /**
+     * Gets the service instance.
+     * @return The service instance.
+     */
     private fun getService(): Service? {
         return V2RayServiceManager.serviceControl?.get()?.getService()
     }
-
 }

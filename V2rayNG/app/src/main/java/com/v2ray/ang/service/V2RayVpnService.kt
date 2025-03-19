@@ -42,11 +42,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
         private const val TUN2SOCKS = "libtun2socks.so"
     }
 
-
     private lateinit var mInterface: ParcelFileDescriptor
     private var isRunning = false
-
-    //val fd: Int get() = mInterface.fd
     private lateinit var process: Process
 
     /**destroy
@@ -88,7 +85,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     override fun onCreate() {
         super.onCreate()
-
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         V2RayServiceManager.serviceControl = SoftReference(this)
@@ -138,6 +134,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
         super.attachBaseContext(context)
     }
 
+    /**
+     * Sets up the VPN service.
+     * Prepares the VPN and configures it if preparation is successful.
+     */
     private fun setup() {
         val prepare = prepare(this)
         if (prepare != null) {
@@ -151,6 +151,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
         runTun2socks()
     }
 
+    /**
+     * Configures the VPN service.
+     * @return True if the VPN service was configured successfully, false otherwise.
+     */
     private fun setupVpnService(): Boolean {
         // If the old interface has exactly the same parameters, use it!
         // Configure a builder while parsing the parameters.
@@ -247,6 +251,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
         return false
     }
 
+    /**
+     * Runs the tun2socks process.
+     * Starts the tun2socks process with the appropriate parameters.
+     */
     private fun runTun2socks() {
         val socksPort = SettingsManager.getSocksPort()
         val cmd = arrayListOf(
@@ -294,6 +302,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
     }
 
+    /**
+     * Sends the file descriptor to the tun2socks process.
+     * Attempts to send the file descriptor multiple times if necessary.
+     */
     private fun sendFd() {
         val fd = mInterface.fileDescriptor
         val path = File(applicationContext.filesDir, "sock_path").absolutePath
@@ -318,6 +330,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
     }
 
+    /**
+     * Stops the V2Ray service.
+     * @param isForced Whether to force stop the service.
+     */
     private fun stopV2Ray(isForced: Boolean = true) {
 //        val configName = defaultDPreference.getPrefString(PREF_CURR_CONFIG_GUID, "")
 //        val emptyInfo = VpnNetworkInfo()
@@ -356,5 +372,4 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
         }
     }
-
 }

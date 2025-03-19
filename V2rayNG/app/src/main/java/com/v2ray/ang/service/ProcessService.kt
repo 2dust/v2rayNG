@@ -10,6 +10,11 @@ import kotlinx.coroutines.launch
 class ProcessService {
     private var process: Process? = null
 
+    /**
+     * Runs a process with the given command.
+     * @param context The context.
+     * @param cmd The command to run.
+     */
     fun runProcess(context: Context, cmd: MutableList<String>) {
         Log.d(ANG_PACKAGE, cmd.toString())
 
@@ -33,6 +38,9 @@ class ProcessService {
         }
     }
 
+    /**
+     * Stops the running process.
+     */
     fun stopProcess() {
         try {
             Log.d(ANG_PACKAGE, "runProcess destroy")

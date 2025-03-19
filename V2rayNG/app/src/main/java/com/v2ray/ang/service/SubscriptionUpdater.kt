@@ -19,7 +19,6 @@ import com.v2ray.ang.handler.MmkvManager
 
 object SubscriptionUpdater {
 
-
     class UpdateTask(context: Context, params: WorkerParameters) :
         CoroutineWorker(context, params) {
 
@@ -33,6 +32,10 @@ object SubscriptionUpdater {
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
+        /**
+         * Performs the subscription update work.
+         * @return The result of the work.
+         */
         @SuppressLint("MissingPermission")
         override suspend fun doWork(): Result {
             Log.d(AppConfig.ANG_PACKAGE, "subscription automatic update starting")
