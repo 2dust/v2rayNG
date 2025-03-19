@@ -15,14 +15,11 @@ import android.util.Base64
 import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.LOOPBACK
-import com.v2ray.ang.dto.Language
-import com.v2ray.ang.handler.MmkvManager
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.URLDecoder
@@ -126,37 +123,6 @@ object Utils {
         }
     }
 
-    /**
-     * get remote dns servers from preference
-     */
-    fun getRemoteDnsServers(): List<String> {
-        val remoteDns =
-            MmkvManager.decodeSettingsString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_PROXY
-        val ret = remoteDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
-        if (ret.isEmpty()) {
-            return listOf(AppConfig.DNS_PROXY)
-        }
-        return ret
-    }
-
-    fun getVpnDnsServers(): List<String> {
-        val vpnDns = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_DNS) ?: AppConfig.DNS_VPN
-        return vpnDns.split(",").filter { isPureIpAddress(it) }
-        // allow empty, in that case dns will use system default
-    }
-
-    /**
-     * get remote dns servers from preference
-     */
-    fun getDomesticDnsServers(): List<String> {
-        val domesticDns =
-            MmkvManager.decodeSettingsString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
-        val ret = domesticDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
-        if (ret.isEmpty()) {
-            return listOf(AppConfig.DNS_DIRECT)
-        }
-        return ret
-    }
 
     /**
      * is ip address
@@ -224,7 +190,7 @@ object Utils {
         return regV6.matches(addr)
     }
 
-    private fun isCoreDNSAddress(s: String): Boolean {
+    fun isCoreDNSAddress(s: String): Boolean {
         return s.startsWith("https")
                 || s.startsWith("tcp")
                 || s.startsWith("quic")
@@ -327,15 +293,6 @@ object Utils {
         return context.resources.configuration.uiMode and UI_MODE_NIGHT_MASK != UI_MODE_NIGHT_NO
     }
 
-
-    fun setNightMode() {
-        when (MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
-            "0" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            "1" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            "2" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }
-    }
-
     fun getIpv6Address(address: String?): String {
         if (address == null) {
             return ""
@@ -347,26 +304,7 @@ object Utils {
         }
     }
 
-    fun getLocale(): Locale {
-        val langCode =
-            MmkvManager.decodeSettingsString(AppConfig.PREF_LANGUAGE) ?: Language.AUTO.code
-        val language = Language.fromCode(langCode)
-
-        return when (language) {
-            Language.AUTO -> getSysLocale()
-            Language.ENGLISH -> Locale.ENGLISH
-            Language.CHINA -> Locale.CHINA
-            Language.TRADITIONAL_CHINESE -> Locale.TRADITIONAL_CHINESE
-            Language.VIETNAMESE -> Locale("vi")
-            Language.RUSSIAN -> Locale("ru")
-            Language.PERSIAN -> Locale("fa")
-            Language.BANGLA -> Locale("bn")
-            Language.BAKHTIARI -> Locale("bqi", "IR")
-        }
-    }
-
-
-    private fun getSysLocale(): Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    fun getSysLocale(): Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         LocaleList.getDefault()[0]
     } else {
         Locale.getDefault()
@@ -384,15 +322,6 @@ object Utils {
 
     fun isTv(context: Context): Boolean =
         context.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
-
-    fun getDelayTestUrl(second: Boolean = false): String {
-        return if (second) {
-            AppConfig.DelayTestUrl2
-        } else {
-            MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL)
-                ?: AppConfig.DelayTestUrl
-        }
-    }
 
     fun findFreePort(ports: List<Int>): Int {
         for (port in ports) {

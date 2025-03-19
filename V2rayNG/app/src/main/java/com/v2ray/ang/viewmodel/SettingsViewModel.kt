@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.preference.PreferenceManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.util.Utils
+import com.v2ray.ang.handler.SettingsManager
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application),
     SharedPreferences.OnSharedPreferenceChangeListener {
@@ -83,7 +83,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 //            }
         }
         if (key == AppConfig.PREF_UI_MODE_NIGHT) {
-            Utils.setNightMode()
+            SettingsManager.setNightMode()
         }
     }
 }

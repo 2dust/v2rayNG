@@ -7,7 +7,6 @@ import androidx.work.WorkManager
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.util.Utils
 
 class AngApplication : MultiDexApplication() {
     companion object {
@@ -36,7 +35,7 @@ class AngApplication : MultiDexApplication() {
 
         MMKV.initialize(this)
 
-        Utils.setNightMode()
+        SettingsManager.setNightMode()
         // Initialize WorkManager with the custom configuration
         WorkManager.initialize(this, workManagerConfiguration)
 

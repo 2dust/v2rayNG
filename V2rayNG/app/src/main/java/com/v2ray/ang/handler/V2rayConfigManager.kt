@@ -271,7 +271,7 @@ object V2rayConfigManager {
             }
 
             // DNS inbound对象
-            val remoteDns = Utils.getRemoteDnsServers()
+            val remoteDns = SettingsManager.getRemoteDnsServers()
             if (v2rayConfig.inbounds.none { e -> e.protocol == "dokodemo-door" && e.tag == "dns-in" }) {
                 val dnsInboundSettings = V2rayConfig.InboundBean.InSettingsBean(
                     address = if (Utils.isPureIpAddress(remoteDns.first())) remoteDns.first() else AppConfig.DNS_PROXY,
@@ -329,7 +329,7 @@ object V2rayConfigManager {
             val servers = ArrayList<Any>()
 
             //remote Dns
-            val remoteDns = Utils.getRemoteDnsServers()
+            val remoteDns = SettingsManager.getRemoteDnsServers()
             val proxyDomain = userRule2Domain(TAG_PROXY)
             remoteDns.forEach {
                 servers.add(it)
@@ -344,7 +344,7 @@ object V2rayConfigManager {
             }
 
             // domestic DNS
-            val domesticDns = Utils.getDomesticDnsServers()
+            val domesticDns = SettingsManager.getDomesticDnsServers()
             val directDomain = userRule2Domain(TAG_DIRECT)
             val isCnRoutingMode = directDomain.contains(GEOSITE_CN)
             val geoipCn = arrayListOf(GEOIP_CN)

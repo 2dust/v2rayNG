@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
 
@@ -34,6 +35,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun attachBaseContext(newBase: Context?) {
-        super.attachBaseContext(MyContextWrapper.wrap(newBase ?: return, Utils.getLocale()))
+        super.attachBaseContext(MyContextWrapper.wrap(newBase ?: return, SettingsManager.getLocale()))
     }
 }

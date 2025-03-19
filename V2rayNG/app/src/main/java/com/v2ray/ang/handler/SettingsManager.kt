@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.text.TextUtils
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.GEOIP_PRIVATE
 import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.Language
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RoutingType
 import com.v2ray.ang.dto.RulesetItem
@@ -18,10 +20,10 @@ import com.v2ray.ang.handler.MmkvManager.decodeServerConfig
 import com.v2ray.ang.handler.MmkvManager.decodeServerList
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
-import com.v2ray.ang.util.Utils.parseInt
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Collections
+import java.util.Locale
 
 object SettingsManager {
 
@@ -173,7 +175,7 @@ object SettingsManager {
     }
 
     fun getSocksPort(): Int {
-        return parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+        return Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
     }
 
     fun getHttpPort(): Int {
@@ -204,5 +206,76 @@ object SettingsManager {
             Log.e(ANG_PACKAGE, "asset copy failed", e)
         }
 
+    }
+
+    /**
+     * get domestic dns servers from preference
+     */
+    fun getDomesticDnsServers(): List<String> {
+        val domesticDns =
+            MmkvManager.decodeSettingsString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
+        val ret = domesticDns.split(",").filter { Utils.isPureIpAddress(it) || Utils.isCoreDNSAddress(it) }
+        if (ret.isEmpty()) {
+            return listOf(AppConfig.DNS_DIRECT)
+        }
+        return ret
+    }
+
+    /**
+     * get remote dns servers from preference
+     */
+    fun getRemoteDnsServers(): List<String> {
+        val remoteDns =
+            MmkvManager.decodeSettingsString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_PROXY
+        val ret = remoteDns.split(",").filter { Utils.isPureIpAddress(it) || Utils.isCoreDNSAddress(it) }
+        if (ret.isEmpty()) {
+            return listOf(AppConfig.DNS_PROXY)
+        }
+        return ret
+    }
+
+    /**
+     * get vpn dns servers from preference
+     */
+    fun getVpnDnsServers(): List<String> {
+        val vpnDns = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_DNS) ?: AppConfig.DNS_VPN
+        return vpnDns.split(",").filter { Utils.isPureIpAddress(it) }
+        // allow empty, in that case dns will use system default
+    }
+
+
+    fun getDelayTestUrl(second: Boolean = false): String {
+        return if (second) {
+            AppConfig.DelayTestUrl2
+        } else {
+            MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL)
+                ?: AppConfig.DelayTestUrl
+        }
+    }
+
+    fun getLocale(): Locale {
+        val langCode =
+            MmkvManager.decodeSettingsString(AppConfig.PREF_LANGUAGE) ?: Language.AUTO.code
+        val language = Language.fromCode(langCode)
+
+        return when (language) {
+            Language.AUTO -> Utils.getSysLocale()
+            Language.ENGLISH -> Locale.ENGLISH
+            Language.CHINA -> Locale.CHINA
+            Language.TRADITIONAL_CHINESE -> Locale.TRADITIONAL_CHINESE
+            Language.VIETNAMESE -> Locale("vi")
+            Language.RUSSIAN -> Locale("ru")
+            Language.PERSIAN -> Locale("fa")
+            Language.BANGLA -> Locale("bn")
+            Language.BAKHTIARI -> Locale("bqi", "IR")
+        }
+    }
+
+    fun setNightMode() {
+        when (MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
+            "0" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            "1" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            "2" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        }
     }
 }

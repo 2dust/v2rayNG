@@ -15,6 +15,7 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.V2rayConfigManager
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.PluginUtil
@@ -176,14 +177,14 @@ object V2RayServiceManager {
             var errstr = ""
             if (v2rayPoint.isRunning) {
                 try {
-                    time = v2rayPoint.measureDelay(Utils.getDelayTestUrl())
+                    time = v2rayPoint.measureDelay(SettingsManager.getDelayTestUrl())
                 } catch (e: Exception) {
                     Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
                     errstr = e.message?.substringAfter("\":") ?: "empty message"
                 }
                 if (time == -1L) {
                     try {
-                        time = v2rayPoint.measureDelay(Utils.getDelayTestUrl(true))
+                        time = v2rayPoint.measureDelay(SettingsManager.getDelayTestUrl(true))
                     } catch (e: Exception) {
                         Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
                         errstr = e.message?.substringAfter("\":") ?: "empty message"

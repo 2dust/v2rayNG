@@ -7,6 +7,7 @@ import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.responseLength
+import com.v2ray.ang.handler.SettingsManager
 import kotlinx.coroutines.isActive
 import libv2ray.Libv2ray
 import java.io.IOException
@@ -35,7 +36,7 @@ object SpeedtestUtil {
 
     fun realPing(config: String): Long {
         return try {
-            Libv2ray.measureOutboundDelay(config, Utils.getDelayTestUrl())
+            Libv2ray.measureOutboundDelay(config, SettingsManager.getDelayTestUrl())
         } catch (e: Exception) {
             Log.d(AppConfig.ANG_PACKAGE, "realPing: $e")
             -1L
@@ -98,7 +99,7 @@ object SpeedtestUtil {
         var result: String
         var elapsed = -1L
 
-        val conn = HttpUtil.createProxyConnection(Utils.getDelayTestUrl(), port, 30000, 30000) ?: return Pair(elapsed, "")
+        val conn = HttpUtil.createProxyConnection(SettingsManager.getDelayTestUrl(), port, 30000, 30000) ?: return Pair(elapsed, "")
         try {
             val start = SystemClock.elapsedRealtime()
             val code = conn.responseCode
