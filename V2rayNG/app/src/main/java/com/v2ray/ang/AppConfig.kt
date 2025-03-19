@@ -12,7 +12,6 @@ object AppConfig {
 
     /** Legacy configuration keys. */
     const val ANG_CONFIG = "ang_config"
-    const val PREF_INAPP_BUY_IS_PREMIUM = "pref_inapp_buy_is_premium"
 
     /** Preferences mapped to MMKV storage. */
     const val PREF_SNIFFING_ENABLED = "pref_sniffing_enabled"

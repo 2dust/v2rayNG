@@ -17,41 +17,32 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/cardview_margin"
-                android:orientation="horizontal"
-                card_view:cardCornerRadius="5dp">
+                android:layout_margin="@dimen/layout_margin_top_height"
+                android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/layout_margin_top_height"
-                    android:paddingStart="@dimen/padding_start"
-                    android:paddingEnd="@dimen/padding_end"
-                    android:orientation="vertical">
+                    android:text="@string/routing_settings_domain_strategy" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/routing_settings_domain_strategy" />
+                <Spinner
+                    android:id="@+id/sp_domain_strategy"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/edit_height"
+                    android:entries="@array/routing_domain_strategy" />
+            </LinearLayout>
 
-                    <Spinner
-                        android:id="@+id/sp_domain_strategy"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/edit_height"
-                        android:entries="@array/routing_domain_strategy" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="@dimen/padding_start"
                 android:layout_marginTop="@dimen/layout_margin_top_height"
                 android:layout_marginBottom="@dimen/layout_margin_top_height"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingStart="@dimen/padding_start">
 
                 <TextView
                     android:layout_width="wrap_content"

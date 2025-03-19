@@ -6,113 +6,108 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical">
 
-    <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/item_cardview"
+    <LinearLayout
+        android:id="@+id/info_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/cardview_margin"
+        android:layout_height="@dimen/sub_height"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/layout_margin_spacing"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:nextFocusRight="@+id/layout_edit"
         android:orientation="horizontal"
-        card_view:cardCornerRadius="5dp">
+        android:paddingTop="@dimen/layout_margin_spacing"
+        android:paddingBottom="@dimen/layout_margin_spacing">
 
         <LinearLayout
-            android:id="@+id/info_container"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/sub_height"
-            android:layout_gravity="center"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:nextFocusRight="@+id/layout_edit"
-            android:orientation="horizontal">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/padding_start">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/remarks"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+                <ImageView
+                    android:id="@+id/img_locked"
+                    android:layout_width="@dimen/padding"
+                    android:layout_height="@dimen/padding"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/padding_start"
+                    app:srcCompat="@drawable/ic_lock_24dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/domainIp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_spacing"
+                android:lines="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+            <TextView
+                android:id="@+id/outboundTag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_spacing"
+                android:lines="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/sub_height"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/padding_start"
+            android:paddingEnd="@dimen/padding_end">
+
+            <LinearLayout
+                android:id="@+id/layout_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:nextFocusLeft="@+id/info_container"
                 android:orientation="vertical"
-                android:paddingStart="@dimen/padding_start">
+                android:padding="@dimen/layout_margin_spacing">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/remarks"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
-
-                    <ImageView
-                        android:id="@+id/img_locked"
-                        android:layout_width="@dimen/padding"
-                        android:layout_height="@dimen/padding"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/padding_start"
-                        app:srcCompat="@drawable/ic_lock_24dp" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/domainIp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/layout_margin_spacing"
-                    android:lines="1"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                <TextView
-                    android:id="@+id/outboundTag"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/layout_margin_spacing"
-                    android:lines="1"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
+                <ImageView
+                    android:layout_width="@dimen/png_height"
+                    android:layout_height="@dimen/png_height"
+                    app:srcCompat="@drawable/ic_edit_24dp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/sub_height"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:paddingStart="@dimen/padding_start"
-                android:paddingEnd="@dimen/padding_end">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_spacing"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:id="@+id/layout_edit"
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/chk_enable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:nextFocusLeft="@+id/info_container"
-                    android:orientation="vertical"
-                    android:padding="@dimen/layout_margin_spacing">
-
-                    <ImageView
-                        android:layout_width="@dimen/png_height"
-                        android:layout_height="@dimen/png_height"
-                        app:srcCompat="@drawable/ic_edit_24dp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/layout_margin_top_height"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/chk_enable"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:theme="@style/BrandedSwitch" />
-                </LinearLayout>
+                    app:theme="@style/BrandedSwitch" />
             </LinearLayout>
-
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+
 </LinearLayout>

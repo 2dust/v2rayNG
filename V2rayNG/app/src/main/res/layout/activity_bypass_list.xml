@@ -41,6 +41,7 @@
                         android:maxLines="2"
                         android:text="@string/title_pref_per_app_proxy"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="@color/colorAccent"
                         app:theme="@style/BrandedSwitch" />
 
                 </LinearLayout>
@@ -60,6 +61,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/switch_bypass_apps_mode"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="@color/colorAccent"
                         app:theme="@style/BrandedSwitch" />
 
                 </LinearLayout>
@@ -77,9 +79,9 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
-        android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:context=".ui.PerAppProxyActivity" />
 
