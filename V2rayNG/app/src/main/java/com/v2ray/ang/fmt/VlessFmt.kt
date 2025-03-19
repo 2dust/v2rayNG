@@ -12,6 +12,12 @@ import java.net.URI
 
 object VlessFmt : FmtBase() {
 
+    /**
+     * Parses a Vless URI string into a ProfileItem object.
+     *
+     * @param str the Vless URI string to parse
+     * @return the parsed ProfileItem object, or null if parsing fails
+     */
     fun parse(str: String): ProfileItem? {
         var allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.VLESS)
@@ -31,6 +37,12 @@ object VlessFmt : FmtBase() {
         return config
     }
 
+    /**
+     * Converts a ProfileItem object to a URI string.
+     *
+     * @param config the ProfileItem object to convert
+     * @return the converted URI string
+     */
     fun toUri(config: ProfileItem): String {
         val dicQuery = getQueryDic(config)
         dicQuery["encryption"] = config.method ?: "none"
@@ -38,7 +50,12 @@ object VlessFmt : FmtBase() {
         return toUri(config, config.password, dicQuery)
     }
 
-
+    /**
+     * Converts a ProfileItem object to an OutboundBean object.
+     *
+     * @param profileItem the ProfileItem object to convert
+     * @return the converted OutboundBean object, or null if conversion fails
+     */
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
         val outboundBean = OutboundBean.create(EConfigType.VLESS)
 
@@ -78,6 +95,4 @@ object VlessFmt : FmtBase() {
 
         return outboundBean
     }
-
-
 }

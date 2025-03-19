@@ -11,6 +11,12 @@ import com.v2ray.ang.util.Utils
 import java.net.URI
 
 object TrojanFmt : FmtBase() {
+    /**
+     * Parses a Trojan URI string into a ProfileItem object.
+     *
+     * @param str the Trojan URI string to parse
+     * @return the parsed ProfileItem object, or null if parsing fails
+     */
     fun parse(str: String): ProfileItem? {
         var allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.TROJAN)
@@ -35,12 +41,24 @@ object TrojanFmt : FmtBase() {
         return config
     }
 
+    /**
+     * Converts a ProfileItem object to a URI string.
+     *
+     * @param config the ProfileItem object to convert
+     * @return the converted URI string
+     */
     fun toUri(config: ProfileItem): String {
         val dicQuery = getQueryDic(config)
 
         return toUri(config, config.password, dicQuery)
     }
 
+    /**
+     * Converts a ProfileItem object to an OutboundBean object.
+     *
+     * @param profileItem the ProfileItem object to convert
+     * @return the converted OutboundBean object, or null if conversion fails
+     */
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
         val outboundBean = OutboundBean.create(EConfigType.TROJAN)
 

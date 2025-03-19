@@ -16,6 +16,12 @@ import com.v2ray.ang.util.Utils
 import java.net.URI
 
 object VmessFmt : FmtBase() {
+    /**
+     * Parses a Vmess string into a ProfileItem object.
+     *
+     * @param str the Vmess string to parse
+     * @return the parsed ProfileItem object, or null if parsing fails
+     */
     fun parse(str: String): ProfileItem? {
         if (str.indexOf('?') > 0 && str.indexOf('&') > 0) {
             return parseVmessStd(str)
@@ -79,6 +85,12 @@ object VmessFmt : FmtBase() {
         return config
     }
 
+    /**
+     * Converts a ProfileItem object to a URI string.
+     *
+     * @param config the ProfileItem object to convert
+     * @return the converted URI string
+     */
     fun toUri(config: ProfileItem): String {
         val vmessQRCode = VmessQRCode()
 
@@ -122,6 +134,12 @@ object VmessFmt : FmtBase() {
         return Utils.encode(json)
     }
 
+    /**
+     * Parses a standard Vmess URI string into a ProfileItem object.
+     *
+     * @param str the standard Vmess URI string to parse
+     * @return the parsed ProfileItem object, or null if parsing fails
+     */
     fun parseVmessStd(str: String): ProfileItem? {
         val allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.VMESS)
@@ -141,7 +159,12 @@ object VmessFmt : FmtBase() {
         return config
     }
 
-
+    /**
+     * Converts a ProfileItem object to an OutboundBean object.
+     *
+     * @param profileItem the ProfileItem object to convert
+     * @return the converted OutboundBean object, or null if conversion fails
+     */
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
         val outboundBean = OutboundBean.create(EConfigType.VMESS)
 

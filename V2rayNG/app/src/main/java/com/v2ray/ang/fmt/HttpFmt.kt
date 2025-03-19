@@ -6,6 +6,12 @@ import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.extension.isNotNullEmpty
 
 object HttpFmt : FmtBase() {
+    /**
+     * Converts a ProfileItem object to an OutboundBean object.
+     *
+     * @param profileItem the ProfileItem object to convert
+     * @return the converted OutboundBean object, or null if conversion fails
+     */
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
         val outboundBean = OutboundBean.create(EConfigType.HTTP)
 
@@ -22,6 +28,4 @@ object HttpFmt : FmtBase() {
 
         return outboundBean
     }
-
-
 }

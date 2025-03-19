@@ -8,6 +8,14 @@ import com.v2ray.ang.util.Utils
 import java.net.URI
 
 open class FmtBase {
+    /**
+     * Converts a ProfileItem object to a URI string.
+     *
+     * @param config the ProfileItem object to convert
+     * @param userInfo the user information to include in the URI
+     * @param dicQuery the query parameters to include in the URI
+     * @return the converted URI string
+     */
     fun toUri(config: ProfileItem, userInfo: String?, dicQuery: HashMap<String, String>?): String {
         val query = if (dicQuery != null)
             ("?" + dicQuery.toList().joinToString(
@@ -25,11 +33,24 @@ open class FmtBase {
         return "${url}${query}#${Utils.urlEncode(config.remarks)}"
     }
 
+    /**
+     * Extracts query parameters from a URI.
+     *
+     * @param uri the URI to extract query parameters from
+     * @return a map of query parameters
+     */
     fun getQueryParam(uri: URI): Map<String, String> {
         return uri.rawQuery.split("&")
             .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
     }
 
+    /**
+     * Populates a ProfileItem object with values from query parameters.
+     *
+     * @param config the ProfileItem object to populate
+     * @param queryParam the query parameters to use for populating the ProfileItem
+     * @param allowInsecure whether to allow insecure connections
+     */
     fun getItemFormQuery(config: ProfileItem, queryParam: Map<String, String>, allowInsecure: Boolean) {
         config.network = queryParam["type"] ?: NetworkType.TCP.type
         config.headerType = queryParam["headerType"]
@@ -63,6 +84,12 @@ open class FmtBase {
         config.flow = queryParam["flow"]
     }
 
+    /**
+     * Creates a map of query parameters from a ProfileItem object.
+     *
+     * @param config the ProfileItem object to create query parameters from
+     * @return a map of query parameters
+     */
     fun getQueryDic(config: ProfileItem): HashMap<String, String> {
         val dicQuery = HashMap<String, String>()
         dicQuery["security"] = config.security?.ifEmpty { "none" }.orEmpty()
@@ -121,5 +148,4 @@ open class FmtBase {
 
         return dicQuery
     }
-
 }

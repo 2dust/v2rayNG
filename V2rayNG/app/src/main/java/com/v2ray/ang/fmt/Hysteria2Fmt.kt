@@ -13,6 +13,12 @@ import com.v2ray.ang.util.Utils
 import java.net.URI
 
 object Hysteria2Fmt : FmtBase() {
+    /**
+     * Parses a Hysteria2 URI string into a ProfileItem object.
+     *
+     * @param str the Hysteria2 URI string to parse
+     * @return the parsed ProfileItem object, or null if parsing fails
+     */
     fun parse(str: String): ProfileItem? {
         var allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.HYSTERIA2)
@@ -45,6 +51,12 @@ object Hysteria2Fmt : FmtBase() {
         return config
     }
 
+    /**
+     * Converts a ProfileItem object to a URI string.
+     *
+     * @param config the ProfileItem object to convert
+     * @return the converted URI string
+     */
     fun toUri(config: ProfileItem): String {
         val dicQuery = HashMap<String, String>()
 
@@ -67,6 +79,13 @@ object Hysteria2Fmt : FmtBase() {
         return toUri(config, config.password, dicQuery)
     }
 
+    /**
+     * Converts a ProfileItem object to a Hysteria2Bean object.
+     *
+     * @param config the ProfileItem object to convert
+     * @param socksPort the port number for the socks5 proxy
+     * @return the converted Hysteria2Bean object, or null if conversion fails
+     */
     fun toNativeConfig(config: ProfileItem, socksPort: Int): Hysteria2Bean? {
 
         val obfs = if (config.obfsPassword.isNullOrEmpty()) null else
@@ -118,10 +137,14 @@ object Hysteria2Fmt : FmtBase() {
         return bean
     }
 
-
+    /**
+     * Converts a ProfileItem object to an OutboundBean object.
+     *
+     * @param profileItem the ProfileItem object to convert
+     * @return the converted OutboundBean object, or null if conversion fails
+     */
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
         val outboundBean = OutboundBean.create(EConfigType.HYSTERIA2)
         return outboundBean
     }
-
 }
