@@ -27,6 +27,6 @@ $NDK_HOME/ndk-build \
 	NDK_LIBS_OUT=$TMPDIR/libs \
 	NDK_OUT=$TMPDIR/tmp \
 	APP_SHORT_COMMANDS=false LOCAL_SHORT_COMMANDS=false -B -j4
-tar cvfz $__dir/libtun2socks.so.tgz libs
+cp -r $TMPDIR/libs $__dir/
 popd
 rm -rf $TMPDIR

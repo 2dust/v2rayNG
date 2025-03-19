@@ -49,7 +49,6 @@ jobs:
       if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
       run: |
         bash compile-tun2socks.sh
-        tar -xvzf libtun2socks.so.tgz
 
     - name: Save libtun2socks
       if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
@@ -83,7 +82,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}/hysteria/libs
-        key: libhysteria2-${{ runner.os }}-${{ env.NDK_HOME }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hysteria/HEAD') }}-${{ hashFiles('libhysteria2.sh') }}
+        key: libhysteria2-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hysteria/HEAD') }}-${{ hashFiles('libhysteria2.sh') }}
 
     - name: Setup Golang
       if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
@@ -102,7 +101,7 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: ${{ github.workspace }}/hysteria/libs
-        key: libhysteria2-${{ runner.os }}-${{ hashFiles('.git/modules/hysteria/HEAD') }}-${{ hashFiles('libhysteria2.sh') }}
+        key: libhysteria2-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hysteria/HEAD') }}-${{ hashFiles('libhysteria2.sh') }}
 
     - name: Copy libhysteria2
       run: |
