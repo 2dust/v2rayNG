@@ -27,6 +27,10 @@ import java.util.Locale
 
 object SettingsManager {
 
+    /**
+     * Initialize routing rulesets.
+     * @param context The application context.
+     */
     fun initRoutingRulesets(context: Context) {
         val exist = MmkvManager.decodeRoutingRulesets()
         if (exist.isNullOrEmpty()) {
@@ -35,6 +39,12 @@ object SettingsManager {
         }
     }
 
+    /**
+     * Get preset routing rulesets.
+     * @param context The application context.
+     * @param index The index of the routing type.
+     * @return A mutable list of RulesetItem.
+     */
     private fun getPresetRoutingRulesets(context: Context, index: Int = 0): MutableList<RulesetItem>? {
         val fileName = RoutingType.fromIndex(index).fileName
         val assets = Utils.readTextFromAssets(context, fileName)
@@ -45,12 +55,21 @@ object SettingsManager {
         return JsonUtil.fromJson(assets, Array<RulesetItem>::class.java).toMutableList()
     }
 
-
+    /**
+     * Reset routing rulesets from presets.
+     * @param context The application context.
+     * @param index The index of the routing type.
+     */
     fun resetRoutingRulesetsFromPresets(context: Context, index: Int) {
         val rulesetList = getPresetRoutingRulesets(context, index) ?: return
         resetRoutingRulesetsCommon(rulesetList)
     }
 
+    /**
+     * Reset routing rulesets.
+     * @param content The content of the rulesets.
+     * @return True if successful, false otherwise.
+     */
     fun resetRoutingRulesets(content: String?): Boolean {
         if (content.isNullOrEmpty()) {
             return false
@@ -70,6 +89,10 @@ object SettingsManager {
         }
     }
 
+    /**
+     * Common method to reset routing rulesets.
+     * @param rulesetList The list of rulesets.
+     */
     private fun resetRoutingRulesetsCommon(rulesetList: MutableList<RulesetItem>) {
         val rulesetNew: MutableList<RulesetItem> = mutableListOf()
         MmkvManager.decodeRoutingRulesets()?.forEach { key ->
@@ -82,6 +105,11 @@ object SettingsManager {
         MmkvManager.encodeRoutingRulesets(rulesetNew)
     }
 
+    /**
+     * Get a routing ruleset by index.
+     * @param index The index of the ruleset.
+     * @return The RulesetItem.
+     */
     fun getRoutingRuleset(index: Int): RulesetItem? {
         if (index < 0) return null
 
@@ -91,6 +119,11 @@ object SettingsManager {
         return rulesetList[index]
     }
 
+    /**
+     * Save a routing ruleset.
+     * @param index The index of the ruleset.
+     * @param ruleset The RulesetItem to save.
+     */
     fun saveRoutingRuleset(index: Int, ruleset: RulesetItem?) {
         if (ruleset == null) return
 
@@ -107,6 +140,10 @@ object SettingsManager {
         MmkvManager.encodeRoutingRulesets(rulesetList)
     }
 
+    /**
+     * Remove a routing ruleset by index.
+     * @param index The index of the ruleset.
+     */
     fun removeRoutingRuleset(index: Int) {
         if (index < 0) return
 
@@ -117,6 +154,10 @@ object SettingsManager {
         MmkvManager.encodeRoutingRulesets(rulesetList)
     }
 
+    /**
+     * Check if routing rulesets bypass LAN.
+     * @return True if bypassing LAN, false otherwise.
+     */
     fun routingRulesetsBypassLan(): Boolean {
         val vpnBypassLan = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_BYPASS_LAN) ?: "0"
         if (vpnBypassLan == "1") {
@@ -125,7 +166,6 @@ object SettingsManager {
             return false
         }
 
-        //Follow config
         val guid = MmkvManager.getSelectServer() ?: return false
         val config = MmkvManager.decodeServerConfig(guid) ?: return false
         if (config.configType == EConfigType.CUSTOM) {
@@ -144,6 +184,11 @@ object SettingsManager {
         return exist == true
     }
 
+    /**
+     * Swap routing rulesets.
+     * @param fromPosition The position to swap from.
+     * @param toPosition The position to swap to.
+     */
     fun swapRoutingRuleset(fromPosition: Int, toPosition: Int) {
         val rulesetList = MmkvManager.decodeRoutingRulesets()
         if (rulesetList.isNullOrEmpty()) return
@@ -152,6 +197,11 @@ object SettingsManager {
         MmkvManager.encodeRoutingRulesets(rulesetList)
     }
 
+    /**
+     * Swap subscriptions.
+     * @param fromPosition The position to swap from.
+     * @param toPosition The position to swap to.
+     */
     fun swapSubscriptions(fromPosition: Int, toPosition: Int) {
         val subsList = MmkvManager.decodeSubsList()
         if (subsList.isNullOrEmpty()) return
@@ -160,6 +210,11 @@ object SettingsManager {
         MmkvManager.encodeSubsList(subsList)
     }
 
+    /**
+     * Get server via remarks.
+     * @param remarks The remarks of the server.
+     * @return The ProfileItem.
+     */
     fun getServerViaRemarks(remarks: String?): ProfileItem? {
         if (remarks == null) {
             return null
@@ -174,14 +229,27 @@ object SettingsManager {
         return null
     }
 
+    /**
+     * Get the SOCKS port.
+     * @return The SOCKS port.
+     */
     fun getSocksPort(): Int {
         return Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
     }
 
+    /**
+     * Get the HTTP port.
+     * @return The HTTP port.
+     */
     fun getHttpPort(): Int {
         return getSocksPort() + (if (Utils.isXray()) 0 else 1)
     }
 
+    /**
+     * Initialize assets.
+     * @param context The application context.
+     * @param assets The AssetManager.
+     */
     fun initAssets(context: Context, assets: AssetManager) {
         val extFolder = Utils.userAssetPath(context)
 
@@ -205,11 +273,11 @@ object SettingsManager {
         } catch (e: Exception) {
             Log.e(ANG_PACKAGE, "asset copy failed", e)
         }
-
     }
 
     /**
-     * get domestic dns servers from preference
+     * Get domestic DNS servers from preference.
+     * @return A list of domestic DNS servers.
      */
     fun getDomesticDnsServers(): List<String> {
         val domesticDns =
@@ -222,7 +290,8 @@ object SettingsManager {
     }
 
     /**
-     * get remote dns servers from preference
+     * Get remote DNS servers from preference.
+     * @return A list of remote DNS servers.
      */
     fun getRemoteDnsServers(): List<String> {
         val remoteDns =
@@ -235,15 +304,19 @@ object SettingsManager {
     }
 
     /**
-     * get vpn dns servers from preference
+     * Get VPN DNS servers from preference.
+     * @return A list of VPN DNS servers.
      */
     fun getVpnDnsServers(): List<String> {
         val vpnDns = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_DNS) ?: AppConfig.DNS_VPN
         return vpnDns.split(",").filter { Utils.isPureIpAddress(it) }
-        // allow empty, in that case dns will use system default
     }
 
-
+    /**
+     * Get delay test URL.
+     * @param second Whether to use the second URL.
+     * @return The delay test URL.
+     */
     fun getDelayTestUrl(second: Boolean = false): String {
         return if (second) {
             AppConfig.DelayTestUrl2
@@ -253,6 +326,10 @@ object SettingsManager {
         }
     }
 
+    /**
+     * Get the locale.
+     * @return The locale.
+     */
     fun getLocale(): Locale {
         val langCode =
             MmkvManager.decodeSettingsString(AppConfig.PREF_LANGUAGE) ?: Language.AUTO.code
@@ -271,6 +348,9 @@ object SettingsManager {
         }
     }
 
+    /**
+     * Set night mode.
+     */
     fun setNightMode() {
         when (MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
             "0" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)

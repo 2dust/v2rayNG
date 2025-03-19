@@ -20,6 +20,13 @@ object SpeedtestManager {
 
     private val tcpTestingSockets = ArrayList<Socket?>()
 
+    /**
+     * Measures the TCP connection time to a given URL and port.
+     *
+     * @param url The URL to connect to.
+     * @param port The port to connect to.
+     * @return The connection time in milliseconds, or -1 if the connection failed.
+     */
     suspend fun tcping(url: String, port: Int): Long {
         var time = -1L
         for (k in 0 until 2) {
@@ -34,6 +41,12 @@ object SpeedtestManager {
         return time
     }
 
+    /**
+     * Measures the real ping time using the V2Ray library.
+     *
+     * @param config The configuration string for the V2Ray library.
+     * @return The ping time in milliseconds, or -1 if the ping failed.
+     */
     fun realPing(config: String): Long {
         return try {
             Libv2ray.measureOutboundDelay(config, SettingsManager.getDelayTestUrl())
@@ -43,6 +56,12 @@ object SpeedtestManager {
         }
     }
 
+    /**
+     * Measures the ping time to a given URL using the system ping command.
+     *
+     * @param url The URL to ping.
+     * @return The ping time in milliseconds as a string, or "-1ms" if the ping failed.
+     */
     fun ping(url: String): String {
         try {
             val command = "/system/bin/ping -c 3 $url"
@@ -62,6 +81,13 @@ object SpeedtestManager {
         return "-1ms"
     }
 
+    /**
+     * Measures the time taken to establish a TCP connection to a given URL and port.
+     *
+     * @param url The URL to connect to.
+     * @param port The port to connect to.
+     * @return The connection time in milliseconds, or -1 if the connection failed.
+     */
     fun socketConnectTime(url: String, port: Int): Long {
         try {
             val socket = Socket()
@@ -86,6 +112,9 @@ object SpeedtestManager {
         return -1
     }
 
+    /**
+     * Closes all TCP sockets that are currently being tested.
+     */
     fun closeAllTcpSockets() {
         synchronized(this) {
             tcpTestingSockets.forEach {
@@ -95,6 +124,13 @@ object SpeedtestManager {
         }
     }
 
+    /**
+     * Tests the connection to a given URL and port.
+     *
+     * @param context The Context in which the test is running.
+     * @param port The port to connect to.
+     * @return A pair containing the elapsed time in milliseconds and the result message.
+     */
     fun testConnection(context: Context, port: Int): Pair<Long, String> {
         var result: String
         var elapsed = -1L
@@ -116,11 +152,9 @@ object SpeedtestManager {
                 )
             }
         } catch (e: IOException) {
-            // network exception
             Log.d(AppConfig.ANG_PACKAGE, "testConnection IOException: " + Log.getStackTraceString(e))
             result = context.getString(R.string.connection_test_error, e.message)
         } catch (e: Exception) {
-            // library exception, eg sumsung
             Log.d(AppConfig.ANG_PACKAGE, "testConnection Exception: " + Log.getStackTraceString(e))
             result = context.getString(R.string.connection_test_error, e.message)
         } finally {
@@ -130,6 +164,11 @@ object SpeedtestManager {
         return Pair(elapsed, result)
     }
 
+    /**
+     * Gets the version of the V2Ray library.
+     *
+     * @return The version of the V2Ray library.
+     */
     fun getLibVersion(): String {
         return Libv2ray.checkVersionX()
     }

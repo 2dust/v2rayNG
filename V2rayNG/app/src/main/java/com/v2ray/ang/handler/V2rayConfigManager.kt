@@ -53,6 +53,13 @@ import com.v2ray.ang.util.Utils
 
 object V2rayConfigManager {
 
+    /**
+     * Retrieves the V2ray configuration for the given GUID.
+     *
+     * @param context The context of the caller.
+     * @param guid The unique identifier for the V2ray configuration.
+     * @return A ConfigResult object containing the configuration details or indicating failure.
+     */
     fun getV2rayConfig(context: Context, guid: String): ConfigResult {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ConfigResult(false)
@@ -72,6 +79,13 @@ object V2rayConfigManager {
         }
     }
 
+    /**
+     * Retrieves the non-custom V2ray configuration.
+     *
+     * @param context The context in which the function is called.
+     * @param config The profile item containing the configuration details.
+     * @return A ConfigResult object containing the result of the configuration retrieval.
+     */
     private fun getV2rayNonCustomConfig(context: Context, config: ProfileItem): ConfigResult {
         val result = ConfigResult(false)
 
@@ -630,6 +644,12 @@ object V2rayConfigManager {
         return returnPair
     }
 
+    /**
+     * Retrieves the proxy outbound configuration for the given profile item.
+     *
+     * @param profileItem The profile item for which to get the proxy outbound configuration.
+     * @return The proxy outbound configuration as a V2rayConfig.OutboundBean, or null if not found.
+     */
     fun getProxyOutbound(profileItem: ProfileItem): V2rayConfig.OutboundBean? {
         return when (profileItem.configType) {
             EConfigType.VMESS -> VmessFmt.toOutbound(profileItem)
