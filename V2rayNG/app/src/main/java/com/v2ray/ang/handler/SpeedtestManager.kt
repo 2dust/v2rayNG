@@ -1,4 +1,4 @@
-package com.v2ray.ang.util
+package com.v2ray.ang.handler
 
 import android.content.Context
 import android.os.SystemClock
@@ -7,7 +7,7 @@ import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.responseLength
-import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.util.HttpUtil
 import kotlinx.coroutines.isActive
 import libv2ray.Libv2ray
 import java.io.IOException
@@ -16,7 +16,7 @@ import java.net.Socket
 import java.net.UnknownHostException
 import kotlin.coroutines.coroutineContext
 
-object SpeedtestUtil {
+object SpeedtestManager {
 
     private val tcpTestingSockets = ArrayList<Socket?>()
 

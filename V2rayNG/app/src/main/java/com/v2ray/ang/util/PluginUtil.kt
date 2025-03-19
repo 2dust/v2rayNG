@@ -7,6 +7,7 @@ import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.fmt.Hysteria2Fmt
+import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.service.ProcessService
 import java.io.File
 
@@ -49,7 +50,7 @@ object PluginUtil {
             val proc = ProcessService()
             proc.runProcess(context, cmd)
             Thread.sleep(1000L)
-            val delay = SpeedtestUtil.testConnection(context, socksPort)
+            val delay = SpeedtestManager.testConnection(context, socksPort)
             proc.stopProcess()
 
             return delay.first

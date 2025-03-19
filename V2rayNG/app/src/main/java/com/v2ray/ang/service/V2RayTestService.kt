@@ -12,7 +12,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.V2rayConfigManager
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.PluginUtil
-import com.v2ray.ang.util.SpeedtestUtil
+import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.util.Utils
 import go.Seq
 import kotlinx.coroutines.CoroutineScope
@@ -65,7 +65,7 @@ class V2RayTestService : Service() {
             if (!config.status) {
                 return retFailure
             }
-            return SpeedtestUtil.realPing(config.content)
+            return SpeedtestManager.realPing(config.content)
         }
     }
 }

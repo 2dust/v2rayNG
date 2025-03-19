@@ -14,7 +14,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityAboutBinding
-import com.v2ray.ang.util.SpeedtestUtil
+import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.ZipUtil
 import java.io.File
@@ -121,7 +121,7 @@ class AboutActivity : BaseActivity() {
             Utils.openUri(this, AppConfig.v2rayNGPrivacyPolicy)
         }
 
-        "v${BuildConfig.VERSION_NAME} (${SpeedtestUtil.getLibVersion()})".also {
+        "v${BuildConfig.VERSION_NAME} (${SpeedtestManager.getLibVersion()})".also {
             binding.tvVersion.text = it
         }
     }
