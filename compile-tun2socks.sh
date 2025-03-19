@@ -23,11 +23,10 @@ $NDK_HOME/ndk-build \
 	NDK_PROJECT_PATH=. \
 	APP_BUILD_SCRIPT=./tun2socks.mk \
 	APP_ABI=all \
-	APP_PLATFORM=android-19 \
+	APP_PLATFORM=android-21 \
 	NDK_LIBS_OUT=$TMPDIR/libs \
 	NDK_OUT=$TMPDIR/tmp \
-	APP_SHORT_COMMANDS=false LOCAL_SHORT_COMMANDS=false -B -j4 \
-        LOCAL_LDFLAGS=-Wl,--build-id=none
+	APP_SHORT_COMMANDS=false LOCAL_SHORT_COMMANDS=false -B -j4
 tar cvfz $__dir/libtun2socks.so.tgz libs
 popd
 rm -rf $TMPDIR

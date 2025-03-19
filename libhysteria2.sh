@@ -14,7 +14,7 @@ for target in "${targets[@]}"; do
 
   echo "Building for ${abi} with ${ndk_target} (${goarch})"
 
-  CC="${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/${ndk_target}-clang" CGO_ENABLED=1 CGO_LDFLAGS="-Wl,-z,max-page-size=16384" GOOS=android GOARCH=$goarch go build -o libs/$abi/libhysteria2.so -trimpath -ldflags "-s -w -buildid=" -buildvcs=false ./app
+  CC="${NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/${ndk_target}-clang" CGO_ENABLED=1 CGO_LDFLAGS="-Wl,-z" GOOS=android GOARCH=$goarch go build -o libs/$abi/libhysteria2.so -trimpath -ldflags "-s -w -buildid=" -buildvcs=false ./app
 
   echo "Built libhysteria2.so for ${abi}"
 done
