@@ -14,14 +14,26 @@ import com.v2ray.ang.service.V2RayServiceManager
 
 class WidgetProvider : AppWidgetProvider() {
     /**
-     * 每次窗口小部件被更新都调用一次该方法
+     * This method is called every time the widget is updated.
+     * It updates the widget background based on the V2Ray service running state.
+     *
+     * @param context The Context in which the receiver is running.
+     * @param appWidgetManager The AppWidgetManager instance.
+     * @param appWidgetIds The appWidgetIds for which an update is needed.
      */
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
         updateWidgetBackground(context, appWidgetManager, appWidgetIds, V2RayServiceManager.isRunning())
     }
 
-
+    /**
+     * Updates the widget background based on whether the V2Ray service is running.
+     *
+     * @param context The Context in which the receiver is running.
+     * @param appWidgetManager The AppWidgetManager instance.
+     * @param appWidgetIds The appWidgetIds for which an update is needed.
+     * @param isRunning Boolean indicating if the V2Ray service is running.
+     */
     private fun updateWidgetBackground(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, isRunning: Boolean) {
         val remoteViews = RemoteViews(context.packageName, R.layout.widget_switch)
         val intent = Intent(context, WidgetProvider::class.java)
@@ -51,7 +63,11 @@ class WidgetProvider : AppWidgetProvider() {
     }
 
     /**
-     * 接收窗口小部件发送的广播
+     * This method is called when the BroadcastReceiver is receiving an Intent broadcast.
+     * It handles widget click actions and updates the widget background based on the V2Ray service state.
+     *
+     * @param context The Context in which the receiver is running.
+     * @param intent The Intent being received.
      */
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)

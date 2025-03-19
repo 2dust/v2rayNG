@@ -7,12 +7,17 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.service.V2RayServiceManager
 
 class BootReceiver : BroadcastReceiver() {
+    /**
+     * This method is called when the BroadcastReceiver is receiving an Intent broadcast.
+     * It checks if the context is not null and the action is ACTION_BOOT_COMPLETED.
+     * If the conditions are met, it starts the V2Ray service.
+     *
+     * @param context The Context in which the receiver is running.
+     * @param intent The Intent being received.
+     */
     override fun onReceive(context: Context?, intent: Intent?) {
-        //Check if context is not null and action is the one we want
         if (context == null || intent?.action != Intent.ACTION_BOOT_COMPLETED) return
-        //Check if flag is true and a server is selected
         if (!MmkvManager.decodeStartOnBoot() || MmkvManager.getSelectServer().isNullOrEmpty()) return
-        //Start v2ray
         V2RayServiceManager.startVService(context)
     }
 }
