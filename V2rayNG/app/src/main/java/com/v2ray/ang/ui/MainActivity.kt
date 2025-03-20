@@ -783,10 +783,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 )
             }
 
+            R.id.per_app_proxy_settings -> {
+                startActivity(Intent(this, PerAppProxyActivity::class.java))
+            }
+
             R.id.routing_setting -> {
                 requestSubSettingActivity.launch(Intent(this, RoutingSettingActivity::class.java))
             }
-
 
             R.id.promotion -> {
                 Utils.openUri(this, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")
