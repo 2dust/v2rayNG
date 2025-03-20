@@ -26,18 +26,18 @@ object HttpUtil {
      *
      * @param url The URL to fetch content from.
      * @param timeout The timeout value in milliseconds.
+     * @param httpPort The HTTP port to use.
      * @return The content of the URL as a string.
      */
-    fun getUrlContent(url: String, timeout: Int): String {
-        var result: String = ""
-        val conn = createProxyConnection(url, 0, timeout, timeout) ?: return result
+    fun getUrlContent(url: String, timeout: Int, httpPort: Int = 0): String? {
+        val conn = createProxyConnection(url, httpPort, timeout, timeout) ?: return null
         try {
-            result = conn.inputStream.bufferedReader().readText()
+            return conn.inputStream.bufferedReader().readText()
         } catch (_: Exception) {
         } finally {
             conn.disconnect()
         }
-        return result
+        return null
     }
 
     /**

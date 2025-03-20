@@ -5,11 +5,8 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.R
@@ -18,6 +15,7 @@ import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.AppManagerUtil
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.Utils
@@ -48,7 +46,7 @@ class PerAppProxyActivity : BaseActivity() {
                 val blacklist = MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
                 val apps = withContext(Dispatchers.IO) {
                     val appsList = AppManagerUtil.loadNetworkAppList(this@PerAppProxyActivity)
-                    
+
                     if (blacklist != null) {
                         appsList.forEach { app ->
                             app.isSelected = if (blacklist.contains(app.packageName)) 1 else 0
@@ -152,13 +150,20 @@ class PerAppProxyActivity : BaseActivity() {
 
     private fun selectProxyApp() {
         toast(R.string.msg_downloading_content)
+        binding.pbWaiting.show()
+
         val url = AppConfig.androidpackagenamelistUrl
         lifecycleScope.launch(Dispatchers.IO) {
-            val content = HttpUtil.getUrlContent(url, 5000)
+            var content = HttpUtil.getUrlContent(url, 5000)
+            if (content.isNullOrEmpty()) {
+                val httpPort = SettingsManager.getHttpPort()
+                content = HttpUtil.getUrlContent(url, 5000, httpPort) ?: ""
+            }
             launch(Dispatchers.Main) {
                 Log.d(ANG_PACKAGE, content)
                 selectProxyApp(content, true)
                 toast(R.string.toast_success)
+                binding.pbWaiting.hide()
             }
         }
     }
