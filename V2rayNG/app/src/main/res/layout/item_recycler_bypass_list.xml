@@ -9,13 +9,13 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/icon"
-        android:layout_width="@dimen/server_height"
-        android:layout_height="@dimen/server_height"
-        android:padding="@dimen/padding" />
+        android:layout_width="@dimen/view_height_dp72"
+        android:layout_height="@dimen/view_height_dp72"
+        android:padding="@dimen/padding_spacing_dp16" />
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="@dimen/server_height"
+        android:layout_height="@dimen/view_height_dp72"
         android:layout_weight="1.0"
         android:gravity="center"
         android:orientation="vertical">
@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="3"
-            android:paddingTop="@dimen/layout_margin_spacing"
+            android:paddingTop="@dimen/margin_spacing_dp8"
             android:textAppearance="@style/TextAppearance.AppCompat.Small" />
     </LinearLayout>
 
@@ -42,6 +42,6 @@
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"
-        android:padding="@dimen/padding"/>
+        android:padding="@dimen/padding_spacing_dp16"/>
 
 </LinearLayout>

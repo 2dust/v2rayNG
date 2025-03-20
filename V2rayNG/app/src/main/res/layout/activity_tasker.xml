@@ -5,12 +5,12 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    android:padding="@dimen/padding"
+    android:padding="@dimen/padding_spacing_dp16"
     tools:context=".ui.TaskerActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/bypass_list_header_height">
+        android:layout_height="@dimen/view_height_dp64">
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switch_start_service"

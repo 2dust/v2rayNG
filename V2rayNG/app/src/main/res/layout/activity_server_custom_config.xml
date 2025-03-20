@@ -14,7 +14,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/layout_margin_spacing"
+            android:layout_margin="@dimen/margin_spacing_dp8"
             android:orientation="vertical">
 
             <TextView
@@ -28,7 +28,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/layout_margin_spacing"
+            android:layout_margin="@dimen/margin_spacing_dp8"
             android:orientation="vertical">
 
             <TextView
@@ -41,7 +41,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/layout_margin_spacing"
+            android:layout_margin="@dimen/margin_spacing_dp8"
             android:orientation="vertical">
 
             <TextView
@@ -52,7 +52,7 @@
             <EditText
                 android:id="@+id/et_remarks"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/edit_height"
+                android:layout_height="@dimen/view_height_dp48"
                 android:inputType="text" />
 
         </LinearLayout>
@@ -65,7 +65,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/layout_margin_spacing"
+                android:layout_margin="@dimen/margin_spacing_dp8"
                 android:text="@string/server_lab_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
@@ -73,7 +73,7 @@
                 android:id="@+id/editor"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:layout_marginTop="@dimen/margin_spacing_dp16"
                 android:gravity="top|start" />
         </LinearLayout>
 

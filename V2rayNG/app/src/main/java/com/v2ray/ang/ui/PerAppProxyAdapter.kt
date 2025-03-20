@@ -35,7 +35,7 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
                 val view = View(ctx)
                 view.layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    ctx.resources.getDimensionPixelSize(R.dimen.bypass_list_header_height) * 0
+                    ctx.resources.getDimensionPixelSize(R.dimen.view_height_dp64) * 0
                 )
                 BaseViewHolder(view)
             }

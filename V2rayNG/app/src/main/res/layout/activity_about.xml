@@ -24,18 +24,18 @@
                 android:focusable="true"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="@dimen/padding">
+                android:padding="@dimen/padding_spacing_dp16">
 
                 <ImageView
-                    android:layout_width="@dimen/png_height"
-                    android:layout_height="@dimen/png_height"
+                    android:layout_width="@dimen/image_size_dp24"
+                    android:layout_height="@dimen/image_size_dp24"
                     app:srcCompat="@drawable/ic_backup_24dp" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingStart="@dimen/padding_start">
+                    android:paddingStart="@dimen/padding_spacing_dp16">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -47,7 +47,7 @@
                         android:id="@+id/tv_backup_summary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/layout_margin_top_height"
+                        android:layout_marginTop="@dimen/margin_spacing_dp16"
                         android:maxLines="4"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -58,23 +58,23 @@
             <LinearLayout
                 android:id="@+id/layout_share"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/server_height"
+                android:layout_height="@dimen/view_height_dp72"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="@dimen/padding">
+                android:padding="@dimen/padding_spacing_dp16">
 
                 <ImageView
-                    android:layout_width="@dimen/png_height"
-                    android:layout_height="@dimen/png_height"
+                    android:layout_width="@dimen/image_size_dp24"
+                    android:layout_height="@dimen/image_size_dp24"
                     app:srcCompat="@drawable/ic_share_24dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_start"
+                    android:paddingStart="@dimen/padding_spacing_dp16"
                     android:text="@string/title_configuration_share"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
@@ -82,23 +82,23 @@
             <LinearLayout
                 android:id="@+id/layout_restore"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/server_height"
+                android:layout_height="@dimen/view_height_dp72"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="@dimen/padding">
+                android:padding="@dimen/padding_spacing_dp16">
 
                 <ImageView
-                    android:layout_width="@dimen/png_height"
-                    android:layout_height="@dimen/png_height"
+                    android:layout_width="@dimen/image_size_dp24"
+                    android:layout_height="@dimen/image_size_dp24"
                     app:srcCompat="@drawable/ic_restore_24dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_start"
+                    android:paddingStart="@dimen/padding_spacing_dp16"
                     android:text="@string/title_configuration_restore"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
@@ -109,28 +109,28 @@
             android:layout_height="match_parent"
             android:gravity="top"
             android:orientation="vertical"
-            android:paddingTop="@dimen/padding_start">
+            android:paddingTop="@dimen/padding_spacing_dp16">
 
             <LinearLayout
                 android:id="@+id/layout_soure_ccode"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/server_height"
+                android:layout_height="@dimen/view_height_dp72"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="@dimen/padding">
+                android:padding="@dimen/padding_spacing_dp16">
 
                 <ImageView
-                    android:layout_width="@dimen/png_height"
-                    android:layout_height="@dimen/png_height"
+                    android:layout_width="@dimen/image_size_dp24"
+                    android:layout_height="@dimen/image_size_dp24"
                     app:srcCompat="@drawable/ic_source_code_24dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_start"
+                    android:paddingStart="@dimen/padding_spacing_dp16"
                     android:text="@string/title_source_code"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
@@ -138,23 +138,23 @@
             <LinearLayout
                 android:id="@+id/layout_oss_licenses"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/server_height"
+                android:layout_height="@dimen/view_height_dp72"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="@dimen/padding">
+                android:padding="@dimen/padding_spacing_dp16">
 
                 <ImageView
-                    android:layout_width="@dimen/png_height"
-                    android:layout_height="@dimen/png_height"
+                    android:layout_width="@dimen/image_size_dp24"
+                    android:layout_height="@dimen/image_size_dp24"
                     app:srcCompat="@drawable/license_24px" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_start"
+                    android:paddingStart="@dimen/padding_spacing_dp16"
                     android:text="@string/title_oss_license"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
@@ -162,23 +162,23 @@
             <LinearLayout
                 android:id="@+id/layout_feedback"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/server_height"
+                android:layout_height="@dimen/view_height_dp72"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="@dimen/padding">
+                android:padding="@dimen/padding_spacing_dp16">
 
                 <ImageView
-                    android:layout_width="@dimen/png_height"
-                    android:layout_height="@dimen/png_height"
+                    android:layout_width="@dimen/image_size_dp24"
+                    android:layout_height="@dimen/image_size_dp24"
                     app:srcCompat="@drawable/ic_feedback_24dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_start"
+                    android:paddingStart="@dimen/padding_spacing_dp16"
                     android:text="@string/title_pref_feedback"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
@@ -187,23 +187,23 @@
             <LinearLayout
                 android:id="@+id/layout_tg_channel"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/server_height"
+                android:layout_height="@dimen/view_height_dp72"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="@dimen/padding">
+                android:padding="@dimen/padding_spacing_dp16">
 
                 <ImageView
-                    android:layout_width="@dimen/png_height"
-                    android:layout_height="@dimen/png_height"
+                    android:layout_width="@dimen/image_size_dp24"
+                    android:layout_height="@dimen/image_size_dp24"
                     app:srcCompat="@drawable/ic_telegram_24dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_start"
+                    android:paddingStart="@dimen/padding_spacing_dp16"
                     android:text="@string/title_tg_channel"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
@@ -211,33 +211,33 @@
             <LinearLayout
                 android:id="@+id/layout_privacy_policy"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/server_height"
+                android:layout_height="@dimen/view_height_dp72"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:padding="@dimen/padding">
+                android:padding="@dimen/padding_spacing_dp16">
 
                 <ImageView
-                    android:layout_width="@dimen/png_height"
-                    android:layout_height="@dimen/png_height"
+                    android:layout_width="@dimen/image_size_dp24"
+                    android:layout_height="@dimen/image_size_dp24"
                     app:srcCompat="@drawable/ic_privacy_24dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_start"
+                    android:paddingStart="@dimen/padding_spacing_dp16"
                     android:text="@string/title_privacy_policy"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/server_height"
+                android:layout_height="@dimen/view_height_dp72"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="@dimen/padding">
+                android:padding="@dimen/padding_spacing_dp16">
 
                 <TextView
                     android:id="@+id/tv_version"

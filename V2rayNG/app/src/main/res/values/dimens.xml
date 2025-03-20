@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="bypass_list_header_height">64dp</dimen>
-    <dimen name="layout_margin_top_height">16dp</dimen>
-    <dimen name="layout_margin_right_height">16dp</dimen>
-    <dimen name="layout_margin_spacing">8dp</dimen>
-    <dimen name="edit_height">50dp</dimen>
-    <dimen name="png_height">24dp</dimen>
-    <dimen name="server_height">72dp</dimen>
-    <dimen name="sub_height">90dp</dimen>
-    <dimen name="connection_test_height">60dp</dimen>
-    <dimen name="padding_start">16dp</dimen>
-    <dimen name="padding_end">16dp</dimen>
-    <dimen name="padding">16dp</dimen>
-    <dimen name="cardview_margin">3dp</dimen>
+    <dimen name="margin_spacing_dp8">8dp</dimen>
+    <dimen name="margin_spacing_dp16">16dp</dimen>
+    <dimen name="padding_spacing_dp16">16dp</dimen>
 
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="nav_header_vertical_spacing">8dp</dimen>
-    <dimen name="nav_header_height">160dp</dimen>
+    <dimen name="image_size_dp24">24dp</dimen>
+
+    <dimen name="view_height_dp48">48dp</dimen>
+    <dimen name="view_height_dp64">64dp</dimen>
+    <dimen name="view_height_dp72">72dp</dimen>
+    <dimen name="view_height_dp90">90dp</dimen>
+    <dimen name="view_height_dp160">160dp</dimen>
 </resources>

@@ -19,7 +19,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layout_margin_top_height"
+        android:layout_marginTop="@dimen/margin_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -30,7 +30,7 @@
         <EditText
             android:id="@+id/et_remarks"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/edit_height"
+            android:layout_height="@dimen/view_height_dp48"
             android:inputType="text" />
 
     </LinearLayout>
@@ -38,7 +38,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layout_margin_top_height"
+        android:layout_marginTop="@dimen/margin_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -49,7 +49,7 @@
         <EditText
             android:id="@+id/et_address"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/edit_height"
+            android:layout_height="@dimen/view_height_dp48"
             android:inputType="text" />
 
     </LinearLayout>
@@ -57,7 +57,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layout_margin_top_height"
+        android:layout_marginTop="@dimen/margin_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -68,7 +68,7 @@
         <EditText
             android:id="@+id/et_port"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/edit_height"
+            android:layout_height="@dimen/view_height_dp48"
             android:inputType="number" />
     </LinearLayout>
 

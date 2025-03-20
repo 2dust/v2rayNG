@@ -11,9 +11,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/layout_margin_spacing"
-        android:paddingTop="@dimen/layout_margin_spacing"
-        android:paddingBottom="@dimen/layout_margin_spacing">
+        android:layout_margin="@dimen/margin_spacing_dp8"
+        android:paddingTop="@dimen/margin_spacing_dp8"
+        android:paddingBottom="@dimen/margin_spacing_dp8">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/log_content"

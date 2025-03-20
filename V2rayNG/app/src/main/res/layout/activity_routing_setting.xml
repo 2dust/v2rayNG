@@ -20,7 +20,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/layout_margin_top_height"
+                android:layout_margin="@dimen/margin_spacing_dp16"
                 android:orientation="vertical">
 
                 <TextView
@@ -31,7 +31,7 @@
                 <Spinner
                     android:id="@+id/sp_domain_strategy"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/edit_height"
+                    android:layout_height="@dimen/view_height_dp48"
                     android:entries="@array/routing_domain_strategy" />
             </LinearLayout>
 
@@ -39,10 +39,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_top_height"
-                android:layout_marginBottom="@dimen/layout_margin_top_height"
+                android:layout_marginTop="@dimen/margin_spacing_dp16"
+                android:layout_marginBottom="@dimen/margin_spacing_dp16"
                 android:orientation="vertical"
-                android:paddingStart="@dimen/padding_start">
+                android:paddingStart="@dimen/padding_spacing_dp16">
 
                 <TextView
                     android:layout_width="wrap_content"

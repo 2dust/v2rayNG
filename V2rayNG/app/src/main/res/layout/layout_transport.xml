@@ -7,7 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layout_margin_top_height"
+        android:layout_marginTop="@dimen/margin_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -20,7 +20,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layout_margin_top_height"
+        android:layout_marginTop="@dimen/margin_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -31,14 +31,14 @@
         <Spinner
             android:id="@+id/sp_network"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/edit_height"
+            android:layout_height="@dimen/view_height_dp48"
             android:entries="@array/networks" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layout_margin_top_height"
+        android:layout_marginTop="@dimen/margin_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -50,13 +50,13 @@
         <Spinner
             android:id="@+id/sp_header_type"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/edit_height" />
+            android:layout_height="@dimen/view_height_dp48" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layout_margin_top_height"
+        android:layout_marginTop="@dimen/margin_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -68,7 +68,7 @@
         <EditText
             android:id="@+id/et_request_host"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/edit_height"
+            android:layout_height="@dimen/view_height_dp48"
             android:inputType="text" />
     </LinearLayout>
 
@@ -76,7 +76,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layout_margin_top_height"
+        android:layout_marginTop="@dimen/margin_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -88,7 +88,7 @@
         <EditText
             android:id="@+id/et_path"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/edit_height"
+            android:layout_height="@dimen/view_height_dp48"
             android:inputType="text" />
     </LinearLayout>
 
@@ -96,7 +96,7 @@
         android:id="@+id/layout_extra"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layout_margin_top_height"
+        android:layout_marginTop="@dimen/margin_spacing_dp16"
         android:orientation="vertical">
 
         <TextView

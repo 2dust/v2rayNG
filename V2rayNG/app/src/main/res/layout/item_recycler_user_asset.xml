@@ -8,18 +8,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/layout_margin_spacing"
+        android:layout_margin="@dimen/margin_spacing_dp8"
         android:background="?attr/selectableItemBackground"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="@dimen/nav_header_vertical_spacing">
+        android:padding="@dimen/margin_spacing_dp8">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingStart="@dimen/padding_start">
+            android:paddingStart="@dimen/padding_spacing_dp16">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -61,11 +61,11 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:padding="@dimen/nav_header_vertical_spacing">
+            android:padding="@dimen/margin_spacing_dp8">
 
             <ImageView
-                android:layout_width="@dimen/png_height"
-                android:layout_height="@dimen/png_height"
+                android:layout_width="@dimen/image_size_dp24"
+                android:layout_height="@dimen/image_size_dp24"
                 app:srcCompat="@drawable/ic_edit_24dp" />
         </LinearLayout>
 
@@ -76,11 +76,11 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:padding="@dimen/nav_header_vertical_spacing">
+            android:padding="@dimen/margin_spacing_dp8">
 
             <ImageView
-                android:layout_width="@dimen/png_height"
-                android:layout_height="@dimen/png_height"
+                android:layout_width="@dimen/image_size_dp24"
+                android:layout_height="@dimen/image_size_dp24"
                 app:srcCompat="@drawable/ic_delete_24dp" />
         </LinearLayout>
     </LinearLayout>

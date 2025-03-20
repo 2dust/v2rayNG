@@ -9,24 +9,24 @@
     <LinearLayout
         android:id="@+id/info_container"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/sub_height"
+        android:layout_height="@dimen/view_height_dp90"
         android:layout_gravity="center"
-        android:layout_margin="@dimen/layout_margin_spacing"
+        android:layout_margin="@dimen/margin_spacing_dp8"
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
         android:nextFocusRight="@+id/layout_edit"
         android:orientation="horizontal"
-        android:paddingTop="@dimen/layout_margin_spacing"
-        android:paddingBottom="@dimen/layout_margin_spacing">
+        android:paddingTop="@dimen/margin_spacing_dp8"
+        android:paddingBottom="@dimen/margin_spacing_dp8">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingStart="@dimen/padding_start">
+            android:paddingStart="@dimen/padding_spacing_dp16">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -41,10 +41,10 @@
 
                 <ImageView
                     android:id="@+id/img_locked"
-                    android:layout_width="@dimen/padding"
-                    android:layout_height="@dimen/padding"
+                    android:layout_width="@dimen/padding_spacing_dp16"
+                    android:layout_height="@dimen/padding_spacing_dp16"
                     android:layout_gravity="center"
-                    android:layout_marginStart="@dimen/padding_start"
+                    android:layout_marginStart="@dimen/padding_spacing_dp16"
                     app:srcCompat="@drawable/ic_lock_24dp" />
 
             </LinearLayout>
@@ -53,7 +53,7 @@
                 android:id="@+id/domainIp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_spacing"
+                android:layout_marginTop="@dimen/margin_spacing_dp8"
                 android:lines="1"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -61,7 +61,7 @@
                 android:id="@+id/outboundTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_spacing"
+                android:layout_marginTop="@dimen/margin_spacing_dp8"
                 android:lines="1"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -69,11 +69,11 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/sub_height"
+            android:layout_height="@dimen/view_height_dp90"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingStart="@dimen/padding_start"
-            android:paddingEnd="@dimen/padding_end">
+            android:paddingStart="@dimen/padding_spacing_dp16"
+            android:paddingEnd="@dimen/padding_spacing_dp16">
 
             <LinearLayout
                 android:id="@+id/layout_edit"
@@ -85,18 +85,18 @@
                 android:gravity="center"
                 android:nextFocusLeft="@+id/info_container"
                 android:orientation="vertical"
-                android:padding="@dimen/layout_margin_spacing">
+                android:padding="@dimen/margin_spacing_dp8">
 
                 <ImageView
-                    android:layout_width="@dimen/png_height"
-                    android:layout_height="@dimen/png_height"
+                    android:layout_width="@dimen/image_size_dp24"
+                    android:layout_height="@dimen/image_size_dp24"
                     app:srcCompat="@drawable/ic_edit_24dp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_spacing"
+                android:layout_marginTop="@dimen/margin_spacing_dp8"
                 android:orientation="horizontal">
 
                 <androidx.appcompat.widget.SwitchCompat

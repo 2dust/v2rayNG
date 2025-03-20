@@ -8,18 +8,18 @@
     <LinearLayout
         android:id="@+id/layout_edit"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/server_height"
+        android:layout_height="@dimen/view_height_dp48"
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="@dimen/padding">
+        android:padding="@dimen/padding_spacing_dp16">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center|left"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/layout_margin_top_height">
+            android:paddingBottom="@dimen/margin_spacing_dp16">
 
             <TextView
                 android:layout_width="wrap_content"

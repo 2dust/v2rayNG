@@ -12,8 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingStart="@dimen/padding_start"
-        android:paddingEnd="@dimen/padding_end">
+        android:paddingStart="@dimen/padding_spacing_dp16"
+        android:paddingEnd="@dimen/padding_spacing_dp16">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,7 +22,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/bypass_list_header_height"
+                android:layout_height="@dimen/view_height_dp64"
                 android:orientation="horizontal">
 
                 <LinearLayout

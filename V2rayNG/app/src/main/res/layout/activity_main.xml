@@ -47,7 +47,7 @@
                     <com.google.android.material.tabs.TabLayout
                         android:id="@+id/tab_group"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/bypass_list_header_height"
+                        android:layout_height="@dimen/view_height_dp64"
                         app:tabIndicatorFullWidth="false"
                         app:tabMode="scrollable"
                         app:tabTextAppearance="@style/TabLayoutTextStyle" />
@@ -63,7 +63,7 @@
                     <LinearLayout
                         android:id="@+id/layout_test"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/connection_test_height"
+                        android:layout_height="@dimen/view_height_dp64"
                         android:background="@color/colorPrimary"
                         android:clickable="true"
                         android:focusable="true"
@@ -77,7 +77,7 @@
                             android:layout_height="wrap_content"
                             android:maxLines="2"
                             android:minLines="1"
-                            android:paddingStart="@dimen/padding_start"
+                            android:paddingStart="@dimen/padding_spacing_dp16"
                             android:text="@string/connection_test_pending"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -89,7 +89,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|end"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="@dimen/margin_spacing_dp16">
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/fab"
@@ -98,10 +98,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
                         android:layout_gravity="bottom|end"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginBottom="16dp"
+                        android:layout_margin="@dimen/margin_spacing_dp16"
                         android:clickable="true"
                         android:focusable="true"
                         android:nextFocusLeft="@+id/layout_test"

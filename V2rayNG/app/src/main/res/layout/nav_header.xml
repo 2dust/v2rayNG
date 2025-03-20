@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/nav_header_height"
+    android:layout_height="@dimen/view_height_dp160"
     android:background="@drawable/nav_header_bg"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="@dimen/activity_horizontal_margin">
+    android:padding="@dimen/margin_spacing_dp16">
 
     <TextView
         android:layout_width="match_parent"
@@ -13,7 +13,7 @@
         android:layout_gravity="center"
         android:fontFamily="@font/montserrat_thin"
         android:gravity="center"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:paddingTop="@dimen/margin_spacing_dp8"
         android:text="@string/app_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 

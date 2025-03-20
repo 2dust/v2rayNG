@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="@dimen/layout_margin_top_height">
+            android:padding="@dimen/margin_spacing_dp16">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -33,7 +33,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:layout_marginTop="@dimen/margin_spacing_dp16"
                 android:orientation="vertical">
 
                 <TextView
@@ -44,7 +44,7 @@
                 <EditText
                     android:id="@+id/et_remarks"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/edit_height"
+                    android:layout_height="@dimen/view_height_dp48"
                     android:inputType="text" />
 
             </LinearLayout>
@@ -52,7 +52,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:layout_marginTop="@dimen/margin_spacing_dp16"
                 android:orientation="vertical">
 
                 <TextView
@@ -77,7 +77,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:layout_marginTop="@dimen/margin_spacing_dp16"
                 android:orientation="vertical">
 
                 <TextView
@@ -88,7 +88,7 @@
                 <EditText
                     android:id="@+id/et_filter"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/edit_height"
+                    android:layout_height="@dimen/view_height_dp48"
                     android:inputType="text" />
 
             </LinearLayout>
@@ -96,7 +96,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:layout_marginTop="@dimen/margin_spacing_dp16"
                 android:orientation="horizontal">
 
                 <TextView
@@ -109,8 +109,8 @@
                     android:id="@+id/chk_enable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_start"
-                    android:paddingEnd="@dimen/padding_end"
+                    android:paddingStart="@dimen/padding_spacing_dp16"
+                    android:paddingEnd="@dimen/padding_spacing_dp16"
                     app:theme="@style/BrandedSwitch" />
 
             </LinearLayout>
@@ -118,7 +118,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:layout_marginTop="@dimen/margin_spacing_dp16"
                 android:orientation="horizontal">
 
                 <TextView
@@ -132,8 +132,8 @@
                     android:id="@+id/auto_update_check"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_start"
-                    android:paddingEnd="@dimen/padding_end"
+                    android:paddingStart="@dimen/padding_spacing_dp16"
+                    android:paddingEnd="@dimen/padding_spacing_dp16"
                     app:theme="@style/BrandedSwitch" />
 
             </LinearLayout>
@@ -141,7 +141,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:layout_marginTop="@dimen/margin_spacing_dp16"
                 android:orientation="vertical">
 
                 <TextView
@@ -152,7 +152,7 @@
                 <EditText
                     android:id="@+id/et_pre_profile"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/edit_height"
+                    android:layout_height="@dimen/view_height_dp48"
                     android:hint="@string/sub_setting_pre_profile_tip"
                     android:inputType="text" />
 
@@ -161,7 +161,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_top_height"
+                android:layout_marginTop="@dimen/margin_spacing_dp16"
                 android:orientation="vertical">
 
                 <TextView
@@ -172,7 +172,7 @@
                 <EditText
                     android:id="@+id/et_next_profile"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/edit_height"
+                    android:layout_height="@dimen/view_height_dp48"
                     android:hint="@string/sub_setting_pre_profile_tip"
                     android:inputType="text" />
 
@@ -182,8 +182,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/layout_margin_top_height"
-            android:layout_marginBottom="@dimen/layout_margin_top_height"
+            android:layout_marginTop="@dimen/margin_spacing_dp16"
+            android:layout_marginBottom="@dimen/margin_spacing_dp16"
             android:orientation="vertical" />
 
     </LinearLayout>
