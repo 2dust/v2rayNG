@@ -105,6 +105,17 @@
     <string name="server_lab_need_inbound">Убедитесь, что входящий порт соответствует настройкам</string>
     <string name="toast_malformed_josn">Профиль повреждён</string>
     <string name="server_lab_request_host6">Узел (SNI) (необязательно)</string>
+    <string name="toast_action_not_allowed">Это действие запрещено</string>
+    <string name="server_obfs_password">Пароль obfs</string>
+    <string name="server_lab_port_hop">Смена портов (переопределяет порт)</string>
+    <string name="server_lab_port_hop_interval">Интервал смены портов</string>
+    <string name="server_lab_stream_pinsha256">pinSHA256</string>
+    <string name="server_lab_bandwidth_down">Входящая пропускная способность (единицы)</string>
+    <string name="server_lab_bandwidth_up">Исходящая пропускная способность (единицы)</string>
+    <string name="server_lab_xhttp_mode">Режим XHTTP</string>
+    <string name="server_lab_xhttp_extra">Необработанный JSON XHTTP Extra, формат: { XHTTPObject }</string>
+
+    <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">Невозможно скопировать файл, используйте файловый менеджер</string>
     <string name="menu_item_add_asset">Добавить ресурс</string>
     <string name="menu_item_add_file">Добавить файлы</string>
@@ -115,15 +126,6 @@
     <string name="title_user_asset_add_url">Добавить URL ресурса</string>
     <string name="msg_file_not_found">Файл не найден</string>
     <string name="msg_remark_is_duplicate">Название уже существует</string>
-    <string name="toast_action_not_allowed">Это действие запрещено</string>
-    <string name="server_obfs_password">Пароль obfs</string>
-    <string name="server_lab_port_hop">Смена портов (переопределяет порт)</string>
-    <string name="server_lab_port_hop_interval">Интервал смены портов</string>
-    <string name="server_lab_stream_pinsha256">pinSHA256</string>
-    <string name="server_lab_bandwidth_down">Входящая пропускная способность (единицы)</string>
-    <string name="server_lab_bandwidth_up">Исходящая пропускная способность (единицы)</string>
-    <string name="server_lab_xhttp_mode">Режим XHTTP</string>
-    <string name="server_lab_xhttp_extra">Необработанный JSON XHTTP Extra, формат: { XHTTPObject }</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Загрузка…</string>
@@ -135,6 +137,8 @@
     <string name="msg_downloading_content">Загрузка данных</string>
     <string name="menu_item_export_proxy_app">Экспорт в буфер обмена</string>
     <string name="menu_item_import_proxy_app">Импорт из буфера обмена</string>
+    <string name="per_app_proxy_settings">Per-app settings</string>
+    <string name="per_app_proxy_settings_enable">Enable per-app</string>
 
 
     <!-- Preferences -->
@@ -212,6 +216,7 @@
     <string name="title_pref_append_http_proxy">Дополнительный HTTP-прокси</string>
     <string name="summary_pref_append_http_proxy">HTTP-прокси будет использоваться напрямую (из браузера и других поддерживающих приложений), минуя виртуальный сетевой адаптер (Android 10+)</string>
 
+    <!-- AboutActivity -->
     <string name="title_pref_feedback">Обратная связь</string>
     <string name="summary_pref_feedback">Предложить улучшение или сообщить об ошибке на GitHub</string>
     <string name="summary_pref_tg_group">Присоединиться к группе в Telegram</string>
@@ -273,6 +278,7 @@
     <string name="tasker_start_service">Запуск службы</string>
     <string name="tasker_setting_confirm">Подтвердить</string>
 
+    <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">Доменная стратегия</string>
     <string name="routing_settings_title">Маршрутизация</string>
     <string name="routing_settings_tips">Введите требуемые домены/IP через запятую</string>
