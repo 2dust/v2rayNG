@@ -97,7 +97,6 @@ object V2rayConfigManager {
             }
         }
 
-        //取得默认配置
         val assets = Utils.readTextFromAssets(context, "v2ray_config.json")
         if (TextUtils.isEmpty(assets)) {
             return result
@@ -284,7 +283,7 @@ object V2rayConfigManager {
                 )
             }
 
-            // DNS inbound对象
+            // DNS inbound
             val remoteDns = SettingsManager.getRemoteDnsServers()
             if (v2rayConfig.inbounds.none { e -> e.protocol == "dokodemo-door" && e.tag == "dns-in" }) {
                 val dnsInboundSettings = V2rayConfig.InboundBean.InSettingsBean(
@@ -309,7 +308,7 @@ object V2rayConfigManager {
                 )
             }
 
-            // DNS outbound对象
+            // DNS outbound
             if (v2rayConfig.outbounds.none { e -> e.protocol == "dns" && e.tag == "dns-out" }) {
                 v2rayConfig.outbounds.add(
                     V2rayConfig.OutboundBean(
@@ -416,7 +415,7 @@ object V2rayConfigManager {
             hosts[DNS_YANDEX_DOMAIN] = DNS_YANDEX_ADDRESSES
 
 
-            // DNS dns对象
+            // DNS dns
             v2rayConfig.dns = V2rayConfig.DnsBean(
                 servers = servers,
                 hosts = hosts

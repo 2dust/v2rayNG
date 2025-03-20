@@ -83,7 +83,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                 }
             }
 
-            // 隐藏主页服务器地址为xxx:xxx:***/xxx.xxx.xxx.***
+            // Hide xxx:xxx:***/xxx.xxx.xxx.***
             val strState = "${
                 profile.server?.let {
                     if (it.contains(":"))
