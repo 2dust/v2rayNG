@@ -106,6 +106,17 @@
     <string name="server_lab_need_inbound">موتمعن بۊین ک پورت وۊرۊڌی وا سامووا ی جۊر هڌ</string>
     <string name="toast_malformed_josn">کانفیگ زبال نؽڌ</string>
     <string name="server_lab_request_host6">هاست(SNI)(اختیاری)</string>
+    <string name="toast_action_not_allowed">ای کار ممنۊ هڌ</string>
+    <string name="server_obfs_password">رزم obfs</string>
+    <string name="server_lab_port_hop">پورت گوم (درگا سرورن ز نۊ هؽل اکونه)</string>
+    <string name="server_lab_port_hop_interval">فاسله پورت گوم (سانیه)</string>
+    <string name="server_lab_stream_pinsha256">pinSHA256</string>
+    <string name="server_lab_bandwidth_down">ب لم ٱووڌن پئنا باند (واهڌ)</string>
+    <string name="server_lab_bandwidth_up">وا روء رئڌن پئنا باند (واهڌ)</string>
+    <string name="server_lab_xhttp_mode">هالت XHTTP</string>
+    <string name="server_lab_xhttp_extra">XHTTP Extra خام JSON، قالوو: { XHTTPObject }</string>
+
+    <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">لف گیری فایل ٱنجوم نوابی، ز ی برنومه دؽوۉداری فایل هیاری بگرین</string>
     <string name="menu_item_add_asset">ازاف کردن دارایی</string>
     <string name="menu_item_add_file">ازاف کردن فایل</string>
@@ -116,15 +127,6 @@
     <string name="title_user_asset_add_url">آدرس اینترنتی دارایین ازاف کۊنین</string>
     <string name="msg_file_not_found">فایلن نجوست</string>
     <string name="msg_remark_is_duplicate">ائزارات ز زیتر بیڌسۉݩ</string>
-    <string name="toast_action_not_allowed">ای کار ممنۊ هڌ</string>
-    <string name="server_obfs_password">رزم obfs</string>
-    <string name="server_lab_port_hop">پورت گوم (درگا سرورن ز نۊ هؽل اکونه)</string>
-    <string name="server_lab_port_hop_interval">فاسله پورت گوم (سانیه)</string>
-    <string name="server_lab_stream_pinsha256">pinSHA256</string>
-    <string name="server_lab_bandwidth_down">ب لم ٱووڌن پئنا باند (واهڌ)</string>
-    <string name="server_lab_bandwidth_up">وا روء رئڌن پئنا باند (واهڌ)</string>
-    <string name="server_lab_xhttp_mode">هالت XHTTP</string>
-    <string name="server_lab_xhttp_extra">XHTTP Extra خام JSON، قالوو: { XHTTPObject }</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">هون بار ونی بۊ</string>
@@ -136,6 +138,8 @@
     <string name="msg_downloading_content">موئتوا هونی دانلود ابۊن</string>
     <string name="menu_item_export_proxy_app">و در کشیڌن من کلیپ بورد</string>
     <string name="menu_item_import_proxy_app">و من ٱووردن ز کلیپ بورد</string>
+    <string name="per_app_proxy_settings">Per-app settings</string>
+    <string name="per_app_proxy_settings_enable">Enable per-app</string>
 
 
     <!-- Preferences -->
@@ -213,6 +217,7 @@
     <string name="title_pref_append_http_proxy">پروکسی HTTP ن و VPN ازاف کۊنین</string>
     <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موسقیمن ز (مۊرۊرگر/ی قرد ز برنومیل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
 
+    <!-- AboutActivity -->
     <string name="title_pref_feedback">فشناڌن منشڌ</string>
     <string name="summary_pref_feedback">فشناڌن منشڌ یا داسوو موشکلا من Github</string>
     <string name="summary_pref_tg_group">ٱووڌن من جرگه تلگرام</string>
@@ -274,6 +279,7 @@
     <string name="tasker_start_service">ر وندن خدمات</string>
     <string name="tasker_setting_confirm">قوۊل</string>
 
+    <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">نشقه دامنه</string>
     <string name="routing_settings_title">سامووا تور جوستن</string>
     <string name="routing_settings_tips">وا کاما ز یک جوڌا ابۊن (،) پسند دامنه یا آی پی</string>

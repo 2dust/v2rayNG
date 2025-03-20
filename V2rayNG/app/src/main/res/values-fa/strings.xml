@@ -106,11 +106,6 @@
     <string name="server_lab_need_inbound">اطمینان حاصل کنید که پورت ورودی با تنظیمات مطابقت دارد</string>
     <string name="toast_malformed_josn">کانفیگ درست نیست</string>
     <string name="server_lab_request_host6">هاست (SNI) (اختیاری)</string>
-    <string name="toast_asset_copy_failed">کپی فایل انجام نشد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
-    <string name="menu_item_add_file">افزودن فایل ‌ها</string>
-    <string name="menu_item_scan_qrcode">اسکن QRcode</string>
-    <string name="title_url">URL</string>
-    <string name="menu_item_download_file">دانلود فایل‌ ها</string>
     <string name="toast_action_not_allowed">این عمل ممنوع است</string>
     <string name="server_obfs_password">رمز عبور obfs</string>
     <string name="server_lab_port_hop">پورت پرش (درگاه سرور را بازنویسی می کند)</string>
@@ -121,10 +116,17 @@
     <string name="server_lab_xhttp_mode">حالت XHTTP</string>
     <string name="server_lab_xhttp_extra">خام JSON XHTTP Extra، قالب: { XHTTPObject }</string>
 
-    <!-- PerAppProxyActivity -->
+    <!-- UserAssetActivity -->
+    <string name="toast_asset_copy_failed">کپی فایل انجام نشد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
+    <string name="menu_item_add_file">افزودن فایل ‌ها</string>
+    <string name="menu_item_scan_qrcode">اسکن QRcode</string>
+    <string name="title_url">URL</string>
+    <string name="menu_item_download_file">دانلود فایل‌ ها</string>
     <string name="title_user_asset_add_url">آدرس اینترنتی را اضافه کنید</string>
     <string name="msg_file_not_found">فایل پیدا نشد</string>
     <string name="msg_remark_is_duplicate">نام قبلاً وجود دارد</string>
+
+    <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">بارگذاری</string>
     <string name="menu_item_search">جستجو</string>
     <string name="menu_item_select_all">انتخاب همه</string>
@@ -134,6 +136,8 @@
     <string name="msg_downloading_content">در حال دانلود محتوا</string>
     <string name="menu_item_export_proxy_app">خروجی گرفتن در کلیپ‌ بورد</string>
     <string name="menu_item_import_proxy_app">وارد کردن از کلیپ‌ بورد</string>
+    <string name="per_app_proxy_settings">Per-app settings</string>
+    <string name="per_app_proxy_settings_enable">Enable per-app</string>
 
     <!-- Preferences -->
     <string name="title_settings">تنظیمات</string>
@@ -211,6 +215,7 @@
     <string name="title_pref_append_http_proxy">پروکسی HTTP را به VPN اضافه کنید</string>
     <string name="summary_pref_append_http_proxy">پروکسی HTTP مستقیماً از (مرورگر/برخی برنامه‌های پشتیبانی‌شده)، بدون استفاده از دستگاه NIC مجازی (Android 10+) استفاده می‌شود.</string>
 
+    <!-- AboutActivity -->
     <string name="title_pref_feedback">بازخورد</string>
     <string name="summary_pref_feedback">بازخورد یا گزارش اشکالات در گیت‌ هاب</string>
     <string name="summary_pref_tg_group">عضویت در گروه تلگرام</string>
@@ -271,6 +276,7 @@
     <string name="tasker_start_service">شروع خدمات</string>
     <string name="tasker_setting_confirm">تایید</string>
 
+    <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">استراتژی دامنه</string>
     <string name="routing_settings_title">تنظیمات مسیریابی</string>
     <string name="routing_settings_tips">با کاما (،) از هم جدا شوند، ذخیره کردن فراموش نشود</string>

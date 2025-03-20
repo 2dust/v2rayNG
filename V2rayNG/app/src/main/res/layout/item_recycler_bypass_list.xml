@@ -42,6 +42,6 @@
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"
-        android:padding="@dimen/padding_spacing_dp16"/>
+        android:paddingEnd="@dimen/padding_spacing_dp16"/>
 
 </LinearLayout>

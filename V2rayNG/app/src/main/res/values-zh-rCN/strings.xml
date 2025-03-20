@@ -2,7 +2,7 @@
 <resources>
     <string name="app_widget_name">开关</string>
     <string name="app_tile_name">开关</string>
-    <string name="app_tile_first_use">初次使用此功能请先用APP添加配置</string>
+    <string name="app_tile_first_use">初次使用此功能请先用 APP 添加配置</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="migration_success">数据迁移成功!</string>
@@ -27,32 +27,32 @@
     <string name="menu_item_import_config_qrcode">扫描二维码</string>
     <string name="menu_item_import_config_clipboard">从剪贴板导入</string>
     <string name="menu_item_import_config_local">从本地导入</string>
-    <string name="menu_item_import_config_manually_vmess">手动输入[VMess]</string>
-    <string name="menu_item_import_config_manually_vless">手动输入[VLESS]</string>
-    <string name="menu_item_import_config_manually_ss">手动输入[Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">手动输入[SOCKS]</string>
-    <string name="menu_item_import_config_manually_http">手动输入[HTTP]</string>
-    <string name="menu_item_import_config_manually_trojan">手动输入[Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">手动输入[Wireguard]</string>
-    <string name="menu_item_import_config_manually_hysteria2">手动输入[Hysteria2]</string>
+    <string name="menu_item_import_config_manually_vmess">手动输入 [VMess]</string>
+    <string name="menu_item_import_config_manually_vless">手动输入 [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">手动输入 [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">手动输入 [SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">手动输入 [HTTP]</string>
+    <string name="menu_item_import_config_manually_trojan">手动输入 [Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">手动输入 [Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">手动输入 [Hysteria2]</string>
     <string name="menu_item_import_config_custom">自定义配置</string>
     <string name="menu_item_import_config_custom_clipboard">从剪贴板导入自定义配置</string>
     <string name="menu_item_import_config_custom_local">从本地导入自定义配置</string>
-    <string name="menu_item_import_config_custom_url">剪贴板URL导入自定义配置</string>
-    <string name="menu_item_import_config_custom_url_scan">扫描URL导入自定义配置</string>
+    <string name="menu_item_import_config_custom_url">剪贴板 URL 导入自定义配置</string>
+    <string name="menu_item_import_config_custom_url_scan">扫描 URL 导入自定义配置</string>
     <string name="del_config_comfirm">确认删除？</string>
     <string name="del_invalid_config_comfirm">删除前请先测试！确认删除？</string>
-    <string name="server_lab_remarks">别名(remarks)</string>
-    <string name="server_lab_address">地址(address)</string>
-    <string name="server_lab_port">端口(port)</string>
-    <string name="server_lab_id">用户ID(id)</string>
-    <string name="server_lab_alterid">额外ID(alterId)</string>
-    <string name="server_lab_security">加密方式(security)</string>
-    <string name="server_lab_network">传输协议(network)</string>
-    <string name="server_lab_more_function">底层传输方式(transport)</string>
-    <string name="server_lab_head_type">伪装类型(type)</string>
-    <string name="server_lab_mode_type">gRPC 传输模式(mode)</string>
-    <string name="server_lab_request_host">伪装域名(host)</string>
+    <string name="server_lab_remarks">别名 (remarks)</string>
+    <string name="server_lab_address">地址 (address)</string>
+    <string name="server_lab_port">端口 (port)</string>
+    <string name="server_lab_id">用户 ID (id)</string>
+    <string name="server_lab_alterid">额外 ID (alterId)</string>
+    <string name="server_lab_security">加密方式 (security)</string>
+    <string name="server_lab_network">传输协议 (network)</string>
+    <string name="server_lab_more_function">底层传输方式 (transport)</string>
+    <string name="server_lab_head_type">伪装类型 (type)</string>
+    <string name="server_lab_mode_type">gRPC 传输模式 (mode)</string>
+    <string name="server_lab_request_host">伪装域名 (host)</string>
     <string name="server_lab_request_host_http">http host</string>
     <string name="server_lab_request_host_ws">ws host</string>
     <string name="server_lab_request_host_httpupgrade">httpupgrade host</string>
@@ -63,32 +63,32 @@
     <string name="server_lab_path">path</string>
     <string name="server_lab_path_ws">ws path</string>
     <string name="server_lab_path_httpupgrade">httpupgrade path</string>
-    <string name="server_lab_path_xhttp">xhttp path </string>
+    <string name="server_lab_path_xhttp">xhttp path</string>
     <string name="server_lab_path_h2">h2 path</string>
     <string name="server_lab_path_quic">QUIC 加密密钥</string>
     <string name="server_lab_path_kcp">kcp seed</string>
     <string name="server_lab_path_grpc">gRPC serviceName</string>
-    <string name="server_lab_stream_security">传输层安全(TLS)</string>
+    <string name="server_lab_stream_security">传输层安全 (TLS)</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn">Alpn</string>
-    <string name="server_lab_allow_insecure">跳过证书验证(allowInsecure)</string>
+    <string name="server_lab_allow_insecure">跳过证书验证 (allowInsecure)</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">服务器地址</string>
     <string name="server_lab_port3">服务器端口</string>
     <string name="server_lab_id3">密码</string>
     <string name="server_lab_security3">加密方式</string>
-    <string name="server_lab_id4">密码(可选)</string>
-    <string name="server_lab_security4">用户名(可选)</string>
-    <string name="server_lab_encryption">加密方式(encryption)</string>
-    <string name="server_lab_flow">流控(flow)</string>
+    <string name="server_lab_id4">密码 (可选)</string>
+    <string name="server_lab_security4">用户名 (可选)</string>
+    <string name="server_lab_encryption">加密方式 (encryption)</string>
+    <string name="server_lab_flow">流控 (flow)</string>
     <string name="server_lab_public_key">PublicKey</string>
-    <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
+    <string name="server_lab_preshared_key">PreSharedKey (optional)</string>
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_secret_key">SecretKey</string>
-    <string name="server_lab_reserved">Reserved(可选，逗号隔开)</string>
-    <string name="server_lab_local_address">本地地址(可选IPv4/IPv6，逗号隔开)</string>
-    <string name="server_lab_local_mtu">Mtu(可选, 默认1420)</string>
+    <string name="server_lab_reserved">Reserved (可选，逗号隔开)</string>
+    <string name="server_lab_local_address">本地地址 (可选 IPv4/IPv6，逗号隔开)</string>
+    <string name="server_lab_local_mtu">Mtu (可选, 默认 1420)</string>
     <string name="toast_success">成功</string>
     <string name="toast_failure">失败</string>
     <string name="toast_none_data">没有数据</string>
@@ -101,29 +101,31 @@
     <string name="server_lab_content">内容</string>
     <string name="toast_none_data_clipboard">剪贴板中没有数据</string>
     <string name="toast_invalid_url">无效的网址</string>
-    <string name="toast_insecure_url_protocol">请不要使用不安全的HTTP协议订阅地址</string>
-    <string name="server_lab_need_inbound">确保inbounds port和设置中的一致</string>
+    <string name="toast_insecure_url_protocol">请不要使用不安全的 HTTP 协议订阅地址</string>
+    <string name="server_lab_need_inbound">确保 inbounds port 和设置中的一致</string>
     <string name="toast_malformed_josn">配置格式错误</string>
-    <string name="server_lab_request_host6">Host(SNI)(可选)</string>
-    <string name="toast_asset_copy_failed">失败, 请使用文件管理器</string>
-    <string name="menu_item_add_file">添加文件</string>
-    <string name="menu_item_scan_qrcode">扫描 QRcode</string>
-    <string name="title_url">URL</string>
-    <string name="menu_item_download_file">下载文件</string>
+    <string name="server_lab_request_host6">Host (SNI) (可选)</string>
     <string name="toast_action_not_allowed">禁止此项操作</string>
     <string name="server_obfs_password">混淆密码</string>
-    <string name="server_lab_port_hop">跳跃端口(会覆盖服务器端口)</string>
-    <string name="server_lab_port_hop_interval">端口跳跃间隔(秒)</string>
-    <string name="server_lab_stream_pinsha256">SHA256证书指纹</string>
+    <string name="server_lab_port_hop">跳跃端口 (会覆盖服务器端口)</string>
+    <string name="server_lab_port_hop_interval">端口跳跃间隔 (秒)</string>
+    <string name="server_lab_stream_pinsha256">SHA256 证书指纹</string>
     <string name="server_lab_bandwidth_down">带宽下行 (单位)</string>
     <string name="server_lab_bandwidth_up">带宽上行 (单位)</string>
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
 
-    <!-- PerAppProxyActivity -->
+    <!-- UserAssetActivity -->
+    <string name="toast_asset_copy_failed">失败, 请使用文件管理器</string>
+    <string name="menu_item_add_file">添加文件</string>
+    <string name="menu_item_scan_qrcode">扫描 QRcode</string>
+    <string name="title_url">URL</string>
+    <string name="menu_item_download_file">下载文件</string>
     <string name="title_user_asset_add_url">添加资产网址</string>
     <string name="msg_file_not_found">文件未找到</string>
     <string name="msg_remark_is_duplicate">备注已经存在</string>
+
+    <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">正在加载</string>
     <string name="menu_item_search">搜索</string>
     <string name="menu_item_select_all">全选</string>
@@ -133,13 +135,15 @@
     <string name="msg_downloading_content">正在下载内容</string>
     <string name="menu_item_export_proxy_app">导出至剪贴板</string>
     <string name="menu_item_import_proxy_app">从剪贴板导入</string>
+    <string name="per_app_proxy_settings">分应用设置</string>
+    <string name="per_app_proxy_settings_enable">启用分应用</string>
 
     <!-- Preferences -->
     <string name="title_settings">设置</string>
     <string name="title_advanced">进阶设置</string>
     <string name="title_vpn_settings">VPN 设置</string>
-    <string name="title_pref_per_app_proxy">分应用代理</string>
-    <string name="summary_pref_per_app_proxy">常规:勾选的App被代理,未勾选的直连;\n绕行模式:勾选的App直连,未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
+    <string name="title_pref_per_app_proxy">分应用</string>
+    <string name="summary_pref_per_app_proxy">常规: 勾选的 App 被代理, 未勾选的直连;\n绕行模式: 勾选的 App 直连, 未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
     <string name="title_pref_is_booted">开机时自动连接</string>
     <string name="summary_pref_is_booted">开机时自动连接选择的服务器，可能会不成功</string>
 
@@ -163,42 +167,42 @@
     <string name="title_pref_route_only_enabled">启用 routeOnly</string>
     <string name="summary_pref_route_only_enabled">将嗅探得到的域名仅用于路由，代理目标地址仍为 IP</string>
 
-    <string name="title_pref_local_dns_enabled">启用本地DNS</string>
+    <string name="title_pref_local_dns_enabled">启用本地 DNS</string>
     <string name="summary_pref_local_dns_enabled">DNS 请求导入 core 由 DNS 模块处理（推荐启用 如果需要路由绕过局域网及大陆地址)</string>
 
-    <string name="title_pref_fake_dns_enabled">启用虚拟DNS</string>
+    <string name="title_pref_fake_dns_enabled">启用虚拟 DNS</string>
     <string name="summary_pref_fake_dns_enabled">本地返回虚构解析结果 (减低延时 但个别应用可能无法使用)</string>
 
-    <string name="title_pref_prefer_ipv6">IPv6优先</string>
-    <string name="summary_pref_prefer_ipv6">App优先使用IPv6地址连接服务器,同时开启VPN的IPv6路由</string>
+    <string name="title_pref_prefer_ipv6">IPv6 优先</string>
+    <string name="summary_pref_prefer_ipv6">App 优先使用 IPv6 地址连接服务器, 同时开启 VPN 的 IPv6 路由</string>
 
-    <string name="title_pref_remote_dns">远程DNS (udp/tcp/https/quic)(可选)</string>
+    <string name="title_pref_remote_dns">远程 DNS (udp/tcp/https/quic)(可选)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (仅支持 IPv4/v6)</string>
-    <string name="title_pref_vpn_bypass_lan">VPN是否绕过局域网</string>
+    <string name="title_pref_vpn_bypass_lan">VPN 是否绕过局域网</string>
 
-    <string name="title_pref_domestic_dns">境内DNS (可选)</string>
+    <string name="title_pref_domestic_dns">境内 DNS (可选)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
-    <string name="title_pref_dns_hosts">DNS hosts (格式: 域名:地址,…)</string>
-    <string name="summary_pref_dns_hosts">domain:address,…</string>
+    <string name="title_pref_dns_hosts">DNS hosts (格式: 域名: 地址,…)</string>
+    <string name="summary_pref_dns_hosts">domain: address,…</string>
 
     <string name="title_pref_delay_test_url">真连接延迟测试网址 (http/https)</string>
     <string name="summary_pref_delay_test_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">允许来自局域网的连接</string>
-    <string name="summary_pref_proxy_sharing_enabled">其他设备可以使用socks/http协议通过您的IP地址连接到代理,仅在受信任的网络中启用以避免未经授权的连接</string>
+    <string name="summary_pref_proxy_sharing_enabled">其他设备可以使用 socks/http 协议通过您的 IP 地址连接到代理, 仅在受信任的网络中启用以避免未经授权的连接</string>
     <string name="toast_warning_pref_proxysharing_short">允许来自局域网的连接，请确保处于受信网络</string>
 
-    <string name="title_pref_allow_insecure">跳过证书验证(allowInsecure)</string>
-    <string name="summary_pref_allow_insecure">传输层安全选tls时，默认跳过证书验证(allowInsecure)</string>
+    <string name="title_pref_allow_insecure">跳过证书验证 (allowInsecure)</string>
+    <string name="summary_pref_allow_insecure">传输层安全选 tls 时，默认跳过证书验证 (allowInsecure)</string>
 
     <string name="title_pref_socks_port">本地代理端口</string>
     <string name="summary_pref_socks_port">本地代理端口</string>
 
-    <string name="title_pref_local_dns_port">本地DNS端口</string>
-    <string name="summary_pref_local_dns_port">本地DNS端口</string>
+    <string name="title_pref_local_dns_port">本地 DNS 端口</string>
+    <string name="summary_pref_local_dns_port">本地 DNS 端口</string>
 
     <string name="title_pref_confirm_remove">删除配置文件确认</string>
     <string name="summary_pref_confirm_remove">删除配置文件是否需要用户二次确认</string>
@@ -209,26 +213,27 @@
     <string name="title_pref_append_http_proxy">追加 HTTP 代理至 VPN</string>
     <string name="summary_pref_append_http_proxy">浏览器 / 一些支持的应用 将直接使用 HTTP 代理, 而不经过虚拟网卡设备 (Android 10+)</string>
 
+    <!-- AboutActivity -->
     <string name="title_pref_feedback">反馈</string>
     <string name="summary_pref_feedback">反馈改进或漏洞至 GitHub</string>
-    <string name="summary_pref_tg_group">加入Telegram Group</string>
-    <string name="toast_tg_app_not_found">未找到Telegram app</string>
+    <string name="summary_pref_tg_group">加入 Telegram Group</string>
+    <string name="toast_tg_app_not_found">未找到 Telegram app</string>
     <string name="title_privacy_policy">隐私权政策</string>
     <string name="title_about">关于</string>
     <string name="title_source_code">源代码</string>
     <string name="title_oss_license">Open Source licenses</string>
     <string name="title_tg_channel">Telegram 频道</string>
     <string name="title_configuration_backup">备份配置</string>
-    <string name="summary_configuration_backup">存储位置: [%s], 卸载App或清除存储后备份将被清除</string>
+    <string name="summary_configuration_backup">存储位置: [%s], 卸载 App 或清除存储后备份将被清除</string>
     <string name="title_configuration_restore">还原配置</string>
     <string name="title_configuration_share">分享配置</string>
 
     <string name="title_pref_promotion">推广</string>
-    <string name="summary_pref_promotion">一些推广,点击查看详情(捐赠可去除)</string>
+    <string name="summary_pref_promotion">一些推广, 点击查看详情 (捐赠可去除)</string>
 
     <string name="title_pref_auto_update_subscription">自动更新订阅</string>
     <string name="summary_pref_auto_update_subscription">在后台按一定时间间隔自动更新您的订阅。受设备影响，此功能不一定总是有效</string>
-    <string name="title_pref_auto_update_interval">自动更新间隔（分钟，最小值15）</string>
+    <string name="title_pref_auto_update_interval">自动更新间隔（分钟，最小值 15）</string>
 
     <string name="title_core_loglevel">日志级别</string>
     <string name="title_mode">模式</string>
@@ -247,7 +252,7 @@
     <string name="title_export_all">导出当前组配置至剪贴板</string>
     <string name="title_sub_setting">订阅分组设置</string>
     <string name="sub_setting_remarks">备注</string>
-    <string name="sub_setting_url">可选地址(url)</string>
+    <string name="sub_setting_url">可选地址 (url)</string>
     <string name="sub_setting_filter">别名正则过滤</string>
     <string name="sub_setting_enable">启用更新</string>
     <string name="sub_auto_update">启用自动更新</string>
@@ -255,7 +260,7 @@
     <string name="sub_setting_next_profile">落地代理別名</string>
     <string name="sub_setting_pre_profile_tip">请确保别名存在并唯一</string>
     <string name="title_sub_update">更新当前组订阅</string>
-    <string name="title_ping_all_server">测试当前组配置Tcping</string>
+    <string name="title_ping_all_server">测试当前组配置 Tcping</string>
     <string name="title_real_ping_all_server">测试当前组配置真连接</string>
     <string name="title_user_asset_setting">Geo 资源文件</string>
     <string name="title_sort_by_test_results">按测试结果排序</string>
@@ -270,9 +275,10 @@
     <string name="tasker_start_service">启动服务</string>
     <string name="tasker_setting_confirm">确定</string>
 
+    <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">域名策略</string>
     <string name="routing_settings_title">路由设置</string>
-    <string name="routing_settings_tips">用逗号(,)隔开,domain和ip二选一填写</string>
+    <string name="routing_settings_tips">用逗号(,)隔开, domain 和 ip 二选一填写</string>
     <string name="routing_settings_save">保存</string>
     <string name="routing_settings_delete">清空</string>
     <string name="routing_settings_rule_title">路由规则设置</string>
@@ -300,8 +306,8 @@
     <string name="menu_item_add_url">添加链接</string>
     <string name="title_fragment_settings">分片（Fragment） 设置</string>
     <string name="title_pref_fragment_packets">分片方式</string>
-    <string name="title_pref_fragment_length">分片包长（最小-最大）</string>
-    <string name="title_pref_fragment_interval">分片间隔（最小-最大）</string>
+    <string name="title_pref_fragment_length">分片包长（最小 - 最大）</string>
+    <string name="title_pref_fragment_interval">分片间隔（最小 - 最大）</string>
     <string name="title_pref_fragment_enabled">启用分片（Fragment）</string>
 
     <string-array name="share_method">
@@ -327,10 +333,10 @@
     </string-array>
 
     <string-array name="preset_rulesets">
-        <item>绕过大陆(Whitelist)</item>
-        <item>黑名单(Blacklist)</item>
-        <item>全局(Global)</item>
-        <item>伊朗(Iran)</item>
+        <item>绕过大陆 (Whitelist)</item>
+        <item>黑名单 (Blacklist)</item>
+        <item>全局 (Global)</item>
+        <item>伊朗 (Iran)</item>
     </string-array>
 
     <string-array name="vpn_bypass_lan">

@@ -19,7 +19,7 @@
     <string name="toast_services_success">啟動服務成功</string>
     <string name="toast_services_failure">啟動服務失敗</string>
 
-    <!--ServerActivity-->
+    <!-- ServerActivity -->
     <string name="title_server">設定檔</string>
     <string name="menu_item_add_config">新增設定</string>
     <string name="menu_item_save_config">儲存設定</string>
@@ -63,7 +63,7 @@
     <string name="server_lab_path">path</string>
     <string name="server_lab_path_ws">ws path</string>
     <string name="server_lab_path_httpupgrade">httpupgrade path</string>
-    <string name="server_lab_path_xhttp">xhttp path </string>
+    <string name="server_lab_path_xhttp">xhttp path</string>
     <string name="server_lab_path_h2">h2 path</string>
     <string name="server_lab_path_quic">QUIC 加密金鑰</string>
     <string name="server_lab_path_kcp">kcp seed</string>
@@ -82,13 +82,13 @@
     <string name="server_lab_encryption">加密 (encryption)</string>
     <string name="server_lab_flow">流程 (flow)</string>
     <string name="server_lab_public_key">PublicKey</string>
-    <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
+    <string name="server_lab_preshared_key">PreSharedKey (optional)</string>
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved (可選，逗號隔開)</string>
-    <string name="server_lab_local_address">本機位址(可選IPv4/IPv6，逗號隔開)</string>
-    <string name="server_lab_local_mtu">MTU(可選, 預設1420)</string>
+    <string name="server_lab_local_address">本機位址 (可選 IPv4/IPv6，逗號隔開)</string>
+    <string name="server_lab_local_mtu">MTU (可選, 預設 1420)</string>
     <string name="toast_success">成功</string>
     <string name="toast_failure">失敗</string>
     <string name="toast_none_data">無資料</string>
@@ -101,29 +101,31 @@
     <string name="server_lab_content">內容</string>
     <string name="toast_none_data_clipboard">剪貼簿內無資料</string>
     <string name="toast_invalid_url">URL 無效</string>
-    <string name="toast_insecure_url_protocol">請不要使用不安全的HTTP協定訂閱位址</string>
+    <string name="toast_insecure_url_protocol">請不要使用不安全的 HTTP 協定訂閱位址</string>
     <string name="server_lab_need_inbound">​​確保 inbounds port 和設定中的一致</string>
     <string name="toast_malformed_josn">設定格式不正確</string>
-    <string name="server_lab_request_host6">Host(SNI)(可選)</string>
-    <string name="toast_asset_copy_failed">失敗，請使用檔案總管</string>
-    <string name="menu_item_add_file">新增檔案</string>
-    <string name="menu_item_scan_qrcode">掃描 QRcode</string>
-    <string name="title_url">URL</string>
-    <string name="menu_item_download_file">下載檔案</string>
+    <string name="server_lab_request_host6">Host (SNI) (可選)</string>
     <string name="toast_action_not_allowed">禁止此項操作</string>
     <string name="server_obfs_password">混淆密碼</string>
-    <string name="server_lab_port_hop">跳躍連接埠(會覆蓋伺服器連接埠)</string>
-    <string name="server_lab_port_hop_interval">連接埠跳躍間隔(秒)</string>
-    <string name="server_lab_stream_pinsha256">SHA256憑證指紋</string>
+    <string name="server_lab_port_hop">跳躍連接埠 (會覆蓋伺服器連接埠)</string>
+    <string name="server_lab_port_hop_interval">連接埠跳躍間隔 (秒)</string>
+    <string name="server_lab_stream_pinsha256">SHA256 憑證指紋</string>
     <string name="server_lab_bandwidth_down">頻寬下行 (單位)</string>
     <string name="server_lab_bandwidth_up">頻寬上行 (單位)</string>
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
 
-    <!-- PerAppProxyActivity -->
+    <!-- UserAssetActivity -->
+    <string name="toast_asset_copy_failed">失敗，請使用檔案總管</string>
+    <string name="menu_item_add_file">新增檔案</string>
+    <string name="menu_item_scan_qrcode">掃描 QRcode</string>
+    <string name="title_url">URL</string>
+    <string name="menu_item_download_file">下載檔案</string>
     <string name="title_user_asset_add_url">新增資產網址</string>
     <string name="msg_file_not_found">文件未找到</string>
     <string name="msg_remark_is_duplicate">備註已經存在</string>
+
+    <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">載入</string>
     <string name="menu_item_search">搜尋</string>
     <string name="menu_item_select_all">全選</string>
@@ -133,6 +135,8 @@
     <string name="msg_downloading_content">正在下載內容</string>
     <string name="menu_item_export_proxy_app">匯出至剪貼簿</string>
     <string name="menu_item_import_proxy_app">從剪貼簿匯入</string>
+    <string name="per_app_proxy_settings">Per-app settings</string>
+    <string name="per_app_proxy_settings_enable">Enable per-app</string>
 
 
     <!-- Preferences -->
@@ -174,11 +178,11 @@
     <string name="title_pref_prefer_ipv6">IPv6 偏好</string>
     <string name="summary_pref_prefer_ipv6">App 優先使用 IPv6 位址連線伺服器，同时開啟 VPN 的 IPv6 路由</string>
 
-    <string name="title_pref_remote_dns">遠端DNS (udp/tcp/https/quic)(可選)</string>
+    <string name="title_pref_remote_dns">遠端 DNS (udp/tcp/https/quic)(可選)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (僅支援 IPv4/v6)</string>
-    <string name="title_pref_vpn_bypass_lan">VPN是否繞過區域網</string>
+    <string name="title_pref_vpn_bypass_lan">VPN 是否繞過區域網</string>
 
     <string name="title_pref_dns_hosts">DNS hosts (格式: 網域:位址,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
@@ -208,6 +212,7 @@
     <string name="title_pref_append_http_proxy">追加 HTTP 代理至 VPN</string>
     <string name="summary_pref_append_http_proxy">瀏覽器 / 一些支援的應用 將直接使用 HTTP 代理, 而不經過虛擬網卡設備 (Android 10+)</string>
 
+    <!-- AboutActivity -->
     <string name="title_pref_feedback">意見回饋</string>
     <string name="summary_pref_feedback">前往 GitHub 回報錯誤</string>
     <string name="summary_pref_tg_group">加入 Telegram 群組</string>
@@ -227,7 +232,7 @@
 
     <string name="title_pref_auto_update_subscription">自動更新訂閱</string>
     <string name="summary_pref_auto_update_subscription">在後台以一定時間間隔自動更新您的訂閱。受設備影響，此功能不一定總是有效</string>
-    <string name="title_pref_auto_update_interval">自動更新間隔（分鐘，最小值15）</string>
+    <string name="title_pref_auto_update_interval">自動更新間隔（分鐘，最小值 15）</string>
 
     <string name="title_core_loglevel">記錄層級</string>
     <string name="title_mode">模式</string>
@@ -269,6 +274,7 @@
     <string name="tasker_start_service">啟動服務</string>
     <string name="tasker_setting_confirm">確定</string>
 
+    <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">網域策略</string>
     <string name="routing_settings_title">轉送設定</string>
     <string name="routing_settings_tips">以半形逗號「,」分隔,domain和ip二選一填寫</string>
@@ -326,10 +332,10 @@
     </string-array>
 
     <string-array name="preset_rulesets">
-        <item>繞過大陸(Whitelist)</item>
-        <item>黑名單(Blacklist)</item>
-        <item>全域(Global)</item>
-        <item>伊朗(Iran)</item>
+        <item>繞過大陸 (Whitelist)</item>
+        <item>黑名單 (Blacklist)</item>
+        <item>全域 (Global)</item>
+        <item>伊朗 (Iran)</item>
     </string-array>
 
     <string-array name="vpn_bypass_lan">
