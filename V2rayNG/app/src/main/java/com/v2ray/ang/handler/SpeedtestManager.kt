@@ -135,7 +135,7 @@ object SpeedtestManager {
         var result: String
         var elapsed = -1L
 
-        val conn = HttpUtil.createProxyConnection(SettingsManager.getDelayTestUrl(), port, 30000, 30000) ?: return Pair(elapsed, "")
+        val conn = HttpUtil.createProxyConnection(SettingsManager.getDelayTestUrl(), port, 15000, 15000) ?: return Pair(elapsed, "")
         try {
             val start = SystemClock.elapsedRealtime()
             val code = conn.responseCode

@@ -206,9 +206,9 @@ class UserAssetActivity : BaseActivity() {
         var resultCount = 0
         lifecycleScope.launch(Dispatchers.IO) {
             assets.forEach {
-                var result = downloadGeo(it.second, 30000, httpPort)
+                var result = downloadGeo(it.second, 15000, httpPort)
                 if (!result) {
-                    result = downloadGeo(it.second, 30000, 0)
+                    result = downloadGeo(it.second, 15000, 0)
                 }
                 if (result)
                     resultCount++
