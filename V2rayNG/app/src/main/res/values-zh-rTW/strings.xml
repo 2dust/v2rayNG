@@ -26,6 +26,7 @@
     <string name="menu_item_del_config">刪除設定</string>
     <string name="menu_item_import_config_qrcode">從 QR Code 匯入設定</string>
     <string name="menu_item_import_config_clipboard">從剪貼簿匯入設定</string>
+    <string name="menu_item_import_config_local">從本地匯入</string>
     <string name="menu_item_import_config_manually_vmess">手動鍵入 [VMess]</string>
     <string name="menu_item_import_config_manually_vless">手動鍵入 [VLESS]</string>
     <string name="menu_item_import_config_manually_ss">手動鍵入 [Shadowsocks]</string>

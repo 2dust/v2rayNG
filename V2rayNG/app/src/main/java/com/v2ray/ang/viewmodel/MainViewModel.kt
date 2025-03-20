@@ -19,7 +19,6 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
@@ -89,37 +88,37 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /**
-     * Appends a custom configuration server.
-     * @param server The server configuration to append.
-     * @return True if the server was successfully appended, false otherwise.
-     */
-    fun appendCustomConfigServer(server: String): Boolean {
-        if (server.contains("inbounds")
-            && server.contains("outbounds")
-            && server.contains("routing")
-        ) {
-            try {
-                val config = CustomFmt.parse(server) ?: return false
-                config.subscriptionId = subscriptionId
-                val key = MmkvManager.encodeServerConfig("", config)
-                MmkvManager.encodeServerRaw(key, server)
-                serverList.add(0, key)
-//                val profile = ProfileLiteItem(
-//                    configType = config.configType,
-//                    subscriptionId = config.subscriptionId,
-//                    remarks = config.remarks,
-//                    server = config.getProxyOutbound()?.getServerAddress(),
-//                    serverPort = config.getProxyOutbound()?.getServerPort(),
-//                )
-                serversCache.add(0, ServersCache(key, config))
-                return true
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        return false
-    }
+//    /**
+//     * Appends a custom configuration server.
+//     * @param server The server configuration to append.
+//     * @return True if the server was successfully appended, false otherwise.
+//     */
+//    fun appendCustomConfigServer(server: String): Boolean {
+//        if (server.contains("inbounds")
+//            && server.contains("outbounds")
+//            && server.contains("routing")
+//        ) {
+//            try {
+//                val config = CustomFmt.parse(server) ?: return false
+//                config.subscriptionId = subscriptionId
+//                val key = MmkvManager.encodeServerConfig("", config)
+//                MmkvManager.encodeServerRaw(key, server)
+//                serverList.add(0, key)
+////                val profile = ProfileLiteItem(
+////                    configType = config.configType,
+////                    subscriptionId = config.subscriptionId,
+////                    remarks = config.remarks,
+////                    server = config.getProxyOutbound()?.getServerAddress(),
+////                    serverPort = config.getProxyOutbound()?.getServerPort(),
+////                )
+//                serversCache.add(0, ServersCache(key, config))
+//                return true
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//            }
+//        }
+//        return false
+//    }
 
     /**
      * Swaps the positions of two servers.

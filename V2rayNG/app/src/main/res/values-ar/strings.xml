@@ -27,6 +27,7 @@
     <string name="menu_item_del_config">حذف التكوين</string>
     <string name="menu_item_import_config_qrcode">استيراد التكوين من رمز الاستجابة السريعة (QRcode)</string>
     <string name="menu_item_import_config_clipboard">استيراد التكوين من الحافظة</string>
+    <string name="menu_item_import_config_local">Import config from locally</string>
     <string name="menu_item_import_config_manually_vmess">الكتابة يدويًا [VMess]</string>
     <string name="menu_item_import_config_manually_vless">الكتابة يدويًا [VLESS]</string>
     <string name="menu_item_import_config_manually_ss">الكتابة يدويًا [Shadowsocks]</string>

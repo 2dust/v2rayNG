@@ -26,6 +26,7 @@
     <string name="menu_item_del_config">删除配置</string>
     <string name="menu_item_import_config_qrcode">扫描二维码</string>
     <string name="menu_item_import_config_clipboard">从剪贴板导入</string>
+    <string name="menu_item_import_config_local">从本地导入</string>
     <string name="menu_item_import_config_manually_vmess">手动输入[VMess]</string>
     <string name="menu_item_import_config_manually_vless">手动输入[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">手动输入[Shadowsocks]</string>

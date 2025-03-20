@@ -27,6 +27,7 @@
     <string name="menu_item_del_config">پاک کردن کانفیگ</string>
     <string name="menu_item_import_config_qrcode">و من ٱووردن کانفیگ ز QRcode</string>
     <string name="menu_item_import_config_clipboard">و من ٱووردن کانفیگ ز کلیپ بورد</string>
+    <string name="menu_item_import_config_local">Import config from locally</string>
     <string name="menu_item_import_config_manually_vmess">هؽل دستی[VMess]</string>
     <string name="menu_item_import_config_manually_vless">هؽل دستی[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">هؽل دستی[Shadowsocks]</string>
