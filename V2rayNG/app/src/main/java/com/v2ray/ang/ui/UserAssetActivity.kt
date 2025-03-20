@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
@@ -23,7 +24,6 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubSettingBinding
 import com.v2ray.ang.databinding.ItemRecyclerUserAssetBinding
-import com.v2ray.ang.databinding.LayoutProgressBinding
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
@@ -196,32 +196,31 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun downloadGeoFiles() {
-        val dialog = AlertDialog.Builder(this)
-            .setView(LayoutProgressBinding.inflate(layoutInflater).root)
-            .setCancelable(false)
-            .show()
+        binding.pbWaiting.show()
         toast(R.string.msg_downloading_content)
 
         val httpPort = SettingsManager.getHttpPort()
         var assets = MmkvManager.decodeAssetUrls()
         assets = addBuiltInGeoItems(assets)
 
-        assets.forEach {
-            //toast(getString(R.string.msg_downloading_content) + it)
-            lifecycleScope.launch(Dispatchers.IO) {
-                var result = downloadGeo(it.second, 60000, httpPort)
+        var resultCount = 0
+        lifecycleScope.launch(Dispatchers.IO) {
+            assets.forEach {
+                var result = downloadGeo(it.second, 30000, httpPort)
                 if (!result) {
-                    result = downloadGeo(it.second, 60000, 0)
+                    result = downloadGeo(it.second, 30000, 0)
                 }
-                launch(Dispatchers.Main) {
-                    if (result) {
-                        toast(getString(R.string.toast_success) + " " + it.second.remarks)
-                        binding.recyclerView.adapter?.notifyDataSetChanged()
-                    } else {
-                        toast(getString(R.string.toast_failure) + " " + it.second.remarks)
-                    }
-                    dialog.dismiss()
+                if (result)
+                    resultCount++
+            }
+            withContext(Dispatchers.Main) {
+                if (resultCount > 0) {
+                    toast(getString(R.string.title_update_config_count, resultCount))
+                    binding.recyclerView.adapter?.notifyDataSetChanged()
+                } else {
+                    toast(getString(R.string.toast_failure))
                 }
+                binding.pbWaiting.hide()
             }
         }
     }

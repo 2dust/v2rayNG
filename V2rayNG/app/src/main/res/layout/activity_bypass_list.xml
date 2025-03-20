@@ -71,11 +71,13 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/pb_waiting"
-        style="@android:style/Widget.DeviceDefault.ProgressBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        app:indicatorColor="@color/color_fab_active" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

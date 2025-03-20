@@ -44,7 +44,7 @@ class PerAppProxyActivity : BaseActivity() {
 
         lifecycleScope.launch {
             try {
-                binding.pbWaiting.visibility = View.VISIBLE
+                binding.pbWaiting.show()
                 val blacklist = MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
                 val apps = withContext(Dispatchers.IO) {
                     val appsList = AppManagerUtil.loadNetworkAppList(this@PerAppProxyActivity)
@@ -69,9 +69,9 @@ class PerAppProxyActivity : BaseActivity() {
                 appsAll = apps
                 adapter = PerAppProxyAdapter(this@PerAppProxyActivity, apps, blacklist)
                 binding.recyclerView.adapter = adapter
-                binding.pbWaiting.visibility = View.GONE
+                binding.pbWaiting.hide()
             } catch (e: Exception) {
-                binding.pbWaiting.visibility = View.GONE
+                binding.pbWaiting.hide()
                 Log.e(ANG_PACKAGE, "Error loading apps", e)
             }
         }
