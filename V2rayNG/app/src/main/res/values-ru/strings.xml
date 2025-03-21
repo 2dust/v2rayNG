@@ -26,7 +26,7 @@
     <string name="menu_item_del_config">Удалить профиль</string>
     <string name="menu_item_import_config_qrcode">Импорт из QR-кода</string>
     <string name="menu_item_import_config_clipboard">Импорт из буфера обмена</string>
-    <string name="menu_item_import_config_local">Import config from locally</string>
+    <string name="menu_item_import_config_local">Импорт из файла</string>
     <string name="menu_item_import_config_manually_vmess">Ручной ввод VMess</string>
     <string name="menu_item_import_config_manually_vless">Ручной ввод VLESS</string>
     <string name="menu_item_import_config_manually_ss">Ручной ввод Shadowsocks</string>
@@ -137,16 +137,15 @@
     <string name="msg_downloading_content">Загрузка данных</string>
     <string name="menu_item_export_proxy_app">Экспорт в буфер обмена</string>
     <string name="menu_item_import_proxy_app">Импорт из буфера обмена</string>
-    <string name="per_app_proxy_settings">Per-app settings</string>
-    <string name="per_app_proxy_settings_enable">Enable per-app</string>
-
+    <string name="per_app_proxy_settings">Настройки выбранных приложений</string>
+    <string name="per_app_proxy_settings_enable">Использовать выбор приложений</string>
 
     <!-- Preferences -->
     <string name="title_settings">Настройки</string>
     <string name="title_advanced">Расширенные настройки</string>
     <string name="title_vpn_settings">Настройки VPN</string>
     <string name="title_pref_per_app_proxy">Прокси для выбранных приложений</string>
-    <string name="summary_pref_per_app_proxy">Основной: выделенное приложение соединяется через прокси, не выделенное — напрямую;\nРежим обхода: выделенное приложение соединяется напрямую, не выделенное — через прокси.\nЕсть возможность автоматического выбора проксируемых приложений в меню.</string>
+    <string name="summary_pref_per_app_proxy">Основной: выбранное приложение соединяется через прокси, не выбранное — напрямую;\nРежим обхода: выбранное приложение соединяется напрямую, не выбранное — через прокси.\nЕсть возможность автоматического выбора проксируемых приложений в меню.</string>
     <string name="title_pref_is_booted">Автоподключение при запуске</string>
     <string name="summary_pref_is_booted">Автоматически подключаться к выбранному серверу при запуске приложения (может оказаться неудачным)</string>
 
@@ -303,7 +302,7 @@
 
     <string name="connection_test_pending">Проверить подключение</string>
     <string name="connection_test_testing">Проверка…</string>
-    <string name="connection_test_testing_count">Проверка профилей: %d</string>
+    <string name="connection_test_testing_count">Проверка профилей (%d)</string>
     <string name="connection_test_available">Успешно: HTTP-соединение заняло %d мс</string>
     <string name="connection_test_error">Сбой проверки интернет-соединения: %s</string>
     <string name="connection_test_fail">Интернет недоступен</string>
