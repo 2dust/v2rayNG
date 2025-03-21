@@ -27,7 +27,7 @@
     <string name="menu_item_del_config">حذف کانفیگ</string>
     <string name="menu_item_import_config_qrcode">کانفیگ را از QRcode وارد کنید</string>
     <string name="menu_item_import_config_clipboard">کانفیگ را از کلیپ ‌بورد وارد کنید</string>
-    <string name="menu_item_import_config_local">Import config from locally</string>
+    <string name="menu_item_import_config_local">کانفیگ را از محلی وارد کنید</string>
     <string name="menu_item_import_config_manually_vmess">تایپ دستی[VMESS]</string>
     <string name="menu_item_import_config_manually_vless">تایپ دستی[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">تایپ دستی[SHADOWSOCKS]</string>
@@ -136,8 +136,8 @@
     <string name="msg_downloading_content">در حال دانلود محتوا</string>
     <string name="menu_item_export_proxy_app">خروجی گرفتن در کلیپ‌ بورد</string>
     <string name="menu_item_import_proxy_app">وارد کردن از کلیپ‌ بورد</string>
-    <string name="per_app_proxy_settings">Per-app settings</string>
-    <string name="per_app_proxy_settings_enable">Enable per-app</string>
+    <string name="per_app_proxy_settings">تنظیمات به تفکیک برنامه</string>
+    <string name="per_app_proxy_settings_enable">فعال کردن به تفکیک برنامه</string>
 
     <!-- Preferences -->
     <string name="title_settings">تنظیمات</string>
