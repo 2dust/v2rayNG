@@ -1,31 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
     tools:context=".ui.SubSettingActivity">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/main_content"
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/pb_waiting"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        app:indicatorColor="@color/color_fab_active" />
 
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/pb_waiting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:visibility="invisible"
-            app:indicatorColor="@color/color_fab_active" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/item_recycler_sub_setting" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:listitem="@layout/item_recycler_sub_setting" />
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </RelativeLayout>

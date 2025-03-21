@@ -38,7 +38,7 @@ class RoutingSettingActivity : BaseActivity() {
     private val preset_rulesets: Array<out String> by lazy {
         resources.getStringArray(R.array.preset_rulesets)
     }
-    
+
     private val requestCameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -85,87 +85,75 @@ class RoutingSettingActivity : BaseActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.add_rule -> {
-            startActivity(Intent(this, RoutingEditActivity::class.java))
-            true
-        }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.add_rule -> startActivity(Intent(this, RoutingEditActivity::class.java)).let { true }
+        R.id.user_asset_setting -> startActivity(Intent(this, UserAssetActivity::class.java)).let { true }
+        R.id.import_predefined_rulesets -> importPredefined().let { true }
+        R.id.import_rulesets_from_clipboard -> importFromClipboard().let { true }
+        R.id.import_rulesets_from_qrcode -> requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA).let { true }
+        R.id.export_rulesets_to_clipboard -> export2Clipboard().let { true }
+        else -> super.onOptionsItemSelected(item)
+    }
 
-        R.id.user_asset_setting -> {
-            startActivity(Intent(this, UserAssetActivity::class.java))
-            true
-        }
-
-        R.id.import_predefined_rulesets -> {
+    private fun importPredefined() {
+        AlertDialog.Builder(this).setItems(preset_rulesets.asList().toTypedArray()) { _, i ->
             AlertDialog.Builder(this).setMessage(R.string.routing_settings_import_rulesets_tip)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    AlertDialog.Builder(this).setItems(preset_rulesets.asList().toTypedArray()) { _, i ->
-                        try {
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                SettingsManager.resetRoutingRulesetsFromPresets(this@RoutingSettingActivity, i)
-                                launch(Dispatchers.Main) {
-                                    refreshData()
-                                    toast(R.string.toast_success)
-                                }
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }.show()
-                }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    //do nothing
-                }
-                .show()
-            true
-        }
-
-        R.id.import_rulesets_from_clipboard -> {
-            AlertDialog.Builder(this).setMessage(R.string.routing_settings_import_rulesets_tip)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    val clipboard = try {
-                        Utils.getClipboard(this)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        toast(R.string.toast_failure)
-                        return@setPositiveButton
-                    }
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val result = SettingsManager.resetRoutingRulesets(clipboard)
-                        withContext(Dispatchers.Main) {
-                            if (result) {
+                    try {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            SettingsManager.resetRoutingRulesetsFromPresets(this@RoutingSettingActivity, i)
+                            launch(Dispatchers.Main) {
                                 refreshData()
                                 toast(R.string.toast_success)
-                            } else {
-                                toast(R.string.toast_failure)
                             }
                         }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
                 }
                 .setNegativeButton(android.R.string.cancel) { _, _ ->
                     //do nothing
                 }
                 .show()
-            true
-        }
+        }.show()
+    }
 
-        R.id.import_rulesets_from_qrcode -> {
-            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-            true
-        }
-
-        R.id.export_rulesets_to_clipboard -> {
-            val rulesetList = MmkvManager.decodeRoutingRulesets()
-            if (rulesetList.isNullOrEmpty()) {
-                toast(R.string.toast_failure)
-            } else {
-                Utils.setClipboard(this, JsonUtil.toJson(rulesetList))
-                toast(R.string.toast_success)
+    private fun importFromClipboard() {
+        AlertDialog.Builder(this).setMessage(R.string.routing_settings_import_rulesets_tip)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val clipboard = try {
+                    Utils.getClipboard(this)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    toast(R.string.toast_failure)
+                    return@setPositiveButton
+                }
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val result = SettingsManager.resetRoutingRulesets(clipboard)
+                    withContext(Dispatchers.Main) {
+                        if (result) {
+                            refreshData()
+                            toast(R.string.toast_success)
+                        } else {
+                            toast(R.string.toast_failure)
+                        }
+                    }
+                }
             }
-            true
-        }
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                //do nothing
+            }
+            .show()
+    }
 
-        else -> super.onOptionsItemSelected(item)
+    private fun export2Clipboard() {
+        val rulesetList = MmkvManager.decodeRoutingRulesets()
+        if (rulesetList.isNullOrEmpty()) {
+            toast(R.string.toast_failure)
+        } else {
+            Utils.setClipboard(this, JsonUtil.toJson(rulesetList))
+            toast(R.string.toast_success)
+        }
     }
 
     private val scanQRcodeForRulesets = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {

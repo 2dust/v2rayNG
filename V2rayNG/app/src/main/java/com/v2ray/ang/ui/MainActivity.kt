@@ -391,24 +391,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //            true
 //        }
 
-        R.id.sub_update -> {
-            importConfigViaSub()
-            true
-        }
-
         R.id.export_all -> {
-            binding.pbWaiting.show()
-            lifecycleScope.launch(Dispatchers.IO) {
-                val ret = mainViewModel.exportAllServer()
-                launch(Dispatchers.Main) {
-                    if (ret > 0)
-                        toast(getString(R.string.title_export_config_count, ret))
-                    else
-                        toast(R.string.toast_failure)
-                    binding.pbWaiting.hide()
-                }
-            }
-
+            exportAll()
             true
         }
 
@@ -430,76 +414,30 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.del_all_config -> {
-            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    binding.pbWaiting.show()
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val ret = mainViewModel.removeAllServer()
-                        launch(Dispatchers.Main) {
-                            mainViewModel.reloadServerList()
-                            toast(getString(R.string.title_del_config_count, ret))
-                            binding.pbWaiting.hide()
-                        }
-                    }
-                }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    //do noting
-                }
-                .show()
+            delAllConfig()
             true
         }
 
         R.id.del_duplicate_config -> {
-            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    binding.pbWaiting.show()
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val ret = mainViewModel.removeDuplicateServer()
-                        launch(Dispatchers.Main) {
-                            mainViewModel.reloadServerList()
-                            toast(getString(R.string.title_del_duplicate_config_count, ret))
-                            binding.pbWaiting.hide()
-                        }
-                    }
-                }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    //do noting
-                }
-                .show()
+            delDuplicateConfig()
             true
         }
 
         R.id.del_invalid_config -> {
-            AlertDialog.Builder(this).setMessage(R.string.del_invalid_config_comfirm)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    binding.pbWaiting.show()
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val ret = mainViewModel.removeInvalidServer()
-                        launch(Dispatchers.Main) {
-                            mainViewModel.reloadServerList()
-                            toast(getString(R.string.title_del_config_count, ret))
-                            binding.pbWaiting.hide()
-                        }
-                    }
-                }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    //do noting
-                }
-                .show()
+            delInvalidConfig()
             true
         }
 
         R.id.sort_by_test_results -> {
-            binding.pbWaiting.show()
-            lifecycleScope.launch(Dispatchers.IO) {
-                mainViewModel.sortByTestResults()
-                launch(Dispatchers.Main) {
-                    mainViewModel.reloadServerList()
-                    binding.pbWaiting.hide()
-                }
-            }
+            sortByTestResults()
             true
         }
+
+        R.id.sub_update -> {
+            importConfigViaSub()
+            true
+        }
+
 
         else -> super.onOptionsItemSelected(item)
     }
@@ -679,6 +617,88 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
+    private fun exportAll() {
+        binding.pbWaiting.show()
+        lifecycleScope.launch(Dispatchers.IO) {
+            val ret = mainViewModel.exportAllServer()
+            launch(Dispatchers.Main) {
+                if (ret > 0)
+                    toast(getString(R.string.title_export_config_count, ret))
+                else
+                    toast(R.string.toast_failure)
+                binding.pbWaiting.hide()
+            }
+        }
+    }
+
+    private fun delAllConfig() {
+        AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                binding.pbWaiting.show()
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val ret = mainViewModel.removeAllServer()
+                    launch(Dispatchers.Main) {
+                        mainViewModel.reloadServerList()
+                        toast(getString(R.string.title_del_config_count, ret))
+                        binding.pbWaiting.hide()
+                    }
+                }
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                //do noting
+            }
+            .show()
+    }
+
+    private fun delDuplicateConfig() {
+        AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                binding.pbWaiting.show()
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val ret = mainViewModel.removeDuplicateServer()
+                    launch(Dispatchers.Main) {
+                        mainViewModel.reloadServerList()
+                        toast(getString(R.string.title_del_duplicate_config_count, ret))
+                        binding.pbWaiting.hide()
+                    }
+                }
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                //do noting
+            }
+            .show()
+    }
+
+    private fun delInvalidConfig() {
+        AlertDialog.Builder(this).setMessage(R.string.del_invalid_config_comfirm)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                binding.pbWaiting.show()
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val ret = mainViewModel.removeInvalidServer()
+                    launch(Dispatchers.Main) {
+                        mainViewModel.reloadServerList()
+                        toast(getString(R.string.title_del_config_count, ret))
+                        binding.pbWaiting.hide()
+                    }
+                }
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                //do noting
+            }
+            .show()
+    }
+
+    private fun sortByTestResults() {
+        binding.pbWaiting.show()
+        lifecycleScope.launch(Dispatchers.IO) {
+            mainViewModel.sortByTestResults()
+            launch(Dispatchers.Main) {
+                mainViewModel.reloadServerList()
+                binding.pbWaiting.hide()
+            }
+        }
+    }
+
     /**
      * show file chooser
      */
@@ -772,37 +792,19 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.sub_setting -> {
-                requestSubSettingActivity.launch(Intent(this, SubSettingActivity::class.java))
-            }
+            R.id.sub_setting -> requestSubSettingActivity.launch(Intent(this, SubSettingActivity::class.java))
+            R.id.settings -> startActivity(
+                Intent(this, SettingsActivity::class.java)
+                    .putExtra("isRunning", mainViewModel.isRunning.value == true)
+            )
 
-            R.id.settings -> {
-                startActivity(
-                    Intent(this, SettingsActivity::class.java)
-                        .putExtra("isRunning", mainViewModel.isRunning.value == true)
-                )
-            }
-
-            R.id.per_app_proxy_settings -> {
-                startActivity(Intent(this, PerAppProxyActivity::class.java))
-            }
-
-            R.id.routing_setting -> {
-                requestSubSettingActivity.launch(Intent(this, RoutingSettingActivity::class.java))
-            }
-
-            R.id.promotion -> {
-                Utils.openUri(this, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")
-            }
-
-            R.id.logcat -> {
-                startActivity(Intent(this, LogcatActivity::class.java))
-            }
-
-            R.id.about -> {
-                startActivity(Intent(this, AboutActivity::class.java))
-            }
+            R.id.per_app_proxy_settings -> startActivity(Intent(this, PerAppProxyActivity::class.java))
+            R.id.routing_setting -> requestSubSettingActivity.launch(Intent(this, RoutingSettingActivity::class.java))
+            R.id.promotion -> Utils.openUri(this, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")
+            R.id.logcat -> startActivity(Intent(this, LogcatActivity::class.java))
+            R.id.about -> startActivity(Intent(this, AboutActivity::class.java))
         }
+
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }

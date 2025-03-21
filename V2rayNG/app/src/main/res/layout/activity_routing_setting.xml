@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.RoutingSettingActivity">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -55,7 +55,8 @@
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_recycler_routing_setting" />
         </LinearLayout>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.core.widget.NestedScrollView>
 </RelativeLayout>
