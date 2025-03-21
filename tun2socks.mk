@@ -37,7 +37,6 @@ LOCAL_CFLAGS += -DNDEBUG -DANDROID
 LOCAL_CFLAGS += -I
 LOCAL_STATIC_LIBRARIES := libancillary
 LOCAL_C_INCLUDES := \
-	$(LOCAL_PATH)/badvpn/libancillary \
         $(LOCAL_PATH)/badvpn/lwip/src/include/ipv4 \
         $(LOCAL_PATH)/badvpn/lwip/src/include/ipv6 \
         $(LOCAL_PATH)/badvpn/lwip/src/include \
@@ -110,6 +109,7 @@ TUN2SOCKS_SOURCES := \
         socks_udp_client/SocksUdpClient.c
 LOCAL_MODULE := tun2socks
 LOCAL_LDLIBS := -ldl -llog
+LOCAL_LDFLAGS=-Wl,--build-id=none
 LOCAL_SRC_FILES := $(addprefix badvpn/, $(TUN2SOCKS_SOURCES))
 LOCAL_BUILD_SCRIPT := BUILD_EXECUTABLE
 LOCAL_MAKEFILE     := $(local-makefile)
