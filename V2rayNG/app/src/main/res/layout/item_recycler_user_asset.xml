@@ -46,7 +46,6 @@
                     android:layout_height="wrap_content"
                     android:lines="1"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:textSize="12sp"
                     tools:text="1MB . 2020.01.01" />
 
 

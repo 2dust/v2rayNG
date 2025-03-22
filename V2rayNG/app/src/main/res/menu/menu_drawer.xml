@@ -9,10 +9,6 @@
             android:icon="@drawable/ic_subscriptions_24dp"
             android:title="@string/title_sub_setting" />
         <item
-            android:id="@+id/settings"
-            android:icon="@drawable/ic_settings_24dp"
-            android:title="@string/title_settings" />
-        <item
             android:id="@+id/per_app_proxy_settings"
             android:icon="@drawable/ic_per_apps_24dp"
             android:title="@string/per_app_proxy_settings" />
@@ -20,6 +16,10 @@
             android:id="@+id/routing_setting"
             android:icon="@drawable/ic_routing_24dp"
             android:title="@string/routing_settings_title" />
+        <item
+            android:id="@+id/settings"
+            android:icon="@drawable/ic_settings_24dp"
+            android:title="@string/title_settings" />
     </group>
 
     <group android:id="@+id/group_id2">

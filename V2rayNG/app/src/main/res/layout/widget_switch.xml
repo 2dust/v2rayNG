@@ -27,5 +27,5 @@
         android:layout_height="wrap_content"
         android:text="@string/app_name"
         android:textColor="@android:color/white"
-        android:textSize="10sp" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 </LinearLayout>
