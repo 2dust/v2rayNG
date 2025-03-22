@@ -48,17 +48,12 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <TextView
                     android:id="@+id/tv_statistics"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:lines="1"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:textSize="12sp" />
+                    android:paddingTop="@dimen/margin_spacing_dp8"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
             </LinearLayout>
 
@@ -74,7 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingTop="4dp"
+                android:paddingTop="2dp"
                 android:paddingEnd="@dimen/padding_spacing_dp16">
 
                 <TextView
@@ -85,7 +80,7 @@
                     android:lines="1"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:textColor="@color/color_secondary"
-                    android:textSize="10sp"
+                    android:textSize="11sp"
                     tools:text="Sub" />
 
                 <TextView
@@ -95,7 +90,7 @@
                     android:lines="1"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:textColor="@color/colorPing"
-                    android:textSize="10sp"
+                    android:textSize="11sp"
                     tools:text="214ms" />
             </LinearLayout>
 
@@ -167,7 +162,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:orientation="vertical"
-                android:paddingBottom="4dp"
+                android:paddingBottom="2dp"
                 android:paddingEnd="@dimen/padding_spacing_dp16">
 
                 <TextView
@@ -177,7 +172,7 @@
                     android:lines="1"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:textColor="@color/colorConfigType"
-                    android:textSize="10sp" />
+                    android:textSize="11sp" />
             </LinearLayout>
 
         </LinearLayout>

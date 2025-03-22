@@ -69,7 +69,11 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             } else {
                 holder.itemMainBinding.layoutIndicator.setBackgroundResource(0)
             }
-            holder.itemMainBinding.tvSubscription.text = MmkvManager.decodeSubscription(profile.subscriptionId)?.remarks ?: ""
+            holder.itemMainBinding.tvSubscription.text =
+                if (mActivity.mainViewModel.subscriptionId.isEmpty())
+                    MmkvManager.decodeSubscription(profile.subscriptionId)?.remarks.orEmpty()
+                else
+                    ""
 
             var shareOptions = share_method.asList()
             when (profile.configType) {
