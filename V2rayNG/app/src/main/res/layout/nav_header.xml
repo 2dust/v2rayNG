@@ -5,7 +5,7 @@
     android:background="@drawable/nav_header_bg"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="@dimen/margin_spacing_dp16">
+    android:padding="@dimen/padding_spacing_dp16">
 
     <TextView
         android:layout_width="match_parent"
@@ -13,7 +13,7 @@
         android:layout_gravity="center"
         android:fontFamily="@font/montserrat_thin"
         android:gravity="center"
-        android:paddingTop="@dimen/margin_spacing_dp8"
+        android:paddingTop="@dimen/padding_spacing_dp8"
         android:text="@string/app_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 

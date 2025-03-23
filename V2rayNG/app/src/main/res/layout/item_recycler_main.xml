@@ -12,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/view_height_dp72"
         android:layout_gravity="center"
-        android:layout_margin="@dimen/margin_spacing_dp8"
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
@@ -23,6 +22,7 @@
         <LinearLayout
             android:id="@+id/layout_indicator"
             android:layout_width="6dp"
+            android:layout_marginStart="4dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:orientation="vertical" />
@@ -52,7 +52,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:lines="1"
-                    android:paddingTop="@dimen/margin_spacing_dp8"
+                    android:paddingTop="@dimen/padding_spacing_dp8"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
             </LinearLayout>
@@ -69,7 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingTop="2dp"
+                android:paddingTop="4dp"
                 android:paddingEnd="@dimen/padding_spacing_dp16">
 
                 <TextView
@@ -111,7 +111,7 @@
                     android:gravity="center"
                     android:nextFocusLeft="@+id/info_container"
                     android:orientation="vertical"
-                    android:padding="@dimen/margin_spacing_dp8">
+                    android:padding="@dimen/padding_spacing_dp8">
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -129,7 +129,7 @@
                     android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="@dimen/margin_spacing_dp8">
+                    android:padding="@dimen/padding_spacing_dp8">
 
                     <ImageView
                         android:layout_width="@dimen/image_size_dp24"
@@ -147,7 +147,7 @@
                     android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="@dimen/margin_spacing_dp8">
+                    android:padding="@dimen/padding_spacing_dp8">
 
                     <ImageView
                         android:layout_width="@dimen/image_size_dp24"
@@ -162,7 +162,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:orientation="vertical"
-                android:paddingBottom="2dp"
+                android:paddingBottom="4dp"
                 android:paddingEnd="@dimen/padding_spacing_dp16">
 
                 <TextView

@@ -2,14 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/margin_spacing_dp16"
+    android:layout_marginTop="@dimen/padding_spacing_dp16"
     android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/lay_stream_security"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_spacing_dp16"
+        android:layout_marginBottom="@dimen/padding_spacing_dp16"
 
         android:orientation="vertical">
 
@@ -31,7 +31,7 @@
         android:id="@+id/lay_sni"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_spacing_dp16"
+        android:layout_marginBottom="@dimen/padding_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -53,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginBottom="@dimen/margin_spacing_dp16">
+        android:layout_marginBottom="@dimen/padding_spacing_dp16">
 
         <TextView
             android:layout_width="wrap_content"
@@ -74,7 +74,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginBottom="@dimen/margin_spacing_dp16">
+        android:layout_marginBottom="@dimen/padding_spacing_dp16">
 
         <TextView
             android:layout_width="wrap_content"
@@ -112,7 +112,7 @@
         android:id="@+id/lay_public_key"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_spacing_dp16"
+        android:layout_marginBottom="@dimen/padding_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -133,7 +133,7 @@
         android:id="@+id/lay_short_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_spacing_dp16"
+        android:layout_marginBottom="@dimen/padding_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -154,7 +154,7 @@
         android:id="@+id/lay_spider_x"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_spacing_dp16"
+        android:layout_marginBottom="@dimen/padding_spacing_dp16"
         android:orientation="vertical">
 
         <TextView

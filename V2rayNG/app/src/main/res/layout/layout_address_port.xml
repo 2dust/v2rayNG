@@ -19,7 +19,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_spacing_dp16"
+        android:layout_marginTop="@dimen/padding_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -38,7 +38,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_spacing_dp16"
+        android:layout_marginTop="@dimen/padding_spacing_dp16"
         android:orientation="vertical">
 
         <TextView
@@ -57,7 +57,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_spacing_dp16"
+        android:layout_marginTop="@dimen/padding_spacing_dp16"
         android:orientation="vertical">
 
         <TextView

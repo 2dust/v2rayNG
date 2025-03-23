@@ -8,11 +8,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_spacing_dp8"
         android:background="?attr/selectableItemBackground"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="@dimen/margin_spacing_dp8">
+        android:padding="@dimen/padding_spacing_dp8">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -60,7 +59,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:padding="@dimen/margin_spacing_dp8">
+            android:padding="@dimen/padding_spacing_dp8">
 
             <ImageView
                 android:layout_width="@dimen/image_size_dp24"
@@ -75,7 +74,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:padding="@dimen/margin_spacing_dp8">
+            android:padding="@dimen/padding_spacing_dp8">
 
             <ImageView
                 android:layout_width="@dimen/image_size_dp24"

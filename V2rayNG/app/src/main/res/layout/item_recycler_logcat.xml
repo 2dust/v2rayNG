@@ -11,10 +11,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_spacing_dp8"
-        android:paddingTop="@dimen/margin_spacing_dp8"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/margin_spacing_dp8">
+        android:padding="@dimen/padding_spacing_dp8"
+        android:orientation="vertical">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/log_tag"
@@ -25,7 +23,7 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/log_content"
             android:layout_width="match_parent"
-            android:paddingTop="@dimen/margin_spacing_dp8"
+            android:paddingTop="@dimen/padding_spacing_dp8"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 

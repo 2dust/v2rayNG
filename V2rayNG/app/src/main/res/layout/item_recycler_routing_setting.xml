@@ -11,15 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/view_height_dp90"
         android:layout_gravity="center"
-        android:layout_margin="@dimen/margin_spacing_dp8"
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
         android:nextFocusRight="@+id/layout_edit"
         android:orientation="horizontal"
-        android:paddingTop="@dimen/margin_spacing_dp8"
-        android:paddingBottom="@dimen/margin_spacing_dp8">
+        android:paddingTop="@dimen/padding_spacing_dp8"
+        android:paddingBottom="@dimen/padding_spacing_dp8">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -53,7 +52,7 @@
                 android:id="@+id/domainIp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_spacing_dp8"
+                android:layout_marginTop="@dimen/padding_spacing_dp8"
                 android:lines="1"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -61,7 +60,7 @@
                 android:id="@+id/outboundTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_spacing_dp8"
+                android:layout_marginTop="@dimen/padding_spacing_dp8"
                 android:lines="1"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
@@ -85,7 +84,7 @@
                 android:gravity="center"
                 android:nextFocusLeft="@+id/info_container"
                 android:orientation="vertical"
-                android:padding="@dimen/margin_spacing_dp8">
+                android:padding="@dimen/padding_spacing_dp8">
 
                 <ImageView
                     android:layout_width="@dimen/image_size_dp24"
@@ -96,7 +95,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_spacing_dp8"
+                android:layout_marginTop="@dimen/padding_spacing_dp8"
                 android:orientation="horizontal">
 
                 <androidx.appcompat.widget.SwitchCompat

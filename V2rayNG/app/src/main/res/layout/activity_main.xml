@@ -89,7 +89,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|end"
-                    android:layout_marginBottom="@dimen/margin_spacing_dp16">
+                    android:layout_marginBottom="@dimen/padding_spacing_dp16">
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/fab"
@@ -98,7 +98,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
                         android:layout_gravity="bottom|end"
-                        android:layout_margin="@dimen/margin_spacing_dp16"
+                        android:layout_margin="@dimen/padding_spacing_dp16"
                         android:clickable="true"
                         android:focusable="true"
                         android:nextFocusLeft="@+id/layout_test"

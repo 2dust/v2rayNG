@@ -19,7 +19,7 @@
             android:layout_height="match_parent"
             android:gravity="center|left"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/margin_spacing_dp16">
+            android:paddingBottom="@dimen/padding_spacing_dp16">
 
             <TextView
                 android:layout_width="wrap_content"
