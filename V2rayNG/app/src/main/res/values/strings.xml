@@ -146,13 +146,13 @@
     <string name="title_advanced">Advanced Settings</string>
     <string name="title_vpn_settings">VPN Settings</string>
     <string name="title_pref_per_app_proxy">Per-app proxy</string>
-    <string name="summary_pref_per_app_proxy">General: Checked App is proxy, unchecked direct connection; \nbypass mode: checked app directly connected, unchecked proxy. \nThe option to automatically select the proxy application in the menu</string>
+    <string name="summary_pref_per_app_proxy">General: Checked apps use proxy, unchecked apps connect directly; \nBypass mode: checked apps connect directly, unchecked apps use proxy. \nThe option to automatically select proxy applications is in the menu</string>
     <string name="title_pref_is_booted">Auto connect at startup</string>
     <string name="summary_pref_is_booted">Automatically connects to the selected server at startup, which may be unsuccessful</string>
 
     <string name="title_mux_settings">Mux Settings</string>
     <string name="title_pref_mux_enabled">Enable Mux</string>
-    <string name="summary_pref_mux_enabled">Faster, but it may cause unstable connectivity\ncustomize how to handle TCP, UDP and QUIC below</string>
+    <string name="summary_pref_mux_enabled">Faster, but it may cause unstable connectivity\nCustomize how to handle TCP, UDP and QUIC below</string>
     <string name="title_pref_mux_concurency">TCP connections（range -1 to 1024）</string>
     <string name="title_pref_mux_xudp_concurency">XUDP connections（range -1 to 1024）</string>
     <string name="title_pref_mux_xudp_quic">Handling of QUIC in mux tunnel</string>
@@ -172,14 +172,13 @@
     <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and keep the target address as the IP address.</string>
 
     <string name="title_pref_local_dns_enabled">Enable local DNS</string>
-    <string name="summary_pref_local_dns_enabled">DNS processed by core‘s DNS module (Recommended, if need routing Bypassing LAN and
-        mainland address)</string>
+    <string name="summary_pref_local_dns_enabled">DNS processed by core‘s DNS module (Recommended if you need routing bypassing LAN and mainland addresses)</string>
 
     <string name="title_pref_fake_dns_enabled">Enable fake DNS</string>
-    <string name="summary_pref_fake_dns_enabled">local DNS returns fake IP address (faster, but it may not work for some apps)</string>
+    <string name="summary_pref_fake_dns_enabled">Local DNS returns fake IP addresses (faster, but it may not work for some apps)</string>
 
     <string name="title_pref_prefer_ipv6">Prefer IPv6</string>
-    <string name="summary_pref_prefer_ipv6">Prefer IPv6 address and routes</string>
+    <string name="summary_pref_prefer_ipv6">Prefer IPv6 addresses and routes</string>
 
     <string name="title_pref_remote_dns">Remote DNS (udp/tcp/https/quic)(Optional)</string>
     <string name="summary_pref_remote_dns">DNS</string>
@@ -197,11 +196,11 @@
     <string name="summary_pref_delay_test_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">Allow connections from the LAN</string>
-    <string name="summary_pref_proxy_sharing_enabled">Other devices can connect to proxy by your ip address through local proxy, Only enable in trusted network to avoid unauthorized connection</string>
-    <string name="toast_warning_pref_proxysharing_short">Allow connections from the LAN, Make sure you are in a trusted network</string>
+    <string name="summary_pref_proxy_sharing_enabled">Other devices can connect to proxy by your IP address through local proxy. Only enable in trusted networks to avoid unauthorized connections</string>
+    <string name="toast_warning_pref_proxysharing_short">Allow connections from the LAN. Make sure you are in a trusted network</string>
 
     <string name="title_pref_allow_insecure">allowInsecure</string>
-    <string name="summary_pref_allow_insecure">When TLS, the default allowInsecure</string>
+    <string name="summary_pref_allow_insecure">When TLS is selected, allow insecure connections by default</string>
 
     <string name="title_pref_socks_port">Local proxy port</string>
     <string name="summary_pref_socks_port">Local proxy port</string>
@@ -237,7 +236,7 @@
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
 
     <string name="title_pref_auto_update_subscription">Automatic update subscriptions</string>
-    <string name="summary_pref_auto_update_subscription">Update your subscriptions automatically with an interval in background. Depending on the device, this feature may not always work</string>
+    <string name="summary_pref_auto_update_subscription">Update your subscriptions automatically at set intervals in the background. Depending on the device, this feature may not always work</string>
     <string name="title_pref_auto_update_interval">Auto Update Interval (Minutes, Min value 15)</string>
 
     <string name="title_core_loglevel">Log Level</string>
@@ -283,7 +282,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">Domain strategy</string>
     <string name="routing_settings_title">Routing Settings</string>
-    <string name="routing_settings_tips">Separated by commas(,),choose domain or ip</string>
+    <string name="routing_settings_tips">Separated by commas(,), choose domain or ip</string>
     <string name="routing_settings_save">Save</string>
     <string name="routing_settings_delete">Clear</string>
     <string name="routing_settings_rule_title">Routing Rule Settings</string>
@@ -299,7 +298,7 @@
     <string name="routing_settings_port" translatable="false">port</string>
     <string name="routing_settings_protocol" translatable="false">protocol</string>
     <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
-    <string name="routing_settings_network" translatable="false">network</string>"[udp|tcp]"
+    <string name="routing_settings_network" translatable="false">network</string>
     <string name="routing_settings_network_tip" translatable="false">[udp|tcp]</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 

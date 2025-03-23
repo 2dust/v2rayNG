@@ -304,7 +304,7 @@
     <string name="import_subscription_failure">导入订阅失败</string>
     <string name="menu_item_add_asset">添加</string>
     <string name="menu_item_add_url">添加链接</string>
-    <string name="title_fragment_settings">分片（Fragment） 设置</string>
+    <string name="title_fragment_settings">分片（Fragment）设置</string>
     <string name="title_pref_fragment_packets">分片方式</string>
     <string name="title_pref_fragment_length">分片包长（最小 - 最大）</string>
     <string name="title_pref_fragment_interval">分片间隔（最小 - 最大）</string>

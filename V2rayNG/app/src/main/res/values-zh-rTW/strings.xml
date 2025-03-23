@@ -170,13 +170,13 @@
 
 
     <string name="title_pref_local_dns_enabled">啟用本機 DNS</string>
-    <string name="summary_pref_local_dns_enabled">DNS 請求匯入 core 由 DNS 模塊處理 (建議啟用，如果需要轉送略過區域網路及中國大陸)</string>
+    <string name="summary_pref_local_dns_enabled">DNS 請求匯入 core 由 DNS 模組處理 (建議啟用，如果需要轉送略過區域網路及中國大陸)</string>
 
     <string name="title_pref_fake_dns_enabled">啟用假 DNS</string>
     <string name="summary_pref_fake_dns_enabled">本機退回假解析結果 (減低延時，但個別應用可能無法使用)</string>
 
     <string name="title_pref_prefer_ipv6">IPv6 偏好</string>
-    <string name="summary_pref_prefer_ipv6">App 優先使用 IPv6 位址連線伺服器，同时開啟 VPN 的 IPv6 路由</string>
+    <string name="summary_pref_prefer_ipv6">App 優先使用 IPv6 位址連線伺服器，同時開啟 VPN 的 IPv6 路由</string>
 
     <string name="title_pref_remote_dns">遠端 DNS (udp/tcp/https/quic)(可選)</string>
     <string name="summary_pref_remote_dns">DNS</string>
@@ -184,6 +184,8 @@
     <string name="title_pref_vpn_dns">VPN DNS (僅支援 IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">VPN 是否繞過區域網</string>
 
+    <string name="summary_pref_domestic_dns">DNS</string>
+    <string name="title_pref_domestic_dns">境内 DNS (可选)</string>
     <string name="title_pref_dns_hosts">DNS hosts (格式: 網域:位址,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
@@ -239,7 +241,7 @@
     <string name="title_mode_help">輕觸以檢視說明</string>
     <string name="title_language">語言</string>
     <string name="title_ui_settings">介面顏色設定</string>
-    <string name="title_pref_ui_mode_night">UI mode settings</string>
+    <string name="title_pref_ui_mode_night">介面顯示模式</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">複製</string>
@@ -265,12 +267,11 @@
     <string name="title_sort_by_test_results">依偵測結果排序</string>
     <string name="title_filter_config">過濾設定</string>
     <string name="filter_config_all">所有分組</string>
-    <string name="title_del_duplicate_config_count">删除 %d 个重复配置</string>
-
-    <string name="title_del_config_count">删除 %d 个配置</string>
-    <string name="title_import_config_count">导入 %d 个配置</string>
-    <string name="title_export_config_count">导出 %d 个配置</string>
-    <string name="title_update_config_count">更新 %d 个配置</string>
+    <string name="title_del_duplicate_config_count">刪除 %d 個重複配置</string>
+    <string name="title_del_config_count">刪除 %d 個配置</string>
+    <string name="title_import_config_count">匯入 %d 個配置</string>
+    <string name="title_export_config_count">匯出 %d 個配置</string>
+    <string name="title_update_config_count">更新 %d 個配置</string>
     <string name="tasker_start_service">啟動服務</string>
     <string name="tasker_setting_confirm">確定</string>
 
@@ -291,7 +292,7 @@
 
     <string name="connection_test_pending">"測試連線能力"</string>
     <string name="connection_test_testing">"測試中……"</string>
-    <string name="connection_test_testing_count">測試 %d 个配置中…</string>
+    <string name="connection_test_testing_count">測試 %d 個配置中…</string>
     <string name="connection_test_available">"成功：%d ms延遲"</string>
     <string name="connection_test_error">"測試網際網路連線失敗：%s"</string>
     <string name="connection_test_fail">"無法使用網際網路"</string>
@@ -301,8 +302,8 @@
 
     <string name="import_subscription_success">匯入訂閱成功</string>
     <string name="import_subscription_failure">匯入訂閱失敗</string>
-    <string name="menu_item_add_asset">添加</string>
-    <string name="menu_item_add_url">添加連結</string>
+    <string name="menu_item_add_asset">新增資源</string>
+    <string name="menu_item_add_url">新增連結</string>
     <string name="title_fragment_settings">分片（Fragment） 設定</string>
     <string name="title_pref_fragment_packets">分片方式</string>
     <string name="title_pref_fragment_length">分片包長（最小-最大）</string>
