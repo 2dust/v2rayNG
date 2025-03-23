@@ -43,7 +43,7 @@ mmkv-static = { module = "com.tencent:mmkv-static", version.ref = "mmkvStatic" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 quickie-foss = { module = "com.github.T8RIN.QuickieExtended:quickie-foss", version.ref = "quickieFoss" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "kotlinx-coroutines-android" }
-1.10.1 = { group = "org.jetbrains.kotlinx", name = "1.10.1", version = "1.10.1" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "kotlinx-coroutines-core" }
 toastcompat = { module = "me.drakeet.support:toastcompat", version.ref = "toastcompat" }
 editorkit = { module = "com.blacksquircle.ui:editorkit", version.ref = "editorkit" }
 language-base = { module = "com.blacksquircle.ui:language-base", version.ref = "editorkit" }
