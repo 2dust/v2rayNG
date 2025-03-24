@@ -94,7 +94,7 @@ val URI.idnHost: String
  *
  * @return The string without whitespace.
  */
-fun String.removeWhiteSpace(): String = replace("\\s+".toRegex(), "")
+fun String?.removeWhiteSpace(): String? = this?.replace(" ", "")
 
 /**
  * Converts the string to a Long value, or returns 0 if the conversion fails.

@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.os.Build
@@ -436,25 +435,6 @@ object Utils {
             .replace(" ", "%20")
             .replace("|", "%7C")
     }
-
-    /**
-     * Remove white space from a string.
-     *
-     * @param str The string to process.
-     * @return The string without white space.
-     */
-    fun removeWhiteSpace(str: String?): String? {
-        return str?.replace(" ", "")
-    }
-
-    /**
-     * Check if the device is a TV.
-     *
-     * @param context The context to use.
-     * @return True if the device is a TV, false otherwise.
-     */
-    fun isTv(context: Context): Boolean =
-        context.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
 
     /**
      * Find a free port from a list of ports.

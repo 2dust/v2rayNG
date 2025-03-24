@@ -6,6 +6,7 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.extension.idnHost
+import com.v2ray.ang.extension.removeWhiteSpace
 import com.v2ray.ang.util.Utils
 import java.net.URI
 
@@ -132,14 +133,14 @@ object WireguardFmt : FmtBase() {
 
         dicQuery["publickey"] = config.publicKey.orEmpty()
         if (config.reserved != null) {
-            dicQuery["reserved"] = Utils.removeWhiteSpace(config.reserved).orEmpty()
+            dicQuery["reserved"] = config.reserved.removeWhiteSpace().orEmpty()
         }
-        dicQuery["address"] = Utils.removeWhiteSpace(config.localAddress).orEmpty()
+        dicQuery["address"] = config.localAddress.removeWhiteSpace().orEmpty()
         if (config.mtu != null) {
             dicQuery["mtu"] = config.mtu.toString()
         }
         if (config.preSharedKey != null) {
-            dicQuery["presharedkey"] = Utils.removeWhiteSpace(config.preSharedKey).orEmpty()
+            dicQuery["presharedkey"] = config.preSharedKey.removeWhiteSpace().orEmpty()
         }
 
         return toUri(config, config.secretKey, dicQuery)
