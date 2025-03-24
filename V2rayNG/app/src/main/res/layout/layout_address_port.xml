@@ -30,7 +30,7 @@
         <EditText
             android:id="@+id/et_remarks"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:inputType="text" />
 
     </LinearLayout>
@@ -49,7 +49,7 @@
         <EditText
             android:id="@+id/et_address"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:inputType="text" />
 
     </LinearLayout>
@@ -68,7 +68,7 @@
         <EditText
             android:id="@+id/et_port"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:inputType="number" />
     </LinearLayout>
 

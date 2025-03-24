@@ -44,7 +44,7 @@
                 <EditText
                     android:id="@+id/et_remarks"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/view_height_dp48"
+                    android:layout_height="wrap_content"
                     android:inputType="text" />
 
             </LinearLayout>
@@ -88,7 +88,7 @@
                 <EditText
                     android:id="@+id/et_filter"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/view_height_dp48"
+                    android:layout_height="wrap_content"
                     android:inputType="text" />
 
             </LinearLayout>
@@ -152,7 +152,7 @@
                 <EditText
                     android:id="@+id/et_pre_profile"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/view_height_dp48"
+                    android:layout_height="wrap_content"
                     android:hint="@string/sub_setting_pre_profile_tip"
                     android:inputType="text" />
 
@@ -172,7 +172,7 @@
                 <EditText
                     android:id="@+id/et_next_profile"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/view_height_dp48"
+                    android:layout_height="wrap_content"
                     android:hint="@string/sub_setting_pre_profile_tip"
                     android:inputType="text" />
 

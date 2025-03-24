@@ -5,17 +5,18 @@
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
+    android:padding="@dimen/padding_spacing_dp8"
     android:gravity="center_vertical">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/icon"
-        android:layout_width="@dimen/view_height_dp72"
-        android:layout_height="@dimen/view_height_dp72"
-        android:padding="@dimen/padding_spacing_dp16" />
+        android:layout_width="@dimen/view_height_dp48"
+        android:layout_height="@dimen/view_height_dp48"
+        android:padding="@dimen/padding_spacing_dp8" />
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="@dimen/view_height_dp72"
+        android:layout_height="wrap_content"
         android:layout_weight="1.0"
         android:gravity="center"
         android:orientation="vertical">
@@ -42,6 +43,6 @@
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"
-        android:paddingEnd="@dimen/padding_spacing_dp16"/>
+        android:padding="@dimen/padding_spacing_dp8"  />
 
 </LinearLayout>

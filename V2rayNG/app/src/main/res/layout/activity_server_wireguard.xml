@@ -28,7 +28,7 @@
             <EditText
                 android:id="@+id/et_id"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_height_dp48"
+                android:layout_height="wrap_content"
                 android:inputType="text" />
 
         </LinearLayout>
@@ -48,7 +48,7 @@
             <EditText
                 android:id="@+id/et_public_key"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_height_dp48"
+                android:layout_height="wrap_content"
                 android:inputType="text" />
 
         </LinearLayout>
@@ -67,7 +67,7 @@
             <EditText
                 android:id="@+id/et_preshared_key"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_height_dp48"
+                android:layout_height="wrap_content"
                 android:inputType="text" />
 
         </LinearLayout>
@@ -91,7 +91,7 @@
                 <EditText
                     android:id="@+id/et_reserved1"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/view_height_dp48"
+                    android:layout_height="wrap_content"
                     android:inputType="text" />
 
             </LinearLayout>
@@ -111,7 +111,7 @@
             <EditText
                 android:id="@+id/et_local_address"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_height_dp48"
+                android:layout_height="wrap_content"
                 android:inputType="text" />
         </LinearLayout>
 
@@ -129,7 +129,7 @@
             <EditText
                 android:id="@+id/et_local_mtu"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_height_dp48"
+                android:layout_height="wrap_content"
                 android:inputType="number" />
 
         </LinearLayout>

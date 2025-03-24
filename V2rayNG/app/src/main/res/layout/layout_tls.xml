@@ -19,9 +19,11 @@
             android:text="@string/server_lab_stream_security" />
 
         <Spinner
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:layout_marginBottom="@dimen/padding_spacing_dp8"
             android:id="@+id/sp_stream_security"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:entries="@array/streamsecurityxs"
             android:nextFocusDown="@+id/et_sni" />
 
@@ -42,7 +44,7 @@
         <EditText
             android:id="@+id/et_sni"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:inputType="text"
             android:nextFocusDown="@+id/sp_stream_fingerprint" />
 
@@ -61,9 +63,11 @@
             android:text="@string/server_lab_stream_fingerprint" />
 
         <Spinner
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:layout_marginBottom="@dimen/padding_spacing_dp8"
             android:id="@+id/sp_stream_fingerprint"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:entries="@array/streamsecurity_utls"
             android:nextFocusDown="@+id/sp_stream_alpn" />
 
@@ -82,9 +86,11 @@
             android:text="@string/server_lab_stream_alpn" />
 
         <Spinner
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:layout_marginBottom="@dimen/padding_spacing_dp8"
             android:id="@+id/sp_stream_alpn"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:entries="@array/streamsecurity_alpn"
             android:nextFocusDown="@+id/sp_allow_insecure" />
 
@@ -102,9 +108,11 @@
             android:text="@string/server_lab_allow_insecure" />
 
         <Spinner
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:layout_marginBottom="@dimen/padding_spacing_dp8"
             android:id="@+id/sp_allow_insecure"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:entries="@array/allowinsecures" />
     </LinearLayout>
 
@@ -123,7 +131,7 @@
         <EditText
             android:id="@+id/et_public_key"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:inputType="text"
             android:nextFocusDown="@+id/sp_stream_fingerprint" />
 
@@ -144,7 +152,7 @@
         <EditText
             android:id="@+id/et_short_id"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:inputType="text"
             android:nextFocusDown="@+id/sp_stream_fingerprint" />
 
@@ -165,7 +173,7 @@
         <EditText
             android:id="@+id/et_spider_x"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:inputType="text"
             android:nextFocusDown="@+id/sp_stream_fingerprint" />
 

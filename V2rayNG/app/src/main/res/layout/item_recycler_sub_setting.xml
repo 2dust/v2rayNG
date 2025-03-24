@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/info_container"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/view_height_dp90"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
@@ -17,15 +17,14 @@
         android:gravity="center"
         android:nextFocusRight="@+id/layout_edit"
         android:orientation="horizontal"
-        android:paddingTop="@dimen/padding_spacing_dp8"
-        android:paddingBottom="@dimen/padding_spacing_dp8">
+        android:padding="@dimen/padding_spacing_dp8">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingStart="@dimen/padding_spacing_dp16">
+            android:padding="@dimen/padding_spacing_dp8">
 
             <TextView
                 android:id="@+id/tv_name"
@@ -45,11 +44,10 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/view_height_dp90"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingStart="@dimen/padding_spacing_dp16"
-            android:paddingEnd="@dimen/padding_spacing_dp16">
+            android:padding="@dimen/padding_spacing_dp8">
 
             <LinearLayout
                 android:layout_width="wrap_content"

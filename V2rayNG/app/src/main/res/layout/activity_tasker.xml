@@ -10,7 +10,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/view_height_dp64">
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_spacing_dp8">
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switch_start_service"

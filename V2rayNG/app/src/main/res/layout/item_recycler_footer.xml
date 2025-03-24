@@ -8,7 +8,7 @@
     <LinearLayout
         android:id="@+id/layout_edit"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/view_height_dp48"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="horizontal"
@@ -18,8 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center|left"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/padding_spacing_dp16">
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"

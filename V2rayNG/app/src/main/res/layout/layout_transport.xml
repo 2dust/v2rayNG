@@ -29,9 +29,11 @@
             android:text="@string/server_lab_network" />
 
         <Spinner
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:layout_marginBottom="@dimen/padding_spacing_dp8"
             android:id="@+id/sp_network"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:entries="@array/networks" />
     </LinearLayout>
 
@@ -48,9 +50,11 @@
             android:text="@string/server_lab_head_type" />
 
         <Spinner
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:layout_marginBottom="@dimen/padding_spacing_dp8"
             android:id="@+id/sp_header_type"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
@@ -68,7 +72,7 @@
         <EditText
             android:id="@+id/et_request_host"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:inputType="text" />
     </LinearLayout>
 
@@ -88,7 +92,7 @@
         <EditText
             android:id="@+id/et_path"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:inputType="text" />
     </LinearLayout>
 

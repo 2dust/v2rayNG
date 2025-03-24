@@ -19,9 +19,11 @@
             android:text="@string/server_lab_stream_security" />
 
         <Spinner
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:layout_marginBottom="@dimen/padding_spacing_dp8"
             android:id="@+id/sp_stream_security"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:entries="@array/streamsecuritys"
             android:nextFocusDown="@+id/et_sni" />
 
@@ -42,7 +44,7 @@
         <EditText
             android:id="@+id/et_sni"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:inputType="text"
             android:nextFocusDown="@+id/sp_stream_fingerprint" />
 
@@ -61,9 +63,11 @@
             android:text="@string/server_lab_allow_insecure" />
 
         <Spinner
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:layout_marginBottom="@dimen/padding_spacing_dp8"
             android:id="@+id/sp_allow_insecure"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_height_dp48"
+            android:layout_height="wrap_content"
             android:entries="@array/allowinsecures" />
 
 
@@ -81,7 +85,7 @@
             <EditText
                 android:id="@+id/et_pinsha256"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_height_dp48"
+                android:layout_height="wrap_content"
                 android:inputType="text" />
 
         </LinearLayout>

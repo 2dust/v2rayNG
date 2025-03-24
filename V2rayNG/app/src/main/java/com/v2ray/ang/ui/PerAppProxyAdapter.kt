@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ItemRecyclerBypassListBinding
 import com.v2ray.ang.dto.AppInfo
 
@@ -35,7 +34,7 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
                 val view = View(ctx)
                 view.layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    ctx.resources.getDimensionPixelSize(R.dimen.view_height_dp64) * 0
+                    0
                 )
                 BaseViewHolder(view)
             }

@@ -28,7 +28,7 @@
             <EditText
                 android:id="@+id/et_id"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_height_dp48"
+                android:layout_height="wrap_content"
                 android:inputType="text" />
 
         </LinearLayout>
@@ -47,7 +47,7 @@
             <EditText
                 android:id="@+id/et_obfs_password"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_height_dp48"
+                android:layout_height="wrap_content"
                 android:inputType="text" />
 
         </LinearLayout>
@@ -66,7 +66,7 @@
             <EditText
                 android:id="@+id/et_port_hop"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_height_dp48"
+                android:layout_height="wrap_content"
                 android:inputType="text" />
 
         </LinearLayout>
@@ -85,7 +85,7 @@
             <EditText
                 android:id="@+id/et_port_hop_interval"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_height_dp48"
+                android:layout_height="wrap_content"
                 android:inputType="number" />
 
         </LinearLayout>
@@ -104,7 +104,7 @@
             <EditText
                 android:id="@+id/et_bandwidth_down"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_height_dp48"
+                android:layout_height="wrap_content"
                 android:inputType="text" />
 
         </LinearLayout>
@@ -123,7 +123,7 @@
             <EditText
                 android:id="@+id/et_bandwidth_up"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/view_height_dp48"
+                android:layout_height="wrap_content"
                 android:inputType="text" />
 
         </LinearLayout>
