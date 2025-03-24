@@ -65,12 +65,16 @@
                         android:id="@+id/layout_test"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/colorPrimary"
                         android:clickable="true"
                         android:focusable="true"
-                        android:gravity="center|start"
                         android:nextFocusLeft="@+id/recycler_view"
+                        android:orientation="vertical"
                         android:nextFocusRight="@+id/fab">
+
+                        <View
+                            android:layout_width="wrap_content"
+                            android:layout_height="1dp"
+                            android:background="@color/divider_color_light" />
 
                         <TextView
                             android:id="@+id/tv_test_state"
@@ -78,6 +82,8 @@
                             android:layout_height="wrap_content"
                             android:maxLines="2"
                             android:minLines="1"
+                            android:layout_marginTop="@dimen/padding_spacing_dp8"
+                            android:layout_marginBottom="@dimen/padding_spacing_dp8"
                             android:padding="@dimen/padding_spacing_dp16"
                             android:text="@string/connection_test_pending"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small" />
@@ -96,8 +102,6 @@
                         android:id="@+id/fab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentBottom="true"
                         android:layout_gravity="bottom|end"
                         android:layout_margin="@dimen/padding_spacing_dp16"
                         android:clickable="true"
