@@ -87,7 +87,7 @@
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_secret_key">کلید خصوصی</string>
     <string name="server_lab_reserved">Reserved (اختیاری، جدا شده با کاما)</string>
-    <string name="server_lab_local_address">آدرس محلی IPV4 (اختیاری)</string>
+    <string name="server_lab_local_address">آدرس محلی (IPv4/IPv6 اختیاری، جدا شده با کاما)</string>
     <string name="server_lab_local_mtu">MTU (اختیاری، پیش‌فرض 1420)</string>
     <string name="toast_success">با موفقیت انجام شد</string>
     <string name="toast_failure">شکست</string>
@@ -101,7 +101,7 @@
     <string name="server_lab_content">محتوا</string>
     <string name="toast_none_data_clipboard">هیچ داده‌ ای در کلیپ ‌بورد وجود ندارد</string>
     <string name="toast_invalid_url">نشانی اینترنتی معتبر نیست</string>
-    <string name="toast_insecure_url_protocol">لطفاً از آدرس اشتراک پروتکل HTTP ناامن استفاده نکنید</string>
+    <string name="toast_insecure_url_protocol">لطفاً از آدرس های اشتراک پروتکل HTTP ناامن استفاده نکنید</string>
     <string name="server_lab_need_inbound">اطمینان حاصل کنید که پورت ورودی با تنظیمات مطابقت دارد</string>
     <string name="toast_malformed_josn">کانفیگ درست نیست</string>
     <string name="server_lab_request_host6">هاست (SNI) (اختیاری)</string>
@@ -143,7 +143,7 @@
     <string name="title_advanced">تنظیمات پیشرفته</string>
     <string name="title_vpn_settings">تنظیمات VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی به تفکیک برنامه</string>
-    <string name="summary_pref_per_app_proxy">عمومی: برنامه بررسی شده پروکسی است، اتصال مستقیم بدون بررسی است. \nحالت دور زدن: برنامه بررسی شده مستقیما متصل است، پراکسی بررسی نشده است. \nگزینه‌ای برای انتخاب خودکار پروکسی برنامه در منو است.</string>
+    <string name="summary_pref_per_app_proxy">عمومی: برنامه انتخاب شده از طریق یک پروکسی متصل می شود، برنامه انتخاب نشده مستقیماً متصل می شود. \nحالت دور زدن: برنامه انتخاب شده مستقیماً متصل می شود، برنامه انتخاب نشده از طریق یک پروکسی متصل می شود. \nانتخاب خودکار برنامه های پراکسی در منو امکان پذیر است.</string>
     <string name="title_pref_is_booted">اتصال خودکار هنگام راه اندازی</string>
     <string name="summary_pref_is_booted">هنگام راه اندازی به طور خودکار به سرور انتخابی متصل می شود که ممکن است ناموفق باشد.</string>
 
@@ -340,7 +340,7 @@
     </string-array>
 
     <string-array name="preset_rulesets">
-        <item>لیست سفید چین</item>
+        <item>لیست سفید چین ( دور زدن سرزمین اصلی )</item>
         <item>لیست سیاه چین</item>
         <item>جهانی(GLOBAL)</item>
         <item>ایران</item>
