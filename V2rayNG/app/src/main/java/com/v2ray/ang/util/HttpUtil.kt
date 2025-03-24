@@ -17,8 +17,14 @@ object HttpUtil {
      * @return The ASCII representation of the URL.
      */
     fun idnToASCII(str: String): String {
-        val url = URL(str)
-        return URL(url.protocol, IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED), url.port, url.file).toExternalForm()
+        val url = URI(str)
+        val host = url.host
+        val asciiHost = IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED)
+        if (host != asciiHost) {
+            return str.replace(host, asciiHost)
+        } else {
+            return str
+        }
     }
 
     /**
