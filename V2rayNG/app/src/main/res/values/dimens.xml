@@ -5,5 +5,6 @@
     <dimen name="padding_spacing_dp16">16dp</dimen>
     <dimen name="image_size_dp24">24dp</dimen>
     <dimen name="view_height_dp48">48dp</dimen>
+    <dimen name="view_height_dp64">64dp</dimen>
     <dimen name="view_height_dp160">160dp</dimen>
 </resources>
