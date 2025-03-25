@@ -53,6 +53,7 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
 
         if (TextUtils.isEmpty(subItem.url)) {
             holder.itemSubSettingBinding.layoutShare.visibility = View.INVISIBLE
+            holder.itemSubSettingBinding.chkEnable.visibility = View.INVISIBLE
         } else {
             holder.itemSubSettingBinding.layoutShare.setOnClickListener {
                 AlertDialog.Builder(mActivity)

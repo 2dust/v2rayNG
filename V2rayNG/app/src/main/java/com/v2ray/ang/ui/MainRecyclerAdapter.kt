@@ -17,6 +17,7 @@ import com.v2ray.ang.databinding.ItemQrcodeBinding
 import com.v2ray.ang.databinding.ItemRecyclerFooterBinding
 import com.v2ray.ang.databinding.ItemRecyclerMainBinding
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
@@ -100,85 +101,18 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             holder.itemMainBinding.tvStatistics.text = strState
 
             holder.itemMainBinding.layoutShare.setOnClickListener {
-                AlertDialog.Builder(mActivity).setItems(shareOptions.toTypedArray()) { _, i ->
-                    try {
-                        when (i) {
-                            0 -> {
-                                if (profile.configType == EConfigType.CUSTOM) {
-                                    shareFullContent(guid)
-                                } else {
-                                    val ivBinding = ItemQrcodeBinding.inflate(LayoutInflater.from(mActivity))
-                                    ivBinding.ivQcode.setImageBitmap(AngConfigManager.share2QRCode(guid))
-                                    AlertDialog.Builder(mActivity).setView(ivBinding.root).show()
-                                }
-                            }
-
-                            1 -> {
-                                if (AngConfigManager.share2Clipboard(mActivity, guid) == 0) {
-                                    mActivity.toast(R.string.toast_success)
-                                } else {
-                                    mActivity.toast(R.string.toast_failure)
-                                }
-                            }
-
-                            2 -> shareFullContent(guid)
-                            else -> mActivity.toast("else")
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }.show()
+                shareServer(guid, profile, shareOptions)
             }
 
             holder.itemMainBinding.layoutEdit.setOnClickListener {
-                val intent = Intent().putExtra("guid", guid)
-                    .putExtra("isRunning", isRunning)
-                    .putExtra("createConfigType", profile.configType.value)
-                if (profile.configType == EConfigType.CUSTOM) {
-                    mActivity.startActivity(intent.setClass(mActivity, ServerCustomConfigActivity::class.java))
-                } else {
-                    mActivity.startActivity(intent.setClass(mActivity, ServerActivity::class.java))
-                }
+                editServer(guid, profile)
             }
             holder.itemMainBinding.layoutRemove.setOnClickListener {
-                if (guid != MmkvManager.getSelectServer()) {
-                    if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
-                        AlertDialog.Builder(mActivity).setMessage(R.string.del_config_comfirm)
-                            .setPositiveButton(android.R.string.ok) { _, _ ->
-                                removeServer(guid, position)
-                            }
-                            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                                //do noting
-                            }
-                            .show()
-                    } else {
-                        removeServer(guid, position)
-                    }
-                } else {
-                    application.toast(R.string.toast_action_not_allowed)
-                }
+                removeServer(guid, position)
             }
 
             holder.itemMainBinding.infoContainer.setOnClickListener {
-                val selected = MmkvManager.getSelectServer()
-                if (guid != selected) {
-                    MmkvManager.setSelectServer(guid)
-                    if (!TextUtils.isEmpty(selected)) {
-                        notifyItemChanged(mActivity.mainViewModel.getPosition(selected.orEmpty()))
-                    }
-                    notifyItemChanged(mActivity.mainViewModel.getPosition(guid))
-                    if (isRunning) {
-                        V2RayServiceManager.stopVService(mActivity)
-                        mActivity.lifecycleScope.launch {
-                            try {
-                                delay(500)
-                                V2RayServiceManager.startVService(mActivity)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
-                    }
-                }
+                setSelectServer(guid)
             }
         }
         if (holder is FooterViewHolder) {
@@ -192,6 +126,37 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
         }
     }
 
+    private fun shareServer(guid: String, profile: ProfileItem, shareOptions: List<String>) {
+        AlertDialog.Builder(mActivity).setItems(shareOptions.toTypedArray()) { _, i ->
+            try {
+                when (i) {
+                    0 -> {
+                        if (profile.configType == EConfigType.CUSTOM) {
+                            shareFullContent(guid)
+                        } else {
+                            val ivBinding = ItemQrcodeBinding.inflate(LayoutInflater.from(mActivity))
+                            ivBinding.ivQcode.setImageBitmap(AngConfigManager.share2QRCode(guid))
+                            AlertDialog.Builder(mActivity).setView(ivBinding.root).show()
+                        }
+                    }
+
+                    1 -> {
+                        if (AngConfigManager.share2Clipboard(mActivity, guid) == 0) {
+                            mActivity.toast(R.string.toast_success)
+                        } else {
+                            mActivity.toast(R.string.toast_failure)
+                        }
+                    }
+
+                    2 -> shareFullContent(guid)
+                    else -> mActivity.toast("else")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }.show()
+    }
+
     private fun shareFullContent(guid: String) {
         if (AngConfigManager.shareFullContent2Clipboard(mActivity, guid) == 0) {
             mActivity.toast(R.string.toast_success)
@@ -200,10 +165,62 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
         }
     }
 
+    private fun editServer(guid: String, profile: ProfileItem) {
+        val intent = Intent().putExtra("guid", guid)
+            .putExtra("isRunning", isRunning)
+            .putExtra("createConfigType", profile.configType.value)
+        if (profile.configType == EConfigType.CUSTOM) {
+            mActivity.startActivity(intent.setClass(mActivity, ServerCustomConfigActivity::class.java))
+        } else {
+            mActivity.startActivity(intent.setClass(mActivity, ServerActivity::class.java))
+        }
+    }
+
     private fun removeServer(guid: String, position: Int) {
+        if (guid != MmkvManager.getSelectServer()) {
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
+                AlertDialog.Builder(mActivity).setMessage(R.string.del_config_comfirm)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        removeServerSub(guid, position)
+                    }
+                    .setNegativeButton(android.R.string.cancel) { _, _ ->
+                        //do noting
+                    }
+                    .show()
+            } else {
+                removeServerSub(guid, position)
+            }
+        } else {
+            application.toast(R.string.toast_action_not_allowed)
+        }
+    }
+
+    private fun removeServerSub(guid: String, position: Int) {
         mActivity.mainViewModel.removeServer(guid)
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, mActivity.mainViewModel.serversCache.size)
+    }
+
+    private fun setSelectServer(guid: String) {
+        val selected = MmkvManager.getSelectServer()
+        if (guid != selected) {
+            MmkvManager.setSelectServer(guid)
+            if (!TextUtils.isEmpty(selected)) {
+                notifyItemChanged(mActivity.mainViewModel.getPosition(selected.orEmpty()))
+            }
+            notifyItemChanged(mActivity.mainViewModel.getPosition(guid))
+            if (isRunning) {
+                V2RayServiceManager.stopVService(mActivity)
+                mActivity.lifecycleScope.launch {
+                    try {
+                        delay(500)
+                        V2RayServiceManager.startVService(mActivity)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
