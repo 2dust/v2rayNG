@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -14,6 +13,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityAboutBinding
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.ZipUtil
@@ -195,8 +195,4 @@ class AboutActivity : BaseActivity() {
                 }
             }
         }
-
-    private fun toast(messageResId: Int) {
-        Toast.makeText(this, getString(messageResId), Toast.LENGTH_SHORT).show()
-    }
 }

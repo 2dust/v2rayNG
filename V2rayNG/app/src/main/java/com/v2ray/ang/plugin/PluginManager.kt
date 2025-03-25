@@ -32,10 +32,10 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.system.Os
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.extension.listenForPackageChanges
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.plugin.PluginContract.METADATA_KEY_ID
 import java.io.File
 import java.io.FileNotFoundException
@@ -126,7 +126,7 @@ object PluginManager {
         if (providers.size > 1) {
             val message =
                 "Conflicting plugins found from: ${providers.joinToString { it.providerInfo.packageName }}"
-            Toast.makeText(AngApplication.application, message, Toast.LENGTH_LONG).show()
+            AngApplication.application.toast(message)
             throw IllegalStateException(message)
         }
         val provider = providers.single().providerInfo
@@ -224,8 +224,8 @@ object PluginManager {
 
     fun ComponentInfo.loadString(key: String) = when (val value = metaData.getString(key)) {
         is String -> value
-        is Int -> AngApplication.application.packageManager.getResourcesForApplication(applicationInfo)
-            .getString(value)
+//        is Int -> AngApplication.application.packageManager.getResourcesForApplication(applicationInfo)
+//            .getString(value)
 
         null -> null
         else -> error("meta-data $key has invalid type ${value.javaClass}")

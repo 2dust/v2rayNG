@@ -78,7 +78,7 @@ class ServerCustomConfigActivity : BaseActivity() {
             CustomFmt.parse(binding.editor.text.toString())
         } catch (e: Exception) {
             e.printStackTrace()
-            ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
+            toast("${getString(R.string.toast_malformed_josn)} ${e.cause?.message}")
             return false
         }
 
