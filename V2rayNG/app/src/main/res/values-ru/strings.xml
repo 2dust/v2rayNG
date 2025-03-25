@@ -133,11 +133,11 @@
     <string name="menu_item_select_all">Выбрать все</string>
     <string name="msg_enter_keywords">Введите ключевые слова</string>
     <string name="switch_bypass_apps_mode">Режим обхода</string>
-    <string name="menu_item_select_proxy_app">Автовыбор проксируемых приложений</string>
+    <string name="menu_item_select_proxy_app">Автовыбор приложений</string>
     <string name="msg_downloading_content">Загрузка данных</string>
     <string name="menu_item_export_proxy_app">Экспорт в буфер обмена</string>
     <string name="menu_item_import_proxy_app">Импорт из буфера обмена</string>
-    <string name="per_app_proxy_settings">Настройки выбранных приложений</string>
+    <string name="per_app_proxy_settings">Выбор приложений</string>
     <string name="per_app_proxy_settings_enable">Использовать выбор приложений</string>
 
     <!-- Preferences -->
@@ -173,7 +173,7 @@
     <string name="summary_pref_local_dns_enabled">Обслуживание выполняется DNS-модулем ядра (в настройках маршрутизации рекомендуется выбрать режим «Все, кроме LAN и Китая»)</string>
 
     <string name="title_pref_fake_dns_enabled">Использовать поддельную DNS</string>
-    <string name="summary_pref_fake_dns_enabled">Локальная DNS возвращает поддельный IP-адрес (быстрее, но может не работать с некоторыми приложениями)</string>
+    <string name="summary_pref_fake_dns_enabled">Локальная DNS возвращает поддельные IP-адреса (быстрее, но может не работать с некоторыми приложениями)</string>
 
     <string name="title_pref_prefer_ipv6">Предпочитать IPv6</string>
     <string name="summary_pref_prefer_ipv6">Предпочитать IPv6-адреса и маршрутизацию</string>
