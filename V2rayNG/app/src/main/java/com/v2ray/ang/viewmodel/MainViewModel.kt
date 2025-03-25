@@ -162,7 +162,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 continue
             }
 
-            if (keywordFilter.isEmpty() || profile.remarks.contains(keywordFilter)) {
+            if (keywordFilter.isEmpty() || profile.remarks.lowercase().contains(keywordFilter.lowercase())) {
                 serversCache.add(ServersCache(guid, profile))
             }
         }
