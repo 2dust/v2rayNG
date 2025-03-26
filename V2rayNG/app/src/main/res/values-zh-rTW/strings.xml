@@ -214,6 +214,9 @@
     <string name="title_pref_append_http_proxy">追加 HTTP 代理至 VPN</string>
     <string name="summary_pref_append_http_proxy">瀏覽器 / 一些支援的應用 將直接使用 HTTP 代理, 而不經過虛擬網卡設備 (Android 10+)</string>
 
+    <string name="title_pref_double_column_display">啟用雙列顯示</string>
+    <string name="summary_pref_double_column_display">設定檔清單以雙列顯示，允許在螢幕上顯示更多內容。需要重啟應用生效。</string>
+
     <!-- AboutActivity -->
     <string name="title_pref_feedback">意見回饋</string>
     <string name="summary_pref_feedback">前往 GitHub 回報錯誤</string>
@@ -314,6 +317,14 @@
         <item>QR Code</item>
         <item>匯出至剪貼簿</item>
         <item>匯出完整設定至剪貼簿</item>
+    </string-array>
+
+    <string-array name="share_method_more">
+        <item>QR Code</item>
+        <item>匯出至剪貼簿</item>
+        <item>匯出完整設定至剪貼簿</item>
+        <item>編輯</item>
+        <item>刪除</item>
     </string-array>
 
     <string-array name="share_sub_method">

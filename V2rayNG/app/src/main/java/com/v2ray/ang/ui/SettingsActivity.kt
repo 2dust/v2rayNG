@@ -238,6 +238,7 @@ class SettingsActivity : BaseActivity() {
                 AppConfig.PREF_SPEED_ENABLED,
                 AppConfig.PREF_CONFIRM_REMOVE,
                 AppConfig.PREF_START_SCAN_IMMEDIATE,
+                AppConfig.PREF_DOUBLE_COLUMN_DISPLAY,
                 AppConfig.PREF_PREFER_IPV6,
                 AppConfig.PREF_PROXY_SHARING,
                 AppConfig.PREF_ALLOW_INSECURE

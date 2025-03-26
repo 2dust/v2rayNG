@@ -24,7 +24,6 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
 import com.v2ray.ang.service.V2RayServiceManager
-import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -38,7 +37,11 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     private val share_method: Array<out String> by lazy {
         mActivity.resources.getStringArray(R.array.share_method)
     }
+    private val share_method_more: Array<out String> by lazy {
+        mActivity.resources.getStringArray(R.array.share_method_more)
+    }
     var isRunning = false
+    private val doubleColumnDisplay = MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
 
     override fun getItemCount() = mActivity.mainViewModel.serversCache.size + 1
 
@@ -46,115 +49,135 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
         if (holder is MainViewHolder) {
             val guid = mActivity.mainViewModel.serversCache[position].guid
             val profile = mActivity.mainViewModel.serversCache[position].profile
-//            //filter
-//            if (mActivity.mainViewModel.subscriptionId.isNotEmpty()
-//                && mActivity.mainViewModel.subscriptionId != config.subscriptionId
-//            ) {
-//                holder.itemMainBinding.cardView.visibility = View.GONE
-//            } else {
-//                holder.itemMainBinding.cardView.visibility = View.VISIBLE
-//            }
+            val isCustom = profile.configType == EConfigType.CUSTOM
 
-            val aff = MmkvManager.decodeServerAffiliationInfo(guid)
-
-            holder.itemMainBinding.tvName.text = profile.remarks
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+
+            //Name address
+            holder.itemMainBinding.tvName.text = profile.remarks
+            holder.itemMainBinding.tvStatistics.text = getAddress(profile)
+            holder.itemMainBinding.tvType.text = profile.configType.name
+
+            //TestResult
+            val aff = MmkvManager.decodeServerAffiliationInfo(guid)
             holder.itemMainBinding.tvTestResult.text = aff?.getTestDelayString().orEmpty()
             if ((aff?.testDelayMillis ?: 0L) < 0L) {
                 holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(mActivity, R.color.colorPingRed))
             } else {
                 holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(mActivity, R.color.colorPing))
             }
+
+            //layoutIndicator
             if (guid == MmkvManager.getSelectServer()) {
                 holder.itemMainBinding.layoutIndicator.setBackgroundResource(R.color.colorAccent)
             } else {
                 holder.itemMainBinding.layoutIndicator.setBackgroundResource(0)
             }
-            holder.itemMainBinding.tvSubscription.text =
-                if (mActivity.mainViewModel.subscriptionId.isEmpty())
-                    MmkvManager.decodeSubscription(profile.subscriptionId)?.remarks.orEmpty()
-                else
-                    ""
 
-            var shareOptions = share_method.asList()
-            when (profile.configType) {
-                EConfigType.CUSTOM -> {
-                    holder.itemMainBinding.tvType.text = mActivity.getString(R.string.server_customize_config)
-                    shareOptions = shareOptions.takeLast(1)
+            //subscription remarks
+            val subRemarks = getSubscriptionRemarks(profile)
+            holder.itemMainBinding.tvSubscription.text = subRemarks
+            holder.itemMainBinding.layoutSubscription.visibility = if (subRemarks.isEmpty()) View.GONE else View.VISIBLE
+
+            //layout
+            if (doubleColumnDisplay) {
+                holder.itemMainBinding.layoutShare.visibility = View.GONE
+                holder.itemMainBinding.layoutEdit.visibility = View.GONE
+                holder.itemMainBinding.layoutRemove.visibility = View.GONE
+                holder.itemMainBinding.layoutMore.visibility = View.VISIBLE
+
+                //share method
+                val shareOptions = if (isCustom) share_method_more.asList().takeLast(3) else share_method_more.asList()
+
+                holder.itemMainBinding.layoutMore.setOnClickListener {
+                    shareServer(guid, profile, position, shareOptions, if (isCustom) 2 else 0)
+                }
+            } else {
+                holder.itemMainBinding.layoutShare.visibility = View.VISIBLE
+                holder.itemMainBinding.layoutEdit.visibility = View.VISIBLE
+                holder.itemMainBinding.layoutRemove.visibility = View.VISIBLE
+                holder.itemMainBinding.layoutMore.visibility = View.GONE
+
+                //share method
+                val shareOptions = if (isCustom) share_method.asList().takeLast(1) else share_method.asList()
+
+                holder.itemMainBinding.layoutShare.setOnClickListener {
+                    shareServer(guid, profile, position, shareOptions, if (isCustom) 2 else 0)
                 }
 
-                else -> {
-                    holder.itemMainBinding.tvType.text = profile.configType.name
+                holder.itemMainBinding.layoutEdit.setOnClickListener {
+                    editServer(guid, profile)
                 }
-            }
-
-            // Hide xxx:xxx:***/xxx.xxx.xxx.***
-            val strState = "${
-                profile.server?.let {
-                    if (it.contains(":"))
-                        it.split(":").take(2).joinToString(":", postfix = ":***")
-                    else
-                        it.split('.').dropLast(1).joinToString(".", postfix = ".***")
+                holder.itemMainBinding.layoutRemove.setOnClickListener {
+                    removeServer(guid, position)
                 }
-            } : ${profile.serverPort}"
-
-            holder.itemMainBinding.tvStatistics.text = strState
-
-            holder.itemMainBinding.layoutShare.setOnClickListener {
-                shareServer(guid, profile, shareOptions)
-            }
-
-            holder.itemMainBinding.layoutEdit.setOnClickListener {
-                editServer(guid, profile)
-            }
-            holder.itemMainBinding.layoutRemove.setOnClickListener {
-                removeServer(guid, position)
             }
 
             holder.itemMainBinding.infoContainer.setOnClickListener {
                 setSelectServer(guid)
             }
         }
-        if (holder is FooterViewHolder) {
-            if (true) {
-                holder.itemFooterBinding.layoutEdit.visibility = View.INVISIBLE
-            } else {
-                holder.itemFooterBinding.layoutEdit.setOnClickListener {
-                    Utils.openUri(mActivity, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")
-                }
-            }
-        }
+//        if (holder is FooterViewHolder) {
+//            if (true) {
+//                holder.itemFooterBinding.layoutEdit.visibility = View.INVISIBLE
+//            } else {
+//                holder.itemFooterBinding.layoutEdit.setOnClickListener {
+//                    Utils.openUri(mActivity, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")
+//                }
+//            }
+//        }
     }
 
-    private fun shareServer(guid: String, profile: ProfileItem, shareOptions: List<String>) {
+    private fun getAddress(profile: ProfileItem): String {
+        // Hide xxx:xxx:***/xxx.xxx.xxx.***
+        return "${
+            profile.server?.let {
+                if (it.contains(":"))
+                    it.split(":").take(2).joinToString(":", postfix = ":***")
+                else
+                    it.split('.').dropLast(1).joinToString(".", postfix = ".***")
+            }
+        } : ${profile.serverPort}"
+    }
+
+    private fun getSubscriptionRemarks(profile: ProfileItem): String {
+        val subRemarks =
+            if (mActivity.mainViewModel.subscriptionId.isEmpty())
+                MmkvManager.decodeSubscription(profile.subscriptionId)?.remarks?.firstOrNull()
+            else
+                null
+        return subRemarks?.toString() ?: ""
+    }
+
+    private fun shareServer(guid: String, profile: ProfileItem, position: Int, shareOptions: List<String>, skip: Int) {
         AlertDialog.Builder(mActivity).setItems(shareOptions.toTypedArray()) { _, i ->
             try {
-                when (i) {
-                    0 -> {
-                        if (profile.configType == EConfigType.CUSTOM) {
-                            shareFullContent(guid)
-                        } else {
-                            val ivBinding = ItemQrcodeBinding.inflate(LayoutInflater.from(mActivity))
-                            ivBinding.ivQcode.setImageBitmap(AngConfigManager.share2QRCode(guid))
-                            AlertDialog.Builder(mActivity).setView(ivBinding.root).show()
-                        }
-                    }
-
-                    1 -> {
-                        if (AngConfigManager.share2Clipboard(mActivity, guid) == 0) {
-                            mActivity.toast(R.string.toast_success)
-                        } else {
-                            mActivity.toast(R.string.toast_failure)
-                        }
-                    }
-
+                when (i + skip) {
+                    0 -> showQRCode(guid)
+                    1 -> share2Clipboard(guid)
                     2 -> shareFullContent(guid)
+                    3 -> editServer(guid, profile)
+                    4 -> removeServer(guid, position)
                     else -> mActivity.toast("else")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }.show()
+    }
+
+    private fun showQRCode(guid: String) {
+        val ivBinding = ItemQrcodeBinding.inflate(LayoutInflater.from(mActivity))
+        ivBinding.ivQcode.setImageBitmap(AngConfigManager.share2QRCode(guid))
+        AlertDialog.Builder(mActivity).setView(ivBinding.root).show()
+    }
+
+    private fun share2Clipboard(guid: String) {
+        if (AngConfigManager.share2Clipboard(mActivity, guid) == 0) {
+            mActivity.toast(R.string.toast_success)
+        } else {
+            mActivity.toast(R.string.toast_failure)
+        }
     }
 
     private fun shareFullContent(guid: String) {

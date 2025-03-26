@@ -75,6 +75,11 @@
             android:summary="@string/summary_pref_start_scan_immediate"
             android:title="@string/title_pref_start_scan_immediate" />
 
+        <CheckBoxPreference
+            android:key="pref_double_column_display"
+            android:summary="@string/summary_pref_double_column_display"
+            android:title="@string/title_pref_double_column_display" />
+
         <ListPreference
             android:defaultValue="auto"
             android:entries="@array/language_select"

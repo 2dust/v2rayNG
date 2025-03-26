@@ -214,6 +214,9 @@
     <string name="title_pref_append_http_proxy">پروکسی HTTP را به VPN اضافه کنید</string>
     <string name="summary_pref_append_http_proxy">پروکسی HTTP مستقیماً از (مرورگر/برخی برنامه‌های پشتیبانی‌شده)، بدون استفاده از دستگاه NIC مجازی (Android 10+) استفاده می‌شود.</string>
 
+    <string name="title_pref_double_column_display">Enable double column display</string>
+    <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen. You need to restart the application to take effect.</string>
+
     <!-- AboutActivity -->
     <string name="title_pref_feedback">بازخورد</string>
     <string name="summary_pref_feedback">بازخورد یا گزارش اشکالات در گیت‌ هاب</string>
@@ -315,10 +318,19 @@
     <string name="title_pref_fragment_length">طول بسته های فرگمنت (حداقل-حداکثر)</string>
     <string name="title_pref_fragment_interval">فاصله بین بسته های فرگمنت (حداقل-حداکثر)</string>
     <string name="title_pref_fragment_enabled">فعال کردن فرگمنت</string>
+
     <string-array name="share_method">
         <item>QRcode</item>
         <item>خروجی گرفتن در کلیپ‌ بورد</item>
         <item>خروجی گرفتن کانفیگ کامل در کلیپ بورد</item>
+    </string-array>
+
+    <string-array name="share_method_more">
+        <item>QRcode</item>
+        <item>Export to clipboard</item>
+        <item>Export full configuration to clipboard</item>
+        <item>Edit</item>
+        <item>Delete</item>
     </string-array>
 
     <string-array name="share_sub_method">

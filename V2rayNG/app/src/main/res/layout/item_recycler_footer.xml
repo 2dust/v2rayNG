@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
+        android:visibility="invisible"
         android:orientation="horizontal"
         android:padding="@dimen/padding_spacing_dp16">
 
