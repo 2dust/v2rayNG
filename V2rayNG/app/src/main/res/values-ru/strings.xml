@@ -215,8 +215,8 @@
     <string name="title_pref_append_http_proxy">Дополнительный HTTP-прокси</string>
     <string name="summary_pref_append_http_proxy">HTTP-прокси будет использоваться напрямую (из браузера и других поддерживающих приложений), минуя виртуальный сетевой адаптер (Android 10+)</string>
 
-    <string name="title_pref_double_column_display">Enable double column display</string>
-    <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen. You need to restart the application to take effect.</string>
+    <string name="title_pref_double_column_display">Отображение в два столбца</string>
+    <string name="summary_pref_double_column_display">Список профилей выводится в виде двух столбцов, что позволяет показать больше информации на экране. Требуется перезапуск приложения.</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">Обратная связь</string>
@@ -328,11 +328,11 @@
     </string-array>
 
     <string-array name="share_method_more">
-        <item>QRcode</item>
-        <item>Export to clipboard</item>
-        <item>Export full configuration to clipboard</item>
-        <item>Edit</item>
-        <item>Delete</item>
+        <item>QR-код</item>
+        <item>Экспорт в буфер обмена</item>
+        <item>Экспорт всей конфигурации в буфер обмена</item>
+        <item>Изменить</item>
+        <item>Удалить</item>
     </string-array>
 
     <string-array name="share_sub_method">
