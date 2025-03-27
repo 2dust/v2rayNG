@@ -1,0 +1,32 @@
+# Ignore data and key store files
+*.dat
+*.jks
+
+# Ignore output JSON file
+V2rayNG/app/release/output.json
+
+# Ignore IDE and build system directories
+.idea/
+.gradle/
+*.iml
+
+# Ignore local properties and DS_Store files
+/local.properties
+.DS_Store
+
+# Ignore build directories and captures
+/build
+/captures
+
+# Ignore APK and AAR files
+*.apk
+*.aar
+
+# Ignore signing properties
+signing.properties
+
+# Ignore shared object files
+*.so
+
+# Ignore Google services JSON
+V2rayNG/app/google-services.json
