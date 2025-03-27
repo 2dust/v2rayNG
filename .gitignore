@@ -30,3 +30,34 @@ signing.properties
 
 # Ignore Google services JSON
 V2rayNG/app/google-services.json
+
+# Additional common Android/Java ignores
+*.log
+*.tmp
+*.bak
+*.swp
+*.orig
+*.class
+*.jar
+*.war
+*.ear
+
+# Ignore executable files
+*.exe
+*.dll
+*.obj
+*.o
+*.pyc
+*.pyo
+
+# Ignore files from other IDEs
+.vscode/
+.classpath
+.project
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# Ignore OS-specific files
+Thumbs.db
+.DS_Store
