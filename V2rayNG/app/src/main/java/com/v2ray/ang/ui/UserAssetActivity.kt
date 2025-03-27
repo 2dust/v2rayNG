@@ -91,7 +91,7 @@ class UserAssetActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        binding.recyclerView.adapter?.notifyDataSetChanged()
+        refreshData()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -117,7 +117,7 @@ class UserAssetActivity : BaseActivity() {
         requestStoragePermissionLauncher.launch(permission)
     }
 
-    val chooseFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val chooseFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val uri = result.data?.data
         if (result.resultCode == RESULT_OK && uri != null) {
             val assetId = Utils.getUuid()
@@ -147,7 +147,7 @@ class UserAssetActivity : BaseActivity() {
             targetFile.outputStream().use { fileOut ->
                 inputStream?.copyTo(fileOut)
                 toast(R.string.toast_success)
-                binding.recyclerView.adapter?.notifyDataSetChanged()
+                refreshData()
             }
         }
         return targetFile.path
@@ -215,7 +215,7 @@ class UserAssetActivity : BaseActivity() {
             withContext(Dispatchers.Main) {
                 if (resultCount > 0) {
                     toast(getString(R.string.title_update_config_count, resultCount))
-                    binding.recyclerView.adapter?.notifyDataSetChanged()
+                    refreshData()
                 } else {
                     toast(getString(R.string.toast_failure))
                 }
@@ -269,9 +269,14 @@ class UserAssetActivity : BaseActivity() {
         lifecycleScope.launch(Dispatchers.Default) {
             SettingsManager.initAssets(this@UserAssetActivity, assets)
             withContext(Dispatchers.Main) {
-                binding.recyclerView.adapter?.notifyDataSetChanged()
+                refreshData()
             }
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun refreshData() {
+        binding.recyclerView.adapter?.notifyDataSetChanged()
     }
 
     inner class UserAssetAdapter : RecyclerView.Adapter<UserAssetViewHolder>() {

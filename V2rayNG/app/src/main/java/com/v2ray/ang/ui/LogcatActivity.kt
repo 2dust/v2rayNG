@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -21,7 +22,7 @@ import java.io.IOException
 class LogcatActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
     private val binding by lazy { ActivityLogcatBinding.inflate(layoutInflater) }
 
-    var logsetsAll: MutableList<String> = mutableListOf()
+    private var logsetsAll: MutableList<String> = mutableListOf()
     var logsets: MutableList<String> = mutableListOf()
     private val adapter by lazy { LogcatRecyclerAdapter(this) }
 
@@ -62,7 +63,7 @@ class LogcatActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
                 launch(Dispatchers.Main) {
                     logsetsAll = allText.toMutableList()
                     logsets = allText.toMutableList()
-                    adapter.notifyDataSetChanged()
+                    refreshData()
                     binding.refreshLayout.isRefreshing = false
                 }
             }
@@ -84,7 +85,7 @@ class LogcatActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
                 launch(Dispatchers.Main) {
                     logsetsAll.clear()
                     logsets.clear()
-                    adapter.notifyDataSetChanged()
+                    refreshData()
                 }
             }
         } catch (e: IOException) {
@@ -138,11 +139,16 @@ class LogcatActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
             logsetsAll.filter { it.contains(key) }.toMutableList()
         }
 
-        adapter?.notifyDataSetChanged()
+        refreshData()
         return true
     }
 
     override fun onRefresh() {
         getLogcat()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun refreshData() {
+        adapter.notifyDataSetChanged()
     }
 }

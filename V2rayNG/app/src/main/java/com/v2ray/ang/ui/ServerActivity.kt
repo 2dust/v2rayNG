@@ -354,11 +354,11 @@ class ServerActivity : BaseActivity() {
             container_alpn?.visibility = View.VISIBLE
 
             et_sni?.text = Utils.getEditable(config.sni)
-            config.fingerPrint?.let {
+            config.fingerPrint?.let { it ->
                 val utlsIndex = Utils.arrayFind(uTlsItems, it)
                 utlsIndex.let { sp_stream_fingerprint?.setSelection(if (it >= 0) it else 0) }
             }
-            config.alpn?.let {
+            config.alpn?.let { it ->
                 val alpnIndex = Utils.arrayFind(alpns, it)
                 alpnIndex.let { sp_stream_alpn?.setSelection(if (it >= 0) it else 0) }
             }

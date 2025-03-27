@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -184,6 +185,7 @@ class RoutingSettingActivity : BaseActivity() {
         return true
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun refreshData() {
         rulesets.clear()
         rulesets.addAll(MmkvManager.decodeRoutingRulesets() ?: mutableListOf())

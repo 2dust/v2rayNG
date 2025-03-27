@@ -21,10 +21,10 @@ class UserAssetUrlActivity : BaseActivity() {
 
     private val binding by lazy { ActivityUserAssetUrlBinding.inflate(layoutInflater) }
 
-    var del_config: MenuItem? = null
-    var save_config: MenuItem? = null
+    private var del_config: MenuItem? = null
+    private var save_config: MenuItem? = null
 
-    val extDir by lazy { File(Utils.userAssetPath(this)) }
+    private val extDir by lazy { File(Utils.userAssetPath(this)) }
     private val editAssetId by lazy { intent.getStringExtra("assetId").orEmpty() }
 
     override fun onCreate(savedInstanceState: Bundle?) {

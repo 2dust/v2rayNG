@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -51,13 +52,13 @@ class PerAppProxyActivity : BaseActivity() {
                         appsList.forEach { app ->
                             app.isSelected = if (blacklist.contains(app.packageName)) 1 else 0
                         }
-                        appsList.sortedWith(Comparator { p1, p2 ->
+                        appsList.sortedWith { p1, p2 ->
                             when {
                                 p1.isSelected > p2.isSelected -> -1
                                 p1.isSelected == p2.isSelected -> 0
                                 else -> 1
                             }
-                        })
+                        }
                     } else {
                         val collator = Collator.getInstance()
                         appsList.sortedWith(compareBy(collator) { it.appName })
@@ -112,8 +113,10 @@ class PerAppProxyActivity : BaseActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+
+    @SuppressLint("NotifyDataSetChanged")
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.select_all -> adapter?.let {
+        R.id.select_all -> adapter?.let { it ->
             val pkgNames = it.apps.map { it.packageName }
             if (it.blacklist.containsAll(pkgNames)) {
                 it.apps.forEach {
@@ -185,6 +188,7 @@ class PerAppProxyActivity : BaseActivity() {
         toast(R.string.toast_success)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun selectProxyApp(content: String, force: Boolean): Boolean {
         try {
             val proxyApps = if (TextUtils.isEmpty(content)) {
@@ -197,7 +201,7 @@ class PerAppProxyActivity : BaseActivity() {
             adapter?.blacklist?.clear()
 
             if (binding.switchBypassApps.isChecked) {
-                adapter?.let {
+                adapter?.let { it ->
                     it.apps.forEach block@{
                         val packageName = it.packageName
                         Log.d(ANG_PACKAGE, packageName)
@@ -210,7 +214,7 @@ class PerAppProxyActivity : BaseActivity() {
                     it.notifyDataSetChanged()
                 }
             } else {
-                adapter?.let {
+                adapter?.let { it ->
                     it.apps.forEach block@{
                         val packageName = it.packageName
                         Log.d(ANG_PACKAGE, packageName)
@@ -259,7 +263,12 @@ class PerAppProxyActivity : BaseActivity() {
 
         adapter = PerAppProxyAdapter(this, apps, adapter?.blacklist)
         binding.recyclerView.adapter = adapter
-        adapter?.notifyDataSetChanged()
+        refreshData()
         return true
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun refreshData() {
+        adapter?.notifyDataSetChanged()
     }
 }

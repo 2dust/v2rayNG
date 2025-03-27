@@ -35,7 +35,6 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!-- <useapplications-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission
@@ -213,7 +212,8 @@
             android:icon="@drawable/ic_stat_name"
             android:label="@string/app_tile_name"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            android:process=":RunSoLibV2RayDaemon">
+            android:process=":RunSoLibV2RayDaemon"
+            tools:targetApi="24">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>

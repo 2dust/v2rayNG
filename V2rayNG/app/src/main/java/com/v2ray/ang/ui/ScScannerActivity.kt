@@ -27,7 +27,7 @@ class ScScannerActivity : BaseActivity() {
         importQRcode()
     }
 
-    fun importQRcode(): Boolean {
+    private fun importQRcode(): Boolean {
         requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         return true
     }

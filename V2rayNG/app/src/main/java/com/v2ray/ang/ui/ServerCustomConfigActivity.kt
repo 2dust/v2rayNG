@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.blacksquircle.ui.editorkit.utils.EditorTheme
 import com.blacksquircle.ui.language.json.JsonLanguage
@@ -16,7 +15,6 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.Utils
-import me.drakeet.support.toast.ToastCompat
 
 class ServerCustomConfigActivity : BaseActivity() {
     private val binding by lazy { ActivityServerCustomConfigBinding.inflate(layoutInflater) }
