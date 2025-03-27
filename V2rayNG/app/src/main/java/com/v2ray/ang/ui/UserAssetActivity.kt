@@ -26,6 +26,8 @@ import com.v2ray.ang.databinding.ItemRecyclerUserAssetBinding
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastError
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.HttpUtil
@@ -135,7 +137,7 @@ class UserAssetActivity : BaseActivity() {
                     copyFile(uri)
                 }
             }.onFailure {
-                toast(R.string.toast_asset_copy_failed)
+                toastError(R.string.toast_asset_copy_failed)
                 MmkvManager.removeAssetUrl(assetId)
             }
         }
@@ -146,7 +148,7 @@ class UserAssetActivity : BaseActivity() {
         contentResolver.openInputStream(uri).use { inputStream ->
             targetFile.outputStream().use { fileOut ->
                 inputStream?.copyTo(fileOut)
-                toast(R.string.toast_success)
+                toastSuccess(R.string.toast_success)
                 refreshData()
             }
         }

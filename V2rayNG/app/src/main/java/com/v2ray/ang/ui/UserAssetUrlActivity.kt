@@ -9,6 +9,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityUserAssetUrlBinding
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.Utils
 import java.io.File
@@ -101,7 +102,7 @@ class UserAssetUrlActivity : BaseActivity() {
         }
 
         MmkvManager.encodeAsset(assetId, assetItem)
-        toast(R.string.toast_success)
+        toastSuccess(R.string.toast_success)
         finish()
         return true
     }

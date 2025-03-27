@@ -12,6 +12,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubSettingBinding
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastError
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
@@ -65,9 +67,9 @@ class SubSettingActivity : BaseActivity() {
                 delay(500L)
                 launch(Dispatchers.Main) {
                     if (count > 0) {
-                        toast(R.string.toast_success)
+                        toastSuccess(R.string.toast_success)
                     } else {
-                        toast(R.string.toast_failure)
+                        toastError(R.string.toast_failure)
                     }
                     binding.pbWaiting.hide()
                 }

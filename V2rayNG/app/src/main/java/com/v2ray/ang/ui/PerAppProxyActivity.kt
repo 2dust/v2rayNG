@@ -14,6 +14,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityBypassListBinding
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
@@ -165,7 +166,7 @@ class PerAppProxyActivity : BaseActivity() {
             launch(Dispatchers.Main) {
                 Log.d(ANG_PACKAGE, content)
                 selectProxyApp(content, true)
-                toast(R.string.toast_success)
+                toastSuccess(R.string.toast_success)
                 binding.pbWaiting.hide()
             }
         }
@@ -175,7 +176,7 @@ class PerAppProxyActivity : BaseActivity() {
         val content = Utils.getClipboard(applicationContext)
         if (TextUtils.isEmpty(content)) return
         selectProxyApp(content, false)
-        toast(R.string.toast_success)
+        toastSuccess(R.string.toast_success)
     }
 
     private fun exportProxyApp() {
@@ -185,7 +186,7 @@ class PerAppProxyActivity : BaseActivity() {
             lst = lst + System.getProperty("line.separator") + it
         }
         Utils.setClipboard(applicationContext, lst)
-        toast(R.string.toast_success)
+        toastSuccess(R.string.toast_success)
     }
 
     @SuppressLint("NotifyDataSetChanged")

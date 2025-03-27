@@ -17,7 +17,7 @@ quickieFoss = "1.14.0"
 kotlinx-coroutines-android = "1.10.1"
 kotlinx-coroutines-core = "1.10.1"
 swiperefreshlayout = "1.1.0"
-toastcompat = "1.1.0"
+toasty = "1.5.2"
 editorkit = "2.9.0"
 core = "3.5.3"
 workRuntimeKtx = "2.10.0"
@@ -44,7 +44,7 @@ gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 quickie-foss = { module = "com.github.T8RIN.QuickieExtended:quickie-foss", version.ref = "quickieFoss" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "kotlinx-coroutines-android" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "kotlinx-coroutines-core" }
-toastcompat = { module = "me.drakeet.support:toastcompat", version.ref = "toastcompat" }
+toasty = { module = "com.github.GrenderG:Toasty", version.ref = "toasty" }
 editorkit = { module = "com.blacksquircle.ui:editorkit", version.ref = "editorkit" }
 language-base = { module = "com.blacksquircle.ui:language-base", version.ref = "editorkit" }
 language-json = { module = "com.blacksquircle.ui:language-json", version.ref = "editorkit" }

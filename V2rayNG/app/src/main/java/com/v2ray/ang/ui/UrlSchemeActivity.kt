@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityLogcatBinding
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AngConfigManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,7 +45,7 @@ class UrlSchemeActivity : BaseActivity() {
                         }
 
                         else -> {
-                            toast(R.string.toast_failure)
+                            toastError(R.string.toast_failure)
                         }
                     }
                 }

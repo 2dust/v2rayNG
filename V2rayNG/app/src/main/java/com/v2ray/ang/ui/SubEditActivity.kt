@@ -10,6 +10,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubEditBinding
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
@@ -94,7 +95,7 @@ class SubEditActivity : BaseActivity() {
         }
 
         MmkvManager.encodeSubscription(editSubId, subItem)
-        toast(R.string.toast_success)
+        toastSuccess(R.string.toast_success)
         finish()
         return true
     }

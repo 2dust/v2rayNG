@@ -18,6 +18,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityRoutingSettingBinding
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastError
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
@@ -105,7 +107,7 @@ class RoutingSettingActivity : BaseActivity() {
                             SettingsManager.resetRoutingRulesetsFromPresets(this@RoutingSettingActivity, i)
                             launch(Dispatchers.Main) {
                                 refreshData()
-                                toast(R.string.toast_success)
+                                toastSuccess(R.string.toast_success)
                             }
                         }
                     } catch (e: Exception) {
@@ -126,7 +128,7 @@ class RoutingSettingActivity : BaseActivity() {
                     Utils.getClipboard(this)
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    toast(R.string.toast_failure)
+                    toastError(R.string.toast_failure)
                     return@setPositiveButton
                 }
                 lifecycleScope.launch(Dispatchers.IO) {
@@ -134,9 +136,9 @@ class RoutingSettingActivity : BaseActivity() {
                     withContext(Dispatchers.Main) {
                         if (result) {
                             refreshData()
-                            toast(R.string.toast_success)
+                            toastSuccess(R.string.toast_success)
                         } else {
-                            toast(R.string.toast_failure)
+                            toastError(R.string.toast_failure)
                         }
                     }
                 }
@@ -150,10 +152,10 @@ class RoutingSettingActivity : BaseActivity() {
     private fun export2Clipboard() {
         val rulesetList = MmkvManager.decodeRoutingRulesets()
         if (rulesetList.isNullOrEmpty()) {
-            toast(R.string.toast_failure)
+            toastError(R.string.toast_failure)
         } else {
             Utils.setClipboard(this, JsonUtil.toJson(rulesetList))
-            toast(R.string.toast_success)
+            toastSuccess(R.string.toast_success)
         }
     }
 
@@ -171,9 +173,9 @@ class RoutingSettingActivity : BaseActivity() {
                     withContext(Dispatchers.Main) {
                         if (result) {
                             refreshData()
-                            toast(R.string.toast_success)
+                            toastSuccess(R.string.toast_success)
                         } else {
-                            toast(R.string.toast_failure)
+                            toastError(R.string.toast_failure)
                         }
                     }
                 }

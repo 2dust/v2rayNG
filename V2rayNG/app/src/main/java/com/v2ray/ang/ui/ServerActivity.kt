@@ -28,6 +28,7 @@ import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
@@ -482,7 +483,7 @@ class ServerActivity : BaseActivity() {
         }
         Log.d(ANG_PACKAGE, JsonUtil.toJsonPretty(config) ?: "")
         MmkvManager.encodeServerConfig(editGuid, config)
-        toast(R.string.toast_success)
+        toastSuccess(R.string.toast_success)
         finish()
         return true
     }

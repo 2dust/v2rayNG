@@ -6,6 +6,8 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastError
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 
 class ScScannerActivity : BaseActivity() {
@@ -38,9 +40,9 @@ class ScScannerActivity : BaseActivity() {
             val (count, countSub) = AngConfigManager.importBatchConfig(scanResult, "", false)
 
             if (count + countSub > 0) {
-                toast(R.string.toast_success)
+                toastSuccess(R.string.toast_success)
             } else {
-                toast(R.string.toast_failure)
+                toastError(R.string.toast_failure)
             }
 
             startActivity(Intent(this, MainActivity::class.java))

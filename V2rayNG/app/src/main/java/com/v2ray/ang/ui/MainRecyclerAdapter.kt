@@ -19,6 +19,8 @@ import com.v2ray.ang.databinding.ItemRecyclerMainBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastError
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
@@ -206,9 +208,9 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
      */
     private fun share2Clipboard(guid: String) {
         if (AngConfigManager.share2Clipboard(mActivity, guid) == 0) {
-            mActivity.toast(R.string.toast_success)
+            mActivity.toastSuccess(R.string.toast_success)
         } else {
-            mActivity.toast(R.string.toast_failure)
+            mActivity.toastError(R.string.toast_failure)
         }
     }
 
@@ -218,9 +220,9 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
      */
     private fun shareFullContent(guid: String) {
         if (AngConfigManager.shareFullContent2Clipboard(mActivity, guid) == 0) {
-            mActivity.toast(R.string.toast_success)
+            mActivity.toastSuccess(R.string.toast_success)
         } else {
-            mActivity.toast(R.string.toast_failure)
+            mActivity.toastError(R.string.toast_failure)
         }
     }
 

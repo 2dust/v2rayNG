@@ -8,7 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import com.v2ray.ang.AngApplication
-import me.drakeet.support.toast.ToastCompat
+import es.dmoral.toasty.Toasty
 import org.json.JSONObject
 import java.io.Serializable
 import java.net.URI
@@ -23,7 +23,7 @@ val Context.v2RayApplication: AngApplication?
  * @param message The resource ID of the message to show.
  */
 fun Context.toast(message: Int) {
-    ToastCompat.makeText(this, message, Toast.LENGTH_SHORT).show()
+    Toasty.normal(this, message).show()
 }
 
 /**
@@ -32,8 +32,45 @@ fun Context.toast(message: Int) {
  * @param message The text of the message to show.
  */
 fun Context.toast(message: CharSequence) {
-    ToastCompat.makeText(this, message, Toast.LENGTH_SHORT).show()
+    Toasty.normal(this, message).show()
 }
+
+/**
+ * Shows a toast message with the given resource ID.
+ *
+ * @param message The resource ID of the message to show.
+ */
+fun Context.toastSuccess(message: Int) {
+    Toasty.success(this, message, Toast.LENGTH_SHORT, true).show()
+}
+
+/**
+ * Shows a toast message with the given text.
+ *
+ * @param message The text of the message to show.
+ */
+fun Context.toastSuccess(message: CharSequence) {
+    Toasty.success(this, message, Toast.LENGTH_SHORT, true).show()
+}
+
+/**
+ * Shows a toast message with the given resource ID.
+ *
+ * @param message The resource ID of the message to show.
+ */
+fun Context.toastError(message: Int) {
+    Toasty.error(this, message, Toast.LENGTH_SHORT, true).show()
+}
+
+/**
+ * Shows a toast message with the given text.
+ *
+ * @param message The text of the message to show.
+ */
+fun Context.toastError(message: CharSequence) {
+    Toasty.error(this, message, Toast.LENGTH_SHORT, true).show()
+}
+
 
 /**
  * Puts a key-value pair into the JSONObject.

@@ -14,6 +14,8 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityAboutBinding
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastError
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.ZipUtil
@@ -50,9 +52,9 @@ class AboutActivity : BaseActivity() {
         binding.layoutBackup.setOnClickListener {
             val ret = backupConfiguration(extDir.absolutePath)
             if (ret.first) {
-                toast(R.string.toast_success)
+                toastSuccess(R.string.toast_success)
             } else {
-                toast(R.string.toast_failure)
+                toastError(R.string.toast_failure)
             }
         }
 
@@ -72,7 +74,7 @@ class AboutActivity : BaseActivity() {
                     )
                 )
             } else {
-                toast(R.string.toast_failure)
+                toastError(R.string.toast_failure)
             }
         }
 
@@ -185,13 +187,13 @@ class AboutActivity : BaseActivity() {
                         }
                     }
                     if (restoreConfiguration(targetFile)) {
-                        toast(R.string.toast_success)
+                        toastSuccess(R.string.toast_success)
                     } else {
-                        toast(R.string.toast_failure)
+                        toastError(R.string.toast_failure)
                     }
                 } catch (e: Exception) {
                     Log.e(AppConfig.ANG_PACKAGE, "Error during file restore: ${e.message}", e)
-                    toast(R.string.toast_failure)
+                    toastError(R.string.toast_failure)
                 }
             }
         }
