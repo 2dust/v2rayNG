@@ -242,7 +242,7 @@
     <string name="title_mode">حالت</string>
     <string name="title_mode_help">برای اطلاعات و راهنمایی بیشتر، روی این متن کلیک کنید</string>
     <string name="title_language">زبان</string>
-    <string name="title_ui_settings">تنظیمات رابط کاربری</string> 
+    <string name="title_ui_settings">تنظیمات رابط کاربری</string>
     <string name="title_pref_ui_mode_night">تنظیمات حالت رابط کاربری</string>
 
     <string name="title_logcat">گزارشات</string>

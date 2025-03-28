@@ -29,13 +29,13 @@
                     android:text="@string/routing_settings_domain_strategy" />
 
                 <Spinner
-                    android:layout_marginTop="@dimen/padding_spacing_dp8"
-                    android:layout_marginBottom="@dimen/padding_spacing_dp8"
                     android:id="@+id/sp_domain_strategy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/padding_spacing_dp8"
-                    android:entries="@array/routing_domain_strategy" />
+                    android:layout_marginTop="@dimen/padding_spacing_dp8"
+                    android:layout_marginBottom="@dimen/padding_spacing_dp8"
+                    android:entries="@array/routing_domain_strategy"
+                    android:paddingTop="@dimen/padding_spacing_dp8" />
             </LinearLayout>
 
             <LinearLayout

@@ -3,5 +3,5 @@
     <solid android:color="@color/divider_color_light" />
     <size
         android:width="48dp"
-        android:height="48dp"/>
+        android:height="48dp" />
 </shape>

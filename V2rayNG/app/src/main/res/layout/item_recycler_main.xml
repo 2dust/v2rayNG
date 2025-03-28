@@ -18,9 +18,9 @@
         android:gravity="center"
         android:nextFocusRight="@+id/layout_share"
         android:orientation="horizontal"
+        android:paddingStart="@dimen/padding_spacing_dp4"
         android:paddingTop="@dimen/padding_spacing_dp8"
         android:paddingEnd="@dimen/padding_spacing_dp4"
-        android:paddingStart="@dimen/padding_spacing_dp4"
         android:paddingBottom="@dimen/padding_spacing_dp8">
 
         <LinearLayout

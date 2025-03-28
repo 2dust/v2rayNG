@@ -261,7 +261,8 @@ data class V2rayConfig(
             ) {
                 data class HeaderBean(
                     var type: String = "none",
-                    var domain: String? = null)
+                    var domain: String? = null
+                )
             }
 
             data class WsSettingsBean(

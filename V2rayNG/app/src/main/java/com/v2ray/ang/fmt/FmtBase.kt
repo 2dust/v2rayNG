@@ -120,7 +120,7 @@ open class FmtBase {
                 config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
             }
 
-             NetworkType.XHTTP -> {
+            NetworkType.XHTTP -> {
                 config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
                 config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
                 config.xhttpMode.let { if (it.isNotNullEmpty()) dicQuery["mode"] = it.orEmpty() }

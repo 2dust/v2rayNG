@@ -11,9 +11,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:visibility="invisible"
         android:orientation="horizontal"
-        android:padding="@dimen/padding_spacing_dp16">
+        android:padding="@dimen/padding_spacing_dp16"
+        android:visibility="invisible">
 
         <LinearLayout
             android:layout_width="match_parent"

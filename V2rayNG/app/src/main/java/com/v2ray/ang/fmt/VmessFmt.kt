@@ -73,6 +73,7 @@ object VmessFmt : FmtBase() {
                 config.serviceName = vmessQRCode.path
                 config.authority = vmessQRCode.host
             }
+
             else -> {}
         }
 
@@ -119,6 +120,7 @@ object VmessFmt : FmtBase() {
                 vmessQRCode.path = config.serviceName.orEmpty()
                 vmessQRCode.host = config.authority.orEmpty()
             }
+
             else -> {}
         }
 

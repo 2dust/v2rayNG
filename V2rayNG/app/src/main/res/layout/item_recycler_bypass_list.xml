@@ -5,8 +5,8 @@
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
-    android:padding="@dimen/padding_spacing_dp8"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:padding="@dimen/padding_spacing_dp8">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/icon"
@@ -25,8 +25,8 @@
             android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/package_name"
@@ -43,6 +43,6 @@
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"
-        android:padding="@dimen/padding_spacing_dp8"  />
+        android:padding="@dimen/padding_spacing_dp8" />
 
 </LinearLayout>

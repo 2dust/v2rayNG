@@ -172,7 +172,7 @@ object MigrateManager {
 
         outbound.settings?.let { wireguard ->
             config.secretKey = wireguard.secretKey
-            config.localAddress =  (wireguard.address as List<*>).joinToString(",").removeWhiteSpace().toString()
+            config.localAddress = (wireguard.address as List<*>).joinToString(",").removeWhiteSpace().toString()
             config.publicKey = wireguard.peers?.getOrNull(0)?.publicKey
             config.mtu = wireguard.mtu
             config.reserved = wireguard.reserved?.joinToString(",").removeWhiteSpace().toString()

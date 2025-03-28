@@ -19,11 +19,11 @@
             android:text="@string/server_lab_stream_security" />
 
         <Spinner
-            android:layout_marginTop="@dimen/padding_spacing_dp8"
-            android:layout_marginBottom="@dimen/padding_spacing_dp8"
             android:id="@+id/sp_stream_security"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:layout_marginBottom="@dimen/padding_spacing_dp8"
             android:entries="@array/streamsecuritys"
             android:nextFocusDown="@+id/et_sni" />
 
@@ -63,11 +63,11 @@
             android:text="@string/server_lab_allow_insecure" />
 
         <Spinner
-            android:layout_marginTop="@dimen/padding_spacing_dp8"
-            android:layout_marginBottom="@dimen/padding_spacing_dp8"
             android:id="@+id/sp_allow_insecure"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:layout_marginBottom="@dimen/padding_spacing_dp8"
             android:entries="@array/allowinsecures" />
 
 

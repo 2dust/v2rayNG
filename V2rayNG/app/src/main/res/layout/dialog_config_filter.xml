@@ -16,11 +16,11 @@
             android:orientation="vertical">
 
             <Spinner
-                android:layout_marginTop="@dimen/padding_spacing_dp8"
-                android:layout_marginBottom="@dimen/padding_spacing_dp8"
                 android:id="@+id/sp_subscriptionId"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_spacing_dp8"
+                android:layout_marginBottom="@dimen/padding_spacing_dp8" />
         </LinearLayout>
 
 
