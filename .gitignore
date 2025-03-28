@@ -17,6 +17,9 @@ V2rayNG/app/release/output.json
 # Ignore build directories and captures
 /build
 /captures
+V2rayNG/app/build
+V2rayNG/build
+V2rayNG/local.properties
 
 # Ignore APK and AAR files
 *.apk
