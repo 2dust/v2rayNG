@@ -8,6 +8,7 @@ enum class Language(val code: String) {
     VIETNAMESE("vi"),
     RUSSIAN("ru"),
     PERSIAN("fa"),
+    ARABIC("ar"),
     BANGLA("bn"),
     BAKHTIARI("bqi-rIR");
 
