@@ -90,7 +90,6 @@ class RoutingSettingActivity : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.add_rule -> startActivity(Intent(this, RoutingEditActivity::class.java)).let { true }
-        R.id.user_asset_setting -> startActivity(Intent(this, UserAssetActivity::class.java)).let { true }
         R.id.import_predefined_rulesets -> importPredefined().let { true }
         R.id.import_rulesets_from_clipboard -> importFromClipboard().let { true }
         R.id.import_rulesets_from_qrcode -> requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA).let { true }

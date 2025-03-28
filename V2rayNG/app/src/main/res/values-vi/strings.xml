@@ -268,7 +268,7 @@
     <string name="title_sub_update">Cập nhật các gói đăng ký</string>
     <string name="title_ping_all_server">Ping tất cả máy chủ</string>
     <string name="title_real_ping_all_server">Kiểm tra HTTP tất cả máy chủ</string>
-    <string name="title_user_asset_setting">Tệp Geo Asset</string>
+    <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sắp xếp lại theo lần kiểm tra cuối cùng</string>
     <string name="title_filter_config">Lọc cấu hình theo các gói đăng ký</string>
     <string name="filter_config_all">Hiển thị tất cả các gói đăng ký</string>

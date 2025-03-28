@@ -7,10 +7,6 @@
         android:title="@string/routing_settings_add_rule"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/user_asset_setting"
-        android:icon="@drawable/ic_file_24dp"
-        android:title="@string/title_user_asset_setting" />
-    <item
         android:id="@+id/import_predefined_rulesets"
         android:title="@string/routing_settings_import_predefined_rulesets"
         app:showAsAction="never" />

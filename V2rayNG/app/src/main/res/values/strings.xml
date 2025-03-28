@@ -269,7 +269,7 @@
     <string name="title_sub_update">Update current group subscription</string>
     <string name="title_ping_all_server">Tcping current group configuration</string>
     <string name="title_real_ping_all_server">Real delay current group configuration</string>
-    <string name="title_user_asset_setting">Geo asset files</string>
+    <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sorting by test results</string>
     <string name="title_filter_config">Filter configuration file</string>
     <string name="filter_config_all">All groups</string>

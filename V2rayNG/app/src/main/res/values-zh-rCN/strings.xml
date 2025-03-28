@@ -265,7 +265,7 @@
     <string name="title_sub_update">更新当前组订阅</string>
     <string name="title_ping_all_server">测试当前组配置 Tcping</string>
     <string name="title_real_ping_all_server">测试当前组配置真连接</string>
-    <string name="title_user_asset_setting">Geo 资源文件</string>
+    <string name="title_user_asset_setting">资源文件</string>
     <string name="title_sort_by_test_results">按测试结果排序</string>
     <string name="title_filter_config">过滤配置文件</string>
     <string name="filter_config_all">所有分组</string>

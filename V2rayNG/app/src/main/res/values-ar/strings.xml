@@ -268,7 +268,7 @@
     <string name="title_sub_update">تحديث الاشتراك (أول خطوة)</string>
     <string name="title_ping_all_server">Tcping لجميع الإعدادات</string>
     <string name="title_real_ping_all_server"> اختبر جميع الإعدادات (3)</string>
-    <string name="title_user_asset_setting">ملفات أصول جغرافية</string>
+    <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">الفرز حسب نتائج الاختبار (5)</string>
     <string name="title_filter_config">تصفية ملف التكوين</string>
     <string name="filter_config_all">جميع مجموعات الاشتراك</string>

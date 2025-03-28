@@ -268,7 +268,7 @@
     <string name="title_sub_update">ورۊ کردن اشتراک جرگه سکویی</string>
     <string name="title_ping_all_server">Tcping کانفیگا جرگه سکویی</string>
     <string name="title_real_ping_all_server">تئخیر واقعی کانفیگا جرگه سکویی</string>
-    <string name="title_user_asset_setting">فایلا دارایی جوقرافیایی</string>
+    <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">ترتیب و ری نتیجیل آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>
     <string name="filter_config_all">پوی جرگیل</string>
