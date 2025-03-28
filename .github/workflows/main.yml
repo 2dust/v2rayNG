@@ -1,0 +1,35 @@
+name: Sync Fork
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天 UTC 00:00 (即北京时间 08:00) 运行，可自定义 Cron 表达式
+
+  workflow_dispatch: # 手动触发工作流
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 确保拉取所有历史记录
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+
+      - name: Add Remote
+        run: git remote add upstream https://github.com/2dust/v2rayNG.git
+
+      - name: Fetch Upstream
+        run: git fetch upstream
+
+      - name: Merge Upstream
+        run: |
+          git checkout main  #  根据你的默认分支进行修改
+          git merge upstream/main  #  根据你的默认分支进行修改
+
+      - name: Push Changes
+        run: git push
