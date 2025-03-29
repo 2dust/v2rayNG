@@ -22,7 +22,7 @@ data class V2rayConfig(
     var policy: PolicyBean?,
     val inbounds: ArrayList<InboundBean>,
     var outbounds: ArrayList<OutboundBean>,
-    var dns: DnsBean,
+    var dns: DnsBean? = null,
     val routing: RoutingBean,
     val api: Any? = null,
     val transport: Any? = null,

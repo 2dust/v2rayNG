@@ -81,11 +81,11 @@ class V2RayTestService : Service() {
             val delay = PluginUtil.realPingHy2(this, config)
             return delay
         } else {
-            val config = V2rayConfigManager.getV2rayConfig(this, guid)
-            if (!config.status) {
+            val configResult = V2rayConfigManager.getV2rayConfig4Speedtest(this, guid)
+            if (!configResult.status) {
                 return retFailure
             }
-            return SpeedtestManager.realPing(config.content)
+            return SpeedtestManager.realPing(configResult.content)
         }
     }
 }
