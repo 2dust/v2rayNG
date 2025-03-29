@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.0"
+agp = "8.9.1"
 desugar_jdk_libs = "2.1.5"
 gradleLicensePlugin = "0.9.8"
 kotlin = "2.1.20"
