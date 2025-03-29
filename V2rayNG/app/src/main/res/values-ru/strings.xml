@@ -267,7 +267,7 @@
     <string name="title_sub_update">Обновить подписку группы</string>
     <string name="title_ping_all_server">Проверка профилей группы</string>
     <string name="title_real_ping_all_server">Время отклика профилей группы</string>
-    <string name="title_user_asset_setting">Asset files</string>
+    <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировка по результатам теста</string>
     <string name="title_filter_config">Фильтр групп</string>
     <string name="filter_config_all">Все группы</string>
