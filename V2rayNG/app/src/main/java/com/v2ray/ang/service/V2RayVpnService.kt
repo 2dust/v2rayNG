@@ -209,7 +209,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                     else
                         builder.addAllowedApplication(it)
                 } catch (e: PackageManager.NameNotFoundException) {
-                    Log.d(AppConfig.TAG, "setup error : --${e.localizedMessage}")
+                    Log.e(AppConfig.TAG, "Failed to configure app in VPN: ${e.localizedMessage}", e)
                 }
             }
         } else {
@@ -277,7 +277,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             cmd.add("--dnsgw")
             cmd.add("$LOOPBACK:${localDnsPort}")
         }
-        Log.d(AppConfig.TAG, cmd.toString())
+        Log.i(AppConfig.TAG, cmd.toString())
 
         try {
             val proBuilder = ProcessBuilder(cmd)
@@ -286,19 +286,19 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 .directory(applicationContext.filesDir)
                 .start()
             Thread {
-                Log.d(AppConfig.TAG, "$TUN2SOCKS check")
+                Log.i(AppConfig.TAG, "$TUN2SOCKS check")
                 process.waitFor()
-                Log.d(AppConfig.TAG, "$TUN2SOCKS exited")
+                Log.i(AppConfig.TAG, "$TUN2SOCKS exited")
                 if (isRunning) {
-                    Log.d(AppConfig.TAG, "$TUN2SOCKS restart")
+                    Log.i(AppConfig.TAG, "$TUN2SOCKS restart")
                     runTun2socks()
                 }
             }.start()
-            Log.d(AppConfig.TAG, process.toString())
+            Log.i(AppConfig.TAG, process.toString())
 
             sendFd()
         } catch (e: Exception) {
-            Log.d(AppConfig.TAG, e.toString())
+            Log.e(AppConfig.TAG, "Failed to start tun2socks process", e)
         }
     }
 
@@ -309,13 +309,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
     private fun sendFd() {
         val fd = mInterface.fileDescriptor
         val path = File(applicationContext.filesDir, "sock_path").absolutePath
-        Log.d(AppConfig.TAG, path)
+        Log.i(AppConfig.TAG, path)
 
         CoroutineScope(Dispatchers.IO).launch {
             var tries = 0
             while (true) try {
                 Thread.sleep(50L shl tries)
-                Log.d(AppConfig.TAG, "sendFd tries: $tries")
+                Log.i(AppConfig.TAG, "sendFd tries: $tries")
                 LocalSocket().use { localSocket ->
                     localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
                     localSocket.setFileDescriptorsForSend(arrayOf(fd))
@@ -323,7 +323,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 }
                 break
             } catch (e: Exception) {
-                Log.d(AppConfig.TAG, e.toString())
+                Log.e(AppConfig.TAG, "Failed to send file descriptor, try: $tries", e)
                 if (tries > 5) break
                 tries += 1
             }
@@ -349,10 +349,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
 
         try {
-            Log.d(AppConfig.TAG, "tun2socks destroy")
+            Log.i(AppConfig.TAG, "tun2socks destroy")
             process.destroy()
         } catch (e: Exception) {
-            Log.d(AppConfig.TAG, e.toString())
+            Log.e(AppConfig.TAG, "Failed to destroy tun2socks process", e)
         }
 
         V2RayServiceManager.stopV2rayPoint()
@@ -367,8 +367,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
             try {
                 mInterface.close()
-            } catch (ignored: Exception) {
-                // ignored
+            } catch (e: Exception) {
+                Log.e(AppConfig.TAG, "Failed to close VPN interface", e)
             }
         }
     }

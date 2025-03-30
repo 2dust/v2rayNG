@@ -26,7 +26,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     override fun onCleared() {
         PreferenceManager.getDefaultSharedPreferences(getApplication())
             .unregisterOnSharedPreferenceChangeListener(this)
-        Log.d(AppConfig.TAG, "Settings ViewModel is cleared")
+        Log.i(AppConfig.TAG, "Settings ViewModel is cleared")
         super.onCleared()
     }
 
@@ -36,7 +36,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
      * @param key The key of the changed preference.
      */
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
-        Log.d(AppConfig.TAG, "Observe settings changed: $key")
+        Log.i(AppConfig.TAG, "Observe settings changed: $key")
         when (key) {
             AppConfig.PREF_MODE,
             AppConfig.PREF_VPN_DNS,

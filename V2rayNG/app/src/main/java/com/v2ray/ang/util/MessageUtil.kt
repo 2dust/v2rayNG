@@ -69,7 +69,7 @@ object MessageUtil {
             intent.putExtra("content", content)
             ctx.sendBroadcast(intent)
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to send broadcast message", e)
+            Log.e(AppConfig.TAG, "Failed to send message with action: $action", e)
         }
     }
 }

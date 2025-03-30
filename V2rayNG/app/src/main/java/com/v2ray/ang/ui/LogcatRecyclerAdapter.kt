@@ -25,7 +25,7 @@ class LogcatRecyclerAdapter(val activity: LogcatActivity) : RecyclerView.Adapter
                 holder.itemSubSettingBinding.logContent.text = if (content.count() > 1) content.last().trim() else ""
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Error binding log data", e)
+            Log.e(AppConfig.TAG, "Error binding log view data", e)
         }
     }
 

@@ -122,7 +122,7 @@ object V2rayConfigManager {
         val address = config.server ?: return result
         if (!Utils.isIpAddress(address)) {
             if (!Utils.isValidUrl(address)) {
-                Log.d(AppConfig.TAG, "$address is an invalid ip or domain")
+                Log.w(AppConfig.TAG, "$address is an invalid ip or domain")
                 return result
             }
         }
@@ -172,7 +172,7 @@ object V2rayConfigManager {
         val address = config.server ?: return result
         if (!Utils.isIpAddress(address)) {
             if (!Utils.isValidUrl(address)) {
-                Log.d(AppConfig.TAG, "$address is an invalid ip or domain")
+                Log.w(AppConfig.TAG, "$address is an invalid ip or domain")
                 return result
             }
         }

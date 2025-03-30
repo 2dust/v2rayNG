@@ -165,7 +165,7 @@ class PerAppProxyActivity : BaseActivity() {
                 content = HttpUtil.getUrlContent(url, 5000, httpPort) ?: ""
             }
             launch(Dispatchers.Main) {
-                Log.d(AppConfig.TAG, content)
+                Log.i(AppConfig.TAG, content)
                 selectProxyApp(content, true)
                 toastSuccess(R.string.toast_success)
                 binding.pbWaiting.hide()
@@ -206,7 +206,7 @@ class PerAppProxyActivity : BaseActivity() {
                 adapter?.let { it ->
                     it.apps.forEach block@{
                         val packageName = it.packageName
-                        Log.d(AppConfig.TAG, packageName)
+                        Log.i(AppConfig.TAG, packageName)
                         if (!inProxyApps(proxyApps, packageName, force)) {
                             adapter?.blacklist?.add(packageName)
                             println(packageName)
@@ -219,7 +219,7 @@ class PerAppProxyActivity : BaseActivity() {
                 adapter?.let { it ->
                     it.apps.forEach block@{
                         val packageName = it.packageName
-                        Log.d(AppConfig.TAG, packageName)
+                        Log.i(AppConfig.TAG, packageName)
                         if (inProxyApps(proxyApps, packageName, force)) {
                             adapter?.blacklist?.add(packageName)
                             println(packageName)

@@ -25,7 +25,7 @@ object MigrateManager {
             return false
         }
         val serverList = serverStorage.allKeys() ?: return false
-        Log.d(AppConfig.TAG, "migrateServerConfig2Profile-" + serverList.count())
+        Log.i(AppConfig.TAG, "migrateServerConfig2Profile-" + serverList.count())
 
         for (guid in serverList) {
             var configOld = decodeServerConfigOld(guid) ?: continue
@@ -42,9 +42,9 @@ object MigrateManager {
             //check and remove old
             decodeServerConfig(guid) ?: continue
             serverStorage.remove(guid)
-            Log.d(AppConfig.TAG, "migrateServerConfig2Profile-" + config.remarks)
+            Log.i(AppConfig.TAG, "migrateServerConfig2Profile-" + config.remarks)
         }
-        Log.d(AppConfig.TAG, "migrateServerConfig2Profile-end")
+        Log.i(AppConfig.TAG, "migrateServerConfig2Profile-end")
         return true
     }
 

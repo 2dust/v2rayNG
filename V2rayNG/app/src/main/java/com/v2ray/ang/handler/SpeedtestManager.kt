@@ -51,7 +51,7 @@ object SpeedtestManager {
         return try {
             Libv2ray.measureOutboundDelay(config, SettingsManager.getDelayTestUrl())
         } catch (e: Exception) {
-            Log.d(AppConfig.TAG, "realPing: $e")
+            Log.e(AppConfig.TAG, "Failed to measure outbound delay", e)
             -1L
         }
     }
@@ -105,7 +105,7 @@ object SpeedtestManager {
         } catch (e: UnknownHostException) {
             Log.e(AppConfig.TAG, "Unknown host: $url", e)
         } catch (e: IOException) {
-            Log.d(AppConfig.TAG, "socketConnectTime IOException: $e")
+            Log.e(AppConfig.TAG, "socketConnectTime IOException: $e")
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to establish socket connection to $url:$port", e)
         }
@@ -152,10 +152,10 @@ object SpeedtestManager {
                 )
             }
         } catch (e: IOException) {
-            Log.d(AppConfig.TAG, "testConnection IOException: " + Log.getStackTraceString(e))
+            Log.e(AppConfig.TAG, "Connection test IOException", e)
             result = context.getString(R.string.connection_test_error, e.message)
         } catch (e: Exception) {
-            Log.d(AppConfig.TAG, "testConnection Exception: " + Log.getStackTraceString(e))
+            Log.e(AppConfig.TAG, "Connection test Exception", e)
             result = context.getString(R.string.connection_test_error, e.message)
         } finally {
             conn.disconnect()

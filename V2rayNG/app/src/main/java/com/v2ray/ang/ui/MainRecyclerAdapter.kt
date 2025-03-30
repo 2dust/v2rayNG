@@ -188,7 +188,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                     else -> mActivity.toast("else")
                 }
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Error occurred while sharing server information", e)
+                Log.e(AppConfig.TAG, "Error when sharing server", e)
             }
         }.show()
     }

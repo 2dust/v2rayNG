@@ -521,6 +521,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
     }
 
+    /**
+     * import config from local config file
+     */
     private fun importConfigLocal(): Boolean {
         try {
             showFileChooser()

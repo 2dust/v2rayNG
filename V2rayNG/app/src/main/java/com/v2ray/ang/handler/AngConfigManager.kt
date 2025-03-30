@@ -417,13 +417,13 @@ object AngConfigManager {
             if (!Utils.isValidUrl(url)) {
                 return 0
             }
-            Log.d(AppConfig.TAG, url)
+            Log.i(AppConfig.TAG, url)
 
             var configText = try {
                 val httpPort = SettingsManager.getHttpPort()
                 HttpUtil.getUrlContentWithUserAgent(url, 15000, httpPort)
             } catch (e: Exception) {
-                Log.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error, try……", e)
+                Log.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
                 ""
             }
             if (configText.isEmpty()) {
