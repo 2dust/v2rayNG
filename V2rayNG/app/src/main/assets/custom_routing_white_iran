@@ -6,13 +6,6 @@
     "network": "udp"
   },
   {
-    "remarks": "Block ads and trackers",
-    "outboundTag": "block",
-    "domain": [
-      "geosite:category-ads-all"
-    ]
-  },
-  {
     "remarks": "Direct LAN IP",
     "outboundTag": "direct",
     "ip": [
