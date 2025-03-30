@@ -3,11 +3,13 @@ package com.v2ray.ang.ui
 import android.content.Intent
 import android.graphics.Color
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ItemQrcodeBinding
 import com.v2ray.ang.databinding.ItemRecyclerSubSettingBinding
@@ -81,7 +83,7 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
                                 else -> mActivity.toast("else")
                             }
                         } catch (e: Exception) {
-                            e.printStackTrace()
+                            Log.e(AppConfig.TAG, "Share subscription failed", e)
                         }
                     }.show()
             }

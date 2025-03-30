@@ -3,6 +3,7 @@ package com.v2ray.ang.ui
 import android.content.Intent
 import android.graphics.Color
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -187,7 +188,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                     else -> mActivity.toast("else")
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(AppConfig.TAG, "Error occurred while sharing server information", e)
             }
         }.show()
     }
@@ -299,7 +300,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
                         delay(500)
                         V2RayServiceManager.startVService(mActivity)
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        Log.e(AppConfig.TAG, "Failed to restart V2Ray service", e)
                     }
                 }
             }

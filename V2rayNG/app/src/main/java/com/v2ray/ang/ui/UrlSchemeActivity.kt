@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.lifecycleScope
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityLogcatBinding
 import com.v2ray.ang.extension.toast
@@ -54,7 +55,7 @@ class UrlSchemeActivity : BaseActivity() {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Error processing URL scheme", e)
         }
     }
 
@@ -62,7 +63,7 @@ class UrlSchemeActivity : BaseActivity() {
         if (uriString.isNullOrEmpty()) {
             return
         }
-        Log.d("UrlScheme", uriString)
+        Log.d(AppConfig.TAG, uriString)
 
         var decodedUrl = URLDecoder.decode(uriString, "UTF-8")
         val uri = Uri.parse(decodedUrl)
@@ -70,7 +71,7 @@ class UrlSchemeActivity : BaseActivity() {
             if (uri.fragment.isNullOrEmpty() && !fragment.isNullOrEmpty()) {
                 decodedUrl += "#${fragment}"
             }
-            Log.d("UrlScheme-decodedUrl", decodedUrl)
+            Log.d(AppConfig.TAG, decodedUrl)
             lifecycleScope.launch(Dispatchers.IO) {
                 val (count, countSub) = AngConfigManager.importBatchConfig(decodedUrl, "", false)
                 withContext(Dispatchers.Main) {

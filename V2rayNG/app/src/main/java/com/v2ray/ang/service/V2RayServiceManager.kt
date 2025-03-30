@@ -9,7 +9,6 @@ import android.os.Build
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
@@ -144,7 +143,7 @@ object V2RayServiceManager {
             mFilter.addAction(Intent.ACTION_USER_PRESENT)
             ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
         } catch (e: Exception) {
-            Log.d(ANG_PACKAGE, e.toString())
+            Log.d(AppConfig.TAG, e.toString())
         }
 
         v2rayPoint.configureFileContent = result.content
@@ -154,7 +153,7 @@ object V2RayServiceManager {
         try {
             v2rayPoint.runLoop(MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6))
         } catch (e: Exception) {
-            Log.d(ANG_PACKAGE, e.toString())
+            Log.d(AppConfig.TAG, e.toString())
         }
 
         if (v2rayPoint.isRunning) {
@@ -179,7 +178,7 @@ object V2RayServiceManager {
                 try {
                     v2rayPoint.stopLoop()
                 } catch (e: Exception) {
-                    Log.d(ANG_PACKAGE, e.toString())
+                    Log.d(AppConfig.TAG, e.toString())
                 }
             }
         }
@@ -190,7 +189,7 @@ object V2RayServiceManager {
         try {
             service.unregisterReceiver(mMsgReceive)
         } catch (e: Exception) {
-            Log.d(ANG_PACKAGE, e.toString())
+            Log.d(AppConfig.TAG, e.toString())
         }
         PluginUtil.stopPlugin()
     }
@@ -217,14 +216,14 @@ object V2RayServiceManager {
                 try {
                     time = v2rayPoint.measureDelay(SettingsManager.getDelayTestUrl())
                 } catch (e: Exception) {
-                    Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
+                    Log.d(AppConfig.TAG, "measureV2rayDelay: $e")
                     errstr = e.message?.substringAfter("\":") ?: "empty message"
                 }
                 if (time == -1L) {
                     try {
                         time = v2rayPoint.measureDelay(SettingsManager.getDelayTestUrl(true))
                     } catch (e: Exception) {
-                        Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
+                        Log.d(AppConfig.TAG, "measureV2rayDelay: $e")
                         errstr = e.message?.substringAfter("\":") ?: "empty message"
                     }
                 }
@@ -255,7 +254,7 @@ object V2RayServiceManager {
                 serviceControl.stopService()
                 0
             } catch (e: Exception) {
-                Log.d(ANG_PACKAGE, e.toString())
+                Log.d(AppConfig.TAG, e.toString())
                 -1
             }
         }
@@ -291,7 +290,7 @@ object V2RayServiceManager {
                 NotificationService.startSpeedNotification(currentConfig)
                 0
             } catch (e: Exception) {
-                Log.d(ANG_PACKAGE, e.toString())
+                Log.d(AppConfig.TAG, e.toString())
                 -1
             }
         }
@@ -323,12 +322,12 @@ object V2RayServiceManager {
                 }
 
                 AppConfig.MSG_STATE_STOP -> {
-                    Log.d(ANG_PACKAGE, "Stop Service")
+                    Log.d(AppConfig.TAG, "Stop Service")
                     serviceControl.stopService()
                 }
 
                 AppConfig.MSG_STATE_RESTART -> {
-                    Log.d(ANG_PACKAGE, "Restart Service")
+                    Log.d(AppConfig.TAG, "Restart Service")
                     serviceControl.stopService()
                     Thread.sleep(500L)
                     startVService(serviceControl.getService())
@@ -341,12 +340,12 @@ object V2RayServiceManager {
 
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
-                    Log.d(ANG_PACKAGE, "SCREEN_OFF, stop querying stats")
+                    Log.d(AppConfig.TAG, "SCREEN_OFF, stop querying stats")
                     NotificationService.stopSpeedNotification(currentConfig)
                 }
 
                 Intent.ACTION_SCREEN_ON -> {
-                    Log.d(ANG_PACKAGE, "SCREEN_ON, start querying stats")
+                    Log.d(AppConfig.TAG, "SCREEN_ON, start querying stats")
                     NotificationService.startSpeedNotification(currentConfig)
                 }
             }

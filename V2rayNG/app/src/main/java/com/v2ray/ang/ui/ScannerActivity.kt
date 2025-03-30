@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +21,7 @@ import io.github.g00fy2.quickie.ScanCustomCode
 import io.github.g00fy2.quickie.config.ScannerConfig
 
 class ScannerActivity : BaseActivity() {
+
 
     private val scanQrCode = registerForActivityResult(ScanCustomCode(), ::handleResult)
     private val chooseFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -37,7 +39,7 @@ class ScannerActivity : BaseActivity() {
                     finished(text)
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(AppConfig.TAG, "Failed to decode QR code from file", e)
                 toast(R.string.toast_decoding_failed)
             }
         }

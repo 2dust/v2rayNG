@@ -3,11 +3,13 @@ package com.v2ray.ang.util
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.service.V2RayTestService
 import java.io.Serializable
 
 object MessageUtil {
+
 
     /**
      * Sends a message to the service.
@@ -46,7 +48,7 @@ object MessageUtil {
             intent.putExtra("content", content)
             ctx.startService(intent)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to send message to test service", e)
         }
     }
 
@@ -67,7 +69,7 @@ object MessageUtil {
             intent.putExtra("content", content)
             ctx.sendBroadcast(intent)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to send broadcast message", e)
         }
     }
 }

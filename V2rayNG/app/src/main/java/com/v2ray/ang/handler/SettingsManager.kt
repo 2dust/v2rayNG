@@ -84,7 +84,7 @@ object SettingsManager {
             resetRoutingRulesetsCommon(rulesetList)
             return true
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(ANG_PACKAGE, "Failed to reset routing rulesets", e)
             return false
         }
     }
@@ -167,11 +167,11 @@ object SettingsManager {
         }
 
         val guid = MmkvManager.getSelectServer() ?: return false
-        val config = MmkvManager.decodeServerConfig(guid) ?: return false
+        val config = decodeServerConfig(guid) ?: return false
         if (config.configType == EConfigType.CUSTOM) {
             val raw = MmkvManager.decodeServerRaw(guid) ?: return false
             val v2rayConfig = JsonUtil.fromJson(raw, V2rayConfig::class.java)
-            val exist = v2rayConfig.routing.rules.filter { it.outboundTag == TAG_DIRECT }?.any {
+            val exist = v2rayConfig.routing.rules.filter { it.outboundTag == TAG_DIRECT }.any {
                 it.domain?.contains(GEOSITE_PRIVATE) == true || it.ip?.contains(GEOIP_PRIVATE) == true
             }
             return exist == true
@@ -265,10 +265,7 @@ object SettingsManager {
                             input.copyTo(output)
                         }
                     }
-                    Log.i(
-                        ANG_PACKAGE,
-                        "Copied from apk assets folder to ${target.absolutePath}"
-                    )
+                    Log.d(AppConfig.TAG, "Copied from apk assets folder to ${target.absolutePath}")
                 }
         } catch (e: Exception) {
             Log.e(ANG_PACKAGE, "asset copy failed", e)

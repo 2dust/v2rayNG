@@ -571,7 +571,7 @@ object MmkvManager {
      * @param startOnBoot Whether to start on boot.
      */
     fun encodeStartOnBoot(startOnBoot: Boolean) {
-        MmkvManager.encodeSettings(PREF_IS_BOOTED, startOnBoot)
+        encodeSettings(PREF_IS_BOOTED, startOnBoot)
     }
 
     /**

@@ -14,7 +14,6 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.DEFAULT_PORT
 import com.v2ray.ang.AppConfig.PREF_ALLOW_INSECURE
 import com.v2ray.ang.AppConfig.REALITY
@@ -481,7 +480,7 @@ class ServerActivity : BaseActivity() {
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
-        Log.d(ANG_PACKAGE, JsonUtil.toJsonPretty(config) ?: "")
+        //Log.d(AppConfig.TAG, JsonUtil.toJsonPretty(config) ?: "")
         MmkvManager.encodeServerConfig(editGuid, config)
         toastSuccess(R.string.toast_success)
         finish()

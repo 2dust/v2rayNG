@@ -35,7 +35,7 @@ class TaskerReceiver : BroadcastReceiver() {
                 V2RayServiceManager.stopVService(context)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            android.util.Log.e(AppConfig.TAG, "Error processing Tasker broadcast", e)
         }
     }
 }

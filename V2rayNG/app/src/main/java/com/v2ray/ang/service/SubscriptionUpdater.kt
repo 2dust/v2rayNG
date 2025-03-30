@@ -38,7 +38,7 @@ object SubscriptionUpdater {
          */
         @SuppressLint("MissingPermission")
         override suspend fun doWork(): Result {
-            Log.d(AppConfig.ANG_PACKAGE, "subscription automatic update starting")
+            Log.d(AppConfig.TAG, "subscription automatic update starting")
 
             val subs = MmkvManager.decodeSubscriptions().filter { it.second.autoUpdate }
 
@@ -56,10 +56,7 @@ object SubscriptionUpdater {
                     notificationManager.createNotificationChannel(channel)
                 }
                 notificationManager.notify(3, notification.build())
-                Log.d(
-                    AppConfig.ANG_PACKAGE,
-                    "subscription automatic update: ---${subItem.remarks}"
-                )
+                Log.d(AppConfig.TAG, "subscription automatic update: ---${subItem.remarks}")
                 updateConfigViaSub(Pair(sub.first, subItem))
                 notification.setContentText("Updating ${subItem.remarks}")
             }

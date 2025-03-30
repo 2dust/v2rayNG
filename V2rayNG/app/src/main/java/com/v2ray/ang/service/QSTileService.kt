@@ -8,6 +8,7 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
@@ -61,7 +62,7 @@ class QSTileService : TileService() {
             applicationContext.unregisterReceiver(mMsgReceive)
             mMsgReceive = null
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to unregister receiver", e)
         }
 
     }

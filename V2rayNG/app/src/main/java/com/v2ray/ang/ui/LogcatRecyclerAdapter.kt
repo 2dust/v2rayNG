@@ -1,12 +1,15 @@
 package com.v2ray.ang.ui
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.databinding.ItemRecyclerLogcatBinding
 
 class LogcatRecyclerAdapter(val activity: LogcatActivity) : RecyclerView.Adapter<LogcatRecyclerAdapter.MainViewHolder>() {
     private var mActivity: LogcatActivity = activity
+
 
     override fun getItemCount() = mActivity.logsets.size
 
@@ -22,7 +25,7 @@ class LogcatRecyclerAdapter(val activity: LogcatActivity) : RecyclerView.Adapter
                 holder.itemSubSettingBinding.logContent.text = if (content.count() > 1) content.last().trim() else ""
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Error binding log data", e)
         }
     }
 

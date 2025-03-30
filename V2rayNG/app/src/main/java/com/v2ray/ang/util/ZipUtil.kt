@@ -1,5 +1,7 @@
 package com.v2ray.ang.util
 
+import android.util.Log
+import com.v2ray.ang.AppConfig
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -61,7 +63,7 @@ object ZipUtil {
             zos.closeEntry()
             zos.close()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to zip folder", e)
             return false
         }
         return true
@@ -97,7 +99,7 @@ object ZipUtil {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to unzip file", e)
             return false
         }
         return true

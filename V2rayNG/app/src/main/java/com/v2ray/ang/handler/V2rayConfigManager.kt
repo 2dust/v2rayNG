@@ -4,7 +4,6 @@ import android.content.Context
 import android.text.TextUtils
 import android.util.Log
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.DEFAULT_NETWORK
 import com.v2ray.ang.AppConfig.DNS_ALIDNS_ADDRESSES
 import com.v2ray.ang.AppConfig.DNS_ALIDNS_DOMAIN
@@ -70,7 +69,7 @@ object V2rayConfigManager {
                 getV2rayNormalConfig(context, guid, config)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to get V2ray config", e)
             return ConfigResult(false)
         }
     }
@@ -91,7 +90,7 @@ object V2rayConfigManager {
                 getV2rayNormalConfig4Speedtest(context, guid, config)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to get V2ray config for speedtest", e)
             return ConfigResult(false)
         }
     }
@@ -123,7 +122,7 @@ object V2rayConfigManager {
         val address = config.server ?: return result
         if (!Utils.isIpAddress(address)) {
             if (!Utils.isValidUrl(address)) {
-                Log.d(ANG_PACKAGE, "$address is an invalid ip or domain")
+                Log.d(AppConfig.TAG, "$address is an invalid ip or domain")
                 return result
             }
         }
@@ -173,7 +172,7 @@ object V2rayConfigManager {
         val address = config.server ?: return result
         if (!Utils.isIpAddress(address)) {
             if (!Utils.isValidUrl(address)) {
-                Log.d(ANG_PACKAGE, "$address is an invalid ip or domain")
+                Log.d(AppConfig.TAG, "$address is an invalid ip or domain")
                 return result
             }
         }
@@ -256,7 +255,7 @@ object V2rayConfigManager {
             }
 
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to configure inbounds", e)
             return false
         }
         return true
@@ -319,7 +318,7 @@ object V2rayConfigManager {
                 routingUserRule(key, v2rayConfig)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to configure routing", e)
             return false
         }
         return true
@@ -336,7 +335,7 @@ object V2rayConfigManager {
             v2rayConfig.routing.rules.add(rule)
 
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to apply routing user rule", e)
         }
     }
 
@@ -422,7 +421,7 @@ object V2rayConfigManager {
                 )
             )
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to configure custom local DNS", e)
             return false
         }
         return true
@@ -486,7 +485,7 @@ object V2rayConfigManager {
                     if (userHostsMap != null) hosts.putAll(userHostsMap)
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(AppConfig.TAG, "Failed to configure user DNS hosts", e)
             }
 
             //block dns
@@ -525,7 +524,7 @@ object V2rayConfigManager {
                 )
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to configure DNS", e)
             return false
         }
         return true
@@ -596,7 +595,7 @@ object V2rayConfigManager {
 
 
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to update outbound with global settings", e)
             return false
         }
         return true
@@ -662,7 +661,7 @@ object V2rayConfigManager {
                     dialerProxy = TAG_FRAGMENT
                 )
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to update outbound fragment", e)
             return false
         }
         return true
@@ -725,7 +724,7 @@ object V2rayConfigManager {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to configure more outbounds", e)
             return returnPair
         }
 

@@ -44,6 +44,7 @@ import java.util.Date
 class UserAssetActivity : BaseActivity() {
     private val binding by lazy { ActivitySubSettingBinding.inflate(layoutInflater) }
 
+
     val extDir by lazy { File(Utils.userAssetPath(this)) }
     val builtInGeoFiles = arrayOf("geosite.dat", "geoip.dat")
 
@@ -163,7 +164,7 @@ class UserAssetActivity : BaseActivity() {
             }.also { cursor.close() }
         }
     } catch (e: Exception) {
-        e.printStackTrace()
+        Log.e(AppConfig.TAG, "Failed to get cursor name", e)
         null
     }
 
@@ -190,7 +191,7 @@ class UserAssetActivity : BaseActivity() {
                     .putExtra(UserAssetUrlActivity.ASSET_URL_QRCODE, url)
             )
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to import asset", e)
             return false
         }
         return true
@@ -229,7 +230,7 @@ class UserAssetActivity : BaseActivity() {
     private fun downloadGeo(item: AssetUrlItem, timeout: Int, httpPort: Int): Boolean {
         val targetTemp = File(extDir, item.remarks + "_temp")
         val target = File(extDir, item.remarks)
-        //Log.d(AppConfig.ANG_PACKAGE, url)
+        //Log.d(AppConfig.TAG, url)
 
         val conn = HttpUtil.createProxyConnection(item.url, httpPort, timeout, timeout, needStream = true) ?: return false
         try {
@@ -244,10 +245,10 @@ class UserAssetActivity : BaseActivity() {
             }
             return true
         } catch (e: Exception) {
-            Log.e(AppConfig.ANG_PACKAGE, Log.getStackTraceString(e))
+            Log.e(AppConfig.TAG, "Failed to download geo file", e)
             return false
         } finally {
-            conn?.disconnect()
+            conn.disconnect()
         }
     }
 

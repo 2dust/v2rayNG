@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -110,7 +111,7 @@ class RoutingSettingActivity : BaseActivity() {
                             }
                         }
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        Log.e(AppConfig.TAG, "Failed to import predefined ruleset", e)
                     }
                 }
                 .setNegativeButton(android.R.string.cancel) { _, _ ->
@@ -126,7 +127,7 @@ class RoutingSettingActivity : BaseActivity() {
                 val clipboard = try {
                     Utils.getClipboard(this)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Log.e(AppConfig.TAG, "Failed to get clipboard content", e)
                     toastError(R.string.toast_failure)
                     return@setPositiveButton
                 }

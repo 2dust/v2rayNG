@@ -9,6 +9,7 @@ import android.net.Uri
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -485,7 +486,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             val clipboard = Utils.getClipboard(this)
             importBatchConfig(clipboard)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to import config from clipboard", e)
             return false
         }
         return true
@@ -515,7 +516,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     toastError(R.string.toast_failure)
                     binding.pbWaiting.hide()
                 }
-                e.printStackTrace()
+                Log.e(AppConfig.TAG, "Failed to import batch config", e)
             }
         }
     }
@@ -524,7 +525,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         try {
             showFileChooser()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to import config from local file", e)
             return false
         }
         return true
@@ -744,7 +745,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     importBatchConfig(input?.bufferedReader()?.readText())
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(AppConfig.TAG, "Failed to read content from URI", e)
             }
         } else {
             requestPermissionLauncher.launch(permission)
@@ -807,6 +808,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 Intent(this, SettingsActivity::class.java)
                     .putExtra("isRunning", mainViewModel.isRunning.value == true)
             )
+
             R.id.promotion -> Utils.openUri(this, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")
             R.id.logcat -> startActivity(Intent(this, LogcatActivity::class.java))
             R.id.about -> startActivity(Intent(this, AboutActivity::class.java))

@@ -1,5 +1,7 @@
 package com.v2ray.ang.util
 
+import android.util.Log
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.util.Utils.encode
@@ -9,6 +11,7 @@ import java.net.*
 import java.util.*
 
 object HttpUtil {
+
 
     /**
      * Converts a URL string to its ASCII representation.
@@ -142,7 +145,7 @@ object HttpUtil {
                 )
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to create proxy connection", e)
             // If an exception occurs, close the connection and return null
             conn?.disconnect()
             return null

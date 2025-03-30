@@ -18,7 +18,6 @@ import android.os.StrictMode
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
@@ -40,6 +39,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         private const val PRIVATE_VLAN6_CLIENT = "fc00::10:10:14:1"
         private const val PRIVATE_VLAN6_ROUTER = "fc00::10:10:14:2"
         private const val TUN2SOCKS = "libtun2socks.so"
+
     }
 
     private lateinit var mInterface: ParcelFileDescriptor
@@ -209,7 +209,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                     else
                         builder.addAllowedApplication(it)
                 } catch (e: PackageManager.NameNotFoundException) {
-                    Log.d(ANG_PACKAGE, "setup error : --${e.localizedMessage}")
+                    Log.d(AppConfig.TAG, "setup error : --${e.localizedMessage}")
                 }
             }
         } else {
@@ -227,7 +227,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             try {
                 connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(AppConfig.TAG, "Failed to request default network", e)
             }
         }
 
@@ -245,7 +245,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             return true
         } catch (e: Exception) {
             // non-nullable lateinit var
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Failed to establish VPN interface", e)
             stopV2Ray()
         }
         return false
@@ -277,7 +277,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             cmd.add("--dnsgw")
             cmd.add("$LOOPBACK:${localDnsPort}")
         }
-        Log.d(packageName, cmd.toString())
+        Log.d(AppConfig.TAG, cmd.toString())
 
         try {
             val proBuilder = ProcessBuilder(cmd)
@@ -286,19 +286,19 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 .directory(applicationContext.filesDir)
                 .start()
             Thread {
-                Log.d(packageName, "$TUN2SOCKS check")
+                Log.d(AppConfig.TAG, "$TUN2SOCKS check")
                 process.waitFor()
-                Log.d(packageName, "$TUN2SOCKS exited")
+                Log.d(AppConfig.TAG, "$TUN2SOCKS exited")
                 if (isRunning) {
-                    Log.d(packageName, "$TUN2SOCKS restart")
+                    Log.d(AppConfig.TAG, "$TUN2SOCKS restart")
                     runTun2socks()
                 }
             }.start()
-            Log.d(packageName, process.toString())
+            Log.d(AppConfig.TAG, process.toString())
 
             sendFd()
         } catch (e: Exception) {
-            Log.d(packageName, e.toString())
+            Log.d(AppConfig.TAG, e.toString())
         }
     }
 
@@ -309,13 +309,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
     private fun sendFd() {
         val fd = mInterface.fileDescriptor
         val path = File(applicationContext.filesDir, "sock_path").absolutePath
-        Log.d(packageName, path)
+        Log.d(AppConfig.TAG, path)
 
         CoroutineScope(Dispatchers.IO).launch {
             var tries = 0
             while (true) try {
                 Thread.sleep(50L shl tries)
-                Log.d(packageName, "sendFd tries: $tries")
+                Log.d(AppConfig.TAG, "sendFd tries: $tries")
                 LocalSocket().use { localSocket ->
                     localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
                     localSocket.setFileDescriptorsForSend(arrayOf(fd))
@@ -323,7 +323,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 }
                 break
             } catch (e: Exception) {
-                Log.d(packageName, e.toString())
+                Log.d(AppConfig.TAG, e.toString())
                 if (tries > 5) break
                 tries += 1
             }
@@ -349,10 +349,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
 
         try {
-            Log.d(packageName, "tun2socks destroy")
+            Log.d(AppConfig.TAG, "tun2socks destroy")
             process.destroy()
         } catch (e: Exception) {
-            Log.d(packageName, e.toString())
+            Log.d(AppConfig.TAG, e.toString())
         }
 
         V2RayServiceManager.stopV2rayPoint()

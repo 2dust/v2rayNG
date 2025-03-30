@@ -31,6 +31,7 @@ class PerAppProxyActivity : BaseActivity() {
         ActivityBypassListBinding.inflate(layoutInflater)
     }
 
+
     private var adapter: PerAppProxyAdapter? = null
     private var appsAll: List<AppInfo>? = null
 
@@ -164,7 +165,7 @@ class PerAppProxyActivity : BaseActivity() {
                 content = HttpUtil.getUrlContent(url, 5000, httpPort) ?: ""
             }
             launch(Dispatchers.Main) {
-                Log.d(ANG_PACKAGE, content)
+                Log.d(AppConfig.TAG, content)
                 selectProxyApp(content, true)
                 toastSuccess(R.string.toast_success)
                 binding.pbWaiting.hide()
@@ -205,7 +206,7 @@ class PerAppProxyActivity : BaseActivity() {
                 adapter?.let { it ->
                     it.apps.forEach block@{
                         val packageName = it.packageName
-                        Log.d(ANG_PACKAGE, packageName)
+                        Log.d(AppConfig.TAG, packageName)
                         if (!inProxyApps(proxyApps, packageName, force)) {
                             adapter?.blacklist?.add(packageName)
                             println(packageName)
@@ -218,7 +219,7 @@ class PerAppProxyActivity : BaseActivity() {
                 adapter?.let { it ->
                     it.apps.forEach block@{
                         val packageName = it.packageName
-                        Log.d(ANG_PACKAGE, packageName)
+                        Log.d(AppConfig.TAG, packageName)
                         if (inProxyApps(proxyApps, packageName, force)) {
                             adapter?.blacklist?.add(packageName)
                             println(packageName)
@@ -229,7 +230,7 @@ class PerAppProxyActivity : BaseActivity() {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(AppConfig.TAG, "Error selecting proxy app", e)
             return false
         }
         return true

@@ -5,6 +5,7 @@ object AppConfig {
 
     /** The application's package name. */
     const val ANG_PACKAGE = BuildConfig.APPLICATION_ID
+    const val TAG = BuildConfig.APPLICATION_ID
 
     /** Directory names used in the app's file system. */
     const val DIR_ASSETS = "assets"
