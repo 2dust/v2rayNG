@@ -313,6 +313,12 @@
     <string name="title_pref_fragment_interval">分片间隔（最小 - 最大）</string>
     <string name="title_pref_fragment_enabled">启用分片（Fragment）</string>
 
+    <string name="update_check_for_update">检查更新</string>
+    <string name="update_already_latest_version">目前已是最新版本</string>
+    <string name="update_new_version_found">发现新版本: %s</string>
+    <string name="update_now">立即更新</string>
+    <string name="update_check_pre_release">检查 Pre-release</string>
+
     <string-array name="share_method">
         <item>二维码</item>
         <item>导出至剪贴板</item>

@@ -309,6 +309,18 @@
     <string name="import_subscription_success">Nhập gói đăng ký thành công!</string>
     <string name="import_subscription_failure">Nhập gói đăng ký không thành công!</string>
 
+    <string name="title_fragment_settings">Fragment Settings</string>
+    <string name="title_pref_fragment_packets">Fragment Packets</string>
+    <string name="title_pref_fragment_length">Fragment Length (min-max)</string>
+    <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
+    <string name="title_pref_fragment_enabled">Enable Fragment</string>
+
+    <string name="update_check_for_update">Check for update</string>
+    <string name="update_already_latest_version">Already on the latest version</string>
+    <string name="update_new_version_found">New version found: %s</string>
+    <string name="update_now">Update now</string>
+    <string name="update_check_pre_release">Check Pre-release</string>
+
     <string-array name="share_method">
         <item>Xuất ra mã QR (Chụp màn hình để lưu)</item>
         <item>Sao chép vào Clipboard</item>
@@ -340,12 +352,6 @@
         <item>Sáng</item>
         <item>Tối</item>
     </string-array>
-    <string name="title_fragment_settings">Fragment Settings</string>
-    <string name="title_pref_fragment_packets">Fragment Packets</string>
-    <string name="title_pref_fragment_length">Fragment Length (min-max)</string>
-    <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
-    <string name="title_pref_fragment_enabled">Enable Fragment</string>
-
     <string-array name="vpn_bypass_lan">
         <item>Follow config</item>
         <item>Bypass</item>

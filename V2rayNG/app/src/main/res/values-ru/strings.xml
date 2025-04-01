@@ -321,6 +321,12 @@
     <string name="title_pref_fragment_interval">Интервал фрагментов (от - до)</string>
     <string name="title_pref_fragment_enabled">Использовать фрагментирование</string>
 
+    <string name="update_check_for_update">Check for update</string>
+    <string name="update_already_latest_version">Already on the latest version</string>
+    <string name="update_new_version_found">New version found: %s</string>
+    <string name="update_now">Update now</string>
+    <string name="update_check_pre_release">Check Pre-release</string>
+
     <string-array name="share_method">
         <item>QR-код</item>
         <item>Экспорт в буфер обмена</item>
