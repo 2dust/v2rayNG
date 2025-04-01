@@ -323,7 +323,7 @@
     <string name="update_already_latest_version">در حال حاضر در آخرین نسخه هست</string>
     <string name="update_new_version_found">نسخه جدید پیدا شد: %s</string>
     <string name="update_now">اکنون به روز رسانی کنید</string>
-    <string name="update_check_pre_release">بررسی کردن نسخه پیش از انتظار</string>
+    <string name="update_check_pre_release">بررسی کردن نسخه پیش از انتشار</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
