@@ -33,4 +33,8 @@ object AppManagerUtil {
 
             return@withContext apps
         }
+
+    fun getLastUpdateTime(context: Context): Long =
+        context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
+
 }
