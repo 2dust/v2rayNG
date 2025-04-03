@@ -7,9 +7,9 @@
     <string name="navigation_drawer_close">بستن نومگه کشاری</string>
     <string name="migration_success">مووفقیت من جاگورویی داده</string>
     <string name="migration_fail">جاگورویی داده ٱنجوم نگرؽڌ</string>
-    <string name="pull_down_to_refresh">Please pull down to refresh!</string>
+    <string name="pull_down_to_refresh">سی وانۊ کردن، بکشینس بلم!</string>
 
-    <!-- Notifications -->
+    <!-- Notifications -->↓
     <string name="notification_action_stop_v2ray">واڌاشتن</string>
     <string name="toast_permission_denied">گرؽڌن موجوز مومکن نؽڌ</string>
     <string name="toast_permission_denied_notification">گرؽڌن موجوز وارسۊوی مومکن نؽڌ</string>
@@ -137,8 +137,8 @@
     <string name="msg_downloading_content">موئتوا هونی دانلود ابۊن</string>
     <string name="menu_item_export_proxy_app">و در کشیڌن من کلیپ بورد</string>
     <string name="menu_item_import_proxy_app">و من ٱووردن ز کلیپ بورد</string>
-    <string name="per_app_proxy_settings">Per-app settings</string>
-    <string name="per_app_proxy_settings_enable">Enable per-app</string>
+    <string name="per_app_proxy_settings">سامووا ب تفکیک برنومه</string>
+    <string name="per_app_proxy_settings_enable">ر وندن ب تفکیک برنومه</string>
 
 
     <!-- Preferences -->
@@ -216,8 +216,8 @@
     <string name="title_pref_append_http_proxy">پروکسی HTTP ن و VPN ازاف کۊنین</string>
     <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موسقیمن ز (مۊرۊرگر/ی قرد ز برنومیل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
 
-    <string name="title_pref_double_column_display">Enable double column display</string>
-    <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen. You need to restart the application to take effect.</string>
+    <string name="title_pref_double_column_display">ر وندن نشۉݩ داڌن دو سۊتۊنی</string>
+    <string name="summary_pref_double_column_display">نومگه نمایه یل من دو سۊتۊن نشۉݩ داڌه ابۊن وو چینۉ ترین موئتوا بیشتری ن سیل کۊنین. سی ر وستن وا برنومه ن ز نۊ ر ونین.</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">فشناڌن منشڌ</string>
@@ -268,7 +268,7 @@
     <string name="title_sub_update">ورۊ کردن اشتراک جرگه سکویی</string>
     <string name="title_ping_all_server">Tcping کانفیگا جرگه سکویی</string>
     <string name="title_real_ping_all_server">تئخیر واقعی کانفیگا جرگه سکویی</string>
-    <string name="title_user_asset_setting">Asset files</string>
+    <string name="title_user_asset_setting">فایلا بونچک جوقرافیایی</string>
     <string name="title_sort_by_test_results">ترتیب و ری نتیجیل آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>
     <string name="filter_config_all">پوی جرگیل</string>
@@ -316,17 +316,17 @@
 
     <string name="import_subscription_success">اشتراک وا مووفقیت زفت زابی</string>
     <string name="import_subscription_failure">اشتراک زفت نوابی</string>
-    <string name="title_fragment_settings">سامووا Fragment</string>
-    <string name="title_pref_fragment_packets">Fragment Packets</string>
-    <string name="title_pref_fragment_length">Fragment Length (min-max)</string>
-    <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
-    <string name="title_pref_fragment_enabled">ر وندن Fragment</string>
+    <string name="title_fragment_settings">سامووا فرگمنت</string>
+    <string name="title_pref_fragment_packets">کتنا فرگمنت</string>
+    <string name="title_pref_fragment_length">تۊل کتنا فرگمنت (هدقل-هدکسر)</string>
+    <string name="title_pref_fragment_interval">فاسله منجا کتنا فرگمنت (هدقل-هدکسر)</string>
+    <string name="title_pref_fragment_enabled">ر وندن فرگمنت</string>
 
-    <string name="update_check_for_update">Check for update</string>
-    <string name="update_already_latest_version">Already on the latest version</string>
-    <string name="update_new_version_found">New version found: %s</string>
-    <string name="update_now">Update now</string>
-    <string name="update_check_pre_release">Check Pre-release</string>
+    <string name="update_check_for_update">واجۊری سی ورۊ رسۊوی</string>
+    <string name="update_already_latest_version">سکو نوسخه دیندایی پۊرنیڌه هڌ</string>
+    <string name="update_new_version_found">نوسخه نۊ ن جوست: %s</string>
+    <string name="update_now">سکو ورۊ رسۊوی کۊنین</string>
+    <string name="update_check_pre_release">نوسخیل پؽش ز تیجنیڌنن واجۊری کۊنین</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
@@ -336,10 +336,10 @@
 
     <string-array name="share_method_more">
         <item>QRcode</item>
-        <item>Export to clipboard</item>
-        <item>Export full configuration to clipboard</item>
-        <item>Edit</item>
-        <item>Delete</item>
+        <item>و در کشیڌن من کلیپ بورد</item>
+        <item>و در کشیڌن پوی کانفیگ من کلیپ بورد</item>
+        <item>آلشت</item>
+        <item>پاک کردن</item>
     </string-array>
 
     <string-array name="share_sub_method">
