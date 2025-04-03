@@ -107,7 +107,7 @@ class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter
             addUpdateListener { animation ->
                 val value = animation.animatedValue as Float
                 viewHolder.itemView.translationX = value
-                viewHolder.itemView.alpha = (1f - abs(value) / (viewHolder.itemView.width * SWIPE_THRESHOLD))
+                viewHolder.itemView.alpha = 1f - abs(value) / (viewHolder.itemView.width * SWIPE_THRESHOLD)
             }
             interpolator = DecelerateInterpolator()
             duration = ANIMATION_DURATION

@@ -242,7 +242,7 @@ object SettingsManager {
      * @return The HTTP port.
      */
     fun getHttpPort(): Int {
-        return getSocksPort() + (if (Utils.isXray()) 0 else 1)
+        return getSocksPort() + if (Utils.isXray()) 0 else 1
     }
 
     /**

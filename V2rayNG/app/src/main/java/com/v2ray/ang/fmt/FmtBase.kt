@@ -18,9 +18,9 @@ open class FmtBase {
      */
     fun toUri(config: ProfileItem, userInfo: String?, dicQuery: HashMap<String, String>?): String {
         val query = if (dicQuery != null)
-            ("?" + dicQuery.toList().joinToString(
+            "?" + dicQuery.toList().joinToString(
                 separator = "&",
-                transform = { it.first + "=" + Utils.urlEncode(it.second) }))
+                transform = { it.first + "=" + Utils.urlEncode(it.second) })
         else ""
 
         val url = String.format(
