@@ -25,7 +25,7 @@ object AppManagerUtil {
 
                 val appName = applicationInfo.loadLabel(packageManager).toString()
                 val appIcon = applicationInfo.loadIcon(packageManager) ?: continue
-                val isSystemApp = (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) > 0
+                val isSystemApp = applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM > 0
 
                 val appInfo = AppInfo(appName, pkg.packageName, appIcon, isSystemApp, 0)
                 apps.add(appInfo)
@@ -33,4 +33,8 @@ object AppManagerUtil {
 
             return@withContext apps
         }
+
+    fun getLastUpdateTime(context: Context): Long =
+        context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
+
 }

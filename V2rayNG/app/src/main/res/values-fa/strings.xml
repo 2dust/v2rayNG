@@ -319,11 +319,11 @@
     <string name="title_pref_fragment_interval">فاصله بین بسته های فرگمنت (حداقل-حداکثر)</string>
     <string name="title_pref_fragment_enabled">فعال کردن فرگمنت</string>
 
-    <string name="update_check_for_update">Check for update</string>
-    <string name="update_already_latest_version">Already on the latest version</string>
-    <string name="update_new_version_found">New version found: %s</string>
-    <string name="update_now">Update now</string>
-    <string name="update_check_pre_release">Check Pre-release</string>
+    <string name="update_check_for_update">بررسی به روز رسانی</string>
+    <string name="update_already_latest_version">در حال حاضر آخرین نسخه نصب شده است</string>
+    <string name="update_new_version_found">نسخه جدید پیدا شد: %s</string>
+    <string name="update_now">اکنون به روز رسانی کنید</string>
+    <string name="update_check_pre_release">بررسی نسخه پیش از انتشار</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
