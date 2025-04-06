@@ -105,11 +105,11 @@ class AboutActivity : BaseActivity() {
             }
         }
 
-        //If it is the Google Play version, not be displayed within 2 days after update
+        //If it is the Google Play version, not be displayed within 1 days after update
         if (Utils.isGoogleFlavor()) {
             val lastUpdateTime = AppManagerUtil.getLastUpdateTime(this)
             val currentTime = System.currentTimeMillis()
-            if ((currentTime - lastUpdateTime) < 2 * 24 * 60 * 60 * 1000L) {
+            if ((currentTime - lastUpdateTime) < 1 * 24 * 60 * 60 * 1000L) {
                 binding.layoutCheckUpdate.visibility = View.GONE
             }
         }
