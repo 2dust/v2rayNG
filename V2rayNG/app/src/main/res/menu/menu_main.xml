@@ -56,29 +56,6 @@
                 android:id="@+id/import_manually_hysteria2"
                 android:title="@string/menu_item_import_config_manually_hysteria2"
                 app:showAsAction="never" />
-
-            <!--            <item-->
-            <!--                android:title="@string/menu_item_import_config_custom"-->
-            <!--                app:showAsAction="ifRoom">-->
-            <!--                <menu>-->
-            <!--                    <item-->
-            <!--                        android:id="@+id/import_config_custom_clipboard"-->
-            <!--                        android:title="@string/menu_item_import_config_custom_clipboard"-->
-            <!--                        app:showAsAction="never" />-->
-            <!--                    <item-->
-            <!--                        android:id="@+id/import_config_custom_local"-->
-            <!--                        android:title="@string/menu_item_import_config_custom_local"-->
-            <!--                        app:showAsAction="never" />-->
-            <!--                    <item-->
-            <!--                        android:id="@+id/import_config_custom_url"-->
-            <!--                        android:title="@string/menu_item_import_config_custom_url"-->
-            <!--                        app:showAsAction="never" />-->
-            <!--                    <item-->
-            <!--                        android:id="@+id/import_config_custom_url_scan"-->
-            <!--                        android:title="@string/menu_item_import_config_custom_url_scan"-->
-            <!--                        app:showAsAction="never" />-->
-            <!--                </menu>-->
-            <!--            </item>-->
         </menu>
     </item>
     <item

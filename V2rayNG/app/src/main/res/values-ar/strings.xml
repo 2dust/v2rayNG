@@ -35,11 +35,6 @@
     <string name="menu_item_import_config_manually_trojan">الكتابة يدويًا [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">الكتابة يدويًا [Wireguard]</string>
     <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
-    <string name="menu_item_import_config_custom">تكوين مخصص</string>
-    <string name="menu_item_import_config_custom_clipboard">استيراد تكوين مخصص من الحافظة</string>
-    <string name="menu_item_import_config_custom_local">استيراد تكوين مخصص من الجهاز</string>
-    <string name="menu_item_import_config_custom_url">استيراد تكوين مخصص من عنوان URL</string>
-    <string name="menu_item_import_config_custom_url_scan">استيراد تكوين مخصص مسح عنوان URL</string>
     <string name="del_config_comfirm">تأكيد الحذف؟</string>
     <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
     <string name="server_lab_remarks">ملاحظات</string>

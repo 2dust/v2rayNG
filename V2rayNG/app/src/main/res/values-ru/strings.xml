@@ -35,11 +35,6 @@
     <string name="menu_item_import_config_manually_trojan">Ручной ввод Trojan</string>
     <string name="menu_item_import_config_manually_wireguard">Ручной ввод WireGuard</string>
     <string name="menu_item_import_config_manually_hysteria2">Ручной ввод Hysteria2</string>
-    <string name="menu_item_import_config_custom">Другой профиль</string>
-    <string name="menu_item_import_config_custom_clipboard">Импорт из буфера обмена</string>
-    <string name="menu_item_import_config_custom_local">Импорт из файла</string>
-    <string name="menu_item_import_config_custom_url">Импорт из URL</string>
-    <string name="menu_item_import_config_custom_url_scan">Импорт сканированием URL</string>
     <string name="del_config_comfirm">Подтверждаете удаление?</string>
     <string name="del_invalid_config_comfirm">Выполните проверку перед удалением! Подтверждаете удаление?</string>
     <string name="server_lab_remarks">Название</string>

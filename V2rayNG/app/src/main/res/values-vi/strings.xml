@@ -35,11 +35,6 @@
     <string name="menu_item_import_config_manually_trojan">Nhập thủ công [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">Nhập thủ công [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
-    <string name="menu_item_import_config_custom">Nâng cao / Cấu hình tùy chỉnh</string>
-    <string name="menu_item_import_config_custom_clipboard">Nhập cấu hình tùy chỉnh từ Clipboard</string>
-    <string name="menu_item_import_config_custom_local">Nhập cấu hình tùy chỉnh từ Tệp</string>
-    <string name="menu_item_import_config_custom_url">Nhập cấu hình tùy chỉnh từ URL</string>
-    <string name="menu_item_import_config_custom_url_scan">Nhập cấu hình tùy chỉnh quét URL</string>
     <string name="del_config_comfirm">Xác nhận xóa?</string>
     <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
     <string name="server_lab_remarks">Tên cấu hình</string>

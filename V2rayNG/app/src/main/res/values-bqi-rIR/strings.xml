@@ -26,7 +26,7 @@
     <string name="menu_item_del_config">پاک کردن کانفیگ</string>
     <string name="menu_item_import_config_qrcode">و من ٱووردن کانفیگ ز QRcode</string>
     <string name="menu_item_import_config_clipboard">و من ٱووردن کانفیگ ز کلیپ بورد</string>
-    <string name="menu_item_import_config_local">Import config from locally</string>
+    <string name="menu_item_import_config_local">و من ٱووردن کانفیگ ز مهلی</string>
     <string name="menu_item_import_config_manually_vmess">هؽل دستی[VMess]</string>
     <string name="menu_item_import_config_manually_vless">هؽل دستی[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">هؽل دستی[Shadowsocks]</string>
@@ -35,15 +35,10 @@
     <string name="menu_item_import_config_manually_trojan">هؽل دستی[Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">هؽل دستی[Wireguard]</string>
     <string name="menu_item_import_config_manually_hysteria2">هؽل دستی[Hysteria2]</string>
-    <string name="menu_item_import_config_custom">کانفیگ سفارشی</string>
-    <string name="menu_item_import_config_custom_clipboard">کانفیگ سفارشین ز کلیپ بورد و من بیار</string>
-    <string name="menu_item_import_config_custom_local">کانفیگ سفارشین ز مهلی و من بیار</string>
-    <string name="menu_item_import_config_custom_url">کانفیگ سفارشین ز آدرس اینترنتی و من بیار</string>
-    <string name="menu_item_import_config_custom_url_scan">نشۊوی اینترنتی اسکن کانفیگ سفارشین بزݩ</string>
     <string name="del_config_comfirm">پاک بۊ؟</string>
     <string name="del_invalid_config_comfirm">پؽش ز پاک کردن کانفیگ نا موئتبر واجۊری کوݩ! پاک کردن کانفیگن قوۊل اکۊنی؟</string>
     <string name="server_lab_remarks">نیشتنا</string>
-    <string name="server_lab_address">آدرس</string>
+    <string name="server_lab_address">نشۊوی</string>
     <string name="server_lab_port">پورت</string>
     <string name="server_lab_id">نوم من توری</string>
     <string name="server_lab_alterid">شناسه جایگۊزین</string>
@@ -73,7 +68,7 @@
     <string name="server_lab_stream_alpn">Alpn</string>
     <string name="server_lab_allow_insecure">اجازه نا ٱمن</string>
     <string name="server_lab_sni">SNI</string>
-    <string name="server_lab_address3">آدرس</string>
+    <string name="server_lab_address3">نشۊوی</string>
     <string name="server_lab_port3">پورت</string>
     <string name="server_lab_id3">رزم</string>
     <string name="server_lab_security3">ٱمنیت</string>
@@ -82,12 +77,12 @@
     <string name="server_lab_encryption">رزم نگاری</string>
     <string name="server_lab_flow">جریان</string>
     <string name="server_lab_public_key">کیلیت پوی وولاتی</string>
-    <string name="server_lab_preshared_key">کیلیت رمز ناهاڌن ازاف (اختیاری)</string>
+    <string name="server_lab_preshared_key">کیلیت رزم ناهاڌن ازاف (اختیاری)</string>
     <string name="server_lab_short_id">ShortID</string>
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_secret_key">کیلیت سیخومی</string>
     <string name="server_lab_reserved">Reserved(اختیاری، وا کاما ز یک جوڌا ابۊن)</string>
-    <string name="server_lab_local_address">آدرس مهلی (اختیاری IPv4/IPv6، وا کاما ز یک جوڌا ابۊن)</string>
+    <string name="server_lab_local_address">نشۊوی مهلی (اختیاری IPv4/IPv6، وا کاما ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_mtu">Mtu(اختیاری، پؽش فرز 1420)</string>
     <string name="toast_success">وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_failure">شکست خرد</string>
@@ -101,11 +96,11 @@
     <string name="server_lab_content">موئتوا</string>
     <string name="toast_none_data_clipboard">هیچ داده ای من کلیپ بورد وۊجۊڌ نڌاره</string>
     <string name="toast_invalid_url">نشۊوی اینترنتی نا موئتبر هڌ</string>
-    <string name="toast_insecure_url_protocol">آدرس اشتراک پوروتوکول نا ٱمن HTTP ن و کار مبرین</string>
+    <string name="toast_insecure_url_protocol">نشۊوی اشتراک پوروتوکول نا ٱمن HTTP ن و کار مبرین</string>
     <string name="server_lab_need_inbound">موتمعن بۊین ک پورت وۊرۊڌی وا سامووا ی جۊر هڌ</string>
     <string name="toast_malformed_josn">کانفیگ زبال نؽڌ</string>
     <string name="server_lab_request_host6">هاست(SNI)(اختیاری)</string>
-    <string name="toast_action_not_allowed">ای کار ممنۊ هڌ</string>
+    <string name="toast_action_not_allowed">ای کار ممنۊع هڌ</string>
     <string name="server_obfs_password">رزم obfs</string>
     <string name="server_lab_port_hop">پورت گوم (درگا سرورن ز نۊ هؽل اکونه)</string>
     <string name="server_lab_port_hop_interval">فاسله پورت گوم (سانیه)</string>
@@ -121,9 +116,9 @@
     <string name="menu_item_add_file">ازاف کردن فایل</string>
     <string name="menu_item_add_url">ازاف کردن لینگ</string>
     <string name="menu_item_scan_qrcode">اسکن QRcode</string>
-    <string name="title_url">آدرس اینترنتی</string>
+    <string name="title_url">نشۊوی اینترنتی</string>
     <string name="menu_item_download_file">دانلود فایلا</string>
-    <string name="title_user_asset_add_url">آدرس اینترنتی دارایین ازاف کۊنین</string>
+    <string name="title_user_asset_add_url">نشۊوی اینترنتی دارایین ازاف کۊنین</string>
     <string name="msg_file_not_found">فایلن نجوست</string>
     <string name="msg_remark_is_duplicate">ائزارات ز زیتر بیڌسۉݩ</string>
 
@@ -131,7 +126,7 @@
     <string name="msg_dialog_progress">هون بار ونی بۊ</string>
     <string name="menu_item_search">پیتینیڌن</string>
     <string name="menu_item_select_all">پسند پوی</string>
-    <string name="msg_enter_keywords">رزمان بزنین</string>
+    <string name="msg_enter_keywords">رزما ن بزنین</string>
     <string name="switch_bypass_apps_mode">هالت Bypass</string>
     <string name="menu_item_select_proxy_app">پسند خوتکار پروکسی برنومه</string>
     <string name="msg_downloading_content">موئتوا هونی دانلود ابۊن</string>
@@ -155,7 +150,7 @@
     <string name="summary_pref_mux_enabled">زل تر، ٱما گاشڌ منپیز زی قت بۊ بارت دؽوۉداری، TCP، UDP و QUIC ن ای لم سفارشی کۊنین.</string>
     <string name="title_pref_mux_concurency">منپیزا TCP (تلایه منجا 1-1024)</string>
     <string name="title_pref_mux_xudp_concurency">منپیزا XUDP (تلایه منجا 1-1024)</string>
-    <string name="title_pref_mux_xudp_quic">دؽوۉداری QUIC من تونل mux</string>
+    <string name="title_pref_mux_xudp_quic">دؽوۉداری QUIC من تۊنل mux</string>
     <string-array name="mux_xudp_quic_entries">
         <item>رڌ کردن</item>
         <item>موجاز</item>
@@ -168,13 +163,13 @@
     <string name="title_pref_sniffing_enabled">ر وندن Sniffing</string>
     <string name="summary_pref_sniffing_enabled">دامنه sniff ن ز کتن امتهۉݩ کۊنین (پؽش فرز رۊشن)</string>
     <string name="title_pref_route_only_enabled">ر وندن routeOnly</string>
-    <string name="summary_pref_route_only_enabled">ز نوم دامنه sniffed تینا سی تور جوستن استفاڌه کۊنین وو آدرس مورد نزرن و عونوان آدرس IP ووردارین.</string>
+    <string name="summary_pref_route_only_enabled">ز نوم دامنه sniffed تینا سی تور جوستن استفاڌه کۊنین وو نشۊوی مۉرد نزرن و عونوان نشۊوی IP ووردارین.</string>
 
     <string name="title_pref_local_dns_enabled">ر وندن DNS مهلی</string>
     <string name="summary_pref_local_dns_enabled">DNS پردازشت وابیڌه و دس هسته ماژول DNS (پؽشنهاڌ ابۊ، ٱر نیاز هڌ ک جوستن تور وو ولات ٱسلین دور زنی)</string>
 
     <string name="title_pref_fake_dns_enabled">ر وندن DNS جئلی</string>
-    <string name="summary_pref_fake_dns_enabled">DNS مهلی آدرسا IP جئلی ن وورگنه (زل تر، ٱما گاشڌ من یقرد ز برنومیل کار نکونه)</string>
+    <string name="summary_pref_fake_dns_enabled">DNS مهلی نشۊویا IP جئلی ن وورگنه (زل تر، ٱما گاشڌ من یقرد ز برنومه یل کار نکونه)</string>
 
     <string name="title_pref_prefer_ipv6">ترجی IPv6</string>
     <string name="summary_pref_prefer_ipv6">ترجی داڌن نشۊوی وو تورا IPv6</string>
@@ -188,14 +183,14 @@
     <string name="title_pref_domestic_dns">DNS منی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
-    <string name="title_pref_dns_hosts">DNS هاست موستقیم (قالوو: دامنه: آدرس،...)</string>
-    <string name="summary_pref_dns_hosts">دامنه:آدرس،...</string>
+    <string name="title_pref_dns_hosts">DNS هاست موستقیم (قالوو: دامنه: نشۊوی،...)</string>
+    <string name="summary_pref_dns_hosts">دامنه:نشۊوی،...</string>
 
-    <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تئخیر واقعی (http/https)</string>
+    <string name="title_pref_delay_test_url">نشۊوی اینترنتی آزمایش تئخیر واقعی (http/https)</string>
     <string name="summary_pref_delay_test_url">نشۊوی اینترنتی</string>
 
     <string name="title_pref_proxy_sharing_enabled">هشتن منپیزا ز شبکه مهلی</string>
-    <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا آدرس IP ایسا، ز ر socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل اعتماد فعال بۊ تا ز منپیز غیر موجاز جلو گری بۊ.</string>
+    <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا نشۊوی IP ایسا، ز ر socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل اعتماد فعال بۊ تا ز منپیز غیر موجاز جلو گری بۊ.</string>
     <string name="toast_warning_pref_proxysharing_short">منپیزا ز شبکه مهلی ن موجار کۊنین، موتمعن بۊین ک من ی شبکه قابل ائتماڌ هڌین.</string>
 
     <string name="title_pref_allow_insecure">اجازه نا ٱمن</string>
@@ -214,7 +209,7 @@
     <string name="summary_pref_start_scan_immediate">شؽواتگرن سی اسکن، زی مجال ر وندن بۊگۊشین، اندی ترین کودن اسکن کۊنین یا شؽواتی ن منه نوار ٱوزار پسند کۊنین.</string>
 
     <string name="title_pref_append_http_proxy">پروکسی HTTP ن و VPN ازاف کۊنین</string>
-    <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موسقیمن ز (مۊرۊرگر/ی قرد ز برنومیل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
+    <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موسقیمن ز (مۊرۊرگر/ی قرد ز برنومه یل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
 
     <string name="title_pref_double_column_display">ر وندن نشۉݩ داڌن دو سۊتۊنی</string>
     <string name="summary_pref_double_column_display">نومگه نمایه یل من دو سۊتۊن نشۉݩ داڌه ابۊن وو چینۉ ترین موئتوا بیشتری ن سیل کۊنین. سی ر وستن وا برنومه ن ز نۊ ر ونین.</string>
@@ -269,9 +264,9 @@
     <string name="title_ping_all_server">Tcping کانفیگا جرگه سکویی</string>
     <string name="title_real_ping_all_server">تئخیر واقعی کانفیگا جرگه سکویی</string>
     <string name="title_user_asset_setting">فایلا بونچک جوقرافیایی</string>
-    <string name="title_sort_by_test_results">ترتیب و ری نتیجیل آزمایش</string>
+    <string name="title_sort_by_test_results">ترتیب و ری نتیجه یل آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>
-    <string name="filter_config_all">پوی جرگیل</string>
+    <string name="filter_config_all">پوی جرگه یل کانفیگ</string>
     <string name="title_del_duplicate_config_count">پاک کردن %d کانفیگ تکراری</string>
 
     <string name="title_del_config_count">پاک کردن %d کانفیگ</string>

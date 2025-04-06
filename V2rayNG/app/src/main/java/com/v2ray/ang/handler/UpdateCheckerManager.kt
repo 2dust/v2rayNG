@@ -31,8 +31,7 @@ object UpdateCheckerManager {
 
             val latestRelease = if (includePreRelease) {
                 JsonUtil.fromJson(response, Array<GitHubRelease>::class.java)
-                    .filter { it.prerelease }
-                    .maxByOrNull { it.publishedAt }
+                    .firstOrNull()
                     ?: throw IllegalStateException("No pre-release found")
             } else {
                 JsonUtil.fromJson(response, GitHubRelease::class.java)
