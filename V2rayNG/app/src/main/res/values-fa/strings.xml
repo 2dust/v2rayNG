@@ -35,11 +35,6 @@
     <string name="menu_item_import_config_manually_trojan">تایپ دستی[TROJAN]</string>
     <string name="menu_item_import_config_manually_wireguard">‌تایپ دستی[WIREGUARD]</string>
     <string name="menu_item_import_config_manually_hysteria2">تایپ دستی[HYSTERIA2]</string>
-    <string name="menu_item_import_config_custom">کانفیگ سفارشی</string>
-    <string name="menu_item_import_config_custom_clipboard">کانفیگ سفارشی را از کلیپ ‌بورد وارد کنید</string>
-    <string name="menu_item_import_config_custom_local">کانفیگ سفارشی را به صورت محلی وارد کنید</string>
-    <string name="menu_item_import_config_custom_url">کانفیگ سفارشی را از طریق نشانی اینترنتی وارد کنید</string>
-    <string name="menu_item_import_config_custom_url_scan">نشانی اینترنتی اسکن کانفیگ سفارشی را وارد کنید</string>
     <string name="del_config_comfirm">حذف شود؟</string>
     <string name="del_invalid_config_comfirm">لطفا قبل از حذف کانفیگ نامعتبر بررسی کنید! حذف کانفیگ را تایید می کنید؟</string>
     <string name="server_lab_remarks">ملاحظات</string>

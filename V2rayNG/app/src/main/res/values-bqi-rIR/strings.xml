@@ -35,11 +35,6 @@
     <string name="menu_item_import_config_manually_trojan">هؽل دستی[Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">هؽل دستی[Wireguard]</string>
     <string name="menu_item_import_config_manually_hysteria2">هؽل دستی[Hysteria2]</string>
-    <string name="menu_item_import_config_custom">کانفیگ سفارشی</string>
-    <string name="menu_item_import_config_custom_clipboard">کانفیگ سفارشین ز کلیپ بورد و من بیار</string>
-    <string name="menu_item_import_config_custom_local">کانفیگ سفارشین ز مهلی و من بیار</string>
-    <string name="menu_item_import_config_custom_url">کانفیگ سفارشین ز نشۊوی اینترنتی و من بیار</string>
-    <string name="menu_item_import_config_custom_url_scan">نشۊوی اینترنتی اسکن کانفیگ سفارشین بزݩ</string>
     <string name="del_config_comfirm">پاک بۊ؟</string>
     <string name="del_invalid_config_comfirm">پؽش ز پاک کردن کانفیگ نا موئتبر واجۊری کوݩ! پاک کردن کانفیگن قوۊل اکۊنی؟</string>
     <string name="server_lab_remarks">نیشتنا</string>

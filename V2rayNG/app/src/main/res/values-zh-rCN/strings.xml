@@ -35,11 +35,6 @@
     <string name="menu_item_import_config_manually_trojan">手动输入 [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">手动输入 [Wireguard]</string>
     <string name="menu_item_import_config_manually_hysteria2">手动输入 [Hysteria2]</string>
-    <string name="menu_item_import_config_custom">自定义配置</string>
-    <string name="menu_item_import_config_custom_clipboard">从剪贴板导入自定义配置</string>
-    <string name="menu_item_import_config_custom_local">从本地导入自定义配置</string>
-    <string name="menu_item_import_config_custom_url">剪贴板 URL 导入自定义配置</string>
-    <string name="menu_item_import_config_custom_url_scan">扫描 URL 导入自定义配置</string>
     <string name="del_config_comfirm">确认删除？</string>
     <string name="del_invalid_config_comfirm">删除前请先测试！确认删除？</string>
     <string name="server_lab_remarks">别名 (remarks)</string>

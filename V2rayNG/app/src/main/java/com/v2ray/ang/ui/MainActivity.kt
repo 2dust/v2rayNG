@@ -87,9 +87,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     Action.IMPORT_QR_CODE_CONFIG ->
                         scanQRCodeForConfig.launch(Intent(this, ScannerActivity::class.java))
 
-//                    Action.IMPORT_QR_CODE_URL ->
-//                        scanQRCodeForUrlToCustomConfig.launch(Intent(this, ScannerActivity::class.java))
-
                     Action.READ_CONTENT_FROM_URI ->
                         chooseFileForCustomConfig.launch(Intent.createChooser(Intent(Intent.ACTION_GET_CONTENT).apply {
                             type = "*/*"
@@ -110,8 +107,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     enum class Action {
         NONE,
         IMPORT_QR_CODE_CONFIG,
-
-        //IMPORT_QR_CODE_URL,
         READ_CONTENT_FROM_URI,
         POST_NOTIFICATIONS
     }
@@ -128,12 +123,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             importBatchConfig(it.data?.getStringExtra("SCAN_RESULT"))
         }
     }
-
-//    private val scanQRCodeForUrlToCustomConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-//        if (it.resultCode == RESULT_OK) {
-//            importConfigCustomUrl(it.data?.getStringExtra("SCAN_RESULT"))
-//        }
-//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -325,7 +314,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.import_qrcode -> {
-            importQRcode(true)
+            importQRcode()
             true
         }
 
@@ -378,26 +367,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             importManually(EConfigType.HYSTERIA2.value)
             true
         }
-
-//        R.id.import_config_custom_clipboard -> {
-//            importConfigCustomClipboard()
-//            true
-//        }
-//
-//        R.id.import_config_custom_local -> {
-//            importConfigCustomLocal()
-//            true
-//        }
-//
-//        R.id.import_config_custom_url -> {
-//            importConfigCustomUrlClipboard()
-//            true
-//        }
-//
-//        R.id.import_config_custom_url_scan -> {
-//            importQRcode(false)
-//            true
-//        }
 
         R.id.export_all -> {
             exportAll()
@@ -462,16 +431,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     /**
      * import config from qrcode
      */
-    private fun importQRcode(forConfig: Boolean): Boolean {
+    private fun importQRcode(): Boolean {
         val permission = Manifest.permission.CAMERA
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
-            if (forConfig) {
-                scanQRCodeForConfig.launch(Intent(this, ScannerActivity::class.java))
-            } else {
-                //scanQRCodeForUrlToCustomConfig.launch(Intent(this, ScannerActivity::class.java))
-            }
+            scanQRCodeForConfig.launch(Intent(this, ScannerActivity::class.java))
         } else {
-            pendingAction = Action.IMPORT_QR_CODE_CONFIG//if (forConfig) Action.IMPORT_QR_CODE_CONFIG else Action.IMPORT_QR_CODE_URL
+            pendingAction = Action.IMPORT_QR_CODE_CONFIG
             requestPermissionLauncher.launch(permission)
         }
         return true
@@ -534,77 +499,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
-
-//    private fun importConfigCustomClipboard()
-//            : Boolean {
-//        try {
-//            val configText = Utils.getClipboard(this)
-//            if (TextUtils.isEmpty(configText)) {
-//                toast(R.string.toast_none_data_clipboard)
-//                return false
-//            }
-//            importCustomizeConfig(configText)
-//            return true
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            return false
-//        }
-//    }
-
-    /**
-     * import config from local config file
-     */
-//    private fun importConfigCustomLocal(): Boolean {
-//        try {
-//            showFileChooser()
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            return false
-//        }
-//        return true
-//    }
-//
-//    private fun importConfigCustomUrlClipboard()
-//            : Boolean {
-//        try {
-//            val url = Utils.getClipboard(this)
-//            if (TextUtils.isEmpty(url)) {
-//                toast(R.string.toast_none_data_clipboard)
-//                return false
-//            }
-//            return importConfigCustomUrl(url)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            return false
-//        }
-//    }
-
-    /**
-     * import config from url
-     */
-//    private fun importConfigCustomUrl(url: String?): Boolean {
-//        try {
-//            if (!Utils.isValidUrl(url)) {
-//                toast(R.string.toast_invalid_url)
-//                return false
-//            }
-//            lifecycleScope.launch(Dispatchers.IO) {
-//                val configText = try {
-//                    HttpUtil.getUrlContentWithUserAgent(url)
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                    ""
-//                }
-//                launch(Dispatchers.Main) {
-//                    importCustomizeConfig(configText)
-//                }
-//            }
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            return false
-//        }
-//        return true
-//    }
 
     /**
      * import config from sub
@@ -754,29 +648,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             requestPermissionLauncher.launch(permission)
         }
     }
-
-//    /**
-//     * import customize config
-//     */
-//    private fun importCustomizeConfig(server: String?) {
-//        try {
-//            if (server == null || TextUtils.isEmpty(server)) {
-//                toast(R.string.toast_none_data)
-//                return
-//            }
-//            if (mainViewModel.appendCustomConfigServer(server)) {
-//                mainViewModel.reloadServerList()
-//                toastSuccess(R.string.toast_success)
-//            } else {
-//                toastError(R.string.toast_failure)
-//            }
-//            //adapter.notifyItemInserted(mainViewModel.serverList.lastIndex)
-//        } catch (e: Exception) {
-//            ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
-//            e.printStackTrace()
-//            return
-//        }
-//    }
 
     private fun setTestState(content: String?) {
         binding.tvTestState.text = content

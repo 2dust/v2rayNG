@@ -36,11 +36,6 @@
     <string name="menu_item_import_config_manually_trojan">Type manually[Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">Type manually[Wireguard]</string>
     <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
-    <string name="menu_item_import_config_custom">Custom config</string>
-    <string name="menu_item_import_config_custom_clipboard">Import custom config from Clipboard</string>
-    <string name="menu_item_import_config_custom_local">Import custom config from locally</string>
-    <string name="menu_item_import_config_custom_url">Import custom config from URL</string>
-    <string name="menu_item_import_config_custom_url_scan">Import custom config scan URL</string>
     <string name="del_config_comfirm">Confirm delete ?</string>
     <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
     <string name="server_lab_remarks">remarks</string>
