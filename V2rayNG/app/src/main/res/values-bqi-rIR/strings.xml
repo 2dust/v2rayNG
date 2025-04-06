@@ -26,7 +26,7 @@
     <string name="menu_item_del_config">پاک کردن کانفیگ</string>
     <string name="menu_item_import_config_qrcode">و من ٱووردن کانفیگ ز QRcode</string>
     <string name="menu_item_import_config_clipboard">و من ٱووردن کانفیگ ز کلیپ بورد</string>
-    <string name="menu_item_import_config_local">Import config from locally</string>
+    <string name="menu_item_import_config_local">و من ٱووردن کانفیگ ز مهلی</string>
     <string name="menu_item_import_config_manually_vmess">هؽل دستی[VMess]</string>
     <string name="menu_item_import_config_manually_vless">هؽل دستی[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">هؽل دستی[Shadowsocks]</string>
@@ -82,7 +82,7 @@
     <string name="server_lab_encryption">رزم نگاری</string>
     <string name="server_lab_flow">جریان</string>
     <string name="server_lab_public_key">کیلیت پوی وولاتی</string>
-    <string name="server_lab_preshared_key">کیلیت رمز ناهاڌن ازاف (اختیاری)</string>
+    <string name="server_lab_preshared_key">کیلیت رزم ناهاڌن ازاف (اختیاری)</string>
     <string name="server_lab_short_id">ShortID</string>
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_secret_key">کیلیت سیخومی</string>
@@ -131,7 +131,7 @@
     <string name="msg_dialog_progress">هون بار ونی بۊ</string>
     <string name="menu_item_search">پیتینیڌن</string>
     <string name="menu_item_select_all">پسند پوی</string>
-    <string name="msg_enter_keywords">رزمان بزنین</string>
+    <string name="msg_enter_keywords">رزمن بزنین</string>
     <string name="switch_bypass_apps_mode">هالت Bypass</string>
     <string name="menu_item_select_proxy_app">پسند خوتکار پروکسی برنومه</string>
     <string name="msg_downloading_content">موئتوا هونی دانلود ابۊن</string>
@@ -155,7 +155,7 @@
     <string name="summary_pref_mux_enabled">زل تر، ٱما گاشڌ منپیز زی قت بۊ بارت دؽوۉداری، TCP، UDP و QUIC ن ای لم سفارشی کۊنین.</string>
     <string name="title_pref_mux_concurency">منپیزا TCP (تلایه منجا 1-1024)</string>
     <string name="title_pref_mux_xudp_concurency">منپیزا XUDP (تلایه منجا 1-1024)</string>
-    <string name="title_pref_mux_xudp_quic">دؽوۉداری QUIC من تونل mux</string>
+    <string name="title_pref_mux_xudp_quic">دؽوۉداری QUIC من تۊنل mux</string>
     <string-array name="mux_xudp_quic_entries">
         <item>رڌ کردن</item>
         <item>موجاز</item>
@@ -269,7 +269,7 @@
     <string name="title_ping_all_server">Tcping کانفیگا جرگه سکویی</string>
     <string name="title_real_ping_all_server">تئخیر واقعی کانفیگا جرگه سکویی</string>
     <string name="title_user_asset_setting">فایلا بونچک جوقرافیایی</string>
-    <string name="title_sort_by_test_results">ترتیب و ری نتیجیل آزمایش</string>
+    <string name="title_sort_by_test_results">ترتیب و ری نتیجه یل آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>
     <string name="filter_config_all">پوی جرگیل</string>
     <string name="title_del_duplicate_config_count">پاک کردن %d کانفیگ تکراری</string>
