@@ -109,7 +109,7 @@ class AboutActivity : BaseActivity() {
         if (Utils.isGoogleFlavor()) {
             val lastUpdateTime = AppManagerUtil.getLastUpdateTime(this)
             val currentTime = System.currentTimeMillis()
-            if ((currentTime - lastUpdateTime) < 1 * 24 * 60 * 60 * 1000L) {
+            if (currentTime - lastUpdateTime < 1 * 24 * 60 * 60 * 1000L) {
                 binding.layoutCheckUpdate.visibility = View.GONE
             }
         }
