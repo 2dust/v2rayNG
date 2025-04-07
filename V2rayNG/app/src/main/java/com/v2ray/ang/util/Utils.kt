@@ -20,7 +20,9 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import java.io.IOException
+import java.net.InetAddress
 import java.net.ServerSocket
+import java.net.URI
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.Locale
@@ -461,13 +463,23 @@ object Utils {
     fun isValidSubUrl(value: String?): Boolean {
         if (value.isNullOrEmpty()) return false
 
-        return try {
-            URLUtil.isHttpsUrl(value) ||
-                    (URLUtil.isHttpUrl(value) && value.contains(LOOPBACK))
+        try {
+            if (URLUtil.isHttpsUrl(value)) return true
+            if (URLUtil.isHttpUrl(value)) {
+                if (value.contains(LOOPBACK)) return true
+
+                //Check private ip address
+                val uri = URI(fixIllegalUrl(value))
+                if (isIpAddress(uri.host)) {
+                    AppConfig.PRIVATE_IP_LIST.forEach {
+                        if (isIpInCidr(uri.host, it)) return true
+                    }
+                }
+            }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to validate subscription URL", e)
-            false
         }
+        return false
     }
 
     /**
@@ -495,5 +507,49 @@ object Utils {
      */
     fun isGoogleFlavor(): Boolean = BuildConfig.FLAVOR == "playstore"
 
+    /**
+     * Converts an InetAddress to its long representation
+     *
+     * @param ip The InetAddress to convert
+     * @return The long representation of the IP address
+     */
+    private fun inetAddressToLong(ip: InetAddress): Long {
+        val bytes = ip.address
+        var result: Long = 0
+        for (i in bytes.indices) {
+            result = result shl 8 or (bytes[i].toInt() and 0xff).toLong()
+        }
+        return result
+    }
+
+    /**
+     * Check if an IP address is within a CIDR range
+     *
+     * @param ip The IP address to check
+     * @param cidr The CIDR notation range (e.g., "192.168.1.0/24")
+     * @return True if the IP is within the CIDR range, false otherwise
+     */
+    fun isIpInCidr(ip: String, cidr: String): Boolean {
+        try {
+            if (!isIpAddress(ip)) return false
+
+            // Parse CIDR (e.g., "192.168.1.0/24")
+            val (cidrIp, prefixLen) = cidr.split("/")
+            val prefixLength = prefixLen.toInt()
+
+            // Convert IP and CIDR's IP portion to Long
+            val ipLong = inetAddressToLong(InetAddress.getByName(ip))
+            val cidrIpLong = inetAddressToLong(InetAddress.getByName(cidrIp))
+
+            // Calculate subnet mask (e.g., /24 → 0xFFFFFF00)
+            val mask = if (prefixLength == 0) 0L else (-1L shl (32 - prefixLength))
+
+            // Check if they're in the same subnet
+            return (ipLong and mask) == (cidrIpLong and mask)
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to check if IP is in CIDR", e)
+            return false
+        }
+    }
 }
 

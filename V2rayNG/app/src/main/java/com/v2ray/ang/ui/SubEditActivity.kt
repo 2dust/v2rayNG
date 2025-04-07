@@ -90,7 +90,7 @@ class SubEditActivity : BaseActivity() {
 
             if (!Utils.isValidSubUrl(subItem.url)) {
                 toast(R.string.toast_insecure_url_protocol)
-                //return false
+                return false
             }
         }
 
