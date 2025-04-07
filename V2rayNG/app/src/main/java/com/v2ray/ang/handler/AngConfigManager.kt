@@ -417,6 +417,9 @@ object AngConfigManager {
             if (!Utils.isValidUrl(url)) {
                 return 0
             }
+            if (!Utils.isValidSubUrl(url)) {
+                return 0
+            }
             Log.i(AppConfig.TAG, url)
 
             var configText = try {
@@ -430,7 +433,7 @@ object AngConfigManager {
                 configText = try {
                     HttpUtil.getUrlContentWithUserAgent(url)
                 } catch (e: Exception) {
-                    Log.e(AppConfig.TAG, "Failed to get URL content with user agent", e)
+                    Log.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
                     ""
                 }
             }

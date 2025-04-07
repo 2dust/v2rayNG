@@ -45,4 +45,18 @@ class AngUnitTest {
         assertTrue(Utils.isIpAddress("240e:1234:abcd:12::/64"))
     }
 
+    @Test
+    fun test_IsIpInCidr() {
+        assertTrue(Utils.isIpInCidr("192.168.1.1", "192.168.1.0/24"))
+        assertTrue(Utils.isIpInCidr("192.168.1.254", "192.168.1.0/24"))
+        assertFalse(Utils.isIpInCidr("192.168.2.1", "192.168.1.0/24"))
+
+        assertTrue(Utils.isIpInCidr("10.0.0.0", "10.0.0.0/8"))
+        assertTrue(Utils.isIpInCidr("10.255.255.255", "10.0.0.0/8"))
+        assertFalse(Utils.isIpInCidr("11.0.0.0", "10.0.0.0/8"))
+
+        assertFalse(Utils.isIpInCidr("invalid-ip", "192.168.1.0/24"))
+        assertFalse(Utils.isIpInCidr("192.168.1.1", "invalid-cidr"))
+    }
+
 }

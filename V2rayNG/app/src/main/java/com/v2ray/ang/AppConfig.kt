@@ -172,6 +172,13 @@ object AppConfig {
     const val DNS_QUAD9_DOMAIN = "dns.quad9.net"
     const val DNS_YANDEX_DOMAIN = "common.dot.dns.yandex.net"
 
+    const val DEFAULT_PORT = 443
+    const val DEFAULT_SECURITY = "auto"
+    const val DEFAULT_LEVEL = 8
+    const val DEFAULT_NETWORK = "tcp"
+    const val TLS = "tls"
+    const val REALITY = "reality"
+    const val HEADER_TYPE_HTTP = "http"
 
     val DNS_ALIDNS_ADDRESSES = arrayListOf("223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1")
     val DNS_CLOUDFLARE_ADDRESSES = arrayListOf("1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001")
@@ -180,12 +187,20 @@ object AppConfig {
     val DNS_QUAD9_ADDRESSES = arrayListOf("9.9.9.9", "149.112.112.112", "2620:fe::fe", "2620:fe::9")
     val DNS_YANDEX_ADDRESSES = arrayListOf("77.88.8.8", "77.88.8.1", "2a02:6b8::feed:0ff", "2a02:6b8:0:1::feed:0ff")
 
-    const val DEFAULT_PORT = 443
-    const val DEFAULT_SECURITY = "auto"
-    const val DEFAULT_LEVEL = 8
-    const val DEFAULT_NETWORK = "tcp"
-    const val TLS = "tls"
-    const val REALITY = "reality"
-    const val HEADER_TYPE_HTTP = "http"
+    val PRIVATE_IP_LIST = arrayListOf(
+        "0.0.0.0/8",
+        "10.0.0.0/8",
+        "169.254.0.0/16",
+        "172.16.0.0/12",
+        "192.0.0.0/24",
+        "192.0.2.0/24",
+        "192.88.99.0/24",
+        "192.168.0.0/16",
+        "198.18.0.0/15",
+        "198.51.100.0/24",
+        "203.0.113.0/24",
+        "224.0.0.0/4",
+        "240.0.0.0/4"
+    )
 
 }

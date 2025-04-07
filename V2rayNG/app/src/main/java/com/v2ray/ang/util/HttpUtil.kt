@@ -7,8 +7,11 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.util.Utils.encode
 import com.v2ray.ang.util.Utils.urlDecode
 import java.io.IOException
-import java.net.*
-import java.util.*
+import java.net.HttpURLConnection
+import java.net.IDN
+import java.net.InetSocketAddress
+import java.net.Proxy
+import java.net.URL
 
 object HttpUtil {
 
@@ -20,7 +23,7 @@ object HttpUtil {
      * @return The ASCII representation of the URL.
      */
     fun idnToASCII(str: String): String {
-        val url = URI(str)
+        val url = URL(str)
         val host = url.host
         val asciiHost = IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED)
         if (host != asciiHost) {
