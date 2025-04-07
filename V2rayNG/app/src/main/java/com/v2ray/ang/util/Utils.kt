@@ -542,10 +542,10 @@ object Utils {
             val cidrIpLong = inetAddressToLong(InetAddress.getByName(cidrIp))
 
             // Calculate subnet mask (e.g., /24 → 0xFFFFFF00)
-            val mask = if (prefixLength == 0) 0L else (-1L shl (32 - prefixLength))
+            val mask = if (prefixLength == 0) 0L else -1L shl 32 - prefixLength
 
             // Check if they're in the same subnet
-            return (ipLong and mask) == (cidrIpLong and mask)
+            return ipLong and mask == cidrIpLong and mask
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to check if IP is in CIDR", e)
             return false
