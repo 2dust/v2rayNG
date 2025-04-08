@@ -120,11 +120,11 @@
     <string name="menu_item_download_file">دانلود فایلا</string>
     <string name="title_user_asset_add_url">نشۊوی اینترنتی دارایین ازاف کۊنین</string>
     <string name="msg_file_not_found">فایلن نجوست</string>
-    <string name="msg_remark_is_duplicate">ائزارات ز زیتر بیڌسۉݩ</string>
-    <string name="asset_geo_files_sources">Geo files source (optional)</string>
+    <string name="msg_remark_is_duplicate">نوم ز زیتر بیڌس</string>
+    <string name="asset_geo_files_sources">بونچک فایلا جوقرافیایی (اختیاری)</string>
 
     <!-- PerAppProxyActivity -->
-    <string name="msg_dialog_progress">هون بار ونی بۊ</string>
+    <string name="msg_dialog_progress">هونی بار ونی بۊ</string>
     <string name="menu_item_search">پیتینیڌن</string>
     <string name="menu_item_select_all">پسند پوی</string>
     <string name="msg_enter_keywords">رزما ن بزنین</string>
