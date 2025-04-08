@@ -24,6 +24,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityUserAssetBinding
 import com.v2ray.ang.databinding.ItemRecyclerUserAssetBinding
 import com.v2ray.ang.dto.AssetUrlItem
+import com.v2ray.ang.extension.concatUrl
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
@@ -121,8 +122,11 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun setGeoFilesSources() {
-        AlertDialog.Builder(this).setItems(AppConfig.GEO_FILES_SOURCES
-            .toTypedArray()) { _, i ->
+        AlertDialog.Builder(this).setItems(
+            AppConfig.GEO_FILES_SOURCES
+                .map { it.replace(AppConfig.GITHUB_URL + "/", "").replace("/" + AppConfig.GITHUB_DOWNLOAD, "") }
+                .toTypedArray()
+        ) { _, i ->
             try {
                 val value = AppConfig.GEO_FILES_SOURCES[i]
                 MmkvManager.encodeSettings(AppConfig.PREF_GEO_FILES_SOURCES, value)
@@ -286,7 +290,8 @@ class UserAssetActivity : BaseActivity() {
                 list.add(
                     Utils.getUuid() to AssetUrlItem(
                         it,
-                        getGeoFilesSources() + it
+                        getGeoFilesSources().concatUrl(it),
+                        locked = true
                     )
                 )
             }
@@ -337,7 +342,7 @@ class UserAssetActivity : BaseActivity() {
                 holder.itemUserAssetBinding.assetProperties.text = getString(R.string.msg_file_not_found)
             }
 
-            if (item.second.remarks in builtInGeoFiles && item.second.url == getGeoFilesSources() + item.second.remarks) {
+            if (item.second.locked == true) {
                 holder.itemUserAssetBinding.layoutEdit.visibility = GONE
                 //holder.itemUserAssetBinding.layoutRemove.visibility = GONE
             } else {

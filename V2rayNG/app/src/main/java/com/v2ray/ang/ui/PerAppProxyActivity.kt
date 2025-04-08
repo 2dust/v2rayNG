@@ -157,7 +157,7 @@ class PerAppProxyActivity : BaseActivity() {
         toast(R.string.msg_downloading_content)
         binding.pbWaiting.show()
 
-        val url = AppConfig.androidpackagenamelistUrl
+        val url = AppConfig.ANDROID_PACKAGE_NAME_LIST_URL
         lifecycleScope.launch(Dispatchers.IO) {
             var content = HttpUtil.getUrlContent(url, 5000)
             if (content.isNullOrEmpty()) {

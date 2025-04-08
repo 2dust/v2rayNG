@@ -65,7 +65,7 @@ object AppConfig {
     const val CACHE_KEYWORD_FILTER = "cache_keyword_filter"
 
     /** Protocol identifiers. */
-    const val PROTOCOL_FREEDOM: String = "freedom"
+    const val PROTOCOL_FREEDOM = "freedom"
 
     /** Broadcast actions. */
     const val BROADCAST_ACTION_SERVICE = "com.v2ray.ang.action.service"
@@ -90,16 +90,19 @@ object AppConfig {
     const val DOWNLINK = "downlink"
 
     /** URLs for various resources. */
-    const val androidpackagenamelistUrl = "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
-    const val v2rayNGUrl = "https://github.com/2dust/v2rayNG"
-    const val v2rayNGAPIUrl = "https://api.github.com/repos/2dust/v2rayNG/releases"
-    const val v2rayNGIssues = "$v2rayNGUrl/issues"
-    const val v2rayNGWikiMode = "$v2rayNGUrl/wiki/Mode"
-    const val v2rayNGPrivacyPolicy = "https://raw.githubusercontent.com/2dust/v2rayNG/master/CR.md"
-    const val PromotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
-    const val TgChannelUrl = "https://t.me/github_2dust"
-    const val DelayTestUrl = "https://www.gstatic.com/generate_204"
-    const val DelayTestUrl2 = "https://www.google.com/generate_204"
+    const val GITHUB_URL = "https://github.com"
+    const val GITHUB_RAW_URL = "https://raw.githubusercontent.com"
+    const val GITHUB_DOWNLOAD = "releases/latest/download"
+    const val ANDROID_PACKAGE_NAME_LIST_URL = "$GITHUB_RAW_URL/2dust/androidpackagenamelist/master/proxy.txt"
+    const val APP_URL = "$GITHUB_URL/2dust/v2rayNG"
+    const val APP_API_URL = "https://api.github.com/repos/2dust/v2rayNG/releases"
+    const val APP_ISSUES_URL = "$APP_URL/issues"
+    const val APP_WIKI_MODE = "$APP_URL/wiki/Mode"
+    const val APP_PRIVACY_POLICY = "$GITHUB_RAW_URL/2dust/v2rayNG/master/CR.md"
+    const val APP_PROMOTION_URL = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
+    const val TG_CHANNEL_URL = "https://t.me/github_2dust"
+    const val DELAY_TEST_URL = "https://www.gstatic.com/generate_204"
+    const val DELAY_TEST_URL2 = "https://www.google.com/generate_204"
 
     /** DNS server addresses. */
     const val DNS_PROXY = "1.1.1.1"
@@ -200,9 +203,9 @@ object AppConfig {
         "240.0.0.0/4"
     )
     val GEO_FILES_SOURCES = arrayListOf(
-        "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/",
-        "https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/",
-        "https://github.com/Chocolate4U/Iran-v2ray-rules/releases/latest/download/"
+        "$GITHUB_URL/Loyalsoldier/v2ray-rules-dat/$GITHUB_DOWNLOAD",
+        "$GITHUB_URL/runetfreedom/russia-v2ray-rules-dat/$GITHUB_DOWNLOAD",
+        "$GITHUB_URL/Chocolate4U/Iran-v2ray-rules/$GITHUB_DOWNLOAD"
     )
 
 }

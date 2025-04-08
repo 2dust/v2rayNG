@@ -316,10 +316,10 @@ object SettingsManager {
      */
     fun getDelayTestUrl(second: Boolean = false): String {
         return if (second) {
-            AppConfig.DelayTestUrl2
+            AppConfig.DELAY_TEST_URL2
         } else {
             MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL)
-                ?: AppConfig.DelayTestUrl
+                ?: AppConfig.DELAY_TEST_URL
         }
     }
 
