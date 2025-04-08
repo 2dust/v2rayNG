@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".ui.PerAppProxyActivity">
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/pb_waiting"
@@ -83,7 +84,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        tools:context=".ui.PerAppProxyActivity" />
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
 
 </LinearLayout>
