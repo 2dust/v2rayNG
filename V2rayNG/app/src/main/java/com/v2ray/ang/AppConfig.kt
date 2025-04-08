@@ -58,6 +58,7 @@ object AppConfig {
     const val PREF_MODE = "pref_mode"
     const val PREF_IS_BOOTED = "pref_is_booted"
     const val PREF_CHECK_UPDATE_PRE_RELEASE = "pref_check_update_pre_release"
+    const val PREF_GEO_FILES_SOURCES = "pref_geo_files_sources"
 
     /** Cache keys. */
     const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"
@@ -89,17 +90,13 @@ object AppConfig {
     const val DOWNLINK = "downlink"
 
     /** URLs for various resources. */
-    const val androidpackagenamelistUrl =
-        "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
-    const val v2rayCustomRoutingListUrl =
-        "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
+    const val androidpackagenamelistUrl = "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
     const val v2rayNGUrl = "https://github.com/2dust/v2rayNG"
     const val v2rayNGAPIUrl = "https://api.github.com/repos/2dust/v2rayNG/releases"
     const val v2rayNGIssues = "$v2rayNGUrl/issues"
     const val v2rayNGWikiMode = "$v2rayNGUrl/wiki/Mode"
     const val v2rayNGPrivacyPolicy = "https://raw.githubusercontent.com/2dust/v2rayNG/master/CR.md"
     const val PromotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
-    const val GeoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
     const val TgChannelUrl = "https://t.me/github_2dust"
     const val DelayTestUrl = "https://www.gstatic.com/generate_204"
     const val DelayTestUrl2 = "https://www.google.com/generate_204"
@@ -201,6 +198,11 @@ object AppConfig {
         "203.0.113.0/24",
         "224.0.0.0/4",
         "240.0.0.0/4"
+    )
+    val GEO_FILES_SOURCES = arrayListOf(
+        "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/",
+        "https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/",
+        "https://github.com/Chocolate4U/Iran-v2ray-rules/releases/latest/download/"
     )
 
 }

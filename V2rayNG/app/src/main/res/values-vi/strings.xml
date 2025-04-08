@@ -119,6 +119,7 @@
     <string name="title_user_asset_add_url">Thêm URL nội dung</string>
     <string name="msg_file_not_found">Không tìm thấy tập tin!</string>
     <string name="msg_remark_is_duplicate">Nhận xét đã tồn tại!</string>
+    <string name="asset_geo_files_sources">Geo files source (optional)</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Đang tải...</string>

@@ -122,6 +122,7 @@
     <string name="title_user_asset_add_url">Add asset URL</string>
     <string name="msg_file_not_found">File not found</string>
     <string name="msg_remark_is_duplicate">The remarks already exists</string>
+    <string name="asset_geo_files_sources">Geo files source (optional)</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Loading</string>

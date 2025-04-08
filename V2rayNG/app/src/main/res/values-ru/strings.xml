@@ -121,6 +121,7 @@
     <string name="title_user_asset_add_url">Добавить URL ресурса</string>
     <string name="msg_file_not_found">Файл не найден</string>
     <string name="msg_remark_is_duplicate">Название уже существует</string>
+    <string name="asset_geo_files_sources">Geo files source (optional)</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Загрузка…</string>

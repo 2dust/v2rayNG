@@ -121,6 +121,7 @@
     <string name="title_user_asset_add_url">نشۊوی اینترنتی دارایین ازاف کۊنین</string>
     <string name="msg_file_not_found">فایلن نجوست</string>
     <string name="msg_remark_is_duplicate">ائزارات ز زیتر بیڌسۉݩ</string>
+    <string name="asset_geo_files_sources">Geo files source (optional)</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">هون بار ونی بۊ</string>

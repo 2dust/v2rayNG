@@ -121,6 +121,7 @@
     <string name="title_user_asset_add_url">অ্যাসেট URL যোগ করুন</string>
     <string name="msg_file_not_found">ফাইল খুঁজে পাওয়া যায়নি</string>
     <string name="msg_remark_is_duplicate">মন্তব্য ইতিমধ্যে বিদ্যমান</string>
+    <string name="asset_geo_files_sources">Geo files source (optional)</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">লোড হচ্ছে</string>

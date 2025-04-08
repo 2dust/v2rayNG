@@ -119,6 +119,7 @@
     <string name="title_user_asset_add_url">新增資產網址</string>
     <string name="msg_file_not_found">文件未找到</string>
     <string name="msg_remark_is_duplicate">備註已經存在</string>
+    <string name="asset_geo_files_sources">Geo 檔案來源 (可選)</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">載入</string>
