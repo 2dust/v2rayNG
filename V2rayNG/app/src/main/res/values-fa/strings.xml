@@ -119,7 +119,7 @@
     <string name="title_user_asset_add_url">آدرس اینترنتی را اضافه کنید</string>
     <string name="msg_file_not_found">فایل پیدا نشد</string>
     <string name="msg_remark_is_duplicate">نام قبلاً وجود دارد</string>
-    <string name="asset_geo_files_sources">Geo files source (optional)</string>
+    <string name="asset_geo_files_sources">منبع فایل های جغرافیایی (اختیاری)</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">بارگذاری</string>
