@@ -6,6 +6,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
@@ -21,16 +22,14 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.AppManagerUtil
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.Utils
+import es.dmoral.toasty.Toasty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.Collator
 
 class PerAppProxyActivity : BaseActivity() {
-    private val binding by lazy {
-        ActivityBypassListBinding.inflate(layoutInflater)
-    }
-
+    private val binding by lazy { ActivityBypassListBinding.inflate(layoutInflater) }
 
     private var adapter: PerAppProxyAdapter? = null
     private var appsAll: List<AppInfo>? = null
@@ -86,6 +85,10 @@ class PerAppProxyActivity : BaseActivity() {
             MmkvManager.encodeSettings(AppConfig.PREF_BYPASS_APPS, isChecked)
         }
         binding.switchBypassApps.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS, false)
+
+        binding.layoutSwitchBypassAppsTips.setOnClickListener {
+            Toasty.info(this, R.string.summary_pref_per_app_proxy, Toast.LENGTH_LONG, true).show()
+        }
     }
 
     override fun onPause() {
