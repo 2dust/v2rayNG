@@ -46,7 +46,7 @@
                     android:id="@+id/tv_geo_files_sources_summary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/padding_spacing_dp16"
+                    android:layout_marginTop="@dimen/padding_spacing_dp8"
                     android:maxLines="2"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
             </LinearLayout>
@@ -55,7 +55,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/padding_spacing_dp8"
+                android:layout_margin="@dimen/padding_spacing_dp16"
                 android:orientation="vertical">
 
                 <TextView
