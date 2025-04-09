@@ -39,5 +39,9 @@ class AngApplication : MultiDexApplication() {
         WorkManager.initialize(this, workManagerConfiguration)
 
         SettingsManager.initRoutingRulesets(this)
+
+        es.dmoral.toasty.Toasty.Config.getInstance()
+            .setGravity(android.view.Gravity.BOTTOM, 0, 200)
+            .apply()
     }
 }

@@ -123,11 +123,11 @@ class AboutActivity : BaseActivity() {
         binding.checkPreRelease.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, false)
 
         binding.layoutSoureCcode.setOnClickListener {
-            Utils.openUri(this, AppConfig.v2rayNGUrl)
+            Utils.openUri(this, AppConfig.APP_URL)
         }
 
         binding.layoutFeedback.setOnClickListener {
-            Utils.openUri(this, AppConfig.v2rayNGIssues)
+            Utils.openUri(this, AppConfig.APP_ISSUES_URL)
         }
 
         binding.layoutOssLicenses.setOnClickListener {
@@ -141,11 +141,11 @@ class AboutActivity : BaseActivity() {
         }
 
         binding.layoutTgChannel.setOnClickListener {
-            Utils.openUri(this, AppConfig.TgChannelUrl)
+            Utils.openUri(this, AppConfig.TG_CHANNEL_URL)
         }
 
         binding.layoutPrivacyPolicy.setOnClickListener {
-            Utils.openUri(this, AppConfig.v2rayNGPrivacyPolicy)
+            Utils.openUri(this, AppConfig.APP_PRIVACY_POLICY)
         }
 
         "v${BuildConfig.VERSION_NAME} (${SpeedtestManager.getLibVersion()})".also {

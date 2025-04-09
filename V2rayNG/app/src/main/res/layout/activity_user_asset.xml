@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".ui.RoutingSettingActivity">
+    tools:context=".ui.UserAssetActivity">
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/pb_waiting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        app:indicatorColor="@color/color_fab_active" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/main_content"
@@ -18,7 +26,7 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/layout_domain_strategy"
+                android:id="@+id/layout_geo_files_sources"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
@@ -31,17 +39,18 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/routing_settings_domain_strategy"
+                    android:text="@string/asset_geo_files_sources"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
                 <TextView
-                    android:id="@+id/tv_domain_strategy_summary"
+                    android:id="@+id/tv_geo_files_sources_summary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/padding_spacing_dp8"
-                    android:maxLines="1"
+                    android:maxLines="2"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
             </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -52,7 +61,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/routing_settings_rule_title"
+                    android:text="@string/title_user_asset_setting"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
             </LinearLayout>
 
@@ -61,7 +70,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_recycler_routing_setting" />
+                tools:listitem="@layout/item_recycler_user_asset" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+
 </RelativeLayout>

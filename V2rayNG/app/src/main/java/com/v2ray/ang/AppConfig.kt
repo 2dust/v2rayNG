@@ -58,13 +58,14 @@ object AppConfig {
     const val PREF_MODE = "pref_mode"
     const val PREF_IS_BOOTED = "pref_is_booted"
     const val PREF_CHECK_UPDATE_PRE_RELEASE = "pref_check_update_pre_release"
+    const val PREF_GEO_FILES_SOURCES = "pref_geo_files_sources"
 
     /** Cache keys. */
     const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"
     const val CACHE_KEYWORD_FILTER = "cache_keyword_filter"
 
     /** Protocol identifiers. */
-    const val PROTOCOL_FREEDOM: String = "freedom"
+    const val PROTOCOL_FREEDOM = "freedom"
 
     /** Broadcast actions. */
     const val BROADCAST_ACTION_SERVICE = "com.v2ray.ang.action.service"
@@ -89,20 +90,19 @@ object AppConfig {
     const val DOWNLINK = "downlink"
 
     /** URLs for various resources. */
-    const val androidpackagenamelistUrl =
-        "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
-    const val v2rayCustomRoutingListUrl =
-        "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
-    const val v2rayNGUrl = "https://github.com/2dust/v2rayNG"
-    const val v2rayNGAPIUrl = "https://api.github.com/repos/2dust/v2rayNG/releases"
-    const val v2rayNGIssues = "$v2rayNGUrl/issues"
-    const val v2rayNGWikiMode = "$v2rayNGUrl/wiki/Mode"
-    const val v2rayNGPrivacyPolicy = "https://raw.githubusercontent.com/2dust/v2rayNG/master/CR.md"
-    const val PromotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
-    const val GeoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
-    const val TgChannelUrl = "https://t.me/github_2dust"
-    const val DelayTestUrl = "https://www.gstatic.com/generate_204"
-    const val DelayTestUrl2 = "https://www.google.com/generate_204"
+    const val GITHUB_URL = "https://github.com"
+    const val GITHUB_RAW_URL = "https://raw.githubusercontent.com"
+    const val GITHUB_DOWNLOAD_URL = "$GITHUB_URL/%s/releases/latest/download"
+    const val ANDROID_PACKAGE_NAME_LIST_URL = "$GITHUB_RAW_URL/2dust/androidpackagenamelist/master/proxy.txt"
+    const val APP_URL = "$GITHUB_URL/2dust/v2rayNG"
+    const val APP_API_URL = "https://api.github.com/repos/2dust/v2rayNG/releases"
+    const val APP_ISSUES_URL = "$APP_URL/issues"
+    const val APP_WIKI_MODE = "$APP_URL/wiki/Mode"
+    const val APP_PRIVACY_POLICY = "$GITHUB_RAW_URL/2dust/v2rayNG/master/CR.md"
+    const val APP_PROMOTION_URL = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
+    const val TG_CHANNEL_URL = "https://t.me/github_2dust"
+    const val DELAY_TEST_URL = "https://www.gstatic.com/generate_204"
+    const val DELAY_TEST_URL2 = "https://www.google.com/generate_204"
 
     /** DNS server addresses. */
     const val DNS_PROXY = "1.1.1.1"
@@ -187,20 +187,53 @@ object AppConfig {
     val DNS_QUAD9_ADDRESSES = arrayListOf("9.9.9.9", "149.112.112.112", "2620:fe::fe", "2620:fe::9")
     val DNS_YANDEX_ADDRESSES = arrayListOf("77.88.8.8", "77.88.8.1", "2a02:6b8::feed:0ff", "2a02:6b8:0:1::feed:0ff")
 
-    val PRIVATE_IP_LIST = arrayListOf(
-        "0.0.0.0/8",
-        "10.0.0.0/8",
-        "169.254.0.0/16",
-        "172.16.0.0/12",
-        "192.0.0.0/24",
-        "192.0.2.0/24",
-        "192.88.99.0/24",
-        "192.168.0.0/16",
-        "198.18.0.0/15",
-        "198.51.100.0/24",
-        "203.0.113.0/24",
-        "224.0.0.0/4",
+    //minimum list https://serverfault.com/a/304791
+    val BYPASS_PRIVATE_IP_LIST = arrayListOf(
+        "0.0.0.0/5",
+        "8.0.0.0/7",
+        "11.0.0.0/8",
+        "12.0.0.0/6",
+        "16.0.0.0/4",
+        "32.0.0.0/3",
+        "64.0.0.0/2",
+        "128.0.0.0/3",
+        "160.0.0.0/5",
+        "168.0.0.0/6",
+        "172.0.0.0/12",
+        "172.32.0.0/11",
+        "172.64.0.0/10",
+        "172.128.0.0/9",
+        "173.0.0.0/8",
+        "174.0.0.0/7",
+        "176.0.0.0/4",
+        "192.0.0.0/9",
+        "192.128.0.0/11",
+        "192.160.0.0/13",
+        "192.169.0.0/16",
+        "192.170.0.0/15",
+        "192.172.0.0/14",
+        "192.176.0.0/12",
+        "192.192.0.0/10",
+        "193.0.0.0/8",
+        "194.0.0.0/7",
+        "196.0.0.0/6",
+        "200.0.0.0/5",
+        "208.0.0.0/4",
         "240.0.0.0/4"
+    )
+
+    val PRIVATE_IP_LIST = arrayListOf(
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "192.168.0.0/16",
+        "169.254.0.0/16",
+        "224.0.0.0/4"
+    )
+
+    val GEO_FILES_SOURCES = arrayListOf(
+        "Loyalsoldier/v2ray-rules-dat",
+        "runetfreedom/russia-v2ray-rules-dat",
+        "Chocolate4U/Iran-v2ray-rules"
     )
 
 }

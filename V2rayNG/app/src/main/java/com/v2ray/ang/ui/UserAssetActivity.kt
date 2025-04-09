@@ -21,9 +21,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.databinding.ActivitySubSettingBinding
+import com.v2ray.ang.databinding.ActivityUserAssetBinding
 import com.v2ray.ang.databinding.ItemRecyclerUserAssetBinding
 import com.v2ray.ang.dto.AssetUrlItem
+import com.v2ray.ang.extension.concatUrl
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
@@ -42,8 +43,7 @@ import java.text.DateFormat
 import java.util.Date
 
 class UserAssetActivity : BaseActivity() {
-    private val binding by lazy { ActivitySubSettingBinding.inflate(layoutInflater) }
-
+    private val binding by lazy { ActivityUserAssetBinding.inflate(layoutInflater) }
 
     val extDir by lazy { File(Utils.userAssetPath(this)) }
     val builtInGeoFiles = arrayOf("geosite.dat", "geoip.dat")
@@ -90,6 +90,11 @@ class UserAssetActivity : BaseActivity() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         addCustomDividerToRecyclerView(binding.recyclerView, this, R.drawable.custom_divider)
         binding.recyclerView.adapter = UserAssetAdapter()
+
+        binding.tvGeoFilesSourcesSummary.text = getGeoFilesSources()
+        binding.layoutGeoFilesSources.setOnClickListener {
+            setGeoFilesSources()
+        }
     }
 
     override fun onResume() {
@@ -109,6 +114,22 @@ class UserAssetActivity : BaseActivity() {
         R.id.add_qrcode -> importAssetFromQRcode().let { true }
         R.id.download_file -> downloadGeoFiles().let { true }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun getGeoFilesSources(): String {
+        return MmkvManager.decodeSettingsString(AppConfig.PREF_GEO_FILES_SOURCES) ?: AppConfig.GEO_FILES_SOURCES.first()
+    }
+
+    private fun setGeoFilesSources() {
+        AlertDialog.Builder(this).setItems(AppConfig.GEO_FILES_SOURCES.toTypedArray()) { _, i ->
+            try {
+                val value = AppConfig.GEO_FILES_SOURCES[i]
+                MmkvManager.encodeSettings(AppConfig.PREF_GEO_FILES_SOURCES, value)
+                binding.tvGeoFilesSourcesSummary.text = value
+            } catch (e: Exception) {
+                Log.e(AppConfig.TAG, "Failed to set geo files sources", e)
+            }
+        }.show()
     }
 
     private fun showFileChooser() {
@@ -264,7 +285,8 @@ class UserAssetActivity : BaseActivity() {
                 list.add(
                     Utils.getUuid() to AssetUrlItem(
                         it,
-                        AppConfig.GeoUrl + it
+                        String.format(AppConfig.GITHUB_DOWNLOAD_URL, getGeoFilesSources()).concatUrl(it),
+                        locked = true
                     )
                 )
             }
@@ -315,7 +337,7 @@ class UserAssetActivity : BaseActivity() {
                 holder.itemUserAssetBinding.assetProperties.text = getString(R.string.msg_file_not_found)
             }
 
-            if (item.second.remarks in builtInGeoFiles && item.second.url == AppConfig.GeoUrl + item.second.remarks) {
+            if (item.second.locked == true) {
                 holder.itemUserAssetBinding.layoutEdit.visibility = GONE
                 //holder.itemUserAssetBinding.layoutRemove.visibility = GONE
             } else {

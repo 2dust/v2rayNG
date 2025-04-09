@@ -683,7 +683,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     .putExtra("isRunning", mainViewModel.isRunning.value == true)
             )
 
-            R.id.promotion -> Utils.openUri(this, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")
+            R.id.promotion -> Utils.openUri(this, "${Utils.decode(AppConfig.APP_PROMOTION_URL)}?t=${System.currentTimeMillis()}")
             R.id.logcat -> startActivity(Intent(this, LogcatActivity::class.java))
             R.id.about -> startActivity(Intent(this, AboutActivity::class.java))
         }

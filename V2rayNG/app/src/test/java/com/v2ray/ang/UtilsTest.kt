@@ -11,7 +11,7 @@ import org.junit.Test
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-class AngUnitTest {
+class UtilsTest {
 
     @Test
     fun test_parseInt() {

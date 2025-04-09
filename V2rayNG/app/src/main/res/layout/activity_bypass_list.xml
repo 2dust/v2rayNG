@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".ui.PerAppProxyActivity">
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/pb_waiting"
@@ -71,6 +72,23 @@
                         android:textColor="@color/colorAccent"
                         app:theme="@style/BrandedSwitch" />
 
+                    <LinearLayout
+                        android:id="@+id/layout_switch_bypass_apps_tips"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:padding="@dimen/padding_spacing_dp8">
+
+                        <ImageView
+                            android:layout_width="@dimen/image_size_dp24"
+                            android:layout_height="@dimen/image_size_dp24"
+                            app:srcCompat="@drawable/ic_about_24dp" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
             </LinearLayout>
 
@@ -83,7 +101,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        tools:context=".ui.PerAppProxyActivity" />
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
 
 </LinearLayout>
