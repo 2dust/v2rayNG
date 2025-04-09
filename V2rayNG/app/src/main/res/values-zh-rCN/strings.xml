@@ -255,9 +255,9 @@
     <string name="sub_setting_filter">别名正则过滤</string>
     <string name="sub_setting_enable">启用更新</string>
     <string name="sub_auto_update">启用自动更新</string>
-    <string name="sub_setting_pre_profile">前置代理别名</string>
-    <string name="sub_setting_next_profile">落地代理別名</string>
-    <string name="sub_setting_pre_profile_tip">请确保别名存在并唯一</string>
+    <string name="sub_setting_pre_profile">前置代理配置文件别名</string>
+    <string name="sub_setting_next_profile">落地代理配置文件別名</string>
+    <string name="sub_setting_pre_profile_tip">请确保配置文件别名存在并唯一</string>
     <string name="title_sub_update">更新当前组订阅</string>
     <string name="title_ping_all_server">测试当前组配置 Tcping</string>
     <string name="title_real_ping_all_server">测试当前组配置真连接</string>

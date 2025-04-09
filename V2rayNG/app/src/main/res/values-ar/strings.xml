@@ -258,9 +258,9 @@
     <string name="sub_setting_filter">Remarks regular filter</string>
     <string name="sub_setting_enable">تفعيل التحديث</string>
     <string name="sub_auto_update">تفعيل التحديث التلقائي</string>
-    <string name="sub_setting_pre_profile">Previous proxy remarks</string>
-    <string name="sub_setting_next_profile">Next proxy remarks</string>
-    <string name="sub_setting_pre_profile_tip">The remarks exists and is unique</string>
+    <string name="sub_setting_pre_profile">Previous proxy configuration remarks</string>
+    <string name="sub_setting_next_profile">Next proxy configuration remarks</string>
+    <string name="sub_setting_pre_profile_tip">The configuration remarks exists and is unique</string>
     <string name="title_sub_update">تحديث الاشتراك (أول خطوة)</string>
     <string name="title_ping_all_server">Tcping لجميع الإعدادات</string>
     <string name="title_real_ping_all_server"> اختبر جميع الإعدادات (3)</string>

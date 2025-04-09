@@ -7,7 +7,9 @@ import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.HY2
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.*
+import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.fmt.Hysteria2Fmt
 import com.v2ray.ang.fmt.ShadowsocksFmt

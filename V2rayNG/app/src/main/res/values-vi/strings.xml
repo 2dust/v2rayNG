@@ -258,9 +258,9 @@
     <string name="sub_setting_filter">Remarks regular filter</string>
     <string name="sub_setting_enable">Sử dụng gói đăng ký này</string>
     <string name="sub_auto_update">Bật tự động cập nhật</string>
-    <string name="sub_setting_pre_profile">Previous proxy remarks</string>
-    <string name="sub_setting_next_profile">Next proxy remarks</string>
-    <string name="sub_setting_pre_profile_tip">The remarks exists and is unique</string>
+    <string name="sub_setting_pre_profile">Previous proxy configuration remarks</string>
+    <string name="sub_setting_next_profile">Next proxy configuration remarks</string>
+    <string name="sub_setting_pre_profile_tip">The configuration remarks exists and is unique</string>
     <string name="title_sub_update">Cập nhật các gói đăng ký</string>
     <string name="title_ping_all_server">Ping tất cả máy chủ</string>
     <string name="title_real_ping_all_server">Kiểm tra HTTP tất cả máy chủ</string>
