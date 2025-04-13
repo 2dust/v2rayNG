@@ -700,6 +700,9 @@ object V2rayConfigManager {
                     updateOutboundWithGlobalSettings(prevOutbound)
                     prevOutbound.tag = TAG_PROXY + "2"
                     v2rayConfig.outbounds.add(prevOutbound)
+                    if (outbound.streamSettings == null) {
+                        outbound.streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()
+                    }
                     outbound.streamSettings?.sockopt =
                         V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
                             dialerProxy = prevOutbound.tag
@@ -717,6 +720,9 @@ object V2rayConfigManager {
                     nextOutbound.tag = TAG_PROXY
                     v2rayConfig.outbounds.add(0, nextOutbound)
                     outbound.tag = TAG_PROXY + "1"
+                    if (nextOutbound.streamSettings == null) {
+                        nextOutbound.streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()
+                    }
                     nextOutbound.streamSettings?.sockopt =
                         V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
                             dialerProxy = outbound.tag
