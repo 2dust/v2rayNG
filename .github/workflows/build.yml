@@ -6,12 +6,7 @@ on:
       release_tag:
         required: false
         type: string
-  pull_request:
-    branches:
-      - master
-  push:
-    branches:
-      - master
+  
 jobs:
   build:
     runs-on: ubuntu-latest
