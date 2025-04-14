@@ -30,7 +30,6 @@ import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.TAG_FRAGMENT
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
-import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.NetworkType
@@ -561,7 +560,7 @@ object V2rayConfigManager {
 
             if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
                 var localTunAddr = if (outbound.settings?.address == null) {
-                    listOf(WIREGUARD_LOCAL_ADDRESS_V4, WIREGUARD_LOCAL_ADDRESS_V6)
+                    listOf(WIREGUARD_LOCAL_ADDRESS_V4)
                 } else {
                     outbound.settings?.address as List<*>
                 }
