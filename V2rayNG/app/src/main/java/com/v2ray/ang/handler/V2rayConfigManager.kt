@@ -726,6 +726,10 @@ object V2rayConfigManager {
                         V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
                             dialerProxy = outbound.tag
                         )
+                    if (nextNode.configType == EConfigType.WIREGUARD)
+                    {
+                        domainPort = nextNode.getServerAddressAndPort()
+                    }
                 }
             }
         } catch (e: Exception) {
