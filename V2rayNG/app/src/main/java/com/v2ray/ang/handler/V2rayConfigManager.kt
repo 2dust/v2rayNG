@@ -30,7 +30,6 @@ import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.TAG_FRAGMENT
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
-import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.NetworkType
@@ -561,7 +560,7 @@ object V2rayConfigManager {
 
             if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
                 var localTunAddr = if (outbound.settings?.address == null) {
-                    listOf(WIREGUARD_LOCAL_ADDRESS_V4, WIREGUARD_LOCAL_ADDRESS_V6)
+                    listOf(WIREGUARD_LOCAL_ADDRESS_V4)
                 } else {
                     outbound.settings?.address as List<*>
                 }
@@ -700,6 +699,9 @@ object V2rayConfigManager {
                     updateOutboundWithGlobalSettings(prevOutbound)
                     prevOutbound.tag = TAG_PROXY + "2"
                     v2rayConfig.outbounds.add(prevOutbound)
+                    if (outbound.streamSettings == null) {
+                        outbound.streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()
+                    }
                     outbound.streamSettings?.sockopt =
                         V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
                             dialerProxy = prevOutbound.tag
@@ -717,10 +719,17 @@ object V2rayConfigManager {
                     nextOutbound.tag = TAG_PROXY
                     v2rayConfig.outbounds.add(0, nextOutbound)
                     outbound.tag = TAG_PROXY + "1"
+                    if (nextOutbound.streamSettings == null) {
+                        nextOutbound.streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()
+                    }
                     nextOutbound.streamSettings?.sockopt =
                         V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
                             dialerProxy = outbound.tag
                         )
+                    if (nextNode.configType == EConfigType.WIREGUARD)
+                    {
+                        domainPort = nextNode.getServerAddressAndPort()
+                    }
                 }
             }
         } catch (e: Exception) {
