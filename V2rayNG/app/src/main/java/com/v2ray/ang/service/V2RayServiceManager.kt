@@ -15,6 +15,7 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.handler.V2rayConfigManager
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.PluginUtil
@@ -231,7 +232,12 @@ object V2RayServiceManager {
             val result = if (time == -1L) {
                 service.getString(R.string.connection_test_error, errstr)
             } else {
-                service.getString(R.string.connection_test_available, time)
+                buildString {
+                    append(service.getString(R.string.connection_test_available, time))
+                    SpeedtestManager.getRemoteIPInfo()?.let { ip ->
+                        append("\n$ip")
+                    }
+                }
             }
 
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, result)

@@ -6,8 +6,10 @@ import android.text.TextUtils
 import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.IPAPIInfo
 import com.v2ray.ang.extension.responseLength
 import com.v2ray.ang.util.HttpUtil
+import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.isActive
 import libv2ray.Libv2ray
 import java.io.IOException
@@ -162,6 +164,14 @@ object SpeedtestManager {
         }
 
         return Pair(elapsed, result)
+    }
+
+    fun getRemoteIPInfo(): String? {
+        val httpPort = SettingsManager.getHttpPort()
+        var content = HttpUtil.getUrlContent(AppConfig.IP_API_Url, 5000, httpPort) ?: return null
+
+        var ipInfo = JsonUtil.fromJson(content, IPAPIInfo::class.java) ?: return null
+        return "(${ipInfo.country_code}) ${ipInfo.ip}"
     }
 
     /**

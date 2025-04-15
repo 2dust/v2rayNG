@@ -303,7 +303,7 @@
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ...</string>
-    <string name="connection_test_available">مووفق بی: منپیز HTTP %dms تۊل کشی</string>
+    <string name="connection_test_available">مووفق بی: منپیز %dms تۊل کشی</string>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود ختا: #%d</string>
@@ -322,7 +322,7 @@
     <string name="update_already_latest_version">سکو نوسخه دیندایی پۊرنیڌه هڌ</string>
     <string name="update_new_version_found">نوسخه نۊ ن جوست: %s</string>
     <string name="update_now">سکو ورۊ رسۊوی کۊنین</string>
-    <string name="update_check_pre_release">نوسخیل پؽش ز تیجنیڌنن واجۊری کۊنین</string>
+    <string name="update_check_pre_release">واجۊری نوسخه یل پؽش ز تیجنیڌن</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
