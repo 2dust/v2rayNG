@@ -300,7 +300,7 @@
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
     <string name="connection_test_testing">در حال آزمایش...</string>
     <string name="connection_test_testing_count">تست کردن %d کانفیگ…</string>
-    <string name="connection_test_available">موفقیت: اتصال HTTP %dms طول کشید</string>
+    <string name="connection_test_available">موفقیت: اتصال %dms طول کشید</string>
     <string name="connection_test_error">اتصال به اینترنت شناسایی نشد: %s</string>
     <string name="connection_test_fail">اینترنت در دسترس نیست</string>
     <string name="connection_test_error_status_code">کد خطا: #%d</string>
