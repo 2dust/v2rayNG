@@ -31,7 +31,7 @@ object WireguardFmt : FmtBase() {
         config.secretKey = uri.userInfo.orEmpty()
         config.localAddress = queryParam["address"] ?: WIREGUARD_LOCAL_ADDRESS_V4
         config.publicKey = queryParam["publickey"].orEmpty()
-        config.preSharedKey = queryParam["presharedkey"].orEmpty()
+        config.preSharedKey = queryParam["presharedkey"]?.takeIf { it.isNotEmpty() }
         config.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
         config.reserved = queryParam["reserved"] ?: "0,0,0"
 
@@ -83,7 +83,7 @@ object WireguardFmt : FmtBase() {
         config.localAddress = interfaceParams["address"] ?: WIREGUARD_LOCAL_ADDRESS_V4
         config.mtu = Utils.parseInt(interfaceParams["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
         config.publicKey = peerParams["publickey"].orEmpty()
-        config.preSharedKey = peerParams["presharedkey"].orEmpty()
+        config.preSharedKey = peerParams["presharedkey"]?.takeIf { it.isNotEmpty() }
         val endpoint = peerParams["endpoint"].orEmpty()
         val endpointParts = endpoint.split(":", limit = 2)
         if (endpointParts.size == 2) {
@@ -112,11 +112,11 @@ object WireguardFmt : FmtBase() {
             wireguard.address = (profileItem.localAddress ?: WIREGUARD_LOCAL_ADDRESS_V4).split(",")
             wireguard.peers?.firstOrNull()?.let { peer ->
                 peer.publicKey = profileItem.publicKey.orEmpty()
-                peer.preSharedKey = profileItem.preSharedKey.orEmpty()
+                peer.preSharedKey = profileItem.preSharedKey?.takeIf { it.isNotEmpty() }
                 peer.endpoint = Utils.getIpv6Address(profileItem.server) + ":${profileItem.serverPort}"
             }
             wireguard.mtu = profileItem.mtu
-            wireguard.reserved = profileItem.reserved?.split(",")?.map { it.toInt() }
+            wireguard.reserved = profileItem.reserved?.takeIf { it.isNotBlank() }?.split(",")?.filter { it.isNotBlank() }?.map { it.trim().toInt() }
         }
 
         return outboundBean

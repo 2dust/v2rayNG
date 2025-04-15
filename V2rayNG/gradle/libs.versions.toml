@@ -1,9 +1,9 @@
 [versions]
 agp = "8.9.1"
-desugar_jdk_libs = "2.1.5"
+desugarJdkLibs = "2.1.5"
 gradleLicensePlugin = "0.9.8"
 kotlin = "2.1.20"
-coreKtx = "1.15.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -14,8 +14,8 @@ constraintlayout = "2.2.1"
 mmkvStatic = "1.3.12"
 gson = "2.12.1"
 quickieFoss = "1.14.0"
-kotlinx-coroutines-android = "1.10.1"
-kotlinx-coroutines-core = "1.10.1"
+kotlinxCoroutinesAndroid = "1.10.1"
+kotlinxCoroutinesCore = "1.10.1"
 swiperefreshlayout = "1.1.0"
 toasty = "1.5.2"
 editorkit = "2.9.0"
@@ -30,7 +30,7 @@ recyclerview = "1.4.0"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
-desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
+desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }
 gradle-license-plugin = { module = "com.jaredsburrows:gradle-license-plugin", version.ref = "gradleLicensePlugin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -42,8 +42,8 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 mmkv-static = { module = "com.tencent:mmkv-static", version.ref = "mmkvStatic" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 quickie-foss = { module = "com.github.T8RIN.QuickieExtended:quickie-foss", version.ref = "quickieFoss" }
-kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "kotlinx-coroutines-android" }
-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "kotlinx-coroutines-core" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 toasty = { module = "com.github.GrenderG:Toasty", version.ref = "toasty" }
 editorkit = { module = "com.blacksquircle.ui:editorkit", version.ref = "editorkit" }
 language-base = { module = "com.blacksquircle.ui:language-base", version.ref = "editorkit" }

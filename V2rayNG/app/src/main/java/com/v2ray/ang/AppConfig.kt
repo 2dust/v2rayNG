@@ -103,6 +103,7 @@ object AppConfig {
     const val TG_CHANNEL_URL = "https://t.me/github_2dust"
     const val DELAY_TEST_URL = "https://www.gstatic.com/generate_204"
     const val DELAY_TEST_URL2 = "https://www.google.com/generate_204"
+    const val IP_API_Url = "https://api.ip.sb/geoip"
 
     /** DNS server addresses. */
     const val DNS_PROXY = "1.1.1.1"
@@ -223,7 +224,9 @@ object AppConfig {
     )
 
     val PRIVATE_IP_LIST = arrayListOf(
+        "0.0.0.0/8",
         "10.0.0.0/8",
+        "127.0.0.0/8",
         "172.16.0.0/12",
         "192.168.0.0/16",
         "169.254.0.0/16",
