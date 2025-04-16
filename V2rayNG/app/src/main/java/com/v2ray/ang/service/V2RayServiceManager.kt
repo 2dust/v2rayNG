@@ -229,18 +229,19 @@ object V2RayServiceManager {
                     }
                 }
             }
-            val result = if (time == -1L) {
-                service.getString(R.string.connection_test_error, errstr)
+            val result = if (time >= 0) {
+                service.getString(R.string.connection_test_available, time)
             } else {
-                buildString {
-                    append(service.getString(R.string.connection_test_available, time))
-                    SpeedtestManager.getRemoteIPInfo()?.let { ip ->
-                        append("\n$ip")
-                    }
+                service.getString(R.string.connection_test_error, errstr)
+            }
+            MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, result)
+
+            // Only fetch IP info if the delay test was successful
+            if (time >= 0) {
+                SpeedtestManager.getRemoteIPInfo()?.let { ip ->
+                    MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, "$result\n$ip")
                 }
             }
-
-            MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, result)
         }
     }
 
