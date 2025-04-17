@@ -104,7 +104,9 @@ class V2RayVpnService : VpnService(), ServiceControl {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        V2RayServiceManager.startV2rayPoint()
+        if (V2RayServiceManager.startCoreLoop()) {
+            startService()
+        }
         return START_STICKY
         //return super.onStartCommand(intent, flags, startId)
     }
@@ -255,6 +257,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Starts the tun2socks process with the appropriate parameters.
      */
     private fun runTun2socks() {
+        Log.i(AppConfig.TAG, "Start run $TUN2SOCKS")
         val socksPort = SettingsManager.getSocksPort()
         val cmd = arrayListOf(
             File(applicationContext.applicationInfo.nativeLibraryDir, TUN2SOCKS).absolutePath,
@@ -293,11 +296,11 @@ class V2RayVpnService : VpnService(), ServiceControl {
                     runTun2socks()
                 }
             }.start()
-            Log.i(AppConfig.TAG, process.toString())
+            Log.i(AppConfig.TAG, "$TUN2SOCKS process info : ${process.toString()}")
 
             sendFd()
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to start tun2socks process", e)
+            Log.e(AppConfig.TAG, "Failed to start $TUN2SOCKS process", e)
         }
     }
 
@@ -308,13 +311,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
     private fun sendFd() {
         val fd = mInterface.fileDescriptor
         val path = File(applicationContext.filesDir, "sock_path").absolutePath
-        Log.i(AppConfig.TAG, path)
+        Log.i(AppConfig.TAG, "LocalSocket path : $path")
 
         CoroutineScope(Dispatchers.IO).launch {
             var tries = 0
             while (true) try {
                 Thread.sleep(50L shl tries)
-                Log.i(AppConfig.TAG, "sendFd tries: $tries")
+                Log.i(AppConfig.TAG, "LocalSocket sendFd tries: $tries")
                 LocalSocket().use { localSocket ->
                     localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
                     localSocket.setFileDescriptorsForSend(arrayOf(fd))
@@ -348,13 +351,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
 
         try {
-            Log.i(AppConfig.TAG, "tun2socks destroy")
+            Log.i(AppConfig.TAG, "$TUN2SOCKS destroy")
             process.destroy()
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to destroy tun2socks process", e)
+            Log.e(AppConfig.TAG, "Failed to destroy $TUN2SOCKS process", e)
         }
 
-        V2RayServiceManager.stopV2rayPoint()
+        V2RayServiceManager.stopCoreLoop()
 
         if (isForced) {
             //stopSelf has to be called ahead of mInterface.close(). otherwise v2ray core cannot be stooped

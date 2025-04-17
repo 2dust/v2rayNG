@@ -24,14 +24,14 @@ import go.Seq
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import libv2ray.CoreCallbackHandler
+import libv2ray.CoreController
 import libv2ray.Libv2ray
-import libv2ray.V2RayPoint
-import libv2ray.V2RayVPNServiceSupportsSet
 import java.lang.ref.SoftReference
 
 object V2RayServiceManager {
 
-    private val v2rayPoint: V2RayPoint = Libv2ray.newV2RayPoint(V2RayCallback(), Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
+    private val coreController: CoreController = Libv2ray.newCoreController(CoreCallback())
     private val mMsgReceive = ReceiveMessageHandler()
     private var currentConfig: ProfileItem? = null
 
@@ -39,7 +39,7 @@ object V2RayServiceManager {
         set(value) {
             field = value
             Seq.setContext(value?.get()?.getService()?.applicationContext)
-            Libv2ray.initV2Env(Utils.userAssetPath(value?.get()?.getService()), Utils.getDeviceIdForXUDPBaseKey())
+            Libv2ray.initCoreEnv(Utils.userAssetPath(value?.get()?.getService()), Utils.getDeviceIdForXUDPBaseKey())
         }
 
     /**
@@ -81,7 +81,7 @@ object V2RayServiceManager {
      * Checks if the V2Ray service is running.
      * @return True if the service is running, false otherwise.
      */
-    fun isRunning() = v2rayPoint.isRunning
+    fun isRunning() = coreController.isRunning
 
     /**
      * Gets the name of the currently running server.
@@ -91,10 +91,11 @@ object V2RayServiceManager {
 
     /**
      * Starts the context service for V2Ray.
+     * Chooses between VPN service or Proxy-only service based on user settings.
      * @param context The context from which the service is started.
      */
     private fun startContextService(context: Context) {
-        if (v2rayPoint.isRunning) return
+        if (coreController.isRunning) return
         val guid = MmkvManager.getSelectServer() ?: return
         val config = MmkvManager.decodeServerConfig(guid) ?: return
         if (config.configType != EConfigType.CUSTOM
@@ -124,18 +125,18 @@ object V2RayServiceManager {
     /**
      * Refer to the official documentation for [registerReceiver](https://developer.android.com/reference/androidx/core/content/ContextCompat#registerReceiver(android.content.Context,android.content.BroadcastReceiver,android.content.IntentFilter,int):
      * `registerReceiver(Context, BroadcastReceiver, IntentFilter, int)`.
-     * Starts the V2Ray point.
+     * Starts the V2Ray core service.
      */
-    fun startV2rayPoint() {
-        val service = getService() ?: return
-        val guid = MmkvManager.getSelectServer() ?: return
-        val config = MmkvManager.decodeServerConfig(guid) ?: return
-        if (v2rayPoint.isRunning) {
-            return
+    fun startCoreLoop(): Boolean {
+        val service = getService() ?: return false
+        val guid = MmkvManager.getSelectServer() ?: return false
+        val config = MmkvManager.decodeServerConfig(guid) ?: return false
+        if (coreController.isRunning) {
+            return false
         }
         val result = V2rayConfigManager.getV2rayConfig(service, guid)
         if (!result.status)
-            return
+            return false
 
         try {
             val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
@@ -145,39 +146,49 @@ object V2RayServiceManager {
             ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to register broadcast receiver", e)
+            return false
         }
 
-        v2rayPoint.configureFileContent = result.content
-        v2rayPoint.domainName = result.domainPort
         currentConfig = config
 
         try {
-            v2rayPoint.runLoop(MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6))
+            coreController.startLoop(result.content)
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to start V2Ray loop", e)
+            Log.e(AppConfig.TAG, "Failed to start Core loop", e)
+            return false
         }
 
-        if (v2rayPoint.isRunning) {
+        if (coreController.isRunning == false) {
+            MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
+            NotificationService.cancelNotification()
+            return false
+        }
+
+        try {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
+            NotificationService.startSpeedNotification(currentConfig)
             NotificationService.showNotification(currentConfig)
 
             PluginUtil.runPlugin(service, config, result.domainPort)
-        } else {
-            MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
-            NotificationService.cancelNotification()
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to startup service", e)
+            return false
         }
+        return true
     }
 
     /**
-     * Stops the V2Ray point.
+     * Stops the V2Ray core service.
+     * Unregisters broadcast receivers, stops notifications, and shuts down plugins.
+     * @return True if the core was stopped successfully, false otherwise.
      */
-    fun stopV2rayPoint() {
-        val service = getService() ?: return
+    fun stopCoreLoop(): Boolean {
+        val service = getService() ?: return false
 
-        if (v2rayPoint.isRunning) {
+        if (coreController.isRunning) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    v2rayPoint.stopLoop()
+                    coreController.stopLoop()
                 } catch (e: Exception) {
                     Log.e(AppConfig.TAG, "Failed to stop V2Ray loop", e)
                 }
@@ -193,6 +204,8 @@ object V2RayServiceManager {
             Log.e(AppConfig.TAG, "Failed to unregister broadcast receiver", e)
         }
         PluginUtil.stopPlugin()
+
+        return true
     }
 
     /**
@@ -202,27 +215,29 @@ object V2RayServiceManager {
      * @return The statistics value.
      */
     fun queryStats(tag: String, link: String): Long {
-        return v2rayPoint.queryStats(tag, link)
+        return coreController.queryStats(tag, link)
     }
 
     /**
-     * Measures the delay for V2Ray.
+     * Measures the connection delay for the current V2Ray configuration.
+     * Tests with primary URL first, then falls back to alternative URL if needed.
+     * Also fetches remote IP information if the delay test was successful.
      */
     private fun measureV2rayDelay() {
         CoroutineScope(Dispatchers.IO).launch {
             val service = getService() ?: return@launch
             var time = -1L
             var errstr = ""
-            if (v2rayPoint.isRunning) {
+            if (coreController.isRunning) {
                 try {
-                    time = v2rayPoint.measureDelay(SettingsManager.getDelayTestUrl())
+                    time = coreController.measureDelay(SettingsManager.getDelayTestUrl())
                 } catch (e: Exception) {
                     Log.e(AppConfig.TAG, "Failed to measure delay with primary URL", e)
                     errstr = e.message?.substringAfter("\":") ?: "empty message"
                 }
                 if (time == -1L) {
                     try {
-                        time = v2rayPoint.measureDelay(SettingsManager.getDelayTestUrl(true))
+                        time = coreController.measureDelay(SettingsManager.getDelayTestUrl(true))
                     } catch (e: Exception) {
                         Log.e(AppConfig.TAG, "Failed to measure delay with alternative URL", e)
                         errstr = e.message?.substringAfter("\":") ?: "empty message"
@@ -253,10 +268,25 @@ object V2RayServiceManager {
         return serviceControl?.get()?.getService()
     }
 
-    private class V2RayCallback : V2RayVPNServiceSupportsSet {
+    /**
+     * Core callback handler implementation for handling V2Ray core events.
+     * Handles startup, shutdown, socket protection, and status emission.
+     */
+    private class CoreCallback : CoreCallbackHandler {
+        /**
+         * Called when V2Ray core starts up.
+         * @return 0 for success, any other value for failure.
+         */
+        override fun startup(): Long {
+            return 0
+        }
+
+        /**
+         * Called when V2Ray core shuts down.
+         * @return 0 for success, any other value for failure.
+         */
         override fun shutdown(): Long {
             val serviceControl = serviceControl?.get() ?: return -1
-            // called by go
             return try {
                 serviceControl.stopService()
                 0
@@ -266,46 +296,35 @@ object V2RayServiceManager {
             }
         }
 
-        override fun prepare(): Long {
-            return 0
-        }
-
+        /**
+         * Protects a socket from being routed through the VPN.
+         * @param l The socket file descriptor.
+         * @return True if protection was successful, false otherwise.
+         */
         override fun protect(l: Long): Boolean {
             val serviceControl = serviceControl?.get() ?: return true
             return serviceControl.vpnProtect(l.toInt())
         }
 
         /**
-         * Called by Go to emit status.
-         * @param l The status code.
-         * @param s The status message.
-         * @return The status code.
+         * Called when V2Ray core emits status information.
+         * @param l Status code.
+         * @param s Status message.
+         * @return Always returns 0.
          */
         override fun onEmitStatus(l: Long, s: String?): Long {
             return 0
         }
-
-        /**
-         * Called by Go to set up the service.
-         * @param s The setup string.
-         * @return The status code.
-         */
-        override fun setup(s: String): Long {
-            val serviceControl = serviceControl?.get() ?: return -1
-            return try {
-                serviceControl.startService()
-                NotificationService.startSpeedNotification(currentConfig)
-                0
-            } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to setup service in callback", e)
-                -1
-            }
-        }
     }
 
+    /**
+     * Broadcast receiver for handling messages sent to the service.
+     * Handles registration, service control, and screen events.
+     */
     private class ReceiveMessageHandler : BroadcastReceiver() {
         /**
          * Handles received broadcast messages.
+         * Processes service control messages and screen state changes.
          * @param ctx The context in which the receiver is running.
          * @param intent The intent being received.
          */
@@ -313,7 +332,7 @@ object V2RayServiceManager {
             val serviceControl = serviceControl?.get() ?: return
             when (intent?.getIntExtra("key", 0)) {
                 AppConfig.MSG_REGISTER_CLIENT -> {
-                    if (v2rayPoint.isRunning) {
+                    if (coreController.isRunning) {
                         MessageUtil.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_RUNNING, "")
                     } else {
                         MessageUtil.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_NOT_RUNNING, "")
