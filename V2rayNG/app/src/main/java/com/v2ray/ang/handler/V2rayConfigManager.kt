@@ -778,12 +778,18 @@ object V2rayConfigManager {
             val domain = item.getServerAddress()
             if (domain.isNullOrEmpty()) continue
 
-            val resolvedIp = HttpUtil.resolveHostToIP(
+            val resolvedIps = HttpUtil.resolveHostToIP(
                 domain,
                 MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true
             )
 
-            newHosts[domain] = resolvedIp
+            if (resolvedIps.isEmpty()) continue
+
+            newHosts[domain] = if (resolvedIps.size == 1) {
+                resolvedIps[0]
+            } else {
+                resolvedIps
+            }
         }
 
         dns.hosts = newHosts
