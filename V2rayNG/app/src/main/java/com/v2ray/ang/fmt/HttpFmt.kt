@@ -16,7 +16,7 @@ object HttpFmt : FmtBase() {
         val outboundBean = OutboundBean.create(EConfigType.HTTP)
 
         outboundBean?.settings?.servers?.first()?.let { server ->
-            server.address = profileItem.server.orEmpty()
+            server.address = resolveHostToIP(profileItem.server)
             server.port = profileItem.serverPort.orEmpty().toInt()
             if (profileItem.username.isNotNullEmpty()) {
                 val socksUsersBean = OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()

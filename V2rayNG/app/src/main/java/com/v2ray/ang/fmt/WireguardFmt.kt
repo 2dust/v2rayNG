@@ -113,7 +113,7 @@ object WireguardFmt : FmtBase() {
             wireguard.peers?.firstOrNull()?.let { peer ->
                 peer.publicKey = profileItem.publicKey.orEmpty()
                 peer.preSharedKey = profileItem.preSharedKey?.takeIf { it.isNotEmpty() }
-                peer.endpoint = Utils.getIpv6Address(profileItem.server) + ":${profileItem.serverPort}"
+                peer.endpoint = Utils.getIpv6Address(resolveHostToIP(profileItem.server)) + ":${profileItem.serverPort}"
             }
             wireguard.mtu = profileItem.mtu
             wireguard.reserved = profileItem.reserved?.takeIf { it.isNotBlank() }?.split(",")?.filter { it.isNotBlank() }?.map { it.trim().toInt() }

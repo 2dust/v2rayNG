@@ -27,6 +27,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
 import com.v2ray.ang.service.V2RayServiceManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -220,10 +221,15 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
      * @param guid The server unique identifier
      */
     private fun shareFullContent(guid: String) {
-        if (AngConfigManager.shareFullContent2Clipboard(mActivity, guid) == 0) {
-            mActivity.toastSuccess(R.string.toast_success)
-        } else {
-            mActivity.toastError(R.string.toast_failure)
+        mActivity.lifecycleScope.launch(Dispatchers.IO) {
+            val result = AngConfigManager.shareFullContent2Clipboard(mActivity, guid)
+            launch(Dispatchers.Main) {
+                if (result == 0) {
+                    mActivity.toastSuccess(R.string.toast_success)
+                } else {
+                    mActivity.toastError(R.string.toast_failure)
+                }
+            }
         }
     }
 

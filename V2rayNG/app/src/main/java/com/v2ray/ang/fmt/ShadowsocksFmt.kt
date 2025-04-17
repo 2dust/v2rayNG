@@ -134,7 +134,7 @@ object ShadowsocksFmt : FmtBase() {
         val outboundBean = OutboundBean.create(EConfigType.SHADOWSOCKS)
 
         outboundBean?.settings?.servers?.first()?.let { server ->
-            server.address = profileItem.server.orEmpty()
+            server.address = resolveHostToIP(profileItem.server)
             server.port = profileItem.serverPort.orEmpty().toInt()
             server.password = profileItem.password
             server.method = profileItem.method
