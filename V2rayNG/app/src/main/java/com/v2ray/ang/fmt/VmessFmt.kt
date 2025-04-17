@@ -171,7 +171,7 @@ object VmessFmt : FmtBase() {
         val outboundBean = OutboundBean.create(EConfigType.VMESS)
 
         outboundBean?.settings?.vnext?.first()?.let { vnext ->
-            vnext.address = resolveHostToIP(profileItem.server)
+            vnext.address = profileItem.server.orEmpty()
             vnext.port = profileItem.serverPort.orEmpty().toInt()
             vnext.users[0].id = profileItem.password.orEmpty()
             vnext.users[0].security = profileItem.method
