@@ -69,29 +69,37 @@ object TrojanFmt : FmtBase() {
             server.flow = profileItem.flow
         }
 
-        val sni = outboundBean?.streamSettings?.populateTransportSettings(
-            profileItem.network.orEmpty(),
-            profileItem.headerType,
-            profileItem.host,
-            profileItem.path,
-            profileItem.seed,
-            profileItem.quicSecurity,
-            profileItem.quicKey,
-            profileItem.mode,
-            profileItem.serviceName,
-            profileItem.authority,
-        )
+        val sni = outboundBean?.streamSettings?.let {
+            populateTransportSettings(
+                it,
+                profileItem.network.orEmpty(),
+                profileItem.headerType,
+                profileItem.host,
+                profileItem.path,
+                profileItem.seed,
+                profileItem.quicSecurity,
+                profileItem.quicKey,
+                profileItem.mode,
+                profileItem.serviceName,
+                profileItem.authority,
+                profileItem.xhttpMode,
+                profileItem.xhttpExtra
+            )
+        }
 
-        outboundBean?.streamSettings?.populateTlsSettings(
-            profileItem.security.orEmpty(),
-            profileItem.insecure == true,
-            if (profileItem.sni.isNullOrEmpty()) sni else profileItem.sni,
-            profileItem.fingerPrint,
-            profileItem.alpn,
-            profileItem.publicKey,
-            profileItem.shortId,
-            profileItem.spiderX,
-        )
+        outboundBean?.streamSettings?.let {
+            populateTlsSettings(
+                it,
+                profileItem.security.orEmpty(),
+                profileItem.insecure == true,
+                if (profileItem.sni.isNullOrEmpty()) sni else profileItem.sni,
+                profileItem.fingerPrint,
+                profileItem.alpn,
+                profileItem.publicKey,
+                profileItem.shortId,
+                profileItem.spiderX,
+            )
+        }
 
         return outboundBean
     }

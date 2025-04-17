@@ -151,7 +151,7 @@ object V2rayConfigManager {
         }
 
         result.status = true
-        result.content = v2rayConfig.toPrettyPrinting()
+        result.content = JsonUtil.toJsonPretty(v2rayConfig) ?: ""
         result.domainPort = if (retMore.first) retMore.second else retOut.second
         result.guid = guid
         return result
@@ -195,7 +195,7 @@ object V2rayConfigManager {
         }
 
         result.status = true
-        result.content = v2rayConfig.toPrettyPrinting()
+        result.content = JsonUtil.toJsonPretty(v2rayConfig) ?: ""
         result.domainPort = if (retMore.first) retMore.second else retOut.second
         result.guid = guid
         return result
@@ -726,8 +726,7 @@ object V2rayConfigManager {
                         V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
                             dialerProxy = outbound.tag
                         )
-                    if (nextNode.configType == EConfigType.WIREGUARD)
-                    {
+                    if (nextNode.configType == EConfigType.WIREGUARD) {
                         domainPort = nextNode.getServerAddressAndPort()
                     }
                 }
