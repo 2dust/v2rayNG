@@ -292,7 +292,8 @@ data class V2rayConfig(
                 var tcpFastOpen: Boolean? = null,
                 var tproxy: String? = null,
                 var mark: Int? = null,
-                var dialerProxy: String? = null
+                var dialerProxy: String? = null,
+                var domainStrategy: String? = null
             )
 
             data class TlsSettingsBean(
@@ -506,6 +507,18 @@ data class V2rayConfig(
                 }
             }
             return null
+        }
+
+        fun ensureSockopt(): V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean {
+            val stream = streamSettings ?: V2rayConfig.OutboundBean.StreamSettingsBean().also {
+                streamSettings = it
+            }
+
+            val sockopt = stream.sockopt ?: V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean().also {
+                stream.sockopt = it
+            }
+
+            return sockopt
         }
     }
 
