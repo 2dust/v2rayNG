@@ -702,9 +702,7 @@ object V2rayConfigManager {
                     updateOutboundWithGlobalSettings(prevOutbound)
                     prevOutbound.tag = TAG_PROXY + "2"
                     v2rayConfig.outbounds.add(prevOutbound)
-                    outbound.streamSettings = outbound.streamSettings ?: V2rayConfig.OutboundBean.StreamSettingsBean()
-                    outbound.streamSettings!!.sockopt = outbound.streamSettings!!.sockopt ?: V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean()
-                    outbound.streamSettings!!.sockopt!!.dialerProxy = prevOutbound.tag
+                    outbound.ensureSockopt().dialerProxy = prevOutbound.tag
                     domainPort = prevNode.getServerAddressAndPort()
                 }
             }
@@ -718,9 +716,7 @@ object V2rayConfigManager {
                     nextOutbound.tag = TAG_PROXY
                     v2rayConfig.outbounds.add(0, nextOutbound)
                     outbound.tag = TAG_PROXY + "1"
-                    nextOutbound.streamSettings = nextOutbound.streamSettings ?: V2rayConfig.OutboundBean.StreamSettingsBean()
-                    nextOutbound.streamSettings!!.sockopt = nextOutbound.streamSettings!!.sockopt ?: V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean()
-                    nextOutbound.streamSettings!!.sockopt!!.dialerProxy = outbound.tag
+                    nextOutbound.ensureSockopt().dialerProxy = outbound.tag
                     if (nextNode.configType == EConfigType.WIREGUARD) {
                         domainPort = nextNode.getServerAddressAndPort()
                     }
@@ -779,10 +775,7 @@ object V2rayConfigManager {
 
             if (resolvedIps.isEmpty()) continue
 
-            item.streamSettings = item.streamSettings ?: V2rayConfig.OutboundBean.StreamSettingsBean()
-            item.streamSettings!!.sockopt = item.streamSettings!!.sockopt ?: V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean()
-
-            item.streamSettings!!.sockopt!!.domainStrategy =
+            item.ensureSockopt().domainStrategy =
                 if (preferIpv6) "UseIPv6v4" else "UseIPv4v6"
 
             newHosts[domain] = if (resolvedIps.size == 1) {

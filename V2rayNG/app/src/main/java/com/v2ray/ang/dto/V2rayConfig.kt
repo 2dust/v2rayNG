@@ -508,6 +508,18 @@ data class V2rayConfig(
             }
             return null
         }
+
+        fun ensureSockopt(): V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean {
+            val stream = streamSettings ?: V2rayConfig.OutboundBean.StreamSettingsBean().also {
+                streamSettings = it
+            }
+
+            val sockopt = stream.sockopt ?: V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean().also {
+                stream.sockopt = it
+            }
+
+            return sockopt
+        }
     }
 
     data class DnsBean(
