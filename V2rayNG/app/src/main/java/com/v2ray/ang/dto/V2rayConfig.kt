@@ -583,4 +583,9 @@ data class V2rayConfig(
         return null
     }
 
+    fun getAllProxyOutbound(): List<OutboundBean> {
+        return outbounds.filter { outbound ->
+            EConfigType.entries.any { it.name.equals(outbound.protocol, ignoreCase = true) }
+        }
+    }
 }

@@ -302,8 +302,4 @@ open class FmtBase {
         }
     }
 
-    fun resolveHostToIP(server: String?): String {
-        return HttpUtil.resolveHostToIP(server.orEmpty(), MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true)
-    }
-
 }
