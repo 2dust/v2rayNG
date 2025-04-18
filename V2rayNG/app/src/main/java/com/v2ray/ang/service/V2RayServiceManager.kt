@@ -95,7 +95,9 @@ object V2RayServiceManager {
      * @param context The context from which the service is started.
      */
     private fun startContextService(context: Context) {
-        if (coreController.isRunning) return
+        if (coreController.isRunning) {
+            return
+        }
         val guid = MmkvManager.getSelectServer() ?: return
         val config = MmkvManager.decodeServerConfig(guid) ?: return
         if (config.configType != EConfigType.CUSTOM
@@ -128,12 +130,13 @@ object V2RayServiceManager {
      * Starts the V2Ray core service.
      */
     fun startCoreLoop(): Boolean {
-        val service = getService() ?: return false
-        val guid = MmkvManager.getSelectServer() ?: return false
-        val config = MmkvManager.decodeServerConfig(guid) ?: return false
         if (coreController.isRunning) {
             return false
         }
+
+        val service = getService() ?: return false
+        val guid = MmkvManager.getSelectServer() ?: return false
+        val config = MmkvManager.decodeServerConfig(guid) ?: return false
         val result = V2rayConfigManager.getV2rayConfig(service, guid)
         if (!result.status)
             return false
@@ -224,30 +227,34 @@ object V2RayServiceManager {
      * Also fetches remote IP information if the delay test was successful.
      */
     private fun measureV2rayDelay() {
+        if (coreController.isRunning == false) {
+            return
+        }
+
         CoroutineScope(Dispatchers.IO).launch {
             val service = getService() ?: return@launch
             var time = -1L
-            var errstr = ""
-            if (coreController.isRunning) {
+            var errorStr = ""
+
+            try {
+                time = coreController.measureDelay(SettingsManager.getDelayTestUrl())
+            } catch (e: Exception) {
+                Log.e(AppConfig.TAG, "Failed to measure delay with primary URL", e)
+                errorStr = e.message?.substringAfter("\":") ?: "empty message"
+            }
+            if (time == -1L) {
                 try {
-                    time = coreController.measureDelay(SettingsManager.getDelayTestUrl())
+                    time = coreController.measureDelay(SettingsManager.getDelayTestUrl(true))
                 } catch (e: Exception) {
-                    Log.e(AppConfig.TAG, "Failed to measure delay with primary URL", e)
-                    errstr = e.message?.substringAfter("\":") ?: "empty message"
-                }
-                if (time == -1L) {
-                    try {
-                        time = coreController.measureDelay(SettingsManager.getDelayTestUrl(true))
-                    } catch (e: Exception) {
-                        Log.e(AppConfig.TAG, "Failed to measure delay with alternative URL", e)
-                        errstr = e.message?.substringAfter("\":") ?: "empty message"
-                    }
+                    Log.e(AppConfig.TAG, "Failed to measure delay with alternative URL", e)
+                    errorStr = e.message?.substringAfter("\":") ?: "empty message"
                 }
             }
+
             val result = if (time >= 0) {
                 service.getString(R.string.connection_test_available, time)
             } else {
-                service.getString(R.string.connection_test_error, errstr)
+                service.getString(R.string.connection_test_error, errorStr)
             }
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, result)
 
@@ -294,16 +301,6 @@ object V2RayServiceManager {
                 Log.e(AppConfig.TAG, "Failed to stop service in callback", e)
                 -1
             }
-        }
-
-        /**
-         * Protects a socket from being routed through the VPN.
-         * @param l The socket file descriptor.
-         * @return True if protection was successful, false otherwise.
-         */
-        override fun protect(l: Long): Boolean {
-            val serviceControl = serviceControl?.get() ?: return true
-            return serviceControl.vpnProtect(l.toInt())
         }
 
         /**
