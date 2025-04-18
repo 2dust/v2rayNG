@@ -1,25 +1,18 @@
 package com.v2ray.ang.dto
 
-import android.text.TextUtils
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonPrimitive
-import com.google.gson.JsonSerializationContext
-import com.google.gson.JsonSerializer
 import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean.ServersBean
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean.VnextBean
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean.VnextBean.UsersBean
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean.WireGuardBean
 import com.v2ray.ang.util.Utils
-import java.lang.reflect.Type
 
 data class V2rayConfig(
     var remarks: String? = null,
     var stats: Any? = null,
     val log: LogBean,
-    var policy: PolicyBean?,
+    var policy: PolicyBean? = null,
     val inbounds: ArrayList<InboundBean>,
     var outbounds: ArrayList<OutboundBean>,
     var dns: DnsBean? = null,
@@ -36,7 +29,7 @@ data class V2rayConfig(
     data class LogBean(
         val access: String,
         val error: String,
-        var loglevel: String?,
+        var loglevel: String? = null,
         val dnsLog: Boolean? = null
     )
 
@@ -46,7 +39,7 @@ data class V2rayConfig(
         var protocol: String,
         var listen: String? = null,
         val settings: Any? = null,
-        val sniffing: SniffingBean?,
+        val sniffing: SniffingBean? = null,
         val streamSettings: Any? = null,
         val allocate: Any? = null
     ) {
