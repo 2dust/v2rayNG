@@ -105,9 +105,7 @@ object V2rayConfigManager {
     private fun getV2rayCustomConfig(guid: String, config: ProfileItem): ConfigResult {
         val raw = MmkvManager.decodeServerRaw(guid) ?: return ConfigResult(false)
         val domainPort = config.getServerAddressAndPort()
-        val fullConfig = JsonUtil.fromJson(raw, V2rayConfig::class.java)
-        resolveProxyDomainsToHosts(fullConfig)
-        return ConfigResult(true, guid, JsonUtil.toJsonPretty(fullConfig) ?: "", domainPort)
+        return ConfigResult(true, guid, raw, domainPort)
     }
 
     /**
@@ -777,6 +775,8 @@ object V2rayConfigManager {
         for (item in proxyOutboundList) {
             val domain = item.getServerAddress()
             if (domain.isNullOrEmpty()) continue
+
+            if (newHosts.containsKey(domain)) continue
 
             val resolvedIps = HttpUtil.resolveHostToIP(
                 domain,
