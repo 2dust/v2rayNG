@@ -292,7 +292,8 @@ data class V2rayConfig(
                 var tcpFastOpen: Boolean? = null,
                 var tproxy: String? = null,
                 var mark: Int? = null,
-                var dialerProxy: String? = null
+                var dialerProxy: String? = null,
+                var domainStrategy: String? = null
             )
 
             data class TlsSettingsBean(
