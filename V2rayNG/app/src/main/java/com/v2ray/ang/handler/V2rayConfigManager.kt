@@ -702,13 +702,7 @@ object V2rayConfigManager {
                     updateOutboundWithGlobalSettings(prevOutbound)
                     prevOutbound.tag = TAG_PROXY + "2"
                     v2rayConfig.outbounds.add(prevOutbound)
-                    if (outbound.streamSettings == null) {
-                        outbound.streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()
-                    }
-                    outbound.streamSettings?.sockopt =
-                        V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
-                            dialerProxy = prevOutbound.tag
-                        )
+                    outbound.ensureSockopt().dialerProxy = prevOutbound.tag
                     domainPort = prevNode.getServerAddressAndPort()
                 }
             }
@@ -722,13 +716,7 @@ object V2rayConfigManager {
                     nextOutbound.tag = TAG_PROXY
                     v2rayConfig.outbounds.add(0, nextOutbound)
                     outbound.tag = TAG_PROXY + "1"
-                    if (nextOutbound.streamSettings == null) {
-                        nextOutbound.streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()
-                    }
-                    nextOutbound.streamSettings?.sockopt =
-                        V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean(
-                            dialerProxy = outbound.tag
-                        )
+                    nextOutbound.ensureSockopt().dialerProxy = outbound.tag
                     if (nextNode.configType == EConfigType.WIREGUARD) {
                         domainPort = nextNode.getServerAddressAndPort()
                     }
@@ -772,6 +760,8 @@ object V2rayConfigManager {
 
         val newHosts = dns.hosts?.toMutableMap() ?: mutableMapOf()
 
+        val preferIpv6 = MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true
+
         for (item in proxyOutboundList) {
             val domain = item.getServerAddress()
             if (domain.isNullOrEmpty()) continue
@@ -780,10 +770,13 @@ object V2rayConfigManager {
 
             val resolvedIps = HttpUtil.resolveHostToIP(
                 domain,
-                MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true
+                preferIpv6
             )
 
             if (resolvedIps.isEmpty()) continue
+
+            item.ensureSockopt().domainStrategy =
+                if (preferIpv6) "UseIPv6v4" else "UseIPv4v6"
 
             newHosts[domain] = if (resolvedIps.size == 1) {
                 resolvedIps[0]
