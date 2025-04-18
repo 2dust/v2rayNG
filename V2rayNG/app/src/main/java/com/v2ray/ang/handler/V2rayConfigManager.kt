@@ -36,6 +36,9 @@ import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean.StreamSettingsBean
 import com.v2ray.ang.dto.V2rayConfig.RoutingBean.RulesBean
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.fmt.HttpFmt
@@ -733,27 +736,6 @@ object V2rayConfigManager {
         return returnPair
     }
 
-    /**
-     * Retrieves the proxy outbound configuration for the given profile item.
-     *
-     * @param profileItem The profile item for which to get the proxy outbound configuration.
-     * @return The proxy outbound configuration as a V2rayConfig.OutboundBean, or null if not found.
-     */
-    fun getProxyOutbound(profileItem: ProfileItem): V2rayConfig.OutboundBean? {
-        return when (profileItem.configType) {
-            EConfigType.VMESS -> VmessFmt.toOutbound(profileItem)
-            EConfigType.CUSTOM -> null
-            EConfigType.SHADOWSOCKS -> ShadowsocksFmt.toOutbound(profileItem)
-            EConfigType.SOCKS -> SocksFmt.toOutbound(profileItem)
-            EConfigType.VLESS -> VlessFmt.toOutbound(profileItem)
-            EConfigType.TROJAN -> TrojanFmt.toOutbound(profileItem)
-            EConfigType.WIREGUARD -> WireguardFmt.toOutbound(profileItem)
-            EConfigType.HYSTERIA2 -> Hysteria2Fmt.toOutbound(profileItem)
-            EConfigType.HTTP -> HttpFmt.toOutbound(profileItem)
-        }
-
-    }
-
     private fun resolveProxyDomainsToHosts(v2rayConfig: V2rayConfig) {
         val proxyOutboundList = v2rayConfig.getAllProxyOutbound()
         val dns = v2rayConfig.dns ?: return
@@ -786,5 +768,205 @@ object V2rayConfigManager {
         }
 
         dns.hosts = newHosts
+    }
+
+    /**
+     * Retrieves the proxy outbound configuration for the given profile item.
+     *
+     * @param profileItem The profile item for which to get the proxy outbound configuration.
+     * @return The proxy outbound configuration as a V2rayConfig.OutboundBean, or null if not found.
+     */
+    private fun getProxyOutbound(profileItem: ProfileItem): V2rayConfig.OutboundBean? {
+        return when (profileItem.configType) {
+            EConfigType.VMESS -> VmessFmt.toOutbound(profileItem)
+            EConfigType.CUSTOM -> null
+            EConfigType.SHADOWSOCKS -> ShadowsocksFmt.toOutbound(profileItem)
+            EConfigType.SOCKS -> SocksFmt.toOutbound(profileItem)
+            EConfigType.VLESS -> VlessFmt.toOutbound(profileItem)
+            EConfigType.TROJAN -> TrojanFmt.toOutbound(profileItem)
+            EConfigType.WIREGUARD -> WireguardFmt.toOutbound(profileItem)
+            EConfigType.HYSTERIA2 -> Hysteria2Fmt.toOutbound(profileItem)
+            EConfigType.HTTP -> HttpFmt.toOutbound(profileItem)
+        }
+    }
+
+    fun createOutbound(configType: EConfigType): OutboundBean? {
+        return when (configType) {
+            EConfigType.VMESS,
+            EConfigType.VLESS ->
+                return OutboundBean(
+                    protocol = configType.name.lowercase(),
+                    settings = OutSettingsBean(
+                        vnext = listOf(
+                            OutSettingsBean.VnextBean(
+                                users = listOf(OutSettingsBean.VnextBean.UsersBean())
+                            )
+                        )
+                    ),
+                    streamSettings = StreamSettingsBean()
+                )
+
+            EConfigType.SHADOWSOCKS,
+            EConfigType.SOCKS,
+            EConfigType.HTTP,
+            EConfigType.TROJAN,
+            EConfigType.HYSTERIA2 ->
+                return OutboundBean(
+                    protocol = configType.name.lowercase(),
+                    settings = OutSettingsBean(
+                        servers = listOf(OutSettingsBean.ServersBean())
+                    ),
+                    streamSettings = StreamSettingsBean()
+                )
+
+            EConfigType.WIREGUARD ->
+                return OutboundBean(
+                    protocol = configType.name.lowercase(),
+                    settings = OutSettingsBean(
+                        secretKey = "",
+                        peers = listOf(OutSettingsBean.WireGuardBean())
+                    )
+                )
+
+            EConfigType.CUSTOM -> null
+        }
+    }
+
+    fun populateTransportSettings(streamSettings: StreamSettingsBean, profileItem: ProfileItem): String? {
+        val transport = profileItem.network.orEmpty()
+        val headerType = profileItem.headerType
+        val host = profileItem.host
+        val path = profileItem.path
+        val seed = profileItem.seed
+//        val quicSecurity = profileItem.quicSecurity
+//        val key = profileItem.quicKey
+        val mode = profileItem.mode
+        val serviceName = profileItem.serviceName
+        val authority = profileItem.authority
+        val xhttpMode = profileItem.xhttpMode
+        val xhttpExtra = profileItem.xhttpExtra
+
+        var sni: String? = null
+        streamSettings.network = if (transport.isEmpty()) NetworkType.TCP.type else transport
+        when (streamSettings.network) {
+            NetworkType.TCP.type -> {
+                val tcpSetting = StreamSettingsBean.TcpSettingsBean()
+                if (headerType == AppConfig.HEADER_TYPE_HTTP) {
+                    tcpSetting.header.type = AppConfig.HEADER_TYPE_HTTP
+                    if (!TextUtils.isEmpty(host) || !TextUtils.isEmpty(path)) {
+                        val requestObj = StreamSettingsBean.TcpSettingsBean.HeaderBean.RequestBean()
+                        requestObj.headers.Host = host.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                        requestObj.path = path.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                        tcpSetting.header.request = requestObj
+                        sni = requestObj.headers.Host?.getOrNull(0)
+                    }
+                } else {
+                    tcpSetting.header.type = "none"
+                    sni = host
+                }
+                streamSettings.tcpSettings = tcpSetting
+            }
+
+            NetworkType.KCP.type -> {
+                val kcpsetting = StreamSettingsBean.KcpSettingsBean()
+                kcpsetting.header.type = headerType ?: "none"
+                if (seed.isNullOrEmpty()) {
+                    kcpsetting.seed = null
+                } else {
+                    kcpsetting.seed = seed
+                }
+                if (host.isNullOrEmpty()) {
+                    kcpsetting.header.domain = null
+                } else {
+                    kcpsetting.header.domain = host
+                }
+                streamSettings.kcpSettings = kcpsetting
+            }
+
+            NetworkType.WS.type -> {
+                val wssetting = StreamSettingsBean.WsSettingsBean()
+                wssetting.headers.Host = host.orEmpty()
+                sni = host
+                wssetting.path = path ?: "/"
+                streamSettings.wsSettings = wssetting
+            }
+
+            NetworkType.HTTP_UPGRADE.type -> {
+                val httpupgradeSetting = StreamSettingsBean.HttpupgradeSettingsBean()
+                httpupgradeSetting.host = host.orEmpty()
+                sni = host
+                httpupgradeSetting.path = path ?: "/"
+                streamSettings.httpupgradeSettings = httpupgradeSetting
+            }
+
+            NetworkType.XHTTP.type -> {
+                val xhttpSetting = StreamSettingsBean.XhttpSettingsBean()
+                xhttpSetting.host = host.orEmpty()
+                sni = host
+                xhttpSetting.path = path ?: "/"
+                xhttpSetting.mode = xhttpMode
+                xhttpSetting.extra = JsonUtil.parseString(xhttpExtra)
+                streamSettings.xhttpSettings = xhttpSetting
+            }
+
+            NetworkType.H2.type, NetworkType.HTTP.type -> {
+                streamSettings.network = NetworkType.H2.type
+                val h2Setting = StreamSettingsBean.HttpSettingsBean()
+                h2Setting.host = host.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                sni = h2Setting.host.getOrNull(0)
+                h2Setting.path = path ?: "/"
+                streamSettings.httpSettings = h2Setting
+            }
+
+//                    "quic" -> {
+//                        val quicsetting = QuicSettingBean()
+//                        quicsetting.security = quicSecurity ?: "none"
+//                        quicsetting.key = key.orEmpty()
+//                        quicsetting.header.type = headerType ?: "none"
+//                        quicSettings = quicsetting
+//                    }
+
+            NetworkType.GRPC.type -> {
+                val grpcSetting = StreamSettingsBean.GrpcSettingsBean()
+                grpcSetting.multiMode = mode == "multi"
+                grpcSetting.serviceName = serviceName.orEmpty()
+                grpcSetting.authority = authority.orEmpty()
+                grpcSetting.idle_timeout = 60
+                grpcSetting.health_check_timeout = 20
+                sni = authority
+                streamSettings.grpcSettings = grpcSetting
+            }
+        }
+        return sni
+    }
+
+    fun populateTlsSettings(streamSettings: StreamSettingsBean, profileItem: ProfileItem, sniExt: String?) {
+        val streamSecurity = profileItem.security.orEmpty()
+        val allowInsecure = profileItem.insecure == true
+        val sni = if (profileItem.sni.isNullOrEmpty()) sniExt else profileItem.sni
+        val fingerprint = profileItem.fingerPrint
+        val alpns = profileItem.alpn
+        val publicKey = profileItem.publicKey
+        val shortId = profileItem.shortId
+        val spiderX = profileItem.spiderX
+
+        streamSettings.security = if (streamSecurity.isEmpty()) null else streamSecurity
+        if (streamSettings.security == null) return
+        val tlsSetting = StreamSettingsBean.TlsSettingsBean(
+            allowInsecure = allowInsecure,
+            serverName = if (sni.isNullOrEmpty()) null else sni,
+            fingerprint = if (fingerprint.isNullOrEmpty()) null else fingerprint,
+            alpn = if (alpns.isNullOrEmpty()) null else alpns.split(",").map { it.trim() }.filter { it.isNotEmpty() },
+            publicKey = if (publicKey.isNullOrEmpty()) null else publicKey,
+            shortId = if (shortId.isNullOrEmpty()) null else shortId,
+            spiderX = if (spiderX.isNullOrEmpty()) null else spiderX,
+        )
+        if (streamSettings.security == AppConfig.TLS) {
+            streamSettings.tlsSettings = tlsSetting
+            streamSettings.realitySettings = null
+        } else if (streamSettings.security == AppConfig.REALITY) {
+            streamSettings.tlsSettings = null
+            streamSettings.realitySettings = tlsSetting
+        }
     }
 }

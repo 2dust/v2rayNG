@@ -9,8 +9,8 @@ import com.v2ray.ang.util.Utils.urlDecode
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.IDN
-import java.net.InetAddress
 import java.net.Inet6Address
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.URL
