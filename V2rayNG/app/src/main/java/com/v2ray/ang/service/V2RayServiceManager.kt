@@ -172,7 +172,7 @@ object V2RayServiceManager {
             NotificationService.startSpeedNotification(currentConfig)
             NotificationService.showNotification(currentConfig)
 
-            PluginUtil.runPlugin(service, config, result.domainPort)
+            PluginUtil.runPlugin(service, config, result.socksPort)
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to startup service", e)
             return false

@@ -107,8 +107,7 @@ object V2rayConfigManager {
      */
     private fun getV2rayCustomConfig(guid: String, config: ProfileItem): ConfigResult {
         val raw = MmkvManager.decodeServerRaw(guid) ?: return ConfigResult(false)
-        val domainPort = config.getServerAddressAndPort()
-        return ConfigResult(true, guid, raw, domainPort)
+        return ConfigResult(true, guid, raw)
     }
 
     /**
@@ -136,9 +135,12 @@ object V2rayConfigManager {
 
         inbounds(v2rayConfig)
 
-        val isPlugin = config.configType == EConfigType.HYSTERIA2
-        val retOut = outbounds(v2rayConfig, config, isPlugin) ?: return result
-        val retMore = moreOutbounds(v2rayConfig, config.subscriptionId, isPlugin)
+        if (config.configType == EConfigType.HYSTERIA2) {
+            result.socksPort = plusOutbound(v2rayConfig, config) ?: return result
+        } else {
+            outbounds(v2rayConfig, config) ?: return result
+            moreOutbounds(v2rayConfig, config.subscriptionId)
+        }
 
         routing(v2rayConfig)
 
@@ -158,7 +160,6 @@ object V2rayConfigManager {
 
         result.status = true
         result.content = JsonUtil.toJsonPretty(v2rayConfig) ?: ""
-        result.domainPort = if (retMore.first) retMore.second else retOut.second
         result.guid = guid
         return result
     }
@@ -184,9 +185,12 @@ object V2rayConfigManager {
 
         val v2rayConfig = initV2rayConfig(context) ?: return result
 
-        val isPlugin = config.configType == EConfigType.HYSTERIA2
-        val retOut = outbounds(v2rayConfig, config, isPlugin) ?: return result
-        val retMore = moreOutbounds(v2rayConfig, config.subscriptionId, isPlugin)
+        if (config.configType == EConfigType.HYSTERIA2) {
+            result.socksPort = plusOutbound(v2rayConfig, config) ?: return result
+        } else {
+            outbounds(v2rayConfig, config) ?: return result
+            moreOutbounds(v2rayConfig, config.subscriptionId)
+        }
 
         v2rayConfig.log.loglevel = MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL) ?: "warning"
         v2rayConfig.inbounds.clear()
@@ -202,7 +206,6 @@ object V2rayConfigManager {
 
         result.status = true
         result.content = JsonUtil.toJsonPretty(v2rayConfig) ?: ""
-        result.domainPort = if (retMore.first) retMore.second else retOut.second
         result.guid = guid
         return result
     }
@@ -266,29 +269,7 @@ object V2rayConfigManager {
         return true
     }
 
-    private fun outbounds(v2rayConfig: V2rayConfig, config: ProfileItem, isPlugin: Boolean): Pair<Boolean, String>? {
-        if (isPlugin) {
-            val socksPort = Utils.findFreePort(listOf(100 + SettingsManager.getSocksPort(), 0))
-            val outboundNew = V2rayConfig.OutboundBean(
-                mux = null,
-                protocol = EConfigType.SOCKS.name.lowercase(),
-                settings = V2rayConfig.OutboundBean.OutSettingsBean(
-                    servers = listOf(
-                        V2rayConfig.OutboundBean.OutSettingsBean.ServersBean(
-                            address = LOOPBACK,
-                            port = socksPort
-                        )
-                    )
-                )
-            )
-            if (v2rayConfig.outbounds.isNotEmpty()) {
-                v2rayConfig.outbounds[0] = outboundNew
-            } else {
-                v2rayConfig.outbounds.add(outboundNew)
-            }
-            return Pair(true, outboundNew.getServerAddressAndPort())
-        }
-
+    private fun outbounds(v2rayConfig: V2rayConfig, config: ProfileItem): Boolean? {
         val outbound = getProxyOutbound(config) ?: return null
         val ret = updateOutboundWithGlobalSettings(outbound)
         if (!ret) return null
@@ -300,7 +281,7 @@ object V2rayConfigManager {
         }
 
         updateOutboundFragment(v2rayConfig)
-        return Pair(true, config.getServerAddressAndPort())
+        return true
     }
 
     private fun fakedns(v2rayConfig: V2rayConfig) {
@@ -672,27 +653,17 @@ object V2rayConfigManager {
         return true
     }
 
-    private fun moreOutbounds(
-        v2rayConfig: V2rayConfig,
-        subscriptionId: String,
-        isPlugin: Boolean
-    ): Pair<Boolean, String> {
-        val returnPair = Pair(false, "")
-        var domainPort: String = ""
-
-        if (isPlugin) {
-            return returnPair
-        }
+    private fun moreOutbounds(v2rayConfig: V2rayConfig, subscriptionId: String): Boolean {
         //fragment proxy
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == true) {
-            return returnPair
+            return false
         }
 
         if (subscriptionId.isEmpty()) {
-            return returnPair
+            return false
         }
         try {
-            val subItem = MmkvManager.decodeSubscription(subscriptionId) ?: return returnPair
+            val subItem = MmkvManager.decodeSubscription(subscriptionId) ?: return false
 
             //current proxy
             val outbound = v2rayConfig.outbounds[0]
@@ -706,7 +677,6 @@ object V2rayConfigManager {
                     prevOutbound.tag = TAG_PROXY + "2"
                     v2rayConfig.outbounds.add(prevOutbound)
                     outbound.ensureSockopt().dialerProxy = prevOutbound.tag
-                    domainPort = prevNode.getServerAddressAndPort()
                 }
             }
 
@@ -720,20 +690,43 @@ object V2rayConfigManager {
                     v2rayConfig.outbounds.add(0, nextOutbound)
                     outbound.tag = TAG_PROXY + "1"
                     nextOutbound.ensureSockopt().dialerProxy = outbound.tag
-                    if (nextNode.configType == EConfigType.WIREGUARD) {
-                        domainPort = nextNode.getServerAddressAndPort()
-                    }
                 }
             }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to configure more outbounds", e)
-            return returnPair
+            return false
         }
 
-        if (domainPort.isNotEmpty()) {
-            return Pair(true, domainPort)
+        return true
+    }
+
+    private fun plusOutbound(v2rayConfig: V2rayConfig, config: ProfileItem): Int? {
+        try {
+            val socksPort = Utils.findFreePort(listOf(100 + SettingsManager.getSocksPort(), 0))
+
+            val outboundNew = V2rayConfig.OutboundBean(
+                mux = null,
+                protocol = EConfigType.SOCKS.name.lowercase(),
+                settings = V2rayConfig.OutboundBean.OutSettingsBean(
+                    servers = listOf(
+                        V2rayConfig.OutboundBean.OutSettingsBean.ServersBean(
+                            address = LOOPBACK,
+                            port = socksPort
+                        )
+                    )
+                )
+            )
+            if (v2rayConfig.outbounds.isNotEmpty()) {
+                v2rayConfig.outbounds[0] = outboundNew
+            } else {
+                v2rayConfig.outbounds.add(outboundNew)
+            }
+
+            return socksPort
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to configure plusOutbound", e)
+            return null
         }
-        return returnPair
     }
 
     private fun resolveProxyDomainsToHosts(v2rayConfig: V2rayConfig) {

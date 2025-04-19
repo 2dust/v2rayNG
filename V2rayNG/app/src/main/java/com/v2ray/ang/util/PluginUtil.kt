@@ -23,20 +23,20 @@ object PluginUtil {
      *
      * @param context The context to use.
      * @param config The profile configuration.
-     * @param domainPort The domain and port information.
+     * @param socksPort The port information.
      */
-    fun runPlugin(context: Context, config: ProfileItem?, domainPort: String?) {
+    fun runPlugin(context: Context, config: ProfileItem?, socksPort: Int?) {
         Log.i(AppConfig.TAG, "Starting plugin execution")
 
-        if (config == null) {
+        if (config == null || socksPort == null) {
             Log.w(AppConfig.TAG, "Cannot run plugin: config is null")
             return
         }
-        
+
         try {
             if (config.configType == EConfigType.HYSTERIA2) {
                 Log.i(AppConfig.TAG, "Running Hysteria2 plugin")
-                val configFile = genConfigHy2(context, config, domainPort) ?: return
+                val configFile = genConfigHy2(context, config, socksPort) ?: return
                 val cmd = genCmdHy2(context, configFile)
 
                 procService.runProcess(context, cmd)
@@ -66,7 +66,7 @@ object PluginUtil {
 
         if (config?.configType?.equals(EConfigType.HYSTERIA2) == true) {
             val socksPort = Utils.findFreePort(listOf(0))
-            val configFile = genConfigHy2(context, config, "0:${socksPort}") ?: return retFailure
+            val configFile = genConfigHy2(context, config, socksPort) ?: return retFailure
             val cmd = genCmdHy2(context, configFile)
 
             val proc = ProcessService()
@@ -85,14 +85,12 @@ object PluginUtil {
      *
      * @param context The context to use.
      * @param config The profile configuration.
-     * @param domainPort The domain and port information.
+     * @param socksPort The port information.
      * @return The generated configuration file.
      */
-    private fun genConfigHy2(context: Context, config: ProfileItem, domainPort: String?): File? {
+    private fun genConfigHy2(context: Context, config: ProfileItem, socksPort: Int): File? {
         Log.i(AppConfig.TAG, "runPlugin $HYSTERIA2")
 
-        val socksPort = domainPort?.split(":")?.last()
-            .let { if (it.isNullOrEmpty()) return null else it.toInt() }
         val hy2Config = Hysteria2Fmt.toNativeConfig(config, socksPort) ?: return null
 
         val configFile = File(context.noBackupFilesDir, "hy2_${SystemClock.elapsedRealtime()}.json")
