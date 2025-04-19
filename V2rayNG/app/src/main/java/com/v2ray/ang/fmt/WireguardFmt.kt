@@ -106,7 +106,7 @@ object WireguardFmt : FmtBase() {
      * @return the converted OutboundBean object, or null if conversion fails
      */
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
-        val outboundBean = V2rayConfigManager.createOutbound(EConfigType.WIREGUARD)
+        val outboundBean = V2rayConfigManager.createInitOutbound(EConfigType.WIREGUARD)
 
         outboundBean?.settings?.let { wireguard ->
             wireguard.secretKey = profileItem.secretKey

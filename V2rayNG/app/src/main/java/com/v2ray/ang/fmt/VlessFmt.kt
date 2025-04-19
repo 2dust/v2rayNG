@@ -57,7 +57,7 @@ object VlessFmt : FmtBase() {
      * @return the converted OutboundBean object, or null if conversion fails
      */
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
-        val outboundBean = V2rayConfigManager.createOutbound(EConfigType.VLESS)
+        val outboundBean = V2rayConfigManager.createInitOutbound(EConfigType.VLESS)
 
         outboundBean?.settings?.vnext?.first()?.let { vnext ->
             vnext.address = profileItem.server.orEmpty()

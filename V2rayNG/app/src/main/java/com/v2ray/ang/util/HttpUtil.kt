@@ -41,17 +41,17 @@ object HttpUtil {
      * @param ipv6Preferred Whether to prefer IPv6 addresses, defaults to false
      * @return The resolved IP address or the original input (if it's already an IP or resolution fails)
      */
-    fun resolveHostToIP(host: String, ipv6Preferred: Boolean = false): List<String> {
+    fun resolveHostToIP(host: String, ipv6Preferred: Boolean = false): List<String>? {
         try {
             // If it's already an IP address, return it as a list
             if (Utils.isPureIpAddress(host)) {
-                return listOf(host)
+                return null
             }
 
             // Get all IP addresses
             val addresses = InetAddress.getAllByName(host)
             if (addresses.isEmpty()) {
-                return emptyList()
+                return null
             }
 
             // Sort addresses based on preference
@@ -68,7 +68,7 @@ object HttpUtil {
             return ipList
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to resolve host to IP", e)
-            return emptyList()
+            return null
         }
     }
 

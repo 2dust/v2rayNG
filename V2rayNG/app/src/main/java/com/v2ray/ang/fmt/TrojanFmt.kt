@@ -61,7 +61,7 @@ object TrojanFmt : FmtBase() {
      * @return the converted OutboundBean object, or null if conversion fails
      */
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
-        val outboundBean = V2rayConfigManager.createOutbound(EConfigType.TROJAN)
+        val outboundBean = V2rayConfigManager.createInitOutbound(EConfigType.TROJAN)
 
         outboundBean?.settings?.servers?.first()?.let { server ->
             server.address = profileItem.server.orEmpty()

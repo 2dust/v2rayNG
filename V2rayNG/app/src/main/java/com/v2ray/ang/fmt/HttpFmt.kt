@@ -14,7 +14,7 @@ object HttpFmt : FmtBase() {
      * @return the converted OutboundBean object, or null if conversion fails
      */
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
-        val outboundBean = V2rayConfigManager.createOutbound(EConfigType.HTTP)
+        val outboundBean = V2rayConfigManager.createInitOutbound(EConfigType.HTTP)
 
         outboundBean?.settings?.servers?.first()?.let { server ->
             server.address = profileItem.server.orEmpty()

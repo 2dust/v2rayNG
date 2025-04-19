@@ -145,7 +145,7 @@ object Hysteria2Fmt : FmtBase() {
      * @return the converted OutboundBean object, or null if conversion fails
      */
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
-        val outboundBean = V2rayConfigManager.createOutbound(EConfigType.HYSTERIA2)
+        val outboundBean = V2rayConfigManager.createInitOutbound(EConfigType.HYSTERIA2)
         return outboundBean
     }
 }
