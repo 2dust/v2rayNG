@@ -171,7 +171,7 @@
     <string name="summary_pref_fake_dns_enabled">دی ان اس محلی آدرس های آیپی جعلی را بر می گرداند (سریع تر می باشد و تاخیر را کاهش می دهد اما ممکن است برای برخی از برنامه ها کار نکند)</string>
 
     <string name="title_pref_prefer_ipv6">ترجیح دادن IPV6</string>
-    <string name="summary_pref_prefer_ipv6">ترجیح دادن نشانی و مسیر های IPv6</string>
+    <string name="summary_pref_prefer_ipv6">مسیرهای IPv6 را فعال کنید و آدرس‌های IPv6 را ترجیح دهید</string>
 
     <string name="title_pref_remote_dns">DNS از راه دور (اختیاری) (udp/tcp/https/quic)</string>
     <string name="summary_pref_remote_dns">DNS</string>
