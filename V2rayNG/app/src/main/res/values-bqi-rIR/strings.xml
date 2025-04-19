@@ -40,7 +40,7 @@
     <string name="server_lab_remarks">نیشتنا</string>
     <string name="server_lab_address">نشۊوی</string>
     <string name="server_lab_port">پورت</string>
-    <string name="server_lab_id">نوم من توری</string>
+    <string name="server_lab_id">نوم منتوری</string>
     <string name="server_lab_alterid">شناسه جایگۊزین</string>
     <string name="server_lab_security">ٱمنیت</string>
     <string name="server_lab_network">شبکه</string>
@@ -73,7 +73,7 @@
     <string name="server_lab_id3">رزم</string>
     <string name="server_lab_security3">ٱمنیت</string>
     <string name="server_lab_id4">رزم (اختیاری)</string>
-    <string name="server_lab_security4">نوم من توری (اختیاری)</string>
+    <string name="server_lab_security4">نوم منتوری (اختیاری)</string>
     <string name="server_lab_encryption">رزم نگاری</string>
     <string name="server_lab_flow">جریان</string>
     <string name="server_lab_public_key">کیلیت پوی وولاتی</string>
@@ -173,7 +173,7 @@
     <string name="summary_pref_fake_dns_enabled">DNS مهلی نشۊویا IP جئلی ن وورگنه (زل تر، ٱما گاشڌ من یقرد ز برنومه یل کار نکونه)</string>
 
     <string name="title_pref_prefer_ipv6">ترجی IPv6</string>
-    <string name="summary_pref_prefer_ipv6">ترجی داڌن نشۊوی وو تورا IPv6</string>
+    <string name="summary_pref_prefer_ipv6">تورا IPv6 ن فعال کۊنین وو نشۊویا IPv6 ن ترجی بڌین</string>
 
     <string name="title_pref_remote_dns">DNS ز ر دیر (اختیاری) (udp/tcp/https/quic) (اختیاری)</string>
     <string name="summary_pref_remote_dns">DNS</string>
