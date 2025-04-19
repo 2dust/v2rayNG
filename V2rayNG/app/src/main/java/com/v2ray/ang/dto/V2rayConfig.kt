@@ -2,10 +2,6 @@ package com.v2ray.ang.dto
 
 import com.google.gson.annotations.SerializedName
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean.ServersBean
-import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean.VnextBean
-import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean.VnextBean.UsersBean
-import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean.WireGuardBean
 import com.v2ray.ang.util.Utils
 
 data class V2rayConfig(
@@ -70,50 +66,6 @@ data class V2rayConfig(
         val sendThrough: String? = null,
         var mux: MuxBean? = MuxBean(false)
     ) {
-        companion object {
-            fun create(configType: EConfigType): OutboundBean? {
-                return when (configType) {
-                    EConfigType.VMESS,
-                    EConfigType.VLESS ->
-                        return OutboundBean(
-                            protocol = configType.name.lowercase(),
-                            settings = OutSettingsBean(
-                                vnext = listOf(
-                                    VnextBean(
-                                        users = listOf(UsersBean())
-                                    )
-                                )
-                            ),
-                            streamSettings = StreamSettingsBean()
-                        )
-
-                    EConfigType.SHADOWSOCKS,
-                    EConfigType.SOCKS,
-                    EConfigType.HTTP,
-                    EConfigType.TROJAN,
-                    EConfigType.HYSTERIA2 ->
-                        return OutboundBean(
-                            protocol = configType.name.lowercase(),
-                            settings = OutSettingsBean(
-                                servers = listOf(ServersBean())
-                            ),
-                            streamSettings = StreamSettingsBean()
-                        )
-
-                    EConfigType.WIREGUARD ->
-                        return OutboundBean(
-                            protocol = configType.name.lowercase(),
-                            settings = OutSettingsBean(
-                                secretKey = "",
-                                peers = listOf(WireGuardBean())
-                            )
-                        )
-
-                    EConfigType.CUSTOM -> null
-                }
-            }
-        }
-
         data class OutSettingsBean(
             var vnext: List<VnextBean>? = null,
             var fragment: FragmentBean? = null,

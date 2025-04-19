@@ -6,6 +6,7 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.extension.idnHost
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.V2rayConfigManager
 import com.v2ray.ang.util.Utils
 import java.net.URI
 
@@ -56,7 +57,7 @@ object VlessFmt : FmtBase() {
      * @return the converted OutboundBean object, or null if conversion fails
      */
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
-        val outboundBean = OutboundBean.create(EConfigType.VLESS)
+        val outboundBean = V2rayConfigManager.createInitOutbound(EConfigType.VLESS)
 
         outboundBean?.settings?.vnext?.first()?.let { vnext ->
             vnext.address = profileItem.server.orEmpty()
@@ -67,35 +68,11 @@ object VlessFmt : FmtBase() {
         }
 
         val sni = outboundBean?.streamSettings?.let {
-            populateTransportSettings(
-                it,
-                profileItem.network.orEmpty(),
-                profileItem.headerType,
-                profileItem.host,
-                profileItem.path,
-                profileItem.seed,
-                profileItem.quicSecurity,
-                profileItem.quicKey,
-                profileItem.mode,
-                profileItem.serviceName,
-                profileItem.authority,
-                profileItem.xhttpMode,
-                profileItem.xhttpExtra
-            )
+            V2rayConfigManager.populateTransportSettings(it, profileItem)
         }
 
         outboundBean?.streamSettings?.let {
-            populateTlsSettings(
-                it,
-                profileItem.security.orEmpty(),
-                profileItem.insecure == true,
-                if (profileItem.sni.isNullOrEmpty()) sni else profileItem.sni,
-                profileItem.fingerPrint,
-                profileItem.alpn,
-                profileItem.publicKey,
-                profileItem.shortId,
-                profileItem.spiderX,
-            )
+            V2rayConfigManager.populateTlsSettings(it, profileItem, sni)
         }
 
         return outboundBean
