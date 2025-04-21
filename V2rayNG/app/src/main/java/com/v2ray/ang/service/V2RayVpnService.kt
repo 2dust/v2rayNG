@@ -42,8 +42,9 @@ class V2RayVpnService : VpnService(), ServiceControl {
     }
 
     private lateinit var mInterface: ParcelFileDescriptor
-    private var isRunning = false
     private lateinit var process: Process
+    private var isRunning = false
+    private var currentConfig = V2RayServiceManager.getConfig()
 
     /**destroy
      * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
@@ -106,6 +107,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (V2RayServiceManager.startCoreLoop()) {
             startService()
+            NotificationService.showNotification(currentConfig)
         }
         return START_STICKY
         //return super.onStartCommand(intent, flags, startId)
@@ -195,7 +197,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
 //        }
 
-        builder.setSession(V2RayServiceManager.getRunningServerName())
+        //builder.setSession(V2RayServiceManager.getRunningServerName())
 
         val selfPackageName = BuildConfig.APPLICATION_ID
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY)) {
@@ -358,6 +360,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
 
         V2RayServiceManager.stopCoreLoop()
+        NotificationService.cancelNotification()
 
         if (isForced) {
             //stopSelf has to be called ahead of mInterface.close(). otherwise v2ray core cannot be stooped

@@ -89,6 +89,11 @@ object V2RayServiceManager {
      */
     fun getRunningServerName() = currentConfig?.remarks.orEmpty()
 
+    fun getConfig(): ProfileItem? {
+        val guid = MmkvManager.getSelectServer() ?: return null
+        return MmkvManager.decodeServerConfig(guid)
+    }
+      
     /**
      * Starts the context service for V2Ray.
      * Chooses between VPN service or Proxy-only service based on user settings.
@@ -170,7 +175,6 @@ object V2RayServiceManager {
         try {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
             NotificationService.startSpeedNotification(currentConfig)
-            NotificationService.showNotification(currentConfig)
 
             PluginUtil.runPlugin(service, config, result.socksPort)
         } catch (e: Exception) {
