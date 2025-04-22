@@ -172,7 +172,7 @@
     <string name="summary_pref_fake_dns_enabled">Локальная DNS возвращает поддельные IP-адреса (быстрее, но может не работать с некоторыми приложениями)</string>
 
     <string name="title_pref_prefer_ipv6">Предпочитать IPv6</string>
-    <string name="summary_pref_prefer_ipv6">Предпочитать IPv6-адреса и маршрутизацию</string>
+    <string name="summary_pref_prefer_ipv6">Использовать маршрутизацию IPv6 предпочитать IPv6-адреса</string>
 
     <string name="title_pref_remote_dns">Удалённая DNS (UDP/TCP/HTTPS/QUIC) (необязательно)</string>
     <string name="summary_pref_remote_dns">DNS</string>
@@ -302,7 +302,7 @@
     <string name="connection_test_pending">Проверить подключение</string>
     <string name="connection_test_testing">Проверка…</string>
     <string name="connection_test_testing_count">Проверка профилей (%d)</string>
-    <string name="connection_test_available">Успешно: HTTP-соединение заняло %d мс</string>
+    <string name="connection_test_available">Успешно: соединение заняло %d мс</string>
     <string name="connection_test_error">Сбой проверки интернет-соединения: %s</string>
     <string name="connection_test_fail">Интернет недоступен</string>
     <string name="connection_test_error_status_code">Код ошибки: #%d</string>
