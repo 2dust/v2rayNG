@@ -158,6 +158,7 @@ object NotificationService {
         mBuilder = null
         speedNotificationJob?.cancel()
         speedNotificationJob = null
+        mNotificationManager = null
     }
 
     /**

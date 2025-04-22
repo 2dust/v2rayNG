@@ -169,8 +169,8 @@ object V2RayServiceManager {
 
         try {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
-            NotificationService.startSpeedNotification(currentConfig)
             NotificationService.showNotification(currentConfig)
+            NotificationService.startSpeedNotification(currentConfig)
 
             PluginUtil.runPlugin(service, config, result.socksPort)
         } catch (e: Exception) {
