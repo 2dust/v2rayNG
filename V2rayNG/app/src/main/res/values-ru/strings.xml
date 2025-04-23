@@ -257,7 +257,7 @@
     <string name="sub_setting_filter">Название фильтра</string>
     <string name="sub_setting_enable">Использовать обновление</string>
     <string name="sub_auto_update">Использовать автообновление</string>
-    <string name="sub_allow_insecure_url">Allow insecure HTTP address</string>
+    <string name="sub_allow_insecure_url">Разрешать незащищённые HTTP-адреса</string>
     <string name="sub_setting_pre_profile">Предыдущая конфигурация прокси</string>
     <string name="sub_setting_next_profile">Следующая конфигурация прокси</string>
     <string name="sub_setting_pre_profile_tip">Конфигурация должна быть уникальной</string>
