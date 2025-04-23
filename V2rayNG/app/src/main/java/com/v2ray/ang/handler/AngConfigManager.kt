@@ -419,8 +419,10 @@ object AngConfigManager {
             if (!Utils.isValidUrl(url)) {
                 return 0
             }
-            if (!Utils.isValidSubUrl(url)) {
-                return 0
+            if (!it.second.allowInsecureUrl) {
+                if (!Utils.isValidSubUrl(url)) {
+                    return 0
+                }
             }
             Log.i(AppConfig.TAG, url)
 

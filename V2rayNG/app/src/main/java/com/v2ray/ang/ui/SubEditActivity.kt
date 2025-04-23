@@ -46,6 +46,7 @@ class SubEditActivity : BaseActivity() {
         binding.etFilter.text = Utils.getEditable(subItem.filter)
         binding.chkEnable.isChecked = subItem.enabled
         binding.autoUpdateCheck.isChecked = subItem.autoUpdate
+        binding.allowInsecureUrl.isChecked = subItem.allowInsecureUrl
         binding.etPreProfile.text = Utils.getEditable(subItem.prevProfile)
         binding.etNextProfile.text = Utils.getEditable(subItem.nextProfile)
         return true
@@ -77,6 +78,7 @@ class SubEditActivity : BaseActivity() {
         subItem.autoUpdate = binding.autoUpdateCheck.isChecked
         subItem.prevProfile = binding.etPreProfile.text.toString()
         subItem.nextProfile = binding.etNextProfile.text.toString()
+        subItem.allowInsecureUrl = binding.allowInsecureUrl.isChecked
 
         if (TextUtils.isEmpty(subItem.remarks)) {
             toast(R.string.sub_setting_remarks)
@@ -90,7 +92,9 @@ class SubEditActivity : BaseActivity() {
 
             if (!Utils.isValidSubUrl(subItem.url)) {
                 toast(R.string.toast_insecure_url_protocol)
-                return false
+                if (!subItem.allowInsecureUrl) {
+                    return false
+                }
             }
         }
 

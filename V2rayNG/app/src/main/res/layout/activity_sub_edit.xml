@@ -142,6 +142,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/padding_spacing_dp16"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.0"
+                    android:text="@string/sub_allow_insecure_url" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/allow_insecure_url"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/padding_spacing_dp16"
+                    android:paddingEnd="@dimen/padding_spacing_dp16"
+                    app:theme="@style/BrandedSwitch" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_spacing_dp16"
                 android:orientation="vertical">
 
                 <TextView

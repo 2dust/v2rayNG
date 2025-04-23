@@ -255,6 +255,7 @@
     <string name="sub_setting_filter">别名正则过滤</string>
     <string name="sub_setting_enable">启用更新</string>
     <string name="sub_auto_update">启用自动更新</string>
+    <string name="sub_allow_insecure_url">允许不安全的 HTTP 地址</string>
     <string name="sub_setting_pre_profile">前置代理配置文件别名</string>
     <string name="sub_setting_next_profile">落地代理配置文件別名</string>
     <string name="sub_setting_pre_profile_tip">请确保配置文件别名存在并唯一</string>

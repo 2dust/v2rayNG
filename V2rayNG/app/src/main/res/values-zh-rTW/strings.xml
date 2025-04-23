@@ -256,6 +256,7 @@
     <string name="sub_setting_filter">別名正規過濾</string>
     <string name="sub_setting_enable">啟用更新</string>
     <string name="sub_auto_update">啟用自動更新</string>
+    <string name="sub_allow_insecure_url">允許不安全的 HTTP 位址</string>
     <string name="sub_setting_pre_profile">前置代理設定檔别名</string>
     <string name="sub_setting_next_profile">落地代理設定檔別名</string>
     <string name="sub_setting_pre_profile_tip">请确保設定檔别名存在并唯一</string>

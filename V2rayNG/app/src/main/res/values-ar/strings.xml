@@ -258,6 +258,7 @@
     <string name="sub_setting_filter">Remarks regular filter</string>
     <string name="sub_setting_enable">تفعيل التحديث</string>
     <string name="sub_auto_update">تفعيل التحديث التلقائي</string>
+    <string name="sub_allow_insecure_url">Allow insecure HTTP address</string>
     <string name="sub_setting_pre_profile">Previous proxy configuration remarks</string>
     <string name="sub_setting_next_profile">Next proxy configuration remarks</string>
     <string name="sub_setting_pre_profile_tip">The configuration remarks exists and is unique</string>
