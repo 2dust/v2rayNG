@@ -255,7 +255,7 @@
     <string name="sub_setting_filter">نام مستعار فیلتر</string>
     <string name="sub_setting_enable">فعال کردن به‌روزرسانی</string>
     <string name="sub_auto_update">فعال سازی به‌روزرسانی خودکار</string>
-    <string name="sub_allow_insecure_url">Allow insecure HTTP address</string>
+    <string name="sub_allow_insecure_url">مجاز کردن آدرس HTTP ناامن</string>
     <string name="sub_setting_pre_profile">نام مستعار پروکسی قبلی</string>
     <string name="sub_setting_next_profile">نام مستعار پروکسی بعدی</string>
     <string name="sub_setting_pre_profile_tip">لطفاً مطمئن شوید که نام مستعار وجود دارد و منحصر به فرد است</string>
