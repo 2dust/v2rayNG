@@ -286,7 +286,7 @@ object V2rayConfigManager {
 
             v2rayConfig.routing.domainStrategy =
                 MmkvManager.decodeSettingsString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY)
-                    ?: "IPIfNonMatch"
+                    ?: "AsIs"
 
             val rulesetItems = MmkvManager.decodeRoutingRulesets()
             rulesetItems?.forEach { key ->

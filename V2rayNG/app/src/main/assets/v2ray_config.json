@@ -97,7 +97,7 @@
   }
   ],
   "routing": {
-      "domainStrategy": "IPIfNonMatch",
+      "domainStrategy": "AsIs",
       "rules": []
   },
   "dns": {
