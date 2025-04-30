@@ -216,7 +216,7 @@ object SettingsManager {
      * @return The ProfileItem.
      */
     fun getServerViaRemarks(remarks: String?): ProfileItem? {
-        if (remarks == null) {
+        if (remarks.isNullOrEmpty()) {
             return null
         }
         val serverList = decodeServerList()
