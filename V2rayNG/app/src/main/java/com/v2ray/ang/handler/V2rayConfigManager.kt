@@ -861,7 +861,7 @@ object V2rayConfigManager {
             EConfigType.VLESS -> VlessFmt.toOutbound(profileItem)
             EConfigType.TROJAN -> TrojanFmt.toOutbound(profileItem)
             EConfigType.WIREGUARD -> WireguardFmt.toOutbound(profileItem)
-            EConfigType.HYSTERIA2 -> Hysteria2Fmt.toOutbound(profileItem)
+            EConfigType.HYSTERIA2 -> null
             EConfigType.HTTP -> HttpFmt.toOutbound(profileItem)
         }
     }
