@@ -3,7 +3,7 @@
     "remarks": "Google cn",
     "outboundTag": "proxy",
     "domain": [
-      "domain:googleapis.cn",
+      "geosite:google@cn",
       "domain:gstatic.com"
     ]
   },
