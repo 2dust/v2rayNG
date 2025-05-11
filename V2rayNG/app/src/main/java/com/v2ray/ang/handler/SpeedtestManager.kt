@@ -168,10 +168,13 @@ object SpeedtestManager {
 
     fun getRemoteIPInfo(): String? {
         val httpPort = SettingsManager.getHttpPort()
-        var content = HttpUtil.getUrlContent(AppConfig.IP_API_Url, 5000, httpPort) ?: return null
+        var content = HttpUtil.getUrlContent(AppConfig.IP_API_URL, 5000, httpPort) ?: return null
 
         var ipInfo = JsonUtil.fromJson(content, IPAPIInfo::class.java) ?: return null
-        return "(${ipInfo.country_code}) ${ipInfo.ip}"
+        var ip = ipInfo.ip ?: ipInfo.clientIp ?: ipInfo.ip_addr ?: ipInfo.query
+        var country = ipInfo.country_code ?: ipInfo.country ?: ipInfo.countryCode
+
+        return "(${country ?: "unknown"}) $ip"
     }
 
     /**
