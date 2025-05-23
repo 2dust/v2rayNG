@@ -321,7 +321,7 @@
     <string name="update_new_version_found">نسخه جدید پیدا شد: %s</string>
     <string name="update_now">اکنون به روز رسانی کنید</string>
     <string name="update_check_pre_release">بررسی نسخه پیش از انتشار</string>
-    <string name="update_checking_for_update">Checking for update…</string>
+    <string name="update_checking_for_update">در حال بررسی برای به‌روزرسانی…</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
