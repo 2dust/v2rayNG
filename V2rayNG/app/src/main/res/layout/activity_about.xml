@@ -112,49 +112,6 @@
             android:paddingTop="@dimen/padding_spacing_dp16">
 
             <LinearLayout
-                android:id="@+id/layout_check_update"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center|start"
-                android:orientation="horizontal"
-                android:padding="@dimen/padding_spacing_dp16">
-
-                <ImageView
-                    android:layout_width="@dimen/image_size_dp24"
-                    android:layout_height="@dimen/image_size_dp24"
-                    app:srcCompat="@drawable/ic_check_update_24dp" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingStart="@dimen/padding_spacing_dp16">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/update_check_for_update"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/check_pre_release"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/padding_spacing_dp16"
-                        android:maxLines="1"
-                        android:text="@string/update_check_pre_release"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/colorAccent"
-                        app:theme="@style/BrandedSwitch" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/layout_soure_ccode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
