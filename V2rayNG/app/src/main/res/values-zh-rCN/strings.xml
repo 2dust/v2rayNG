@@ -315,6 +315,7 @@
     <string name="update_new_version_found">发现新版本: %s</string>
     <string name="update_now">立即更新</string>
     <string name="update_check_pre_release">检查 Pre-release</string>
+    <string name="update_checking_for_update">正在检查更新中…</string>
 
     <string-array name="share_method">
         <item>二维码</item>

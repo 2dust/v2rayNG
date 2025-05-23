@@ -315,6 +315,7 @@
     <string name="update_new_version_found">發現新版本: %s</string>
     <string name="update_now">立即更新</string>
     <string name="update_check_pre_release">檢查 Pre-release</string>
+    <string name="update_checking_for_update">正在檢查更新中…</string>
 
     <string-array name="share_method">
         <item>QR Code</item>

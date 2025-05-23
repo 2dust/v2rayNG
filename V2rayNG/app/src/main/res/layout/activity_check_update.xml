@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center|start"
+            android:orientation="horizontal"
+            android:padding="@dimen/padding_spacing_dp16">
+
+            <ImageView
+                android:layout_width="@dimen/image_size_dp24"
+                android:layout_height="@dimen/image_size_dp24"
+                app:srcCompat="@drawable/ic_source_code_24dp" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/check_pre_release"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:paddingStart="@dimen/padding_spacing_dp16"
+                android:text="@string/update_check_pre_release"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/colorAccent"
+                app:theme="@style/BrandedSwitch" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_check_update"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center|start"
+            android:orientation="horizontal"
+            android:padding="@dimen/padding_spacing_dp16">
+
+            <ImageView
+                android:layout_width="@dimen/image_size_dp24"
+                android:layout_height="@dimen/image_size_dp24"
+                app:srcCompat="@drawable/ic_check_update_24dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/padding_spacing_dp16"
+                android:text="@string/update_check_for_update"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/padding_spacing_dp16">
+
+            <TextView
+                android:id="@+id/tv_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/title_about"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+
