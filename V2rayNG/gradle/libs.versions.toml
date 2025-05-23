@@ -2,7 +2,7 @@
 agp = "8.9.3"
 desugarJdkLibs = "2.1.5"
 gradleLicensePlugin = "0.9.8"
-kotlin = "2.1.20"
+kotlin = "2.1.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
