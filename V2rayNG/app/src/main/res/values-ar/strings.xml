@@ -316,6 +316,7 @@
     <string name="update_new_version_found">New version found: %s</string>
     <string name="update_now">Update now</string>
     <string name="update_check_pre_release">Check Pre-release</string>
+    <string name="update_checking_for_update">Checking for update…</string>
 
     <string-array name="share_method">
         <item>رمز استجابة سريعة (QRcode)</item>

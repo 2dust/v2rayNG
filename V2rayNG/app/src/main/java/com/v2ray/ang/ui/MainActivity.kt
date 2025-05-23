@@ -685,6 +685,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
             R.id.promotion -> Utils.openUri(this, "${Utils.decode(AppConfig.APP_PROMOTION_URL)}?t=${System.currentTimeMillis()}")
             R.id.logcat -> startActivity(Intent(this, LogcatActivity::class.java))
+            R.id.check_for_update -> startActivity(Intent(this, CheckUpdateActivity::class.java))
             R.id.about -> startActivity(Intent(this, AboutActivity::class.java))
         }
 
