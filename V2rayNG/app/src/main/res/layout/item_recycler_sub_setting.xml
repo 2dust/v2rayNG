@@ -15,97 +15,144 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
-        android:nextFocusRight="@+id/layout_edit"
+        android:nextFocusRight="@+id/layout_share"
         android:orientation="horizontal"
         android:padding="@dimen/padding_spacing_dp8">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:padding="@dimen/padding_spacing_dp8">
-
-            <TextView
-                android:id="@+id/tv_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
-
-            <TextView
-                android:id="@+id/tv_url"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/padding_spacing_dp8"
-                android:lines="2"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="@dimen/padding_spacing_dp8">
+            android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:orientation="horizontal">
 
                 <LinearLayout
-                    android:id="@+id/layout_share"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
+                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:padding="@dimen/padding_spacing_dp8">
+                    android:paddingStart="@dimen/padding_spacing_dp8">
 
-                    <ImageView
-                        android:layout_width="@dimen/image_size_dp24"
-                        android:layout_height="@dimen/image_size_dp24"
-                        app:srcCompat="@drawable/ic_share_24dp" />
+                    <TextView
+                        android:id="@+id/tv_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLines="2"
+                        android:minLines="1"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/layout_edit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
                     android:gravity="center"
-                    android:nextFocusLeft="@+id/info_container"
-                    android:orientation="vertical"
-                    android:padding="@dimen/padding_spacing_dp8">
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="@dimen/image_size_dp24"
-                        android:layout_height="@dimen/image_size_dp24"
-                        app:srcCompat="@drawable/ic_edit_24dp" />
+                    <LinearLayout
+                        android:id="@+id/layout_share"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:nextFocusLeft="@+id/info_container"
+                        android:orientation="vertical"
+                        android:padding="@dimen/padding_spacing_dp8">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/image_size_dp24"
+                            app:srcCompat="@drawable/ic_share_24dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/padding_spacing_dp8">
+
+                        <ImageView
+                            android:layout_width="@dimen/image_size_dp24"
+                            android:layout_height="@dimen/image_size_dp24"
+                            app:srcCompat="@drawable/ic_edit_24dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_remove"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/padding_spacing_dp8">
+
+                        <ImageView
+                            android:layout_width="@dimen/image_size_dp24"
+                            android:layout_height="@dimen/image_size_dp24"
+                            app:srcCompat="@drawable/ic_delete_24dp" />
+
+                    </LinearLayout>
+
 
                 </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:id="@+id/layout_url"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/padding_spacing_dp8"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/padding_spacing_dp8"
+                android:paddingEnd="@dimen/padding_spacing_dp8">
 
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/chk_enable"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:paddingTop="@dimen/padding_spacing_dp8">
+
+                    <TextView
+                        android:id="@+id/tv_url"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:lines="2"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:theme="@style/BrandedSwitch" />
+                    android:layout_marginTop="@dimen/padding_spacing_dp8"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/chk_enable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:theme="@style/BrandedSwitch" />
+                </LinearLayout>
+
             </LinearLayout>
+
         </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>

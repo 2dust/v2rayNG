@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -20,6 +21,8 @@ import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView.Adapter<SubSettingRecyclerAdapter.MainViewHolder>(), ItemTouchHelperAdapter {
 
@@ -46,6 +49,10 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
             )
         }
 
+        holder.itemSubSettingBinding.layoutRemove.setOnClickListener {
+            removeSubscription(subId, position)
+        }
+
         holder.itemSubSettingBinding.chkEnable.setOnCheckedChangeListener { it, isChecked ->
             if (!it.isPressed) return@setOnCheckedChangeListener
             subItem.enabled = isChecked
@@ -54,9 +61,11 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
         }
 
         if (TextUtils.isEmpty(subItem.url)) {
+            holder.itemSubSettingBinding.layoutUrl.visibility = View.GONE
             holder.itemSubSettingBinding.layoutShare.visibility = View.INVISIBLE
             holder.itemSubSettingBinding.chkEnable.visibility = View.INVISIBLE
         } else {
+            holder.itemSubSettingBinding.layoutUrl.visibility = View.VISIBLE
             holder.itemSubSettingBinding.layoutShare.visibility = View.VISIBLE
             holder.itemSubSettingBinding.chkEnable.visibility = View.VISIBLE
             holder.itemSubSettingBinding.layoutShare.setOnClickListener {
@@ -86,6 +95,32 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
                             Log.e(AppConfig.TAG, "Share subscription failed", e)
                         }
                     }.show()
+            }
+        }
+    }
+
+    private fun removeSubscription(subId: String, position: Int) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
+            AlertDialog.Builder(mActivity).setMessage(R.string.del_config_comfirm)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    removeSubscriptionSub(subId, position)
+                }
+                .setNegativeButton(android.R.string.cancel) { _, _ ->
+                    //do noting
+                }
+                .show()
+        } else {
+            removeSubscriptionSub(subId, position)
+        }
+    }
+
+    private fun removeSubscriptionSub(subId: String, position: Int) {
+        mActivity.lifecycleScope.launch(Dispatchers.IO) {
+            MmkvManager.removeSubscription(subId)
+            launch(Dispatchers.Main) {
+                notifyItemRemoved(position)
+                notifyItemRangeChanged(position, mActivity.subscriptions.size)
+                mActivity.refreshData()
             }
         }
     }

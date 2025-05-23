@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubEditBinding
 import com.v2ray.ang.dto.SubscriptionItem
@@ -109,19 +110,28 @@ class SubEditActivity : BaseActivity() {
      */
     private fun deleteServer(): Boolean {
         if (editSubId.isNotEmpty()) {
-            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        MmkvManager.removeSubscription(editSubId)
-                        launch(Dispatchers.Main) {
-                            finish()
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
+                AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            MmkvManager.removeSubscription(editSubId)
+                            launch(Dispatchers.Main) {
+                                finish()
+                            }
                         }
                     }
+                    .setNegativeButton(android.R.string.cancel) { _, _ ->
+                        // do nothing
+                    }
+                    .show()
+            } else {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    MmkvManager.removeSubscription(editSubId)
+                    launch(Dispatchers.Main) {
+                        finish()
+                    }
                 }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    // do nothing
-                }
-                .show()
+            }
         }
         return true
     }
