@@ -415,7 +415,7 @@ object AngConfigManager {
             if (!it.second.enabled) {
                 return 0
             }
-            val url = HttpUtil.idnToASCII(it.second.url)
+            val url = HttpUtil.toIdnUrl(it.second.url)
             if (!Utils.isValidUrl(url)) {
                 return 0
             }

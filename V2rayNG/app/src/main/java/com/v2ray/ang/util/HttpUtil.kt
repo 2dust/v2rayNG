@@ -18,12 +18,14 @@ import java.net.URL
 object HttpUtil {
 
     /**
-     * Converts a URL string to its ASCII representation.
+     * Converts the domain part of a URL string to its IDN (Punycode, ASCII Compatible Encoding) format.
      *
-     * @param str The URL string to convert.
-     * @return The ASCII representation of the URL.
+     * For example, a URL like "https://例子.中国/path" will be converted to "https://xn--fsqu00a.xn--fiqs8s/path".
+     *
+     * @param str The URL string to convert (can contain non-ASCII characters in the domain).
+     * @return The URL string with the domain part converted to ASCII-compatible (Punycode) format.
      */
-    fun idnToASCII(str: String): String {
+    fun toIdnUrl(str: String): String {
         val url = URL(str)
         val host = url.host
         val asciiHost = IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED)
@@ -32,6 +34,28 @@ object HttpUtil {
         } else {
             return str
         }
+    }
+
+    /**
+     * Converts a Unicode domain name to its IDN (Punycode, ASCII Compatible Encoding) format.
+     * If the input is an IP address or already an ASCII domain, returns the original string.
+     *
+     * @param domain The domain string to convert (can include non-ASCII internationalized characters).
+     * @return The domain in ASCII-compatible (Punycode) format, or the original string if input is an IP or already ASCII.
+     */
+    fun toIdnDomain(domain: String): String {
+        // Return as is if it's a pure IP address (IPv4 or IPv6)
+        if (Utils.isPureIpAddress(domain)) {
+            return domain
+        }
+
+        // Return as is if already ASCII (English domain or already punycode)
+        if (domain.all { it.code < 128 }) {
+            return domain
+        }
+
+        // Otherwise, convert to ASCII using IDN
+        return IDN.toASCII(domain, IDN.ALLOW_UNASSIGNED)
     }
 
     /**

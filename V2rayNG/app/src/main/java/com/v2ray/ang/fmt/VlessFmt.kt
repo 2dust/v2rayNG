@@ -60,7 +60,7 @@ object VlessFmt : FmtBase() {
         val outboundBean = V2rayConfigManager.createInitOutbound(EConfigType.VLESS)
 
         outboundBean?.settings?.vnext?.first()?.let { vnext ->
-            vnext.address = profileItem.server.orEmpty()
+            vnext.address = getServerAddress(profileItem)
             vnext.port = profileItem.serverPort.orEmpty().toInt()
             vnext.users[0].id = profileItem.password.orEmpty()
             vnext.users[0].encryption = profileItem.method
