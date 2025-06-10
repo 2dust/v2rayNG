@@ -167,7 +167,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         //builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
         val bypassLan = SettingsManager.routingRulesetsBypassLan()
         if (bypassLan) {
-            AppConfig.BYPASS_PRIVATE_IP_LIST.forEach {
+            AppConfig.ROUTED_IP_LIST.forEach {
                 val addr = it.split('/')
                 builder.addRoute(addr[0], addr[1].toInt())
             }
