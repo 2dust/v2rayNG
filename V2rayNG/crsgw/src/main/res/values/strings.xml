@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="npv_app_name">Lets Connect</string>
+    <string name="npv_login_email">Email</string>
+    <string name="npv_login_email_placeholder">Please input your email</string>
+    <string name="npv_login_password">Password</string>
+    <string name="npv_login_password_placeholder">Please input password</string>
+    <string name="npv_login">Login</string>
+    <string name="npv_no_account">No account?</string>
+    <string name="npv_create_account">Create one</string>
+    <string name="npv_missing_email_or_password">Email or password is empty</string>
+
+    <string name="npv_error_unknown">Unknown error</string>
+    <string name="npv_error_network">Network connection failed</string>
+    <string name="npv_error_server">Internal server error</string>
+
+</resources>

@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_widget_name">التبديل</string>
+    <string name="app_tile_name">التبديل</string>
+    <string name="app_tile_first_use">أول استخدام لهذه الميزة، يرجى استخدام التطبيق لإضافة خادم</string>
+    <string name="navigation_drawer_open">فتح درج التنقل</string>
+    <string name="navigation_drawer_close">إغلاق درج التنقل</string>
+    <string name="migration_success">نجحت عملية ترحيل البيانات!</string>
+    <string name="migration_fail">فشلت عملية ترحيل البيانات!</string>
+    <string name="pull_down_to_refresh">Please pull down to refresh!</string>
+
+    <!-- Notifications -->
+    <string name="notification_action_stop_v2ray">إيقاف</string>
+    <string name="toast_permission_denied">تعذر الحصول على الإذن</string>
+    <string name="toast_permission_denied_notification">Unable to obtain the notification permission</string>
+    <string name="notification_action_more">انقر للمزيد</string>
+    <string name="toast_services_start">بدء الخدمات</string>
+    <string name="toast_services_stop">إيقاف الخدمات</string>
+    <string name="toast_services_success">نجاح بدء الخدمات</string>
+    <string name="toast_services_failure">فشل بدء الخدمات</string>
+
+    <!--ServerActivity-->
+    <string name="title_server">ملف التكوين</string>
+    <string name="menu_item_add_config">إضافة تكوين</string>
+    <string name="menu_item_save_config">حفظ التكوين</string>
+    <string name="menu_item_del_config">حذف التكوين</string>
+    <string name="menu_item_import_config_qrcode">استيراد التكوين من رمز الاستجابة السريعة (QRcode)</string>
+    <string name="menu_item_import_config_clipboard">استيراد التكوين من الحافظة</string>
+    <string name="menu_item_import_config_local">Import config from locally</string>
+    <string name="menu_item_import_config_manually_vmess">الكتابة يدويًا [VMess]</string>
+    <string name="menu_item_import_config_manually_vless">الكتابة يدويًا [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">الكتابة يدويًا [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">الكتابة يدويًا [SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
+    <string name="menu_item_import_config_manually_trojan">الكتابة يدويًا [Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">الكتابة يدويًا [Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
+    <string name="del_config_comfirm">تأكيد الحذف؟</string>
+    <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
+    <string name="server_lab_remarks">ملاحظات</string>
+    <string name="server_lab_address">العنوان</string>
+    <string name="server_lab_port">المنفذ</string>
+    <string name="server_lab_id">المعرف</string>
+    <string name="server_lab_alterid">AlterId</string>
+
+    <string name="server_lab_security">الأمان</string>
+    <string name="server_lab_network">الشبكة</string>
+    <string name="server_lab_more_function">النقل</string>
+    <string name="server_lab_head_type">نوع الرأس</string>
+    <string name="server_lab_mode_type">وضع gRPC</string>
+    <string name="server_lab_request_host">host</string>
+    <string name="server_lab_request_host_http">http host</string>
+    <string name="server_lab_request_host_ws">ws host</string>
+    <string name="server_lab_request_host_httpupgrade">httpupgrade host</string>
+    <string name="server_lab_request_host_xhttp">xhttp host</string>
+    <string name="server_lab_request_host_h2">h2 host</string>
+    <string name="server_lab_request_host_quic">QUIC security</string>
+    <string name="server_lab_request_host_grpc">gRPC Authority</string>
+    <string name="server_lab_path">path</string>
+    <string name="server_lab_path_ws">ws path</string>
+    <string name="server_lab_path_httpupgrade">httpupgrade path</string>
+    <string name="server_lab_path_xhttp">xhttp path </string>
+    <string name="server_lab_path_h2">h2 path</string>
+    <string name="server_lab_path_quic">QUIC key</string>
+    <string name="server_lab_path_kcp">kcp seed</string>
+    <string name="server_lab_path_grpc">gRPC serviceName</string>
+    <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_fingerprint" translatable="false">البصمة</string>
+    <string name="server_lab_stream_alpn" translatable="false">بروتوكول الطبقة الآخرى التالية (ALPN)</string>
+    <string name="server_lab_allow_insecure">السماح غير الآمن</string>
+    <string name="server_lab_sni">SNI</string>
+    <string name="server_lab_address3">العنوان</string>
+    <string name="server_lab_port3">المنفذ</string>
+    <string name="server_lab_id3">كلمة المرور</string>
+    <string name="server_lab_security3">الأمان</string>
+    <string name="server_lab_id4">كلمة المرور (اختياري)</string>
+    <string name="server_lab_security4">المستخدم (اختياري)</string>
+    <string name="server_lab_encryption">التشفير</string>
+    <string name="server_lab_flow">التدفق</string>
+    <string name="server_lab_public_key" translatable="false">المفتاح العام</string>
+    <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
+    <string name="server_lab_short_id" translatable="false">المعرّف القصير</string>
+    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
+    <string name="server_lab_secret_key" translatable="false">المفتاح السري</string>
+    <string name="server_lab_reserved">محجوز (اختياري)</string>
+    <string name="server_lab_local_address">العنوان المحلي (اختياري IPv4/IPv6، مفصولة بفواصل)</string>
+    <string name="server_lab_local_mtu">Mtu (اختياري، الافتراضي 1420)</string>
+    <string name="toast_success">نجاح</string>
+    <string name="toast_failure">فشل</string>
+    <string name="toast_none_data">لا يوجد شيء</string>
+    <string name="toast_incorrect_protocol">بروتوكول غير صحيح</string>
+    <string name="toast_decoding_failed">فشل فك التشفير</string>
+    <string name="title_file_chooser">حدد ملف التكوين</string>
+    <string name="toast_require_file_manager">يرجى تثبيت مدير الملفات.</string>
+    <string name="server_customize_config">تخصيص التكوين</string>
+    <string name="toast_config_file_invalid">تكوين غير صالح</string>
+    <string name="server_lab_content">المحتوى</string>
+    <string name="toast_none_data_clipboard">لا توجد بيانات في الحافظة</string>
+    <string name="toast_invalid_url">رابط URL غير صالح</string>
+    <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
+    <string name="server_lab_need_inbound">تأكد من أن منفذ الاتصالات الواردة يتوافق مع الإعدادات</string>
+    <string name="toast_malformed_josn">تكوين مشوه</string>
+    <string name="server_lab_request_host6">مضيف (SNI) (اختياري)</string>
+    <string name="toast_action_not_allowed">الإجراء غير مسموح به</string>
+    <string name="server_obfs_password">Obfs password</string>
+    <string name="server_lab_port_hop">Port Hopping</string>
+    <string name="server_lab_port_hop_interval">Port Hopping Interval</string>
+    <string name="server_lab_stream_pinsha256">pinSHA256</string>
+    <string name="server_lab_bandwidth_down">Bandwidth down (units)</string>
+    <string name="server_lab_bandwidth_up">Bandwidth up (units)</string>
+    <string name="server_lab_xhttp_mode">XHTTP Mode</string>
+    <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
+
+    <!-- UserAssetActivity -->
+    <string name="toast_asset_copy_failed">فشل نسخ الملف، يرجى استخدام مدير الملفات</string>
+    <string name="menu_item_add_asset">إضافة أصل</string>
+    <string name="menu_item_add_file">إضافة ملفات</string>
+    <string name="menu_item_add_url">إضافة URL</string>
+    <string name="menu_item_scan_qrcode">مسح رمز الاستجابة السريعة (QRcode)</string>
+    <string name="title_url" translatable="false">URL</string>
+    <string name="menu_item_download_file">تنزيل الملفات</string>
+    <string name="title_user_asset_add_url">إضافة عنوان URL للأصل</string>
+    <string name="msg_file_not_found">الملف غير موجود</string>
+    <string name="msg_remark_is_duplicate">الملاحظات موجودة بالفعل</string>
+    <string name="asset_geo_files_sources">Geo files source (optional)</string>
+
+    <!-- PerAppProxyActivity -->
+    <string name="msg_dialog_progress">جار التحميل</string>
+    <string name="menu_item_search">بحث</string>
+    <string name="menu_item_select_all">تحديد الكل</string>
+    <string name="msg_enter_keywords">أدخل الكلمات الرئيسية</string>
+    <string name="switch_bypass_apps_mode">وضع التجاوز</string>
+    <string name="menu_item_select_proxy_app">تحديد تطبيق الوكيل تلقائيًا</string>
+    <string name="msg_downloading_content">جارٍ تنزيل المحتوى</string>
+    <string name="menu_item_export_proxy_app">تصدير إلى الحافظة</string>
+    <string name="menu_item_import_proxy_app">استيراد من الحافظة</string>
+    <string name="per_app_proxy_settings">Per-app settings</string>
+    <string name="per_app_proxy_settings_enable">Enable per-app</string>
+
+
+    <!-- Preferences -->
+    <string name="title_settings">الإعدادات</string>
+    <string name="title_advanced">إعدادات متقدمة</string>
+    <string name="title_vpn_settings">إعدادات VPN</string>
+    <string name="title_pref_per_app_proxy">الوكيل لكل تطبيق</string>
+    <string name="summary_pref_per_app_proxy">عام: التطبيق المحدد هو وكيل، غير المحدد اتصال مباشر؛ \nوضع التجاوز: التطبيق المحدد متصل مباشرة، غير المحدد وكيل. \nخيار تحديد تطبيق الوكيل تلقائيًا في القائمة</string>
+    <string name="title_pref_is_booted">Auto connect at startup</string>
+    <string name="summary_pref_is_booted">Automatically connects to the selected server at startup, which may be unsuccessful</string>
+
+    <string name="title_mux_settings">إعدادات Mux</string>
+    <string name="title_pref_mux_enabled">تمكين Mux</string>
+    <string name="summary_pref_mux_enabled">أسرع، لكن قد يتسبب في اتصال غير مستقر\nتخصيص كيفية التعامل مع TCP و UDP و QUIC أدناه</string>
+    <string name="title_pref_mux_concurency">اتصالات TCP（النطاق من -1 إلى 1024）</string>
+    <string name="title_pref_mux_xudp_concurency">اتصالات XUDP（النطاق من -1 إلى 1024）</string>
+    <string name="title_pref_mux_xudp_quic">التعامل مع QUIC في نفق mux</string>
+    <string-array name="mux_xudp_quic_entries">
+        <item>رفض</item>
+        <item>سماح</item>
+        <item>تخطي</item>
+    </string-array>
+
+    <string name="title_pref_speed_enabled">تمكين عرض السرعة</string>
+    <string name="summary_pref_speed_enabled">عرض السرعة الحالية في الإشعار.\nستتغير أيقونة الإشعار بناءً على الاستخدام.</string>
+    <string name="title_pref_sniffing_enabled">تفعيل استخراج الشبكة</string>
+    <string name="summary_pref_sniffing_enabled">محاولة استخراج النطاق من الحزمة (مفعل افتراضيًا)</string>
+    <string name="title_pref_route_only_enabled">تفعيل التوجيه فقط</string>
+    <string name="summary_pref_route_only_enabled">استخدم اسم النطاق الذي تم استخراجه للتوجيه فقط، واحتفظ بعنوان الوجهة كعنوان IP.</string>
+
+    <string name="title_pref_local_dns_enabled">تفعيل DNS المحلي</string>
+    <string name="summary_pref_local_dns_enabled">يتم معالجة DNS بواسطة وحدة DNS الأساسية (موصى به، إذا لزم تجاوز التوجيه لشبكة LAN وعنوان البر الرئيسي)</string>
+
+    <string name="title_pref_fake_dns_enabled">تفعيل DNS وهمي</string>
+    <string name="summary_pref_fake_dns_enabled">يعيد DNS المحلي عنوان IP وهمي (أسرع، ولكنه قد لا يعمل مع بعض التطبيقات)</string>
+
+    <string name="title_pref_prefer_ipv6">تفضيل IPv6</string>
+    <string name="summary_pref_prefer_ipv6">تفضيل عنوان IPv6 وطرق التوجيه</string>
+
+    <string name="title_pref_remote_dns">DNS البعيد (udp/tcp/https/quic) (اختياري)</string>
+    <string name="summary_pref_remote_dns">DNS</string>
+
+    <string name="title_pref_vpn_dns">VPN DNS (IPv4/v6 فقط)</string>
+    <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
+
+    <string name="title_pref_domestic_dns">DNS المحلي (اختياري)</string>
+    <string name="summary_pref_domestic_dns">DNS</string>
+
+    <string name="title_pref_dns_hosts">DNS hosts (Format: domain:address,…)</string>
+    <string name="summary_pref_dns_hosts">domain:address,…</string>
+
+    <string name="title_pref_delay_test_url">True delay test url (http/https)</string>
+    <string name="summary_pref_delay_test_url">Url</string>
+
+    <string name="title_pref_proxy_sharing_enabled">السماح بالاتصالات من الشبكة المحلية</string>
+    <string name="summary_pref_proxy_sharing_enabled">يمكن للأجهزة الأخرى الاتصال بالبروكسي بواسطة عنوان IP الخاص بك من خلال socks/http، يتم التمكين فقط في الشبكة الموثوقة لتجنب الاتصال غير المصرح به</string>
+    <string name="toast_warning_pref_proxysharing_short">السماح بالاتصالات من الشبكة المحلية، تأكد من أنك في شبكة موثوقة</string>
+
+    <string name="title_pref_allow_insecure">السماح غير الآمن</string>
+    <string name="summary_pref_allow_insecure">عند TLS، الافتراضي هو السماح غير الآمن</string>
+
+    <string name="title_pref_socks_port">منفذ بروكسي Local</string>
+    <string name="summary_pref_socks_port">منفذ بروكسي Local</string>
+
+    <string name="title_pref_local_dns_port">منفذ DNS المحلي</string>
+    <string name="summary_pref_local_dns_port">منفذ DNS المحلي</string>
+
+    <string name="title_pref_confirm_remove">تأكيد حذف ملف التكوين</string>
+    <string name="summary_pref_confirm_remove">ما إذا كان حذف ملف التكوين يتطلب تأكيدًا ثانيًا من قبل المستخدم</string>
+
+    <string name="title_pref_start_scan_immediate">بدء المسح الضوئي على الفور</string>
+    <string name="summary_pref_start_scan_immediate">افتح الكاميرا لمسح الرمز ضوئيًا على الفور عند بدء التشغيل، وإلا يمكنك اختيار مسح الرمز ضوئيًا أو تحديد صورة في شريط الأدوات</string>
+
+    <string name="title_pref_append_http_proxy">Append HTTP Proxy to VPN</string>
+    <string name="summary_pref_append_http_proxy">HTTP proxy will be used directly from (browser/ some supported apps), without going through the virtual NIC device (Android 10+)</string>
+
+    <string name="title_pref_double_column_display">Enable double column display</string>
+    <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen. You need to restart the application to take effect.</string>
+
+    <!-- AboutActivity -->
+    <string name="title_pref_feedback">ملاحظات</string>
+    <string name="summary_pref_feedback">ملاحظات التحسينات أو الأخطاء إلى GitHub</string>
+    <string name="summary_pref_tg_group">الانضمام إلى مجموعة Telegram</string>
+    <string name="toast_tg_app_not_found">لم يتم العثور على تطبيق Telegram</string>
+    <string name="title_privacy_policy">سياسة الخصوصية</string>
+    <string name="title_about">حول\nترجمة م. ابراهيم قاسم</string>
+    <string name="title_source_code">الكود المصدري</string>
+    <string name="title_oss_license">Open Source licenses</string>
+    <string name="title_tg_channel">قناة Telegram</string>
+    <string name="title_configuration_backup">نسخ التكوين احتياطيًا</string>
+    <string name="summary_configuration_backup">موقع التخزين: [%s]، سيتم مسح النسخة الاحتياطية بعد إلغاء تثبيت التطبيق أو مسح التخزين</string>
+    <string name="title_configuration_restore">استعادة التكوين</string>
+    <string name="title_configuration_share">مشاركة التكوين</string>
+
+    <string name="title_pref_promotion">ترويج</string>
+    <string name="summary_pref_promotion">ترويج، انقر للحصول على التفاصيل (يمكن إزالة التبرع)</string>
+
+    <string name="title_pref_auto_update_subscription">اشتراكات التحديث التلقائي</string>
+    <string name="summary_pref_auto_update_subscription">قم بتحديث اشتراكاتك تلقائيًا بفترة زمنية في الخلفية. اعتمادًا على الجهاز، قد لا تعمل هذه الميزة دائمًا</string>
+    <string name="title_pref_auto_update_interval">فاصل التحديث التلقائي (بالدقائق، الحد الأدنى للقيمة 15)</string>
+
+    <string name="title_core_loglevel">مستوى السجل</string>
+    <string name="title_mode">الوضع</string>
+    <string name="title_mode_help">انقر هنا للحصول على مزيد من المساعدة</string>
+    <string name="title_language">اللغة</string>
+    <string name="title_ui_settings">إعدادات واجهة المستخدم</string>
+    <string name="title_pref_ui_mode_night">إعدادات وضع واجهة المستخدم ليلاً</string>
+
+    <string name="title_logcat">Logcat</string>
+    <string name="logcat_copy">نسخ</string>
+    <string name="logcat_clear">مسح</string>
+    <string name="title_service_restart">إعادة تشغيل الخدمة</string>
+    <string name="title_del_all_config">حذف جميع الإعدادات (قبل أول خطوة)</string>
+    <string name="title_del_duplicate_config">حذف الإعدادات المكررة (2)</string>
+    <string name="title_del_invalid_config">حذف الإعدادات غير الصالحة (بعد الاختبار؛ 4)</string>
+    <string name="title_export_all">تصدير الإعدادات غير المخصصة إلى الحافظة</string>
+    <string name="title_sub_setting">إعداد مجموعة الاشتراك</string>
+    <string name="sub_setting_remarks">ملاحظات</string>
+    <string name="sub_setting_url">عنوان URL اختياري</string>
+    <string name="sub_setting_filter">Remarks regular filter</string>
+    <string name="sub_setting_enable">تفعيل التحديث</string>
+    <string name="sub_auto_update">تفعيل التحديث التلقائي</string>
+    <string name="sub_allow_insecure_url">Allow insecure HTTP address</string>
+    <string name="sub_setting_pre_profile">Previous proxy configuration remarks</string>
+    <string name="sub_setting_next_profile">Next proxy configuration remarks</string>
+    <string name="sub_setting_pre_profile_tip">The configuration remarks exists and is unique</string>
+    <string name="title_sub_update">تحديث الاشتراك (أول خطوة)</string>
+    <string name="title_ping_all_server">Tcping لجميع الإعدادات</string>
+    <string name="title_real_ping_all_server"> اختبر جميع الإعدادات (3)</string>
+    <string name="title_user_asset_setting">Asset files</string>
+    <string name="title_sort_by_test_results">الفرز حسب نتائج الاختبار (5)</string>
+    <string name="title_filter_config">تصفية ملف التكوين</string>
+    <string name="filter_config_all">جميع مجموعات الاشتراك</string>
+    <string name="title_del_duplicate_config_count">حذف %d من الإعدادات المكررة</string>
+
+    <string name="title_del_config_count">Delete %d configurations</string>
+    <string name="title_import_config_count">Import %d configurations</string>
+    <string name="title_export_config_count">Export %d configurations</string>
+    <string name="title_update_config_count">Update %d configurations</string>
+    <string name="tasker_start_service">بدء الخدمة</string>
+    <string name="tasker_setting_confirm">تأكيد</string>
+
+    <!-- RoutingSettingActivity -->
+    <string name="routing_settings_domain_strategy">استراتيجية النطاق</string>
+    <string name="routing_settings_title">إعدادات التوجيه</string>
+    <string name="routing_settings_tips">مفصولة بفواصل (،)، تذكر الحفظ</string>
+    <string name="routing_settings_save">حفظ</string>
+    <string name="routing_settings_delete">مسح</string>
+    <string name="routing_settings_rule_title">Routing Rule Settings</string>
+    <string name="routing_settings_add_rule">Add rule</string>
+    <string name="routing_settings_import_predefined_rulesets">استيراد مجموعات قواعد محددة مسبقاً</string>
+    <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
+    <string name="routing_settings_import_rulesets_from_clipboard">Import ruleset from clipboard</string>
+    <string name="routing_settings_import_rulesets_from_qrcode">استيراد مجموعة قواعد من رمز الاستجابة السريعة</string>
+    <string name="routing_settings_export_rulesets_to_clipboard">Export ruleset to clipboard</string>
+    <string name="routing_settings_locked">Locked, keep this rule when import presets</string>
+
+    <string name="connection_test_pending">التحقق من الاتصال</string>
+    <string name="connection_test_testing">يجري الاختبار…</string>
+    <string name="connection_test_testing_count">Testing %d configurations…</string>
+    <string name="connection_test_available">نجاح: استغرق اتصال HTTP %dms</string>
+    <string name="connection_test_error">فشل اكتشاف اتصال الإنترنت: %s</string>
+    <string name="connection_test_fail">الإنترنت غير متاح</string>
+    <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
+    <string name="connection_connected">متصل، انقر للتحقق من الاتصال</string>
+    <string name="connection_not_connected">غير متصل</string>
+
+    <string name="import_subscription_success">تم استيراد الاشتراك بنجاح</string>
+    <string name="import_subscription_failure">فشل استيراد الاشتراك</string>
+    <string name="title_fragment_settings">إعدادات الجزء</string>
+    <string name="title_pref_fragment_packets">حزم الجزء</string>
+    <string name="title_pref_fragment_length">طول الجزء (الحد الأدنى - الحد الأقصى)</string>
+    <string name="title_pref_fragment_interval">فاصل الجزء (الحد الأدنى - الحد الأقصى)</string>
+    <string name="title_pref_fragment_enabled">تفعيل الجزء</string>
+
+    <string name="update_check_for_update">Check for update</string>
+    <string name="update_already_latest_version">Already on the latest version</string>
+    <string name="update_new_version_found">New version found: %s</string>
+    <string name="update_now">Update now</string>
+    <string name="update_check_pre_release">Check Pre-release</string>
+    <string name="update_checking_for_update">Checking for update…</string>
+
+    <string-array name="share_method">
+        <item>رمز استجابة سريعة (QRcode)</item>
+        <item>تصدير إلى الحافظة</item>
+        <item>تصدير التكوين الكامل إلى الحافظة</item>
+    </string-array>
+
+    <string-array name="share_method_more">
+        <item>QRcode</item>
+        <item>Export to clipboard</item>
+        <item>Export full configuration to clipboard</item>
+        <item>Edit</item>
+        <item>Delete</item>
+    </string-array>
+
+    <string-array name="share_sub_method">
+        <item>رمز استجابة سريعة (QRcode)</item>
+        <item>تصدير إلى الحافظة</item>
+    </string-array>
+
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>بروكسي فقط</item>
+    </string-array>
+
+    <string-array name="ui_mode_night">
+        <item>اتبع النظام</item>
+        <item>فاتح</item>
+        <item>داكن</item>
+    </string-array>
+
+    <string-array name="vpn_bypass_lan">
+        <item>Follow config</item>
+        <item>Bypass</item>
+        <item>Not Bypass</item>
+    </string-array>
+
+</resources>

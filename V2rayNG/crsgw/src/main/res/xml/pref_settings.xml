@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_sniffing_enabled"
+        android:summary="@string/summary_pref_sniffing_enabled"
+        android:title="@string/title_pref_sniffing_enabled" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_route_only_enabled"
+        android:summary="@string/summary_pref_route_only_enabled"
+        android:title="@string/title_pref_route_only_enabled" />
+    <CheckBoxPreference
+        android:key="pref_is_booted"
+        android:summary="@string/summary_pref_is_booted"
+        android:title="@string/title_pref_is_booted" />
+
+    <PreferenceCategory android:title="@string/title_vpn_settings">
+        <CheckBoxPreference
+                android:key="pref_prefer_ipv6"
+                android:summary="@string/summary_pref_prefer_ipv6"
+                android:title="@string/title_pref_prefer_ipv6" />
+
+        <CheckBoxPreference
+            android:key="pref_per_app_proxy"
+            android:summary="@string/summary_pref_per_app_proxy"
+            android:title="@string/title_pref_per_app_proxy" />
+
+        <CheckBoxPreference
+            android:key="pref_local_dns_enabled"
+            android:summary="@string/summary_pref_local_dns_enabled"
+            android:title="@string/title_pref_local_dns_enabled" />
+
+        <CheckBoxPreference
+            android:key="pref_fake_dns_enabled"
+            android:summary="@string/summary_pref_fake_dns_enabled"
+            android:title="@string/title_pref_fake_dns_enabled" />
+
+        <CheckBoxPreference
+            android:key="pref_append_http_proxy"
+            android:summary="@string/summary_pref_append_http_proxy"
+            android:title="@string/title_pref_append_http_proxy" />
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_local_dns_port"
+            android:summary="10853"
+            android:title="@string/title_pref_local_dns_port" />
+
+        <EditTextPreference
+            android:key="pref_vpn_dns"
+            android:summary="@string/summary_pref_remote_dns"
+            android:title="@string/title_pref_vpn_dns" />
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/vpn_bypass_lan"
+            android:entryValues="@array/vpn_bypass_lan_value"
+            android:key="pref_vpn_bypass_lan"
+            android:summary="%s"
+            android:title="@string/title_pref_vpn_bypass_lan" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_ui_settings">
+        <CheckBoxPreference
+            android:key="pref_speed_enabled"
+            android:summary="@string/summary_pref_speed_enabled"
+            android:title="@string/title_pref_speed_enabled" />
+
+        <CheckBoxPreference
+            android:key="pref_confirm_remove"
+            android:summary="@string/summary_pref_confirm_remove"
+            android:title="@string/title_pref_confirm_remove" />
+
+        <CheckBoxPreference
+            android:key="pref_start_scan_immediate"
+            android:summary="@string/summary_pref_start_scan_immediate"
+            android:title="@string/title_pref_start_scan_immediate" />
+
+        <CheckBoxPreference
+            android:key="pref_double_column_display"
+            android:summary="@string/summary_pref_double_column_display"
+            android:title="@string/title_pref_double_column_display" />
+
+        <ListPreference
+            android:defaultValue="auto"
+            android:entries="@array/language_select"
+            android:entryValues="@array/language_select_value"
+            android:key="pref_language"
+            android:summary="%s"
+            android:title="@string/title_language" />
+
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/ui_mode_night"
+            android:entryValues="@array/ui_mode_night_value"
+            android:key="pref_ui_mode_night"
+            android:summary="%s"
+            android:title="@string/title_pref_ui_mode_night" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/title_mux_settings"
+        app:initialExpandedChildrenCount="0">
+        <CheckBoxPreference
+            android:key="pref_mux_enabled"
+            android:summary="@string/summary_pref_mux_enabled"
+            android:title="@string/title_pref_mux_enabled" />
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_mux_concurrency"
+            android:summary="8"
+            android:title="@string/title_pref_mux_concurency" />
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_mux_xudp_concurrency"
+            android:summary="8"
+            android:title="@string/title_pref_mux_xudp_concurency" />
+
+        <ListPreference
+            android:defaultValue="reject"
+            android:entries="@array/mux_xudp_quic_entries"
+            android:entryValues="@array/mux_xudp_quic_value"
+            android:key="pref_mux_xudp_quic"
+            android:summary="%s"
+            android:title="@string/title_pref_mux_xudp_quic" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/title_fragment_settings"
+        app:initialExpandedChildrenCount="0">
+        <CheckBoxPreference
+            android:key="pref_fragment_enabled"
+            android:title="@string/title_pref_fragment_enabled" />
+
+        <EditTextPreference
+            android:key="pref_fragment_length"
+            android:summary="50-100"
+            android:title="@string/title_pref_fragment_length" />
+
+        <EditTextPreference
+            android:key="pref_fragment_interval"
+            android:summary="10-20"
+            android:title="@string/title_pref_fragment_interval" />
+
+        <ListPreference
+            android:defaultValue="tlshello"
+            android:entries="@array/fragment_packets"
+            android:entryValues="@array/fragment_packets"
+            android:key="pref_fragment_packets"
+            android:summary="%s"
+            android:title="@string/title_pref_fragment_packets" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/title_sub_setting"
+        app:initialExpandedChildrenCount="0">
+        <CheckBoxPreference
+            android:key="pref_auto_update_subscription"
+            android:summary="@string/summary_pref_auto_update_subscription"
+            android:title="@string/title_pref_auto_update_subscription" />
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_auto_update_interval"
+            android:summary="1440"
+            android:title="@string/title_pref_auto_update_interval" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/title_advanced"
+        app:initialExpandedChildrenCount="0">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_proxy_sharing_enabled"
+            android:summary="@string/summary_pref_proxy_sharing_enabled"
+            android:title="@string/title_pref_proxy_sharing_enabled" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_allow_insecure"
+            android:summary="@string/summary_pref_allow_insecure"
+            android:title="@string/title_pref_allow_insecure" />
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_socks_port"
+            android:summary="10808"
+            android:title="@string/title_pref_socks_port" />
+
+        <EditTextPreference
+            android:key="pref_remote_dns"
+            android:summary="@string/summary_pref_remote_dns"
+            android:title="@string/title_pref_remote_dns" />
+
+        <EditTextPreference
+            android:key="pref_domestic_dns"
+            android:summary="@string/summary_pref_domestic_dns"
+            android:title="@string/title_pref_domestic_dns" />
+
+        <EditTextPreference
+            android:key="pref_dns_hosts"
+            android:summary="@string/summary_pref_dns_hosts"
+            android:title="@string/title_pref_dns_hosts" />
+
+        <EditTextPreference
+            android:key="pref_delay_test_url"
+            android:summary="@string/summary_pref_delay_test_url"
+            android:title="@string/title_pref_delay_test_url" />
+
+        <ListPreference
+            android:defaultValue="warning"
+            android:entries="@array/core_loglevel"
+            android:entryValues="@array/core_loglevel"
+            android:key="pref_core_loglevel"
+            android:summary="%s"
+            android:title="@string/title_core_loglevel" />
+
+        <ListPreference
+            android:defaultValue="VPN"
+            android:entries="@array/mode_entries"
+            android:entryValues="@array/mode_value"
+            android:key="pref_mode"
+            android:summary="%s"
+            android:title="@string/title_mode" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

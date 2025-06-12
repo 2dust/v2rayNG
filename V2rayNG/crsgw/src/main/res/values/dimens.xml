@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padding_spacing_dp4">4dp</dimen>
+    <dimen name="padding_spacing_dp8">8dp</dimen>
+    <dimen name="padding_spacing_dp16">16dp</dimen>
+    <dimen name="image_size_dp24">24dp</dimen>
+    <dimen name="view_height_dp36">36dp</dimen>
+    <dimen name="view_height_dp48">48dp</dimen>
+    <dimen name="view_height_dp64">64dp</dimen>
+    <dimen name="view_height_dp160">160dp</dimen>
+</resources>

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
 import androidx.work.WorkManager
+import com.npv.crsgw.store.UserStore
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.handler.SettingsManager
@@ -43,5 +44,7 @@ class AngApplication : MultiDexApplication() {
         es.dmoral.toasty.Toasty.Config.getInstance()
             .setGravity(android.view.Gravity.BOTTOM, 0, 200)
             .apply()
+
+        UserStore.init(this)
     }
 }

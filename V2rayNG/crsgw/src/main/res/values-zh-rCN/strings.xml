@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="npv_app_name">青葱</string>
+    <string name="npv_login_email">邮箱</string>
+    <string name="npv_login_email_placeholder">请输入邮箱</string>
+    <string name="npv_login_password">密码</string>
+    <string name="npv_login_password_placeholder">请输入密码</string>
+    <string name="npv_login">登录</string>
+    <string name="npv_no_account">没有账号?</string>
+    <string name="npv_create_account">创建一个</string>
+    <string name="npv_missing_email_or_password">邮箱和密码不能为空</string>
+
+    <string name="npv_error_unknown">未知错误</string>
+    <string name="npv_error_network">网络错误</string>
+    <string name="npv_error_server">内部服务错误</string>
+</resources>

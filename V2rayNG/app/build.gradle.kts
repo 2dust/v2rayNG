@@ -188,4 +188,6 @@ dependencies {
     testImplementation(libs.org.mockito.mockito.inline)
     testImplementation(libs.mockito.kotlin)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    implementation(project(":crsgw"))
 }
