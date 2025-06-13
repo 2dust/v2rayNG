@@ -2,5 +2,8 @@
 <resources>
     <color name="colorPing">#009966</color>
     <color name="colorLoginButton">#2686ea</color>
+    <color name="colorRipple">#2686ea</color>
+    <color name="green_connected">#4CAF50</color> <!-- 已连接绿色 -->
+    <color name="red_disconnected">#F44336</color> <!-- 断开红色 -->
 
 </resources>

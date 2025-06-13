@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:id="@+id/group_main">
+        <item
+            android:id="@+id/sub_setting"
+            android:icon="@drawable/ic_subscriptions_24dp"
+            android:title="@string/title_sub_setting" />
+        <item
+            android:id="@+id/per_app_proxy_settings"
+            android:icon="@drawable/ic_per_apps_24dp"
+            android:title="@string/per_app_proxy_settings" />
+        <item
+            android:id="@+id/routing_setting"
+            android:icon="@drawable/ic_routing_24dp"
+            android:title="@string/routing_settings_title" />
+        <item
+            android:id="@+id/user_asset_setting"
+            android:icon="@drawable/ic_file_24dp"
+            android:title="@string/title_user_asset_setting" />
+        <item
+            android:id="@+id/settings"
+            android:icon="@drawable/ic_settings_24dp"
+            android:title="@string/title_settings" />
+    </group>
+
+    <group android:id="@+id/group_id2">
+        <item
+            android:id="@+id/promotion"
+            android:icon="@drawable/ic_promotion_24dp"
+            android:title="@string/title_pref_promotion" />
+        <item
+            android:id="@+id/logcat"
+            android:icon="@drawable/ic_logcat_24dp"
+            android:title="@string/title_logcat" />
+        <item
+            android:id="@+id/check_for_update"
+            android:icon="@drawable/ic_check_update_24dp"
+            android:title="@string/update_check_for_update" />
+        <item
+            android:id="@+id/about"
+            android:icon="@drawable/ic_about_24dp"
+            android:title="@string/title_about" />
+        <!-- place holder for version text at the bottom -->
+        <item
+            android:id="@+id/placeholder"
+            android:enabled="false"
+            android:title="" />
+    </group>
+</menu>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/view_height_dp160"
+    android:background="@drawable/nav_header_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="@dimen/padding_spacing_dp16">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/montserrat_thin"
+        android:gravity="center"
+        android:paddingTop="@dimen/padding_spacing_dp8"
+        android:text="@string/app_name"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+
+
+</LinearLayout>

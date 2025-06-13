@@ -67,5 +67,8 @@ dependencies {
     implementation("androidx.datastore:datastore-core:1.2.0-alpha02")
     implementation("androidx.datastore:datastore-preferences-core:1.2.0-alpha02")
 
+    implementation("androidx.slidingpanelayout:slidingpanelayout:1.2.0")
+
+
 
 }

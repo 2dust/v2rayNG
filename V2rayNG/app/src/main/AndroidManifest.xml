@@ -78,6 +78,7 @@
         </activity>
         <activity
             android:name="com.v2ray.npv.NpvMainActivity"
+            android:theme="@style/AppThemeDayNight.NoActionBar"
             android:exported="false" />
         <activity
             android:name="com.v2ray.npv.LoginActivity"
