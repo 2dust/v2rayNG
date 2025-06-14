@@ -28,13 +28,17 @@ object PluginUtil {
     fun runPlugin(context: Context, config: ProfileItem?, socksPort: Int?) {
         Log.i(AppConfig.TAG, "Starting plugin execution")
 
-        if (config == null || socksPort == null) {
+        if (config == null) {
             Log.w(AppConfig.TAG, "Cannot run plugin: config is null")
             return
         }
 
         try {
             if (config.configType == EConfigType.HYSTERIA2) {
+                if (socksPort == null) {
+                    Log.w(AppConfig.TAG, "Cannot run plugin: socksPort is null")
+                    return
+                }
                 Log.i(AppConfig.TAG, "Running Hysteria2 plugin")
                 val configFile = genConfigHy2(context, config, socksPort) ?: return
                 val cmd = genCmdHy2(context, configFile)
