@@ -32,4 +32,8 @@
     <style name="BrandedSwitch" parent="AppTheme">
         <item name="colorAccent">@color/color_fab_active</item>
     </style>
+    <style name="NpvRoundedImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item> <!-- 圆形 -->
+    </style>
 </resources>

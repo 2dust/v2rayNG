@@ -69,6 +69,9 @@ dependencies {
 
     implementation("androidx.slidingpanelayout:slidingpanelayout:1.2.0")
 
+    implementation("com.google.android.material:material:1.14.0-alpha01")
 
+    // lottie animation
+    implementation("com.airbnb.android:lottie:6.6.6")
 
 }

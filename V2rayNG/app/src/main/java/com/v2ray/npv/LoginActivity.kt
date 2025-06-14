@@ -6,11 +6,13 @@ import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.npv.crsgw.component.LoadingDialog
 import com.npv.crsgw.databinding.NpvActivityLoginBinding
 import com.npv.crsgw.rest.model.NpvUser
 import com.npv.crsgw.rest.model.SignInWithEmailRequest
 import com.npv.crsgw.rest.network.ApiResult
 import com.npv.crsgw.rest.network.TokenManager
+import com.npv.crsgw.rest.repository.NpvRepository
 import com.npv.crsgw.store.UserStore
 import com.npv.crsgw.ui.UserViewModel
 import com.v2ray.ang.BuildConfig
@@ -18,14 +20,16 @@ import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.ui.BaseActivity
-import com.v2ray.npv.SplashActivity
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
-class LoginActivity : BaseActivity() {
+class LoginActivity : NpvBaseActivity() {
     private val TAG = LoginActivity::class.simpleName
 
     private val binding by lazy { NpvActivityLoginBinding.inflate(layoutInflater) }
+
+    private val repo = NpvRepository()
+    private var loadingDialog: LoadingDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,11 +37,16 @@ class LoginActivity : BaseActivity() {
 
         Log.d(TAG, "Version: " + "v${BuildConfig.VERSION_NAME} (${SpeedtestManager.getLibVersion()})")
 
-        // TODO: Delete these two lines
-        binding.email.setText("wyylling@gmail.com")
-        binding.password.setText("Wyyl1002!")
+        // TODO: encrypt the user's password
+        lifecycleScope.launch {
+            val user = UserStore.getUser()
+            binding.email.setText(user?.username)
+            binding.password.setText(user?.password)
+        }
 
-        var viewModel = UserViewModel()
+        loadingDialog = LoadingDialog(this)
+
+        // var viewModel = UserViewModel()
 
         binding.login.setOnClickListener {
             val email = binding.email.text?.trim().toString()
@@ -48,17 +57,30 @@ class LoginActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
+            showLoading()
+
+            val request = SignInWithEmailRequest(email, password)
             lifecycleScope.launch {
-                when (val result = viewModel.login(SignInWithEmailRequest(email, password))) {
-                    is ApiResult.Success -> {
-                        val r = result.data
-                        val user = NpvUser(r.avatar, r.username, r.nickname, r.accessToken, r.tokenType, r.status)
-                        UserStore.storeUser(user)
-                        // 跳转主页
-                        startActivity(Intent(this@LoginActivity, NpvMainActivity::class.java))
-                    }
-                    is ApiResult.Failure -> {
-                        toastError("登录失败：${result.code}")
+                repo.login(request).collect { result ->
+
+                    hideLoading()
+
+                    when (result) {
+                        is ApiResult.Success -> {
+                            val r = result.data
+                            val user = NpvUser(r.avatar, r.username, r.nickname, r.accessToken, r.tokenType, r.status, password)
+                            UserStore.storeUser(user)
+                            // 跳转主页
+                            startActivity(Intent(this@LoginActivity, NpvMainActivity::class.java))
+                        }
+
+                        is ApiResult.Failure -> {
+                            // ❌ 登录失败，显示错误信息
+                            toastError("登录失败：${result.code}")
+                        }
+
+                        ApiResult.Loading -> {
+                        }
                     }
                 }
             }

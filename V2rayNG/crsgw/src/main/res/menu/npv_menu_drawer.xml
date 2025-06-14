@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:id="@+id/group_main">
+        <item
+            android:id="@+id/switch_country_region"
+            android:icon="@drawable/earth_line"
+            android:title="@string/npv_switch_country_or_region" />
+        <item
+            android:id="@+id/my_ticket"
+            android:icon="@drawable/ticket2_fill"
+            android:title="@string/npv_my_ticket" />
+        <item
+            android:id="@+id/referral_rebate"
+            android:icon="@drawable/gift2_fill"
+            android:title="@string/npv_referral_rebate" />
+        <item
+            android:id="@+id/notification_center"
+            android:icon="@drawable/notification2_fill"
+            android:title="@string/npv_notification_center" />
+        <item
+            android:id="@+id/logout"
+            android:icon="@drawable/logout_circle_fill"
+            android:title="@string/npv_logout" />
+        <item
+            android:id="@+id/about"
+            android:icon="@drawable/information2_fill"
+            android:title="@string/npv_about" />
+    </group>
+
+<!--    <group android:id="@+id/group_id3">-->
+<!--        <item-->
+<!--            android:id="@+id/logout"-->
+<!--            android:icon="@drawable/ic_promotion_24dp"-->
+<!--            android:title="Logout" />-->
+<!--    </group>-->
+</menu>

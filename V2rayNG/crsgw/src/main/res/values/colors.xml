@@ -5,5 +5,6 @@
     <color name="colorRipple">#2686ea</color>
     <color name="green_connected">#4CAF50</color> <!-- 已连接绿色 -->
     <color name="red_disconnected">#F44336</color> <!-- 断开红色 -->
+    <color name="lightGray">#d1d1cf</color>
 
 </resources>

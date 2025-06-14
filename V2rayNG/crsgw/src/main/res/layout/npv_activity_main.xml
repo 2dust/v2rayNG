@@ -31,19 +31,64 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/test"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="1123131312"
-                         />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/rippleButton"
+                        android:layout_width="240dp"
+                        android:layout_height="240dp"
+                        android:layout_centerInParent="true"
+                        android:backgroundTint="@android:color/darker_gray"
+                        android:text="@string/npv_tap_to_connect"
+                        android:textColor="@android:color/white"
+                        app:cornerRadius="120dp"
+                        app:icon="@drawable/arrow_up_double_fill"
+                        app:iconGravity="textTop"
+                        app:iconPadding="8dp"
+                        app:iconSize="64dp"
+                        app:iconTint="@android:color/white"
+                        app:rippleColor="@color/colorRipple" />
 
-                </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_alignParentBottom="true"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="0.5dp"
+                            android:background="@color/lightGray" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="64dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/membership_status"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="@string/npv_membership_status_expired">
+                            </TextView>
+
+                            <TextView
+                                android:id="@+id/membership_renew"
+                                android:layout_width="120dp"
+                                android:layout_height="match_parent"
+                                android:background="@color/colorRipple"
+                                android:gravity="center"
+                                android:text="@string/npv_membership_renew"
+                                android:textColor="@android:color/white">
+                            </TextView>
+                        </LinearLayout>
+                    </LinearLayout>
+                </RelativeLayout>
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
         </RelativeLayout>
     </LinearLayout>
@@ -53,9 +98,9 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:headerLayout="@layout/nav_header"
+        app:headerLayout="@layout/npv_nav_header"
         app:itemIconTint="@color/colorAccent"
-        app:menu="@menu/menu_drawer">
+        app:menu="@menu/npv_menu_drawer">
 
     </com.google.android.material.navigation.NavigationView>
 

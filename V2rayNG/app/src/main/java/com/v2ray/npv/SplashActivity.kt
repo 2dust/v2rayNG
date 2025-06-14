@@ -17,7 +17,7 @@ class SplashActivity : BaseActivity() {
 
         // 可以添加启动动画或延迟
         lifecycleScope.launch {
-            delay(1000)
+            delay(500)
             if (UserStore.isLoggedIn()) {
                 startActivity(Intent(this@SplashActivity, NpvMainActivity::class.java))
             } else {

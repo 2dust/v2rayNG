@@ -6,5 +6,6 @@ data class NpvUser(
     val nickname: String?,
     val accessToken: String,
     val tokenType: String,
-    val status: String
+    val status: String,
+    val password: String?
 )

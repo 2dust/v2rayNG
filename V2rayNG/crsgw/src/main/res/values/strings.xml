@@ -9,6 +9,24 @@
     <string name="npv_no_account">No account?</string>
     <string name="npv_create_account">Create one</string>
     <string name="npv_missing_email_or_password">Email or password is empty</string>
+    <string name="npv_tap_to_connect">Tap to connect</string>
+    <string name="npv_disconnect">Disconnect</string>
+    <string name="npv_connected">Connected</string>
+
+    <string name="npv_membership">Membership</string>
+    <string name="npv_membership_status_normal">Expires on: %1$s</string>
+    <string name="npv_membership_status_expired">Membership has expired</string>
+    <string name="npv_membership_renew">Renew</string>
+
+    <!-- Menu title -->
+    <string name="npv_switch_country_or_region">Switch Country/Region</string>
+    <string name="npv_my_ticket">My Ticket</string>
+    <string name="npv_referral_rebate">Referral Rebate</string>
+    <string name="npv_notification_center">Notification Center</string>
+    <string name="npv_logout">Logout</string>
+    <string name="npv_about">About</string>
+
+    <string name="npv_purchase_membership">Purchase Membership</string>
 
     <string name="npv_error_unknown">Unknown error</string>
     <string name="npv_error_network">Network connection failed</string>
