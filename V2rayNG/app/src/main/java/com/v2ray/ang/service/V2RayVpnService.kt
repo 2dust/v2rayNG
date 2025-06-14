@@ -167,7 +167,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         //builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
         val bypassLan = SettingsManager.routingRulesetsBypassLan()
         if (bypassLan) {
-            AppConfig.BYPASS_PRIVATE_IP_LIST.forEach {
+            AppConfig.ROUTED_IP_LIST.forEach {
                 val addr = it.split('/')
                 builder.addRoute(addr[0], addr[1].toInt())
             }
@@ -179,6 +179,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             builder.addAddress(PRIVATE_VLAN6_CLIENT, 126)
             if (bypassLan) {
                 builder.addRoute("2000::", 3) //currently only 1/8 of total ipV6 is in use
+                builder.addRoute("fc00::", 18) //Xray-core default FakeIPv6 Pool
             } else {
                 builder.addRoute("::", 0)
             }

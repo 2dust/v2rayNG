@@ -189,7 +189,7 @@ object AppConfig {
     val DNS_YANDEX_ADDRESSES = arrayListOf("77.88.8.8", "77.88.8.1", "2a02:6b8::feed:0ff", "2a02:6b8:0:1::feed:0ff")
 
     //minimum list https://serverfault.com/a/304791
-    val BYPASS_PRIVATE_IP_LIST = arrayListOf(
+    val ROUTED_IP_LIST = arrayListOf(
         "0.0.0.0/5",
         "8.0.0.0/7",
         "11.0.0.0/8",
