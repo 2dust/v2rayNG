@@ -16,7 +16,6 @@ import com.v2ray.ang.dto.V2rayConfig.OutboundBean.StreamSettingsBean
 import com.v2ray.ang.dto.V2rayConfig.RoutingBean.RulesBean
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.fmt.HttpFmt
-import com.v2ray.ang.fmt.Hysteria2Fmt
 import com.v2ray.ang.fmt.ShadowsocksFmt
 import com.v2ray.ang.fmt.SocksFmt
 import com.v2ray.ang.fmt.TrojanFmt
@@ -479,6 +478,25 @@ object V2rayConfigManager {
                 )
             }
 
+            //block dns
+            val blkDomain = getUserRule2Domain(AppConfig.TAG_BLOCKED)
+            if (blkDomain.isNotEmpty()) {
+                hosts.putAll(blkDomain.map { it to AppConfig.LOOPBACK })
+            }
+
+            // hardcode googleapi rule to fix play store problems
+            hosts[AppConfig.GOOGLEAPIS_CN_DOMAIN] = AppConfig.GOOGLEAPIS_COM_DOMAIN
+
+            // hardcode popular Android Private DNS rule to fix localhost DNS problem
+            hosts[AppConfig.DNS_ALIDNS_DOMAIN] = AppConfig.DNS_ALIDNS_ADDRESSES
+            hosts[AppConfig.DNS_CLOUDFLARE_ONE_DOMAIN] = AppConfig.DNS_CLOUDFLARE_ONE_ADDRESSES
+            hosts[AppConfig.DNS_CLOUDFLARE_DNS_COM_DOMAIN] = AppConfig.DNS_CLOUDFLARE_DNS_COM_ADDRESSES
+            hosts[AppConfig.DNS_CLOUDFLARE_DNS_DOMAIN] = AppConfig.DNS_CLOUDFLARE_DNS_ADDRESSES
+            hosts[AppConfig.DNS_DNSPOD_DOMAIN] = AppConfig.DNS_DNSPOD_ADDRESSES
+            hosts[AppConfig.DNS_GOOGLE_DOMAIN] = AppConfig.DNS_GOOGLE_ADDRESSES
+            hosts[AppConfig.DNS_QUAD9_DOMAIN] = AppConfig.DNS_QUAD9_ADDRESSES
+            hosts[AppConfig.DNS_YANDEX_DOMAIN] = AppConfig.DNS_YANDEX_ADDRESSES
+
             //User DNS hosts
             try {
                 val userHosts = MmkvManager.decodeSettingsString(AppConfig.PREF_DNS_HOSTS)
@@ -492,24 +510,6 @@ object V2rayConfigManager {
             } catch (e: Exception) {
                 Log.e(AppConfig.TAG, "Failed to configure user DNS hosts", e)
             }
-
-            //block dns
-            val blkDomain = getUserRule2Domain(AppConfig.TAG_BLOCKED)
-            if (blkDomain.isNotEmpty()) {
-                hosts.putAll(blkDomain.map { it to AppConfig.LOOPBACK })
-            }
-
-            // hardcode googleapi rule to fix play store problems
-            hosts[AppConfig.GOOGLEAPIS_CN_DOMAIN] = AppConfig.GOOGLEAPIS_COM_DOMAIN
-
-            // hardcode popular Android Private DNS rule to fix localhost DNS problem
-            hosts[AppConfig.DNS_ALIDNS_DOMAIN] = AppConfig.DNS_ALIDNS_ADDRESSES
-            hosts[AppConfig.DNS_CLOUDFLARE_DOMAIN] = AppConfig.DNS_CLOUDFLARE_ADDRESSES
-            hosts[AppConfig.DNS_DNSPOD_DOMAIN] = AppConfig.DNS_DNSPOD_ADDRESSES
-            hosts[AppConfig.DNS_GOOGLE_DOMAIN] = AppConfig.DNS_GOOGLE_ADDRESSES
-            hosts[AppConfig.DNS_QUAD9_DOMAIN] = AppConfig.DNS_QUAD9_ADDRESSES
-            hosts[AppConfig.DNS_YANDEX_DOMAIN] = AppConfig.DNS_YANDEX_ADDRESSES
-
 
             // DNS dns
             v2rayConfig.dns = V2rayConfig.DnsBean(
