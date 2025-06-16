@@ -3,28 +3,21 @@ package com.v2ray.npv
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.npv.crsgw.component.LoadingDialog
 import com.npv.crsgw.databinding.NpvActivityLoginBinding
 import com.npv.crsgw.rest.model.NpvUser
 import com.npv.crsgw.rest.model.SignInWithEmailRequest
 import com.npv.crsgw.rest.network.ApiResult
-import com.npv.crsgw.rest.network.TokenManager
 import com.npv.crsgw.rest.repository.NpvRepository
 import com.npv.crsgw.store.UserStore
-import com.npv.crsgw.ui.UserViewModel
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.SpeedtestManager
-import com.v2ray.ang.ui.BaseActivity
 import kotlinx.coroutines.launch
-import kotlin.math.log
 
-class LoginActivity : NpvBaseActivity() {
-    private val TAG = LoginActivity::class.simpleName
+class NpvLoginActivity : NpvBaseActivity() {
+    private val TAG = NpvLoginActivity::class.simpleName
 
     private val binding by lazy { NpvActivityLoginBinding.inflate(layoutInflater) }
 
@@ -71,7 +64,7 @@ class LoginActivity : NpvBaseActivity() {
                             val user = NpvUser(r.avatar, r.username, r.nickname, r.accessToken, r.tokenType, r.status, password)
                             UserStore.storeUser(user)
                             // 跳转主页
-                            startActivity(Intent(this@LoginActivity, NpvMainActivity::class.java))
+                            startActivity(Intent(this@NpvLoginActivity, NpvMainActivity::class.java))
                         }
 
                         is ApiResult.Failure -> {

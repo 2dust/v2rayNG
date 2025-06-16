@@ -1,13 +1,18 @@
 package com.v2ray.npv
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.net.VpnService
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
@@ -16,15 +21,25 @@ import com.npv.crsgw.rest.model.GetHomeDataItemResponse
 import com.npv.crsgw.store.UserStore
 import com.npv.crsgw.ui.UserViewModel
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
+import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
+import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.service.V2RayServiceManager
 import com.v2ray.ang.ui.AboutActivity
 import com.v2ray.ang.ui.CheckUpdateActivity
 import com.v2ray.ang.ui.LogcatActivity
 import com.v2ray.ang.ui.PerAppProxyActivity
 import com.v2ray.ang.ui.UserAssetActivity
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.viewmodel.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -32,6 +47,13 @@ class NpvMainActivity : NpvBaseActivity(), NavigationView.OnNavigationItemSelect
     private val TAG = NpvMainActivity::class.simpleName
 
     private val binding by lazy { NpvActivityMainBinding.inflate(layoutInflater) }
+
+    private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            startV2Ray()
+        }
+    }
+    val mainViewModel: MainViewModel by viewModels()
 
     private val viewModel: UserViewModel by viewModels()
 
@@ -54,12 +76,29 @@ class NpvMainActivity : NpvBaseActivity(), NavigationView.OnNavigationItemSelect
             viewModel.getHomeData(email.toString())
         }
 
+        binding.startVpnButton.setOnClickListener {
+            if (mainViewModel.isRunning.value == true) {
+                V2RayServiceManager.stopVService(this)
+            } else if ((MmkvManager.decodeSettingsString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
+                val intent = VpnService.prepare(this)
+                if (intent == null) {
+                    startV2Ray()
+                } else {
+                    requestVpnPermission.launch(intent)
+                }
+            } else {
+                startV2Ray()
+            }
+        }
+
         val toggle = ActionBarDrawerToggle(
             this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
         )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         binding.navView.setNavigationItemSelectedListener(this)
+
+        setupViewModel()
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -82,9 +121,14 @@ class NpvMainActivity : NpvBaseActivity(), NavigationView.OnNavigationItemSelect
                 hideLoading()
                 // progressBar.visibility = View.GONE
                 // textView.text = it.name
+
+                importXrayConfig(it.subscriptionLinks)
+
                 userNameView.text = it.email
                 val t = formatExpireDate(it)
                 expireTime.text = t
+                binding.membershipStatus.text = t
+
                 Log.i(TAG, "get home data successfully: ${it.expireAt}")
             },
             onFailure = { _, msg ->
@@ -93,6 +137,15 @@ class NpvMainActivity : NpvBaseActivity(), NavigationView.OnNavigationItemSelect
                 Log.e(TAG, "Failed to get home data: $msg")
             }
         )
+    }
+
+    public override fun onResume() {
+        super.onResume()
+        mainViewModel.reloadServerList()
+    }
+
+    public override fun onPause() {
+        super.onPause()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -108,6 +161,89 @@ class NpvMainActivity : NpvBaseActivity(), NavigationView.OnNavigationItemSelect
 
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun setupViewModel() {
+        // mainViewModel.updateTestResultAction.observe(this) { setTestState(it) }
+        mainViewModel.isRunning.observe(this) { isRunning ->
+            //adapter.isRunning = isRunning
+            if (isRunning) {
+                // binding.startVpnButton.setImageResource(R.drawable.ic_stop_24dp)
+                binding.startVpnButton.text = getString(com.npv.crsgw.R.string.npv_disconnect)
+                binding.startVpnButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_active))
+                // setTestState(getString(R.string.connection_connected))
+                // binding.layoutTest.isFocusable = true
+            } else {
+                // binding.fab.setImageResource(R.drawable.ic_play_24dp)
+                binding.startVpnButton.text = getString(com.npv.crsgw.R.string.npv_tap_to_connect)
+                binding.startVpnButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_inactive))
+                // setTestState(getString(R.string.connection_not_connected))
+                // binding.layoutTest.isFocusable = false
+            }
+        }
+        mainViewModel.startListenBroadcast()
+        mainViewModel.initAssets(assets)
+    }
+
+    private fun startV2Ray() {
+        if (MmkvManager.getSelectServer().isNullOrEmpty()) {
+            toast(R.string.title_file_chooser)
+            return
+        }
+        V2RayServiceManager.startVService(this)
+    }
+
+    private fun restartV2Ray() {
+        if (mainViewModel.isRunning.value == true) {
+            V2RayServiceManager.stopVService(this)
+        }
+        lifecycleScope.launch {
+            delay(500)
+            startV2Ray()
+        }
+    }
+
+    private fun importXrayConfig(servers: List<String>?) {
+        if (servers == null || servers.isEmpty()) {
+            Log.w(TAG, "cannot import config, empty server list")
+            return
+        }
+
+        val server = servers[0]
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+
+                val ret = mainViewModel.removeAllServer()
+
+                val (count, countSub) = AngConfigManager.importBatchConfig(server, mainViewModel.subscriptionId, true)
+                delay(500L)
+                withContext(Dispatchers.Main) {
+                    when {
+                        count > 0 -> {
+                            // toast(getString(R.string.title_import_config_count, count))
+                            Log.i(TAG, "import config: " + getString(R.string.title_import_config_count, count))
+                            mainViewModel.reloadServerList()
+                        }
+
+                        // countSub > 0 -> initGroupTab()
+                        else -> {
+                            // toastError(R.string.toast_failure)
+                            Log.e(TAG, "Import config failed")
+                        }
+                    }
+                    // binding.pbWaiting.hide()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    // toastError(R.string.toast_failure)
+                    // binding.pbWaiting.hide()
+                    Log.e(TAG, "Import config exception: $e")
+                }
+                Log.e(AppConfig.TAG, "Failed to import batch config", e)
+            }
+        }
     }
 
     fun formatExpireDate(homeData: GetHomeDataItemResponse): String {

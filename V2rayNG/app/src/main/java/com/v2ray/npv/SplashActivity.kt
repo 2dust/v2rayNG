@@ -2,8 +2,6 @@ package com.v2ray.npv
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.lifecycleScope
 import com.npv.crsgw.store.UserStore
 import com.v2ray.ang.ui.BaseActivity
@@ -21,7 +19,7 @@ class SplashActivity : BaseActivity() {
             if (UserStore.isLoggedIn()) {
                 startActivity(Intent(this@SplashActivity, NpvMainActivity::class.java))
             } else {
-                startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
+                startActivity(Intent(this@SplashActivity, NpvLoginActivity::class.java))
             }
             finish()
         }

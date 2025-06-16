@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import com.npv.crsgw.component.LoadingDialog
 import com.npv.crsgw.event.AuthEventBus
+import com.npv.crsgw.rest.model.NpvUser
 import com.npv.crsgw.rest.network.ApiResult
 import com.npv.crsgw.store.UserStore
 import com.v2ray.ang.ui.BaseActivity
@@ -25,9 +26,18 @@ abstract class NpvBaseActivity : BaseActivity() {
                 if (!hasHandledLogout) {
                     hasHandledLogout = true // 防止多次跳转
 
-                    UserStore.clear() // 清除用户信息
+                    var user = UserStore.getUser()
+                    if (user != null) {
+                        val email = user.username
+                        val password = user.password
+                        UserStore.clear() // 清除用户信息
+                        val newUser = NpvUser("", email, "", "", "", "", password)
+                        UserStore.storeUser(newUser)
+                    }
 
-                    startActivity(Intent(this@NpvBaseActivity, LoginActivity::class.java).apply {
+                    // UserStore.clear() // 清除用户信息
+
+                    startActivity(Intent(this@NpvBaseActivity, NpvLoginActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     })
                 }

@@ -37,7 +37,7 @@
                     android:orientation="vertical">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/rippleButton"
+                        android:id="@+id/start_vpn_button"
                         android:layout_width="240dp"
                         android:layout_height="240dp"
                         android:layout_centerInParent="true"
