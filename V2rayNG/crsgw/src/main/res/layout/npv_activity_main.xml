@@ -66,16 +66,75 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="64dp"
+                            android:layout_gravity="center"
                             android:orientation="horizontal">
 
-                            <TextView
-                                android:id="@+id/membership_status"
+                            <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:gravity="center"
-                                android:text="@string/npv_membership_status_expired">
-                            </TextView>
+                                android:gravity="center_vertical"
+                                android:layout_marginLeft="16dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/membership_traffic_label"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/npv_data_usage"
+                                    android:textSize="12sp">
+                                </TextView>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:id="@+id/membership_used_traffic"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center"
+                                        android:text="@string/npv_used_traffic_value_0"
+                                        android:textSize="16sp">
+                                    </TextView>
+                                    <TextView
+                                        android:id="@+id/membership_total_traffic"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center"
+                                        android:text="@string/npv_total_traffic_value_0"
+                                        android:textSize="14sp">
+                                    </TextView>
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center_vertical"
+                                android:layout_marginRight="16dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/membership_valid_for_label"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/npv_valid_for"
+                                    android:textSize="12sp">
+                                </TextView>
+
+                                <TextView
+                                    android:id="@+id/membership_valid_for"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/npv_valid_for_days"
+                                    android:textSize="16sp">
+                                </TextView>
+                            </LinearLayout>
 
                             <TextView
                                 android:id="@+id/membership_renew"

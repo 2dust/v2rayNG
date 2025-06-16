@@ -28,6 +28,12 @@
 
     <string name="npv_purchase_membership">Purchase Membership</string>
 
+    <string name="npv_data_usage">Data Usage</string>
+    <string name="npv_total_traffic_value_0">/%1$d GB</string>
+    <string name="npv_used_traffic_value_0">%.2f GB</string>
+    <string name="npv_valid_for">Valid For</string>
+    <string name="npv_valid_for_days">%1$d Days</string>
+
     <string name="npv_error_unknown">Unknown error</string>
     <string name="npv_error_network">Network connection failed</string>
     <string name="npv_error_server">Internal server error</string>

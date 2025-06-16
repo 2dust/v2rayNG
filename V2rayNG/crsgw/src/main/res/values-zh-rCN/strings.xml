@@ -20,6 +20,12 @@
 
     <string name="npv_purchase_membership">购买会员</string>
 
+    <string name="npv_data_usage">已使用</string>
+    <string name="npv_total_traffic_value_0">/%1$d GB</string>
+    <string name="npv_used_traffic_value_0">%.2f GB</string>
+    <string name="npv_valid_for">有效期</string>
+    <string name="npv_valid_for_days">%1$d 天</string>
+
     <string name="npv_switch_country_or_region">变更国家和地区</string>
     <string name="npv_my_ticket">我的工单</string>
     <string name="npv_referral_rebate">推荐有奖</string>

@@ -24,8 +24,6 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.service.V2RayServiceManager
@@ -127,13 +125,18 @@ class NpvMainActivity : NpvBaseActivity(), NavigationView.OnNavigationItemSelect
                 userNameView.text = it.email
                 val t = formatExpireDate(it)
                 expireTime.text = t
-                binding.membershipStatus.text = t
+
+                binding.membershipUsedTraffic.text = getString(com.npv.crsgw.R.string.npv_used_traffic_value_0, it.usedTraffic)
+                binding.membershipTotalTraffic.text = getString(com.npv.crsgw.R.string.npv_total_traffic_value_0, it.totalTraffic)
+                binding.membershipValidFor.text = getString(com.npv.crsgw.R.string.npv_valid_for_days, it.remainingDays)
 
                 Log.i(TAG, "get home data successfully: ${it.expireAt}")
             },
             onFailure = { _, msg ->
                 hideLoading()
-
+                binding.membershipUsedTraffic.text = getString(com.npv.crsgw.R.string.npv_used_traffic_value_0, 0)
+                binding.membershipTotalTraffic.text = getString(com.npv.crsgw.R.string.npv_total_traffic_value_0, 0)
+                binding.membershipValidFor.text = getString(com.npv.crsgw.R.string.npv_valid_for_days, 0)
                 Log.e(TAG, "Failed to get home data: $msg")
             }
         )
@@ -259,7 +262,7 @@ class NpvMainActivity : NpvBaseActivity(), NavigationView.OnNavigationItemSelect
         if (result.isNullOrEmpty()) {
             result = getString(com.npv.crsgw.R.string.npv_purchase_membership)
         } else {
-            result = getString(com.npv.crsgw.R.string.npv_membership_status_normal, result)
+            // result = getString(com.npv.crsgw.R.string.npv_membership_status_normal, result)
         }
         return result
     }
