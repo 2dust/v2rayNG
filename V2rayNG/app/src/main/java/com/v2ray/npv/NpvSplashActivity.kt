@@ -8,7 +8,7 @@ import com.v2ray.ang.ui.BaseActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class SplashActivity : BaseActivity() {
+class NpvSplashActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,9 +17,9 @@ class SplashActivity : BaseActivity() {
         lifecycleScope.launch {
             delay(500)
             if (UserStore.isLoggedIn()) {
-                startActivity(Intent(this@SplashActivity, NpvMainActivity::class.java))
+                startActivity(Intent(this@NpvSplashActivity, NpvMainActivity::class.java))
             } else {
-                startActivity(Intent(this@SplashActivity, NpvLoginActivity::class.java))
+                startActivity(Intent(this@NpvSplashActivity, NpvLoginActivity::class.java))
             }
             finish()
         }

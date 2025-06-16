@@ -58,7 +58,7 @@
         tools:targetApi="m">
 
         <activity
-            android:name="com.v2ray.npv.SplashActivity"
+            android:name="com.v2ray.npv.NpvSplashActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/AppThemeDayNight.NoActionBar">
