@@ -17,6 +17,7 @@ import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
 import com.npv.crsgw.databinding.NpvActivityMainBinding
+import com.npv.crsgw.event.AuthEventBus
 import com.npv.crsgw.rest.model.GetHomeDataItemResponse
 import com.npv.crsgw.store.UserStore
 import com.npv.crsgw.ui.UserViewModel
@@ -24,6 +25,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.service.V2RayServiceManager
@@ -34,6 +36,8 @@ import com.v2ray.ang.ui.PerAppProxyActivity
 import com.v2ray.ang.ui.UserAssetActivity
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
+import com.v2ray.npv.NpvBaseActivity
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -154,12 +158,22 @@ class NpvMainActivity : NpvBaseActivity(), NavigationView.OnNavigationItemSelect
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
+            com.npv.crsgw.R.id.switch_country_region -> toastSuccess("Switch region")
+            com.npv.crsgw.R.id.my_ticket -> toastSuccess("提交工单")
+            com.npv.crsgw.R.id.referral_rebate -> toastSuccess("referral_rebate")
+            com.npv.crsgw.R.id.notification_center -> toastSuccess("notification_center")
+            com.npv.crsgw.R.id.logout ->  CoroutineScope(Dispatchers.Main).launch {
+                AuthEventBus.notifyAuthExpired()
+            }
+            com.npv.crsgw.R.id.about -> toastSuccess("about")
+            /*
             R.id.per_app_proxy_settings -> startActivity(Intent(this, PerAppProxyActivity::class.java))
             R.id.user_asset_setting -> startActivity(Intent(this, UserAssetActivity::class.java))
             R.id.promotion -> Utils.openUri(this, "${Utils.decode(AppConfig.APP_PROMOTION_URL)}?t=${System.currentTimeMillis()}")
             R.id.logcat -> startActivity(Intent(this, LogcatActivity::class.java))
             R.id.check_for_update -> startActivity(Intent(this, CheckUpdateActivity::class.java))
             R.id.about -> startActivity(Intent(this, AboutActivity::class.java))
+            */
         }
 
         binding.drawerLayout.closeDrawer(GravityCompat.START)

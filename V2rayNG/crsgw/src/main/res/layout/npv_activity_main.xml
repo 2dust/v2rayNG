@@ -96,7 +96,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:gravity="center"
-                                        android:text="@string/npv_used_traffic_value_0"
+                                        android:text="@string/npv_used_traffic_default_value"
                                         android:textSize="16sp">
                                     </TextView>
                                     <TextView
@@ -104,7 +104,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:gravity="center"
-                                        android:text="@string/npv_total_traffic_value_0"
+                                        android:text="@string/npv_total_traffic_default_value"
                                         android:textSize="14sp">
                                     </TextView>
                                 </LinearLayout>
@@ -131,7 +131,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:gravity="center"
-                                    android:text="@string/npv_valid_for_days"
+                                    android:text="@string/npv_valid_for_default_days"
                                     android:textSize="16sp">
                                 </TextView>
                             </LinearLayout>
