@@ -827,13 +827,13 @@ object V2rayConfigManager {
 
         for (item in proxyOutboundList) {
             val domain = item.getServerAddress()
-            if (domain.isNullOrEmpty()) continue
+            if (domain.isNullOrEmpty() || Utils.isPureIpAddress(domain)) continue
+            item.ensureSockopt().domainStrategy = if (preferIpv6) "UseIPv6v4" else "UseIPv4v6"
             if (newHosts.containsKey(domain)) continue
 
             val resolvedIps = HttpUtil.resolveHostToIP(domain, preferIpv6)
             if (resolvedIps.isNullOrEmpty()) continue
 
-            item.ensureSockopt().domainStrategy = if (preferIpv6) "UseIPv6v4" else "UseIPv4v6"
             newHosts[domain] = if (resolvedIps.size == 1) {
                 resolvedIps[0]
             } else {
