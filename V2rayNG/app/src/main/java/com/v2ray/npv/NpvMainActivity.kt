@@ -16,6 +16,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
+import com.npv.crsgw.data.NpvDatabase
+import com.npv.crsgw.data.Server
+import com.npv.crsgw.data.ServerDao
 import com.npv.crsgw.databinding.NpvActivityMainBinding
 import com.npv.crsgw.event.AuthEventBus
 import com.npv.crsgw.rest.model.GetHomeDataItemResponse
@@ -59,11 +62,19 @@ class NpvMainActivity : NpvBaseActivity(), NavigationView.OnNavigationItemSelect
 
     private val viewModel: UserViewModel by viewModels()
 
+    private lateinit var db: NpvDatabase
+    private lateinit var serverDao: ServerDao
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
+
+        // 初始化 Room 数据库
+        db = NpvDatabase.getInstance(applicationContext)
+        serverDao = db.serverDao()
+
         val navView = binding.navView
         val headerView = navView.getHeaderView(0)
         val userNameView = headerView.findViewById<TextView>(com.npv.crsgw.R.id.user_name)
@@ -124,7 +135,7 @@ class NpvMainActivity : NpvBaseActivity(), NavigationView.OnNavigationItemSelect
                 // progressBar.visibility = View.GONE
                 // textView.text = it.name
 
-                importXrayConfig(it.subscriptionLinks)
+                importXrayConfig(it)
 
                 userNameView.text = it.email
                 val t = formatExpireDate(it)
@@ -221,7 +232,8 @@ class NpvMainActivity : NpvBaseActivity(), NavigationView.OnNavigationItemSelect
         }
     }
 
-    private fun importXrayConfig(servers: List<String>?) {
+    private fun importXrayConfig(response: GetHomeDataItemResponse) {
+        val servers: List<String>? = response.subscriptionLinks
         if (servers == null || servers.isEmpty()) {
             Log.w(TAG, "cannot import config, empty server list")
             return
@@ -231,11 +243,23 @@ class NpvMainActivity : NpvBaseActivity(), NavigationView.OnNavigationItemSelect
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
+                mainViewModel.removeInvalidServer()
+                mainViewModel.removeDuplicateServer()
 
-                val ret = mainViewModel.removeAllServer()
-
-                val (count, countSub) = AngConfigManager.importBatchConfig(server, mainViewModel.subscriptionId, true)
+                var count = 0;
+                val currentServer = serverDao.findBySignature(response.signature)
+                if (currentServer == null || currentServer.signature != response.signature) {
+                    val (number, countSub) = AngConfigManager.importBatchConfig(server, mainViewModel.subscriptionId, true)
+                    count = number
+                    val guid = MmkvManager.getSelectServer()
+                    serverDao.insertServer(Server(0,
+                        guid.toString(), response.signature, server, response.email, 2))
+                    Log.i(TAG, "Add new subscription link: $server, $guid")
+                } else {
+                    MmkvManager.setSelectServer(currentServer.guid)
+                }
                 delay(500L)
+
                 withContext(Dispatchers.Main) {
                     when {
                         count > 0 -> {

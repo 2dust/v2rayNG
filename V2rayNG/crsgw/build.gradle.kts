@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
 }
 
 android {
@@ -47,6 +48,8 @@ tasks.withType<Test>().configureEach {
     }
 }
 
+val roomVersion = "2.7.1"
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -64,7 +67,6 @@ dependencies {
 
     testImplementation("androidx.test:core:1.5.0")
     testImplementation("org.robolectric:robolectric:4.15-beta-1")
-
 
     testImplementation("org.junit.platform:junit-platform-launcher:1.10.2")
     testImplementation("org.junit.platform:junit-platform-engine:1.10.2")
@@ -98,5 +100,11 @@ dependencies {
 
     // lottie animation
     implementation("com.airbnb.android:lottie:6.6.6")
+
+    // Room
+    api("androidx.room:room-runtime:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
+    // 可选：支持 Kotlin 协程
+    api("androidx.room:room-ktx:$roomVersion")
 
 }

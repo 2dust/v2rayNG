@@ -61,7 +61,9 @@ class NpvLoginActivity : NpvBaseActivity() {
                     when (result) {
                         is ApiResult.Success -> {
                             val r = result.data
-                            val user = NpvUser(r.avatar, r.username, r.nickname, r.accessToken, r.tokenType, r.status, password)
+                            val user = NpvUser(r.avatar, r.username, r.nickname,
+                                r.accessToken, r.tokenType, r.status,
+                                password, "", "")
                             UserStore.storeUser(user)
                             // 跳转主页
                             startActivity(Intent(this@NpvLoginActivity, NpvMainActivity::class.java))

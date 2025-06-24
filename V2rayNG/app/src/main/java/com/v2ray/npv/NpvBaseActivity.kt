@@ -31,7 +31,7 @@ abstract class NpvBaseActivity : BaseActivity() {
                         val email = user.username
                         val password = user.password
                         UserStore.clear() // 清除用户信息
-                        val newUser = NpvUser("", email, "", "", "", "", password)
+                        val newUser = NpvUser("", email, "", "", "", "", password, "", "")
                         UserStore.storeUser(newUser)
                     }
 

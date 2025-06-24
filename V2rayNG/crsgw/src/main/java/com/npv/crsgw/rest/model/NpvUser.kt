@@ -7,5 +7,7 @@ data class NpvUser(
     val accessToken: String,
     val tokenType: String,
     val status: String,
-    val password: String?
+    val password: String?,
+    val linkSignature: String?,
+    val configGuid: String?
 )

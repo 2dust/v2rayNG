@@ -35,10 +35,7 @@ object UserStore {
 
     suspend fun isLoggedIn(): Boolean {
         val user = getUser()
-        if (user != null) {
-            return true
-        }
-        return false
+        return user != null
     }
 
     suspend fun storeUser(user: NpvUser) {
