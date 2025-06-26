@@ -181,11 +181,20 @@
             android:summary="@string/summary_pref_proxy_sharing_enabled"
             android:title="@string/title_pref_proxy_sharing_enabled" />
 
+
+
+
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_allow_insecure"
             android:summary="@string/summary_pref_allow_insecure"
             android:title="@string/title_pref_allow_insecure" />
+
+        <Preference
+            android:title="@string/title_pref_local_ip"
+            android:key="pref_local_ip"
+            android:selectable="true"
+            android:enabled="true" />
 
         <EditTextPreference
             android:inputType="number"
