@@ -21,6 +21,7 @@ import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import java.io.IOException
 import java.net.InetAddress
+import java.net.NetworkInterface
 import java.net.ServerSocket
 import java.net.URI
 import java.net.URLDecoder
@@ -81,6 +82,38 @@ object Utils {
             ""
         }
     }
+
+    /**
+     * get Device Local Ip Address
+     */
+    fun getLocalIpAddress(): String? {
+        try {
+            val interfaces = NetworkInterface.getNetworkInterfaces()
+            while (interfaces.hasMoreElements()) {
+                val networkInterface = interfaces.nextElement()
+
+                // Skip loopback and inactive interfaces
+                if (networkInterface.isLoopback || !networkInterface.isUp) {
+                    continue
+                }
+
+                val addresses = networkInterface.inetAddresses
+                while (addresses.hasMoreElements()) {
+                    val address = addresses.nextElement()
+
+                    // Check if it's IPv4 and not loopback
+                    if (!address.isLoopbackAddress &&
+                        address is java.net.Inet4Address) {
+                        return address.hostAddress
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
 
     /**
      * Set text to the clipboard.
