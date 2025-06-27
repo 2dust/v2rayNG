@@ -137,6 +137,7 @@
     <!-- Preferences -->
     <string name="title_settings">设置</string>
     <string name="title_advanced">进阶设置</string>
+    <string name="title_core_settings">核心设置</string>
     <string name="title_vpn_settings">VPN 设置</string>
     <string name="title_pref_per_app_proxy">分应用</string>
     <string name="summary_pref_per_app_proxy">常规: 勾选的 App 被代理, 未勾选的直连;\n绕行模式: 勾选的 App 直连, 未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>

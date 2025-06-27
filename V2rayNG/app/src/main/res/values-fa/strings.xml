@@ -137,6 +137,7 @@
     <!-- Preferences -->
     <string name="title_settings">تنظیمات</string>
     <string name="title_advanced">تنظیمات پیشرفته</string>
+    <string name="title_core_settings">تنظیمات هسته</string>
     <string name="title_vpn_settings">تنظیمات VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی به تفکیک برنامه</string>
     <string name="summary_pref_per_app_proxy">عمومی: برنامه انتخاب شده از طریق یک پروکسی متصل می شود، برنامه انتخاب نشده مستقیماً متصل می شود. \nحالت دور زدن: برنامه انتخاب شده مستقیماً متصل می شود، برنامه انتخاب نشده از طریق یک پروکسی متصل می شود. \nانتخاب خودکار برنامه های پراکسی در منو امکان پذیر است.</string>

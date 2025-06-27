@@ -141,6 +141,7 @@
     <!-- Preferences -->
     <string name="title_settings">الإعدادات</string>
     <string name="title_advanced">إعدادات متقدمة</string>
+    <string name="title_core_settings">إعدادات النواة</string>
     <string name="title_vpn_settings">إعدادات VPN</string>
     <string name="title_pref_per_app_proxy">الوكيل لكل تطبيق</string>
     <string name="summary_pref_per_app_proxy">عام: التطبيق المحدد هو وكيل، غير المحدد اتصال مباشر؛ \nوضع التجاوز: التطبيق المحدد متصل مباشرة، غير المحدد وكيل. \nخيار تحديد تطبيق الوكيل تلقائيًا في القائمة</string>

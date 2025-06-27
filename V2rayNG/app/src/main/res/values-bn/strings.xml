@@ -139,6 +139,7 @@
     <!-- Preferences -->
     <string name="title_settings">সেটিংস</string>
     <string name="title_advanced">এডভান্সড সেটিংস</string>
+    <string name="title_core_settings">কোর সেটিংস</string>
     <string name="title_vpn_settings">VPN সেটিংস</string>
     <string name="title_pref_per_app_proxy">প্রতি-অ্যাপ প্রক্সি</string>
     <string name="summary_pref_per_app_proxy">সাধারণ: চেকড অ্যাপ প্রক্সি, আনচেকড সরাসরি সংযোগ; \nবাইপাস মোড: চেকড অ্যাপ সরাসরি সংযুক্ত, আনচেকড প্রক্সি। \nমেনুতে প্রক্সি অ্যাপ্লিকেশন স্বয়ংক্রিয়ভাবে নির্বাচন করার বিকল্প</string>

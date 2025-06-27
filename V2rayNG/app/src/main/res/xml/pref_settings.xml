@@ -179,9 +179,7 @@
             android:title="@string/title_pref_auto_update_interval" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/title_advanced"
-        app:initialExpandedChildrenCount="0">
+    <PreferenceCategory android:title="@string/title_core_settings">
 
         <CheckBoxPreference
             android:defaultValue="false"
@@ -216,11 +214,6 @@
             android:summary="@string/summary_pref_dns_hosts"
             android:title="@string/title_pref_dns_hosts" />
 
-        <EditTextPreference
-            android:key="pref_delay_test_url"
-            android:summary="@string/summary_pref_delay_test_url"
-            android:title="@string/title_pref_delay_test_url" />
-
         <ListPreference
             android:defaultValue="warning"
             android:entries="@array/core_loglevel"
@@ -229,6 +222,15 @@
             android:summary="%s"
             android:title="@string/title_core_loglevel" />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_advanced">
+
+        <EditTextPreference
+            android:key="pref_delay_test_url"
+            android:summary="@string/summary_pref_delay_test_url"
+            android:title="@string/title_pref_delay_test_url" />
+
         <ListPreference
             android:defaultValue="VPN"
             android:entries="@array/mode_entries"
@@ -236,6 +238,7 @@
             android:key="pref_mode"
             android:summary="%s"
             android:title="@string/title_mode" />
-
     </PreferenceCategory>
+
+
 </PreferenceScreen>

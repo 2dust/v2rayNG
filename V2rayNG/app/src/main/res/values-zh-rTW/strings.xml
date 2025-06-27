@@ -138,6 +138,7 @@
     <!-- Preferences -->
     <string name="title_settings">設定</string>
     <string name="title_advanced">進階</string>
+    <string name="title_core_settings">核心設定</string>
     <string name="title_vpn_settings">VPN 設定</string>
     <string name="title_pref_per_app_proxy">Proxy 個別應用程式</string>
     <string name="summary_pref_per_app_proxy">常規：勾選的 App 啟用 Proxy，未勾選的直接連線；\n繞行模式：勾選的 App 直接連線，未勾選的啟用 Proxy。\n可在選單中選擇自動選中需 Proxy 應用</string>
