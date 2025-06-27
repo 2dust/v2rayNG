@@ -140,7 +140,6 @@
     <!-- Preferences -->
     <string name="title_settings">سامووا</string>
     <string name="title_advanced">سامووا پؽش رئڌه</string>
-    <string name="title_core_settings">سامووا هسته</string>
     <string name="title_vpn_settings">سامووا VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی و ری برنومه</string>
     <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه واجۊری بیڌه پروکسی هڌ، منپیز موستقیم بؽ نشووه هڌ. هالت دور زیڌن: برنومه نشووک ناڌه موستقیمن منپیز هڌ، پروکسی نشووک زیڌه نؽڌ. گۊزینه پسند خوتکار برنومه پروکسی من نومگه</string>
@@ -168,7 +167,7 @@
     <string name="summary_pref_route_only_enabled">ز نوم دامنه sniffed تینا سی تور جوستن استفاڌه کۊنین وو نشۊوی مۉرد نزرن و عونوان نشۊوی IP ووردارین.</string>
 
     <string name="title_pref_local_dns_enabled">ر وندن DNS مهلی</string>
-    <string name="summary_pref_local_dns_enabled">DNS پردازشت وابیڌه و دس هسته ماژول DNS (پؽشنهاڌ ابۊ، ٱر نیاز هڌ ک جوستن تور وو ولات ٱسلین دور زنی)</string>
+    <string name="summary_pref_local_dns_enabled">درخاستا DNS و هسته و من ایان وو و دست ماژول DNS پردازشت ابۊن (پؽشنهاڌ ابۊ ٱر لنگ تور جوستن سی دور زیڌن نشۊویا LAN وو وولات ٱسلی هڌین فعال بۊ)</string>
 
     <string name="title_pref_fake_dns_enabled">ر وندن DNS جئلی</string>
     <string name="summary_pref_fake_dns_enabled">DNS مهلی نشۊویا IP جئلی ن وورگنه (زل تر، ٱما گاشڌ من یقرد ز برنومه یل کار نکونه)</string>
@@ -182,7 +181,7 @@
     <string name="title_pref_vpn_dns">VPN DNS (تینا IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">VPN ز شبکه مهلی اگوڌرته؟</string>
 
-    <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
+    <string name="title_pref_vpn_interface_address">نشۊوی رابت VPN</string>
 
     <string name="title_pref_domestic_dns">DNS منی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
