@@ -41,6 +41,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_MODE,
             AppConfig.PREF_VPN_DNS,
             AppConfig.PREF_VPN_BYPASS_LAN,
+            AppConfig.PREF_VPN_INTERFACE_ADDRESS_CONFIG_INDEX,
             AppConfig.PREF_REMOTE_DNS,
             AppConfig.PREF_DOMESTIC_DNS,
             AppConfig.PREF_DNS_HOSTS,

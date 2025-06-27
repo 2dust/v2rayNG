@@ -16,6 +16,7 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RoutingType
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.dto.VpnInterfaceAddressConfig
 import com.v2ray.ang.handler.MmkvManager.decodeServerConfig
 import com.v2ray.ang.handler.MmkvManager.decodeServerList
 import com.v2ray.ang.util.JsonUtil
@@ -355,5 +356,18 @@ object SettingsManager {
             "1" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             "2" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
+    }
+
+    /**
+     * Retrieves the currently selected VPN interface address configuration.
+     * This method reads the user's preference for VPN interface addressing and returns
+     * the corresponding configuration containing IPv4 and IPv6 addresses.
+     *
+     * @return The selected VpnInterfaceAddressConfig instance, or the default configuration
+     *         if no valid selection is found or if the stored index is invalid.
+     */
+    fun getCurrentVpnInterfaceAddressConfig(): VpnInterfaceAddressConfig {
+        val selectedIndex = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_INTERFACE_ADDRESS_CONFIG_INDEX, "0")?.toInt()
+        return VpnInterfaceAddressConfig.getConfigByIndex(selectedIndex ?: 0)
     }
 }

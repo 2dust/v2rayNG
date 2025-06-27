@@ -20,9 +20,9 @@
 
     <PreferenceCategory android:title="@string/title_vpn_settings">
         <CheckBoxPreference
-                android:key="pref_prefer_ipv6"
-                android:summary="@string/summary_pref_prefer_ipv6"
-                android:title="@string/title_pref_prefer_ipv6" />
+            android:key="pref_prefer_ipv6"
+            android:summary="@string/summary_pref_prefer_ipv6"
+            android:title="@string/title_pref_prefer_ipv6" />
 
         <CheckBoxPreference
             android:key="pref_per_app_proxy"
@@ -62,6 +62,14 @@
             android:key="pref_vpn_bypass_lan"
             android:summary="%s"
             android:title="@string/title_pref_vpn_bypass_lan" />
+
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/vpn_interface_address"
+            android:entryValues="@array/vpn_interface_address_value"
+            android:key="pref_vpn_interface_address_config_index"
+            android:summary="%s"
+            android:title="@string/title_pref_vpn_interface_address" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_ui_settings">

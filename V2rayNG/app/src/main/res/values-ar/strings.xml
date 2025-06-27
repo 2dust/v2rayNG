@@ -181,6 +181,8 @@
     <string name="title_pref_vpn_dns">VPN DNS (IPv4/v6 فقط)</string>
     <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
 
+    <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
+
     <string name="title_pref_domestic_dns">DNS المحلي (اختياري)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 

@@ -180,6 +180,8 @@
     <string name="title_pref_vpn_dns">VPN DNS (только IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">VPN пропускает LAN</string>
 
+    <string name="title_pref_vpn_interface_address">VPN частный IP</string>
+
     <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 

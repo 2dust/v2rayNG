@@ -180,6 +180,8 @@
     <string name="title_pref_vpn_dns">VPN DNS (僅支援 IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">VPN 是否繞過區域網</string>
 
+    <string name="title_pref_vpn_interface_address">VPN 介面位址</string>
+
     <string name="summary_pref_domestic_dns">DNS</string>
     <string name="title_pref_domestic_dns">境内 DNS (可选)</string>
     <string name="title_pref_dns_hosts">DNS hosts (格式: 網域:位址,…)</string>
@@ -359,5 +361,6 @@
         <item>繞過</item>
         <item>不繞過</item>
     </string-array>
+
 
 </resources>
