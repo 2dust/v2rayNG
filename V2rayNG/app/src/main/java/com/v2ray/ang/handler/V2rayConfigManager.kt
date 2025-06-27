@@ -131,7 +131,10 @@ object V2rayConfigManager {
             v2rayConfig.policy = null
         }
 
-        resolveOutboundDomainsToHosts(v2rayConfig)
+        //Resolve and add to DNS Hosts
+        if (MmkvManager.decodeSettingsString(AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD, "1") == "1") {
+            resolveOutboundDomainsToHosts(v2rayConfig)
+        }
 
         result.status = true
         result.content = JsonUtil.toJsonPretty(v2rayConfig) ?: ""

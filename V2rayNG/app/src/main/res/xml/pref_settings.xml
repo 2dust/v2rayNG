@@ -222,6 +222,14 @@
             android:summary="%s"
             android:title="@string/title_core_loglevel" />
 
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/outbound_domain_resolve_method"
+            android:entryValues="@array/outbound_domain_resolve_method_value"
+            android:key="pref_outbound_domain_resolve_method"
+            android:summary="%s"
+            android:title="@string/title_outbound_domain_resolve_method" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_advanced">

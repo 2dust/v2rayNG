@@ -241,6 +241,7 @@
     <string name="title_pref_auto_update_interval">فاسله ورۊ کردن خوتکار (اقلن وا 15 دؽقه بۊ)</string>
 
     <string name="title_core_loglevel">سئت داسووا</string>
+    <string name="title_outbound_domain_resolve_method">Outbound domain pre-resolve method</string>
     <string name="title_mode">هالت</string>
     <string name="title_mode_help">سی دووسمندیا وو هیاری بیشتر، ری ای هؽل بزݩ</string>
     <string name="title_language">زۉݩ</string>
@@ -370,6 +371,12 @@
         <item>پؽش فرز کانفیگ</item>
         <item>دور زیڌه بۊ</item>
         <item>دور زیڌه نبۊ</item>
+    </string-array>
+
+    <string-array name="outbound_domain_resolve_method">
+        <item>Do not resolve</item>
+        <item>Resolve and add to DNS Hosts</item>
+        <item>Resolve and replace domain</item>
     </string-array>
 
 </resources>
