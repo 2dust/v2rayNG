@@ -140,6 +140,7 @@
     <!-- Preferences -->
     <string name="title_settings">سامووا</string>
     <string name="title_advanced">سامووا پؽش رئڌه</string>
+    <string name="title_core_settings">سامووا هسته</string>
     <string name="title_vpn_settings">سامووا VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی و ری برنومه</string>
     <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه واجۊری بیڌه پروکسی هڌ، منپیز موستقیم بؽ نشووه هڌ. هالت دور زیڌن: برنومه نشووک ناڌه موستقیمن منپیز هڌ، پروکسی نشووک زیڌه نؽڌ. گۊزینه پسند خوتکار برنومه پروکسی من نومگه</string>
