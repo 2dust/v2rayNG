@@ -267,6 +267,7 @@
     <string name="title_sub_update">更新目前群組訂閱</string>
     <string name="title_ping_all_server">偵測目前群組設定 Tcping</string>
     <string name="title_real_ping_all_server">偵測目前群組設定真延遲</string>
+    <string name="title_create_intelligent_selection_all_server">Creating Intelligent Selection Current Group Configuration</string>
     <string name="title_user_asset_setting">資源檔案</string>
     <string name="title_sort_by_test_results">依偵測結果排序</string>
     <string name="title_filter_config">過濾設定</string>
@@ -368,6 +369,13 @@
         <item>不解析</item>
         <item>解析後加入 DNS Hosts</item>
         <item>解析後替換原網域名稱</item>
+    </string-array>
+    <string name="intelligent_selection">Intelligent Selection</string>
+    <string name="sub_setting_intelligent_selection_filter">Remarks Intelligent Selection regular filter</string>
+    <string name="title_intelligent_selection_method">Intelligent Selection Method</string>
+    <string-array name="intelligent_selection_method">
+        <item>Least Ping</item>
+        <item>Least Load</item>
     </string-array>
 
 </resources>

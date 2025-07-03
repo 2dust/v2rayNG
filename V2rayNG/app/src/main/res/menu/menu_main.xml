@@ -98,4 +98,8 @@
         android:id="@+id/sub_update"
         android:title="@string/title_sub_update"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/intelligent_selection_all"
+        android:title="@string/title_create_intelligent_selection_all_server"
+        app:showAsAction="never" />
 </menu>

@@ -385,6 +385,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
+     * Creates an intelligent selection configuration containing all currently filtered servers.
+     */
+    fun createIntelligentSelectionAll() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val key = AngConfigManager.createIntelligentSelection(
+                getApplication<AngApplication>(),
+                serversCache.map { it.guid }.toList(),
+                subscriptionId
+            )
+
+            launch(Dispatchers.Main) {
+                if (key.isNullOrEmpty()) {
+                    getApplication<AngApplication>().toastError(R.string.toast_failure)
+                } else {
+                    getApplication<AngApplication>().toastSuccess(R.string.toast_success)
+                    MmkvManager.setSelectServer(key)
+                    reloadServerList()
+                }
+            }
+        }
+    }
+
+    /**
      * Initializes assets.
      * @param assets The asset manager.
      */

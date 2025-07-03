@@ -230,6 +230,14 @@
             android:summary="%s"
             android:title="@string/title_outbound_domain_resolve_method" />
 
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/intelligent_selection_method"
+            android:entryValues="@array/intelligent_selection_method_value"
+            android:key="pref_intelligent_selection_method"
+            android:summary="%s"
+            android:title="@string/title_intelligent_selection_method" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_advanced">
