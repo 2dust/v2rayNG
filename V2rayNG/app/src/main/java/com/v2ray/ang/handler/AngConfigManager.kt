@@ -490,4 +490,31 @@ object AngConfigManager {
         MmkvManager.encodeSubscription("", subItem)
         return 1
     }
+
+    /**
+     * Creates an intelligent selection configuration based on multiple server configurations.
+     *
+     * @param context The application context used for configuration generation.
+     * @param guidList The list of server GUIDs to be included in the intelligent selection.
+     *                 Each GUID represents a server configuration that will be combined.
+     * @param subid The subscription ID to associate with the generated configuration.
+     *              This helps organize the configuration under a specific subscription.
+     * @return The GUID key of the newly created intelligent selection configuration,
+     *         or null if the operation fails (e.g., empty guidList or configuration parsing error).
+     */
+    fun createIntelligentSelection(
+        context: Context,
+        guidList: List<String>,
+        subid: String
+    ): String? {
+        if (guidList.isEmpty()) {
+            return null
+        }
+        val result = V2rayConfigManager.genV2rayConfig(context, guidList) ?: return null
+        val config = CustomFmt.parse(JsonUtil.toJson(result)) ?: return null
+        config.subscriptionId = subid
+        val key = MmkvManager.encodeServerConfig("", config)
+        MmkvManager.encodeServerRaw(key, JsonUtil.toJsonPretty(result) ?: "")
+        return key
+    }
 }

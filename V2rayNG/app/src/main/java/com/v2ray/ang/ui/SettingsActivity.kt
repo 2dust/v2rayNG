@@ -258,6 +258,7 @@ class SettingsActivity : BaseActivity() {
                 AppConfig.PREF_UI_MODE_NIGHT,
                 AppConfig.PREF_LOGLEVEL,
                 AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD,
+                AppConfig.PREF_INTELLIGENT_SELECTION_METHOD,
                 AppConfig.PREF_MODE
             ).forEach { key ->
                 if (MmkvManager.decodeSettingsString(key) != null) {
