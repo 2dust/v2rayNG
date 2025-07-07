@@ -137,6 +137,7 @@
     <!-- Preferences -->
     <string name="title_settings">设置</string>
     <string name="title_advanced">进阶设置</string>
+    <string name="title_core_settings">核心设置</string>
     <string name="title_vpn_settings">VPN 设置</string>
     <string name="title_pref_per_app_proxy">分应用</string>
     <string name="summary_pref_per_app_proxy">常规: 勾选的 App 被代理, 未勾选的直连;\n绕行模式: 勾选的 App 直连, 未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
@@ -177,6 +178,8 @@
 
     <string name="title_pref_vpn_dns">VPN DNS (仅支持 IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">VPN 是否绕过局域网</string>
+
+    <string name="title_pref_vpn_interface_address">VPN 接口地址</string>
 
     <string name="title_pref_domestic_dns">境内 DNS (可选)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -235,6 +238,7 @@
     <string name="title_pref_auto_update_interval">自动更新间隔（分钟，最小值 15）</string>
 
     <string name="title_core_loglevel">日志级别</string>
+    <string name="title_outbound_domain_resolve_method">Outbound 域名预解析方式</string>
     <string name="title_mode">模式</string>
     <string name="title_mode_help">点此查看更多帮助</string>
     <string name="title_language">语言</string>
@@ -358,6 +362,12 @@
         <item>跟随配置文件</item>
         <item>绕过</item>
         <item>不绕过</item>
+    </string-array>
+
+    <string-array name="outbound_domain_resolve_method">
+        <item>不解析</item>
+        <item>解析后添加至 DNS Hosts</item>
+        <item>解析后替换原域名</item>
     </string-array>
 
 </resources>

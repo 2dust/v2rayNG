@@ -199,6 +199,21 @@ object Utils {
     }
 
     /**
+     * Check if a string is a valid domain name.
+     *
+     * A valid domain name must not be an IP address and must be a valid URL format.
+     *
+     * @param input The string to check.
+     * @return True if the string is a valid domain name, false otherwise.
+     */
+    fun isDomainName(input: String?): Boolean {
+        if (input.isNullOrEmpty()) return false
+
+        // Must not be an IP address and must be a valid URL format
+        return !isPureIpAddress(input) && isValidUrl(input)
+    }
+
+    /**
      * Check if a string is a valid IPv4 address.
      *
      * @param value The string to check.

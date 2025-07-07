@@ -71,7 +71,7 @@ object AngConfigManager {
             if (sb.count() > 0) {
                 Utils.setClipboard(context, sb.toString())
             }
-            return sb.lines().count()
+            return sb.lines().count() - 1
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to share non-custom configs to clipboard", e)
             return -1

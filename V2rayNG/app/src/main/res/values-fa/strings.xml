@@ -137,6 +137,7 @@
     <!-- Preferences -->
     <string name="title_settings">تنظیمات</string>
     <string name="title_advanced">تنظیمات پیشرفته</string>
+    <string name="title_core_settings">تنظیمات هسته</string>
     <string name="title_vpn_settings">تنظیمات VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی به تفکیک برنامه</string>
     <string name="summary_pref_per_app_proxy">عمومی: برنامه انتخاب شده از طریق یک پروکسی متصل می شود، برنامه انتخاب نشده مستقیماً متصل می شود. \nحالت دور زدن: برنامه انتخاب شده مستقیماً متصل می شود، برنامه انتخاب نشده از طریق یک پروکسی متصل می شود. \nانتخاب خودکار برنامه های پراکسی در منو امکان پذیر است.</string>
@@ -178,6 +179,8 @@
 
     <string name="title_pref_vpn_dns">VPN DNS (فقط IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">آیا VPN از شبکه محلی عبور می کند؟</string>
+
+    <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
 
     <string name="title_pref_domestic_dns">DNS داخلی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -235,6 +238,7 @@
     <string name="summary_pref_auto_update_subscription">اشتراک های خود را به طور خودکار با فاصله زمانی در پس زمینه به روز کنید. بسته به دستگاه، این ویژگی ممکن است همیشه کار نکند.</string>
     <string name="title_pref_auto_update_interval">فاصله به‌ روزرسانی خودکار ( حداقل مقدار ، 15 دقیقه )</string>
     <string name="title_core_loglevel">سطح گزارشات</string>
+    <string name="title_outbound_domain_resolve_method">Outbound domain pre-resolve method</string>
     <string name="title_mode">حالت</string>
     <string name="title_mode_help">برای اطلاعات و راهنمایی بیشتر، روی این متن کلیک کنید</string>
     <string name="title_language">زبان</string>
@@ -366,6 +370,12 @@
         <item>پیش فرض کانفیگ</item>
         <item>دور زده شود</item>
         <item>دور زده نشود</item>
+    </string-array>
+
+    <string-array name="outbound_domain_resolve_method">
+        <item>Do not resolve</item>
+        <item>Resolve and add to DNS Hosts</item>
+        <item>Resolve and replace domain</item>
     </string-array>
 
 </resources>

@@ -140,6 +140,7 @@
     <!-- Preferences -->
     <string name="title_settings">سامووا</string>
     <string name="title_advanced">سامووا پؽش رئڌه</string>
+    <string name="title_core_settings">سامووا هسته</string>
     <string name="title_vpn_settings">سامووا VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی و ری برنومه</string>
     <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه واجۊری بیڌه پروکسی هڌ، منپیز موستقیم بؽ نشووه هڌ. هالت دور زیڌن: برنومه نشووک ناڌه موستقیمن منپیز هڌ، پروکسی نشووک زیڌه نؽڌ. گۊزینه پسند خوتکار برنومه پروکسی من نومگه</string>
@@ -167,7 +168,7 @@
     <string name="summary_pref_route_only_enabled">ز نوم دامنه sniffed تینا سی تور جوستن استفاڌه کۊنین وو نشۊوی مۉرد نزرن و عونوان نشۊوی IP ووردارین.</string>
 
     <string name="title_pref_local_dns_enabled">ر وندن DNS مهلی</string>
-    <string name="summary_pref_local_dns_enabled">DNS پردازشت وابیڌه و دس هسته ماژول DNS (پؽشنهاڌ ابۊ، ٱر نیاز هڌ ک جوستن تور وو ولات ٱسلین دور زنی)</string>
+    <string name="summary_pref_local_dns_enabled">درخاستا DNS و هسته و من ایان وو و دست ماژول DNS پردازشت ابۊن (پؽشنهاڌ ابۊ ٱر لنگ تور جوستن سی دور زیڌن نشۊویا LAN وو وولات ٱسلی هڌین فعال بۊ)</string>
 
     <string name="title_pref_fake_dns_enabled">ر وندن DNS جئلی</string>
     <string name="summary_pref_fake_dns_enabled">DNS مهلی نشۊویا IP جئلی ن وورگنه (زل تر، ٱما گاشڌ من یقرد ز برنومه یل کار نکونه)</string>
@@ -175,16 +176,18 @@
     <string name="title_pref_prefer_ipv6">ترجی IPv6</string>
     <string name="summary_pref_prefer_ipv6">تورا IPv6 ن فعال کۊنین وو نشۊویا IPv6 ن ترجی بڌین</string>
 
-    <string name="title_pref_remote_dns">DNS ز ر دیر (اختیاری) (udp/tcp/https/quic) (اختیاری)</string>
+    <string name="title_pref_remote_dns">ز ر دیر (اختیاری) DNS (udp/tcp/https/quic) (اختیاری)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (تینا IPv4/v6)</string>
-    <string name="title_pref_vpn_bypass_lan">VPN ز شبکه مهلی اگوڌرته؟</string>
+    <string name="title_pref_vpn_bypass_lan">ز شبکه مهلی اگوڌرته؟ VPN</string>
 
-    <string name="title_pref_domestic_dns">DNS منی (اختیاری)</string>
+    <string name="title_pref_vpn_interface_address">نشۊوی رابت VPN</string>
+
+    <string name="title_pref_domestic_dns">منی (اختیاری) DNS</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
-    <string name="title_pref_dns_hosts">DNS هاست موستقیم (قالوو: دامنه: نشۊوی،...)</string>
+    <string name="title_pref_dns_hosts">هاست موستقیم (قالوو: دامنه: نشۊوی،...) DNS</string>
     <string name="summary_pref_dns_hosts">دامنه:نشۊوی،...</string>
 
     <string name="title_pref_delay_test_url">نشۊوی اینترنتی آزمایش تئخیر واقعی (http/https)</string>
@@ -204,20 +207,20 @@
     <string name="summary_pref_local_dns_port">پورت DNS مهلی</string>
 
     <string name="title_pref_confirm_remove">قوۊل کردن پاک کردن کانفیگ</string>
-    <string name="summary_pref_confirm_remove">سی پاک وابیڌن فایل کانفیگ نیاز به قوۊل کردن دووارته ز سمت منتور هڌ</string>
+    <string name="summary_pref_confirm_remove">سی پاک وابیڌن فایل کانفیگ نیاز به قوۊل کردن دووارته ز سمت منتور هڌ.</string>
 
     <string name="title_pref_start_scan_immediate">زی اسکنن ر ون</string>
-    <string name="summary_pref_start_scan_immediate">شؽواتگرن سی اسکن، زی مجال ر وندن بۊگۊشین، اندی ترین کودن اسکن کۊنین یا شؽواتی ن منه نوار ٱوزار پسند کۊنین.</string>
+    <string name="summary_pref_start_scan_immediate">شؽواتگرن سی اسکن، زی مجال ر وندن بۊگۊشین، ٱندی ترین کودن اسکن کۊنین یا شؽواتی ن منه نوار ٱوزار پسند کۊنین.</string>
 
     <string name="title_pref_append_http_proxy">پروکسی HTTP ن و VPN ازاف کۊنین</string>
     <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موسقیمن ز (مۊرۊرگر/ی قرد ز برنومه یل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
 
     <string name="title_pref_double_column_display">ر وندن نشۉݩ داڌن دو سۊتۊنی</string>
-    <string name="summary_pref_double_column_display">نومگه نمایه یل من دو سۊتۊن نشۉݩ داڌه ابۊن وو چینۉ ترین موئتوا بیشتری ن سیل کۊنین. سی ر وستن وا برنومه ن ز نۊ ر ونین.</string>
+    <string name="summary_pref_double_column_display">نومگه نمایه یل من دو سۊتۊن نشۉݩ داڌه ابۊن وو چینۉ ترین موئتوا بیشتری ن سیل کۊنین. سی ر وستن، وا برنومه ن ز نۊ ر ونین.</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">فشناڌن منشڌ</string>
-    <string name="summary_pref_feedback">فشناڌن منشڌ یا داسوو موشکلا من Github</string>
+    <string name="summary_pref_feedback">فشناڌن منشڌ یا داسووݩ موشکلا من Github</string>
     <string name="summary_pref_tg_group">ٱووڌن من جرگه تلگرام</string>
     <string name="toast_tg_app_not_found">برنومه تلگرامن نجوست</string>
     <string name="title_privacy_policy">هریم سیخومی</string>
@@ -238,6 +241,7 @@
     <string name="title_pref_auto_update_interval">فاسله ورۊ کردن خوتکار (اقلن وا 15 دؽقه بۊ)</string>
 
     <string name="title_core_loglevel">سئت داسووا</string>
+    <string name="title_outbound_domain_resolve_method">بارت پؽش هل دامنه دری</string>
     <string name="title_mode">هالت</string>
     <string name="title_mode_help">سی دووسمندیا وو هیاری بیشتر، ری ای هؽل بزݩ</string>
     <string name="title_language">زۉݩ</string>
@@ -367,6 +371,12 @@
         <item>پؽش فرز کانفیگ</item>
         <item>دور زیڌه بۊ</item>
         <item>دور زیڌه نبۊ</item>
+    </string-array>
+
+    <string-array name="outbound_domain_resolve_method">
+        <item>هل وو فسل مکۊنین</item>
+        <item>هل وو ٱووردن و میزبووݩ یل دامنه DNS</item>
+        <item>هل وو جایونی دامنه</item>
     </string-array>
 
 </resources>

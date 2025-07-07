@@ -139,6 +139,7 @@
     <!-- Preferences -->
     <string name="title_settings">সেটিংস</string>
     <string name="title_advanced">এডভান্সড সেটিংস</string>
+    <string name="title_core_settings">কোর সেটিংস</string>
     <string name="title_vpn_settings">VPN সেটিংস</string>
     <string name="title_pref_per_app_proxy">প্রতি-অ্যাপ প্রক্সি</string>
     <string name="summary_pref_per_app_proxy">সাধারণ: চেকড অ্যাপ প্রক্সি, আনচেকড সরাসরি সংযোগ; \nবাইপাস মোড: চেকড অ্যাপ সরাসরি সংযুক্ত, আনচেকড প্রক্সি। \nমেনুতে প্রক্সি অ্যাপ্লিকেশন স্বয়ংক্রিয়ভাবে নির্বাচন করার বিকল্প</string>
@@ -180,6 +181,8 @@
 
     <string name="title_pref_vpn_dns">VPN DNS (শুধুমাত্র IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
+
+    <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
 
     <string name="title_pref_domestic_dns">ঘরোয়া DNS (ঐচ্ছিক)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -238,6 +241,7 @@
     <string name="title_pref_auto_update_interval">অটো আপডেট ইন্টারভ্যাল (মিনিট, সর্বনিম্ন মান ১৫)</string>
 
     <string name="title_core_loglevel">লগ স্তর</string>
+    <string name="title_outbound_domain_resolve_method">Outbound domain pre-resolve method</string>
     <string name="title_mode">মোড</string>
     <string name="title_mode_help">আরো সাহায্যের জন্য ক্লিক করুন</string>
     <string name="title_language">ভাষা</string>
@@ -357,6 +361,12 @@
         <item>Follow config</item>
         <item>Bypass</item>
         <item>Not Bypass</item>
+    </string-array>
+
+    <string-array name="outbound_domain_resolve_method">
+        <item>Do not resolve</item>
+        <item>Resolve and add to DNS Hosts</item>
+        <item>Resolve and replace domain</item>
     </string-array>
 
 </resources>

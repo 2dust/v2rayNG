@@ -17,7 +17,6 @@ import java.io.FileOutputStream
 
 object UpdateCheckerManager {
     suspend fun checkForUpdate(includePreRelease: Boolean = false): CheckUpdateResult = withContext(Dispatchers.IO) {
-        try {
             val url = if (includePreRelease) {
                 AppConfig.APP_API_URL
             } else {
@@ -53,10 +52,6 @@ object UpdateCheckerManager {
             } else {
                 CheckUpdateResult(hasUpdate = false)
             }
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to check for updates: ${e.message}")
-            return@withContext CheckUpdateResult(hasUpdate = false, error = e.message)
-        }
     }
 
     suspend fun downloadApk(context: Context, downloadUrl: String): File? = withContext(Dispatchers.IO) {

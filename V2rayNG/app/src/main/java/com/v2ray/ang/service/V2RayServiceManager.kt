@@ -102,7 +102,7 @@ object V2RayServiceManager {
         val config = MmkvManager.decodeServerConfig(guid) ?: return
         if (config.configType != EConfigType.CUSTOM
             && !Utils.isValidUrl(config.server)
-            && !Utils.isIpAddress(config.server)
+            && !Utils.isPureIpAddress(config.server.orEmpty())
         ) return
 //        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
 //        if (!result.status) return

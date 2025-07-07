@@ -140,6 +140,7 @@
     <!-- Preferences -->
     <string name="title_settings">Settings</string>
     <string name="title_advanced">Advanced Settings</string>
+    <string name="title_core_settings">Core Settings</string>
     <string name="title_vpn_settings">VPN Settings</string>
     <string name="title_pref_per_app_proxy">Per-app proxy</string>
     <string name="summary_pref_per_app_proxy">General: Checked apps use proxy, unchecked apps connect directly; \nBypass mode: checked apps connect directly, unchecked apps use proxy. \nThe option to automatically select proxy applications is in the menu</string>
@@ -181,6 +182,8 @@
 
     <string name="title_pref_vpn_dns">VPN DNS (only IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
+
+    <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
 
     <string name="title_pref_domestic_dns">Domestic DNS (Optional)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -239,6 +242,7 @@
     <string name="title_pref_auto_update_interval">Auto Update Interval (Minutes, Min value 15)</string>
 
     <string name="title_core_loglevel">Log Level</string>
+    <string name="title_outbound_domain_resolve_method">Outbound domain pre-resolve method</string>
     <string name="title_mode">Mode</string>
     <string name="title_mode_help">Click me for more help</string>
     <string name="title_language">Language</string>
@@ -368,6 +372,12 @@
         <item>Follow config</item>
         <item>Bypass</item>
         <item>Not Bypass</item>
+    </string-array>
+
+    <string-array name="outbound_domain_resolve_method">
+        <item>Do not resolve</item>
+        <item>Resolve and add to DNS Hosts</item>
+        <item>Resolve and replace domain</item>
     </string-array>
 
 </resources>

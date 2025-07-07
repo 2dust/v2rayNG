@@ -20,9 +20,9 @@
 
     <PreferenceCategory android:title="@string/title_vpn_settings">
         <CheckBoxPreference
-                android:key="pref_prefer_ipv6"
-                android:summary="@string/summary_pref_prefer_ipv6"
-                android:title="@string/title_pref_prefer_ipv6" />
+            android:key="pref_prefer_ipv6"
+            android:summary="@string/summary_pref_prefer_ipv6"
+            android:title="@string/title_pref_prefer_ipv6" />
 
         <CheckBoxPreference
             android:key="pref_per_app_proxy"
@@ -62,6 +62,14 @@
             android:key="pref_vpn_bypass_lan"
             android:summary="%s"
             android:title="@string/title_pref_vpn_bypass_lan" />
+
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/vpn_interface_address"
+            android:entryValues="@array/vpn_interface_address_value"
+            android:key="pref_vpn_interface_address_config_index"
+            android:summary="%s"
+            android:title="@string/title_pref_vpn_interface_address" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_ui_settings">
@@ -171,9 +179,7 @@
             android:title="@string/title_pref_auto_update_interval" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/title_advanced"
-        app:initialExpandedChildrenCount="0">
+    <PreferenceCategory android:title="@string/title_core_settings">
 
         <CheckBoxPreference
             android:defaultValue="false"
@@ -208,11 +214,6 @@
             android:summary="@string/summary_pref_dns_hosts"
             android:title="@string/title_pref_dns_hosts" />
 
-        <EditTextPreference
-            android:key="pref_delay_test_url"
-            android:summary="@string/summary_pref_delay_test_url"
-            android:title="@string/title_pref_delay_test_url" />
-
         <ListPreference
             android:defaultValue="warning"
             android:entries="@array/core_loglevel"
@@ -222,12 +223,30 @@
             android:title="@string/title_core_loglevel" />
 
         <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/outbound_domain_resolve_method"
+            android:entryValues="@array/outbound_domain_resolve_method_value"
+            android:key="pref_outbound_domain_resolve_method"
+            android:summary="%s"
+            android:title="@string/title_outbound_domain_resolve_method" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_advanced">
+
+        <EditTextPreference
+            android:key="pref_delay_test_url"
+            android:summary="@string/summary_pref_delay_test_url"
+            android:title="@string/title_pref_delay_test_url" />
+
+        <ListPreference
             android:defaultValue="VPN"
             android:entries="@array/mode_entries"
             android:entryValues="@array/mode_value"
             android:key="pref_mode"
             android:summary="%s"
             android:title="@string/title_mode" />
-
     </PreferenceCategory>
+
+
 </PreferenceScreen>

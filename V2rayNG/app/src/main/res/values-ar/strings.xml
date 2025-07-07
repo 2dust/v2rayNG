@@ -141,6 +141,7 @@
     <!-- Preferences -->
     <string name="title_settings">الإعدادات</string>
     <string name="title_advanced">إعدادات متقدمة</string>
+    <string name="title_core_settings">إعدادات النواة</string>
     <string name="title_vpn_settings">إعدادات VPN</string>
     <string name="title_pref_per_app_proxy">الوكيل لكل تطبيق</string>
     <string name="summary_pref_per_app_proxy">عام: التطبيق المحدد هو وكيل، غير المحدد اتصال مباشر؛ \nوضع التجاوز: التطبيق المحدد متصل مباشرة، غير المحدد وكيل. \nخيار تحديد تطبيق الوكيل تلقائيًا في القائمة</string>
@@ -180,6 +181,8 @@
 
     <string name="title_pref_vpn_dns">VPN DNS (IPv4/v6 فقط)</string>
     <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
+
+    <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
 
     <string name="title_pref_domestic_dns">DNS المحلي (اختياري)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -238,6 +241,7 @@
     <string name="title_pref_auto_update_interval">فاصل التحديث التلقائي (بالدقائق، الحد الأدنى للقيمة 15)</string>
 
     <string name="title_core_loglevel">مستوى السجل</string>
+    <string name="title_outbound_domain_resolve_method">Outbound domain pre-resolve method</string>
     <string name="title_mode">الوضع</string>
     <string name="title_mode_help">انقر هنا للحصول على مزيد من المساعدة</string>
     <string name="title_language">اللغة</string>
@@ -352,6 +356,12 @@
         <item>Follow config</item>
         <item>Bypass</item>
         <item>Not Bypass</item>
+    </string-array>
+
+    <string-array name="outbound_domain_resolve_method">
+        <item>Do not resolve</item>
+        <item>Resolve and add to DNS Hosts</item>
+        <item>Resolve and replace domain</item>
     </string-array>
 
 </resources>

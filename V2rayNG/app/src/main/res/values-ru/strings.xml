@@ -139,6 +139,7 @@
     <!-- Preferences -->
     <string name="title_settings">Настройки</string>
     <string name="title_advanced">Расширенные настройки</string>
+    <string name="title_core_settings">Настройки ядра</string>
     <string name="title_vpn_settings">Настройки VPN</string>
     <string name="title_pref_per_app_proxy">Прокси для выбранных приложений</string>
     <string name="summary_pref_per_app_proxy">Основной: выбранное приложение соединяется через прокси, не выбранное — напрямую;\nРежим обхода: выбранное приложение соединяется напрямую, не выбранное — через прокси.\nЕсть возможность автоматического выбора проксируемых приложений в меню.</string>
@@ -152,9 +153,9 @@
     <string name="title_pref_mux_xudp_concurency">XUDP-соединения (диапазон от 1 до 1024)</string>
     <string name="title_pref_mux_xudp_quic">Обработка QUIC в мультиплексном туннеле</string>
     <string-array name="mux_xudp_quic_entries">
-        <item>отклонять</item>
-        <item>разрешать</item>
-        <item>пропускать</item>
+        <item>Отклонять</item>
+        <item>Разрешать</item>
+        <item>Пропускать</item>
     </string-array>
 
     <string name="title_pref_speed_enabled">Отображение скорости</string>
@@ -178,7 +179,9 @@
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (только IPv4/v6)</string>
-    <string name="title_pref_vpn_bypass_lan">VPN пропускает LAN</string>
+    <string name="title_pref_vpn_bypass_lan">VPN обходит LAN</string>
+
+    <string name="title_pref_vpn_interface_address">VPN частный IP</string>
 
     <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -237,6 +240,7 @@
     <string name="title_pref_auto_update_interval">Интервал автообновления (минут, не менее 15)</string>
 
     <string name="title_core_loglevel">Подробность ведения журнала</string>
+    <string name="title_outbound_domain_resolve_method">Предварительное определение исходящего домена</string>
     <string name="title_mode">Режим</string>
     <string name="title_mode_help">Нажмите для получения дополнительной информации</string>
     <string name="title_language">Язык</string>
@@ -262,10 +266,10 @@
     <string name="sub_setting_next_profile">Следующая конфигурация прокси</string>
     <string name="sub_setting_pre_profile_tip">Конфигурация должна быть уникальной</string>
     <string name="title_sub_update">Обновить подписку группы</string>
-    <string name="title_ping_all_server">Проверка профилей группы</string>
+    <string name="title_ping_all_server">Проверить профили группы</string>
     <string name="title_real_ping_all_server">Время отклика профилей группы</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>
-    <string name="title_sort_by_test_results">Сортировка по результатам теста</string>
+    <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
     <string name="title_filter_config">Фильтр групп</string>
     <string name="filter_config_all">Все группы</string>
     <string name="title_del_duplicate_config_count">Удалено дубликатов профилей: %d</string>
@@ -364,8 +368,14 @@
 
     <string-array name="vpn_bypass_lan">
         <item>Как в профиле</item>
-        <item>Пропускает</item>
-        <item>Не пропускает</item>
+        <item>Обходит</item>
+        <item>Не обходит</item>
+    </string-array>
+
+    <string-array name="outbound_domain_resolve_method">
+        <item>Не определять</item>
+        <item>Определять и добавлять к узлам DNS</item>
+        <item>Определять и заменять домен</item>
     </string-array>
 
 </resources>
