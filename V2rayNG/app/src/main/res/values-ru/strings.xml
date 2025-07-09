@@ -268,7 +268,7 @@
     <string name="title_sub_update">Обновить подписку группы</string>
     <string name="title_ping_all_server">Проверить профили группы</string>
     <string name="title_real_ping_all_server">Время отклика профилей группы</string>
-    <string name="title_create_intelligent_selection_all_server">Creating Intelligent Selection Current Group Configuration</string>
+    <string name="title_create_intelligent_selection_all_server">Создать конфигурацию умного выбора</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
     <string name="title_filter_config">Фильтр групп</string>
@@ -378,12 +378,12 @@
         <item>Определять и добавлять к узлам DNS</item>
         <item>Определять и заменять домен</item>
     </string-array>
-    <string name="intelligent_selection">Intelligent Selection</string>
-    <string name="sub_setting_intelligent_selection_filter">Remarks Intelligent Selection regular filter</string>
-    <string name="title_intelligent_selection_method">Intelligent Selection Method</string>
+    <string name="intelligent_selection">Умный выбор</string>
+    <string name="sub_setting_intelligent_selection_filter">Название фильтра умного выбора</string>
+    <string name="title_intelligent_selection_method">Принцип умного выбора</string>
     <string-array name="intelligent_selection_method">
-        <item>Least Ping</item>
-        <item>Least Load</item>
+        <item>Наименьшая задержка</item>
+        <item>Наименьшая нагрузка</item>
     </string-array>
 
 </resources>
