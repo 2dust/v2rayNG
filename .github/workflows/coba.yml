@@ -1,0 +1,200 @@
+name: Build APK keystone
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        required: false
+        type: string
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4.2.2
+      with:
+        submodules: 'recursive'
+        fetch-depth: '0'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3.2.0
+      with:
+        log-accepted-android-sdk-licenses: false
+        cmdline-tools-version: '12266719'
+        packages: 'platforms;android-35 build-tools;35.0.0 platform-tools'
+
+    - name: Install NDK
+      run: |
+        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+          --channel=3 \
+          --install "ndk;29.0.13113456"
+        echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.13113456" >> $GITHUB_ENV
+        sed -i '10i\
+        \
+          ndkVersion = "29.0.13113456"' ${{ github.workspace }}/V2rayNG/app/build.gradle.kts
+
+    - name: Restore cached libtun2socks
+      id: cache-libtun2socks-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ github.workspace }}/libs
+        key: libtun2socks-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/badvpn/HEAD') }}-${{ hashFiles('.git/modules/libancillary/HEAD') }}
+
+    - name: Build libtun2socks
+      if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
+      run: |
+        bash compile-tun2socks.sh
+
+    - name: Save libtun2socks
+      if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ github.workspace }}/libs
+        key: libtun2socks-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/badvpn/HEAD') }}-${{ hashFiles('.git/modules/libancillary/HEAD') }}
+
+    - name: Copy libtun2socks
+      run: |
+        cp -r ${{ github.workspace }}/libs ${{ github.workspace }}/V2rayNG/app
+
+    - name: Fetch AndroidLibXrayLite tag
+      run: |
+        pushd AndroidLibXrayLite
+        CURRENT_TAG=$(git describe --tags --abbrev=0)
+        echo "Current tag in this repo: $CURRENT_TAG"
+        echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
+        popd
+
+    - name: Download libv2ray
+      uses: robinraju/release-downloader@v1.12
+      with:
+        repository: '2dust/AndroidLibXrayLite'
+        tag: ${{ env.CURRENT_TAG }}
+        fileName: 'libv2ray.aar'
+        out-file-path: V2rayNG/app/libs/
+
+    - name: Restore cached libhysteria2
+      id: cache-libhysteria2-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ github.workspace }}/hysteria/libs
+        key: libhysteria2-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hysteria/HEAD') }}-${{ hashFiles('libhysteria2.sh') }}
+
+    - name: Setup Golang
+      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
+      uses: actions/setup-go@v5.4.0
+      with:
+        go-version-file: 'AndroidLibXrayLite/go.mod'
+        cache: false
+
+    - name: Build libhysteria2
+      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
+      run: |
+        bash libhysteria2.sh
+
+    - name: Save libhysteria2
+      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ github.workspace }}/hysteria/libs
+        key: libhysteria2-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hysteria/HEAD') }}-${{ hashFiles('libhysteria2.sh') }}
+
+    - name: Copy libhysteria2
+      run: |
+        cp -r ${{ github.workspace }}/hysteria/libs ${{ github.workspace }}/V2rayNG/app
+
+    - name: Setup Java
+      uses: actions/setup-java@v4.7.0
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+
+    # --- LANGKAH SEMENTARA UNTUK MEMBUAT KEYSTORE ---
+    # PERINGATAN: Ini hanya boleh dijalankan SATU KALI.
+    # Setelah Anda mendapatkan output Base64 dan kata sandi,
+    # HAPUS langkah ini dari workflow Anda dan simpan nilainya sebagai GitHub Secrets.
+    - name: Buat Keystore Baru (Sangat Sementara & Tidak Direkomendasikan untuk Produksi Jangka Panjang)
+      run: |
+        # Ganti nilai-nilai berikut dengan informasi Anda sendiri
+        KEYSTORE_PASSWORD="p4kulaut07" # Ganti dengan kata sandi keystore Anda
+        KEY_PASSWORD="p4kulaut07"       # Ganti dengan kata sandi kunci Anda (bisa sama dengan keystore)
+        KEY_ALIAS="mangkoyla"                     # Ganti dengan alias kunci Anda
+
+        echo "Membuat keystore..."
+        keytool -genkeypair -v \
+          -keystore android_keystore.jks \
+          -alias "$KEY_ALIAS" \
+          -keyalg RSA \
+          -keysize 2048 \
+          -validity 10000 \
+          -storepass "$KEYSTORE_PASSWORD" \
+          -keypass "$KEY_PASSWORD" \
+          -dname "CN=Your Name, OU=Your Org Unit, O=Your Org, L=Your City, ST=Your State, C=ID"
+
+        echo "Keystore berhasil dibuat: android_keystore.jks"
+
+        echo "--- SALIN NILAI BERIKUT KE GITHUB SECRETS ANDA ---"
+        echo "APP_KEYSTORE_BASE64:"
+        # Gunakan -w 0 untuk memastikan output Base64 tidak memiliki baris baru
+        base64 -w 0 android_keystore.jks
+        echo "" # Tambahkan baris baru untuk keterbacaan
+        echo "APP_KEYSTORE_PASSWORD: $KEYSTORE_PASSWORD"
+        echo "APP_KEY_PASSWORD: $KEY_PASSWORD"
+        echo "APP_KEYSTORE_ALIAS: $KEY_ALIAS"
+        echo "--- AKHIR NILAI UNTUK GITHUB SECRETS ---"
+        
+        # Simpan keystore yang baru dibuat untuk langkah selanjutnya dalam workflow ini
+        cp android_keystore.jks ${{ github.workspace }}/android_keystore.jks
+      # Tambahkan kondisi 'if: false' setelah Anda menjalankan ini sekali dan mendapatkan secret-nya
+      # Contoh: if: false
+    # --- AKHIR LANGKAH SEMENTARA ---
+
+    - name: Decode Keystore
+      uses: timheuer/base64-to-file@v1.2.4
+      id: android_keystore
+      with:
+        fileName: "android_keystore.jks"
+        # Gunakan secret yang akan Anda buat setelah langkah "Buat Keystore Baru" dijalankan
+        encodedString: ${{ secrets.APP_KEYSTORE_BASE64 }}
+
+    - name: Build APK
+      run: |
+        cd ${{ github.workspace }}/V2rayNG
+        echo "sdk.dir=${ANDROID_HOME}" > local.properties
+        chmod 755 gradlew
+        ./gradlew licenseFdroidReleaseReport
+        ./gradlew assembleRelease -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
+    
+    - name: Upload arm64-v8a APK
+      uses: actions/upload-artifact@v4.6.2
+      if: ${{ success() }}
+      with:
+        name: arm64-v8a
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*arm64-v8a*.apk
+
+    - name: Upload armeabi-v7a APK
+      uses: actions/upload-artifact@v4.6.2
+      if: ${{ success() }}
+      with:
+        name: armeabi-v7a
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*armeabi-v7a*.apk
+
+    - name: Upload x86 APK
+      uses: actions/upload-artifact@v4.6.2
+      if: ${{ success() }}
+      with:
+        name: x86-apk
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*x86*.apk
+
+    - name: Upload to release
+      uses: svenstaro/upload-release-action@v2
+      if: github.event.inputs.release_tag != ''
+      with:
+        file: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*playstore*/release/*.apk
+        tag: ${{ github.event.inputs.release_tag }}
+        file_glob: true
+        prerelease: true
