@@ -135,6 +135,7 @@
         <item>عربي</item>
         <item>বাংলা</item>
         <item>لۊری بختیاری</item>
+        <item>Bahasa Indonesia</item>
     </string-array>
 
 
@@ -149,6 +150,7 @@
         <item>ar</item>
         <item>bn</item>
         <item>bqi-rIR</item>
+        <item>id</item>
     </string-array>
 
     <string-array name="mux_xudp_quic_value" translatable="false">
