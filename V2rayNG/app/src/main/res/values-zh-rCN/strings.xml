@@ -266,6 +266,7 @@
     <string name="title_sub_update">更新当前组订阅</string>
     <string name="title_ping_all_server">测试当前组配置 Tcping</string>
     <string name="title_real_ping_all_server">测试当前组配置真连接</string>
+    <string name="title_create_intelligent_selection_all_server">生成当前组智能选择配置</string>
     <string name="title_user_asset_setting">资源文件</string>
     <string name="title_sort_by_test_results">按测试结果排序</string>
     <string name="title_filter_config">过滤配置文件</string>
@@ -368,6 +369,13 @@
         <item>不解析</item>
         <item>解析后添加至 DNS Hosts</item>
         <item>解析后替换原域名</item>
+    </string-array>
+    <string name="intelligent_selection">智能选择</string>
+    <string name="sub_setting_intelligent_selection_filter">别名智能选择正则过滤</string>
+    <string name="title_intelligent_selection_method">智能选择方式</string>
+    <string-array name="intelligent_selection_method">
+        <item>最低延迟</item>
+        <item>最稳定</item>
     </string-array>
 
 </resources>

@@ -269,6 +269,7 @@
     <string name="title_sub_update">সাবস্ক্রিপশন আপডেট</string>
     <string name="title_ping_all_server">সব কনফিগারেশন TCPing</string>
     <string name="title_real_ping_all_server">সব কনফিগারেশন প্রকৃত বিলম্ব</string>
+    <string name="title_create_intelligent_selection_all_server">Creating Intelligent Selection Current Group Configuration</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">টেস্ট ফলাফল দ্বারা সাজানো</string>
     <string name="title_filter_config">কনফিগারেশন ফাইল ফিল্টার করুন</string>
@@ -367,6 +368,13 @@
         <item>Do not resolve</item>
         <item>Resolve and add to DNS Hosts</item>
         <item>Resolve and replace domain</item>
+    </string-array>
+    <string name="intelligent_selection">Intelligent Selection</string>
+    <string name="sub_setting_intelligent_selection_filter">Remarks Intelligent Selection regular filter</string>
+    <string name="title_intelligent_selection_method">Intelligent Selection Method</string>
+    <string-array name="intelligent_selection_method">
+        <item>Least Ping</item>
+        <item>Least Load</item>
     </string-array>
 
 </resources>
