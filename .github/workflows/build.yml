@@ -39,6 +39,9 @@ jobs:
           cd V2rayNG
           ./gradlew assembleRelease
 
+      - name: Debug – list all APKs
+        run: find . -name "*.apk"
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
