@@ -1,4 +1,4 @@
-name: Build v2rayNG APK
+name: Build Unsigned v2rayNG APK
 
 on:
   workflow_dispatch:
@@ -8,12 +8,14 @@ on:
 
 jobs:
   build:
-    name: Build APK
+    name: Build APK (unsigned)
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          submodules: true
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -21,24 +23,24 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Download Android SDK Commandline Tools
-        uses: maxim-lobanov/setup-android@v1
-        with:
-          api-level: 34
-          build-tools: 34.0.0
-          ndk: 25.2.9519653
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Give gradlew execution permission
-        run: chmod +x gradlew
+      - name: Download libv2ray.aar
+        run: |
+          mkdir -p V2rayNG/app/libs
+          curl -L -o V2rayNG/app/libs/libv2ray.aar https://github.com/2dust/AndroidLibXrayLite/releases/latest/download/libv2ray.aar
 
-      - name: Build release APK
-        run: ./gradlew assembleRelease
+      - name: Make Gradle executable
+        run: chmod +x ./V2rayNG/gradlew
 
-      - name: Upload release APK
+      - name: Build unsigned APK
+        run: |
+          cd V2rayNG
+          ./gradlew assembleRelease
+
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: v2rayNG-release.apk
-          path: app/build/outputs/apk/release/app-release.apk
-
-
-            
+          name: v2rayNG-release-unsigned
+          path: V2rayNG/app/build/outputs/apk/release/app-release-unsigned.apk
