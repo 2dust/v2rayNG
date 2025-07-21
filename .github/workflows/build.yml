@@ -39,11 +39,19 @@ jobs:
           cd V2rayNG
           ./gradlew assembleRelease
 
-      - name: Debug – list all APKs
-        run: find . -name "*.apk"
-
-      - name: Upload APK artifact
+      - name: Upload all APK variants as artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: v2rayNG-release-unsigned
-          path: V2rayNG/app/build/outputs/apk/release/app-release-unsigned.apk
+          name: v2rayNG-apks
+          path: |
+            V2rayNG/app/build/outputs/apk/playstore/release/*.apk
+            V2rayNG/app/build/outputs/apk/fdroid/release/*.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v2rayNG-unsigned-${{ github.run_number }}
+          name: v2rayNG unsigned ${{ github.run_number }}
+          files: |
+            V2rayNG/app/build/outputs/apk/playstore/release/*.apk
+            V2rayNG/app/build/outputs/apk/fdroid/release/*.apk
