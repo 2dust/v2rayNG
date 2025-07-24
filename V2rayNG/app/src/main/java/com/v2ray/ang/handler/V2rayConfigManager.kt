@@ -887,6 +887,24 @@ object V2rayConfigManager {
                     )
                 )
             }
+
+            if (v2rayConfig.routing.domainStrategy == "IPIfNonMatch") {
+                v2rayConfig.routing.rules.add(
+                    RulesBean(
+                        ip = arrayListOf("0.0.0.0/0", "::/0"),
+                        balancerTag = "proxy-round",
+                        type = "field"
+                    )
+                )
+            } else {
+                v2rayConfig.routing.rules.add(
+                    RulesBean(
+                        network = "tcp,udp",
+                        balancerTag = "proxy-round",
+                        type = "field"
+                    )
+                )
+            }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to configure balance", e)
         }
