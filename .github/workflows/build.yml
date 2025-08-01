@@ -1,4 +1,4 @@
-name: Build Unsigned v2rayNG APK
+name: Build Signed v2rayNG APK
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build APK (unsigned)
+    name: Build APK (signed)
     runs-on: ubuntu-latest
 
     steps:
@@ -31,13 +31,28 @@ jobs:
           mkdir -p V2rayNG/app/libs
           curl -L -o V2rayNG/app/libs/libv2ray.aar https://github.com/2dust/AndroidLibXrayLite/releases/latest/download/libv2ray.aar
 
+      - name: Decode Keystore
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+        run: |
+          echo $SIGNING_KEYSTORE_BASE64 > keystore.base64
+          base64 -d keystore.base64 > V2rayNG/app/keystore.jks
+
       - name: Make Gradle executable
         run: chmod +x ./V2rayNG/gradlew
 
-      - name: Build unsigned APK
+      - name: Build signed APK
+        env:
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
         run: |
           cd V2rayNG
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file=$(pwd)/app/keystore.jks \
+            -Pandroid.injected.signing.store.password=$SIGNING_KEYSTORE_PASSWORD \
+            -Pandroid.injected.signing.key.alias=$SIGNING_KEY_ALIAS \
+            -Pandroid.injected.signing.key.password=$SIGNING_KEY_PASSWORD
 
       - name: Upload all APK variants as artifacts
         uses: actions/upload-artifact@v4
@@ -50,8 +65,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2rayNG-unsigned-${{ github.run_number }}
-          name: v2rayNG unsigned ${{ github.run_number }}
+          tag_name: v2rayNG-signed-${{ github.run_number }}
+          name: v2rayNG signed ${{ github.run_number }}
           files: |
             V2rayNG/app/build/outputs/apk/playstore/release/*.apk
             V2rayNG/app/build/outputs/apk/fdroid/release/*.apk
