@@ -8,6 +8,8 @@
     <string name="migration_success">موفقیت در انتقال داده</string>
     <string name="migration_fail">انتقال داده انجام نشد!</string>
     <string name="pull_down_to_refresh">لطفاً برای تازه کردن، پایین بکشید!</string>
+    <string name="initial_sub_prompt_title">لطفا لینک ساب دریافتی رو وارد کنید</string>
+    <string name="initial_sub_prompt_message">برای استفاده از برنامه، لینک اشتراک خود را وارد کنید</string>
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">توقف</string>

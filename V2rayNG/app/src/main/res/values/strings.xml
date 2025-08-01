@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">stormnetNG</string>
+    <string name="app_name" translatable="false">stormnet</string>
     <string name="app_widget_name">Switch</string>
     <string name="app_tile_name">Switch</string>
     <string name="app_tile_first_use">First use of this feature, please use the app to add server</string>
@@ -9,6 +9,8 @@
     <string name="migration_success">Data migration success!</string>
     <string name="migration_fail">Data migration failed!</string>
     <string name="pull_down_to_refresh">Please pull down to refresh!</string>
+    <string name="initial_sub_prompt_title">Please enter your subscription link</string>
+    <string name="initial_sub_prompt_message">To use the app, please enter your subscription link</string>
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">Stop</string>

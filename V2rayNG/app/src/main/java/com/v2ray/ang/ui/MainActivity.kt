@@ -45,6 +45,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.widget.EditText
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     private val binding by lazy {
@@ -175,6 +176,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         initGroupTab()
         setupViewModel()
         migrateLegacy()
+
+        if (!MmkvManager.decodeBool("sub_added", false)) {
+            showInitialSubDialog()
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -656,6 +661,23 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private fun setTestState(content: String?) {
         binding.tvTestState.text = content
+    }
+
+    private fun showInitialSubDialog() {
+        val editText = EditText(this)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.initial_sub_prompt_title)
+            .setMessage(R.string.initial_sub_prompt_message)
+            .setView(editText)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val subLink = editText.text.toString()
+                if (subLink.isNotBlank()) {
+                    importBatchConfig(subLink)
+                    MmkvManager.encode("sub_added", true)
+                }
+            }
+            .setCancelable(false)
+            .show()
     }
 
 //    val mConnection = object : ServiceConnection {
