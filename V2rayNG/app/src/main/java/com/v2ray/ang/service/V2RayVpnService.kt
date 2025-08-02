@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
-import android.net.LocalSocket
-import android.net.LocalSocketAddress
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
@@ -19,26 +17,18 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
+import com.v2ray.ang.AppConfig.VPN_MTU
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.File
 import java.lang.ref.SoftReference
 
 class V2RayVpnService : VpnService(), ServiceControl {
-    companion object {
-        private const val VPN_MTU = 1500
-        private const val TUN2SOCKS = "libtun2socks.so"
-    }
-
     private lateinit var mInterface: ParcelFileDescriptor
     private var isRunning = false
-    private lateinit var process: Process
+    private var tun2SocksManager: Tun2SocksManager? = null
 
     /**destroy
      * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
@@ -281,79 +271,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Starts the tun2socks process with the appropriate parameters.
      */
     private fun runTun2socks() {
-        Log.i(AppConfig.TAG, "Start run $TUN2SOCKS")
-        val socksPort = SettingsManager.getSocksPort()
-        val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
-        val cmd = arrayListOf(
-            File(applicationContext.applicationInfo.nativeLibraryDir, TUN2SOCKS).absolutePath,
-            "--netif-ipaddr", vpnConfig.ipv4Router,
-            "--netif-netmask", "255.255.255.252",
-            "--socks-server-addr", "$LOOPBACK:${socksPort}",
-            "--tunmtu", VPN_MTU.toString(),
-            "--sock-path", "sock_path",//File(applicationContext.filesDir, "sock_path").absolutePath,
-            "--enable-udprelay",
-            "--loglevel", "notice"
-        )
-
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6)) {
-            cmd.add("--netif-ip6addr")
-            cmd.add(vpnConfig.ipv6Router)
-        }
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED)) {
-            val localDnsPort = Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT), AppConfig.PORT_LOCAL_DNS.toInt())
-            cmd.add("--dnsgw")
-            cmd.add("$LOOPBACK:${localDnsPort}")
-        }
-        Log.i(AppConfig.TAG, cmd.toString())
-
-        try {
-            val proBuilder = ProcessBuilder(cmd)
-            proBuilder.redirectErrorStream(true)
-            process = proBuilder
-                .directory(applicationContext.filesDir)
-                .start()
-            Thread {
-                Log.i(AppConfig.TAG, "$TUN2SOCKS check")
-                process.waitFor()
-                Log.i(AppConfig.TAG, "$TUN2SOCKS exited")
-                if (isRunning) {
-                    Log.i(AppConfig.TAG, "$TUN2SOCKS restart")
-                    runTun2socks()
-                }
-            }.start()
-            Log.i(AppConfig.TAG, "$TUN2SOCKS process info : ${process.toString()}")
-
-            sendFd()
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to start $TUN2SOCKS process", e)
-        }
-    }
-
-    /**
-     * Sends the file descriptor to the tun2socks process.
-     * Attempts to send the file descriptor multiple times if necessary.
-     */
-    private fun sendFd() {
-        val fd = mInterface.fileDescriptor
-        val path = File(applicationContext.filesDir, "sock_path").absolutePath
-        Log.i(AppConfig.TAG, "LocalSocket path : $path")
-
-        CoroutineScope(Dispatchers.IO).launch {
-            var tries = 0
-            while (true) try {
-                Thread.sleep(50L shl tries)
-                Log.i(AppConfig.TAG, "LocalSocket sendFd tries: $tries")
-                LocalSocket().use { localSocket ->
-                    localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
-                    localSocket.setFileDescriptorsForSend(arrayOf(fd))
-                    localSocket.outputStream.write(42)
-                }
-                break
-            } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to send file descriptor, try: $tries", e)
-                if (tries > 5) break
-                tries += 1
-            }
+        tun2SocksManager = Tun2SocksManager(
+            context = applicationContext,
+            vpnInterface = mInterface,
+            isRunningProvider = { isRunning },
+            restartCallback = { runTun2socks() }
+        ).also {
+            it.startTun2Socks()
         }
     }
 
@@ -375,12 +299,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
         }
 
-        try {
-            Log.i(AppConfig.TAG, "$TUN2SOCKS destroy")
-            process.destroy()
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to destroy $TUN2SOCKS process", e)
-        }
+        tun2SocksManager?.stopTun2Socks()
+        tun2SocksManager = null
 
         V2RayServiceManager.stopCoreLoop()
 

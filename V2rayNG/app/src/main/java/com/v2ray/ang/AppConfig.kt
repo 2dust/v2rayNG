@@ -163,6 +163,7 @@ object AppConfig {
 
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"
+    const val VPN_MTU = 1500
 
     // Google API rule constants
     const val GOOGLEAPIS_CN_DOMAIN = "domain:googleapis.cn"
