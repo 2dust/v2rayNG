@@ -18,7 +18,7 @@ import java.io.File
 /**
  * Manages the tun2socks process that handles VPN traffic
  */
-class Tun2SocksManager(
+class Tun2SocksService(
     private val context: Context,
     private val vpnInterface: ParcelFileDescriptor,
     private val isRunningProvider: () -> Boolean,

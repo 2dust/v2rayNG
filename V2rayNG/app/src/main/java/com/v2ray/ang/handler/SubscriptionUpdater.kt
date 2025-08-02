@@ -1,4 +1,4 @@
-package com.v2ray.ang.service
+package com.v2ray.ang.handler
 
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
@@ -11,11 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.SUBSCRIPTION_UPDATE_CHANNEL
-import com.v2ray.ang.AppConfig.SUBSCRIPTION_UPDATE_CHANNEL_NAME
 import com.v2ray.ang.R
-import com.v2ray.ang.handler.AngConfigManager.updateConfigViaSub
-import com.v2ray.ang.handler.MmkvManager
 
 object SubscriptionUpdater {
 
@@ -24,7 +20,7 @@ object SubscriptionUpdater {
 
         private val notificationManager = NotificationManagerCompat.from(applicationContext)
         private val notification =
-            NotificationCompat.Builder(applicationContext, SUBSCRIPTION_UPDATE_CHANNEL)
+            NotificationCompat.Builder(applicationContext, AppConfig.SUBSCRIPTION_UPDATE_CHANNEL)
                 .setWhen(0)
                 .setTicker("Update")
                 .setContentTitle(context.getString(R.string.title_pref_auto_update_subscription))
@@ -46,18 +42,18 @@ object SubscriptionUpdater {
                 val subItem = sub.second
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    notification.setChannelId(SUBSCRIPTION_UPDATE_CHANNEL)
+                    notification.setChannelId(AppConfig.SUBSCRIPTION_UPDATE_CHANNEL)
                     val channel =
                         NotificationChannel(
-                            SUBSCRIPTION_UPDATE_CHANNEL,
-                            SUBSCRIPTION_UPDATE_CHANNEL_NAME,
+                            AppConfig.SUBSCRIPTION_UPDATE_CHANNEL,
+                            AppConfig.SUBSCRIPTION_UPDATE_CHANNEL_NAME,
                             NotificationManager.IMPORTANCE_MIN
                         )
                     notificationManager.createNotificationChannel(channel)
                 }
                 notificationManager.notify(3, notification.build())
                 Log.i(AppConfig.TAG, "subscription automatic update: ---${subItem.remarks}")
-                updateConfigViaSub(Pair(sub.first, subItem))
+                AngConfigManager.updateConfigViaSub(Pair(sub.first, subItem))
                 notification.setContentText("Updating ${subItem.remarks}")
             }
             notificationManager.cancel(3)
