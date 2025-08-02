@@ -103,7 +103,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
     }
 
     override fun startService() {
-        setup()
+        setupService()
     }
 
     override fun stopService() {
@@ -126,13 +126,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Sets up the VPN service.
      * Prepares the VPN and configures it if preparation is successful.
      */
-    private fun setup() {
+    private fun setupService() {
         val prepare = prepare(this)
         if (prepare != null) {
             return
         }
 
-        if (setupVpnService() != true) {
+        if (configureVpnService() != true) {
             return
         }
 
@@ -143,17 +143,52 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Configures the VPN service.
      * @return True if the VPN service was configured successfully, false otherwise.
      */
-    private fun setupVpnService(): Boolean {
-        // If the old interface has exactly the same parameters, use it!
-        // Configure a builder while parsing the parameters.
+    private fun configureVpnService(): Boolean {
         val builder = Builder()
-        val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
-        //val enableLocalDns = defaultDPreference.getPrefBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
+        
+        // Configure network settings (addresses, routing and DNS)
+        configureNetworkSettings(builder)
 
+        // Configure app-specific settings (session name and per-app proxy)
+        configurePerAppProxy(builder)
+        
+        // Close the old interface since the parameters have been changed
+        try {
+            mInterface.close()
+        } catch (ignored: Exception) {
+            // ignored
+        }
+        
+        // Configure platform-specific features
+        configurePlatformFeatures(builder)
+
+        // Create a new interface using the builder and save the parameters
+        try {
+            mInterface = builder.establish()!!
+            isRunning = true
+            return true
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to establish VPN interface", e)
+            stopV2Ray()
+        }
+        return false
+    }
+    
+    /**
+     * Configures the basic network settings for the VPN.
+     * This includes IP addresses, routing rules, and DNS servers.
+     * 
+     * @param builder The VPN Builder to configure
+     */
+    private fun configureNetworkSettings(builder: Builder) {
+        val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
+        val bypassLan = SettingsManager.routingRulesetsBypassLan()
+        
+        // Configure IPv4 settings
         builder.setMtu(VPN_MTU)
         builder.addAddress(vpnConfig.ipv4Client, 30)
-        //builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
-        val bypassLan = SettingsManager.routingRulesetsBypassLan()
+        
+        // Configure routing rules
         if (bypassLan) {
             AppConfig.ROUTED_IP_LIST.forEach {
                 val addr = it.split('/')
@@ -162,39 +197,38 @@ class V2RayVpnService : VpnService(), ServiceControl {
         } else {
             builder.addRoute("0.0.0.0", 0)
         }
-
+        
+        // Configure IPv6 if enabled
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true) {
             builder.addAddress(vpnConfig.ipv6Client, 126)
             if (bypassLan) {
-                builder.addRoute("2000::", 3) //currently only 1/8 of total ipV6 is in use
-                builder.addRoute("fc00::", 18) //Xray-core default FakeIPv6 Pool
+                builder.addRoute("2000::", 3) // Currently only 1/8 of total IPv6 is in use
+                builder.addRoute("fc00::", 18) // Xray-core default FakeIPv6 Pool
             } else {
                 builder.addRoute("::", 0)
             }
         }
-
-//        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
-//            builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
-//        } else {
-        SettingsManager.getVpnDnsServers()
-            .forEach {
-                if (Utils.isPureIpAddress(it)) {
-                    builder.addDnsServer(it)
-                }
+        
+        // Configure DNS servers
+        //if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
+        //  builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
+        //} else {
+        SettingsManager.getVpnDnsServers().forEach {
+            if (Utils.isPureIpAddress(it)) {
+                builder.addDnsServer(it)
             }
-//        }
-
-        builder.setSession(V2RayServiceManager.getRunningServerName())
-
-        configurePerAppProxy(builder)
-
-        // Close the old interface since the parameters have been changed.
-        try {
-            mInterface.close()
-        } catch (ignored: Exception) {
-            // ignored
         }
-
+        
+        builder.setSession(V2RayServiceManager.getRunningServerName())
+    }
+    
+    /**
+     * Configures platform-specific VPN features for different Android versions.
+     * 
+     * @param builder The VPN Builder to configure
+     */
+    private fun configurePlatformFeatures(builder: Builder) {
+        // Android P (API 28) and above: Configure network callbacks
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             try {
                 connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
@@ -202,25 +236,14 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 Log.e(AppConfig.TAG, "Failed to request default network", e)
             }
         }
-
+        
+        // Android Q (API 29) and above: Configure metering and HTTP proxy
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             builder.setMetered(false)
             if (MmkvManager.decodeSettingsBool(AppConfig.PREF_APPEND_HTTP_PROXY)) {
                 builder.setHttpProxy(ProxyInfo.buildDirectProxy(LOOPBACK, SettingsManager.getHttpPort()))
             }
         }
-
-        // Create a new interface using the builder and save the parameters.
-        try {
-            mInterface = builder.establish()!!
-            isRunning = true
-            return true
-        } catch (e: Exception) {
-            // non-nullable lateinit var
-            Log.e(AppConfig.TAG, "Failed to establish VPN interface", e)
-            stopV2Ray()
-        }
-        return false
     }
 
     /**
