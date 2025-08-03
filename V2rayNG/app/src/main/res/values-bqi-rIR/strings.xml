@@ -80,6 +80,7 @@
     <string name="server_lab_preshared_key">کیلیت رزم ناهاڌن ازاف (اختیاری)</string>
     <string name="server_lab_short_id">ShortID</string>
     <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
     <string name="server_lab_secret_key">کیلیت سیخومی</string>
     <string name="server_lab_reserved">Reserved(اختیاری، وا کاما ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_address">نشۊوی مهلی (اختیاری IPv4/IPv6، وا کاما ز یک جوڌا ابۊن)</string>

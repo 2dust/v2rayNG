@@ -264,7 +264,8 @@ data class V2rayConfig(
                 val show: Boolean = false,
                 var publicKey: String? = null,
                 var shortId: String? = null,
-                var spiderX: String? = null
+                var spiderX: String? = null,
+                var mldsa65Verify: String? = null
             )
 
             data class QuicSettingBean(

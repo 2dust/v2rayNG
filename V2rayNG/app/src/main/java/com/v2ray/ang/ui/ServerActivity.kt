@@ -117,6 +117,8 @@ class ServerActivity : BaseActivity() {
     private val container_short_id: LinearLayout? by lazy { findViewById(R.id.lay_short_id) }
     private val et_spider_x: EditText? by lazy { findViewById(R.id.et_spider_x) }
     private val container_spider_x: LinearLayout? by lazy { findViewById(R.id.lay_spider_x) }
+    private val et_mldsa65_verify: EditText? by lazy { findViewById(R.id.et_mldsa65_verify) }
+    private val container_mldsa65_verify: LinearLayout? by lazy { findViewById(R.id.lay_mldsa65_verify) }
     private val et_reserved1: EditText? by lazy { findViewById(R.id.et_reserved1) }
     private val et_local_address: EditText? by lazy { findViewById(R.id.et_local_address) }
     private val et_local_mtu: EditText? by lazy { findViewById(R.id.et_local_mtu) }
@@ -253,9 +255,14 @@ class ServerActivity : BaseActivity() {
                     // Case 1: Null or blank
                     isBlank -> {
                         listOf(
-                            container_sni, container_fingerprint, container_alpn,
-                            container_allow_insecure, container_public_key,
-                            container_short_id, container_spider_x
+                            container_sni,
+                            container_fingerprint,
+                            container_alpn,
+                            container_allow_insecure,
+                            container_public_key,
+                            container_short_id,
+                            container_spider_x,
+                            container_mldsa65_verify
                         ).forEach { it?.visibility = View.GONE }
                     }
 
@@ -270,7 +277,8 @@ class ServerActivity : BaseActivity() {
                         listOf(
                             container_public_key,
                             container_short_id,
-                            container_spider_x
+                            container_spider_x,
+                            container_mldsa65_verify
                         ).forEach { it?.visibility = View.GONE }
                     }
 
@@ -284,7 +292,8 @@ class ServerActivity : BaseActivity() {
                         listOf(
                             container_public_key,
                             container_short_id,
-                            container_spider_x
+                            container_spider_x,
+                            container_mldsa65_verify
                         ).forEach { it?.visibility = View.VISIBLE }
                     }
                 }
@@ -366,9 +375,12 @@ class ServerActivity : BaseActivity() {
                 if (allowinsecure >= 0) {
                     sp_allow_insecure?.setSelection(allowinsecure)
                 }
-                container_public_key?.visibility = View.GONE
-                container_short_id?.visibility = View.GONE
-                container_spider_x?.visibility = View.GONE
+                listOf(
+                    container_public_key,
+                    container_short_id,
+                    container_spider_x,
+                    container_mldsa65_verify
+                ).forEach { it?.visibility = View.GONE }
             } else if (config.security == REALITY) {
                 container_public_key?.visibility = View.VISIBLE
                 et_public_key?.text = Utils.getEditable(config.publicKey.orEmpty())
@@ -376,18 +388,23 @@ class ServerActivity : BaseActivity() {
                 et_short_id?.text = Utils.getEditable(config.shortId.orEmpty())
                 container_spider_x?.visibility = View.VISIBLE
                 et_spider_x?.text = Utils.getEditable(config.spiderX.orEmpty())
+                container_mldsa65_verify?.visibility = View.VISIBLE
+                et_mldsa65_verify?.text = Utils.getEditable(config.mldsa65Verify.orEmpty())
                 container_allow_insecure?.visibility = View.GONE
             }
         }
 
         if (config.security.isNullOrEmpty()) {
-            container_sni?.visibility = View.GONE
-            container_fingerprint?.visibility = View.GONE
-            container_alpn?.visibility = View.GONE
-            container_allow_insecure?.visibility = View.GONE
-            container_public_key?.visibility = View.GONE
-            container_short_id?.visibility = View.GONE
-            container_spider_x?.visibility = View.GONE
+            listOf(
+                container_sni,
+                container_fingerprint,
+                container_alpn,
+                container_allow_insecure,
+                container_public_key,
+                container_short_id,
+                container_spider_x,
+                container_mldsa65_verify
+            ).forEach { it?.visibility = View.GONE }
         }
         val network = Utils.arrayFind(networks, config.network.orEmpty())
         if (network >= 0) {
@@ -550,6 +567,7 @@ class ServerActivity : BaseActivity() {
         val publicKey = et_public_key?.text?.toString()
         val shortId = et_short_id?.text?.toString()
         val spiderX = et_spider_x?.text?.toString()
+        val mldsa65Verify = et_mldsa65_verify?.text?.toString()
 
         val allowInsecure =
             if (allowInsecureField == null || allowinsecures[allowInsecureField].isBlank()) {
@@ -566,6 +584,7 @@ class ServerActivity : BaseActivity() {
         config.publicKey = publicKey
         config.shortId = shortId
         config.spiderX = spiderX
+        config.mldsa65Verify = mldsa65Verify
     }
 
     private fun transportTypes(network: String?): Array<out String> {

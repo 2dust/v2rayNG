@@ -80,6 +80,7 @@
     <string name="server_lab_preshared_key">PreSharedKey (optional)</string>
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved (可选，逗号隔开)</string>
     <string name="server_lab_local_address">本地地址 (可选 IPv4/IPv6，逗号隔开)</string>

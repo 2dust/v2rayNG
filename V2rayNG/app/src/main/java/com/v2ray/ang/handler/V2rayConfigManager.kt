@@ -1235,6 +1235,7 @@ object V2rayConfigManager {
         val publicKey = profileItem.publicKey
         val shortId = profileItem.shortId
         val spiderX = profileItem.spiderX
+        val mldsa65Verify = profileItem.mldsa65Verify
 
         streamSettings.security = if (streamSecurity.isEmpty()) null else streamSecurity
         if (streamSettings.security == null) return
@@ -1246,6 +1247,7 @@ object V2rayConfigManager {
             publicKey = if (publicKey.isNullOrEmpty()) null else publicKey,
             shortId = if (shortId.isNullOrEmpty()) null else shortId,
             spiderX = if (spiderX.isNullOrEmpty()) null else spiderX,
+            mldsa65Verify = if (mldsa65Verify.isNullOrEmpty()) null else mldsa65Verify,
         )
         if (streamSettings.security == AppConfig.TLS) {
             streamSettings.tlsSettings = tlsSetting

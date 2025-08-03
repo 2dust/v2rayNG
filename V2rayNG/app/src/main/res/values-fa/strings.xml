@@ -80,6 +80,7 @@
     <string name="server_lab_preshared_key">کلید رمزگذاری اضافی (اختیاری)</string>
     <string name="server_lab_short_id">ShortID</string>
     <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
     <string name="server_lab_secret_key">کلید خصوصی</string>
     <string name="server_lab_reserved">Reserved (اختیاری، جدا شده با کاما)</string>
     <string name="server_lab_local_address">آدرس محلی (IPv4/IPv6 اختیاری، جدا شده با کاما)</string>

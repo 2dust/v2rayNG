@@ -44,6 +44,7 @@ data class ProfileItem(
     var publicKey: String? = null,
     var shortId: String? = null,
     var spiderX: String? = null,
+    var mldsa65Verify: String? = null,
 
     var secretKey: String? = null,
     var preSharedKey: String? = null,
