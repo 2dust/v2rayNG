@@ -267,7 +267,7 @@
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
     <string name="title_ping_all_server">TCPING کانفیگ های گروه فعلی</string>
     <string name="title_real_ping_all_server">تاخیر واقعی کانفیگ های گروه فعلی</string>
-    <string name="title_create_intelligent_selection_all_server">Creating Intelligent Selection Current Group Configuration</string>
+    <string name="title_create_intelligent_selection_all_server">ایجاد کانفیگ انتخاب هوشمند برای گروه فعلی</string>
     <string name="title_user_asset_setting">فایل های منبع جغرافیایی</string>
     <string name="title_sort_by_test_results">مرتب‌ سازی بر اساس نتایج آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگ‌ها</string>
@@ -379,12 +379,12 @@
         <item>Resolve and add to DNS Hosts</item>
         <item>Resolve and replace domain</item>
     </string-array>
-    <string name="intelligent_selection">Intelligent Selection</string>
-    <string name="sub_setting_intelligent_selection_filter">Remarks Intelligent Selection regular filter</string>
-    <string name="title_intelligent_selection_method">Intelligent Selection Method</string>
+    <string name="intelligent_selection">انتخاب هوشمند</string>
+    <string name="sub_setting_intelligent_selection_filter">فیلتر نام مستعار برای انتخاب هوشمند</string>
+    <string name="title_intelligent_selection_method">روش انتخاب هوشمند</string>
     <string-array name="intelligent_selection_method">
-        <item>Least Ping</item>
-        <item>Least Load</item>
+        <item>کمترین پینگ</item>
+        <item>کمترین بار(لود)</item>
     </string-array>
 
 </resources>
