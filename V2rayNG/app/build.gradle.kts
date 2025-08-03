@@ -35,7 +35,20 @@ android {
             }
         }
 
+        externalNativeBuild {
+            ndkVersion = "28.2.13676358"
+            ndkBuild {
+                arguments("APP_CFLAGS+=-DPKGNAME=com/v2ray/ang/service -DCLSNAME=Tun2SocksService -ffile-prefix-map=${rootDir}=.") \
+            }
+        }
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+    
+    externalNativeBuild {
+        ndkBuild {
+            path = file("src/main/jni/Android.mk")
+        }
     }
 
     buildTypes {
