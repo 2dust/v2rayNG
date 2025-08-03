@@ -330,6 +330,7 @@ object V2rayConfigManager {
                 }
             }
             v2rayConfig.inbounds[0].port = socksPort
+            v2rayConfig.inbounds[0].tag = "socks-in"
             val fakedns = MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
             val sniffAllTlsAndHttp =
                 MmkvManager.decodeSettingsBool(AppConfig.PREF_SNIFFING_ENABLED, true) != false
@@ -470,33 +471,7 @@ object V2rayConfigManager {
                 )
             }
 
-            // DNS inbound
-            val remoteDns = SettingsManager.getRemoteDnsServers()
-            if (v2rayConfig.inbounds.none { e -> e.protocol == "dokodemo-door" && e.tag == "dns-in" }) {
-                val dnsInboundSettings = V2rayConfig.InboundBean.InSettingsBean(
-                    address = if (Utils.isPureIpAddress(remoteDns.first())) remoteDns.first() else AppConfig.DNS_PROXY,
-                    port = 53,
-                    network = "tcp,udp"
-                )
-
-                val localDnsPort = Utils.parseInt(
-                    MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT),
-                    AppConfig.PORT_LOCAL_DNS.toInt()
-                )
-                v2rayConfig.inbounds.add(
-                    V2rayConfig.InboundBean(
-                        tag = "dns-in",
-                        port = localDnsPort,
-                        listen = AppConfig.LOOPBACK,
-                        protocol = "dokodemo-door",
-                        settings = dnsInboundSettings,
-                        sniffing = null
-                    )
-                )
-            }
-
-            // DNS outbound
-            if (v2rayConfig.outbounds.none { e -> e.protocol == "dns" && e.tag == "dns-out" }) {
+            if (v2rayConfig.outbounds.none { it.protocol == "dns" }) {
                 v2rayConfig.outbounds.add(
                     V2rayConfig.OutboundBean(
                         protocol = "dns",
@@ -508,14 +483,12 @@ object V2rayConfigManager {
                 )
             }
 
-            // DNS routing tag
-            v2rayConfig.routing.rules.add(
-                0, RulesBean(
-                    inboundTag = arrayListOf("dns-in"),
-                    outboundTag = "dns-out",
-                    domain = null
-                )
-            )
+            v2rayConfig.routing.rules.add(0, RulesBean(
+                type = "field",
+                inboundTag = listOf("socks-in"),
+                port = "53",
+                outboundTag = "dns-out"
+            ))
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to configure custom local DNS", e)
             return false

@@ -20,110 +20,73 @@ import java.io.File
  */
 class Tun2SocksService(
     private val context: Context,
-    private val vpnInterface: ParcelFileDescriptor,
-    private val isRunningProvider: () -> Boolean,
-    private val restartCallback: () -> Unit
+    private val vpnInterface: ParcelFileDescriptor
 ) {
     companion object {
-        private const val TUN2SOCKS = "libtun2socks.so"
+        init {
+            System.loadLibrary("hev-socks5-tunnel")
+        }
     }
 
-    private lateinit var process: Process
+    private external fun TProxyStartService(configPath: String, fd: Int)
+    private external fun TProxyStopService()
+    private external fun TProxyGetStats(): LongArray
 
     /**
-     * Starts the tun2socks process with the appropriate parameters.
+     * Start the HevSocks5Tunnel
      */
-    fun startTun2Socks() {
-        Log.i(AppConfig.TAG, "Start run $TUN2SOCKS")
-        val socksPort = SettingsManager.getSocksPort()
-        val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
-        val cmd = arrayListOf(
-            File(context.applicationInfo.nativeLibraryDir, TUN2SOCKS).absolutePath,
-            "--netif-ipaddr", vpnConfig.ipv4Router,
-            "--netif-netmask", "255.255.255.252",
-            "--socks-server-addr", "${AppConfig.LOOPBACK}:${socksPort}",
-            "--tunmtu", VPN_MTU.toString(),
-            "--sock-path", "sock_path",
-            "--enable-udprelay",
-            "--loglevel", "notice"
-        )
+    fun startHevSocks5Tunnel() {
+        Log.i(AppConfig.TAG, "Starting HevSocks5Tunnel via JNI")
 
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6)) {
-            cmd.add("--netif-ip6addr")
-            cmd.add(vpnConfig.ipv6Router)
+        val configContent = buildConfig()
+        val configFile = File(context.filesDir, "hev-socks5-tunnel.yaml").apply {
+            writeText(configContent)
         }
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED)) {
-            val localDnsPort = Utils.parseInt(
-                MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT), 
-                AppConfig.PORT_LOCAL_DNS.toInt()
-            )
-            cmd.add("--dnsgw")
-            cmd.add("${AppConfig.LOOPBACK}:${localDnsPort}")
-        }
-        Log.i(AppConfig.TAG, cmd.toString())
+        Log.i(AppConfig.TAG, "Config file created: ${configFile.absolutePath}")
+        Log.d(AppConfig.TAG, "Config content:\n$configContent")
 
         try {
-            val proBuilder = ProcessBuilder(cmd)
-            proBuilder.redirectErrorStream(true)
-            process = proBuilder
-                .directory(context.filesDir)
-                .start()
-            Thread {
-                Log.i(AppConfig.TAG, "$TUN2SOCKS check")
-                process.waitFor()
-                Log.i(AppConfig.TAG, "$TUN2SOCKS exited")
-                if (isRunningProvider()) {
-                    Log.i(AppConfig.TAG, "$TUN2SOCKS restart")
-                    restartCallback()
-                }
-            }.start()
-            Log.i(AppConfig.TAG, "$TUN2SOCKS process info: $process")
-
-            sendFd()
+            Log.i(AppConfig.TAG, "TProxyStartService...")
+            TProxyStartService(configFile.absolutePath, vpnInterface.fd)
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to start $TUN2SOCKS process", e)
+            Log.e(AppConfig.TAG, "HevSocks5Tunnel exception: ${e.message}")
         }
     }
 
-    /**
-     * Sends the file descriptor to the tun2socks process.
-     * Attempts to send the file descriptor multiple times if necessary.
-     */
-    private fun sendFd() {
-        val fd = vpnInterface.fileDescriptor
-        val path = File(context.filesDir, "sock_path").absolutePath
-        Log.i(AppConfig.TAG, "LocalSocket path: $path")
+    private fun buildConfig(): String {
+        return buildString {
+            appendLine("tunnel:")
+            appendLine("  mtu: $VPN_MTU")
+            appendLine("  ipv4: ${SettingsManager.getCurrentVpnInterfaceAddressConfig().ipv4Client}")
 
-        CoroutineScope(Dispatchers.IO).launch {
-            var tries = 0
-            while (true) try {
-                Thread.sleep(50L shl tries)
-                Log.i(AppConfig.TAG, "LocalSocket sendFd tries: $tries")
-                LocalSocket().use { localSocket ->
-                    localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
-                    localSocket.setFileDescriptorsForSend(arrayOf(fd))
-                    localSocket.outputStream.write(42)
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true) {
+                appendLine("  ipv6: \'${SettingsManager.getCurrentVpnInterfaceAddressConfig().ipv6Client}\'")
+            }
+
+            appendLine("socks5:")
+            appendLine("  port: ${SettingsManager.getSocksPort()}")
+            appendLine("  address: ${AppConfig.LOOPBACK}")
+            appendLine("  udp: 'udp'")
+
+            MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL)?.let { logPref ->
+                if (logPref != "none") {
+                    val logLevel = if (logPref == "warning") "warn" else logPref
+                    appendLine("misc:")
+                    appendLine("  log-level: $logLevel")
                 }
-                break
-            } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to send file descriptor, try: $tries", e)
-                if (tries > 5) break
-                tries += 1
             }
         }
     }
 
     /**
-     * Stops the tun2socks process
+     * Stops the HevSocks5Tunnel
      */
-    fun stopTun2Socks() {
+    fun stopHevSocks5Tunnel() {
         try {
-            Log.i(AppConfig.TAG, "$TUN2SOCKS destroy")
-            if (::process.isInitialized) {
-                process.destroy()
-            }
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to destroy $TUN2SOCKS process", e)
-        }
+            Log.i(AppConfig.TAG, "TProxyStopService...")
+            TProxyStopService()
+         } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to stop hev-socks5-tunnel", e)
+         }
     }
 }
