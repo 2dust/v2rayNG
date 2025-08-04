@@ -23,7 +23,7 @@ class Tun2SocksService(
     private val vpnInterface: ParcelFileDescriptor,
     private val isRunningProvider: () -> Boolean,
     private val restartCallback: () -> Unit
-) {
+) : Tun2SocksControl {
     companion object {
         private const val TUN2SOCKS = "libtun2socks.so"
     }
@@ -33,7 +33,7 @@ class Tun2SocksService(
     /**
      * Starts the tun2socks process with the appropriate parameters.
      */
-    fun startTun2Socks() {
+    override fun startTun2Socks() {
         Log.i(AppConfig.TAG, "Start run $TUN2SOCKS")
         val socksPort = SettingsManager.getSocksPort()
         val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
@@ -116,7 +116,7 @@ class Tun2SocksService(
     /**
      * Stops the tun2socks process
      */
-    fun stopTun2Socks() {
+    override fun stopTun2Socks() {
         try {
             Log.i(AppConfig.TAG, "$TUN2SOCKS destroy")
             if (::process.isInitialized) {

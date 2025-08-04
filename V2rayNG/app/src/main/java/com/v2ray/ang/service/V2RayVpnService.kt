@@ -30,7 +30,7 @@ import java.lang.ref.SoftReference
 class V2RayVpnService : VpnService(), ServiceControl {
     private lateinit var mInterface: ParcelFileDescriptor
     private var isRunning = false
-    private var tun2SocksService: Tun2SocksService? = null
+    private var tun2SocksService: Tun2SocksControl? = null
 
     /**destroy
      * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
@@ -145,20 +145,20 @@ class V2RayVpnService : VpnService(), ServiceControl {
      */
     private fun configureVpnService(): Boolean {
         val builder = Builder()
-        
+
         // Configure network settings (addresses, routing and DNS)
         configureNetworkSettings(builder)
 
         // Configure app-specific settings (session name and per-app proxy)
         configurePerAppProxy(builder)
-        
+
         // Close the old interface since the parameters have been changed
         try {
             mInterface.close()
         } catch (ignored: Exception) {
             // ignored
         }
-        
+
         // Configure platform-specific features
         configurePlatformFeatures(builder)
 
@@ -173,21 +173,21 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
         return false
     }
-    
+
     /**
      * Configures the basic network settings for the VPN.
      * This includes IP addresses, routing rules, and DNS servers.
-     * 
+     *
      * @param builder The VPN Builder to configure
      */
     private fun configureNetworkSettings(builder: Builder) {
         val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
         val bypassLan = SettingsManager.routingRulesetsBypassLan()
-        
+
         // Configure IPv4 settings
         builder.setMtu(VPN_MTU)
         builder.addAddress(vpnConfig.ipv4Client, 30)
-        
+
         // Configure routing rules
         if (bypassLan) {
             AppConfig.ROUTED_IP_LIST.forEach {
@@ -197,7 +197,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         } else {
             builder.addRoute("0.0.0.0", 0)
         }
-        
+
         // Configure IPv6 if enabled
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true) {
             builder.addAddress(vpnConfig.ipv6Client, 126)
@@ -208,7 +208,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 builder.addRoute("::", 0)
             }
         }
-        
+
         // Configure DNS servers
         //if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
         //  builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
@@ -218,13 +218,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 builder.addDnsServer(it)
             }
         }
-        
+
         builder.setSession(V2RayServiceManager.getRunningServerName())
     }
-    
+
     /**
      * Configures platform-specific VPN features for different Android versions.
-     * 
+     *
      * @param builder The VPN Builder to configure
      */
     private fun configurePlatformFeatures(builder: Builder) {
@@ -236,7 +236,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 Log.e(AppConfig.TAG, "Failed to request default network", e)
             }
         }
-        
+
         // Android Q (API 29) and above: Configure metering and HTTP proxy
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             builder.setMetered(false)
@@ -296,14 +296,23 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Starts the tun2socks process with the appropriate parameters.
      */
     private fun runTun2socks() {
-        tun2SocksService = Tun2SocksService(
-            context = applicationContext,
-            vpnInterface = mInterface,
-            isRunningProvider = { isRunning },
-            restartCallback = { runTun2socks() }
-        ).also {
-            it.startTun2Socks()
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL) == true) {
+            tun2SocksService = TProxyService(
+                context = applicationContext,
+                vpnInterface = mInterface,
+                isRunningProvider = { isRunning },
+                restartCallback = { runTun2socks() }
+            )
+        } else {
+            tun2SocksService = Tun2SocksService(
+                context = applicationContext,
+                vpnInterface = mInterface,
+                isRunningProvider = { isRunning },
+                restartCallback = { runTun2socks() }
+            )
         }
+
+        tun2SocksService?.startTun2Socks()
     }
 
     /**

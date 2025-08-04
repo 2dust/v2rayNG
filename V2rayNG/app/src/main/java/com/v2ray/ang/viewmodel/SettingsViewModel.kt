@@ -80,6 +80,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.SUBSCRIPTION_AUTO_UPDATE,
             AppConfig.PREF_FRAGMENT_ENABLED,
             AppConfig.PREF_MUX_ENABLED,
+            AppConfig.PREF_USE_HEV_TUNNEL
                 -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getBoolean(key, false))
             }

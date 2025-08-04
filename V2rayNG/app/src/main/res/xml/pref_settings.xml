@@ -13,6 +13,7 @@
         android:key="pref_route_only_enabled"
         android:summary="@string/summary_pref_route_only_enabled"
         android:title="@string/title_pref_route_only_enabled" />
+
     <CheckBoxPreference
         android:key="pref_is_booted"
         android:summary="@string/summary_pref_is_booted"
@@ -254,6 +255,11 @@
             android:key="pref_mode"
             android:summary="%s"
             android:title="@string/title_mode" />
+
+        <CheckBoxPreference
+            android:key="pref_use_hev_tunnel"
+            android:summary="@string/summary_pref_use_hev_tunnel"
+            android:title="@string/title_pref_use_hev_tunnel" />
     </PreferenceCategory>
 
 

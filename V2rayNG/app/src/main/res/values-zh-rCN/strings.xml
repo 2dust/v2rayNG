@@ -245,6 +245,8 @@
     <string name="title_language">语言</string>
     <string name="title_ui_settings">用户界面设置</string>
     <string name="title_pref_ui_mode_night">界面颜色设置</string>
+    <string name="title_pref_use_hev_tunnel">启用新的 TUN 功能</string>
+    <string name="summary_pref_use_hev_tunnel">选择启用后 TUN 将使用 hev-socks5-tunnel 否则使用 badvpn-tun2socks</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">复制</string>
