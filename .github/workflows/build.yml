@@ -31,31 +31,31 @@ jobs:
     - name: Install NDK
       run: |
         echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
-          --channel=3 \
-          --install "ndk;29.0.13113456"
-        echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.13113456" >> $GITHUB_ENV
+          --channel=0 \
+          --install "ndk;28.2.13676358"
+        echo "NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> $GITHUB_ENV
         sed -i '10i\
         \
-            ndkVersion = "29.0.13113456"' ${{ github.workspace }}/V2rayNG/app/build.gradle.kts
+            ndkVersion = "28.2.13676358"' ${{ github.workspace }}/V2rayNG/app/build.gradle.kts
 
     - name: Restore cached libtun2socks
       id: cache-libtun2socks-restore
       uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}/libs
-        key: libtun2socks-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/badvpn/HEAD') }}-${{ hashFiles('.git/modules/libancillary/HEAD') }}
+        key: libtun2socks-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD') }}-${{ hashFiles('.git/modules/badvpn/HEAD') }}-${{ hashFiles('.git/modules/libancillary/HEAD') }}
 
     - name: Build libtun2socks
       if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
       run: |
         bash compile-tun2socks.sh
-
+    
     - name: Save libtun2socks
       if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
       with:
         path: ${{ github.workspace }}/libs
-        key: libtun2socks-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/badvpn/HEAD') }}-${{ hashFiles('.git/modules/libancillary/HEAD') }}
+        key: libtun2socks-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD') }}-${{ hashFiles('.git/modules/badvpn/HEAD') }}-${{ hashFiles('.git/modules/libancillary/HEAD') }}
 
     - name: Copy libtun2socks
       run: |
