@@ -247,8 +247,8 @@
     <string name="title_language">Язык</string>
     <string name="title_ui_settings">Настройки интерфейса</string>
     <string name="title_pref_ui_mode_night">Тема интерфейса</string>
-    <string name="title_pref_use_hev_tunnel">Enable New TUN Feature</string>
-    <string name="summary_pref_use_hev_tunnel">When enabled, TUN will use hev-socks5-tunnel; otherwise, it will use badvpn-tun2socks.</string>
+    <string name="title_pref_use_hev_tunnel">Использовать новую версию TUN</string>
+    <string name="summary_pref_use_hev_tunnel">Если включено, TUN будет использовать hev-socks5-tunnel; иначе будет использоваться badvpn-tun2socks.</string>
 
     <string name="title_logcat">Журнал</string>
     <string name="logcat_copy">Копировать</string>
