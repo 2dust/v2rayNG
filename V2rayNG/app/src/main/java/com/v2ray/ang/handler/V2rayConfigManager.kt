@@ -511,9 +511,8 @@ object V2rayConfigManager {
                 v2rayConfig.routing.rules.add(
                     0, RulesBean(
                         type = "field",
-                        inboundTag = listOf("socks"),
-                    port = "53",
-                    outboundTag = "dns-out"
+                        port = "53",
+                        outboundTag = "dns-out"
                     )
                 )
             }
