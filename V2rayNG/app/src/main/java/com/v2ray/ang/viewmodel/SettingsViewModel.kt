@@ -59,6 +59,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_FRAGMENT_LENGTH,
             AppConfig.PREF_FRAGMENT_INTERVAL,
             AppConfig.PREF_MUX_XUDP_QUIC,
+            AppConfig.PREF_HEV_TUNNEL_LOGLEVEL,
+            AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT
                 -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getString(key, ""))
             }
