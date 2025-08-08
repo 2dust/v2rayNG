@@ -222,7 +222,7 @@
     <!-- AboutActivity -->
     <string name="title_pref_feedback">فشناڌن منشڌ</string>
     <string name="summary_pref_feedback">فشناڌن منشڌ یا داسووݩ موشکلا من Github</string>
-    <string name="summary_pref_tg_group">ٱووڌن من جرگه تلگرام</string>
+    <string name="summary_pref_tg_group">ٱووڌن من بونکۊ تلگرام</string>
     <string name="toast_tg_app_not_found">برنومه تلگرامن نجوست</string>
     <string name="title_privacy_policy">هریم سیخومی</string>
     <string name="title_about">زبار</string>
@@ -249,19 +249,19 @@
     <string name="title_ui_settings">سامووا رابت منتوری</string>
     <string name="title_pref_ui_mode_night">سامووا هالت رابت منتوری</string>
     <string name="title_pref_use_hev_tunnel">فعال کردن ویژیی نۊ TUN</string>
-    <string name="summary_pref_use_hev_tunnel">مجالی ک فعال بۊ، TUN ، hev-socks5-tunnel ن و کار اگره؛ ٱر چینووݩ نبۊ و جاس badvpn-tun2socks و کار گرؽڌه ابۊ.</string>
-    <string name="title_pref_hev_tunnel_loglevel">Hev Tun Log Level</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun Read/Write Timeout (ms, default 300000)</string>
+    <string name="summary_pref_use_hev_tunnel">ٱر ک فعال بۊ، TUN ایا hev-socks5-tunnel ن و کار اگره؛ ٱندی ز badvpn-tun2socks.</string>
+    <string name="title_pref_hev_tunnel_loglevel">Hev Tun سئت گوزارشا</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun زمووݩ مندیر بیڌن خوندن وو هؽل کردن (میلی سانیه، پؽش فرز 300000)</string>
 
     <string name="title_logcat">داسووا</string>
     <string name="logcat_copy">لف گیری</string>
     <string name="logcat_clear">روفتن</string>
     <string name="title_service_restart">ر وندن دووارته خدمات</string>
-    <string name="title_del_all_config">پاک کردن پوی کانفیگا جرگه سکویی</string>
-    <string name="title_del_duplicate_config">پاک کردن کانفیگا تکراری جرگه سکویی</string>
-    <string name="title_del_invalid_config">پاک کردن کانفیگا نا موئتبر جرگه سکویی</string>
-    <string name="title_export_all">و در کشیڌن کانفیگا غیر سفارشی جرگه سکویی من کلیپ بورد</string>
-    <string name="title_sub_setting">سامووا جرگه اشتراک</string>
+    <string name="title_del_all_config">پاک کردن پوی کانفیگا بونکۊ سکویی</string>
+    <string name="title_del_duplicate_config">پاک کردن کانفیگا تکراری بونکۊ سکویی</string>
+    <string name="title_del_invalid_config">پاک کردن کانفیگا نا موئتبر بونکۊ سکویی</string>
+    <string name="title_export_all">و در کشیڌن کانفیگا غیر سفارشی بونکۊ سکویی من کلیپ بورد</string>
+    <string name="title_sub_setting">سامووا بونکۊ اشتراک</string>
     <string name="sub_setting_remarks">نیشتنا</string>
     <string name="sub_setting_url">نشۊوی اینترنتی اختیاری</string>
     <string name="sub_setting_filter">نوم موستعار فیلتر</string>
@@ -271,14 +271,14 @@
     <string name="sub_setting_pre_profile">نوم موستعار پروکسی دیندایی</string>
     <string name="sub_setting_next_profile">نوم موستعار پروکسی نیایی</string>
     <string name="sub_setting_pre_profile_tip">موتمعن بۊ ک نوم موستعار هڌس وو جۊرس نی</string>
-    <string name="title_sub_update">ورۊ کردن اشتراک جرگه سکویی</string>
-    <string name="title_ping_all_server">Tcping کانفیگا جرگه سکویی</string>
-    <string name="title_real_ping_all_server">تئخیر واقعی کانفیگا جرگه سکویی</string>
-    <string name="title_create_intelligent_selection_all_server">وورکل پسند هۊشمند کانفیگ جرگه سکویی</string>
+    <string name="title_sub_update">ورۊ کردن اشتراک بونکۊ سکویی</string>
+    <string name="title_ping_all_server">Tcping کانفیگا بونکۊ سکویی</string>
+    <string name="title_real_ping_all_server">تئخیر واقعی کانفیگا بونکۊ سکویی</string>
+    <string name="title_create_intelligent_selection_all_server">وورکل پسند هۊشمند کانفیگ بونکۊ سکویی</string>
     <string name="title_user_asset_setting">فایلا بونچک جوقرافیایی</string>
     <string name="title_sort_by_test_results">ترتیب و ری نتیجه یل آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>
-    <string name="filter_config_all">پوی جرگه یل کانفیگ</string>
+    <string name="filter_config_all">پوی بونکۊ یل کانفیگ</string>
     <string name="title_del_duplicate_config_count">پاک کردن %d کانفیگ تکراری</string>
 
     <string name="title_del_config_count">پاک کردن %d کانفیگ</string>
@@ -388,8 +388,8 @@
     <string name="sub_setting_intelligent_selection_filter">گوڌنا دیاری پسند هۊشمند فیلتر مئمۊلی</string>
     <string name="title_intelligent_selection_method">بارت پسند هۊشمند</string>
     <string-array name="intelligent_selection_method">
-        <item>بلم ترین پینگ</item>
-        <item>هدقل بار</item>
+        <item>کم ترین پینگ</item>
+        <item>کم ترین بار(لود)</item>
     </string-array>
 
 </resources>
