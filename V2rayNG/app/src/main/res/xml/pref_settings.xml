@@ -71,6 +71,25 @@
             android:key="pref_vpn_interface_address_config_index"
             android:summary="%s"
             android:title="@string/title_pref_vpn_interface_address" />
+
+        <CheckBoxPreference
+            android:key="pref_use_hev_tunnel"
+            android:summary="@string/summary_pref_use_hev_tunnel"
+            android:title="@string/title_pref_use_hev_tunnel" />
+
+        <ListPreference
+            android:defaultValue="none"
+            android:entries="@array/hev_tunnel_loglevel"
+            android:entryValues="@array/hev_tunnel_loglevel"
+            android:key="pref_hev_tunnel_loglevel"
+            android:summary="%s"
+            android:title="@string/title_pref_hev_tunnel_loglevel" />
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_hev_tunnel_rw_timeout"
+            android:summary="300000"
+            android:title="@string/title_pref_hev_tunnel_rw_timeout" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_ui_settings">
@@ -255,25 +274,6 @@
             android:key="pref_mode"
             android:summary="%s"
             android:title="@string/title_mode" />
-
-        <CheckBoxPreference
-            android:key="pref_use_hev_tunnel"
-            android:summary="@string/summary_pref_use_hev_tunnel"
-            android:title="@string/title_pref_use_hev_tunnel" />
-
-        <ListPreference
-            android:defaultValue="none"
-            android:entries="@array/hev_tunnel_loglevel"
-            android:entryValues="@array/hev_tunnel_loglevel"
-            android:key="pref_hev_tunnel_loglevel"
-            android:summary="%s"
-            android:title="@string/title_pref_hev_tunnel_loglevel" />
-
-        <EditTextPreference
-            android:inputType="number"
-            android:key="pref_hev_tunnel_rw_timeout"
-            android:summary="300000"
-            android:title="@string/title_pref_hev_tunnel_rw_timeout" />
 
     </PreferenceCategory>
 

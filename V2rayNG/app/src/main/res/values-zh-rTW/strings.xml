@@ -248,8 +248,8 @@
     <string name="title_pref_ui_mode_night">介面顯示模式</string>
     <string name="title_pref_use_hev_tunnel">啟用新 TUN 功能</string>
     <string name="summary_pref_use_hev_tunnel">選擇啟用後，TUN 將使用 hev-socks5-tunnel，否則使用 badvpn-tun2socks。</string>
-    <string name="title_pref_hev_tunnel_loglevel">HevTun日誌級別</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">HevTun讀寫超時 (ms)</string>
+    <string name="title_pref_hev_tunnel_loglevel">HevTun 日誌級別</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">HevTun 讀寫逾時 (ms, 預設 300000)</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">複製</string>

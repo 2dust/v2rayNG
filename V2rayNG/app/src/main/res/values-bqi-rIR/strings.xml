@@ -251,7 +251,7 @@
     <string name="title_pref_use_hev_tunnel">فعال کردن ویژیی نۊ TUN</string>
     <string name="summary_pref_use_hev_tunnel">مجالی ک فعال بۊ، TUN ، hev-socks5-tunnel ن و کار اگره؛ ٱر چینووݩ نبۊ و جاس badvpn-tun2socks و کار گرؽڌه ابۊ.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun Log Level</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun Read/Write Timeout (ms)</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun Read/Write Timeout (ms, default 300000)</string>
 
     <string name="title_logcat">داسووا</string>
     <string name="logcat_copy">لف گیری</string>
