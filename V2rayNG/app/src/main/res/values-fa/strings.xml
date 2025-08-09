@@ -181,7 +181,7 @@
     <string name="title_pref_vpn_dns">VPN DNS (فقط IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">آیا VPN از شبکه محلی عبور می کند؟</string>
 
-    <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
+    <string name="title_pref_vpn_interface_address">آدرس واسط VPN</string>
 
     <string name="title_pref_domestic_dns">DNS داخلی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -247,8 +247,8 @@
     <string name="title_pref_ui_mode_night">تنظیمات حالت رابط کاربری</string>
     <string name="title_pref_use_hev_tunnel">فعالسازی قابلیت TUN جدید</string>
     <string name="summary_pref_use_hev_tunnel">در صورت فعال بودن، TUN از hev-socks5-tunnel استفاده می‌کند؛ در غیر این صورت از badvpn-tun2socks.</string>
-    <string name="title_pref_hev_tunnel_loglevel">Hev Tun Log Level</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun Read/Write Timeout (ms, default 300000)</string>
+    <string name="title_pref_hev_tunnel_loglevel">سطح گزارشات Hev Tun</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">زمان انتظار خواندن/نوشتن (میلی‌ثانیه، پیش‌فرض ۳۰۰۰۰۰) Hev Tun</string>
 
     <string name="title_logcat">گزارشات</string>
     <string name="logcat_copy">کپی</string>
