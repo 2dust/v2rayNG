@@ -80,7 +80,7 @@
     <string name="server_lab_preshared_key">Дополнительный ключ шифрования (необязательно)</string>
     <string name="server_lab_short_id">ShortID</string>
     <string name="server_lab_spider_x">SpiderX</string>
-    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
+    <string name="server_lab_mldsa65_verify">mldsa65Verify</string>
     <string name="server_lab_secret_key">Закрытый ключ</string>
     <string name="server_lab_reserved">Reserved (необязательно, через запятую)</string>
     <string name="server_lab_local_address">Локальный адрес (необязательно, IPv4/IPv6 через запятую)</string>
@@ -182,7 +182,7 @@
     <string name="title_pref_vpn_dns">VPN DNS (только IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">VPN обходит LAN</string>
 
-    <string name="title_pref_vpn_interface_address">VPN частный IP</string>
+    <string name="title_pref_vpn_interface_address">Адрес интерфейса VPN</string>
 
     <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -241,16 +241,16 @@
     <string name="title_pref_auto_update_interval">Интервал автообновления (минут, не менее 15)</string>
 
     <string name="title_core_loglevel">Подробность ведения журнала</string>
-    <string name="title_outbound_domain_resolve_method">Предварительное определение исходящего домена</string>
+    <string name="title_outbound_domain_resolve_method">Предопределение исходящего домена</string>
     <string name="title_mode">Режим</string>
     <string name="title_mode_help">Нажмите для получения дополнительной информации</string>
     <string name="title_language">Язык</string>
     <string name="title_ui_settings">Настройки интерфейса</string>
     <string name="title_pref_ui_mode_night">Тема интерфейса</string>
     <string name="title_pref_use_hev_tunnel">Использовать новую версию TUN</string>
-    <string name="summary_pref_use_hev_tunnel">Если включено, TUN будет использовать hev-socks5-tunnel; иначе будет использоваться badvpn-tun2socks.</string>
-    <string name="title_pref_hev_tunnel_loglevel">Hev Tun Log Level</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun Read/Write Timeout (ms, default 300000)</string>
+    <string name="summary_pref_use_hev_tunnel">Если включено, TUN будет использовать hev-socks5-tunnel, иначе будет использоваться badvpn-tun2socks</string>
+    <string name="title_pref_hev_tunnel_loglevel">Подробность журнала HevTun</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">Время ожидания чтения/записи HevTun (мс, по умолчанию 300000)</string>
 
     <string name="title_logcat">Журнал</string>
     <string name="logcat_copy">Копировать</string>
