@@ -370,4 +370,11 @@ object SettingsManager {
         val selectedIndex = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_INTERFACE_ADDRESS_CONFIG_INDEX, "0")?.toInt()
         return VpnInterfaceAddressConfig.getConfigByIndex(selectedIndex ?: 0)
     }
+
+    /**
+     * Get the VPN MTU from settings, defaulting to AppConfig.VPN_MTU.
+     */
+    fun getVpnMtu(): Int {
+        return Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_MTU), AppConfig.VPN_MTU)
+    }
 }

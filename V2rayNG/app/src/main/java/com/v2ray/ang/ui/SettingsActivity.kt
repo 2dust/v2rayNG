@@ -45,6 +45,7 @@ class SettingsActivity : BaseActivity() {
         private val vpnDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_VPN_DNS) }
         private val vpnBypassLan by lazy { findPreference<ListPreference>(AppConfig.PREF_VPN_BYPASS_LAN) }
         private val vpnInterfaceAddress by lazy { findPreference<ListPreference>(AppConfig.PREF_VPN_INTERFACE_ADDRESS_CONFIG_INDEX) }
+        private val vpnMtu by lazy { findPreference<EditTextPreference>(AppConfig.PREF_VPN_MTU) }
 
         private val mux by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_MUX_ENABLED) }
         private val muxConcurrency by lazy { findPreference<EditTextPreference>(AppConfig.PREF_MUX_CONCURRENCY) }
@@ -90,6 +91,12 @@ class SettingsActivity : BaseActivity() {
             }
             vpnDns?.setOnPreferenceChangeListener { _, any ->
                 vpnDns?.summary = any as String
+                true
+            }
+
+            vpnMtu?.setOnPreferenceChangeListener { _, any ->
+                val nval = any as String
+                vpnMtu?.summary = if (TextUtils.isEmpty(nval)) AppConfig.VPN_MTU.toString() else nval
                 true
             }
 
@@ -196,6 +203,7 @@ class SettingsActivity : BaseActivity() {
             appendHttpProxy?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_APPEND_HTTP_PROXY, false)
             localDnsPort?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
             vpnDns?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_DNS, AppConfig.DNS_VPN)
+            vpnMtu?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_MTU, AppConfig.VPN_MTU.toString())
 
             updateMux(MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false))
             mux?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false)
@@ -229,6 +237,7 @@ class SettingsActivity : BaseActivity() {
             listOf(
                 localDnsPort,
                 vpnDns,
+                vpnMtu,
                 muxConcurrency,
                 muxXudpConcurrency,
                 fragmentLength,
@@ -298,6 +307,7 @@ class SettingsActivity : BaseActivity() {
             vpnDns?.isEnabled = vpn
             vpnBypassLan?.isEnabled = vpn
             vpnInterfaceAddress?.isEnabled = vpn
+            vpnMtu?.isEnabled = vpn
             if (vpn) {
                 updateLocalDns(
                     MmkvManager.decodeSettingsBool(

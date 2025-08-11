@@ -72,6 +72,12 @@
             android:summary="%s"
             android:title="@string/title_pref_vpn_interface_address" />
 
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_vpn_mtu"
+            android:summary="1500"
+            android:title="@string/title_pref_vpn_mtu" />
+
         <CheckBoxPreference
             android:key="pref_use_hev_tunnel"
             android:summary="@string/summary_pref_use_hev_tunnel"
