@@ -81,6 +81,7 @@
     <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
     <string name="server_lab_short_id" translatable="false">المعرّف القصير</string>
     <string name="server_lab_spider_x" translatable="false">SpiderX</string>
+    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
     <string name="server_lab_secret_key" translatable="false">المفتاح السري</string>
     <string name="server_lab_reserved">محجوز (اختياري)</string>
     <string name="server_lab_local_address">العنوان المحلي (اختياري IPv4/IPv6، مفصولة بفواصل)</string>
@@ -183,6 +184,7 @@
     <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
 
     <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
+    <string name="title_pref_vpn_mtu">VPN MTU (default 1500)</string>
 
     <string name="title_pref_domestic_dns">DNS المحلي (اختياري)</string>
     <string name="summary_pref_domestic_dns">DNS</string>

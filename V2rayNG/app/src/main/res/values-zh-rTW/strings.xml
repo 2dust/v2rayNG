@@ -183,6 +183,7 @@
     <string name="title_pref_vpn_bypass_lan">VPN 是否繞過區域網</string>
 
     <string name="title_pref_vpn_interface_address">VPN 介面位址</string>
+    <string name="title_pref_vpn_mtu">VPN MTU (預設 1500)</string>
 
     <string name="summary_pref_domestic_dns">DNS</string>
     <string name="title_pref_domestic_dns">境内 DNS (可选)</string>

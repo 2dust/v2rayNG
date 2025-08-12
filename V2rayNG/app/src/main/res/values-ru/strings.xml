@@ -183,6 +183,7 @@
     <string name="title_pref_vpn_bypass_lan">VPN обходит LAN</string>
 
     <string name="title_pref_vpn_interface_address">Адрес интерфейса VPN</string>
+    <string name="title_pref_vpn_mtu">VPN MTU (default 1500)</string>
 
     <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
