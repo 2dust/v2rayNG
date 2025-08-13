@@ -22,9 +22,167 @@ import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.handler.SpeedtestManager
 import java.net.URI
+import java.net.InetSocketAddress
+import java.net.Socket
 
 object AngConfigManager {
+
+    // ====== Successive Halving Helpers ======
+    /**
+     * Candidate wrapper used during successive halving. Each candidate holds its
+     * associated GUID, profile object and a mutable delay value used for ranking.
+     */
+    private data class Candidate(val guid: String, val profile: ProfileItem, var delayMs: Long = Long.MAX_VALUE)
+
+    /**
+     * Produces a deterministic signature for a profile in order to deduplicate
+     * near‑identical nodes. This signature attempts to capture the aspects of a
+     * profile that uniquely determine its connection characteristics: server, port,
+     * network type and other transport parameters such as host, sni, path and flow.
+     */
+    private fun signatureForDedup(p: ProfileItem): String {
+        val b = StringBuilder()
+        b.append(p.server ?: "").append(':').append(p.serverPort ?: "")
+        b.append('|').append(p.network ?: "")
+        b.append('|').append(p.host ?: "").append('|').append(p.sni ?: "").append('|').append(p.path ?: "")
+        b.append('|').append(p.publicKey ?: "").append('|').append(p.shortId ?: "")
+        b.append('|').append(p.flow ?: "").append('|').append(p.headerType ?: "")
+        b.append('|').append(p.username ?: "").append('|').append(p.method ?: "")
+        return b.toString()
+    }
+
+    /**
+     * Deduplicates a list of candidates based on their signature. Keeps the first
+     * occurrence of each signature and discards duplicates.
+     */
+    private fun dedupCandidates(list: List<Candidate>): List<Candidate> {
+        val seen = LinkedHashMap<String, Candidate>(list.size)
+        for (c in list) {
+            val sig = signatureForDedup(c.profile)
+            if (!seen.containsKey(sig)) {
+                seen[sig] = c
+            }
+        }
+        return ArrayList(seen.values)
+    }
+
+    /**
+     * Performs a very fast raw TCP connect for TCP-like transports in order to
+     * quickly eliminate dead endpoints. For non‑TCP protocols (e.g. kcp/quic),
+     * the candidate is kept without testing to avoid false negatives.
+     *
+     * @param cands the list of candidates to filter.
+     * @param timeoutMs connection timeout in milliseconds.
+     * @return a filtered list containing only candidates that respond to a raw
+     * connect within the timeout or those that are UDP-only.
+     */
+    private fun preFilterByRawConnectCandidates(cands: List<Candidate>, timeoutMs: Int = 300): List<Candidate> {
+        val tcpish = setOf<String?>(null, "", "tcp", "ws", "grpc", "h2", "http", "httpupgrade")
+        val kept = ArrayList<Candidate>(cands.size)
+        for (c in cands) {
+            try {
+                val host = c.profile.server ?: continue
+                val port = c.profile.serverPort?.toIntOrNull() ?: continue
+                val network = c.profile.network?.lowercase()
+                if (network !in tcpish) {
+                    // Skip raw connect for UDP‑based transports.
+                    kept.add(c)
+                    continue
+                }
+                Socket().use { s ->
+                    s.connect(InetSocketAddress(host, port), timeoutMs)
+                    kept.add(c)
+                }
+            } catch (e: Exception) {
+                Log.d(AppConfig.TAG, "SH: drop (raw connect) ${c.profile.remarks} ${c.profile.server}:${c.profile.serverPort} -> ${e.javaClass.simpleName}")
+            }
+        }
+        return if (kept.isNotEmpty()) kept else cands
+    }
+
+    /**
+     * Measures a realistic ping using the existing speedtest infrastructure in
+     * V2rayConfigManager and SpeedtestManager. It tries to construct a temporary
+     * V2ray configuration for the candidate GUID and then performs one or more
+     * ping measurements, returning the best (lowest) latency observed.
+     *
+     * @param context Android context used to obtain speedtest configuration.
+     * @param guid server GUID to test.
+     * @param repeats number of times to measure; the minimum of these values is returned.
+     * @return the measured latency in milliseconds, or a large sentinel value if failed.
+     */
+    private fun measureRealPingMs(context: Context, guid: String, repeats: Int = 1): Long {
+        var best: Long = Long.MAX_VALUE
+        for (i in 0 until repeats) {
+            try {
+                val conf = V2rayConfigManager.getV2rayConfig4Speedtest(context, guid)
+                if (!conf.status) continue
+                val one = SpeedtestManager.realPing(conf.content)
+                if (one > 0 && one < best) best = one
+            } catch (_: Exception) {
+                // ignore
+            }
+        }
+        return if (best == Long.MAX_VALUE) -1L else best
+    }
+
+    /**
+     * Core successive halving selection. Given a list of GUIDs, it deduplicates,
+     * performs a raw connect filter, then iteratively measures latency and keeps
+     * only the top performers until a target size is reached. The final pass
+     * performs deeper measurements on the remaining candidates.
+     *
+     * @param context Android context used to obtain speedtest configuration.
+     * @param guidList list of server GUIDs to select from.
+     * @param targetK desired number of servers in the final selection.
+     * @return a list of GUIDs representing the selected top candidates.
+     */
+    private fun successiveHalvingSelect(context: Context, guidList: List<String>, targetK: Int = 128): List<String> {
+        if (guidList.isEmpty()) return emptyList()
+
+        // Load candidate profiles and wrap into Candidate objects.
+        val loaded = guidList.mapNotNull { g ->
+            val p = MmkvManager.decodeServerConfig(g)
+            if (p != null) Candidate(g, p) else null
+        }
+
+        // Stage 0: dedup identical endpoints.
+        var pool = dedupCandidates(loaded)
+
+        // For small lists, do a quick pass: raw filter then a single ping to order.
+        if (pool.size <= targetK * 2) {
+            pool = preFilterByRawConnectCandidates(pool, 300)
+            for (c in pool) {
+                c.delayMs = measureRealPingMs(context, c.guid, 1).let { if (it <= 0) Long.MAX_VALUE / 2 else it }
+            }
+            return pool.sortedBy { it.delayMs }.take(targetK).map { it.guid }
+        }
+
+        // Stage 1: raw connect filter.
+        pool = preFilterByRawConnectCandidates(pool, 300)
+
+        // Stage 2: iterative halving with light single ping.
+        var current = pool
+        var round = 0
+        while (current.size > targetK * 4 && round < 3) {
+            for (c in current) {
+                c.delayMs = measureRealPingMs(context, c.guid, 1).let { if (it <= 0) Long.MAX_VALUE / 2 else it }
+            }
+            current = current.sortedBy { it.delayMs }
+            val keep = kotlin.math.max(targetK * 2, current.size / 2)
+            current = current.take(keep)
+            round++
+        }
+
+        // Stage 3: final deep measurement on the remaining pool.
+        val finalist = current.take(kotlin.math.max(targetK * 2, kotlin.math.min(current.size, targetK * 4)))
+        for (c in finalist) {
+            c.delayMs = measureRealPingMs(context, c.guid, 3).let { if (it <= 0) Long.MAX_VALUE / 2 else it }
+        }
+        return finalist.sortedBy { it.delayMs }.take(targetK).map { it.guid }
+    }
 
 
     /**
@@ -510,7 +668,14 @@ object AngConfigManager {
         if (guidList.isEmpty()) {
             return null
         }
-        val result = V2rayConfigManager.genV2rayConfig(context, guidList) ?: return null
+        // When there are many servers, perform successive halving to pick the top candidates.
+        val targetK = 128
+        val selectedGuids = if (guidList.size > targetK) {
+            successiveHalvingSelect(context, guidList, targetK)
+        } else {
+            guidList
+        }
+        val result = V2rayConfigManager.genV2rayConfig(context, selectedGuids) ?: return null
         val config = CustomFmt.parse(JsonUtil.toJson(result)) ?: return null
         config.subscriptionId = subid
         val key = MmkvManager.encodeServerConfig("", config)
