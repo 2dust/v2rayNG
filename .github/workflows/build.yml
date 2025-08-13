@@ -115,33 +115,33 @@ jobs:
         distribution: 'temurin'
         java-version: '21'
 
-    - name: Build APKs (debug, auto-signed)
+    - name: Build APKs (fdroidDebug only)
       run: |
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
         chmod 755 gradlew
-        ./gradlew assembleDebug -PABI_FILTERS="${ABI_FILTERS}"
+        ./gradlew assembleFdroidDebug -PABI_FILTERS="${ABI_FILTERS}"
     
-    - name: Upload arm64-v8a APK (debug)
+    - name: Upload arm64-v8a APK (fdroidDebug)
       uses: actions/upload-artifact@v4.6.2
       if: ${{  success() }}
       with:
-        name: arm64-v8a-debug
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/debug/*arm64-v8a*.apk
+        name: arm64-v8a-fdroid-debug
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/fdroid/debug/*arm64-v8a*.apk
 
-    - name: Upload armeabi-v7a APK (debug)
+    - name: Upload armeabi-v7a APK (fdroidDebug)
       uses: actions/upload-artifact@v4.6.2
       if: ${{  success() }}
       with:
-        name: armeabi-v7a-debug
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/debug/*armeabi-v7a*.apk
+        name: armeabi-v7a-fdroid-debug
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/fdroid/debug/*armeabi-v7a*.apk
 
-    - name: Upload universal APK (debug)
+    - name: Upload universal APK (fdroidDebug)
       uses: actions/upload-artifact@v4.6.2
       if: ${{  success() }}
       with:
-        name: universal-debug
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/debug/*universal*.apk
+        name: universal-fdroid-debug
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/fdroid/debug/*universal*.apk
 
     - name: Upload to release
       uses: svenstaro/upload-release-action@v2
