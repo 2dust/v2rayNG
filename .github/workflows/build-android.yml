@@ -32,16 +32,16 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x V2rayNG/gradlew
 
-      - name: Build release APKs (unsigned)
+      - name: Build debug APKs (auto-signed)
         working-directory: V2rayNG
-        run: ./gradlew --no-daemon clean assembleRelease -PABI_FILTERS="${ABI_FILTERS}"
+        run: ./gradlew --no-daemon clean assembleDebug -PABI_FILTERS="${ABI_FILTERS}"
 
-      - name: Upload APKs
+      - name: Upload APKs (debug)
         uses: actions/upload-artifact@v4
         with:
-          name: v2rayng-apks
+          name: v2rayng-apks-debug
           path: |
-            V2rayNG/app/build/outputs/apk/**/release/*.apk
+            V2rayNG/app/build/outputs/apk/**/debug/*.apk
           if-no-files-found: error
 
 

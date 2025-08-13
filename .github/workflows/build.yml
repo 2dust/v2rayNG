@@ -115,34 +115,33 @@ jobs:
         distribution: 'temurin'
         java-version: '21'
 
-    - name: Build APKs (unsigned)
+    - name: Build APKs (debug, auto-signed)
       run: |
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
         chmod 755 gradlew
-        ./gradlew licenseFdroidReleaseReport
-        ./gradlew assembleRelease -PABI_FILTERS="${ABI_FILTERS}"
+        ./gradlew assembleDebug -PABI_FILTERS="${ABI_FILTERS}"
     
-    - name: Upload arm64-v8a APK
+    - name: Upload arm64-v8a APK (debug)
       uses: actions/upload-artifact@v4.6.2
       if: ${{  success() }}
       with:
-        name: arm64-v8a
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*arm64-v8a*.apk
+        name: arm64-v8a-debug
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/debug/*arm64-v8a*.apk
 
-    - name: Upload armeabi-v7a APK
+    - name: Upload armeabi-v7a APK (debug)
       uses: actions/upload-artifact@v4.6.2
       if: ${{  success() }}
       with:
-        name: armeabi-v7a
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*armeabi-v7a*.apk
+        name: armeabi-v7a-debug
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/debug/*armeabi-v7a*.apk
 
-    - name: Upload universal APK
+    - name: Upload universal APK (debug)
       uses: actions/upload-artifact@v4.6.2
       if: ${{  success() }}
       with:
-        name: universal
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*universal*.apk
+        name: universal-debug
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/debug/*universal*.apk
 
     - name: Upload to release
       uses: svenstaro/upload-release-action@v2
