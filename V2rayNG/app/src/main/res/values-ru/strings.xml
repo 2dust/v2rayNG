@@ -183,7 +183,7 @@
     <string name="title_pref_vpn_bypass_lan">VPN обходит LAN</string>
 
     <string name="title_pref_vpn_interface_address">Адрес интерфейса VPN</string>
-    <string name="title_pref_vpn_mtu">VPN MTU (default 1500)</string>
+    <string name="title_pref_vpn_mtu">VPN MTU (по умолчанию 1500)</string>
 
     <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -198,7 +198,7 @@
     <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться, используя ваш IP-адрес, чтобы использовать локальный прокси. Используйте только в доверенной сети, чтобы избежать несанкционированного подключения.</string>
     <string name="toast_warning_pref_proxysharing_short">Доступ из LAN разрешён, убедитесь, что вы находитесь в доверенной сети</string>
 
-    <string name="title_pref_allow_insecure">Разрешать небезопасные</string>
+    <string name="title_pref_allow_insecure">Разрешать небезопасные соединения</string>
     <string name="summary_pref_allow_insecure">Для TLS по умолчанию разрешены небезопасные соединения</string>
 
     <string name="title_pref_socks_port">Порт локального прокси</string>
