@@ -91,8 +91,8 @@ object AppConfig {
     const val TAG_DIRECT = "direct"
     const val TAG_BLOCKED = "block"
     const val TAG_FRAGMENT = "fragment"
-    const val TAG_DNS = "dns_module"
-    const val TAG_DOMESTIC_DNS = "domestic_dns"
+    const val TAG_DNS = "dns-module"
+    const val TAG_DOMESTIC_DNS = "domestic-dns"
 
     /** Network-related constants. */
     const val UPLINK = "uplink"
