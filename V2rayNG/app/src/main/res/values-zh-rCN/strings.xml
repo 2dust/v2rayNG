@@ -383,5 +383,6 @@
         <item>最低延迟</item>
         <item>最稳定</item>
     </string-array>
+    <string name="pre_resolving_domain">预解析域名中…</string>
 
 </resources>

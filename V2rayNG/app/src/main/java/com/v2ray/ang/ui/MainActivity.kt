@@ -386,6 +386,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         R.id.intelligent_selection_all -> {
+            if (MmkvManager.decodeSettingsString(AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD, "1") != "0") {
+                toast(getString(R.string.pre_resolving_domain))
+            }
             mainViewModel.createIntelligentSelectionAll()
             true
         }
