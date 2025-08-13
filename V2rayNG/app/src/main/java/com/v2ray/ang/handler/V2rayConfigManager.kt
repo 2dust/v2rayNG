@@ -522,7 +522,9 @@ object V2rayConfigManager {
                     V2rayConfig.OutboundBean(
                         protocol = "dns",
                         tag = "dns-out",
-                        settings = null,
+                        settings = V2rayConfig.OutboundBean.OutSettingsBean(
+                            blockTypes = listOf(64, 65)
+                        ),
                         streamSettings = null,
                         mux = null
                     )

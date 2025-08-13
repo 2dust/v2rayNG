@@ -89,6 +89,7 @@ data class V2rayConfig(
             var reserved: List<Int>? = null,
             var mtu: Int? = null,
             var obfsPassword: String? = null,
+            var blockTypes: List<Int>? = null,
         ) {
 
             data class VnextBean(
