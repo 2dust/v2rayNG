@@ -574,18 +574,8 @@ object V2rayConfigManager {
                         address = domesticDns.first(),
                         domains = directDomain,
                         expectIPs = if (isCnRoutingMode) geoipCn else null,
-                        skipFallback = true
-                    )
-                )
-            }
-
-            if (Utils.isPureIpAddress(domesticDns.first())) {
-                v2rayConfig.routing.rules.add(
-                    0, RulesBean(
-                        outboundTag = AppConfig.TAG_DIRECT,
-                        port = "53",
-                        ip = arrayListOf(domesticDns.first()),
-                        domain = null
+                        skipFallback = true,
+                        tag = AppConfig.TAG_DOMESTIC_DNS
                     )
                 )
             }
@@ -626,20 +616,26 @@ object V2rayConfigManager {
             // DNS dns
             v2rayConfig.dns = V2rayConfig.DnsBean(
                 servers = servers,
-                hosts = hosts
+                hosts = hosts,
+                tag = AppConfig.TAG_DNS
             )
 
             // DNS routing
-            if (Utils.isPureIpAddress(remoteDns.first())) {
-                v2rayConfig.routing.rules.add(
-                    0, RulesBean(
-                        outboundTag = AppConfig.TAG_PROXY,
-                        port = "53",
-                        ip = arrayListOf(remoteDns.first()),
-                        domain = null
-                    )
+            v2rayConfig.routing.rules.add(
+                0, RulesBean(
+                    outboundTag = AppConfig.TAG_PROXY,
+                    inboundTag = arrayListOf(AppConfig.TAG_DNS),
+                    domain = null
                 )
-            }
+            )
+
+            v2rayConfig.routing.rules.add(
+                0, RulesBean(
+                    outboundTag = AppConfig.TAG_DIRECT,
+                    inboundTag = arrayListOf(AppConfig.TAG_DOMESTIC_DNS),
+                    domain = null
+                )
+            )
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to configure DNS", e)
             return false

@@ -392,5 +392,6 @@
         <item>کم ترین پینگ</item>
         <item>کم ترین بار(لود)</item>
     </string-array>
+    <string name="pre_resolving_domain">Pre-resolving domain…</string>
 
 </resources>
