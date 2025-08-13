@@ -31,7 +31,7 @@ android {
                         "x86"
                     )
                 }
-                isUniversalApk = abiFilterList.isNullOrEmpty()
+                        isUniversalApk = true
             }
         }
 
