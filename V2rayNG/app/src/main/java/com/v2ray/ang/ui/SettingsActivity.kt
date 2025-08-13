@@ -270,7 +270,8 @@ class SettingsActivity : BaseActivity() {
                 AppConfig.PREF_PREFER_IPV6,
                 AppConfig.PREF_PROXY_SHARING,
                 AppConfig.PREF_ALLOW_INSECURE,
-                AppConfig.PREF_USE_HEV_TUNNEL
+                AppConfig.PREF_USE_HEV_TUNNEL,
+                AppConfig.PREF_EXCLUDE_FROM_RECENT
             ).forEach { key ->
                 findPreference<CheckBoxPreference>(key)?.isChecked =
                     MmkvManager.decodeSettingsBool(key, false)

@@ -391,5 +391,7 @@
         <item>کمترین پینگ</item>
         <item>کمترین بار(لود)</item>
     </string-array>
+    <string name="summary_pref_exclude_from_recent">Only hides from the recent apps list when returning to the home screen via the Back key. Pressing the Home key or similar will not work.</string>
+    <string name="title_pref_exclude_from_recent">Hide this app from the recent apps list</string>
 
 </resources>

@@ -383,5 +383,7 @@
         <item>最低延迟</item>
         <item>最稳定</item>
     </string-array>
+    <string name="summary_pref_exclude_from_recent">仅在按返回键返回桌面时才会从最近任务中隐藏，按 Home 键等无效。</string>
+    <string name="title_pref_exclude_from_recent">从最近任务中隐藏</string>
 
 </resources>

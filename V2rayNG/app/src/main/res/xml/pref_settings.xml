@@ -119,6 +119,11 @@
             android:summary="@string/summary_pref_double_column_display"
             android:title="@string/title_pref_double_column_display" />
 
+        <CheckBoxPreference
+            android:key="pref_exclude_from_recent"
+            android:summary="@string/summary_pref_exclude_from_recent"
+            android:title="@string/title_pref_exclude_from_recent" />
+
         <ListPreference
             android:defaultValue="auto"
             android:entries="@array/language_select"
