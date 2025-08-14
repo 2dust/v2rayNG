@@ -18,13 +18,13 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // Enable ABI splits only for Play Store flavor
+    // Enable ABI splits for smaller APKs per architecture
     splits {
         abi {
             isEnable = true
             reset()
             include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-            isUniversalApk = false
+            isUniversalApk = false   // We want architecture-specific APKs
         }
     }
 
@@ -36,6 +36,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
         debug {
             isMinifyEnabled = false
@@ -56,32 +57,26 @@ android {
         }
     }
 
-    // APK naming and version code per flavor & ABI
+    // APK naming and version code for each ABI
     applicationVariants.all {
         val variant = this
         val isFdroid = variant.productFlavors.any { it.name == "fdroid" }
-
-        if (isFdroid) {
-            // F-Droid uses universal APK
-            variant.outputs
-                .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
-                .forEach { output ->
-                    output.outputFileName = "v2rayNG_${variant.versionName}-fdroid.apk"
-                    output.versionCodeOverride = variant.versionCode + 5000000
-                }
+        val versionCodesMap = if (isFdroid) {
+            mapOf("armeabi-v7a" to 2, "arm64-v8a" to 1, "x86" to 4, "x86_64" to 3)
         } else {
-            // Play Store uses ABI-specific APKs
-            val versionCodesMap = mapOf("armeabi-v7a" to 4, "arm64-v8a" to 4, "x86" to 4, "x86_64" to 4)
-            variant.outputs
-                .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
-                .forEach { output ->
-                    val abi = output.getFilter("ABI") ?: "universal"
-                    output.outputFileName = "v2rayNG_${variant.versionName}_${abi}.apk"
-                    if (versionCodesMap.containsKey(abi)) {
-                        output.versionCodeOverride = 1000000 * versionCodesMap[abi]!! + variant.versionCode
-                    }
-                }
+            mapOf("armeabi-v7a" to 4, "arm64-v8a" to 4, "x86" to 4, "x86_64" to 4)
         }
+
+        variant.outputs
+            .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
+            .forEach { output ->
+                val abi = output.getFilter("ABI") ?: "universal"
+                val flavorName = variant.productFlavors.joinToString("_") { it.name }
+                output.outputFileName = "v2rayNG_${variant.versionName}_${flavorName}_${abi}.apk"
+                if (versionCodesMap.containsKey(abi)) {
+                    output.versionCodeOverride = (1000000 * versionCodesMap[abi]!! + variant.versionCode)
+                }
+            }
     }
 
     buildFeatures {
