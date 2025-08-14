@@ -24,12 +24,7 @@ android {
                 if (abiFilterList != null && abiFilterList.isNotEmpty()) {
                     include(*abiFilterList.toTypedArray())
                 } else {
-                    include(
-                        "arm64-v8a",
-                        "armeabi-v7a",
-                        "x86_64",
-                        "x86"
-                    )
+                    include("arm64-v8a", "armeabi-v7a", "x86_64", "x86")
                 }
                 isUniversalApk = abiFilterList.isNullOrEmpty()
             }
@@ -40,11 +35,17 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true            // Enable code shrinking
+            shrinkResources = true            // Remove unused resources
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release") // Make sure release signing is set
+        }
+        debug {
+            isMinifyEnabled = false           // Keep debug readable
+            shrinkResources = false
         }
     }
 
@@ -67,78 +68,58 @@ android {
         }
     }
 
-
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
+    // Rename APKs and override version codes based on flavor and ABI
     applicationVariants.all {
         val variant = this
         val isFdroid = variant.productFlavors.any { it.name == "fdroid" }
-        if (isFdroid) {
-            val versionCodes =
-                mapOf(
-                    "armeabi-v7a" to 2, "arm64-v8a" to 1, "x86" to 4, "x86_64" to 3, "universal" to 0
-                )
+        val versionCodesFdroid =
+            mapOf("armeabi-v7a" to 2, "arm64-v8a" to 1, "x86" to 4, "x86_64" to 3, "universal" to 0)
+        val versionCodesPlay =
+            mapOf("armeabi-v7a" to 4, "arm64-v8a" to 4, "x86" to 4, "x86_64" to 4, "universal" to 4)
 
-            variant.outputs
-                .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
-                .forEach { output ->
-                    val abi = output.getFilter("ABI") ?: "universal"
+        variant.outputs
+            .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
+            .forEach { output ->
+                val abi = output.getFilter("ABI") ?: "universal"
+                if (isFdroid) {
                     output.outputFileName = "v2rayNG_${variant.versionName}-fdroid_${abi}.apk"
-                    if (versionCodes.containsKey(abi)) {
-                        output.versionCodeOverride =
-                            (100 * variant.versionCode + versionCodes[abi]!!).plus(5000000)
-                    } else {
-                        return@forEach
-                    }
-                }
-        } else {
-            val versionCodes =
-                mapOf("armeabi-v7a" to 4, "arm64-v8a" to 4, "x86" to 4, "x86_64" to 4, "universal" to 4)
-
-            variant.outputs
-                .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
-                .forEach { output ->
-                    val abi = if (output.getFilter("ABI") != null)
-                        output.getFilter("ABI")
-                    else
-                        "universal"
-
+                    output.versionCodeOverride =
+                        (100 * variant.versionCode + (versionCodesFdroid[abi] ?: 0)) + 5000000
+                } else {
                     output.outputFileName = "v2rayNG_${variant.versionName}_${abi}.apk"
-                    if (versionCodes.containsKey(abi)) {
-                        output.versionCodeOverride =
-                            (1000000 * versionCodes[abi]!!).plus(variant.versionCode)
-                    } else {
-                        return@forEach
-                    }
+                    output.versionCodeOverride =
+                        (1000000 * (versionCodesPlay[abi] ?: 0)) + variant.versionCode
                 }
-        }
+            }
     }
 
     buildFeatures {
-        viewBinding = true
-        buildConfig = true
+        viewBinding = true       // Enable ViewBinding
+        buildConfig = true       // Enable BuildConfig generation
     }
 
     packaging {
         jniLibs {
-            useLegacyPackaging = true
+            useLegacyPackaging = true   // Maintain legacy JNI packaging
         }
     }
-
 }
 
 dependencies {
-    // Core Libraries
+    // Core libraries
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar", "*.jar"))))
 
-    // AndroidX Core Libraries
+    // AndroidX core libraries
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity)
@@ -147,45 +128,47 @@ dependencies {
     implementation(libs.recyclerview)
     implementation(libs.androidx.swiperefreshlayout)
 
-    // UI Libraries
+    // UI libraries
     implementation(libs.material)
     implementation(libs.toasty)
     implementation(libs.editorkit)
     implementation(libs.flexbox)
 
-    // Data and Storage Libraries
+    // Data and storage
     implementation(libs.mmkv.static)
     implementation(libs.gson)
 
-    // Reactive and Utility Libraries
+    // Reactive and utility libraries
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
 
-    // Language and Processing Libraries
+    // Language and processing
     implementation(libs.language.base)
     implementation(libs.language.json)
 
-    // Intent and Utility Libraries
+    // Intent and utility
     implementation(libs.quickie.foss)
     implementation(libs.core)
 
-    // AndroidX Lifecycle and Architecture Components
+    // AndroidX lifecycle
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.runtime.ktx)
 
-    // Background Task Libraries
+    // Background tasks
     implementation(libs.work.runtime.ktx)
     implementation(libs.work.multiprocess)
 
-    // Multidex Support
+    // Multidex support
     implementation(libs.multidex)
 
-    // Testing Libraries
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.org.mockito.mockito.inline)
     testImplementation(libs.mockito.kotlin)
+
+    // Desugar Java 8+ features
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
