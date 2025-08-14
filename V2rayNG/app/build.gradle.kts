@@ -51,6 +51,7 @@ android {
             isMinifyEnabled = false
         }
     }
+
     flavorDimensions.add("distribution")
     productFlavors {
         create("fdroid") {
