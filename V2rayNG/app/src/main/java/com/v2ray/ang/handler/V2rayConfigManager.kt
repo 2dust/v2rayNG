@@ -1009,8 +1009,8 @@ object V2rayConfigManager {
             val domain = item.getServerAddress()
             if (domain.isNullOrEmpty()) continue
 
-            item.ensureSockopt().domainStrategy = "UseIP"
             if (newHosts.containsKey(domain)) {
+                item.ensureSockopt().domainStrategy = "UseIP"
                 item.ensureSockopt().happyEyeballs = StreamSettingsBean.happyEyeballsBean(
                     prioritizeIPv6 = preferIpv6,
                     interleave = 2
@@ -1021,6 +1021,7 @@ object V2rayConfigManager {
             val resolvedIps = HttpUtil.resolveHostToIP(domain, preferIpv6)
             if (resolvedIps.isNullOrEmpty()) continue
 
+            item.ensureSockopt().domainStrategy = "UseIP"
             item.ensureSockopt().happyEyeballs = StreamSettingsBean.happyEyeballsBean(
                 prioritizeIPv6 = preferIpv6,
                 interleave = 2
