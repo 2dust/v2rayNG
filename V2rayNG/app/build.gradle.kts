@@ -39,15 +39,19 @@ android {
     }
 
     buildTypes {
-        release {
-            isMinifyEnabled = false
+        getByName("release") {
+            isMinifyEnabled = true       // Enable code shrinking and obfuscation
+            isShrinkResources = true     // Remove unused resources to reduce APK size
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
-    }
 
+        getByName("debug") {
+            isMinifyEnabled = false      // Disable code shrinking for debug builds
+        }
+    }
     flavorDimensions.add("distribution")
     productFlavors {
         create("fdroid") {
@@ -73,10 +77,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
 
+    kotlin {
+        jvmToolchain(17)    
+}
     applicationVariants.all {
         val variant = this
         val isFdroid = variant.productFlavors.any { it.name == "fdroid" }
