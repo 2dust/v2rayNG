@@ -39,17 +39,16 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true       // Enable code shrinking and obfuscation
-            isShrinkResources = true     // Remove unused resources to reduce APK size
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
-
-        getByName("debug") {
-            isMinifyEnabled = false      // Disable code shrinking for debug builds
+        debug {
+            isMinifyEnabled = false
         }
     }
     flavorDimensions.add("distribution")
