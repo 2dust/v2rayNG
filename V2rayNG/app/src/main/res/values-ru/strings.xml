@@ -391,6 +391,6 @@
         <item>Наименьшая задержка</item>
         <item>Наименьшая нагрузка</item>
     </string-array>
-    <string name="pre_resolving_domain">Pre-resolving domain…</string>
+    <string name="pre_resolving_domain">Предварительное определение домена…</string>
 
 </resources>
