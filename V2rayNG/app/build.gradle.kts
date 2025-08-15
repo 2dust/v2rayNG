@@ -40,8 +40,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true       // Enable code shrinking and obfuscation
-            isShrinkResources = true     // Remove unused resources to reduce APK size
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
