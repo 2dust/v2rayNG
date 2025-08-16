@@ -1011,14 +1011,22 @@ object V2rayConfigManager {
             if (domain.isNullOrEmpty()) continue
 
             if (newHosts.containsKey(domain)) {
-                item.ensureSockopt().domainStrategy = if (preferIpv6) "UseIPv6v4" else "UseIPv4v6"
+                item.ensureSockopt().domainStrategy = "UseIP"
+                item.ensureSockopt().happyEyeballs = StreamSettingsBean.happyEyeballsBean(
+                    prioritizeIPv6 = preferIpv6,
+                    interleave = 2
+                )
                 continue
             }
 
             val resolvedIps = HttpUtil.resolveHostToIP(domain, preferIpv6)
             if (resolvedIps.isNullOrEmpty()) continue
 
-            item.ensureSockopt().domainStrategy = if (preferIpv6) "UseIPv6v4" else "UseIPv4v6"
+            item.ensureSockopt().domainStrategy = "UseIP"
+            item.ensureSockopt().happyEyeballs = StreamSettingsBean.happyEyeballsBean(
+                prioritizeIPv6 = preferIpv6,
+                interleave = 2
+            )
             newHosts[domain] = if (resolvedIps.size == 1) {
                 resolvedIps[0]
             } else {
