@@ -509,9 +509,10 @@ object V2rayConfigManager {
                 //hev-socks5-tunnel dns routing
                 v2rayConfig.routing.rules.add(
                     0, RulesBean(
-                        type = "field",
+                        inboundTag = arrayListOf("socks"),
+                        outboundTag = "dns-out",
                         port = "53",
-                        outboundTag = "dns-out"
+                        type = "field"
                     )
                 )
             }
