@@ -245,7 +245,14 @@ data class V2rayConfig(
                 var tproxy: String? = null,
                 var mark: Int? = null,
                 var dialerProxy: String? = null,
-                var domainStrategy: String? = null
+                var domainStrategy: String? = null,
+                var happyEyeballs: happyEyeballsBean? = null,
+                )
+            data class happyEyeballsBean(
+                var prioritizeIPv6: Boolean? = null,
+                var maxConcurrentTry: Int? = 4,
+                var tryDelayMs: Int? = 250, // ms
+                var interleave: Int? = null,
             )
 
             data class TlsSettingsBean(
