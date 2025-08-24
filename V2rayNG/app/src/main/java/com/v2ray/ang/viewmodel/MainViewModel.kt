@@ -193,10 +193,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 serversCache.map { it.guid }.toList()
             }
 
-        val ret = AngConfigManager.shareNonCustomConfigsToClipboard(
-            getApplication<AngApplication>(),
-            serverListCopy
-        )
+        val ret = kotlinx.coroutines.runBlocking {
+            AngConfigManager.shareNonCustomConfigsToClipboard(
+                getApplication<AngApplication>(),
+                serverListCopy
+            )
+        }
         return ret
     }
 

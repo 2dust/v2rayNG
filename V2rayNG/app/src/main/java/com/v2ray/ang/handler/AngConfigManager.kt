@@ -22,6 +22,8 @@ import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.net.URI
 
 object AngConfigManager {
@@ -57,7 +59,7 @@ object AngConfigManager {
      * @param serverList The list of server GUIDs.
      * @return The number of configurations shared.
      */
-    fun shareNonCustomConfigsToClipboard(context: Context, serverList: List<String>): Int {
+    suspend fun shareNonCustomConfigsToClipboard(context: Context, serverList: List<String>): Int {
         try {
             val sb = StringBuilder()
             for (guid in serverList) {
@@ -68,10 +70,12 @@ object AngConfigManager {
                 sb.append(url)
                 sb.appendLine()
             }
-            if (sb.count() > 0) {
-                Utils.setClipboard(context, sb.toString())
+            return withContext(Dispatchers.Main) {
+                if (sb.count() > 0) {
+                    Utils.setClipboard(context, sb.toString())
+                }
+                sb.lines().count() - 1
             }
-            return sb.lines().count() - 1
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to share non-custom configs to clipboard", e)
             return -1
