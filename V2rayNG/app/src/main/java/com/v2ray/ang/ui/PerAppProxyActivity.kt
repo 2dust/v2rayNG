@@ -56,8 +56,14 @@ class PerAppProxyActivity : BaseActivity() {
                         appsList.sortedWith { p1, p2 ->
                             when {
                                 p1.isSelected > p2.isSelected -> -1
-                                p1.isSelected == p2.isSelected -> 0
-                                else -> 1
+                                p1.isSelected < p2.isSelected -> 1
+                                p1.isSystemApp > p2.isSystemApp -> 1
+                                p1.isSystemApp < p2.isSystemApp -> -1
+                                p1.appName.lowercase() > p2.appName.lowercase() -> 1
+                                p1.appName.lowercase() < p2.appName.lowercase() -> -1
+                                p1.packageName > p2.packageName -> 1
+                                p1.packageName < p2.packageName -> -1
+                                else -> 0
                             }
                         }
                     } else {
