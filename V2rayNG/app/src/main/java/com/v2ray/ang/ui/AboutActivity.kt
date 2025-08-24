@@ -143,10 +143,10 @@ class AboutActivity : BaseActivity() {
             return Pair(false, "")
         }
 
-        if (ZipUtil.zipFromFolder(backupDir, outputZipFilePath)) {
-            return Pair(true, outputZipFilePath)
+        return if (ZipUtil.zipFromFolder(backupDir, outputZipFilePath)) {
+            Pair(true, outputZipFilePath)
         } else {
-            return Pair(false, "")
+            Pair(false, "")
         }
     }
 

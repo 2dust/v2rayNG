@@ -1,17 +1,19 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.jaredsburrows.license")
+    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
+    // id("com.jaredsburrows.license")
 }
 
 android {
     namespace = "com.v2ray.ang"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.v2ray.ang"
         minSdk = 21
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 668
         versionName = "1.10.18"
         multiDexEnabled = true
@@ -48,18 +50,32 @@ android {
         }
     }
 
-    flavorDimensions.add("distribution")
-    productFlavors {
-        create("fdroid") {
-            dimension = "distribution"
-            applicationIdSuffix = ".fdroid"
-            buildConfigField("String", "DISTRIBUTION", "\"F-Droid\"")
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = false
         }
-        create("playstore") {
-            dimension = "distribution"
-            buildConfigField("String", "DISTRIBUTION", "\"Play Store\"")
-        }
+        animationsDisabled = true
     }
+    
+    // Disable Android Test builds completely
+    // variantFilter { variant ->
+    //     if (variant.buildType.name == "debug" && variant.name.contains("AndroidTest")) {
+    //         variant.ignore = true
+    //     }
+    // }
+
+    // flavorDimensions.add("distribution")
+    // productFlavors {
+    //     create("fdroid") {
+    //         dimension = "distribution"
+    //         applicationIdSuffix = ".fdroid"
+    //         buildConfigField("String", "DISTRIBUTION", "\"F-Droid\"")
+    //     }
+    //     create("playstore") {
+    //         dimension = "distribution"
+    //         buildConfigField("String", "DISTRIBUTION", "\"Play Store\"")
+    //     }
+    // }
 
     sourceSets {
         getByName("main") {
@@ -70,68 +86,75 @@ android {
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
-    applicationVariants.all {
-        val variant = this
-        val isFdroid = variant.productFlavors.any { it.name == "fdroid" }
-        if (isFdroid) {
-            val versionCodes =
-                mapOf(
-                    "armeabi-v7a" to 2, "arm64-v8a" to 1, "x86" to 4, "x86_64" to 3, "universal" to 0
-                )
+    // applicationVariants.all {
+    //     val variant = this
+    //     val isFdroid = variant.productFlavors.any { it.name == "fdroid" }
+    //     if (isFdroid) {
+    //         val versionCodes =
+    //             mapOf(
+    //                 "armeabi-v7a" to 2, "arm64-v8a" to 1, "x86" to 4, "x86_64" to 3, "universal" to 0
+    //             )
 
-            variant.outputs
-                .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
-                .forEach { output ->
-                    val abi = output.getFilter("ABI") ?: "universal"
-                    output.outputFileName = "v2rayNG_${variant.versionName}-fdroid_${abi}.apk"
-                    if (versionCodes.containsKey(abi)) {
-                        output.versionCodeOverride =
-                            (100 * variant.versionCode + versionCodes[abi]!!).plus(5000000)
-                    } else {
-                        return@forEach
-                    }
-                }
-        } else {
-            val versionCodes =
-                mapOf("armeabi-v7a" to 4, "arm64-v8a" to 4, "x86" to 4, "x86_64" to 4, "universal" to 4)
+    //         variant.outputs
+    //             .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
+    //             .forEach { output ->
+    //                 val abi = output.getFilter("ABI") ?: "universal"
+    //                 output.outputFileName = "v2rayNG_${variant.versionName}-fdroid_${abi}.apk"
+    //                 if (versionCodes.containsKey(abi)) {
+    //                     output.versionCodeOverride =
+    //                         (100 * variant.versionCode + versionCodes[abi]!!).plus(5000000)
+    //                 } else {
+    //                     return@forEach
+    //                 }
+    //             }
+    //     } else {
+    //         val versionCodes =
+    //             mapOf("armeabi-v7a" to 4, "arm64-v8a" to 4, "x86" to 4, "x86_64" to 4, "universal" to 4)
 
-            variant.outputs
-                .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
-                .forEach { output ->
-                    val abi = if (output.getFilter("ABI") != null)
-                        output.getFilter("ABI")
-                    else
-                        "universal"
+    //         variant.outputs
+    //             .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
+    //             .forEach { output ->
+    //                 val abi = if (output.getFilter("ABI") != null)
+    //                     output.getFilter("ABI")
+    //                 else
+    //                     "universal"
 
-                    output.outputFileName = "v2rayNG_${variant.versionName}_${abi}.apk"
-                    if (versionCodes.containsKey(abi)) {
-                        output.versionCodeOverride =
-                            (1000000 * versionCodes[abi]!!).plus(variant.versionCode)
-                    } else {
-                        return@forEach
-                    }
-                }
-        }
-    }
+    //                     output.outputFileName = "v2rayNG_${variant.versionName}_${abi}.apk"
+    //                     if (versionCodes.containsKey(abi)) {
+    //                         output.versionCodeOverride =
+    //                             (1000000 * versionCodes[abi]!!).plus(variant.versionCode)
+    //                     } else {
+    //                         return@forEach
+    //                     }
+    //             }
+    //     }
+    // }
 
     buildFeatures {
         viewBinding = true
         buildConfig = true
     }
 
-    packaging {
+    packagingOptions {
         jniLibs {
             useLegacyPackaging = true
         }
     }
 
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("androidx.core:core-ktx:1.10.1")
+        force("androidx.core:core:1.10.1")
+    }
 }
 
 dependencies {
@@ -180,12 +203,13 @@ dependencies {
 
     // Multidex Support
     implementation(libs.multidex)
+    implementation(libs.firebase.crashlytics)
 
     // Testing Libraries
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    testImplementation(libs.org.mockito.mockito.inline)
-    testImplementation(libs.mockito.kotlin)
+    // testImplementation(libs.junit)
+    // androidTestImplementation(libs.androidx.junit)
+    // androidTestImplementation(libs.androidx.espresso.core)
+    // testImplementation(libs.org.mockito.mockito.inline)
+    // testImplementation(libs.mockito.kotlin)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

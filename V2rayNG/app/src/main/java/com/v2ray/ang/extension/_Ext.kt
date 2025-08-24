@@ -71,25 +71,6 @@ fun Context.toastError(message: CharSequence) {
     Toasty.error(this, message, Toast.LENGTH_SHORT, true).show()
 }
 
-
-/**
- * Puts a key-value pair into the JSONObject.
- *
- * @param pair The key-value pair to put.
- */
-fun JSONObject.putOpt(pair: Pair<String, Any?>) {
-    put(pair.first, pair.second)
-}
-
-/**
- * Puts multiple key-value pairs into the JSONObject.
- *
- * @param pairs The map of key-value pairs to put.
- */
-fun JSONObject.putOpt(pairs: Map<String, Any?>) {
-    pairs.forEach { put(it.key, it.value) }
-}
-
 const val THRESHOLD = 1000L
 const val DIVISOR = 1024.0
 
