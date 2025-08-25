@@ -533,8 +533,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private fun exportAll() {
         binding.pbWaiting.show()
         lifecycleScope.launch(Dispatchers.IO) {
-            val ret = mainViewModel.exportAllServer()
             launch(Dispatchers.Main) {
+                val ret = mainViewModel.exportAllServer()
                 if (ret > 0)
                     toast(getString(R.string.title_export_config_count, ret))
                 else
