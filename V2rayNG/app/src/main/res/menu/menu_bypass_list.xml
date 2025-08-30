@@ -31,4 +31,22 @@
         android:title="@string/menu_item_export_proxy_app"
         app:showAsAction="withText" />
 
+    <item
+        android:id="@+id/per_app_profile_add"
+        android:icon="@drawable/ic_add_24dp"
+        android:title="@string/menu_item_add_per_app_profile"
+        app:showAsAction="withText" />
+
+    <item
+        android:id="@+id/per_app_profile_rename"
+        android:icon="@drawable/ic_edit_24dp"
+        android:title="@string/menu_item_rename_per_app_profile"
+        app:showAsAction="withText" />
+
+    <item
+        android:id="@+id/per_app_profile_delete"
+        android:icon="@drawable/ic_delete_24dp"
+        android:title="@string/menu_item_delete_per_app_profile"
+        app:showAsAction="withText" />
+
 </menu>

@@ -136,6 +136,11 @@
     <string name="menu_item_import_proxy_app">Импорт из буфера обмена</string>
     <string name="per_app_proxy_settings">Выбор приложений</string>
     <string name="per_app_proxy_settings_enable">Использовать выбор приложений</string>
+    <string name="menu_item_add_per_app_profile">Добавить профиль</string>
+    <string name="menu_item_rename_per_app_profile">Переименовать профиль</string>
+    <string name="menu_item_delete_per_app_profile">Удалить профиль</string>
+    <string name="title_per_app_profile_name">Название профиля</string>
+    <string name="msg_delete_profile_confirm">Удалить этот профиль?</string>
 
     <!-- Preferences -->
     <string name="title_settings">Настройки</string>

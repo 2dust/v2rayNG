@@ -3,7 +3,11 @@ package com.v2ray.ang.handler
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
+import com.v2ray.ang.AppConfig.PREF_PER_APP_PROFILE_IDS
+import com.v2ray.ang.AppConfig.PREF_PER_APP_ACTIVE_PROFILE
+import com.v2ray.ang.AppConfig.PREF_PER_APP_PROXY_SET
 import com.v2ray.ang.dto.AssetUrlItem
+import com.v2ray.ang.dto.PerAppProfileItem
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerAffiliationInfo
@@ -23,6 +27,7 @@ object MmkvManager {
     private const val ID_SUB = "SUB"
     private const val ID_ASSET = "ASSET"
     private const val ID_SETTING = "SETTING"
+    private const val ID_PER_APP_PROFILE = "PER_APP_PROFILE"
     private const val KEY_SELECTED_SERVER = "SELECTED_SERVER"
     private const val KEY_ANG_CONFIGS = "ANG_CONFIGS"
     private const val KEY_SUB_IDS = "SUB_IDS"
@@ -35,6 +40,101 @@ object MmkvManager {
     private val subStorage by lazy { MMKV.mmkvWithID(ID_SUB, MMKV.MULTI_PROCESS_MODE) }
     private val assetStorage by lazy { MMKV.mmkvWithID(ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
+    private val perAppProfileStorage by lazy { MMKV.mmkvWithID(ID_PER_APP_PROFILE, MMKV.MULTI_PROCESS_MODE) }
+
+    //endregion
+
+    //region Per-App Profiles
+
+    fun decodePerAppProfileIds(): MutableList<String> {
+        val json = mainStorage.decodeString(PREF_PER_APP_PROFILE_IDS)
+        return if (json.isNullOrBlank()) mutableListOf() else JsonUtil.fromJson(json, Array<String>::class.java).toMutableList()
+    }
+
+    fun encodePerAppProfileIds(ids: MutableList<String>) {
+        mainStorage.encode(PREF_PER_APP_PROFILE_IDS, JsonUtil.toJson(ids))
+    }
+
+    fun getPerAppActiveProfileId(): String? {
+        return settingsStorage.decodeString(PREF_PER_APP_ACTIVE_PROFILE)
+    }
+
+    fun setPerAppActiveProfileId(id: String) {
+        settingsStorage.encode(PREF_PER_APP_ACTIVE_PROFILE, id)
+    }
+
+    fun encodePerAppProfile(id: String, item: PerAppProfileItem): String {
+        val key = id.ifBlank { Utils.getUuid() }
+        perAppProfileStorage.encode(key, JsonUtil.toJson(item))
+        val ids = decodePerAppProfileIds()
+        if (!ids.contains(key)) {
+            ids.add(0, key)
+            encodePerAppProfileIds(ids)
+            if (getPerAppActiveProfileId().isNullOrBlank()) setPerAppActiveProfileId(key)
+        }
+        return key
+    }
+
+    fun decodePerAppProfile(id: String?): PerAppProfileItem? {
+        if (id.isNullOrBlank()) return null
+        val json = perAppProfileStorage.decodeString(id) ?: return null
+        return JsonUtil.fromJson(json, PerAppProfileItem::class.java)
+    }
+
+    fun decodePerAppProfiles(): List<Pair<String, PerAppProfileItem>> {
+        val result = mutableListOf<Pair<String, PerAppProfileItem>>()
+        decodePerAppProfileIds().forEach { id ->
+            decodePerAppProfile(id)?.let { result.add(id to it) }
+        }
+        return result
+    }
+
+    fun removePerAppProfile(id: String) {
+        perAppProfileStorage.remove(id)
+        val ids = decodePerAppProfileIds()
+        val wasRemoved = ids.remove(id)
+        if (wasRemoved) encodePerAppProfileIds(ids)
+        if (id == getPerAppActiveProfileId()) {
+            settingsStorage.remove(PREF_PER_APP_ACTIVE_PROFILE)
+        }
+        // fallback to first profile if available, otherwise ensure a default exists
+        if (ids.isNotEmpty()) {
+            setPerAppActiveProfileId(ids.first())
+        } else {
+            ensureDefaultPerAppProfile()
+        }
+    }
+
+    // If legacy single per-app set exists and no per-app profiles are created, migrate to a default profile.
+    fun ensurePerAppProfileMigratedFromLegacy(): String? {
+        val ids = decodePerAppProfileIds()
+        if (ids.isNotEmpty()) return null
+        val legacy = decodeSettingsStringSet(PREF_PER_APP_PROXY_SET)
+        if (legacy != null && legacy.isNotEmpty()) {
+            val profile = PerAppProfileItem(remarks = "default", apps = legacy)
+            val id = encodePerAppProfile("", profile)
+            setPerAppActiveProfileId(id)
+            return id
+        }
+        // no legacy, ensure a blank default
+        return ensureDefaultPerAppProfile()
+    }
+
+    // Ensure there is at least one per-app profile; returns created id or selected id
+    fun ensureDefaultPerAppProfile(): String {
+        val ids = decodePerAppProfileIds()
+        if (ids.isEmpty()) {
+            val id = encodePerAppProfile("", PerAppProfileItem(remarks = "default", apps = mutableSetOf()))
+            setPerAppActiveProfileId(id)
+            return id
+        }
+        val selected = getPerAppActiveProfileId()
+        if (selected.isNullOrBlank()) {
+            setPerAppActiveProfileId(ids.first())
+            return ids.first()
+        }
+        return selected
+    }
 
     //endregion
 

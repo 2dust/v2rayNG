@@ -265,7 +265,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
 
         // If no apps are selected, disallow the VPN service's own package and return
-        val apps = MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
+        // Load selected per-app profile list; fallback to legacy set for backward compatibility
+        val selectedPerAppProfile = MmkvManager.getPerAppActiveProfileId()
+        val apps = (MmkvManager.decodePerAppProfile(selectedPerAppProfile)?.apps
+            ?: MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET))
         if (apps.isNullOrEmpty()) {
             builder.addDisallowedApplication(selfPackageName)
             return

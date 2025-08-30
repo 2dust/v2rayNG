@@ -19,6 +19,8 @@ object AppConfig {
     const val PREF_ROUTE_ONLY_ENABLED = "pref_route_only_enabled"
     const val PREF_PER_APP_PROXY = "pref_per_app_proxy"
     const val PREF_PER_APP_PROXY_SET = "pref_per_app_proxy_set"
+    const val PREF_PER_APP_ACTIVE_PROFILE = "pref_per_app_active_profile"
+    const val PREF_PER_APP_PROFILE_IDS = "pref_per_app_profile_ids"
     const val PREF_BYPASS_APPS = "pref_bypass_apps"
     const val PREF_LOCAL_DNS_ENABLED = "pref_local_dns_enabled"
     const val PREF_FAKE_DNS_ENABLED = "pref_fake_dns_enabled"

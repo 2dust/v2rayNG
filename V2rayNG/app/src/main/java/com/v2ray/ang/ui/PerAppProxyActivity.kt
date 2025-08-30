@@ -2,12 +2,18 @@ package com.v2ray.ang.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
+import android.widget.EditText
 import android.text.TextUtils
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import android.content.Context
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.SearchView
+import com.google.android.material.tabs.TabLayout
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
@@ -33,6 +39,22 @@ class PerAppProxyActivity : BaseActivity() {
 
     private var adapter: PerAppProxyAdapter? = null
     private var appsAll: List<AppInfo>? = null
+    private var currentProfileId: String? = null
+    private var isLoading = false
+
+    private val packageComparator = Comparator<AppInfo> { p1, p2 ->
+        when {
+            p1.isSelected > p2.isSelected -> -1
+            p1.isSelected < p2.isSelected -> 1
+            p1.isSystemApp > p2.isSystemApp -> 1
+            p1.isSystemApp < p2.isSystemApp -> -1
+            p1.appName.lowercase() > p2.appName.lowercase() -> 1
+            p1.appName.lowercase() < p2.appName.lowercase() -> -1
+            p1.packageName > p2.packageName -> 1
+            p1.packageName < p2.packageName -> -1
+            else -> 0
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,40 +64,24 @@ class PerAppProxyActivity : BaseActivity() {
 
         addCustomDividerToRecyclerView(binding.recyclerView, this, R.drawable.custom_divider)
 
+        setupProfilesTabs()
+
         lifecycleScope.launch {
             try {
                 binding.pbWaiting.show()
-                val blacklist = MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
+                MmkvManager.ensurePerAppProfileMigratedFromLegacy()
+                currentProfileId = MmkvManager.getPerAppActiveProfileId()
+                val blacklist = MmkvManager.decodePerAppProfile(currentProfileId)?.apps
                 val apps = withContext(Dispatchers.IO) {
                     val appsList = AppManagerUtil.loadNetworkAppList(this@PerAppProxyActivity)
-
-                    if (blacklist != null) {
-                        appsList.forEach { app ->
-                            app.isSelected = if (blacklist.contains(app.packageName)) 1 else 0
-                        }
-                        appsList.sortedWith { p1, p2 ->
-                            when {
-                                p1.isSelected > p2.isSelected -> -1
-                                p1.isSelected < p2.isSelected -> 1
-                                p1.isSystemApp > p2.isSystemApp -> 1
-                                p1.isSystemApp < p2.isSystemApp -> -1
-                                p1.appName.lowercase() > p2.appName.lowercase() -> 1
-                                p1.appName.lowercase() < p2.appName.lowercase() -> -1
-                                p1.packageName > p2.packageName -> 1
-                                p1.packageName < p2.packageName -> -1
-                                else -> 0
-                            }
-                        }
-                    } else {
-                        val collator = Collator.getInstance()
-                        appsList.sortedWith(compareBy(collator) { it.appName })
-                    }
+                    sortApps(appsList, blacklist)
                 }
 
                 appsAll = apps
                 adapter = PerAppProxyAdapter(this@PerAppProxyActivity, apps, blacklist)
                 binding.recyclerView.adapter = adapter
                 binding.pbWaiting.hide()
+                refreshTabs()
             } catch (e: Exception) {
                 binding.pbWaiting.hide()
                 Log.e(ANG_PACKAGE, "Error loading apps", e)
@@ -99,9 +105,7 @@ class PerAppProxyActivity : BaseActivity() {
 
     override fun onPause() {
         super.onPause()
-        adapter?.let {
-            MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY_SET, it.blacklist)
-        }
+        saveCurrentProfileApps()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -119,7 +123,6 @@ class PerAppProxyActivity : BaseActivity() {
                 }
             })
         }
-
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -156,6 +159,18 @@ class PerAppProxyActivity : BaseActivity() {
 
         R.id.export_proxy_app -> {
             exportProxyApp()
+            true
+        }
+        R.id.per_app_profile_add -> {
+            promptAddProfile()
+            true
+        }
+        R.id.per_app_profile_rename -> {
+            promptRenameProfile()
+            true
+        }
+        R.id.per_app_profile_delete -> {
+            promptDeleteProfile()
             true
         }
 
@@ -242,6 +257,7 @@ class PerAppProxyActivity : BaseActivity() {
             Log.e(AppConfig.TAG, "Error selecting proxy app", e)
             return false
         }
+        saveCurrentProfileApps()
         return true
     }
 
@@ -281,5 +297,137 @@ class PerAppProxyActivity : BaseActivity() {
     @SuppressLint("NotifyDataSetChanged")
     fun refreshData() {
         adapter?.notifyDataSetChanged()
+    }
+
+    private fun setupProfilesTabs() {
+        binding.tabPerAppProfiles.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                if (isLoading) return
+                val id = tab?.tag as? String ?: return
+                if (id != currentProfileId) {
+                    saveCurrentProfileApps()
+                    currentProfileId = id
+                    MmkvManager.setPerAppActiveProfileId(id)
+                    loadProfileApps(id)
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+    }
+
+    private fun refreshTabs() {
+        val tabs = binding.tabPerAppProfiles
+        isLoading = true
+        tabs.clearOnTabSelectedListeners()
+        tabs.removeAllTabs()
+        val list = MmkvManager
+            .decodePerAppProfiles()
+            .sortedWith(compareBy({ it.second.remarks.lowercase() }, { it.first }))
+        var selectedIndex = 0
+        list.forEachIndexed { index, pair ->
+            val (id, item) = pair
+            val tab = tabs.newTab()
+            tab.text = item.remarks
+            tab.tag = id
+            tabs.addTab(tab)
+            if (id == currentProfileId) selectedIndex = index
+        }
+        if (tabs.tabCount > 0) tabs.getTabAt(selectedIndex)?.select()
+        // restore listener
+        isLoading = false
+        setupProfilesTabs()
+    }
+
+    private fun loadProfileApps(profileId: String) {
+        val set = MmkvManager.decodePerAppProfile(profileId)?.apps
+        adapter = PerAppProxyAdapter(this, sortApps(appsAll ?: emptyList(), set), set)
+        binding.recyclerView.adapter = adapter
+        refreshData()
+    }
+
+    private fun saveCurrentProfileApps() {
+        val id = currentProfileId ?: return
+        val item = MmkvManager.decodePerAppProfile(id) ?: return
+        adapter?.let {
+            item.apps = it.blacklist
+            MmkvManager.encodePerAppProfile(id, item)
+        }
+    }
+
+    private fun sortApps(apps: List<AppInfo>, blacklist: MutableSet<String>?): List<AppInfo> {
+        apps.forEach { app ->
+            app.isSelected = if (blacklist?.contains(app.packageName) == true) 1 else 0
+        }
+        return apps.sortedWith(packageComparator)
+    }
+
+    private fun promptAddProfile() {
+        val input = EditText(this)
+        input.hint = getString(R.string.title_per_app_profile_name)
+        input.requestFocus()
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.menu_item_add_per_app_profile)
+            .setView(input)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val name = input.text?.toString()?.trim().orEmpty().ifEmpty { "new" }
+                val id = MmkvManager.encodePerAppProfile("", com.v2ray.ang.dto.PerAppProfileItem(remarks = name, apps = mutableSetOf()))
+                MmkvManager.setPerAppActiveProfileId(id)
+                currentProfileId = id
+                refreshTabs()
+                loadProfileApps(id)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+        dialog.setOnShowListener {
+            input.requestFocus()
+            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+        }
+        dialog.show()
+    }
+
+    private fun promptRenameProfile() {
+        val id = currentProfileId ?: return
+        val item = MmkvManager.decodePerAppProfile(id) ?: return
+        val input = EditText(this)
+        input.setText(item.remarks)
+        input.setSelection(input.text.length)
+        input.requestFocus()
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.menu_item_rename_per_app_profile)
+            .setView(input)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val name = input.text?.toString()?.trim().orEmpty().ifEmpty { item.remarks }
+                item.remarks = name
+                MmkvManager.encodePerAppProfile(id, item)
+                refreshTabs()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+        dialog.setOnShowListener {
+            input.requestFocus()
+            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+        }
+        dialog.show()
+    }
+
+    private fun promptDeleteProfile() {
+        val id = currentProfileId ?: return
+        AlertDialog.Builder(this)
+            .setMessage(R.string.msg_delete_profile_confirm)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                MmkvManager.removePerAppProfile(id)
+                val fallback = MmkvManager.ensureDefaultPerAppProfile()
+                currentProfileId = fallback
+                refreshTabs()
+                loadProfileApps(fallback)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 }
