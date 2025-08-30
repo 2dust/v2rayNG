@@ -1,5 +1,6 @@
 package com.v2ray.ang.util
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -21,6 +22,11 @@ object AppManagerUtil {
             val apps = ArrayList<AppInfo>()
 
             for (pkg in packages) {
+                val hasInternetPermission = when (pkg.packageName) {
+                    "android" -> true
+                    else -> pkg.requestedPermissions?.contains(Manifest.permission.INTERNET) == true
+                }
+                if (!hasInternetPermission) continue
                 val applicationInfo = pkg.applicationInfo ?: continue
 
                 val appName = applicationInfo.loadLabel(packageManager).toString()
