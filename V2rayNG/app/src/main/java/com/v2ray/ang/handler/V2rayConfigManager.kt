@@ -623,17 +623,16 @@ object V2rayConfigManager {
 
             // DNS routing
             v2rayConfig.routing.rules.add(
-                0, RulesBean(
-                    outboundTag = AppConfig.TAG_PROXY,
-                    inboundTag = arrayListOf(AppConfig.TAG_DNS),
+                RulesBean(
+                    outboundTag = AppConfig.TAG_DIRECT,
+                    inboundTag = arrayListOf(AppConfig.TAG_DOMESTIC_DNS),
                     domain = null
                 )
             )
-
             v2rayConfig.routing.rules.add(
-                0, RulesBean(
-                    outboundTag = AppConfig.TAG_DIRECT,
-                    inboundTag = arrayListOf(AppConfig.TAG_DOMESTIC_DNS),
+                RulesBean(
+                    outboundTag = AppConfig.TAG_PROXY,
+                    inboundTag = arrayListOf(AppConfig.TAG_DNS),
                     domain = null
                 )
             )
