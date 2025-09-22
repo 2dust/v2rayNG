@@ -1190,7 +1190,7 @@ object V2rayConfigManager {
                 sni = host
                 xhttpSetting.path = path ?: "/"
                 xhttpSetting.mode = xhttpMode
-                xhttpSetting.extra = JsonUtil.parseString(xhttpExtra)
+                xhttpSetting.downloadSettings = JsonUtil.parseString(xhttpExtra)
                 streamSettings.xhttpSettings = xhttpSetting
             }
 

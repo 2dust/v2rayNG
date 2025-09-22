@@ -230,7 +230,7 @@ data class V2rayConfig(
                 var path: String? = null,
                 var host: String? = null,
                 var mode: String? = null,
-                var extra: Any? = null,
+                var downloadSettings: Any? = null,
             )
 
             data class HttpSettingsBean(
