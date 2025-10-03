@@ -51,7 +51,7 @@ object SocksFmt : FmtBase() {
             else
                 ":"
 
-        return toUri(config, Utils.encode(pw), null)
+        return toUri(config, Utils.encode(pw, true), null)
     }
 
     /**

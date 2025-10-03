@@ -134,11 +134,16 @@ object Utils {
      * Encode a string to base64.
      *
      * @param text The string to encode.
+     * @param removePadding
      * @return The base64 encoded string, or an empty string if encoding fails.
      */
-    fun encode(text: String): String {
+    fun encode(text: String, removePadding : Boolean = false): String {
         return try {
-            Base64.encodeToString(text.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
+            var encoded = Base64.encodeToString(text.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
+            if (removePadding) {
+                encoded = encoded.trimEnd('=')
+            }
+            encoded
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to encode text to base64", e)
             ""
