@@ -195,8 +195,8 @@
                 android:resource="@xml/app_widget_provider" />
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.v2ray.ang.action.widget.click" />
-                <action android:name="com.v2ray.ang.action.activity" />
+                <action android:name="${applicationId}.action.widget.click" />
+                <action android:name="${applicationId}.action.activity" />
             </intent-filter>
         </receiver>
         <receiver
