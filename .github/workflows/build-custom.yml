@@ -1,0 +1,48 @@
+name: Build V2RayNG Custom APK
+
+on:
+  workflow_dispatch:
+  push:
+分支:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Rename package to com.v2ray.mi
+      run: |
+        OLD="com.v2ray.ang"
+        NEW="com.v2ray.mi"
+        echo "Replacing package name..."
+        grep -rl "$OLD" app/src | xargs sed -i "s/$OLD/$NEW/g"
+        # 同时更新 AndroidManifest.xml 顶部 package 声明
+        sed -i "s/package=\"$OLD\"/package=\"$NEW\"/" app/src/main/AndroidManifest.xml
+        echo "Package name replaced to $NEW"
+
+    - name: Change app display name
+      run: |
+        sed -i 's/<string name="app_name">V2RayNG<\/string>/<string name="app_name">V2RayNG MI<\/string>/' app/src/main/res/values/strings.xml || true
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build debug APK
+      run: ./gradlew assembleDebug
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: V2RayNG-MI-APK
+        path: app/build/outputs/apk/debug/app-debug.apk
