@@ -4,8 +4,12 @@ on:
   workflow_dispatch:
   push:
       branches: [ "master" ]
+      paths:
+        - 'fastlane/**'
   pull_request:
       branches: [ "master" ]
+      paths:
+        - 'fastlane/**'
 
 jobs:
   go:
