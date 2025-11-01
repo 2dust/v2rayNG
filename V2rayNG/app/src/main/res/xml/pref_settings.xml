@@ -25,10 +25,10 @@
             android:summary="@string/summary_pref_prefer_ipv6"
             android:title="@string/title_pref_prefer_ipv6" />
 
-        <CheckBoxPreference
-            android:key="pref_per_app_proxy"
-            android:summary="@string/summary_pref_per_app_proxy"
-            android:title="@string/title_pref_per_app_proxy" />
+<!--        <CheckBoxPreference-->
+<!--            android:key="pref_per_app_proxy"-->
+<!--            android:summary="@string/summary_pref_per_app_proxy"-->
+<!--            android:title="@string/title_pref_per_app_proxy" />-->
 
         <CheckBoxPreference
             android:key="pref_local_dns_enabled"

@@ -37,7 +37,7 @@ class SettingsActivity : BaseActivity() {
 
     class SettingsFragment : PreferenceFragmentCompat() {
 
-        private val perAppProxy by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_PER_APP_PROXY) }
+//        private val perAppProxy by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_PER_APP_PROXY) }
         private val localDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_LOCAL_DNS_ENABLED) }
         private val fakeDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_FAKE_DNS_ENABLED) }
         private val appendHttpProxy by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_APPEND_HTTP_PROXY) }
@@ -74,11 +74,11 @@ class SettingsActivity : BaseActivity() {
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             addPreferencesFromResource(R.xml.pref_settings)
 
-            perAppProxy?.setOnPreferenceClickListener {
-                startActivity(Intent(activity, PerAppProxyActivity::class.java))
-                perAppProxy?.isChecked = true
-                false
-            }
+//            perAppProxy?.setOnPreferenceClickListener {
+//                startActivity(Intent(activity, PerAppProxyActivity::class.java))
+//                perAppProxy?.isChecked = true
+//                false
+//            }
             localDns?.setOnPreferenceChangeListener { _, any ->
                 updateLocalDns(any as Boolean)
                 true
@@ -298,8 +298,8 @@ class SettingsActivity : BaseActivity() {
 
         private fun updateMode(mode: String?) {
             val vpn = mode == VPN
-            perAppProxy?.isEnabled = vpn
-            perAppProxy?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY, false)
+//            perAppProxy?.isEnabled = vpn
+//            perAppProxy?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY, false)
             localDns?.isEnabled = vpn
             fakeDns?.isEnabled = vpn
             appendHttpProxy?.isEnabled = vpn
