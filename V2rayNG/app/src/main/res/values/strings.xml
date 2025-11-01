@@ -21,13 +21,13 @@
     <string name="toast_services_failure">Start Services Failure</string>
 
     <!--ServerActivity-->
-    <string name="title_server">Configuration file</string>
-    <string name="menu_item_add_config">Add config</string>
-    <string name="menu_item_save_config">Save config</string>
-    <string name="menu_item_del_config">Delete config</string>
-    <string name="menu_item_import_config_qrcode">Import config from QRcode</string>
-    <string name="menu_item_import_config_clipboard">Import config from Clipboard</string>
-    <string name="menu_item_import_config_local">Import config from locally</string>
+    <string name="title_server">Configuration</string>
+    <string name="menu_item_add_config">Add configuration</string>
+    <string name="menu_item_save_config">Save configuration</string>
+    <string name="menu_item_del_config">Delete configuration</string>
+    <string name="menu_item_import_config_qrcode">Import configuration from QRcode</string>
+    <string name="menu_item_import_config_clipboard">Import configuration from Clipboard</string>
+    <string name="menu_item_import_config_local">Import configuration from locally</string>
     <string name="menu_item_import_config_manually_vmess">Type manually[VMess]</string>
     <string name="menu_item_import_config_manually_vless">Type manually[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">Type manually[Shadowsocks]</string>
@@ -91,16 +91,16 @@
     <string name="toast_none_data">There is nothing</string>
     <string name="toast_incorrect_protocol">Incorrect protocol</string>
     <string name="toast_decoding_failed">Decoding failed</string>
-    <string name="title_file_chooser">Select a Config File</string>
+    <string name="title_file_chooser">Select a configuration</string>
     <string name="toast_require_file_manager">Please install a File Manager.</string>
-    <string name="server_customize_config">Customize Config</string>
-    <string name="toast_config_file_invalid">Invalid Config</string>
+    <string name="server_customize_config">Customize configuration</string>
+    <string name="toast_config_file_invalid">Invalid configuration</string>
     <string name="server_lab_content">Content</string>
     <string name="toast_none_data_clipboard">There is no data in the clipboard</string>
     <string name="toast_invalid_url">Invalid URL</string>
     <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
     <string name="server_lab_need_inbound">Ensure inbounds port is consistent with the settings</string>
-    <string name="toast_malformed_josn">Config malformed</string>
+    <string name="toast_malformed_josn">Configuration malformed</string>
     <string name="server_lab_request_host6">Host(SNI)(Optional)</string>
     <string name="toast_action_not_allowed">Action not allowed</string>
     <string name="server_obfs_password">Obfs password</string>
@@ -211,8 +211,8 @@
     <string name="title_pref_local_dns_port">Local DNS port</string>
     <string name="summary_pref_local_dns_port">Local DNS port</string>
 
-    <string name="title_pref_confirm_remove">Delete configuration file confirmation</string>
-    <string name="summary_pref_confirm_remove">Whether to delete the configuration file requires a second confirmation by the user</string>
+    <string name="title_pref_confirm_remove">Delete configuration confirmation</string>
+    <string name="summary_pref_confirm_remove">Whether to delete the configuration requires a second confirmation by the user</string>
 
     <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
     <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
@@ -281,7 +281,7 @@
     <string name="title_create_intelligent_selection_all_server">Creating Intelligent Selection Current Group Configuration</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sorting by test results</string>
-    <string name="title_filter_config">Filter configuration file</string>
+    <string name="title_filter_config">Filter configuration</string>
     <string name="filter_config_all">All groups</string>
     <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
     <string name="title_del_config_count">Delete %d configurations</string>
@@ -378,7 +378,7 @@
     </string-array>
 
     <string-array name="vpn_bypass_lan">
-        <item>Follow config</item>
+        <item>Follow configuration</item>
         <item>Bypass</item>
         <item>Not Bypass</item>
     </string-array>

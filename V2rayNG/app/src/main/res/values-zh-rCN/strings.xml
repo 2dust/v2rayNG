@@ -20,7 +20,7 @@
     <string name="toast_services_failure">启动服务失败</string>
 
     <!--ServerActivity-->
-    <string name="title_server">配置文件</string>
+    <string name="title_server">配置项</string>
     <string name="menu_item_add_config">添加配置</string>
     <string name="menu_item_save_config">保存配置</string>
     <string name="menu_item_del_config">删除配置</string>
@@ -90,10 +90,10 @@
     <string name="toast_none_data">没有数据</string>
     <string name="toast_incorrect_protocol">不正确的协议</string>
     <string name="toast_decoding_failed">解码失败</string>
-    <string name="title_file_chooser">选择一个配置文件</string>
+    <string name="title_file_chooser">选择一个配置</string>
     <string name="toast_require_file_manager">请安装一个文件管理器</string>
     <string name="server_customize_config">自定义配置</string>
-    <string name="toast_config_file_invalid">无效的配置文件</string>
+    <string name="toast_config_file_invalid">无效的配置</string>
     <string name="server_lab_content">内容</string>
     <string name="toast_none_data_clipboard">剪贴板中没有数据</string>
     <string name="toast_invalid_url">无效的网址</string>
@@ -205,8 +205,8 @@
     <string name="title_pref_local_dns_port">本地 DNS 端口</string>
     <string name="summary_pref_local_dns_port">本地 DNS 端口</string>
 
-    <string name="title_pref_confirm_remove">删除配置文件确认</string>
-    <string name="summary_pref_confirm_remove">删除配置文件是否需要用户二次确认</string>
+    <string name="title_pref_confirm_remove">删除配置确认</string>
+    <string name="summary_pref_confirm_remove">删除配置是否需要用户二次确认</string>
 
     <string name="title_pref_start_scan_immediate">立即启动扫码</string>
     <string name="summary_pref_start_scan_immediate">启动时立即打开相机扫描，否则可在工具栏选择扫码或选照片</string>
@@ -215,7 +215,7 @@
     <string name="summary_pref_append_http_proxy">浏览器 / 一些支持的应用 将直接使用 HTTP 代理, 而不经过虚拟网卡设备 (Android 10+)</string>
 
     <string name="title_pref_double_column_display">启用双列显示</string>
-    <string name="summary_pref_double_column_display">配置文件列表以双列显示，允许在屏幕上显示更多内容。需要重启应用生效。</string>
+    <string name="summary_pref_double_column_display">配置列表以双列显示，允许在屏幕上显示更多内容。需要重启应用生效。</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">反馈</string>
@@ -266,16 +266,16 @@
     <string name="sub_setting_enable">启用更新</string>
     <string name="sub_auto_update">启用自动更新</string>
     <string name="sub_allow_insecure_url">允许不安全的 HTTP 地址</string>
-    <string name="sub_setting_pre_profile">前置代理配置文件别名</string>
-    <string name="sub_setting_next_profile">落地代理配置文件別名</string>
-    <string name="sub_setting_pre_profile_tip">请确保配置文件别名存在并唯一</string>
+    <string name="sub_setting_pre_profile">前置代理配置别名</string>
+    <string name="sub_setting_next_profile">落地代理配置別名</string>
+    <string name="sub_setting_pre_profile_tip">请确保配置别名存在并唯一</string>
     <string name="title_sub_update">更新当前组订阅</string>
     <string name="title_ping_all_server">测试当前组配置 Tcping</string>
     <string name="title_real_ping_all_server">测试当前组配置真连接</string>
     <string name="title_create_intelligent_selection_all_server">生成当前组智能选择配置</string>
     <string name="title_user_asset_setting">资源文件</string>
     <string name="title_sort_by_test_results">按测试结果排序</string>
-    <string name="title_filter_config">过滤配置文件</string>
+    <string name="title_filter_config">过滤配置</string>
     <string name="filter_config_all">所有分组</string>
     <string name="title_del_duplicate_config_count">删除 %d 个重复配置</string>
 
@@ -366,7 +366,7 @@
     </string-array>
 
     <string-array name="vpn_bypass_lan">
-        <item>跟随配置文件</item>
+        <item>跟随配置</item>
         <item>绕过</item>
         <item>不绕过</item>
     </string-array>
