@@ -82,13 +82,13 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_DOUBLE_COLUMN_DISPLAY,
             AppConfig.SUBSCRIPTION_AUTO_UPDATE,
             AppConfig.PREF_FRAGMENT_ENABLED,
-            AppConfig.PREF_MUX_ENABLED,
-            AppConfig.PREF_USE_HEV_TUNNEL
+            AppConfig.PREF_MUX_ENABLED
                 -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getBoolean(key, false))
             }
 
-            AppConfig.PREF_SNIFFING_ENABLED -> {
+            AppConfig.PREF_SNIFFING_ENABLED,
+            AppConfig.PREF_USE_HEV_TUNNEL -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getBoolean(key, true))
             }
 
