@@ -42,10 +42,30 @@ class PerAppProxyActivity : BaseActivity() {
 
         addCustomDividerToRecyclerView(binding.recyclerView, this, R.drawable.custom_divider)
 
+        initList()
+
+        binding.switchPerAppProxy.setOnCheckedChangeListener { _, isChecked ->
+            MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY, isChecked)
+        }
+        binding.switchPerAppProxy.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY, false)
+
+        binding.switchBypassApps.setOnCheckedChangeListener { _, isChecked ->
+            MmkvManager.encodeSettings(AppConfig.PREF_BYPASS_APPS, isChecked)
+        }
+        binding.switchBypassApps.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS, false)
+
+        binding.layoutSwitchBypassAppsTips.setOnClickListener {
+            Toasty.info(this, R.string.summary_pref_per_app_proxy, Toast.LENGTH_LONG, true).show()
+        }
+    }
+
+    private fun initList() {
+        binding.pbWaiting.show()
+
         lifecycleScope.launch {
             try {
-                binding.pbWaiting.show()
-                val blacklist = MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
+                val blacklist =
+                    MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
                 val apps = withContext(Dispatchers.IO) {
                     val appsList = AppManagerUtil.loadNetworkAppList(this@PerAppProxyActivity)
 
@@ -75,25 +95,11 @@ class PerAppProxyActivity : BaseActivity() {
                 appsAll = apps
                 adapter = PerAppProxyAdapter(this@PerAppProxyActivity, apps, blacklist)
                 binding.recyclerView.adapter = adapter
-                binding.pbWaiting.hide()
             } catch (e: Exception) {
-                binding.pbWaiting.hide()
                 Log.e(ANG_PACKAGE, "Error loading apps", e)
+            } finally {
+                binding.pbWaiting.hide()
             }
-        }
-
-        binding.switchPerAppProxy.setOnCheckedChangeListener { _, isChecked ->
-            MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY, isChecked)
-        }
-        binding.switchPerAppProxy.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY, false)
-
-        binding.switchBypassApps.setOnCheckedChangeListener { _, isChecked ->
-            MmkvManager.encodeSettings(AppConfig.PREF_BYPASS_APPS, isChecked)
-        }
-        binding.switchBypassApps.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS, false)
-
-        binding.layoutSwitchBypassAppsTips.setOnClickListener {
-            Toasty.info(this, R.string.summary_pref_per_app_proxy, Toast.LENGTH_LONG, true).show()
         }
     }
 
@@ -120,14 +126,40 @@ class PerAppProxyActivity : BaseActivity() {
             })
         }
 
-
         return super.onCreateOptionsMenu(menu)
     }
 
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.select_all -> adapter?.let { it ->
+        R.id.select_all -> {
+            selectAllApp()
+            allowPerAppProxy()
+            true
+        }
+
+        R.id.select_proxy_app -> {
+            selectProxyAppAuto()
+            allowPerAppProxy()
+            true
+        }
+
+        R.id.import_proxy_app -> {
+            importProxyApp()
+            allowPerAppProxy()
+            true
+        }
+
+        R.id.export_proxy_app -> {
+            exportProxyApp()
+            true
+        }
+
+        else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun selectAllApp() {
+        adapter?.let { it ->
             val pkgNames = it.apps.map { it.packageName }
             if (it.blacklist.containsAll(pkgNames)) {
                 it.apps.forEach {
@@ -142,27 +174,10 @@ class PerAppProxyActivity : BaseActivity() {
             }
             it.notifyDataSetChanged()
             true
-        } == true
-
-        R.id.select_proxy_app -> {
-            selectProxyApp()
-            true
         }
-
-        R.id.import_proxy_app -> {
-            importProxyApp()
-            true
-        }
-
-        R.id.export_proxy_app -> {
-            exportProxyApp()
-            true
-        }
-
-        else -> super.onOptionsItemSelected(item)
     }
 
-    private fun selectProxyApp() {
+    private fun selectProxyAppAuto() {
         toast(R.string.msg_downloading_content)
         binding.pbWaiting.show()
 
@@ -197,6 +212,10 @@ class PerAppProxyActivity : BaseActivity() {
         }
         Utils.setClipboard(applicationContext, lst)
         toastSuccess(R.string.toast_success)
+    }
+
+    private fun allowPerAppProxy() {
+        binding.switchPerAppProxy.isChecked = true
     }
 
     @SuppressLint("NotifyDataSetChanged")
