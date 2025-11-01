@@ -90,7 +90,7 @@
     <string name="toast_none_data">Ничего нет</string>
     <string name="toast_incorrect_protocol">Неправильный протокол</string>
     <string name="toast_decoding_failed">Невозможно декодировать</string>
-    <string name="title_file_chooser">Выберите файл профиля</string>
+    <string name="title_file_chooser">Выберите профиль</string>
     <string name="toast_require_file_manager">Установите файловый менеджер</string>
     <string name="server_customize_config">Изменить профиль</string>
     <string name="toast_config_file_invalid">Неправильный профиль</string>
@@ -159,11 +159,11 @@
         <item>Пропускать</item>
     </string-array>
 
-    <string name="title_pref_speed_enabled">Отображение скорости</string>
+    <string name="title_pref_speed_enabled">Показывать скорость</string>
     <string name="summary_pref_speed_enabled">Показывать текущую скорость в уведомлении.\nЗначок будет меняться в зависимости от использования.</string>
 
-    <string name="title_pref_sniffing_enabled">Анализ пакетов</string>
-    <string name="summary_pref_sniffing_enabled">Использовать определение доменных имён в пакетах (по умолчанию включено)</string>
+    <string name="title_pref_sniffing_enabled">Анализировать пакеты</string>
+    <string name="summary_pref_sniffing_enabled">Пытаться определелять доменные имена в пакетах (по умолчанию включено)</string>
     <string name="title_pref_route_only_enabled">Домен только для маршрутизации</string>
     <string name="summary_pref_route_only_enabled">Использовать доменное имя только для маршрутизации и сохранять целевой адрес в виде IP.</string>
 
@@ -191,7 +191,7 @@
     <string name="title_pref_dns_hosts">Узлы DNS (формат: домен:адрес,…)</string>
     <string name="summary_pref_dns_hosts">домен:адрес,…</string>
 
-    <string name="title_pref_delay_test_url">Сервис проверки времени отклика (HTTP/HTTPS)</string>
+    <string name="title_pref_delay_test_url">Сервис проверки задержки (HTTP/HTTPS)</string>
     <string name="summary_pref_delay_test_url">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">Разрешать подключения из LAN</string>
@@ -207,17 +207,17 @@
     <string name="title_pref_local_dns_port">Порт локальной DNS</string>
     <string name="summary_pref_local_dns_port">Порт локальной DNS</string>
 
-    <string name="title_pref_confirm_remove">Подтверждение удаления профиля</string>
-    <string name="summary_pref_confirm_remove">Требовать двойное подтверждение удаления профиля</string>
+    <string name="title_pref_confirm_remove">Подтверждать удаление профиля</string>
+    <string name="summary_pref_confirm_remove">Обязательное подтверждение удаления профиля</string>
 
-    <string name="title_pref_start_scan_immediate">Сканирование при запуске</string>
+    <string name="title_pref_start_scan_immediate">Сканировать при запуске</string>
     <string name="summary_pref_start_scan_immediate">Начинать сканирование сразу при запуске приложения или запускать функцию сканирования камерой или из изображения через панель инструментов</string>
 
     <string name="title_pref_append_http_proxy">Дополнительный HTTP-прокси</string>
     <string name="summary_pref_append_http_proxy">HTTP-прокси будет использоваться напрямую (из браузера и других поддерживающих приложений), минуя виртуальный сетевой адаптер (Android 10+)</string>
 
-    <string name="title_pref_double_column_display">Отображение в два столбца</string>
-    <string name="summary_pref_double_column_display">Список профилей выводится в виде двух столбцов, что позволяет показать больше информации на экране. Требуется перезапуск приложения.</string>
+    <string name="title_pref_double_column_display">Профили в два столбца</string>
+    <string name="summary_pref_double_column_display">Список профилей отображается двумя столбцами, что позволяет показать больше информации на экране. Требуется перезапуск приложения.</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">Обратная связь</string>
@@ -237,7 +237,7 @@
     <string name="title_pref_promotion">Содействие</string>
     <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации (пожертвование может быть удалено)</string>
 
-    <string name="title_pref_auto_update_subscription">Автоматическое обновление подписок</string>
+    <string name="title_pref_auto_update_subscription">Автоматически обновлять подписки</string>
     <string name="summary_pref_auto_update_subscription">Автоматическое обновление подписок в фоновом режиме с указанным интервалом. В зависимости от устройства эта функция может работать не всегда.</string>
     <string name="title_pref_auto_update_interval">Интервал автообновления (минут, не менее 15)</string>
 
@@ -273,11 +273,11 @@
     <string name="sub_setting_pre_profile_tip">Конфигурация должна быть уникальной</string>
     <string name="title_sub_update">Обновить подписку группы</string>
     <string name="title_ping_all_server">Проверить профили группы</string>
-    <string name="title_real_ping_all_server">Время отклика профилей группы</string>
+    <string name="title_real_ping_all_server">Проверить задержку профилей группы</string>
     <string name="title_create_intelligent_selection_all_server">Создать конфигурацию умного выбора</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
-    <string name="title_filter_config">Фильтр групп</string>
+    <string name="title_filter_config">Фильтр профилей</string>
     <string name="filter_config_all">Все группы</string>
     <string name="title_del_duplicate_config_count">Удалено дубликатов профилей: %d</string>
     <string name="title_del_config_count">Удалено профилей: %d</string>
