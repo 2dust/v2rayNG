@@ -1,4 +1,4 @@
-package com.v2ray.ang.service
+package com.v2ray.ang.handler
 
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -13,12 +13,11 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.handler.SpeedtestManager
-import com.v2ray.ang.handler.V2rayConfigManager
+import com.v2ray.ang.service.ServiceControl
+import com.v2ray.ang.service.V2RayProxyOnlyService
+import com.v2ray.ang.service.V2RayVpnService
 import com.v2ray.ang.util.MessageUtil
-import com.v2ray.ang.util.PluginUtil
+import com.v2ray.ang.handler.PluginServiceManager
 import com.v2ray.ang.util.Utils
 import go.Seq
 import kotlinx.coroutines.CoroutineScope
@@ -163,16 +162,16 @@ object V2RayServiceManager {
 
         if (coreController.isRunning == false) {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
-            NotificationService.cancelNotification()
+            NotificationManager.cancelNotification()
             return false
         }
 
         try {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
-            NotificationService.showNotification(currentConfig)
-            NotificationService.startSpeedNotification(currentConfig)
+            NotificationManager.showNotification(currentConfig)
+            NotificationManager.startSpeedNotification(currentConfig)
 
-            PluginUtil.runPlugin(service, config, result.socksPort)
+            PluginServiceManager.runPlugin(service, config, result.socksPort)
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to startup service", e)
             return false
@@ -199,14 +198,14 @@ object V2RayServiceManager {
         }
 
         MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
-        NotificationService.cancelNotification()
+        NotificationManager.cancelNotification()
 
         try {
             service.unregisterReceiver(mMsgReceive)
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to unregister broadcast receiver", e)
         }
-        PluginUtil.stopPlugin()
+        PluginServiceManager.stopPlugin()
 
         return true
     }
@@ -364,12 +363,12 @@ object V2RayServiceManager {
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
                     Log.i(AppConfig.TAG, "SCREEN_OFF, stop querying stats")
-                    NotificationService.stopSpeedNotification(currentConfig)
+                    NotificationManager.stopSpeedNotification(currentConfig)
                 }
 
                 Intent.ACTION_SCREEN_ON -> {
                     Log.i(AppConfig.TAG, "SCREEN_ON, start querying stats")
-                    NotificationService.startSpeedNotification(currentConfig)
+                    NotificationManager.startSpeedNotification(currentConfig)
                 }
             }
         }

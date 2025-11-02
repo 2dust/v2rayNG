@@ -80,6 +80,7 @@
     <string name="server_lab_preshared_key">کلید رمزگذاری اضافی (اختیاری)</string>
     <string name="server_lab_short_id">ShortID</string>
     <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
     <string name="server_lab_secret_key">کلید خصوصی</string>
     <string name="server_lab_reserved">Reserved (اختیاری، جدا شده با کاما)</string>
     <string name="server_lab_local_address">آدرس محلی (IPv4/IPv6 اختیاری، جدا شده با کاما)</string>
@@ -180,7 +181,8 @@
     <string name="title_pref_vpn_dns">VPN DNS (فقط IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">آیا VPN از شبکه محلی عبور می کند؟</string>
 
-    <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
+    <string name="title_pref_vpn_interface_address">آدرس واسط VPN</string>
+    <string name="title_pref_vpn_mtu">VPN MTU (default 1500)</string>
 
     <string name="title_pref_domestic_dns">DNS داخلی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -244,6 +246,10 @@
     <string name="title_language">زبان</string>
     <string name="title_ui_settings">تنظیمات رابط کاربری</string>
     <string name="title_pref_ui_mode_night">تنظیمات حالت رابط کاربری</string>
+    <string name="title_pref_use_hev_tunnel">فعالسازی قابلیت TUN جدید</string>
+    <string name="summary_pref_use_hev_tunnel">در صورت فعال بودن، TUN از hev-socks5-tunnel استفاده می‌کند؛ در غیر این صورت از badvpn-tun2socks.</string>
+    <string name="title_pref_hev_tunnel_loglevel">سطح گزارشات Hev Tun</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">زمان انتظار خواندن/نوشتن (میلی‌ثانیه، پیش‌فرض ۳۰۰۰۰۰) Hev Tun</string>
 
     <string name="title_logcat">گزارشات</string>
     <string name="logcat_copy">کپی</string>
@@ -266,7 +272,7 @@
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
     <string name="title_ping_all_server">TCPING کانفیگ های گروه فعلی</string>
     <string name="title_real_ping_all_server">تاخیر واقعی کانفیگ های گروه فعلی</string>
-    <string name="title_create_intelligent_selection_all_server">Creating Intelligent Selection Current Group Configuration</string>
+    <string name="title_create_intelligent_selection_all_server">ایجاد کانفیگ انتخاب هوشمند برای گروه فعلی</string>
     <string name="title_user_asset_setting">فایل های منبع جغرافیایی</string>
     <string name="title_sort_by_test_results">مرتب‌ سازی بر اساس نتایج آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگ‌ها</string>
@@ -378,12 +384,13 @@
         <item>Resolve and add to DNS Hosts</item>
         <item>Resolve and replace domain</item>
     </string-array>
-    <string name="intelligent_selection">Intelligent Selection</string>
-    <string name="sub_setting_intelligent_selection_filter">Remarks Intelligent Selection regular filter</string>
-    <string name="title_intelligent_selection_method">Intelligent Selection Method</string>
+    <string name="intelligent_selection">انتخاب هوشمند</string>
+    <string name="sub_setting_intelligent_selection_filter">فیلتر نام مستعار برای انتخاب هوشمند</string>
+    <string name="title_intelligent_selection_method">روش انتخاب هوشمند</string>
     <string-array name="intelligent_selection_method">
-        <item>Least Ping</item>
-        <item>Least Load</item>
+        <item>کمترین پینگ</item>
+        <item>کمترین بار(لود)</item>
     </string-array>
+    <string name="pre_resolving_domain">Pre-resolving domain…</string>
 
 </resources>

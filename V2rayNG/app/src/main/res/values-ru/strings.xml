@@ -80,6 +80,7 @@
     <string name="server_lab_preshared_key">Дополнительный ключ шифрования (необязательно)</string>
     <string name="server_lab_short_id">ShortID</string>
     <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_mldsa65_verify">mldsa65Verify</string>
     <string name="server_lab_secret_key">Закрытый ключ</string>
     <string name="server_lab_reserved">Reserved (необязательно, через запятую)</string>
     <string name="server_lab_local_address">Локальный адрес (необязательно, IPv4/IPv6 через запятую)</string>
@@ -89,7 +90,7 @@
     <string name="toast_none_data">Ничего нет</string>
     <string name="toast_incorrect_protocol">Неправильный протокол</string>
     <string name="toast_decoding_failed">Невозможно декодировать</string>
-    <string name="title_file_chooser">Выберите файл профиля</string>
+    <string name="title_file_chooser">Выберите профиль</string>
     <string name="toast_require_file_manager">Установите файловый менеджер</string>
     <string name="server_customize_config">Изменить профиль</string>
     <string name="toast_config_file_invalid">Неправильный профиль</string>
@@ -158,11 +159,11 @@
         <item>Пропускать</item>
     </string-array>
 
-    <string name="title_pref_speed_enabled">Отображение скорости</string>
+    <string name="title_pref_speed_enabled">Показывать скорость</string>
     <string name="summary_pref_speed_enabled">Показывать текущую скорость в уведомлении.\nЗначок будет меняться в зависимости от использования.</string>
 
-    <string name="title_pref_sniffing_enabled">Анализ пакетов</string>
-    <string name="summary_pref_sniffing_enabled">Использовать определение доменных имён в пакетах (по умолчанию включено)</string>
+    <string name="title_pref_sniffing_enabled">Анализировать пакеты</string>
+    <string name="summary_pref_sniffing_enabled">Пытаться определелять доменные имена в пакетах (по умолчанию включено)</string>
     <string name="title_pref_route_only_enabled">Домен только для маршрутизации</string>
     <string name="summary_pref_route_only_enabled">Использовать доменное имя только для маршрутизации и сохранять целевой адрес в виде IP.</string>
 
@@ -181,7 +182,8 @@
     <string name="title_pref_vpn_dns">VPN DNS (только IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">VPN обходит LAN</string>
 
-    <string name="title_pref_vpn_interface_address">VPN частный IP</string>
+    <string name="title_pref_vpn_interface_address">Адрес интерфейса VPN</string>
+    <string name="title_pref_vpn_mtu">VPN MTU (по умолчанию 1500)</string>
 
     <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -189,14 +191,14 @@
     <string name="title_pref_dns_hosts">Узлы DNS (формат: домен:адрес,…)</string>
     <string name="summary_pref_dns_hosts">домен:адрес,…</string>
 
-    <string name="title_pref_delay_test_url">Сервис проверки времени отклика (HTTP/HTTPS)</string>
+    <string name="title_pref_delay_test_url">Сервис проверки задержки (HTTP/HTTPS)</string>
     <string name="summary_pref_delay_test_url">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">Разрешать подключения из LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться, используя ваш IP-адрес, чтобы использовать локальный прокси. Используйте только в доверенной сети, чтобы избежать несанкционированного подключения.</string>
     <string name="toast_warning_pref_proxysharing_short">Доступ из LAN разрешён, убедитесь, что вы находитесь в доверенной сети</string>
 
-    <string name="title_pref_allow_insecure">Разрешать небезопасные</string>
+    <string name="title_pref_allow_insecure">Разрешать небезопасные соединения</string>
     <string name="summary_pref_allow_insecure">Для TLS по умолчанию разрешены небезопасные соединения</string>
 
     <string name="title_pref_socks_port">Порт локального прокси</string>
@@ -205,17 +207,17 @@
     <string name="title_pref_local_dns_port">Порт локальной DNS</string>
     <string name="summary_pref_local_dns_port">Порт локальной DNS</string>
 
-    <string name="title_pref_confirm_remove">Подтверждение удаления профиля</string>
-    <string name="summary_pref_confirm_remove">Требовать двойное подтверждение удаления профиля</string>
+    <string name="title_pref_confirm_remove">Подтверждать удаление профиля</string>
+    <string name="summary_pref_confirm_remove">Обязательное подтверждение удаления профиля</string>
 
-    <string name="title_pref_start_scan_immediate">Сканирование при запуске</string>
+    <string name="title_pref_start_scan_immediate">Сканировать при запуске</string>
     <string name="summary_pref_start_scan_immediate">Начинать сканирование сразу при запуске приложения или запускать функцию сканирования камерой или из изображения через панель инструментов</string>
 
     <string name="title_pref_append_http_proxy">Дополнительный HTTP-прокси</string>
     <string name="summary_pref_append_http_proxy">HTTP-прокси будет использоваться напрямую (из браузера и других поддерживающих приложений), минуя виртуальный сетевой адаптер (Android 10+)</string>
 
-    <string name="title_pref_double_column_display">Отображение в два столбца</string>
-    <string name="summary_pref_double_column_display">Список профилей выводится в виде двух столбцов, что позволяет показать больше информации на экране. Требуется перезапуск приложения.</string>
+    <string name="title_pref_double_column_display">Профили в два столбца</string>
+    <string name="summary_pref_double_column_display">Список профилей отображается двумя столбцами, что позволяет показать больше информации на экране. Требуется перезапуск приложения.</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">Обратная связь</string>
@@ -235,17 +237,21 @@
     <string name="title_pref_promotion">Содействие</string>
     <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации (пожертвование может быть удалено)</string>
 
-    <string name="title_pref_auto_update_subscription">Автоматическое обновление подписок</string>
+    <string name="title_pref_auto_update_subscription">Автоматически обновлять подписки</string>
     <string name="summary_pref_auto_update_subscription">Автоматическое обновление подписок в фоновом режиме с указанным интервалом. В зависимости от устройства эта функция может работать не всегда.</string>
     <string name="title_pref_auto_update_interval">Интервал автообновления (минут, не менее 15)</string>
 
     <string name="title_core_loglevel">Подробность ведения журнала</string>
-    <string name="title_outbound_domain_resolve_method">Предварительное определение исходящего домена</string>
+    <string name="title_outbound_domain_resolve_method">Предопределение исходящего домена</string>
     <string name="title_mode">Режим</string>
     <string name="title_mode_help">Нажмите для получения дополнительной информации</string>
     <string name="title_language">Язык</string>
     <string name="title_ui_settings">Настройки интерфейса</string>
     <string name="title_pref_ui_mode_night">Тема интерфейса</string>
+    <string name="title_pref_use_hev_tunnel">Использовать новую версию TUN</string>
+    <string name="summary_pref_use_hev_tunnel">Если включено, TUN будет использовать hev-socks5-tunnel, иначе будет использоваться badvpn-tun2socks</string>
+    <string name="title_pref_hev_tunnel_loglevel">Подробность журнала HevTun</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">Время ожидания чтения/записи HevTun (мс, по умолчанию 300000)</string>
 
     <string name="title_logcat">Журнал</string>
     <string name="logcat_copy">Копировать</string>
@@ -267,11 +273,11 @@
     <string name="sub_setting_pre_profile_tip">Конфигурация должна быть уникальной</string>
     <string name="title_sub_update">Обновить подписку группы</string>
     <string name="title_ping_all_server">Проверить профили группы</string>
-    <string name="title_real_ping_all_server">Время отклика профилей группы</string>
+    <string name="title_real_ping_all_server">Проверить задержку профилей группы</string>
     <string name="title_create_intelligent_selection_all_server">Создать конфигурацию умного выбора</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
-    <string name="title_filter_config">Фильтр групп</string>
+    <string name="title_filter_config">Фильтр профилей</string>
     <string name="filter_config_all">Все группы</string>
     <string name="title_del_duplicate_config_count">Удалено дубликатов профилей: %d</string>
     <string name="title_del_config_count">Удалено профилей: %d</string>
@@ -385,5 +391,6 @@
         <item>Наименьшая задержка</item>
         <item>Наименьшая нагрузка</item>
     </string-array>
+    <string name="pre_resolving_domain">Предварительное определение домена…</string>
 
 </resources>

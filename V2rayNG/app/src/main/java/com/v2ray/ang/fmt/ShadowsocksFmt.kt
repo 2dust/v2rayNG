@@ -122,7 +122,7 @@ object ShadowsocksFmt : FmtBase() {
     fun toUri(config: ProfileItem): String {
         val pw = "${config.method}:${config.password}"
 
-        return toUri(config, Utils.encode(pw), null)
+        return toUri(config, Utils.encode(pw, true), null)
     }
 
     /**

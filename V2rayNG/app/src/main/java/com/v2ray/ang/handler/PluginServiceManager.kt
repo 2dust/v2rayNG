@@ -1,4 +1,4 @@
-package com.v2ray.ang.util
+package com.v2ray.ang.handler
 
 import android.content.Context
 import android.os.SystemClock
@@ -7,11 +7,12 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.fmt.Hysteria2Fmt
-import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.service.ProcessService
+import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.util.Utils
 import java.io.File
 
-object PluginUtil {
+object PluginServiceManager {
     private const val HYSTERIA2 = "libhysteria2.so"
 
     private val procService: ProcessService by lazy {

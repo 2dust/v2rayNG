@@ -127,6 +127,9 @@ class AboutActivity : BaseActivity() {
         "v${BuildConfig.VERSION_NAME} (${SpeedtestManager.getLibVersion()})".also {
             binding.tvVersion.text = it
         }
+        BuildConfig.APPLICATION_ID.also {
+            binding.tvAppId.text = it
+        }
     }
 
     private fun backupConfiguration(outputZipFilePos: String): Pair<Boolean, String> {

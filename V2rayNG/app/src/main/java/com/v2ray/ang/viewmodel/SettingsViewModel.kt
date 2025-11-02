@@ -42,6 +42,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_VPN_DNS,
             AppConfig.PREF_VPN_BYPASS_LAN,
             AppConfig.PREF_VPN_INTERFACE_ADDRESS_CONFIG_INDEX,
+            AppConfig.PREF_VPN_MTU,
             AppConfig.PREF_REMOTE_DNS,
             AppConfig.PREF_DOMESTIC_DNS,
             AppConfig.PREF_DNS_HOSTS,
@@ -59,6 +60,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_FRAGMENT_LENGTH,
             AppConfig.PREF_FRAGMENT_INTERVAL,
             AppConfig.PREF_MUX_XUDP_QUIC,
+            AppConfig.PREF_HEV_TUNNEL_LOGLEVEL,
+            AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT
                 -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getString(key, ""))
             }
@@ -72,19 +75,20 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_APPEND_HTTP_PROXY,
             AppConfig.PREF_ALLOW_INSECURE,
             AppConfig.PREF_PREFER_IPV6,
-            AppConfig.PREF_PER_APP_PROXY,
+//            AppConfig.PREF_PER_APP_PROXY,
             AppConfig.PREF_BYPASS_APPS,
             AppConfig.PREF_CONFIRM_REMOVE,
             AppConfig.PREF_START_SCAN_IMMEDIATE,
             AppConfig.PREF_DOUBLE_COLUMN_DISPLAY,
             AppConfig.SUBSCRIPTION_AUTO_UPDATE,
             AppConfig.PREF_FRAGMENT_ENABLED,
-            AppConfig.PREF_MUX_ENABLED,
+            AppConfig.PREF_MUX_ENABLED
                 -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getBoolean(key, false))
             }
 
-            AppConfig.PREF_SNIFFING_ENABLED -> {
+            AppConfig.PREF_SNIFFING_ENABLED,
+            AppConfig.PREF_USE_HEV_TUNNEL -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getBoolean(key, true))
             }
 

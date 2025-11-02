@@ -83,6 +83,7 @@ open class FmtBase {
         config.publicKey = queryParam["pbk"]
         config.shortId = queryParam["sid"]
         config.spiderX = queryParam["spx"]
+        config.mldsa65Verify = queryParam["pqv"]
         config.flow = queryParam["flow"]
     }
 
@@ -101,6 +102,7 @@ open class FmtBase {
         config.publicKey.let { if (it.isNotNullEmpty()) dicQuery["pbk"] = it.orEmpty() }
         config.shortId.let { if (it.isNotNullEmpty()) dicQuery["sid"] = it.orEmpty() }
         config.spiderX.let { if (it.isNotNullEmpty()) dicQuery["spx"] = it.orEmpty() }
+        config.mldsa65Verify.let { if (it.isNotNullEmpty()) dicQuery["pqv"] = it.orEmpty() }
         config.flow.let { if (it.isNotNullEmpty()) dicQuery["flow"] = it.orEmpty() }
 
         val networkType = NetworkType.fromString(config.network)

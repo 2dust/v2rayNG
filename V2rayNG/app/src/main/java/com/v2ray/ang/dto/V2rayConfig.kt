@@ -245,7 +245,14 @@ data class V2rayConfig(
                 var tproxy: String? = null,
                 var mark: Int? = null,
                 var dialerProxy: String? = null,
-                var domainStrategy: String? = null
+                var domainStrategy: String? = null,
+                var happyEyeballs: happyEyeballsBean? = null,
+                )
+            data class happyEyeballsBean(
+                var prioritizeIPv6: Boolean? = null,
+                var maxConcurrentTry: Int? = 4,
+                var tryDelayMs: Int? = 250, // ms
+                var interleave: Int? = null,
             )
 
             data class TlsSettingsBean(
@@ -264,7 +271,8 @@ data class V2rayConfig(
                 val show: Boolean = false,
                 var publicKey: String? = null,
                 var shortId: String? = null,
-                var spiderX: String? = null
+                var spiderX: String? = null,
+                var mldsa65Verify: String? = null
             )
 
             data class QuicSettingBean(
@@ -489,6 +497,7 @@ data class V2rayConfig(
             var expectIPs: List<String>? = null,
             val clientIp: String? = null,
             val skipFallback: Boolean? = null,
+            val tag: String? = null,
         )
     }
 

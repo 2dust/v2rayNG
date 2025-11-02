@@ -470,27 +470,49 @@ object V2rayConfigManager {
                 )
             }
 
-            // DNS inbound
-            val remoteDns = SettingsManager.getRemoteDnsServers()
-            if (v2rayConfig.inbounds.none { e -> e.protocol == "dokodemo-door" && e.tag == "dns-in" }) {
-                val dnsInboundSettings = V2rayConfig.InboundBean.InSettingsBean(
-                    address = if (Utils.isPureIpAddress(remoteDns.first())) remoteDns.first() else AppConfig.DNS_PROXY,
-                    port = 53,
-                    network = "tcp,udp"
-                )
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL ,true) == false) {
 
-                val localDnsPort = Utils.parseInt(
-                    MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT),
-                    AppConfig.PORT_LOCAL_DNS.toInt()
+                // DNS inbound
+                val remoteDns = SettingsManager.getRemoteDnsServers()
+                if (v2rayConfig.inbounds.none { e -> e.protocol == "dokodemo-door" && e.tag == "dns-in" }) {
+                    val dnsInboundSettings = V2rayConfig.InboundBean.InSettingsBean(
+                        address = if (Utils.isPureIpAddress(remoteDns.first())) remoteDns.first() else AppConfig.DNS_PROXY,
+                        port = 53,
+                        network = "tcp,udp"
+                    )
+
+                    val localDnsPort = Utils.parseInt(
+                        MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT),
+                        AppConfig.PORT_LOCAL_DNS.toInt()
+                    )
+                    v2rayConfig.inbounds.add(
+                        V2rayConfig.InboundBean(
+                            tag = "dns-in",
+                            port = localDnsPort,
+                            listen = AppConfig.LOOPBACK,
+                            protocol = "dokodemo-door",
+                            settings = dnsInboundSettings,
+                            sniffing = null
+                        )
+                    )
+                }
+
+                // DNS routing tag
+                v2rayConfig.routing.rules.add(
+                    0, RulesBean(
+                        inboundTag = arrayListOf("dns-in"),
+                        outboundTag = "dns-out",
+                        domain = null
+                    )
                 )
-                v2rayConfig.inbounds.add(
-                    V2rayConfig.InboundBean(
-                        tag = "dns-in",
-                        port = localDnsPort,
-                        listen = AppConfig.LOOPBACK,
-                        protocol = "dokodemo-door",
-                        settings = dnsInboundSettings,
-                        sniffing = null
+            } else {
+                //hev-socks5-tunnel dns routing
+                v2rayConfig.routing.rules.add(
+                    0, RulesBean(
+                        inboundTag = arrayListOf("socks"),
+                        outboundTag = "dns-out",
+                        port = "53",
+                        type = "field"
                     )
                 )
             }
@@ -507,15 +529,6 @@ object V2rayConfigManager {
                     )
                 )
             }
-
-            // DNS routing tag
-            v2rayConfig.routing.rules.add(
-                0, RulesBean(
-                    inboundTag = arrayListOf("dns-in"),
-                    outboundTag = "dns-out",
-                    domain = null
-                )
-            )
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to configure custom local DNS", e)
             return false
@@ -562,18 +575,8 @@ object V2rayConfigManager {
                         address = domesticDns.first(),
                         domains = directDomain,
                         expectIPs = if (isCnRoutingMode) geoipCn else null,
-                        skipFallback = true
-                    )
-                )
-            }
-
-            if (Utils.isPureIpAddress(domesticDns.first())) {
-                v2rayConfig.routing.rules.add(
-                    0, RulesBean(
-                        outboundTag = AppConfig.TAG_DIRECT,
-                        port = "53",
-                        ip = arrayListOf(domesticDns.first()),
-                        domain = null
+                        skipFallback = true,
+                        tag = AppConfig.TAG_DOMESTIC_DNS
                     )
                 )
             }
@@ -614,20 +617,25 @@ object V2rayConfigManager {
             // DNS dns
             v2rayConfig.dns = V2rayConfig.DnsBean(
                 servers = servers,
-                hosts = hosts
+                hosts = hosts,
+                tag = AppConfig.TAG_DNS
             )
 
             // DNS routing
-            if (Utils.isPureIpAddress(remoteDns.first())) {
-                v2rayConfig.routing.rules.add(
-                    0, RulesBean(
-                        outboundTag = AppConfig.TAG_PROXY,
-                        port = "53",
-                        ip = arrayListOf(remoteDns.first()),
-                        domain = null
-                    )
+            v2rayConfig.routing.rules.add(
+                RulesBean(
+                    outboundTag = AppConfig.TAG_DIRECT,
+                    inboundTag = arrayListOf(AppConfig.TAG_DOMESTIC_DNS),
+                    domain = null
                 )
-            }
+            )
+            v2rayConfig.routing.rules.add(
+                RulesBean(
+                    outboundTag = AppConfig.TAG_PROXY,
+                    inboundTag = arrayListOf(AppConfig.TAG_DNS),
+                    domain = null
+                )
+            )
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to configure DNS", e)
             return false
@@ -887,6 +895,24 @@ object V2rayConfigManager {
                     )
                 )
             }
+
+            if (v2rayConfig.routing.domainStrategy == "IPIfNonMatch") {
+                v2rayConfig.routing.rules.add(
+                    RulesBean(
+                        ip = arrayListOf("0.0.0.0/0", "::/0"),
+                        balancerTag = "proxy-round",
+                        type = "field"
+                    )
+                )
+            } else {
+                v2rayConfig.routing.rules.add(
+                    RulesBean(
+                        network = "tcp,udp",
+                        balancerTag = "proxy-round",
+                        type = "field"
+                    )
+                )
+            }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to configure balance", e)
         }
@@ -984,14 +1010,22 @@ object V2rayConfigManager {
             if (domain.isNullOrEmpty()) continue
 
             if (newHosts.containsKey(domain)) {
-                item.ensureSockopt().domainStrategy = if (preferIpv6) "UseIPv6v4" else "UseIPv4v6"
+                item.ensureSockopt().domainStrategy = "UseIP"
+                item.ensureSockopt().happyEyeballs = StreamSettingsBean.happyEyeballsBean(
+                    prioritizeIPv6 = preferIpv6,
+                    interleave = 2
+                )
                 continue
             }
 
             val resolvedIps = HttpUtil.resolveHostToIP(domain, preferIpv6)
             if (resolvedIps.isNullOrEmpty()) continue
 
-            item.ensureSockopt().domainStrategy = if (preferIpv6) "UseIPv6v4" else "UseIPv4v6"
+            item.ensureSockopt().domainStrategy = "UseIP"
+            item.ensureSockopt().happyEyeballs = StreamSettingsBean.happyEyeballsBean(
+                prioritizeIPv6 = preferIpv6,
+                interleave = 2
+            )
             newHosts[domain] = if (resolvedIps.size == 1) {
                 resolvedIps[0]
             } else {
@@ -1217,6 +1251,7 @@ object V2rayConfigManager {
         val publicKey = profileItem.publicKey
         val shortId = profileItem.shortId
         val spiderX = profileItem.spiderX
+        val mldsa65Verify = profileItem.mldsa65Verify
 
         streamSettings.security = if (streamSecurity.isEmpty()) null else streamSecurity
         if (streamSettings.security == null) return
@@ -1228,6 +1263,7 @@ object V2rayConfigManager {
             publicKey = if (publicKey.isNullOrEmpty()) null else publicKey,
             shortId = if (shortId.isNullOrEmpty()) null else shortId,
             spiderX = if (spiderX.isNullOrEmpty()) null else spiderX,
+            mldsa65Verify = if (mldsa65Verify.isNullOrEmpty()) null else mldsa65Verify,
         )
         if (streamSettings.security == AppConfig.TLS) {
             streamSettings.tlsSettings = tlsSetting

@@ -80,6 +80,7 @@
     <string name="server_lab_preshared_key">PreSharedKey (optional)</string>
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved (可選，逗號隔開)</string>
     <string name="server_lab_local_address">本機位址 (可選 IPv4/IPv6，逗號隔開)</string>
@@ -182,6 +183,7 @@
     <string name="title_pref_vpn_bypass_lan">VPN 是否繞過區域網</string>
 
     <string name="title_pref_vpn_interface_address">VPN 介面位址</string>
+    <string name="title_pref_vpn_mtu">VPN MTU (預設 1500)</string>
 
     <string name="summary_pref_domestic_dns">DNS</string>
     <string name="title_pref_domestic_dns">境内 DNS (可选)</string>
@@ -245,6 +247,10 @@
     <string name="title_language">語言</string>
     <string name="title_ui_settings">介面顏色設定</string>
     <string name="title_pref_ui_mode_night">介面顯示模式</string>
+    <string name="title_pref_use_hev_tunnel">啟用新 TUN 功能</string>
+    <string name="summary_pref_use_hev_tunnel">選擇啟用後，TUN 將使用 hev-socks5-tunnel，否則使用 badvpn-tun2socks。</string>
+    <string name="title_pref_hev_tunnel_loglevel">HevTun 日誌級別</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">HevTun 讀寫逾時 (ms, 預設 300000)</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">複製</string>
@@ -377,5 +383,6 @@
         <item>Least Ping</item>
         <item>Least Load</item>
     </string-array>
+    <string name="pre_resolving_domain">Pre-resolving domain…</string>
 
 </resources>

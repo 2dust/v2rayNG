@@ -1,4 +1,4 @@
-package com.v2ray.ang.service
+package com.v2ray.ang.handler
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -12,12 +12,10 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.ANG_PACKAGE
-import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toSpeedString
-import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.V2RayServiceManager
 import com.v2ray.ang.ui.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +25,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
-object NotificationService {
+object NotificationManager {
     private const val NOTIFICATION_ID = 1
     private const val NOTIFICATION_PENDING_INTENT_CONTENT = 0
     private const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 1
@@ -50,7 +48,7 @@ object NotificationService {
         lastQueryTime = System.currentTimeMillis()
         var lastZeroSpeed = false
         val outboundTags = currentConfig?.getAllOutboundTags()
-        outboundTags?.remove(TAG_DIRECT)
+        outboundTags?.remove(AppConfig.TAG_DIRECT)
 
         speedNotificationJob = CoroutineScope(Dispatchers.IO).launch {
             while (isActive) {
@@ -66,15 +64,15 @@ object NotificationService {
                         proxyTotal += up + down
                     }
                 }
-                val directUplink = V2RayServiceManager.queryStats(TAG_DIRECT, AppConfig.UPLINK)
-                val directDownlink = V2RayServiceManager.queryStats(TAG_DIRECT, AppConfig.DOWNLINK)
+                val directUplink = V2RayServiceManager.queryStats(AppConfig.TAG_DIRECT, AppConfig.UPLINK)
+                val directDownlink = V2RayServiceManager.queryStats(AppConfig.TAG_DIRECT, AppConfig.DOWNLINK)
                 val zeroSpeed = proxyTotal == 0L && directUplink == 0L && directDownlink == 0L
                 if (!zeroSpeed || !lastZeroSpeed) {
                     if (proxyTotal == 0L) {
                         appendSpeedString(text, outboundTags?.firstOrNull(), 0.0, 0.0)
                     }
                     appendSpeedString(
-                        text, TAG_DIRECT, directUplink / sinceLastQueryInSeconds,
+                        text, AppConfig.TAG_DIRECT, directUplink / sinceLastQueryInSeconds,
                         directDownlink / sinceLastQueryInSeconds
                     )
                     updateNotification(text.toString(), proxyTotal, directDownlink + directUplink)
@@ -102,12 +100,12 @@ object NotificationService {
         val contentPendingIntent = PendingIntent.getActivity(service, NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent, flags)
 
         val stopV2RayIntent = Intent(AppConfig.BROADCAST_ACTION_SERVICE)
-        stopV2RayIntent.`package` = ANG_PACKAGE
+        stopV2RayIntent.`package` = AppConfig.ANG_PACKAGE
         stopV2RayIntent.putExtra("key", AppConfig.MSG_STATE_STOP)
         val stopV2RayPendingIntent = PendingIntent.getBroadcast(service, NOTIFICATION_PENDING_INTENT_STOP_V2RAY, stopV2RayIntent, flags)
 
         val restartV2RayIntent = Intent(AppConfig.BROADCAST_ACTION_SERVICE)
-        restartV2RayIntent.`package` = ANG_PACKAGE
+        restartV2RayIntent.`package` = AppConfig.ANG_PACKAGE
         restartV2RayIntent.putExtra("key", AppConfig.MSG_STATE_RESTART)
         val restartV2RayPendingIntent = PendingIntent.getBroadcast(service, NOTIFICATION_PENDING_INTENT_RESTART_V2RAY, restartV2RayIntent, flags)
 

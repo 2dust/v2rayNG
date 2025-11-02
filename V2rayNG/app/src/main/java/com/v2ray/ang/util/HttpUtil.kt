@@ -12,7 +12,9 @@ import java.net.IDN
 import java.net.Inet6Address
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.net.MalformedURLException
 import java.net.Proxy
+import java.net.URI
 import java.net.URL
 
 object HttpUtil {
@@ -140,7 +142,7 @@ object HttpUtil {
             val responseCode = conn.responseCode
             when (responseCode) {
                 in 300..399 -> {
-                    val location = conn.getHeaderField("Location")
+                    val location = resolveLocation(conn)
                     conn.disconnect()
                     if (location.isNullOrEmpty()) {
                         throw IOException("Redirect location not found")
@@ -218,6 +220,30 @@ object HttpUtil {
             return null
         }
         return conn
+    }
+
+    // Returns absolute URL string location header sets
+    fun resolveLocation(conn: HttpURLConnection): String? {
+        val raw = conn.getHeaderField("Location")?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+
+        // Try check url is relative or absolute
+        return try {
+            val locUri = URI(raw)
+            val baseUri = conn.url.toURI()
+            val resolved = if (locUri.isAbsolute) locUri else baseUri.resolve(locUri)
+            resolved.toURL().toString()
+        } catch (_: Exception) {
+            // Fallback: url resolver, also should handles //host/...
+            try {
+                URL(raw).toString() // absolute with protocol
+            } catch (_: MalformedURLException) {
+                try {
+                    URL(conn.url, raw).toString()
+                } catch (_: MalformedURLException) {
+                    null
+                }
+            }
+        }
     }
 }
 

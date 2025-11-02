@@ -30,3 +30,29 @@ $NDK_HOME/ndk-build \
 cp -r $TMPDIR/libs $__dir/
 popd
 rm -rf $TMPDIR
+
+#build hev-socks5-tunnel
+HEVTUN_TMP=$(mktemp -d)
+trap 'rm -rf "$HEVTUN_TMP"' EXIT
+
+mkdir -p "$HEVTUN_TMP/jni"
+pushd "$HEVTUN_TMP"
+
+echo 'include $(call all-subdir-makefiles)' > jni/Android.mk
+
+ln -s "$__dir/hev-socks5-tunnel" jni/hev-socks5-tunnel
+
+"$NDK_HOME/ndk-build" \
+    NDK_PROJECT_PATH=. \
+    APP_BUILD_SCRIPT=jni/Android.mk \
+	"APP_ABI=armeabi-v7a arm64-v8a x86 x86_64" \
+	APP_PLATFORM=android-21 \
+    NDK_LIBS_OUT="$HEVTUN_TMP/libs" \
+    NDK_OUT="$HEVTUN_TMP/obj" \
+    "APP_CFLAGS=-O3 -DPKGNAME=com/v2ray/ang/service" \
+    "APP_LDFLAGS=-WI,--build-id=none -WI,--hash-style=gnu" \
+
+cp -r "$HEVTUN_TMP/libs/"* "$__dir/libs/"
+popd
+
+rm -rf "$HEVTUN_TMP"

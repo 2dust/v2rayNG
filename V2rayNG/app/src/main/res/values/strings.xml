@@ -21,13 +21,13 @@
     <string name="toast_services_failure">Start Services Failure</string>
 
     <!--ServerActivity-->
-    <string name="title_server">Configuration file</string>
-    <string name="menu_item_add_config">Add config</string>
-    <string name="menu_item_save_config">Save config</string>
-    <string name="menu_item_del_config">Delete config</string>
-    <string name="menu_item_import_config_qrcode">Import config from QRcode</string>
-    <string name="menu_item_import_config_clipboard">Import config from Clipboard</string>
-    <string name="menu_item_import_config_local">Import config from locally</string>
+    <string name="title_server">Configuration</string>
+    <string name="menu_item_add_config">Add configuration</string>
+    <string name="menu_item_save_config">Save configuration</string>
+    <string name="menu_item_del_config">Delete configuration</string>
+    <string name="menu_item_import_config_qrcode">Import configuration from QRcode</string>
+    <string name="menu_item_import_config_clipboard">Import configuration from Clipboard</string>
+    <string name="menu_item_import_config_local">Import configuration from locally</string>
     <string name="menu_item_import_config_manually_vmess">Type manually[VMess]</string>
     <string name="menu_item_import_config_manually_vless">Type manually[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">Type manually[Shadowsocks]</string>
@@ -81,6 +81,7 @@
     <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved(Optional, separated by commas)</string>
     <string name="server_lab_local_address">Local address (optional IPv4/IPv6, separated by commas)</string>
@@ -90,16 +91,16 @@
     <string name="toast_none_data">There is nothing</string>
     <string name="toast_incorrect_protocol">Incorrect protocol</string>
     <string name="toast_decoding_failed">Decoding failed</string>
-    <string name="title_file_chooser">Select a Config File</string>
+    <string name="title_file_chooser">Select a configuration</string>
     <string name="toast_require_file_manager">Please install a File Manager.</string>
-    <string name="server_customize_config">Customize Config</string>
-    <string name="toast_config_file_invalid">Invalid Config</string>
+    <string name="server_customize_config">Customize configuration</string>
+    <string name="toast_config_file_invalid">Invalid configuration</string>
     <string name="server_lab_content">Content</string>
     <string name="toast_none_data_clipboard">There is no data in the clipboard</string>
     <string name="toast_invalid_url">Invalid URL</string>
     <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
     <string name="server_lab_need_inbound">Ensure inbounds port is consistent with the settings</string>
-    <string name="toast_malformed_josn">Config malformed</string>
+    <string name="toast_malformed_josn">Configuration malformed</string>
     <string name="server_lab_request_host6">Host(SNI)(Optional)</string>
     <string name="toast_action_not_allowed">Action not allowed</string>
     <string name="server_obfs_password">Obfs password</string>
@@ -185,6 +186,9 @@
 
     <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
 
+    <string name="title_pref_vpn_mtu">VPN MTU (default 1500)</string>
+
+
     <string name="title_pref_domestic_dns">Domestic DNS (Optional)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
 
@@ -207,8 +211,8 @@
     <string name="title_pref_local_dns_port">Local DNS port</string>
     <string name="summary_pref_local_dns_port">Local DNS port</string>
 
-    <string name="title_pref_confirm_remove">Delete configuration file confirmation</string>
-    <string name="summary_pref_confirm_remove">Whether to delete the configuration file requires a second confirmation by the user</string>
+    <string name="title_pref_confirm_remove">Delete configuration confirmation</string>
+    <string name="summary_pref_confirm_remove">Whether to delete the configuration requires a second confirmation by the user</string>
 
     <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
     <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
@@ -248,6 +252,10 @@
     <string name="title_language">Language</string>
     <string name="title_ui_settings">UI settings</string>
     <string name="title_pref_ui_mode_night">UI mode settings</string>
+    <string name="title_pref_use_hev_tunnel">Enable New TUN Feature</string>
+    <string name="summary_pref_use_hev_tunnel">When enabled, TUN will use hev-socks5-tunnel; otherwise, it will use badvpn-tun2socks.</string>
+    <string name="title_pref_hev_tunnel_loglevel">Hev Tun Log Level</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun Read/Write Timeout (ms, default 300000)</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Copy</string>
@@ -273,7 +281,7 @@
     <string name="title_create_intelligent_selection_all_server">Creating Intelligent Selection Current Group Configuration</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sorting by test results</string>
-    <string name="title_filter_config">Filter configuration file</string>
+    <string name="title_filter_config">Filter configuration</string>
     <string name="filter_config_all">All groups</string>
     <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
     <string name="title_del_config_count">Delete %d configurations</string>
@@ -370,7 +378,7 @@
     </string-array>
 
     <string-array name="vpn_bypass_lan">
-        <item>Follow config</item>
+        <item>Follow configuration</item>
         <item>Bypass</item>
         <item>Not Bypass</item>
     </string-array>
@@ -387,5 +395,6 @@
         <item>Least Ping</item>
         <item>Least Load</item>
     </string-array>
+    <string name="pre_resolving_domain">Pre-resolving domain…</string>
 
 </resources>

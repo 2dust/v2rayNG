@@ -42,39 +42,7 @@ class PerAppProxyActivity : BaseActivity() {
 
         addCustomDividerToRecyclerView(binding.recyclerView, this, R.drawable.custom_divider)
 
-        lifecycleScope.launch {
-            try {
-                binding.pbWaiting.show()
-                val blacklist = MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
-                val apps = withContext(Dispatchers.IO) {
-                    val appsList = AppManagerUtil.loadNetworkAppList(this@PerAppProxyActivity)
-
-                    if (blacklist != null) {
-                        appsList.forEach { app ->
-                            app.isSelected = if (blacklist.contains(app.packageName)) 1 else 0
-                        }
-                        appsList.sortedWith { p1, p2 ->
-                            when {
-                                p1.isSelected > p2.isSelected -> -1
-                                p1.isSelected == p2.isSelected -> 0
-                                else -> 1
-                            }
-                        }
-                    } else {
-                        val collator = Collator.getInstance()
-                        appsList.sortedWith(compareBy(collator) { it.appName })
-                    }
-                }
-
-                appsAll = apps
-                adapter = PerAppProxyAdapter(this@PerAppProxyActivity, apps, blacklist)
-                binding.recyclerView.adapter = adapter
-                binding.pbWaiting.hide()
-            } catch (e: Exception) {
-                binding.pbWaiting.hide()
-                Log.e(ANG_PACKAGE, "Error loading apps", e)
-            }
-        }
+        initList()
 
         binding.switchPerAppProxy.setOnCheckedChangeListener { _, isChecked ->
             MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY, isChecked)
@@ -88,6 +56,50 @@ class PerAppProxyActivity : BaseActivity() {
 
         binding.layoutSwitchBypassAppsTips.setOnClickListener {
             Toasty.info(this, R.string.summary_pref_per_app_proxy, Toast.LENGTH_LONG, true).show()
+        }
+    }
+
+    private fun initList() {
+        binding.pbWaiting.show()
+
+        lifecycleScope.launch {
+            try {
+                val blacklist =
+                    MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
+                val apps = withContext(Dispatchers.IO) {
+                    val appsList = AppManagerUtil.loadNetworkAppList(this@PerAppProxyActivity)
+
+                    if (blacklist != null) {
+                        appsList.forEach { app ->
+                            app.isSelected = if (blacklist.contains(app.packageName)) 1 else 0
+                        }
+                        appsList.sortedWith { p1, p2 ->
+                            when {
+                                p1.isSelected > p2.isSelected -> -1
+                                p1.isSelected < p2.isSelected -> 1
+                                p1.isSystemApp > p2.isSystemApp -> 1
+                                p1.isSystemApp < p2.isSystemApp -> -1
+                                p1.appName.lowercase() > p2.appName.lowercase() -> 1
+                                p1.appName.lowercase() < p2.appName.lowercase() -> -1
+                                p1.packageName > p2.packageName -> 1
+                                p1.packageName < p2.packageName -> -1
+                                else -> 0
+                            }
+                        }
+                    } else {
+                        val collator = Collator.getInstance()
+                        appsList.sortedWith(compareBy(collator) { it.appName })
+                    }
+                }
+
+                appsAll = apps
+                adapter = PerAppProxyAdapter(this@PerAppProxyActivity, apps, blacklist)
+                binding.recyclerView.adapter = adapter
+            } catch (e: Exception) {
+                Log.e(ANG_PACKAGE, "Error loading apps", e)
+            } finally {
+                binding.pbWaiting.hide()
+            }
         }
     }
 
@@ -114,14 +126,40 @@ class PerAppProxyActivity : BaseActivity() {
             })
         }
 
-
         return super.onCreateOptionsMenu(menu)
     }
 
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.select_all -> adapter?.let { it ->
+        R.id.select_all -> {
+            selectAllApp()
+            allowPerAppProxy()
+            true
+        }
+
+        R.id.select_proxy_app -> {
+            selectProxyAppAuto()
+            allowPerAppProxy()
+            true
+        }
+
+        R.id.import_proxy_app -> {
+            importProxyApp()
+            allowPerAppProxy()
+            true
+        }
+
+        R.id.export_proxy_app -> {
+            exportProxyApp()
+            true
+        }
+
+        else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun selectAllApp() {
+        adapter?.let { it ->
             val pkgNames = it.apps.map { it.packageName }
             if (it.blacklist.containsAll(pkgNames)) {
                 it.apps.forEach {
@@ -136,27 +174,10 @@ class PerAppProxyActivity : BaseActivity() {
             }
             it.notifyDataSetChanged()
             true
-        } == true
-
-        R.id.select_proxy_app -> {
-            selectProxyApp()
-            true
         }
-
-        R.id.import_proxy_app -> {
-            importProxyApp()
-            true
-        }
-
-        R.id.export_proxy_app -> {
-            exportProxyApp()
-            true
-        }
-
-        else -> super.onOptionsItemSelected(item)
     }
 
-    private fun selectProxyApp() {
+    private fun selectProxyAppAuto() {
         toast(R.string.msg_downloading_content)
         binding.pbWaiting.show()
 
@@ -191,6 +212,10 @@ class PerAppProxyActivity : BaseActivity() {
         }
         Utils.setClipboard(applicationContext, lst)
         toastSuccess(R.string.toast_success)
+    }
+
+    private fun allowPerAppProxy() {
+        binding.switchPerAppProxy.isChecked = true
     }
 
     @SuppressLint("NotifyDataSetChanged")

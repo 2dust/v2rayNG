@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
-import android.net.LocalSocket
-import android.net.LocalSocketAddress
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
@@ -21,24 +19,17 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.handler.V2RayServiceManager
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.File
 import java.lang.ref.SoftReference
 
 class V2RayVpnService : VpnService(), ServiceControl {
-    companion object {
-        private const val VPN_MTU = 1500
-        private const val TUN2SOCKS = "libtun2socks.so"
-    }
-
     private lateinit var mInterface: ParcelFileDescriptor
     private var isRunning = false
-    private lateinit var process: Process
+    private var tun2SocksService: Tun2SocksControl? = null
 
     /**destroy
      * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
@@ -95,7 +86,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     override fun onDestroy() {
         super.onDestroy()
-        NotificationService.cancelNotification()
+        NotificationManager.cancelNotification()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -111,7 +102,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
     }
 
     override fun startService() {
-        setup()
+        setupService()
     }
 
     override fun stopService() {
@@ -134,13 +125,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Sets up the VPN service.
      * Prepares the VPN and configures it if preparation is successful.
      */
-    private fun setup() {
+    private fun setupService() {
         val prepare = prepare(this)
         if (prepare != null) {
             return
         }
 
-        if (setupVpnService() != true) {
+        if (configureVpnService() != true) {
             return
         }
 
@@ -151,17 +142,52 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Configures the VPN service.
      * @return True if the VPN service was configured successfully, false otherwise.
      */
-    private fun setupVpnService(): Boolean {
-        // If the old interface has exactly the same parameters, use it!
-        // Configure a builder while parsing the parameters.
+    private fun configureVpnService(): Boolean {
         val builder = Builder()
-        val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
-        //val enableLocalDns = defaultDPreference.getPrefBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
 
-        builder.setMtu(VPN_MTU)
-        builder.addAddress(vpnConfig.ipv4Client, 30)
-        //builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
+        // Configure network settings (addresses, routing and DNS)
+        configureNetworkSettings(builder)
+
+        // Configure app-specific settings (session name and per-app proxy)
+        configurePerAppProxy(builder)
+
+        // Close the old interface since the parameters have been changed
+        try {
+            mInterface.close()
+        } catch (ignored: Exception) {
+            // ignored
+        }
+
+        // Configure platform-specific features
+        configurePlatformFeatures(builder)
+
+        // Create a new interface using the builder and save the parameters
+        try {
+            mInterface = builder.establish()!!
+            isRunning = true
+            return true
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to establish VPN interface", e)
+            stopV2Ray()
+        }
+        return false
+    }
+
+    /**
+     * Configures the basic network settings for the VPN.
+     * This includes IP addresses, routing rules, and DNS servers.
+     *
+     * @param builder The VPN Builder to configure
+     */
+    private fun configureNetworkSettings(builder: Builder) {
+        val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
         val bypassLan = SettingsManager.routingRulesetsBypassLan()
+
+        // Configure IPv4 settings
+        builder.setMtu(SettingsManager.getVpnMtu())
+        builder.addAddress(vpnConfig.ipv4Client, 30)
+
+        // Configure routing rules
         if (bypassLan) {
             AppConfig.ROUTED_IP_LIST.forEach {
                 val addr = it.split('/')
@@ -171,38 +197,37 @@ class V2RayVpnService : VpnService(), ServiceControl {
             builder.addRoute("0.0.0.0", 0)
         }
 
+        // Configure IPv6 if enabled
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true) {
             builder.addAddress(vpnConfig.ipv6Client, 126)
             if (bypassLan) {
-                builder.addRoute("2000::", 3) //currently only 1/8 of total ipV6 is in use
-                builder.addRoute("fc00::", 18) //Xray-core default FakeIPv6 Pool
+                builder.addRoute("2000::", 3) // Currently only 1/8 of total IPv6 is in use
+                builder.addRoute("fc00::", 18) // Xray-core default FakeIPv6 Pool
             } else {
                 builder.addRoute("::", 0)
             }
         }
 
-//        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
-//            builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
-//        } else {
-        SettingsManager.getVpnDnsServers()
-            .forEach {
-                if (Utils.isPureIpAddress(it)) {
-                    builder.addDnsServer(it)
-                }
+        // Configure DNS servers
+        //if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
+        //  builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
+        //} else {
+        SettingsManager.getVpnDnsServers().forEach {
+            if (Utils.isPureIpAddress(it)) {
+                builder.addDnsServer(it)
             }
-//        }
-
-        builder.setSession(V2RayServiceManager.getRunningServerName())
-
-        configurePerAppProxy(builder)
-
-        // Close the old interface since the parameters have been changed.
-        try {
-            mInterface.close()
-        } catch (ignored: Exception) {
-            // ignored
         }
 
+        builder.setSession(V2RayServiceManager.getRunningServerName())
+    }
+
+    /**
+     * Configures platform-specific VPN features for different Android versions.
+     *
+     * @param builder The VPN Builder to configure
+     */
+    private fun configurePlatformFeatures(builder: Builder) {
+        // Android P (API 28) and above: Configure network callbacks
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             try {
                 connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
@@ -211,24 +236,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
         }
 
+        // Android Q (API 29) and above: Configure metering and HTTP proxy
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             builder.setMetered(false)
             if (MmkvManager.decodeSettingsBool(AppConfig.PREF_APPEND_HTTP_PROXY)) {
                 builder.setHttpProxy(ProxyInfo.buildDirectProxy(LOOPBACK, SettingsManager.getHttpPort()))
             }
         }
-
-        // Create a new interface using the builder and save the parameters.
-        try {
-            mInterface = builder.establish()!!
-            isRunning = true
-            return true
-        } catch (e: Exception) {
-            // non-nullable lateinit var
-            Log.e(AppConfig.TAG, "Failed to establish VPN interface", e)
-            stopV2Ray()
-        }
-        return false
     }
 
     /**
@@ -281,80 +295,23 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Starts the tun2socks process with the appropriate parameters.
      */
     private fun runTun2socks() {
-        Log.i(AppConfig.TAG, "Start run $TUN2SOCKS")
-        val socksPort = SettingsManager.getSocksPort()
-        val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
-        val cmd = arrayListOf(
-            File(applicationContext.applicationInfo.nativeLibraryDir, TUN2SOCKS).absolutePath,
-            "--netif-ipaddr", vpnConfig.ipv4Router,
-            "--netif-netmask", "255.255.255.252",
-            "--socks-server-addr", "$LOOPBACK:${socksPort}",
-            "--tunmtu", VPN_MTU.toString(),
-            "--sock-path", "sock_path",//File(applicationContext.filesDir, "sock_path").absolutePath,
-            "--enable-udprelay",
-            "--loglevel", "notice"
-        )
-
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6)) {
-            cmd.add("--netif-ip6addr")
-            cmd.add(vpnConfig.ipv6Router)
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true) == true) {
+            tun2SocksService = TProxyService(
+                context = applicationContext,
+                vpnInterface = mInterface,
+                isRunningProvider = { isRunning },
+                restartCallback = { runTun2socks() }
+            )
+        } else {
+            tun2SocksService = Tun2SocksService(
+                context = applicationContext,
+                vpnInterface = mInterface,
+                isRunningProvider = { isRunning },
+                restartCallback = { runTun2socks() }
+            )
         }
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED)) {
-            val localDnsPort = Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT), AppConfig.PORT_LOCAL_DNS.toInt())
-            cmd.add("--dnsgw")
-            cmd.add("$LOOPBACK:${localDnsPort}")
-        }
-        Log.i(AppConfig.TAG, cmd.toString())
 
-        try {
-            val proBuilder = ProcessBuilder(cmd)
-            proBuilder.redirectErrorStream(true)
-            process = proBuilder
-                .directory(applicationContext.filesDir)
-                .start()
-            Thread {
-                Log.i(AppConfig.TAG, "$TUN2SOCKS check")
-                process.waitFor()
-                Log.i(AppConfig.TAG, "$TUN2SOCKS exited")
-                if (isRunning) {
-                    Log.i(AppConfig.TAG, "$TUN2SOCKS restart")
-                    runTun2socks()
-                }
-            }.start()
-            Log.i(AppConfig.TAG, "$TUN2SOCKS process info : ${process.toString()}")
-
-            sendFd()
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to start $TUN2SOCKS process", e)
-        }
-    }
-
-    /**
-     * Sends the file descriptor to the tun2socks process.
-     * Attempts to send the file descriptor multiple times if necessary.
-     */
-    private fun sendFd() {
-        val fd = mInterface.fileDescriptor
-        val path = File(applicationContext.filesDir, "sock_path").absolutePath
-        Log.i(AppConfig.TAG, "LocalSocket path : $path")
-
-        CoroutineScope(Dispatchers.IO).launch {
-            var tries = 0
-            while (true) try {
-                Thread.sleep(50L shl tries)
-                Log.i(AppConfig.TAG, "LocalSocket sendFd tries: $tries")
-                LocalSocket().use { localSocket ->
-                    localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
-                    localSocket.setFileDescriptorsForSend(arrayOf(fd))
-                    localSocket.outputStream.write(42)
-                }
-                break
-            } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to send file descriptor, try: $tries", e)
-                if (tries > 5) break
-                tries += 1
-            }
-        }
+        tun2SocksService?.startTun2Socks()
     }
 
     /**
@@ -375,12 +332,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
         }
 
-        try {
-            Log.i(AppConfig.TAG, "$TUN2SOCKS destroy")
-            process.destroy()
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to destroy $TUN2SOCKS process", e)
-        }
+        tun2SocksService?.stopTun2Socks()
+        tun2SocksService = null
 
         V2RayServiceManager.stopCoreLoop()
 
@@ -400,3 +353,4 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
     }
 }
+
