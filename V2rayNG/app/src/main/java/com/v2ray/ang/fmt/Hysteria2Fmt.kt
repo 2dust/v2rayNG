@@ -34,15 +34,9 @@ object Hysteria2Fmt : FmtBase() {
         if (!uri.rawQuery.isNullOrEmpty()) {
             val queryParam = getQueryParam(uri)
 
+            getItemFormQuery(config, queryParam, allowInsecure)
+            
             config.security = queryParam["security"] ?: AppConfig.TLS
-            config.insecure = if (queryParam["insecure"].isNullOrEmpty()) {
-                allowInsecure
-            } else {
-                queryParam["insecure"].orEmpty() == "1"
-            }
-            config.sni = queryParam["sni"]
-            config.alpn = queryParam["alpn"]
-
             config.obfsPassword = queryParam["obfs-password"]
             config.portHopping = queryParam["mport"]
             config.pinSHA256 = queryParam["pinSHA256"]
