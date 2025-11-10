@@ -35,10 +35,13 @@ object Hysteria2Fmt : FmtBase() {
             val queryParam = getQueryParam(uri)
 
             getItemFormQuery(config, queryParam, allowInsecure)
-            
+
             config.security = queryParam["security"] ?: AppConfig.TLS
             config.obfsPassword = queryParam["obfs-password"]
             config.portHopping = queryParam["mport"]
+            if (config.portHopping.isNotNullEmpty()) {
+                config.portHoppingInterval = queryParam["mportHopInt"]
+            }
             config.pinSHA256 = queryParam["pinSHA256"]
 
         }
@@ -66,6 +69,9 @@ object Hysteria2Fmt : FmtBase() {
         }
         if (config.portHopping.isNotNullEmpty()) {
             dicQuery["mport"] = config.portHopping.orEmpty()
+        }
+        if (config.portHoppingInterval.isNotNullEmpty()) {
+            dicQuery["mportHopInt"] = config.portHoppingInterval.orEmpty()
         }
         if (config.pinSHA256.isNotNullEmpty()) {
             dicQuery["pinSHA256"] = config.pinSHA256.orEmpty()
