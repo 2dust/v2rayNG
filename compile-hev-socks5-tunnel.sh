@@ -15,6 +15,7 @@ clear_tmp () {
   rm -rf $TMPDIR
 }
 trap 'echo -e "Aborted, error $? in command: $BASH_COMMAND"; trap ERR; clear_tmp; exit 1' ERR INT
+: <<'COMMENT'
 install -m644 $__dir/tun2socks.mk $TMPDIR/
 pushd $TMPDIR
 ln -s $__dir/badvpn badvpn
@@ -30,8 +31,8 @@ $NDK_HOME/ndk-build \
 cp -r $TMPDIR/libs $__dir/
 popd
 rm -rf $TMPDIR
+COMMENT
 
-: <<'COMMENT'
 #build hev-socks5-tunnel
 HEVTUN_TMP=$(mktemp -d)
 trap 'rm -rf "$HEVTUN_TMP"' EXIT
@@ -57,4 +58,3 @@ cp -r "$HEVTUN_TMP/libs/"* "$__dir/libs/"
 popd
 
 rm -rf "$HEVTUN_TMP"
-COMMENT
