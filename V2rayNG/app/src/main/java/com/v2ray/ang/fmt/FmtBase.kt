@@ -73,7 +73,7 @@ open class FmtBase {
             config.security = null
         }
         // Support multiple possible query keys for allowInsecure like the C# implementation
-        val allowInsecureKeys = arrayOf("insecure", "allowInsecure", "allow_insecure", "verify")
+        val allowInsecureKeys = arrayOf("insecure", "allowInsecure", "allow_insecure")
         config.insecure = when {
             allowInsecureKeys.any { queryParam[it] == "1" } -> true
             allowInsecureKeys.any { queryParam[it] == "0" } -> false
