@@ -263,6 +263,7 @@
     <string name="title_sub_setting">訂閱分組設定</string>
     <string name="sub_setting_remarks">備註</string>
     <string name="sub_setting_url">可選位址(url)</string>
+    <string name="sub_setting_user_agent">User Agent</string>
     <string name="sub_setting_filter">別名正規過濾</string>
     <string name="sub_setting_enable">啟用更新</string>
     <string name="sub_auto_update">啟用自動更新</string>

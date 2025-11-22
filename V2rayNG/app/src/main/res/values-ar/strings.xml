@@ -265,6 +265,7 @@
     <string name="title_sub_setting">إعداد مجموعة الاشتراك</string>
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">عنوان URL اختياري</string>
+    <string name="sub_setting_user_agent">User Agent</string>
     <string name="sub_setting_filter">Remarks regular filter</string>
     <string name="sub_setting_enable">تفعيل التحديث</string>
     <string name="sub_auto_update">تفعيل التحديث التلقائي</string>

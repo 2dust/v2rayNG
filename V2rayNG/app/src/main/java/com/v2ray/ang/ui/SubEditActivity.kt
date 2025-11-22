@@ -44,6 +44,7 @@ class SubEditActivity : BaseActivity() {
     private fun bindingServer(subItem: SubscriptionItem): Boolean {
         binding.etRemarks.text = Utils.getEditable(subItem.remarks)
         binding.etUrl.text = Utils.getEditable(subItem.url)
+        binding.etUserAgent.text = Utils.getEditable(subItem.userAgent)
         binding.etFilter.text = Utils.getEditable(subItem.filter)
         binding.etIntelligentSelectionFilter.text = Utils.getEditable(subItem.intelligentSelectionFilter)
         binding.chkEnable.isChecked = subItem.enabled
@@ -76,6 +77,7 @@ class SubEditActivity : BaseActivity() {
 
         subItem.remarks = binding.etRemarks.text.toString()
         subItem.url = binding.etUrl.text.toString()
+        subItem.userAgent = binding.etUserAgent.text.toString()
         subItem.filter = binding.etFilter.text.toString()
         subItem.intelligentSelectionFilter = binding.etIntelligentSelectionFilter.text.toString()
         subItem.enabled = binding.chkEnable.isChecked

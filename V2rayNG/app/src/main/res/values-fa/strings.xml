@@ -262,6 +262,7 @@
     <string name="title_sub_setting">تنظیمات گروه‌ اشتراک</string>
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">نشانی اینترنتی اختیاری</string>
+    <string name="sub_setting_user_agent">User Agent</string>
     <string name="sub_setting_filter">نام مستعار فیلتر</string>
     <string name="sub_setting_enable">فعال کردن به‌روزرسانی</string>
     <string name="sub_auto_update">فعال سازی به‌روزرسانی خودکار</string>

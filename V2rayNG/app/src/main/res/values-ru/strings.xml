@@ -264,6 +264,7 @@
     <string name="title_sub_setting">Группы</string>
     <string name="sub_setting_remarks">Название</string>
     <string name="sub_setting_url">URL (необязательно)</string>
+    <string name="sub_setting_user_agent">User Agent</string>
     <string name="sub_setting_filter">Название фильтра</string>
     <string name="sub_setting_enable">Использовать обновление</string>
     <string name="sub_auto_update">Использовать автообновление</string>
