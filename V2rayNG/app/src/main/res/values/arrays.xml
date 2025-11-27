@@ -119,9 +119,9 @@
     </string-array>
 
     <string-array name="hev_tunnel_loglevel" translatable="false">
-        <item>none</item>
         <item>error</item>
         <item>warn</item>
+        <item>info</item>
         <item>debug</item>
     </string-array>
 
