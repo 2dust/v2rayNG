@@ -85,7 +85,7 @@
             android:title="@string/title_pref_use_hev_tunnel" />
 
         <ListPreference
-            android:defaultValue="none"
+            android:defaultValue="warn"
             android:entries="@array/hev_tunnel_loglevel"
             android:entryValues="@array/hev_tunnel_loglevel"
             android:key="pref_hev_tunnel_loglevel"
