@@ -43,7 +43,10 @@ object Hysteria2Fmt : FmtBase() {
                 config.portHoppingInterval = queryParam["mportHopInt"]
             }
             config.pinSHA256 = queryParam["pinSHA256"]
-
+            
+            // Parse bandwidth parameters
+            config.bandwidthUp = queryParam["up"]
+            config.bandwidthDown = queryParam["down"]
         }
 
         return config
@@ -75,6 +78,14 @@ object Hysteria2Fmt : FmtBase() {
         }
         if (config.pinSHA256.isNotNullEmpty()) {
             dicQuery["pinSHA256"] = config.pinSHA256.orEmpty()
+        }
+        
+        // Add bandwidth parameters
+        if (config.bandwidthUp.isNotNullEmpty()) {
+            dicQuery["up"] = config.bandwidthUp.orEmpty()
+        }
+        if (config.bandwidthDown.isNotNullEmpty()) {
+            dicQuery["down"] = config.bandwidthDown.orEmpty()
         }
 
         return toUri(config, config.password, dicQuery)
