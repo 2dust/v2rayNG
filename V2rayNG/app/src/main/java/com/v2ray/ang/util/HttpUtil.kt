@@ -128,7 +128,7 @@ object HttpUtil {
      * @throws IOException If an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun getUrlContentWithUserAgent(url: String?, timeout: Int = 15000, httpPort: Int = 0): String {
+    fun getUrlContentWithUserAgent(url: String?, userAgent: String?,  timeout: Int = 15000, httpPort: Int = 0): String {
         var currentUrl = url
         var redirects = 0
         val maxRedirects = 3
@@ -136,7 +136,12 @@ object HttpUtil {
         while (redirects++ < maxRedirects) {
             if (currentUrl == null) continue
             val conn = createProxyConnection(currentUrl, httpPort, timeout, timeout) ?: continue
-            conn.setRequestProperty("User-agent", "v2rayNG/${BuildConfig.VERSION_NAME}")
+            val finalUserAgent = if (userAgent.isNullOrBlank()) {
+                "v2rayNG/${BuildConfig.VERSION_NAME}"
+            } else {
+                userAgent
+            }
+            conn.setRequestProperty("User-agent", finalUserAgent)
             conn.connect()
 
             val responseCode = conn.responseCode

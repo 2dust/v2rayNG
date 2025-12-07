@@ -15,18 +15,26 @@ clear_tmp () {
   rm -rf $TMPDIR
 }
 trap 'echo -e "Aborted, error $? in command: $BASH_COMMAND"; trap ERR; clear_tmp; exit 1' ERR INT
-install -m644 $__dir/tun2socks.mk $TMPDIR/
-pushd $TMPDIR
-ln -s $__dir/badvpn badvpn
-ln -s $__dir/libancillary libancillary
-$NDK_HOME/ndk-build \
-	NDK_PROJECT_PATH=. \
-	APP_BUILD_SCRIPT=./tun2socks.mk \
-	APP_ABI=all \
+
+#build hev-socks5-tunnel
+mkdir -p "$TMPDIR/jni"
+pushd "$TMPDIR"
+
+echo 'include $(call all-subdir-makefiles)' > jni/Android.mk
+
+ln -s "$__dir/hev-socks5-tunnel" jni/hev-socks5-tunnel
+
+"$NDK_HOME/ndk-build" \
+    NDK_PROJECT_PATH=. \
+    APP_BUILD_SCRIPT=jni/Android.mk \
+	"APP_ABI=armeabi-v7a arm64-v8a x86 x86_64" \
 	APP_PLATFORM=android-21 \
-	NDK_LIBS_OUT=$TMPDIR/libs \
-	NDK_OUT=$TMPDIR/tmp \
-	APP_SHORT_COMMANDS=false LOCAL_SHORT_COMMANDS=false -B -j4
-cp -r $TMPDIR/libs $__dir/
+    NDK_LIBS_OUT="$TMPDIR/libs" \
+    NDK_OUT="$TMPDIR/obj" \
+    "APP_CFLAGS=-O3 -DPKGNAME=com/v2ray/ang/service" \
+    "APP_LDFLAGS=-Wl,--build-id=none -Wl,--hash-style=gnu" \
+
+cp -r "$TMPDIR/libs/"* "$__dir/libs/"
+
 popd
 rm -rf $TMPDIR

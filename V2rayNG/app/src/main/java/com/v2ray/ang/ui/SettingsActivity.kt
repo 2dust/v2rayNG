@@ -37,7 +37,7 @@ class SettingsActivity : BaseActivity() {
 
     class SettingsFragment : PreferenceFragmentCompat() {
 
-        private val perAppProxy by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_PER_APP_PROXY) }
+//        private val perAppProxy by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_PER_APP_PROXY) }
         private val localDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_LOCAL_DNS_ENABLED) }
         private val fakeDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_FAKE_DNS_ENABLED) }
         private val appendHttpProxy by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_APPEND_HTTP_PROXY) }
@@ -74,11 +74,11 @@ class SettingsActivity : BaseActivity() {
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             addPreferencesFromResource(R.xml.pref_settings)
 
-            perAppProxy?.setOnPreferenceClickListener {
-                startActivity(Intent(activity, PerAppProxyActivity::class.java))
-                perAppProxy?.isChecked = true
-                false
-            }
+//            perAppProxy?.setOnPreferenceClickListener {
+//                startActivity(Intent(activity, PerAppProxyActivity::class.java))
+//                perAppProxy?.isChecked = true
+//                false
+//            }
             localDns?.setOnPreferenceChangeListener { _, any ->
                 updateLocalDns(any as Boolean)
                 true
@@ -227,7 +227,7 @@ class SettingsActivity : BaseActivity() {
             dnsHosts?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DNS_HOSTS)
             delayTestUrl?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DELAY_TEST_URL)
 
-            updateHevTunSettings(MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, false))
+            updateHevTunSettings(MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true))
             hevTunRwTimeout?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT, AppConfig.HEVTUN_RW_TIMEOUT)
 
             initSharedPreference()
@@ -254,6 +254,7 @@ class SettingsActivity : BaseActivity() {
 
             listOf(
                 AppConfig.PREF_SNIFFING_ENABLED,
+                AppConfig.PREF_USE_HEV_TUNNEL
             ).forEach { key ->
                 findPreference<CheckBoxPreference>(key)?.isChecked =
                     MmkvManager.decodeSettingsBool(key, true)
@@ -269,8 +270,7 @@ class SettingsActivity : BaseActivity() {
                 AppConfig.PREF_DOUBLE_COLUMN_DISPLAY,
                 AppConfig.PREF_PREFER_IPV6,
                 AppConfig.PREF_PROXY_SHARING,
-                AppConfig.PREF_ALLOW_INSECURE,
-                AppConfig.PREF_USE_HEV_TUNNEL
+                AppConfig.PREF_ALLOW_INSECURE
             ).forEach { key ->
                 findPreference<CheckBoxPreference>(key)?.isChecked =
                     MmkvManager.decodeSettingsBool(key, false)
@@ -298,8 +298,8 @@ class SettingsActivity : BaseActivity() {
 
         private fun updateMode(mode: String?) {
             val vpn = mode == VPN
-            perAppProxy?.isEnabled = vpn
-            perAppProxy?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY, false)
+//            perAppProxy?.isEnabled = vpn
+//            perAppProxy?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY, false)
             localDns?.isEnabled = vpn
             fakeDns?.isEnabled = vpn
             appendHttpProxy?.isEnabled = vpn

@@ -174,7 +174,7 @@
     <string name="title_pref_fake_dns_enabled">ر وندن DNS جئلی</string>
     <string name="summary_pref_fake_dns_enabled">DNS مهلی نشۊویا IP جئلی ن وورگنه (زل تر، ٱما گاشڌ من یقرد ز برنومه یل کار نکونه)</string>
 
-    <string name="title_pref_prefer_ipv6">ترجی IPv6</string>
+    <string name="title_pref_prefer_ipv6">ترجی داڌن IPv6</string>
     <string name="summary_pref_prefer_ipv6">تورا IPv6 ن فعال کۊنین وو نشۊویا IPv6 ن ترجی بڌین</string>
 
     <string name="title_pref_remote_dns">DNS ز ر دیر (اختیاری) (udp/tcp/https/quic) (اختیاری)</string>
@@ -184,7 +184,7 @@
     <string name="title_pref_vpn_bypass_lan">VPN ز شبکه مهلی اگوڌرته؟</string>
 
     <string name="title_pref_vpn_interface_address">نشۊوی رابت VPN</string>
-    <string name="title_pref_vpn_mtu">VPN MTU (default 1500)</string>
+    <string name="title_pref_vpn_mtu">VPN MTU (پؽش فرز 1500)</string>
 
     <string name="title_pref_domestic_dns">DNS منی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -222,7 +222,7 @@
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">فشناڌن منشڌ</string>
-    <string name="summary_pref_feedback">فشناڌن منشڌ یا داسووݩ موشکلا من Github</string>
+    <string name="summary_pref_feedback">فشناڌن منشڌ یا گوزارش موشکلا من Github</string>
     <string name="summary_pref_tg_group">ٱووڌن من بونکۊ تلگرام</string>
     <string name="toast_tg_app_not_found">برنومه تلگرامن نجوست</string>
     <string name="title_privacy_policy">هریم سیخومی</string>
@@ -242,7 +242,7 @@
     <string name="summary_pref_auto_update_subscription">اشتراکا خوتۉ ن و تۉر خوتکار وا فاسله زمۊوی من پس زمینه ورۊ کۊنین. ای ویژیی من پوی دسگایل گاشڌ همیشه کار نکونه</string>
     <string name="title_pref_auto_update_interval">فاسله ورۊ کردن خوتکار (اقلن وا 15 دؽقه بۊ)</string>
 
-    <string name="title_core_loglevel">سئت داسووا</string>
+    <string name="title_core_loglevel">سئت گوزارشا</string>
     <string name="title_outbound_domain_resolve_method">بارت پؽش هل دامنه دری</string>
     <string name="title_mode">هالت</string>
     <string name="title_mode_help">سی دووسمندیا وو هیاری بیشتر، ری ای هؽل بزݩ</string>
@@ -254,7 +254,7 @@
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun سئت گوزارشا</string>
     <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun زمووݩ مندیر بیڌن خوندن وو هؽل کردن (میلی سانیه، پؽش فرز 300000)</string>
 
-    <string name="title_logcat">داسووا</string>
+    <string name="title_logcat">گوزارشا</string>
     <string name="logcat_copy">لف گیری</string>
     <string name="logcat_clear">روفتن</string>
     <string name="title_service_restart">ر وندن دووارته خدمات</string>
@@ -265,6 +265,7 @@
     <string name="title_sub_setting">سامووا بونکۊ اشتراک</string>
     <string name="sub_setting_remarks">نیشتنا</string>
     <string name="sub_setting_url">نشۊوی اینترنتی اختیاری</string>
+    <string name="sub_setting_user_agent">User Agent</string>
     <string name="sub_setting_filter">نوم موستعار فیلتر</string>
     <string name="sub_setting_enable">فعال بیڌن ورۊ کردن</string>
     <string name="sub_auto_update">فعال بیڌن ورۊ کردن خوتکار</string>
@@ -392,6 +393,6 @@
         <item>کم ترین پینگ</item>
         <item>کم ترین بار(لود)</item>
     </string-array>
-    <string name="pre_resolving_domain">Pre-resolving domain…</string>
+    <string name="pre_resolving_domain">پؽش هل دامنه…</string>
 
 </resources>

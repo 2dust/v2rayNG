@@ -72,10 +72,12 @@ open class FmtBase {
         if (config.security != AppConfig.TLS && config.security != AppConfig.REALITY) {
             config.security = null
         }
-        config.insecure = if (queryParam["allowInsecure"].isNullOrEmpty()) {
-            allowInsecure
-        } else {
-            queryParam["allowInsecure"].orEmpty() == "1"
+        // Support multiple possible query keys for allowInsecure like the C# implementation
+        val allowInsecureKeys = arrayOf("insecure", "allowInsecure", "allow_insecure")
+        config.insecure = when {
+            allowInsecureKeys.any { queryParam[it] == "1" } -> true
+            allowInsecureKeys.any { queryParam[it] == "0" } -> false
+            else -> allowInsecure
         }
         config.sni = queryParam["sni"]
         config.fingerPrint = queryParam["fp"]
@@ -104,6 +106,12 @@ open class FmtBase {
         config.spiderX.let { if (it.isNotNullEmpty()) dicQuery["spx"] = it.orEmpty() }
         config.mldsa65Verify.let { if (it.isNotNullEmpty()) dicQuery["pqv"] = it.orEmpty() }
         config.flow.let { if (it.isNotNullEmpty()) dicQuery["flow"] = it.orEmpty() }
+        // Add two keys for compatibility: "insecure" and "allowInsecure"
+        if (config.security == AppConfig.TLS) {
+            val insecureFlag = if (config.insecure == true) "1" else "0"
+            dicQuery["insecure"] = insecureFlag
+            dicQuery["allowInsecure"] = insecureFlag
+        }
 
         val networkType = NetworkType.fromString(config.network)
         dicQuery["type"] = networkType.type

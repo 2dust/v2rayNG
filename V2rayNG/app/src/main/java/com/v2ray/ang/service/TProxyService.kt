@@ -72,11 +72,9 @@ class TProxyService(
             appendLine("  udp: 'udp'")
 
             appendLine("misc:")
-            appendLine("  read-write-timeout: ${MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) ?: AppConfig.HEVTUN_RW_TIMEOUT}")
-            val hevTunLogLevel = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) ?: "none"
-            if (hevTunLogLevel != "none") {
-                appendLine("  log-level: $hevTunLogLevel")
-            }
+            appendLine("  tcp-read-write-timeout: ${MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) ?: AppConfig.HEVTUN_RW_TIMEOUT}")
+            appendLine("  udp-read-write-timeout: ${MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) ?: AppConfig.HEVTUN_RW_TIMEOUT}")
+            appendLine("  log-level: ${MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) ?: "warn"}")
         }
     }
 

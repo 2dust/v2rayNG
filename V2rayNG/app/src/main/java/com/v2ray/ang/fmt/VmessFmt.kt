@@ -28,7 +28,7 @@ object VmessFmt : FmtBase() {
             return parseVmessStd(str)
         }
 
-        var allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
+        val allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.VMESS)
 
         var result = str.replace(EConfigType.VMESS.protocolScheme, "")
@@ -78,12 +78,15 @@ object VmessFmt : FmtBase() {
             else -> {}
         }
 
-        config.security = vmessQRCode.tls
-        config.insecure = allowInsecure
+        config.security = vmessQRCode.tls     
         config.sni = vmessQRCode.sni
         config.fingerPrint = vmessQRCode.fp
         config.alpn = vmessQRCode.alpn
-
+        config.insecure = when (vmessQRCode.insecure) {
+            "1" -> true
+            "0" -> false
+            else -> allowInsecure
+        }
         return config
     }
 
@@ -132,6 +135,11 @@ object VmessFmt : FmtBase() {
         vmessQRCode.sni = config.sni.orEmpty()
         vmessQRCode.fp = config.fingerPrint.orEmpty()
         vmessQRCode.alpn = config.alpn.orEmpty()
+        vmessQRCode.insecure = when (config.insecure) {
+            true -> "1"
+            false -> "0"
+            else -> ""
+        }
 
         val json = JsonUtil.toJson(vmessQRCode)
         return Utils.encode(json)

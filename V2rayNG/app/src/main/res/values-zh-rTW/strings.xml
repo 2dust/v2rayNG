@@ -106,8 +106,8 @@
     <string name="server_lab_port_hop">跳躍連接埠 (會覆蓋伺服器連接埠)</string>
     <string name="server_lab_port_hop_interval">連接埠跳躍間隔 (秒)</string>
     <string name="server_lab_stream_pinsha256">SHA256 憑證指紋</string>
-    <string name="server_lab_bandwidth_down">頻寬下行 (單位)</string>
-    <string name="server_lab_bandwidth_up">頻寬上行 (單位)</string>
+    <string name="server_lab_bandwidth_down">頻寬下行 (支持的單位 k/m/g/t)</string>
+    <string name="server_lab_bandwidth_up">頻寬上行 (支持的單位 k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
 
@@ -263,6 +263,7 @@
     <string name="title_sub_setting">訂閱分組設定</string>
     <string name="sub_setting_remarks">備註</string>
     <string name="sub_setting_url">可選位址(url)</string>
+    <string name="sub_setting_user_agent">User Agent</string>
     <string name="sub_setting_filter">別名正規過濾</string>
     <string name="sub_setting_enable">啟用更新</string>
     <string name="sub_auto_update">啟用自動更新</string>

@@ -106,8 +106,8 @@
     <string name="server_lab_port_hop">Port Hopping</string>
     <string name="server_lab_port_hop_interval">Port Hopping Interval</string>
     <string name="server_lab_stream_pinsha256">pinSHA256</string>
-    <string name="server_lab_bandwidth_down">Bandwidth down (units)</string>
-    <string name="server_lab_bandwidth_up">Bandwidth up (units)</string>
+    <string name="server_lab_bandwidth_down">Bandwidth down (Supported units: k/m/g/t)</string>
+    <string name="server_lab_bandwidth_up">Bandwidth up (Supported units: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
 
@@ -265,6 +265,7 @@
     <string name="title_sub_setting">Các gói đăng ký</string>
     <string name="sub_setting_remarks">Tên gói đăng ký</string>
     <string name="sub_setting_url">URL gói đăng ký</string>
+    <string name="sub_setting_user_agent">User Agent</string>
     <string name="sub_setting_filter">Remarks regular filter</string>
     <string name="sub_setting_enable">Sử dụng gói đăng ký này</string>
     <string name="sub_auto_update">Bật tự động cập nhật</string>
