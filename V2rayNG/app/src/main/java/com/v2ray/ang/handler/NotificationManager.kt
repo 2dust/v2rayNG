@@ -36,6 +36,8 @@ object NotificationManager {
     private var mBuilder: NotificationCompat.Builder? = null
     private var speedNotificationJob: Job? = null
     private var mNotificationManager: NotificationManager? = null
+    private var sessionStartDownload = 0L
+    private var currentConfigGuid: String? = null
 
     /**
      * Starts the speed notification.
@@ -46,6 +48,8 @@ object NotificationManager {
         if (speedNotificationJob != null || V2RayServiceManager.isRunning() == false) return
 
         lastQueryTime = System.currentTimeMillis()
+        sessionStartDownload = 0L
+        currentConfigGuid = MmkvManager.getSelectServer()
         var lastZeroSpeed = false
         val outboundTags = currentConfig?.getAllOutboundTags()
         outboundTags?.remove(AppConfig.TAG_DIRECT)
@@ -55,10 +59,12 @@ object NotificationManager {
                 val queryTime = System.currentTimeMillis()
                 val sinceLastQueryInSeconds = (queryTime - lastQueryTime) / 1000.0
                 var proxyTotal = 0L
+                var totalDownloadThisQuery = 0L
                 val text = StringBuilder()
                 outboundTags?.forEach {
                     val up = V2RayServiceManager.queryStats(it, AppConfig.UPLINK)
                     val down = V2RayServiceManager.queryStats(it, AppConfig.DOWNLINK)
+                    totalDownloadThisQuery += down
                     if (up + down > 0) {
                         appendSpeedString(text, it, up / sinceLastQueryInSeconds, down / sinceLastQueryInSeconds)
                         proxyTotal += up + down
@@ -66,6 +72,12 @@ object NotificationManager {
                 }
                 val directUplink = V2RayServiceManager.queryStats(AppConfig.TAG_DIRECT, AppConfig.UPLINK)
                 val directDownlink = V2RayServiceManager.queryStats(AppConfig.TAG_DIRECT, AppConfig.DOWNLINK)
+                totalDownloadThisQuery += directDownlink
+
+                // Update total download for current config
+                sessionStartDownload += totalDownloadThisQuery
+                updateTotalDownload(currentConfigGuid, totalDownloadThisQuery)
+
                 val zeroSpeed = proxyTotal == 0L && directUplink == 0L && directDownlink == 0L
                 if (!zeroSpeed || !lastZeroSpeed) {
                     if (proxyTotal == 0L) {
@@ -82,6 +94,19 @@ object NotificationManager {
                 delay(3000)
             }
         }
+    }
+
+    /**
+     * Updates the total download bytes for a config.
+     * @param guid The GUID of the config.
+     * @param downloadBytes The bytes downloaded in this query.
+     */
+    private fun updateTotalDownload(guid: String?, downloadBytes: Long) {
+        if (guid == null || downloadBytes == 0L) return
+
+        val affInfo = MmkvManager.decodeServerAffiliationInfo(guid) ?: com.v2ray.ang.dto.ServerAffiliationInfo()
+        affInfo.totalDownloadBytes += downloadBytes
+        MmkvManager.encodeServerAffiliationInfo(guid, affInfo)
     }
 
     /**

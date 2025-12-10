@@ -172,6 +172,9 @@ object V2RayServiceManager {
             NotificationManager.startSpeedNotification(currentConfig)
 
             PluginServiceManager.runPlugin(service, config, result.socksPort)
+
+            // Start auto-switch if enabled
+            AutoSwitchManager.startAutoSwitch(service, guid)
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to startup service", e)
             return false
@@ -186,6 +189,9 @@ object V2RayServiceManager {
      */
     fun stopCoreLoop(): Boolean {
         val service = getService() ?: return false
+
+        // Stop auto-switch
+        AutoSwitchManager.stopAutoSwitch()
 
         if (coreController.isRunning) {
             CoroutineScope(Dispatchers.IO).launch {

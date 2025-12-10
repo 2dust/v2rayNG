@@ -373,6 +373,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
+        R.id.push_configs_to_github -> {
+            pushConfigsToGitHub()
+            true
+        }
+
         R.id.ping_all -> {
             toast(getString(R.string.connection_test_testing_count, mainViewModel.serversCache.count()))
             mainViewModel.testAllTcping()
@@ -540,6 +545,46 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 else
                     toastError(R.string.toast_failure)
                 binding.pbWaiting.hide()
+            }
+        }
+    }
+
+    private fun pushConfigsToGitHub() {
+        binding.pbWaiting.show()
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                // Get all servers
+                val allServers = MmkvManager.decodeServerList()
+                val sb = StringBuilder()
+
+                // Export each config
+                for (server in allServers) {
+                    val url = AngConfigManager.shareConfig(server.guid)
+                    if (!TextUtils.isEmpty(url)) {
+                        sb.append(url)
+                        sb.appendLine()
+                    }
+                }
+
+                // Write to configs.txt file
+                val configsContent = sb.toString()
+                val file = java.io.File(getExternalFilesDir(null), "configs.txt")
+                file.writeText(configsContent)
+
+                launch(Dispatchers.Main) {
+                    toast("Configs exported to ${file.absolutePath}")
+
+                    // Copy to clipboard as well
+                    Utils.setClipboard(this@MainActivity, configsContent)
+                    toast("Configs also copied to clipboard")
+                    binding.pbWaiting.hide()
+                }
+            } catch (e: Exception) {
+                Log.e(AppConfig.TAG, "Failed to export configs", e)
+                launch(Dispatchers.Main) {
+                    toastError("Failed to export configs: ${e.message}")
+                    binding.pbWaiting.hide()
+                }
             }
         }
     }

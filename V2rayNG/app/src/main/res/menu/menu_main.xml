@@ -83,6 +83,11 @@
         android:title="@string/title_export_all"
         app:showAsAction="never" />
     <item
+        android:id="@+id/push_configs_to_github"
+        android:icon="@drawable/ic_share_24dp"
+        android:title="@string/title_push_configs_to_github"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/intelligent_selection_all"
         android:title="@string/title_create_intelligent_selection_all_server"
         app:showAsAction="never" />

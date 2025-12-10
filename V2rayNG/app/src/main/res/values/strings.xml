@@ -245,6 +245,13 @@
     <string name="summary_pref_auto_update_subscription">Update your subscriptions automatically at set intervals in the background. Depending on the device, this feature may not always work</string>
     <string name="title_pref_auto_update_interval">Auto Update Interval (Minutes, Min value 15)</string>
 
+    <string name="title_pref_auto_switch_enabled">Auto-switch configs in group</string>
+    <string name="summary_pref_auto_switch_enabled">Automatically switch to next config after interval or on timeout</string>
+    <string name="title_pref_auto_switch_interval">Auto-switch interval (seconds)</string>
+    <string name="summary_pref_auto_switch_interval">Time in seconds before switching to next config (0 = disabled)</string>
+    <string name="title_pref_auto_switch_timeout">Config connection timeout (seconds)</string>
+    <string name="summary_pref_auto_switch_timeout">Time in seconds to wait for connection before switching (0 = disabled)</string>
+
     <string name="title_core_loglevel">Log Level</string>
     <string name="title_outbound_domain_resolve_method">Outbound domain pre-resolve method</string>
     <string name="title_mode">Mode</string>
@@ -265,6 +272,7 @@
     <string name="title_del_duplicate_config">Delete current group duplicate configuration</string>
     <string name="title_del_invalid_config">Delete current group invalid configuration</string>
     <string name="title_export_all">Export current group non-custom configs to clipboard</string>
+    <string name="title_push_configs_to_github">Push all configs to GitHub</string>
     <string name="title_sub_setting">Subscription group setting</string>
     <string name="sub_setting_remarks">remarks</string>
     <string name="sub_setting_url">Optional URL</string>

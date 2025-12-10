@@ -66,6 +66,9 @@ object AppConfig {
     const val PREF_USE_HEV_TUNNEL = "pref_use_hev_tunnel"
     const val PREF_HEV_TUNNEL_LOGLEVEL = "pref_hev_tunnel_loglevel"
     const val PREF_HEV_TUNNEL_RW_TIMEOUT = "pref_hev_tunnel_rw_timeout"
+    const val PREF_AUTO_SWITCH_ENABLED = "pref_auto_switch_enabled"
+    const val PREF_AUTO_SWITCH_INTERVAL = "pref_auto_switch_interval"
+    const val PREF_AUTO_SWITCH_TIMEOUT = "pref_auto_switch_timeout"
 
     /** Cache keys. */
     const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"

@@ -63,11 +63,17 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
 
             //Name address
             holder.itemMainBinding.tvName.text = profile.remarks
-            holder.itemMainBinding.tvStatistics.text = getAddress(profile)
+            val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+            val address = getAddress(profile)
+            val download = aff?.getTotalDownloadString() ?: ""
+            holder.itemMainBinding.tvStatistics.text = if (download.isNotEmpty()) {
+                "$address • ↓$download"
+            } else {
+                address
+            }
             holder.itemMainBinding.tvType.text = profile.configType.name
 
             //TestResult
-            val aff = MmkvManager.decodeServerAffiliationInfo(guid)
             holder.itemMainBinding.tvTestResult.text = aff?.getTestDelayString().orEmpty()
             if ((aff?.testDelayMillis ?: 0L) < 0L) {
                 holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(mActivity, R.color.colorPingRed))
