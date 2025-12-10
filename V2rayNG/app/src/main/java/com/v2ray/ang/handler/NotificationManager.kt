@@ -35,6 +35,7 @@ object NotificationManager {
     private var lastQueryTime = 0L
     private var mBuilder: NotificationCompat.Builder? = null
     private var speedNotificationJob: Job? = null
+    private var downloadTrackingJob: Job? = null
     private var mNotificationManager: NotificationManager? = null
     private var sessionStartDownload = 0L
     private var currentConfigGuid: String? = null
@@ -104,6 +105,47 @@ object NotificationManager {
     private fun updateTotalDownload(guid: String?, downloadBytes: Long) {
         if (guid == null || downloadBytes == 0L) return
         MmkvManager.addServerDownloadBytes(guid, downloadBytes)
+    }
+
+    /**
+     * Starts download tracking independently of speed notification.
+     * @param currentConfig The current profile configuration.
+     */
+    fun startDownloadTracking(currentConfig: ProfileItem?) {
+        // Stop any existing tracking job
+        downloadTrackingJob?.cancel()
+
+        if (V2RayServiceManager.isRunning() == false) return
+
+        currentConfigGuid = MmkvManager.getSelectServer()
+        val outboundTags = currentConfig?.getAllOutboundTags()
+        outboundTags?.remove(AppConfig.TAG_DIRECT)
+
+        downloadTrackingJob = CoroutineScope(Dispatchers.IO).launch {
+            while (isActive) {
+                var totalDownloadThisQuery = 0L
+
+                outboundTags?.forEach {
+                    val down = V2RayServiceManager.queryStats(it, AppConfig.DOWNLINK)
+                    totalDownloadThisQuery += down
+                }
+                val directDownlink = V2RayServiceManager.queryStats(AppConfig.TAG_DIRECT, AppConfig.DOWNLINK)
+                totalDownloadThisQuery += directDownlink
+
+                // Update total download for current config
+                updateTotalDownload(currentConfigGuid, totalDownloadThisQuery)
+
+                delay(3000)
+            }
+        }
+    }
+
+    /**
+     * Stops download tracking.
+     */
+    fun stopDownloadTracking() {
+        downloadTrackingJob?.cancel()
+        downloadTrackingJob = null
     }
 
     /**
@@ -178,6 +220,8 @@ object NotificationManager {
         mBuilder = null
         speedNotificationJob?.cancel()
         speedNotificationJob = null
+        downloadTrackingJob?.cancel()
+        downloadTrackingJob = null
         mNotificationManager = null
     }
 

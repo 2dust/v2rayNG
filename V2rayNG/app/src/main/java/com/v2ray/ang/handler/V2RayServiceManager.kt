@@ -171,6 +171,9 @@ object V2RayServiceManager {
             NotificationManager.showNotification(currentConfig)
             NotificationManager.startSpeedNotification(currentConfig)
 
+            // Always start download tracking
+            NotificationManager.startDownloadTracking(currentConfig)
+
             PluginServiceManager.runPlugin(service, config, result.socksPort)
 
             // Start auto-switch if enabled

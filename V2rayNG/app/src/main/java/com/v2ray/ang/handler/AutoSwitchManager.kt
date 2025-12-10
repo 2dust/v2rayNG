@@ -146,16 +146,20 @@ object AutoSwitchManager {
         val currentConfig = MmkvManager.decodeServerConfig(currentGuid) ?: return null
         val subscriptionId = currentConfig.subscriptionId
 
-        // If not in a subscription group, return null
-        if (subscriptionId.isEmpty()) {
-            return null
-        }
-
-        // Get all servers in the same subscription
+        // Get all servers
         val allServerGuids = MmkvManager.decodeServerList()
-        val serversInGroup = allServerGuids.mapNotNull { guid ->
-            val config = MmkvManager.decodeServerConfig(guid)
-            if (config?.subscriptionId == subscriptionId) guid else null
+
+        // If in a subscription group, only switch within that group
+        // Otherwise, switch through all configs
+        val serversInGroup = if (subscriptionId.isNotEmpty()) {
+            // Filter by subscription group
+            allServerGuids.mapNotNull { guid ->
+                val config = MmkvManager.decodeServerConfig(guid)
+                if (config?.subscriptionId == subscriptionId) guid else null
+            }
+        } else {
+            // Use all servers for switching
+            allServerGuids
         }
 
         if (serversInGroup.isEmpty()) {
