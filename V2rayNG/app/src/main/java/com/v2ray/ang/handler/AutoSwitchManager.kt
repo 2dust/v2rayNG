@@ -3,6 +3,7 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.util.Log
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.util.MessageUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -132,6 +133,9 @@ object AutoSwitchManager {
 
             // Start next config
             V2RayServiceManager.startVService(context, nextGuid)
+
+            // Notify UI of config change
+            MessageUtil.sendMsg2UI(context, AppConfig.MSG_CONFIG_SWITCHED, nextGuid)
         } else {
             Log.w(AppConfig.TAG, "No next config found in group")
         }

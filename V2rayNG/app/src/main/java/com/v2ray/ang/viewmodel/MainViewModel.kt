@@ -464,6 +464,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     MmkvManager.encodeServerTestDelayMillis(resultPair.first, resultPair.second)
                     updateListAction.value = getPosition(resultPair.first)
                 }
+
+                AppConfig.MSG_CONFIG_SWITCHED -> {
+                    // Config was switched by auto-switch, refresh the UI to show new selection
+                    val newGuid = intent.getStringExtra("content") ?: return
+                    updateListAction.value = -1  // Refresh entire list to update selected indicator
+                }
             }
         }
     }
