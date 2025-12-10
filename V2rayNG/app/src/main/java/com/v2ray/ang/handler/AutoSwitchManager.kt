@@ -3,7 +3,6 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.util.Log
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.dto.ProfileItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
