@@ -152,21 +152,24 @@ object AutoSwitchManager {
         }
 
         // Get all servers in the same subscription
-        val allServers = MmkvManager.decodeServerList()
-        val serversInGroup = allServers.filter { it.subscriptionId == subscriptionId }
+        val allServerGuids = MmkvManager.decodeServerList()
+        val serversInGroup = allServerGuids.mapNotNull { guid ->
+            val config = MmkvManager.decodeServerConfig(guid)
+            if (config?.subscriptionId == subscriptionId) guid else null
+        }
 
         if (serversInGroup.isEmpty()) {
             return null
         }
 
         // Find current index
-        val currentIndex = serversInGroup.indexOfFirst { it.guid == currentGuid }
+        val currentIndex = serversInGroup.indexOfFirst { it == currentGuid }
         if (currentIndex == -1) {
-            return serversInGroup.firstOrNull()?.guid
+            return serversInGroup.firstOrNull()
         }
 
         // Get next index (wrap around to start)
         val nextIndex = (currentIndex + 1) % serversInGroup.size
-        return serversInGroup[nextIndex].guid
+        return serversInGroup[nextIndex]
     }
 }

@@ -556,29 +556,28 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             try {
                 // Get all servers
                 val allServers = MmkvManager.decodeServerList()
-                val sb = StringBuilder()
 
-                // Export each config
-                for (server in allServers) {
-                    val url = AngConfigManager.shareConfig(server.guid)
-                    if (!TextUtils.isEmpty(url)) {
-                        sb.append(url)
-                        sb.appendLine()
+                // Use the public method to export configs
+                val ret = AngConfigManager.shareNonCustomConfigsToClipboard(this@MainActivity, allServers)
+
+                if (ret > 0) {
+                    // Get the exported content from clipboard
+                    val configsContent = Utils.getClipboard(this@MainActivity) ?: ""
+
+                    // Write to configs.txt file
+                    val file = java.io.File(getExternalFilesDir(null), "configs.txt")
+                    file.writeText(configsContent)
+
+                    launch(Dispatchers.Main) {
+                        toast("Configs exported to ${file.absolutePath}")
+                        toast("$ret configs also copied to clipboard")
+                        binding.pbWaiting.hide()
                     }
-                }
-
-                // Write to configs.txt file
-                val configsContent = sb.toString()
-                val file = java.io.File(getExternalFilesDir(null), "configs.txt")
-                file.writeText(configsContent)
-
-                launch(Dispatchers.Main) {
-                    toast("Configs exported to ${file.absolutePath}")
-
-                    // Copy to clipboard as well
-                    Utils.setClipboard(this@MainActivity, configsContent)
-                    toast("Configs also copied to clipboard")
-                    binding.pbWaiting.hide()
+                } else {
+                    launch(Dispatchers.Main) {
+                        toastError("Failed to export configs")
+                        binding.pbWaiting.hide()
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(AppConfig.TAG, "Failed to export configs", e)

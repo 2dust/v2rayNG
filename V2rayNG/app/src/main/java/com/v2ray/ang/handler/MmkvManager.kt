@@ -209,6 +209,21 @@ object MmkvManager {
     }
 
     /**
+     * Updates the total download bytes for a server.
+     *
+     * @param guid The server GUID.
+     * @param downloadBytes The download bytes to add.
+     */
+    fun addServerDownloadBytes(guid: String, downloadBytes: Long) {
+        if (guid.isBlank() || downloadBytes == 0L) {
+            return
+        }
+        val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
+        aff.totalDownloadBytes += downloadBytes
+        serverAffStorage.encode(guid, JsonUtil.toJson(aff))
+    }
+
+    /**
      * Clears all test delay results.
      *
      * @param keys The list of server GUIDs.

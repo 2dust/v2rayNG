@@ -103,10 +103,7 @@ object NotificationManager {
      */
     private fun updateTotalDownload(guid: String?, downloadBytes: Long) {
         if (guid == null || downloadBytes == 0L) return
-
-        val affInfo = MmkvManager.decodeServerAffiliationInfo(guid) ?: com.v2ray.ang.dto.ServerAffiliationInfo()
-        affInfo.totalDownloadBytes += downloadBytes
-        MmkvManager.encodeServerAffiliationInfo(guid, affInfo)
+        MmkvManager.addServerDownloadBytes(guid, downloadBytes)
     }
 
     /**
