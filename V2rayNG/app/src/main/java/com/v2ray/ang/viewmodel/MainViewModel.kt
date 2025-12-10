@@ -17,6 +17,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.extension.serializable
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
@@ -468,7 +469,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 AppConfig.MSG_CONFIG_SWITCHED -> {
                     // Config was switched by auto-switch, refresh the UI to show new selection
                     val newGuid = intent.getStringExtra("content") ?: return
-                    updateListAction.value = -1  // Refresh entire list to update selected indicator
+                    // Show toast notification
+                    viewModelScope.launch(Dispatchers.Main) {
+                        val config = MmkvManager.decodeServerConfig(newGuid)
+                        getApplication<AngApplication>().toast("Auto-switched to: ${config?.remarks}")
+                        // Refresh the entire list to update selected indicator
+                        updateListAction.postValue(-1)
+                    }
                 }
             }
         }
