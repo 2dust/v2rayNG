@@ -112,9 +112,13 @@ object V2RayServiceManager {
 //        if (!result.status) return
 
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING) == true) {
-            context.toast(R.string.toast_warning_pref_proxysharing_short)
+            Handler(Looper.getMainLooper()).post {
+                context.toast(R.string.toast_warning_pref_proxysharing_short)
+            }
         } else {
-            context.toast(R.string.toast_services_start)
+            Handler(Looper.getMainLooper()).post {
+                context.toast(R.string.toast_services_start)
+            }
         }
         val intent = if ((MmkvManager.decodeSettingsString(AppConfig.PREF_MODE) ?: AppConfig.VPN) == AppConfig.VPN) {
             Intent(context.applicationContext, V2RayVpnService::class.java)
