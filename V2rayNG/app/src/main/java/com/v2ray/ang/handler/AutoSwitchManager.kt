@@ -140,20 +140,13 @@ object AutoSwitchManager {
         if (nextGuid != null && nextGuid != currentGuid) {
             Log.i(AppConfig.TAG, "AutoSwitch: Switching from $currentGuid to $nextGuid")
 
-            // Stop current service
-            V2RayServiceManager.stopVService(context)
-            Log.i(AppConfig.TAG, "AutoSwitch: Stopped current service")
-
-            // Small delay before starting next
-            Thread.sleep(1000)
-
-            // Start next config
-            V2RayServiceManager.startVService(context, nextGuid)
-            Log.i(AppConfig.TAG, "AutoSwitch: Started new config")
-
-            // Notify UI of config change
-            MessageUtil.sendMsg2UI(context, AppConfig.MSG_CONFIG_SWITCHED, nextGuid)
-            Log.i(AppConfig.TAG, "AutoSwitch: UI notification sent")
+            // Seamlessly restart core with new config (no service stop/start)
+            val success = V2RayServiceManager.restartCoreWithNewConfig(context, nextGuid)
+            if (success) {
+                Log.i(AppConfig.TAG, "AutoSwitch: Successfully switched to new config")
+            } else {
+                Log.e(AppConfig.TAG, "AutoSwitch: Failed to switch to new config")
+            }
         } else {
             Log.w(AppConfig.TAG, "AutoSwitch: No next config found (nextGuid=$nextGuid, currentGuid=$currentGuid)")
         }

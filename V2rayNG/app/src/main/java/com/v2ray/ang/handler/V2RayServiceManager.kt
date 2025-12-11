@@ -82,6 +82,63 @@ object V2RayServiceManager {
     }
 
     /**
+     * Restarts the V2Ray core with a new configuration without stopping the service.
+     * This provides seamless config switching without disconnecting.
+     * @param context The context.
+     * @param newGuid The GUID of the new config to switch to.
+     * @return True if the restart was successful, false otherwise.
+     */
+    fun restartCoreWithNewConfig(context: Context, newGuid: String): Boolean {
+        val service = getService() ?: return false
+
+        // Stop the core loop (not the service)
+        if (coreController.isRunning) {
+            try {
+                coreController.stopLoop()
+                Log.i(AppConfig.TAG, "Core loop stopped for config switch")
+            } catch (e: Exception) {
+                Log.e(AppConfig.TAG, "Failed to stop core loop", e)
+                return false
+            }
+        }
+
+        // Update the selected server
+        MmkvManager.setSelectServer(newGuid)
+        val newConfig = MmkvManager.decodeServerConfig(newGuid) ?: return false
+
+        // Generate the new config
+        val result = V2rayConfigManager.getV2rayConfig(service, newGuid)
+        if (!result.status) {
+            Log.e(AppConfig.TAG, "Failed to generate config for $newGuid")
+            return false
+        }
+
+        // Start the core loop with new config
+        try {
+            coreController.startLoop(result.content)
+            Log.i(AppConfig.TAG, "Core loop started with new config")
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to start core loop with new config", e)
+            return false
+        }
+
+        if (coreController.isRunning == false) {
+            Log.e(AppConfig.TAG, "Core is not running after restart")
+            return false
+        }
+
+        // Update current config and notifications
+        currentConfig = newConfig
+        NotificationManager.showNotification(currentConfig)
+        NotificationManager.startDownloadTracking(currentConfig)
+
+        // Send success message to UI
+        MessageUtil.sendMsg2UI(service, AppConfig.MSG_CONFIG_SWITCHED, newGuid)
+
+        return true
+    }
+
+    /**
      * Checks if the V2Ray service is running.
      * @return True if the service is running, false otherwise.
      */
