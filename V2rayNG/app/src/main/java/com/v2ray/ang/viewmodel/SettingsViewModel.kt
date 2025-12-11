@@ -61,7 +61,9 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_FRAGMENT_INTERVAL,
             AppConfig.PREF_MUX_XUDP_QUIC,
             AppConfig.PREF_HEV_TUNNEL_LOGLEVEL,
-            AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT
+            AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT,
+            AppConfig.PREF_AUTO_SWITCH_INTERVAL,
+            AppConfig.PREF_AUTO_SWITCH_TIMEOUT
                 -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getString(key, ""))
             }
@@ -82,7 +84,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_DOUBLE_COLUMN_DISPLAY,
             AppConfig.SUBSCRIPTION_AUTO_UPDATE,
             AppConfig.PREF_FRAGMENT_ENABLED,
-            AppConfig.PREF_MUX_ENABLED
+            AppConfig.PREF_MUX_ENABLED,
+            AppConfig.PREF_AUTO_SWITCH_ENABLED
                 -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getBoolean(key, false))
             }
