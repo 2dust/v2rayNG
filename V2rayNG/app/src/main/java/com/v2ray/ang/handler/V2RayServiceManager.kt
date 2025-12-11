@@ -91,6 +91,10 @@ object V2RayServiceManager {
     fun restartCoreWithNewConfig(context: Context, newGuid: String): Boolean {
         val service = getService() ?: return false
 
+        // Stop auto-switch before changing configs
+        AutoSwitchManager.stopAutoSwitch()
+        Log.i(AppConfig.TAG, "Auto-switch stopped for config change")
+
         // Stop the core loop (not the service)
         if (coreController.isRunning) {
             try {
@@ -131,6 +135,10 @@ object V2RayServiceManager {
         currentConfig = newConfig
         NotificationManager.showNotification(currentConfig)
         NotificationManager.startDownloadTracking(currentConfig)
+
+        // Restart auto-switch with the new config GUID
+        AutoSwitchManager.startAutoSwitch(service, newGuid)
+        Log.i(AppConfig.TAG, "Auto-switch restarted with new config")
 
         // Send success message to UI
         MessageUtil.sendMsg2UI(service, AppConfig.MSG_CONFIG_SWITCHED, newGuid)
