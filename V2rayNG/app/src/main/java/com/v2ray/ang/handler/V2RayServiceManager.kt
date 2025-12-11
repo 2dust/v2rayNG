@@ -91,6 +91,31 @@ object V2RayServiceManager {
     fun restartCoreWithNewConfig(context: Context, newGuid: String): Boolean {
         val service = getService() ?: return false
 
+        // Save download stats for current config before switching
+        val oldGuid = MmkvManager.getSelectServer()
+        if (oldGuid != null && coreController.isRunning) {
+            try {
+                val oldConfig = MmkvManager.decodeServerConfig(oldGuid)
+                val outboundTags = oldConfig?.getAllOutboundTags()
+                outboundTags?.remove(AppConfig.TAG_DIRECT)
+
+                var totalDownload = 0L
+                outboundTags?.forEach {
+                    val down = queryStats(it, AppConfig.DOWNLINK)
+                    totalDownload += down
+                }
+                val directDownlink = queryStats(AppConfig.TAG_DIRECT, AppConfig.DOWNLINK)
+                totalDownload += directDownlink
+
+                if (totalDownload > 0L) {
+                    MmkvManager.addServerDownloadBytes(oldGuid, totalDownload)
+                    Log.i(AppConfig.TAG, "Saved $totalDownload bytes for config $oldGuid before switch")
+                }
+            } catch (e: Exception) {
+                Log.e(AppConfig.TAG, "Failed to save download stats before switch", e)
+            }
+        }
+
         // Stop auto-switch before changing configs
         AutoSwitchManager.stopAutoSwitch()
         Log.i(AppConfig.TAG, "Auto-switch stopped for config change")
