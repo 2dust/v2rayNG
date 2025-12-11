@@ -39,6 +39,7 @@ object NotificationManager {
     private var mNotificationManager: NotificationManager? = null
     private var sessionStartDownload = 0L
     private var currentConfigGuid: String? = null
+    private var downloadUpdateCounter = 0
 
     /**
      * Starts the speed notification.
@@ -105,6 +106,16 @@ object NotificationManager {
     private fun updateTotalDownload(guid: String?, downloadBytes: Long) {
         if (guid == null || downloadBytes == 0L) return
         MmkvManager.addServerDownloadBytes(guid, downloadBytes)
+
+        // Update UI every 5 iterations (15 seconds) to show download stats
+        downloadUpdateCounter++
+        if (downloadUpdateCounter >= 5) {
+            downloadUpdateCounter = 0
+            val service = getService()
+            service?.let {
+                MessageUtil.sendMsg2UI(it, AppConfig.MSG_DOWNLOAD_STATS_UPDATE, "")
+            }
+        }
     }
 
     /**
@@ -118,6 +129,7 @@ object NotificationManager {
         if (V2RayServiceManager.isRunning() == false) return
 
         currentConfigGuid = MmkvManager.getSelectServer()
+        downloadUpdateCounter = 0 // Reset counter when starting new tracking
         val outboundTags = currentConfig?.getAllOutboundTags()
         outboundTags?.remove(AppConfig.TAG_DIRECT)
 

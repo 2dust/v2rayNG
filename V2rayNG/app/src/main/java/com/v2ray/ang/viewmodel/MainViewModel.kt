@@ -477,6 +477,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         updateListAction.postValue(-1)
                     }
                 }
+
+                AppConfig.MSG_DOWNLOAD_STATS_UPDATE -> {
+                    // Download stats have been updated, refresh the UI to show new stats
+                    updateListAction.postValue(-1)
+                }
             }
         }
     }
