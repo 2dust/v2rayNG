@@ -106,13 +106,23 @@ object NotificationManager {
      * @param downloadBytes The bytes downloaded in this query.
      */
     private fun updateTotalDownload(guid: String?, downloadBytes: Long) {
-        if (guid == null || downloadBytes == 0L) return
+        if (guid == null || downloadBytes == 0L) {
+            android.util.Log.i(AppConfig.TAG, "DownloadTracking: Skipping update - guid=$guid, bytes=$downloadBytes")
+            return
+        }
+
+        android.util.Log.i(AppConfig.TAG, "DownloadTracking: Saving $downloadBytes bytes for config $guid")
         MmkvManager.addServerDownloadBytes(guid, downloadBytes)
+
+        // Check what was actually saved
+        val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+        android.util.Log.i(AppConfig.TAG, "DownloadTracking: Total now: ${aff?.totalDownloadBytes} bytes (${aff?.getTotalDownloadString()})")
 
         // Update UI every 5 iterations (15 seconds) to show download stats
         downloadUpdateCounter++
         if (downloadUpdateCounter >= 5) {
             downloadUpdateCounter = 0
+            android.util.Log.i(AppConfig.TAG, "DownloadTracking: Sending UI update message")
             val service = getService()
             service?.let {
                 MessageUtil.sendMsg2UI(it, AppConfig.MSG_DOWNLOAD_STATS_UPDATE, "")
@@ -130,15 +140,21 @@ object NotificationManager {
 
         // If speed notification is enabled, it already tracks downloads, so don't start separate tracking
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) == true) {
+            android.util.Log.i(AppConfig.TAG, "DownloadTracking: Speed notification enabled, using speed notification for tracking")
             return
         }
 
-        if (V2RayServiceManager.isRunning() == false) return
+        if (V2RayServiceManager.isRunning() == false) {
+            android.util.Log.i(AppConfig.TAG, "DownloadTracking: VPN not running, not starting tracking")
+            return
+        }
 
         currentConfigGuid = MmkvManager.getSelectServer()
         downloadUpdateCounter = 0 // Reset counter when starting new tracking
         val outboundTags = currentConfig?.getAllOutboundTags()
         outboundTags?.remove(AppConfig.TAG_DIRECT)
+
+        android.util.Log.i(AppConfig.TAG, "DownloadTracking: Started for config $currentConfigGuid with tags: $outboundTags")
 
         downloadTrackingJob = CoroutineScope(Dispatchers.IO).launch {
             while (isActive) {
@@ -150,6 +166,8 @@ object NotificationManager {
                 }
                 val directDownlink = V2RayServiceManager.queryStats(AppConfig.TAG_DIRECT, AppConfig.DOWNLINK)
                 totalDownloadThisQuery += directDownlink
+
+                android.util.Log.i(AppConfig.TAG, "DownloadTracking: Query returned $totalDownloadThisQuery bytes for $currentConfigGuid")
 
                 // Update total download for current config
                 updateTotalDownload(currentConfigGuid, totalDownloadThisQuery)
