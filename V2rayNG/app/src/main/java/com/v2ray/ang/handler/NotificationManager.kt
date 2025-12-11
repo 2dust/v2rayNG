@@ -53,6 +53,7 @@ object NotificationManager {
         lastQueryTime = System.currentTimeMillis()
         sessionStartDownload = 0L
         currentConfigGuid = MmkvManager.getSelectServer()
+        downloadUpdateCounter = 0 // Reset counter when starting speed notification
         var lastZeroSpeed = false
         val outboundTags = currentConfig?.getAllOutboundTags()
         outboundTags?.remove(AppConfig.TAG_DIRECT)
@@ -126,6 +127,11 @@ object NotificationManager {
     fun startDownloadTracking(currentConfig: ProfileItem?) {
         // Stop any existing tracking job
         downloadTrackingJob?.cancel()
+
+        // If speed notification is enabled, it already tracks downloads, so don't start separate tracking
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) == true) {
+            return
+        }
 
         if (V2RayServiceManager.isRunning() == false) return
 
