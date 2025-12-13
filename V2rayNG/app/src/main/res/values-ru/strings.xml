@@ -273,8 +273,8 @@
     <string name="sub_setting_next_profile">Следующая конфигурация прокси</string>
     <string name="sub_setting_pre_profile_tip">Конфигурация должна быть уникальной</string>
     <string name="title_sub_update">Обновить подписку группы</string>
-    <string name="title_ping_all_server">Проверить профили группы</string>
-    <string name="title_real_ping_all_server">Проверить задержку профилей группы</string>
+    <string name="title_ping_all_server">Пинг-тест профилей группы</string>
+    <string name="title_real_ping_all_server">URL-тест профилей группы</string>
     <string name="title_create_intelligent_selection_all_server">Создать конфигурацию умного выбора</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
