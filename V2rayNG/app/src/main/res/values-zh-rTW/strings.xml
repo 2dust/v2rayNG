@@ -114,7 +114,7 @@
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">失敗，請使用檔案總管</string>
     <string name="menu_item_add_file">新增檔案</string>
-    <string name="menu_item_scan_qrcode">掃描 QRcode</string>
+    <string name="menu_item_scan_qrcode">掃描二維碼</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">下載檔案</string>
     <string name="title_user_asset_add_url">新增資產網址</string>
@@ -128,12 +128,12 @@
     <string name="menu_item_select_all">全選</string>
     <string name="msg_enter_keywords">輸入關鍵字</string>
     <string name="switch_bypass_apps_mode">略過模式</string>
-    <string name="menu_item_select_proxy_app">自動選中需 Proxy 應用</string>
+    <string name="menu_item_select_proxy_app">自動選中需代理的應用</string>
     <string name="msg_downloading_content">正在下載內容</string>
     <string name="menu_item_export_proxy_app">匯出至剪貼簿</string>
     <string name="menu_item_import_proxy_app">從剪貼簿匯入</string>
-    <string name="per_app_proxy_settings">Per-app settings</string>
-    <string name="per_app_proxy_settings_enable">Enable per-app</string>
+    <string name="per_app_proxy_settings">分應用設置</string>
+    <string name="per_app_proxy_settings_enable">根據應用分流</string>
 
 
     <!-- Preferences -->
@@ -200,8 +200,8 @@
     <string name="title_pref_allow_insecure">跳過憑證驗證 (allowInsecure)</string>
     <string name="summary_pref_allow_insecure">傳輸層安全選 tls 時，預設跳過憑證驗證 (allowInsecure)</string>
 
-    <string name="title_pref_socks_port">本地 Proxy 埠</string>
-    <string name="summary_pref_socks_port">本地 Proxy 埠</string>
+    <string name="title_pref_socks_port">本地代理埠</string>
+    <string name="summary_pref_socks_port">本地代理埠</string>
 
     <string name="title_pref_local_dns_port">本機 DNS 埠</string>
     <string name="summary_pref_local_dns_port">本機 DNS 埠</string>
@@ -241,7 +241,7 @@
     <string name="title_pref_auto_update_interval">自動更新間隔（分鐘，最小值 15）</string>
 
     <string name="title_core_loglevel">記錄層級</string>
-    <string name="title_outbound_domain_resolve_method">Outbound 網域預解析方式</string>
+    <string name="title_outbound_domain_resolve_method">出口網域預解析方式</string>
     <string name="title_mode">模式</string>
     <string name="title_mode_help">輕觸以檢視說明</string>
     <string name="title_language">語言</string>
@@ -274,7 +274,7 @@
     <string name="title_sub_update">更新目前群組訂閱</string>
     <string name="title_ping_all_server">偵測目前群組設定 Tcping</string>
     <string name="title_real_ping_all_server">偵測目前群組設定真延遲</string>
-    <string name="title_create_intelligent_selection_all_server">Creating Intelligent Selection Current Group Configuration</string>
+    <string name="title_create_intelligent_selection_all_server">創建目前群組智慧選擇</string>
     <string name="title_user_asset_setting">資源檔案</string>
     <string name="title_sort_by_test_results">依偵測結果排序</string>
     <string name="title_filter_config">過濾設定</string>
@@ -298,7 +298,7 @@
     <string name="routing_settings_import_predefined_rulesets">匯入預先定義的規則集</string>
     <string name="routing_settings_import_rulesets_tip">將刪除現有的規則集，是否確定繼續？ </string>
     <string name="routing_settings_import_rulesets_from_clipboard">從剪貼簿匯入規則集</string>
-    <string name="routing_settings_import_rulesets_from_qrcode">從 QRcode 匯入規則集</string>
+    <string name="routing_settings_import_rulesets_from_qrcode">從二維碼匯入規則集</string>
     <string name="routing_settings_export_rulesets_to_clipboard">匯出規則集至剪貼簿</string>
     <string name="routing_settings_locked">鎖定中，匯入預設時不刪除此規則</string>
 
@@ -330,7 +330,7 @@
     <string name="update_checking_for_update">正在檢查更新中…</string>
 
     <string-array name="share_method">
-        <item>QR Code</item>
+        <item>二維碼</item>
         <item>匯出至剪貼簿</item>
         <item>匯出完整設定至剪貼簿</item>
     </string-array>
@@ -344,7 +344,7 @@
     </string-array>
 
     <string-array name="share_sub_method">
-        <item>QR Code</item>
+        <item>二維碼</item>
         <item>匯出至剪貼簿</item>
     </string-array>
 
@@ -377,13 +377,13 @@
         <item>解析後加入 DNS Hosts</item>
         <item>解析後替換原網域名稱</item>
     </string-array>
-    <string name="intelligent_selection">Intelligent Selection</string>
-    <string name="sub_setting_intelligent_selection_filter">Remarks Intelligent Selection regular filter</string>
-    <string name="title_intelligent_selection_method">Intelligent Selection Method</string>
+    <string name="intelligent_selection">智慧選擇</string>
+    <string name="sub_setting_intelligent_selection_filter">別名智慧選擇正則過濾</string>
+    <string name="title_intelligent_selection_method">智慧選擇方案</string>
     <string-array name="intelligent_selection_method">
-        <item>Least Ping</item>
-        <item>Least Load</item>
+        <item>最低延遲</item>
+        <item>最少卡頓</item>
     </string-array>
-    <string name="pre_resolving_domain">Pre-resolving domain…</string>
+    <string name="pre_resolving_domain">預解析域名…</string>
 
 </resources>
