@@ -128,7 +128,7 @@
                         android:id="@+id/layout_edit"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@string/server_customize_config"  android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/menu_item_edit_config"  android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
