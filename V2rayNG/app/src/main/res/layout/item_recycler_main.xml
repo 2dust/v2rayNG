@@ -105,11 +105,11 @@
                     android:gravity="center"
                     android:orientation="horizontal">
 
-                    <LinearLayout
+                                        <LinearLayout
                         android:id="@+id/layout_share"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/title_configuration_share"  android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
@@ -124,11 +124,11 @@
 
                     </LinearLayout>
 
-                    <LinearLayout
+                                        <LinearLayout
                         android:id="@+id/layout_edit"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/server_customize_config"  android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
@@ -142,11 +142,11 @@
 
                     </LinearLayout>
 
-                    <LinearLayout
+                                        <LinearLayout
                         android:id="@+id/layout_remove"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/menu_item_del_config"  android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
@@ -160,11 +160,11 @@
 
                     </LinearLayout>
 
-                    <LinearLayout
+                                        <LinearLayout
                         android:id="@+id/layout_more"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/notification_action_more"  android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
