@@ -23,6 +23,7 @@
     <string name="title_server">配置项</string>
     <string name="menu_item_add_config">添加配置</string>
     <string name="menu_item_save_config">保存配置</string>
+    <string name="menu_item_edit_config">编辑配置</string>
     <string name="menu_item_del_config">删除配置</string>
     <string name="menu_item_import_config_qrcode">扫描二维码</string>
     <string name="menu_item_import_config_clipboard">从剪贴板导入</string>
