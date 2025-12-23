@@ -102,7 +102,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:contentDescription="@string/toast_services_start"  android:clickable="true"
+        android:contentDescription="@string/tasker_start_service"  android:clickable="true"
         android:focusable="true"
         app:srcCompat="@drawable/ic_play_24dp"
         app:tint="@android:color/white" />
