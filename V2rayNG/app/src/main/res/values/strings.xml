@@ -25,7 +25,7 @@
     <string name="title_server">Configuration</string>
     <string name="menu_item_add_config">Add configuration</string>
     <string name="menu_item_save_config">Save configuration</string>
-        <string name="menu_item_edit_config">Edit configuration</string>
+    <string name="menu_item_edit_config">Edit configuration</string>
     <string name="menu_item_del_config">Delete configuration</string>
     <string name="menu_item_import_config_qrcode">Import configuration from QRcode</string>
     <string name="menu_item_import_config_clipboard">Import configuration from Clipboard</string>
