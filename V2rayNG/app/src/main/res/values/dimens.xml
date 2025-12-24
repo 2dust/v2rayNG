@@ -8,5 +8,4 @@
     <dimen name="view_height_dp48">48dp</dimen>
     <dimen name="view_height_dp64">64dp</dimen>
     <dimen name="view_height_dp160">160dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
 </resources>

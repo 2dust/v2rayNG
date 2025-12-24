@@ -96,16 +96,18 @@
                     android:layout_gravity="bottom|end"
                     android:layout_marginEnd="@dimen/padding_spacing_dp16">
 
-                        <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:contentDescription="@string/tasker_start_service"  android:clickable="true"
-        android:focusable="true"
-        app:srcCompat="@drawable/ic_play_24dp"
-        app:tint="@android:color/white" />
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/fab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginBottom="@dimen/view_height_dp36"
+                        android:clickable="true"
+                        android:contentDescription="@string/tasker_start_service"
+                        android:focusable="true"
+                        android:nextFocusLeft="@+id/layout_test"
+                        android:src="@drawable/ic_play_24dp"
+                        app:layout_anchorGravity="bottom|right|end" />
 
                 </FrameLayout>
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
@@ -124,4 +126,3 @@
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>
-
