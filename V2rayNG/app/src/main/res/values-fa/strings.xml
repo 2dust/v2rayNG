@@ -250,7 +250,7 @@
     <string name="title_pref_use_hev_tunnel">فعالسازی قابلیت TUN جدید</string>
     <string name="summary_pref_use_hev_tunnel">در صورت فعال بودن، TUN از hev-socks5-tunnel استفاده می‌کند؛ در غیر این صورت از badvpn-tun2socks.</string>
     <string name="title_pref_hev_tunnel_loglevel">سطح گزارشات Hev Tun</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun read/write timeout (seconds) (tcp,udp default 300,60)</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">زمان انتظار خواندن/نوشتن Hev Tun (ثانیه) (پیش‌فرض tcp,udp 300،60)</string>
 
     <string name="title_logcat">گزارشات</string>
     <string name="logcat_copy">کپی</string>
