@@ -1,4 +1,4 @@
-# v2rayNG
+gh pr checkout 3347# v2rayNG
 
 A V2Ray client for Android, support [Xray core](https://github.com/XTLS/Xray-core) and [v2fly core](https://github.com/v2fly/v2ray-core)
 
