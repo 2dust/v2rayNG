@@ -7,6 +7,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="migration_success">Data migration success!</string>
+    <string name="action_stop_service">Stop service</string>
     <string name="migration_fail">Data migration failed!</string>
     <string name="pull_down_to_refresh">Please pull down to refresh!</string>
 
@@ -24,6 +25,7 @@
     <string name="title_server">Configuration</string>
     <string name="menu_item_add_config">Add configuration</string>
     <string name="menu_item_save_config">Save configuration</string>
+    <string name="menu_item_edit_config">Edit configuration</string>
     <string name="menu_item_del_config">Delete configuration</string>
     <string name="menu_item_import_config_qrcode">Import configuration from QRcode</string>
     <string name="menu_item_import_config_clipboard">Import configuration from Clipboard</string>

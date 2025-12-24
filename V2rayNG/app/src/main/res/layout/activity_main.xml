@@ -103,6 +103,7 @@
                         android:layout_gravity="bottom|end"
                         android:layout_marginBottom="@dimen/view_height_dp36"
                         android:clickable="true"
+                        android:contentDescription="@string/tasker_start_service"
                         android:focusable="true"
                         android:nextFocusLeft="@+id/layout_test"
                         android:src="@drawable/ic_play_24dp"
@@ -125,4 +126,3 @@
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>
-

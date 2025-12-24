@@ -23,6 +23,7 @@
     <string name="title_server">ملف التكوين</string>
     <string name="menu_item_add_config">إضافة تكوين</string>
     <string name="menu_item_save_config">حفظ التكوين</string>
+    <string name="menu_item_edit_config">Edit configuration</string>
     <string name="menu_item_del_config">حذف التكوين</string>
     <string name="menu_item_import_config_qrcode">استيراد التكوين من رمز الاستجابة السريعة (QRcode)</string>
     <string name="menu_item_import_config_clipboard">استيراد التكوين من الحافظة</string>
