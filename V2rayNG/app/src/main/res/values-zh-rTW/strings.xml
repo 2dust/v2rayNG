@@ -23,6 +23,7 @@
     <string name="title_server">設定檔</string>
     <string name="menu_item_add_config">新增設定</string>
     <string name="menu_item_save_config">儲存設定</string>
+    <string name="menu_item_edit_config">Edit configuration</string>
     <string name="menu_item_del_config">刪除設定</string>
     <string name="menu_item_import_config_qrcode">從 QR Code 匯入設定</string>
     <string name="menu_item_import_config_clipboard">從剪貼簿匯入設定</string>
