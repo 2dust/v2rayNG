@@ -201,12 +201,11 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     private fun showQRCode(guid: String) {
         val ivBinding = ItemQrcodeBinding.inflate(LayoutInflater.from(mActivity))
         ivBinding.ivQcode.setImageBitmap(AngConfigManager.share2QRCode(guid))
-    val shareOptions = mActivity.resources.getStringArray(R.array.share_method)
-    if (shareOptions.isNotEmpty()) {
-        ivBinding.ivQcode.contentDescription = shareOptions[0]
-    } else {
-        ivBinding.ivQcode.contentDescription = "QR Code"
-    }
+        if (share_method.isNotEmpty()) {
+            ivBinding.ivQcode.contentDescription = share_method[0]
+        } else {
+            ivBinding.ivQcode.contentDescription = "QR Code"
+        }
         AlertDialog.Builder(mActivity).setView(ivBinding.root).show()
     }
 
