@@ -23,7 +23,7 @@
     <string name="title_server">فایل کانفیگ</string>
     <string name="menu_item_add_config">ٱووردن کانفیگ</string>
     <string name="menu_item_save_config">زفت کردن کانفیگ</string>
-    <string name="menu_item_edit_config">Edit configuration</string>
+    <string name="menu_item_edit_config">آلشتکاری کانفیگ</string>
     <string name="menu_item_del_config">پاک کردن کانفیگ</string>
     <string name="menu_item_import_config_qrcode">و من ٱووردن کانفیگ ز QRcode</string>
     <string name="menu_item_import_config_clipboard">و من ٱووردن کانفیگ ز کلیپ بورد</string>
@@ -253,7 +253,7 @@
     <string name="title_pref_use_hev_tunnel">فعال کردن ویژیی نۊ TUN</string>
     <string name="summary_pref_use_hev_tunnel">ٱر ک فعال بۊ، TUN ایا hev-socks5-tunnel ن و کار اگره؛ ٱندی ز badvpn-tun2socks.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun سئت گوزارشا</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun read/write timeout (seconds) (tcp,udp default 300,60)</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">زمووݩ مندیر بیڌن خوندن/هؽل کردن Hev Tun (سانیه) (پؽش فرز tcp,udp 300،60)</string>
 
     <string name="title_logcat">گوزارشا</string>
     <string name="logcat_copy">لف گیری</string>
