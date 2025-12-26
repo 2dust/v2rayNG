@@ -23,7 +23,7 @@
     <string name="title_server">Профиль</string>
     <string name="menu_item_add_config">Добавить профиль</string>
     <string name="menu_item_save_config">Сохранить профиль</string>
-    <string name="menu_item_edit_config">Edit configuration</string>
+    <string name="menu_item_edit_config">Изменить профиль</string>
     <string name="menu_item_del_config">Удалить профиль</string>
     <string name="menu_item_import_config_qrcode">Импорт из QR-кода</string>
     <string name="menu_item_import_config_clipboard">Импорт из буфера обмена</string>
@@ -252,7 +252,7 @@
     <string name="title_pref_use_hev_tunnel">Использовать новую версию TUN</string>
     <string name="summary_pref_use_hev_tunnel">Если включено, TUN будет использовать hev-socks5-tunnel, иначе будет использоваться badvpn-tun2socks</string>
     <string name="title_pref_hev_tunnel_loglevel">Подробность журнала HevTun</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun read/write timeout (seconds) (tcp,udp default 300,60)</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">Ожидание чтения/записи HevTun (секунд, по умолчанию TCP,UDP 300,60)</string>
 
     <string name="title_logcat">Журнал</string>
     <string name="logcat_copy">Копировать</string>
@@ -274,8 +274,8 @@
     <string name="sub_setting_next_profile">Следующая конфигурация прокси</string>
     <string name="sub_setting_pre_profile_tip">Конфигурация должна быть уникальной</string>
     <string name="title_sub_update">Обновить подписку группы</string>
-    <string name="title_ping_all_server">Пинг-тест профилей группы</string>
-    <string name="title_real_ping_all_server">URL-тест профилей группы</string>
+    <string name="title_ping_all_server">Проверить профили группы</string>
+    <string name="title_real_ping_all_server">Проверить задержку профилей группы</string>
     <string name="title_create_intelligent_selection_all_server">Создать конфигурацию умного выбора</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
