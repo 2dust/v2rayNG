@@ -37,7 +37,7 @@ object VmessFmt : FmtBase() {
             Log.w(AppConfig.TAG, "Toast decoding failed")
             return null
         }
-        val vmessQRCode = JsonUtil.fromJson(result, VmessQRCode::class.java)
+        val vmessQRCode = JsonUtil.fromJson(result, VmessQRCode::class.java) ?: return null
         // Although VmessQRCode fields are non null, looks like Gson may still create null fields
         if (TextUtils.isEmpty(vmessQRCode.add)
             || TextUtils.isEmpty(vmessQRCode.port)
@@ -52,9 +52,13 @@ object VmessFmt : FmtBase() {
         config.server = vmessQRCode.add
         config.serverPort = vmessQRCode.port
         config.password = vmessQRCode.id
-        config.method = if (TextUtils.isEmpty(vmessQRCode.scy)) AppConfig.DEFAULT_SECURITY else vmessQRCode.scy
+        config.method =
+            if (TextUtils.isEmpty(vmessQRCode.scy)) AppConfig.DEFAULT_SECURITY else vmessQRCode.scy
 
-        config.network = vmessQRCode.net ?: NetworkType.TCP.type
+        config.network = vmessQRCode.net
+        if (config.network.isNullOrEmpty()) {
+            config.network = NetworkType.TCP.type
+        }
         config.headerType = vmessQRCode.type
         config.host = vmessQRCode.host
         config.path = vmessQRCode.path
@@ -78,7 +82,7 @@ object VmessFmt : FmtBase() {
             else -> {}
         }
 
-        config.security = vmessQRCode.tls     
+        config.security = vmessQRCode.tls
         config.sni = vmessQRCode.sni
         config.fingerPrint = vmessQRCode.fp
         config.alpn = vmessQRCode.alpn

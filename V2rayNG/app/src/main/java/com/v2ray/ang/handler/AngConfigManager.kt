@@ -275,7 +275,7 @@ object AngConfigManager {
         ) {
             try {
                 val serverList: Array<Any> =
-                    JsonUtil.fromJson(server, Array<Any>::class.java)
+                    JsonUtil.fromJson(server, Array<Any>::class.java)?: arrayOf()
 
                 if (serverList.isNotEmpty()) {
                     var count = 0

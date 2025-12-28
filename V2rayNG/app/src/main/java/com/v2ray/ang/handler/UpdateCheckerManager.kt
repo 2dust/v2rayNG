@@ -17,41 +17,48 @@ import java.io.FileOutputStream
 
 object UpdateCheckerManager {
     suspend fun checkForUpdate(includePreRelease: Boolean = false): CheckUpdateResult = withContext(Dispatchers.IO) {
-            val url = if (includePreRelease) {
-                AppConfig.APP_API_URL
-            } else {
-                AppConfig.APP_API_URL.concatUrl("latest")
-            }
+        val url = if (includePreRelease) {
+            AppConfig.APP_API_URL
+        } else {
+            AppConfig.APP_API_URL.concatUrl("latest")
+        }
 
-            var response = HttpUtil.getUrlContent(url, 5000)
-            if (response.isNullOrEmpty()) {
-                val httpPort = SettingsManager.getHttpPort()
-                response = HttpUtil.getUrlContent(url, 5000, httpPort) ?: throw IllegalStateException("Failed to get response")
-            }
+        var response = HttpUtil.getUrlContent(url, 5000)
+        if (response.isNullOrEmpty()) {
+            val httpPort = SettingsManager.getHttpPort()
+            response = HttpUtil.getUrlContent(url, 5000, httpPort)
+                ?: throw IllegalStateException("Failed to get response")
+        }
 
-            val latestRelease = if (includePreRelease) {
-                JsonUtil.fromJson(response, Array<GitHubRelease>::class.java)
-                    .firstOrNull()
-                    ?: throw IllegalStateException("No pre-release found")
-            } else {
-                JsonUtil.fromJson(response, GitHubRelease::class.java)
-            }
+        val latestRelease = if (includePreRelease) {
+            JsonUtil.fromJson(response, Array<GitHubRelease>::class.java)
+                ?.firstOrNull()
+                ?: throw IllegalStateException("No pre-release found")
+        } else {
+            JsonUtil.fromJson(response, GitHubRelease::class.java)
+        }
+        if (latestRelease == null) {
+            return@withContext CheckUpdateResult(hasUpdate = false)
+        }
 
-            val latestVersion = latestRelease.tagName.removePrefix("v")
-            Log.i(AppConfig.TAG, "Found new version: $latestVersion (current: ${BuildConfig.VERSION_NAME})")
+        val latestVersion = latestRelease.tagName.removePrefix("v")
+        Log.i(
+            AppConfig.TAG,
+            "Found new version: $latestVersion (current: ${BuildConfig.VERSION_NAME})"
+        )
 
-            return@withContext if (compareVersions(latestVersion, BuildConfig.VERSION_NAME) > 0) {
-                val downloadUrl = getDownloadUrl(latestRelease, Build.SUPPORTED_ABIS[0])
-                CheckUpdateResult(
-                    hasUpdate = true,
-                    latestVersion = latestVersion,
-                    releaseNotes = latestRelease.body,
-                    downloadUrl = downloadUrl,
-                    isPreRelease = latestRelease.prerelease
-                )
-            } else {
-                CheckUpdateResult(hasUpdate = false)
-            }
+        return@withContext if (compareVersions(latestVersion, BuildConfig.VERSION_NAME) > 0) {
+            val downloadUrl = getDownloadUrl(latestRelease, Build.SUPPORTED_ABIS[0])
+            CheckUpdateResult(
+                hasUpdate = true,
+                latestVersion = latestVersion,
+                releaseNotes = latestRelease.body,
+                downloadUrl = downloadUrl,
+                isPreRelease = latestRelease.prerelease
+            )
+        } else {
+            CheckUpdateResult(hasUpdate = false)
+        }
     }
 
     suspend fun downloadApk(context: Context, downloadUrl: String): File? = withContext(Dispatchers.IO) {

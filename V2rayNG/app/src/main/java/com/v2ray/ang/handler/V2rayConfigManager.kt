@@ -178,7 +178,7 @@ object V2rayConfigManager {
                 if (subItem?.intelligentSelectionFilter.isNullOrEmpty() || config.remarks.isEmpty()) {
                     return@filter true
                 }
-                Regex(pattern = subItem?.intelligentSelectionFilter!!).containsMatchIn(input = config.remarks)
+                Regex(pattern = subItem.intelligentSelectionFilter.orEmpty()).containsMatchIn(input = config.remarks)
             }.toList()
 
         if (validConfigs.isEmpty()) {

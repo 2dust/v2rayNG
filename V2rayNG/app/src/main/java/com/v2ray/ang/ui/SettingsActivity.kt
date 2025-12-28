@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -249,7 +248,7 @@ class SettingsActivity : BaseActivity() {
                 delayTestUrl,
                 hevTunRwTimeout
             ).forEach { key ->
-                key?.text = key?.summary.toString()
+                key?.text = key.summary.toString()
             }
 
             listOf(
