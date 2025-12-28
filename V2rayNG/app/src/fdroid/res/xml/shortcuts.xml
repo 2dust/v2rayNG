@@ -8,6 +8,7 @@
         android:shortcutLongLabel="@string/app_widget_name"
         android:shortcutShortLabel="@string/app_widget_name">
 
+        <!--suppress AndroidDomInspection -->
         <intent
             android:action="android.intent.action.VIEW"
             android:targetClass="com.v2ray.ang.ui.ScSwitchActivity"
@@ -22,6 +23,7 @@
         android:shortcutLongLabel="@string/menu_item_import_config_qrcode"
         android:shortcutShortLabel="@string/menu_item_import_config_qrcode">
 
+        <!--suppress AndroidDomInspection -->
         <intent
             android:action="android.intent.action.VIEW"
             android:targetClass="com.v2ray.ang.ui.ScScannerActivity"

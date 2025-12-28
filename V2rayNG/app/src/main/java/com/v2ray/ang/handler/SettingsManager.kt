@@ -205,7 +205,7 @@ object SettingsManager {
      */
     fun swapSubscriptions(fromPosition: Int, toPosition: Int) {
         val subsList = MmkvManager.decodeSubsList()
-        if (subsList.isNullOrEmpty()) return
+        if (subsList.isEmpty()) return
 
         Collections.swap(subsList, fromPosition, toPosition)
         MmkvManager.encodeSubsList(subsList)

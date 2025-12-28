@@ -6,6 +6,7 @@
     <string name="navigation_drawer_open">باز کردن منو کشویی</string>
     <string name="navigation_drawer_close">بستن منو کشویی</string>
     <string name="migration_success">موفقیت در انتقال داده</string>
+    <string name="action_stop_service">Stop service</string>
     <string name="migration_fail">انتقال داده انجام نشد!</string>
     <string name="pull_down_to_refresh">لطفاً برای تازه کردن، پایین بکشید!</string>
 

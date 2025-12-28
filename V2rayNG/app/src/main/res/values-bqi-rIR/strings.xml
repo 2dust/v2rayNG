@@ -6,6 +6,7 @@
     <string name="navigation_drawer_open">گۊشیڌن نومگه کشاری</string>
     <string name="navigation_drawer_close">بستن نومگه کشاری</string>
     <string name="migration_success">مووفقیت من جاگورویی داده</string>
+    <string name="action_stop_service">Stop service</string>
     <string name="migration_fail">جاگورویی داده ٱنجوم نگرؽڌ</string>
     <string name="pull_down_to_refresh">سی وانۊ کردن، بکشینس بلم!</string>
 

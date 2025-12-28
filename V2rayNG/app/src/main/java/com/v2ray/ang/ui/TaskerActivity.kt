@@ -92,8 +92,8 @@ class TaskerActivity : BaseActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.action_server, menu)
-        val del_config = menu.findItem(R.id.del_config)
-        del_config?.isVisible = false
+        val delConfig = menu.findItem(R.id.del_config)
+        delConfig?.isVisible = false
         return super.onCreateOptionsMenu(menu)
     }
 

@@ -246,9 +246,9 @@ data class V2rayConfig(
                 var mark: Int? = null,
                 var dialerProxy: String? = null,
                 var domainStrategy: String? = null,
-                var happyEyeballs: happyEyeballsBean? = null,
+                var happyEyeballs: HappyEyeballsBean? = null,
                 )
-            data class happyEyeballsBean(
+            data class HappyEyeballsBean(
                 var prioritizeIPv6: Boolean? = null,
                 var maxConcurrentTry: Int? = 4,
                 var tryDelayMs: Int? = 250, // ms

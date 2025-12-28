@@ -6,6 +6,7 @@
     <string name="navigation_drawer_open">開啟導覽匣</string>
     <string name="navigation_drawer_close">關閉導覽匣</string>
     <string name="migration_success">資料遷移成功！</string>
+    <string name="action_stop_service">Stop service</string>
     <string name="migration_fail">資料遷移失敗！</string>
     <string name="pull_down_to_refresh">請下拉刷新!</string>
 

@@ -208,7 +208,7 @@ class PerAppProxyActivity : BaseActivity() {
         var lst = binding.switchBypassApps.isChecked.toString()
 
         adapter?.blacklist?.forEach block@{
-            lst = lst + System.getProperty("line.separator") + it
+            lst = lst + System.lineSeparator() + it
         }
         Utils.setClipboard(applicationContext, lst)
         toastSuccess(R.string.toast_success)

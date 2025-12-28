@@ -100,7 +100,7 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
     }
 
     private fun removeSubscription(subId: String, position: Int) {
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE)) {
             AlertDialog.Builder(mActivity).setMessage(R.string.del_config_comfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     removeSubscriptionSub(subId, position)

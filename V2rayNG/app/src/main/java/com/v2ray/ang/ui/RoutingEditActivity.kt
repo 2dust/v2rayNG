@@ -106,10 +106,10 @@ class RoutingEditActivity : BaseActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.action_server, menu)
-        val del_config = menu.findItem(R.id.del_config)
+        val delConfig = menu.findItem(R.id.del_config)
 
         if (position < 0) {
-            del_config?.isVisible = false
+            delConfig?.isVisible = false
         }
 
         return super.onCreateOptionsMenu(menu)

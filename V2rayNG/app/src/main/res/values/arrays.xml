@@ -53,11 +53,11 @@
     </string-array>
 
     <string-array name="streamsecuritys" translatable="false">
-        <item></item>
+        <item />
         <item>tls</item>
     </string-array>
     <string-array name="streamsecurityxs" translatable="false">
-        <item></item>
+        <item />
         <item>tls</item>
         <item>reality</item>
     </string-array>
@@ -70,7 +70,7 @@
     </string-array>
 
     <string-array name="streamsecurity_utls" translatable="false">
-        <item></item>
+        <item />
         <item>chrome</item>
         <item>firefox</item>
         <item>safari</item>
@@ -84,7 +84,7 @@
     </string-array>
 
     <string-array name="streamsecurity_alpn" translatable="false">
-        <item></item>
+        <item />
         <item>h3</item>
         <item>h2</item>
         <item>http/1.1</item>
@@ -94,7 +94,7 @@
     </string-array>
 
     <string-array name="allowinsecures" translatable="false">
-        <item></item>
+        <item />
         <item>true</item>
         <item>false</item>
     </string-array>
@@ -126,7 +126,7 @@
     </string-array>
 
     <string-array name="flows" translatable="false">
-        <item></item>
+        <item />
         <item>xtls-rprx-vision</item>
         <item>xtls-rprx-vision-udp443</item>
     </string-array>

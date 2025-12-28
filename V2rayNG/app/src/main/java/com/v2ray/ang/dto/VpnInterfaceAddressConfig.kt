@@ -29,8 +29,8 @@ enum class VpnInterfaceAddressConfig(
          *         or OPTION_1 (default) if the index is out of bounds
          */
         fun getConfigByIndex(index: Int): VpnInterfaceAddressConfig {
-            return if (index in values().indices) {
-                values()[index]
+            return if (index in entries.toTypedArray().indices) {
+                entries[index]
             } else {
                 OPTION_1 // Default to the first configuration
             }
