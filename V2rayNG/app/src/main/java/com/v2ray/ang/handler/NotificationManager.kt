@@ -15,7 +15,6 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toSpeedString
-import com.v2ray.ang.handler.V2RayServiceManager
 import com.v2ray.ang.ui.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -90,11 +89,7 @@ object NotificationManager {
      */
     fun showNotification(currentConfig: ProfileItem?) {
         val service = getService() ?: return
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        } else {
-            PendingIntent.FLAG_UPDATE_CURRENT
-        }
+        val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
         val startMainIntent = Intent(service, MainActivity::class.java)
         val contentPendingIntent = PendingIntent.getActivity(service, NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent, flags)
@@ -147,11 +142,7 @@ object NotificationManager {
      */
     fun cancelNotification() {
         val service = getService() ?: return
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            service.stopForeground(Service.STOP_FOREGROUND_REMOVE)
-        } else {
-            service.stopForeground(true)
-        }
+        service.stopForeground(Service.STOP_FOREGROUND_REMOVE)
 
         mBuilder = null
         speedNotificationJob?.cancel()

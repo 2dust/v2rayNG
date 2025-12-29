@@ -437,11 +437,7 @@ object Utils {
      *
      * @return The system locale.
      */
-    fun getSysLocale(): Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        LocaleList.getDefault()[0]
-    } else {
-        Locale.getDefault()
-    }
+    fun getSysLocale(): Locale = LocaleList.getDefault().get(0) ?: Locale.getDefault()
 
     /**
      * Fix illegal characters in a URL.

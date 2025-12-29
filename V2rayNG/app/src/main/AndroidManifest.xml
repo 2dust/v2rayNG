@@ -10,10 +10,6 @@
         android:smallScreens="true"
         android:xlargeScreens="true" />
 
-    <uses-sdk
-        android:minSdkVersion="21"
-        tools:overrideLibrary="com.blacksquircle.ui.editorkit" />
-
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -54,8 +50,7 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
         android:theme="@style/AppThemeDayNight"
-        android:usesCleartextTraffic="true"
-        tools:targetApi="m">
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name=".ui.MainActivity"
@@ -216,8 +211,7 @@
             android:icon="@drawable/ic_stat_name"
             android:label="@string/app_tile_name"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            android:process=":RunSoLibV2RayDaemon"
-            tools:targetApi="24">
+            android:process=":RunSoLibV2RayDaemon">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>

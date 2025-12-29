@@ -7,7 +7,6 @@ import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.IPAPIInfo
-import com.v2ray.ang.extension.responseLength
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.currentCoroutineContext
@@ -143,14 +142,11 @@ object SpeedtestManager {
             val code = conn.responseCode
             elapsed = SystemClock.elapsedRealtime() - start
 
-            if (code == 204 || code == 200 && conn.responseLength == 0L) {
-                result = context.getString(R.string.connection_test_available, elapsed)
-            } else {
-                throw IOException(
-                    context.getString(
-                        R.string.connection_test_error_status_code,
-                        code
-                    )
+            result = when (code) {
+                204 -> context.getString(R.string.connection_test_available, elapsed)
+                200 if conn.contentLengthLong == 0L -> context.getString(R.string.connection_test_available, elapsed)
+                else -> throw IOException(
+                    context.getString(R.string.connection_test_error_status_code, code)
                 )
             }
         } catch (e: IOException) {

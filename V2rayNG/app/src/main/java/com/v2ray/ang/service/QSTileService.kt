@@ -18,7 +18,6 @@ import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import java.lang.ref.SoftReference
 
-@RequiresApi(Build.VERSION_CODES.N)
 class QSTileService : TileService() {
 
     /**

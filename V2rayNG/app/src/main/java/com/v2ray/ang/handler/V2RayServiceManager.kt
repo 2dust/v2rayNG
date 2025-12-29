@@ -106,7 +106,7 @@ object V2RayServiceManager {
 //        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
 //        if (!result.status) return
 
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)
         } else {
             context.toast(R.string.toast_services_start)
@@ -116,11 +116,7 @@ object V2RayServiceManager {
         } else {
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
         }
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
-            context.startForegroundService(intent)
-        } else {
-            context.startService(intent)
-        }
+        ContextCompat.startForegroundService(context, intent)
     }
 
     /**
