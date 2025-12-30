@@ -57,7 +57,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
         if (holder is MainViewHolder) {
             val guid = mActivity.mainViewModel.serversCache[position].guid
             val profile = mActivity.mainViewModel.serversCache[position].profile
-            val isCustom = profile.configType == EConfigType.CUSTOM
+            val isCustom = profile.configType == EConfigType.CUSTOM || profile.configType == EConfigType.POLICYGROUP
 
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
 
@@ -144,14 +144,18 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
      */
     private fun getAddress(profile: ProfileItem): String {
         // Hide xxx:xxx:***/xxx.xxx.xxx.***
-        return "${
-            profile.server?.let {
-                if (it.contains(":"))
-                    it.split(":").take(2).joinToString(":", postfix = ":***")
-                else
-                    it.split('.').dropLast(1).joinToString(".", postfix = ".***")
-            }
-        } : ${profile.serverPort}"
+        val server = profile.server
+        val port = profile.serverPort
+        if (server.isNullOrBlank() && port.isNullOrBlank()) return ""
+
+        val addrPart = server?.let {
+            if (it.contains(":"))
+                it.split(":").take(2).joinToString(":", postfix = ":***")
+            else
+                it.split('.').dropLast(1).joinToString(".", postfix = ".***")
+        } ?: ""
+
+        return "$addrPart : ${port ?: ""}"
     }
 
     /**
@@ -250,6 +254,8 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             .putExtra("createConfigType", profile.configType.value)
         if (profile.configType == EConfigType.CUSTOM) {
             mActivity.startActivity(intent.setClass(mActivity, ServerCustomConfigActivity::class.java))
+        } else if (profile.configType == EConfigType.POLICYGROUP) {
+            mActivity.startActivity(intent.setClass(mActivity, ServerGroupActivity::class.java))
         } else {
             mActivity.startActivity(intent.setClass(mActivity, ServerActivity::class.java))
         }

@@ -29,14 +29,15 @@
     <string name="menu_item_import_config_qrcode">扫描二维码</string>
     <string name="menu_item_import_config_clipboard">从剪贴板导入</string>
     <string name="menu_item_import_config_local">从本地导入</string>
-    <string name="menu_item_import_config_manually_vmess">手动输入 [VMess]</string>
-    <string name="menu_item_import_config_manually_vless">手动输入 [VLESS]</string>
-    <string name="menu_item_import_config_manually_ss">手动输入 [Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">手动输入 [SOCKS]</string>
-    <string name="menu_item_import_config_manually_http">手动输入 [HTTP]</string>
-    <string name="menu_item_import_config_manually_trojan">手动输入 [Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">手动输入 [Wireguard]</string>
-    <string name="menu_item_import_config_manually_hysteria2">手动输入 [Hysteria2]</string>
+    <string name="menu_item_import_config_policy_group">添加 [策略组]</string>
+    <string name="menu_item_import_config_manually_vmess">添加 [VMess]</string>
+    <string name="menu_item_import_config_manually_vless">添加 [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">添加 [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">添加 [SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">添加 [HTTP]</string>
+    <string name="menu_item_import_config_manually_trojan">添加 [Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">添加 [Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">添加 [Hysteria2]</string>
     <string name="del_config_comfirm">确认删除？</string>
     <string name="del_invalid_config_comfirm">删除前请先测试！确认删除？</string>
     <string name="server_lab_remarks">别名 (remarks)</string>
@@ -275,7 +276,6 @@
     <string name="title_sub_update">更新当前组订阅</string>
     <string name="title_ping_all_server">测试当前组配置 Tcping</string>
     <string name="title_real_ping_all_server">测试当前组配置真连接</string>
-    <string name="title_create_intelligent_selection_all_server">生成当前组智能选择配置</string>
     <string name="title_user_asset_setting">资源文件</string>
     <string name="title_sort_by_test_results">按测试结果排序</string>
     <string name="title_filter_config">过滤配置</string>
@@ -331,6 +331,10 @@
     <string name="update_check_pre_release">检查 Pre-release</string>
     <string name="update_checking_for_update">正在检查更新中…</string>
 
+    <string name="title_policy_group_type">策略组类型</string>
+    <string name="title_policy_group_subscription_id">来自订阅分组</string>
+    <string name="title_policy_group_subscription_filter">别名正则过滤</string>
+
     <string-array name="share_method">
         <item>二维码</item>
         <item>导出至剪贴板</item>
@@ -379,10 +383,7 @@
         <item>解析后添加至 DNS Hosts</item>
         <item>解析后替换原域名</item>
     </string-array>
-    <string name="intelligent_selection">智能选择</string>
-    <string name="sub_setting_intelligent_selection_filter">别名智能选择正则过滤</string>
-    <string name="title_intelligent_selection_method">智能选择方式</string>
-    <string-array name="intelligent_selection_method">
+    <string-array name="policy_group_type">
         <item>最低延迟</item>
         <item>最稳定</item>
     </string-array>

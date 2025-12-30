@@ -59,6 +59,10 @@ data class ProfileItem(
     var bandwidthDown: String? = null,
     var bandwidthUp: String? = null,
 
+    var policyGroupType: String? = null,
+    var policyGroupSubscriptionId: String? = null,
+    var policyGroupFilter: String? = null,
+
     ) {
     companion object {
         fun create(configType: EConfigType): ProfileItem {

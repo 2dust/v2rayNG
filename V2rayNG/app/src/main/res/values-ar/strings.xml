@@ -29,6 +29,7 @@
     <string name="menu_item_import_config_qrcode">استيراد التكوين من رمز الاستجابة السريعة (QRcode)</string>
     <string name="menu_item_import_config_clipboard">استيراد التكوين من الحافظة</string>
     <string name="menu_item_import_config_local">Import config from locally</string>
+    <string name="menu_item_import_config_policy_group">Add [Policy group]</string>
     <string name="menu_item_import_config_manually_vmess">الكتابة يدويًا [VMess]</string>
     <string name="menu_item_import_config_manually_vless">الكتابة يدويًا [VLESS]</string>
     <string name="menu_item_import_config_manually_ss">الكتابة يدويًا [Shadowsocks]</string>
@@ -278,7 +279,6 @@
     <string name="title_sub_update">تحديث الاشتراك (أول خطوة)</string>
     <string name="title_ping_all_server">Tcping لجميع الإعدادات</string>
     <string name="title_real_ping_all_server"> اختبر جميع الإعدادات (3)</string>
-    <string name="title_create_intelligent_selection_all_server">Creating Intelligent Selection Current Group Configuration</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">الفرز حسب نتائج الاختبار (5)</string>
     <string name="title_filter_config">تصفية ملف التكوين</string>
@@ -332,6 +332,10 @@
     <string name="update_check_pre_release">Check Pre-release</string>
     <string name="update_checking_for_update">Checking for update…</string>
 
+    <string name="title_policy_group_type">Policy group type</string>
+    <string name="title_policy_group_subscription_id">From subscription group</string>
+    <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+
     <string-array name="share_method">
         <item>رمز استجابة سريعة (QRcode)</item>
         <item>تصدير إلى الحافظة</item>
@@ -373,10 +377,7 @@
         <item>Resolve and add to DNS Hosts</item>
         <item>Resolve and replace domain</item>
     </string-array>
-    <string name="intelligent_selection">Intelligent Selection</string>
-    <string name="sub_setting_intelligent_selection_filter">Remarks Intelligent Selection regular filter</string>
-    <string name="title_intelligent_selection_method">Intelligent Selection Method</string>
-    <string-array name="intelligent_selection_method">
+    <string-array name="policy_group_type">
         <item>Least Ping</item>
         <item>Least Load</item>
     </string-array>

@@ -51,7 +51,6 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_SOCKS_PORT,
             AppConfig.PREF_LOGLEVEL,
             AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD,
-            AppConfig.PREF_INTELLIGENT_SELECTION_METHOD,
             AppConfig.PREF_LANGUAGE,
             AppConfig.PREF_UI_MODE_NIGHT,
             AppConfig.PREF_ROUTING_DOMAIN_STRATEGY,

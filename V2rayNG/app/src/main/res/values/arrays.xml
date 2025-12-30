@@ -215,9 +215,4 @@
         <item>2</item>
     </string-array>
 
-    <string-array name="intelligent_selection_method_value" translatable="false">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
-
 </resources>

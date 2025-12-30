@@ -80,6 +80,10 @@
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged" />
         <activity
+            android:name=".ui.ServerGroupActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateUnchanged" />
+        <activity
             android:name=".ui.SettingsActivity"
             android:exported="false" />
         <activity

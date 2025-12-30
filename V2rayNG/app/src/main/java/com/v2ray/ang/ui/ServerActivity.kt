@@ -134,9 +134,9 @@ class ServerActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        title = getString(R.string.title_server)
 
         val config = MmkvManager.decodeServerConfig(editGuid)
+        title = (config?.configType ?: createConfigType).toString()
         when (config?.configType ?: createConfigType) {
             EConfigType.VMESS -> setContentView(R.layout.activity_server_vmess)
             EConfigType.CUSTOM -> return
@@ -147,6 +147,7 @@ class ServerActivity : BaseActivity() {
             EConfigType.TROJAN -> setContentView(R.layout.activity_server_trojan)
             EConfigType.WIREGUARD -> setContentView(R.layout.activity_server_wireguard)
             EConfigType.HYSTERIA2 -> setContentView(R.layout.activity_server_hysteria2)
+            EConfigType.POLICYGROUP -> return
         }
         sp_network?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(

@@ -29,6 +29,7 @@
     <string name="menu_item_import_config_qrcode">کانفیگ را از QRcode وارد کنید</string>
     <string name="menu_item_import_config_clipboard">کانفیگ را از کلیپ ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_local">کانفیگ را از محلی وارد کنید</string>
+    <string name="menu_item_import_config_policy_group">Add [Policy group]</string>
     <string name="menu_item_import_config_manually_vmess">تایپ دستی[VMESS]</string>
     <string name="menu_item_import_config_manually_vless">تایپ دستی[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">تایپ دستی[SHADOWSOCKS]</string>
@@ -275,7 +276,6 @@
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
     <string name="title_ping_all_server">TCPING کانفیگ های گروه فعلی</string>
     <string name="title_real_ping_all_server">تاخیر واقعی کانفیگ های گروه فعلی</string>
-    <string name="title_create_intelligent_selection_all_server">ایجاد کانفیگ انتخاب هوشمند برای گروه فعلی</string>
     <string name="title_user_asset_setting">فایل های منبع جغرافیایی</string>
     <string name="title_sort_by_test_results">مرتب‌ سازی بر اساس نتایج آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگ‌ها</string>
@@ -337,6 +337,10 @@
     <string name="update_check_pre_release">بررسی نسخه پیش از انتشار</string>
     <string name="update_checking_for_update">در حال بررسی برای به‌روزرسانی…</string>
 
+    <string name="title_policy_group_type">Policy group type</string>
+    <string name="title_policy_group_subscription_id">From subscription group</string>
+    <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+
     <string-array name="share_method">
         <item>QRcode</item>
         <item>خروجی گرفتن در کلیپ‌ بورد</item>
@@ -387,10 +391,7 @@
         <item>Resolve and add to DNS Hosts</item>
         <item>Resolve and replace domain</item>
     </string-array>
-    <string name="intelligent_selection">انتخاب هوشمند</string>
-    <string name="sub_setting_intelligent_selection_filter">فیلتر نام مستعار برای انتخاب هوشمند</string>
-    <string name="title_intelligent_selection_method">روش انتخاب هوشمند</string>
-    <string-array name="intelligent_selection_method">
+    <string-array name="policy_group_type">
         <item>کمترین پینگ</item>
         <item>کمترین بار(لود)</item>
     </string-array>

@@ -44,33 +44,14 @@ object V2rayConfigManager {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ConfigResult(false)
             return if (config.configType == EConfigType.CUSTOM) {
                 getV2rayCustomConfig(guid, config)
+            } else if (config.configType == EConfigType.POLICYGROUP) {
+                getV2rayGroupConfig(context, guid, config)
             } else {
                 getV2rayNormalConfig(context, guid, config)
             }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to get V2ray config", e)
             return ConfigResult(false)
-        }
-    }
-
-    /**
-     * Generates a V2ray configuration from multiple server profiles.
-     *
-     * @param context The context of the caller.
-     * @param guidList A list of server GUIDs to be included in the generated configuration.
-     *                 Each GUID represents a unique server profile stored in the system.
-     * @return A V2rayConfig object containing the combined configuration of all specified servers,
-     *         or null if the operation fails (e.g., no valid configurations found, parsing errors)
-     */
-    fun genV2rayConfig(context: Context, guidList: List<String>): V2rayConfig? {
-        try {
-            val configList = guidList.mapNotNull { guid ->
-                MmkvManager.decodeServerConfig(guid)
-            }
-            return genV2rayMultipleConfig(context, configList)
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to generate V2ray config", e)
-            return null
         }
     }
 
@@ -86,6 +67,9 @@ object V2rayConfigManager {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ConfigResult(false)
             return if (config.configType == EConfigType.CUSTOM) {
                 getV2rayCustomConfig(guid, config)
+            } else if (config.configType == EConfigType.POLICYGROUP) {
+                // The number of policy groups will not be very large, so no special handling is needed.
+                getV2rayGroupConfig(context, guid, config)
             } else {
                 getV2rayNormalConfig4Speedtest(context, guid, config)
             }
@@ -105,6 +89,50 @@ object V2rayConfigManager {
     private fun getV2rayCustomConfig(guid: String, config: ProfileItem): ConfigResult {
         val raw = MmkvManager.decodeServerRaw(guid) ?: return ConfigResult(false)
         return ConfigResult(true, guid, raw)
+    }
+
+    /**
+     * Retrieves the group V2ray configuration.
+     *
+     * @param context The context in which the function is called.
+     * @param guid The unique identifier for the V2ray configuration.
+     * @param config The profile item containing the configuration details.
+     * @return A ConfigResult object containing the result of the configuration retrieval.
+     */
+    private fun getV2rayGroupConfig(context: Context, guid: String, config: ProfileItem): ConfigResult {
+        val result = ConfigResult(false)
+
+        val serverList = MmkvManager.decodeServerList()
+        val configList = serverList
+            .mapNotNull { id -> MmkvManager.decodeServerConfig(id) }
+            .filter { profile ->
+                val subscriptionId = config.policyGroupSubscriptionId
+                if (subscriptionId.isNullOrBlank()) {
+                    true
+                } else {
+                    profile.subscriptionId == subscriptionId
+                }
+            }
+            .filter { profile ->
+                val filter = config.policyGroupFilter
+                if (filter.isNullOrBlank()) {
+                    true
+                } else {
+                    try {
+                        Regex(filter).containsMatchIn(profile.remarks)
+                    } catch (e: Exception) {
+                        profile.remarks.contains(filter)
+                    }
+                }
+            }
+
+        val v2rayConfig = getV2rayMultipleConfig(context, config, configList) ?: return result
+
+        result.status = true
+        result.content = JsonUtil.toJsonPretty(v2rayConfig) ?: ""
+        result.guid = guid
+
+        return result
     }
 
     /**
@@ -164,21 +192,13 @@ object V2rayConfigManager {
         return result
     }
 
-    private fun genV2rayMultipleConfig(context: Context, configList: List<ProfileItem>): V2rayConfig? {
+    private fun getV2rayMultipleConfig(context: Context, config: ProfileItem, configList: List<ProfileItem>): V2rayConfig? {
         val validConfigs = configList.asSequence().filter { it.server.isNotNullEmpty() }
             .filter { !Utils.isPureIpAddress(it.server!!) || Utils.isValidUrl(it.server!!) }
             .filter { it.configType != EConfigType.CUSTOM }
             .filter { it.configType != EConfigType.HYSTERIA2 }
-            .filter { config ->
-                if (config.subscriptionId.isEmpty()) {
-                    return@filter true
-                }
-                val subItem = MmkvManager.decodeSubscription(config.subscriptionId)
-                if (subItem?.intelligentSelectionFilter.isNullOrEmpty() || config.remarks.isEmpty()) {
-                    return@filter true
-                }
-                Regex(pattern = subItem.intelligentSelectionFilter.orEmpty()).containsMatchIn(input = config.remarks)
-            }.toList()
+            .filter { it.configType != EConfigType.POLICYGROUP }
+            .toList()
 
         if (validConfigs.isEmpty()) {
             Log.w(AppConfig.TAG, "All configs are invalid")
@@ -187,16 +207,7 @@ object V2rayConfigManager {
 
         val v2rayConfig = initV2rayConfig(context) ?: return null
         v2rayConfig.log.loglevel = MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL) ?: "warning"
-
-        val subIds = configList.map { it.subscriptionId }.toHashSet()
-        val remarks = if (subIds.size == 1 && subIds.first().isNotEmpty()) {
-            val sub = MmkvManager.decodeSubscription(subIds.first())
-            (sub?.remarks ?: "") + context.getString(R.string.intelligent_selection)
-        } else {
-            context.getString(R.string.intelligent_selection)
-        }
-
-        v2rayConfig.remarks = remarks
+        v2rayConfig.remarks = config.remarks
 
         getInbounds(v2rayConfig)
 
@@ -220,12 +231,12 @@ object V2rayConfigManager {
 
         getDns(v2rayConfig)
 
-        getBalance(v2rayConfig)
+        getBalance(v2rayConfig, config)
 
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED)) {
             getCustomLocalDns(v2rayConfig)
         }
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) != true) {
+        if (!MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED)) {
             v2rayConfig.stats = null
             v2rayConfig.policy = null
         }
@@ -469,7 +480,7 @@ object V2rayConfigManager {
                 )
             }
 
-            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL ,true) == false) {
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true) == false) {
 
                 // DNS inbound
                 val remoteDns = SettingsManager.getRemoteDnsServers()
@@ -850,8 +861,7 @@ object V2rayConfigManager {
      *
      * @param v2rayConfig The V2ray configuration object to be modified with balancing settings
      */
-    private fun getBalance(v2rayConfig: V2rayConfig)
-    {
+    private fun getBalance(v2rayConfig: V2rayConfig, config: ProfileItem) {
         try {
             v2rayConfig.routing.rules.forEach { rule ->
                 if (rule.outboundTag == "proxy") {
@@ -860,7 +870,7 @@ object V2rayConfigManager {
                 }
             }
 
-            if (MmkvManager.decodeSettingsString(AppConfig.PREF_INTELLIGENT_SELECTION_METHOD, "0") == "0") {
+            if (config.policyGroupType == "0") {
                 val balancer = V2rayConfig.RoutingBean.BalancerBean(
                     tag = "proxy-round",
                     selector = listOf("proxy-"),
@@ -1054,6 +1064,7 @@ object V2rayConfigManager {
             EConfigType.WIREGUARD -> WireguardFmt.toOutbound(profileItem)
             EConfigType.HYSTERIA2 -> null
             EConfigType.HTTP -> HttpFmt.toOutbound(profileItem)
+            EConfigType.POLICYGROUP -> null
         }
     }
 
@@ -1104,6 +1115,7 @@ object V2rayConfigManager {
                 )
 
             EConfigType.CUSTOM -> null
+            EConfigType.POLICYGROUP -> null
         }
     }
 

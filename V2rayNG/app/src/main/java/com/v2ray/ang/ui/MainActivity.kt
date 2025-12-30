@@ -313,6 +313,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
+        R.id.import_manually_policy_group -> {
+            importManually(EConfigType.POLICYGROUP.value)
+            true
+        }
+
         R.id.import_manually_vmess -> {
             importManually(EConfigType.VMESS.value)
             true
@@ -370,14 +375,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
-        R.id.intelligent_selection_all -> {
-            if (MmkvManager.decodeSettingsString(AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD, "1") != "0") {
-                toast(getString(R.string.pre_resolving_domain))
-            }
-            mainViewModel.createIntelligentSelectionAll()
-            true
-        }
-
         R.id.service_restart -> {
             restartV2Ray()
             true
@@ -413,12 +410,20 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private fun importManually(createConfigType: Int) {
-        startActivity(
-            Intent()
-                .putExtra("createConfigType", createConfigType)
-                .putExtra("subscriptionId", mainViewModel.subscriptionId)
-                .setClass(this, ServerActivity::class.java)
-        )
+        if (createConfigType == EConfigType.POLICYGROUP.value) {
+            startActivity(
+                Intent()
+                    .putExtra("subscriptionId", mainViewModel.subscriptionId)
+                    .setClass(this, ServerGroupActivity::class.java)
+            )
+        } else {
+            startActivity(
+                Intent()
+                    .putExtra("createConfigType", createConfigType)
+                    .putExtra("subscriptionId", mainViewModel.subscriptionId)
+                    .setClass(this, ServerActivity::class.java)
+            )
+        }
     }
 
     /**
