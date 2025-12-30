@@ -294,21 +294,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Starts the tun2socks process with the appropriate parameters.
      */
     private fun runTun2socks() {
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true) == true) {
-            tun2SocksService = TProxyService(
-                context = applicationContext,
-                vpnInterface = mInterface,
-                isRunningProvider = { isRunning },
-                restartCallback = { runTun2socks() }
-            )
-        } else {
-            tun2SocksService = Tun2SocksService(
-                context = applicationContext,
-                vpnInterface = mInterface,
-                isRunningProvider = { isRunning },
-                restartCallback = { runTun2socks() }
-            )
-        }
+        //if (MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true)) {
+        tun2SocksService = TProxyService(
+            context = applicationContext,
+            vpnInterface = mInterface,
+            isRunningProvider = { isRunning },
+            restartCallback = { runTun2socks() }
+        )
 
         tun2SocksService?.startTun2Socks()
     }

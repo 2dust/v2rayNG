@@ -480,52 +480,16 @@ object V2rayConfigManager {
                 )
             }
 
-            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true) == false) {
-
-                // DNS inbound
-                val remoteDns = SettingsManager.getRemoteDnsServers()
-                if (v2rayConfig.inbounds.none { e -> e.protocol == "dokodemo-door" && e.tag == "dns-in" }) {
-                    val dnsInboundSettings = V2rayConfig.InboundBean.InSettingsBean(
-                        address = if (Utils.isPureIpAddress(remoteDns.first())) remoteDns.first() else AppConfig.DNS_PROXY,
-                        port = 53,
-                        network = "tcp,udp"
-                    )
-
-                    val localDnsPort = Utils.parseInt(
-                        MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT),
-                        AppConfig.PORT_LOCAL_DNS.toInt()
-                    )
-                    v2rayConfig.inbounds.add(
-                        V2rayConfig.InboundBean(
-                            tag = "dns-in",
-                            port = localDnsPort,
-                            listen = AppConfig.LOOPBACK,
-                            protocol = "dokodemo-door",
-                            settings = dnsInboundSettings,
-                            sniffing = null
-                        )
-                    )
-                }
-
-                // DNS routing tag
-                v2rayConfig.routing.rules.add(
-                    0, RulesBean(
-                        inboundTag = arrayListOf("dns-in"),
-                        outboundTag = "dns-out",
-                        domain = null
-                    )
+            // if (MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true)) {
+            //hev-socks5-tunnel dns routing
+            v2rayConfig.routing.rules.add(
+                0, RulesBean(
+                    inboundTag = arrayListOf("socks"),
+                    outboundTag = "dns-out",
+                    port = "53",
+                    type = "field"
                 )
-            } else {
-                //hev-socks5-tunnel dns routing
-                v2rayConfig.routing.rules.add(
-                    0, RulesBean(
-                        inboundTag = arrayListOf("socks"),
-                        outboundTag = "dns-out",
-                        port = "53",
-                        type = "field"
-                    )
-                )
-            }
+            )
 
             // DNS outbound
             if (v2rayConfig.outbounds.none { e -> e.protocol == "dns" && e.tag == "dns-out" }) {

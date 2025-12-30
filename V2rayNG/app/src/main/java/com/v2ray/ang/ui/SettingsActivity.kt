@@ -68,7 +68,7 @@ class SettingsActivity : BaseActivity() {
 
         private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
         private val hevTunRwTimeout by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) }
-        private val useHevTun by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_USE_HEV_TUNNEL) }
+//        private val useHevTun by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_USE_HEV_TUNNEL) }
 
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             addPreferencesFromResource(R.xml.pref_settings)
@@ -182,10 +182,10 @@ class SettingsActivity : BaseActivity() {
             mode?.dialogLayoutResource = R.layout.preference_with_help_link
             //loglevel.summary = "LogLevel"
 
-            useHevTun?.setOnPreferenceChangeListener { _, newValue ->
-                updateHevTunSettings(newValue as Boolean)
-                true
-            }
+//            useHevTun?.setOnPreferenceChangeListener { _, newValue ->
+//                updateHevTunSettings(newValue as Boolean)
+//                true
+//            }
 
             hevTunRwTimeout?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
@@ -226,7 +226,7 @@ class SettingsActivity : BaseActivity() {
             dnsHosts?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DNS_HOSTS)
             delayTestUrl?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DELAY_TEST_URL)
 
-            updateHevTunSettings(MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true))
+            //updateHevTunSettings(MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true))
             hevTunRwTimeout?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT, AppConfig.HEVTUN_RW_TIMEOUT)
 
             initSharedPreference()
