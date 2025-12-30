@@ -43,14 +43,6 @@
                         android:text="@string/title_configuration_backup"
                         android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
-                    <TextView
-                        android:id="@+id/tv_backup_summary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/padding_spacing_dp16"
-                        android:maxLines="4"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
                 </LinearLayout>
 
             </LinearLayout>

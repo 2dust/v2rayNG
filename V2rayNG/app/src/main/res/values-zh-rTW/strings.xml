@@ -232,7 +232,6 @@
     <string name="title_oss_license">Open Source licenses</string>
     <string name="title_tg_channel">Telegram 頻道</string>
     <string name="title_configuration_backup">備份設定</string>
-    <string name="summary_configuration_backup">儲存位置: [%s], 卸載App或清除儲存後備份將被清除</string>
     <string name="title_configuration_restore">還原設定</string>
     <string name="title_configuration_share">分享設定</string>
 

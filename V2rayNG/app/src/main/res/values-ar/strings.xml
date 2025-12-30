@@ -234,7 +234,6 @@
     <string name="title_oss_license">Open Source licenses</string>
     <string name="title_tg_channel">قناة Telegram</string>
     <string name="title_configuration_backup">نسخ التكوين احتياطيًا</string>
-    <string name="summary_configuration_backup">موقع التخزين: [%s]، سيتم مسح النسخة الاحتياطية بعد إلغاء تثبيت التطبيق أو مسح التخزين</string>
     <string name="title_configuration_restore">استعادة التكوين</string>
     <string name="title_configuration_share">مشاركة التكوين</string>
 

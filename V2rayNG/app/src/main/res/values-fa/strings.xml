@@ -233,7 +233,6 @@
     <string name="title_oss_license">مجوز های منبع باز</string>
     <string name="title_tg_channel">کانال تلگرام</string>
     <string name="title_configuration_backup">پشتیبان گیری از پیکربندی</string>
-    <string name="summary_configuration_backup">محل ذخیره سازی: [%s], پس از حذف نصب برنامه یا پاک کردن فضای ذخیره سازی، نسخه پشتیبان پاک می شود</string>
     <string name="title_configuration_restore">بازیابی پیکربندی</string>
     <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
     <string name="title_pref_promotion">تبلیغات</string>

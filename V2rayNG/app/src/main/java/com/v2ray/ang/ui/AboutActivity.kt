@@ -16,7 +16,6 @@ import com.v2ray.ang.databinding.ActivityAboutBinding
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.ZipUtil
@@ -27,7 +26,6 @@ import java.util.Locale
 class AboutActivity : BaseActivity() {
 
     private val binding by lazy { ActivityAboutBinding.inflate(layoutInflater) }
-    private val extDir by lazy { File(Utils.backupPath(this)) }
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -42,25 +40,50 @@ class AboutActivity : BaseActivity() {
             }
         }
 
+    private val createBackupFile =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
+            if (uri != null) {
+                try {
+                    val ret = backupConfigurationToCache()
+                    if (ret.first) {
+                        // Copy the cached zip file to user-selected location
+                        contentResolver.openOutputStream(uri)?.use { output ->
+                            File(ret.second).inputStream().use { input ->
+                                input.copyTo(output)
+                            }
+                        }
+                        // Clean up cache file
+                        File(ret.second).delete()
+                        toastSuccess(R.string.toast_success)
+                    } else {
+                        toastError(R.string.toast_failure)
+                    }
+                } catch (e: Exception) {
+                    Log.e(AppConfig.TAG, "Failed to backup configuration", e)
+                    toastError(R.string.toast_failure)
+                }
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
         title = getString(R.string.title_about)
 
-        binding.tvBackupSummary.text = this.getString(R.string.summary_configuration_backup, extDir)
-
         binding.layoutBackup.setOnClickListener {
-            val ret = backupConfiguration(extDir.absolutePath)
-            if (ret.first) {
-                toastSuccess(R.string.toast_success)
-            } else {
-                toastError(R.string.toast_failure)
-            }
+            val dateFormatted = SimpleDateFormat(
+                "yyyy-MM-dd-HH-mm-ss",
+                Locale.getDefault()
+            ).format(System.currentTimeMillis())
+            val defaultFileName = "${getString(R.string.app_name)}_${dateFormatted}.zip"
+            
+            // Let user choose where to save the backup file
+            createBackupFile.launch(defaultFileName)
         }
 
         binding.layoutShare.setOnClickListener {
-            val ret = backupConfiguration(cacheDir.absolutePath)
+            val ret = backupConfigurationToCache()
             if (ret.first) {
                 startActivity(
                     Intent.createChooser(
@@ -132,14 +155,18 @@ class AboutActivity : BaseActivity() {
         }
     }
 
-    private fun backupConfiguration(outputZipFilePos: String): Pair<Boolean, String> {
-        val dateFormated = SimpleDateFormat(
+    /**
+     * Backup configuration to cache directory
+     * Returns Pair<success, zipFilePath>
+     */
+    private fun backupConfigurationToCache(): Pair<Boolean, String> {
+        val dateFormatted = SimpleDateFormat(
             "yyyy-MM-dd-HH-mm-ss",
             Locale.getDefault()
         ).format(System.currentTimeMillis())
-        val folderName = "${getString(R.string.app_name)}_${dateFormated}"
+        val folderName = "${getString(R.string.app_name)}_${dateFormatted}"
         val backupDir = this.cacheDir.absolutePath + "/$folderName"
-        val outputZipFilePath = "$outputZipFilePos/$folderName.zip"
+        val outputZipFilePath = "${this.cacheDir.absolutePath}/$folderName.zip"
 
         val count = MMKV.backupAllToDirectory(backupDir)
         if (count <= 0) {

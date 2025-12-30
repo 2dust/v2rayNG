@@ -235,7 +235,6 @@
     <string name="title_oss_license">Open Source licenses</string>
     <string name="title_tg_channel">Kênh Telegram</string>
     <string name="title_configuration_backup">Sao lưu cấu hình</string>
-    <string name="summary_configuration_backup">Nơi lưu trữ: [%s], bản backup sẽ được dọn dẹp sau khi xóa ứng dụng hoặc xóa bộ nhớ.</string>
     <string name="title_configuration_restore">Khôi phục cấu hình</string>
     <string name="title_configuration_share">Chia sẻ cấu hình</string>
     <string name="title_pref_promotion">Quảng bá server</string>

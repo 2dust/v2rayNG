@@ -233,7 +233,6 @@
     <string name="title_oss_license">Лицензии открытого исходного кода</string>
     <string name="title_tg_channel">Telegram-канал</string>
     <string name="title_configuration_backup">Резервирование конфигурации</string>
-    <string name="summary_configuration_backup">Путь: [%s]. Резервная копия будет стёрта при удалении приложения или очистке хранилища.</string>
     <string name="title_configuration_restore">Восстановление конфигурации</string>
     <string name="title_configuration_share">Поделиться конфигурацией</string>
 

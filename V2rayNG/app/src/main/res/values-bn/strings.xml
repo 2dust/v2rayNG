@@ -234,7 +234,6 @@
     <string name="title_oss_license">Open Source licenses</string>
     <string name="title_tg_channel">টেলিগ্রাম চ্যানেল</string>
     <string name="title_configuration_backup">কনফিগারেশন ব্যাকআপ</string>
-    <string name="summary_configuration_backup">স্টোরেজ অবস্থান: [%s], অ্যাপ আনইনস্টল বা স্টোরেজ ক্লিয়ার করার পরে ব্যাকআপ মুছে যাবে</string>
     <string name="title_configuration_restore">কনফিগারেশন পুনরুদ্ধার</string>
     <string name="title_configuration_share">কনফিগারেশন শেয়ার করুন</string>
 
