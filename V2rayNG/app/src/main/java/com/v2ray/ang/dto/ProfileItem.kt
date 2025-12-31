@@ -40,6 +40,8 @@ data class ProfileItem(
     var alpn: String? = null,
     var fingerPrint: String? = null,
     var insecure: Boolean? = null,
+    var echConfigList: String? = null,
+    var echForceQuery: String? = null,
 
     var publicKey: String? = null,
     var shortId: String? = null,

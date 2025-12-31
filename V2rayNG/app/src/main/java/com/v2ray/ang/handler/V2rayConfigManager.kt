@@ -1223,6 +1223,8 @@ object V2rayConfigManager {
         }
         val fingerprint = profileItem.fingerPrint
         val alpns = profileItem.alpn
+        val echConfigList = profileItem.echConfigList
+        val echForceQuery = profileItem.echForceQuery
         val publicKey = profileItem.publicKey
         val shortId = profileItem.shortId
         val spiderX = profileItem.spiderX
@@ -1235,6 +1237,8 @@ object V2rayConfigManager {
             serverName = if (sni.isNullOrEmpty()) null else sni,
             fingerprint = if (fingerprint.isNullOrEmpty()) null else fingerprint,
             alpn = if (alpns.isNullOrEmpty()) null else alpns.split(",").map { it.trim() }.filter { it.isNotEmpty() },
+            echConfigList = if (echConfigList.isNullOrEmpty()) null else echConfigList,
+            echForceQuery = if (echForceQuery.isNullOrEmpty()) null else echForceQuery,
             publicKey = if (publicKey.isNullOrEmpty()) null else publicKey,
             shortId = if (shortId.isNullOrEmpty()) null else shortId,
             spiderX = if (spiderX.isNullOrEmpty()) null else spiderX,

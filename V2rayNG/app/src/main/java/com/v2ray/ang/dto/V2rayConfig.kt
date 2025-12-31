@@ -267,6 +267,8 @@ data class V2rayConfig(
                 val certificates: List<Any>? = null,
                 val disableSystemRoot: Boolean? = null,
                 val enableSessionResumption: Boolean? = null,
+                var echConfigList: String? = null,
+                var echForceQuery: String? = null,
                 // REALITY settings
                 val show: Boolean = false,
                 var publicKey: String? = null,
