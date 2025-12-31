@@ -34,6 +34,7 @@ ln -s "$__dir/hev-socks5-tunnel" jni/hev-socks5-tunnel
     "APP_CFLAGS=-O3 -DPKGNAME=com/v2ray/ang/service" \
     "APP_LDFLAGS=-Wl,--build-id=none -Wl,--hash-style=gnu" \
 
+mkdir -p "$__dir/libs"
 cp -r "$TMPDIR/libs/"* "$__dir/libs/"
 
 popd
