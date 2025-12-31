@@ -38,26 +38,26 @@ jobs:
         \
             ndkVersion = "28.2.13676358"' ${{ github.workspace }}/V2rayNG/app/build.gradle.kts
 
-    - name: Restore cached libtun2socks
-      id: cache-libtun2socks-restore
+    - name: Restore cached libhevtun
+      id: cache-libhevtun-restore
       uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}/libs
-        key: libtun2socks-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD') }}-${{ hashFiles('.git/modules/badvpn/HEAD') }}-${{ hashFiles('.git/modules/libancillary/HEAD') }}-${{ hashFiles('compile-tun2socks.sh') }}--${{ hashFiles('compile-hevtun.sh') }}
+        key: libhevtun-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD') }}-${{ hashFiles('compile-hevtun.sh') }}
 
-    - name: Build libtun2socks
-      if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
+    - name: Build libhevtun
+      if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
       run: |
-        bash compile-tun2socks.sh && bash compile-hevtun.sh
+        bash compile-hevtun.sh
     
-    - name: Save libtun2socks
-      if: steps.cache-libtun2socks-restore.outputs.cache-hit != 'true'
+    - name: Save libhevtun
+      if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
       with:
         path: ${{ github.workspace }}/libs
-        key: libtun2socks-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD') }}-${{ hashFiles('.git/modules/badvpn/HEAD') }}-${{ hashFiles('.git/modules/libancillary/HEAD') }}-${{ hashFiles('compile-tun2socks.sh') }}--${{ hashFiles('compile-hevtun.sh') }}
+        key: libhevtun-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD') }}-${{ hashFiles('compile-hevtun.sh') }}
 
-    - name: Copy libtun2socks
+    - name: Copy libhevtun
       run: |
         cp -r ${{ github.workspace }}/libs ${{ github.workspace }}/V2rayNG/app
 
