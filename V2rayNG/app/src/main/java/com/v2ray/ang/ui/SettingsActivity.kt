@@ -64,6 +64,7 @@ class SettingsActivity : BaseActivity() {
         private val domesticDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DOMESTIC_DNS) }
         private val dnsHosts by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DNS_HOSTS) }
         private val delayTestUrl by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DELAY_TEST_URL) }
+        private val ipApiUrl by lazy { findPreference<EditTextPreference>(AppConfig.PREF_IP_API_URL) }
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
 
         private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
@@ -84,8 +85,7 @@ class SettingsActivity : BaseActivity() {
             }
             localDnsPort?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                localDnsPort?.summary =
-                    if (TextUtils.isEmpty(nval)) AppConfig.PORT_LOCAL_DNS else nval
+                localDnsPort?.summary =  nval.ifEmpty { AppConfig.PORT_LOCAL_DNS }
                 true
             }
             vpnDns?.setOnPreferenceChangeListener { _, any ->
@@ -95,7 +95,7 @@ class SettingsActivity : BaseActivity() {
 
             vpnMtu?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                vpnMtu?.summary = if (TextUtils.isEmpty(nval)) AppConfig.VPN_MTU.toString() else nval
+                vpnMtu?.summary =  nval.ifEmpty { AppConfig.VPN_MTU.toString() }
                 true
             }
 
@@ -151,18 +151,18 @@ class SettingsActivity : BaseActivity() {
 
             socksPort?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                socksPort?.summary = if (TextUtils.isEmpty(nval)) AppConfig.PORT_SOCKS else nval
+                socksPort?.summary = nval.ifEmpty { AppConfig.PORT_SOCKS }
                 true
             }
 
             remoteDns?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                remoteDns?.summary = if (nval == "") AppConfig.DNS_PROXY else nval
+                remoteDns?.summary = nval.ifEmpty { AppConfig.DNS_PROXY }
                 true
             }
             domesticDns?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                domesticDns?.summary = if (nval == "") AppConfig.DNS_DIRECT else nval
+                domesticDns?.summary = nval.ifEmpty { AppConfig.DNS_DIRECT }
                 true
             }
             dnsHosts?.setOnPreferenceChangeListener { _, any ->
@@ -172,7 +172,12 @@ class SettingsActivity : BaseActivity() {
             }
             delayTestUrl?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                delayTestUrl?.summary = if (nval == "") AppConfig.DELAY_TEST_URL else nval
+                delayTestUrl?.summary = nval.ifEmpty { AppConfig.DELAY_TEST_URL }
+                true
+            }
+            ipApiUrl?.setOnPreferenceChangeListener { _, any ->
+                val nval = any as String
+                ipApiUrl?.summary = nval.ifEmpty { AppConfig.IP_API_URL }
                 true
             }
             mode?.setOnPreferenceChangeListener { _, newValue ->
@@ -189,7 +194,7 @@ class SettingsActivity : BaseActivity() {
 
             hevTunRwTimeout?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                hevTunRwTimeout?.summary = if (TextUtils.isEmpty(nval)) AppConfig.HEVTUN_RW_TIMEOUT else nval
+                hevTunRwTimeout?.summary = nval.ifEmpty { AppConfig.HEVTUN_RW_TIMEOUT }
                 true
             }
         }
@@ -225,6 +230,7 @@ class SettingsActivity : BaseActivity() {
             domesticDns?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
             dnsHosts?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DNS_HOSTS)
             delayTestUrl?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DELAY_TEST_URL)
+            ipApiUrl?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_IP_API_URL, AppConfig.IP_API_URL)
 
             //updateHevTunSettings(MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true))
             hevTunRwTimeout?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT, AppConfig.HEVTUN_RW_TIMEOUT)
@@ -246,6 +252,7 @@ class SettingsActivity : BaseActivity() {
                 remoteDns,
                 domesticDns,
                 delayTestUrl,
+                ipApiUrl,
                 hevTunRwTimeout
             ).forEach { key ->
                 key?.text = key.summary.toString()

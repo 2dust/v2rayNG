@@ -265,6 +265,11 @@
             android:summary="@string/summary_pref_delay_test_url"
             android:title="@string/title_pref_delay_test_url" />
 
+        <EditTextPreference
+            android:key="pref_ip_api_url"
+            android:summary="@string/summary_pref_ip_api_url"
+            android:title="@string/title_pref_ip_api_url" />
+
         <ListPreference
             android:defaultValue="VPN"
             android:entries="@array/mode_entries"

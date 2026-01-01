@@ -197,8 +197,11 @@
     <string name="title_pref_dns_hosts">DNS هاست موستقیم (قالوو: دامنه: نشۊوی،...)</string>
     <string name="summary_pref_dns_hosts">دامنه:نشۊوی،...</string>
 
-    <string name="title_pref_delay_test_url">نشۊوی اینترنتی آزمایش تئخیر واقعی (http/https)</string>
+    <string name="title_pref_delay_test_url">نشۊوی اینترنتی آزمایش تئخیر واقعی </string>
     <string name="summary_pref_delay_test_url">نشۊوی اینترنتی</string>
+
+    <string name="title_pref_ip_api_url">Current connection info test url</string>
+    <string name="summary_pref_ip_api_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">هشتن منپیزا ز شبکه مهلی</string>
     <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا نشۊوی IP ایسا، ز ر socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل اعتماد فعال بۊ تا ز منپیز غیر موجاز جلو گری بۊ.</string>

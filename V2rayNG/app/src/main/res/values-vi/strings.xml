@@ -197,8 +197,11 @@
     <string name="title_pref_dns_hosts">DNS hosts (Format: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
-    <string name="title_pref_delay_test_url">URL kiểm tra độ trễ thực (HTTP / HTTPS)</string>
+    <string name="title_pref_delay_test_url">URL kiểm tra độ trễ thực </string>
     <string name="summary_pref_delay_test_url">URL</string>
+
+    <string name="title_pref_ip_api_url">Current connection info test url</string>
+    <string name="summary_pref_ip_api_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">Cho phép kết nối từ mạng LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác trong cùng mạng LAN có thể kết nối đến SOCKS / HTTP proxy trên thiết bị của bạn. \nChỉ bật tính năng này trong các mạng đáng tin cậy để tránh kết nối trái phép.</string>

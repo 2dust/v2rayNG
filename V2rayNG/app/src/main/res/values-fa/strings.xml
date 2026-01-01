@@ -195,8 +195,11 @@
     <string name="title_pref_dns_hosts">DNS مستقیم هاست (فرمت: دامنه:آدرس،…)</string>
     <string name="summary_pref_dns_hosts">دامنه:آدرس،…</string>
 
-    <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تاخیر واقعی کانفیگ ها (HTTP/HTTPS)</string>
+    <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تاخیر واقعی کانفیگ ها </string>
     <string name="summary_pref_delay_test_url">URL</string>
+
+    <string name="title_pref_ip_api_url">Current connection info test url</string>
+    <string name="summary_pref_ip_api_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">اجازه اتصالات از طریق شبکه محلی</string>
     <string name="summary_pref_proxy_sharing_enabled">سایر دستگاه ها می توانند با استفاده از آدرس آیپی شما برای استفاده از یک پروکسی محلی متصل شوند. فقط در یک شبکه قابل اعتماد برای جلوگیری از اتصالات غیرمجاز استفاده کنید.</string>

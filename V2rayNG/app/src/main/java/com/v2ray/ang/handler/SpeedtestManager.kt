@@ -163,14 +163,28 @@ object SpeedtestManager {
     }
 
     fun getRemoteIPInfo(): String? {
+        val url = MmkvManager.decodeSettingsString(AppConfig.PREF_IP_API_URL)
+            .takeIf { !it.isNullOrBlank() } ?: AppConfig.IP_API_URL
+
         val httpPort = SettingsManager.getHttpPort()
-        var content = HttpUtil.getUrlContent(AppConfig.IP_API_URL, 5000, httpPort) ?: return null
+        val content = HttpUtil.getUrlContent(url, 5000, httpPort) ?: return null
+        val ipInfo = JsonUtil.fromJson(content, IPAPIInfo::class.java) ?: return null
 
-        var ipInfo = JsonUtil.fromJson(content, IPAPIInfo::class.java) ?: return null
-        var ip = ipInfo.ip ?: ipInfo.clientIp ?: ipInfo.ip_addr ?: ipInfo.query
-        var country = ipInfo.country_code ?: ipInfo.country ?: ipInfo.countryCode
+        val ip = listOf(
+            ipInfo.ip,
+            ipInfo.clientIp,
+            ipInfo.ip_addr,
+            ipInfo.query
+        ).firstOrNull { !it.isNullOrBlank() }
 
-        return "(${country ?: "unknown"}) $ip"
+        val country = listOf(
+            ipInfo.country_code,
+            ipInfo.country,
+            ipInfo.countryCode,
+            ipInfo.location?.country_code
+        ).firstOrNull { !it.isNullOrBlank() }
+
+        return "(${country ?: "unknown"}) ${ip ?: "unknown"}"
     }
 
     /**
