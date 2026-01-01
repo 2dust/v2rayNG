@@ -6,7 +6,7 @@
     <string name="navigation_drawer_open">Открыть панель навигации</string>
     <string name="navigation_drawer_close">Закрыть панель навигации</string>
     <string name="migration_success">Успешный перенос данных!</string>
-    <string name="action_stop_service">Stop service</string>
+    <string name="action_stop_service">Остановить службу</string>
     <string name="migration_fail">Перенос данных не выполнен!</string>
     <string name="pull_down_to_refresh">Потяните вниз для обновления!</string>
 
@@ -29,7 +29,7 @@
     <string name="menu_item_import_config_qrcode">Импорт из QR-кода</string>
     <string name="menu_item_import_config_clipboard">Импорт из буфера обмена</string>
     <string name="menu_item_import_config_local">Импорт из файла</string>
-    <string name="menu_item_import_config_policy_group">Add [Policy group]</string>
+    <string name="menu_item_import_config_policy_group">Добавить группу политик</string>
     <string name="menu_item_import_config_manually_vmess">Ручной ввод VMess</string>
     <string name="menu_item_import_config_manually_vless">Ручной ввод VLESS</string>
     <string name="menu_item_import_config_manually_ss">Ручной ввод Shadowsocks</string>
@@ -168,7 +168,7 @@
     <string name="summary_pref_speed_enabled">Показывать текущую скорость в уведомлении.\nЗначок будет меняться в зависимости от использования.</string>
 
     <string name="title_pref_sniffing_enabled">Анализировать пакеты</string>
-    <string name="summary_pref_sniffing_enabled">Пытаться определелять доменные имена в пакетах (по умолчанию включено)</string>
+    <string name="summary_pref_sniffing_enabled">Пытаться определять доменные имена в пакетах (по умолчанию включено)</string>
     <string name="title_pref_route_only_enabled">Домен только для маршрутизации</string>
     <string name="summary_pref_route_only_enabled">Использовать доменное имя только для маршрутизации и сохранять целевой адрес в виде IP.</string>
 
@@ -199,10 +199,10 @@
     <string name="title_pref_delay_test_url">Сервис проверки задержки</string>
     <string name="summary_pref_delay_test_url">URL</string>
 
-    <string name="title_pref_ip_api_url">Current connection info test url</string>
-    <string name="summary_pref_ip_api_url">Url</string>
+    <string name="title_pref_ip_api_url">Сервис проверки текущего соединения</string>
+    <string name="summary_pref_ip_api_url">URL</string>
 
-    <string name="title_pref_proxy_sharing_enabled">Разрешать подключения из LAN</string>
+    <string name="title_pref_proxy_sharing_enabled">Разрешать соединения из LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться, используя ваш IP-адрес, чтобы использовать локальный прокси. Используйте только в доверенной сети, чтобы избежать несанкционированного подключения.</string>
     <string name="toast_warning_pref_proxysharing_short">Доступ из LAN разрешён, убедитесь, что вы находитесь в доверенной сети</string>
 
@@ -315,9 +315,9 @@
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">Сеть</string>
     <string name="routing_settings_network_tip">[udp|tcp]</string>
-    <string name="routing_settings_outbound_tag">Исходящее подключение</string>
+    <string name="routing_settings_outbound_tag">Исходящее соединение</string>
 
-    <string name="connection_test_pending">Проверить подключение</string>
+    <string name="connection_test_pending">Проверить соединение</string>
     <string name="connection_test_testing">Проверка…</string>
     <string name="connection_test_testing_count">Проверка профилей (%d)</string>
     <string name="connection_test_available">Успешно: соединение заняло %d мс</string>
@@ -342,9 +342,9 @@
     <string name="update_check_pre_release">Искать предварительный выпуск</string>
     <string name="update_checking_for_update">Проверка обновления…</string>
 
-    <string name="title_policy_group_type">Policy group type</string>
-    <string name="title_policy_group_subscription_id">From subscription group</string>
-    <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+    <string name="title_policy_group_type">Тип группы политик</string>
+    <string name="title_policy_group_subscription_id">Из группы подписки</string>
+    <string name="title_policy_group_subscription_filter">Название фильтра</string>
 
     <string-array name="share_method">
         <item>QR-код</item>
