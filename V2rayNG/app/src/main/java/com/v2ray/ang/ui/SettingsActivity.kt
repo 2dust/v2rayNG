@@ -40,7 +40,7 @@ class SettingsActivity : BaseActivity() {
         private val localDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_LOCAL_DNS_ENABLED) }
         private val fakeDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_FAKE_DNS_ENABLED) }
         private val appendHttpProxy by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_APPEND_HTTP_PROXY) }
-        private val localDnsPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_LOCAL_DNS_PORT) }
+//        private val localDnsPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_LOCAL_DNS_PORT) }
         private val vpnDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_VPN_DNS) }
         private val vpnBypassLan by lazy { findPreference<ListPreference>(AppConfig.PREF_VPN_BYPASS_LAN) }
         private val vpnInterfaceAddress by lazy { findPreference<ListPreference>(AppConfig.PREF_VPN_INTERFACE_ADDRESS_CONFIG_INDEX) }
@@ -83,11 +83,11 @@ class SettingsActivity : BaseActivity() {
                 updateLocalDns(any as Boolean)
                 true
             }
-            localDnsPort?.setOnPreferenceChangeListener { _, any ->
-                val nval = any as String
-                localDnsPort?.summary =  nval.ifEmpty { AppConfig.PORT_LOCAL_DNS }
-                true
-            }
+//            localDnsPort?.setOnPreferenceChangeListener { _, any ->
+//                val nval = any as String
+//                localDnsPort?.summary =  nval.ifEmpty { AppConfig.PORT_LOCAL_DNS }
+//                true
+//            }
             vpnDns?.setOnPreferenceChangeListener { _, any ->
                 vpnDns?.summary = any as String
                 true
@@ -205,7 +205,7 @@ class SettingsActivity : BaseActivity() {
             localDns?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
             fakeDns?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED, false)
             appendHttpProxy?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_APPEND_HTTP_PROXY, false)
-            localDnsPort?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
+//            localDnsPort?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
             vpnDns?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_DNS, AppConfig.DNS_VPN)
             vpnMtu?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_MTU, AppConfig.VPN_MTU.toString())
 
@@ -240,7 +240,7 @@ class SettingsActivity : BaseActivity() {
 
         private fun initSharedPreference() {
             listOf(
-                localDnsPort,
+                //localDnsPort,
                 vpnDns,
                 vpnMtu,
                 muxConcurrency,
@@ -308,7 +308,7 @@ class SettingsActivity : BaseActivity() {
             localDns?.isEnabled = vpn
             fakeDns?.isEnabled = vpn
             appendHttpProxy?.isEnabled = vpn
-            localDnsPort?.isEnabled = vpn
+//            localDnsPort?.isEnabled = vpn
             vpnDns?.isEnabled = vpn
             vpnBypassLan?.isEnabled = vpn
             vpnInterfaceAddress?.isEnabled = vpn
@@ -325,7 +325,7 @@ class SettingsActivity : BaseActivity() {
 
         private fun updateLocalDns(enabled: Boolean) {
             fakeDns?.isEnabled = enabled
-            localDnsPort?.isEnabled = enabled
+//            localDnsPort?.isEnabled = enabled
             vpnDns?.isEnabled = !enabled
         }
 
