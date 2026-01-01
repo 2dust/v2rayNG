@@ -243,7 +243,6 @@
     <string name="title_configuration_share">কনফিগারেশন শেয়ার করুন</string>
 
     <string name="title_pref_promotion">প্রচার</string>
-    <string name="summary_pref_promotion">প্রচার, বিস্তারিত জানার জন্য ক্লিক করুন (ডোনেশন মুছে ফেলা যেতে পারে)</string>
 
     <string name="title_pref_auto_update_subscription">স্বয়ংক্রিয় আপডেট সাবস্ক্রিপশন</string>
     <string name="summary_pref_auto_update_subscription">পটভূমিতে একটি নির্দিষ্ট সময় পর পর আপনার সাবস্ক্রিপশন স্বয়ংক্রিয়ভাবে আপডেট করুন। ডিভাইসের উপর নির্ভর করে, এই বৈশিষ্ট্যটি সবসময় কাজ নাও করতে পারে</string>

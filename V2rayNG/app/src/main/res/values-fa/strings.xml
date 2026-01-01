@@ -241,7 +241,6 @@
     <string name="title_configuration_restore">بازیابی پیکربندی</string>
     <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
     <string name="title_pref_promotion">تبلیغات</string>
-    <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف شود)</string>
 
     <string name="title_pref_auto_update_subscription">به‌ روزرسانی خودکار اشتراک ها</string>
     <string name="summary_pref_auto_update_subscription">اشتراک های خود را به طور خودکار با فاصله زمانی در پس زمینه به روز کنید. بسته به دستگاه، این ویژگی ممکن است همیشه کار نکند.</string>

@@ -243,7 +243,6 @@
     <string name="title_configuration_share">مشاركة التكوين</string>
 
     <string name="title_pref_promotion">ترويج</string>
-    <string name="summary_pref_promotion">ترويج، انقر للحصول على التفاصيل (يمكن إزالة التبرع)</string>
 
     <string name="title_pref_auto_update_subscription">اشتراكات التحديث التلقائي</string>
     <string name="summary_pref_auto_update_subscription">قم بتحديث اشتراكاتك تلقائيًا بفترة زمنية في الخلفية. اعتمادًا على الجهاز، قد لا تعمل هذه الميزة دائمًا</string>

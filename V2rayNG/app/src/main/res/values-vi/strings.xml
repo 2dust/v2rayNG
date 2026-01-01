@@ -243,7 +243,6 @@
     <string name="title_configuration_restore">Khôi phục cấu hình</string>
     <string name="title_configuration_share">Chia sẻ cấu hình</string>
     <string name="title_pref_promotion">Quảng bá server</string>
-    <string name="summary_pref_promotion">Quảng cáo, nhấn để biết thêm (Ủng hộ có thể được gỡ bỏ)</string>
 
     <string name="title_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký</string>
     <string name="summary_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký của bạn ở trong nền với khoảng thời gian cố định. Tùy thiết bị, tính năng này có thể không luôn hoạt động đúng như mong đợi.</string>

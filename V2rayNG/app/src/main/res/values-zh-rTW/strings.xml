@@ -241,7 +241,6 @@
     <string name="title_configuration_share">分享設定</string>
 
     <string name="title_pref_promotion">推廣</string>
-    <string name="summary_pref_promotion">一些推廣，輕觸以檢視 (捐贈可去除)</string>
 
     <string name="title_pref_auto_update_subscription">自動更新訂閱</string>
     <string name="summary_pref_auto_update_subscription">在後台以一定時間間隔自動更新您的訂閱。受設備影響，此功能不一定總是有效</string>
@@ -263,10 +262,10 @@
     <string name="logcat_copy">複製</string>
     <string name="logcat_clear">清除</string>
     <string name="title_service_restart">重啟服務</string>
-    <string name="title_del_all_config">刪除目前群組設定</string>
-    <string name="title_del_duplicate_config">刪除目前群組重複設定</string>
-    <string name="title_del_invalid_config">刪除目前群組無效設定</string>
-    <string name="title_export_all">匯出目前群組設定至剪貼簿</string>
+    <string name="title_del_all_config">刪除設定</string>
+    <string name="title_del_duplicate_config">刪除重複設定</string>
+    <string name="title_del_invalid_config">刪除無效設定</string>
+    <string name="title_export_all">匯出設定至剪貼簿</string>
     <string name="title_sub_setting">訂閱分組設定</string>
     <string name="sub_setting_remarks">備註</string>
     <string name="sub_setting_url">可選位址(url)</string>
@@ -278,9 +277,9 @@
     <string name="sub_setting_pre_profile">前置代理設定檔别名</string>
     <string name="sub_setting_next_profile">落地代理設定檔別名</string>
     <string name="sub_setting_pre_profile_tip">请确保設定檔别名存在并唯一</string>
-    <string name="title_sub_update">更新目前群組訂閱</string>
-    <string name="title_ping_all_server">偵測目前群組設定 Tcping</string>
-    <string name="title_real_ping_all_server">偵測目前群組設定真延遲</string>
+    <string name="title_sub_update">更新訂閱</string>
+    <string name="title_ping_all_server">偵測設定 Tcping</string>
+    <string name="title_real_ping_all_server">偵測設定真延遲</string>
     <string name="title_user_asset_setting">資源檔案</string>
     <string name="title_sort_by_test_results">依偵測結果排序</string>
     <string name="title_filter_config">過濾設定</string>
