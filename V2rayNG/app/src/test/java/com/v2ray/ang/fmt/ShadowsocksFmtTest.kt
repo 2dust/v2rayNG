@@ -5,6 +5,7 @@ import android.util.Log
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -268,6 +269,9 @@ class ShadowsocksFmtTest {
         }
 
         val uri = ShadowsocksFmt.toUri(config)
+
+        // Verify URI does not include scheme (toUri returns without ss:// prefix)
+        assertFalse("toUri should not include scheme prefix", uri.startsWith(SS_SCHEME))
 
         assertTrue(uri.contains("@example.com:8388"))
         assertTrue(uri.contains("#Test%20Server"))
