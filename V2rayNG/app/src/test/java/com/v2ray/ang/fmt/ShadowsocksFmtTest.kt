@@ -28,8 +28,43 @@ import java.util.Base64 as JavaBase64
  */
 class ShadowsocksFmtTest {
 
+    companion object {
+        private const val SS_SCHEME = "ss://"
+    }
+
     private lateinit var mockBase64: MockedStatic<Base64>
     private lateinit var mockLog: MockedStatic<Log>
+
+    /**
+     * Helper function to create a SIP002 format Shadowsocks URL.
+     */
+    private fun createSip002Url(
+        method: String,
+        password: String,
+        host: String,
+        port: Int,
+        remarks: String
+    ): String {
+        val methodPassword = "$method:$password"
+        val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding()
+            .encodeToString(methodPassword.toByteArray())
+        return "$SS_SCHEME${base64UserInfo}@$host:$port#${remarks.replace(" ", "%20")}"
+    }
+
+    /**
+     * Helper function to create a legacy format Shadowsocks URL.
+     */
+    private fun createLegacyUrl(
+        method: String,
+        password: String,
+        host: String,
+        port: Int,
+        remarks: String
+    ): String {
+        val legacyContent = "$method:$password@$host:$port"
+        val base64Encoded = JavaBase64.getEncoder().encodeToString(legacyContent.toByteArray())
+        return "$SS_SCHEME${base64Encoded}#${remarks.replace(" ", "%20")}"
+    }
 
     @Before
     fun setUp() {
@@ -87,9 +122,13 @@ class ShadowsocksFmtTest {
 
     @Test
     fun test_parseSip002_validUrlWithBase64EncodedUserinfo() {
-        val methodPassword = "aes-256-gcm:my-secret-password"
-        val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
-        val ssUrl = "ss://${base64UserInfo}@example.com:8388#Test%20Server"
+        val ssUrl = createSip002Url(
+            method = "aes-256-gcm",
+            password = "my-secret-password",
+            host = "example.com",
+            port = 8388,
+            remarks = "Test Server"
+        )
 
         val result = ShadowsocksFmt.parseSip002(ssUrl)
 
@@ -115,9 +154,13 @@ class ShadowsocksFmtTest {
 
     @Test
     fun test_parseSip002_withChacha20Encryption() {
-        val methodPassword = "chacha20-ietf-poly1305:secret123"
-        val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
-        val ssUrl = "ss://${base64UserInfo}@ss.example.com:443#ChaCha20"
+        val ssUrl = createSip002Url(
+            method = "chacha20-ietf-poly1305",
+            password = "secret123",
+            host = "ss.example.com",
+            port = 443,
+            remarks = "ChaCha20"
+        )
 
         val result = ShadowsocksFmt.parseSip002(ssUrl)
 
@@ -127,9 +170,11 @@ class ShadowsocksFmtTest {
 
     @Test
     fun test_parseSip002_returnsNullForEmptyHost() {
+        // Manually construct URL with empty host (can't use helper)
         val methodPassword = "aes-256-gcm:password"
-        val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
-        val ssUrl = "ss://${base64UserInfo}@:8388#No%20Host"
+        val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding()
+            .encodeToString(methodPassword.toByteArray())
+        val ssUrl = "${SS_SCHEME}${base64UserInfo}@:8388#No%20Host"
 
         val result = ShadowsocksFmt.parseSip002(ssUrl)
 
@@ -138,9 +183,11 @@ class ShadowsocksFmtTest {
 
     @Test
     fun test_parseSip002_returnsNullForInvalidPort() {
+        // Manually construct URL with invalid port (can't use helper)
         val methodPassword = "aes-256-gcm:password"
-        val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
-        val ssUrl = "ss://${base64UserInfo}@example.com:-1#Invalid%20Port"
+        val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding()
+            .encodeToString(methodPassword.toByteArray())
+        val ssUrl = "${SS_SCHEME}${base64UserInfo}@example.com:-1#Invalid%20Port"
 
         val result = ShadowsocksFmt.parseSip002(ssUrl)
 
@@ -151,9 +198,13 @@ class ShadowsocksFmtTest {
 
     @Test
     fun test_parseLegacy_validUrl() {
-        val legacyContent = "aes-256-gcm:password123@legacy.example.com:8388"
-        val base64Encoded = JavaBase64.getEncoder().encodeToString(legacyContent.toByteArray())
-        val ssUrl = "ss://${base64Encoded}#Legacy%20Server"
+        val ssUrl = createLegacyUrl(
+            method = "aes-256-gcm",
+            password = "password123",
+            host = "legacy.example.com",
+            port = 8388,
+            remarks = "Legacy Server"
+        )
 
         val result = ShadowsocksFmt.parseLegacy(ssUrl)
 
@@ -167,9 +218,10 @@ class ShadowsocksFmtTest {
 
     @Test
     fun test_parseLegacy_withPartiallyEncodedUrl() {
+        // Partially encoded legacy format (method:password encoded, host:port not)
         val methodPassword = "chacha20-ietf-poly1305:my-pass"
         val base64Part = JavaBase64.getEncoder().encodeToString(methodPassword.toByteArray())
-        val ssUrl = "ss://${base64Part}@partial.example.com:443#Partial%20Encoded"
+        val ssUrl = "${SS_SCHEME}${base64Part}@partial.example.com:443#Partial%20Encoded"
 
         val result = ShadowsocksFmt.parseLegacy(ssUrl)
 
@@ -183,7 +235,7 @@ class ShadowsocksFmtTest {
     fun test_parseLegacy_returnsNullForInvalidFormat() {
         val invalidContent = "not-a-valid-format"
         val base64Encoded = JavaBase64.getEncoder().encodeToString(invalidContent.toByteArray())
-        val ssUrl = "ss://${base64Encoded}#Invalid"
+        val ssUrl = "${SS_SCHEME}${base64Encoded}#Invalid"
 
         val result = ShadowsocksFmt.parseLegacy(ssUrl)
 
@@ -192,9 +244,10 @@ class ShadowsocksFmtTest {
 
     @Test
     fun test_parseLegacy_handlesPasswordWithColon() {
+        // Special case: password contains colons (can't use helper)
         val legacyContent = "aes-256-gcm:pass:word:with:colons@example.com:8388"
         val base64Encoded = JavaBase64.getEncoder().encodeToString(legacyContent.toByteArray())
-        val ssUrl = "ss://${base64Encoded}#Colon%20Password"
+        val ssUrl = "${SS_SCHEME}${base64Encoded}#Colon%20Password"
 
         val result = ShadowsocksFmt.parseLegacy(ssUrl)
 
@@ -245,15 +298,19 @@ class ShadowsocksFmtTest {
 
     @Test
     fun test_parseAndToUri_roundTripPreservesData() {
-        val methodPassword = "chacha20-ietf-poly1305:round-trip-password"
-        val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
-        val originalUrl = "ss://${base64UserInfo}@roundtrip.example.com:443#Round%20Trip%20Test"
+        val originalUrl = createSip002Url(
+            method = "chacha20-ietf-poly1305",
+            password = "round-trip-password",
+            host = "roundtrip.example.com",
+            port = 443,
+            remarks = "Round Trip Test"
+        )
 
         val parsed = ShadowsocksFmt.parse(originalUrl)
         assertNotNull(parsed)
 
         val regeneratedUri = ShadowsocksFmt.toUri(parsed!!)
-        val reparsed = ShadowsocksFmt.parse("ss://$regeneratedUri")
+        val reparsed = ShadowsocksFmt.parse("$SS_SCHEME$regeneratedUri")
         assertNotNull(reparsed)
 
         assertEquals(parsed.remarks, reparsed?.remarks)
@@ -267,9 +324,11 @@ class ShadowsocksFmtTest {
 
     @Test
     fun test_parse_handlesEmptyRemarksGracefully() {
+        // Empty remarks edge case (can't use helper)
         val methodPassword = "aes-256-gcm:password"
-        val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
-        val ssUrl = "ss://${base64UserInfo}@example.com:8388#"
+        val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding()
+            .encodeToString(methodPassword.toByteArray())
+        val ssUrl = "${SS_SCHEME}${base64UserInfo}@example.com:8388#"
 
         val result = ShadowsocksFmt.parse(ssUrl)
 
@@ -282,9 +341,13 @@ class ShadowsocksFmtTest {
         val methods = listOf("aes-128-gcm", "aes-256-gcm", "chacha20-ietf-poly1305")
 
         for (method in methods) {
-            val methodPassword = "$method:testpass"
-            val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
-            val ssUrl = "ss://${base64UserInfo}@example.com:8388#$method"
+            val ssUrl = createSip002Url(
+                method = method,
+                password = "testpass",
+                host = "example.com",
+                port = 8388,
+                remarks = method
+            )
 
             val result = ShadowsocksFmt.parseSip002(ssUrl)
 
@@ -295,9 +358,10 @@ class ShadowsocksFmtTest {
 
     @Test
     fun test_parseLegacy_convertsMethodToLowercase() {
+        // Uppercase method to test lowercase conversion (can't use helper)
         val legacyContent = "AES-256-GCM:password@example.com:8388"
         val base64Encoded = JavaBase64.getEncoder().encodeToString(legacyContent.toByteArray())
-        val ssUrl = "ss://${base64Encoded}#Uppercase%20Method"
+        val ssUrl = "${SS_SCHEME}${base64Encoded}#Uppercase%20Method"
 
         val result = ShadowsocksFmt.parseLegacy(ssUrl)
 
