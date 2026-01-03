@@ -51,12 +51,27 @@ class ShadowsocksFmtTest {
                 }
             }
         }
-        // Mock encode
+        // Mock encode with proper flag handling
         mockBase64.`when`<String> {
             Base64.encodeToString(Mockito.any(ByteArray::class.java), Mockito.anyInt())
         }.thenAnswer { invocation ->
             val input = invocation.arguments[0] as ByteArray
-            JavaBase64.getEncoder().withoutPadding().encodeToString(input)
+            val flags = invocation.arguments[1] as Int
+
+            val isUrlSafe = (flags and Base64.URL_SAFE) != 0
+            val noPadding = (flags and Base64.NO_PADDING) != 0
+
+            var encoder = if (isUrlSafe) {
+                JavaBase64.getUrlEncoder()
+            } else {
+                JavaBase64.getEncoder()
+            }
+
+            if (noPadding) {
+                encoder = encoder.withoutPadding()
+            }
+
+            encoder.encodeToString(input)
         }
     }
 
