@@ -36,20 +36,22 @@ class ShadowsocksFmtTest {
         mockLog = mockStatic(Log::class.java, Mockito.RETURNS_DEFAULTS)
 
         mockBase64 = mockStatic(Base64::class.java)
-        // Mock decode
+        // Mock decode with proper flag handling and exception propagation
         mockBase64.`when`<ByteArray> {
             Base64.decode(Mockito.anyString(), Mockito.anyInt())
         }.thenAnswer { invocation ->
             val input = invocation.arguments[0] as String
-            try {
-                JavaBase64.getDecoder().decode(input)
-            } catch (e: Exception) {
-                try {
-                    JavaBase64.getUrlDecoder().decode(input)
-                } catch (e2: Exception) {
-                    ByteArray(0)
-                }
+            val flags = invocation.arguments[1] as Int
+            val isUrlSafe = (flags and Base64.URL_SAFE) != 0
+
+            val decoder = if (isUrlSafe) {
+                JavaBase64.getUrlDecoder()
+            } else {
+                JavaBase64.getDecoder()
             }
+
+            // Propagate exception on invalid input (matches Android behavior)
+            decoder.decode(input)
         }
         // Mock encode with proper flag handling
         mockBase64.`when`<String> {
