@@ -69,7 +69,7 @@ class ShadowsocksFmtTest {
     // ==================== SIP002 Format Tests ====================
 
     @Test
-    fun `parseSip002 valid URL with base64 encoded userinfo`() {
+    fun test_parseSip002_validUrlWithBase64EncodedUserinfo() {
         val methodPassword = "aes-256-gcm:my-secret-password"
         val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
         val ssUrl = "ss://${base64UserInfo}@example.com:8388#Test%20Server"
@@ -85,7 +85,7 @@ class ShadowsocksFmtTest {
     }
 
     @Test
-    fun `parseSip002 valid URL with plain text userinfo`() {
+    fun test_parseSip002_validUrlWithPlainTextUserinfo() {
         val ssUrl = "ss://aes-256-gcm:mypassword@example.com:8388#Plain%20Server"
 
         val result = ShadowsocksFmt.parseSip002(ssUrl)
@@ -97,7 +97,7 @@ class ShadowsocksFmtTest {
     }
 
     @Test
-    fun `parseSip002 with chacha20 encryption`() {
+    fun test_parseSip002_withChacha20Encryption() {
         val methodPassword = "chacha20-ietf-poly1305:secret123"
         val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
         val ssUrl = "ss://${base64UserInfo}@ss.example.com:443#ChaCha20"
@@ -109,7 +109,7 @@ class ShadowsocksFmtTest {
     }
 
     @Test
-    fun `parseSip002 returns null for empty host`() {
+    fun test_parseSip002_returnsNullForEmptyHost() {
         val methodPassword = "aes-256-gcm:password"
         val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
         val ssUrl = "ss://${base64UserInfo}@:8388#No%20Host"
@@ -120,7 +120,7 @@ class ShadowsocksFmtTest {
     }
 
     @Test
-    fun `parseSip002 returns null for invalid port`() {
+    fun test_parseSip002_returnsNullForInvalidPort() {
         val methodPassword = "aes-256-gcm:password"
         val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
         val ssUrl = "ss://${base64UserInfo}@example.com:-1#Invalid%20Port"
@@ -133,7 +133,7 @@ class ShadowsocksFmtTest {
     // ==================== Legacy Format Tests ====================
 
     @Test
-    fun `parseLegacy valid URL`() {
+    fun test_parseLegacy_validUrl() {
         val legacyContent = "aes-256-gcm:password123@legacy.example.com:8388"
         val base64Encoded = JavaBase64.getEncoder().encodeToString(legacyContent.toByteArray())
         val ssUrl = "ss://${base64Encoded}#Legacy%20Server"
@@ -149,7 +149,7 @@ class ShadowsocksFmtTest {
     }
 
     @Test
-    fun `parseLegacy with partially encoded URL`() {
+    fun test_parseLegacy_withPartiallyEncodedUrl() {
         val methodPassword = "chacha20-ietf-poly1305:my-pass"
         val base64Part = JavaBase64.getEncoder().encodeToString(methodPassword.toByteArray())
         val ssUrl = "ss://${base64Part}@partial.example.com:443#Partial%20Encoded"
@@ -163,7 +163,7 @@ class ShadowsocksFmtTest {
     }
 
     @Test
-    fun `parseLegacy returns null for invalid format`() {
+    fun test_parseLegacy_returnsNullForInvalidFormat() {
         val invalidContent = "not-a-valid-format"
         val base64Encoded = JavaBase64.getEncoder().encodeToString(invalidContent.toByteArray())
         val ssUrl = "ss://${base64Encoded}#Invalid"
@@ -174,7 +174,7 @@ class ShadowsocksFmtTest {
     }
 
     @Test
-    fun `parseLegacy handles password with colon`() {
+    fun test_parseLegacy_handlesPasswordWithColon() {
         val legacyContent = "aes-256-gcm:pass:word:with:colons@example.com:8388"
         val base64Encoded = JavaBase64.getEncoder().encodeToString(legacyContent.toByteArray())
         val ssUrl = "ss://${base64Encoded}#Colon%20Password"
@@ -188,7 +188,7 @@ class ShadowsocksFmtTest {
     // ==================== toUri Tests ====================
 
     @Test
-    fun `toUri creates valid SIP002 URL`() {
+    fun test_toUri_createsValidSip002Url() {
         val config = ProfileItem.create(EConfigType.SHADOWSOCKS).apply {
             remarks = "Test Server"
             server = "example.com"
@@ -210,7 +210,7 @@ class ShadowsocksFmtTest {
     }
 
     @Test
-    fun `toUri handles IPv6 address`() {
+    fun test_toUri_handlesIpv6Address() {
         val config = ProfileItem.create(EConfigType.SHADOWSOCKS).apply {
             remarks = "IPv6 Server"
             server = "2001:db8::1"
@@ -227,7 +227,7 @@ class ShadowsocksFmtTest {
     // ==================== Round-trip Tests ====================
 
     @Test
-    fun `parse and toUri round-trip preserves data`() {
+    fun test_parseAndToUri_roundTripPreservesData() {
         val methodPassword = "chacha20-ietf-poly1305:round-trip-password"
         val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
         val originalUrl = "ss://${base64UserInfo}@roundtrip.example.com:443#Round%20Trip%20Test"
@@ -249,7 +249,7 @@ class ShadowsocksFmtTest {
     // ==================== Edge Cases ====================
 
     @Test
-    fun `parse handles empty remarks gracefully`() {
+    fun test_parse_handlesEmptyRemarksGracefully() {
         val methodPassword = "aes-256-gcm:password"
         val base64UserInfo = JavaBase64.getUrlEncoder().withoutPadding().encodeToString(methodPassword.toByteArray())
         val ssUrl = "ss://${base64UserInfo}@example.com:8388#"
@@ -261,7 +261,7 @@ class ShadowsocksFmtTest {
     }
 
     @Test
-    fun `parseSip002 handles different encryption methods`() {
+    fun test_parseSip002_handlesDifferentEncryptionMethods() {
         val methods = listOf("aes-128-gcm", "aes-256-gcm", "chacha20-ietf-poly1305")
 
         for (method in methods) {
@@ -277,7 +277,7 @@ class ShadowsocksFmtTest {
     }
 
     @Test
-    fun `parseLegacy converts method to lowercase`() {
+    fun test_parseLegacy_convertsMethodToLowercase() {
         val legacyContent = "AES-256-GCM:password@example.com:8388"
         val base64Encoded = JavaBase64.getEncoder().encodeToString(legacyContent.toByteArray())
         val ssUrl = "ss://${base64Encoded}#Uppercase%20Method"
