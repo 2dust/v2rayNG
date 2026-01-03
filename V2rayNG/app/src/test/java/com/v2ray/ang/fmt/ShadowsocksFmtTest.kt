@@ -314,6 +314,13 @@ class ShadowsocksFmtTest {
         assertNotNull(parsed)
 
         val regeneratedUri = ShadowsocksFmt.toUri(parsed!!)
+
+        // Verify toUri returns without scheme, so we need to prepend it
+        assertFalse(
+            "toUri should return URI without scheme",
+            regeneratedUri.startsWith(SS_SCHEME)
+        )
+
         val reparsed = ShadowsocksFmt.parse("$SS_SCHEME$regeneratedUri")
         assertNotNull(reparsed)
 
