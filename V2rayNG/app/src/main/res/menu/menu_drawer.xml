@@ -40,6 +40,10 @@
             android:icon="@drawable/ic_check_update_24dp"
             android:title="@string/update_check_for_update" />
         <item
+            android:id="@+id/backup_restore"
+            android:icon="@drawable/ic_restore_24dp"
+            android:title="@string/title_configuration_backup_restore" />
+        <item
             android:id="@+id/about"
             android:icon="@drawable/ic_about_24dp"
             android:title="@string/title_about" />

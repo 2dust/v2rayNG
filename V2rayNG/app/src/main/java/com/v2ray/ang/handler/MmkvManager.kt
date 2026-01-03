@@ -4,6 +4,7 @@ import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
 import com.v2ray.ang.dto.AssetUrlItem
+import com.v2ray.ang.dto.WebDavConfig
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerAffiliationInfo
@@ -27,6 +28,7 @@ object MmkvManager {
     private const val KEY_SELECTED_SERVER = "SELECTED_SERVER"
     private const val KEY_ANG_CONFIGS = "ANG_CONFIGS"
     private const val KEY_SUB_IDS = "SUB_IDS"
+    private const val KEY_WEBDAV_CONFIG = "WEBDAV_CONFIG"
 
     //private val profileStorage by lazy { MMKV.mmkvWithID(ID_PROFILE_CONFIG, MMKV.MULTI_PROCESS_MODE) }
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
@@ -468,6 +470,7 @@ object MmkvManager {
 
     //endregion
 
+    //region settings
     /**
      * Encodes the settings.
      *
@@ -588,4 +591,22 @@ object MmkvManager {
 
     //endregion
 
+    //region WebDAV
+
+    /**
+     * Encodes the WebDAV config as JSON into settings storage.
+     */
+    fun encodeWebDavConfig(config: WebDavConfig): Boolean {
+        return settingsStorage.encode(KEY_WEBDAV_CONFIG, JsonUtil.toJson(config))
+    }
+
+    /**
+     * Decodes the WebDAV config from settings storage.
+     */
+    fun decodeWebDavConfig(): WebDavConfig? {
+        val json = settingsStorage.decodeString(KEY_WEBDAV_CONFIG) ?: return null
+        return JsonUtil.fromJson(json, WebDavConfig::class.java)
+    }
+
+    //endregion
 }

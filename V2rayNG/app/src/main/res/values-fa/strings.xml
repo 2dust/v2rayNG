@@ -237,9 +237,6 @@
     <string name="title_source_code">کد منبع</string>
     <string name="title_oss_license">مجوز های منبع باز</string>
     <string name="title_tg_channel">کانال تلگرام</string>
-    <string name="title_configuration_backup">پشتیبان گیری از پیکربندی</string>
-    <string name="title_configuration_restore">بازیابی پیکربندی</string>
-    <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
     <string name="title_pref_promotion">تبلیغات</string>
 
     <string name="title_pref_auto_update_subscription">به‌ روزرسانی خودکار اشتراک ها</string>
@@ -344,6 +341,18 @@
     <string name="title_policy_group_subscription_id">From subscription group</string>
     <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
 
+    <!-- BackupActivity -->
+    <string name="title_configuration_backup_restore">Backup &amp; Restore</string>
+    <string name="title_configuration_backup">پشتیبان گیری از پیکربندی</string>
+    <string name="title_configuration_restore">بازیابی پیکربندی</string>
+    <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
+    <string name="title_webdav_config_setting">WebDAV Settings</string>
+    <string name="title_webdav_config_setting_unknown">Please configure WebDAV first.</string>
+    <string name="title_webdav_url">WebDAV server URL</string>
+    <string name="title_webdav_user">Username</string>
+    <string name="title_webdav_pass">Password</string>
+    <string name="title_webdav_remote_path">Remote directory (optional)</string>
+
     <string-array name="share_method">
         <item>QRcode</item>
         <item>خروجی گرفتن در کلیپ‌ بورد</item>
@@ -398,6 +407,10 @@
         <item>کمترین پینگ</item>
         <item>کمترین بار(لود)</item>
     </string-array>
-    <string name="pre_resolving_domain">Pre-resolving domain…</string>
+
+    <string-array name="config_backup_options">
+        <item>Local</item>
+        <item>WebDAV</item>
+    </string-array>
 
 </resources>

@@ -236,9 +236,6 @@
     <string name="title_source_code">原始碼</string>
     <string name="title_oss_license">Open Source licenses</string>
     <string name="title_tg_channel">Telegram 頻道</string>
-    <string name="title_configuration_backup">備份設定</string>
-    <string name="title_configuration_restore">還原設定</string>
-    <string name="title_configuration_share">分享設定</string>
 
     <string name="title_pref_promotion">推廣</string>
 
@@ -338,6 +335,18 @@
     <string name="title_policy_group_subscription_id">來自訂閱分組</string>
     <string name="title_policy_group_subscription_filter">別名正規過濾</string>
 
+    <!-- BackupActivity -->
+    <string name="title_configuration_backup_restore">Backup &amp; Restore</string>
+    <string name="title_configuration_backup">備份設定</string>
+    <string name="title_configuration_restore">還原設定</string>
+    <string name="title_configuration_share">分享設定</string>
+    <string name="title_webdav_config_setting">WebDAV 設定</string>
+    <string name="title_webdav_config_setting_unknown">請先設定 WebDAV</string>
+    <string name="title_webdav_url">WebDAV 伺服器位址</string>
+    <string name="title_webdav_user">使用者名稱</string>
+    <string name="title_webdav_pass">密碼</string>
+    <string name="title_webdav_remote_path">遠端目錄（可選）</string>
+
     <string-array name="share_method">
         <item>二維碼</item>
         <item>匯出至剪貼簿</item>
@@ -390,6 +399,10 @@
         <item>最低延遲</item>
         <item>最少卡頓</item>
     </string-array>
-    <string name="pre_resolving_domain">預解析域名…</string>
+
+    <string-array name="config_backup_options">
+        <item>本地</item>
+        <item>WebDAV</item>
+    </string-array>
 
 </resources>

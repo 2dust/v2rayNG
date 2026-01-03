@@ -147,6 +147,9 @@
             android:name=".ui.CheckUpdateActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.BackupActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.AboutActivity"
             android:exported="false" />
 

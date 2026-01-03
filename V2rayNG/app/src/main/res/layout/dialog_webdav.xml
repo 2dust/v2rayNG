@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_spacing_dp16">
+
+        <EditText
+            android:id="@+id/et_webdav_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/title_webdav_url"
+            android:inputType="textUri"
+            android:layout_marginTop="@dimen/padding_spacing_dp8" />
+
+        <EditText
+            android:id="@+id/et_webdav_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/title_webdav_user"
+            android:layout_marginTop="@dimen/padding_spacing_dp8" />
+
+        <EditText
+            android:id="@+id/et_webdav_pass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/title_webdav_pass"
+            android:inputType="textPassword"
+            android:layout_marginTop="@dimen/padding_spacing_dp8" />
+
+        <EditText
+            android:id="@+id/et_webdav_remote_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/title_webdav_remote_path"
+            android:layout_marginTop="@dimen/padding_spacing_dp8" />
+
+    </LinearLayout>
+
+</ScrollView>

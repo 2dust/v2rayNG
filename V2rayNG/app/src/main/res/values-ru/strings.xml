@@ -237,9 +237,6 @@
     <string name="title_source_code">Исходный код</string>
     <string name="title_oss_license">Лицензии открытого исходного кода</string>
     <string name="title_tg_channel">Telegram-канал</string>
-    <string name="title_configuration_backup">Резервирование конфигурации</string>
-    <string name="title_configuration_restore">Восстановление конфигурации</string>
-    <string name="title_configuration_share">Поделиться конфигурацией</string>
 
     <string name="title_pref_promotion">Содействие</string>
 
@@ -346,6 +343,18 @@
     <string name="title_policy_group_subscription_id">From subscription group</string>
     <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
 
+    <!-- BackupActivity -->
+    <string name="title_configuration_backup_restore">Backup &amp; Restore</string>
+    <string name="title_configuration_backup">Резервирование конфигурации</string>
+    <string name="title_configuration_restore">Восстановление конфигурации</string>
+    <string name="title_configuration_share">Поделиться конфигурацией</string>
+    <string name="title_webdav_config_setting">WebDAV Settings</string>
+    <string name="title_webdav_config_setting_unknown">Please configure WebDAV first.</string>
+    <string name="title_webdav_url">WebDAV server URL</string>
+    <string name="title_webdav_user">Username</string>
+    <string name="title_webdav_pass">Password</string>
+    <string name="title_webdav_remote_path">Remote directory (optional)</string>
+
     <string-array name="share_method">
         <item>QR-код</item>
         <item>Экспорт в буфер обмена</item>
@@ -398,6 +407,10 @@
         <item>Наименьшая задержка</item>
         <item>Наименьшая нагрузка</item>
     </string-array>
-    <string name="pre_resolving_domain">Предварительное определение домена…</string>
+
+    <string-array name="config_backup_options">
+        <item>Local</item>
+        <item>WebDAV</item>
+    </string-array>
 
 </resources>

@@ -238,9 +238,6 @@
     <string name="title_source_code">کود بونچک</string>
     <string name="title_oss_license">موجوزا کود بونچک</string>
     <string name="title_tg_channel">تورگه تلگرام</string>
-    <string name="title_configuration_backup">لادراری گرؽڌن ز کانفیگ</string>
-    <string name="title_configuration_restore">وورگندن کانفیگ</string>
-    <string name="title_configuration_share">یک رسۊوی کانفیگ</string>
 
     <string name="title_pref_promotion">تبلیقات</string>
 
@@ -347,6 +344,18 @@
     <string name="title_policy_group_subscription_id">From subscription group</string>
     <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
 
+    <!-- BackupActivity -->
+    <string name="title_configuration_backup_restore">Backup &amp; Restore</string>
+    <string name="title_configuration_backup">لادراری گرؽڌن ز کانفیگ</string>
+    <string name="title_configuration_restore">وورگندن کانفیگ</string>
+    <string name="title_configuration_share">یک رسۊوی کانفیگ</string>
+    <string name="title_webdav_config_setting">WebDAV Settings</string>
+    <string name="title_webdav_config_setting_unknown">Please configure WebDAV first.</string>
+    <string name="title_webdav_url">WebDAV server URL</string>
+    <string name="title_webdav_user">Username</string>
+    <string name="title_webdav_pass">Password</string>
+    <string name="title_webdav_remote_path">Remote directory (optional)</string>
+
     <string-array name="share_method">
         <item>QRcode</item>
         <item>و در کشیڌن من کلیپ بورد</item>
@@ -399,6 +408,10 @@
         <item>کم ترین پینگ</item>
         <item>کم ترین بار(لود)</item>
     </string-array>
-    <string name="pre_resolving_domain">پؽش هل دامنه…</string>
+
+    <string-array name="config_backup_options">
+        <item>Local</item>
+        <item>WebDAV</item>
+    </string-array>
 
 </resources>
