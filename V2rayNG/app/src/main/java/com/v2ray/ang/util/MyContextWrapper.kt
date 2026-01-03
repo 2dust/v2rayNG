@@ -18,21 +18,18 @@ open class MyContextWrapper(base: Context?) : ContextWrapper(base) {
          * @param newLocale The new locale to set.
          * @return A ContextWrapper with the new locale.
          */
-        @RequiresApi(Build.VERSION_CODES.N)
         fun wrap(context: Context, newLocale: Locale?): ContextWrapper {
             var mContext = context
             val res: Resources = mContext.resources
             val configuration: Configuration = res.configuration
-            mContext = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                configuration.setLocale(newLocale)
-                val localeList = LocaleList(newLocale)
-                LocaleList.setDefault(localeList)
-                configuration.setLocales(localeList)
-                mContext.createConfigurationContext(configuration)
-            } else {
-                configuration.setLocale(newLocale)
-                mContext.createConfigurationContext(configuration)
-            }
+
+            val locale = newLocale ?: Locale.getDefault()
+            configuration.setLocale(locale)
+            val localeList = LocaleList(locale)
+            LocaleList.setDefault(localeList)
+            configuration.setLocales(localeList)
+
+            mContext = mContext.createConfigurationContext(configuration)
             return ContextWrapper(mContext)
         }
     }

@@ -16,7 +16,7 @@ object CustomFmt : FmtBase() {
         val config = ProfileItem.create(EConfigType.CUSTOM)
 
         val fullConfig = JsonUtil.fromJson(str, V2rayConfig::class.java)
-        val outbound = fullConfig.getProxyOutbound()
+        val outbound = fullConfig?.getProxyOutbound()
 
         config.remarks = fullConfig?.remarks ?: System.currentTimeMillis().toString()
         config.server = outbound?.getServerAddress()

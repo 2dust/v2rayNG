@@ -84,7 +84,6 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
      * Attaches the base context to the service.
      * @param newBase The new base context.
      */
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun attachBaseContext(newBase: Context?) {
         val context = newBase?.let {
             MyContextWrapper.wrap(newBase, SettingsManager.getLocale())

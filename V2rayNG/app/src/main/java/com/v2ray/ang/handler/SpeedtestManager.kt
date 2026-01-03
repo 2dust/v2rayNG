@@ -7,16 +7,15 @@ import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.IPAPIInfo
-import com.v2ray.ang.extension.responseLength
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import libv2ray.Libv2ray
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.UnknownHostException
-import kotlin.coroutines.coroutineContext
 
 object SpeedtestManager {
 
@@ -33,7 +32,7 @@ object SpeedtestManager {
         var time = -1L
         for (k in 0 until 2) {
             val one = socketConnectTime(url, port)
-            if (!coroutineContext.isActive) {
+            if (!currentCoroutineContext().isActive) {
                 break
             }
             if (one != -1L && (time == -1L || one < time)) {
@@ -143,14 +142,11 @@ object SpeedtestManager {
             val code = conn.responseCode
             elapsed = SystemClock.elapsedRealtime() - start
 
-            if (code == 204 || code == 200 && conn.responseLength == 0L) {
-                result = context.getString(R.string.connection_test_available, elapsed)
-            } else {
-                throw IOException(
-                    context.getString(
-                        R.string.connection_test_error_status_code,
-                        code
-                    )
+            result = when (code) {
+                204 -> context.getString(R.string.connection_test_available, elapsed)
+                200 if conn.contentLengthLong == 0L -> context.getString(R.string.connection_test_available, elapsed)
+                else -> throw IOException(
+                    context.getString(R.string.connection_test_error_status_code, code)
                 )
             }
         } catch (e: IOException) {
@@ -167,14 +163,28 @@ object SpeedtestManager {
     }
 
     fun getRemoteIPInfo(): String? {
+        val url = MmkvManager.decodeSettingsString(AppConfig.PREF_IP_API_URL)
+            .takeIf { !it.isNullOrBlank() } ?: AppConfig.IP_API_URL
+
         val httpPort = SettingsManager.getHttpPort()
-        var content = HttpUtil.getUrlContent(AppConfig.IP_API_URL, 5000, httpPort) ?: return null
+        val content = HttpUtil.getUrlContent(url, 5000, httpPort) ?: return null
+        val ipInfo = JsonUtil.fromJson(content, IPAPIInfo::class.java) ?: return null
 
-        var ipInfo = JsonUtil.fromJson(content, IPAPIInfo::class.java) ?: return null
-        var ip = ipInfo.ip ?: ipInfo.clientIp ?: ipInfo.ip_addr ?: ipInfo.query
-        var country = ipInfo.country_code ?: ipInfo.country ?: ipInfo.countryCode
+        val ip = listOf(
+            ipInfo.ip,
+            ipInfo.clientIp,
+            ipInfo.ip_addr,
+            ipInfo.query
+        ).firstOrNull { !it.isNullOrBlank() }
 
-        return "(${country ?: "unknown"}) $ip"
+        val country = listOf(
+            ipInfo.country_code,
+            ipInfo.country,
+            ipInfo.countryCode,
+            ipInfo.location?.country_code
+        ).firstOrNull { !it.isNullOrBlank() }
+
+        return "(${country ?: "unknown"}) ${ip ?: "unknown"}"
     }
 
     /**

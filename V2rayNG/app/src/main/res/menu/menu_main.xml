@@ -25,6 +25,10 @@
                 android:title="@string/menu_item_import_config_local"
                 app:showAsAction="never" />
             <item
+                android:id="@+id/import_manually_policy_group"
+                android:title="@string/menu_item_import_config_policy_group"
+                app:showAsAction="never" />
+            <item
                 android:id="@+id/import_manually_vmess"
                 android:title="@string/menu_item_import_config_manually_vmess"
                 app:showAsAction="never" />
@@ -81,10 +85,6 @@
         android:id="@+id/export_all"
         android:icon="@drawable/ic_share_24dp"
         android:title="@string/title_export_all"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/intelligent_selection_all"
-        android:title="@string/title_create_intelligent_selection_all_server"
         app:showAsAction="never" />
     <item
         android:id="@+id/ping_all"

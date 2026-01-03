@@ -133,7 +133,7 @@ object PluginServiceManager {
     private fun stopHy2() {
         try {
             Log.i(AppConfig.TAG, "$HYSTERIA2 destroy")
-            procService?.stopProcess()
+            procService.stopProcess()
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to stop Hysteria2 process", e)
         }

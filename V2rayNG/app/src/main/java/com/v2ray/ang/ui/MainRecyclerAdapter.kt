@@ -57,7 +57,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
         if (holder is MainViewHolder) {
             val guid = mActivity.mainViewModel.serversCache[position].guid
             val profile = mActivity.mainViewModel.serversCache[position].profile
-            val isCustom = profile.configType == EConfigType.CUSTOM
+            val isCustom = profile.configType == EConfigType.CUSTOM || profile.configType == EConfigType.POLICYGROUP
 
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
 
@@ -144,14 +144,18 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
      */
     private fun getAddress(profile: ProfileItem): String {
         // Hide xxx:xxx:***/xxx.xxx.xxx.***
-        return "${
-            profile.server?.let {
-                if (it.contains(":"))
-                    it.split(":").take(2).joinToString(":", postfix = ":***")
-                else
-                    it.split('.').dropLast(1).joinToString(".", postfix = ".***")
-            }
-        } : ${profile.serverPort}"
+        val server = profile.server
+        val port = profile.serverPort
+        if (server.isNullOrBlank() && port.isNullOrBlank()) return ""
+
+        val addrPart = server?.let {
+            if (it.contains(":"))
+                it.split(":").take(2).joinToString(":", postfix = ":***")
+            else
+                it.split('.').dropLast(1).joinToString(".", postfix = ".***")
+        } ?: ""
+
+        return "$addrPart : ${port ?: ""}"
     }
 
     /**
@@ -201,6 +205,11 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     private fun showQRCode(guid: String) {
         val ivBinding = ItemQrcodeBinding.inflate(LayoutInflater.from(mActivity))
         ivBinding.ivQcode.setImageBitmap(AngConfigManager.share2QRCode(guid))
+        if (share_method.isNotEmpty()) {
+            ivBinding.ivQcode.contentDescription = share_method[0]
+        } else {
+            ivBinding.ivQcode.contentDescription = "QR Code"
+        }
         AlertDialog.Builder(mActivity).setView(ivBinding.root).show()
     }
 
@@ -245,6 +254,8 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             .putExtra("createConfigType", profile.configType.value)
         if (profile.configType == EConfigType.CUSTOM) {
             mActivity.startActivity(intent.setClass(mActivity, ServerCustomConfigActivity::class.java))
+        } else if (profile.configType == EConfigType.POLICYGROUP) {
+            mActivity.startActivity(intent.setClass(mActivity, ServerGroupActivity::class.java))
         } else {
             mActivity.startActivity(intent.setClass(mActivity, ServerActivity::class.java))
         }
@@ -258,7 +269,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
      */
     private fun removeServer(guid: String, position: Int) {
         if (guid != MmkvManager.getSelectServer()) {
-            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE) == true) {
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE)) {
                 AlertDialog.Builder(mActivity).setMessage(R.string.del_config_comfirm)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         removeServerSub(guid, position)

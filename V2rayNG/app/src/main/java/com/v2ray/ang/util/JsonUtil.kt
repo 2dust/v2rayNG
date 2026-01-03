@@ -32,7 +32,7 @@ object JsonUtil {
      * @param cls The class of the object to parse into.
      * @return The parsed object.
      */
-    fun <T> fromJson(src: String, cls: Class<T>): T {
+    fun <T> fromJson(src: String, cls: Class<T>): T? {
         return gson.fromJson(src, cls)
     }
 

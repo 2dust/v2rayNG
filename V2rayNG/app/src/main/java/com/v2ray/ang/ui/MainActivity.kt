@@ -35,7 +35,6 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AngConfigManager
-import com.v2ray.ang.handler.MigrateManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.handler.V2RayServiceManager
@@ -174,7 +173,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         initGroupTab()
         setupViewModel()
-        migrateLegacy()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -211,32 +209,19 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             if (isRunning) {
                 binding.fab.setImageResource(R.drawable.ic_stop_24dp)
                 binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_active))
+                binding.fab.contentDescription = getString(R.string.action_stop_service)
                 setTestState(getString(R.string.connection_connected))
                 binding.layoutTest.isFocusable = true
             } else {
                 binding.fab.setImageResource(R.drawable.ic_play_24dp)
                 binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_inactive))
+                binding.fab.contentDescription = getString(R.string.tasker_start_service)
                 setTestState(getString(R.string.connection_not_connected))
                 binding.layoutTest.isFocusable = false
             }
         }
         mainViewModel.startListenBroadcast()
         mainViewModel.initAssets(assets)
-    }
-
-    private fun migrateLegacy() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val result = MigrateManager.migrateServerConfig2Profile()
-            launch(Dispatchers.Main) {
-                if (result) {
-                    toast(getString(R.string.migration_success))
-                    mainViewModel.reloadServerList()
-                } else {
-                    //toast(getString(R.string.migration_fail))
-                }
-            }
-
-        }
     }
 
     private fun initGroupTab() {
@@ -328,6 +313,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
+        R.id.import_manually_policy_group -> {
+            importManually(EConfigType.POLICYGROUP.value)
+            true
+        }
+
         R.id.import_manually_vmess -> {
             importManually(EConfigType.VMESS.value)
             true
@@ -385,14 +375,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
-        R.id.intelligent_selection_all -> {
-            if (MmkvManager.decodeSettingsString(AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD, "1") != "0") {
-                toast(getString(R.string.pre_resolving_domain))
-            }
-            mainViewModel.createIntelligentSelectionAll()
-            true
-        }
-
         R.id.service_restart -> {
             restartV2Ray()
             true
@@ -428,12 +410,20 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private fun importManually(createConfigType: Int) {
-        startActivity(
-            Intent()
-                .putExtra("createConfigType", createConfigType)
-                .putExtra("subscriptionId", mainViewModel.subscriptionId)
-                .setClass(this, ServerActivity::class.java)
-        )
+        if (createConfigType == EConfigType.POLICYGROUP.value) {
+            startActivity(
+                Intent()
+                    .putExtra("subscriptionId", mainViewModel.subscriptionId)
+                    .setClass(this, ServerGroupActivity::class.java)
+            )
+        } else {
+            startActivity(
+                Intent()
+                    .putExtra("createConfigType", createConfigType)
+                    .putExtra("subscriptionId", mainViewModel.subscriptionId)
+                    .setClass(this, ServerActivity::class.java)
+            )
+        }
     }
 
     /**

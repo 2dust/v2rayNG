@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
@@ -17,7 +16,6 @@ import com.v2ray.ang.service.ServiceControl
 import com.v2ray.ang.service.V2RayProxyOnlyService
 import com.v2ray.ang.service.V2RayVpnService
 import com.v2ray.ang.util.MessageUtil
-import com.v2ray.ang.handler.PluginServiceManager
 import com.v2ray.ang.util.Utils
 import go.Seq
 import kotlinx.coroutines.CoroutineScope
@@ -100,13 +98,14 @@ object V2RayServiceManager {
         val guid = MmkvManager.getSelectServer() ?: return
         val config = MmkvManager.decodeServerConfig(guid) ?: return
         if (config.configType != EConfigType.CUSTOM
+            && config.configType != EConfigType.POLICYGROUP
             && !Utils.isValidUrl(config.server)
             && !Utils.isPureIpAddress(config.server.orEmpty())
         ) return
 //        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
 //        if (!result.status) return
 
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)
         } else {
             context.toast(R.string.toast_services_start)
@@ -116,11 +115,7 @@ object V2RayServiceManager {
         } else {
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
         }
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
-            context.startForegroundService(intent)
-        } else {
-            context.startService(intent)
-        }
+        ContextCompat.startForegroundService(context, intent)
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -41,7 +40,7 @@ class SettingsActivity : BaseActivity() {
         private val localDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_LOCAL_DNS_ENABLED) }
         private val fakeDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_FAKE_DNS_ENABLED) }
         private val appendHttpProxy by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_APPEND_HTTP_PROXY) }
-        private val localDnsPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_LOCAL_DNS_PORT) }
+//        private val localDnsPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_LOCAL_DNS_PORT) }
         private val vpnDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_VPN_DNS) }
         private val vpnBypassLan by lazy { findPreference<ListPreference>(AppConfig.PREF_VPN_BYPASS_LAN) }
         private val vpnInterfaceAddress by lazy { findPreference<ListPreference>(AppConfig.PREF_VPN_INTERFACE_ADDRESS_CONFIG_INDEX) }
@@ -65,11 +64,12 @@ class SettingsActivity : BaseActivity() {
         private val domesticDns by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DOMESTIC_DNS) }
         private val dnsHosts by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DNS_HOSTS) }
         private val delayTestUrl by lazy { findPreference<EditTextPreference>(AppConfig.PREF_DELAY_TEST_URL) }
+        private val ipApiUrl by lazy { findPreference<EditTextPreference>(AppConfig.PREF_IP_API_URL) }
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
 
         private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
         private val hevTunRwTimeout by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) }
-        private val useHevTun by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_USE_HEV_TUNNEL) }
+//        private val useHevTun by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_USE_HEV_TUNNEL) }
 
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             addPreferencesFromResource(R.xml.pref_settings)
@@ -83,12 +83,11 @@ class SettingsActivity : BaseActivity() {
                 updateLocalDns(any as Boolean)
                 true
             }
-            localDnsPort?.setOnPreferenceChangeListener { _, any ->
-                val nval = any as String
-                localDnsPort?.summary =
-                    if (TextUtils.isEmpty(nval)) AppConfig.PORT_LOCAL_DNS else nval
-                true
-            }
+//            localDnsPort?.setOnPreferenceChangeListener { _, any ->
+//                val nval = any as String
+//                localDnsPort?.summary =  nval.ifEmpty { AppConfig.PORT_LOCAL_DNS }
+//                true
+//            }
             vpnDns?.setOnPreferenceChangeListener { _, any ->
                 vpnDns?.summary = any as String
                 true
@@ -96,7 +95,7 @@ class SettingsActivity : BaseActivity() {
 
             vpnMtu?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                vpnMtu?.summary = if (TextUtils.isEmpty(nval)) AppConfig.VPN_MTU.toString() else nval
+                vpnMtu?.summary =  nval.ifEmpty { AppConfig.VPN_MTU.toString() }
                 true
             }
 
@@ -152,18 +151,18 @@ class SettingsActivity : BaseActivity() {
 
             socksPort?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                socksPort?.summary = if (TextUtils.isEmpty(nval)) AppConfig.PORT_SOCKS else nval
+                socksPort?.summary = nval.ifEmpty { AppConfig.PORT_SOCKS }
                 true
             }
 
             remoteDns?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                remoteDns?.summary = if (nval == "") AppConfig.DNS_PROXY else nval
+                remoteDns?.summary = nval.ifEmpty { AppConfig.DNS_PROXY }
                 true
             }
             domesticDns?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                domesticDns?.summary = if (nval == "") AppConfig.DNS_DIRECT else nval
+                domesticDns?.summary = nval.ifEmpty { AppConfig.DNS_DIRECT }
                 true
             }
             dnsHosts?.setOnPreferenceChangeListener { _, any ->
@@ -173,7 +172,12 @@ class SettingsActivity : BaseActivity() {
             }
             delayTestUrl?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                delayTestUrl?.summary = if (nval == "") AppConfig.DELAY_TEST_URL else nval
+                delayTestUrl?.summary = nval.ifEmpty { AppConfig.DELAY_TEST_URL }
+                true
+            }
+            ipApiUrl?.setOnPreferenceChangeListener { _, any ->
+                val nval = any as String
+                ipApiUrl?.summary = nval.ifEmpty { AppConfig.IP_API_URL }
                 true
             }
             mode?.setOnPreferenceChangeListener { _, newValue ->
@@ -183,14 +187,14 @@ class SettingsActivity : BaseActivity() {
             mode?.dialogLayoutResource = R.layout.preference_with_help_link
             //loglevel.summary = "LogLevel"
 
-            useHevTun?.setOnPreferenceChangeListener { _, newValue ->
-                updateHevTunSettings(newValue as Boolean)
-                true
-            }
+//            useHevTun?.setOnPreferenceChangeListener { _, newValue ->
+//                updateHevTunSettings(newValue as Boolean)
+//                true
+//            }
 
             hevTunRwTimeout?.setOnPreferenceChangeListener { _, any ->
                 val nval = any as String
-                hevTunRwTimeout?.summary = if (TextUtils.isEmpty(nval)) AppConfig.HEVTUN_RW_TIMEOUT else nval
+                hevTunRwTimeout?.summary = nval.ifEmpty { AppConfig.HEVTUN_RW_TIMEOUT }
                 true
             }
         }
@@ -201,7 +205,7 @@ class SettingsActivity : BaseActivity() {
             localDns?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
             fakeDns?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED, false)
             appendHttpProxy?.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_APPEND_HTTP_PROXY, false)
-            localDnsPort?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
+//            localDnsPort?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT, AppConfig.PORT_LOCAL_DNS)
             vpnDns?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_DNS, AppConfig.DNS_VPN)
             vpnMtu?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_MTU, AppConfig.VPN_MTU.toString())
 
@@ -226,8 +230,9 @@ class SettingsActivity : BaseActivity() {
             domesticDns?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
             dnsHosts?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DNS_HOSTS)
             delayTestUrl?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DELAY_TEST_URL)
+            ipApiUrl?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_IP_API_URL, AppConfig.IP_API_URL)
 
-            updateHevTunSettings(MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true))
+            //updateHevTunSettings(MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true))
             hevTunRwTimeout?.summary = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT, AppConfig.HEVTUN_RW_TIMEOUT)
 
             initSharedPreference()
@@ -235,7 +240,7 @@ class SettingsActivity : BaseActivity() {
 
         private fun initSharedPreference() {
             listOf(
-                localDnsPort,
+                //localDnsPort,
                 vpnDns,
                 vpnMtu,
                 muxConcurrency,
@@ -247,9 +252,10 @@ class SettingsActivity : BaseActivity() {
                 remoteDns,
                 domesticDns,
                 delayTestUrl,
+                ipApiUrl,
                 hevTunRwTimeout
             ).forEach { key ->
-                key?.text = key?.summary.toString()
+                key?.text = key.summary.toString()
             }
 
             listOf(
@@ -286,7 +292,6 @@ class SettingsActivity : BaseActivity() {
                 AppConfig.PREF_UI_MODE_NIGHT,
                 AppConfig.PREF_LOGLEVEL,
                 AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD,
-                AppConfig.PREF_INTELLIGENT_SELECTION_METHOD,
                 AppConfig.PREF_MODE,
                 AppConfig.PREF_HEV_TUNNEL_LOGLEVEL
             ).forEach { key ->
@@ -303,7 +308,7 @@ class SettingsActivity : BaseActivity() {
             localDns?.isEnabled = vpn
             fakeDns?.isEnabled = vpn
             appendHttpProxy?.isEnabled = vpn
-            localDnsPort?.isEnabled = vpn
+//            localDnsPort?.isEnabled = vpn
             vpnDns?.isEnabled = vpn
             vpnBypassLan?.isEnabled = vpn
             vpnInterfaceAddress?.isEnabled = vpn
@@ -320,7 +325,7 @@ class SettingsActivity : BaseActivity() {
 
         private fun updateLocalDns(enabled: Boolean) {
             fakeDns?.isEnabled = enabled
-            localDnsPort?.isEnabled = enabled
+//            localDnsPort?.isEnabled = enabled
             vpnDns?.isEnabled = !enabled
         }
 

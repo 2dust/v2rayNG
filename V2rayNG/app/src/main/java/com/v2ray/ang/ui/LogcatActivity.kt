@@ -56,7 +56,7 @@ class LogcatActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
                 lst.add("-v")
                 lst.add("time")
                 lst.add("-s")
-                lst.add("GoLog,tun2socks,${ANG_PACKAGE},AndroidRuntime,System.err")
+                lst.add("GoLog,${ANG_PACKAGE},AndroidRuntime,System.err")
                 val process = withContext(Dispatchers.IO) {
                     Runtime.getRuntime().exec(lst.toTypedArray())
                 }

@@ -37,17 +37,17 @@ class TProxyService(
      * Starts the tun2socks process with the appropriate parameters.
      */
     override fun startTun2Socks() {
-        Log.i(AppConfig.TAG, "Starting HevSocks5Tunnel via JNI")
+//        Log.i(AppConfig.TAG, "Starting HevSocks5Tunnel via JNI")
 
         val configContent = buildConfig()
         val configFile = File(context.filesDir, "hev-socks5-tunnel.yaml").apply {
             writeText(configContent)
         }
-        Log.i(AppConfig.TAG, "Config file created: ${configFile.absolutePath}")
-        Log.d(AppConfig.TAG, "Config content:\n$configContent")
+//        Log.i(AppConfig.TAG, "Config file created: ${configFile.absolutePath}")
+        Log.d(AppConfig.TAG, "HevSocks5Tunnel Config content:\n$configContent")
 
         try {
-            Log.i(AppConfig.TAG, "TProxyStartService...")
+//            Log.i(AppConfig.TAG, "TProxyStartService...")
             TProxyStartService(configFile.absolutePath, vpnInterface.fd)
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "HevSocks5Tunnel exception: ${e.message}")
@@ -62,7 +62,7 @@ class TProxyService(
             appendLine("  mtu: ${SettingsManager.getVpnMtu()}")
             appendLine("  ipv4: ${vpnConfig.ipv4Client}")
 
-            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true) {
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6)) {
                 appendLine("  ipv6: '${vpnConfig.ipv6Client}'")
             }
 
@@ -71,9 +71,17 @@ class TProxyService(
             appendLine("  address: ${AppConfig.LOOPBACK}")
             appendLine("  udp: 'udp'")
 
+            // Read-write timeout settings
+            val timeoutSetting = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) ?: AppConfig.HEVTUN_RW_TIMEOUT
+            val parts = timeoutSetting.split(",")
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+            val tcpTimeout = parts.getOrNull(0)?.toIntOrNull() ?: 300
+            val udpTimeout = parts.getOrNull(1)?.toIntOrNull() ?: 60
+
             appendLine("misc:")
-            appendLine("  tcp-read-write-timeout: ${MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) ?: AppConfig.HEVTUN_RW_TIMEOUT}")
-            appendLine("  udp-read-write-timeout: ${MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) ?: AppConfig.HEVTUN_RW_TIMEOUT}")
+            appendLine("  tcp-read-write-timeout: ${tcpTimeout * 1000}")
+            appendLine("  udp-read-write-timeout: ${udpTimeout * 1000}")
             appendLine("  log-level: ${MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) ?: "warn"}")
         }
     }

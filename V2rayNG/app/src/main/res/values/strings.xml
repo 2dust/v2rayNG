@@ -7,6 +7,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="migration_success">Data migration success!</string>
+    <string name="action_stop_service">Stop service</string>
     <string name="migration_fail">Data migration failed!</string>
     <string name="pull_down_to_refresh">Please pull down to refresh!</string>
 
@@ -21,21 +22,23 @@
     <string name="toast_services_failure">Start Services Failure</string>
 
     <!--ServerActivity-->
-    <string name="title_server">Configuration</string>
-    <string name="menu_item_add_config">Add configuration</string>
-    <string name="menu_item_save_config">Save configuration</string>
-    <string name="menu_item_del_config">Delete configuration</string>
-    <string name="menu_item_import_config_qrcode">Import configuration from QRcode</string>
-    <string name="menu_item_import_config_clipboard">Import configuration from Clipboard</string>
-    <string name="menu_item_import_config_local">Import configuration from locally</string>
-    <string name="menu_item_import_config_manually_vmess">Type manually[VMess]</string>
-    <string name="menu_item_import_config_manually_vless">Type manually[VLESS]</string>
-    <string name="menu_item_import_config_manually_ss">Type manually[Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">Type manually[SOCKS]</string>
-    <string name="menu_item_import_config_manually_http">Type manually[HTTP]</string>
-    <string name="menu_item_import_config_manually_trojan">Type manually[Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">Type manually[Wireguard]</string>
-    <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
+    <string name="title_server">Config</string>
+    <string name="menu_item_add_config">Add config</string>
+    <string name="menu_item_save_config">Save config</string>
+    <string name="menu_item_edit_config">Edit config</string>
+    <string name="menu_item_del_config">Delete config</string>
+    <string name="menu_item_import_config_qrcode">Import from QRcode</string>
+    <string name="menu_item_import_config_clipboard">Import from Clipboard</string>
+    <string name="menu_item_import_config_local">Import from locally</string>
+    <string name="menu_item_import_config_policy_group">Add [Policy group]</string>
+    <string name="menu_item_import_config_manually_vmess">Add [VMess]</string>
+    <string name="menu_item_import_config_manually_vless">Add [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">Add [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">Add [SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">Add [HTTP]</string>
+    <string name="menu_item_import_config_manually_trojan">Add [Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">Add [Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">Add [Hysteria2]</string>
     <string name="del_config_comfirm">Confirm delete ?</string>
     <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
     <string name="server_lab_remarks">remarks</string>
@@ -91,16 +94,16 @@
     <string name="toast_none_data">There is nothing</string>
     <string name="toast_incorrect_protocol">Incorrect protocol</string>
     <string name="toast_decoding_failed">Decoding failed</string>
-    <string name="title_file_chooser">Select a configuration</string>
+    <string name="title_file_chooser">Select a config</string>
     <string name="toast_require_file_manager">Please install a File Manager.</string>
-    <string name="server_customize_config">Customize configuration</string>
-    <string name="toast_config_file_invalid">Invalid configuration</string>
+    <string name="server_customize_config">Customize config</string>
+    <string name="toast_config_file_invalid">Invalid config</string>
     <string name="server_lab_content">Content</string>
     <string name="toast_none_data_clipboard">There is no data in the clipboard</string>
     <string name="toast_invalid_url">Invalid URL</string>
     <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
     <string name="server_lab_need_inbound">Ensure inbounds port is consistent with the settings</string>
-    <string name="toast_malformed_josn">Configuration malformed</string>
+    <string name="toast_malformed_josn">Config malformed</string>
     <string name="server_lab_request_host6">Host(SNI)(Optional)</string>
     <string name="toast_action_not_allowed">Action not allowed</string>
     <string name="server_obfs_password">Obfs password</string>
@@ -111,6 +114,8 @@
     <string name="server_lab_bandwidth_up">Bandwidth up (Supported units: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
+    <string name="server_lab_ech_config_list">EchConfigList</string>
+    <string name="server_lab_ech_force_query">EchForceQuery</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">File copy failed, please use File Manager</string>
@@ -195,8 +200,11 @@
     <string name="title_pref_dns_hosts">DNS hosts (Format: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
-    <string name="title_pref_delay_test_url">True delay test url (http/https)</string>
+    <string name="title_pref_delay_test_url">True delay test url </string>
     <string name="summary_pref_delay_test_url">Url</string>
+
+    <string name="title_pref_ip_api_url">Current connection info test url</string>
+    <string name="summary_pref_ip_api_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">Allow connections from the LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Other devices can connect to proxy by your IP address through local proxy. Only enable in trusted networks to avoid unauthorized connections</string>
@@ -211,8 +219,8 @@
     <string name="title_pref_local_dns_port">Local DNS port</string>
     <string name="summary_pref_local_dns_port">Local DNS port</string>
 
-    <string name="title_pref_confirm_remove">Delete configuration confirmation</string>
-    <string name="summary_pref_confirm_remove">Whether to delete the configuration requires a second confirmation by the user</string>
+    <string name="title_pref_confirm_remove">Delete config confirmation</string>
+    <string name="summary_pref_confirm_remove">Whether deleting a config requires a second confirmation by the user</string>
 
     <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
     <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
@@ -233,13 +241,11 @@
     <string name="title_source_code">Source code</string>
     <string name="title_oss_license">Open Source licenses</string>
     <string name="title_tg_channel">Telegram channel</string>
-    <string name="title_configuration_backup">Backup configuration</string>
-    <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
-    <string name="title_configuration_restore">Restore configuration</string>
-    <string name="title_configuration_share">Share configuration</string>
+    <string name="title_configuration_backup">Backup config</string>
+    <string name="title_configuration_restore">Restore config</string>
+    <string name="title_configuration_share">Share config</string>
 
     <string name="title_pref_promotion">Promotion</string>
-    <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
 
     <string name="title_pref_auto_update_subscription">Automatic update subscriptions</string>
     <string name="summary_pref_auto_update_subscription">Update your subscriptions automatically at set intervals in the background. Depending on the device, this feature may not always work</string>
@@ -255,16 +261,16 @@
     <string name="title_pref_use_hev_tunnel">Enable New TUN Feature</string>
     <string name="summary_pref_use_hev_tunnel">When enabled, TUN will use hev-socks5-tunnel; otherwise, it will use badvpn-tun2socks.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun Log Level</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun Read/Write Timeout (ms, default 300000)</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun read/write timeout (seconds) (tcp,udp default 300,60)</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Copy</string>
     <string name="logcat_clear">Clear</string>
     <string name="title_service_restart">Service restart</string>
-    <string name="title_del_all_config">Delete current group configuration</string>
-    <string name="title_del_duplicate_config">Delete current group duplicate configuration</string>
-    <string name="title_del_invalid_config">Delete current group invalid configuration</string>
-    <string name="title_export_all">Export current group non-custom configs to clipboard</string>
+    <string name="title_del_all_config">Delete config</string>
+    <string name="title_del_duplicate_config">Delete duplicate config</string>
+    <string name="title_del_invalid_config">Delete invalid config</string>
+    <string name="title_export_all">Export configs to clipboard</string>
     <string name="title_sub_setting">Subscription group setting</string>
     <string name="sub_setting_remarks">remarks</string>
     <string name="sub_setting_url">Optional URL</string>
@@ -273,22 +279,21 @@
     <string name="sub_setting_enable">Enable update</string>
     <string name="sub_auto_update">Enable automatic update</string>
     <string name="sub_allow_insecure_url">Allow insecure HTTP address</string>
-    <string name="sub_setting_pre_profile">Previous proxy configuration remarks</string>
-    <string name="sub_setting_next_profile">Next proxy configuration remarks</string>
-    <string name="sub_setting_pre_profile_tip">The configuration remarks exists and is unique</string>
-    <string name="title_sub_update">Update current group subscription</string>
-    <string name="title_ping_all_server">Tcping current group configuration</string>
-    <string name="title_real_ping_all_server">Real delay current group configuration</string>
-    <string name="title_create_intelligent_selection_all_server">Creating Intelligent Selection Current Group Configuration</string>
+    <string name="sub_setting_pre_profile">Previous proxy config remarks</string>
+    <string name="sub_setting_next_profile">Next proxy config remarks</string>
+    <string name="sub_setting_pre_profile_tip">The config remarks exist and are unique</string>
+    <string name="title_sub_update">Update subscription</string>
+    <string name="title_ping_all_server">Tcping config</string>
+    <string name="title_real_ping_all_server">Real delay config</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sorting by test results</string>
-    <string name="title_filter_config">Filter configuration</string>
+    <string name="title_filter_config">Filter config</string>
     <string name="filter_config_all">All groups</string>
-    <string name="title_del_duplicate_config_count">Delete %d duplicate configurations</string>
-    <string name="title_del_config_count">Delete %d configurations</string>
-    <string name="title_import_config_count">Import %d configurations</string>
-    <string name="title_export_config_count">Export %d configurations</string>
-    <string name="title_update_config_count">Update %d configurations</string>
+    <string name="title_del_duplicate_config_count">Delete %d duplicate configs</string>
+    <string name="title_del_config_count">Delete %d configs</string>
+    <string name="title_import_config_count">Import %d configs</string>
+    <string name="title_export_config_count">Export %d configs</string>
+    <string name="title_update_config_count">Update %d configs</string>
 
     <string name="tasker_start_service">Start Service</string>
     <string name="tasker_setting_confirm">Confirm</string>
@@ -318,7 +323,7 @@
 
     <string name="connection_test_pending">Check Connectivity</string>
     <string name="connection_test_testing">Testing…</string>
-    <string name="connection_test_testing_count">Testing %d configurations…</string>
+    <string name="connection_test_testing_count">Testing %d configs…</string>
     <string name="connection_test_available">Success: Connection took %dms</string>
     <string name="connection_test_error">Fail to detect internet connection: %s</string>
     <string name="connection_test_fail">Internet Unavailable</string>
@@ -341,16 +346,20 @@
     <string name="update_check_pre_release">Check Pre-release</string>
     <string name="update_checking_for_update">Checking for update…</string>
 
+    <string name="title_policy_group_type">Policy group type</string>
+    <string name="title_policy_group_subscription_id">From subscription group</string>
+    <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+
     <string-array name="share_method">
         <item>QRcode</item>
         <item>Export to clipboard</item>
-        <item>Export full configuration to clipboard</item>
+        <item>Export full config to clipboard</item>
     </string-array>
 
     <string-array name="share_method_more">
         <item>QRcode</item>
         <item>Export to clipboard</item>
-        <item>Export full configuration to clipboard</item>
+        <item>Export full config to clipboard</item>
         <item>Edit</item>
         <item>Delete</item>
     </string-array>
@@ -379,7 +388,7 @@
     </string-array>
 
     <string-array name="vpn_bypass_lan">
-        <item>Follow configuration</item>
+        <item>Follow config</item>
         <item>Bypass</item>
         <item>Not Bypass</item>
     </string-array>
@@ -389,13 +398,12 @@
         <item>Resolve and add to DNS Hosts</item>
         <item>Resolve and replace domain</item>
     </string-array>
-    <string name="intelligent_selection">Intelligent Selection</string>
-    <string name="sub_setting_intelligent_selection_filter">Remarks Intelligent Selection regular filter</string>
-    <string name="title_intelligent_selection_method">Intelligent Selection Method</string>
-    <string-array name="intelligent_selection_method">
+
+    <string-array name="policy_group_type">
         <item>Least Ping</item>
         <item>Least Load</item>
     </string-array>
+
     <string name="pre_resolving_domain">Pre-resolving domain…</string>
 
 </resources>

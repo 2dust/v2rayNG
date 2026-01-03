@@ -40,6 +40,8 @@ data class ProfileItem(
     var alpn: String? = null,
     var fingerPrint: String? = null,
     var insecure: Boolean? = null,
+    var echConfigList: String? = null,
+    var echForceQuery: String? = null,
 
     var publicKey: String? = null,
     var shortId: String? = null,
@@ -58,6 +60,10 @@ data class ProfileItem(
     var pinSHA256: String? = null,
     var bandwidthDown: String? = null,
     var bandwidthUp: String? = null,
+
+    var policyGroupType: String? = null,
+    var policyGroupSubscriptionId: String? = null,
+    var policyGroupFilter: String? = null,
 
     ) {
     companion object {

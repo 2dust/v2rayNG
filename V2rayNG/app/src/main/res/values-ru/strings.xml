@@ -6,6 +6,7 @@
     <string name="navigation_drawer_open">Открыть панель навигации</string>
     <string name="navigation_drawer_close">Закрыть панель навигации</string>
     <string name="migration_success">Успешный перенос данных!</string>
+    <string name="action_stop_service">Stop service</string>
     <string name="migration_fail">Перенос данных не выполнен!</string>
     <string name="pull_down_to_refresh">Потяните вниз для обновления!</string>
 
@@ -23,10 +24,12 @@
     <string name="title_server">Профиль</string>
     <string name="menu_item_add_config">Добавить профиль</string>
     <string name="menu_item_save_config">Сохранить профиль</string>
+    <string name="menu_item_edit_config">Изменить профиль</string>
     <string name="menu_item_del_config">Удалить профиль</string>
     <string name="menu_item_import_config_qrcode">Импорт из QR-кода</string>
     <string name="menu_item_import_config_clipboard">Импорт из буфера обмена</string>
     <string name="menu_item_import_config_local">Импорт из файла</string>
+    <string name="menu_item_import_config_policy_group">Add [Policy group]</string>
     <string name="menu_item_import_config_manually_vmess">Ручной ввод VMess</string>
     <string name="menu_item_import_config_manually_vless">Ручной ввод VLESS</string>
     <string name="menu_item_import_config_manually_ss">Ручной ввод Shadowsocks</string>
@@ -110,6 +113,8 @@
     <string name="server_lab_bandwidth_up">Исходящая пропускная способность (допускаются: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">Режим XHTTP</string>
     <string name="server_lab_xhttp_extra">Необработанный JSON XHTTP Extra, формат: { XHTTPObject }</string>
+    <string name="server_lab_ech_config_list">EchConfigList</string>
+    <string name="server_lab_ech_force_query">EchForceQuery</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">Невозможно скопировать файл, используйте файловый менеджер</string>
@@ -191,8 +196,11 @@
     <string name="title_pref_dns_hosts">Узлы DNS (формат: домен:адрес,…)</string>
     <string name="summary_pref_dns_hosts">домен:адрес,…</string>
 
-    <string name="title_pref_delay_test_url">Сервис проверки задержки (HTTP/HTTPS)</string>
+    <string name="title_pref_delay_test_url">Сервис проверки задержки</string>
     <string name="summary_pref_delay_test_url">URL</string>
+
+    <string name="title_pref_ip_api_url">Current connection info test url</string>
+    <string name="summary_pref_ip_api_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">Разрешать подключения из LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться, используя ваш IP-адрес, чтобы использовать локальный прокси. Используйте только в доверенной сети, чтобы избежать несанкционированного подключения.</string>
@@ -230,12 +238,10 @@
     <string name="title_oss_license">Лицензии открытого исходного кода</string>
     <string name="title_tg_channel">Telegram-канал</string>
     <string name="title_configuration_backup">Резервирование конфигурации</string>
-    <string name="summary_configuration_backup">Путь: [%s]. Резервная копия будет стёрта при удалении приложения или очистке хранилища.</string>
     <string name="title_configuration_restore">Восстановление конфигурации</string>
     <string name="title_configuration_share">Поделиться конфигурацией</string>
 
     <string name="title_pref_promotion">Содействие</string>
-    <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации (пожертвование может быть удалено)</string>
 
     <string name="title_pref_auto_update_subscription">Автоматически обновлять подписки</string>
     <string name="summary_pref_auto_update_subscription">Автоматическое обновление подписок в фоновом режиме с указанным интервалом. В зависимости от устройства эта функция может работать не всегда.</string>
@@ -251,7 +257,7 @@
     <string name="title_pref_use_hev_tunnel">Использовать новую версию TUN</string>
     <string name="summary_pref_use_hev_tunnel">Если включено, TUN будет использовать hev-socks5-tunnel, иначе будет использоваться badvpn-tun2socks</string>
     <string name="title_pref_hev_tunnel_loglevel">Подробность журнала HevTun</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">Время ожидания чтения/записи HevTun (мс, по умолчанию 300000)</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">Ожидание чтения/записи HevTun (секунд, по умолчанию TCP,UDP 300,60)</string>
 
     <string name="title_logcat">Журнал</string>
     <string name="logcat_copy">Копировать</string>
@@ -273,9 +279,8 @@
     <string name="sub_setting_next_profile">Следующая конфигурация прокси</string>
     <string name="sub_setting_pre_profile_tip">Конфигурация должна быть уникальной</string>
     <string name="title_sub_update">Обновить подписку группы</string>
-    <string name="title_ping_all_server">Пинг-тест профилей группы</string>
-    <string name="title_real_ping_all_server">URL-тест профилей группы</string>
-    <string name="title_create_intelligent_selection_all_server">Создать конфигурацию умного выбора</string>
+    <string name="title_ping_all_server">Проверить профили группы</string>
+    <string name="title_real_ping_all_server">Проверить задержку профилей группы</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
     <string name="title_filter_config">Фильтр профилей</string>
@@ -337,6 +342,10 @@
     <string name="update_check_pre_release">Искать предварительный выпуск</string>
     <string name="update_checking_for_update">Проверка обновления…</string>
 
+    <string name="title_policy_group_type">Policy group type</string>
+    <string name="title_policy_group_subscription_id">From subscription group</string>
+    <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+
     <string-array name="share_method">
         <item>QR-код</item>
         <item>Экспорт в буфер обмена</item>
@@ -385,10 +394,7 @@
         <item>Определять и добавлять к узлам DNS</item>
         <item>Определять и заменять домен</item>
     </string-array>
-    <string name="intelligent_selection">Умный выбор</string>
-    <string name="sub_setting_intelligent_selection_filter">Название фильтра умного выбора</string>
-    <string name="title_intelligent_selection_method">Принцип умного выбора</string>
-    <string-array name="intelligent_selection_method">
+    <string-array name="policy_group_type">
         <item>Наименьшая задержка</item>
         <item>Наименьшая нагрузка</item>
     </string-array>

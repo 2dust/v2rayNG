@@ -6,14 +6,14 @@ plugins {
 
 android {
     namespace = "com.v2ray.ang"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.v2ray.ang"
-        minSdk = 21
-        targetSdk = 35
-        versionCode = 683
-        versionName = "1.10.31"
+        minSdk = 24
+        targetSdk = 36
+        versionCode = 684
+        versionName = "1.10.33"
         multiDexEnabled = true
 
         val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')
@@ -67,14 +67,16 @@ android {
         }
     }
 
-
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
 
     applicationVariants.all {

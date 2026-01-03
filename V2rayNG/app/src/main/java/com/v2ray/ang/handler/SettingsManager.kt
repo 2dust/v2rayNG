@@ -53,7 +53,7 @@ object SettingsManager {
             return null
         }
 
-        return JsonUtil.fromJson(assets, Array<RulesetItem>::class.java).toMutableList()
+        return JsonUtil.fromJson(assets, Array<RulesetItem>::class.java)?.toMutableList()
     }
 
     /**
@@ -77,7 +77,7 @@ object SettingsManager {
         }
 
         try {
-            val rulesetList = JsonUtil.fromJson(content, Array<RulesetItem>::class.java).toMutableList()
+            val rulesetList = JsonUtil.fromJson(content, Array<RulesetItem>::class.java)?.toMutableList()
             if (rulesetList.isNullOrEmpty()) {
                 return false
             }
@@ -172,7 +172,7 @@ object SettingsManager {
         if (config.configType == EConfigType.CUSTOM) {
             val raw = MmkvManager.decodeServerRaw(guid) ?: return false
             val v2rayConfig = JsonUtil.fromJson(raw, V2rayConfig::class.java)
-            val exist = v2rayConfig.routing.rules.filter { it.outboundTag == TAG_DIRECT }.any {
+            val exist = v2rayConfig?.routing?.rules?.filter { it.outboundTag == TAG_DIRECT }?.any {
                 it.domain?.contains(GEOSITE_PRIVATE) == true || it.ip?.contains(GEOIP_PRIVATE) == true
             }
             return exist == true
@@ -205,7 +205,7 @@ object SettingsManager {
      */
     fun swapSubscriptions(fromPosition: Int, toPosition: Int) {
         val subsList = MmkvManager.decodeSubsList()
-        if (subsList.isNullOrEmpty()) return
+        if (subsList.isEmpty()) return
 
         Collections.swap(subsList, fromPosition, toPosition)
         MmkvManager.encodeSubsList(subsList)

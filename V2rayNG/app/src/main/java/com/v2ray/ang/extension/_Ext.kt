@@ -116,13 +116,6 @@ fun Long.toTrafficString(): String {
     return String.format("%.1f %s", size, units[unitIndex])
 }
 
-val URLConnection.responseLength: Long
-    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        contentLengthLong
-    } else {
-        contentLength.toLong()
-    }
-
 val URI.idnHost: String
     get() = host?.replace("[", "")?.replace("]", "").orEmpty()
 

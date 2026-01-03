@@ -161,7 +161,7 @@ object PluginManager {
                 uri
             )?.let { InitResult(it) }
         } catch (t: Throwable) {
-            failure?.also { t.addSuppressed(it) }
+            failure.also { t.addSuppressed(it) }
             throw t
         }
     }
@@ -228,6 +228,5 @@ object PluginManager {
 //            .getString(value)
 
         null -> null
-        else -> error("meta-data $key has invalid type ${value.javaClass}")
     }
 }

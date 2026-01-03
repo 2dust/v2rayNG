@@ -38,7 +38,6 @@ abstract class BaseActivity : AppCompatActivity() {
         else -> super.onOptionsItemSelected(item)
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(MyContextWrapper.wrap(newBase ?: return, SettingsManager.getLocale()))
     }

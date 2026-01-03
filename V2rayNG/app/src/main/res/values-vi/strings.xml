@@ -6,6 +6,7 @@
     <string name="navigation_drawer_open">Mở Menu ứng dụng</string>
     <string name="navigation_drawer_close">Đóng Menu ứng dụng</string>
     <string name="migration_success">Đã chuyển dữ liệu!</string>
+    <string name="action_stop_service">Stop service</string>
     <string name="migration_fail">Không thể chuyển dữ liệu!</string>
     <string name="pull_down_to_refresh">Please pull down to refresh!</string>
 
@@ -23,10 +24,12 @@
     <string name="title_server">v2rayNG</string>
     <string name="menu_item_add_config">Thêm cấu hình</string>
     <string name="menu_item_save_config">Lưu cấu hình</string>
+    <string name="menu_item_edit_config">Edit configuration</string>
     <string name="menu_item_del_config">Xoá cấu hình</string>
     <string name="menu_item_import_config_qrcode">Nhập cấu hình từ mã QR</string>
     <string name="menu_item_import_config_clipboard">Nhập cấu hình từ Clipboard</string>
     <string name="menu_item_import_config_local">Import config from locally</string>
+    <string name="menu_item_import_config_policy_group">Add [Policy group]</string>
     <string name="menu_item_import_config_manually_vmess">Nhập thủ công [VMess]</string>
     <string name="menu_item_import_config_manually_vless">Nhập thủ công [VLESS]</string>
     <string name="menu_item_import_config_manually_ss">Nhập thủ công [ShadowSocks]</string>
@@ -110,6 +113,8 @@
     <string name="server_lab_bandwidth_up">Bandwidth up (Supported units: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
+    <string name="server_lab_ech_config_list">EchConfigList</string>
+    <string name="server_lab_ech_force_query">EchForceQuery</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp!</string>
@@ -192,8 +197,11 @@
     <string name="title_pref_dns_hosts">DNS hosts (Format: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
-    <string name="title_pref_delay_test_url">URL kiểm tra độ trễ thực (HTTP / HTTPS)</string>
+    <string name="title_pref_delay_test_url">URL kiểm tra độ trễ thực </string>
     <string name="summary_pref_delay_test_url">URL</string>
+
+    <string name="title_pref_ip_api_url">Current connection info test url</string>
+    <string name="summary_pref_ip_api_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">Cho phép kết nối từ mạng LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác trong cùng mạng LAN có thể kết nối đến SOCKS / HTTP proxy trên thiết bị của bạn. \nChỉ bật tính năng này trong các mạng đáng tin cậy để tránh kết nối trái phép.</string>
@@ -232,11 +240,9 @@
     <string name="title_oss_license">Open Source licenses</string>
     <string name="title_tg_channel">Kênh Telegram</string>
     <string name="title_configuration_backup">Sao lưu cấu hình</string>
-    <string name="summary_configuration_backup">Nơi lưu trữ: [%s], bản backup sẽ được dọn dẹp sau khi xóa ứng dụng hoặc xóa bộ nhớ.</string>
     <string name="title_configuration_restore">Khôi phục cấu hình</string>
     <string name="title_configuration_share">Chia sẻ cấu hình</string>
     <string name="title_pref_promotion">Quảng bá server</string>
-    <string name="summary_pref_promotion">Quảng cáo, nhấn để biết thêm (Ủng hộ có thể được gỡ bỏ)</string>
 
     <string name="title_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký</string>
     <string name="summary_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký của bạn ở trong nền với khoảng thời gian cố định. Tùy thiết bị, tính năng này có thể không luôn hoạt động đúng như mong đợi.</string>
@@ -252,7 +258,7 @@
     <string name="title_pref_use_hev_tunnel">Enable New TUN Feature</string>
     <string name="summary_pref_use_hev_tunnel">When enabled, TUN will use hev-socks5-tunnel; otherwise, it will use badvpn-tun2socks.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun Log Level</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun Read/Write Timeout (ms, default 300000)</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun read/write timeout (seconds) (tcp,udp default 300,60)</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Sao chép</string>
@@ -276,7 +282,6 @@
     <string name="title_sub_update">Cập nhật các gói đăng ký</string>
     <string name="title_ping_all_server">Ping tất cả máy chủ</string>
     <string name="title_real_ping_all_server">Kiểm tra HTTP tất cả máy chủ</string>
-    <string name="title_create_intelligent_selection_all_server">Creating Intelligent Selection Current Group Configuration</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sắp xếp lại theo lần kiểm tra cuối cùng</string>
     <string name="title_filter_config">Lọc cấu hình theo các gói đăng ký</string>
@@ -331,6 +336,10 @@
     <string name="update_check_pre_release">Check Pre-release</string>
     <string name="update_checking_for_update">Checking for update…</string>
 
+    <string name="title_policy_group_type">Policy group type</string>
+    <string name="title_policy_group_subscription_id">From subscription group</string>
+    <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+
     <string-array name="share_method">
         <item>Xuất ra mã QR (Chụp màn hình để lưu)</item>
         <item>Sao chép vào Clipboard</item>
@@ -373,10 +382,7 @@
         <item>Resolve and add to DNS Hosts</item>
         <item>Resolve and replace domain</item>
     </string-array>
-    <string name="intelligent_selection">Intelligent Selection</string>
-    <string name="sub_setting_intelligent_selection_filter">Remarks Intelligent Selection regular filter</string>
-    <string name="title_intelligent_selection_method">Intelligent Selection Method</string>
-    <string-array name="intelligent_selection_method">
+    <string-array name="policy_group_type">
         <item>Least Ping</item>
         <item>Least Load</item>
     </string-array>

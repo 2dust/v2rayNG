@@ -3,9 +3,10 @@
     <string name="app_widget_name">开关</string>
     <string name="app_tile_name">开关</string>
     <string name="app_tile_first_use">初次使用此功能请先用 APP 添加配置</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open">打开导航栏</string>
+    <string name="navigation_drawer_close">关闭导航栏</string>
     <string name="migration_success">数据迁移成功!</string>
+    <string name="action_stop_service">停止服务</string>
     <string name="migration_fail">数据迁移失败啦!</string>
     <string name="pull_down_to_refresh">请下拉刷新!</string>
 
@@ -23,18 +24,20 @@
     <string name="title_server">配置项</string>
     <string name="menu_item_add_config">添加配置</string>
     <string name="menu_item_save_config">保存配置</string>
+    <string name="menu_item_edit_config">编辑配置</string>
     <string name="menu_item_del_config">删除配置</string>
     <string name="menu_item_import_config_qrcode">扫描二维码</string>
     <string name="menu_item_import_config_clipboard">从剪贴板导入</string>
     <string name="menu_item_import_config_local">从本地导入</string>
-    <string name="menu_item_import_config_manually_vmess">手动输入 [VMess]</string>
-    <string name="menu_item_import_config_manually_vless">手动输入 [VLESS]</string>
-    <string name="menu_item_import_config_manually_ss">手动输入 [Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">手动输入 [SOCKS]</string>
-    <string name="menu_item_import_config_manually_http">手动输入 [HTTP]</string>
-    <string name="menu_item_import_config_manually_trojan">手动输入 [Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">手动输入 [Wireguard]</string>
-    <string name="menu_item_import_config_manually_hysteria2">手动输入 [Hysteria2]</string>
+    <string name="menu_item_import_config_policy_group">添加 [策略组]</string>
+    <string name="menu_item_import_config_manually_vmess">添加 [VMess]</string>
+    <string name="menu_item_import_config_manually_vless">添加 [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">添加 [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">添加 [SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">添加 [HTTP]</string>
+    <string name="menu_item_import_config_manually_trojan">添加 [Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">添加 [Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">添加 [Hysteria2]</string>
     <string name="del_config_comfirm">确认删除？</string>
     <string name="del_invalid_config_comfirm">删除前请先测试！确认删除？</string>
     <string name="server_lab_remarks">别名 (remarks)</string>
@@ -110,6 +113,8 @@
     <string name="server_lab_bandwidth_up">带宽上行 (支持的单位 k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
+    <string name="server_lab_ech_config_list">EchConfigList</string>
+    <string name="server_lab_ech_force_query">EchForceQuery</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">失败, 请使用文件管理器</string>
@@ -189,8 +194,11 @@
     <string name="title_pref_dns_hosts">DNS hosts (格式: 域名: 地址,…)</string>
     <string name="summary_pref_dns_hosts">domain: address,…</string>
 
-    <string name="title_pref_delay_test_url">真连接延迟测试网址 (http/https)</string>
+    <string name="title_pref_delay_test_url">真连接延迟测试网址 </string>
     <string name="summary_pref_delay_test_url">Url</string>
+
+    <string name="title_pref_ip_api_url">当前连接信息测试网址</string>
+    <string name="summary_pref_ip_api_url">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">允许来自局域网的连接</string>
     <string name="summary_pref_proxy_sharing_enabled">其他设备可以使用 socks/http 协议通过您的 IP 地址连接到代理, 仅在受信任的网络中启用以避免未经授权的连接</string>
@@ -228,12 +236,10 @@
     <string name="title_oss_license">Open Source licenses</string>
     <string name="title_tg_channel">Telegram 频道</string>
     <string name="title_configuration_backup">备份配置</string>
-    <string name="summary_configuration_backup">存储位置: [%s], 卸载 App 或清除存储后备份将被清除</string>
     <string name="title_configuration_restore">还原配置</string>
     <string name="title_configuration_share">分享配置</string>
 
     <string name="title_pref_promotion">推广</string>
-    <string name="summary_pref_promotion">一些推广, 点击查看详情 (捐赠可去除)</string>
 
     <string name="title_pref_auto_update_subscription">自动更新订阅</string>
     <string name="summary_pref_auto_update_subscription">在后台按一定时间间隔自动更新您的订阅。受设备影响，此功能不一定总是有效</string>
@@ -249,16 +255,16 @@
     <string name="title_pref_use_hev_tunnel">启用新的 TUN 功能</string>
     <string name="summary_pref_use_hev_tunnel">选择启用后 TUN 将使用 hev-socks5-tunnel 否则使用 badvpn-tun2socks</string>
     <string name="title_pref_hev_tunnel_loglevel">HevTun 日志级别</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">HevTun 读写超时 (ms, 默认 300000)</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">HevTun 读写超时(秒) (tcp,udp 默认 300,60)</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">复制</string>
     <string name="logcat_clear">清除</string>
     <string name="title_service_restart">服务重启</string>
-    <string name="title_del_all_config">删除当前组配置</string>
-    <string name="title_del_duplicate_config">删除当前组重复配置</string>
-    <string name="title_del_invalid_config">删除当前组无效配置</string>
-    <string name="title_export_all">导出当前组配置至剪贴板</string>
+    <string name="title_del_all_config">删除配置</string>
+    <string name="title_del_duplicate_config">删除重复配置</string>
+    <string name="title_del_invalid_config">删除无效配置</string>
+    <string name="title_export_all">导出配置至剪贴板</string>
     <string name="title_sub_setting">订阅分组设置</string>
     <string name="sub_setting_remarks">备注</string>
     <string name="sub_setting_url">可选地址 (url)</string>
@@ -270,10 +276,9 @@
     <string name="sub_setting_pre_profile">前置代理配置别名</string>
     <string name="sub_setting_next_profile">落地代理配置別名</string>
     <string name="sub_setting_pre_profile_tip">请确保配置别名存在并唯一</string>
-    <string name="title_sub_update">更新当前组订阅</string>
-    <string name="title_ping_all_server">测试当前组配置 Tcping</string>
-    <string name="title_real_ping_all_server">测试当前组配置真连接</string>
-    <string name="title_create_intelligent_selection_all_server">生成当前组智能选择配置</string>
+    <string name="title_sub_update">更新订阅</string>
+    <string name="title_ping_all_server">测试配置 Tcping</string>
+    <string name="title_real_ping_all_server">测试配置真连接</string>
     <string name="title_user_asset_setting">资源文件</string>
     <string name="title_sort_by_test_results">按测试结果排序</string>
     <string name="title_filter_config">过滤配置</string>
@@ -329,6 +334,10 @@
     <string name="update_check_pre_release">检查 Pre-release</string>
     <string name="update_checking_for_update">正在检查更新中…</string>
 
+    <string name="title_policy_group_type">策略组类型</string>
+    <string name="title_policy_group_subscription_id">来自订阅分组</string>
+    <string name="title_policy_group_subscription_filter">别名正则过滤</string>
+
     <string-array name="share_method">
         <item>二维码</item>
         <item>导出至剪贴板</item>
@@ -377,10 +386,7 @@
         <item>解析后添加至 DNS Hosts</item>
         <item>解析后替换原域名</item>
     </string-array>
-    <string name="intelligent_selection">智能选择</string>
-    <string name="sub_setting_intelligent_selection_filter">别名智能选择正则过滤</string>
-    <string name="title_intelligent_selection_method">智能选择方式</string>
-    <string-array name="intelligent_selection_method">
+    <string-array name="policy_group_type">
         <item>最低延迟</item>
         <item>最稳定</item>
     </string-array>

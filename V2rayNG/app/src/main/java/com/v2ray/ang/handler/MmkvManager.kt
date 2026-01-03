@@ -10,6 +10,7 @@ import com.v2ray.ang.dto.ServerAffiliationInfo
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
+import kotlin.collections.mutableListOf
 
 object MmkvManager {
 
@@ -77,7 +78,7 @@ object MmkvManager {
         return if (json.isNullOrBlank()) {
             mutableListOf()
         } else {
-            JsonUtil.fromJson(json, Array<String>::class.java).toMutableList()
+            JsonUtil.fromJson(json, Array<String>::class.java)?.toMutableList() ?: mutableListOf()
         }
     }
 
@@ -314,7 +315,8 @@ object MmkvManager {
         decodeSubsList().forEach { key ->
             val json = subStorage.decodeString(key)
             if (!json.isNullOrBlank()) {
-                subscriptions.add(Pair(key, JsonUtil.fromJson(json, SubscriptionItem::class.java)))
+                val item = JsonUtil.fromJson(json, SubscriptionItem::class.java)?: SubscriptionItem()
+                subscriptions.add(Pair(key, item))
             }
         }
         return subscriptions
@@ -381,7 +383,7 @@ object MmkvManager {
         return if (json.isNullOrBlank()) {
             mutableListOf()
         } else {
-            JsonUtil.fromJson(json, Array<String>::class.java).toMutableList()
+            JsonUtil.fromJson(json, Array<String>::class.java)?.toMutableList()?: mutableListOf()
         }
     }
 
@@ -399,7 +401,8 @@ object MmkvManager {
         assetStorage.allKeys()?.forEach { key ->
             val json = assetStorage.decodeString(key)
             if (!json.isNullOrBlank()) {
-                assetUrlItems.add(Pair(key, JsonUtil.fromJson(json, AssetUrlItem::class.java)))
+                val item = JsonUtil.fromJson(json, AssetUrlItem::class.java)?: AssetUrlItem()
+                assetUrlItems.add(Pair(key, item))
             }
         }
         return assetUrlItems.sortedBy { (_, value) -> value.addedTime }
@@ -448,7 +451,7 @@ object MmkvManager {
     fun decodeRoutingRulesets(): MutableList<RulesetItem>? {
         val ruleset = settingsStorage.decodeString(PREF_ROUTING_RULESET)
         if (ruleset.isNullOrEmpty()) return null
-        return JsonUtil.fromJson(ruleset, Array<RulesetItem>::class.java).toMutableList()
+        return JsonUtil.fromJson(ruleset, Array<RulesetItem>::class.java)?.toMutableList()?: mutableListOf()
     }
 
     /**
