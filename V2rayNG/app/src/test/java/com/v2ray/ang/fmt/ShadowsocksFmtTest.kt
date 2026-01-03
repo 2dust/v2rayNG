@@ -14,6 +14,7 @@ import org.junit.Test
 import org.mockito.MockedStatic
 import org.mockito.Mockito
 import org.mockito.Mockito.mockStatic
+import java.net.URLDecoder
 import java.util.Base64 as JavaBase64
 
 /**
@@ -201,9 +202,10 @@ class ShadowsocksFmtTest {
         assertTrue(uri.contains("@example.com:8388"))
         assertTrue(uri.contains("#Test%20Server"))
 
-        // Verify the base64 part
+        // Verify the base64 part (URL decode first, then Base64 decode)
         val base64Part = uri.substringBefore("@")
-        val decoded = String(JavaBase64.getDecoder().decode(base64Part))
+        val urlDecoded = URLDecoder.decode(base64Part, Charsets.UTF_8.name())
+        val decoded = String(JavaBase64.getDecoder().decode(urlDecoded))
         assertEquals("aes-256-gcm:my-secret-password", decoded)
     }
 
