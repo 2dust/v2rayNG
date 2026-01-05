@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.v2ray.ang.databinding.ItemRecyclerBypassListBinding
 import com.v2ray.ang.dto.AppInfo
+import com.v2ray.ang.handler.SettingsChangeManager
 
 class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, blacklist: MutableSet<String>?) :
     RecyclerView.Adapter<PerAppProxyAdapter.BaseViewHolder>() {
@@ -83,6 +84,7 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, bl
                 blacklist.add(appInfo.packageName)
                 itemBypassBinding.checkBox.isChecked = true
             }
+            SettingsChangeManager.makeRestartService()
         }
     }
 }

@@ -311,15 +311,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             }
             notifyItemChanged(mActivity.mainViewModel.getPosition(guid))
             if (isRunning) {
-                V2RayServiceManager.stopVService(mActivity)
-                mActivity.lifecycleScope.launch {
-                    try {
-                        delay(500)
-                        V2RayServiceManager.startVService(mActivity)
-                    } catch (e: Exception) {
-                        Log.e(AppConfig.TAG, "Failed to restart V2Ray service", e)
-                    }
-                }
+                mActivity.restartV2Ray()
             }
         }
     }

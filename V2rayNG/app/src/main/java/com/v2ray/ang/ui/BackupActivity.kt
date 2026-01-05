@@ -27,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.v2ray.ang.databinding.DialogWebdavBinding
+import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.util.ZipUtil
 import java.io.File
 import java.text.SimpleDateFormat
@@ -169,6 +170,8 @@ class BackupActivity : BaseActivity() {
         }
 
         val count = MMKV.restoreAllFromDirectory(backupDir)
+        SettingsChangeManager.makeReinitGroupTab()
+        SettingsChangeManager.makeRestartService()
         return count > 0
     }
 
@@ -312,7 +315,6 @@ class BackupActivity : BaseActivity() {
                 val restored = restoreConfiguration(target)
                 withContext(Dispatchers.Main) {
                     if (restored) {
-                        setResult(RESULT_OK, Intent().putExtra("config_restored", true))
                         toastSuccess(R.string.toast_success)
                     } else {
                         toastError(R.string.toast_failure)

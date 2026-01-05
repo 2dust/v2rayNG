@@ -18,6 +18,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.AppManagerUtil
 import com.v2ray.ang.util.HttpUtil
@@ -216,6 +217,7 @@ class PerAppProxyActivity : BaseActivity() {
 
     private fun allowPerAppProxy() {
         binding.switchPerAppProxy.isChecked = true
+        SettingsChangeManager.makeRestartService()
     }
 
     @SuppressLint("NotifyDataSetChanged")

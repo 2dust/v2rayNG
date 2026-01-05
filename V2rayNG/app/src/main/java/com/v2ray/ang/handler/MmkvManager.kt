@@ -567,10 +567,6 @@ object MmkvManager {
         return settingsStorage.decodeStringSet(key)
     }
 
-    //endregion
-
-    //region Others
-
     /**
      * Encodes the start on boot setting.
      *
@@ -594,17 +590,17 @@ object MmkvManager {
     //region WebDAV
 
     /**
-     * Encodes the WebDAV config as JSON into settings storage.
+     * Encodes the WebDAV config as JSON into storage.
      */
     fun encodeWebDavConfig(config: WebDavConfig): Boolean {
-        return settingsStorage.encode(KEY_WEBDAV_CONFIG, JsonUtil.toJson(config))
+        return mainStorage.encode(KEY_WEBDAV_CONFIG, JsonUtil.toJson(config))
     }
 
     /**
-     * Decodes the WebDAV config from settings storage.
+     * Decodes the WebDAV config from storage.
      */
     fun decodeWebDavConfig(): WebDavConfig? {
-        val json = settingsStorage.decodeString(KEY_WEBDAV_CONFIG) ?: return null
+        val json = mainStorage.decodeString(KEY_WEBDAV_CONFIG) ?: return null
         return JsonUtil.fromJson(json, WebDavConfig::class.java)
     }
 

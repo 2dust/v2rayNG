@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.preference.PreferenceManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application),
@@ -100,5 +101,6 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         if (key == AppConfig.PREF_UI_MODE_NIGHT) {
             SettingsManager.setNightMode()
         }
+        SettingsChangeManager.makeRestartService()
     }
 }
