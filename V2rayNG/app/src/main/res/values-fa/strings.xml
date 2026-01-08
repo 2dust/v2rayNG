@@ -199,7 +199,7 @@
     <string name="summary_pref_delay_test_url">URL</string>
 
     <string name="title_pref_ip_api_url">تست اطلاعات اتصال فعلی url</string>
-    <string name="summary_pref_ip_api_url">url</string>
+    <string name="summary_pref_ip_api_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">اجازه اتصالات از طریق شبکه محلی</string>
     <string name="summary_pref_proxy_sharing_enabled">سایر دستگاه ها می توانند با استفاده از آدرس آیپی شما برای استفاده از یک پروکسی محلی متصل شوند. فقط در یک شبکه قابل اعتماد برای جلوگیری از اتصالات غیرمجاز استفاده کنید.</string>
@@ -343,11 +343,11 @@
     <string name="title_policy_group_subscription_filter">توضیحات فیلتر معمولی</string>
 
     <!-- BackupActivity -->
-    <string name="title_configuration_backup_restore">Backup &amp; Restore</string>
+    <string name="title_configuration_backup_restore">پشتیبان‌گیری و بازیابی</string>
     <string name="title_configuration_backup">پشتیبان گیری از پیکربندی</string>
     <string name="title_configuration_restore">بازیابی پیکربندی</string>
     <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
-    <string name="title_webdav_config_setting">WebDAV تنظیمات</string>
+    <string name="title_webdav_config_setting">تنظیمات WebDAV</string>
     <string name="title_webdav_config_setting_unknown">لطفا ابتدا WebDAV را پیکربندی کنید.</string>
     <string name="title_webdav_url">WebDAV server URL</string>
     <string name="title_webdav_user">یوزرنیم</string>
