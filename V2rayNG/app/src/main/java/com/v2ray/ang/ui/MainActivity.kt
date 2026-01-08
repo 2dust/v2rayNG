@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
@@ -23,10 +22,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
@@ -37,7 +34,6 @@ import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
-import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.handler.V2RayServiceManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
@@ -51,7 +47,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    private val adapter by lazy { MainRecyclerAdapter(this) }
+    val mainViewModel: MainViewModel by viewModels()
+    private lateinit var groupPagerAdapter: GroupPagerAdapter
+    private var tabMediator: TabLayoutMediator? = null
+
     private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
             startV2Ray()
@@ -61,26 +60,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         if (SettingsChangeManager.consumeRestartService() && mainViewModel.isRunning.value == true) {
             restartV2Ray()
         }
-        if (SettingsChangeManager.consumeReinitGroupTab()) {
-            initGroupTab()
+        if (SettingsChangeManager.consumeSetupGroupTab()) {
+            setupGroupTab()
         }
     }
-    private val tabGroupListener = object : TabLayout.OnTabSelectedListener {
-        override fun onTabSelected(tab: TabLayout.Tab?) {
-            val selectId = tab?.tag.toString()
-            if (selectId != mainViewModel.subscriptionId) {
-                mainViewModel.subscriptionIdChanged(selectId)
-            }
-        }
-
-        override fun onTabUnselected(tab: TabLayout.Tab?) {
-        }
-
-        override fun onTabReselected(tab: TabLayout.Tab?) {
-        }
-    }
-    private var mItemTouchHelper: ItemTouchHelper? = null
-    val mainViewModel: MainViewModel by viewModels()
 
     // register activity result for requesting permission
     private val requestPermissionLauncher =
@@ -158,17 +141,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
         }
 
-        binding.recyclerView.setHasFixedSize(true)
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)) {
-            binding.recyclerView.layoutManager = GridLayoutManager(this, 2)
-        } else {
-            binding.recyclerView.layoutManager = GridLayoutManager(this, 1)
-        }
-        addCustomDividerToRecyclerView(binding.recyclerView, this, R.drawable.custom_divider)
-        binding.recyclerView.adapter = adapter
-
-        mItemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(adapter))
-        mItemTouchHelper?.attachToRecyclerView(binding.recyclerView)
+        groupPagerAdapter = GroupPagerAdapter(this, emptyList())
+        binding.viewPager.adapter = groupPagerAdapter
+        binding.viewPager.isUserInputEnabled = true
 
         val toggle = ActionBarDrawerToggle(
             this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
@@ -177,7 +152,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         toggle.syncState()
         binding.navView.setNavigationItemSelectedListener(this)
 
-        initGroupTab()
+        setupGroupTab()
         setupViewModel()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -198,20 +173,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 }
             }
         })
+        mainViewModel.reloadServerList()
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun setupViewModel() {
-        mainViewModel.updateListAction.observe(this) { index ->
-            if (index >= 0) {
-                adapter.notifyItemChanged(index)
-            } else {
-                adapter.notifyDataSetChanged()
-            }
-        }
         mainViewModel.updateTestResultAction.observe(this) { setTestState(it) }
         mainViewModel.isRunning.observe(this) { isRunning ->
-            adapter.isRunning = isRunning
             if (isRunning) {
                 binding.fab.setImageResource(R.drawable.ic_stop_24dp)
                 binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_active))
@@ -230,27 +197,22 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         mainViewModel.initAssets(assets)
     }
 
-    private fun initGroupTab() {
-        binding.tabGroup.removeOnTabSelectedListener(tabGroupListener)
-        binding.tabGroup.removeAllTabs()
-        binding.tabGroup.isVisible = false
+    private fun setupGroupTab() {
+        val groups = mainViewModel.getSubscriptions(this)
+        groupPagerAdapter.update(groups)
 
-        val (listId, listRemarks) = mainViewModel.getSubscriptions(this)
-        if (listId == null || listRemarks == null) {
-            return
-        }
+        tabMediator?.detach()
+        tabMediator = TabLayoutMediator(binding.tabGroup, binding.viewPager) { tab, position ->
+            groupPagerAdapter.groups.getOrNull(position)?.let {
+                tab.text = it.remarks
+                tab.tag = it.id
+            }
+        }.also { it.attach() }
 
-        for (it in listRemarks.indices) {
-            val tab = binding.tabGroup.newTab()
-            tab.text = listRemarks[it]
-            tab.tag = listId[it]
-            binding.tabGroup.addTab(tab)
-        }
-        val selectIndex =
-            listId.indexOf(mainViewModel.subscriptionId).takeIf { it >= 0 } ?: (listId.count() - 1)
-        binding.tabGroup.selectTab(binding.tabGroup.getTabAt(selectIndex))
-        binding.tabGroup.addOnTabSelectedListener(tabGroupListener)
-        binding.tabGroup.isVisible = true
+        val targetIndex = groups.indexOfFirst { it.id == mainViewModel.subscriptionId }.takeIf { it >= 0 } ?: (groups.size - 1)
+        binding.viewPager.setCurrentItem(targetIndex, false)
+
+        binding.tabGroup.isVisible = groups.size > 1
     }
 
     private fun startV2Ray() {
@@ -261,7 +223,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         V2RayServiceManager.startVService(this)
     }
 
-    public fun restartV2Ray() {
+    fun restartV2Ray() {
         if (mainViewModel.isRunning.value == true) {
             V2RayServiceManager.stopVService(this)
         }
@@ -271,12 +233,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
     }
 
-    public override fun onResume() {
+    override fun onResume() {
         super.onResume()
-        mainViewModel.reloadServerList()
     }
 
-    public override fun onPause() {
+    override fun onPause() {
         super.onPause()
     }
 
@@ -475,7 +436,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                             mainViewModel.reloadServerList()
                         }
 
-                        countSub > 0 -> initGroupTab()
+                        countSub > 0 -> setupGroupTab()
                         else -> toastError(R.string.toast_failure)
                     }
                     binding.pbWaiting.hide()
@@ -692,5 +653,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    override fun onDestroy() {
+        tabMediator?.detach()
+        super.onDestroy()
     }
 }
