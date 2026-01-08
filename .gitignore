@@ -9,16 +9,19 @@ V2rayNG/app/release/output.json
 .idea/
 .gradle/
 *.iml
+.vscode/
 
 # Ignore local properties and DS_Store files
 /local.properties
 .DS_Store
+Thumbs.db
 
-# Ignore build directories and captures
+# Ignore build and capture folders
 /build
 /captures
 V2rayNG/app/build
 V2rayNG/build
+V2rayNG/captures
 V2rayNG/local.properties
 
 # Ignore APK and AAR files
@@ -50,17 +53,20 @@ V2rayNG/app/google-services.json
 *.dll
 *.obj
 *.o
+
+# Ignore Python artifacts (if present)
 *.pyc
 *.pyo
 
-# Ignore files from other IDEs
-.vscode/
+# Eclipse project files
 .classpath
 .project
 .settings/
+
+# SublimeIDE
 *.sublime-workspace
 *.sublime-project
 
-# Ignore OS-specific files
-Thumbs.db
-.DS_Store
+# Optional: ignore any new cache or temp folders created by build/test scripts (if applicable)
+cache/
+tmp/
