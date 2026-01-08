@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 object SettingsChangeManager {
     private val _restartService = MutableStateFlow(false)
-    private val _reinitGroupTab = MutableStateFlow(false)
+    private val _setupGroupTab = MutableStateFlow(false)
 
     // Mark restartService as requiring a restart
     fun makeRestartService() {
@@ -19,14 +19,14 @@ object SettingsChangeManager {
     }
 
     // Mark reinitGroupTab as requiring tab reinitialization
-    fun makeReinitGroupTab() {
-        _reinitGroupTab.value = true
+    fun makeSetupGroupTab() {
+        _setupGroupTab.value = true
     }
 
     // Read and clear the reinitGroupTab flag
-    fun consumeReinitGroupTab(): Boolean {
-        val v = _reinitGroupTab.value
-        _reinitGroupTab.value = false
+    fun consumeSetupGroupTab(): Boolean {
+        val v = _setupGroupTab.value
+        _setupGroupTab.value = false
         return v
     }
 }

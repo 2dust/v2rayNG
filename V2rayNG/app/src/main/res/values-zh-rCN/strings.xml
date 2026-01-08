@@ -313,6 +313,7 @@
     <string name="connection_test_error_status_code">"状态码无效（#%d）"</string>
     <string name="connection_connected">"已连接，点击测试连接"</string>
     <string name="connection_not_connected">"未连接"</string>
+    <string name="connection_runing_task_left">运行中的测试任务数：%s</string>
 
     <string name="import_subscription_success">订阅导入成功</string>
     <string name="import_subscription_failure">导入订阅失败</string>

@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.text.TextUtils
@@ -19,6 +20,7 @@ import com.v2ray.ang.databinding.ItemRecyclerFooterBinding
 import com.v2ray.ang.databinding.ItemRecyclerMainBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -26,9 +28,7 @@ import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
-import com.v2ray.ang.handler.V2RayServiceManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<MainRecyclerAdapter.BaseViewHolder>(), ItemTouchHelperAdapter {
@@ -46,17 +46,24 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     }
     var isRunning = false
     private val doubleColumnDisplay = MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
+    private var data: List<ServersCache> = emptyList()
 
-    /**
-     * Gets the total number of items in the adapter (servers count + footer view)
-     * @return The total item count
-     */
-    override fun getItemCount() = mActivity.mainViewModel.serversCache.size + 1
+    @SuppressLint("NotifyDataSetChanged")
+    fun setData(newData: List<ServersCache>?,  position: Int = -1) {
+        data = newData ?: emptyList()
+        if (position >= 0) {
+            notifyItemChanged(position)
+        } else {
+            notifyDataSetChanged()
+        }
+    }
+
+    override fun getItemCount() = data.size + 1
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         if (holder is MainViewHolder) {
-            val guid = mActivity.mainViewModel.serversCache[position].guid
-            val profile = mActivity.mainViewModel.serversCache[position].profile
+            val guid = data[position].guid
+            val profile = data[position].profile
             val isCustom = profile.configType == EConfigType.CUSTOM || profile.configType == EConfigType.POLICYGROUP
 
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
@@ -294,7 +301,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     private fun removeServerSub(guid: String, position: Int) {
         mActivity.mainViewModel.removeServer(guid)
         notifyItemRemoved(position)
-        notifyItemRangeChanged(position, mActivity.mainViewModel.serversCache.size)
+        notifyItemRangeChanged(position, data.size)
     }
 
     /**
@@ -327,7 +334,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == mActivity.mainViewModel.serversCache.size) {
+        return if (position == data.size) {
             VIEW_TYPE_FOOTER
         } else {
             VIEW_TYPE_ITEM

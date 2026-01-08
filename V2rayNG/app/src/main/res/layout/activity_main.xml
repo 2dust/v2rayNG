@@ -48,18 +48,17 @@
                         android:id="@+id/tab_group"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="@dimen/padding_spacing_dp8"
                         app:tabIndicatorFullWidth="false"
                         app:tabMode="scrollable"
                         app:tabTextAppearance="@style/TabLayoutTextStyle" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recycler_view"
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/view_pager"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="1"
                         android:nextFocusRight="@+id/fab"
-                        android:scrollbars="vertical" />
+                        android:scrollbars="vertical"
+                        android:layout_weight="1" />
 
                     <LinearLayout
                         android:id="@+id/layout_test"
@@ -67,7 +66,7 @@
                         android:layout_height="@dimen/view_height_dp64"
                         android:clickable="true"
                         android:focusable="true"
-                        android:nextFocusLeft="@+id/recycler_view"
+                        android:nextFocusLeft="@+id/view_pager"
                         android:nextFocusRight="@+id/fab"
                         android:orientation="vertical">
 
