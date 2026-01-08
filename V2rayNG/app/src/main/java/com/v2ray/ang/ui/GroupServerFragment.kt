@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -33,7 +32,6 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>() {
     override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentGroupServerBinding.inflate(inflater, container, false)
 
-    @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         adapter = MainRecyclerAdapter(requireActivity() as MainActivity)
@@ -54,11 +52,7 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>() {
                 return@observe
             }
             Log.d(TAG, "GroupServerFragment updateListAction subId=$subId")
-            if (index >= 0) {
-                adapter.notifyItemChanged(index)
-            } else {
-                adapter.notifyDataSetChanged()
-            }
+            adapter.setData(mainViewModel.serversCache, index)
         }
         mainViewModel.isRunning.observe(viewLifecycleOwner) { isRunning ->
             adapter.isRunning = isRunning
