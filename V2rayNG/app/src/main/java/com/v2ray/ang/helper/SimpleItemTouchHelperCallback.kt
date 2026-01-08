@@ -34,12 +34,12 @@ import kotlin.math.sign
  *
  * @author Paul Burke (ipaulpro)
  */
-class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter) : ItemTouchHelper.Callback() {
+class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter, private val allowSwipe: Boolean = false) : ItemTouchHelper.Callback() {
     private var mReturnAnimator: ValueAnimator? = null
 
     override fun isLongPressDragEnabled(): Boolean = true
 
-    override fun isItemViewSwipeEnabled(): Boolean = true
+    override fun isItemViewSwipeEnabled(): Boolean = allowSwipe
 
     override fun getMovementFlags(
         recyclerView: RecyclerView,
@@ -49,10 +49,10 @@ class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter
         val swipeFlags: Int
         if (recyclerView.layoutManager is GridLayoutManager) {
             dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-            swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
+            swipeFlags = if (allowSwipe) ItemTouchHelper.START or ItemTouchHelper.END else 0
         } else {
             dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
-            swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
+            swipeFlags = if (allowSwipe) ItemTouchHelper.START or ItemTouchHelper.END else 0
         }
         return makeMovementFlags(dragFlags, swipeFlags)
     }

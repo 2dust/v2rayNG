@@ -29,7 +29,7 @@
     <string name="menu_item_import_config_qrcode">و من ٱووردن کانفیگ ز QRcode</string>
     <string name="menu_item_import_config_clipboard">و من ٱووردن کانفیگ ز کلیپ بورد</string>
     <string name="menu_item_import_config_local">و من ٱووردن کانفیگ ز مهلی</string>
-    <string name="menu_item_import_config_policy_group">Add [Policy group]</string>
+    <string name="menu_item_import_config_policy_group">ٱووردن [بونکۊ سیاست]</string>
     <string name="menu_item_import_config_manually_vmess">هؽل دستی[VMess]</string>
     <string name="menu_item_import_config_manually_vless">هؽل دستی[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">هؽل دستی[Shadowsocks]</string>
@@ -113,8 +113,8 @@
     <string name="server_lab_bandwidth_up">وا روء رئڌن پئنا باند (واهڌ)</string>
     <string name="server_lab_xhttp_mode">هالت XHTTP</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra خام JSON، قالوو: { XHTTPObject }</string>
-    <string name="server_lab_ech_config_list">EchConfigList</string>
-    <string name="server_lab_ech_force_query">EchForceQuery</string>
+    <string name="server_lab_ech_config_list">نومگه کانفیگ Ech</string>
+    <string name="server_lab_ech_force_query">پورس وو جۊ اجباری Ech</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">لف گیری فایل ٱنجوم نوابی، ز ی برنومه دؽوۉداری فایل هیاری بگرین</string>
@@ -200,8 +200,8 @@
     <string name="title_pref_delay_test_url">نشۊوی اینترنتی آزمایش تئخیر واقعی </string>
     <string name="summary_pref_delay_test_url">نشۊوی اینترنتی</string>
 
-    <string name="title_pref_ip_api_url">Current connection info test url</string>
-    <string name="summary_pref_ip_api_url">Url</string>
+    <string name="title_pref_ip_api_url">نشۊوی اینترنتی آزمایش دووسمندیا منپیز هیم سکویی</string>
+    <string name="summary_pref_ip_api_url">نشۊوی اینترنتی</string>
 
     <string name="title_pref_proxy_sharing_enabled">هشتن منپیزا ز شبکه مهلی</string>
     <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا نشۊوی IP ایسا، ز ر socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل اعتماد فعال بۊ تا ز منپیز غیر موجاز جلو گری بۊ.</string>
@@ -324,6 +324,7 @@
     <string name="connection_test_error_status_code">کود ختا: #%d</string>
     <string name="connection_connected">منپیز هڌ، سی واجۊری کیلیک کوݩ</string>
     <string name="connection_not_connected">منپیز نؽڌ</string>
+    <string name="connection_runing_task_left">تعداد وزیفه یل آزمایشی ک ر اۊفتانه: %s</string>
 
     <string name="import_subscription_success">اشتراک وا مووفقیت زفت زابی</string>
     <string name="import_subscription_failure">اشتراک زفت نوابی</string>
@@ -340,21 +341,21 @@
     <string name="update_check_pre_release">واجۊری نوسخه یل پؽش ز تیجنیڌن</string>
     <string name="update_checking_for_update">ورۊ رسۊوی ن هونی واجۊری اکونه...</string>
 
-    <string name="title_policy_group_type">Policy group type</string>
-    <string name="title_policy_group_subscription_id">From subscription group</string>
-    <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+    <string name="title_policy_group_type">نوع بونکۊ سیاست</string>
+    <string name="title_policy_group_subscription_id">ز بونکۊ اشتراک</string>
+    <string name="title_policy_group_subscription_filter">توزیهات فیلتر معمۊلی</string>
 
     <!-- BackupActivity -->
-    <string name="title_configuration_backup_restore">Backup &amp; Restore</string>
+    <string name="title_configuration_backup_restore">لادراری گرؽڌن &amp; وورگندن</string>
     <string name="title_configuration_backup">لادراری گرؽڌن ز کانفیگ</string>
     <string name="title_configuration_restore">وورگندن کانفیگ</string>
     <string name="title_configuration_share">یک رسۊوی کانفیگ</string>
-    <string name="title_webdav_config_setting">WebDAV Settings</string>
-    <string name="title_webdav_config_setting_unknown">Please configure WebDAV first.</string>
-    <string name="title_webdav_url">WebDAV server URL</string>
-    <string name="title_webdav_user">Username</string>
-    <string name="title_webdav_pass">Password</string>
-    <string name="title_webdav_remote_path">Remote directory (optional)</string>
+    <string name="title_webdav_config_setting">WebDAV سامووا</string>
+    <string name="title_webdav_config_setting_unknown">ٱول WebDAV ن کانفیگ کۊنین</string>
+    <string name="title_webdav_url">WebDAV نشۊوی اینترنتی سرور</string>
+    <string name="title_webdav_user">نوم منتوری</string>
+    <string name="title_webdav_pass">رزم</string>
+    <string name="title_webdav_remote_path">دایرکتوری ر دیر (اختیاری)</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
@@ -410,7 +411,7 @@
     </string-array>
 
     <string-array name="config_backup_options">
-        <item>Local</item>
+        <item>مهلی</item>
         <item>WebDAV</item>
     </string-array>
 

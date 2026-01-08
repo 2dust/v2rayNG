@@ -316,6 +316,7 @@
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
     <string name="connection_connected">Đã kết nối, nhấn để kiểm tra kết nối mạng!</string>
     <string name="connection_not_connected">Chưa kết nối</string>
+    <string name="connection_runing_task_left">Number of running test tasks: %s</string>
 
     <string name="import_subscription_success">Nhập gói đăng ký thành công!</string>
     <string name="import_subscription_failure">Nhập gói đăng ký không thành công!</string>

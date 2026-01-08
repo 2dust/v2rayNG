@@ -31,7 +31,7 @@ class SubEditActivity : BaseActivity() {
         setContentView(binding.root)
         title = getString(R.string.title_sub_setting)
 
-        SettingsChangeManager.makeReinitGroupTab()
+        SettingsChangeManager.makeSetupGroupTab()
         val subItem = MmkvManager.decodeSubscription(editSubId)
         if (subItem != null) {
             bindingServer(subItem)

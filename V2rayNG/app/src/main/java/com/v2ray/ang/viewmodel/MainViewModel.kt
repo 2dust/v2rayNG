@@ -16,6 +16,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.ServersCache
+import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -144,7 +145,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun updateCache() {
         serversCache.clear()
         for (guid in serverList) {
-            var profile = MmkvManager.decodeServerConfig(guid) ?: continue
+            val profile = MmkvManager.decodeServerConfig(guid) ?: continue
 //            var profile = MmkvManager.decodeProfileConfig(guid)
 //            if (profile == null) {
 //                val config = MmkvManager.decodeServerConfig(guid) ?: continue
@@ -266,22 +267,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * @param context The context.
      * @return A pair of lists containing the subscription IDs and remarks.
      */
-    fun getSubscriptions(context: Context): Pair<MutableList<String>?, MutableList<String>?> {
+    fun getSubscriptions(context: Context): List<GroupMapItem> {
         val subscriptions = MmkvManager.decodeSubscriptions()
         if (subscriptionId.isNotEmpty()
             && !subscriptions.map { it.first }.contains(subscriptionId)
         ) {
             subscriptionIdChanged("")
         }
-        if (subscriptions.isEmpty()) {
-            return null to null
-        }
-        val listId = subscriptions.map { it.first }.toMutableList()
-        listId.add(0, "")
-        val listRemarks = subscriptions.map { it.second.remarks }.toMutableList()
-        listRemarks.add(0, context.getString(R.string.filter_config_all))
 
-        return listId to listRemarks
+        val groups = mutableListOf<GroupMapItem>()
+        groups.add(
+            GroupMapItem(
+                id = "",
+                remarks = context.getString(R.string.filter_config_all)
+            )
+        )
+        subscriptions.forEach { (id, item) ->
+            groups.add(GroupMapItem(id = id, remarks = item.remarks))
+        }
+        return groups
     }
 
     /**
@@ -440,6 +444,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val resultPair = intent.serializable<Pair<String, Long>>("content") ?: return
                     MmkvManager.encodeServerTestDelayMillis(resultPair.first, resultPair.second)
                     updateListAction.value = getPosition(resultPair.first)
+                }
+
+                AppConfig.MSG_MEASURE_CONFIG_FINISH -> {
+                    val content = intent.getStringExtra("content")
+                    updateTestResultAction.value =
+                        getApplication<AngApplication>().getString(R.string.connection_runing_task_left, content)
                 }
             }
         }

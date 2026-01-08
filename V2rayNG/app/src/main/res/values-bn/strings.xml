@@ -315,6 +315,7 @@
     <string name="connection_test_error_status_code">ত্রুটি কোড: #%d</string>
     <string name="connection_connected">সংযুক্ত, সংযোগ পরীক্ষা করতে ট্যাপ করুন</string>
     <string name="connection_not_connected">সংযুক্ত নয়</string>
+    <string name="connection_runing_task_left">Number of running test tasks: %s</string>
 
     <string name="import_subscription_success">সাবস্ক্রিপশন সফলভাবে আমদানি করা হয়েছে</string>
     <string name="import_subscription_failure">সাবস্ক্রিপশন আমদানি ব্যর্থ</string>

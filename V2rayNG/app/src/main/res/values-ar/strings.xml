@@ -316,6 +316,7 @@
     <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
     <string name="connection_connected">متصل، انقر للتحقق من الاتصال</string>
     <string name="connection_not_connected">غير متصل</string>
+    <string name="connection_runing_task_left">Number of running test tasks: %s</string>
 
     <string name="import_subscription_success">تم استيراد الاشتراك بنجاح</string>
     <string name="import_subscription_failure">فشل استيراد الاشتراك</string>

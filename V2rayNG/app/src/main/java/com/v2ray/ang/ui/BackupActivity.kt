@@ -170,7 +170,7 @@ class BackupActivity : BaseActivity() {
         }
 
         val count = MMKV.restoreAllFromDirectory(backupDir)
-        SettingsChangeManager.makeReinitGroupTab()
+        SettingsChangeManager.makeSetupGroupTab()
         SettingsChangeManager.makeRestartService()
         return count > 0
     }
