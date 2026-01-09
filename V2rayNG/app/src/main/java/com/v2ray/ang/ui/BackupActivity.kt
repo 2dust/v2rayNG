@@ -84,9 +84,8 @@ class BackupActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-
-        title = getString(R.string.title_configuration_backup_restore)
+       //setContentView(binding.root)
+        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.title_configuration_backup_restore))
 
         binding.layoutBackup.setOnClickListener {
             AlertDialog.Builder(this)

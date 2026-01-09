@@ -46,12 +46,17 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     }
     var isRunning = false
     private val doubleColumnDisplay = MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
-    private var data: List<ServersCache> = emptyList()
+    private var data: MutableList<ServersCache> = mutableListOf()
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setData(newData: List<ServersCache>?,  position: Int = -1) {
-        data = newData ?: emptyList()
-        if (position >= 0) {
+    fun setData(newData: MutableList<ServersCache>?, position: Int = -1) {
+        if (android.os.Looper.myLooper() != android.os.Looper.getMainLooper()) {
+            mActivity.runOnUiThread { setData(newData, position) }
+            return
+        }
+        data = newData?.toMutableList() ?: mutableListOf()
+
+        if (position >= 0 && position in data.indices) {
             notifyItemChanged(position)
         } else {
             notifyDataSetChanged()
@@ -84,7 +89,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
 
             //layoutIndicator
             if (guid == MmkvManager.getSelectServer()) {
-                holder.itemMainBinding.layoutIndicator.setBackgroundResource(R.color.colorAccent)
+                holder.itemMainBinding.layoutIndicator.setBackgroundResource(R.color.colorIndicator)
             } else {
                 holder.itemMainBinding.layoutIndicator.setBackgroundResource(0)
             }

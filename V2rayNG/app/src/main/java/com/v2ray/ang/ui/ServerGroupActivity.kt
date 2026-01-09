@@ -31,8 +31,8 @@ class ServerGroupActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-        title = EConfigType.POLICYGROUP.toString()
+        //setContentView(binding.root)
+        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = EConfigType.POLICYGROUP.toString())
 
         val config = MmkvManager.decodeServerConfig(editGuid)
         populateSubscriptionSpinner()

@@ -32,7 +32,6 @@
                 android:paddingStart="@dimen/padding_spacing_dp16"
                 android:text="@string/update_check_pre_release"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:textColor="@color/colorAccent"
                 app:theme="@style/BrandedSwitch" />
         </LinearLayout>
 

@@ -27,9 +27,8 @@ class SettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
-
-        title = getString(R.string.title_settings)
+        //setContentView(R.layout.activity_settings)
+        setContentViewWithToolbar(R.layout.activity_settings, showHomeAsUp = true, title = getString(R.string.title_settings))
 
         settingsViewModel.startListenPreferenceChange()
     }

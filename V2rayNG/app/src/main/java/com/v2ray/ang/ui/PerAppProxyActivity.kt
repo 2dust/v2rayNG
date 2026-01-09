@@ -37,9 +37,8 @@ class PerAppProxyActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-
-        title = getString(R.string.per_app_proxy_settings)
+        //setContentView(binding.root)
+        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.per_app_proxy_settings))
 
         addCustomDividerToRecyclerView(binding.recyclerView, this, R.drawable.custom_divider)
 

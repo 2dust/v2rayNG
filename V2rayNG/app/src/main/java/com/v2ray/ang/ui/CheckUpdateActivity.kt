@@ -24,9 +24,8 @@ class CheckUpdateActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-
-        title = getString(R.string.update_check_for_update)
+        //setContentView(binding.root)
+        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.update_check_for_update))
 
         binding.layoutCheckUpdate.setOnClickListener {
             checkForUpdates(binding.checkPreRelease.isChecked)

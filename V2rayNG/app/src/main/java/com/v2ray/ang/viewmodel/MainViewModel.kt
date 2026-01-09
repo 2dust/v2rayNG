@@ -258,8 +258,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (subscriptionId != id) {
             subscriptionId = id
             MmkvManager.encodeSettings(AppConfig.CACHE_SUBSCRIPTION_ID, subscriptionId)
-            reloadServerList()
         }
+        reloadServerList()
     }
 
     /**

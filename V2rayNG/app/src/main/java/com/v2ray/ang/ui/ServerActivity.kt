@@ -143,19 +143,20 @@ class ServerActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         val config = MmkvManager.decodeServerConfig(editGuid)
-        title = (config?.configType ?: createConfigType).toString()
-        when (config?.configType ?: createConfigType) {
-            EConfigType.VMESS -> setContentView(R.layout.activity_server_vmess)
-            EConfigType.CUSTOM -> return
-            EConfigType.SHADOWSOCKS -> setContentView(R.layout.activity_server_shadowsocks)
-            EConfigType.SOCKS -> setContentView(R.layout.activity_server_socks)
-            EConfigType.HTTP -> setContentView(R.layout.activity_server_socks)
-            EConfigType.VLESS -> setContentView(R.layout.activity_server_vless)
-            EConfigType.TROJAN -> setContentView(R.layout.activity_server_trojan)
-            EConfigType.WIREGUARD -> setContentView(R.layout.activity_server_wireguard)
-            EConfigType.HYSTERIA2 -> setContentView(R.layout.activity_server_hysteria2)
-            EConfigType.POLICYGROUP -> return
-        }
+
+        val layoutId = when (config?.configType ?: createConfigType) {
+            EConfigType.VMESS -> R.layout.activity_server_vmess
+            EConfigType.CUSTOM -> null
+            EConfigType.SHADOWSOCKS -> R.layout.activity_server_shadowsocks
+            EConfigType.SOCKS, EConfigType.HTTP -> R.layout.activity_server_socks
+            EConfigType.VLESS -> R.layout.activity_server_vless
+            EConfigType.TROJAN -> R.layout.activity_server_trojan
+            EConfigType.WIREGUARD -> R.layout.activity_server_wireguard
+            EConfigType.HYSTERIA2 -> R.layout.activity_server_hysteria2
+            EConfigType.POLICYGROUP -> null
+        } ?: return
+        setContentViewWithToolbar(layoutId, showHomeAsUp = true, title = (config?.configType ?: createConfigType).toString())
+
         sp_network?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,

@@ -21,8 +21,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/server_lab_need_inbound"
-                android:textAppearance="@style/TextAppearance.AppCompat.Tooltip"
-                android:textColor="@color/color_secondary" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Tooltip" />
         </LinearLayout>
 
         <LinearLayout

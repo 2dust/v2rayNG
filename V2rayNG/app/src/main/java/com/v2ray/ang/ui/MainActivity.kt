@@ -115,8 +115,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        title = getString(R.string.title_server)
-        setSupportActionBar(binding.toolbar)
+        setupToolbar(binding.toolbar,false, getString(R.string.title_server))
 
         binding.fab.setOnClickListener {
             if (mainViewModel.isRunning.value == true) {

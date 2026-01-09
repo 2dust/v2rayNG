@@ -32,8 +32,8 @@ class UserAssetUrlActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-        title = getString(R.string.title_user_asset_add_url)
+        //setContentView(binding.root)
+        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.title_user_asset_add_url))
 
         val assetItem = MmkvManager.decodeAsset(editAssetId)
         val assetUrlQrcode = intent.getStringExtra(ASSET_URL_QRCODE)

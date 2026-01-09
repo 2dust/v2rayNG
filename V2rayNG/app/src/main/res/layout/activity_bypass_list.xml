@@ -49,7 +49,6 @@
                         android:maxLines="2"
                         android:text="@string/per_app_proxy_settings_enable"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/colorAccent"
                         app:theme="@style/BrandedSwitch" />
 
                 </LinearLayout>
@@ -69,7 +68,6 @@
                         android:layout_height="wrap_content"
                         android:text="@string/switch_bypass_apps_mode"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/colorAccent"
                         app:theme="@style/BrandedSwitch" />
 
                     <LinearLayout

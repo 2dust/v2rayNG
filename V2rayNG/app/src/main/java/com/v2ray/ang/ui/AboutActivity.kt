@@ -13,9 +13,8 @@ class AboutActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-
-        title = getString(R.string.title_about)
+        //setContentView(binding.root)
+        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.title_about))
 
         binding.layoutSoureCcode.setOnClickListener {
             Utils.openUri(this, AppConfig.APP_URL)
