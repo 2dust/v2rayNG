@@ -6,7 +6,7 @@
     <string name="navigation_drawer_open">Открыть панель навигации</string>
     <string name="navigation_drawer_close">Закрыть панель навигации</string>
     <string name="migration_success">Успешный перенос данных!</string>
-    <string name="action_stop_service">Stop service</string>
+    <string name="action_stop_service">Остановить службу</string>
     <string name="migration_fail">Перенос данных не выполнен!</string>
     <string name="pull_down_to_refresh">Потяните вниз для обновления!</string>
 
@@ -29,7 +29,7 @@
     <string name="menu_item_import_config_qrcode">Импорт из QR-кода</string>
     <string name="menu_item_import_config_clipboard">Импорт из буфера обмена</string>
     <string name="menu_item_import_config_local">Импорт из файла</string>
-    <string name="menu_item_import_config_policy_group">Add [Policy group]</string>
+    <string name="menu_item_import_config_policy_group">Добавить группу политик</string>
     <string name="menu_item_import_config_manually_vmess">Ручной ввод VMess</string>
     <string name="menu_item_import_config_manually_vless">Ручной ввод VLESS</string>
     <string name="menu_item_import_config_manually_ss">Ручной ввод Shadowsocks</string>
@@ -168,7 +168,7 @@
     <string name="summary_pref_speed_enabled">Показывать текущую скорость в уведомлении.\nЗначок будет меняться в зависимости от использования.</string>
 
     <string name="title_pref_sniffing_enabled">Анализировать пакеты</string>
-    <string name="summary_pref_sniffing_enabled">Пытаться определелять доменные имена в пакетах (по умолчанию включено)</string>
+    <string name="summary_pref_sniffing_enabled">Пытаться определять доменные имена в пакетах (по умолчанию включено)</string>
     <string name="title_pref_route_only_enabled">Домен только для маршрутизации</string>
     <string name="summary_pref_route_only_enabled">Использовать доменное имя только для маршрутизации и сохранять целевой адрес в виде IP.</string>
 
@@ -199,10 +199,10 @@
     <string name="title_pref_delay_test_url">Сервис проверки задержки</string>
     <string name="summary_pref_delay_test_url">URL</string>
 
-    <string name="title_pref_ip_api_url">Current connection info test url</string>
-    <string name="summary_pref_ip_api_url">Url</string>
+    <string name="title_pref_ip_api_url">Сервис проверки текущего соединения</string>
+    <string name="summary_pref_ip_api_url">URL</string>
 
-    <string name="title_pref_proxy_sharing_enabled">Разрешать подключения из LAN</string>
+    <string name="title_pref_proxy_sharing_enabled">Разрешать соединения из LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться, используя ваш IP-адрес, чтобы использовать локальный прокси. Используйте только в доверенной сети, чтобы избежать несанкционированного подключения.</string>
     <string name="toast_warning_pref_proxysharing_short">Доступ из LAN разрешён, убедитесь, что вы находитесь в доверенной сети</string>
 
@@ -260,10 +260,10 @@
     <string name="logcat_copy">Копировать</string>
     <string name="logcat_clear">Очистить</string>
     <string name="title_service_restart">Перезапуск службы</string>
-    <string name="title_del_all_config">Удалить профили группы</string>
-    <string name="title_del_duplicate_config">Удалить дубликаты профилей группы</string>
-    <string name="title_del_invalid_config">Удалить нерабочие профили группы</string>
-    <string name="title_export_all">Экспорт профилей группы в буфер обмена</string>
+    <string name="title_del_all_config">Удалить профили</string>
+    <string name="title_del_duplicate_config">Удалить дубликаты профилей</string>
+    <string name="title_del_invalid_config">Удалить нерабочие профили</string>
+    <string name="title_export_all">Экспорт профилей в буфер обмена</string>
     <string name="title_sub_setting">Группы</string>
     <string name="sub_setting_remarks">Название</string>
     <string name="sub_setting_url">URL (необязательно)</string>
@@ -272,12 +272,12 @@
     <string name="sub_setting_enable">Использовать обновление</string>
     <string name="sub_auto_update">Использовать автообновление</string>
     <string name="sub_allow_insecure_url">Разрешать незащищённые HTTP-адреса</string>
-    <string name="sub_setting_pre_profile">Предыдущая конфигурация прокси</string>
-    <string name="sub_setting_next_profile">Следующая конфигурация прокси</string>
-    <string name="sub_setting_pre_profile_tip">Конфигурация должна быть уникальной</string>
-    <string name="title_sub_update">Обновить подписку группы</string>
-    <string name="title_ping_all_server">Проверить профили группы</string>
-    <string name="title_real_ping_all_server">Проверить задержку профилей группы</string>
+    <string name="sub_setting_pre_profile">Предыдущий профиль прокси</string>
+    <string name="sub_setting_next_profile">Следующий профиль прокси</string>
+    <string name="sub_setting_pre_profile_tip">Профиль должен быть уникальным</string>
+    <string name="title_sub_update">Обновить подписку</string>
+    <string name="title_ping_all_server">Проверить профили</string>
+    <string name="title_real_ping_all_server">Проверить задержку профилей</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
     <string name="title_filter_config">Фильтр профилей</string>
@@ -312,18 +312,18 @@
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">Сеть</string>
     <string name="routing_settings_network_tip">[udp|tcp]</string>
-    <string name="routing_settings_outbound_tag">Исходящее подключение</string>
+    <string name="routing_settings_outbound_tag">Исходящее соединение</string>
 
-    <string name="connection_test_pending">Проверить подключение</string>
+    <string name="connection_test_pending">Проверить соединение</string>
     <string name="connection_test_testing">Проверка…</string>
     <string name="connection_test_testing_count">Проверка профилей (%d)</string>
     <string name="connection_test_available">Успешно: соединение заняло %d мс</string>
     <string name="connection_test_error">Сбой проверки интернет-соединения: %s</string>
     <string name="connection_test_fail">Интернет недоступен</string>
     <string name="connection_test_error_status_code">Код ошибки: #%d</string>
-    <string name="connection_connected">Подключено, нажмите для проверки</string>
-    <string name="connection_not_connected">Не подключено</string>
-    <string name="connection_runing_task_left">Number of running test tasks: %s</string>
+    <string name="connection_connected">Соединено, нажмите для проверки</string>
+    <string name="connection_not_connected">Нет соединения</string>
+    <string name="connection_runing_task_left">Запущено проверок: %s</string>
 
     <string name="import_subscription_success">Подписка импортирована</string>
     <string name="import_subscription_failure">Невозможно импортировать подписку</string>
@@ -340,32 +340,32 @@
     <string name="update_check_pre_release">Искать предварительный выпуск</string>
     <string name="update_checking_for_update">Проверка обновления…</string>
 
-    <string name="title_policy_group_type">Policy group type</string>
-    <string name="title_policy_group_subscription_id">From subscription group</string>
-    <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+    <string name="title_policy_group_type">Тип группы политик</string>
+    <string name="title_policy_group_subscription_id">Из группы подписки</string>
+    <string name="title_policy_group_subscription_filter">Название фильтра</string>
 
     <!-- BackupActivity -->
-    <string name="title_configuration_backup_restore">Backup &amp; Restore</string>
+    <string name="title_configuration_backup_restore">Резервное копирование</string>
     <string name="title_configuration_backup">Резервирование конфигурации</string>
     <string name="title_configuration_restore">Восстановление конфигурации</string>
     <string name="title_configuration_share">Поделиться конфигурацией</string>
-    <string name="title_webdav_config_setting">WebDAV Settings</string>
-    <string name="title_webdav_config_setting_unknown">Please configure WebDAV first.</string>
-    <string name="title_webdav_url">WebDAV server URL</string>
-    <string name="title_webdav_user">Username</string>
-    <string name="title_webdav_pass">Password</string>
-    <string name="title_webdav_remote_path">Remote directory (optional)</string>
+    <string name="title_webdav_config_setting">Настройки WebDAV</string>
+    <string name="title_webdav_config_setting_unknown">Необходимо настроить WebDAV.</string>
+    <string name="title_webdav_url">URL сервера</string>
+    <string name="title_webdav_user">Пользователь</string>
+    <string name="title_webdav_pass">Пароль</string>
+    <string name="title_webdav_remote_path">Удалённый путь (необязательно)</string>
 
     <string-array name="share_method">
         <item>QR-код</item>
         <item>Экспорт в буфер обмена</item>
-        <item>Экспорт всей конфигурации в буфер обмена</item>
+        <item>Экспорт конфигурации в буфер обмена</item>
     </string-array>
 
     <string-array name="share_method_more">
         <item>QR-код</item>
         <item>Экспорт в буфер обмена</item>
-        <item>Экспорт всей конфигурации в буфер обмена</item>
+        <item>Экспорт конфигурации в буфер обмена</item>
         <item>Изменить</item>
         <item>Удалить</item>
     </string-array>
@@ -410,7 +410,7 @@
     </string-array>
 
     <string-array name="config_backup_options">
-        <item>Local</item>
+        <item>Локально</item>
         <item>WebDAV</item>
     </string-array>
 
