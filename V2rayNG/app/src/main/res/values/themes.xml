@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- MD3 Light Theme - base theme, uses DayNight for automatic switching -->
-    <style name="AppThemeDayNight" parent="Theme.Material3.DayNight">
+    <!-- Common base theme: put all shared items here so day/night can reuse -->
+    <style name="AppThemeBase" parent="Theme.Material3.DayNight">
         <!-- Primary colors - main tone: black -->
         <item name="colorPrimary">@color/md_theme_primary</item>
         <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
@@ -33,6 +33,11 @@
         <item name="colorOnSurfaceVariant">@color/md_theme_onSurfaceVariant</item>
         <item name="colorSurfaceInverse">@color/md_theme_inverseSurface</item>
         <item name="colorOnSurfaceInverse">@color/md_theme_inverseOnSurface</item>
+        <item name="colorSurfaceContainer">@color/md_theme_surface</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_surface</item>
+        <item name="colorSurfaceContainerHighest">@color/md_theme_surface</item>
+        <item name="colorSurfaceContainerLow">@color/md_theme_surface</item>
+        <item name="colorSurfaceContainerLowest">@color/md_theme_surface</item>
 
         <!-- Background colors -->
         <item name="android:colorBackground">@color/md_theme_background</item>
@@ -48,6 +53,11 @@
         <!-- Status bar and navigation bar - system bars -->
         <item name="android:statusBarColor">@color/md_theme_surface</item>
         <item name="android:navigationBarColor">@color/md_theme_surface</item>
+    </style>
+
+    <!-- Day/Night theme: inherit common values and set light-mode-specific items -->
+    <style name="AppThemeDayNight" parent="AppThemeBase">
+        <!-- day/night-specific overrides (light/default) -->
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
     </style>
