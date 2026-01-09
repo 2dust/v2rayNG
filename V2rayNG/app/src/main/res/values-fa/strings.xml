@@ -6,7 +6,7 @@
     <string name="navigation_drawer_open">باز کردن منو کشویی</string>
     <string name="navigation_drawer_close">بستن منو کشویی</string>
     <string name="migration_success">موفقیت در انتقال داده</string>
-    <string name="action_stop_service">Stop service</string>
+    <string name="action_stop_service">توقف کردن سرویس</string>
     <string name="migration_fail">انتقال داده انجام نشد!</string>
     <string name="pull_down_to_refresh">لطفاً برای تازه کردن، پایین بکشید!</string>
 
@@ -24,12 +24,12 @@
     <string name="title_server">فایل کانفیگ</string>
     <string name="menu_item_add_config">افزودن کانفیگ</string>
     <string name="menu_item_save_config">ذخیره کانفیگ</string>
-    <string name="menu_item_edit_config">Edit configuration</string>
+    <string name="menu_item_edit_config">ویرایش کردن کانفیگ</string>
     <string name="menu_item_del_config">حذف کانفیگ</string>
     <string name="menu_item_import_config_qrcode">کانفیگ را از QRcode وارد کنید</string>
     <string name="menu_item_import_config_clipboard">کانفیگ را از کلیپ ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_local">کانفیگ را از محلی وارد کنید</string>
-    <string name="menu_item_import_config_policy_group">Add [Policy group]</string>
+    <string name="menu_item_import_config_policy_group">اضافه کردن [گروه خط مشی]</string>
     <string name="menu_item_import_config_manually_vmess">تایپ دستی[VMESS]</string>
     <string name="menu_item_import_config_manually_vless">تایپ دستی[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">تایپ دستی[SHADOWSOCKS]</string>
@@ -113,7 +113,7 @@
     <string name="server_lab_bandwidth_up">افزایش پهنای باند (واحد)</string>
     <string name="server_lab_xhttp_mode">حالت XHTTP</string>
     <string name="server_lab_xhttp_extra">خام JSON XHTTP Extra، قالب: { XHTTPObject }</string>
-    <string name="server_lab_ech_config_list">EchConfigList</string>
+    <string name="server_lab_ech_config_list">لیست کانفیگ Ech</string>
     <string name="server_lab_ech_force_query">EchForceQuery</string>
 
     <!-- UserAssetActivity -->
@@ -198,7 +198,7 @@
     <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تاخیر واقعی کانفیگ ها </string>
     <string name="summary_pref_delay_test_url">URL</string>
 
-    <string name="title_pref_ip_api_url">Current connection info test url</string>
+    <string name="title_pref_ip_api_url">تست اطلاعات اتصال فعلی url</string>
     <string name="summary_pref_ip_api_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">اجازه اتصالات از طریق شبکه محلی</string>
@@ -321,7 +321,7 @@
     <string name="connection_test_error_status_code">کد خطا: #%d</string>
     <string name="connection_connected">متصل است، برای بررسی اتصال ضربه بزنید</string>
     <string name="connection_not_connected">متصل نیست</string>
-    <string name="connection_runing_task_left">Number of running test tasks: %s</string>
+    <string name="connection_runing_task_left">تعداد وظایف آزمایشی در حال اجرا: %s</string>
 
     <string name="import_subscription_success">اشتراک با موفقیت ذخیره شد</string>
     <string name="import_subscription_failure">ذخیره اشتراک ناموفق بود</string>
@@ -338,21 +338,21 @@
     <string name="update_check_pre_release">بررسی نسخه پیش از انتشار</string>
     <string name="update_checking_for_update">در حال بررسی برای به‌روزرسانی…</string>
 
-    <string name="title_policy_group_type">Policy group type</string>
-    <string name="title_policy_group_subscription_id">From subscription group</string>
-    <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+    <string name="title_policy_group_type">نوع گروه خط مشی</string>
+    <string name="title_policy_group_subscription_id">از گروه اشتراک</string>
+    <string name="title_policy_group_subscription_filter">توضیحات فیلتر معمولی</string>
 
     <!-- BackupActivity -->
-    <string name="title_configuration_backup_restore">Backup &amp; Restore</string>
+    <string name="title_configuration_backup_restore">پشتیبان‌گیری و بازیابی</string>
     <string name="title_configuration_backup">پشتیبان گیری از پیکربندی</string>
     <string name="title_configuration_restore">بازیابی پیکربندی</string>
     <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
-    <string name="title_webdav_config_setting">WebDAV Settings</string>
-    <string name="title_webdav_config_setting_unknown">Please configure WebDAV first.</string>
+    <string name="title_webdav_config_setting">تنظیمات WebDAV</string>
+    <string name="title_webdav_config_setting_unknown">لطفا ابتدا WebDAV را پیکربندی کنید.</string>
     <string name="title_webdav_url">WebDAV server URL</string>
-    <string name="title_webdav_user">Username</string>
-    <string name="title_webdav_pass">Password</string>
-    <string name="title_webdav_remote_path">Remote directory (optional)</string>
+    <string name="title_webdav_user">یوزرنیم</string>
+    <string name="title_webdav_pass">پسورد</string>
+    <string name="title_webdav_remote_path">دایرکتوری راه دور (اختیاری)</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
@@ -410,7 +410,7 @@
     </string-array>
 
     <string-array name="config_backup_options">
-        <item>Local</item>
+        <item>محلی</item>
         <item>WebDAV</item>
     </string-array>
 
