@@ -237,9 +237,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val serversCopy = serversCache.toList()
         viewModelScope.launch(Dispatchers.Default) {
-            for (item in serversCopy) {
-                MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG, item.guid)
+            val guids = ArrayList<String>(serversCopy.map { it.guid })
+            if (guids.isEmpty()) {
+                return@launch
             }
+            MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG, guids)
         }
     }
 

@@ -36,6 +36,7 @@ class V2RayTestService : Service() {
 
     // simple counter for currently running tasks
     private val realTestRunningCount = AtomicInteger(0)
+    private val realTestCount = AtomicInteger(0)
 
     /**
      * Initializes the V2Ray environment.
@@ -56,15 +57,22 @@ class V2RayTestService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.getIntExtra("key", 0)) {
             MSG_MEASURE_CONFIG -> {
-                val guid = intent.serializable<String>("content") ?: ""
-                realTestScope.launch {
-                    realTestRunningCount.incrementAndGet()
-                    try {
-                        val result = startRealPing(guid)
-                        MessageUtil.sendMsg2UI(this@V2RayTestService, MSG_MEASURE_CONFIG_SUCCESS, Pair(guid, result))
-                    } finally {
-                        val left = realTestRunningCount.decrementAndGet()
-                        MessageUtil.sendMsg2UI(this@V2RayTestService, AppConfig.MSG_MEASURE_CONFIG_FINISH, left.toString())
+                val guidsList = intent.serializable<ArrayList<String>>("content")
+                if (guidsList == null || guidsList.isEmpty()) {
+                    return super.onStartCommand(intent, flags, startId)
+                }
+                for (guid in guidsList) {
+                    realTestCount.incrementAndGet()
+                    realTestScope.launch {
+                        realTestRunningCount.incrementAndGet()
+                        try {
+                            val result = startRealPing(guid)
+                            MessageUtil.sendMsg2UI(this@V2RayTestService, MSG_MEASURE_CONFIG_SUCCESS, Pair(guid, result))
+                         } finally {
+                            val count = realTestCount.decrementAndGet()
+                            val left = realTestRunningCount.decrementAndGet()
+                            MessageUtil.sendMsg2UI(this@V2RayTestService, AppConfig.MSG_MEASURE_CONFIG_FINISH, "$left / $count")
+                        }
                     }
                 }
             }
