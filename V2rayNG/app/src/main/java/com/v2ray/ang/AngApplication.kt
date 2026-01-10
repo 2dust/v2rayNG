@@ -34,6 +34,8 @@ class AngApplication : MultiDexApplication() {
 
         MMKV.initialize(this)
 
+        // Ensure critical preference defaults are present in MMKV early
+        SettingsManager.ensureDefaultSettings()
         SettingsManager.setNightMode()
         // Initialize WorkManager with the custom configuration
         WorkManager.initialize(this, workManagerConfiguration)

@@ -500,6 +500,28 @@ object MmkvManager {
      * @param value The settings value.
      * @return Whether the encoding was successful.
      */
+    fun encodeSettings(key: String, value: Long): Boolean {
+        return settingsStorage.encode(key, value)
+    }
+
+    /**
+     * Encodes the settings.
+     *
+     * @param key The settings key.
+     * @param value The settings value.
+     * @return Whether the encoding was successful.
+     */
+    fun encodeSettings(key: String, value: Float): Boolean {
+        return settingsStorage.encode(key, value)
+    }
+
+    /**
+     * Encodes the settings.
+     *
+     * @param key The settings key.
+     * @param value The settings value.
+     * @return Whether the encoding was successful.
+     */
     fun encodeSettings(key: String, value: Boolean): Boolean {
         return settingsStorage.encode(key, value)
     }
@@ -534,6 +556,39 @@ object MmkvManager {
      */
     fun decodeSettingsString(key: String, defaultValue: String?): String? {
         return settingsStorage.decodeString(key, defaultValue)
+    }
+
+    /**
+     * Decodes the settings integer.
+     *
+     * @param key The settings key.
+     * @param defaultValue The default value.
+     * @return The settings value.
+     */
+    fun decodeSettingsInt(key: String, defaultValue: Int): Int {
+        return settingsStorage.decodeInt(key, defaultValue)
+    }
+
+    /**
+     * Decodes the settings long.
+     *
+     * @param key The settings key.
+     * @param defaultValue The default value.
+     * @return The settings value.
+     */
+    fun decodeSettingsLong(key: String, defaultValue: Long): Long {
+        return settingsStorage.decodeLong(key, defaultValue)
+    }
+
+    /**
+     * Decodes the settings float.
+     *
+     * @param key The settings key.
+     * @param defaultValue The default value.
+     * @return The settings value.
+     */
+    fun decodeSettingsFloat(key: String, defaultValue: Float): Float {
+        return settingsStorage.decodeFloat(key, defaultValue)
     }
 
     /**
