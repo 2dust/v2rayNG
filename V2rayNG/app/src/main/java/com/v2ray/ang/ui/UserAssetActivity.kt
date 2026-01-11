@@ -219,7 +219,7 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun downloadGeoFiles() {
-        binding.pbWaiting.show()
+        showLoading()
         toast(R.string.msg_downloading_content)
 
         val httpPort = SettingsManager.getHttpPort()
@@ -247,7 +247,7 @@ class UserAssetActivity : BaseActivity() {
                 } else {
                     toast(getString(R.string.toast_failure))
                 }
-                binding.pbWaiting.hide()
+                hideLoading()
             }
         }
     }

@@ -422,7 +422,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private fun importBatchConfig(server: String?) {
-        binding.pbWaiting.show()
+        showLoading()
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -438,12 +438,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         countSub > 0 -> setupGroupTab()
                         else -> toastError(R.string.toast_failure)
                     }
-                    binding.pbWaiting.hide()
+                    hideLoading()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     toastError(R.string.toast_failure)
-                    binding.pbWaiting.hide()
+                    hideLoading()
                 }
                 Log.e(AppConfig.TAG, "Failed to import batch config", e)
             }
@@ -468,7 +468,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      * import config from sub
      */
     private fun importConfigViaSub(): Boolean {
-        binding.pbWaiting.show()
+        showLoading()
 
         lifecycleScope.launch(Dispatchers.IO) {
             val count = mainViewModel.updateConfigViaSubAll()
@@ -480,14 +480,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 } else {
                     toastError(R.string.toast_failure)
                 }
-                binding.pbWaiting.hide()
+                hideLoading()
             }
         }
         return true
     }
 
     private fun exportAll() {
-        binding.pbWaiting.show()
+        showLoading()
         lifecycleScope.launch(Dispatchers.IO) {
             val ret = mainViewModel.exportAllServer()
             launch(Dispatchers.Main) {
@@ -495,7 +495,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     toast(getString(R.string.title_export_config_count, ret))
                 else
                     toastError(R.string.toast_failure)
-                binding.pbWaiting.hide()
+                hideLoading()
             }
         }
     }
@@ -503,13 +503,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private fun delAllConfig() {
         AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                binding.pbWaiting.show()
+                showLoading()
                 lifecycleScope.launch(Dispatchers.IO) {
                     val ret = mainViewModel.removeAllServer()
                     launch(Dispatchers.Main) {
                         mainViewModel.reloadServerList()
                         toast(getString(R.string.title_del_config_count, ret))
-                        binding.pbWaiting.hide()
+                        hideLoading()
                     }
                 }
             }
@@ -522,13 +522,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private fun delDuplicateConfig() {
         AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                binding.pbWaiting.show()
+                showLoading()
                 lifecycleScope.launch(Dispatchers.IO) {
                     val ret = mainViewModel.removeDuplicateServer()
                     launch(Dispatchers.Main) {
                         mainViewModel.reloadServerList()
                         toast(getString(R.string.title_del_duplicate_config_count, ret))
-                        binding.pbWaiting.hide()
+                        hideLoading()
                     }
                 }
             }
@@ -541,13 +541,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private fun delInvalidConfig() {
         AlertDialog.Builder(this).setMessage(R.string.del_invalid_config_comfirm)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                binding.pbWaiting.show()
+                showLoading()
                 lifecycleScope.launch(Dispatchers.IO) {
                     val ret = mainViewModel.removeInvalidServer()
                     launch(Dispatchers.Main) {
                         mainViewModel.reloadServerList()
                         toast(getString(R.string.title_del_config_count, ret))
-                        binding.pbWaiting.hide()
+                        hideLoading()
                     }
                 }
             }
@@ -558,12 +558,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private fun sortByTestResults() {
-        binding.pbWaiting.show()
+        showLoading()
         lifecycleScope.launch(Dispatchers.IO) {
             mainViewModel.sortByTestResults()
             launch(Dispatchers.Main) {
                 mainViewModel.reloadServerList()
-                binding.pbWaiting.hide()
+                hideLoading()
             }
         }
     }

@@ -60,7 +60,7 @@ class PerAppProxyActivity : BaseActivity() {
     }
 
     private fun initList() {
-        binding.pbWaiting.show()
+        showLoading()
 
         lifecycleScope.launch {
             try {
@@ -98,7 +98,7 @@ class PerAppProxyActivity : BaseActivity() {
             } catch (e: Exception) {
                 Log.e(ANG_PACKAGE, "Error loading apps", e)
             } finally {
-                binding.pbWaiting.hide()
+                hideLoading()
             }
         }
     }
@@ -179,7 +179,7 @@ class PerAppProxyActivity : BaseActivity() {
 
     private fun selectProxyAppAuto() {
         toast(R.string.msg_downloading_content)
-        binding.pbWaiting.show()
+        showLoading()
 
         val url = AppConfig.ANDROID_PACKAGE_NAME_LIST_URL
         lifecycleScope.launch(Dispatchers.IO) {
@@ -192,7 +192,7 @@ class PerAppProxyActivity : BaseActivity() {
                 //Log.i(AppConfig.TAG, content)
                 selectProxyApp(content, true)
                 toastSuccess(R.string.toast_success)
-                binding.pbWaiting.hide()
+                hideLoading()
             }
         }
     }

@@ -246,7 +246,7 @@ class BackupActivity : BaseActivity() {
             return
         }
 
-        binding.pbWaiting.show()
+        showLoading()
 
         lifecycleScope.launch(Dispatchers.IO) {
             var tempFile: File? = null
@@ -283,7 +283,7 @@ class BackupActivity : BaseActivity() {
                 } catch (_: Exception) {
                 }
                 withContext(Dispatchers.Main) {
-                    binding.pbWaiting.hide()
+                    hideLoading()
                 }
             }
         }
@@ -296,7 +296,7 @@ class BackupActivity : BaseActivity() {
             return
         }
 
-        binding.pbWaiting.show()
+        showLoading()
 
         lifecycleScope.launch(Dispatchers.IO) {
             var target: File? = null
@@ -328,7 +328,7 @@ class BackupActivity : BaseActivity() {
                 } catch (_: Exception) {
                 }
                 withContext(Dispatchers.Main) {
-                    binding.pbWaiting.hide()
+                    hideLoading()
                 }
             }
         }

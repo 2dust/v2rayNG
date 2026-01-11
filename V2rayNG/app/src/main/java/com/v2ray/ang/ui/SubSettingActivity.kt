@@ -58,7 +58,7 @@ class SubSettingActivity : BaseActivity() {
         }
 
         R.id.sub_update -> {
-            binding.pbWaiting.show()
+            showLoading()
 
             lifecycleScope.launch(Dispatchers.IO) {
                 val count = AngConfigManager.updateConfigViaSubAll()
@@ -70,7 +70,7 @@ class SubSettingActivity : BaseActivity() {
                     } else {
                         toastError(R.string.toast_failure)
                     }
-                    binding.pbWaiting.hide()
+                    hideLoading()
                 }
             }
 

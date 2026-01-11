@@ -45,6 +45,7 @@ class CheckUpdateActivity : BaseActivity() {
 
     private fun checkForUpdates(includePreRelease: Boolean) {
         toast(R.string.update_checking_for_update)
+        showLoading()
 
         lifecycleScope.launch {
             try {
@@ -57,6 +58,9 @@ class CheckUpdateActivity : BaseActivity() {
             } catch (e: Exception) {
                 Log.e(AppConfig.TAG, "Failed to check for updates: ${e.message}")
                 toastError(e.message ?: getString(R.string.toast_failure))
+            }
+            finally {
+                hideLoading()
             }
         }
     }

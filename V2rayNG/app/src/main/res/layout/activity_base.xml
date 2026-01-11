@@ -14,6 +14,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:indicatorColor="@color/color_fab_active" />
+
     <FrameLayout
         android:id="@+id/content_container"
         android:layout_width="0dp"
@@ -21,6 +30,8 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
