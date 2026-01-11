@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityServerGroupBinding
@@ -11,7 +12,6 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
-import android.widget.ArrayAdapter
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.Utils
 

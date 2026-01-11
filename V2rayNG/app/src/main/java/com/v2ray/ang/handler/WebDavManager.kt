@@ -97,13 +97,7 @@ object WebDavManager {
                     return@withContext false
                 }
 
-                val body = resp.body
-                if (body == null) {
-                    Log.e(AppConfig.TAG, "WebDAV download failed: $remoteRelativePath (empty response body)")
-                    return@withContext false
-                }
-
-                body.byteStream().use { input ->
+                resp.body.byteStream().use { input ->
                     destFile.parentFile?.mkdirs()
                     FileOutputStream(destFile).use { fos ->
                         input.copyTo(fos)

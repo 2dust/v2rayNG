@@ -2,7 +2,6 @@ package com.v2ray.ang.handler
 
 import android.content.Context
 import android.os.SystemClock
-import android.text.TextUtils
 import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -55,31 +54,6 @@ object SpeedtestManager {
             Log.e(AppConfig.TAG, "Failed to measure outbound delay", e)
             -1L
         }
-    }
-
-    /**
-     * Measures the ping time to a given URL using the system ping command.
-     *
-     * @param url The URL to ping.
-     * @return The ping time in milliseconds as a string, or "-1ms" if the ping failed.
-     */
-    fun ping(url: String): String {
-        try {
-            val command = "/system/bin/ping -c 3 $url"
-            val process = Runtime.getRuntime().exec(command)
-            val allText = process.inputStream.bufferedReader().use { it.readText() }
-            if (!TextUtils.isEmpty(allText)) {
-                val tempInfo = allText.substring(allText.indexOf("min/avg/max/mdev") + 19)
-                val temps =
-                    tempInfo.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                if (temps.count() > 0 && temps[0].length < 10) {
-                    return temps[0].toFloat().toInt().toString() + "ms"
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to ping URL: $url", e)
-        }
-        return "-1ms"
     }
 
     /**

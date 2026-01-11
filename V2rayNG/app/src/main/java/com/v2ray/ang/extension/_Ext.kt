@@ -9,10 +9,8 @@ import android.os.Bundle
 import android.widget.Toast
 import com.v2ray.ang.AngApplication
 import es.dmoral.toasty.Toasty
-import org.json.JSONObject
 import java.io.Serializable
 import java.net.URI
-import java.net.URLConnection
 
 val Context.v2RayApplication: AngApplication?
     get() = applicationContext as? AngApplication
@@ -69,25 +67,6 @@ fun Context.toastError(message: Int) {
  */
 fun Context.toastError(message: CharSequence) {
     Toasty.error(this, message, Toast.LENGTH_SHORT, true).show()
-}
-
-
-/**
- * Puts a key-value pair into the JSONObject.
- *
- * @param pair The key-value pair to put.
- */
-fun JSONObject.putOpt(pair: Pair<String, Any?>) {
-    put(pair.first, pair.second)
-}
-
-/**
- * Puts multiple key-value pairs into the JSONObject.
- *
- * @param pairs The map of key-value pairs to put.
- */
-fun JSONObject.putOpt(pairs: Map<String, Any?>) {
-    pairs.forEach { put(it.key, it.value) }
 }
 
 const val THRESHOLD = 1000L

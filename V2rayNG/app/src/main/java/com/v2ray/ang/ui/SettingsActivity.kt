@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.View
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference

@@ -223,7 +223,7 @@ object NotificationManager {
      */
     private fun appendSpeedString(text: StringBuilder, name: String?, up: Double, down: Double) {
         var n = name ?: "no tag"
-        n = n.substring(0, min(n.length, 6))
+        n = n.take(min(n.length, 6))
         text.append(n)
         for (i in n.length..6 step 2) {
             text.append("\t")
