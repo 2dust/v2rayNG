@@ -41,6 +41,7 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
         holder.itemSubSettingBinding.tvName.text = subItem.remarks
         holder.itemSubSettingBinding.tvUrl.text = subItem.url
         holder.itemSubSettingBinding.chkEnable.isChecked = subItem.enabled
+        holder.itemSubSettingBinding.tvLastUpdated.text = Utils.formatTimestamp(subItem.lastUpdated)
         holder.itemView.setBackgroundColor(Color.TRANSPARENT)
 
         holder.itemSubSettingBinding.layoutEdit.setOnClickListener {
@@ -65,10 +66,12 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
             holder.itemSubSettingBinding.layoutUrl.visibility = View.GONE
             holder.itemSubSettingBinding.layoutShare.visibility = View.INVISIBLE
             holder.itemSubSettingBinding.chkEnable.visibility = View.INVISIBLE
+            holder.itemSubSettingBinding.layoutLastUpdated.visibility = View.INVISIBLE
         } else {
             holder.itemSubSettingBinding.layoutUrl.visibility = View.VISIBLE
             holder.itemSubSettingBinding.layoutShare.visibility = View.VISIBLE
             holder.itemSubSettingBinding.chkEnable.visibility = View.VISIBLE
+            holder.itemSubSettingBinding.layoutLastUpdated.visibility = View.VISIBLE
             holder.itemSubSettingBinding.layoutShare.setOnClickListener {
                 AlertDialog.Builder(mActivity)
                     .setItems(share_method.asList().toTypedArray()) { _, i ->
