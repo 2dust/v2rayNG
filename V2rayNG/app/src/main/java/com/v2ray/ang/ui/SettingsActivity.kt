@@ -229,8 +229,7 @@ class SettingsActivity : BaseActivity() {
 
             fun traverse(group: androidx.preference.PreferenceGroup) {
                 for (i in 0 until group.preferenceCount) {
-                    val p = group.getPreference(i)
-                    when (p) {
+                    when (val p = group.getPreference(i)) {
                         is androidx.preference.PreferenceGroup -> traverse(p)
                         else -> updateSummary(p)
                     }
