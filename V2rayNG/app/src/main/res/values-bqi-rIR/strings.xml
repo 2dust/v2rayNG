@@ -153,6 +153,11 @@
     <string name="title_pref_is_booted">منپیز خوتکار مجال ر ونی</string>
     <string name="summary_pref_is_booted">مجال ر وندن، خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
 
+    <string name="title_pref_auto_remove_invalid_after_test">Auto delete invalid config after testing</string>
+    <string name="summary_pref_auto_remove_invalid_after_test">Test results may not be accurate; deleted config cannot be recovered.</string>
+    <string name="title_pref_auto_sort_after_test">Auto sort after testing</string>
+    <string name="summary_pref_auto_sort_after_test">Test results may not be accurate;</string>
+
     <string name="title_mux_settings">سامووا Mux</string>
     <string name="title_pref_mux_enabled">ر وندن Mux</string>
     <string name="summary_pref_mux_enabled">زل تر، ٱما گاشڌ منپیز زی قت بۊ\nمخزن ترافیک TCP وا 8 منپیز پؽش فرز، بارت دؽوۉداری UDP وو QUIC ن ای لم سفارشی کۊنین.</string>

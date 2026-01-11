@@ -22,6 +22,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.CancellationException
 import libv2ray.Libv2ray
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -48,43 +50,6 @@ class V2RayTestService : Service() {
     }
 
     /**
-     * Handles the start command for the service.
-     * @param intent The intent.
-     * @param flags The flags.
-     * @param startId The start ID.
-     * @return The start mode.
-     */
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        when (intent?.getIntExtra("key", 0)) {
-            MSG_MEASURE_CONFIG -> {
-                val guidsList = intent.serializable<ArrayList<String>>("content")
-                if (guidsList == null || guidsList.isEmpty()) {
-                    return super.onStartCommand(intent, flags, startId)
-                }
-                for (guid in guidsList) {
-                    realTestCount.incrementAndGet()
-                    realTestScope.launch {
-                        realTestRunningCount.incrementAndGet()
-                        try {
-                            val result = startRealPing(guid)
-                            MessageUtil.sendMsg2UI(this@V2RayTestService, MSG_MEASURE_CONFIG_SUCCESS, Pair(guid, result))
-                         } finally {
-                            val count = realTestCount.decrementAndGet()
-                            val left = realTestRunningCount.decrementAndGet()
-                            MessageUtil.sendMsg2UI(this@V2RayTestService, AppConfig.MSG_MEASURE_CONFIG_FINISH, "$left / $count")
-                        }
-                    }
-                }
-            }
-
-            MSG_MEASURE_CONFIG_CANCEL -> {
-                realTestJob.cancelChildren()
-            }
-        }
-        return super.onStartCommand(intent, flags, startId)
-    }
-
-    /**
      * Binds the service.
      * @param intent The intent.
      * @return The binder.
@@ -100,6 +65,64 @@ class V2RayTestService : Service() {
         super.onDestroy()
         realTestJob.cancel()
     }
+
+    /**
+     * Handles the start command for the service.
+     * @param intent The intent.
+     * @param flags The flags.
+     * @param startId The start ID.
+     * @return The start mode.
+     */
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when (intent?.getIntExtra("key", 0)) {
+            MSG_MEASURE_CONFIG -> {
+                val guidsList = intent.serializable<ArrayList<String>>("content")
+                if (guidsList != null && guidsList.isNotEmpty()) {
+                    startBatchRealPing(guidsList)
+                }
+            }
+
+            MSG_MEASURE_CONFIG_CANCEL -> {
+                realTestJob.cancelChildren()
+            }
+        }
+        return super.onStartCommand(intent, flags, startId)
+    }
+
+    /**
+     * Starts batch real ping tests.
+     * @param guidsList The list of GUIDs to test.
+     */
+    private fun startBatchRealPing(guidsList: List<String>) {
+        val jobs = guidsList.map { guid ->
+            realTestCount.incrementAndGet()
+            realTestScope.launch {
+                realTestRunningCount.incrementAndGet()
+                try {
+                    val result = startRealPing(guid)
+                    MessageUtil.sendMsg2UI(this@V2RayTestService, MSG_MEASURE_CONFIG_SUCCESS, Pair(guid, result))
+                } finally {
+                    val count = realTestCount.decrementAndGet()
+                    val left = realTestRunningCount.decrementAndGet()
+                    MessageUtil.sendMsg2UI(this@V2RayTestService, AppConfig.MSG_MEASURE_CONFIG_NOTIFY, "$left / $count")
+                }
+            }
+        }
+
+        realTestScope.launch {
+            try {
+                joinAll(*jobs.toTypedArray())
+                notifyAllTasksCompleted("0")
+            } catch (_: CancellationException) {
+                notifyAllTasksCompleted("-1")
+            }
+        }
+    }
+
+    private fun notifyAllTasksCompleted(status: String) {
+        MessageUtil.sendMsg2UI(this@V2RayTestService, AppConfig.MSG_MEASURE_CONFIG_FINISH, status)
+    }
+
 
     /**
      * Starts the real ping test.

@@ -31,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Collections
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -413,6 +414,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         reloadServerList()
     }
 
+    fun onTestsFinished() {
+        viewModelScope.launch(Dispatchers.Default) {
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST)) {
+                removeInvalidServer()
+            }
+
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SORT_AFTER_TEST)) {
+                sortByTestResults()
+            }
+
+            withContext(Dispatchers.Main) {
+                reloadServerList()
+            }
+        }
+    }
+
     private val mMsgReceiver = object : BroadcastReceiver() {
         override fun onReceive(ctx: Context?, intent: Intent?) {
             when (intent?.getIntExtra("key", 0)) {
@@ -448,10 +465,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     updateListAction.value = getPosition(resultPair.first)
                 }
 
-                AppConfig.MSG_MEASURE_CONFIG_FINISH -> {
+                AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> {
                     val content = intent.getStringExtra("content")
                     updateTestResultAction.value =
                         getApplication<AngApplication>().getString(R.string.connection_runing_task_left, content)
+                }
+
+                AppConfig.MSG_MEASURE_CONFIG_FINISH -> {
+                    onTestsFinished()
                 }
             }
         }

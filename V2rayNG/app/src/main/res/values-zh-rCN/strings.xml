@@ -150,6 +150,11 @@
     <string name="title_pref_is_booted">开机时自动连接</string>
     <string name="summary_pref_is_booted">开机时自动连接选择的服务器，可能会不成功</string>
 
+    <string name="title_pref_auto_remove_invalid_after_test">测试后自动删除无效配置</string>
+    <string name="summary_pref_auto_remove_invalid_after_test">测试结果可能不准确；已删除的配置无法恢复。</string>
+    <string name="title_pref_auto_sort_after_test">测试后自动排序</string>
+    <string name="summary_pref_auto_sort_after_test">测试结果可能不准确；</string>
+
     <string name="title_mux_settings">Mux 多路复用 设置</string>
     <string name="title_pref_mux_enabled">启用 Mux 多路复用</string>
     <string name="summary_pref_mux_enabled">减低延时，但可能会断流，建议不要启用。\nTCP，UDP 及 QUIC 流量处理方式下方可选。</string>
