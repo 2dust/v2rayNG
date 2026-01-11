@@ -304,13 +304,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 isRunningProvider = { isRunning },
                 restartCallback = { runTun2socks() }
             )
-        } else if (MmkvManager.decodeSettingsString(AppConfig.PREF_TUN, AppConfig.TUN_hevsocks5) == AppConfig.TUN_tun2socks) {
-            tun2SocksService = Tun2SocksService(
-                context = applicationContext,
-                vpnInterface = mInterface,
-                isRunningProvider = { isRunning },
-                restartCallback = { runTun2socks() }
-            )
         } else {
             tun2SocksService = null
         }

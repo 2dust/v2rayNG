@@ -489,42 +489,7 @@ object V2rayConfigManager {
                 )
             }
 
-            if (MmkvManager.decodeSettingsString(AppConfig.PREF_TUN, AppConfig.TUN_hevsocks5) == AppConfig.TUN_tun2socks) {
-
-                // DNS inbound
-                val remoteDns = SettingsManager.getRemoteDnsServers()
-                if (v2rayConfig.inbounds.none { e -> e.protocol == "dokodemo-door" && e.tag == "dns-in" }) {
-                    val dnsInboundSettings = V2rayConfig.InboundBean.InSettingsBean(
-                        address = if (Utils.isPureIpAddress(remoteDns.first())) remoteDns.first() else AppConfig.DNS_PROXY,
-                        port = 53,
-                        network = "tcp,udp"
-                    )
-
-                    val localDnsPort = Utils.parseInt(
-                        MmkvManager.decodeSettingsString(AppConfig.PREF_LOCAL_DNS_PORT),
-                        AppConfig.PORT_LOCAL_DNS.toInt()
-                    )
-                    v2rayConfig.inbounds.add(
-                        V2rayConfig.InboundBean(
-                            tag = "dns-in",
-                            port = localDnsPort,
-                            listen = AppConfig.LOOPBACK,
-                            protocol = "dokodemo-door",
-                            settings = dnsInboundSettings,
-                            sniffing = null
-                        )
-                    )
-                }
-
-                // DNS routing tag
-                v2rayConfig.routing.rules.add(
-                    0, RulesBean(
-                        inboundTag = arrayListOf("dns-in"),
-                        outboundTag = "dns-out",
-                        domain = null
-                    )
-                )
-            } else if (MmkvManager.decodeSettingsString(AppConfig.PREF_TUN, AppConfig.TUN_hevsocks5) == AppConfig.TUN_hevsocks5) {
+            if (MmkvManager.decodeSettingsString(AppConfig.PREF_TUN, AppConfig.TUN_hevsocks5) == AppConfig.TUN_hevsocks5) {
                 //hev-socks5-tunnel dns routing
                 v2rayConfig.routing.rules.add(
                     0, RulesBean(

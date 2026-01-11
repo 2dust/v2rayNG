@@ -119,7 +119,6 @@
     </string-array>
 
     <string-array name="tun_value" translatable="false">
-        <item>badvpn-tun2socks</item>
         <item>hev-socks5-tunnel</item>
         <item>xray-core</item>
     </string-array>

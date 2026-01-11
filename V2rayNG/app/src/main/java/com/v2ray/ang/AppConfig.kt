@@ -172,7 +172,6 @@ object AppConfig {
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"
     const val VPN_MTU = 1500
-    const val TUN_tun2socks = "badvpn-tun2socks"
     const val TUN_hevsocks5 = "hev-socks5-tunnel"
     const val TUN_xray = "xray-core"
 
