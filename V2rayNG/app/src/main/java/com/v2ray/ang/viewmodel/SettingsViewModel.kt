@@ -62,7 +62,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_FRAGMENT_INTERVAL,
             AppConfig.PREF_MUX_XUDP_QUIC,
             AppConfig.PREF_HEV_TUNNEL_LOGLEVEL,
-            AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT
+            AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT,
+            AppConfig.PREF_TUN,
                 -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getString(key, ""))
             }
@@ -83,18 +84,19 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             AppConfig.PREF_DOUBLE_COLUMN_DISPLAY,
             AppConfig.SUBSCRIPTION_AUTO_UPDATE,
             AppConfig.PREF_FRAGMENT_ENABLED,
-            AppConfig.PREF_MUX_ENABLED
+            AppConfig.PREF_MUX_ENABLED,
                 -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getBoolean(key, false))
             }
 
             AppConfig.PREF_SNIFFING_ENABLED,
-            AppConfig.PREF_USE_HEV_TUNNEL -> {
+                 -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getBoolean(key, true))
             }
 
             AppConfig.PREF_MUX_CONCURRENCY,
-            AppConfig.PREF_MUX_XUDP_CONCURRENCY -> {
+            AppConfig.PREF_MUX_XUDP_CONCURRENCY,
+                 -> {
                 MmkvManager.encodeSettings(key, sharedPreferences.getString(key, "8"))
             }
         }

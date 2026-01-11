@@ -90,9 +90,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (V2RayServiceManager.startCoreLoop()) {
-            startService()
-        }
+        setupVpnService()
+        startService()
         return START_STICKY
         //return super.onStartCommand(intent, flags, startId)
     }
@@ -102,7 +101,11 @@ class V2RayVpnService : VpnService(), ServiceControl {
     }
 
     override fun startService() {
-        setupService()
+        if (mInterface == null) {
+            Log.e(AppConfig.TAG, "Failed to create VPN interface")
+            return
+        }
+        V2RayServiceManager.startCoreLoop(mInterface)
     }
 
     override fun stopService() {
@@ -124,7 +127,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Sets up the VPN service.
      * Prepares the VPN and configures it if preparation is successful.
      */
-    private fun setupService() {
+    private fun setupVpnService() {
         val prepare = prepare(this)
         if (prepare != null) {
             return
@@ -294,13 +297,23 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Starts the tun2socks process with the appropriate parameters.
      */
     private fun runTun2socks() {
-        //if (MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true)) {
-        tun2SocksService = TProxyService(
-            context = applicationContext,
-            vpnInterface = mInterface,
-            isRunningProvider = { isRunning },
-            restartCallback = { runTun2socks() }
-        )
+        if (MmkvManager.decodeSettingsString(AppConfig.PREF_TUN, AppConfig.TUN_hevsocks5) == AppConfig.TUN_hevsocks5) {
+            tun2SocksService = TProxyService(
+                context = applicationContext,
+                vpnInterface = mInterface,
+                isRunningProvider = { isRunning },
+                restartCallback = { runTun2socks() }
+            )
+        } else if (MmkvManager.decodeSettingsString(AppConfig.PREF_TUN, AppConfig.TUN_hevsocks5) == AppConfig.TUN_tun2socks) {
+            tun2SocksService = Tun2SocksService(
+                context = applicationContext,
+                vpnInterface = mInterface,
+                isRunningProvider = { isRunning },
+                restartCallback = { runTun2socks() }
+            )
+        } else {
+            tun2SocksService = null
+        }
 
         tun2SocksService?.startTun2Socks()
     }

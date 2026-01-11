@@ -249,8 +249,7 @@
     <string name="title_language">语言</string>
     <string name="title_ui_settings">用户界面设置</string>
     <string name="title_pref_ui_mode_night">界面颜色设置</string>
-    <string name="title_pref_use_hev_tunnel">启用新的 TUN 功能</string>
-    <string name="summary_pref_use_hev_tunnel">选择启用后 TUN 将使用 hev-socks5-tunnel 否则使用 badvpn-tun2socks</string>
+    <string name="title_pref_tun">TUN 接口</string>
     <string name="title_pref_hev_tunnel_loglevel">HevTun 日志级别</string>
     <string name="title_pref_hev_tunnel_rw_timeout">HevTun 读写超时(秒) (tcp,udp 默认 300,60)</string>
 
