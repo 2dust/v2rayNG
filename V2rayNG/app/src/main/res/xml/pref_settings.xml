@@ -100,11 +100,13 @@
             android:summary="1500"
             android:title="@string/title_pref_vpn_mtu" />
 
-<!--        <CheckBoxPreference-->
-<!--            android:defaultValue="true"-->
-<!--            android:key="pref_use_hev_tunnel"-->
-<!--            android:summary="@string/summary_pref_use_hev_tunnel"-->
-<!--            android:title="@string/title_pref_use_hev_tunnel" />-->
+        <ListPreference
+            android:defaultValue="hev-socks5-tunnel"
+            android:entries="@array/tun_value"
+            android:entryValues="@array/tun_value"
+            android:key="pref_tun"
+            android:summary="%s"
+            android:title="@string/title_pref_tun" />
 
         <ListPreference
             android:defaultValue="warn"

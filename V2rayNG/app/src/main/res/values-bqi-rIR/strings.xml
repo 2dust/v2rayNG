@@ -257,8 +257,7 @@
     <string name="title_language">زووݩ</string>
     <string name="title_ui_settings">سامووا رابت منتوری</string>
     <string name="title_pref_ui_mode_night">سامووا هالت رابت منتوری</string>
-    <string name="title_pref_use_hev_tunnel">فعال کردن ویژیی نۊ TUN</string>
-    <string name="summary_pref_use_hev_tunnel">ٱر ک فعال بۊ، TUN ایا hev-socks5-tunnel ن و کار اگره؛ ٱندی ز badvpn-tun2socks.</string>
+    <string name="title_pref_tun">TUN Interface</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun سئت گوزارشا</string>
     <string name="title_pref_hev_tunnel_rw_timeout">زمووݩ مندیر بیڌن خوندن/هؽل کردن Hev Tun (سانیه) (پؽش فرز tcp,udp 300،60)</string>
 
