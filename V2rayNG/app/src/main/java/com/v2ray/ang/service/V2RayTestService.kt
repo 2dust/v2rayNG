@@ -11,20 +11,18 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.PluginServiceManager
-import com.v2ray.ang.handler.SpeedtestManager
+import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.handler.V2RayNativeManager
 import com.v2ray.ang.handler.V2rayConfigManager
 import com.v2ray.ang.util.MessageUtil
-import com.v2ray.ang.util.Utils
-import go.Seq
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.CancellationException
-import libv2ray.Libv2ray
+import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 
 class V2RayTestService : Service() {
@@ -45,8 +43,7 @@ class V2RayTestService : Service() {
      */
     override fun onCreate() {
         super.onCreate()
-        Seq.setContext(this)
-        Libv2ray.initCoreEnv(Utils.userAssetPath(this), Utils.getDeviceIdForXUDPBaseKey())
+        V2RayNativeManager.initCoreEnv(this)
     }
 
     /**
@@ -141,7 +138,7 @@ class V2RayTestService : Service() {
             if (!configResult.status) {
                 return retFailure
             }
-            return SpeedtestManager.realPing(configResult.content)
+            return V2RayNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
         }
     }
 }

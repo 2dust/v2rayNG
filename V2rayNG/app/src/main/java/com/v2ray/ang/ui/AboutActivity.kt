@@ -5,7 +5,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityAboutBinding
-import com.v2ray.ang.handler.SpeedtestManager
+import com.v2ray.ang.handler.V2RayNativeManager
 import com.v2ray.ang.util.Utils
 
 class AboutActivity : BaseActivity() {
@@ -42,7 +42,7 @@ class AboutActivity : BaseActivity() {
             Utils.openUri(this, AppConfig.APP_PRIVACY_POLICY)
         }
 
-        "v${BuildConfig.VERSION_NAME} (${SpeedtestManager.getLibVersion()})".also {
+        "v${BuildConfig.VERSION_NAME} (${V2RayNativeManager.getLibVersion()})".also {
             binding.tvVersion.text = it
         }
         BuildConfig.APPLICATION_ID.also {
