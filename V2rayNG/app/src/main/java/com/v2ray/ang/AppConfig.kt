@@ -63,7 +63,7 @@ object AppConfig {
     const val PREF_IS_BOOTED = "pref_is_booted"
     const val PREF_CHECK_UPDATE_PRE_RELEASE = "pref_check_update_pre_release"
     const val PREF_GEO_FILES_SOURCES = "pref_geo_files_sources"
-    const val PREF_TUN = "pref_tun"
+    const val PREF_USE_HEV_TUNNEL = "pref_use_hev_tunnel_v2"
     const val PREF_HEV_TUNNEL_LOGLEVEL = "pref_hev_tunnel_loglevel"
     const val PREF_HEV_TUNNEL_RW_TIMEOUT = "pref_hev_tunnel_rw_timeout_v2"
     const val PREF_AUTO_REMOVE_INVALID_AFTER_TEST = "pref_auto_remove_invalid_after_test"
@@ -175,8 +175,6 @@ object AppConfig {
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"
     const val VPN_MTU = 1500
-    const val TUN_hevsocks5 = "hev-socks5-tunnel"
-    const val TUN_xray = "xray-core"
 
     /** hev-sock5-tunnel read-write-timeout value */
     const val HEVTUN_RW_TIMEOUT = "300,60"

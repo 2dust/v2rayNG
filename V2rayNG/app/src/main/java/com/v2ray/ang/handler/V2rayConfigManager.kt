@@ -307,7 +307,7 @@ object V2rayConfigManager {
      */
     private fun initV2rayConfig(context: Context): V2rayConfig? {
         var assets = ""
-        if ((MmkvManager.decodeSettingsString(AppConfig.PREF_TUN) ?: AppConfig.TUN_hevsocks5) != AppConfig.TUN_xray) {
+        if (SettingsManager.isUsingHevTun()) {
             assets = initConfigCache ?: Utils.readTextFromAssets(context, "v2ray_config.json")
             if (TextUtils.isEmpty(assets)) {
                 return null
@@ -341,34 +341,37 @@ object V2rayConfigManager {
     private fun getInbounds(v2rayConfig: V2rayConfig): Boolean {
         try {
             val socksPort = SettingsManager.getSocksPort()
+            val inbound1 = v2rayConfig.inbounds[0]
 
-            v2rayConfig.inbounds.forEach { curInbound ->
-                if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING) != true) {
-                    //bind all inbounds to localhost if the user requests
-                    curInbound.listen = AppConfig.LOOPBACK
-                }
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING) != true) {
+                inbound1.listen = AppConfig.LOOPBACK
             }
-            v2rayConfig.inbounds[0].port = socksPort
+            inbound1.port = socksPort
             val fakedns = MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
             val sniffAllTlsAndHttp =
                 MmkvManager.decodeSettingsBool(AppConfig.PREF_SNIFFING_ENABLED, true) != false
-            v2rayConfig.inbounds[0].sniffing?.enabled = fakedns || sniffAllTlsAndHttp
-            v2rayConfig.inbounds[0].sniffing?.routeOnly =
+            inbound1.sniffing?.enabled = fakedns || sniffAllTlsAndHttp
+            inbound1.sniffing?.routeOnly =
                 MmkvManager.decodeSettingsBool(AppConfig.PREF_ROUTE_ONLY_ENABLED, false)
             if (!sniffAllTlsAndHttp) {
-                v2rayConfig.inbounds[0].sniffing?.destOverride?.clear()
+                inbound1.sniffing?.destOverride?.clear()
             }
             if (fakedns) {
-                v2rayConfig.inbounds[0].sniffing?.destOverride?.add("fakedns")
+                inbound1.sniffing?.destOverride?.add("fakedns")
             }
 
-            if (Utils.isXray()) {
-                v2rayConfig.inbounds.removeAt(1)
-            } else {
-                val httpPort = SettingsManager.getHttpPort()
-                v2rayConfig.inbounds[1].port = httpPort
+            if (!Utils.isXray()) {
+                val inbound2 = JsonUtil.fromJson(JsonUtil.toJson(inbound1), V2rayConfig.InboundBean::class.java) ?: return false
+                inbound2.tag = EConfigType.HTTP.name.lowercase()
+                inbound2.port = SettingsManager.getHttpPort()
+                inbound2.protocol = EConfigType.HTTP.name.lowercase()
+                v2rayConfig.inbounds.add(inbound2)
             }
 
+            if (!SettingsManager.isUsingHevTun()) {
+                val inboundTun = v2rayConfig.inbounds.firstOrNull { e -> e.tag == "tun" }
+                inboundTun?.settings?.mtu = SettingsManager.getVpnMtu()
+            }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to configure inbounds", e)
             return false
@@ -489,7 +492,7 @@ object V2rayConfigManager {
                 )
             }
 
-            if (MmkvManager.decodeSettingsString(AppConfig.PREF_TUN, AppConfig.TUN_hevsocks5) == AppConfig.TUN_hevsocks5) {
+            if (SettingsManager.isUsingHevTun()) {
                 //hev-socks5-tunnel dns routing
                 v2rayConfig.routing.rules.add(
                     0, RulesBean(

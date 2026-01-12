@@ -379,6 +379,14 @@ object SettingsManager {
     }
 
     /**
+     * Check if HEV TUN is being used.
+     * @return True if HEV TUN is used, false otherwise.
+     */
+    fun isUsingHevTun(): Boolean {
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true)
+    }
+
+    /**
      * Ensure default settings are present in MMKV.
      */
     fun ensureDefaultSettings() {
@@ -397,7 +405,6 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
-        ensureDefaultValue(AppConfig.PREF_TUN, AppConfig.TUN_hevsocks5)
     }
 
     private fun ensureDefaultValue(key: String, default: String) {

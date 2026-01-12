@@ -297,7 +297,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Starts the tun2socks process with the appropriate parameters.
      */
     private fun runTun2socks() {
-        if (MmkvManager.decodeSettingsString(AppConfig.PREF_TUN, AppConfig.TUN_hevsocks5) == AppConfig.TUN_hevsocks5) {
+        if (SettingsManager.isUsingHevTun()) {
             tun2SocksService = TProxyService(
                 context = applicationContext,
                 vpnInterface = mInterface,

@@ -257,7 +257,8 @@
     <string name="title_language">زووݩ</string>
     <string name="title_ui_settings">سامووا رابت منتوری</string>
     <string name="title_pref_ui_mode_night">سامووا هالت رابت منتوری</string>
-    <string name="title_pref_tun">TUN Interface</string>
+    <string name="title_pref_use_hev_tunnel">Enable Hev TUN Feature</string>
+    <string name="summary_pref_use_hev_tunnel">When enabled, TUN will use hev-socks5-tunnel; otherwise, it will use xray-core.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun سئت گوزارشا</string>
     <string name="title_pref_hev_tunnel_rw_timeout">زمووݩ مندیر بیڌن خوندن/هؽل کردن Hev Tun (سانیه) (پؽش فرز tcp,udp 300،60)</string>
 

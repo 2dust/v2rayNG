@@ -149,7 +149,7 @@ object V2RayServiceManager {
 
         currentConfig = config
         var tunFd = vpnInterface?.fd ?: 0
-        if ((MmkvManager.decodeSettingsString(AppConfig.PREF_TUN) ?: AppConfig.TUN_hevsocks5) != AppConfig.TUN_xray) {
+        if (SettingsManager.isUsingHevTun()) {
             tunFd = 0
         }
 

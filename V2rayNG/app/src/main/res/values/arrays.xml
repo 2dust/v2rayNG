@@ -118,11 +118,6 @@
         <item>Proxy only</item>
     </string-array>
 
-    <string-array name="tun_value" translatable="false">
-        <item>hev-socks5-tunnel</item>
-        <item>xray-core</item>
-    </string-array>
-
     <string-array name="hev_tunnel_loglevel" translatable="false">
         <item>error</item>
         <item>warn</item>

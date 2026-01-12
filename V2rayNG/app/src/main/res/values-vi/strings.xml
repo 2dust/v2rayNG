@@ -257,7 +257,8 @@
     <string name="title_language">Ngôn ngữ</string>
     <string name="title_ui_settings">Cài đặt UI</string>
     <string name="title_pref_ui_mode_night">Cài đặt chế độ UI</string>
-    <string name="title_pref_tun">TUN Interface</string>
+    <string name="title_pref_use_hev_tunnel">Enable Hev TUN Feature</string>
+    <string name="summary_pref_use_hev_tunnel">When enabled, TUN will use hev-socks5-tunnel; otherwise, it will use xray-core.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun Log Level</string>
     <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun read/write timeout (seconds) (tcp,udp default 300,60)</string>
 

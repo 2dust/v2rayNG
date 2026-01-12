@@ -34,19 +34,19 @@ data class V2rayConfig(
         var port: Int,
         var protocol: String,
         var listen: String? = null,
-        val settings: Any? = null,
+        var settings: InSettingsBean? = null,
         val sniffing: SniffingBean? = null,
         val streamSettings: Any? = null,
         val allocate: Any? = null
     ) {
 
         data class InSettingsBean(
-            val auth: String? = null,
-            val udp: Boolean? = null,
-            val userLevel: Int? = null,
-            val address: String? = null,
-            val port: Int? = null,
-            val network: String? = null
+            var auth: String? = null,
+            var udp: Boolean? = null,
+            var userLevel: Int? = null,
+            var name: String? = null,
+            @SerializedName("MTU")
+            var mtu: Int? = null
         )
 
         data class SniffingBean(
