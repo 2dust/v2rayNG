@@ -1,10 +1,10 @@
 #!/bin/bash
 
 targets=(
-  "aarch64-linux-android21 arm64 arm64-v8a"
-  "armv7a-linux-androideabi21 arm armeabi-v7a"
-  "x86_64-linux-android21 amd64 x86_64"
-  "i686-linux-android21 386 x86"
+  "aarch64-linux-android24 arm64 arm64-v8a"
+  "armv7a-linux-androideabi24 arm armeabi-v7a"
+  "x86_64-linux-android24 amd64 x86_64"
+  "i686-linux-android24 386 x86"
 )
 
 cd "hysteria" || exit
