@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
@@ -23,6 +24,7 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.AppManagerUtil
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.viewmodel.PerAppProxyViewModel
 import es.dmoral.toasty.Toasty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,6 +36,7 @@ class PerAppProxyActivity : BaseActivity() {
 
     private var adapter: PerAppProxyAdapter? = null
     private var appsAll: List<AppInfo>? = null
+    private val viewModel: PerAppProxyViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,14 +67,13 @@ class PerAppProxyActivity : BaseActivity() {
 
         lifecycleScope.launch {
             try {
-                val blacklist =
-                    MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
                 val apps = withContext(Dispatchers.IO) {
                     val appsList = AppManagerUtil.loadNetworkAppList(this@PerAppProxyActivity)
 
-                    if (blacklist != null) {
+                    val blacklistSet = viewModel.getAll()
+                    if (blacklistSet.isNotEmpty()) {
                         appsList.forEach { app ->
-                            app.isSelected = if (blacklist.contains(app.packageName)) 1 else 0
+                            app.isSelected = if (blacklistSet.contains(app.packageName)) 1 else 0
                         }
                         appsList.sortedWith { p1, p2 ->
                             when {
@@ -93,20 +95,14 @@ class PerAppProxyActivity : BaseActivity() {
                 }
 
                 appsAll = apps
-                adapter = PerAppProxyAdapter(this@PerAppProxyActivity, apps, blacklist)
+                adapter = PerAppProxyAdapter(this@PerAppProxyActivity, apps, viewModel)
                 binding.recyclerView.adapter = adapter
+
             } catch (e: Exception) {
                 Log.e(ANG_PACKAGE, "Error loading apps", e)
             } finally {
                 hideLoading()
             }
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        adapter?.let {
-            MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY_SET, it.blacklist)
         }
     }
 
@@ -164,33 +160,23 @@ class PerAppProxyActivity : BaseActivity() {
     }
 
     private fun selectAllApp() {
-        adapter?.let { it ->
-            val pkgNames = it.apps.map { it.packageName }
-            if (it.blacklist.containsAll(pkgNames)) {
-                it.apps.forEach {
-                    val packageName = it.packageName
-                    adapter?.blacklist?.remove(packageName)
-                }
+        adapter?.let { adapter ->
+            val pkgNames = adapter.apps.map { it.packageName }
+            val allSelected = pkgNames.all { viewModel.contains(it) }
+
+            if (allSelected) {
+                viewModel.removeAll(pkgNames)
             } else {
-                it.apps.forEach {
-                    val packageName = it.packageName
-                    adapter?.blacklist?.add(packageName)
-                }
+                viewModel.addAll(pkgNames)
             }
-            it.notifyDataSetChanged()
-            true
+            refreshData()
         }
     }
 
     private fun invertSelection() {
         adapter?.let { adapter ->
             adapter.apps.forEach { app ->
-                val packageName = app.packageName
-                if (adapter.blacklist.contains(packageName)) {
-                    adapter.blacklist.remove(packageName)
-                } else {
-                    adapter.blacklist.add(packageName)
-                }
+                viewModel.toggle(app.packageName)
             }
             refreshData()
         }
@@ -226,8 +212,8 @@ class PerAppProxyActivity : BaseActivity() {
     private fun exportProxyApp() {
         var lst = binding.switchBypassApps.isChecked.toString()
 
-        adapter?.blacklist?.forEach block@{
-            lst = lst + System.lineSeparator() + it
+        viewModel.getAll().forEach { pkg ->
+            lst = lst + System.lineSeparator() + pkg
         }
         Utils.setClipboard(applicationContext, lst)
         toastSuccess(R.string.toast_success)
@@ -248,29 +234,27 @@ class PerAppProxyActivity : BaseActivity() {
             }
             if (TextUtils.isEmpty(proxyApps)) return false
 
-            adapter?.blacklist?.clear()
+            viewModel.clear()
 
             if (binding.switchBypassApps.isChecked) {
-                adapter?.let { it ->
-                    it.apps.forEach block@{
-                        val packageName = it.packageName
+                adapter?.let { adapter ->
+                    adapter.apps.forEach { app ->
+                        val packageName = app.packageName
                         if (!inProxyApps(proxyApps, packageName, force)) {
-                            adapter?.blacklist?.add(packageName)
-                            return@block
+                            viewModel.add(packageName)
                         }
                     }
-                    it.notifyDataSetChanged()
+                    refreshData()
                 }
             } else {
-                adapter?.let { it ->
-                    it.apps.forEach block@{
-                        val packageName = it.packageName
+                adapter?.let { adapter ->
+                    adapter.apps.forEach { app ->
+                        val packageName = app.packageName
                         if (inProxyApps(proxyApps, packageName, force)) {
-                            adapter?.blacklist?.add(packageName)
-                            return@block
+                            viewModel.add(packageName)
                         }
                     }
-                    it.notifyDataSetChanged()
+                    refreshData()
                 }
             }
         } catch (e: Exception) {
@@ -308,7 +292,7 @@ class PerAppProxyActivity : BaseActivity() {
             }
         }
 
-        adapter = PerAppProxyAdapter(this, apps, adapter?.blacklist)
+        adapter = PerAppProxyAdapter(this, apps, adapter?.viewModel ?: viewModel)
         binding.recyclerView.adapter = adapter
         refreshData()
         return true
