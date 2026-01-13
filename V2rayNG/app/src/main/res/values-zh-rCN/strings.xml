@@ -131,6 +131,7 @@
     <string name="msg_dialog_progress">正在加载</string>
     <string name="menu_item_search">搜索</string>
     <string name="menu_item_select_all">全选</string>
+    <string name="menu_item_invert_selection">反选</string>
     <string name="msg_enter_keywords">输入关键字</string>
     <string name="switch_bypass_apps_mode">绕行模式</string>
     <string name="menu_item_select_proxy_app">自动选中需代理应用</string>
@@ -284,7 +285,7 @@
     <string name="title_user_asset_setting">资源文件</string>
     <string name="title_sort_by_test_results">按测试结果排序</string>
     <string name="title_filter_config">过滤配置</string>
-    <string name="filter_config_all">所有分组</string>
+    <string name="filter_config_all">所有</string>
     <string name="title_del_duplicate_config_count">删除 %d 个重复配置</string>
 
     <string name="title_del_config_count">删除 %d 个配置</string>

@@ -134,6 +134,7 @@
     <string name="msg_dialog_progress">جار التحميل</string>
     <string name="menu_item_search">بحث</string>
     <string name="menu_item_select_all">تحديد الكل</string>
+    <string name="menu_item_invert_selection">عكس الاختيار</string>
     <string name="msg_enter_keywords">أدخل الكلمات الرئيسية</string>
     <string name="switch_bypass_apps_mode">وضع التجاوز</string>
     <string name="menu_item_select_proxy_app">تحديد تطبيق الوكيل تلقائيًا</string>
@@ -287,7 +288,7 @@
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">الفرز حسب نتائج الاختبار (5)</string>
     <string name="title_filter_config">تصفية ملف التكوين</string>
-    <string name="filter_config_all">جميع مجموعات الاشتراك</string>
+    <string name="filter_config_all">All</string>
     <string name="title_del_duplicate_config_count">حذف %d من الإعدادات المكررة</string>
 
     <string name="title_del_config_count">Delete %d configurations</string>

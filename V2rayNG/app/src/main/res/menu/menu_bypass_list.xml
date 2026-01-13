@@ -14,6 +14,12 @@
         app:showAsAction="withText" />
 
     <item
+        android:id="@+id/invert_selection"
+        android:icon="@drawable/ic_select_all_24dp"
+        android:title="@string/menu_item_invert_selection"
+        app:showAsAction="withText" />
+
+    <item
         android:id="@+id/select_proxy_app"
         android:icon="@drawable/ic_description_24dp"
         android:title="@string/menu_item_select_proxy_app"

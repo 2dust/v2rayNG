@@ -137,6 +137,11 @@ class PerAppProxyActivity : BaseActivity() {
             allowPerAppProxy()
             true
         }
+        R.id.invert_selection -> {
+            invertSelection()
+            allowPerAppProxy()
+            true
+        }
 
         R.id.select_proxy_app -> {
             selectProxyAppAuto()
@@ -174,6 +179,20 @@ class PerAppProxyActivity : BaseActivity() {
             }
             it.notifyDataSetChanged()
             true
+        }
+    }
+
+    private fun invertSelection() {
+        adapter?.let { adapter ->
+            adapter.apps.forEach { app ->
+                val packageName = app.packageName
+                if (adapter.blacklist.contains(packageName)) {
+                    adapter.blacklist.remove(packageName)
+                } else {
+                    adapter.blacklist.add(packageName)
+                }
+            }
+            refreshData()
         }
     }
 

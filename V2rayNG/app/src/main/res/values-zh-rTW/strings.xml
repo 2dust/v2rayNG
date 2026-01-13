@@ -131,6 +131,7 @@
     <string name="msg_dialog_progress">載入</string>
     <string name="menu_item_search">搜尋</string>
     <string name="menu_item_select_all">全選</string>
+    <string name="menu_item_invert_selection">反選</string>
     <string name="msg_enter_keywords">輸入關鍵字</string>
     <string name="switch_bypass_apps_mode">略過模式</string>
     <string name="menu_item_select_proxy_app">自動選中需代理的應用</string>
@@ -285,7 +286,7 @@
     <string name="title_user_asset_setting">資源檔案</string>
     <string name="title_sort_by_test_results">依偵測結果排序</string>
     <string name="title_filter_config">過濾設定</string>
-    <string name="filter_config_all">所有分組</string>
+    <string name="filter_config_all">所有</string>
     <string name="title_del_duplicate_config_count">刪除 %d 個重複配置</string>
     <string name="title_del_config_count">刪除 %d 個配置</string>
     <string name="title_import_config_count">匯入 %d 個配置</string>

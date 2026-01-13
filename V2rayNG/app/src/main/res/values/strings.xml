@@ -134,6 +134,7 @@
     <string name="msg_dialog_progress">Loading</string>
     <string name="menu_item_search">Search</string>
     <string name="menu_item_select_all">Select all</string>
+    <string name="menu_item_invert_selection">Invert selection</string>
     <string name="msg_enter_keywords">Enter keywords</string>
     <string name="switch_bypass_apps_mode">Bypass Mode</string>
     <string name="menu_item_select_proxy_app">Auto select proxy app</string>
@@ -290,7 +291,7 @@
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sorting by test results</string>
     <string name="title_filter_config">Filter config</string>
-    <string name="filter_config_all">All groups</string>
+    <string name="filter_config_all">All</string>
     <string name="title_del_duplicate_config_count">Delete %d duplicate configs</string>
     <string name="title_del_config_count">Delete %d configs</string>
     <string name="title_import_config_count">Import %d configs</string>

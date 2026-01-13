@@ -133,7 +133,8 @@
     <string name="msg_dialog_progress">هونی بار ونی بۊ</string>
     <string name="menu_item_search">پیتینیڌن</string>
     <string name="menu_item_select_all">پسند پوی</string>
-    <string name="msg_enter_keywords">رزما ن بزنین</string>
+    <string name="menu_item_invert_selection">Invert selection</string>
+    <string name="msg_enter_keywords">کلمه کلیدی را وارد کنید</string>
     <string name="switch_bypass_apps_mode">هالت Bypass</string>
     <string name="menu_item_select_proxy_app">پسند خوتکار پروکسی برنومه</string>
     <string name="msg_downloading_content">موئتوا هونی دانلود ابۊن</string>
@@ -331,7 +332,7 @@
     <string name="connection_not_connected">منپیز نؽڌ</string>
     <string name="connection_runing_task_left">تعداد وزیفه یل آزمایشی ک ر اۊفتانه: %s</string>
 
-    <string name="import_subscription_success">اشتراک وا مووفقیت زفت زابی</string>
+    <string name="import_subscription_success">اشتراک وا موفقیت زفت زابی</string>
     <string name="import_subscription_failure">اشتراک زفت نوابی</string>
     <string name="title_fragment_settings">سامووا فرگمنت</string>
     <string name="title_pref_fragment_packets">کتنا فرگمنت</string>

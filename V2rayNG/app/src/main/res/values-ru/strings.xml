@@ -133,7 +133,8 @@
     <string name="msg_dialog_progress">Загрузка…</string>
     <string name="menu_item_search">Поиск</string>
     <string name="menu_item_select_all">Выбрать все</string>
-    <string name="msg_enter_keywords">Введите ключевые слова</string>
+    <string name="menu_item_invert_selection">Invert selection</string>
+    <string name="msg_enter_keywords">Введите ключевое слово</string>
     <string name="switch_bypass_apps_mode">Режим обхода</string>
     <string name="menu_item_select_proxy_app">Автовыбор приложений</string>
     <string name="msg_downloading_content">Загрузка данных</string>
@@ -286,7 +287,7 @@
     <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
     <string name="title_filter_config">Фильтр профилей</string>
-    <string name="filter_config_all">Все группы</string>
+    <string name="filter_config_all">All</string>
     <string name="title_del_duplicate_config_count">Удалено дубликатов профилей: %d</string>
     <string name="title_del_config_count">Удалено профилей: %d</string>
     <string name="title_import_config_count">Импортировано профилей: %d</string>
