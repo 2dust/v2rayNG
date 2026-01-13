@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -15,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityRoutingSettingBinding
-import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -24,6 +24,7 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.viewmodel.RoutingSettingsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,8 +32,8 @@ import kotlinx.coroutines.withContext
 class RoutingSettingActivity : BaseActivity() {
     private val binding by lazy { ActivityRoutingSettingBinding.inflate(layoutInflater) }
 
-    var rulesets: MutableList<RulesetItem> = mutableListOf()
-    private val adapter by lazy { RoutingSettingRecyclerAdapter(this) }
+    private val viewModel: RoutingSettingsViewModel by viewModels()
+    private lateinit var adapter: RoutingSettingRecyclerAdapter
     private var mItemTouchHelper: ItemTouchHelper? = null
     private val routing_domain_strategy: Array<out String> by lazy {
         resources.getStringArray(R.array.routing_domain_strategy)
@@ -55,6 +56,8 @@ class RoutingSettingActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         //setContentView(binding.root)
         setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.routing_settings_title))
+
+        adapter = RoutingSettingRecyclerAdapter(this, viewModel)
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
@@ -196,8 +199,7 @@ class RoutingSettingActivity : BaseActivity() {
 
     @SuppressLint("NotifyDataSetChanged")
     fun refreshData() {
-        rulesets.clear()
-        rulesets.addAll(MmkvManager.decodeRoutingRulesets() ?: mutableListOf())
+        viewModel.reload()
         adapter.notifyDataSetChanged()
     }
 }
