@@ -5,32 +5,35 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubSettingBinding
-import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
-import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
+import com.v2ray.ang.viewmodel.SubscriptionsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.getValue
 
 class SubSettingActivity : BaseActivity() {
     private val binding by lazy { ActivitySubSettingBinding.inflate(layoutInflater) }
 
-    var subscriptions: List<Pair<String, SubscriptionItem>> = listOf()
-    private val adapter by lazy { SubSettingRecyclerAdapter(this) }
+    private val viewModel: SubscriptionsViewModel by viewModels()
+    private lateinit var adapter: SubSettingRecyclerAdapter
     private var mItemTouchHelper: ItemTouchHelper? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(binding.root)
         setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.title_sub_setting))
+
+        adapter = SubSettingRecyclerAdapter(this, viewModel)
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
@@ -83,7 +86,7 @@ class SubSettingActivity : BaseActivity() {
 
     @SuppressLint("NotifyDataSetChanged")
     fun refreshData() {
-        subscriptions = MmkvManager.decodeSubscriptions()
+        viewModel.reload()
         adapter.notifyDataSetChanged()
     }
 }

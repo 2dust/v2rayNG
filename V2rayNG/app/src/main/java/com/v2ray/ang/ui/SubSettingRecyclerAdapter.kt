@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -16,16 +15,16 @@ import com.v2ray.ang.databinding.ItemQrcodeBinding
 import com.v2ray.ang.databinding.ItemRecyclerSubSettingBinding
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsChangeManager
-import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.v2ray.ang.viewmodel.SubscriptionsViewModel
 
-class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView.Adapter<SubSettingRecyclerAdapter.MainViewHolder>(), ItemTouchHelperAdapter {
+class SubSettingRecyclerAdapter(
+    val activity: SubSettingActivity,
+    private val viewModel: SubscriptionsViewModel
+) : RecyclerView.Adapter<SubSettingRecyclerAdapter.MainViewHolder>(), ItemTouchHelperAdapter {
 
     private var mActivity: SubSettingActivity = activity
 
@@ -33,11 +32,12 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
         mActivity.resources.getStringArray(R.array.share_sub_method)
     }
 
-    override fun getItemCount() = mActivity.subscriptions.size
+    override fun getItemCount() = viewModel.getAll().size
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
-        val subId = mActivity.subscriptions[position].first
-        val subItem = mActivity.subscriptions[position].second
+        val subscriptions = viewModel.getAll()
+        val subId = subscriptions[position].first
+        val subItem = subscriptions[position].second
         holder.itemSubSettingBinding.tvName.text = subItem.remarks
         holder.itemSubSettingBinding.tvUrl.text = subItem.url
         holder.itemSubSettingBinding.chkEnable.isChecked = subItem.enabled
@@ -58,8 +58,7 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
         holder.itemSubSettingBinding.chkEnable.setOnCheckedChangeListener { it, isChecked ->
             if (!it.isPressed) return@setOnCheckedChangeListener
             subItem.enabled = isChecked
-            MmkvManager.encodeSubscription(subId, subItem)
-
+            viewModel.update(subId, subItem)
         }
 
         if (TextUtils.isEmpty(subItem.url)) {
@@ -119,15 +118,10 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
     }
 
     private fun removeSubscriptionSub(subId: String, position: Int) {
-        mActivity.lifecycleScope.launch(Dispatchers.IO) {
-            MmkvManager.removeSubscription(subId)
-            launch(Dispatchers.Main) {
-                notifyItemRemoved(position)
-                notifyItemRangeChanged(position, mActivity.subscriptions.size)
-                mActivity.refreshData()
-                SettingsChangeManager.makeSetupGroupTab()
-            }
-        }
+        viewModel.remove(subId)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, viewModel.getAll().size)
+        mActivity.refreshData()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
@@ -154,14 +148,13 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) : RecyclerView
     }
 
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
-        SettingsManager.swapSubscriptions(fromPosition, toPosition)
+        viewModel.swap(fromPosition, toPosition)
         notifyItemMoved(fromPosition, toPosition)
         return true
     }
 
     override fun onItemMoveCompleted() {
         mActivity.refreshData()
-        SettingsChangeManager.makeSetupGroupTab()
     }
 
     override fun onItemDismiss(position: Int) {
