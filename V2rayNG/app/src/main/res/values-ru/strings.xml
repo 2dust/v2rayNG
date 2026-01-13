@@ -133,7 +133,7 @@
     <string name="msg_dialog_progress">Загрузка…</string>
     <string name="menu_item_search">Поиск</string>
     <string name="menu_item_select_all">Выбрать все</string>
-    <string name="menu_item_invert_selection">Invert selection</string>
+    <string name="menu_item_invert_selection">Инвертировать выбор</string>
     <string name="msg_enter_keywords">Введите ключевое слово</string>
     <string name="switch_bypass_apps_mode">Режим обхода</string>
     <string name="menu_item_select_proxy_app">Автовыбор приложений</string>
@@ -153,10 +153,10 @@
     <string name="title_pref_is_booted">Автоподключение при запуске</string>
     <string name="summary_pref_is_booted">Автоматически подключаться к выбранному серверу при запуске приложения (может оказаться неудачным)</string>
 
-    <string name="title_pref_auto_remove_invalid_after_test">Auto delete invalid config after testing</string>
-    <string name="summary_pref_auto_remove_invalid_after_test">Test results may not be accurate; deleted config cannot be recovered.</string>
-    <string name="title_pref_auto_sort_after_test">Auto sort after testing</string>
-    <string name="summary_pref_auto_sort_after_test">Test results may not be accurate;</string>
+    <string name="title_pref_auto_remove_invalid_after_test">Автоудаление нерабочих профилей</string>
+    <string name="summary_pref_auto_remove_invalid_after_test">Автоматическое удаление нерабочих профилей после проверки (результаты проверки могут быть неточными; восстановить удалённые профили невозможно)</string>
+    <string name="title_pref_auto_sort_after_test">Автосортировка профилей</string>
+    <string name="summary_pref_auto_sort_after_test">Автоматическая сортировка профилей после проверки (результаты проверки могут быть неточными)</string>
 
     <string name="title_mux_settings">Настройки мультиплексирования</string>
     <string name="title_pref_mux_enabled">Использовать мультиплексирование</string>
@@ -257,8 +257,8 @@
     <string name="title_language">Язык</string>
     <string name="title_ui_settings">Настройки интерфейса</string>
     <string name="title_pref_ui_mode_night">Тема интерфейса</string>
-    <string name="title_pref_use_hev_tunnel">Enable Hev TUN Feature</string>
-    <string name="summary_pref_use_hev_tunnel">When enabled, TUN will use hev-socks5-tunnel; otherwise, it will use xray-core.</string>
+    <string name="title_pref_use_hev_tunnel">Использовать Hev TUN</string>
+    <string name="summary_pref_use_hev_tunnel">Если включено, TUN будет использовать hev-socks5-tunnel; иначе будет использован xray-core</string>
     <string name="title_pref_hev_tunnel_loglevel">Подробность журнала HevTun</string>
     <string name="title_pref_hev_tunnel_rw_timeout">Ожидание чтения/записи HevTun (секунд, по умолчанию TCP,UDP 300,60)</string>
 
@@ -287,7 +287,7 @@
     <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
     <string name="title_filter_config">Фильтр профилей</string>
-    <string name="filter_config_all">All</string>
+    <string name="filter_config_all">Все</string>
     <string name="title_del_duplicate_config_count">Удалено дубликатов профилей: %d</string>
     <string name="title_del_config_count">Удалено профилей: %d</string>
     <string name="title_import_config_count">Импортировано профилей: %d</string>
