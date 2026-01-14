@@ -397,6 +397,7 @@
         <item>Чёрный список Китая</item>
         <item>Общие</item>
         <item>Белый список Ирана</item>
+        <item>Белый список России</item>
     </string-array>
 
     <string-array name="vpn_bypass_lan">
