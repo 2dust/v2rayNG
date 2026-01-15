@@ -16,6 +16,7 @@ import com.v2ray.ang.dto.V2rayConfig.OutboundBean.StreamSettingsBean
 import com.v2ray.ang.dto.V2rayConfig.RoutingBean.RulesBean
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.fmt.HttpFmt
+import com.v2ray.ang.fmt.Hysteria2Fmt
 import com.v2ray.ang.fmt.ShadowsocksFmt
 import com.v2ray.ang.fmt.SocksFmt
 import com.v2ray.ang.fmt.TrojanFmt
@@ -160,12 +161,8 @@ object V2rayConfigManager {
 
         getInbounds(v2rayConfig)
 
-        if (config.configType == EConfigType.HYSTERIA2) {
-            result.socksPort = getPlusOutbounds(v2rayConfig, config) ?: return result
-        } else {
-            getOutbounds(v2rayConfig, config) ?: return result
-            getMoreOutbounds(v2rayConfig, config.subscriptionId)
-        }
+        getOutbounds(v2rayConfig, config) ?: return result
+        getMoreOutbounds(v2rayConfig, config.subscriptionId)
 
         getRouting(v2rayConfig)
 
@@ -196,7 +193,6 @@ object V2rayConfigManager {
         val validConfigs = configList.asSequence().filter { it.server.isNotNullEmpty() }
             .filter { !Utils.isPureIpAddress(it.server!!) || Utils.isValidUrl(it.server!!) }
             .filter { it.configType != EConfigType.CUSTOM }
-            .filter { it.configType != EConfigType.HYSTERIA2 }
             .filter { it.configType != EConfigType.POLICYGROUP }
             .toList()
 
@@ -270,12 +266,8 @@ object V2rayConfigManager {
 
         val v2rayConfig = initV2rayConfig(context) ?: return result
 
-        if (config.configType == EConfigType.HYSTERIA2) {
-            result.socksPort = getPlusOutbounds(v2rayConfig, config) ?: return result
-        } else {
-            getOutbounds(v2rayConfig, config) ?: return result
-            getMoreOutbounds(v2rayConfig, config.subscriptionId)
-        }
+        getOutbounds(v2rayConfig, config) ?: return result
+        getMoreOutbounds(v2rayConfig, config.subscriptionId)
 
         v2rayConfig.log.loglevel = MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL) ?: "warning"
         v2rayConfig.inbounds.clear()
@@ -668,44 +660,6 @@ object V2rayConfigManager {
     }
 
     /**
-     * Configures special outbound settings for Hysteria2 protocol.
-     *
-     * Creates a SOCKS outbound connection on a free port for protocols requiring special handling.
-     *
-     * @param v2rayConfig The V2ray configuration object to be modified
-     * @param config The profile item containing connection details
-     * @return The port number for the SOCKS connection, or null if there was an error
-     */
-    private fun getPlusOutbounds(v2rayConfig: V2rayConfig, config: ProfileItem): Int? {
-        try {
-            val socksPort = Utils.findFreePort(listOf(100 + SettingsManager.getSocksPort(), 0))
-
-            val outboundNew = OutboundBean(
-                mux = null,
-                protocol = EConfigType.SOCKS.name.lowercase(),
-                settings = OutSettingsBean(
-                    servers = listOf(
-                        OutSettingsBean.ServersBean(
-                            address = AppConfig.LOOPBACK,
-                            port = socksPort
-                        )
-                    )
-                )
-            )
-            if (v2rayConfig.outbounds.isNotEmpty()) {
-                v2rayConfig.outbounds[0] = outboundNew
-            } else {
-                v2rayConfig.outbounds.add(outboundNew)
-            }
-
-            return socksPort
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to configure plusOutbound", e)
-            return null
-        }
-    }
-
-    /**
      * Configures additional outbound connections for proxy chaining.
      *
      * Sets up previous and next proxies in a subscription for advanced routing capabilities.
@@ -1046,7 +1000,7 @@ object V2rayConfigManager {
             EConfigType.VLESS -> VlessFmt.toOutbound(profileItem)
             EConfigType.TROJAN -> TrojanFmt.toOutbound(profileItem)
             EConfigType.WIREGUARD -> WireguardFmt.toOutbound(profileItem)
-            EConfigType.HYSTERIA2 -> null
+            EConfigType.HYSTERIA2 -> Hysteria2Fmt.toOutbound(profileItem)
             EConfigType.HTTP -> HttpFmt.toOutbound(profileItem)
             EConfigType.POLICYGROUP -> null
         }
@@ -1079,8 +1033,7 @@ object V2rayConfigManager {
             EConfigType.SHADOWSOCKS,
             EConfigType.SOCKS,
             EConfigType.HTTP,
-            EConfigType.TROJAN,
-            EConfigType.HYSTERIA2 ->
+            EConfigType.TROJAN ->
                 return OutboundBean(
                     protocol = configType.name.lowercase(),
                     settings = OutSettingsBean(
@@ -1096,6 +1049,15 @@ object V2rayConfigManager {
                         secretKey = "",
                         peers = listOf(OutSettingsBean.WireGuardBean())
                     )
+                )
+
+            EConfigType.HYSTERIA2 ->
+                return OutboundBean(
+                    protocol = "hysteria",
+                    settings = OutSettingsBean(
+                        servers = null
+                    ),
+                    streamSettings = StreamSettingsBean()
                 )
 
             EConfigType.CUSTOM -> null
@@ -1127,7 +1089,7 @@ object V2rayConfigManager {
         val xhttpExtra = profileItem.xhttpExtra
 
         var sni: String? = null
-        streamSettings.network = if (transport.isEmpty()) NetworkType.TCP.type else transport
+        streamSettings.network = transport.ifEmpty { NetworkType.TCP.type }
         when (streamSettings.network) {
             NetworkType.TCP.type -> {
                 val tcpSetting = StreamSettingsBean.TcpSettingsBean()
@@ -1215,6 +1177,23 @@ object V2rayConfigManager {
                 grpcSetting.health_check_timeout = 20
                 sni = authority
                 streamSettings.grpcSettings = grpcSetting
+            }
+
+            NetworkType.HYSTERIA.type -> {
+                val hysteriaSetting = StreamSettingsBean.HysteriaSettingsBean(
+                    version = 2,
+                    auth = profileItem.password.orEmpty(),
+                    up = profileItem.bandwidthUp?.ifEmpty { "0" }.orEmpty(),
+                    down = profileItem.bandwidthDown?.ifEmpty { "0" }.orEmpty(),
+                    udphop = null
+                )
+                if (profileItem.portHopping.isNotNullEmpty()) {
+                    hysteriaSetting.udphop = StreamSettingsBean.HysteriaSettingsBean.HysteriaUdpHopBean(
+                        port = profileItem.portHopping,
+                        interval = profileItem.portHoppingInterval?.ifEmpty { "30" }.orEmpty().toInt()
+                    )
+                }
+                streamSettings.hysteriaSettings = hysteriaSetting
             }
         }
         return sni

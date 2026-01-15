@@ -110,13 +110,6 @@ object AngConfigManager {
             if (guid == null) return -1
             val result = V2rayConfigManager.getV2rayConfig(context, guid)
             if (result.status) {
-                val config = MmkvManager.decodeServerConfig(guid)
-                if (config?.configType == EConfigType.HYSTERIA2) {
-                    val socksPort = Utils.findFreePort(listOf(100 + SettingsManager.getSocksPort(), 0))
-                    val hy2Config = Hysteria2Fmt.toNativeConfig(config, socksPort)
-                    Utils.setClipboard(context, JsonUtil.toJsonPretty(hy2Config) + "\n" + result.content)
-                    return 0
-                }
                 Utils.setClipboard(context, result.content)
             } else {
                 return -1

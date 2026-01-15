@@ -168,7 +168,6 @@ object V2RayServiceManager {
             NotificationManager.showNotification(currentConfig)
             NotificationManager.startSpeedNotification(currentConfig)
 
-            PluginServiceManager.runPlugin(service, config, result.socksPort)
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to startup service", e)
             return false
@@ -202,7 +201,6 @@ object V2RayServiceManager {
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to unregister broadcast receiver", e)
         }
-        PluginServiceManager.stopPlugin()
 
         return true
     }

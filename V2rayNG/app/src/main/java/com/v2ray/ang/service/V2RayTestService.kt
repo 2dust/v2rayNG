@@ -10,7 +10,6 @@ import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG_SUCCESS
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.PluginServiceManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.V2RayNativeManager
 import com.v2ray.ang.handler.V2rayConfigManager
@@ -129,16 +128,10 @@ class V2RayTestService : Service() {
     private fun startRealPing(guid: String): Long {
         val retFailure = -1L
 
-        val config = MmkvManager.decodeServerConfig(guid) ?: return retFailure
-        if (config.configType == EConfigType.HYSTERIA2) {
-            val delay = PluginServiceManager.realPingHy2(this, config)
-            return delay
-        } else {
-            val configResult = V2rayConfigManager.getV2rayConfig4Speedtest(this, guid)
-            if (!configResult.status) {
-                return retFailure
-            }
-            return V2RayNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
+        val configResult = V2rayConfigManager.getV2rayConfig4Speedtest(this, guid)
+        if (!configResult.status) {
+            return retFailure
         }
+        return V2RayNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
     }
 }

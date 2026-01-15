@@ -76,7 +76,7 @@ data class V2rayConfig(
             /*DNS*/
             val network: String? = null,
             var address: Any? = null,
-            val port: Int? = null,
+            var port: Int? = null,
             /*Freedom*/
             var domainStrategy: String? = null,
             val redirect: String? = null,
@@ -160,7 +160,8 @@ data class V2rayConfig(
             var quicSettings: QuicSettingBean? = null,
             var realitySettings: TlsSettingsBean? = null,
             var grpcSettings: GrpcSettingsBean? = null,
-            var hy2steriaSettings: Hy2steriaSettingsBean? = null,
+            var hysteriaSettings: HysteriaSettingsBean? = null,
+            var udpmasks: List<UdpMasksBean>? = null,
             val dsSettings: Any? = null,
             var sockopt: SockoptBean? = null
         ) {
@@ -247,7 +248,8 @@ data class V2rayConfig(
                 var dialerProxy: String? = null,
                 var domainStrategy: String? = null,
                 var happyEyeballs: HappyEyeballsBean? = null,
-                )
+            )
+
             data class HappyEyeballsBean(
                 var prioritizeIPv6: Boolean? = null,
                 var maxConcurrentTry: Int? = 4,
@@ -293,18 +295,27 @@ data class V2rayConfig(
                 var health_check_timeout: Int? = null
             )
 
-            data class Hy2steriaSettingsBean(
-                var password: String? = null,
-                var use_udp_extension: Boolean? = true,
-                var congestion: Hy2CongestionBean? = null
+            data class HysteriaSettingsBean(
+                var version: Int,
+                var auth: String? = null,
+                var up: String? = null,
+                var down: String? = null,
+                var udphop: HysteriaUdpHopBean? = null
             ) {
-                data class Hy2CongestionBean(
-                    var type: String? = "bbr",
-                    var up_mbps: Int? = null,
-                    var down_mbps: Int? = null,
+                data class HysteriaUdpHopBean(
+                    var port: String? = null,
+                    var interval: Int? = null
                 )
             }
 
+            data class UdpMasksBean(
+                var type: String,
+                var settings: UdpMasksSettingsBean? = null
+            ) {
+                data class UdpMasksSettingsBean(
+                    var password: String? = null
+                )
+            }
         }
 
         data class MuxBean(

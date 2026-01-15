@@ -1,11 +1,12 @@
 package com.v2ray.ang.fmt
 
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.Hysteria2Bean
+import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean.StreamSettingsBean
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean.StreamSettingsBean.UdpMasksBean.UdpMasksSettingsBean
 import com.v2ray.ang.extension.idnHost
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.handler.MmkvManager
@@ -30,6 +31,7 @@ object Hysteria2Fmt : FmtBase() {
         config.serverPort = uri.port.toString()
         config.password = uri.userInfo
         config.security = AppConfig.TLS
+        config.network = NetworkType.HYSTERIA.type
 
         if (!uri.rawQuery.isNullOrEmpty()) {
             val queryParam = getQueryParam(uri)
@@ -81,71 +83,39 @@ object Hysteria2Fmt : FmtBase() {
     }
 
     /**
-     * Converts a ProfileItem object to a Hysteria2Bean object.
-     *
-     * @param config the ProfileItem object to convert
-     * @param socksPort the port number for the socks5 proxy
-     * @return the converted Hysteria2Bean object, or null if conversion fails
-     */
-    fun toNativeConfig(config: ProfileItem, socksPort: Int): Hysteria2Bean? {
-
-        val obfs = if (config.obfsPassword.isNullOrEmpty()) null else
-            Hysteria2Bean.ObfsBean(
-                type = "salamander",
-                salamander = Hysteria2Bean.ObfsBean.SalamanderBean(
-                    password = config.obfsPassword
-                )
-            )
-
-        val transport = if (config.portHopping.isNullOrEmpty()) null else
-            Hysteria2Bean.TransportBean(
-                type = "udp",
-                udp = Hysteria2Bean.TransportBean.TransportUdpBean(
-                    hopInterval = (config.portHoppingInterval?.takeIf { it.isNotEmpty() } ?: "30") + "s"
-                )
-            )
-
-        val bandwidth = if (config.bandwidthDown.isNullOrEmpty() || config.bandwidthUp.isNullOrEmpty()) null else
-            Hysteria2Bean.BandwidthBean(
-                down = config.bandwidthDown,
-                up = config.bandwidthUp,
-            )
-
-        val server =
-            if (config.portHopping.isNullOrEmpty())
-                config.getServerAddressAndPort()
-            else
-                Utils.getIpv6Address(config.server) + ":" + config.portHopping
-
-        val bean = Hysteria2Bean(
-            server = server,
-            auth = config.password,
-            obfs = obfs,
-            transport = transport,
-            bandwidth = bandwidth,
-            socks5 = Hysteria2Bean.Socks5Bean(
-                listen = "$LOOPBACK:${socksPort}",
-            ),
-            http = Hysteria2Bean.Socks5Bean(
-                listen = "$LOOPBACK:${socksPort}",
-            ),
-            tls = Hysteria2Bean.TlsBean(
-                sni = config.sni ?: config.server,
-                insecure = config.insecure,
-                pinSHA256 = if (config.pinSHA256.isNullOrEmpty()) null else config.pinSHA256
-            )
-        )
-        return bean
-    }
-
-    /**
      * Converts a ProfileItem object to an OutboundBean object.
      *
      * @param profileItem the ProfileItem object to convert
      * @return the converted OutboundBean object, or null if conversion fails
      */
     fun toOutbound(profileItem: ProfileItem): OutboundBean? {
-        val outboundBean = V2rayConfigManager.createInitOutbound(EConfigType.HYSTERIA2)
+        val outboundBean = V2rayConfigManager.createInitOutbound(EConfigType.HYSTERIA2) ?: return null
+        profileItem.network = NetworkType.HYSTERIA.type
+        profileItem.alpn = "h3"
+
+        outboundBean.settings?.let { server ->
+            server.address = getServerAddress(profileItem)
+            server.port = profileItem.serverPort.orEmpty().toInt()
+        }
+
+        val sni = outboundBean.streamSettings?.let {
+            V2rayConfigManager.populateTransportSettings(it, profileItem)
+        }
+
+        outboundBean.streamSettings?.let {
+            V2rayConfigManager.populateTlsSettings(it, profileItem, sni)
+        }
+
+        if (profileItem.obfsPassword.isNotNullEmpty()) {
+            outboundBean.streamSettings?.udpmasks = mutableListOf(
+                StreamSettingsBean.UdpMasksBean(
+                    type = "salamander",
+                    settings = UdpMasksSettingsBean(
+                        password = profileItem.obfsPassword
+                    )
+                )
+            )
+        }
         return outboundBean
     }
 }

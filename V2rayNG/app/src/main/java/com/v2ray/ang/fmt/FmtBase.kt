@@ -158,6 +158,8 @@ open class FmtBase {
                 config.authority.let { if (it.isNotNullEmpty()) dicQuery["authority"] = it.orEmpty() }
                 config.serviceName.let { if (it.isNotNullEmpty()) dicQuery["serviceName"] = it.orEmpty() }
             }
+
+            else -> {}
         }
 
         return dicQuery
