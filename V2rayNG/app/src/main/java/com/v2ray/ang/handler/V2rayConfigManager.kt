@@ -1003,6 +1003,7 @@ object V2rayConfigManager {
             EConfigType.HYSTERIA2 -> Hysteria2Fmt.toOutbound(profileItem)
             EConfigType.HTTP -> HttpFmt.toOutbound(profileItem)
             EConfigType.POLICYGROUP -> null
+            else -> null
         }
     }
 
@@ -1051,9 +1052,10 @@ object V2rayConfigManager {
                     )
                 )
 
+            EConfigType.HYSTERIA,
             EConfigType.HYSTERIA2 ->
                 return OutboundBean(
-                    protocol = "hysteria",
+                    protocol = EConfigType.HYSTERIA.name.lowercase(),
                     settings = OutSettingsBean(
                         servers = null
                     ),

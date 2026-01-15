@@ -2,7 +2,6 @@ package com.v2ray.ang.dto
 
 import com.google.gson.annotations.SerializedName
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.util.Utils
 
 data class V2rayConfig(
     var remarks: String? = null,
@@ -334,11 +333,14 @@ data class V2rayConfig(
                 || protocol.equals(EConfigType.SOCKS.name, true)
                 || protocol.equals(EConfigType.HTTP.name, true)
                 || protocol.equals(EConfigType.TROJAN.name, true)
-                || protocol.equals(EConfigType.HYSTERIA2.name, true)
             ) {
                 return settings?.servers?.first()?.address
             } else if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
                 return settings?.peers?.first()?.endpoint?.substringBeforeLast(":")
+            } else if (protocol.equals(EConfigType.HYSTERIA2.name, true)
+                || protocol.equals(EConfigType.HYSTERIA.name, true)
+            ) {
+                return settings?.address as String?
             }
             return null
         }
@@ -352,132 +354,14 @@ data class V2rayConfig(
                 || protocol.equals(EConfigType.SOCKS.name, true)
                 || protocol.equals(EConfigType.HTTP.name, true)
                 || protocol.equals(EConfigType.TROJAN.name, true)
-                || protocol.equals(EConfigType.HYSTERIA2.name, true)
             ) {
                 return settings?.servers?.first()?.port
             } else if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
                 return settings?.peers?.first()?.endpoint?.substringAfterLast(":")?.toInt()
-            }
-            return null
-        }
-
-        fun getServerAddressAndPort(): String {
-            val address = getServerAddress().orEmpty()
-            val port = getServerPort()
-            return Utils.getIpv6Address(address) + ":" + port
-        }
-
-        fun getPassword(): String? {
-            if (protocol.equals(EConfigType.VMESS.name, true)
-                || protocol.equals(EConfigType.VLESS.name, true)
+            } else if (protocol.equals(EConfigType.HYSTERIA2.name, true)
+                || protocol.equals(EConfigType.HYSTERIA.name, true)
             ) {
-                return settings?.vnext?.first()?.users?.first()?.id
-            } else if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)
-                || protocol.equals(EConfigType.TROJAN.name, true)
-                || protocol.equals(EConfigType.HYSTERIA2.name, true)
-            ) {
-                return settings?.servers?.first()?.password
-            } else if (protocol.equals(EConfigType.SOCKS.name, true)
-                || protocol.equals(EConfigType.HTTP.name, true)
-            ) {
-                return settings?.servers?.first()?.users?.first()?.pass
-            } else if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
-                return settings?.secretKey
-            }
-            return null
-        }
-
-        fun getSecurityEncryption(): String? {
-            return when {
-                protocol.equals(EConfigType.VMESS.name, true) -> settings?.vnext?.first()?.users?.first()?.security
-                protocol.equals(EConfigType.VLESS.name, true) -> settings?.vnext?.first()?.users?.first()?.encryption
-                protocol.equals(EConfigType.SHADOWSOCKS.name, true) -> settings?.servers?.first()?.method
-                else -> null
-            }
-        }
-
-        fun getTransportSettingDetails(): List<String?>? {
-            if (protocol.equals(EConfigType.VMESS.name, true)
-                || protocol.equals(EConfigType.VLESS.name, true)
-                || protocol.equals(EConfigType.TROJAN.name, true)
-                || protocol.equals(EConfigType.SHADOWSOCKS.name, true)
-            ) {
-                val transport = streamSettings?.network ?: return null
-                return when (transport) {
-                    NetworkType.TCP.type -> {
-                        val tcpSetting = streamSettings?.tcpSettings ?: return null
-                        listOf(
-                            tcpSetting.header.type,
-                            tcpSetting.header.request?.headers?.Host?.joinToString(",").orEmpty(),
-                            tcpSetting.header.request?.path?.joinToString(",").orEmpty()
-                        )
-                    }
-
-                    NetworkType.KCP.type -> {
-                        val kcpSetting = streamSettings?.kcpSettings ?: return null
-                        listOf(
-                            kcpSetting.header.type,
-                            "",
-                            kcpSetting.seed.orEmpty()
-                        )
-                    }
-
-                    NetworkType.WS.type -> {
-                        val wsSetting = streamSettings?.wsSettings ?: return null
-                        listOf(
-                            "",
-                            wsSetting.headers.Host,
-                            wsSetting.path
-                        )
-                    }
-
-                    NetworkType.HTTP_UPGRADE.type -> {
-                        val httpupgradeSetting = streamSettings?.httpupgradeSettings ?: return null
-                        listOf(
-                            "",
-                            httpupgradeSetting.host,
-                            httpupgradeSetting.path
-                        )
-                    }
-
-                    NetworkType.XHTTP.type -> {
-                        val xhttpSettings = streamSettings?.xhttpSettings ?: return null
-                        listOf(
-                            "",
-                            xhttpSettings.host,
-                            xhttpSettings.path
-                        )
-                    }
-
-                    NetworkType.H2.type -> {
-                        val h2Setting = streamSettings?.httpSettings ?: return null
-                        listOf(
-                            "",
-                            h2Setting.host.joinToString(","),
-                            h2Setting.path
-                        )
-                    }
-
-//                    "quic" -> {
-//                        val quicSetting = streamSettings?.quicSettings ?: return null
-//                        listOf(
-//                            quicSetting.header.type,
-//                            quicSetting.security,
-//                            quicSetting.key
-//                        )
-//                    }
-
-                    NetworkType.GRPC.type -> {
-                        val grpcSetting = streamSettings?.grpcSettings ?: return null
-                        listOf(
-                            if (grpcSetting.multiMode == true) "multi" else "gun",
-                            grpcSetting.authority.orEmpty(),
-                            grpcSetting.serviceName
-                        )
-                    }
-
-                    else -> null
-                }
+                return settings?.port
             }
             return null
         }

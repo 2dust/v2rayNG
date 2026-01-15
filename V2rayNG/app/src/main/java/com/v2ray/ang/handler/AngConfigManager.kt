@@ -142,6 +142,7 @@ object AngConfigManager {
                 EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
                 EConfigType.HYSTERIA2 -> Hysteria2Fmt.toUri(config)
                 EConfigType.POLICYGROUP -> ""
+                else -> {}
             }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to share config for GUID: $guid", e)

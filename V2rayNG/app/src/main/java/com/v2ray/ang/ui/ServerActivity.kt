@@ -154,6 +154,7 @@ class ServerActivity : BaseActivity() {
             EConfigType.WIREGUARD -> R.layout.activity_server_wireguard
             EConfigType.HYSTERIA2 -> R.layout.activity_server_hysteria2
             EConfigType.POLICYGROUP -> null
+            else -> null
         } ?: return
         setContentViewWithToolbar(layoutId, showHomeAsUp = true, title = (config?.configType ?: createConfigType).toString())
 
