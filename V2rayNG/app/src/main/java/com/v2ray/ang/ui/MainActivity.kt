@@ -115,52 +115,20 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        setupToolbar(binding.toolbar,false, getString(R.string.title_server))
+        setupToolbar(binding.toolbar, false, getString(R.string.title_server))
 
-        binding.fab.setOnClickListener {
-            if (mainViewModel.isRunning.value == true) {
-                V2RayServiceManager.stopVService(this)
-            } else if ((MmkvManager.decodeSettingsString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
-                val intent = VpnService.prepare(this)
-                if (intent == null) {
-                    startV2Ray()
-                } else {
-                    requestVpnPermission.launch(intent)
-                }
-            } else {
-                startV2Ray()
-            }
-        }
-        binding.layoutTest.setOnClickListener {
-            if (mainViewModel.isRunning.value == true) {
-                setTestState(getString(R.string.connection_test_testing))
-                mainViewModel.testCurrentServerRealPing()
-            } else {
-//                tv_test_state.text = getString(R.string.connection_test_fail)
-            }
-        }
-
+        // setup viewpager and tablayout
         groupPagerAdapter = GroupPagerAdapter(this, emptyList())
         binding.viewPager.adapter = groupPagerAdapter
         binding.viewPager.isUserInputEnabled = true
 
+        // setup navigation drawer
         val toggle = ActionBarDrawerToggle(
             this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
         )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         binding.navView.setNavigationItemSelectedListener(this)
-
-        setupGroupTab()
-        setupViewModel()
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                pendingAction = Action.POST_NOTIFICATIONS
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
-
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -172,7 +140,20 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 }
             }
         })
+
+        binding.fab.setOnClickListener { handleFabAction() }
+        binding.layoutTest.setOnClickListener { handleLayoutTestClick() }
+
+        setupGroupTab()
+        setupViewModel()
         mainViewModel.reloadServerList()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                pendingAction = Action.POST_NOTIFICATIONS
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     private fun setupViewModel() {
@@ -214,6 +195,30 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.tabGroup.isVisible = groups.size > 1
     }
 
+    private fun handleFabAction() {
+        if (mainViewModel.isRunning.value == true) {
+            V2RayServiceManager.stopVService(this)
+        } else if ((MmkvManager.decodeSettingsString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
+            val intent = VpnService.prepare(this)
+            if (intent == null) {
+                startV2Ray()
+            } else {
+                requestVpnPermission.launch(intent)
+            }
+        } else {
+            startV2Ray()
+        }
+    }
+
+    private fun handleLayoutTestClick() {
+        if (mainViewModel.isRunning.value == true) {
+            setTestState(getString(R.string.connection_test_testing))
+            mainViewModel.testCurrentServerRealPing()
+        } else {
+            // service not running: keep existing no-op (could show a message if desired)
+        }
+    }
+
     private fun startV2Ray() {
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
             toast(R.string.title_file_chooser)
@@ -230,6 +235,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             delay(500)
             startV2Ray()
         }
+    }
+
+    private fun setTestState(content: String?) {
+        binding.tvTestState.text = content
     }
 
     override fun onResume() {
@@ -612,19 +621,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             requestPermissionLauncher.launch(permission)
         }
     }
-
-    private fun setTestState(content: String?) {
-        binding.tvTestState.text = content
-    }
-
-//    val mConnection = object : ServiceConnection {
-//        override fun onServiceDisconnected(name: ComponentName?) {
-//        }
-//
-//        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-//            sendMsg(AppConfig.MSG_REGISTER_CLIENT, "")
-//        }
-//    }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_BUTTON_B) {
