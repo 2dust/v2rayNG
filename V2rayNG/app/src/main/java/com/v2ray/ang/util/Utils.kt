@@ -376,24 +376,6 @@ object Utils {
     }
 
     /**
-     * Get the path to the backup directory.
-     *
-     * @param context The context to use.
-     * @return The path to the backup directory.
-     */
-    fun backupPath(context: Context?): String {
-        if (context == null) return ""
-
-        return try {
-            context.getExternalFilesDir(AppConfig.DIR_BACKUPS)?.absolutePath
-                ?: context.getDir(AppConfig.DIR_BACKUPS, 0).absolutePath
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to get backup path", e)
-            ""
-        }
-    }
-
-    /**
      * Get the device ID for XUDP base key.
      *
      * @return The device ID for XUDP base key.

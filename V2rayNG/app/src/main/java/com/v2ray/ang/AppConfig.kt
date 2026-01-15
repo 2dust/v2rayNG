@@ -9,7 +9,9 @@ object AppConfig {
 
     /** Directory names used in the app's file system. */
     const val DIR_ASSETS = "assets"
-    const val DIR_BACKUPS = "backups"
+
+    const val  WEBDAV_BACKUP_DIR = "backups"
+    const val  WEBDAV_BACKUP_FILE_NAME = "backup_ng.zip"
 
     /** Legacy configuration keys. */
     const val ANG_CONFIG = "ang_config"

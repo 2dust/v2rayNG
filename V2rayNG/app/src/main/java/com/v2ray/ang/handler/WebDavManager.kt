@@ -35,18 +35,18 @@ object WebDavManager {
     }
 
     /**
-     * Upload a local file to a remote relative path under the configured remoteBasePath.
-     * The provided `remoteRelativePath` should be relative (e.g. "backup_ng.zip").
+     * Upload a local file to a remote file name under the configured remoteBasePath.
+     * The provided `remoteFileName` should be a file name (e.g. "backup_ng.zip").
      * The method will attempt to create parent directories via MKCOL before PUT.
      *
      * @param localFile File to upload.
-     * @param remoteRelativePath Remote path relative to configured remoteBasePath.
+     * @param remoteFileName Remote file name relative to configured remoteBasePath.
      * @return true if upload succeeded (HTTP 2xx), false otherwise.
      */
-    suspend fun uploadFile(localFile: File, remoteRelativePath: String): Boolean = withContext(Dispatchers.IO) {
+    suspend fun uploadFile(localFile: File, remoteFileName: String): Boolean = withContext(Dispatchers.IO) {
+        val remote = buildRemoteUrl(remoteFileName)
         try {
             val cl = client ?: return@withContext false
-            val remote = buildRemoteUrl(remoteRelativePath)
 
             // Ensure parent directories exist
             val dirPath = remote.substringBeforeLast('/')
@@ -67,14 +67,14 @@ object WebDavManager {
             cl.newCall(req).execute().use { resp ->
                 val success = resp.isSuccessful
                 if (success) {
-                    Log.i(AppConfig.TAG, "WebDAV upload success: $remoteRelativePath")
+                    Log.i(AppConfig.TAG, "WebDAV upload success: $remote")
                 } else {
-                    Log.e(AppConfig.TAG, "WebDAV upload failed: $remoteRelativePath (HTTP ${resp.code})")
+                    Log.e(AppConfig.TAG, "WebDAV upload failed: $remote (HTTP ${resp.code})")
                 }
                 return@withContext success
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "WebDAV upload exception: $remoteRelativePath", e)
+            Log.e(AppConfig.TAG, "WebDAV upload exception: $remote", e)
             return@withContext false
         }
     }
@@ -82,18 +82,18 @@ object WebDavManager {
     /**
      * Download a remote file (relative to configured remoteBasePath) into a local file.
      *
-     * @param remoteRelativePath Remote path relative to configured remoteBasePath.
+     * @param remoteFileName Remote file name relative to configured remoteBasePath.
      * @param destFile Local destination file to write to.
      * @return true if download and write succeeded, false otherwise.
      */
-    suspend fun downloadFile(remoteRelativePath: String, destFile: File): Boolean = withContext(Dispatchers.IO) {
+    suspend fun downloadFile(remoteFileName: String, destFile: File): Boolean = withContext(Dispatchers.IO) {
+        val remote = buildRemoteUrl(remoteFileName)
         try {
             val cl = client ?: return@withContext false
-            val remote = buildRemoteUrl(remoteRelativePath)
             val req = applyAuth(Request.Builder().url(remote).get()).build()
             cl.newCall(req).execute().use { resp ->
                 if (!resp.isSuccessful) {
-                    Log.e(AppConfig.TAG, "WebDAV download failed: $remoteRelativePath (HTTP ${resp.code})")
+                    Log.e(AppConfig.TAG, "WebDAV download failed: $remote (HTTP ${resp.code})")
                     return@withContext false
                 }
 
@@ -104,29 +104,31 @@ object WebDavManager {
                     }
                 }
 
-                Log.i(AppConfig.TAG, "WebDAV download success: $remoteRelativePath")
+                Log.i(AppConfig.TAG, "WebDAV download success: $remote")
                 return@withContext true
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "WebDAV download exception: $remoteRelativePath", e)
+            Log.e(AppConfig.TAG, "WebDAV download exception: $remote", e)
             return@withContext false
         }
     }
 
     /**
      * Build a full remote URL by combining the configured base URL, the configured
-     * remote base path and a relative path provided by the caller.
+     * remote base path and a file name provided by the caller.
      *
      * Example: baseUrl="https://example.com/remote.php/dav", remoteBasePath="backups",
-     * remoteRelativePath="backup_ng.zip" => "https://example.com/remote.php/dav/backups/backup_ng.zip"
+     * remoteFileName="backup_ng.zip" => "https://example.com/remote.php/dav/backups/backup_ng.zip"
      *
-     * @param remoteRelativePath A path relative to the configured remoteBasePath (no leading slash required).
+     * @param remoteFileName A file name relative to the configured remoteBasePath (no leading slash required).
      * @return Full URL string used for HTTP operations.
      */
-    private fun buildRemoteUrl(remoteRelativePath: String): String {
+    private fun buildRemoteUrl(remoteFileName: String): String {
         val base = cfg?.baseUrl?.trimEnd('/') ?: ""
-        val basePath = cfg?.remoteBasePath?.trim('/') ?: ""
-        val rel = remoteRelativePath.trimStart('/')
+        // Use configured remoteBasePath when not empty; otherwise fallback to AppConfig.WEBDAV_BACKUP_DIR
+        val basePathConfigured = cfg?.remoteBasePath?.trim('/')?.takeIf { it.isNotEmpty() }
+        val basePath = basePathConfigured ?: AppConfig.WEBDAV_BACKUP_DIR
+        val rel = remoteFileName.trimStart('/')
         return if (basePath.isEmpty()) "$base/$rel" else "$base/$basePath/$rel"
     }
 
@@ -170,7 +172,7 @@ object WebDavManager {
                             Log.w(AppConfig.TAG, "WebDAV MKCOL $mkUrl returned ${resp.code}")
                         }
                     }
-                } catch (ignored: Exception) {
+                } catch (_: Exception) {
                     // best-effort, continue
                 }
             }

@@ -14,6 +14,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.WEBDAV_BACKUP_FILE_NAME
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityBackupBinding
@@ -38,10 +39,6 @@ class BackupActivity : BaseActivity() {
 
     private val config_backup_options: Array<out String> by lazy {
         resources.getStringArray(R.array.config_backup_options)
-    }
-
-    companion object {
-        private const val BACKUP_FILE_NAME = "backup_ng.zip"
     }
 
     private val requestPermissionLauncher =
@@ -263,7 +260,7 @@ class BackupActivity : BaseActivity() {
                 WebDavManager.init(saved)
 
                 val ok = try {
-                    WebDavManager.uploadFile(tempFile, BACKUP_FILE_NAME)
+                    WebDavManager.uploadFile(tempFile, WEBDAV_BACKUP_FILE_NAME)
                 } catch (e: Exception) {
                     Log.e(AppConfig.TAG, "WebDAV upload error", e)
                     false
@@ -303,7 +300,7 @@ class BackupActivity : BaseActivity() {
             try {
                 target = File(cacheDir, "download_${System.currentTimeMillis()}.zip")
                 WebDavManager.init(saved)
-                val ok = WebDavManager.downloadFile(BACKUP_FILE_NAME, target)
+                val ok = WebDavManager.downloadFile(WEBDAV_BACKUP_FILE_NAME, target)
                 if (!ok) {
                     withContext(Dispatchers.Main) {
                         toastError(R.string.toast_failure)
@@ -351,7 +348,7 @@ class BackupActivity : BaseActivity() {
                 val url = dialogBinding.etWebdavUrl.text.toString().trim()
                 val user = dialogBinding.etWebdavUser.text.toString().trim().ifEmpty { null }
                 val pass = dialogBinding.etWebdavPass.text.toString()
-                val remotePath = dialogBinding.etWebdavRemotePath.text.toString().trim().ifEmpty { "/" }
+                val remotePath = dialogBinding.etWebdavRemotePath.text.toString().trim().ifEmpty { AppConfig.WEBDAV_BACKUP_DIR }
                 val cfg = WebDavConfig(baseUrl = url, username = user, password = pass, remoteBasePath = remotePath)
                 MmkvManager.encodeWebDavConfig(cfg)
                 toastSuccess(R.string.toast_success)
