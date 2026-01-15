@@ -77,36 +77,6 @@ jobs:
         fileName: 'libv2ray.aar'
         out-file-path: V2rayNG/app/libs/
 
-    - name: Restore cached libhysteria2
-      id: cache-libhysteria2-restore
-      uses: actions/cache/restore@v4
-      with:
-        path: ${{ github.workspace }}/hysteria/libs
-        key: libhysteria2-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hysteria/HEAD') }}-${{ hashFiles('libhysteria2.sh') }}
-
-    - name: Setup Golang
-      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
-      uses: actions/setup-go@v5.4.0
-      with:
-        go-version-file: 'AndroidLibXrayLite/go.mod'
-        cache: false
-
-    - name: Build libhysteria2
-      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
-      run: |
-        bash libhysteria2.sh
-
-    - name: Save libhysteria2
-      if: steps.cache-libhysteria2-restore.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
-      with:
-        path: ${{ github.workspace }}/hysteria/libs
-        key: libhysteria2-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hysteria/HEAD') }}-${{ hashFiles('libhysteria2.sh') }}
-
-    - name: Copy libhysteria2
-      run: |
-        cp -r ${{ github.workspace }}/hysteria/libs ${{ github.workspace }}/V2rayNG/app
-
     - name: Setup Java
       uses: actions/setup-java@v4.7.0
       with:
