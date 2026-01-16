@@ -472,7 +472,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 AppConfig.MSG_MEASURE_CONFIG_FINISH -> {
-                    onTestsFinished()
+                    val content = intent.getStringExtra("content")
+                    if (content == "0") {
+                        onTestsFinished()
+                    }
                 }
             }
         }

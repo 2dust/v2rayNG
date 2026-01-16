@@ -6,34 +6,15 @@ import android.os.IBinder
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG_CANCEL
-import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG_SUCCESS
 import com.v2ray.ang.extension.serializable
-import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.V2RayNativeManager
-import com.v2ray.ang.handler.V2rayConfigManager
 import com.v2ray.ang.util.MessageUtil
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.Collections
 
 class V2RayTestService : Service() {
-    private val realTestJob = SupervisorJob()
-    private val cpu = Runtime.getRuntime().availableProcessors().coerceAtLeast(1)
-    private val realDispatcher = Executors.newFixedThreadPool((cpu * 2)).asCoroutineDispatcher()
-    private val realTestScope = CoroutineScope(
-        realTestJob + realDispatcher + CoroutineName("RealTest")
-    )
 
-    // simple counter for currently running tasks
-    private val realTestRunningCount = AtomicInteger(0)
-    private val realTestCount = AtomicInteger(0)
+    // manage active batch workers so each batch is independent and cancellable
+    private val activeWorkers = Collections.synchronizedList(mutableListOf<RealPingWorkerService>())
 
     /**
      * Initializes the V2Ray environment.
@@ -57,8 +38,10 @@ class V2RayTestService : Service() {
      */
     override fun onDestroy() {
         super.onDestroy()
-        realTestJob.cancel()
-        realDispatcher.close()
+        // cancel any active workers
+        val snapshot = ArrayList(activeWorkers)
+        snapshot.forEach { it.cancel() }
+        activeWorkers.clear()
     }
 
     /**
@@ -73,64 +56,24 @@ class V2RayTestService : Service() {
             MSG_MEASURE_CONFIG -> {
                 val guidsList = intent.serializable<ArrayList<String>>("content")
                 if (guidsList != null && guidsList.isNotEmpty()) {
-                    startBatchRealPing(guidsList)
+                    lateinit var worker: RealPingWorkerService
+                    worker = RealPingWorkerService(this, guidsList) { status ->
+                        // notify UI and remove the worker from active list when finished
+                        MessageUtil.sendMsg2UI(this@V2RayTestService, AppConfig.MSG_MEASURE_CONFIG_FINISH, status)
+                        activeWorkers.remove(worker)
+                    }
+                    activeWorkers.add(worker)
+                    worker.start()
                 }
             }
 
             MSG_MEASURE_CONFIG_CANCEL -> {
-                realTestJob.cancelChildren()
+                // cancel all running batch workers independently
+                val snapshot = ArrayList(activeWorkers)
+                snapshot.forEach { it.cancel() }
+                activeWorkers.clear()
             }
         }
         return super.onStartCommand(intent, flags, startId)
-    }
-
-    /**
-     * Starts batch real ping tests.
-     * @param guidsList The list of GUIDs to test.
-     */
-    private fun startBatchRealPing(guidsList: List<String>) {
-        val jobs = guidsList.map { guid ->
-            realTestCount.incrementAndGet()
-            realTestScope.launch {
-                realTestRunningCount.incrementAndGet()
-                try {
-                    val result = startRealPing(guid)
-                    MessageUtil.sendMsg2UI(this@V2RayTestService, MSG_MEASURE_CONFIG_SUCCESS, Pair(guid, result))
-                } finally {
-                    val count = realTestCount.decrementAndGet()
-                    val left = realTestRunningCount.decrementAndGet()
-                    MessageUtil.sendMsg2UI(this@V2RayTestService, AppConfig.MSG_MEASURE_CONFIG_NOTIFY, "$left / $count")
-                }
-            }
-        }
-
-        realTestScope.launch {
-            try {
-                joinAll(*jobs.toTypedArray())
-                notifyAllTasksCompleted("0")
-            } catch (_: CancellationException) {
-                notifyAllTasksCompleted("-1")
-            }
-        }
-    }
-
-    private fun notifyAllTasksCompleted(status: String) {
-        MessageUtil.sendMsg2UI(this@V2RayTestService, AppConfig.MSG_MEASURE_CONFIG_FINISH, status)
-    }
-
-
-    /**
-     * Starts the real ping test.
-     * @param guid The GUID of the configuration.
-     * @return The ping result.
-     */
-    private fun startRealPing(guid: String): Long {
-        val retFailure = -1L
-
-        val configResult = V2rayConfigManager.getV2rayConfig4Speedtest(this, guid)
-        if (!configResult.status) {
-            return retFailure
-        }
-        return V2RayNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
     }
 }
