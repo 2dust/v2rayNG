@@ -168,7 +168,7 @@ inline fun <reified T : Serializable> Intent.serializable(key: String): T? = whe
  *
  * @return True if the CharSequence is not null and not empty, false otherwise.
  */
-fun CharSequence?.isNotNullEmpty(): Boolean = this != null && this.isNotEmpty()
+fun CharSequence?.isNotNullEmpty(): Boolean = !this.isNullOrBlank()
 
 fun String.concatUrl(vararg paths: String): String {
     val builder = StringBuilder(this.trimEnd('/'))

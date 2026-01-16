@@ -1227,7 +1227,11 @@ object V2rayConfigManager {
                 if (profileItem.portHopping.isNotNullEmpty()) {
                     hysteriaSetting.udphop = StreamSettingsBean.HysteriaSettingsBean.HysteriaUdpHopBean(
                         port = profileItem.portHopping,
-                        interval = profileItem.portHoppingInterval?.ifEmpty { "30" }.orEmpty().toInt()
+                        interval = profileItem.portHoppingInterval
+                            ?.trim()
+                            ?.toIntOrNull()
+                            ?.takeIf { it >= 5 }
+                            ?: 30
                     )
                 }
                 streamSettings.hysteriaSettings = hysteriaSetting
