@@ -159,19 +159,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private fun setupViewModel() {
         mainViewModel.updateTestResultAction.observe(this) { setTestState(it) }
         mainViewModel.isRunning.observe(this) { isRunning ->
-            if (isRunning) {
-                binding.fab.setImageResource(R.drawable.ic_stop_24dp)
-                binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_active))
-                binding.fab.contentDescription = getString(R.string.action_stop_service)
-                setTestState(getString(R.string.connection_connected))
-                binding.layoutTest.isFocusable = true
-            } else {
-                binding.fab.setImageResource(R.drawable.ic_play_24dp)
-                binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_inactive))
-                binding.fab.contentDescription = getString(R.string.tasker_start_service)
-                setTestState(getString(R.string.connection_not_connected))
-                binding.layoutTest.isFocusable = false
-            }
+            applyRunningState(false, isRunning)
         }
         mainViewModel.startListenBroadcast()
         mainViewModel.initAssets(assets)
@@ -196,6 +184,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private fun handleFabAction() {
+        applyRunningState(isLoading = true, isRunning = false)
+
         if (mainViewModel.isRunning.value == true) {
             V2RayServiceManager.stopVService(this)
         } else if ((MmkvManager.decodeSettingsString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
@@ -239,6 +229,27 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private fun setTestState(content: String?) {
         binding.tvTestState.text = content
+    }
+
+    private  fun applyRunningState(isLoading: Boolean, isRunning: Boolean) {
+        if (isLoading) {
+            binding.fab.setImageResource(R.drawable.ic_fab_check)
+            return
+        }
+
+        if (isRunning) {
+            binding.fab.setImageResource(R.drawable.ic_stop_24dp)
+            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_active))
+            binding.fab.contentDescription = getString(R.string.action_stop_service)
+            setTestState(getString(R.string.connection_connected))
+            binding.layoutTest.isFocusable = true
+        } else {
+            binding.fab.setImageResource(R.drawable.ic_play_24dp)
+            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_inactive))
+            binding.fab.contentDescription = getString(R.string.tasker_start_service)
+            setTestState(getString(R.string.connection_not_connected))
+            binding.layoutTest.isFocusable = false
+        }
     }
 
     override fun onResume() {
