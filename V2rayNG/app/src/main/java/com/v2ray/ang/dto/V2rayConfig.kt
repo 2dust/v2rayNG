@@ -34,7 +34,7 @@ data class V2rayConfig(
         var protocol: String,
         var listen: String? = null,
         var settings: InSettingsBean? = null,
-        val sniffing: SniffingBean? = null,
+        var sniffing: SniffingBean? = null,
         val streamSettings: Any? = null,
         val allocate: Any? = null
     ) {

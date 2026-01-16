@@ -398,6 +398,7 @@ object V2rayConfigManager {
             if (!SettingsManager.isUsingHevTun()) {
                 val inboundTun = v2rayConfig.inbounds.firstOrNull { e -> e.tag == "tun" }
                 inboundTun?.settings?.mtu = SettingsManager.getVpnMtu()
+                inboundTun?.sniffing = inbound1.sniffing
             }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to configure inbounds", e)
