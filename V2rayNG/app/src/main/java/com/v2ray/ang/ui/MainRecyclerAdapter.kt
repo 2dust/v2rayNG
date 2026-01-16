@@ -30,6 +30,7 @@ import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.Collections
 
 class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<MainRecyclerAdapter.BaseViewHolder>(), ItemTouchHelperAdapter {
     companion object {
@@ -282,6 +283,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     private fun removeServer(guid: String, position: Int) {
         if (guid == MmkvManager.getSelectServer()) {
             application.toast(R.string.toast_action_not_allowed)
+            return
         }
 
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE)) {
@@ -368,6 +370,9 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
 
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
         mActivity.mainViewModel.swapServer(fromPosition, toPosition)
+        if (fromPosition < data.size && toPosition < data.size) {
+            Collections.swap(data, fromPosition, toPosition)
+        }
         notifyItemMoved(fromPosition, toPosition)
         return true
     }
