@@ -25,8 +25,8 @@ jobs:
       uses: android-actions/setup-android@v3.2.0
       with:
         log-accepted-android-sdk-licenses: false
-        cmdline-tools-version: '12266719'
-        packages: 'platforms;android-35 build-tools;35.0.0 platform-tools'
+        cmdline-tools-version: '13114758'
+        packages: 'platforms;android-36.1 build-tools;36.1.0 platform-tools'
 
     - name: Install NDK
       run: |
