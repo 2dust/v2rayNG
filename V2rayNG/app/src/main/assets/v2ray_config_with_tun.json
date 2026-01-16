@@ -42,6 +42,13 @@
       "name": "xray0",
       "MTU": 1500,
       "userLevel": 8
+    },
+    "sniffing": {
+      "enabled": true,
+      "destOverride": [
+        "http",
+        "tls"
+      ]
     }
   }
 ],
