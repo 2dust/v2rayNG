@@ -3,6 +3,7 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.text.TextUtils
 import android.util.Log
+import com.google.gson.JsonArray
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.EConfigType
@@ -44,7 +45,7 @@ object V2rayConfigManager {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ConfigResult(false)
             return if (config.configType == EConfigType.CUSTOM) {
-                getV2rayCustomConfig(guid, config)
+                getV2rayCustomConfig(context, guid, config)
             } else if (config.configType == EConfigType.POLICYGROUP) {
                 getV2rayGroupConfig(context, guid, config)
             } else {
@@ -67,7 +68,7 @@ object V2rayConfigManager {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ConfigResult(false)
             return if (config.configType == EConfigType.CUSTOM) {
-                getV2rayCustomConfig(guid, config)
+                getV2rayCustomConfig(context, guid, config)
             } else if (config.configType == EConfigType.POLICYGROUP) {
                 // The number of policy groups will not be very large, so no special handling is needed.
                 getV2rayGroupConfig(context, guid, config)
@@ -87,9 +88,43 @@ object V2rayConfigManager {
      * @param config The profile item containing the configuration details.
      * @return A ConfigResult object containing the result of the configuration retrieval.
      */
-    private fun getV2rayCustomConfig(guid: String, config: ProfileItem): ConfigResult {
+    private fun getV2rayCustomConfig(context: Context, guid: String, config: ProfileItem): ConfigResult {
         val raw = MmkvManager.decodeServerRaw(guid) ?: return ConfigResult(false)
-        return ConfigResult(true, guid, raw)
+        val result = ConfigResult(true, guid, raw)
+        if (SettingsManager.isUsingHevTun()) {
+            return result
+        }
+
+        // check if tun inbound exists
+        val json = JsonUtil.parseString(raw) ?: return result
+        val inboundsJson = if (json.has("inbounds") && json.get("inbounds")?.isJsonNull == false) {
+            json.getAsJsonArray("inbounds")
+        } else {
+            JsonArray()
+        }
+
+        for (i in 0 until inboundsJson.size()) {
+            val elem = inboundsJson.get(i)
+            if (elem.isJsonObject) {
+                val inb = elem.asJsonObject
+                val tag = if (inb.has("tag") && inb.get("tag")?.isJsonNull == false) inb.get("tag").asString else ""
+                if (tag == "tun") return result
+            }
+        }
+
+        // add tun inbound from template
+        val templateConfig = initV2rayConfig(context) ?: return result
+        val inboundTun = templateConfig.inbounds.firstOrNull { it.tag == "tun" } ?: return result
+        inboundTun.settings?.mtu = SettingsManager.getVpnMtu()
+
+        // add to json
+        inboundsJson.add(JsonUtil.parseString(JsonUtil.toJson(inboundTun)))
+        if (inboundsJson.size() == 1) {
+            json.add("inbounds", inboundsJson)
+        }
+
+        val updatedRaw = JsonUtil.toJsonPretty(json) ?: return result
+        return ConfigResult(true, guid, updatedRaw)
     }
 
     /**
