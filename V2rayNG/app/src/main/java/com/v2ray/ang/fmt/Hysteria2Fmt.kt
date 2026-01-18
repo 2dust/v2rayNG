@@ -96,6 +96,7 @@ object Hysteria2Fmt : FmtBase() {
         outboundBean.settings?.let { server ->
             server.address = getServerAddress(profileItem)
             server.port = profileItem.serverPort.orEmpty().toInt()
+            server.version = 2
         }
 
         val sni = outboundBean.streamSettings?.let {
