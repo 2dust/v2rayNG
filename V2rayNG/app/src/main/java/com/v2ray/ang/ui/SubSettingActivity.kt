@@ -3,18 +3,27 @@ package com.v2ray.ang.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubSettingBinding
+import com.v2ray.ang.databinding.ItemQrcodeBinding
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
+import com.v2ray.ang.util.QRCodeDecoder
+import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.SubscriptionsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,17 +31,21 @@ import kotlinx.coroutines.launch
 
 class SubSettingActivity : BaseActivity() {
     private val binding by lazy { ActivitySubSettingBinding.inflate(layoutInflater) }
-
+    private val ownerActivity: SubSettingActivity
+        get() = this
     private val viewModel: SubscriptionsViewModel by viewModels()
     private lateinit var adapter: SubSettingRecyclerAdapter
     private var mItemTouchHelper: ItemTouchHelper? = null
+    private val share_method: Array<out String> by lazy {
+        resources.getStringArray(R.array.share_sub_method)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(binding.root)
         setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.title_sub_setting))
 
-        adapter = SubSettingRecyclerAdapter(this, viewModel)
+        adapter = SubSettingRecyclerAdapter(viewModel, ActivityAdapterListener())
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
@@ -87,5 +100,63 @@ class SubSettingActivity : BaseActivity() {
     fun refreshData() {
         viewModel.reload()
         adapter.notifyDataSetChanged()
+    }
+
+    private inner class ActivityAdapterListener : BaseAdapterListener {
+        override fun onEdit(guid: String) {
+            startActivity(
+                Intent(ownerActivity, SubEditActivity::class.java)
+                    .putExtra("subId", guid)
+            )
+        }
+
+        override fun onRemove(guid: String, position: Int) {
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE)) {
+                AlertDialog.Builder(ownerActivity)
+                    .setMessage(R.string.del_config_comfirm)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        viewModel.remove(guid)
+                        refreshData()
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            } else {
+                viewModel.remove(guid)
+                refreshData()
+            }
+        }
+
+        override fun onShare(url: String) {
+            AlertDialog.Builder(ownerActivity)
+                .setItems(share_method.asList().toTypedArray()) { _, i ->
+                    try {
+                        when (i) {
+                            0 -> {
+                                val ivBinding =
+                                    ItemQrcodeBinding.inflate(LayoutInflater.from(ownerActivity))
+                                ivBinding.ivQcode.setImageBitmap(
+                                    QRCodeDecoder.createQRCode(
+                                        url
+
+                                    )
+                                )
+                                AlertDialog.Builder(ownerActivity).setView(ivBinding.root).show()
+                            }
+
+                            1 -> {
+                                Utils.setClipboard(ownerActivity, url)
+                            }
+
+                            else -> ownerActivity.toast("else")
+                        }
+                    } catch (e: Exception) {
+                        Log.e(AppConfig.TAG, "Share subscription failed", e)
+                    }
+                }.show()
+        }
+
+        override fun onRefreshData() {
+            refreshData()
+        }
     }
 }
