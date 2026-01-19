@@ -34,6 +34,7 @@ import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.V2RayServiceManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
@@ -188,7 +189,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         if (mainViewModel.isRunning.value == true) {
             V2RayServiceManager.stopVService(this)
-        } else if ((MmkvManager.decodeSettingsString(AppConfig.PREF_MODE) ?: VPN) == VPN) {
+        } else if (SettingsManager.isVpnMode()) {
             val intent = VpnService.prepare(this)
             if (intent == null) {
                 startV2Ray()

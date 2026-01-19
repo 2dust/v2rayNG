@@ -91,7 +91,7 @@ object V2rayConfigManager {
     private fun getV2rayCustomConfig(context: Context, guid: String, config: ProfileItem): ConfigResult {
         val raw = MmkvManager.decodeServerRaw(guid) ?: return ConfigResult(false)
         val result = ConfigResult(true, guid, raw)
-        if (SettingsManager.isUsingHevTun()) {
+        if (!needTun()) {
             return result
         }
 
@@ -334,18 +334,18 @@ object V2rayConfigManager {
      */
     private fun initV2rayConfig(context: Context): V2rayConfig? {
         var assets = ""
-        if (SettingsManager.isUsingHevTun()) {
-            assets = initConfigCache ?: Utils.readTextFromAssets(context, "v2ray_config.json")
-            if (TextUtils.isEmpty(assets)) {
-                return null
-            }
-            initConfigCache = assets
-        } else {
+        if (needTun()) {
             assets = initConfigCacheWithTun ?: Utils.readTextFromAssets(context, "v2ray_config_with_tun.json")
             if (TextUtils.isEmpty(assets)) {
                 return null
             }
             initConfigCacheWithTun = assets
+        } else {
+            assets = initConfigCache ?: Utils.readTextFromAssets(context, "v2ray_config.json")
+            if (TextUtils.isEmpty(assets)) {
+                return null
+            }
+            initConfigCache = assets
         }
         val config = JsonUtil.fromJson(assets, V2rayConfig::class.java)
         return config
@@ -356,6 +356,10 @@ object V2rayConfigManager {
 
 
     //region some sub function
+
+    private fun needTun(): Boolean {
+        return SettingsManager.isVpnMode() && !SettingsManager.isUsingHevTun()
+    }
 
     /**
      * Configures the inbound settings for V2ray.
@@ -395,7 +399,7 @@ object V2rayConfigManager {
                 v2rayConfig.inbounds.add(inbound2)
             }
 
-            if (!SettingsManager.isUsingHevTun()) {
+            if (needTun()) {
                 val inboundTun = v2rayConfig.inbounds.firstOrNull { e -> e.tag == "tun" }
                 inboundTun?.settings?.mtu = SettingsManager.getVpnMtu()
                 inboundTun?.sniffing = inbound1.sniffing
@@ -520,23 +524,25 @@ object V2rayConfigManager {
                 )
             }
 
-            if (SettingsManager.isUsingHevTun()) {
-                //hev-socks5-tunnel dns routing
-                v2rayConfig.routing.rules.add(
-                    0, RulesBean(
-                        inboundTag = arrayListOf("socks"),
-                        outboundTag = "dns-out",
-                        port = "53",
+            if(SettingsManager.isVpnMode()) {
+                if (SettingsManager.isUsingHevTun()) {
+                    //hev-socks5-tunnel dns routing
+                    v2rayConfig.routing.rules.add(
+                        0, RulesBean(
+                            inboundTag = arrayListOf("socks"),
+                            outboundTag = "dns-out",
+                            port = "53",
+                        )
                     )
-                )
-            } else {
-                v2rayConfig.routing.rules.add(
-                    0, RulesBean(
-                        inboundTag = arrayListOf("tun"),
-                        outboundTag = "dns-out",
-                        port = "53",
+                } else {
+                    v2rayConfig.routing.rules.add(
+                        0, RulesBean(
+                            inboundTag = arrayListOf("tun"),
+                            outboundTag = "dns-out",
+                            port = "53",
+                        )
                     )
-                )
+                }
             }
 
             // DNS outbound

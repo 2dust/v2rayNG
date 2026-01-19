@@ -10,6 +10,7 @@ import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.GEOIP_PRIVATE
 import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
+import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.Language
 import com.v2ray.ang.dto.ProfileItem
@@ -384,6 +385,15 @@ object SettingsManager {
      */
     fun isUsingHevTun(): Boolean {
         return MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true)
+    }
+
+    /**
+     * Check if VPN mode is enabled.
+     * @return True if VPN mode is enabled, false otherwise.
+     */
+    fun isVpnMode(): Boolean {
+        val mode = MmkvManager.decodeSettingsString(AppConfig.PREF_MODE)
+        return mode == null || mode == VPN
     }
 
     /**
