@@ -23,7 +23,7 @@ object TrojanFmt : FmtBase() {
         val config = ProfileItem.create(EConfigType.TROJAN)
 
         val uri = URI(Utils.fixIllegalUrl(str))
-        config.remarks = Utils.urlDecode(uri.fragment.orEmpty()).let { if (it.isEmpty()) "none" else it }
+        config.remarks = Utils.urlDecode(uri.fragment.orEmpty()).let { it.ifEmpty { "none" } }
         config.server = uri.idnHost
         config.serverPort = uri.port.toString()
         config.password = uri.userInfo

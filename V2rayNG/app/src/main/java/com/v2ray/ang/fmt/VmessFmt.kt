@@ -163,7 +163,7 @@ object VmessFmt : FmtBase() {
         if (uri.rawQuery.isNullOrEmpty()) return null
         val queryParam = getQueryParam(uri)
 
-        config.remarks = Utils.urlDecode(uri.fragment.orEmpty()).let { if (it.isEmpty()) "none" else it }
+        config.remarks = Utils.urlDecode(uri.fragment.orEmpty()).let { it.ifEmpty { "none" } }
         config.server = uri.idnHost
         config.serverPort = uri.port.toString()
         config.password = uri.userInfo

@@ -36,7 +36,7 @@ object ShadowsocksFmt : FmtBase() {
         if (uri.port <= 0) return null
         if (uri.userInfo.isNullOrEmpty()) return null
 
-        config.remarks = Utils.urlDecode(uri.fragment.orEmpty()).let { if (it.isEmpty()) "none" else it }
+        config.remarks = Utils.urlDecode(uri.fragment.orEmpty()).let { it.ifEmpty { "none" } }
         config.server = uri.idnHost
         config.serverPort = uri.port.toString()
 
