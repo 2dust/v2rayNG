@@ -31,7 +31,8 @@ import kotlinx.coroutines.withContext
 
 class RoutingSettingActivity : BaseActivity() {
     private val binding by lazy { ActivityRoutingSettingBinding.inflate(layoutInflater) }
-
+    private val ownerActivity: RoutingSettingActivity
+        get() = this
     private val viewModel: RoutingSettingsViewModel by viewModels()
     private lateinit var adapter: RoutingSettingRecyclerAdapter
     private var mItemTouchHelper: ItemTouchHelper? = null
@@ -57,7 +58,7 @@ class RoutingSettingActivity : BaseActivity() {
         //setContentView(binding.root)
         setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.routing_settings_title))
 
-        adapter = RoutingSettingRecyclerAdapter(this, viewModel)
+        adapter = RoutingSettingRecyclerAdapter(viewModel, ActivityAdapterListener())
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
@@ -201,5 +202,24 @@ class RoutingSettingActivity : BaseActivity() {
     fun refreshData() {
         viewModel.reload()
         adapter.notifyDataSetChanged()
+    }
+
+    private inner class ActivityAdapterListener : BaseAdapterListener {
+        override fun onEdit(guid: String, position: Int) {
+            startActivity(
+                Intent(ownerActivity, RoutingEditActivity::class.java)
+                    .putExtra("position", position)
+            )
+        }
+
+        override fun onRemove(guid: String, position: Int) {
+        }
+
+        override fun onShare(url: String) {
+        }
+
+        override fun onRefreshData() {
+            refreshData()
+        }
     }
 }

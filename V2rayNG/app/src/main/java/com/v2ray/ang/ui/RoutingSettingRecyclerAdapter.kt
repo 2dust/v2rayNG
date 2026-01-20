@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui
 
-import android.content.Intent
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -13,12 +12,11 @@ import com.v2ray.ang.helper.ItemTouchHelperViewHolder
 import com.v2ray.ang.viewmodel.RoutingSettingsViewModel
 
 class RoutingSettingRecyclerAdapter(
-    val activity: RoutingSettingActivity,
-    private val viewModel: RoutingSettingsViewModel
+    private val viewModel: RoutingSettingsViewModel,
+    private val adapterListener: BaseAdapterListener?
 ) : RecyclerView.Adapter<RoutingSettingRecyclerAdapter.MainViewHolder>(),
     ItemTouchHelperAdapter {
 
-    private var mActivity: RoutingSettingActivity = activity
     override fun getItemCount() = viewModel.getAll().size
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
@@ -33,10 +31,7 @@ class RoutingSettingRecyclerAdapter(
         holder.itemView.setBackgroundColor(Color.TRANSPARENT)
 
         holder.itemRoutingSettingBinding.layoutEdit.setOnClickListener {
-            mActivity.startActivity(
-                Intent(mActivity, RoutingEditActivity::class.java)
-                    .putExtra("position", position)
-            )
+            adapterListener?.onEdit("", position)
         }
 
         holder.itemRoutingSettingBinding.chkEnable.setOnCheckedChangeListener { it, isChecked ->
@@ -76,7 +71,7 @@ class RoutingSettingRecyclerAdapter(
     }
 
     override fun onItemMoveCompleted() {
-        mActivity.refreshData()
+        adapterListener?.onRefreshData()
     }
 
     override fun onItemDismiss(position: Int) {

@@ -8,8 +8,9 @@ interface BaseAdapterListener {
     /**
      * Request the host to edit the specified item.
      * @param guid Unique identifier (GUID) of the item
+     * @param position Current position in the adapter (optional; host should validate it)
      */
-    fun onEdit(guid: String)
+    fun onEdit(guid: String, position: Int)
 
     /**
      * Request the host to remove the specified item. Position is provided for optional animation or validation.

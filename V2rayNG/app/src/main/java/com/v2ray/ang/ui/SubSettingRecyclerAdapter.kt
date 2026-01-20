@@ -30,7 +30,7 @@ class SubSettingRecyclerAdapter(
         holder.itemView.setBackgroundColor(Color.TRANSPARENT)
 
         holder.itemSubSettingBinding.layoutEdit.setOnClickListener {
-            adapterListener?.onEdit(subId)
+            adapterListener?.onEdit(subId, position)
         }
 
         holder.itemSubSettingBinding.layoutRemove.setOnClickListener {
