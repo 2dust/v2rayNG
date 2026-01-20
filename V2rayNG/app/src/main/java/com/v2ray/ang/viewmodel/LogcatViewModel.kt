@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import java.io.IOException
-import java.util.LinkedHashSet
 
 class LogcatViewModel : ViewModel() {
     private val logsetsAll: MutableList<String> = mutableListOf()

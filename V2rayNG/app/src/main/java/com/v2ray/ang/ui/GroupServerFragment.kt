@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +8,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.TAG
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.FragmentGroupServerBinding
 import com.v2ray.ang.handler.MmkvManager
@@ -51,14 +49,14 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>() {
             if (mainViewModel.subscriptionId != subId) {
                 return@observe
             }
-            Log.d(TAG, "GroupServerFragment updateListAction subId=$subId")
+            // Log.d(TAG, "GroupServerFragment updateListAction subId=$subId")
             adapter.setData(mainViewModel.serversCache, index)
         }
         mainViewModel.isRunning.observe(viewLifecycleOwner) { isRunning ->
             adapter.isRunning = isRunning
         }
 
-        Log.d(TAG, "GroupServerFragment onViewCreated: subId=$subId")
+        // Log.d(TAG, "GroupServerFragment onViewCreated: subId=$subId")
     }
 
     override fun onResume() {
