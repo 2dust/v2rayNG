@@ -6,17 +6,20 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.databinding.ItemRecyclerLogcatBinding
-import com.v2ray.ang.util.Utils
+import com.v2ray.ang.viewmodel.LogcatViewModel
 
-class LogcatRecyclerAdapter(val activity: LogcatActivity) : RecyclerView.Adapter<LogcatRecyclerAdapter.MainViewHolder>() {
-    private var mActivity: LogcatActivity = activity
+class LogcatRecyclerAdapter(
+    private val viewModel: LogcatViewModel,
+    private val onLongClick: ((String) -> Boolean)? = null
+) : RecyclerView.Adapter<LogcatRecyclerAdapter.MainViewHolder>() {
 
-
-    override fun getItemCount() = mActivity.logsets.size
+    override fun getItemCount() = viewModel.getAll().size
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
         try {
-            val log = mActivity.logsets[position]
+            val logs = viewModel.getAll()
+            val log = logs[position]
+
             if (log.isEmpty()) {
                 holder.itemSubSettingBinding.logTag.text = ""
                 holder.itemSubSettingBinding.logContent.text = ""
@@ -27,8 +30,7 @@ class LogcatRecyclerAdapter(val activity: LogcatActivity) : RecyclerView.Adapter
             }
 
             holder.itemView.setOnLongClickListener {
-                Utils.setClipboard(mActivity, log)
-                true
+                onLongClick?.invoke(log) ?: false
             }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Error binding log view data", e)
