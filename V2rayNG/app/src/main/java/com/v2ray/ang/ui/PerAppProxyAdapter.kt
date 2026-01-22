@@ -8,8 +8,10 @@ import com.v2ray.ang.databinding.ItemRecyclerBypassListBinding
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.viewmodel.PerAppProxyViewModel
 
-class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, val viewModel: PerAppProxyViewModel) :
-    RecyclerView.Adapter<PerAppProxyAdapter.BaseViewHolder>() {
+class PerAppProxyAdapter(
+    val apps: List<AppInfo>,
+    val viewModel: PerAppProxyViewModel
+) :RecyclerView.Adapter<PerAppProxyAdapter.BaseViewHolder>() {
 
     companion object {
         private const val VIEW_TYPE_HEADER = 0
@@ -37,6 +39,7 @@ class PerAppProxyAdapter(val activity: BaseActivity, val apps: List<AppInfo>, va
                 )
                 BaseViewHolder(view)
             }
+
             else -> AppViewHolder(ItemRecyclerBypassListBinding.inflate(LayoutInflater.from(ctx), parent, false))
         }
     }
