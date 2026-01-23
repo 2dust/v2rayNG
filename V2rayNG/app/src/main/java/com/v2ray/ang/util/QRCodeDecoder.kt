@@ -65,9 +65,9 @@ object QRCodeDecoder {
                 val qrReader = QRCodeReader()
 
                 try {
-                    qrReader.decode(BinaryBitmap(GlobalHistogramBinarizer(source)), mapOf(DecodeHintType.TRY_HARDER to true)).text
+                    qrReader.decode(BinaryBitmap(GlobalHistogramBinarizer(source)), HINTS).text
                 } catch (e: NotFoundException) {
-                    qrReader.decode(BinaryBitmap(GlobalHistogramBinarizer(source.invert())), mapOf(DecodeHintType.TRY_HARDER to true)).text
+                    qrReader.decode(BinaryBitmap(GlobalHistogramBinarizer(source.invert())), HINTS).text
                 }
             }.getOrNull()
         }
@@ -97,27 +97,9 @@ object QRCodeDecoder {
     }
 
     init {
-        val allFormats: List<BarcodeFormat> = arrayListOf(
-            BarcodeFormat.AZTEC,
-            BarcodeFormat.CODABAR,
-            BarcodeFormat.CODE_39,
-            BarcodeFormat.CODE_93,
-            BarcodeFormat.CODE_128,
-            BarcodeFormat.DATA_MATRIX,
-            BarcodeFormat.EAN_8,
-            BarcodeFormat.EAN_13,
-            BarcodeFormat.ITF,
-            BarcodeFormat.MAXICODE,
-            BarcodeFormat.PDF_417,
-            BarcodeFormat.QR_CODE,
-            BarcodeFormat.RSS_14,
-            BarcodeFormat.RSS_EXPANDED,
-            BarcodeFormat.UPC_A,
-            BarcodeFormat.UPC_E,
-            BarcodeFormat.UPC_EAN_EXTENSION
-        )
-        HINTS[DecodeHintType.TRY_HARDER] = BarcodeFormat.QR_CODE
-        HINTS[DecodeHintType.POSSIBLE_FORMATS] = allFormats
-        HINTS[DecodeHintType.CHARACTER_SET] = Charsets.UTF_8
+        // Keep decoding hints focused on QR codes and enable TRY_HARDER + UTF-8 charset for better success rate.
+        HINTS[DecodeHintType.TRY_HARDER] = true
+        HINTS[DecodeHintType.POSSIBLE_FORMATS] = listOf(BarcodeFormat.QR_CODE)
+        HINTS[DecodeHintType.CHARACTER_SET] = Charsets.UTF_8.name()
     }
 }

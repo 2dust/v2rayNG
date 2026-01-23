@@ -19,6 +19,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.QRCodeDecoder
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
+import io.github.g00fy2.quickie.config.BarcodeFormat
 import io.github.g00fy2.quickie.config.ScannerConfig
 
 class ScannerActivity : BaseActivity() {
@@ -73,6 +74,7 @@ class ScannerActivity : BaseActivity() {
                 setHapticSuccessFeedback(true) // enable (default) or disable haptic feedback when a barcode was detected
                 setShowTorchToggle(true) // show or hide (default) torch/flashlight toggle button
                 setShowCloseButton(true) // show or hide (default) close button
+                setBarcodeFormats(listOf(BarcodeFormat.QR_CODE))
             }
         )
     }
