@@ -632,7 +632,7 @@ class ServerActivity : BaseActivity() {
                     finish()
                 }
             } else {
-                application.toast(R.string.toast_action_not_allowed)
+                toast(R.string.toast_action_not_allowed)
             }
         }
         return true
