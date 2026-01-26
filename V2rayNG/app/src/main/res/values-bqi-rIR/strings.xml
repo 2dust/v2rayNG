@@ -415,6 +415,8 @@
     <string-array name="policy_group_type">
         <item>کم ترین پینگ</item>
         <item>کم ترین بار(لود)</item>
+        <item>تصادفی</item>
+        <item>گردشی</item>
     </string-array>
 
     <string-array name="config_backup_options">

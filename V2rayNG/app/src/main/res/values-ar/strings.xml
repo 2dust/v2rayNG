@@ -399,6 +399,8 @@
     <string-array name="policy_group_type">
         <item>Least Ping</item>
         <item>Least Load</item>
+        <item>Random</item>
+        <item>Round Robin</item>
     </string-array>
 
     <string-array name="config_backup_options">

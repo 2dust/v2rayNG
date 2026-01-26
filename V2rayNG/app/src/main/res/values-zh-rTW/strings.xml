@@ -406,6 +406,8 @@
     <string-array name="policy_group_type">
         <item>最低延遲</item>
         <item>最少卡頓</item>
+        <item>隨機選擇</item>
+        <item>輪詢</item>
     </string-array>
 
     <string-array name="config_backup_options">

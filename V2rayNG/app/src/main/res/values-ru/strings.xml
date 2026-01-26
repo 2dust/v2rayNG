@@ -414,6 +414,8 @@
     <string-array name="policy_group_type">
         <item>Наименьшая задержка</item>
         <item>Наименьшая нагрузка</item>
+        <item>Случайный</item>
+        <item>По очереди</item>
     </string-array>
 
     <string-array name="config_backup_options">

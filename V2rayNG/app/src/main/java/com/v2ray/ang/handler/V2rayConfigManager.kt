@@ -840,65 +840,93 @@ object V2rayConfigManager {
      * Configures load balancing settings for the V2ray configuration.
      *
      * @param v2rayConfig The V2ray configuration object to be modified with balancing settings
+     * @param config The profile item containing policy group settings
      */
     private fun getBalance(v2rayConfig: V2rayConfig, config: ProfileItem) {
         try {
             v2rayConfig.routing.rules.forEach { rule ->
                 if (rule.outboundTag == "proxy") {
                     rule.outboundTag = null
-                    rule.balancerTag = "proxy-round"
+                    rule.balancerTag = AppConfig.TAG_BALANCER
                 }
             }
 
-            if (config.policyGroupType == "0") {
-                val balancer = V2rayConfig.RoutingBean.BalancerBean(
-                    tag = "proxy-round",
-                    selector = listOf("proxy-"),
-                    strategy = V2rayConfig.RoutingBean.StrategyObject(
-                        type = "leastPing"
+            val lstSelector =  listOf("proxy-")
+            when (config.policyGroupType) {
+                // Least Ping goto else
+                "1" -> {
+                    // Least Load
+                    val balancer = V2rayConfig.RoutingBean.BalancerBean(
+                        tag = AppConfig.TAG_BALANCER,
+                        selector = lstSelector,
+                        strategy = V2rayConfig.RoutingBean.StrategyObject(
+                            type = "leastLoad"
+                        )
                     )
-                )
-                v2rayConfig.routing.balancers = listOf(balancer)
-                v2rayConfig.observatory = V2rayConfig.ObservatoryObject(
-                    subjectSelector = listOf("proxy-"),
-                    probeUrl = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL) ?: AppConfig.DELAY_TEST_URL,
-                    probeInterval = "3m",
-                    enableConcurrency = true
-                )
-            } else {
-                val balancer = V2rayConfig.RoutingBean.BalancerBean(
-                    tag = "proxy-round",
-                    selector = listOf("proxy-"),
-                    strategy = V2rayConfig.RoutingBean.StrategyObject(
-                        type = "leastLoad"
+                    v2rayConfig.routing.balancers = listOf(balancer)
+                    v2rayConfig.burstObservatory = V2rayConfig.BurstObservatoryObject(
+                        subjectSelector = lstSelector,
+                        pingConfig = V2rayConfig.BurstObservatoryObject.PingConfigObject(
+                            destination = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL) ?: AppConfig.DELAY_TEST_URL,
+                            interval = "5m",
+                            sampling = 2,
+                            timeout = "30s"
+                        )
                     )
-                )
-                v2rayConfig.routing.balancers = listOf(balancer)
-                v2rayConfig.burstObservatory = V2rayConfig.BurstObservatoryObject(
-                    subjectSelector = listOf("proxy-"),
-                    pingConfig = V2rayConfig.BurstObservatoryObject.PingConfigObject(
-                        destination = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL) ?: AppConfig.DELAY_TEST_URL,
-                        interval = "5m",
-                        sampling = 2,
-                        timeout = "30s"
+                }
+                "2" -> {
+                    // Random
+                    val balancer = V2rayConfig.RoutingBean.BalancerBean(
+                        tag = AppConfig.TAG_BALANCER,
+                        selector = lstSelector,
+                        strategy = V2rayConfig.RoutingBean.StrategyObject(
+                            type = "random"
+                        )
                     )
-                )
+                    v2rayConfig.routing.balancers = listOf(balancer)
+                }
+                "3" -> {
+                    // Round Robin
+                    val balancer = V2rayConfig.RoutingBean.BalancerBean(
+                        tag = AppConfig.TAG_BALANCER,
+                        selector = lstSelector,
+                        strategy = V2rayConfig.RoutingBean.StrategyObject(
+                            type = "roundRobin"
+                        )
+                    )
+                    v2rayConfig.routing.balancers = listOf(balancer)
+                }
+                else -> {
+                    // Default: Least Ping
+                    val balancer = V2rayConfig.RoutingBean.BalancerBean(
+                        tag = AppConfig.TAG_BALANCER,
+                        selector = lstSelector,
+                        strategy = V2rayConfig.RoutingBean.StrategyObject(
+                            type = "leastPing"
+                        )
+                    )
+                    v2rayConfig.routing.balancers = listOf(balancer)
+                    v2rayConfig.observatory = V2rayConfig.ObservatoryObject(
+                        subjectSelector = lstSelector,
+                        probeUrl = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL) ?: AppConfig.DELAY_TEST_URL,
+                        probeInterval = "3m",
+                        enableConcurrency = true
+                    )
+                }
             }
 
             if (v2rayConfig.routing.domainStrategy == "IPIfNonMatch") {
                 v2rayConfig.routing.rules.add(
                     RulesBean(
                         ip = arrayListOf("0.0.0.0/0", "::/0"),
-                        balancerTag = "proxy-round",
-                        type = "field"
+                        balancerTag = AppConfig.TAG_BALANCER,
                     )
                 )
             } else {
                 v2rayConfig.routing.rules.add(
                     RulesBean(
                         network = "tcp,udp",
-                        balancerTag = "proxy-round",
-                        type = "field"
+                        balancerTag = AppConfig.TAG_BALANCER,
                     )
                 )
             }
