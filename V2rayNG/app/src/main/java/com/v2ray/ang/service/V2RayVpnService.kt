@@ -89,6 +89,11 @@ class V2RayVpnService : VpnService(), ServiceControl {
         NotificationManager.cancelNotification()
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        stopV2Ray()
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         setupVpnService()
         startService()

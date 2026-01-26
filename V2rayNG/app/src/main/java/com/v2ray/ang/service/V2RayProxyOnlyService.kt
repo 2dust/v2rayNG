@@ -39,6 +39,15 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
     }
 
     /**
+     * Called when the user removes the app from the recent tasks list.
+     * @param rootIntent The original root Intent.
+     */
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        stopService()
+    }
+
+    /**
      * Gets the service instance.
      * @return The service instance.
      */
