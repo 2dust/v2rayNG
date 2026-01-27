@@ -78,7 +78,7 @@ jobs:
         out-file-path: V2rayNG/app/libs/
 
     - name: Setup Java
-      uses: actions/setup-java@v4.7.0
+      uses: actions/setup-java@v5.2.0
       with:
         distribution: 'temurin'
         java-version: '21'
