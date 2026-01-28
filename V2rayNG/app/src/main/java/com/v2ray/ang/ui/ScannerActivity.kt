@@ -72,9 +72,7 @@ class ScannerActivity : BaseActivity() {
         }
 
         R.id.select_photo -> {
-            checkAndRequestPermission(PermissionType.READ_STORAGE) {
-                showFileChooser()
-            }
+            showFileChooser()
             true
         }
 

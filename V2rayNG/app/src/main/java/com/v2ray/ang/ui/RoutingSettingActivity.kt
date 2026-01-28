@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
@@ -150,8 +149,10 @@ class RoutingSettingActivity : BaseActivity() {
     }
 
     private fun importQRcode(): Boolean {
-        checkAndRequestPermission(PermissionType.CAMERA) {
-            scanQRcodeForRulesets.launch(Intent(this, ScannerActivity::class.java))
+        launchQRCodeScanner { scanResult ->
+            if (scanResult != null) {
+                importRulesetsFromQRcode(scanResult)
+            }
         }
         return true
     }
@@ -166,11 +167,6 @@ class RoutingSettingActivity : BaseActivity() {
         }
     }
 
-    private val scanQRcodeForRulesets = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == RESULT_OK) {
-            importRulesetsFromQRcode(it.data?.getStringExtra("SCAN_RESULT"))
-        }
-    }
 
     private fun importRulesetsFromQRcode(qrcode: String?): Boolean {
         AlertDialog.Builder(this).setMessage(R.string.routing_settings_import_rulesets_tip)

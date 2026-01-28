@@ -188,9 +188,7 @@ class BackupActivity : BaseActivity() {
     }
 
     private fun restoreViaLocal() {
-        checkAndRequestPermission(PermissionType.READ_STORAGE) {
-            showFileChooser()
-        }
+        showFileChooser()
     }
 
     private fun backupViaWebDav() {

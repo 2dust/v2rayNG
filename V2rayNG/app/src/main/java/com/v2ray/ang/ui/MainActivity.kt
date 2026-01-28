@@ -64,12 +64,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
 
-    private val scanQRCodeForConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == RESULT_OK) {
-            importBatchConfig(it.data?.getStringExtra("SCAN_RESULT"))
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -370,8 +364,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      * import config from qrcode
      */
     private fun importQRcode(): Boolean {
-        checkAndRequestPermission(PermissionType.CAMERA) {
-            scanQRCodeForConfig.launch(Intent(this, ScannerActivity::class.java))
+        launchQRCodeScanner { scanResult ->
+            if (scanResult != null) {
+                importBatchConfig(scanResult)
+            }
         }
         return true
     }
@@ -425,9 +421,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      */
     private fun importConfigLocal(): Boolean {
         try {
-            checkAndRequestPermission(PermissionType.READ_STORAGE) {
-                showFileChooser()
-            }
+            showFileChooser()
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to import config from local file", e)
             return false

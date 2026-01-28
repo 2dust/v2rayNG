@@ -9,7 +9,6 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -91,12 +90,6 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun showFileChooser() {
-        checkAndRequestPermission(PermissionType.READ_STORAGE) {
-            showFileChooser2()
-        }
-    }
-
-    private fun showFileChooser2() {
         launchFileChooser { uri ->
             if (uri == null) {
                 return@launchFileChooser
@@ -148,17 +141,14 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun importAssetFromQRcode(): Boolean {
-        checkAndRequestPermission(PermissionType.CAMERA) {
-            scanQRCodeForAssetURL.launch(Intent(this, ScannerActivity::class.java))
+        launchQRCodeScanner { scanResult ->
+            if (scanResult != null) {
+                importAsset(scanResult)
+            }
         }
         return true
     }
 
-    private val scanQRCodeForAssetURL = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == RESULT_OK) {
-            importAsset(it.data?.getStringExtra("SCAN_RESULT"))
-        }
-    }
 
     private fun importAsset(url: String?): Boolean {
         try {

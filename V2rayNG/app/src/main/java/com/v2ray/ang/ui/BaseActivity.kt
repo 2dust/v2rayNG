@@ -23,6 +23,7 @@ import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.dto.PermissionType
 import com.v2ray.ang.helper.FileChooserHelper
 import com.v2ray.ang.helper.PermissionHelper
+import com.v2ray.ang.helper.QRCodeScannerHelper
 import com.v2ray.ang.util.Utils
 
 
@@ -42,11 +43,13 @@ abstract class BaseActivity : AppCompatActivity() {
     private var progressBar: LinearProgressIndicator? = null
     private lateinit var fileChooser : FileChooserHelper
     private lateinit var permissionRequester : PermissionHelper
+    private lateinit var qrCodeScanner : QRCodeScannerHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fileChooser = FileChooserHelper(this)
         permissionRequester = PermissionHelper(this)
+        qrCodeScanner = QRCodeScannerHelper(this)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         if (!Utils.getDarkModeStatus(this)) {
@@ -247,6 +250,20 @@ abstract class BaseActivity : AppCompatActivity() {
         mimeType: String = "*/*",
         onResult: (Uri?) -> Unit
     ) {
-        fileChooser.launch(mimeType, onResult)
+        checkAndRequestPermission(PermissionType.READ_STORAGE) {
+            fileChooser.launch(mimeType, onResult)
+        }
+    }
+
+    /**
+     * Launch QR code scanner with camera permission check.
+     * Convenience method that delegates to qrCodeScanner helper.
+     *
+     * @param onResult Callback invoked with the scan result string (null if cancelled or failed)
+     */
+    protected fun launchQRCodeScanner(onResult: (String?) -> Unit) {
+        checkAndRequestPermission(PermissionType.CAMERA) {
+            qrCodeScanner.launch(onResult)
+        }
     }
 }
