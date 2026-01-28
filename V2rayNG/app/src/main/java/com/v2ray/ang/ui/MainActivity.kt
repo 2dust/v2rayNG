@@ -544,9 +544,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      * show file chooser
      */
     private fun showFileChooser() {
-        launchFileChooser("*/*") { uri ->
+        launchFileChooser { uri ->
             if (uri == null) {
-                toastError(R.string.toast_failure)
                 return@launchFileChooser
             }
 

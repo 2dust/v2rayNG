@@ -85,7 +85,6 @@ class ScannerActivity : BaseActivity() {
     private fun showFileChooser() {
         launchFileChooser("image/*") { uri ->
             if (uri == null) {
-                toastError(R.string.toast_failure)
                 return@launchFileChooser
             }
             try {

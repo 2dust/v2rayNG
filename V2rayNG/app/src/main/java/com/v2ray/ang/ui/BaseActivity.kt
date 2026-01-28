@@ -21,9 +21,9 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.CustomDividerItemDecoration
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.dto.PermissionType
+import com.v2ray.ang.helper.FileChooserHelper
+import com.v2ray.ang.helper.PermissionHelper
 import com.v2ray.ang.util.Utils
-import com.v2ray.ang.util.fileChooserHelper
-import com.v2ray.ang.util.permissionRequester
 
 
 /**
@@ -40,11 +40,14 @@ import com.v2ray.ang.util.permissionRequester
 abstract class BaseActivity : AppCompatActivity() {
     // Progress indicator that sits at the bottom of the toolbar
     private var progressBar: LinearProgressIndicator? = null
-    private val permissionRequester = permissionRequester()
-    private val fileChooser = fileChooserHelper()
+    private lateinit var fileChooser : FileChooserHelper
+    private lateinit var permissionRequester : PermissionHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        fileChooser = FileChooserHelper(this)
+        permissionRequester = PermissionHelper(this)
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         if (!Utils.getDarkModeStatus(this)) {
             WindowCompat.getInsetsController(window, window.decorView).apply {

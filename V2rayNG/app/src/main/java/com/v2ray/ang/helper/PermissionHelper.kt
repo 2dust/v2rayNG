@@ -1,4 +1,4 @@
-package com.v2ray.ang.util
+package com.v2ray.ang.helper
 
 import android.content.pm.PackageManager
 import androidx.activity.result.ActivityResultLauncher
@@ -12,7 +12,7 @@ import com.v2ray.ang.extension.toast
 /**
  * Helper for requesting permissions.
  */
-class PermissionRequester(private val activity: AppCompatActivity) {
+class PermissionHelper(private val activity: AppCompatActivity) {
     private var permissionCallback: ((Boolean) -> Unit)? = null
 
     private val permissionLauncher: ActivityResultLauncher<String> =
@@ -44,5 +44,3 @@ class PermissionRequester(private val activity: AppCompatActivity) {
         }
     }
 }
-
-fun AppCompatActivity.permissionRequester() = PermissionRequester(this)

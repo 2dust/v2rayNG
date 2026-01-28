@@ -97,9 +97,8 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun showFileChooser2() {
-        launchFileChooser("*/*") { uri ->
+        launchFileChooser { uri ->
             if (uri == null) {
-                toastError(R.string.toast_failure)
                 return@launchFileChooser
             }
 

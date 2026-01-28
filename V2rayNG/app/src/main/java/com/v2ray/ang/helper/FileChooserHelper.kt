@@ -1,5 +1,6 @@
-package com.v2ray.ang.util
+package com.v2ray.ang.helper
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
@@ -13,7 +14,7 @@ import com.v2ray.ang.extension.toast
 /**
  * Helper for choosing files using ACTION_GET_CONTENT intent.
  *
-*/
+ */
 
 class FileChooserHelper(private val activity: AppCompatActivity) {
     private var fileChooserCallback: ((Uri?) -> Unit)? = null
@@ -50,7 +51,7 @@ class FileChooserHelper(private val activity: AppCompatActivity) {
             fileChooserLauncher.launch(
                 Intent.createChooser(intent, activity.getString(R.string.title_file_chooser))
             )
-        } catch (ex: android.content.ActivityNotFoundException) {
+        } catch (ex: ActivityNotFoundException) {
             Log.e(AppConfig.TAG, "File chooser activity not found", ex)
             activity.toast(R.string.toast_require_file_manager)
             fileChooserCallback?.invoke(null)
@@ -58,8 +59,3 @@ class FileChooserHelper(private val activity: AppCompatActivity) {
         }
     }
 }
-
-/**
- * Extension function to create a FileChooserHelper instance.
- */
-fun AppCompatActivity.fileChooserHelper() = FileChooserHelper(this)
