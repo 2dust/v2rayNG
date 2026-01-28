@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.tencent.mmkv.MMKV
@@ -20,7 +19,6 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.WebDavManager
-import com.v2ray.ang.dto.PermissionType
 import com.v2ray.ang.util.ZipUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,30 +34,6 @@ class BackupActivity : BaseActivity() {
         resources.getStringArray(R.array.config_backup_options)
     }
 
-    private val createBackupFile =
-        registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
-            if (uri != null) {
-                try {
-                    val ret = backupConfigurationToCache()
-                    if (ret.first) {
-                        // Copy the cached zip file to user-selected location
-                        contentResolver.openOutputStream(uri)?.use { output ->
-                            File(ret.second).inputStream().use { input ->
-                                input.copyTo(output)
-                            }
-                        }
-                        // Clean up cache file
-                        File(ret.second).delete()
-                        toastSuccess(R.string.toast_success)
-                    } else {
-                        toastError(R.string.toast_failure)
-                    }
-                } catch (e: Exception) {
-                    Log.e(AppConfig.TAG, "Failed to backup configuration", e)
-                    toastError(R.string.toast_failure)
-                }
-            }
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -184,7 +158,30 @@ class BackupActivity : BaseActivity() {
             Locale.getDefault()
         ).format(System.currentTimeMillis())
         val defaultFileName = "${getString(R.string.app_name)}_${dateFormatted}.zip"
-        createBackupFile.launch(defaultFileName)
+
+        launchCreateDocument(defaultFileName) { uri ->
+            if (uri != null) {
+                try {
+                    val ret = backupConfigurationToCache()
+                    if (ret.first) {
+                        // Copy the cached zip file to user-selected location
+                        contentResolver.openOutputStream(uri)?.use { output ->
+                            File(ret.second).inputStream().use { input ->
+                                input.copyTo(output)
+                            }
+                        }
+                        // Clean up cache file
+                        File(ret.second).delete()
+                        toastSuccess(R.string.toast_success)
+                    } else {
+                        toastError(R.string.toast_failure)
+                    }
+                } catch (e: Exception) {
+                    Log.e(AppConfig.TAG, "Failed to backup configuration", e)
+                    toastError(R.string.toast_failure)
+                }
+            }
+        }
     }
 
     private fun restoreViaLocal() {

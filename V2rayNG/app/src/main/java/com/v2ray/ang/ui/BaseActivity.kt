@@ -256,6 +256,21 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     /**
+     * Launch document creator to create a new file at user-selected location.
+     * Convenience method that delegates to fileChooser helper.
+     * Note: No permission check needed as CreateDocument uses Storage Access Framework.
+     *
+     * @param fileName Default file name for the new document
+     * @param onResult Callback invoked with the created file URI (null if cancelled)
+     */
+    protected fun launchCreateDocument(
+        fileName: String,
+        onResult: (Uri?) -> Unit
+    ) {
+        fileChooser.createDocument(fileName, onResult)
+    }
+
+    /**
      * Launch QR code scanner with camera permission check.
      * Convenience method that delegates to qrCodeScanner helper.
      *
