@@ -1,12 +1,9 @@
 package com.v2ray.ang.ui
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.net.VpnService
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -35,6 +32,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.V2RayServiceManager
+import com.v2ray.ang.dto.PermissionType
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
@@ -63,40 +61,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         if (SettingsChangeManager.consumeSetupGroupTab()) {
             setupGroupTab()
         }
-    }
-
-    // register activity result for requesting permission
-    private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                when (pendingAction) {
-                    Action.IMPORT_QR_CODE_CONFIG ->
-                        scanQRCodeForConfig.launch(Intent(this, ScannerActivity::class.java))
-
-                    Action.READ_CONTENT_FROM_URI ->
-                        chooseFileForCustomConfig.launch(Intent.createChooser(Intent(Intent.ACTION_GET_CONTENT).apply {
-                            type = "*/*"
-                            addCategory(Intent.CATEGORY_OPENABLE)
-                        }, getString(R.string.title_file_chooser)))
-
-                    Action.POST_NOTIFICATIONS -> {}
-                    else -> {}
-                }
-            } else {
-                toast(R.string.toast_permission_denied)
-            }
-            pendingAction = Action.NONE
-        }
-
-    private var pendingAction: Action = Action.NONE
-
-    enum class Action {
-        NONE,
-        IMPORT_QR_CODE_CONFIG,
-        READ_CONTENT_FROM_URI,
-        POST_NOTIFICATIONS
     }
 
     private val chooseFileForCustomConfig = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -148,11 +112,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         setupViewModel()
         mainViewModel.reloadServerList()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                pendingAction = Action.POST_NOTIFICATIONS
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
+        checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {
         }
     }
 
@@ -416,12 +376,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      * import config from qrcode
      */
     private fun importQRcode(): Boolean {
-        val permission = Manifest.permission.CAMERA
-        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+        checkAndRequestPermission(PermissionType.CAMERA) {
             scanQRCodeForConfig.launch(Intent(this, ScannerActivity::class.java))
-        } else {
-            pendingAction = Action.IMPORT_QR_CODE_CONFIG
-            requestPermissionLauncher.launch(permission)
         }
         return true
     }
@@ -475,7 +431,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
      */
     private fun importConfigLocal(): Boolean {
         try {
-            showFileChooser()
+            checkAndRequestPermission(PermissionType.READ_STORAGE) {
+                showFileChooser()
+            }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to import config from local file", e)
             return false
@@ -596,40 +554,19 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         intent.type = "*/*"
         intent.addCategory(Intent.CATEGORY_OPENABLE)
 
-        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Manifest.permission.READ_MEDIA_IMAGES
-        } else {
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        }
-
-        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
-            pendingAction = Action.READ_CONTENT_FROM_URI
-            chooseFileForCustomConfig.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
-        } else {
-            requestPermissionLauncher.launch(permission)
-        }
+        chooseFileForCustomConfig.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
     }
 
     /**
      * read content from uri
      */
     private fun readContentFromUri(uri: Uri) {
-        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Manifest.permission.READ_MEDIA_IMAGES
-        } else {
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        }
-
-        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
-            try {
-                contentResolver.openInputStream(uri).use { input ->
-                    importBatchConfig(input?.bufferedReader()?.readText())
-                }
-            } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to read content from URI", e)
+        try {
+            contentResolver.openInputStream(uri).use { input ->
+                importBatchConfig(input?.bufferedReader()?.readText())
             }
-        } else {
-            requestPermissionLauncher.launch(permission)
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to read content from URI", e)
         }
     }
 

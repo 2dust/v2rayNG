@@ -19,7 +19,9 @@ import com.v2ray.ang.R
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.CustomDividerItemDecoration
 import com.v2ray.ang.util.MyContextWrapper
+import com.v2ray.ang.dto.PermissionType
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.permissionRequester
 
 
 /**
@@ -36,7 +38,7 @@ import com.v2ray.ang.util.Utils
 abstract class BaseActivity : AppCompatActivity() {
     // Progress indicator that sits at the bottom of the toolbar
     private var progressBar: LinearProgressIndicator? = null
-
+    protected val permissionRequester = permissionRequester()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -211,6 +213,20 @@ abstract class BaseActivity : AppCompatActivity() {
      */
     protected fun isLoadingVisible(): Boolean {
         return progressBar?.visibility == View.VISIBLE
+    }
+
+    /**
+     * Check if permission is granted and request it if not.
+     * Convenience method that delegates to permissionRequester.
+     *
+     * @param permissionType The type of permission to check and request
+     * @param onGranted Callback to execute when permission is granted
+     */
+    protected fun checkAndRequestPermission(
+        permissionType: PermissionType,
+        onGranted: () -> Unit
+    ) {
+        permissionRequester.request(permissionType, onGranted)
     }
 
 }

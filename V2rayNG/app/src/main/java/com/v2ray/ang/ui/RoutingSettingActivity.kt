@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -16,13 +15,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityRoutingSettingBinding
-import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.dto.PermissionType
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.RoutingSettingsViewModel
 import kotlinx.coroutines.Dispatchers
@@ -41,16 +40,6 @@ class RoutingSettingActivity : BaseActivity() {
     }
     private val preset_rulesets: Array<out String> by lazy {
         resources.getStringArray(R.array.preset_rulesets)
-    }
-
-    private val requestCameraPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            scanQRcodeForRulesets.launch(Intent(this, ScannerActivity::class.java))
-        } else {
-            toast(R.string.toast_permission_denied)
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,7 +77,7 @@ class RoutingSettingActivity : BaseActivity() {
         R.id.add_rule -> startActivity(Intent(this, RoutingEditActivity::class.java)).let { true }
         R.id.import_predefined_rulesets -> importPredefined().let { true }
         R.id.import_rulesets_from_clipboard -> importFromClipboard().let { true }
-        R.id.import_rulesets_from_qrcode -> requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA).let { true }
+        R.id.import_rulesets_from_qrcode -> importQRcode()
         R.id.export_rulesets_to_clipboard -> export2Clipboard().let { true }
         else -> super.onOptionsItemSelected(item)
     }
@@ -158,6 +147,13 @@ class RoutingSettingActivity : BaseActivity() {
                 //do nothing
             }
             .show()
+    }
+
+    private fun importQRcode(): Boolean {
+        checkAndRequestPermission(PermissionType.CAMERA) {
+            scanQRcodeForRulesets.launch(Intent(this, ScannerActivity::class.java))
+        }
+        return true
     }
 
     private fun export2Clipboard() {

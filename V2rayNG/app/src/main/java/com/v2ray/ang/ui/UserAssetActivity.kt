@@ -1,11 +1,9 @@
 package com.v2ray.ang.ui
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Log
@@ -24,6 +22,7 @@ import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.dto.PermissionType
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.UserAssetViewModel
 import kotlinx.coroutines.Dispatchers
@@ -39,39 +38,6 @@ class UserAssetActivity : BaseActivity() {
     private lateinit var adapter: UserAssetAdapter
 
     val extDir by lazy { File(Utils.userAssetPath(this)) }
-
-    private val requestStoragePermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "*/*"
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-
-            try {
-                chooseFile.launch(
-                    Intent.createChooser(
-                        intent,
-                        getString(R.string.title_file_chooser)
-                    )
-                )
-            } catch (ex: android.content.ActivityNotFoundException) {
-                toast(R.string.toast_require_file_manager)
-            }
-        } else {
-            toast(R.string.toast_permission_denied)
-        }
-    }
-
-    private val requestCameraPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            scanQRCodeForAssetURL.launch(Intent(this, ScannerActivity::class.java))
-        } else {
-            toast(R.string.toast_permission_denied)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,13 +91,28 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun showFileChooser() {
-        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Manifest.permission.READ_MEDIA_IMAGES
-        } else {
-            Manifest.permission.READ_EXTERNAL_STORAGE
+        checkAndRequestPermission(PermissionType.READ_STORAGE) {
+            showFileChooser2()
         }
-        requestStoragePermissionLauncher.launch(permission)
     }
+
+    private fun showFileChooser2() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.type = "*/*"
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+
+        try {
+            chooseFile.launch(
+                Intent.createChooser(
+                    intent,
+                    getString(R.string.title_file_chooser)
+                )
+            )
+        } catch (ex: android.content.ActivityNotFoundException) {
+            toast(R.string.toast_require_file_manager)
+        }
+    }
+
 
     private val chooseFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val uri = result.data?.data
@@ -182,7 +163,9 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun importAssetFromQRcode(): Boolean {
-        requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        checkAndRequestPermission(PermissionType.CAMERA) {
+            scanQRCodeForAssetURL.launch(Intent(this, ScannerActivity::class.java))
+        }
         return true
     }
 

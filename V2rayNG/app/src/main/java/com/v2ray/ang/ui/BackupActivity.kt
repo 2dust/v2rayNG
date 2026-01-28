@@ -1,15 +1,11 @@
 package com.v2ray.ang.ui
 
-import android.Manifest
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.tencent.mmkv.MMKV
@@ -26,6 +22,7 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.WebDavManager
+import com.v2ray.ang.dto.PermissionType
 import com.v2ray.ang.util.ZipUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,19 +37,6 @@ class BackupActivity : BaseActivity() {
     private val config_backup_options: Array<out String> by lazy {
         resources.getStringArray(R.array.config_backup_options)
     }
-
-    private val requestPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                try {
-                    showFileChooser()
-                } catch (e: Exception) {
-                    Log.e(AppConfig.TAG, "Failed to show file chooser", e)
-                }
-            } else {
-                toast(R.string.toast_permission_denied)
-            }
-        }
 
     private val createBackupFile =
         registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
@@ -219,20 +203,8 @@ class BackupActivity : BaseActivity() {
     }
 
     private fun restoreViaLocal() {
-        val permission =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Manifest.permission.READ_MEDIA_IMAGES
-            } else {
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            }
-        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
-            try {
-                showFileChooser()
-            } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to show file chooser", e)
-            }
-        } else {
-            requestPermissionLauncher.launch(permission)
+        checkAndRequestPermission(PermissionType.READ_STORAGE) {
+            showFileChooser()
         }
     }
 

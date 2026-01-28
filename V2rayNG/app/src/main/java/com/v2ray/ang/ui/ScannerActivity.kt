@@ -1,21 +1,18 @@
 package com.v2ray.ang.ui
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityNoneBinding
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.dto.PermissionType
 import com.v2ray.ang.util.QRCodeDecoder
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
@@ -46,17 +43,6 @@ class ScannerActivity : BaseActivity() {
             }
         }
     }
-
-    private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                showFileChooser()
-            } else {
-                toast(R.string.toast_permission_denied)
-            }
-        }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,16 +92,8 @@ class ScannerActivity : BaseActivity() {
         }
 
         R.id.select_photo -> {
-            val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Manifest.permission.READ_MEDIA_IMAGES
-            } else {
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            }
-
-            if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+            checkAndRequestPermission(PermissionType.READ_STORAGE) {
                 showFileChooser()
-            } else {
-                requestPermissionLauncher.launch(permission)
             }
             true
         }
