@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui
 
 import android.app.AlertDialog
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -16,7 +15,6 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityBackupBinding
 import com.v2ray.ang.databinding.DialogWebdavBinding
 import com.v2ray.ang.dto.WebDavConfig
-import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
@@ -156,42 +154,30 @@ class BackupActivity : BaseActivity() {
     }
 
     private fun showFileChooser() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-            type = "*/*"
-            addCategory(Intent.CATEGORY_OPENABLE)
-        }
-
-        try {
-            chooseFile.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
-        } catch (ex: ActivityNotFoundException) {
-            Log.e(AppConfig.TAG, "File chooser activity not found", ex)
-            toast(R.string.toast_require_file_manager)
-        }
-    }
-
-    private val chooseFile =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            val uri = result.data?.data
-            if (result.resultCode == RESULT_OK && uri != null) {
-                try {
-                    val targetFile =
-                        File(this.cacheDir.absolutePath, "${System.currentTimeMillis()}.zip")
-                    contentResolver.openInputStream(uri).use { input ->
-                        targetFile.outputStream().use { fileOut ->
-                            input?.copyTo(fileOut)
-                        }
+        launchFileChooser("*/*") { uri ->
+            if (uri == null) {
+                toastError(R.string.toast_failure)
+                return@launchFileChooser
+            }
+            try {
+                val targetFile =
+                    File(this.cacheDir.absolutePath, "${System.currentTimeMillis()}.zip")
+                contentResolver.openInputStream(uri).use { input ->
+                    targetFile.outputStream().use { fileOut ->
+                        input?.copyTo(fileOut)
                     }
-                    if (restoreConfiguration(targetFile)) {
-                        toastSuccess(R.string.toast_success)
-                    } else {
-                        toastError(R.string.toast_failure)
-                    }
-                } catch (e: Exception) {
-                    Log.e(AppConfig.TAG, "Error during file restore", e)
+                }
+                if (restoreConfiguration(targetFile)) {
+                    toastSuccess(R.string.toast_success)
+                } else {
                     toastError(R.string.toast_failure)
                 }
+            } catch (e: Exception) {
+                Log.e(AppConfig.TAG, "Error during file restore", e)
+                toastError(R.string.toast_failure)
             }
         }
+    }
 
     private fun backupViaLocal() {
         val dateFormatted = SimpleDateFormat(

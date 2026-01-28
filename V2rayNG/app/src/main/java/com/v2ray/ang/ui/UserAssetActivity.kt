@@ -97,26 +97,12 @@ class UserAssetActivity : BaseActivity() {
     }
 
     private fun showFileChooser2() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "*/*"
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        launchFileChooser("*/*") { uri ->
+            if (uri == null) {
+                toastError(R.string.toast_failure)
+                return@launchFileChooser
+            }
 
-        try {
-            chooseFile.launch(
-                Intent.createChooser(
-                    intent,
-                    getString(R.string.title_file_chooser)
-                )
-            )
-        } catch (ex: android.content.ActivityNotFoundException) {
-            toast(R.string.toast_require_file_manager)
-        }
-    }
-
-
-    private val chooseFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val uri = result.data?.data
-        if (result.resultCode == RESULT_OK && uri != null) {
             val assetId = Utils.getUuid()
             runCatching {
                 val assetItem = AssetUrlItem(

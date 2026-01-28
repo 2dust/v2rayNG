@@ -6,13 +6,13 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.result.contract.ActivityResultContracts
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityNoneBinding
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.dto.PermissionType
+import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.util.QRCodeDecoder
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
@@ -23,26 +23,6 @@ class ScannerActivity : BaseActivity() {
     private val binding by lazy {  ActivityNoneBinding.inflate(layoutInflater) }
 
     private val scanQrCode = registerForActivityResult(ScanCustomCode(), ::handleResult)
-    private val chooseFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        val uri = it.data?.data
-        if (it.resultCode == RESULT_OK && uri != null) {
-            try {
-                val inputStream = contentResolver.openInputStream(uri)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                inputStream?.close()
-
-                val text = QRCodeDecoder.syncDecodeQRCode(bitmap)
-                if (text.isNullOrEmpty()) {
-                    toast(R.string.toast_decoding_failed)
-                } else {
-                    finished(text)
-                }
-            } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to decode QR code from file", e)
-                toast(R.string.toast_decoding_failed)
-            }
-        }
-    }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,15 +83,26 @@ class ScannerActivity : BaseActivity() {
     }
 
     private fun showFileChooser() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "image/*"
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        //intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        launchFileChooser("image/*") { uri ->
+            if (uri == null) {
+                toastError(R.string.toast_failure)
+                return@launchFileChooser
+            }
+            try {
+                val inputStream = contentResolver.openInputStream(uri)
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream?.close()
 
-        try {
-            chooseFile.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
-        } catch (ex: android.content.ActivityNotFoundException) {
-            toast(R.string.toast_require_file_manager)
+                val text = QRCodeDecoder.syncDecodeQRCode(bitmap)
+                if (text.isNullOrEmpty()) {
+                    toast(R.string.toast_decoding_failed)
+                } else {
+                    finished(text)
+                }
+            } catch (e: Exception) {
+                Log.e(AppConfig.TAG, "Failed to decode QR code from file", e)
+                toast(R.string.toast_decoding_failed)
+            }
         }
     }
 }

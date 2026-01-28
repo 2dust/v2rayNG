@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -21,6 +22,7 @@ import com.v2ray.ang.helper.CustomDividerItemDecoration
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.dto.PermissionType
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.fileChooserHelper
 import com.v2ray.ang.util.permissionRequester
 
 
@@ -38,7 +40,9 @@ import com.v2ray.ang.util.permissionRequester
 abstract class BaseActivity : AppCompatActivity() {
     // Progress indicator that sits at the bottom of the toolbar
     private var progressBar: LinearProgressIndicator? = null
-    protected val permissionRequester = permissionRequester()
+    private val permissionRequester = permissionRequester()
+    private val fileChooser = fileChooserHelper()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -229,4 +233,17 @@ abstract class BaseActivity : AppCompatActivity() {
         permissionRequester.request(permissionType, onGranted)
     }
 
+    /**
+     * Launch file chooser with ACTION_GET_CONTENT intent.
+     * Convenience method that delegates to fileChooser helper.
+     *
+     * @param mimeType MIME type filter for files
+     * @param onResult Callback invoked with the selected file URI (null if cancelled)
+     */
+    protected fun launchFileChooser(
+        mimeType: String = "*/*",
+        onResult: (Uri?) -> Unit
+    ) {
+        fileChooser.launch(mimeType, onResult)
+    }
 }
