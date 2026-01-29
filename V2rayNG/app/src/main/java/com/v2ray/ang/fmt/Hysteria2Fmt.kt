@@ -9,6 +9,7 @@ import com.v2ray.ang.dto.V2rayConfig.OutboundBean.StreamSettingsBean
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean.StreamSettingsBean.UdpMasksBean.UdpMasksSettingsBean
 import com.v2ray.ang.extension.idnHost
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.V2rayConfigManager
 import com.v2ray.ang.util.Utils
@@ -61,8 +62,8 @@ object Hysteria2Fmt : FmtBase() {
         val dicQuery = HashMap<String, String>()
 
         config.security.let { if (it != null) dicQuery["security"] = it }
-        config.sni.let { if (it.isNotNullEmpty()) dicQuery["sni"] = it.orEmpty() }
-        config.alpn.let { if (it.isNotNullEmpty()) dicQuery["alpn"] = it.orEmpty() }
+        config.sni?.nullIfBlank()?.let { dicQuery["sni"] = it }
+        config.alpn?.nullIfBlank()?.let { dicQuery["alpn"] = it }
         config.insecure.let { dicQuery["insecure"] = if (it == true) "1" else "0" }
 
         if (config.obfsPassword.isNotNullEmpty()) {

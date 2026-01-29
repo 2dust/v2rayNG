@@ -3,7 +3,7 @@ package com.v2ray.ang.fmt
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.NetworkType
 import com.v2ray.ang.dto.ProfileItem
-import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.Utils
@@ -100,16 +100,16 @@ open class FmtBase {
     fun getQueryDic(config: ProfileItem): HashMap<String, String> {
         val dicQuery = HashMap<String, String>()
         dicQuery["security"] = config.security?.ifEmpty { "none" }.orEmpty()
-        config.sni.let { if (it.isNotNullEmpty()) dicQuery["sni"] = it.orEmpty() }
-        config.alpn.let { if (it.isNotNullEmpty()) dicQuery["alpn"] = it.orEmpty() }
-        config.echConfigList.let { if (it.isNotNullEmpty()) dicQuery["ech"] = it.orEmpty() }
-        config.pinnedCA256.let { if (it.isNotNullEmpty()) dicQuery["pcs"] = it.orEmpty() }
-        config.fingerPrint.let { if (it.isNotNullEmpty()) dicQuery["fp"] = it.orEmpty() }
-        config.publicKey.let { if (it.isNotNullEmpty()) dicQuery["pbk"] = it.orEmpty() }
-        config.shortId.let { if (it.isNotNullEmpty()) dicQuery["sid"] = it.orEmpty() }
-        config.spiderX.let { if (it.isNotNullEmpty()) dicQuery["spx"] = it.orEmpty() }
-        config.mldsa65Verify.let { if (it.isNotNullEmpty()) dicQuery["pqv"] = it.orEmpty() }
-        config.flow.let { if (it.isNotNullEmpty()) dicQuery["flow"] = it.orEmpty() }
+        config.sni?.nullIfBlank()?.let { dicQuery["sni"] = it }
+        config.alpn?.nullIfBlank()?.let { dicQuery["alpn"] = it }
+        config.echConfigList?.nullIfBlank()?.let { dicQuery["ech"] = it }
+        config.pinnedCA256?.nullIfBlank()?.let { dicQuery["pcs"] = it }
+        config.fingerPrint?.nullIfBlank()?.let { dicQuery["fp"] = it }
+        config.publicKey?.nullIfBlank()?.let { dicQuery["pbk"] = it }
+        config.shortId?.nullIfBlank()?.let { dicQuery["sid"] = it }
+        config.spiderX?.nullIfBlank()?.let { dicQuery["spx"] = it }
+        config.mldsa65Verify?.nullIfBlank()?.let { dicQuery["pqv"] = it }
+        config.flow?.nullIfBlank()?.let { dicQuery["flow"] = it }
         // Add two keys for compatibility: "insecure" and "allowInsecure"
         if (config.security == AppConfig.TLS) {
             val insecureFlag = if (config.insecure == true) "1" else "0"
@@ -123,42 +123,42 @@ open class FmtBase {
         when (networkType) {
             NetworkType.TCP -> {
                 dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
-                config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
+                config.host?.nullIfBlank()?.let { dicQuery["host"] = it }
             }
 
             NetworkType.KCP -> {
                 dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
-                config.seed.let { if (it.isNotNullEmpty()) dicQuery["seed"] = it.orEmpty() }
+                config.seed?.nullIfBlank()?.let { dicQuery["seed"] = it }
             }
 
             NetworkType.WS, NetworkType.HTTP_UPGRADE -> {
-                config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
-                config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
+                config.host?.nullIfBlank()?.let { dicQuery["host"] = it }
+                config.path?.nullIfBlank()?.let { dicQuery["path"] = it }
             }
 
             NetworkType.XHTTP -> {
-                config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
-                config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
-                config.xhttpMode.let { if (it.isNotNullEmpty()) dicQuery["mode"] = it.orEmpty() }
-                config.xhttpExtra.let { if (it.isNotNullEmpty()) dicQuery["extra"] = it.orEmpty() }
+                config.host?.nullIfBlank()?.let { dicQuery["host"] = it }
+                config.path?.nullIfBlank()?.let { dicQuery["path"] = it }
+                config.xhttpMode?.nullIfBlank()?.let { dicQuery["mode"] = it }
+                config.xhttpExtra?.nullIfBlank()?.let { dicQuery["extra"] = it }
             }
 
             NetworkType.HTTP, NetworkType.H2 -> {
                 dicQuery["type"] = "http"
-                config.host.let { if (it.isNotNullEmpty()) dicQuery["host"] = it.orEmpty() }
-                config.path.let { if (it.isNotNullEmpty()) dicQuery["path"] = it.orEmpty() }
+                config.host?.nullIfBlank()?.let { dicQuery["host"] = it }
+                config.path?.nullIfBlank()?.let { dicQuery["path"] = it }
             }
 
 //            NetworkType.QUIC -> {
 //                dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
-//                config.quicSecurity.let { if (it.isNotNullEmpty()) dicQuery["quicSecurity"] = it.orEmpty() }
-//                config.quicKey.let { if (it.isNotNullEmpty()) dicQuery["key"] = it.orEmpty() }
+//                config.quicSecurity?.nullIfBlank()?.let { dicQuery["quicSecurity"] = it }
+//                config.quicKey?.nullIfBlank()?.let { dicQuery["key"] = it }
 //            }
 
             NetworkType.GRPC -> {
-                config.mode.let { if (it.isNotNullEmpty()) dicQuery["mode"] = it.orEmpty() }
-                config.authority.let { if (it.isNotNullEmpty()) dicQuery["authority"] = it.orEmpty() }
-                config.serviceName.let { if (it.isNotNullEmpty()) dicQuery["serviceName"] = it.orEmpty() }
+                config.mode?.nullIfBlank()?.let { dicQuery["mode"] = it }
+                config.authority?.nullIfBlank()?.let { dicQuery["authority"] = it }
+                config.serviceName?.nullIfBlank()?.let { dicQuery["serviceName"] = it }
             }
 
             else -> {}

@@ -6,6 +6,7 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.extension.idnHost
+import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.extension.removeWhiteSpace
 import com.v2ray.ang.handler.V2rayConfigManager
 import com.v2ray.ang.util.Utils
@@ -32,7 +33,7 @@ object WireguardFmt : FmtBase() {
         config.secretKey = uri.userInfo.orEmpty()
         config.localAddress = queryParam["address"] ?: WIREGUARD_LOCAL_ADDRESS_V4
         config.publicKey = queryParam["publickey"].orEmpty()
-        config.preSharedKey = queryParam["presharedkey"]?.takeIf { it.isNotEmpty() }
+        config.preSharedKey = queryParam["presharedkey"]?.nullIfBlank()
         config.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
         config.reserved = queryParam["reserved"] ?: "0,0,0"
 
@@ -84,7 +85,7 @@ object WireguardFmt : FmtBase() {
         config.localAddress = interfaceParams["address"] ?: WIREGUARD_LOCAL_ADDRESS_V4
         config.mtu = Utils.parseInt(interfaceParams["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
         config.publicKey = peerParams["publickey"].orEmpty()
-        config.preSharedKey = peerParams["presharedkey"]?.takeIf { it.isNotEmpty() }
+        config.preSharedKey = peerParams["presharedkey"]?.nullIfBlank()
         val endpoint = peerParams["endpoint"].orEmpty()
         val endpointParts = endpoint.split(":", limit = 2)
         if (endpointParts.size == 2) {
@@ -113,7 +114,7 @@ object WireguardFmt : FmtBase() {
             wireguard.address = (profileItem.localAddress ?: WIREGUARD_LOCAL_ADDRESS_V4).split(",")
             wireguard.peers?.firstOrNull()?.let { peer ->
                 peer.publicKey = profileItem.publicKey.orEmpty()
-                peer.preSharedKey = profileItem.preSharedKey?.takeIf { it.isNotEmpty() }
+                peer.preSharedKey = profileItem.preSharedKey?.nullIfBlank()
                 peer.endpoint = Utils.getIpv6Address(profileItem.server) + ":${profileItem.serverPort}"
             }
             wireguard.mtu = profileItem.mtu
