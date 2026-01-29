@@ -78,7 +78,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
     }
 
     override fun onRevoke() {
-        stopV2Ray()
+        stopAllService()
     }
 
 //    override fun onLowMemory() {
@@ -107,11 +107,15 @@ class V2RayVpnService : VpnService(), ServiceControl {
             Log.e(AppConfig.TAG, "Failed to create VPN interface")
             return
         }
-        V2RayServiceManager.startCoreLoop(mInterface)
+        if (!V2RayServiceManager.startCoreLoop(mInterface)) {
+            Log.e(AppConfig.TAG, "Failed to start V2Ray core loop")
+            stopAllService()
+            return
+        }
     }
 
     override fun stopService() {
-        stopV2Ray(true)
+        stopAllService(true)
     }
 
     override fun vpnProtect(socket: Int): Boolean {
@@ -132,10 +136,14 @@ class V2RayVpnService : VpnService(), ServiceControl {
     private fun setupVpnService() {
         val prepare = prepare(this)
         if (prepare != null) {
+            Log.e(AppConfig.TAG, "VPN preparation failed")
+            stopSelf()
             return
         }
 
         if (configureVpnService() != true) {
+            Log.e(AppConfig.TAG, "VPN configuration failed")
+            stopSelf()
             return
         }
 
@@ -172,7 +180,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             return true
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to establish VPN interface", e)
-            stopV2Ray()
+            stopAllService()
         }
         return false
     }
@@ -313,11 +321,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         tun2SocksService?.startTun2Socks()
     }
 
-    /**
-     * Stops the V2Ray service.
-     * @param isForced Whether to force stop the service.
-     */
-    private fun stopV2Ray(isForced: Boolean = true) {
+    private fun stopAllService(isForced: Boolean = true) {
 //        val configName = defaultDPreference.getPrefString(PREF_CURR_CONFIG_GUID, "")
 //        val emptyInfo = VpnNetworkInfo()
 //        val info = loadVpnNetworkInfo(configName, emptyInfo)!! + (lastNetworkInfo ?: emptyInfo)

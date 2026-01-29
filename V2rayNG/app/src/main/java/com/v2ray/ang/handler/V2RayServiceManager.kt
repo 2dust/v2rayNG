@@ -151,6 +151,7 @@ object V2RayServiceManager {
         }
 
         try {
+            NotificationManager.showNotification(currentConfig)
             coreController.startLoop(result.content, tunFd)
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to start Core loop", e)
@@ -165,7 +166,7 @@ object V2RayServiceManager {
 
         try {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
-            NotificationManager.showNotification(currentConfig)
+            //NotificationManager.showNotification(currentConfig)
             NotificationManager.startSpeedNotification(currentConfig)
 
         } catch (e: Exception) {
