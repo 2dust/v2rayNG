@@ -1,4 +1,4 @@
-package com.v2ray.ang.dto
+package com.v2ray.ang.enums
 
 /**
  * VPN interface address configuration enum class

@@ -11,13 +11,13 @@ import com.v2ray.ang.AppConfig.GEOIP_PRIVATE
 import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.VPN
-import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.Language
+import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.enums.Language
 import com.v2ray.ang.dto.ProfileItem
-import com.v2ray.ang.dto.RoutingType
+import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.V2rayConfig
-import com.v2ray.ang.dto.VpnInterfaceAddressConfig
+import com.v2ray.ang.enums.VpnInterfaceAddressConfig
 import com.v2ray.ang.handler.MmkvManager.decodeServerConfig
 import com.v2ray.ang.handler.MmkvManager.decodeServerList
 import com.v2ray.ang.util.JsonUtil

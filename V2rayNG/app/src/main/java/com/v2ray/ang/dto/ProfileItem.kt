@@ -5,6 +5,7 @@ import com.v2ray.ang.AppConfig.PORT_SOCKS
 import com.v2ray.ang.AppConfig.TAG_BLOCKED
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.TAG_PROXY
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.util.Utils
 
 data class ProfileItem(

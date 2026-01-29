@@ -1,4 +1,4 @@
-package com.v2ray.ang.dto
+package com.v2ray.ang.enums
 
 import android.Manifest
 import android.os.Build

@@ -2,7 +2,7 @@ package com.v2ray.ang.ui
 
 import android.net.Uri
 import android.os.Bundle
-import com.v2ray.ang.dto.PermissionType
+import com.v2ray.ang.enums.PermissionType
 import com.v2ray.ang.helper.FileChooserHelper
 import com.v2ray.ang.helper.PermissionHelper
 import com.v2ray.ang.helper.QRCodeScannerHelper

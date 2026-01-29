@@ -2,7 +2,7 @@ package com.v2ray.ang.fmt
 
 import android.util.Base64
 import android.util.Log
-import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import org.junit.After
 import org.junit.Assert.assertEquals
