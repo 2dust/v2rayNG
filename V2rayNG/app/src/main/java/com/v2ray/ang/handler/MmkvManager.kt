@@ -3,6 +3,7 @@ package com.v2ray.ang.handler
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
+import com.v2ray.ang.dto.AssetUrlCache
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
@@ -398,16 +399,16 @@ object MmkvManager {
      *
      * @return The list of asset URLs.
      */
-    fun decodeAssetUrls(): List<Pair<String, AssetUrlItem>> {
-        val assetUrlItems = mutableListOf<Pair<String, AssetUrlItem>>()
+    fun decodeAssetUrls(): List<AssetUrlCache> {
+        val assetUrlItems = mutableListOf<AssetUrlCache>()
         assetStorage.allKeys()?.forEach { key ->
             val json = assetStorage.decodeString(key)
             if (!json.isNullOrBlank()) {
                 val item = JsonUtil.fromJson(json, AssetUrlItem::class.java)?: AssetUrlItem()
-                assetUrlItems.add(Pair(key, item))
+                assetUrlItems.add(AssetUrlCache(key, item))
             }
         }
-        return assetUrlItems.sortedBy { (_, value) -> value.addedTime }
+        return assetUrlItems.sortedBy { it.assetUrl.addedTime }
     }
 
     /**

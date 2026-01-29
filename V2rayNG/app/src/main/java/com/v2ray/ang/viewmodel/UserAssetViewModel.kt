@@ -3,6 +3,7 @@ package com.v2ray.ang.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.dto.AssetUrlCache
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.extension.concatUrl
 import com.v2ray.ang.handler.MmkvManager
@@ -13,15 +14,15 @@ import java.io.FileOutputStream
 import java.net.HttpURLConnection
 
 class UserAssetViewModel : ViewModel() {
-    private val assets = mutableListOf<Pair<String, AssetUrlItem>>()
+    private val assets = mutableListOf<AssetUrlCache>()
     private val builtInGeoFiles = listOf("geosite.dat", "geoip.dat")
 
     val itemCount: Int
         get() = assets.size
 
-    fun getAssets(): List<Pair<String, AssetUrlItem>> = assets.toList()
+    fun getAssets(): List<AssetUrlCache> = assets.toList()
 
-    fun getAsset(position: Int): Pair<String, AssetUrlItem>? = assets.getOrNull(position)
+    fun getAsset(position: Int): AssetUrlCache? = assets.getOrNull(position)
 
     fun reload(geoFilesSource: String) {
         val decoded = MmkvManager.decodeAssetUrls()
@@ -30,17 +31,20 @@ class UserAssetViewModel : ViewModel() {
     }
 
     private fun buildAssetList(
-        decodedAssets: List<Pair<String, AssetUrlItem>>?,
+        decodedAssets: List<AssetUrlCache>?,
         geoFilesSource: String
-    ): List<Pair<String, AssetUrlItem>> {
+    ): List<AssetUrlCache> {
         val savedAssets = decodedAssets ?: emptyList()
         val builtInItems = builtInGeoFiles
-            .filter { geoFile -> savedAssets.none { it.second.remarks == geoFile } }
+            .filter { geoFile -> savedAssets.none { it.assetUrl.remarks == geoFile } }
             .map {
-                Utils.getUuid() to AssetUrlItem(
-                    it,
-                    String.format(AppConfig.GITHUB_DOWNLOAD_URL, geoFilesSource).concatUrl(it),
-                    locked = true
+                AssetUrlCache(
+                    Utils.getUuid(),
+                    AssetUrlItem(
+                        it,
+                        String.format(AppConfig.GITHUB_DOWNLOAD_URL, geoFilesSource).concatUrl(it),
+                        locked = true
+                    )
                 )
             }
         return builtInItems + savedAssets
@@ -51,7 +55,8 @@ class UserAssetViewModel : ViewModel() {
         var successCount = 0
         val failures = mutableListOf<String>()
 
-        snapshot.forEach { (_, item) ->
+        snapshot.forEach { cache ->
+            val item = cache.assetUrl
             val portsToTry = if (httpPort == 0) listOf(0) else listOf(httpPort, 0)
             if (portsToTry.any { tryDownload(item, extDir, it) }) {
                 successCount++

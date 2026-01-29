@@ -102,7 +102,7 @@ class UserAssetActivity : HelperBaseActivity() {
                 )
 
                 val assetList = MmkvManager.decodeAssetUrls()
-                if (assetList.any { it.second.remarks == assetItem.remarks && it.first != assetId }) {
+                if (assetList.any { it.assetUrl.remarks == assetItem.remarks && it.guid != assetId }) {
                     toast(R.string.msg_remark_is_duplicate)
                 } else {
                     MmkvManager.encodeAsset(assetId, assetItem)
@@ -211,10 +211,10 @@ class UserAssetActivity : HelperBaseActivity() {
         }
 
         override fun onRemove(guid: String, position: Int) {
-            val asset = viewModel.getAsset(position)?.takeIf { it.first == guid }
-                ?: viewModel.getAssets().find { it.first == guid }
+            val asset = viewModel.getAsset(position)?.takeIf { it.guid == guid }
+                ?: viewModel.getAssets().find { it.guid == guid }
                 ?: return
-            val file = extDir.listFiles()?.find { it.name == asset.second.remarks }
+            val file = extDir.listFiles()?.find { it.name == asset.assetUrl.remarks }
 
             AlertDialog.Builder(ownerActivity).setMessage(R.string.del_config_comfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->

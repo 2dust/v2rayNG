@@ -34,9 +34,9 @@ class UserAssetAdapter(
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: UserAssetViewHolder, position: Int) {
         val item = viewModel.getAsset(position) ?: return
-        val file = extDir.listFiles()?.find { it.name == item.second.remarks }
+        val file = extDir.listFiles()?.find { it.name == item.assetUrl.remarks }
 
-        holder.itemUserAssetBinding.assetName.text = item.second.remarks
+        holder.itemUserAssetBinding.assetName.text = item.assetUrl.remarks
 
         if (file != null) {
             val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
@@ -47,10 +47,10 @@ class UserAssetAdapter(
                 holder.itemUserAssetBinding.root.context.getString(R.string.msg_file_not_found)
         }
 
-        if (item.second.locked == true) {
+        if (item.assetUrl.locked == true) {
             holder.itemUserAssetBinding.layoutEdit.visibility = View.GONE
         } else {
-            holder.itemUserAssetBinding.layoutEdit.visibility = if (item.second.url == "file") {
+            holder.itemUserAssetBinding.layoutEdit.visibility = if (item.assetUrl.url == "file") {
                 View.GONE
             } else {
                 View.VISIBLE
@@ -58,10 +58,10 @@ class UserAssetAdapter(
         }
 
         holder.itemUserAssetBinding.layoutEdit.setOnClickListener {
-            adapterListener?.onEdit(item.first, position)
+            adapterListener?.onEdit(item.guid, position)
         }
         holder.itemUserAssetBinding.layoutRemove.setOnClickListener {
-            adapterListener?.onRemove(item.first, position)
+            adapterListener?.onRemove(item.guid, position)
         }
     }
 

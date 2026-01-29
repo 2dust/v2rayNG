@@ -93,7 +93,7 @@ class UserAssetUrlActivity : BaseActivity() {
 
         // check remarks unique
         val assetList = MmkvManager.decodeAssetUrls()
-        if (assetList.any { it.second.remarks == assetItem.remarks && it.first != assetId }) {
+        if (assetList.any { it.assetUrl.remarks == assetItem.remarks && it.guid != assetId }) {
             toast(R.string.msg_remark_is_duplicate)
             return false
         }
