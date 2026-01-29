@@ -222,4 +222,18 @@
         <item>full</item>
     </string-array>
 
+    <!-- Auto test interval entries -->
+    <string-array name="auto_test_interval_entries">
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>2 hours</item>
+        <item>4 hours</item>
+    </string-array>
+    <string-array name="auto_test_interval_values" translatable="false">
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>240</item>
+    </string-array>
+
 </resources>

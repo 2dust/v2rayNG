@@ -55,6 +55,11 @@ object SubscriptionUpdater {
                 Log.i(AppConfig.TAG, "subscription automatic update: ---${subItem.remarks}")
                 AngConfigManager.updateConfigViaSub(Pair(sub.first, subItem))
                 notification.setContentText("Updating ${subItem.remarks}")
+
+                // Trigger immediate server test after subscription update if enabled
+                if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SERVER_TEST_ENABLED)) {
+                    BackgroundServerTester.triggerImmediateTest(applicationContext, sub.first)
+                }
             }
             notificationManager.cancel(3)
             return Result.success()

@@ -200,13 +200,16 @@ object MmkvManager {
      *
      * @param guid The server GUID.
      * @param testResult The test delay in milliseconds.
+     * @param testSource The source of the test (manual, background, post-sub).
      */
-    fun encodeServerTestDelayMillis(guid: String, testResult: Long) {
+    fun encodeServerTestDelayMillis(guid: String, testResult: Long, testSource: String = "manual") {
         if (guid.isBlank()) {
             return
         }
         val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
         aff.testDelayMillis = testResult
+        aff.lastTestTime = System.currentTimeMillis()
+        aff.testSource = testSource
         serverAffStorage.encode(guid, JsonUtil.toJson(aff))
     }
 
@@ -264,6 +267,39 @@ object MmkvManager {
             }
         }
         return count
+    }
+
+    /**
+     * Gets server GUIDs by subscription ID.
+     *
+     * @param subscriptionId The subscription ID (empty string for all servers).
+     * @return The list of server GUIDs.
+     */
+    fun getServersBySubscriptionId(subscriptionId: String): List<String> {
+        val serverList = decodeServerList()
+        if (subscriptionId.isEmpty()) {
+            return serverList
+        }
+        return serverList.filter { guid ->
+            decodeServerConfig(guid)?.subscriptionId == subscriptionId
+        }
+    }
+
+    /**
+     * Finds the best server (lowest positive delay) from a list of GUIDs.
+     *
+     * @param guids The list of server GUIDs to evaluate.
+     * @return The GUID of the best server, or null if none found.
+     */
+    fun findBestServer(guids: List<String>): String? {
+        return guids
+            .mapNotNull { guid ->
+                decodeServerAffiliationInfo(guid)?.let { aff ->
+                    if (aff.testDelayMillis > 0) guid to aff.testDelayMillis else null
+                }
+            }
+            .minByOrNull { it.second }
+            ?.first
     }
 
     /**

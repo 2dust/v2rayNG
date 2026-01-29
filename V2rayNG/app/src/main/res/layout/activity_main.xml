@@ -95,6 +95,22 @@
                     android:layout_gravity="bottom|end"
                     android:layout_marginEnd="@dimen/padding_spacing_dp16">
 
+                    <!-- Smart Connect Mini FAB -->
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/fab_smart_connect"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginBottom="@dimen/view_height_dp100"
+                        android:clickable="true"
+                        android:contentDescription="@string/smart_connect"
+                        android:focusable="true"
+                        android:src="@drawable/ic_auto_awesome_24dp"
+                        app:backgroundTint="@color/color_fab_smart"
+                        app:fabSize="mini"
+                        app:tint="@color/colorWhite" />
+
+                    <!-- Main Connect FAB -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/fab"
                         android:layout_width="wrap_content"

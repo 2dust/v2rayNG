@@ -14,6 +14,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toLongEx
+import com.v2ray.ang.handler.BackgroundServerTester
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.MmkvPreferenceDataStore
 import com.v2ray.ang.handler.SubscriptionUpdater
@@ -51,6 +52,10 @@ class SettingsActivity : BaseActivity() {
         private val autoUpdateCheck by lazy { findPreference<CheckBoxPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE) }
         private val autoUpdateInterval by lazy { findPreference<EditTextPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL) }
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
+
+        private val autoTestCheck by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_AUTO_SERVER_TEST_ENABLED) }
+        private val autoTestInterval by lazy { findPreference<ListPreference>(AppConfig.PREF_AUTO_SERVER_TEST_INTERVAL) }
+        private val autoSwitchCheck by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_AUTO_SERVER_SWITCH_ENABLED) }
 
         private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
         private val hevTunRwTimeout by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) }
@@ -112,6 +117,36 @@ class SettingsActivity : BaseActivity() {
                 updateHevTunSettings(newValue as Boolean)
                 true
             }
+
+            autoTestCheck?.setOnPreferenceChangeListener { _, newValue ->
+                val enabled = newValue as Boolean
+                autoTestInterval?.isEnabled = enabled
+                autoSwitchCheck?.isEnabled = enabled
+
+                if (enabled) {
+                    val interval = MmkvManager.decodeSettingsString(
+                        AppConfig.PREF_AUTO_SERVER_TEST_INTERVAL,
+                        AppConfig.DEFAULT_AUTO_TEST_INTERVAL
+                    )?.toLongOrNull() ?: 60L
+                    configureAutoTestTask(interval)
+                } else {
+                    cancelAutoTestTask()
+                }
+                true
+            }
+
+            autoTestInterval?.setOnPreferenceChangeListener { pref, newValue ->
+                val valueStr = newValue.toString()
+                (pref as? ListPreference)?.let { lp ->
+                    val idx = lp.findIndexOfValue(valueStr)
+                    lp.summary = if (idx >= 0) lp.entries[idx] else valueStr
+                }
+
+                if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SERVER_TEST_ENABLED, false)) {
+                    configureAutoTestTask(valueStr.toLongOrNull() ?: 60L)
+                }
+                true
+            }
         }
 
         private fun initPreferenceSummaries() {
@@ -167,6 +202,11 @@ class SettingsActivity : BaseActivity() {
 
             // Initialize auto-update interval state
             autoUpdateInterval?.isEnabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
+
+            // Initialize auto-test settings state
+            val autoTestEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SERVER_TEST_ENABLED, false)
+            autoTestInterval?.isEnabled = autoTestEnabled
+            autoSwitchCheck?.isEnabled = autoTestEnabled
         }
 
         private fun updateMode(value: String?) {
@@ -224,6 +264,14 @@ class SettingsActivity : BaseActivity() {
         private fun cancelUpdateTask() {
             val rw = RemoteWorkManager.getInstance(AngApplication.application)
             rw.cancelUniqueWork(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
+        }
+
+        private fun configureAutoTestTask(intervalMinutes: Long) {
+            BackgroundServerTester.schedulePeriodicTest(requireContext(), intervalMinutes)
+        }
+
+        private fun cancelAutoTestTask() {
+            BackgroundServerTester.cancelPeriodicTest(requireContext())
         }
 
         private fun updateMux(enabled: Boolean) {

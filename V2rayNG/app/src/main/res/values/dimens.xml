@@ -7,5 +7,6 @@
     <dimen name="view_height_dp36">36dp</dimen>
     <dimen name="view_height_dp48">48dp</dimen>
     <dimen name="view_height_dp64">64dp</dimen>
+    <dimen name="view_height_dp100">100dp</dimen>
     <dimen name="view_height_dp160">160dp</dimen>
 </resources>

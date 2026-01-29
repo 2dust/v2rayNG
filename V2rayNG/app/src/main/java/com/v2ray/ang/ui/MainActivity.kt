@@ -28,6 +28,7 @@ import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.handler.BackgroundServerTester
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
@@ -94,6 +95,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         })
 
         binding.fab.setOnClickListener { handleFabAction() }
+        binding.fabSmartConnect.setOnClickListener { handleSmartConnect() }
         binding.layoutTest.setOnClickListener { handleLayoutTestClick() }
 
         setupGroupTab()
@@ -136,7 +138,48 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         if (mainViewModel.isRunning.value == true) {
             V2RayServiceManager.stopVService(this)
-        } else if (SettingsManager.isVpnMode()) {
+        } else {
+            startV2RayWithPermissionCheck()
+        }
+    }
+
+    private fun handleLayoutTestClick() {
+        if (mainViewModel.isRunning.value == true) {
+            setTestState(getString(R.string.connection_test_testing))
+            mainViewModel.testCurrentServerRealPing()
+        }
+    }
+
+    private fun handleSmartConnect() {
+        binding.fabSmartConnect.isEnabled = false
+        setTestState(getString(R.string.smart_connect_testing))
+
+        lifecycleScope.launch {
+            val bestServer = withContext(Dispatchers.IO) {
+                BackgroundServerTester.testAndFindBest(this@MainActivity, mainViewModel.subscriptionId)
+            }
+
+            if (bestServer != null) {
+                MmkvManager.setSelectServer(bestServer.guid)
+                mainViewModel.reloadServerList()
+
+                if (mainViewModel.isRunning.value == true) {
+                    restartV2Ray()
+                } else {
+                    startV2RayWithPermissionCheck()
+                }
+
+                toast(getString(R.string.smart_connect_success, bestServer.remarks, bestServer.delay))
+            } else {
+                toastError(R.string.smart_connect_no_servers)
+            }
+
+            binding.fabSmartConnect.isEnabled = true
+        }
+    }
+
+    private fun startV2RayWithPermissionCheck() {
+        if (SettingsManager.isVpnMode()) {
             val intent = VpnService.prepare(this)
             if (intent == null) {
                 startV2Ray()
@@ -145,15 +188,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
         } else {
             startV2Ray()
-        }
-    }
-
-    private fun handleLayoutTestClick() {
-        if (mainViewModel.isRunning.value == true) {
-            setTestState(getString(R.string.connection_test_testing))
-            mainViewModel.testCurrentServerRealPing()
-        } else {
-            // service not running: keep existing no-op (could show a message if desired)
         }
     }
 

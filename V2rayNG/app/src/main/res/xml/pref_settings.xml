@@ -254,6 +254,27 @@
             android:title="@string/title_pref_auto_update_interval" />
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="@string/title_auto_server_test"
+        app:initialExpandedChildrenCount="0">
+        <CheckBoxPreference
+            android:key="pref_auto_server_test_enabled"
+            android:summary="@string/summary_pref_auto_server_test"
+            android:title="@string/title_pref_auto_server_test" />
+        <ListPreference
+            android:defaultValue="60"
+            android:entries="@array/auto_test_interval_entries"
+            android:entryValues="@array/auto_test_interval_values"
+            android:key="pref_auto_server_test_interval"
+            android:summary="%s"
+            android:title="@string/title_pref_auto_test_interval" />
+        <CheckBoxPreference
+            android:key="pref_auto_server_switch_enabled"
+            android:defaultValue="true"
+            android:summary="@string/summary_pref_auto_switch"
+            android:title="@string/title_pref_auto_switch" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/title_advanced">
 
         <CheckBoxPreference

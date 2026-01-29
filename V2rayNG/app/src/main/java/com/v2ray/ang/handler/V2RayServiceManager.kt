@@ -73,6 +73,21 @@ object V2RayServiceManager {
     }
 
     /**
+     * Switches to a different server while VPN is running.
+     * @param context The context from which the server is switched.
+     * @param newGuid The GUID of the new server to switch to.
+     * @return True if the switch was initiated, false otherwise.
+     */
+    fun switchServer(context: Context, newGuid: String): Boolean {
+        if (!isRunning()) return false
+        if (MmkvManager.getSelectServer() == newGuid) return false
+
+        MmkvManager.setSelectServer(newGuid)
+        MessageUtil.sendMsg2Service(context, AppConfig.MSG_STATE_RESTART, "")
+        return true
+    }
+
+    /**
      * Checks if the V2Ray service is running.
      * @return True if the service is running, false otherwise.
      */

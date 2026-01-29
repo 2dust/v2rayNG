@@ -6,6 +6,7 @@
     <color name="colorWhite">#FFFFFF</color>
     <color name="color_fab_active">#f97910</color>
     <color name="color_fab_inactive">#9C9C9C</color>
+    <color name="color_fab_smart">#FF9800</color>
     <color name="divider_color_light">#E0E0E0</color>
     <color name="colorIndicator">@color/md_theme_primary</color>
 

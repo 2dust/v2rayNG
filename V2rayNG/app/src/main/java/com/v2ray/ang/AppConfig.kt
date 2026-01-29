@@ -44,6 +44,13 @@ object AppConfig {
     const val SUBSCRIPTION_AUTO_UPDATE_INTERVAL = "pref_auto_update_interval"
     const val SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL = "1440" // Default is 24 hours
     const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
+
+    /** Auto server testing preferences. */
+    const val PREF_AUTO_SERVER_TEST_ENABLED = "pref_auto_server_test_enabled"
+    const val PREF_AUTO_SERVER_TEST_INTERVAL = "pref_auto_server_test_interval"
+    const val PREF_AUTO_SERVER_SWITCH_ENABLED = "pref_auto_server_switch_enabled"
+    const val AUTO_SERVER_TEST_TASK_NAME = "auto_server_tester"
+    const val DEFAULT_AUTO_TEST_INTERVAL = "60"
     const val PREF_SPEED_ENABLED = "pref_speed_enabled"
     const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
     const val PREF_START_SCAN_IMMEDIATE = "pref_start_scan_immediate"
@@ -161,6 +168,8 @@ object AppConfig {
     const val RAY_NG_CHANNEL_NAME = "v2rayNG Background Service"
     const val SUBSCRIPTION_UPDATE_CHANNEL = "subscription_update_channel"
     const val SUBSCRIPTION_UPDATE_CHANNEL_NAME = "Subscription Update Service"
+    const val AUTO_SWITCH_CHANNEL = "auto_switch_channel"
+    const val AUTO_SWITCH_CHANNEL_NAME = "Auto Server Switch"
 
     /** Protocols Scheme **/
     const val VMESS = "vmess://"

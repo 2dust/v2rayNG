@@ -254,6 +254,21 @@
     <string name="summary_pref_auto_update_subscription">Update your subscriptions automatically at set intervals in the background. Depending on the device, this feature may not always work</string>
     <string name="title_pref_auto_update_interval">Auto Update Interval (Minutes, Min value 15)</string>
 
+    <!-- Auto Server Testing Settings -->
+    <string name="title_auto_server_test">Automatic Server Testing</string>
+    <string name="title_pref_auto_server_test">Enable background testing</string>
+    <string name="summary_pref_auto_server_test">Periodically test servers in current subscription</string>
+    <string name="title_pref_auto_test_interval">Test interval</string>
+    <string name="title_pref_auto_switch">Auto-switch to best server</string>
+    <string name="summary_pref_auto_switch">Automatically switch when VPN is running</string>
+    <string name="notification_server_switched">Switched to %1$s (%2$dms)</string>
+
+    <!-- Smart Connect Button -->
+    <string name="smart_connect">Smart Connect</string>
+    <string name="smart_connect_testing">Finding best server…</string>
+    <string name="smart_connect_success">Connected to %1$s (%2$dms)</string>
+    <string name="smart_connect_no_servers">No working servers found</string>
+
     <string name="title_core_loglevel">Log Level</string>
     <string name="title_outbound_domain_resolve_method">Outbound domain pre-resolve method</string>
     <string name="title_mode">Mode</string>
