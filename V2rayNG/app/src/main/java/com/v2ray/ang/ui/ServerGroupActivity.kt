@@ -119,13 +119,13 @@ class ServerGroupActivity : BaseActivity() {
         val displayList = mutableListOf(getString(R.string.filter_config_all)) //none
         subIds.clear()
         subIds.add("") // index 0 => All
-        subs.forEach { (id, item) ->
+        subs.forEach { sub ->
             val name = when {
-                item.remarks.isNotBlank() -> item.remarks
-                else -> id
+                sub.subscription.remarks.isNotBlank() -> sub.subscription.remarks
+                else -> sub.guid
             }
             displayList.add(name)
-            subIds.add(id)
+            subIds.add(sub.guid)
         }
         val subAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, displayList)
         subAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)

@@ -36,10 +36,10 @@ object SubscriptionUpdater {
         override suspend fun doWork(): Result {
             Log.i(AppConfig.TAG, "subscription automatic update starting")
 
-            val subs = MmkvManager.decodeSubscriptions().filter { it.second.autoUpdate }
+            val subs = MmkvManager.decodeSubscriptions().filter { it.subscription.autoUpdate }
 
             for (sub in subs) {
-                val subItem = sub.second
+                val subItem = sub.subscription
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     notification.setChannelId(AppConfig.SUBSCRIPTION_UPDATE_CHANNEL)
@@ -53,7 +53,7 @@ object SubscriptionUpdater {
                 }
                 notificationManager.notify(3, notification.build())
                 Log.i(AppConfig.TAG, "subscription automatic update: ---${subItem.remarks}")
-                AngConfigManager.updateConfigViaSub(Pair(sub.first, subItem))
+                AngConfigManager.updateConfigViaSub(sub)
                 notification.setContentText("Updating ${subItem.remarks}")
             }
             notificationManager.cancel(3)

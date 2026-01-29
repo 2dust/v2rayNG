@@ -7,6 +7,7 @@ import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerAffiliationInfo
+import com.v2ray.ang.dto.SubscriptionCache
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.dto.WebDavConfig
 import com.v2ray.ang.util.JsonUtil
@@ -309,15 +310,15 @@ object MmkvManager {
      *
      * @return The list of subscriptions.
      */
-    fun decodeSubscriptions(): List<Pair<String, SubscriptionItem>> {
+    fun decodeSubscriptions(): List<SubscriptionCache> {
         initSubsList()
 
-        val subscriptions = mutableListOf<Pair<String, SubscriptionItem>>()
+        val subscriptions = mutableListOf<SubscriptionCache>()
         decodeSubsList().forEach { key ->
             val json = subStorage.decodeString(key)
             if (!json.isNullOrBlank()) {
                 val item = JsonUtil.fromJson(json, SubscriptionItem::class.java)?: SubscriptionItem()
-                subscriptions.add(Pair(key, item))
+                subscriptions.add(SubscriptionCache(key, item))
             }
         }
         return subscriptions

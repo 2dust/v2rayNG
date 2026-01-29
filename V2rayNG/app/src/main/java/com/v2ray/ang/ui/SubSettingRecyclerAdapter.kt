@@ -21,8 +21,8 @@ class SubSettingRecyclerAdapter(
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
         val subscriptions = viewModel.getAll()
-        val subId = subscriptions[position].first
-        val subItem = subscriptions[position].second
+        val subId = subscriptions[position].guid
+        val subItem = subscriptions[position].subscription
         holder.itemSubSettingBinding.tvName.text = subItem.remarks
         holder.itemSubSettingBinding.tvUrl.text = subItem.url
         holder.itemSubSettingBinding.chkEnable.isChecked = subItem.enabled

@@ -17,6 +17,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.ServersCache
+import com.v2ray.ang.dto.SubscriptionCache
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -179,7 +180,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return AngConfigManager.updateConfigViaSubAll()
         } else {
             val subItem = MmkvManager.decodeSubscription(subscriptionId) ?: return 0
-            return AngConfigManager.updateConfigViaSub(Pair(subscriptionId, subItem))
+            return AngConfigManager.updateConfigViaSub(SubscriptionCache(subscriptionId, subItem))
         }
     }
 
@@ -273,7 +274,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun getSubscriptions(context: Context): List<GroupMapItem> {
         val subscriptions = MmkvManager.decodeSubscriptions()
         if (subscriptionId.isNotEmpty()
-            && !subscriptions.map { it.first }.contains(subscriptionId)
+            && !subscriptions.map { it.guid }.contains(subscriptionId)
         ) {
             subscriptionIdChanged("")
         }
@@ -285,8 +286,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 remarks = context.getString(R.string.filter_config_all)
             )
         )
-        subscriptions.forEach { (id, item) ->
-            groups.add(GroupMapItem(id = id, remarks = item.remarks))
+        subscriptions.forEach { sub ->
+            groups.add(GroupMapItem(id = sub.guid, remarks = sub.subscription.remarks))
         }
         return groups
     }

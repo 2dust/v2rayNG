@@ -9,6 +9,7 @@ import com.v2ray.ang.AppConfig.HY2
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.SubscriptionCache
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.fmt.Hysteria2Fmt
@@ -399,28 +400,28 @@ object AngConfigManager {
      * @param it The subscription item.
      * @return The number of configurations updated.
      */
-    fun updateConfigViaSub(it: Pair<String, SubscriptionItem>): Int {
+    fun updateConfigViaSub(it: SubscriptionCache): Int {
         try {
-            if (TextUtils.isEmpty(it.first)
-                || TextUtils.isEmpty(it.second.remarks)
-                || TextUtils.isEmpty(it.second.url)
+            if (TextUtils.isEmpty(it.guid)
+                || TextUtils.isEmpty(it.subscription.remarks)
+                || TextUtils.isEmpty(it.subscription.url)
             ) {
                 return 0
             }
-            if (!it.second.enabled) {
+            if (!it.subscription.enabled) {
                 return 0
             }
-            val url = HttpUtil.toIdnUrl(it.second.url)
+            val url = HttpUtil.toIdnUrl(it.subscription.url)
             if (!Utils.isValidUrl(url)) {
                 return 0
             }
-            if (!it.second.allowInsecureUrl) {
+            if (!it.subscription.allowInsecureUrl) {
                 if (!Utils.isValidSubUrl(url)) {
                     return 0
                 }
             }
             Log.i(AppConfig.TAG, url)
-            val userAgent = it.second.userAgent
+            val userAgent = it.subscription.userAgent
 
             var configText = try {
                 val httpPort = SettingsManager.getHttpPort()
@@ -440,11 +441,11 @@ object AngConfigManager {
             if (configText.isEmpty()) {
                 return 0
             }
-            val count = parseConfigViaSub(configText, it.first, false)
+            val count = parseConfigViaSub(configText, it.guid, false)
             if (count > 0) {
-                it.second.lastUpdated = System.currentTimeMillis()
-                MmkvManager.encodeSubscription(it.first, it.second)
-                Log.i(AppConfig.TAG, "Subscription updated: ${it.second.remarks}, $count configs")
+                it.subscription.lastUpdated = System.currentTimeMillis()
+                MmkvManager.encodeSubscription(it.guid, it.subscription)
+                Log.i(AppConfig.TAG, "Subscription updated: ${it.subscription.remarks}, $count configs")
             }
             return count
         } catch (e: Exception) {
@@ -481,7 +482,7 @@ object AngConfigManager {
     private fun importUrlAsSubscription(url: String): Int {
         val subscriptions = MmkvManager.decodeSubscriptions()
         subscriptions.forEach {
-            if (it.second.url == url) {
+            if (it.subscription.url == url) {
                 return 0
             }
         }
