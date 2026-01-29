@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.v2ray.ang.R
+import com.v2ray.ang.contracts.BaseAdapterListener
 import com.v2ray.ang.databinding.ItemRecyclerUserAssetBinding
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.viewmodel.UserAssetViewModel

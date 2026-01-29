@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.contracts.BaseAdapterListener
 import com.v2ray.ang.databinding.ActivityRoutingSettingBinding
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess

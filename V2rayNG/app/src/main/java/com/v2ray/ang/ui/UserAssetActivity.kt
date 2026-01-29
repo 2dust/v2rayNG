@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.contracts.BaseAdapterListener
 import com.v2ray.ang.databinding.ActivityUserAssetBinding
 import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.extension.toast

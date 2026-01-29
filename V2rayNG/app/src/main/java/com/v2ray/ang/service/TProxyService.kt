@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.contracts.Tun2SocksControl
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import java.io.File

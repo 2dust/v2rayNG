@@ -1,4 +1,4 @@
-package com.v2ray.ang.service
+package com.v2ray.ang.contracts
 
 import android.app.Service
 

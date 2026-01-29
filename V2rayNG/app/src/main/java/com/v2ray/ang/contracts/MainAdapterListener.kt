@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui
+package com.v2ray.ang.contracts
 
 import com.v2ray.ang.dto.ProfileItem
 
