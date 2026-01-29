@@ -11,15 +11,13 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityNoneBinding
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.dto.PermissionType
-import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.util.QRCodeDecoder
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
 import io.github.g00fy2.quickie.config.BarcodeFormat
 import io.github.g00fy2.quickie.config.ScannerConfig
 
-class ScannerActivity : BaseActivity() {
+class ScannerActivity : HelperBaseActivity() {
     private val binding by lazy {  ActivityNoneBinding.inflate(layoutInflater) }
 
     private val scanQrCode = registerForActivityResult(ScanCustomCode(), ::handleResult)

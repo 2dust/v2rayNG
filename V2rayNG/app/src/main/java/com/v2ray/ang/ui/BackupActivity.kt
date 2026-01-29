@@ -27,7 +27,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class BackupActivity : BaseActivity() {
+class BackupActivity : HelperBaseActivity() {
     private val binding by lazy { ActivityBackupBinding.inflate(layoutInflater) }
 
     private val config_backup_options: Array<out String> by lazy {

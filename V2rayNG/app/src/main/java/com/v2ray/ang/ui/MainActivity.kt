@@ -25,6 +25,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.PermissionType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AngConfigManager
@@ -32,7 +33,6 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.V2RayServiceManager
-import com.v2ray.ang.dto.PermissionType
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +40,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }

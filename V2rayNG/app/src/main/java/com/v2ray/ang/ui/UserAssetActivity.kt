@@ -21,7 +21,6 @@ import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.dto.PermissionType
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.UserAssetViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class UserAssetActivity : BaseActivity() {
+class UserAssetActivity : HelperBaseActivity() {
     private val binding by lazy { ActivityUserAssetBinding.inflate(layoutInflater) }
     private val ownerActivity: UserAssetActivity
         get() = this
