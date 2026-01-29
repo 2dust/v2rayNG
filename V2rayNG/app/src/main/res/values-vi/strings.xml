@@ -115,6 +115,7 @@
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
     <string name="server_lab_ech_config_list">EchConfigList</string>
     <string name="server_lab_ech_force_query">EchForceQuery</string>
+    <string name="server_lab_pinned_ca256">Certificate fingerprint (SHA-256)</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp!</string>

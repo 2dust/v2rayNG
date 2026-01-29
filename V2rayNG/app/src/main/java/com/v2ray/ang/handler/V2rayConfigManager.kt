@@ -16,6 +16,7 @@ import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean.StreamSettingsBean
 import com.v2ray.ang.dto.V2rayConfig.RoutingBean.RulesBean
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.fmt.HttpFmt
 import com.v2ray.ang.fmt.Hysteria2Fmt
 import com.v2ray.ang.fmt.ShadowsocksFmt
@@ -1314,6 +1315,7 @@ object V2rayConfigManager {
             alpn = if (alpns.isNullOrEmpty()) null else alpns.split(",").map { it.trim() }.filter { it.isNotEmpty() },
             echConfigList = if (echConfigList.isNullOrEmpty()) null else echConfigList,
             echForceQuery = if (echForceQuery.isNullOrEmpty()) null else echForceQuery,
+            pinnedPeerCertSha256 = profileItem.pinnedCA256?.nullIfBlank(),
             publicKey = if (publicKey.isNullOrEmpty()) null else publicKey,
             shortId = if (shortId.isNullOrEmpty()) null else shortId,
             spiderX = if (spiderX.isNullOrEmpty()) null else spiderX,

@@ -271,6 +271,7 @@ data class V2rayConfig(
                 val enableSessionResumption: Boolean? = null,
                 var echConfigList: String? = null,
                 var echForceQuery: String? = null,
+                var pinnedPeerCertSha256: String? = null,
                 // REALITY settings
                 val show: Boolean = false,
                 var publicKey: String? = null,

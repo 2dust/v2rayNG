@@ -42,6 +42,7 @@ data class ProfileItem(
     var insecure: Boolean? = null,
     var echConfigList: String? = null,
     var echForceQuery: String? = null,
+    var pinnedCA256: String? = null,
 
     var publicKey: String? = null,
     var shortId: String? = null,

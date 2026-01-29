@@ -159,6 +159,27 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/lay_pinned_ca256"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_spacing_dp16"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_lab_pinned_ca256" />
+
+        <EditText
+            android:id="@+id/et_pinned_ca256"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:nextFocusDown="@+id/sp_ech_force_query" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/lay_public_key"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

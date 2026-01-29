@@ -83,6 +83,7 @@ open class FmtBase {
         config.fingerPrint = queryParam["fp"]
         config.alpn = queryParam["alpn"]
         config.echConfigList = queryParam["ech"]
+        config.pinnedCA256 = queryParam["pcs"]
         config.publicKey = queryParam["pbk"]
         config.shortId = queryParam["sid"]
         config.spiderX = queryParam["spx"]
@@ -102,6 +103,7 @@ open class FmtBase {
         config.sni.let { if (it.isNotNullEmpty()) dicQuery["sni"] = it.orEmpty() }
         config.alpn.let { if (it.isNotNullEmpty()) dicQuery["alpn"] = it.orEmpty() }
         config.echConfigList.let { if (it.isNotNullEmpty()) dicQuery["ech"] = it.orEmpty() }
+        config.pinnedCA256.let { if (it.isNotNullEmpty()) dicQuery["pcs"] = it.orEmpty() }
         config.fingerPrint.let { if (it.isNotNullEmpty()) dicQuery["fp"] = it.orEmpty() }
         config.publicKey.let { if (it.isNotNullEmpty()) dicQuery["pbk"] = it.orEmpty() }
         config.shortId.let { if (it.isNotNullEmpty()) dicQuery["sid"] = it.orEmpty() }

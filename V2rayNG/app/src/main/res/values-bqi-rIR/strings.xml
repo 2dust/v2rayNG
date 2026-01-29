@@ -115,6 +115,7 @@
     <string name="server_lab_xhttp_extra">XHTTP Extra خام JSON، قالوو: { XHTTPObject }</string>
     <string name="server_lab_ech_config_list">نومگه کانفیگ Ech</string>
     <string name="server_lab_ech_force_query">پورس وو جۊ اجباری Ech</string>
+    <string name="server_lab_pinned_ca256">Certificate fingerprint (SHA-256)</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">لف گیری فایل ٱنجوم نوابی، ز ی برنومه دؽوۉداری فایل هیاری بگرین</string>

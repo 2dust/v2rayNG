@@ -11,6 +11,7 @@ import com.v2ray.ang.AngApplication
 import es.dmoral.toasty.Toasty
 import java.io.Serializable
 import java.net.URI
+import java.util.Locale
 
 val Context.v2RayApplication: AngApplication?
     get() = applicationContext as? AngApplication
@@ -92,7 +93,7 @@ fun Long.toTrafficString(): String {
         size /= DIVISOR
         unitIndex++
     }
-    return String.format("%.1f %s", size, units[unitIndex])
+    return String.format(Locale.getDefault(), "%.1f %s", size, units[unitIndex])
 }
 
 val URI.idnHost: String
@@ -104,6 +105,13 @@ val URI.idnHost: String
  * @return The string without whitespace.
  */
 fun String?.removeWhiteSpace(): String? = this?.replace(" ", "")
+
+/**
+ * Returns null if the string is null or blank, otherwise returns the string itself.
+ *
+ * @return The string or null.
+ */
+fun String?.nullIfBlank(): String? = this?.takeIf { it.isNotBlank() }
 
 /**
  * Converts the string to a Long value, or returns 0 if the conversion fails.
