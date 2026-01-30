@@ -16,6 +16,7 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.fmt.CustomFmt
+import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.Utils
 
@@ -89,6 +90,7 @@ class ServerCustomConfigActivity : BaseActivity() {
         }
         config.server = profileItem?.server
         config.serverPort = profileItem?.serverPort
+        config.description = AngConfigManager.generateDescription(config)
 
         MmkvManager.encodeServerConfig(editGuid, config)
         MmkvManager.encodeServerRaw(editGuid, binding.editor.text.toString())

@@ -271,13 +271,14 @@ object AngConfigManager {
         ) {
             try {
                 val serverList: Array<Any> =
-                    JsonUtil.fromJson(server, Array<Any>::class.java)?: arrayOf()
+                    JsonUtil.fromJson(server, Array<Any>::class.java) ?: arrayOf()
 
                 if (serverList.isNotEmpty()) {
                     var count = 0
                     for (srv in serverList.reversed()) {
                         val config = CustomFmt.parse(JsonUtil.toJson(srv)) ?: continue
                         config.subscriptionId = subid
+                        config.description = generateDescription(config)
                         val key = MmkvManager.encodeServerConfig("", config)
                         MmkvManager.encodeServerRaw(key, JsonUtil.toJsonPretty(srv) ?: "")
                         count += 1
@@ -292,6 +293,7 @@ object AngConfigManager {
                 // For compatibility
                 val config = CustomFmt.parse(server) ?: return 0
                 config.subscriptionId = subid
+                config.description = generateDescription(config)
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
                 return 1
@@ -302,6 +304,7 @@ object AngConfigManager {
         } else if (server.startsWith("[Interface]") && server.contains("[Peer]")) {
             try {
                 val config = WireguardFmt.parseWireguardConfFile(server) ?: return R.string.toast_incorrect_protocol
+                config.description = generateDescription(config)
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
                 return 1
@@ -363,6 +366,7 @@ object AngConfigManager {
             }
 
             config.subscriptionId = subid
+            config.description = generateDescription(config)
             val guid = MmkvManager.encodeServerConfig("", config)
             if (removedSelectedServer != null &&
                 config.server == removedSelectedServer.server && config.serverPort == removedSelectedServer.serverPort
@@ -492,5 +496,26 @@ object AngConfigManager {
         subItem.url = url
         MmkvManager.encodeSubscription("", subItem)
         return 1
+    }
+
+    /** Generates a description for the profile.
+     *
+     * @param profile The profile item.
+     * @return The generated description.
+     */
+    fun generateDescription(profile: ProfileItem): String {
+        // Hide xxx:xxx:***/xxx.xxx.xxx.***
+        val server = profile.server
+        val port = profile.serverPort
+        if (server.isNullOrBlank() && port.isNullOrBlank()) return ""
+
+        val addrPart = server?.let {
+            if (it.contains(":"))
+                it.split(":").take(2).joinToString(":", postfix = ":***")
+            else
+                it.split('.').dropLast(1).joinToString(".", postfix = ".***")
+        } ?: ""
+
+        return "$addrPart : ${port ?: ""}"
     }
 }

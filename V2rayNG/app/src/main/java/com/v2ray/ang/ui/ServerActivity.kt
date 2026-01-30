@@ -26,6 +26,7 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
+import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
@@ -493,6 +494,8 @@ class ServerActivity : BaseActivity() {
         saveCommon(config)
         saveStreamSettings(config)
         saveTls(config)
+
+        config.description = AngConfigManager.generateDescription(config)
 
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()

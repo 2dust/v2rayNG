@@ -15,6 +15,7 @@ data class ProfileItem(
     var addedTime: Long = System.currentTimeMillis(),
 
     var remarks: String = "",
+    var description: String? = null,
     var server: String? = null,
     var serverPort: String? = null,
 

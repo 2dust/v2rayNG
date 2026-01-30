@@ -14,6 +14,8 @@ import com.v2ray.ang.databinding.ItemRecyclerFooterBinding
 import com.v2ray.ang.databinding.ItemRecyclerMainBinding
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.ServersCache
+import com.v2ray.ang.extension.nullIfBlank
+import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
@@ -121,19 +123,7 @@ class MainRecyclerAdapter(
      * @return Formatted address string
      */
     private fun getAddress(profile: ProfileItem): String {
-        // Hide xxx:xxx:***/xxx.xxx.xxx.***
-        val server = profile.server
-        val port = profile.serverPort
-        if (server.isNullOrBlank() && port.isNullOrBlank()) return ""
-
-        val addrPart = server?.let {
-            if (it.contains(":"))
-                it.split(":").take(2).joinToString(":", postfix = ":***")
-            else
-                it.split('.').dropLast(1).joinToString(".", postfix = ".***")
-        } ?: ""
-
-        return "$addrPart : ${port ?: ""}"
+        return profile.description.nullIfBlank() ?: AngConfigManager.generateDescription(profile)
     }
 
     /**
