@@ -1183,19 +1183,39 @@ object V2rayConfigManager {
             }
 
             NetworkType.KCP.type -> {
-                val kcpsetting = StreamSettingsBean.KcpSettingsBean()
-                kcpsetting.header.type = headerType ?: "none"
+                streamSettings.kcpSettings = StreamSettingsBean.KcpSettingsBean()
+                val udpMaskList = mutableListOf<StreamSettingsBean.FinalMaskBean.MaskBean>()
+                if (!headerType.isNullOrEmpty() && headerType != "none") {
+                    val kcpHeaderType = when {
+                        headerType == "wechat-video" -> "header-wechat"
+                        else -> "header-$headerType"
+                    }
+                    udpMaskList.add(StreamSettingsBean.FinalMaskBean.MaskBean(
+                        type = kcpHeaderType,
+                        settings = if (headerType == "dns" && !host.isNullOrEmpty()) {
+                            StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
+                                domain = host
+                            )
+                        } else {
+                            null
+                        }
+                    ))
+                }
                 if (seed.isNullOrEmpty()) {
-                    kcpsetting.seed = null
+                    udpMaskList.add(StreamSettingsBean.FinalMaskBean.MaskBean(
+                        type = "mkcp-original"
+                    ))
                 } else {
-                    kcpsetting.seed = seed
+                    udpMaskList.add(StreamSettingsBean.FinalMaskBean.MaskBean(
+                        type = "mkcp-aes128gcm",
+                        settings = StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
+                            password = seed
+                        )
+                    ))
                 }
-                if (host.isNullOrEmpty()) {
-                    kcpsetting.header.domain = null
-                } else {
-                    kcpsetting.header.domain = host
-                }
-                streamSettings.kcpSettings = kcpsetting
+                streamSettings.finalmask = StreamSettingsBean.FinalMaskBean(
+                    udp = udpMaskList.toList()
+                )
             }
 
             NetworkType.WS.type -> {
