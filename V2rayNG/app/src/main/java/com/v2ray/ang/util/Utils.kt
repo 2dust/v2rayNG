@@ -328,9 +328,44 @@ object Utils {
      */
     fun urlEncode(url: String): String {
         return try {
-            URLEncoder.encode(url, Charsets.UTF_8.toString()).replace("+", "%20")
+            URLEncoder.encode(url, Charsets.UTF_8.toString())
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to encode URL", e)
+            url
+        }
+    }
+
+    /**
+     * Decode a "encodeURIComponent" string.
+     *
+     * @param url The "encodeURIComponent" string.
+     * @return The decoded string, or the original string if decoding fails.
+     */
+    fun decodeURIComponent(url: String): String {
+        return try {
+            // Decode strictly according to RFC 3986 / encodeURIComponent semantics.
+            // '+' is a literal plus and MUST NOT be interpreted as space.
+            // Inputs using '+' for spaces are non-conforming and rejected deliberately
+            // to avoid cross-language interoperability issues.
+            URLDecoder.decode(url.replace("+", "%2B"), Charsets.UTF_8.toString())
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to decode encodeURIComponent", e)
+            url
+        }
+    }
+
+    /**
+     * Encode a string to "encodeURIComponent" format.
+     * 
+     * @param url The string to encode.
+     * @return The "encodeURIComponent" encoded string, or the original string if encoding fails.
+     */
+    fun encodeURIComponent(url: String): String {
+        return try {
+            // Replace '+' with '%20' to conform to encodeURIComponent semantics.
+            URLEncoder.encode(url, Charsets.UTF_8.toString()).replace("+", "%20")
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to encode encodeURIComponent", e)
             url
         }
     }
