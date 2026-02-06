@@ -29,6 +29,7 @@
                 <ImageView
                     android:layout_width="@dimen/image_size_dp24"
                     android:layout_height="@dimen/image_size_dp24"
+                    android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_source_code_24dp" />
 
                 <TextView
@@ -53,6 +54,7 @@
                 <ImageView
                     android:layout_width="@dimen/image_size_dp24"
                     android:layout_height="@dimen/image_size_dp24"
+                    android:importantForAccessibility="no"
                     app:srcCompat="@drawable/license_24px" />
 
                 <TextView
@@ -77,6 +79,7 @@
                 <ImageView
                     android:layout_width="@dimen/image_size_dp24"
                     android:layout_height="@dimen/image_size_dp24"
+                    android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_feedback_24dp" />
 
                 <TextView
@@ -102,6 +105,7 @@
                 <ImageView
                     android:layout_width="@dimen/image_size_dp24"
                     android:layout_height="@dimen/image_size_dp24"
+                    android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_telegram_24dp" />
 
                 <TextView
@@ -126,6 +130,7 @@
                 <ImageView
                     android:layout_width="@dimen/image_size_dp24"
                     android:layout_height="@dimen/image_size_dp24"
+                    android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_privacy_24dp" />
 
                 <TextView
