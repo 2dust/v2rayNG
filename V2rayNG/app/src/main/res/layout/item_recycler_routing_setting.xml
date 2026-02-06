@@ -43,6 +43,7 @@
                     android:layout_height="@dimen/padding_spacing_dp16"
                     android:layout_gravity="center"
                     android:layout_marginStart="@dimen/padding_spacing_dp16"
+                    android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_lock_24dp" />
 
             </LinearLayout>
@@ -87,6 +88,7 @@
                 <ImageView
                     android:layout_width="@dimen/image_size_dp24"
                     android:layout_height="@dimen/image_size_dp24"
+                    android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_edit_24dp" />
             </LinearLayout>
 
