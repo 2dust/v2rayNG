@@ -162,7 +162,7 @@ data class V2rayConfig(
             var realitySettings: TlsSettingsBean? = null,
             var grpcSettings: GrpcSettingsBean? = null,
             var hysteriaSettings: HysteriaSettingsBean? = null,
-            var udpmasks: List<UdpMasksBean>? = null,
+            var finalmask: FinalMaskBean? = null,
             val dsSettings: Any? = null,
             var sockopt: SockoptBean? = null
         ) {
@@ -202,15 +202,8 @@ data class V2rayConfig(
                 var downlinkCapacity: Int = 100,
                 var congestion: Boolean = false,
                 var readBufferSize: Int = 1,
-                var writeBufferSize: Int = 1,
-                var header: HeaderBean = HeaderBean(),
-                var seed: String? = null
-            ) {
-                data class HeaderBean(
-                    var type: String = "none",
-                    var domain: String? = null
-                )
-            }
+                var writeBufferSize: Int = 1
+            )
 
             data class WsSettingsBean(
                 var path: String? = null,
@@ -310,13 +303,19 @@ data class V2rayConfig(
                 )
             }
 
-            data class UdpMasksBean(
-                var type: String,
-                var settings: UdpMasksSettingsBean? = null
+            data class FinalMaskBean(
+                var tcp: List<MaskBean>? = null,
+                var udp: List<MaskBean>? = null
             ) {
-                data class UdpMasksSettingsBean(
-                    var password: String? = null
-                )
+                data class MaskBean(
+                    var type: String,
+                    var settings: MaskSettingsBean? = null
+                ) {
+                    data class MaskSettingsBean(
+                        var password: String? = null,
+                        var domain: String? = null
+                    )
+                }
             }
         }
 
