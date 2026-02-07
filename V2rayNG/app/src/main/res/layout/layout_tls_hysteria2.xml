@@ -80,10 +80,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/server_lab_stream_pinsha256" />
+                android:text="@string/server_lab_pinned_ca256" />
 
             <EditText
-                android:id="@+id/et_pinsha256"
+                android:id="@+id/et_pinned_ca256"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text" />

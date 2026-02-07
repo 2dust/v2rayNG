@@ -124,7 +124,7 @@ data class ProfileItem(
                 && this.obfsPassword == obj.obfsPassword
                 && this.portHopping == obj.portHopping
                 && this.portHoppingInterval == obj.portHoppingInterval
-                && this.pinSHA256 == obj.pinSHA256
+                && this.pinnedCA256 == obj.pinnedCA256
                 )
     }
 }

@@ -44,7 +44,7 @@ object Hysteria2Fmt : FmtBase() {
             if (config.portHopping.isNotNullEmpty()) {
                 config.portHoppingInterval = queryParam["mportHopInt"]
             }
-            config.pinSHA256 = queryParam["pinSHA256"]
+            config.pinnedCA256 = queryParam["pinSHA256"]
 
         }
 
@@ -75,8 +75,8 @@ object Hysteria2Fmt : FmtBase() {
         if (config.portHoppingInterval.isNotNullEmpty()) {
             dicQuery["mportHopInt"] = config.portHoppingInterval.orEmpty()
         }
-        if (config.pinSHA256.isNotNullEmpty()) {
-            dicQuery["pinSHA256"] = config.pinSHA256.orEmpty()
+        if (config.pinnedCA256.isNotNullEmpty()) {
+            dicQuery["pinSHA256"] = config.pinnedCA256.orEmpty()
         }
 
         return toUri(config, config.password, dicQuery)
