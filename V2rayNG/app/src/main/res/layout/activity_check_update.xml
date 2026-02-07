@@ -22,6 +22,7 @@
             <ImageView
                 android:layout_width="@dimen/image_size_dp24"
                 android:layout_height="@dimen/image_size_dp24"
+                android:importantForAccessibility="no"
                 app:srcCompat="@drawable/ic_source_code_24dp" />
 
             <androidx.appcompat.widget.SwitchCompat
@@ -49,6 +50,7 @@
             <ImageView
                 android:layout_width="@dimen/image_size_dp24"
                 android:layout_height="@dimen/image_size_dp24"
+                android:importantForAccessibility="no"
                 app:srcCompat="@drawable/ic_check_update_24dp" />
 
             <TextView

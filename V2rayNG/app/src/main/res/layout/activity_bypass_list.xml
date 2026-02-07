@@ -75,6 +75,7 @@
                         <ImageView
                             android:layout_width="@dimen/image_size_dp24"
                             android:layout_height="@dimen/image_size_dp24"
+                            android:importantForAccessibility="no"
                             app:srcCompat="@drawable/ic_about_24dp" />
 
                     </LinearLayout>

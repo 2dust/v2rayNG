@@ -243,6 +243,7 @@
     <string name="summary_pref_tg_group">Join Telegram Group</string>
     <string name="toast_tg_app_not_found">Telegram app not found</string>
     <string name="title_privacy_policy">Privacy policy</string>
+    <string name="title_qr_code">QR code</string>
     <string name="title_about">About</string>
     <string name="title_source_code">Source code</string>
     <string name="title_oss_license">Open Source licenses</string>

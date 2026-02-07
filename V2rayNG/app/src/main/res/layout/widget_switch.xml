@@ -18,6 +18,7 @@
             android:id="@+id/image_switch"
             android:layout_width="45dp"
             android:layout_height="45dp"
+            android:importantForAccessibility="no"
             android:padding="@dimen/padding_spacing_dp16"
             app:srcCompat="@drawable/ic_stat_name" />
     </LinearLayout>

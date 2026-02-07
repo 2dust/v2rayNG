@@ -11,6 +11,7 @@
         android:id="@+id/iv_qcode"
         android:layout_width="336dp"
         android:layout_height="336dp"
+        android:contentDescription="@string/title_qr_code"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/ic_fab_check" />
 </LinearLayout>

@@ -67,6 +67,7 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="@dimen/image_size_dp24"
+                            android:importantForAccessibility="no"
                             app:srcCompat="@drawable/ic_share_24dp" />
 
                     </LinearLayout>
@@ -85,6 +86,7 @@
                         <ImageView
                             android:layout_width="@dimen/image_size_dp24"
                             android:layout_height="@dimen/image_size_dp24"
+                            android:importantForAccessibility="no"
                             app:srcCompat="@drawable/ic_edit_24dp" />
 
                     </LinearLayout>
@@ -103,6 +105,7 @@
                         <ImageView
                             android:layout_width="@dimen/image_size_dp24"
                             android:layout_height="@dimen/image_size_dp24"
+                            android:importantForAccessibility="no"
                             app:srcCompat="@drawable/ic_delete_24dp" />
 
                     </LinearLayout>
