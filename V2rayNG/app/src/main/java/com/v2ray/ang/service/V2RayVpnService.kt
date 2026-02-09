@@ -107,7 +107,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             Log.e(AppConfig.TAG, "Failed to create VPN interface")
             return
         }
-        if (!V2RayServiceManager.startCoreLoop(mInterface)) {
+        if (!V2RayServiceManager.startCoreLoop()) {
             Log.e(AppConfig.TAG, "Failed to start V2Ray core loop")
             stopAllService()
             return
