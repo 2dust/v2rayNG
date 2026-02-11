@@ -79,6 +79,7 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
+                android:contentDescription="@string/menu_item_edit_config"
                 android:focusable="true"
                 android:gravity="center"
                 android:nextFocusLeft="@+id/info_container"
