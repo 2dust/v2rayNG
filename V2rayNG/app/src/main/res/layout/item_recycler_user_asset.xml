@@ -58,6 +58,7 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:contentDescription="@string/menu_item_edit_config"
             android:focusable="true"
             android:padding="@dimen/padding_spacing_dp8">
 
@@ -74,6 +75,7 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:contentDescription="@string/menu_item_del_config"
             android:focusable="true"
             android:padding="@dimen/padding_spacing_dp8">
 
