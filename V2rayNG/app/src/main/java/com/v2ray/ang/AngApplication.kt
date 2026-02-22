@@ -44,7 +44,7 @@ class AngApplication : MultiDexApplication() {
         SettingsManager.migrateHysteria2PinSHA256()
 
         es.dmoral.toasty.Toasty.Config.getInstance()
-            .setGravity(android.view.Gravity.BOTTOM, 0, 200)
+            .setGravity(android.view.Gravity.BOTTOM, 0, 300)
             .apply()
     }
 }
