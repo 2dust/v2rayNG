@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.v2ray.ang.AppConfig
@@ -30,6 +31,7 @@ object NotificationManager {
     private const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 1
     private const val NOTIFICATION_PENDING_INTENT_RESTART_V2RAY = 2
     private const val NOTIFICATION_ICON_THRESHOLD = 3000
+    private const val QUERY_INTERVAL_MS = 3000L
 
     private var lastQueryTime = 0L
     private var mBuilder: NotificationCompat.Builder? = null
@@ -44,7 +46,6 @@ object NotificationManager {
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) != true) return
         if (speedNotificationJob != null || V2RayServiceManager.isRunning() == false) return
 
-        lastQueryTime = System.currentTimeMillis()
         var lastZeroSpeed = false
         val outboundTags = currentConfig?.getAllOutboundTags()
         outboundTags?.remove(AppConfig.TAG_DIRECT)
@@ -52,7 +53,17 @@ object NotificationManager {
         speedNotificationJob = CoroutineScope(Dispatchers.IO).launch {
             while (isActive) {
                 val queryTime = System.currentTimeMillis()
-                val sinceLastQueryInSeconds = (queryTime - lastQueryTime) / 1000.0
+                val sinceLastQueryIn = (queryTime - lastQueryTime)
+
+                // If the query interval is too short, skip this round to avoid excessive CPU usage
+                if (sinceLastQueryIn < QUERY_INTERVAL_MS) {
+                    Log.w(AppConfig.TAG, "Query interval too short: ${sinceLastQueryIn}ms, skipping")
+                    lastQueryTime = queryTime
+                    delay(QUERY_INTERVAL_MS)
+                    continue
+                }
+                val sinceLastQueryInSeconds = sinceLastQueryIn / 1000.0
+
                 var proxyTotal = 0L
                 val text = StringBuilder()
                 outboundTags?.forEach {
@@ -78,7 +89,7 @@ object NotificationManager {
                 }
                 lastZeroSpeed = zeroSpeed
                 lastQueryTime = queryTime
-                delay(3000)
+                delay(QUERY_INTERVAL_MS)
             }
         }
     }
@@ -89,6 +100,10 @@ object NotificationManager {
      */
     fun showNotification(currentConfig: ProfileItem?) {
         val service = getService() ?: return
+
+        // Reset last query time to avoid querying stats too soon after showing the notification
+        lastQueryTime = System.currentTimeMillis()
+
         val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
         val startMainIntent = Intent(service, MainActivity::class.java)
