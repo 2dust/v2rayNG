@@ -8,4 +8,5 @@
     android:text="@string/title_mode_help"
     android:textAlignment="textStart"
     android:textStyle="italic"
+    android:textColor="?attr/colorPrimary"
     tools:ignore="UsingOnClickInXml" />
