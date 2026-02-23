@@ -34,12 +34,14 @@ class AngApplication : MultiDexApplication() {
 
         MMKV.initialize(this)
 
+        // Ensure critical preference defaults are present in MMKV early
+        SettingsManager.ensureDefaultSettings()
+        SettingsManager.setNightMode()
         // Initialize WorkManager with the custom configuration
         WorkManager.initialize(this, workManagerConfiguration)
 
-        // Ensure critical preference defaults are present in MMKV early
-        SettingsManager.initApp(this)
-        SettingsManager.setNightMode()
+        SettingsManager.initRoutingRulesets(this)
+        SettingsManager.migrateHysteria2PinSHA256()
 
         es.dmoral.toasty.Toasty.Config.getInstance()
             .setGravity(android.view.Gravity.BOTTOM, 0, 300)

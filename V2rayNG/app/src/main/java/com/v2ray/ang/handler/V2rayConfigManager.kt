@@ -6,6 +6,8 @@ import android.util.Log
 import com.google.gson.JsonArray
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ConfigResult
+import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.V2rayConfig
@@ -13,8 +15,6 @@ import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean.OutSettingsBean
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean.StreamSettingsBean
 import com.v2ray.ang.dto.V2rayConfig.RoutingBean.RulesBean
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.fmt.HttpFmt
@@ -139,7 +139,7 @@ object V2rayConfigManager {
     private fun getV2rayGroupConfig(context: Context, guid: String, config: ProfileItem): ConfigResult {
         val result = ConfigResult(false)
 
-        val serverList = MmkvManager.decodeAllServerList()
+        val serverList = MmkvManager.decodeServerList()
         val configList = serverList
             .mapNotNull { id -> MmkvManager.decodeServerConfig(id) }
             .filter { profile ->

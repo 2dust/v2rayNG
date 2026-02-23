@@ -35,7 +35,7 @@ import kotlinx.coroutines.withContext
 import java.util.Collections
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
-    private var serverList = mutableListOf<String>() // MmkvManager.decodeServerList()
+    private var serverList = MmkvManager.decodeServerList()
     var subscriptionId: String = MmkvManager.decodeSettingsString(AppConfig.CACHE_SUBSCRIPTION_ID, "").orEmpty()
 
     //var keywordFilter: String = MmkvManager.MmkvManager.decodeSettingsString(AppConfig.CACHE_KEYWORD_FILTER, "")?:""
@@ -69,15 +69,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Reloads the server list based on current subscription filter.
+     * Reloads the server list.
      */
     fun reloadServerList() {
-        serverList = if (subscriptionId.isEmpty()) {
-            MmkvManager.decodeAllServerList()
-        } else {
-            MmkvManager.decodeServerList(subscriptionId)
-        }
-
+        serverList = MmkvManager.decodeServerList()
         updateCache()
         updateListAction.value = -1
     }
@@ -134,13 +129,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun swapServer(fromPosition: Int, toPosition: Int) {
         if (subscriptionId.isEmpty()) {
-            return
+            Collections.swap(serverList, fromPosition, toPosition)
+        } else {
+            val fromPosition2 = serverList.indexOf(serversCache[fromPosition].guid)
+            val toPosition2 = serverList.indexOf(serversCache[toPosition].guid)
+            Collections.swap(serverList, fromPosition2, toPosition2)
         }
-
-        Collections.swap(serverList, fromPosition, toPosition)
         Collections.swap(serversCache, fromPosition, toPosition)
-
-        MmkvManager.encodeServerList(serverList, subscriptionId)
+        MmkvManager.encodeServerList(serverList)
     }
 
     /**
@@ -164,9 +160,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 //                MmkvManager.encodeServerConfig(guid, config)
 //            }
 
-//            if (subscriptionId.isNotEmpty() && subscriptionId != profile.subscriptionId) {
-//                continue
-//            }
+            if (subscriptionId.isNotEmpty() && subscriptionId != profile.subscriptionId) {
+                continue
+            }
 
             if (keywordFilter.isEmpty() || profile.remarks.lowercase().contains(keywordFilter.lowercase())) {
                 serversCache.add(ServersCache(guid, profile))
@@ -283,21 +279,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         val groups = mutableListOf<GroupMapItem>()
-        if (subscriptions.count() > 1) {
-            groups.add(
-                GroupMapItem(
-                    id = "",
-                    remarks = context.getString(R.string.filter_config_all)
-                )
+        groups.add(
+            GroupMapItem(
+                id = "",
+                remarks = context.getString(R.string.filter_config_all)
             )
-        }
+        )
         subscriptions.forEach { sub ->
-            groups.add(
-                GroupMapItem(
-                    id = sub.guid,
-                    remarks = sub.subscription.remarks
-                )
-            )
+            groups.add(GroupMapItem(id = sub.guid, remarks = sub.subscription.remarks))
         }
         return groups
     }
@@ -382,9 +371,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         data class ServerDelay(var guid: String, var testDelayMillis: Long)
 
         val serverDelays = mutableListOf<ServerDelay>()
-        // Use current subscription filter
-        val serverListToSort = MmkvManager.decodeServerList(subscriptionId)
-        serverListToSort.forEach { key ->
+        val serverList = MmkvManager.decodeServerList()
+        serverList.forEach { key ->
             val delay = MmkvManager.decodeServerAffiliationInfo(key)?.testDelayMillis ?: 0L
             serverDelays.add(ServerDelay(key, if (delay <= 0L) 999999 else delay))
         }
@@ -395,8 +383,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             serverList.add(it.guid)
         }
 
-        // Save to appropriate list based on subscriptionId
-        MmkvManager.encodeServerList(serverList, subscriptionId)
+        MmkvManager.encodeServerList(serverList)
     }
 
     /**

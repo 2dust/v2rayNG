@@ -164,7 +164,6 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>() {
         val intent = Intent().putExtra("guid", guid)
             .putExtra("isRunning", mainViewModel.isRunning.value)
             .putExtra("createConfigType", profile.configType.value)
-            .putExtra("subscriptionId", subId)
         when (profile.configType) {
             EConfigType.CUSTOM -> {
                 ownerActivity.startActivity(intent.setClass(ownerActivity, ServerCustomConfigActivity::class.java))

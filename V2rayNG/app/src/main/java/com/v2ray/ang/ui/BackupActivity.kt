@@ -18,7 +18,6 @@ import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
-import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.WebDavManager
 import com.v2ray.ang.util.ZipUtil
 import kotlinx.coroutines.Dispatchers
@@ -125,8 +124,6 @@ class BackupActivity : HelperBaseActivity() {
         val count = MMKV.restoreAllFromDirectory(backupDir)
         SettingsChangeManager.makeSetupGroupTab()
         SettingsChangeManager.makeRestartService()
-
-        SettingsManager.initApp(this)
         return count > 0
     }
 

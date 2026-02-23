@@ -13,6 +13,5 @@ data class SubscriptionItem(
     var filter: String? = null,
     var allowInsecureUrl: Boolean = false,
     var userAgent: String? = null,
-    var serverList: MutableList<String> = mutableListOf(),
 )
 

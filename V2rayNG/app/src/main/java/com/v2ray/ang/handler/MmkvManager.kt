@@ -1,7 +1,6 @@
 package com.v2ray.ang.handler
 
 import com.tencent.mmkv.MMKV
-import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
 import com.v2ray.ang.dto.AssetUrlCache
@@ -46,24 +45,6 @@ object MmkvManager {
     //region Server
 
     /**
-     * Reads the legacy server list from KEY_ANG_CONFIGS for migration.
-     * This method is for migration purposes only.
-     *
-     * @return The JSON string of legacy server list, or null if not exists.
-     */
-    fun readLegacyServerList(): String? {
-        return mainStorage.decodeString(KEY_ANG_CONFIGS)
-    }
-
-//    /**
-//     * Removes the legacy KEY_ANG_CONFIGS after migration.
-//     * This method is for migration purposes only.
-//     */
-//    fun removeLegacyServerListKey() {
-//        mainStorage.remove(KEY_ANG_CONFIGS)
-//    }
-
-    /**
      * Gets the selected server GUID.
      *
      * @return The selected server GUID.
@@ -82,62 +63,19 @@ object MmkvManager {
     }
 
     /**
-     * Encodes the server list for a given subscription.
-     * Saves to the subscription's serverList (including default subscription for ungrouped servers).
+     * Encodes the server list.
      *
      * @param serverList The list of server GUIDs.
-     * @param subscriptionId The subscription ID.
      */
-    fun encodeServerList(serverList: MutableList<String>, subscriptionId: String) {
-        val subId = getSubscriptionId(subscriptionId)
-        val subItem = decodeSubscription(subId) ?: return
-
-        subItem.serverList = serverList
-        encodeSubscription(subId, subItem)
-    }
-
-    // Legacy method for compatibility
-    // TODO: Remove after migration and update all callers
-    /*
     fun encodeServerList(serverList: MutableList<String>) {
         mainStorage.encode(KEY_ANG_CONFIGS, JsonUtil.toJson(serverList))
     }
-    */
 
     /**
-     * Decodes the server list for a given subscription.
-     * If subscriptionId is empty, returns ungrouped servers.
-     * Otherwise, returns servers from the specified subscription's serverList.
+     * Decodes the server list.
      *
-     * @param subscriptionId The subscription ID.
      * @return The list of server GUIDs.
      */
-    fun decodeServerList(subscriptionId: String): MutableList<String> {
-        val subId = getSubscriptionId(subscriptionId)
-
-        return decodeSubscription(subId)?.serverList ?: mutableListOf()
-    }
-
-    /**
-     * Decodes all server list (merged from all subscriptions including default subscription).
-     * Use this when you need the complete server list.
-     *
-     * @return The list of all server GUIDs.
-     */
-    fun decodeAllServerList(): MutableList<String> {
-        val allServers = mutableListOf<String>()
-
-        // Add servers from all subscriptions (including default subscription)
-        decodeSubscriptions().forEach { sub ->
-            allServers.addAll(sub.subscription.serverList)
-        }
-
-        return allServers
-    }
-
-    // Legacy method for compatibility - reads all servers
-    // TODO: Remove after migration and update all callers
-    /*
     fun decodeServerList(): MutableList<String> {
         val json = mainStorage.decodeString(KEY_ANG_CONFIGS)
         return if (json.isNullOrBlank()) {
@@ -146,7 +84,6 @@ object MmkvManager {
             JsonUtil.fromJson(json, Array<String>::class.java)?.toMutableList() ?: mutableListOf()
         }
     }
-    */
 
     /**
      * Decodes the server configuration.
@@ -186,21 +123,6 @@ object MmkvManager {
     fun encodeServerConfig(guid: String, config: ProfileItem): String {
         val key = guid.ifBlank { Utils.getUuid() }
         profileFullStorage.encode(key, JsonUtil.toJson(config))
-
-        // Use default subscription for servers without subscription
-        val subId = getSubscriptionId(config.subscriptionId)
-        val serverList = decodeServerList(subId)
-
-        if (!serverList.contains(key)) {
-            serverList.add(0, key)
-            encodeServerList(serverList, subId)
-            if (getSelectServer().isNullOrBlank()) {
-                mainStorage.encode(KEY_SELECTED_SERVER, key)
-            }
-        }
-
-        // Legacy code - keep for reference during migration
-        /*
         val serverList = decodeServerList()
         if (!serverList.contains(key)) {
             serverList.add(0, key)
@@ -209,7 +131,6 @@ object MmkvManager {
                 mainStorage.encode(KEY_SELECTED_SERVER, key)
             }
         }
-        */
 //        val profile = ProfileLiteItem(
 //            configType = config.configType,
 //            subscriptionId = config.subscriptionId,
@@ -230,30 +151,12 @@ object MmkvManager {
         if (guid.isBlank()) {
             return
         }
-
-        // Get config to determine which subscription to update
-        val config = decodeServerConfig(guid)
-        val subId = getSubscriptionId(config?.subscriptionId)
-
-        // Remove from appropriate server list
-        val serverList = decodeServerList(subId)
-        serverList.remove(guid)
-        encodeServerList(serverList, subId)
-
-        // Legacy code - keep for reference during migration
-        /*
         if (getSelectServer() == guid) {
             mainStorage.remove(KEY_SELECTED_SERVER)
         }
         val serverList = decodeServerList()
         serverList.remove(guid)
         encodeServerList(serverList)
-        */
-
-        // Clean up storage
-        if (getSelectServer() == guid) {
-            mainStorage.remove(KEY_SELECTED_SERVER)
-        }
         profileFullStorage.remove(guid)
         //profileStorage.remove(guid)
         serverAffStorage.remove(guid)
@@ -264,28 +167,10 @@ object MmkvManager {
      *
      * @param subid The subscription ID.
      */
-    fun removeServerViaSubid(subid: String?) {
-        val subId2 = getSubscriptionId(subid)
-
-        // Get server list from subscription
-        val subItem = decodeSubscription(subId2) ?: return
-        val serverList = subItem.serverList
-
-        // Remove all servers in the list
-        serverList.forEach { guid ->
-            if (getSelectServer() == guid) {
-                mainStorage.remove(KEY_SELECTED_SERVER)
-            }
-            profileFullStorage.remove(guid)
-            serverAffStorage.remove(guid)
+    fun removeServerViaSubid(subid: String) {
+        if (subid.isBlank()) {
+            return
         }
-
-        // Clear subscription's serverList
-        subItem.serverList.clear()
-        encodeSubscription(subId2, subItem)
-
-        // Legacy code - keep for reference during migration
-        /*
         profileFullStorage.allKeys()?.forEach { key ->
             decodeServerConfig(key)?.let { config ->
                 if (config.subscriptionId == subid) {
@@ -293,7 +178,6 @@ object MmkvManager {
                 }
             }
         }
-        */
     }
 
     /**
@@ -349,21 +233,12 @@ object MmkvManager {
      */
     fun removeAllServer(): Int {
         val count = profileFullStorage.allKeys()?.count() ?: 0
-
-        decodeSubscriptions().forEach { sub ->
-            sub.subscription.serverList.clear()
-            encodeSubscription(sub.guid, sub.subscription)
-        }
-
-        // Clear all storage
         mainStorage.clearAll()
         profileFullStorage.clearAll()
         //profileStorage.clearAll()
         serverAffStorage.clearAll()
-
         return count
     }
-
 
     /**
      * Removes invalid server configurations.
@@ -417,10 +292,6 @@ object MmkvManager {
 
     //region Subscriptions
 
-    private fun getSubscriptionId(subscriptionId: String?):String {
-        return subscriptionId?.ifEmpty { DEFAULT_SUBSCRIPTION_ID } ?: DEFAULT_SUBSCRIPTION_ID
-    }
-
     /**
      * Initializes the subscription list.
      */
@@ -460,11 +331,6 @@ object MmkvManager {
      * @param subid The subscription ID.
      */
     fun removeSubscription(subid: String) {
-        // Protect default subscription from being deleted
-        if (subid == DEFAULT_SUBSCRIPTION_ID) {
-            return
-        }
-
         subStorage.remove(subid)
         val subsList = decodeSubsList()
         subsList.remove(subid)
