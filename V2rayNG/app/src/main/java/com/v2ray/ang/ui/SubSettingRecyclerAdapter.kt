@@ -5,7 +5,9 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.contracts.BaseAdapterListener
 import com.v2ray.ang.databinding.ItemRecyclerSubSettingBinding
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
@@ -37,6 +39,7 @@ class SubSettingRecyclerAdapter(
         holder.itemSubSettingBinding.layoutRemove.setOnClickListener {
             adapterListener?.onRemove(subId, position)
         }
+        holder.itemSubSettingBinding.layoutRemove.isVisible = subId != AppConfig.DEFAULT_SUBSCRIPTION_ID
 
         holder.itemSubSettingBinding.chkEnable.setOnCheckedChangeListener { it, isChecked ->
             if (!it.isPressed) return@setOnCheckedChangeListener

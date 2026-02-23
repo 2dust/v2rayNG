@@ -7,20 +7,24 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
 import com.v2ray.ang.AppConfig.GEOIP_PRIVATE
 import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.VPN
+import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.RulesetItem
+import com.v2ray.ang.dto.SubscriptionItem
+import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.Language
-import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.enums.RoutingType
-import com.v2ray.ang.dto.RulesetItem
-import com.v2ray.ang.dto.ServersCache
-import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.enums.VpnInterfaceAddressConfig
+import com.v2ray.ang.handler.MmkvManager.decodeAllServerList
 import com.v2ray.ang.handler.MmkvManager.decodeServerConfig
-import com.v2ray.ang.handler.MmkvManager.decodeServerList
+import com.v2ray.ang.handler.MmkvManager.decodeSubsList
+import com.v2ray.ang.handler.MmkvManager.decodeSubscription
+import com.v2ray.ang.handler.MmkvManager.encodeSubscription
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import java.io.File
@@ -30,11 +34,19 @@ import java.util.Locale
 
 object SettingsManager {
 
+    fun initApp(context: Context) {
+        ensureDefaultSettings()
+        ensureDefaultSubscription()
+        initRoutingRulesets(context)
+        migrateServerListToSubscriptions()
+        migrateHysteria2PinSHA256()
+    }
+
     /**
      * Initialize routing rulesets.
      * @param context The application context.
      */
-    fun initRoutingRulesets(context: Context) {
+    private fun initRoutingRulesets(context: Context) {
         val exist = MmkvManager.decodeRoutingRulesets()
         if (exist.isNullOrEmpty()) {
             val rulesetList = getPresetRoutingRulesets(context)
@@ -222,14 +234,10 @@ object SettingsManager {
         if (remarks.isNullOrEmpty()) {
             return null
         }
-        val serverList = decodeServerList()
-        for (guid in serverList) {
-            val profile = decodeServerConfig(guid)
-            if (profile != null && profile.remarks == remarks) {
-                return profile
-            }
-        }
-        return null
+        val serverList = decodeAllServerList()
+        return serverList
+            .mapNotNull { guid -> decodeServerConfig(guid) }
+            .firstOrNull { it.remarks == remarks }
     }
 
     /**
@@ -400,7 +408,7 @@ object SettingsManager {
     /**
      * Ensure default settings are present in MMKV.
      */
-    fun ensureDefaultSettings() {
+    private fun ensureDefaultSettings() {
         // Write defaults in the exact order requested by the user
         ensureDefaultValue(AppConfig.PREF_MODE, AppConfig.VPN)
         ensureDefaultValue(AppConfig.PREF_VPN_DNS, AppConfig.DNS_VPN)
@@ -424,14 +432,14 @@ object SettingsManager {
         }
     }
 
-    fun migrateHysteria2PinSHA256() {
+    private fun migrateHysteria2PinSHA256() {
         // Check if migration has already been done
         val migrationKey = "hysteria2_pin_sha256_migrated"
         if (MmkvManager.decodeSettingsBool(migrationKey, false)) {
             return
         }
 
-        val serverList = decodeServerList()
+        val serverList = decodeAllServerList()
 
         for (guid in serverList) {
             val profile = decodeServerConfig(guid) ?: continue
@@ -447,6 +455,78 @@ object SettingsManager {
         }
 
         MmkvManager.encodeSettings(migrationKey, true)
+    }
+
+    /**
+     * Migrates server list from legacy KEY_ANG_CONFIGS to subscription-based storage.
+     * This method should be called once during app initialization after the storage structure change.
+     * Servers are grouped by their subscriptionId into respective subscription's serverList.
+     * Servers without subscription are moved to the default subscription.
+     * After migration, KEY_ANG_CONFIGS is removed.
+     */
+    private fun migrateServerListToSubscriptions() {
+        // Check if migration has already been done
+        val migrationKey = "server_list_to_subscriptions_migrated"
+        if (MmkvManager.decodeSettingsBool(migrationKey, false)) {
+            return
+        }
+
+        // Ensure default subscription exists before migration
+        ensureDefaultSubscription()
+
+        // Read existing server list from legacy KEY_ANG_CONFIGS
+        val oldJson = MmkvManager.readLegacyServerList()
+        if (oldJson.isNullOrBlank()) {
+            // No data to migrate, mark as done
+            MmkvManager.encodeSettings(migrationKey, true)
+            return
+        }
+
+        val guids = JsonUtil.fromJson(oldJson, Array<String>::class.java) ?: run {
+            MmkvManager.encodeSettings(migrationKey, true)
+            return
+        }
+
+        val subscriptionServerMap = mutableMapOf<String, MutableList<String>>()
+
+        // Group servers by subscription (use default subscription for empty subscriptionId)
+        guids.forEach { guid ->
+            val config = decodeServerConfig(guid) ?: return@forEach
+            val subId = config.subscriptionId.ifEmpty { DEFAULT_SUBSCRIPTION_ID }
+
+            subscriptionServerMap.getOrPut(subId) { mutableListOf() }.add(guid)
+        }
+
+        // Update each subscription's serverList (including default subscription)
+        subscriptionServerMap.forEach { (subId, serverGuids) ->
+            MmkvManager.encodeServerList(serverGuids, subId)
+        }
+
+        // Remove legacy KEY_ANG_CONFIGS data
+        // MmkvManager.removeLegacyServerListKey()
+
+        // Mark migration as complete
+        MmkvManager.encodeSettings(migrationKey, true)
+    }
+
+    /**
+     * Ensures the default subscription exists for ungrouped servers.
+     * This subscription is used internally to store servers without a subscription.
+     * Made public for migration in SettingsManager.
+     */
+    private fun ensureDefaultSubscription() {
+        if (decodeSubscription(DEFAULT_SUBSCRIPTION_ID) == null) {
+            val defaultSub = SubscriptionItem(
+                remarks = "Default",
+            )
+            encodeSubscription(DEFAULT_SUBSCRIPTION_ID, defaultSub)
+
+            // Move top
+            val subsList = decodeSubsList()
+            if (subsList.count() > 1) {
+                swapSubscriptions(0, subsList.count() - 1)
+            }
+        }
     }
 
 }

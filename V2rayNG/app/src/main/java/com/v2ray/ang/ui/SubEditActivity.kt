@@ -145,7 +145,7 @@ class SubEditActivity : BaseActivity() {
         del_config = menu.findItem(R.id.del_config)
         save_config = menu.findItem(R.id.save_config)
 
-        if (editSubId.isEmpty()) {
+        if (editSubId.isEmpty() || editSubId == AppConfig.DEFAULT_SUBSCRIPTION_ID) {
             del_config?.isVisible = false
         }
 
