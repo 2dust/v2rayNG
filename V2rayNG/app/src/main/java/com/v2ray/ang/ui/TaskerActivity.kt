@@ -30,7 +30,7 @@ class TaskerActivity : BaseActivity() {
         lstData.add("Default")
         lstGuid.add(AppConfig.TASKER_DEFAULT_GUID)
 
-        MmkvManager.decodeServerList().forEach { key ->
+        MmkvManager.decodeAllServerList().forEach { key ->
             MmkvManager.decodeServerConfig(key)?.let { config ->
                 lstData.add(config.remarks)
                 lstGuid.add(key)
