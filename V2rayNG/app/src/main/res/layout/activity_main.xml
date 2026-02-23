@@ -65,6 +65,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/view_height_dp64"
                         android:clickable="true"
+                        android:contentDescription="@string/connection_test_pending"
                         android:focusable="true"
                         android:nextFocusLeft="@+id/view_pager"
                         android:nextFocusRight="@+id/fab"

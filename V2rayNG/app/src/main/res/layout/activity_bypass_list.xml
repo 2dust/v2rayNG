@@ -68,6 +68,7 @@
                         android:layout_height="wrap_content"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
+                        android:contentDescription="@string/switch_bypass_apps_mode"
                         android:focusable="true"
                         android:gravity="center"
                         android:padding="@dimen/padding_spacing_dp8">

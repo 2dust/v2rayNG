@@ -29,6 +29,7 @@
                 <ImageView
                     android:layout_width="@dimen/image_size_dp24"
                     android:layout_height="@dimen/image_size_dp24"
+                    android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_backup_24dp" />
 
                 <LinearLayout
@@ -61,6 +62,7 @@
                 <ImageView
                     android:layout_width="@dimen/image_size_dp24"
                     android:layout_height="@dimen/image_size_dp24"
+                    android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_share_24dp" />
 
                 <TextView
@@ -85,6 +87,7 @@
                 <ImageView
                     android:layout_width="@dimen/image_size_dp24"
                     android:layout_height="@dimen/image_size_dp24"
+                    android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_restore_24dp" />
 
                 <TextView
@@ -117,6 +120,7 @@
                 <ImageView
                     android:layout_width="@dimen/image_size_dp24"
                     android:layout_height="@dimen/image_size_dp24"
+                    android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_settings_24dp" />
 
                 <LinearLayout
