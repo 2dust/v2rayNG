@@ -1,8 +1,8 @@
 package com.v2ray.ang.fmt
 
-import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.idnHost
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.handler.V2rayConfigManager

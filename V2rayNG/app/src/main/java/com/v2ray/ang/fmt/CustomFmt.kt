@@ -1,8 +1,8 @@
 package com.v2ray.ang.fmt
 
-import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.util.JsonUtil
 
 object CustomFmt : FmtBase() {
