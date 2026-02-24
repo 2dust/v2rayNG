@@ -6,7 +6,7 @@ import android.os.IBinder
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG
 import com.v2ray.ang.AppConfig.MSG_MEASURE_CONFIG_CANCEL
-import com.v2ray.ang.extension.serializable
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.V2RayNativeManager
 import com.v2ray.ang.util.MessageUtil
 import java.util.Collections
@@ -54,8 +54,14 @@ class V2RayTestService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.getIntExtra("key", 0)) {
             MSG_MEASURE_CONFIG -> {
-                val guidsList = intent.serializable<ArrayList<String>>("content")
-                if (guidsList != null && guidsList.isNotEmpty()) {
+                val subscriptionId = intent.getStringExtra("content").orEmpty()
+                val guidsList = if (subscriptionId.isEmpty()) {
+                    MmkvManager.decodeAllServerList()
+                } else {
+                    MmkvManager.decodeServerList(subscriptionId)
+                }
+
+                if (guidsList.isNotEmpty()) {
                     lateinit var worker: RealPingWorkerService
                     worker = RealPingWorkerService(this, guidsList) { status ->
                         // notify UI and remove the worker from active list when finished

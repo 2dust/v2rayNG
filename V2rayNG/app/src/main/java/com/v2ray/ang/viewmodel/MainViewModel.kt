@@ -240,13 +240,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         MmkvManager.clearAllTestDelayResults(serversCache.map { it.guid }.toList())
         updateListAction.value = -1
 
-        val serversCopy = serversCache.toList()
         viewModelScope.launch(Dispatchers.Default) {
-            val guids = ArrayList<String>(serversCopy.map { it.guid })
-            if (guids.isEmpty()) {
+            if (serversCache.isEmpty()) {
                 return@launch
             }
-            MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG, guids)
+            MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG, subscriptionId)
         }
     }
 
