@@ -231,6 +231,9 @@
     <string name="title_pref_double_column_display">启用双列显示</string>
     <string name="summary_pref_double_column_display">配置列表以双列显示，允许在屏幕上显示更多内容。需要重启应用生效。</string>
 
+    <string name="title_pref_group_all_display">启用显示所有组</string>
+    <string name="summary_pref_group_all_display">添加一个额外的“所有选项卡”页面</string>
+
     <!-- AboutActivity -->
     <string name="title_pref_feedback">反馈</string>
     <string name="summary_pref_feedback">反馈改进或漏洞至 GitHub</string>

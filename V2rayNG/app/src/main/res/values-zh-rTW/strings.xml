@@ -232,6 +232,9 @@
     <string name="title_pref_double_column_display">啟用雙列顯示</string>
     <string name="summary_pref_double_column_display">設定檔清單以雙列顯示，允許在螢幕上顯示更多內容。需要重啟應用生效。</string>
 
+    <string name="title_pref_group_all_display">啟用顯示所有群組</string>
+    <string name="summary_pref_group_all_display">新增一個額外的「所有選項卡」頁面</string>
+
     <!-- AboutActivity -->
     <string name="title_pref_feedback">意見回饋</string>
     <string name="summary_pref_feedback">前往 GitHub 回報錯誤</string>

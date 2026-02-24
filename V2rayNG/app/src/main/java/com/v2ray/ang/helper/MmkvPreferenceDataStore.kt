@@ -79,5 +79,6 @@ class MmkvPreferenceDataStore : PreferenceDataStore() {
         }
         // Notify listeners that require service restart or reinit
         SettingsChangeManager.makeRestartService()
+        SettingsChangeManager.makeSetupGroupTab()
     }
 }

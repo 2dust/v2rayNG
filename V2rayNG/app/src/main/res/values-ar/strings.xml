@@ -234,6 +234,8 @@
     <string name="title_pref_double_column_display">Enable double column display</string>
     <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen. You need to restart the application to take effect.</string>
 
+    <string name="title_pref_group_all_display">Enable show all groups</string>
+    <string name="summary_pref_group_all_display">Add an extra "All Tabs" page</string>
     <!-- AboutActivity -->
     <string name="title_pref_feedback">ملاحظات</string>
     <string name="summary_pref_feedback">ملاحظات التحسينات أو الأخطاء إلى GitHub</string>

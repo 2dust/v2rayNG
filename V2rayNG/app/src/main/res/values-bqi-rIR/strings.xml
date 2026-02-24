@@ -234,6 +234,8 @@
     <string name="title_pref_double_column_display">ره وندن نشووݩ داڌن دو سۊتۊنی</string>
     <string name="summary_pref_double_column_display">نومگه نمایه یل من دو سۊتۊن نشووݩ داڌه ابۊن وو چینۉ ترین موئتوا بیشتری ن سیل کۊنین. سی ره وستن، وا برنومه ن ز نۊ ره ونین.</string>
 
+    <string name="title_pref_group_all_display">Enable show all groups</string>
+    <string name="summary_pref_group_all_display">Add an extra "All Tabs" page</string>
     <!-- AboutActivity -->
     <string name="title_pref_feedback">فشناڌن منشڌ</string>
     <string name="summary_pref_feedback">فشناڌن منشڌ یا گوزارش موشکلا من Github</string>
