@@ -233,8 +233,8 @@
     <string name="title_pref_double_column_display">Профили в два столбца</string>
     <string name="summary_pref_double_column_display">Список профилей отображается двумя столбцами, что позволяет показать больше информации на экране. Требуется перезапуск приложения.</string>
 
-    <string name="title_pref_group_all_display">Enable show all groups</string>
-    <string name="summary_pref_group_all_display">Add an extra "All Tabs" page</string>
+    <string name="title_pref_group_all_display">Общая вкладка групп</string>
+    <string name="summary_pref_group_all_display">Показывать дополнительную вкладку со всеми профилями групп</string>
     <!-- AboutActivity -->
     <string name="title_pref_feedback">Обратная связь</string>
     <string name="summary_pref_feedback">Предложить улучшение или сообщить об ошибке на GitHub</string>
@@ -358,7 +358,7 @@
     <string name="title_configuration_restore">Восстановление конфигурации</string>
     <string name="title_configuration_share">Поделиться конфигурацией</string>
     <string name="title_webdav_config_setting">Настройки WebDAV</string>
-    <string name="title_webdav_config_setting_unknown">Необходимо настроить WebDAV.</string>
+    <string name="title_webdav_config_setting_unknown">Необходимо настроить WebDAV</string>
     <string name="title_webdav_url">URL сервера</string>
     <string name="title_webdav_user">Пользователь</string>
     <string name="title_webdav_pass">Пароль</string>
