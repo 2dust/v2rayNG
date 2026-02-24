@@ -37,8 +37,6 @@ import java.util.Collections
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var serverList = mutableListOf<String>() // MmkvManager.decodeServerList()
     var subscriptionId: String = MmkvManager.decodeSettingsString(AppConfig.CACHE_SUBSCRIPTION_ID, "").orEmpty()
-
-    //var keywordFilter: String = MmkvManager.MmkvManager.decodeSettingsString(AppConfig.CACHE_KEYWORD_FILTER, "")?:""
     var keywordFilter = ""
     val serversCache = mutableListOf<ServersCache>()
     val isRunning by lazy { MutableLiveData<Boolean>() }
@@ -149,6 +147,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     @Synchronized
     fun updateCache() {
         serversCache.clear()
+        val kw = keywordFilter.trim().lowercase()
         for (guid in serverList) {
             val profile = MmkvManager.decodeServerConfig(guid) ?: continue
 //            var profile = MmkvManager.decodeProfileConfig(guid)
@@ -167,8 +166,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 //            if (subscriptionId.isNotEmpty() && subscriptionId != profile.subscriptionId) {
 //                continue
 //            }
+            if (kw.isEmpty()) {
+                serversCache.add(ServersCache(guid, profile))
+                continue
+            }
 
-            if (keywordFilter.isEmpty() || profile.remarks.lowercase().contains(keywordFilter.lowercase())) {
+            val remarks = profile.remarks.lowercase()
+            val description = profile.description.orEmpty().lowercase()
+            val server = profile.server.orEmpty().lowercase()
+
+            if (remarks.contains(kw) || description.contains(kw) || server.contains(kw)) {
                 serversCache.add(ServersCache(guid, profile))
             }
         }
@@ -430,7 +437,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         keywordFilter = keyword
-        MmkvManager.encodeSettings(AppConfig.CACHE_KEYWORD_FILTER, keywordFilter)
         reloadServerList()
     }
 
