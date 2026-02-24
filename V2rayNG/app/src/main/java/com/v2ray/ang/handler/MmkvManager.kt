@@ -226,6 +226,16 @@ object MmkvManager {
     }
 
     /**
+     * Encodes the server configuration directly without updating serverList.
+     *
+     * @param key The server GUID.
+     * @param configJson The server configuration JSON string.
+     */
+    fun encodeProfileDirect(key: String, configJson: String) {
+        profileFullStorage.encode(key, configJson)
+    }
+
+    /**
      * Removes the server configuration.
      *
      * @param guid The server GUID.

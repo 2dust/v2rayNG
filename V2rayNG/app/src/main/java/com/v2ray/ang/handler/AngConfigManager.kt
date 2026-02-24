@@ -11,6 +11,7 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.SubscriptionCache
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.fmt.Hysteria2Fmt
 import com.v2ray.ang.fmt.ShadowsocksFmt
@@ -237,21 +238,75 @@ object AngConfigManager {
             }
 
             val subItem = MmkvManager.decodeSubscription(subid)
-            var count = 0
+
+            // Parse all configs first (no I/O during parsing)
+            val configs = mutableListOf<ProfileItem>()
             servers.lines()
                 .distinct()
                 .reversed()
                 .forEach {
-                    val resId = parseConfig(it, subid, subItem, removedSelectedServer)
-                    if (resId == 0) {
-                        count++
+                    val config = parseConfig(it, subid, subItem)
+                    if (config != null) {
+                        configs.add(config)
                     }
                 }
-            return count
+
+            // Batch save all parsed configs (only one serverList read/write)
+            if (configs.isNotEmpty()) {
+                val keys = batchSaveConfigs(configs, subid)
+
+                // Handle removed selected server
+                removedSelectedServer?.let { removed ->
+                    val matchKey = keys.find { key ->
+                        val savedConfig = MmkvManager.decodeServerConfig(key)
+                        savedConfig != null &&
+                                savedConfig.server == removed.server &&
+                                savedConfig.serverPort == removed.serverPort
+                    }
+                    matchKey?.let { MmkvManager.setSelectServer(it) }
+                }
+            }
+
+            return configs.size
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to parse batch config", e)
         }
         return 0
+    }
+
+    /**
+     * Batch save configurations to reduce serverList read/write operations.
+     * Reads serverList once, saves all configs, then writes serverList once.
+     *
+     * @param configs The list of ProfileItem to save.
+     * @param subid The subscription ID.
+     * @return The list of generated keys.
+     */
+    private fun batchSaveConfigs(configs: List<ProfileItem>, subid: String): List<String> {
+        val keys = mutableListOf<String>()
+
+        // Read serverList once
+        val serverList = MmkvManager.decodeServerList(subid)
+        var needSetSelected = MmkvManager.getSelectServer().isNullOrBlank()
+
+        configs.forEach { config ->
+            val key = Utils.getUuid()
+            // Save profile directly without updating serverList
+            MmkvManager.encodeProfileDirect(key, JsonUtil.toJson(config))
+
+            if (!serverList.contains(key)) {
+                serverList.add(0, key)
+                if (needSetSelected) {
+                    MmkvManager.setSelectServer(key)
+                    needSetSelected = false
+                }
+            }
+            keys.add(key)
+        }
+
+        // Write serverList once
+        MmkvManager.encodeServerList(serverList, subid)
+        return keys
     }
 
     /**
@@ -319,22 +374,21 @@ object AngConfigManager {
 
     /**
      * Parses the configuration from a QR code or string.
+     * Only parses and returns ProfileItem, does not save.
      *
      * @param str The configuration string.
      * @param subid The subscription ID.
      * @param subItem The subscription item.
-     * @param removedSelectedServer The removed selected server.
-     * @return The result code.
+     * @return The parsed ProfileItem or null if parsing fails or filtered out.
      */
     private fun parseConfig(
         str: String?,
         subid: String,
-        subItem: SubscriptionItem?,
-        removedSelectedServer: ProfileItem?
-    ): Int {
+        subItem: SubscriptionItem?
+    ): ProfileItem? {
         try {
             if (str == null || TextUtils.isEmpty(str)) {
-                return R.string.toast_none_data
+                return null
             }
 
             val config = if (str.startsWith(EConfigType.VMESS.protocolScheme)) {
@@ -356,28 +410,24 @@ object AngConfigManager {
             }
 
             if (config == null) {
-                return R.string.toast_incorrect_protocol
+                return null
             }
-            //filter
-            if (subItem?.filter != null && subItem.filter?.isNotEmpty() == true && config.remarks.isNotEmpty()) {
-                val matched = Regex(pattern = subItem.filter ?: "")
+
+            // Apply filter
+            if (subItem?.filter.isNotNullEmpty() && config.remarks.isNotNullEmpty()) {
+                val matched = Regex(pattern = subItem?.filter.orEmpty())
                     .containsMatchIn(input = config.remarks)
-                if (!matched) return -1
+                if (!matched) return null
             }
 
             config.subscriptionId = subid
             config.description = generateDescription(config)
-            val guid = MmkvManager.encodeServerConfig("", config)
-            if (removedSelectedServer != null &&
-                config.server == removedSelectedServer.server && config.serverPort == removedSelectedServer.serverPort
-            ) {
-                MmkvManager.setSelectServer(guid)
-            }
+
+            return config
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to parse config", e)
-            return -1
+            return null
         }
-        return 0
     }
 
     /**
