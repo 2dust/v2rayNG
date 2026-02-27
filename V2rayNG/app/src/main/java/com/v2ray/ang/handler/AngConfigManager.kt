@@ -10,6 +10,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.SubscriptionCache
 import com.v2ray.ang.dto.SubscriptionItem
+import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.fmt.CustomFmt
@@ -433,45 +434,48 @@ object AngConfigManager {
     /**
      * Updates the configuration via all subscriptions.
      *
-     * @return The number of configurations updated.
+     * @return Detailed result of the subscription update operation.
      */
-    fun updateConfigViaSubAll(): Int {
-        var count = 0
-        try {
-            MmkvManager.decodeSubscriptions().forEach {
-                count += updateConfigViaSub(it)
+    fun updateConfigViaSubAll(): SubscriptionUpdateResult {
+        return try {
+            val subscriptions = MmkvManager.decodeSubscriptions()
+            subscriptions.fold(SubscriptionUpdateResult()) { acc, subscription ->
+                acc + updateConfigViaSub(subscription)
             }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to update config via all subscriptions", e)
-            return 0
+            SubscriptionUpdateResult()
         }
-        return count
     }
 
     /**
      * Updates the configuration via a subscription.
      *
      * @param it The subscription item.
-     * @return The number of configurations updated.
+     * @return Subscription update result.
      */
-    fun updateConfigViaSub(it: SubscriptionCache): Int {
+    fun updateConfigViaSub(it: SubscriptionCache): SubscriptionUpdateResult {
         try {
+            // Check if disabled
+            if (!it.subscription.enabled) {
+                return SubscriptionUpdateResult(skipCount = 1)
+            }
+
+            // Validate subscription info
             if (TextUtils.isEmpty(it.guid)
                 || TextUtils.isEmpty(it.subscription.remarks)
                 || TextUtils.isEmpty(it.subscription.url)
             ) {
-                return 0
+                return SubscriptionUpdateResult(skipCount = 1)
             }
-            if (!it.subscription.enabled) {
-                return 0
-            }
+
             val url = HttpUtil.toIdnUrl(it.subscription.url)
             if (!Utils.isValidUrl(url)) {
-                return 0
+                return SubscriptionUpdateResult(failureCount = 1)
             }
             if (!it.subscription.allowInsecureUrl) {
                 if (!Utils.isValidSubUrl(url)) {
-                    return 0
+                    return SubscriptionUpdateResult(failureCount = 1)
                 }
             }
             Log.i(AppConfig.TAG, url)
@@ -493,18 +497,25 @@ object AngConfigManager {
                 }
             }
             if (configText.isEmpty()) {
-                return 0
+                return SubscriptionUpdateResult(failureCount = 1)
             }
+
             val count = parseConfigViaSub(configText, it.guid, false)
             if (count > 0) {
                 it.subscription.lastUpdated = System.currentTimeMillis()
                 MmkvManager.encodeSubscription(it.guid, it.subscription)
                 Log.i(AppConfig.TAG, "Subscription updated: ${it.subscription.remarks}, $count configs")
+                return SubscriptionUpdateResult(
+                    configCount = count,
+                    successCount = 1
+                )
+            } else {
+                // Got response but no valid configs parsed
+                return SubscriptionUpdateResult(failureCount = 1)
             }
-            return count
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to update config via subscription", e)
-            return 0
+            return SubscriptionUpdateResult(failureCount = 1)
         }
     }
 

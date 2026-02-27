@@ -17,6 +17,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.dto.SubscriptionCache
+import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -183,13 +184,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Updates the configuration via subscription for all servers.
-     * @return The number of updated configurations.
+     * @return Detailed result of the subscription update operation.
      */
-    fun updateConfigViaSubAll(): Int {
+    fun updateConfigViaSubAll(): SubscriptionUpdateResult {
         if (subscriptionId.isEmpty()) {
             return AngConfigManager.updateConfigViaSubAll()
         } else {
-            val subItem = MmkvManager.decodeSubscription(subscriptionId) ?: return 0
+            val subItem = MmkvManager.decodeSubscription(subscriptionId) ?: return SubscriptionUpdateResult()
             return AngConfigManager.updateConfigViaSub(SubscriptionCache(subscriptionId, subItem))
         }
     }

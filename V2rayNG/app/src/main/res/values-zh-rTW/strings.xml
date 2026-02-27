@@ -295,6 +295,8 @@
     <string name="title_import_config_count">匯入 %d 個配置</string>
     <string name="title_export_config_count">匯出 %d 個配置</string>
     <string name="title_update_config_count">更新 %d 個配置</string>
+    <string name="title_update_subscription_result">更新了 %1$d 個配置（%2$d 個成功，%3$d 個失敗，%4$d 個跳過）</string>
+    <string name="title_update_subscription_no_subscription">無訂閱</string>
     <string name="tasker_start_service">啟動服務</string>
     <string name="tasker_setting_confirm">確定</string>
 

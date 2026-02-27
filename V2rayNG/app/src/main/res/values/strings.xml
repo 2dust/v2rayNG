@@ -301,6 +301,8 @@
     <string name="title_import_config_count">Import %d configs</string>
     <string name="title_export_config_count">Export %d configs</string>
     <string name="title_update_config_count">Update %d configs</string>
+    <string name="title_update_subscription_result">Updated %1$d configs (%2$d success, %3$d failed, %4$d skipped)</string>
+    <string name="title_update_subscription_no_subscription">No subscriptions</string>
 
     <string name="tasker_start_service">Start Service</string>
     <string name="tasker_setting_confirm">Confirm</string>

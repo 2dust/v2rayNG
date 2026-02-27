@@ -18,8 +18,6 @@ import com.v2ray.ang.contracts.BaseAdapterListener
 import com.v2ray.ang.databinding.ActivitySubSettingBinding
 import com.v2ray.ang.databinding.ItemQrcodeBinding
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
@@ -77,14 +75,20 @@ class SubSettingActivity : BaseActivity() {
             showLoading()
 
             lifecycleScope.launch(Dispatchers.IO) {
-                val count = AngConfigManager.updateConfigViaSubAll()
+                val result = AngConfigManager.updateConfigViaSubAll()
                 delay(500L)
                 launch(Dispatchers.Main) {
-                    if (count > 0) {
-                        toastSuccess(R.string.toast_success)
-                        refreshData()
+                    if (result.successCount + result.failureCount + result.skipCount == 0) {
+                        toast(R.string.title_update_subscription_no_subscription)
+                    } else if (result.successCount > 0 && result.failureCount + result.skipCount == 0) {
+                        toast(getString(R.string.title_update_config_count, result.configCount))
                     } else {
-                        toastError(R.string.toast_failure)
+                        toast(
+                            getString(
+                                R.string.title_update_subscription_result,
+                                result.configCount, result.successCount, result.failureCount, result.skipCount
+                            )
+                        )
                     }
                     hideLoading()
                 }

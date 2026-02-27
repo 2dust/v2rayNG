@@ -437,14 +437,23 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         showLoading()
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val count = mainViewModel.updateConfigViaSubAll()
+            val result = mainViewModel.updateConfigViaSubAll()
             delay(500L)
             launch(Dispatchers.Main) {
-                if (count > 0) {
-                    toast(getString(R.string.title_update_config_count, count))
-                    mainViewModel.reloadServerList()
+                if (result.successCount + result.failureCount + result.skipCount == 0) {
+                    toast(R.string.title_update_subscription_no_subscription)
+                } else if (result.successCount > 0 && result.failureCount + result.skipCount == 0) {
+                    toast(getString(R.string.title_update_config_count, result.configCount))
                 } else {
-                    toastError(R.string.toast_failure)
+                    toast(
+                        getString(
+                            R.string.title_update_subscription_result,
+                            result.configCount, result.successCount, result.failureCount, result.skipCount
+                        )
+                    )
+                }
+                if (result.configCount > 0) {
+                    mainViewModel.reloadServerList()
                 }
                 hideLoading()
             }

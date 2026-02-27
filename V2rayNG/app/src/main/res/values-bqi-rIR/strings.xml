@@ -297,6 +297,8 @@
     <string name="title_import_config_count">و من ٱووردن %d کانفیگ</string>
     <string name="title_export_config_count">و در کشیڌن %d کانفیگ</string>
     <string name="title_update_config_count">ورۊ کردن %d کانفیگ</string>
+    <string name="title_update_subscription_result">Updated %1$d configs (%2$d success, %3$d failed, %4$d skipped)</string>
+    <string name="title_update_subscription_no_subscription">No subscriptions</string>
     <string name="tasker_start_service">ره وندن خدمات</string>
     <string name="tasker_setting_confirm">قوۊل</string>
 
