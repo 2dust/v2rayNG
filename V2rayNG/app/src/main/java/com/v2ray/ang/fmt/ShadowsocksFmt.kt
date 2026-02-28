@@ -153,6 +153,17 @@ object ShadowsocksFmt : FmtBase() {
             server.port = profileItem.serverPort.orEmpty().toInt()
             server.password = profileItem.password
             server.method = profileItem.method
+
+            if (profileItem.method.orEmpty().startsWith("2022-blake3-")) {
+                // UDP over TCP is a feature of SagerNet implementation
+                // which is used by Xray only if the method is one of 2022's
+                // Relevant sources:
+                // https://sing-box.sagernet.org/configuration/shared/udp-over-tcp/
+                // https://github.com/SagerNet/sing-shadowsocks/blob/v0.2.8/shadowaead_2022/protocol.go#L57-L61
+                // https://github.com/XTLS/Xray-core/blob/v26.2.6/infra/conf/shadowsocks.go#L54-L56
+                // https://github.com/XTLS/Xray-core/blob/v26.2.6/proxy/shadowsocks_2022/outbound.go#L58-L60
+                server.uot = true;
+            }
         }
 
         val sni = outboundBean?.streamSettings?.let {

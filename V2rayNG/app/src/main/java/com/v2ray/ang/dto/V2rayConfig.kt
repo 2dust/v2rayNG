@@ -130,6 +130,7 @@ data class V2rayConfig(
                 val email: String? = null,
                 var flow: String? = null,
                 val ivCheck: Boolean? = null,
+                var uot: Boolean? = null,
                 var users: List<SocksUsersBean>? = null
             ) {
                 data class SocksUsersBean(
