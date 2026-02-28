@@ -7,6 +7,7 @@ import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.idnHost
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.V2rayConfigManager
 import com.v2ray.ang.util.Utils
 import java.net.URI
@@ -64,6 +65,13 @@ object ShadowsocksFmt : FmtBase() {
                 config.headerType = "http"
                 config.host = queryPairs["obfs-host"]
                 config.path = queryPairs["path"]
+            } else {
+                val allowInsecureDefault = try {
+                    MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
+                } catch(_: IllegalStateException) {
+                    false
+                }
+                getItemFormQuery(config, queryParam, allowInsecureDefault)
             }
         }
 
