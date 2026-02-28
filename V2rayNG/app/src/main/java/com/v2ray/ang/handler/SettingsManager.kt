@@ -502,8 +502,6 @@ object SettingsManager {
             MmkvManager.encodeServerList(serverGuids, subId)
         }
 
-        // Remove legacy KEY_ANG_CONFIGS data
-        // MmkvManager.removeLegacyServerListKey()
 
         // Mark migration as complete
         MmkvManager.encodeSettings(migrationKey, true)

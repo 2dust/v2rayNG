@@ -19,7 +19,6 @@ object MmkvManager {
 
     //region private
 
-    //private const val ID_PROFILE_CONFIG = "PROFILE_CONFIG"
     private const val ID_MAIN = "MAIN"
     private const val ID_PROFILE_FULL_CONFIG = "PROFILE_FULL_CONFIG"
     private const val ID_SERVER_RAW = "SERVER_RAW"
@@ -33,7 +32,6 @@ object MmkvManager {
     private const val KEY_SUB_IDS = "SUB_IDS"
     private const val KEY_WEBDAV_CONFIG = "WEBDAV_CONFIG"
 
-    //private val profileStorage by lazy { MMKV.mmkvWithID(ID_PROFILE_CONFIG, MMKV.MULTI_PROCESS_MODE) }
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val profileFullStorage by lazy { MMKV.mmkvWithID(ID_PROFILE_FULL_CONFIG, MMKV.MULTI_PROCESS_MODE) }
     private val serverRawStorage by lazy { MMKV.mmkvWithID(ID_SERVER_RAW, MMKV.MULTI_PROCESS_MODE) }
@@ -56,13 +54,6 @@ object MmkvManager {
         return mainStorage.decodeString(KEY_ANG_CONFIGS)
     }
 
-//    /**
-//     * Removes the legacy KEY_ANG_CONFIGS after migration.
-//     * This method is for migration purposes only.
-//     */
-//    fun removeLegacyServerListKey() {
-//        mainStorage.remove(KEY_ANG_CONFIGS)
-//    }
 
     /**
      * Gets the selected server GUID.
@@ -95,13 +86,6 @@ object MmkvManager {
         mainStorage.encode(key, JsonUtil.toJson(serverList))
     }
 
-    // Legacy method for compatibility
-    // TODO: Remove after migration and update all callers
-    /*
-    fun encodeServerList(serverList: MutableList<String>) {
-        mainStorage.encode(KEY_ANG_CONFIGS, JsonUtil.toJson(serverList))
-    }
-    */
 
     /**
      * Decodes the server list for a given subscription.
@@ -139,18 +123,6 @@ object MmkvManager {
         return allServers
     }
 
-    // Legacy method for compatibility - reads all servers
-    // TODO: Remove after migration and update all callers
-    /*
-    fun decodeServerList(): MutableList<String> {
-        val json = mainStorage.decodeString(KEY_ANG_CONFIGS)
-        return if (json.isNullOrBlank()) {
-            mutableListOf()
-        } else {
-            JsonUtil.fromJson(json, Array<String>::class.java)?.toMutableList() ?: mutableListOf()
-        }
-    }
-    */
 
     /**
      * Decodes the server configuration.
@@ -169,16 +141,6 @@ object MmkvManager {
         return JsonUtil.fromJson(json, ProfileItem::class.java)
     }
 
-//    fun decodeProfileConfig(guid: String): ProfileLiteItem? {
-//        if (guid.isBlank()) {
-//            return null
-//        }
-//        val json = profileStorage.decodeString(guid)
-//        if (json.isNullOrBlank()) {
-//            return null
-//        }
-//        return JsonUtil.fromJson(json, ProfileLiteItem::class.java)
-//    }
 
     /**
      * Encodes the server configuration.
@@ -203,25 +165,6 @@ object MmkvManager {
             }
         }
 
-        // Legacy code - keep for reference during migration
-        /*
-        val serverList = decodeServerList()
-        if (!serverList.contains(key)) {
-            serverList.add(0, key)
-            encodeServerList(serverList)
-            if (getSelectServer().isNullOrBlank()) {
-                mainStorage.encode(KEY_SELECTED_SERVER, key)
-            }
-        }
-        */
-//        val profile = ProfileLiteItem(
-//            configType = config.configType,
-//            subscriptionId = config.subscriptionId,
-//            remarks = config.remarks,
-//            server = config.getProxyOutbound()?.getServerAddress(),
-//            serverPort = config.getProxyOutbound()?.getServerPort(),
-//        )
-//        profileStorage.encode(key, JsonUtil.toJson(profile))
         return key
     }
 
@@ -254,22 +197,11 @@ object MmkvManager {
         serverList.remove(guid)
         encodeServerList(serverList, subId)
 
-        // Legacy code - keep for reference during migration
-        /*
-        if (getSelectServer() == guid) {
-            mainStorage.remove(KEY_SELECTED_SERVER)
-        }
-        val serverList = decodeServerList()
-        serverList.remove(guid)
-        encodeServerList(serverList)
-        */
-
         // Clean up storage
         if (getSelectServer() == guid) {
             mainStorage.remove(KEY_SELECTED_SERVER)
         }
         profileFullStorage.remove(guid)
-        //profileStorage.remove(guid)
         serverAffStorage.remove(guid)
     }
 
@@ -293,17 +225,6 @@ object MmkvManager {
 
         serverList.clear()
         encodeServerList(serverList, subId)
-
-        // Legacy code - keep for reference during migration
-        /*
-        profileFullStorage.allKeys()?.forEach { key ->
-            decodeServerConfig(key)?.let { config ->
-                if (config.subscriptionId == subid) {
-                    removeServer(key)
-                }
-            }
-        }
-        */
     }
 
     /**
@@ -361,7 +282,6 @@ object MmkvManager {
         val count = profileFullStorage.allKeys()?.count() ?: 0
         mainStorage.clearAll()
         profileFullStorage.clearAll()
-        //profileStorage.clearAll()
         serverAffStorage.clearAll()
         return count
     }
