@@ -86,9 +86,14 @@ object ZipUtil {
         }
         try {
             ZipFile(zipFile).use { zip ->
+                val destDir = File(destDirectory).canonicalFile
                 zip.entries().asSequence().forEach { entry ->
                     zip.getInputStream(entry).use { input ->
-                        val filePath = destDirectory + File.separator + entry.name
+                        val destFile = File(destDir, entry.name).canonicalFile
+                        if (!destFile.toPath().startsWith(destDir.toPath())) {
+                            throw IOException("Entry is outside of the target directory: ${entry.name}")
+                        }
+                        val filePath = destFile.absolutePath
                         if (!entry.isDirectory) {
                             extractFile(input, filePath)
                         } else {
