@@ -120,9 +120,15 @@ object ShadowsocksFmt : FmtBase() {
      * @return the converted URI string
      */
     fun toUri(config: ProfileItem): String {
-        val pw = "${config.method}:${config.password}"
+        val isRaw = config.network.let { it.isNullOrBlank() || it == NetworkType.TCP.type }
+                && config.headerType.let { it.isNullOrBlank() || it == "none" }
+                && config.host.let { it.isNullOrBlank() }
+                && config.security.let { it.isNullOrBlank() || it == "none" }
 
-        return toUri(config, Utils.encode(pw, true), null)
+        val pw = "${config.method}:${config.password}"
+        val dicQuery = if (!isRaw) getQueryDic(config) else null
+
+        return toUri(config, Utils.encode(pw, true), dicQuery)
     }
 
     /**
