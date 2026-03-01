@@ -7,6 +7,7 @@ import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.idnHost
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.V2rayConfigManager
 import com.v2ray.ang.util.Utils
 import java.net.URI
@@ -64,6 +65,13 @@ object ShadowsocksFmt : FmtBase() {
                 config.headerType = "http"
                 config.host = queryPairs["obfs-host"]
                 config.path = queryPairs["path"]
+            } else {
+                val allowInsecureDefault = try {
+                    MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
+                } catch(_: IllegalStateException) {
+                    false
+                }
+                getItemFormQuery(config, queryParam, allowInsecureDefault)
             }
         }
 
@@ -120,9 +128,15 @@ object ShadowsocksFmt : FmtBase() {
      * @return the converted URI string
      */
     fun toUri(config: ProfileItem): String {
-        val pw = "${config.method}:${config.password}"
+        val isRaw = config.network.let { it.isNullOrBlank() || it == NetworkType.TCP.type }
+                && config.headerType.let { it.isNullOrBlank() || it == "none" }
+                && config.host.let { it.isNullOrBlank() }
+                && config.security.let { it.isNullOrBlank() || it == "none" }
 
-        return toUri(config, Utils.encode(pw, true), null)
+        val pw = "${config.method}:${config.password}"
+        val dicQuery = if (!isRaw) getQueryDic(config) else null
+
+        return toUri(config, Utils.encode(pw, true), dicQuery)
     }
 
     /**
@@ -139,6 +153,17 @@ object ShadowsocksFmt : FmtBase() {
             server.port = profileItem.serverPort.orEmpty().toInt()
             server.password = profileItem.password
             server.method = profileItem.method
+
+            if (profileItem.method.orEmpty().startsWith("2022-blake3-")) {
+                // UDP over TCP is a feature of SagerNet implementation
+                // which is used by Xray only if the method is one of 2022's
+                // Relevant sources:
+                // https://sing-box.sagernet.org/configuration/shared/udp-over-tcp/
+                // https://github.com/SagerNet/sing-shadowsocks/blob/v0.2.8/shadowaead_2022/protocol.go#L57-L61
+                // https://github.com/XTLS/Xray-core/blob/v26.2.6/infra/conf/shadowsocks.go#L54-L56
+                // https://github.com/XTLS/Xray-core/blob/v26.2.6/proxy/shadowsocks_2022/outbound.go#L58-L60
+                server.uot = true;
+            }
         }
 
         val sni = outboundBean?.streamSettings?.let {

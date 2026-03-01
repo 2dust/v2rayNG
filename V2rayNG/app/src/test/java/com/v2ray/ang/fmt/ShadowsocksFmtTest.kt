@@ -379,4 +379,29 @@ class ShadowsocksFmtTest {
         assertNotNull(result)
         assertEquals("aes-256-gcm", result?.method)
     }
+
+    // ==================== Stream settings via query string  ====================
+
+    @Test
+    fun test_queryString_toUri() {
+        val config = ProfileItem.create(EConfigType.SHADOWSOCKS)
+        assertFalse(ShadowsocksFmt.toUri(config).contains('?'))
+
+        config.network = "tcp"
+        config.headerType = "none"
+        config.security = "none"
+        assertFalse(ShadowsocksFmt.toUri(config).contains('?'))
+
+        config.network = "ws";
+        assertTrue(ShadowsocksFmt.toUri(config).contains("type=ws"))
+    }
+
+    @Test
+    fun test_queryString_parse() {
+        val uri = "ss://plain:@example.com:443?type=ws&security=tls"
+        val item = ShadowsocksFmt.parse(uri)!!
+
+        assertEquals("ws", item.network)
+        assertEquals("tls", item.security)
+    }
 }
