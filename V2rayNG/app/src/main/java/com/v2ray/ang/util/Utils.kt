@@ -20,6 +20,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
 import java.io.IOException
@@ -616,6 +617,19 @@ object Utils {
             headerType = config.headerType,
             host = config.host,
             security = config.security
+        )
+    }
+
+    fun isRawShadowsocks(outbound: OutboundBean): Boolean {
+        if (!outbound.protocol.equals(EConfigType.SHADOWSOCKS.name, true)) {
+            return false
+        }
+        val streamSettings = outbound.streamSettings;
+        return isRawStreamSettings(
+            network =  streamSettings?.network,
+            headerType = streamSettings?.tcpSettings?.header?.type,
+            host = streamSettings?.wsSettings?.headers?.Host,
+            security = streamSettings?.security
         )
     }
 

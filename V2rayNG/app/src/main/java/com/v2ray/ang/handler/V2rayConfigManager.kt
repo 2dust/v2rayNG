@@ -770,14 +770,15 @@ object V2rayConfigManager {
         try {
             var muxEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false)
             val protocol = outbound.protocol
-            if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)
-                || protocol.equals(EConfigType.SOCKS.name, true)
+            if (protocol.equals(EConfigType.SOCKS.name, true)
                 || protocol.equals(EConfigType.HTTP.name, true)
                 || protocol.equals(EConfigType.TROJAN.name, true)
                 || protocol.equals(EConfigType.WIREGUARD.name, true)
                 || protocol.equals(EConfigType.HYSTERIA2.name, true)
                 || protocol.equals(EConfigType.HYSTERIA.name, true)
             ) {
+                muxEnabled = false
+            } else if (Utils.isRawShadowsocks(outbound)) {
                 muxEnabled = false
             } else if (outbound.streamSettings?.network == NetworkType.XHTTP.type) {
                 muxEnabled = false
