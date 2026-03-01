@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.service.V2RayTestService
 import java.io.Serializable
 
@@ -37,15 +38,13 @@ object MessageUtil {
      * Sends a message to the test service.
      *
      * @param ctx The context.
-     * @param what The message identifier.
-     * @param content The message content.
+     * @param message The test service message containing key, subscriptionId, and serverGuids.
      */
-    fun sendMsg2TestService(ctx: Context, what: Int, content: Serializable) {
+    fun sendMsg2TestService(ctx: Context, message: TestServiceMessage) {
         try {
             val intent = Intent()
             intent.component = ComponentName(ctx, V2RayTestService::class.java)
-            intent.putExtra("key", what)
-            intent.putExtra("content", content)
+            intent.putExtra("content", message)
             ctx.startService(intent)
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to send message to test service", e)
