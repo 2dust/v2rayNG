@@ -19,6 +19,9 @@ import androidx.core.net.toUri
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
+import com.v2ray.ang.dto.ProfileItem
+import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.enums.NetworkType
 import java.io.IOException
 import java.net.InetAddress
 import java.net.ServerSocket
@@ -602,5 +605,24 @@ object Utils {
             Log.e(AppConfig.TAG, "Failed to format timestamp", e)
             ""
         }
+    }
+
+    fun isRawShadowsocks(config: ProfileItem): Boolean {
+        if (config.configType != EConfigType.SHADOWSOCKS) {
+            return false
+        }
+        return isRawStreamSettings(
+            network = config.network,
+            headerType = config.headerType,
+            host = config.host,
+            security = config.security
+        )
+    }
+
+    private fun isRawStreamSettings(network: String?, headerType: String?, host: String?, security: String?): Boolean {
+        return (network.isNullOrBlank() || network.equals(NetworkType.TCP.type, true))
+            && (headerType.isNullOrBlank() || headerType.equals("none", true))
+            && host.isNullOrBlank()
+            && (security.isNullOrBlank() || security.equals("none", true))
     }
 }
