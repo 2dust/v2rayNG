@@ -3,6 +3,8 @@ package com.v2ray.ang.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.V2RayServiceManager
 
@@ -16,8 +18,24 @@ class BootReceiver : BroadcastReceiver() {
      * @param intent The Intent being received.
      */
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (context == null || intent?.action != Intent.ACTION_BOOT_COMPLETED) return
-        if (!MmkvManager.decodeStartOnBoot() || MmkvManager.getSelectServer().isNullOrEmpty()) return
+        Log.i(AppConfig.TAG, "BootReceiver received: ${intent?.action}")
+
+        if (context == null || intent?.action != Intent.ACTION_BOOT_COMPLETED) {
+            Log.w(AppConfig.TAG, "BootReceiver: Invalid context or action")
+            return
+        }
+
+        if (!MmkvManager.decodeStartOnBoot()) {
+            Log.i(AppConfig.TAG, "BootReceiver: Auto-start on boot is disabled")
+            return
+        }
+
+        if (MmkvManager.getSelectServer().isNullOrEmpty()) {
+            Log.w(AppConfig.TAG, "BootReceiver: No server selected")
+            return
+        }
+
+        Log.i(AppConfig.TAG, "BootReceiver: Starting V2Ray service")
         V2RayServiceManager.startVService(context)
     }
 }
