@@ -114,9 +114,15 @@ object MmkvManager {
      */
     fun decodeAllServerList(): MutableList<String> {
         val allServers = mutableListOf<String>()
+        val subsList = decodeSubsList()
 
-        // Add servers from all subscriptions (including default subscription)
-        decodeSubsList().forEach { guid ->
+        // If DEFAULT_SUBSCRIPTION_ID is not in the subscriptions list, add its servers
+        if (!subsList.contains(DEFAULT_SUBSCRIPTION_ID)) {
+            allServers.addAll(decodeServerList(DEFAULT_SUBSCRIPTION_ID))
+        }
+
+        // Add servers from all subscriptions
+        subsList.forEach { guid ->
             allServers.addAll(decodeServerList(guid))
         }
 
@@ -381,11 +387,6 @@ object MmkvManager {
      * @param subid The subscription ID.
      */
     fun removeSubscription(subid: String) {
-        // Protect default subscription from being deleted
-        if (subid == DEFAULT_SUBSCRIPTION_ID) {
-            return
-        }
-
         subStorage.remove(subid)
         val subsList = decodeSubsList()
         subsList.remove(subid)

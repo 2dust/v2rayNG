@@ -14,6 +14,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -118,7 +119,7 @@ class SubEditActivity : BaseActivity() {
                 AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         lifecycleScope.launch(Dispatchers.IO) {
-                            MmkvManager.removeSubscription(editSubId)
+                            SettingsManager.removeSubscriptionWithDefault(editSubId)
                             launch(Dispatchers.Main) {
                                 finish()
                             }
@@ -130,7 +131,7 @@ class SubEditActivity : BaseActivity() {
                     .show()
             } else {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    MmkvManager.removeSubscription(editSubId)
+                    SettingsManager.removeSubscriptionWithDefault(editSubId)
                     launch(Dispatchers.Main) {
                         finish()
                     }
@@ -144,10 +145,6 @@ class SubEditActivity : BaseActivity() {
         menuInflater.inflate(R.menu.action_server, menu)
         del_config = menu.findItem(R.id.del_config)
         save_config = menu.findItem(R.id.save_config)
-
-        if (editSubId.isEmpty() || editSubId == AppConfig.DEFAULT_SUBSCRIPTION_ID) {
-            del_config?.isVisible = false
-        }
 
         return super.onCreateOptionsMenu(menu)
     }

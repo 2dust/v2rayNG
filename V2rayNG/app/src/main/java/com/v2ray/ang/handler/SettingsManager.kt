@@ -25,6 +25,7 @@ import com.v2ray.ang.handler.MmkvManager.decodeServerConfig
 import com.v2ray.ang.handler.MmkvManager.decodeSubsList
 import com.v2ray.ang.handler.MmkvManager.decodeSubscription
 import com.v2ray.ang.handler.MmkvManager.encodeSubscription
+import com.v2ray.ang.handler.MmkvManager.removeSubscription
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import java.io.File
@@ -36,7 +37,7 @@ object SettingsManager {
 
     fun initApp(context: Context) {
         ensureDefaultSettings()
-        ensureDefaultSubscription()
+        //ensureDefaultSubscription()
         initRoutingRulesets(context)
         migrateServerListToSubscriptions()
         migrateHysteria2PinSHA256()
@@ -238,6 +239,33 @@ object SettingsManager {
         return serverList
             .mapNotNull { guid -> decodeServerConfig(guid) }
             .firstOrNull { it.remarks == remarks }
+    }
+
+    /**
+     * Removes the subscription.
+     * If there are no remaining subscriptions,
+     * it creates a new default subscription to ensure that ungroup
+     **/
+    fun removeSubscriptionWithDefault(subid: String) {
+//        val subsList = decodeSubsList()
+//        if (subsList.size == 1 && subsList.first() == DEFAULT_SUBSCRIPTION_ID) {
+//            Log.i(ANG_PACKAGE,"Attempted to remove the only existing default subscription, operation ignored.")
+//            return
+//        }
+
+        // Remove the subscription
+        removeSubscription(subid)
+
+        // After removal, check if there are any subscriptions left. If not, create a default subscription.
+        val subsList2 = decodeSubsList()
+        if (subsList2.isNotEmpty()) {
+            return
+        }
+
+        val defaultSub = SubscriptionItem(
+            remarks = "Default",
+        )
+        encodeSubscription(DEFAULT_SUBSCRIPTION_ID, defaultSub)
     }
 
     /**

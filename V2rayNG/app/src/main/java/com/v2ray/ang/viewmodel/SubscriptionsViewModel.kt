@@ -21,7 +21,7 @@ class SubscriptionsViewModel : ViewModel() {
     fun remove(subId: String): Boolean {
         val changed = subscriptions.removeAll { it.guid == subId }
         if (changed) {
-            MmkvManager.removeSubscription(subId)
+            SettingsManager.removeSubscriptionWithDefault(subId)
             SettingsChangeManager.makeSetupGroupTab()
         }
         return changed

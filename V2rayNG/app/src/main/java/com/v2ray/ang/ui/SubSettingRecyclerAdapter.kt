@@ -39,7 +39,6 @@ class SubSettingRecyclerAdapter(
         holder.itemSubSettingBinding.layoutRemove.setOnClickListener {
             adapterListener?.onRemove(subId, position)
         }
-        holder.itemSubSettingBinding.layoutRemove.isVisible = subId != AppConfig.DEFAULT_SUBSCRIPTION_ID
 
         holder.itemSubSettingBinding.chkEnable.setOnCheckedChangeListener { it, isChecked ->
             if (!it.isPressed) return@setOnCheckedChangeListener
