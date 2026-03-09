@@ -132,6 +132,12 @@ object AppConfig {
     const val GEOIP_PRIVATE = "geoip:private"
     const val GEOIP_CN = "geoip:cn"
 
+    /** Geo data file names. */
+    const val GEOSITE_DAT = "geosite.dat"
+    const val GEOIP_DAT = "geoip.dat"
+    const val GEOIP_ONLY_CN_PRIVATE_DAT = "geoip-only-cn-private.dat"
+    const val GEOIP_ONLY_CN_PRIVATE_URL = "$GITHUB_RAW_URL/Loyalsoldier/geoip/release/$GEOIP_ONLY_CN_PRIVATE_DAT"
+
     /** Ports and addresses for various services. */
     const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"

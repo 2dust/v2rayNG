@@ -265,7 +265,7 @@ object SettingsManager {
         val extFolder = Utils.userAssetPath(context)
 
         try {
-            val geo = arrayOf("geosite.dat", "geoip.dat")
+            val geo = arrayOf(AppConfig.GEOSITE_DAT, AppConfig.GEOIP_DAT, AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT)
             assets.list("")
                 ?.filter { geo.contains(it) }
                 ?.filter { !File(extFolder, it).exists() }

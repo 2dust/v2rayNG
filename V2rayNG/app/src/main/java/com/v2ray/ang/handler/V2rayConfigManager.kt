@@ -467,6 +467,19 @@ object V2rayConfigManager {
 
             val rule = JsonUtil.fromJson(JsonUtil.toJson(item), RulesBean::class.java) ?: return
 
+            // Replace specific geoip rules with ext versions
+            rule.ip?.let { ipList ->
+                val updatedIpList = ArrayList<String>()
+                ipList.forEach { ip ->
+                    when (ip) {
+                        AppConfig.GEOIP_CN -> updatedIpList.add("ext:${AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT}:cn")
+                        AppConfig.GEOIP_PRIVATE -> updatedIpList.add("ext:${AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT}:private")
+                        else -> updatedIpList.add(ip)
+                    }
+                }
+                rule.ip = updatedIpList
+            }
+
             v2rayConfig.routing.rules.add(rule)
 
         } catch (e: Exception) {
