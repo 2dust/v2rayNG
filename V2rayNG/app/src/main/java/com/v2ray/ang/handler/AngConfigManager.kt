@@ -221,21 +221,14 @@ object AngConfigManager {
             if (servers == null) {
                 return 0
             }
-            val removedSelectedServer =
-                if (!TextUtils.isEmpty(subid) && !append) {
-                    MmkvManager.decodeServerConfig(
-                        MmkvManager.getSelectServer().orEmpty()
-                    )?.let {
-                        if (it.subscriptionId == subid) {
-                            return@let it
-                        }
-                        return@let null
-                    }
-                } else {
-                    null
-                }
-            if (!append) {
-                MmkvManager.removeServerViaSubid(subid)
+            //  Find the currently selected server that matches the subscription ID
+            val removedSelected = if (subid.isNotBlank() && !append) {
+                MmkvManager.getSelectServer()
+                    .takeIf { it?.isNotBlank() == true }
+                    ?.let { MmkvManager.decodeServerConfig(it) }
+                    ?.takeIf { it.subscriptionId == subid }
+            } else {
+                null
             }
 
             val subItem = MmkvManager.decodeSubscription(subid)
@@ -254,18 +247,12 @@ object AngConfigManager {
 
             // Batch save all parsed configs (only one serverList read/write)
             if (configs.isNotEmpty()) {
-                val keys = batchSaveConfigs(configs, subid)
-
-                // Handle removed selected server
-                removedSelectedServer?.let { removed ->
-                    val matchKey = keys.find { key ->
-                        val savedConfig = MmkvManager.decodeServerConfig(key)
-                        savedConfig != null &&
-                                savedConfig.server == removed.server &&
-                                savedConfig.serverPort == removed.serverPort
-                    }
-                    matchKey?.let { MmkvManager.setSelectServer(it) }
+                if (!append) {
+                    MmkvManager.removeServerViaSubid(subid)
                 }
+                val keyToProfile = batchSaveConfigs(configs, subid)
+                val matchKey = findMatchedProfileKey(keyToProfile, removedSelected)
+                matchKey?.let { MmkvManager.setSelectServer(it) }
             }
 
             return configs.size
@@ -281,10 +268,10 @@ object AngConfigManager {
      *
      * @param configs The list of ProfileItem to save.
      * @param subid The subscription ID.
-     * @return The list of generated keys.
+     * @return Map of generated keys to their corresponding ProfileItem.
      */
-    private fun batchSaveConfigs(configs: List<ProfileItem>, subid: String): List<String> {
-        val keys = mutableListOf<String>()
+    private fun batchSaveConfigs(configs: List<ProfileItem>, subid: String): Map<String, ProfileItem> {
+        val keyToProfile = mutableMapOf<String, ProfileItem>()
 
         // Read serverList once
         val serverList = MmkvManager.decodeServerList(subid)
@@ -302,12 +289,67 @@ object AngConfigManager {
                     needSetSelected = false
                 }
             }
-            keys.add(key)
+            keyToProfile[key] = config
         }
 
         // Write serverList once
         MmkvManager.encodeServerList(serverList, subid)
-        return keys
+        return keyToProfile
+    }
+
+    /**
+     * Finds a matched profile key from the given key-profile map using multi-level matching.
+     * Matching priority (from highest to lowest):
+     * 1. Exact match: server + port + password
+     * 2. Match by remarks (exact match)
+     * 3. Match by server + port
+     * 4. Match by server only
+     *
+     * @param keyToProfile Map of server keys to their ProfileItem
+     * @param target Target profile to match
+     * @return Matched key or null
+     */
+    private fun findMatchedProfileKey(keyToProfile: Map<String, ProfileItem>, target: ProfileItem?): String? {
+        if (keyToProfile.isEmpty() || target == null) return null
+
+        // Level 1: Match by remarks
+        if (target.remarks.isNotBlank()) {
+            keyToProfile.entries.firstOrNull { (_, saved) ->
+                isSameText(saved.remarks, target.remarks)
+            }?.key?.let { return it }
+        }
+
+        // Level 2: Exact match (server + port + password)
+        keyToProfile.entries.firstOrNull { (_, saved) ->
+            isSameText(saved.server, target.server) &&
+                    isSameText(saved.serverPort, target.serverPort) &&
+                    isSameText(saved.password, target.password)
+        }?.key?.let { return it }
+
+        // Level 3: Match by server + port
+        keyToProfile.entries.firstOrNull { (_, saved) ->
+            isSameText(saved.server, target.server) &&
+                    isSameText(saved.serverPort, target.serverPort)
+        }?.key?.let { return it }
+
+        // Level 4: Match by server only
+        keyToProfile.entries.firstOrNull { (_, saved) ->
+            isSameText(saved.server, target.server)
+        }?.key?.let { return it }
+
+        return null
+    }
+
+    /**
+     * Case-insensitive trimmed string comparison.
+     *
+     * @param left First string
+     * @param right Second string
+     * @return True if both are non-empty and equal (case-insensitive, trimmed)
+     */
+    private fun isSameText(left: String?, right: String?): Boolean {
+        if (left.isNullOrBlank() || right.isNullOrBlank()) return false
+        return left.trim().equals(right.trim(), ignoreCase = true)
     }
 
     /**
