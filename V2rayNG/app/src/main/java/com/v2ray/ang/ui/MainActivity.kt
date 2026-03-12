@@ -433,7 +433,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     /**
      * import config from sub
      */
-    private fun importConfigViaSub(): Boolean {
+    fun importConfigViaSub(): Boolean {
         showLoading()
 
         lifecycleScope.launch(Dispatchers.IO) {

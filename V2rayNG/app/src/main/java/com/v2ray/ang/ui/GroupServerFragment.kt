@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.contracts.MainAdapterListener
@@ -28,7 +29,8 @@ import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>() {
+class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
+    SwipeRefreshLayout.OnRefreshListener {
     private val ownerActivity: MainActivity
         get() = requireActivity() as MainActivity
     private val mainViewModel: MainViewModel by activityViewModels()
@@ -67,6 +69,8 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>() {
 
         itemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(adapter, allowSwipe = false))
         itemTouchHelper?.attachToRecyclerView(binding.recyclerView)
+
+        binding.refreshLayout.setOnRefreshListener(this)
 
         mainViewModel.updateListAction.observe(viewLifecycleOwner) { index ->
             if (mainViewModel.subscriptionId != subId) {
@@ -142,7 +146,7 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>() {
      * @param guid The server unique identifier
      */
     private fun shareFullContent(guid: String) {
-        ownerActivity.lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             val result = AngConfigManager.shareFullContent2Clipboard(ownerActivity, guid)
             launch(Dispatchers.Main) {
                 if (result == 0) {
@@ -212,7 +216,7 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>() {
      * @param position The position in the list
      */
     private fun removeServerSub(guid: String, position: Int) {
-        ownerActivity.mainViewModel.removeServer(guid)
+        mainViewModel.removeServer(guid)
         adapter.removeServerSub(guid, position)
     }
 
@@ -270,5 +274,10 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>() {
 
             shareServer(guid, profile, position, shareOptions, skip)
         }
+    }
+
+    override fun onRefresh() {
+        ownerActivity.importConfigViaSub()
+        binding.refreshLayout.isRefreshing = false
     }
 }
