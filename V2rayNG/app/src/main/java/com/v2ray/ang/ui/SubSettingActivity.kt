@@ -91,6 +91,7 @@ class SubSettingActivity : BaseActivity() {
                         )
                     }
                     hideLoading()
+                    refreshData()
                 }
             }
 
