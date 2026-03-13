@@ -402,6 +402,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         reloadServerList()
     }
 
+    fun findSubscriptionIdBySelect(): String? {
+        // Get the selected server GUID
+        val selectedGuid = MmkvManager.getSelectServer()
+        if (selectedGuid.isNullOrEmpty()) {
+            return null
+        }
+
+        val config = MmkvManager.decodeServerConfig(selectedGuid)
+        return config?.subscriptionId
+    }
+
     fun onTestsFinished() {
         viewModelScope.launch(Dispatchers.Default) {
             if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST)) {

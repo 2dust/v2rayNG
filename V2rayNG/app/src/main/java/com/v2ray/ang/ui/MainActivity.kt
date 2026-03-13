@@ -94,6 +94,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         })
 
         binding.fab.setOnClickListener { handleFabAction() }
+        binding.fabLocate.setOnClickListener { locateSelectedServer() }
         binding.layoutTest.setOnClickListener { handleLayoutTestClick() }
 
         setupGroupTab()
@@ -566,6 +567,47 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to read content from URI", e)
+        }
+    }
+
+    /**
+     * Locates and scrolls to the currently selected server.
+     * If the selected server is in a different group, automatically switches to that group first.
+     */
+    private fun locateSelectedServer() {
+        val targetSubscriptionId = mainViewModel.findSubscriptionIdBySelect()
+        if (targetSubscriptionId.isNullOrEmpty()) {
+            toast(R.string.title_file_chooser)
+            return
+        }
+
+        val targetGroupIndex = groupPagerAdapter.groups.indexOfFirst { it.id == targetSubscriptionId }
+        if (targetGroupIndex < 0) {
+            toast(R.string.toast_server_not_found_in_group)
+            return
+        }
+
+        // Switch to target group if needed, then scroll to the server
+        if (binding.viewPager.currentItem != targetGroupIndex) {
+            binding.viewPager.setCurrentItem(targetGroupIndex, true)
+            binding.viewPager.postDelayed({ scrollToSelectedServer(targetGroupIndex) }, 1000)
+        } else {
+            scrollToSelectedServer(targetGroupIndex)
+        }
+    }
+
+    /**
+     * Scrolls to the selected server in the specified fragment.
+     * @param groupIndex The index of the group/fragment to scroll in
+     */
+    private fun scrollToSelectedServer(groupIndex: Int) {
+        val itemId = groupPagerAdapter.getItemId(groupIndex)
+        val fragment = supportFragmentManager.findFragmentByTag("f$itemId") as? GroupServerFragment
+
+        if (fragment?.isAdded == true && fragment.view != null) {
+            fragment.scrollToSelectedServer()
+        } else {
+            toast(R.string.toast_fragment_not_available)
         }
     }
 

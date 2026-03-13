@@ -280,4 +280,38 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
         ownerActivity.importConfigViaSub()
         binding.refreshLayout.isRefreshing = false
     }
+
+    /**
+     * Scrolls to the currently selected server in the RecyclerView
+     */
+    fun scrollToSelectedServer() {
+        val selectedGuid = MmkvManager.getSelectServer()
+        if (selectedGuid.isNullOrEmpty()) {
+            ownerActivity.toast(R.string.title_file_chooser)
+            return
+        }
+
+        // Find the position of the selected server
+        val serversCache = mainViewModel.serversCache
+        val position = serversCache.indexOfFirst { it.guid == selectedGuid }
+        val recyclerView = binding.recyclerView
+
+        if (position >= 0) {
+            // Get the layout manager
+            val layoutManager = recyclerView.layoutManager as? GridLayoutManager
+
+            if (layoutManager != null) {
+                // Scroll to position with offset to center it on screen
+                // First scroll to position, then adjust to center
+                recyclerView.post {
+                    layoutManager.scrollToPositionWithOffset(position, recyclerView.height / 3)
+                }
+            } else {
+                // Fallback to smooth scroll if layout manager is not GridLayoutManager
+                recyclerView.smoothScrollToPosition(position)
+            }
+        } else {
+            ownerActivity.toast(R.string.toast_server_not_found_in_group)
+        }
+    }
 }
