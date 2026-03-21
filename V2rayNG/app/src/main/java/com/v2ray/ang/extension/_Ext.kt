@@ -190,3 +190,14 @@ fun String.concatUrl(vararg paths: String): String {
 
     return builder.toString()
 }
+
+/**
+ * Helper function to match text either by Regex or literal string.
+ */
+fun String.matchesPattern(regex: Regex?, keyword: String?, ignoreCase: Boolean = true): Boolean {
+    if (keyword.isNullOrEmpty()) {
+        return true
+    }
+    return regex?.containsMatchIn(this)
+        ?: this.contains(keyword, ignoreCase = ignoreCase)
+}

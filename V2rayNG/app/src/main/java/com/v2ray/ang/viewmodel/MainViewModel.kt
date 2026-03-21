@@ -19,6 +19,7 @@ import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.dto.SubscriptionCache
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.TestServiceMessage
+import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -118,7 +119,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     @Synchronized
     fun updateCache() {
         serversCache.clear()
-        val kw = keywordFilter.trim().lowercase()
+        val kw = keywordFilter.trim()
         val searchRegex = try {
             if (kw.isNotEmpty()) Regex(kw, setOf(RegexOption.IGNORE_CASE)) else null
         } catch (e: PatternSyntaxException) {
@@ -131,14 +132,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 continue
             }
 
-            val remarks = profile.remarks.lowercase()
-            val description = profile.description.orEmpty().lowercase()
-            val server = profile.server.orEmpty().lowercase()
-            val protocol = profile.configType.name.lowercase()
-            if (remarks.matchesPattern(searchRegex,kw)
-                || description.matchesPattern(searchRegex,kw)
-                || server.matchesPattern(searchRegex,kw)
-                || protocol.matchesPattern(searchRegex,kw)) {
+            val remarks = profile.remarks
+            val description = profile.description.orEmpty()
+            val server = profile.server.orEmpty()
+            val protocol = profile.configType.name
+            if (remarks.matchesPattern(searchRegex, kw)
+                || description.matchesPattern(searchRegex, kw)
+                || server.matchesPattern(searchRegex, kw)
+                || protocol.matchesPattern(searchRegex, kw)
+            ) {
                 serversCache.add(ServersCache(guid, profile))
             }
         }
@@ -487,14 +489,5 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
-    }
-
-    /**
-     * Helper function to match text either by Regex or literal string.
-     */
-    fun String.matchesPattern(regex: Regex?, keyword: String, ignoreCase: Boolean = true): Boolean {
-        if (keyword.isEmpty()) return true
-        return regex?.containsMatchIn(this)
-            ?: this.contains(keyword, ignoreCase = ignoreCase)
     }
 }
