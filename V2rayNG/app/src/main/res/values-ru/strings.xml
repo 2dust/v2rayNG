@@ -297,8 +297,8 @@
     <string name="title_update_config_count">Обновлено профилей: %d</string>
     <string name="title_update_subscription_result">Обновлено профилей: %1$d (успешно: %2$d, ошибок: %3$d, пропущено: %4$d)</string>
     <string name="title_update_subscription_no_subscription">Нет подписок</string>
-    <string name="toast_server_not_found_in_group">Selected server not found in current group</string>
-    <string name="toast_fragment_not_available">Unable to locate current view</string>
+    <string name="toast_server_not_found_in_group">Выбранный профиль не найден в текущей группе</string>
+    <string name="toast_fragment_not_available">Фрагмент недоступен</string>
 
     <string name="tasker_start_service">Запуск службы</string>
     <string name="tasker_setting_confirm">Подтвердить</string>
