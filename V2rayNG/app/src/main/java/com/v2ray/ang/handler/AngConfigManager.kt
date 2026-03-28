@@ -392,6 +392,7 @@ object AngConfigManager {
                 val config = CustomFmt.parse(server) ?: return 0
                 config.subscriptionId = subid
                 config.description = generateDescription(config)
+                MmkvManager.removeServerViaSubid(subid)
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
                 return 1
@@ -403,6 +404,7 @@ object AngConfigManager {
             try {
                 val config = WireguardFmt.parseWireguardConfFile(server) ?: return R.string.toast_incorrect_protocol
                 config.description = generateDescription(config)
+                MmkvManager.removeServerViaSubid(subid)
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
                 return 1
