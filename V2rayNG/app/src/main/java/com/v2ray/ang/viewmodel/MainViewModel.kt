@@ -15,6 +15,7 @@ import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.GroupMapItem
+import com.v2ray.ang.dto.IpPurityResult
 import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.dto.SubscriptionCache
 import com.v2ray.ang.dto.SubscriptionUpdateResult
@@ -212,6 +213,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             getApplication(),
             TestServiceMessage(key = AppConfig.MSG_MEASURE_CONFIG_CANCEL)
         )
+        MessageUtil.sendMsg2TestService(
+            getApplication(),
+            TestServiceMessage(key = AppConfig.MSG_MEASURE_IP_PURITY_CANCEL)
+        )
+        MessageUtil.sendMsg2TestService(
+            getApplication(),
+            TestServiceMessage(key = AppConfig.MSG_MEASURE_FAST_IP_PURITY_CANCEL)
+        )
         MmkvManager.clearAllTestDelayResults(serversCache.map { it.guid }.toList())
         updateListAction.value = -1
 
@@ -223,6 +232,68 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 getApplication(),
                 TestServiceMessage(
                     key = AppConfig.MSG_MEASURE_CONFIG,
+                    subscriptionId = subscriptionId,
+                    serverGuids = if (keywordFilter.isNotEmpty()) serversCache.map { it.guid } else emptyList()
+                )
+            )
+        }
+    }
+
+    fun testAllIpPurity() {
+        MessageUtil.sendMsg2TestService(
+            getApplication(),
+            TestServiceMessage(key = AppConfig.MSG_MEASURE_CONFIG_CANCEL)
+        )
+        MessageUtil.sendMsg2TestService(
+            getApplication(),
+            TestServiceMessage(key = AppConfig.MSG_MEASURE_IP_PURITY_CANCEL)
+        )
+        MessageUtil.sendMsg2TestService(
+            getApplication(),
+            TestServiceMessage(key = AppConfig.MSG_MEASURE_FAST_IP_PURITY_CANCEL)
+        )
+        MmkvManager.clearAllPurityResults(serversCache.map { it.guid }.toList())
+        updateListAction.value = -1
+
+        viewModelScope.launch(Dispatchers.Default) {
+            if (serversCache.isEmpty()) {
+                return@launch
+            }
+            MessageUtil.sendMsg2TestService(
+                getApplication(),
+                TestServiceMessage(
+                    key = AppConfig.MSG_MEASURE_IP_PURITY,
+                    subscriptionId = subscriptionId,
+                    serverGuids = if (keywordFilter.isNotEmpty()) serversCache.map { it.guid } else emptyList()
+                )
+            )
+        }
+    }
+
+    fun testAllFastIpPurity() {
+        MessageUtil.sendMsg2TestService(
+            getApplication(),
+            TestServiceMessage(key = AppConfig.MSG_MEASURE_CONFIG_CANCEL)
+        )
+        MessageUtil.sendMsg2TestService(
+            getApplication(),
+            TestServiceMessage(key = AppConfig.MSG_MEASURE_IP_PURITY_CANCEL)
+        )
+        MessageUtil.sendMsg2TestService(
+            getApplication(),
+            TestServiceMessage(key = AppConfig.MSG_MEASURE_FAST_IP_PURITY_CANCEL)
+        )
+        MmkvManager.clearAllPurityResults(serversCache.map { it.guid }.toList())
+        updateListAction.value = -1
+
+        viewModelScope.launch(Dispatchers.Default) {
+            if (serversCache.isEmpty()) {
+                return@launch
+            }
+            MessageUtil.sendMsg2TestService(
+                getApplication(),
+                TestServiceMessage(
+                    key = AppConfig.MSG_MEASURE_FAST_IP_PURITY,
                     subscriptionId = subscriptionId,
                     serverGuids = if (keywordFilter.isNotEmpty()) serversCache.map { it.guid } else emptyList()
                 )
@@ -391,6 +462,35 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
+    fun sortByPurityResults() {
+        if (subscriptionId.isEmpty()) {
+            getSortableSubscriptionIds().forEach { guid ->
+                sortByPurityResultsForSub(guid)
+            }
+        } else {
+            sortByPurityResultsForSub(subscriptionId)
+        }
+    }
+
+    private fun sortByPurityResultsForSub(subId: String) {
+        data class ServerPurity(val guid: String, val purityScore: Int, val testDelayMillis: Long)
+
+        val serverListToSort = MmkvManager.decodeServerList(subId)
+        val serverPurities = serverListToSort.map { key ->
+            val aff = MmkvManager.decodeServerAffiliationInfo(key)
+            val purityScore = aff?.purityScore?.removeSuffix("%")?.toIntOrNull() ?: Int.MAX_VALUE
+            val testDelayMillis = aff?.testDelayMillis?.takeIf { it > 0L } ?: Long.MAX_VALUE
+            ServerPurity(key, purityScore, testDelayMillis)
+        }
+
+        val sortedServerList = serverPurities
+            .sortedWith(compareBy<ServerPurity> { it.purityScore }.thenBy { it.testDelayMillis })
+            .map { it.guid }
+            .toMutableList()
+
+        MmkvManager.encodeServerList(sortedServerList, subId)
+    }
+
     /**
      * Initializes assets.
      * @param assets The asset manager.
@@ -424,14 +524,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return config?.subscriptionId
     }
 
-    fun onTestsFinished() {
+    private fun getSortableSubscriptionIds(): List<String> {
+        val subIds = MmkvManager.decodeSubsList().toMutableList()
+        if (!subIds.contains(AppConfig.DEFAULT_SUBSCRIPTION_ID)) {
+            subIds.add(0, AppConfig.DEFAULT_SUBSCRIPTION_ID)
+        }
+        return subIds
+    }
+
+    fun onTestsFinished(sortByPurityResults: Boolean = false) {
         viewModelScope.launch(Dispatchers.Default) {
             if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST)) {
                 removeInvalidServer()
             }
 
             if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SORT_AFTER_TEST)) {
-                sortByTestResults()
+                if (sortByPurityResults) {
+                    sortByPurityResults()
+                } else {
+                    sortByTestResults()
+                }
             }
 
             withContext(Dispatchers.Main) {
@@ -487,7 +599,47 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         onTestsFinished()
                     }
                 }
+
+                AppConfig.MSG_MEASURE_IP_PURITY_SUCCESS -> {
+                    val resultPair = intent.serializable<Pair<String, IpPurityResult>>("content") ?: return
+                    MmkvManager.encodeServerPurityResult(resultPair.first, resultPair.second)
+                    updateListAction.value = getPosition(resultPair.first)
+                }
+
+                AppConfig.MSG_MEASURE_IP_PURITY_NOTIFY -> {
+                    val content = intent.getStringExtra("content")
+                    updateTestResultAction.value =
+                        getApplication<AngApplication>().getString(R.string.connection_runing_task_left, content)
+                }
+
+                AppConfig.MSG_MEASURE_IP_PURITY_FINISH -> {
+                    val content = intent.getStringExtra("content")
+                    if (content == "0") {
+                        onTestsFinished(sortByPurityResults = true)
+                    }
+                }
+
+                AppConfig.MSG_MEASURE_FAST_IP_PURITY_SUCCESS -> {
+                    val resultPair = intent.serializable<Pair<String, Int>>("content") ?: return
+                    MmkvManager.encodeServerPurityScore(resultPair.first, resultPair.second)
+                    updateListAction.value = getPosition(resultPair.first)
+                }
+
+                AppConfig.MSG_MEASURE_FAST_IP_PURITY_NOTIFY -> {
+                    val content = intent.getStringExtra("content")
+                    updateTestResultAction.value =
+                        getApplication<AngApplication>().getString(R.string.connection_runing_task_left, content)
+                }
+
+                AppConfig.MSG_MEASURE_FAST_IP_PURITY_FINISH -> {
+                    val content = intent.getStringExtra("content")
+                    if (content == "0") {
+                        onTestsFinished(sortByPurityResults = true)
+                    }
+                }
             }
         }
     }
 }
+
+

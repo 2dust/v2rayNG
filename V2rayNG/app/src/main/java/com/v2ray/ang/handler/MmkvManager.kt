@@ -1,4 +1,4 @@
-package com.v2ray.ang.handler
+﻿package com.v2ray.ang.handler
 
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
@@ -6,9 +6,11 @@ import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
 import com.v2ray.ang.dto.AssetUrlCache
 import com.v2ray.ang.dto.AssetUrlItem
+import com.v2ray.ang.dto.IpPurityResult
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerAffiliationInfo
+import com.v2ray.ang.dto.ServerTestResult
 import com.v2ray.ang.dto.SubscriptionCache
 import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.dto.WebDavConfig
@@ -265,6 +267,71 @@ object MmkvManager {
         serverAffStorage.encode(guid, JsonUtil.toJson(aff))
     }
 
+    fun encodeServerTestResult(guid: String, testResult: ServerTestResult) {
+        if (guid.isBlank()) {
+            return
+        }
+        val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
+        aff.testDelayMillis = testResult.delayMillis
+        aff.purityScore = testResult.ipPurityResult.purityScore
+        aff.purityEmoji = testResult.ipPurityResult.purityEmoji
+        aff.ipCategory = testResult.ipPurityResult.ipCategory
+        aff.ipOrigin = testResult.ipPurityResult.ipOrigin
+        aff.purityDisplay = testResult.ipPurityResult.purityDisplay
+        aff.purityLastError = testResult.ipPurityResult.purityLastError
+        aff.exitIp = testResult.ipPurityResult.exitIp
+        serverAffStorage.encode(guid, JsonUtil.toJson(aff))
+    }
+
+    fun encodeServerPurityResult(guid: String, purityResult: IpPurityResult) {
+        if (guid.isBlank()) {
+            return
+        }
+        val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
+        aff.purityScore = purityResult.purityScore
+        aff.purityEmoji = purityResult.purityEmoji
+        aff.ipCategory = purityResult.ipCategory
+        aff.ipOrigin = purityResult.ipOrigin
+        aff.purityDisplay = purityResult.purityDisplay
+        aff.purityLastError = purityResult.purityLastError
+        aff.exitIp = purityResult.exitIp
+        serverAffStorage.encode(guid, JsonUtil.toJson(aff))
+    }
+
+    fun encodeServerPurityScore(guid: String, score: Int) {
+        if (guid.isBlank()) {
+            return
+        }
+        val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
+        if (score < 0) {
+            aff.purityScore = ""
+            aff.purityEmoji = ""
+            aff.ipCategory = ""
+            aff.ipOrigin = ""
+            aff.purityDisplay = ""
+            aff.purityLastError = "Fast purity check failed"
+            aff.exitIp = ""
+        } else {
+            val scoreText = "$score%"
+            val emoji = when {
+                score <= 10 -> "⚪"
+                score <= 30 -> "🟢"
+                score <= 50 -> "🟡"
+                score <= 70 -> "🟠"
+                score <= 90 -> "🔴"
+                else -> "⚫"
+            }
+            aff.purityScore = scoreText
+            aff.purityEmoji = emoji
+            aff.ipCategory = ""
+            aff.ipOrigin = ""
+            aff.purityDisplay = "$emoji $scoreText 快测"
+            aff.purityLastError = ""
+            aff.exitIp = ""
+        }
+        serverAffStorage.encode(guid, JsonUtil.toJson(aff))
+    }
+
     /**
      * Clears all test delay results.
      *
@@ -274,6 +341,37 @@ object MmkvManager {
         keys?.forEach { key ->
             decodeServerAffiliationInfo(key)?.let { aff ->
                 aff.testDelayMillis = 0
+                serverAffStorage.encode(key, JsonUtil.toJson(aff))
+            }
+        }
+    }
+
+    fun clearAllRealTestResults(keys: List<String>?) {
+        keys?.forEach { key ->
+            decodeServerAffiliationInfo(key)?.let { aff ->
+                aff.testDelayMillis = 0
+                aff.purityScore = ""
+                aff.purityEmoji = ""
+                aff.ipCategory = ""
+                aff.ipOrigin = ""
+                aff.purityDisplay = ""
+                aff.purityLastError = ""
+                aff.exitIp = ""
+                serverAffStorage.encode(key, JsonUtil.toJson(aff))
+            }
+        }
+    }
+
+    fun clearAllPurityResults(keys: List<String>?) {
+        keys?.forEach { key ->
+            decodeServerAffiliationInfo(key)?.let { aff ->
+                aff.purityScore = ""
+                aff.purityEmoji = ""
+                aff.ipCategory = ""
+                aff.ipOrigin = ""
+                aff.purityDisplay = ""
+                aff.purityLastError = ""
+                aff.exitIp = ""
                 serverAffStorage.encode(key, JsonUtil.toJson(aff))
             }
         }
@@ -718,3 +816,4 @@ object MmkvManager {
 
     //endregion
 }
+

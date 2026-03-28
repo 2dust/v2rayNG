@@ -1,4 +1,4 @@
-package com.v2ray.ang
+﻿package com.v2ray.ang
 
 
 object AppConfig {
@@ -63,6 +63,7 @@ object AppConfig {
     const val PREF_DNS_HOSTS = "pref_dns_hosts"
     const val PREF_DELAY_TEST_URL = "pref_delay_test_url"
     const val PREF_IP_API_URL = "pref_ip_api_url"
+    const val PREF_IP_PURITY_API_URL = "pref_ip_purity_api_url"
     const val PREF_LOGLEVEL = "pref_core_loglevel"
     const val PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD = "pref_outbound_domain_resolve_method"
     const val PREF_MODE = "pref_mode"
@@ -122,6 +123,7 @@ object AppConfig {
     const val DELAY_TEST_URL2 = "https://www.google.com/generate_204"
 //    const val IP_API_URL = "https://speed.cloudflare.com/meta"
     const val IP_API_URL = "https://api.ip.sb/geoip"
+    const val IP_PURITY_API_URL = "https://my.123169.xyz/v1/info"
 
     /** DNS server addresses. */
     const val DNS_PROXY = "1.1.1.1"
@@ -164,6 +166,16 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG_CANCEL = 72
     const val MSG_MEASURE_CONFIG_NOTIFY = 73
     const val MSG_MEASURE_CONFIG_FINISH = 74
+    const val MSG_MEASURE_IP_PURITY = 8
+    const val MSG_MEASURE_IP_PURITY_SUCCESS = 81
+    const val MSG_MEASURE_IP_PURITY_CANCEL = 82
+    const val MSG_MEASURE_IP_PURITY_NOTIFY = 83
+    const val MSG_MEASURE_IP_PURITY_FINISH = 84
+    const val MSG_MEASURE_FAST_IP_PURITY = 9
+    const val MSG_MEASURE_FAST_IP_PURITY_SUCCESS = 91
+    const val MSG_MEASURE_FAST_IP_PURITY_CANCEL = 92
+    const val MSG_MEASURE_FAST_IP_PURITY_NOTIFY = 93
+    const val MSG_MEASURE_FAST_IP_PURITY_FINISH = 94
 
     /** Notification channel IDs and names. */
     const val RAY_NG_CHANNEL_ID = "RAY_NG_M_CH_ID"
@@ -275,3 +287,4 @@ object AppConfig {
     )
 
 }
+

@@ -2,9 +2,8 @@ package com.v2ray.ang.service
 
 import android.content.Context
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.handler.V2RayNativeManager
-import com.v2ray.ang.handler.V2rayConfigManager
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.util.MessageUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
@@ -16,10 +15,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
-/**
- * Worker that runs a batch of real-ping tests independently.
- */
-class RealPingWorkerService(
+class FastIpPurityWorkerService(
     private val context: Context,
     private val guids: List<String>,
     private val onFinish: (status: String) -> Unit = {}
@@ -28,8 +24,9 @@ class RealPingWorkerService(
     private var cancelled = false
     private val job = SupervisorJob()
     private val cpu = Runtime.getRuntime().availableProcessors().coerceAtLeast(1)
-    private val dispatcher = Executors.newFixedThreadPool(cpu * 4).asCoroutineDispatcher()
-    private val scope = CoroutineScope(job + dispatcher + CoroutineName("RealPingBatchWorker"))
+    private val poolSize = (cpu.coerceAtMost(4)).coerceAtLeast(2)
+    private val dispatcher = Executors.newFixedThreadPool(poolSize).asCoroutineDispatcher()
+    private val scope = CoroutineScope(job + dispatcher + CoroutineName("FastIpPurityBatchWorker"))
     private val runningCount = AtomicInteger(0)
     private val totalCount = AtomicInteger(0)
 
@@ -42,16 +39,23 @@ class RealPingWorkerService(
                     if (cancelled || !job.isActive) {
                         throw CancellationException()
                     }
-                    val result = startRealPing(guid)
+                    val delay = MmkvManager.decodeServerAffiliationInfo(guid)?.testDelayMillis
+                    val score = if (delay != null && delay < 0L) {
+                        -1
+                    } else {
+                        SpeedtestManager.getIpPurityScore(context, guid)
+                    }
                     if (cancelled || !job.isActive) {
                         throw CancellationException()
                     }
-                    MessageUtil.sendMsg2UI(context, AppConfig.MSG_MEASURE_CONFIG_SUCCESS, Pair(guid, result))
+                    MessageUtil.sendMsg2UI(context, AppConfig.MSG_MEASURE_FAST_IP_PURITY_SUCCESS, Pair(guid, score))
+                } catch (_: CancellationException) {
+                    throw CancellationException()
                 } finally {
                     val count = totalCount.decrementAndGet()
                     val left = runningCount.decrementAndGet()
                     if (!cancelled && job.isActive) {
-                        MessageUtil.sendMsg2UI(context, AppConfig.MSG_MEASURE_CONFIG_NOTIFY, "$left / $count")
+                        MessageUtil.sendMsg2UI(context, AppConfig.MSG_MEASURE_FAST_IP_PURITY_NOTIFY, "$left / $count")
                     }
                 }
             }
@@ -80,14 +84,5 @@ class RealPingWorkerService(
         } catch (_: Throwable) {
             // ignore
         }
-    }
-
-    private fun startRealPing(guid: String): Long {
-        val retFailure = -1L
-        val configResult = V2rayConfigManager.getV2rayConfig4Speedtest(context, guid)
-        if (!configResult.status) {
-            return retFailure
-        }
-        return V2RayNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
     }
 }

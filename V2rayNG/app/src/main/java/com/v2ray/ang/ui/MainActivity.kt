@@ -298,15 +298,21 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             true
         }
 
-        R.id.ping_all -> {
-            toast(getString(R.string.connection_test_testing_count, mainViewModel.serversCache.count()))
-            mainViewModel.testAllTcping()
-            true
-        }
-
         R.id.real_ping_all -> {
             toast(getString(R.string.connection_test_testing_count, mainViewModel.serversCache.count()))
             mainViewModel.testAllRealPing()
+            true
+        }
+
+        R.id.purity_ping_all -> {
+            toast(getString(R.string.connection_test_testing_count, mainViewModel.serversCache.count()))
+            mainViewModel.testAllIpPurity()
+            true
+        }
+
+        R.id.fast_purity_ping_all -> {
+            toast(getString(R.string.connection_test_testing_count, mainViewModel.serversCache.count()))
+            mainViewModel.testAllFastIpPurity()
             true
         }
 
@@ -332,6 +338,11 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
         R.id.sort_by_test_results -> {
             sortByTestResults()
+            true
+        }
+
+        R.id.sort_by_purity_results -> {
+            sortByPurityResults()
             true
         }
 
@@ -537,6 +548,17 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         showLoading()
         lifecycleScope.launch(Dispatchers.IO) {
             mainViewModel.sortByTestResults()
+            launch(Dispatchers.Main) {
+                mainViewModel.reloadServerList()
+                hideLoading()
+            }
+        }
+    }
+
+    private fun sortByPurityResults() {
+        showLoading()
+        lifecycleScope.launch(Dispatchers.IO) {
+            mainViewModel.sortByPurityResults()
             launch(Dispatchers.Main) {
                 mainViewModel.reloadServerList()
                 hideLoading()

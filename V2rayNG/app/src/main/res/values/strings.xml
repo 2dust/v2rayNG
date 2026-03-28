@@ -291,7 +291,9 @@
     <string name="sub_setting_pre_profile_tip">The config remarks exist and are unique</string>
     <string name="title_sub_update">Update subscription</string>
     <string name="title_ping_all_server">Tcping config</string>
-    <string name="title_real_ping_all_server">Real delay config</string>
+    <string name="title_real_ping_all_server">测试配置真连接</string>
+    <string name="title_purity_ping_all_server">测试配置纯净度</string>
+    <string name="title_fast_purity_ping_all_server">快速测试纯净度</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sorting by test results</string>
     <string name="title_filter_config">Filter config</string>
@@ -436,4 +438,8 @@
         <item>WebDAV</item>
     </string-array>
 
+    <string name="title_sort_by_purity_results">按纯净度排序</string>
+    <string name="title_pref_ip_purity_api_url">IP purity test url</string>
+    <string name="summary_pref_ip_purity_api_url">Url</string>
+    <string name="connection_test_purity_failed">IP purity check failed</string>
 </resources>

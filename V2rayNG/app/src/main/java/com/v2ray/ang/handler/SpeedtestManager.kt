@@ -1,21 +1,32 @@
-package com.v2ray.ang.handler
+﻿package com.v2ray.ang.handler
 
 import android.content.Context
 import android.os.SystemClock
 import android.util.Log
+import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.IPAPIInfo
+import com.v2ray.ang.dto.IpPurityResult
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.isActive
+import libv2ray.CoreCallbackHandler
+import libv2ray.CoreController
 import java.io.IOException
 import java.net.InetSocketAddress
+import java.net.ServerSocket
 import java.net.Socket
 import java.net.UnknownHostException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.isActive
 
 object SpeedtestManager {
+
+    private const val TEMP_CORE_START_RETRY = 10
+    private const val TEMP_CORE_START_WAIT_MS = 100L
+    private const val TEMP_PROXY_REQUEST_RETRY = 3
+    private const val TEMP_PROXY_REQUEST_WAIT_MS = 200L
+    private const val TEMP_PROXY_REQUEST_TIMEOUT_MS = 5000
 
     private val tcpTestingSockets = ArrayList<Socket?>()
 
@@ -143,5 +154,158 @@ object SpeedtestManager {
         ).firstOrNull { !it.isNullOrBlank() }
 
         return "(${country ?: "unknown"}) ${ip ?: "unknown"}"
+    }
+
+    fun getIpPurityResult(context: Context, guid: String): IpPurityResult {
+        val failureDisplay = context.getString(R.string.connection_test_purity_failed)
+        val socksPort = findAvailablePort()
+        val httpPort = findAvailablePort(setOf(socksPort))
+        val configResult = V2rayConfigManager.getV2rayConfig4PurityTest(context, guid, socksPort, httpPort)
+        if (!configResult.status) {
+            return IpPurityResult.failure("Config unavailable", failureDisplay)
+        }
+
+        val controller = V2RayNativeManager.newCoreController(TemporaryCoreCallback())
+        try {
+            controller.startLoop(configResult.content, 0)
+            if (!waitForCore(controller)) {
+                return IpPurityResult.failure("Temporary core failed to start", failureDisplay)
+            }
+
+            repeat(TEMP_PROXY_REQUEST_RETRY) {
+                val content = HttpUtil.getUrlContent(SettingsManager.getIpPurityApiUrl(), TEMP_PROXY_REQUEST_TIMEOUT_MS, httpPort)
+                val result = parseIpPurityResult(content)
+                if (result != null) {
+                    return result
+                }
+                Thread.sleep(TEMP_PROXY_REQUEST_WAIT_MS)
+            }
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to check IP purity", e)
+            return IpPurityResult.failure(e.message ?: "Unknown error", failureDisplay)
+        } finally {
+            stopTemporaryCore(controller)
+        }
+
+        return IpPurityResult.failure("Empty or invalid response", failureDisplay)
+    }
+
+    fun getIpPurityScore(context: Context, guid: String): Int {
+        val result = getIpPurityResult(context, guid)
+        return result.purityScore.removeSuffix("%").toIntOrNull() ?: -1
+    }
+
+    private fun waitForCore(controller: CoreController): Boolean {
+        repeat(TEMP_CORE_START_RETRY) {
+            if (controller.isRunning) {
+                return true
+            }
+            Thread.sleep(TEMP_CORE_START_WAIT_MS)
+        }
+        return controller.isRunning
+    }
+
+    private fun stopTemporaryCore(controller: CoreController) {
+        try {
+            if (controller.isRunning) {
+                controller.stopLoop()
+            }
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to stop temporary core", e)
+        }
+    }
+
+    private fun parseIpPurityResult(content: String?): IpPurityResult? {
+        if (content.isNullOrBlank()) {
+            return null
+        }
+        val json = JsonUtil.parseString(content) ?: return null
+        val score = getPercentageString(json, "fraudScore") ?: return null
+        val category = when (json.getBooleanValue("isResidential")) {
+            true -> "住宅"
+            false -> "机房"
+            null -> "未知"
+        }
+        val origin = when (json.getBooleanValue("isBroadcast")) {
+            true -> "广播"
+            false -> "原生"
+            null -> "未知"
+        }
+        val emoji = getPurityEmoji(score)
+        return IpPurityResult(
+            exitIp = json.getStringValue("ip").orEmpty(),
+            purityScore = score,
+            purityEmoji = emoji,
+            ipCategory = category,
+            ipOrigin = origin,
+            purityDisplay = "$emoji $score $category|$origin"
+        )
+    }
+
+    private fun getPercentageString(json: JsonObject, key: String): String? {
+        val element = json.get(key) ?: return null
+        return try {
+            when {
+                element.isJsonNull -> null
+                element.isJsonPrimitive && element.asJsonPrimitive.isNumber -> "${element.asNumber.toInt()}%"
+                element.isJsonPrimitive && element.asJsonPrimitive.isString -> {
+                    val raw = element.asString.trim()
+                    if (raw.isEmpty()) null else if (raw.endsWith("%")) raw else "$raw%"
+                }
+                else -> null
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun JsonObject.getStringValue(key: String): String? {
+        val element = get(key) ?: return null
+        return try {
+            if (element.isJsonNull) null else element.asString
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun JsonObject.getBooleanValue(key: String): Boolean? {
+        val element = get(key) ?: return null
+        return try {
+            if (element.isJsonNull) null else element.asBoolean
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun getPurityEmoji(score: String): String {
+        val value = score.removeSuffix("%").toIntOrNull() ?: return "❓"
+        return when {
+            value <= 10 -> "⚪"
+            value <= 30 -> "🟢"
+            value <= 50 -> "🟡"
+            value <= 70 -> "🟠"
+            value <= 90 -> "🔴"
+            else -> "⚫"
+        }
+    }
+
+    private fun findAvailablePort(excluded: Set<Int> = emptySet()): Int {
+        repeat(10) {
+            ServerSocket(0).use { serverSocket ->
+                val port = serverSocket.localPort
+                if (port !in excluded) {
+                    return port
+                }
+            }
+        }
+        return if (excluded.contains(18080)) 18081 else 18080
+    }
+
+    private class TemporaryCoreCallback : CoreCallbackHandler {
+        override fun startup(): Long = 0
+
+        override fun shutdown(): Long = 0
+
+        override fun onEmitStatus(l: Long, s: String?): Long = 0
     }
 }

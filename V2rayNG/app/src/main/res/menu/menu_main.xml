@@ -87,16 +87,24 @@
         android:title="@string/title_export_all"
         app:showAsAction="never" />
     <item
-        android:id="@+id/ping_all"
-        android:title="@string/title_ping_all_server"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/real_ping_all"
         android:title="@string/title_real_ping_all_server"
         app:showAsAction="never" />
     <item
+        android:id="@+id/purity_ping_all"
+        android:title="@string/title_purity_ping_all_server"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/fast_purity_ping_all"
+        android:title="@string/title_fast_purity_ping_all_server"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/sort_by_test_results"
         android:title="@string/title_sort_by_test_results"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/sort_by_purity_results"
+        android:title="@string/title_sort_by_purity_results"
         app:showAsAction="never" />
     <item
         android:id="@+id/sub_update"
