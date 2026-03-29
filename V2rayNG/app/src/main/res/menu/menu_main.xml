@@ -99,6 +99,10 @@
         android:title="@string/title_sort_by_test_results"
         app:showAsAction="never" />
     <item
+        android:id="@+id/locate_selected_config"
+        android:title="@string/title_locate_selected_config"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/sub_update"
         android:title="@string/title_sub_update"
         app:showAsAction="never" />

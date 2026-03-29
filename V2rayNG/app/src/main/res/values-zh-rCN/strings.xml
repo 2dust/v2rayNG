@@ -299,6 +299,8 @@
     <string name="title_update_subscription_no_subscription">无订阅</string>
     <string name="toast_server_not_found_in_group">当前分组中未找到选中的服务器</string>
     <string name="toast_fragment_not_available">无法定位当前视图</string>
+    <string name="title_locate_selected_config">定位所选配置</string>
+
     <string name="tasker_start_service">启动服务</string>
     <string name="tasker_setting_confirm">确定</string>
 
