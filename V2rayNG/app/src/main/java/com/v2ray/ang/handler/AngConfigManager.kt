@@ -167,7 +167,7 @@ object AngConfigManager {
             count = parseBatchConfig(server, subid, append)
         }
         if (count <= 0) {
-            count = parseCustomConfigServer(server, subid)
+            count = parseCustomConfigServer(server, subid, append)
         }
 
         var countSub = parseBatchSubscription(server)
@@ -357,9 +357,10 @@ object AngConfigManager {
      *
      * @param server The server string.
      * @param subid The subscription ID.
+     * @param append Whether to append the configurations.
      * @return The number of configurations parsed.
      */
-    private fun parseCustomConfigServer(server: String?, subid: String): Int {
+    private fun parseCustomConfigServer(server: String?, subid: String, append: Boolean): Int {
         if (server == null) {
             return 0
         }
@@ -372,7 +373,9 @@ object AngConfigManager {
                     JsonUtil.fromJson(server, Array<Any>::class.java) ?: arrayOf()
 
                 if (serverList.isNotEmpty()) {
-                    MmkvManager.removeServerViaSubid(subid)
+                    if (!append) {
+                        MmkvManager.removeServerViaSubid(subid)
+                    }
                     var count = 0
                     for (srv in serverList.reversed()) {
                         val config = CustomFmt.parse(JsonUtil.toJson(srv)) ?: continue
@@ -393,7 +396,9 @@ object AngConfigManager {
                 val config = CustomFmt.parse(server) ?: return 0
                 config.subscriptionId = subid
                 config.description = generateDescription(config)
-                MmkvManager.removeServerViaSubid(subid)
+                if (!append) {
+                    MmkvManager.removeServerViaSubid(subid)
+                }
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
                 return 1
@@ -405,7 +410,9 @@ object AngConfigManager {
             try {
                 val config = WireguardFmt.parseWireguardConfFile(server) ?: return R.string.toast_incorrect_protocol
                 config.description = generateDescription(config)
-                MmkvManager.removeServerViaSubid(subid)
+                if (!append) {
+                    MmkvManager.removeServerViaSubid(subid)
+                }
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
                 return 1
@@ -578,7 +585,7 @@ object AngConfigManager {
             count = parseBatchConfig(server, subid, append)
         }
         if (count <= 0) {
-            count = parseCustomConfigServer(server, subid)
+            count = parseCustomConfigServer(server, subid, append)
         }
         return count
     }
