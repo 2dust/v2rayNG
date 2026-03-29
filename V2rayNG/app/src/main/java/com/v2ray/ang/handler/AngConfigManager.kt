@@ -372,6 +372,7 @@ object AngConfigManager {
                     JsonUtil.fromJson(server, Array<Any>::class.java) ?: arrayOf()
 
                 if (serverList.isNotEmpty()) {
+                    MmkvManager.removeServerViaSubid(subid)
                     var count = 0
                     for (srv in serverList.reversed()) {
                         val config = CustomFmt.parse(JsonUtil.toJson(srv)) ?: continue
