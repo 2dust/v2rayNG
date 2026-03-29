@@ -70,9 +70,10 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
         itemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(adapter, allowSwipe = false))
         itemTouchHelper?.attachToRecyclerView(binding.recyclerView)
 
-        binding.refreshLayout.setOnRefreshListener(this)
-        // Set the distance to trigger sync to 160dp
-        binding.refreshLayout.setDistanceToTriggerSync((160 * resources.displayMetrics.density).toInt())
+        binding.refreshLayout.isEnabled = false
+//        binding.refreshLayout.setOnRefreshListener(this)
+//        // Set the distance to trigger sync to 160dp
+//        binding.refreshLayout.setDistanceToTriggerSync((160 * resources.displayMetrics.density).toInt())
 
         mainViewModel.updateListAction.observe(viewLifecycleOwner) { index ->
             if (mainViewModel.subscriptionId != subId) {
@@ -280,7 +281,7 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
 
     override fun onRefresh() {
         ownerActivity.importConfigViaSub()
-        binding.refreshLayout.isRefreshing = false
+        //binding.refreshLayout.isRefreshing = false
     }
 
     /**
