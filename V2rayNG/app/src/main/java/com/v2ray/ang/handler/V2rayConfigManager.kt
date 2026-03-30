@@ -3,7 +3,6 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.text.TextUtils
 import android.util.Log
-import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ConfigResult

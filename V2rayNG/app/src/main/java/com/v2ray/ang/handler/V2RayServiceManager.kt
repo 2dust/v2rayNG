@@ -198,7 +198,6 @@ object V2RayServiceManager {
 
         try {
             NotificationManager.showNotification(currentConfig)
-            Log.d("temptest", "startCoreLoop: ${result.content}")
             coreController.startLoop(result.content, tunFd)
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "StartCore-Manager: Failed to start core loop", e)
