@@ -3,6 +3,7 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.text.TextUtils
 import android.util.Log
+import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ConfigResult
@@ -1174,9 +1175,13 @@ object V2rayConfigManager {
         val authority = profileItem.authority
         val xhttpMode = profileItem.xhttpMode
         val xhttpExtra = profileItem.xhttpExtra
-
+        val finalMask = profileItem.finalMask
         var sni: String? = null
         streamSettings.network = transport.ifEmpty { NetworkType.TCP.type }
+        finalMask?.let {
+            streamSettings.finalmask =
+                JsonUtil.fromJson(finalMask,StreamSettingsBean.FinalMaskBean::class.java)
+        }
         when (streamSettings.network) {
             NetworkType.TCP.type -> {
                 val tcpSetting = StreamSettingsBean.TcpSettingsBean()
