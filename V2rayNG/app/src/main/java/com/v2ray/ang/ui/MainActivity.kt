@@ -94,6 +94,10 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         })
 
         binding.fab.setOnClickListener { handleFabAction() }
+        binding.fab.setOnLongClickListener {
+            locateSelectedServer()
+            true
+        }
         binding.layoutTest.setOnClickListener { handleLayoutTestClick() }
 
         setupGroupTab()
