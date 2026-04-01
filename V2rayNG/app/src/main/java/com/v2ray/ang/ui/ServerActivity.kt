@@ -24,6 +24,7 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
@@ -566,7 +567,7 @@ class ServerActivity : BaseActivity() {
         profileItem.serviceName = path
         profileItem.authority = requestHost
         profileItem.xhttpMode = transportTypes(networks[network])[type]
-        profileItem.xhttpExtra = et_extra?.text?.toString()?.trim()
+        profileItem.xhttpExtra = et_extra?.text?.toString()?.trim().nullIfBlank()
         profileItem.finalMask = et_fm?.text?.toString()?.trim()?.nullIfBlank()
     }
 

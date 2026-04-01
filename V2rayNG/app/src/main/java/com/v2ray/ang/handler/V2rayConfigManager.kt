@@ -1178,8 +1178,7 @@ object V2rayConfigManager {
         var sni: String? = null
         streamSettings.network = transport.ifEmpty { NetworkType.TCP.type }
         finalMask?.let {
-            streamSettings.finalmask =
-                JsonUtil.fromJson(finalMask,StreamSettingsBean.FinalMaskBean::class.java)
+            streamSettings.finalmask = JsonUtil.parseString(finalMask)
         }
         when (streamSettings.network) {
             NetworkType.TCP.type -> {
