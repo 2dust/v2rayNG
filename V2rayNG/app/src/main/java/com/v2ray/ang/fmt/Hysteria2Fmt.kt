@@ -72,14 +72,36 @@ object Hysteria2Fmt : FmtBase() {
             dicQuery["mport"] = config.portHopping.orEmpty()
         }
         if (config.portHoppingInterval.isNotNullEmpty()) {
-            var portHoppingInterval = config.portHoppingInterval.orEmpty()
-            if (portHoppingInterval.contains('-')) {
-                // interval range
-                portHoppingInterval = portHoppingInterval.substringBefore('-')
+            val rawInterval = config.portHoppingInterval?.trim().nullIfBlank()
+            val interval = if (rawInterval == null) {
+                null
+            } else {
+                val singleValue = rawInterval.toIntOrNull()
+                if (singleValue != null) {
+                    if (singleValue < 5) {
+                        null
+                    } else {
+                        rawInterval
+                    }
+                } else {
+                    val parts = rawInterval.split('-')
+                    if (parts.size == 2) {
+                        val start = parts[0].trim().toIntOrNull()
+                        val end = parts[1].trim().toIntOrNull()
+                        if (start != null && end != null) {
+                            val minStart = maxOf(5, start)
+                            val minEnd = maxOf(minStart, end)
+                            (minStart + minEnd) / 2
+                        } else {
+                            null
+                        }
+                    } else {
+                        null
+                    }
+                }
             }
-            val trimmedPortHoppingInterval = portHoppingInterval.trim()
-            if (trimmedPortHoppingInterval.isNotEmpty()) {
-                dicQuery["mportHopInt"] = trimmedPortHoppingInterval
+            if (interval != null) {
+                dicQuery["mportHopInt"] = interval.toString()
             }
         }
         if (config.pinnedCA256.isNotNullEmpty()) {

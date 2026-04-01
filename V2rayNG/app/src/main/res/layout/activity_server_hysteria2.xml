@@ -85,8 +85,7 @@
             <EditText
                 android:id="@+id/et_port_hop_interval"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number" />
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
