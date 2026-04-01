@@ -567,7 +567,7 @@ class ServerActivity : BaseActivity() {
         profileItem.authority = requestHost
         profileItem.xhttpMode = transportTypes(networks[network])[type]
         profileItem.xhttpExtra = et_extra?.text?.toString()?.trim()
-        profileItem.finalMask = et_fm?.text.toString().trim()
+        profileItem.finalMask = et_fm?.text?.toString()?.trim()?.nullIfBlank()
     }
 
     private fun saveTls(config: ProfileItem) {
