@@ -219,6 +219,11 @@ object V2rayConfigManager {
             resolveOutboundDomainsToHosts(v2rayConfig)
         }
 
+        // apply fragment
+        for (outbound in v2rayConfig.outbounds) {
+            updateOutboundFragment(outbound)
+        }
+
         result.status = true
         result.content = JsonUtil.toJsonPretty(v2rayConfig) ?: ""
         result.guid = guid
@@ -276,6 +281,11 @@ object V2rayConfigManager {
         //Resolve and add to DNS Hosts
         if (MmkvManager.decodeSettingsString(AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD, "1") == "1") {
             resolveOutboundDomainsToHosts(v2rayConfig)
+        }
+
+        // apply fragment
+        for (outbound in v2rayConfig.outbounds) {
+            updateOutboundFragment(outbound)
         }
 
         return v2rayConfig
@@ -710,8 +720,6 @@ object V2rayConfigManager {
         } else {
             v2rayConfig.outbounds.add(outbound)
         }
-
-        updateOutboundFragment(v2rayConfig)
         return true
     }
 
@@ -955,17 +963,20 @@ object V2rayConfigManager {
      *
      * Configures packet fragmentation for TLS and REALITY protocols if enabled.
      *
-     * @param v2rayConfig The V2ray configuration object to be modified
+     * @param outbound The outbound object to be modified
      * @return true if fragment configuration was successful, false otherwise
      */
-    private fun updateOutboundFragment(v2rayConfig: V2rayConfig): Boolean {
+    private fun updateOutboundFragment(outbound: OutboundBean): Boolean {
         try {
             if (MmkvManager.decodeSettingsBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == false) {
                 return true
             }
-            if (v2rayConfig.outbounds[0].streamSettings?.security != AppConfig.TLS
-                && v2rayConfig.outbounds[0].streamSettings?.security != AppConfig.REALITY
+            if (outbound.streamSettings?.security != AppConfig.TLS
+                && outbound.streamSettings?.security != AppConfig.REALITY
             ) {
+                return true
+            }
+            if (outbound.streamSettings?.sockopt?.dialerProxy.isNotNullEmpty()) {
                 return true
             }
 
@@ -978,45 +989,56 @@ object V2rayConfigManager {
 
             var packets =
                 MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_PACKETS) ?: "tlshello"
-            if (v2rayConfig.outbounds[0].streamSettings?.security == AppConfig.REALITY
+            if (outbound.streamSettings?.security == AppConfig.REALITY
                 && packets == "tlshello"
             ) {
                 packets = "1-3"
-            } else if (v2rayConfig.outbounds[0].streamSettings?.security == AppConfig.TLS
+            } else if (outbound.streamSettings?.security == AppConfig.TLS
                 && packets != "tlshello"
             ) {
                 packets = "tlshello"
             }
 
-            fragmentOutbound.settings = OutSettingsBean(
-                fragment = OutSettingsBean.FragmentBean(
+            val fragmentMask = StreamSettingsBean.FinalMaskBean.MaskBean(
+                type = "fragment",
+                settings = StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
                     packets = packets,
                     length = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_LENGTH)
                         ?: "50-100",
-                    interval = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_INTERVAL)
+                    delay = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_INTERVAL)
                         ?: "10-20"
-                ),
-                noises = listOf(
-                    OutSettingsBean.NoiseBean(
-                        type = "rand",
-                        packet = "10-20",
-                        delay = "10-16",
+                )
+            )
+            val noiseMask = StreamSettingsBean.FinalMaskBean.MaskBean(
+                type = "noise",
+                settings = StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
+                    noise = listOf(
+                        StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean.NoiseMaskBean(
+                            rand = "10-20",
+                            delay = "10-16",
+                        )
                     )
-                ),
-            )
-            fragmentOutbound.streamSettings = StreamSettingsBean(
-                sockopt = StreamSettingsBean.SockoptBean(
-                    TcpNoDelay = true,
-                    mark = 255
                 )
             )
-            v2rayConfig.outbounds.add(fragmentOutbound)
 
-            //proxy chain
-            v2rayConfig.outbounds[0].streamSettings?.sockopt =
-                StreamSettingsBean.SockoptBean(
-                    dialerProxy = AppConfig.TAG_FRAGMENT
-                )
+            val finalMaskObj = JsonUtil.parseString(JsonUtil.toJson(outbound.streamSettings?.finalmask))
+                ?: com.google.gson.JsonObject()
+
+            // finalmask.tcp / finalmask.udp are arrays; prepend mask at index 0.
+            fun prependMask(scope: String, mask: StreamSettingsBean.FinalMaskBean.MaskBean) {
+                val newArray = JsonArray()
+                newArray.add(JsonUtil.parseString(JsonUtil.toJson(mask)))
+
+                val current = finalMaskObj.get(scope)
+                if (current != null && current.isJsonArray) {
+                    current.asJsonArray.forEach { newArray.add(it) }
+                }
+                finalMaskObj.add(scope, newArray)
+            }
+
+            prependMask("tcp", fragmentMask)
+            prependMask("udp", noiseMask)
+            outbound.streamSettings?.finalmask = finalMaskObj
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to update outbound fragment", e)
             return false
