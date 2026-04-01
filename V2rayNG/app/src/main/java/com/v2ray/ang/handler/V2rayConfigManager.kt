@@ -1177,9 +1177,6 @@ object V2rayConfigManager {
         val finalMask = profileItem.finalMask
         var sni: String? = null
         streamSettings.network = transport.ifEmpty { NetworkType.TCP.type }
-        finalMask?.let {
-            streamSettings.finalmask = JsonUtil.parseString(finalMask)
-        }
         when (streamSettings.network) {
             NetworkType.TCP.type -> {
                 val tcpSetting = StreamSettingsBean.TcpSettingsBean()
@@ -1293,21 +1290,69 @@ object V2rayConfigManager {
                 val hysteriaSetting = StreamSettingsBean.HysteriaSettingsBean(
                     version = 2,
                     auth = profileItem.password.orEmpty(),
-                    up = profileItem.bandwidthUp?.ifEmpty { "0" }.orEmpty(),
-                    down = profileItem.bandwidthDown?.ifEmpty { "0" }.orEmpty(),
-                    udphop = null
                 )
+                val quicParams = StreamSettingsBean.FinalMaskBean.QuicParamsBean(
+                    brutalUp = profileItem.bandwidthUp?.nullIfBlank(),
+                    brutalDown = profileItem.bandwidthDown?.nullIfBlank(),
+                )
+                quicParams.congestion = if (quicParams.brutalUp != null || quicParams.brutalDown != null) "brutal" else null
                 if (profileItem.portHopping.isNotNullEmpty()) {
-                    hysteriaSetting.udphop = StreamSettingsBean.HysteriaSettingsBean.HysteriaUdpHopBean(
-                        port = profileItem.portHopping,
-                        interval = profileItem.portHoppingInterval
-                            ?.trim()
-                            ?.toIntOrNull()
-                            ?.takeIf { it >= 5 }
-                            ?: 30
+                    val rawInterval = profileItem.portHoppingInterval?.trim().nullIfBlank()
+                    val interval = if (rawInterval == null) {
+                        "30"
+                    } else {
+                        val singleValue = rawInterval.toIntOrNull()
+                        if (singleValue != null) {
+                            if (singleValue < 5) {
+                                "30"
+                            } else {
+                                rawInterval
+                            }
+                        } else {
+                            val parts = rawInterval.split('-')
+                            if (parts.size == 2) {
+                                val start = parts[0].trim().toIntOrNull()
+                                val end = parts[1].trim().toIntOrNull()
+                                if (start != null && end != null) {
+                                    val minStart = maxOf(5, start)
+                                    val minEnd = maxOf(minStart, end)
+                                        "$minStart-$minEnd"
+                                } else {
+                                    "30"
+                                }
+                            } else {
+                                "30"
+                            }
+                        }
+                    }
+                    quicParams.udpHop = StreamSettingsBean.FinalMaskBean.QuicParamsBean.UdpHopBean(
+                        ports = profileItem.portHopping,
+                        interval = interval
+                    )
+                }
+                val finalmask = StreamSettingsBean.FinalMaskBean(
+                    quicParams = quicParams
+                )
+                if (profileItem.obfsPassword.isNotNullEmpty()) {
+                    finalmask.udp = listOf(
+                        StreamSettingsBean.FinalMaskBean.MaskBean(
+                            type = "salamander",
+                            settings = StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
+                                password = profileItem.obfsPassword.orEmpty()
+                            )
+                        )
                     )
                 }
                 streamSettings.hysteriaSettings = hysteriaSetting
+                streamSettings.finalmask = finalmask
+            }
+        }
+        finalMask?.let {
+            val parsedFinalMask = JsonUtil.parseString(finalMask)
+            if (parsedFinalMask != null) {
+                streamSettings.finalmask = parsedFinalMask
+            } else {
+                Log.w("V2rayConfigManager", "Invalid finalMask JSON, keeping previously generated finalmask")
             }
         }
         return sni

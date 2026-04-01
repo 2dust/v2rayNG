@@ -292,16 +292,8 @@ data class V2rayConfig(
 
             data class HysteriaSettingsBean(
                 var version: Int,
-                var auth: String? = null,
-                var up: String? = null,
-                var down: String? = null,
-                var udphop: HysteriaUdpHopBean? = null
-            ) {
-                data class HysteriaUdpHopBean(
-                    var port: String? = null,
-                    var interval: Int? = null
-                )
-            }
+                var auth: String? = null
+            )
 
             //https://xtls.github.io/config/transport.html#finalmaskobject
             data class FinalMaskBean(
@@ -320,19 +312,9 @@ data class V2rayConfig(
                 }
                 data class QuicParamsBean(
                     var congestion: String? = null,
-                    var debug: Boolean? = null,
                     var brutalUp: String? = null,
-                    var brutalDown: Int? = null,
+                    var brutalDown: String? = null,
                     var udpHop: UdpHopBean? = null,
-                    // Using Long for large memory/window size values
-                    var initStreamReceiveWindow: Long? = null,
-                    var maxStreamReceiveWindow: Long? = null,
-                    var initConnectionReceiveWindow: Long? = null,
-                    var maxConnectionReceiveWindow: Long? = null,
-                    var maxIdleTimeout: Int? = null,
-                    var keepAlivePeriod: Int? = null,
-                    var disablePathMTUDiscovery: Boolean? = null,
-                    var maxIncomingStreams: Int? = null
                 ) {
                     // Nested data class for the udpHop JSON object
                     data class UdpHopBean(

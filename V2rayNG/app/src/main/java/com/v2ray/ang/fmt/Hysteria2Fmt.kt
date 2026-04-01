@@ -3,7 +3,6 @@ package com.v2ray.ang.fmt
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
-import com.v2ray.ang.dto.V2rayConfig.OutboundBean.StreamSettingsBean.FinalMaskBean
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.idnHost
@@ -73,7 +72,15 @@ object Hysteria2Fmt : FmtBase() {
             dicQuery["mport"] = config.portHopping.orEmpty()
         }
         if (config.portHoppingInterval.isNotNullEmpty()) {
-            dicQuery["mportHopInt"] = config.portHoppingInterval.orEmpty()
+            var portHoppingInterval = config.portHoppingInterval.orEmpty()
+            if (portHoppingInterval.contains('-')) {
+                // interval range
+                portHoppingInterval = portHoppingInterval.substringBefore('-')
+            }
+            val trimmedPortHoppingInterval = portHoppingInterval.trim()
+            if (trimmedPortHoppingInterval.isNotEmpty()) {
+                dicQuery["mportHopInt"] = trimmedPortHoppingInterval
+            }
         }
         if (config.pinnedCA256.isNotNullEmpty()) {
             dicQuery["pinSHA256"] = config.pinnedCA256.orEmpty()
@@ -107,18 +114,6 @@ object Hysteria2Fmt : FmtBase() {
             V2rayConfigManager.populateTlsSettings(it, profileItem, sni)
         }
 
-        if (profileItem.obfsPassword.isNotNullEmpty()) {
-            outboundBean.streamSettings?.finalmask = FinalMaskBean(
-                udp = listOf(
-                    FinalMaskBean.MaskBean(
-                        type = "salamander",
-                        settings = FinalMaskBean.MaskBean.MaskSettingsBean(
-                            password = profileItem.obfsPassword
-                        )
-                    )
-                )
-            )
-        }
         return outboundBean
     }
 }
