@@ -1174,9 +1174,12 @@ object V2rayConfigManager {
         val authority = profileItem.authority
         val xhttpMode = profileItem.xhttpMode
         val xhttpExtra = profileItem.xhttpExtra
-
+        val finalMask = profileItem.finalMask
         var sni: String? = null
         streamSettings.network = transport.ifEmpty { NetworkType.TCP.type }
+        finalMask?.let {
+            streamSettings.finalmask = JsonUtil.parseString(finalMask)
+        }
         when (streamSettings.network) {
             NetworkType.TCP.type -> {
                 val tcpSetting = StreamSettingsBean.TcpSettingsBean()

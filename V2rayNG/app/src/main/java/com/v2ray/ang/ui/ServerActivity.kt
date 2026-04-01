@@ -24,6 +24,7 @@ import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
@@ -132,6 +133,7 @@ class ServerActivity : BaseActivity() {
     private val et_bandwidth_down: EditText? by lazy { findViewById(R.id.et_bandwidth_down) }
     private val et_bandwidth_up: EditText? by lazy { findViewById(R.id.et_bandwidth_up) }
     private val et_extra: EditText? by lazy { findViewById(R.id.et_extra) }
+    private val et_fm: EditText? by lazy { findViewById(R.id.et_fm) }
     private val layout_extra: LinearLayout? by lazy { findViewById(R.id.layout_extra) }
     private val et_ech_config_list: EditText? by lazy { findViewById(R.id.et_ech_config_list) }
     private val container_ech_config_list: LinearLayout? by lazy { findViewById(R.id.lay_ech_config_list) }
@@ -241,6 +243,7 @@ class ServerActivity : BaseActivity() {
                         else -> null
                     }.orEmpty()
                 )
+                et_fm?.text = Utils.getEditable(config?.finalMask)
 
                 layout_extra?.visibility =
                     when (networks[position]) {
@@ -489,6 +492,13 @@ class ServerActivity : BaseActivity() {
             }
         }
 
+        if (et_fm?.text?.toString().isNotNullEmpty()) {
+            if (JsonUtil.parseString(et_fm?.text?.toString()) == null) {
+                toast(R.string.server_lab_final_mask)
+                return false
+            }
+        }
+
         saveCommon(config)
         saveStreamSettings(config)
         saveTls(config)
@@ -557,7 +567,8 @@ class ServerActivity : BaseActivity() {
         profileItem.serviceName = path
         profileItem.authority = requestHost
         profileItem.xhttpMode = transportTypes(networks[network])[type]
-        profileItem.xhttpExtra = et_extra?.text?.toString()?.trim()
+        profileItem.xhttpExtra = et_extra?.text?.toString()?.trim().nullIfBlank()
+        profileItem.finalMask = et_fm?.text?.toString()?.trim()?.nullIfBlank()
     }
 
     private fun saveTls(config: ProfileItem) {

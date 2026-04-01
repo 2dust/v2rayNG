@@ -162,7 +162,7 @@ data class V2rayConfig(
             var realitySettings: TlsSettingsBean? = null,
             var grpcSettings: GrpcSettingsBean? = null,
             var hysteriaSettings: HysteriaSettingsBean? = null,
-            var finalmask: FinalMaskBean? = null,
+            var finalmask: Any? = null,
             val dsSettings: Any? = null,
             var sockopt: SockoptBean? = null
         ) {
@@ -303,9 +303,11 @@ data class V2rayConfig(
                 )
             }
 
+            //https://xtls.github.io/config/transport.html#finalmaskobject
             data class FinalMaskBean(
                 var tcp: List<MaskBean>? = null,
-                var udp: List<MaskBean>? = null
+                var udp: List<MaskBean>? = null,
+                var quicParams: QuicParamsBean? = null
             ) {
                 data class MaskBean(
                     var type: String,
@@ -314,6 +316,28 @@ data class V2rayConfig(
                     data class MaskSettingsBean(
                         var password: String? = null,
                         var domain: String? = null
+                    )
+                }
+                data class QuicParamsBean(
+                    var congestion: String? = null,
+                    var debug: Boolean? = null,
+                    var brutalUp: String? = null,
+                    var brutalDown: Int? = null,
+                    var udpHop: UdpHopBean? = null,
+                    // Using Long for large memory/window size values
+                    var initStreamReceiveWindow: Long? = null,
+                    var maxStreamReceiveWindow: Long? = null,
+                    var initConnectionReceiveWindow: Long? = null,
+                    var maxConnectionReceiveWindow: Long? = null,
+                    var maxIdleTimeout: Int? = null,
+                    var keepAlivePeriod: Int? = null,
+                    var disablePathMTUDiscovery: Boolean? = null,
+                    var maxIncomingStreams: Int? = null
+                ) {
+                    // Nested data class for the udpHop JSON object
+                    data class UdpHopBean(
+                        var ports: String? = null,
+                        var interval: String? = null
                     )
                 }
             }
