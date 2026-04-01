@@ -111,7 +111,7 @@ open class FmtBase {
         config.spiderX?.nullIfBlank()?.let { dicQuery["spx"] = it }
         config.mldsa65Verify?.nullIfBlank()?.let { dicQuery["pqv"] = it }
         config.flow?.nullIfBlank()?.let { dicQuery["flow"] = it }
-        config.finalMask?.nullIfBlank()?.let { dicQuery["fm"] =it }
+        config.finalMask?.nullIfBlank()?.let { dicQuery["fm"] = it }
         // Add two keys for compatibility: "insecure" and "allowInsecure"
         if (config.security == AppConfig.TLS) {
             val insecureFlag = if (config.insecure == true) "1" else "0"
