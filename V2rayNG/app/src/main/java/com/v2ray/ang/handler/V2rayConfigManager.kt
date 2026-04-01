@@ -219,11 +219,6 @@ object V2rayConfigManager {
             resolveOutboundDomainsToHosts(v2rayConfig)
         }
 
-        // apply fragment
-        for (outbound in v2rayConfig.outbounds) {
-            updateOutboundFragment(outbound)
-        }
-
         result.status = true
         result.content = JsonUtil.toJsonPretty(v2rayConfig) ?: ""
         result.guid = guid
@@ -281,11 +276,6 @@ object V2rayConfigManager {
         //Resolve and add to DNS Hosts
         if (MmkvManager.decodeSettingsString(AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD, "1") == "1") {
             resolveOutboundDomainsToHosts(v2rayConfig)
-        }
-
-        // apply fragment
-        for (outbound in v2rayConfig.outbounds) {
-            updateOutboundFragment(outbound)
         }
 
         return v2rayConfig
@@ -963,37 +953,30 @@ object V2rayConfigManager {
      *
      * Configures packet fragmentation for TLS and REALITY protocols if enabled.
      *
-     * @param outbound The outbound object to be modified
+     * @param streamSettings The streamSettings object to be modified
      * @return true if fragment configuration was successful, false otherwise
      */
-    private fun updateOutboundFragment(outbound: OutboundBean): Boolean {
+    private fun updateOutboundFragment(streamSettings: StreamSettingsBean): Boolean {
         try {
             if (MmkvManager.decodeSettingsBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == false) {
                 return true
             }
-            if (outbound.streamSettings?.security != AppConfig.TLS
-                && outbound.streamSettings?.security != AppConfig.REALITY
+            if (streamSettings.security != AppConfig.TLS
+                && streamSettings.security != AppConfig.REALITY
             ) {
                 return true
             }
-            if (outbound.streamSettings?.sockopt?.dialerProxy.isNotNullEmpty()) {
+            if (streamSettings.sockopt?.dialerProxy.isNotNullEmpty()) {
                 return true
             }
-
-            val fragmentOutbound =
-                OutboundBean(
-                    protocol = AppConfig.PROTOCOL_FREEDOM,
-                    tag = AppConfig.TAG_FRAGMENT,
-                    mux = null
-                )
 
             var packets =
                 MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_PACKETS) ?: "tlshello"
-            if (outbound.streamSettings?.security == AppConfig.REALITY
+            if (streamSettings.security == AppConfig.REALITY
                 && packets == "tlshello"
             ) {
                 packets = "1-3"
-            } else if (outbound.streamSettings?.security == AppConfig.TLS
+            } else if (streamSettings.security == AppConfig.TLS
                 && packets != "tlshello"
             ) {
                 packets = "tlshello"
@@ -1021,15 +1004,20 @@ object V2rayConfigManager {
                 )
             )
 
-            val finalMaskObj = JsonUtil.parseString(JsonUtil.toJson(outbound.streamSettings?.finalmask))
-                ?: com.google.gson.JsonObject()
+            val finalMaskObj = streamSettings.finalmask?.let { existingFinalMask ->
+                JsonUtil.parseString(JsonUtil.toJson(existingFinalMask))
+            } ?: com.google.gson.JsonObject()
 
             // finalmask.tcp / finalmask.udp are arrays; prepend mask at index 0.
             fun prependMask(scope: String, mask: StreamSettingsBean.FinalMaskBean.MaskBean) {
+                val current = finalMaskObj.get(scope)
+                if (current != null && current.isJsonArray && current.asJsonArray.size() > 0) {
+                    return
+                }
+
                 val newArray = JsonArray()
                 newArray.add(JsonUtil.parseString(JsonUtil.toJson(mask)))
 
-                val current = finalMaskObj.get(scope)
                 if (current != null && current.isJsonArray) {
                     current.asJsonArray.forEach { newArray.add(it) }
                 }
@@ -1038,7 +1026,7 @@ object V2rayConfigManager {
 
             prependMask("tcp", fragmentMask)
             prependMask("udp", noiseMask)
-            outbound.streamSettings?.finalmask = finalMaskObj
+            streamSettings.finalmask = finalMaskObj
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to update outbound fragment", e)
             return false
@@ -1423,6 +1411,10 @@ object V2rayConfigManager {
         } else if (streamSettings.security == AppConfig.REALITY) {
             streamSettings.tlsSettings = null
             streamSettings.realitySettings = tlsSetting
+        }
+
+        if (profileItem.finalMask.isNullOrEmpty()) {
+            updateOutboundFragment(streamSettings)
         }
     }
 
