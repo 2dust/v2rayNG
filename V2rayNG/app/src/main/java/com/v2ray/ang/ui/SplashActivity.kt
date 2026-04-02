@@ -14,7 +14,8 @@ class SplashActivity : AppCompatActivity() {
 
         // Aguardar 2 segundos e depois ir para a MainActivity
         Handler(Looper.getMainLooper()).postDelayed({
-            startActivity(Intent(this, MainActivity::class.java))
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
             finish()
         }, 2000)
     }
