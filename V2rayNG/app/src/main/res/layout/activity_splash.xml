@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/md_theme_background">
+    android:background="@color/medieval_dark">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -12,37 +12,41 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/img_logo"
-            android:layout_width="128dp"
-            android:layout_height="128dp"
-            android:src="@mipmap/ic_launcher_foreground"
-            android:contentDescription="@string/app_name" />
+            android:id="@+id/splash_logo"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:contentDescription="@string/app_name"
+            android:src="@mipmap/ic_launcher" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:text="@string/app_name"
-            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
-            android:textColor="@color/md_theme_primary"
+            android:textColor="@color/simpsons_yellow"
+            android:textSize="28sp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Internet Ilimitada Angola"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/md_theme_onBackground" />
+            android:text="From DaggomoStudios"
+            android:textColor="@color/simpsons_yellow_dirty"
+            android:textSize="16sp"
+            android:textStyle="italic" />
 
     </LinearLayout>
 
-    <ProgressBar
-        android:layout_width="wrap_content"
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="48dp"
-        android:indeterminateTint="@color/md_theme_primary" />
+        android:indeterminate="true"
+        app:indicatorColor="@color/simpsons_yellow"
+        app:trackColor="@color/medieval_brown"
+        xmlns:app="http://schemas.android.com/apk/res-auto" />
 
 </RelativeLayout>
