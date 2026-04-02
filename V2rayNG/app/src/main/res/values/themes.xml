@@ -36,6 +36,9 @@
         <item name="tabTextColor">@color/medieval_brown</item>
     </style>
 
+    <!-- AppThemeBase required by other activities and resources -->
+    <style name="AppThemeBase" parent="AppThemeDayNight" />
+
     <style name="AppThemeDayNight.NoActionBar" parent="AppThemeDayNight">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
