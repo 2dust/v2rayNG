@@ -398,90 +398,30 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         return true
     }
 
-    private fun exportAll() {
-        showLoading()
-        lifecycleScope.launch(Dispatchers.IO) {
-            val ret = mainViewModel.exportAllServer()
-            launch(Dispatchers.Main) {
-                if (ret > 0)
-                    toast(getString(R.string.title_export_config_count, ret))
-                else
-                    toastError(R.string.toast_failure)
-                hideLoading()
+    /**
+     * show file chooser
+     */
+    private fun showFileChooser() {
+        launchFileChooser { uri ->
+            if (uri == null) {
+                return@launchFileChooser
             }
+
+            readContentFromUri(uri)
         }
     }
 
-    private fun delAllConfig() {
-        AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                showLoading()
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val ret = mainViewModel.removeAllServer()
-                    launch(Dispatchers.Main) {
-                        mainViewModel.reloadServerList()
-                        toast(getString(R.string.title_del_config_count, ret))
-                        hideLoading()
-                    }
-                }
+    /**
+     * read content from uri
+     */
+    private fun readContentFromUri(uri: Uri) {
+        try {
+            contentResolver.openInputStream(uri).use { input ->
+                importBatchConfig(input?.bufferedReader()?.readText())
             }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                //do noting
-            }
-            .show()
-    }
-
-    private fun delDuplicateConfig() {
-        AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                showLoading()
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val ret = mainViewModel.removeDuplicateServer()
-                    launch(Dispatchers.Main) {
-                        mainViewModel.reloadServerList()
-                        toast(getString(R.string.title_del_duplicate_config_count, ret))
-                        hideLoading()
-                    }
-                }
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                //do noting
-            }
-            .show()
-    }
-
-    private fun delInvalidConfig() {
-        AlertDialog.Builder(this).setMessage(R.string.del_invalid_config_comfirm)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                showLoading()
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val ret = mainViewModel.removeInvalidServer()
-                    launch(Dispatchers.Main) {
-                        mainViewModel.reloadServerList()
-                        toast(getString(R.string.title_del_config_count, ret))
-                        hideLoading()
-                    }
-                }
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                //do noting
-            }
-            .show()
-    }
-
-    private fun sortByTestResults() {
-        showLoading()
-        lifecycleScope.launch(Dispatchers.IO) {
-            mainViewModel.sortByTestResults()
-            launch(Dispatchers.Main) {
-                mainViewModel.reloadServerList()
-                hideLoading()
-            }
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to read content from URI", e)
         }
-    }
-
-    private fun locateSelectedServer() {
-        // Implementation for locating selected server
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -492,9 +432,15 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         return super.onKeyDown(keyCode, event)
     }
 
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    override fun onDestroy() {
+        tabMediator?.detach()
+        super.onDestroy()
     }
 }
