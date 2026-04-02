@@ -1,45 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Medieval Base Palette (Dominant Dark) -->
-    <color name="medieval_dark">#1A120B</color> <!-- Fundo Principal (Couro Escuro/Pedra) -->
-    <color name="medieval_brown">#3C2A21</color> <!-- Fundo Secundário (Madeira/Couro) -->
-    <color name="medieval_brown_light">#D4A373</color> <!-- Destaques em Castanho Claro -->
-    <color name="medieval_red">#7B1113</color> <!-- Vermelho Sangue Medieval para Erros -->
-    <color name="parchment">#E6D5B8</color> <!-- Cor de Pergaminho para Textos Principais -->
-    <color name="parchment_dark">#B2A58D</color> <!-- Pergaminho Escurecido para Textos Secundários -->
+    <!-- Manus Choice: Charcoal & Gold (The Simpsons Premium Medieval) -->
+    <color name="charcoal_black">#0F0F0F</color> <!-- Fundo Ultra Escuro / Carvão -->
+    <color name="charcoal_surface">#1A1A1A</color> <!-- Superfícies / Cards -->
+    <color name="simpsons_gold">#FFD700</color> <!-- Ouro Simpsons Vibrante (Highlight) -->
+    <color name="simpsons_gold_dark">#B8860B</color> <!-- Ouro Velho (Medieval) -->
+    <color name="parchment_white">#E0E0E0</color> <!-- Texto Principal (Quase Branco) -->
+    <color name="parchment_grey">#9E9E9E</color> <!-- Texto Secundário (Cinza) -->
+    <color name="medieval_red">#B22222</color> <!-- Vermelho Medieval para Erros -->
 
-    <!-- Simpsons Yellow as Support/Highlight -->
-    <color name="simpsons_yellow">#FFD90F</color> <!-- Cor de Destaque (Botões Ativos, Indicadores) -->
-    <color name="simpsons_yellow_dirty">#CCAD00</color> <!-- Amarelo Ouro para Detalhes Menores -->
-    
-    <color name="colorPing">#00C853</color> <!-- Verde para Ping Bom -->
+    <!-- Status Colors -->
+    <color name="colorPing">#4CAF50</color> <!-- Verde Material -->
     <color name="colorPingRed">@color/medieval_red</color>
-    <color name="colorConfigType">@color/simpsons_yellow_dirty</color>
+    <color name="colorConfigType">@color/simpsons_gold_dark</color>
     <color name="colorWhite">#FFFFFF</color>
-    <color name="color_fab_active">@color/simpsons_yellow</color> <!-- FAB Amarelo sobre fundo Escuro -->
-    <color name="color_fab_inactive">#5D4037</color>
-    <color name="divider_color_light">#2D2018</color>
-    <color name="colorIndicator">@color/simpsons_yellow</color>
+    <color name="color_fab_active">@color/simpsons_gold</color> <!-- FAB Ouro sobre Preto -->
+    <color name="color_fab_inactive">#424242</color>
+    <color name="divider_color_light">#262626</color>
+    <color name="colorIndicator">@color/simpsons_gold</color>
 
-    <!-- Material Theme Mapping (Sempre Dark para compatibilidade Nightly) -->
-    <color name="md_theme_primary">@color/simpsons_yellow</color>
-    <color name="md_theme_onPrimary">@color/medieval_dark</color>
-    <color name="md_theme_primaryContainer">@color/medieval_brown</color>
-    <color name="md_theme_onPrimaryContainer">@color/parchment</color>
+    <!-- Material Theme Mapping (Sempre Dark) -->
+    <color name="md_theme_primary">@color/simpsons_gold</color>
+    <color name="md_theme_onPrimary">@color/charcoal_black</color>
+    <color name="md_theme_primaryContainer">@color/charcoal_surface</color>
+    <color name="md_theme_onPrimaryContainer">@color/simpsons_gold</color>
 
-    <color name="md_theme_secondary">@color/medieval_brown_light</color>
-    <color name="md_theme_onSecondary">@color/medieval_dark</color>
-    <color name="md_theme_secondaryContainer">@color/medieval_dark</color>
-    <color name="md_theme_onSecondaryContainer">@color/simpsons_yellow</color>
+    <color name="md_theme_secondary">@color/simpsons_gold_dark</color>
+    <color name="md_theme_onSecondary">@color/charcoal_black</color>
+    <color name="md_theme_secondaryContainer">@color/charcoal_black</color>
+    <color name="md_theme_onSecondaryContainer">@color/simpsons_gold</color>
 
-    <color name="md_theme_background">@color/medieval_dark</color>
-    <color name="md_theme_onBackground">@color/parchment</color>
+    <color name="md_theme_background">@color/charcoal_black</color>
+    <color name="md_theme_onBackground">@color/parchment_white</color>
 
-    <color name="md_theme_surface">@color/medieval_brown</color>
-    <color name="md_theme_onSurface">@color/parchment</color>
-    <color name="md_theme_surfaceVariant">@color/medieval_dark</color>
-    <color name="md_theme_onSurfaceVariant">@color/parchment_dark</color>
+    <color name="md_theme_surface">@color/charcoal_surface</color>
+    <color name="md_theme_onSurface">@color/parchment_white</color>
+    <color name="md_theme_surfaceVariant">@color/charcoal_black</color>
+    <color name="md_theme_onSurfaceVariant">@color/parchment_grey</color>
     
-    <color name="md_theme_outline">@color/medieval_brown_light</color>
+    <color name="md_theme_outline">@color/simpsons_gold_dark</color>
     <color name="md_theme_error">@color/medieval_red</color>
 </resources>

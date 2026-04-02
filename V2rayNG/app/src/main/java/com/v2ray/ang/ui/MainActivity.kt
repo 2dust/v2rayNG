@@ -185,21 +185,21 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     private  fun applyRunningState(isLoading: Boolean, isRunning: Boolean) {
         if (isLoading) {
             binding.fab.setImageResource(R.drawable.ic_fab_check)
-            binding.fab.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.medieval_dark))
+            binding.fab.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.charcoal_black))
             return
         }
 
         if (isRunning) {
             binding.fab.setImageResource(R.drawable.ic_stop_24dp)
-            binding.fab.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.medieval_dark))
-            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.simpsons_yellow))
+            binding.fab.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.charcoal_black))
+            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.simpsons_gold))
             binding.fab.contentDescription = getString(R.string.action_stop_service)
             setTestState(getString(R.string.connection_connected))
             binding.layoutTest.isFocusable = true
         } else {
             binding.fab.setImageResource(R.drawable.ic_play_24dp)
-            binding.fab.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.medieval_dark))
-            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.simpsons_yellow_dirty))
+            binding.fab.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.charcoal_black))
+            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.simpsons_gold_dark))
             binding.fab.contentDescription = getString(R.string.tasker_start_service)
             setTestState(getString(R.string.connection_not_connected))
             binding.layoutTest.isFocusable = false

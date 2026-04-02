@@ -1,40 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme (Medieval Dark with Yellow Highlights). -->
-    <!-- Forcing Dark theme for full Nightly mode compatibility. -->
+    <!-- Manus Choice: Charcoal & Gold (Always Dark Theme) -->
     <style name="AppThemeDayNight" parent="Theme.Material3.Dark.NoActionBar">
-        <!-- Main colors (Medieval Dark Background) -->
-        <item name="colorPrimary">@color/simpsons_yellow</item>
-        <item name="colorOnPrimary">@color/medieval_dark</item>
-        <item name="colorPrimaryContainer">@color/medieval_brown</item>
-        <item name="colorOnPrimaryContainer">@color/parchment</item>
+        <!-- Main colors (Charcoal Black Background) -->
+        <item name="colorPrimary">@color/simpsons_gold</item>
+        <item name="colorOnPrimary">@color/charcoal_black</item>
+        <item name="colorPrimaryContainer">@color/charcoal_surface</item>
+        <item name="colorOnPrimaryContainer">@color/simpsons_gold</item>
         
-        <item name="colorSecondary">@color/medieval_brown_light</item>
-        <item name="colorOnSecondary">@color/medieval_dark</item>
-        <item name="colorSecondaryContainer">@color/medieval_dark</item>
-        <item name="colorOnSecondaryContainer">@color/simpsons_yellow</item>
+        <item name="colorSecondary">@color/simpsons_gold_dark</item>
+        <item name="colorOnSecondary">@color/charcoal_black</item>
+        <item name="colorSecondaryContainer">@color/charcoal_black</item>
+        <item name="colorOnSecondaryContainer">@color/simpsons_gold</item>
         
-        <item name="android:windowBackground">@color/medieval_dark</item>
-        <item name="android:statusBarColor">@color/medieval_dark</item>
-        <item name="android:navigationBarColor">@color/medieval_dark</item>
+        <item name="android:windowBackground">@color/charcoal_black</item>
+        <item name="android:statusBarColor">@color/charcoal_black</item>
+        <item name="android:navigationBarColor">@color/charcoal_black</item>
         
         <!-- Surface and background colors -->
-        <item name="android:colorBackground">@color/medieval_dark</item>
-        <item name="colorSurface">@color/medieval_brown</item>
-        <item name="colorOnSurface">@color/parchment</item>
-        <item name="colorSurfaceVariant">@color/medieval_dark</item>
-        <item name="colorOnSurfaceVariant">@color/parchment_dark</item>
+        <item name="android:colorBackground">@color/charcoal_black</item>
+        <item name="colorSurface">@color/charcoal_surface</item>
+        <item name="colorOnSurface">@color/parchment_white</item>
+        <item name="colorSurfaceVariant">@color/charcoal_black</item>
+        <item name="colorOnSurfaceVariant">@color/parchment_grey</item>
         
-        <item name="colorOutline">@color/medieval_brown_light</item>
+        <item name="colorOutline">@color/simpsons_gold_dark</item>
         
         <!-- Typography -->
-        <item name="android:textColor">@color/parchment</item>
-        <item name="android:textColorSecondary">@color/parchment_dark</item>
+        <item name="android:textColor">@color/parchment_white</item>
+        <item name="android:textColorSecondary">@color/parchment_grey</item>
         
         <!-- Tab Layout styling -->
-        <item name="tabIndicatorColor">@color/simpsons_yellow</item>
-        <item name="tabSelectedTextColor">@color/simpsons_yellow</item>
-        <item name="tabTextColor">@color/parchment_dark</item>
+        <item name="tabIndicatorColor">@color/simpsons_gold</item>
+        <item name="tabSelectedTextColor">@color/simpsons_gold</item>
+        <item name="tabTextColor">@color/parchment_grey</item>
     </style>
 
     <!-- AppThemeBase required by other activities and resources -->
@@ -54,6 +53,6 @@
     </style>
 
     <style name="BrandedSwitch" parent="AppThemeDayNight">
-        <item name="colorPrimary">@color/simpsons_yellow</item>
+        <item name="colorPrimary">@color/simpsons_gold</item>
     </style>
 </resources>
