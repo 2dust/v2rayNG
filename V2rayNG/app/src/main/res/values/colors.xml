@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Simpsons Dirty Yellow Palette -->
-    <color name="simpsons_yellow">#FFD90F</color> <!-- O clássico Amarelo Simpsons -->
-    <color name="simpsons_yellow_dirty">#E1AD01</color> <!-- Amarelo Sujo / Ouro Velho -->
-    <color name="medieval_brown">#4E342E</color> <!-- Castanho Medieval (Couro) -->
-    <color name="medieval_dark">#2B1B17</color> <!-- Castanho Muito Escuro / Quase Preto -->
-    <color name="medieval_red">#8B0000</color> <!-- Vermelho Medieval (Sangue/Vinho) -->
-    <color name="parchment">#F5F5DC</color> <!-- Cor de Pergaminho (Bege) -->
+    <!-- Simpsons Main Palette (Dominant Yellow) -->
+    <color name="simpsons_yellow">#FFD90F</color> <!-- Fundo Principal Vibrante -->
+    <color name="simpsons_yellow_dirty">#E1AD01</color> <!-- Detalhes em Amarelo Ouro -->
+    <color name="medieval_brown">#4E342E</color> <!-- Texto e Ícones em Castanho Medieval (Couro) -->
+    <color name="medieval_dark">#2B1B17</color> <!-- Texto em Castanho Muito Escuro -->
+    <color name="medieval_red">#8B0000</color> <!-- Vermelho Medieval para Alertas -->
+    <color name="parchment">#F5F5DC</color> <!-- Cor de Pergaminho (Bege) para fundos secundários -->
     
-    <color name="colorPing">#00C853</color> <!-- Verde Brilhante para Ping Bom -->
+    <color name="colorPing">#00C853</color> <!-- Verde para Ping Bom -->
     <color name="colorPingRed">@color/medieval_red</color>
-    <color name="colorConfigType">@color/simpsons_yellow_dirty</color>
+    <color name="colorConfigType">@color/medieval_brown</color>
     <color name="colorWhite">#FFFFFF</color>
-    <color name="color_fab_active">@color/simpsons_yellow</color>
+    <color name="color_fab_active">@color/medieval_brown</color> <!-- FAB Escuro para contrastar no amarelo -->
     <color name="color_fab_inactive">#9E9E9E</color>
-    <color name="divider_color_light">#3D2B1F</color>
-    <color name="colorIndicator">@color/simpsons_yellow</color>
+    <color name="divider_color_light">#D4AF37</color> <!-- Dourado para divisórias -->
+    <color name="colorIndicator">@color/medieval_brown</color>
 
-    <!-- Material Theme Mapping -->
-    <color name="md_theme_primary">@color/simpsons_yellow</color>
-    <color name="md_theme_onPrimary">@color/medieval_dark</color>
+    <!-- Material Theme Mapping (Invertido para fundo amarelo) -->
+    <color name="md_theme_primary">@color/medieval_brown</color>
+    <color name="md_theme_onPrimary">@color/simpsons_yellow</color>
     <color name="md_theme_primaryContainer">@color/simpsons_yellow_dirty</color>
     <color name="md_theme_onPrimaryContainer">@color/medieval_dark</color>
 
-    <color name="md_theme_secondary">@color/medieval_brown</color>
-    <color name="md_theme_onSecondary">@color/parchment</color>
-    <color name="md_theme_secondaryContainer">@color/medieval_dark</color>
-    <color name="md_theme_onSecondaryContainer">@color/simpsons_yellow</color>
+    <color name="md_theme_secondary">@color/simpsons_yellow_dirty</color>
+    <color name="md_theme_onSecondary">@color/medieval_dark</color>
+    <color name="md_theme_secondaryContainer">@color/parchment</color>
+    <color name="md_theme_onSecondaryContainer">@color/medieval_dark</color>
 
-    <color name="md_theme_background">@color/medieval_dark</color>
-    <color name="md_theme_onBackground">@color/simpsons_yellow</color>
+    <color name="md_theme_background">@color/simpsons_yellow</color>
+    <color name="md_theme_onBackground">@color/medieval_dark</color>
 
-    <color name="md_theme_surface">@color/medieval_brown</color>
-    <color name="md_theme_onSurface">@color/simpsons_yellow</color>
-    <color name="md_theme_surfaceVariant">#3E2723</color>
-    <color name="md_theme_onSurfaceVariant">@color/simpsons_yellow_dirty</color>
+    <color name="md_theme_surface">@color/simpsons_yellow</color>
+    <color name="md_theme_onSurface">@color/medieval_dark</color>
+    <color name="md_theme_surfaceVariant">@color/simpsons_yellow_dirty</color>
+    <color name="md_theme_onSurfaceVariant">@color/medieval_dark</color>
     
-    <color name="md_theme_outline">@color/simpsons_yellow_dirty</color>
+    <color name="md_theme_outline">@color/medieval_brown</color>
     <color name="md_theme_error">#FF5252</color>
 </resources>

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/medieval_dark">
+    android:background="@color/simpsons_yellow">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -13,8 +14,8 @@
 
         <ImageView
             android:id="@+id/splash_logo"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:contentDescription="@string/app_name"
             android:src="@mipmap/ic_launcher" />
 
@@ -23,8 +24,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="@string/app_name"
-            android:textColor="@color/simpsons_yellow"
-            android:textSize="28sp"
+            android:textColor="@color/medieval_dark"
+            android:textSize="32sp"
             android:textStyle="bold" />
 
         <TextView
@@ -32,21 +33,20 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="From DaggomoStudios"
-            android:textColor="@color/simpsons_yellow_dirty"
-            android:textSize="16sp"
+            android:textColor="@color/medieval_brown"
+            android:textSize="18sp"
             android:textStyle="italic" />
 
     </LinearLayout>
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:layout_width="200dp"
+        android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="64dp"
         android:indeterminate="true"
-        app:indicatorColor="@color/simpsons_yellow"
-        app:trackColor="@color/medieval_brown"
-        xmlns:app="http://schemas.android.com/apk/res-auto" />
+        app:indicatorColor="@color/medieval_brown"
+        app:trackColor="@color/simpsons_yellow_dirty" />
 
 </RelativeLayout>
