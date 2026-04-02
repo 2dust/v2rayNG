@@ -1,39 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme (Vibrant Yellow with Medieval Dark Text). -->
-    <style name="AppThemeDayNight" parent="Theme.Material3.Light.NoActionBar">
-        <!-- Main colors (Yellow Background) -->
-        <item name="colorPrimary">@color/medieval_brown</item>
-        <item name="colorOnPrimary">@color/simpsons_yellow</item>
-        <item name="colorPrimaryContainer">@color/simpsons_yellow_dirty</item>
-        <item name="colorOnPrimaryContainer">@color/medieval_dark</item>
+    <!-- Base application theme (Medieval Dark with Yellow Highlights). -->
+    <!-- Forcing Dark theme for full Nightly mode compatibility. -->
+    <style name="AppThemeDayNight" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Main colors (Medieval Dark Background) -->
+        <item name="colorPrimary">@color/simpsons_yellow</item>
+        <item name="colorOnPrimary">@color/medieval_dark</item>
+        <item name="colorPrimaryContainer">@color/medieval_brown</item>
+        <item name="colorOnPrimaryContainer">@color/parchment</item>
         
-        <item name="colorSecondary">@color/simpsons_yellow_dirty</item>
+        <item name="colorSecondary">@color/medieval_brown_light</item>
         <item name="colorOnSecondary">@color/medieval_dark</item>
-        <item name="colorSecondaryContainer">@color/parchment</item>
-        <item name="colorOnSecondaryContainer">@color/medieval_dark</item>
+        <item name="colorSecondaryContainer">@color/medieval_dark</item>
+        <item name="colorOnSecondaryContainer">@color/simpsons_yellow</item>
         
-        <item name="android:windowBackground">@color/simpsons_yellow</item>
-        <item name="android:statusBarColor">@color/simpsons_yellow</item>
-        <item name="android:navigationBarColor">@color/simpsons_yellow</item>
+        <item name="android:windowBackground">@color/medieval_dark</item>
+        <item name="android:statusBarColor">@color/medieval_dark</item>
+        <item name="android:navigationBarColor">@color/medieval_dark</item>
         
         <!-- Surface and background colors -->
-        <item name="android:colorBackground">@color/simpsons_yellow</item>
-        <item name="colorSurface">@color/simpsons_yellow</item>
-        <item name="colorOnSurface">@color/medieval_dark</item>
-        <item name="colorSurfaceVariant">@color/simpsons_yellow_dirty</item>
-        <item name="colorOnSurfaceVariant">@color/medieval_dark</item>
+        <item name="android:colorBackground">@color/medieval_dark</item>
+        <item name="colorSurface">@color/medieval_brown</item>
+        <item name="colorOnSurface">@color/parchment</item>
+        <item name="colorSurfaceVariant">@color/medieval_dark</item>
+        <item name="colorOnSurfaceVariant">@color/parchment_dark</item>
         
-        <item name="colorOutline">@color/medieval_brown</item>
+        <item name="colorOutline">@color/medieval_brown_light</item>
         
         <!-- Typography -->
-        <item name="android:textColor">@color/medieval_dark</item>
-        <item name="android:textColorSecondary">@color/medieval_brown</item>
+        <item name="android:textColor">@color/parchment</item>
+        <item name="android:textColorSecondary">@color/parchment_dark</item>
         
         <!-- Tab Layout styling -->
-        <item name="tabIndicatorColor">@color/medieval_brown</item>
-        <item name="tabSelectedTextColor">@color/medieval_dark</item>
-        <item name="tabTextColor">@color/medieval_brown</item>
+        <item name="tabIndicatorColor">@color/simpsons_yellow</item>
+        <item name="tabSelectedTextColor">@color/simpsons_yellow</item>
+        <item name="tabTextColor">@color/parchment_dark</item>
     </style>
 
     <!-- AppThemeBase required by other activities and resources -->
@@ -53,6 +54,6 @@
     </style>
 
     <style name="BrandedSwitch" parent="AppThemeDayNight">
-        <item name="colorPrimary">@color/medieval_brown</item>
+        <item name="colorPrimary">@color/simpsons_yellow</item>
     </style>
 </resources>
