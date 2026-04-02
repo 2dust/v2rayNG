@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPing">#009966</color>
-    <color name="colorPingRed">#FF0099</color>
-    <color name="colorConfigType">#f97910</color>
-    <color name="colorWhite">#FFFFFF</color>
-    <color name="color_fab_active">#f97910</color>
-    <color name="color_fab_inactive">#9C9C9C</color>
-    <color name="divider_color_light">#E0E0E0</color>
+    <color name="colorPing">#D4AF37</color> <!-- Gold -->
+    <color name="colorPingRed">#8B0000</color> <!-- Dark Red -->
+    <color name="colorConfigType">#B8860B</color> <!-- Dark Goldenrod -->
+    <color name="colorWhite">#F5F5DC</color> <!-- Beige/Parchment -->
+    <color name="color_fab_active">#E1AD01</color> <!-- Mustard Yellow -->
+    <color name="color_fab_inactive">#4A4A4A</color> <!-- Stone Gray -->
+    <color name="divider_color_light">#3D3D3D</color>
     <color name="colorIndicator">@color/md_theme_primary</color>
 
-    <!-- Primary colors - main tone: black -->
-    <color name="md_theme_primary">#000000</color>
-    <color name="md_theme_onPrimary">#FFFFFF</color>
-    <color name="md_theme_primaryContainer">#E0E0E0</color>
-    <color name="md_theme_onPrimaryContainer">#000000</color>
+    <!-- Primary colors - main tone: Mustard Yellow (Simpsons Dirty Yellow) -->
+    <color name="md_theme_primary">#E1AD01</color>
+    <color name="md_theme_onPrimary">#1A1A1A</color>
+    <color name="md_theme_primaryContainer">#B8860B</color>
+    <color name="md_theme_onPrimaryContainer">#FFFFFF</color>
 
-    <!-- Secondary colors - accent color: orange -->
-    <color name="md_theme_secondary">#f97910</color>
+    <!-- Secondary colors - accent color: Dark Medieval Red/Brown -->
+    <color name="md_theme_secondary">#8B4513</color> <!-- Saddle Brown -->
     <color name="md_theme_onSecondary">#FFFFFF</color>
-    <color name="md_theme_secondaryContainer">#FFE8D6</color>
-    <color name="md_theme_onSecondaryContainer">#2B1700</color>
+    <color name="md_theme_secondaryContainer">#5D2E0A</color>
+    <color name="md_theme_onSecondaryContainer">#F5F5DC</color>
 
-    <!-- Tertiary colors - accent color: green -->
-    <color name="md_theme_tertiary">#009966</color>
+    <!-- Tertiary colors - accent color: Iron Gray -->
+    <color name="md_theme_tertiary">#4A4A4A</color>
     <color name="md_theme_onTertiary">#FFFFFF</color>
-    <color name="md_theme_tertiaryContainer">#A0F2D0</color>
-    <color name="md_theme_onTertiaryContainer">#00201A</color>
+    <color name="md_theme_tertiaryContainer">#2F2F2F</color>
+    <color name="md_theme_onTertiaryContainer">#D4AF37</color>
 
     <!-- Error colors -->
     <color name="md_theme_error">#BA1A1A</color>
@@ -33,25 +33,25 @@
     <color name="md_theme_onError">#FFFFFF</color>
     <color name="md_theme_onErrorContainer">#410002</color>
 
-    <!-- Background colors -->
-    <color name="md_theme_background">#FFFFFF</color>
-    <color name="md_theme_onBackground">#1C1B1F</color>
+    <!-- Background colors - Dark Medieval Background -->
+    <color name="md_theme_background">#1A1A1A</color> <!-- Dark Gray/Black -->
+    <color name="md_theme_onBackground">#F5F5DC</color> <!-- Parchment -->
 
     <!-- Surface colors -->
-    <color name="md_theme_surface">#FFFFFF</color>
-    <color name="md_theme_onSurface">#1C1B1F</color>
-    <color name="md_theme_surfaceVariant">#E7E0EC</color>
-    <color name="md_theme_onSurfaceVariant">#49454F</color>
-    <color name="md_theme_inverseSurface">#313033</color>
-    <color name="md_theme_inverseOnSurface">#F4EFF4</color>
+    <color name="md_theme_surface">#242424</color>
+    <color name="md_theme_onSurface">#F5F5DC</color>
+    <color name="md_theme_surfaceVariant">#3D3D3D</color>
+    <color name="md_theme_onSurfaceVariant">#D4AF37</color>
+    <color name="md_theme_inverseSurface">#F5F5DC</color>
+    <color name="md_theme_inverseOnSurface">#1A1A1A</color>
 
     <!-- Outline colors -->
-    <color name="md_theme_outline">#79747E</color>
-    <color name="md_theme_outlineVariant">#CAC4D0</color>
+    <color name="md_theme_outline">#D4AF37</color>
+    <color name="md_theme_outlineVariant">#B8860B</color>
 
     <!-- Other colors -->
-    <color name="md_theme_inversePrimary">#C0C0C0</color>
+    <color name="md_theme_inversePrimary">#B8860B</color>
     <color name="md_theme_shadow">#000000</color>
-    <color name="md_theme_surfaceTint">#000000</color>
+    <color name="md_theme_surfaceTint">#E1AD01</color>
     <color name="md_theme_scrim">#000000</color>
 </resources>
