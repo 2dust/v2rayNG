@@ -77,10 +77,6 @@
         <item name="colorPrimary">@color/color_fab_active</item>
     </style>
 
-    <style name="TabLayoutTextStyle" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">14sp</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textStyle">bold</item>
-    </style>
+
 
 </resources>
