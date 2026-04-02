@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/search_view"
-        android:icon="@drawable/ic_outline_filter_alt_24"
-        android:title="@string/menu_item_search"
-        app:actionViewClass="androidx.appcompat.widget.SearchView"
-        app:showAsAction="always|collapseActionView" />
+    
+    <!-- Apenas o botão de adicionar (+) foi mantido para base clean tipo DTunnel -->
     <item
         android:icon="@drawable/ic_add_24dp"
         android:title="@string/menu_item_add_config"
-        app:showAsAction="ifRoom">
+        app:showAsAction="always">
         <menu>
             <item
                 android:id="@+id/import_qrcode"
@@ -62,48 +58,4 @@
                 app:showAsAction="never" />
         </menu>
     </item>
-    <item
-        android:id="@+id/service_restart"
-        android:title="@string/title_service_restart"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/del_all_config"
-        android:icon="@drawable/ic_delete_24dp"
-        android:title="@string/title_del_all_config"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/del_duplicate_config"
-        android:icon="@drawable/ic_delete_24dp"
-        android:title="@string/title_del_duplicate_config"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/del_invalid_config"
-        android:icon="@drawable/ic_delete_24dp"
-        android:title="@string/title_del_invalid_config"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/export_all"
-        android:icon="@drawable/ic_share_24dp"
-        android:title="@string/title_export_all"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/ping_all"
-        android:title="@string/title_ping_all_server"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/real_ping_all"
-        android:title="@string/title_real_ping_all_server"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/sort_by_test_results"
-        android:title="@string/title_sort_by_test_results"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/locate_selected_config"
-        android:title="@string/title_locate_selected_config"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/sub_update"
-        android:title="@string/title_sub_update"
-        app:showAsAction="never" />
 </menu>

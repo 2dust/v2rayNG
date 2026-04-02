@@ -117,11 +117,13 @@
         </RelativeLayout>
     </LinearLayout>
 
+    <!-- Ocultado para base clean tipo DTunnel -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:visibility="gone"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/menu_drawer">
 
