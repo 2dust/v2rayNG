@@ -543,7 +543,7 @@ class ServerActivity : BaseActivity() {
         } else if (config.configType == EConfigType.HYSTERIA2) {
             config.obfsPassword = et_obfs_password?.text?.toString()
             config.portHopping = et_port_hop?.text?.toString()
-            config.portHoppingInterval = et_port_hop_interval?.text?.toString()
+            config.portHoppingInterval = et_port_hop_interval?.text?.toString()?.trim()
             config.bandwidthDown = et_bandwidth_down?.text?.toString()
             config.bandwidthUp = et_bandwidth_up?.text?.toString()
         }
