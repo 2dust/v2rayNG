@@ -68,8 +68,6 @@ data class V2rayConfig(
     ) {
         data class OutSettingsBean(
             var vnext: List<VnextBean>? = null,
-            var fragment: FragmentBean? = null,
-            var noises: List<NoiseBean>? = null,
             var servers: List<ServersBean>? = null,
             /*Blackhole*/
             var response: Response? = null,
@@ -107,18 +105,6 @@ data class V2rayConfig(
                     var flow: String? = null
                 )
             }
-
-            data class FragmentBean(
-                var packets: String? = null,
-                var length: String? = null,
-                var interval: String? = null
-            )
-
-            data class NoiseBean(
-                var type: String? = null,
-                var packet: String? = null,
-                var delay: String? = null
-            )
 
             data class ServersBean(
                 var address: String = "",
@@ -306,9 +292,25 @@ data class V2rayConfig(
                     var settings: MaskSettingsBean? = null
                 ) {
                     data class MaskSettingsBean(
-                        var password: String? = null,
-                        var domain: String? = null
-                    )
+                        val password: String? = null,
+                        val domain: String? = null,
+                        // fragment
+                        val packets: String? = null,
+                        val length: String? = null,
+                        val delay: String? = null,
+                        // val maxSplit: String? = null,
+                        // noise
+                        val reset: Int? = null,
+                        val noise: List<NoiseMaskBean>? = null
+                    ) {
+                        data class NoiseMaskBean(
+                            val rand: String? = null,
+                            // val randRange: String? = null,
+                            // val type: String? = null,
+                            // val packet: String? = null,
+                            val delay: String? = null,
+                        )
+                    }
                 }
                 data class QuicParamsBean(
                     var congestion: String? = null,

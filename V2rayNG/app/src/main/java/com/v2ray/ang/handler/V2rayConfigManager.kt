@@ -710,8 +710,6 @@ object V2rayConfigManager {
         } else {
             v2rayConfig.outbounds.add(outbound)
         }
-
-        updateOutboundFragment(v2rayConfig)
         return true
     }
 
@@ -955,68 +953,80 @@ object V2rayConfigManager {
      *
      * Configures packet fragmentation for TLS and REALITY protocols if enabled.
      *
-     * @param v2rayConfig The V2ray configuration object to be modified
+     * @param streamSettings The streamSettings object to be modified
      * @return true if fragment configuration was successful, false otherwise
      */
-    private fun updateOutboundFragment(v2rayConfig: V2rayConfig): Boolean {
+    private fun updateOutboundFragment(streamSettings: StreamSettingsBean): Boolean {
         try {
             if (MmkvManager.decodeSettingsBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == false) {
                 return true
             }
-            if (v2rayConfig.outbounds[0].streamSettings?.security != AppConfig.TLS
-                && v2rayConfig.outbounds[0].streamSettings?.security != AppConfig.REALITY
+            if (streamSettings.security != AppConfig.TLS
+                && streamSettings.security != AppConfig.REALITY
             ) {
                 return true
             }
-
-            val fragmentOutbound =
-                OutboundBean(
-                    protocol = AppConfig.PROTOCOL_FREEDOM,
-                    tag = AppConfig.TAG_FRAGMENT,
-                    mux = null
-                )
+            if (streamSettings.sockopt?.dialerProxy.isNotNullEmpty()) {
+                return true
+            }
 
             var packets =
                 MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_PACKETS) ?: "tlshello"
-            if (v2rayConfig.outbounds[0].streamSettings?.security == AppConfig.REALITY
+            if (streamSettings.security == AppConfig.REALITY
                 && packets == "tlshello"
             ) {
                 packets = "1-3"
-            } else if (v2rayConfig.outbounds[0].streamSettings?.security == AppConfig.TLS
+            } else if (streamSettings.security == AppConfig.TLS
                 && packets != "tlshello"
             ) {
                 packets = "tlshello"
             }
 
-            fragmentOutbound.settings = OutSettingsBean(
-                fragment = OutSettingsBean.FragmentBean(
+            val fragmentMask = StreamSettingsBean.FinalMaskBean.MaskBean(
+                type = "fragment",
+                settings = StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
                     packets = packets,
                     length = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_LENGTH)
                         ?: "50-100",
-                    interval = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_INTERVAL)
+                    delay = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_INTERVAL)
                         ?: "10-20"
-                ),
-                noises = listOf(
-                    OutSettingsBean.NoiseBean(
-                        type = "rand",
-                        packet = "10-20",
-                        delay = "10-16",
+                )
+            )
+            val noiseMask = StreamSettingsBean.FinalMaskBean.MaskBean(
+                type = "noise",
+                settings = StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
+                    noise = listOf(
+                        StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean.NoiseMaskBean(
+                            rand = "10-20",
+                            delay = "10-16",
+                        )
                     )
-                ),
-            )
-            fragmentOutbound.streamSettings = StreamSettingsBean(
-                sockopt = StreamSettingsBean.SockoptBean(
-                    TcpNoDelay = true,
-                    mark = 255
                 )
             )
-            v2rayConfig.outbounds.add(fragmentOutbound)
 
-            //proxy chain
-            v2rayConfig.outbounds[0].streamSettings?.sockopt =
-                StreamSettingsBean.SockoptBean(
-                    dialerProxy = AppConfig.TAG_FRAGMENT
-                )
+            val finalMaskObj = streamSettings.finalmask?.let { existingFinalMask ->
+                JsonUtil.parseString(JsonUtil.toJson(existingFinalMask))
+            } ?: com.google.gson.JsonObject()
+
+            // finalmask.tcp / finalmask.udp are arrays; prepend mask at index 0.
+            fun prependMask(scope: String, mask: StreamSettingsBean.FinalMaskBean.MaskBean) {
+                val current = finalMaskObj.get(scope)
+                if (current != null && current.isJsonArray && current.asJsonArray.size() > 0) {
+                    return
+                }
+
+                val newArray = JsonArray()
+                newArray.add(JsonUtil.parseString(JsonUtil.toJson(mask)))
+
+                if (current != null && current.isJsonArray) {
+                    current.asJsonArray.forEach { newArray.add(it) }
+                }
+                finalMaskObj.add(scope, newArray)
+            }
+
+            prependMask("tcp", fragmentMask)
+            prependMask("udp", noiseMask)
+            streamSettings.finalmask = finalMaskObj
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to update outbound fragment", e)
             return false
@@ -1401,6 +1411,10 @@ object V2rayConfigManager {
         } else if (streamSettings.security == AppConfig.REALITY) {
             streamSettings.tlsSettings = null
             streamSettings.realitySettings = tlsSetting
+        }
+
+        if (profileItem.finalMask.isNullOrEmpty()) {
+            updateOutboundFragment(streamSettings)
         }
     }
 
