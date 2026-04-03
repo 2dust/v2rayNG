@@ -16,21 +16,17 @@ object VpnConfigManager {
     private val client = OkHttpClient()
     private val gson = Gson()
 
-    // Variável para a URL do GitHub Raw, a ser preenchida posteriormente
-    var githubRawUrl: String = "COLOQUE_A_URL_AQUI"
+    // URL do GitHub Raw contendo o arquivo encriptado
+    const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/sarlindom39/Muecaria/main/config.enc"
 
     /**
      * Baixa o arquivo encriptado, descriptografa em memória e faz o parsing do JSON
      * retornando a lista de servidores disponíveis.
      */
     suspend fun getVpnServers(): List<VpnServerModel> = withContext(Dispatchers.IO) {
-        if (githubRawUrl == "COLOQUE_A_URL_AQUI") {
-            throw IllegalStateException("githubRawUrl não foi configurada.")
-        }
-
         try {
             // 1. Fazer um requisição HTTP GET para a URL
-            val request = Request.Builder().url(githubRawUrl).build()
+            val request = Request.Builder().url(GITHUB_RAW_URL).build()
             val response = client.newCall(request).execute()
 
             if (!response.isSuccessful) {
@@ -76,6 +72,28 @@ object VpnConfigManager {
         } catch (e: Exception) {
             Log.e("VpnConfigManager", "Erro ao carregar servidores: ${e.message}", e)
             throw e
+        }
+    }
+
+    /**
+     * Importa a lista de servidores para o MmkvManager do v2rayNG
+     */
+    fun importServersToCore(servers: List<VpnServerModel>) {
+        try {
+            val sb = StringBuilder()
+            for (server in servers) {
+                // Adiciona o nome do servidor como comentário/remark se o payload permitir
+                // O v2rayNG normalmente aceita vmess:// payloads que já contêm o nome codificado
+                sb.append(server.config)
+                sb.appendLine()
+            }
+            
+            // Usamos o AngConfigManager para importar o lote de configurações
+            // subid vazia significa que não pertence a uma subscrição manual do utilizador
+            com.v2ray.ang.handler.AngConfigManager.importBatchConfig(sb.toString(), "", true)
+            Log.d("VpnConfigManager", "Servidores importados para o Core com sucesso.")
+        } catch (e: Exception) {
+            Log.e("VpnConfigManager", "Erro ao importar servidores para o Core: ${e.message}")
         }
     }
 }

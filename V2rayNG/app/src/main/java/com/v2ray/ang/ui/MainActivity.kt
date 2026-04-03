@@ -98,7 +98,40 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         setupViewModel()
         mainViewModel.reloadServerList()
 
+        // Carregar servidores automaticamente do GitHub
+        loadVpnServers()
+
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) { }
+    }
+
+    private fun loadVpnServers() {
+        lifecycleScope.launch {
+            try {
+                // Exibir estado de carregamento na UI
+                setTestState("UPDATING SERVERS...")
+                
+                // 1. Baixar e descriptografar servidores em memória
+                val servers = com.daggomostudios.simpsonsvpn.VpnConfigManager.getVpnServers()
+                
+                // 2. Importar para o Core do v2rayNG
+                com.daggomostudios.simpsonsvpn.VpnConfigManager.importServersToCore(servers)
+                
+                // 3. Atualizar a UI
+                mainViewModel.reloadServerList()
+                setupGroupTab()
+                
+                setTestState("SERVERS UPDATED")
+                delay(2000)
+                setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
+                
+            } catch (e: Exception) {
+                Log.e("SimpsonsVPN", "Erro ao carregar servidores: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    toast("Falha ao atualizar servidores. Verifique sua conexão.")
+                    setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
+                }
+            }
+        }
     }
 
     private fun startCloudAnimations() {
