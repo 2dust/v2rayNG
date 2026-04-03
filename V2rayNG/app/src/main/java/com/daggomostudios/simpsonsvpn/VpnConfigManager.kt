@@ -43,14 +43,6 @@ object VpnConfigManager {
             val secretKeySpec = SecretKeySpec(aesKeyBytes, "AES")
 
             // 4. Descriptografar os bytes em memória usando AES/GCM/NoPadding
-            // Para GCM, é necessário um IV (Initialization Vector) e um GCMParameterSpec.
-            // Assumindo que o IV está prefixado aos dados encriptados ou é conhecido.
-            // Para simplificar, vamos assumir um IV fixo para este exemplo, mas em produção
-            // ele deve ser gerado aleatoriamente e transmitido com os dados encriptados.
-            // Se for CBC, o IV também é necessário.
-
-            // Exemplo com IV fixo (NÃO RECOMENDADO PARA PRODUÇÃO, APENAS PARA DEMONSTRAÇÃO)
-            // Em um cenário real, o IV seria parte dos dados encriptados ou transmitido separadamente.
             val ivSize = 12 // Tamanho comum para GCM
             if (encryptedBytes.size < ivSize) {
                 throw Exception("Dados encriptados muito curtos para conter o IV.")
@@ -64,8 +56,8 @@ object VpnConfigManager {
 
             val decryptedBytes = cipher.doFinal(cipherText)
 
-            // 5. Retornar o resultado final como uma String pura
-            return decryptedBytes.toString(Charsets.UTF_8)
+            // 5. Retornar o resultado final como uma String pura (o valor final do bloco withContext)
+            decryptedBytes.toString(Charsets.UTF_8)
 
         } catch (e: Exception) {
             Log.e("VpnConfigManager", "Erro ao baixar ou descriptografar a configuração: ${e.message}", e)
