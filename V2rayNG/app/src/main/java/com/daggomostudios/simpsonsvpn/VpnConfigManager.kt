@@ -15,6 +15,7 @@ object VpnConfigManager {
 
     private val client = OkHttpClient()
     private val gson = Gson()
+    private const val TAG = "VpnConfigManager"
 
     // URL do GitHub Raw contendo o arquivo encriptado
     const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/sarlindom39/Muecaria/main/config.enc"
@@ -25,19 +26,33 @@ object VpnConfigManager {
      */
     suspend fun getVpnServers(): List<VpnServerModel> = withContext(Dispatchers.IO) {
         try {
+            Log.d(TAG, "Iniciando download de: $GITHUB_RAW_URL")
+            
             // 1. Fazer um requisição HTTP GET para a URL
-            val request = Request.Builder().url(GITHUB_RAW_URL).build()
+            val request = Request.Builder()
+                .url(GITHUB_RAW_URL)
+                .header("User-Agent", "Mozilla/5.0 SimpsonsVPN")
+                .build()
+                
             val response = client.newCall(request).execute()
 
             if (!response.isSuccessful) {
+                Log.e(TAG, "Erro HTTP: ${response.code} - ${response.message}")
                 throw Exception("Erro ao baixar a configuração: ${response.code}")
             }
 
             val downloadedBytes = response.body?.bytes()
                 ?: throw Exception("Resposta vazia ao baixar a configuração.")
+            
+            Log.d(TAG, "Download concluído: ${downloadedBytes.size} bytes recebidos.")
 
             // 2. Obter a chave de 200 caracteres chamando NativeCrypto.getDecryptionKey()
-            val longKey = NativeCrypto.getDecryptionKey()
+            val longKey = try {
+                NativeCrypto.getDecryptionKey()
+            } catch (e: UnsatisfiedLinkError) {
+                Log.e(TAG, "Erro ao carregar biblioteca nativa: ${e.message}")
+                throw Exception("Biblioteca nativa não carregada.")
+            }
 
             // 3. Derivar a chave de 32 bytes via SHA-256
             val digest = MessageDigest.getInstance("SHA-256")
@@ -45,8 +60,9 @@ object VpnConfigManager {
             val secretKey = SecretKeySpec(secretKeyBytes, "AES")
 
             // 4. Extrair o IV (primeiros 12 bytes) e o Ciphertext (o resto)
-            if (downloadedBytes.size < 12) {
-                throw Exception("Dados baixados muito curtos para conter o IV.")
+            if (downloadedBytes.size < 28) { // 12 (IV) + pelo menos algum dado + 16 (Tag GCM)
+                Log.e(TAG, "Dados insuficientes: ${downloadedBytes.size} bytes")
+                throw Exception("Dados baixados muito curtos.")
             }
             val iv = downloadedBytes.copyOfRange(0, 12)
             val cipherText = downloadedBytes.copyOfRange(12, downloadedBytes.size)
@@ -57,20 +73,36 @@ object VpnConfigManager {
             // 6. Descriptografar usando AES/GCM/NoPadding
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmSpec)
-            val decryptedBytes = cipher.doFinal(cipherText)
+            
+            val decryptedBytes = try {
+                cipher.doFinal(cipherText)
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro na descriptografia AES-GCM: ${e.message}. Verifique se a chave no Python é idêntica à do C++.")
+                throw Exception("Falha na descriptografia dos dados.")
+            }
 
             // 7. Converter bytes descriptografados em String JSON
             val jsonString = decryptedBytes.toString(Charsets.UTF_8)
+            Log.d(TAG, "JSON descriptografado com sucesso.")
 
             // 8. Fazer o parsing do JSON para a lista de servidores usando Gson
-            val responseObj = gson.fromJson(jsonString, VpnConfigResponse::class.java)
+            val responseObj = try {
+                gson.fromJson(jsonString, VpnConfigResponse::class.java)
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro ao processar JSON: ${e.message}")
+                throw Exception("Formato JSON inválido.")
+            }
             
-            Log.d("VpnConfigManager", "Sucesso: ${responseObj.listaServidores.size} servidores carregados (Versão ${responseObj.versao})")
+            if (responseObj?.listaServidores == null) {
+                throw Exception("Lista de servidores está vazia no JSON.")
+            }
+
+            Log.d(TAG, "Sucesso: ${responseObj.listaServidores.size} servidores carregados (Versão ${responseObj.versao})")
             
             return@withContext responseObj.listaServidores
 
         } catch (e: Exception) {
-            Log.e("VpnConfigManager", "Erro ao carregar servidores: ${e.message}", e)
+            Log.e(TAG, "Erro fatal no VpnConfigManager: ${e.message}", e)
             throw e
         }
     }
@@ -82,18 +114,29 @@ object VpnConfigManager {
         try {
             val sb = StringBuilder()
             for (server in servers) {
-                // Adiciona o nome do servidor como comentário/remark se o payload permitir
-                // O v2rayNG normalmente aceita vmess:// payloads que já contêm o nome codificado
-                sb.append(server.config)
-                sb.appendLine()
+                if (server.config.isNotBlank()) {
+                    sb.append(server.config.trim())
+                    sb.appendLine()
+                }
             }
             
+            val configText = sb.toString()
+            if (configText.isBlank()) {
+                Log.w(TAG, "Nenhuma configuração válida para importar.")
+                return
+            }
+
             // Usamos o AngConfigManager para importar o lote de configurações
-            // subid vazia significa que não pertence a uma subscrição manual do utilizador
-            com.v2ray.ang.handler.AngConfigManager.importBatchConfig(sb.toString(), "", true)
-            Log.d("VpnConfigManager", "Servidores importados para o Core com sucesso.")
+            // O v2rayNG retorna um Pair(count, countSub)
+            val (count, _) = com.v2ray.ang.handler.AngConfigManager.importBatchConfig(configText, "", true)
+            
+            if (count > 0) {
+                Log.d(TAG, "$count servidores importados para o Core com sucesso.")
+            } else {
+                Log.e(TAG, "O Core não conseguiu processar as configurações. Verifique o formato vmess/vless/etc.")
+            }
         } catch (e: Exception) {
-            Log.e("VpnConfigManager", "Erro ao importar servidores para o Core: ${e.message}")
+            Log.e(TAG, "Erro ao importar servidores para o Core: ${e.message}")
         }
     }
 }
