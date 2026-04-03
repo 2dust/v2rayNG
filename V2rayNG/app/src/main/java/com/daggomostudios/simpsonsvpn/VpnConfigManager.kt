@@ -15,6 +15,14 @@ import javax.crypto.spec.SecretKeySpec
 
 object VpnConfigManager {
 
+    // Extensão para converter string hexadecimal para ByteArray
+    private fun String.decodeHex(): ByteArray {
+        check(length % 2 == 0) { "Must have an even length" }
+        return chunked(2)
+            .map { it.toInt(16).toByte() }
+            .toByteArray()
+    }
+
     private val client = OkHttpClient()
     private val gson = Gson()
     private const val TAG = "VpnConfigManager"
@@ -60,8 +68,8 @@ object VpnConfigManager {
             debugUpdateCallback?.invoke(DebugInfo(status = "Download concluído", httpStatus = "OK (${downloadedBytes.size} bytes)"))
             withContext(Dispatchers.Main) { Toast.makeText(context, "Download concluído. Descriptografando...", Toast.LENGTH_SHORT).show() }
 
-            // 2. Obter a chave de 200 caracteres chamando NativeCrypto.getDecryptionKey()
-            val longKey = try {
+            // 2. Obter a chave hexadecimal de 64 caracteres chamando NativeCrypto.getDecryptionKey()
+            val hexKeyString = try {
                 NativeCrypto.getDecryptionKey()
             } catch (e: UnsatisfiedLinkError) {
                 Log.e(TAG, "Erro ao carregar biblioteca nativa: ${e.message}")
@@ -71,9 +79,18 @@ object VpnConfigManager {
             }
             debugUpdateCallback?.invoke(DebugInfo(status = "Chave NDK obtida", decryptionStatus = "Chave obtida"))
 
-            // 3. Derivar a chave de 32 bytes via SHA-256
+            // Converter a string hexadecimal para um array de bytes
+            val keyBytes = hexKeyString.decodeHex()
+            if (keyBytes.size != 32) { // 32 bytes para AES-256
+                Log.e(TAG, "Chave hexadecimal inválida: ${hexKeyString.length} caracteres, ${keyBytes.size} bytes.")
+                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", decryptionStatus = "Chave inválida", errorMessage = "Chave hexadecimal NDK inválida."))
+                withContext(Dispatchers.Main) { Toast.makeText(context, "Erro: Chave hexadecimal NDK inválida.", Toast.LENGTH_LONG).show() }
+                throw Exception("Chave hexadecimal NDK inválida.")
+            }
+
+            // 3. Derivar a chave de 32 bytes via SHA-256 (usando os bytes da chave hexadecimal)
             val digest = MessageDigest.getInstance("SHA-256")
-            val secretKeyBytes = digest.digest(longKey.toByteArray(Charsets.UTF_8))
+            val secretKeyBytes = digest.digest(keyBytes)
             val secretKey = SecretKeySpec(secretKeyBytes, "AES")
 
             // 4. Extrair o IV (primeiros 12 bytes) e o Ciphertext (o resto)
