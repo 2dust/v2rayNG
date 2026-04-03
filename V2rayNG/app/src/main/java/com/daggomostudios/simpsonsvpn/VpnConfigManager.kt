@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.security.MessageDigest
 import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 object VpnConfigManager {
@@ -31,32 +31,33 @@ object VpnConfigManager {
                 throw Exception("Erro ao baixar a configuração: ${response.code}")
             }
 
-            val encryptedBytes = response.body?.bytes()
+            val downloadedBytes = response.body?.bytes()
                 ?: throw Exception("Resposta vazia ao baixar a configuração.")
 
             // 2. Obter a chave de 200 caracteres chamando NativeCrypto.getDecryptionKey()
             val longKey = NativeCrypto.getDecryptionKey()
 
-            // 3. Derivar da chave longa uma chave AES válida de 256 bits (32 bytes) usando SHA-256
-            val sha256Digest = MessageDigest.getInstance("SHA-256")
-            val aesKeyBytes = sha256Digest.digest(longKey.toByteArray(Charsets.UTF_8))
-            val secretKeySpec = SecretKeySpec(aesKeyBytes, "AES")
+            // 3. Derivar a chave de 32 bytes via SHA-256
+            val digest = MessageDigest.getInstance("SHA-256")
+            val secretKeyBytes = digest.digest(longKey.toByteArray(Charsets.UTF_8))
+            val secretKey = SecretKeySpec(secretKeyBytes, "AES")
 
-            // 4. Descriptografar os bytes em memória usando AES/GCM/NoPadding
-            val ivSize = 12 // Tamanho comum para GCM
-            if (encryptedBytes.size < ivSize) {
-                throw Exception("Dados encriptados muito curtos para conter o IV.")
+            // 4. Extrair o IV (primeiros 12 bytes) e o Ciphertext (o resto)
+            if (downloadedBytes.size < 12) {
+                throw Exception("Dados baixados muito curtos para conter o IV.")
             }
-            val iv = encryptedBytes.copyOfRange(0, ivSize)
-            val cipherText = encryptedBytes.copyOfRange(ivSize, encryptedBytes.size)
+            val iv = downloadedBytes.copyOfRange(0, 12)
+            val cipherText = downloadedBytes.copyOfRange(12, downloadedBytes.size)
 
-            val ivParameterSpec = IvParameterSpec(iv)
+            // 5. Configurar o GCM (128 bits de tamanho de tag de autenticação = 16 bytes)
+            val gcmSpec = GCMParameterSpec(128, iv)
+
+            // 6. Descriptografar usando AES/GCM/NoPadding
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec)
-
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmSpec)
             val decryptedBytes = cipher.doFinal(cipherText)
 
-            // 5. Retornar o resultado final como uma String pura (o valor final do bloco withContext)
+            // 7. Retornar o resultado final como uma String pura
             decryptedBytes.toString(Charsets.UTF_8)
 
         } catch (e: Exception) {
