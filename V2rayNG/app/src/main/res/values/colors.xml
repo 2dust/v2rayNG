@@ -22,6 +22,7 @@
     <color name="colorPing">@color/simpsons_green</color>
     <color name="colorPingRed">@color/simpsons_red</color>
     <color name="colorWhite">#FFFFFF</color>
+    <color name="colorIndicator">@color/simpsons_yellow</color>
 
     <!-- Compatibility mappings -->
     <color name="medieval_dark">@color/black</color>

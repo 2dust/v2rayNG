@@ -155,21 +155,35 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         V2RayServiceManager.startVService(this)
     }
 
+    fun restartV2Ray() {
+        if (mainViewModel.isRunning.value == true) {
+            V2RayServiceManager.stopVService(this)
+        }
+        lifecycleScope.launch {
+            delay(500)
+            startV2Ray()
+        }
+    }
+
+    fun importConfigViaSub() {
+        mainViewModel.importConfigViaSub(this)
+    }
+
     private fun setTestState(content: String?) {
         binding.tvTestState.text = content?.uppercase() ?: "DISCONNECTED"
     }
 
     private fun applyRunningState(isLoading: Boolean, isRunning: Boolean) {
         if (isLoading) {
-            binding.ivPower_icon.setImageResource(R.drawable.ic_fab_check)
+            binding.ivPowerIcon.setImageResource(R.drawable.ic_fab_check)
             return
         }
         if (isRunning) {
-            binding.ivPower_icon.setImageResource(R.drawable.ic_stop_24dp)
-            binding.status_container.setBackgroundResource(R.drawable.bg_neobrutalist_status) // Aqui poderiamos mudar para verde
+            binding.ivPowerIcon.setImageResource(R.drawable.ic_stop_24dp)
+            binding.statusContainer.setBackgroundResource(R.drawable.bg_neobrutalist_status) 
             setTestState("CONNECTED")
         } else {
-            binding.ivPower_icon.setImageResource(R.drawable.ic_play_24dp)
+            binding.ivPowerIcon.setImageResource(R.drawable.ic_play_24dp)
             setTestState("DISCONNECTED")
         }
     }

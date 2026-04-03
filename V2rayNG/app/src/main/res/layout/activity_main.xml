@@ -83,7 +83,7 @@
 
                 <!-- Status Indicator -->
                 <LinearLayout
-                    android:id="@+id/status_container"
+                    android:id="@+id/statusContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_neobrutalist_status"
@@ -123,7 +123,7 @@
                         android:background="@drawable/bg_neobrutalist_connect_button" />
 
                     <ImageView
-                        android:id="@+id/iv_power_icon"
+                        android:id="@+id/ivPowerIcon"
                         android:layout_width="90dp"
                         android:layout_height="90dp"
                         android:layout_gravity="center"
