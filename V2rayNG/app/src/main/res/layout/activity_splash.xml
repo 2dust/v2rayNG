@@ -3,50 +3,85 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/charcoal_black">
+    android:background="@color/simpsons_sky"
+    android:padding="24dp">
+
+    <!-- Background Clouds -->
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="100dp"
+        android:layout_alignParentEnd="true"
+        android:alpha="0.8"
+        android:src="@drawable/ic_cartoon_cloud" />
+
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="150dp"
+        android:alpha="0.8"
+        android:src="@drawable/ic_cartoon_cloud" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
         android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/splash_logo"
+        <!-- Logo Container -->
+        <FrameLayout
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:contentDescription="@string/app_name"
-            android:src="@mipmap/ic_launcher" />
+            android:background="@drawable/bg_neobrutalist_card"
+            android:padding="16dp">
 
+            <ImageView
+                android:id="@+id/splash_logo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@mipmap/ic_launcher" />
+        </FrameLayout>
+
+        <!-- App Name -->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:rotation="-2"
+            android:background="@drawable/bg_neobrutalist_header"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SIMPSONS VPN"
+                android:textColor="@color/black"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1" />
+        </FrameLayout>
+
+        <!-- Studio Name -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="@string/app_name"
-            android:textColor="@color/simpsons_gold"
-            android:textSize="32sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:text="From DaggomoStudios"
-            android:textColor="@color/parchment_grey"
-            android:textSize="18sp"
-            android:textStyle="italic" />
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="italic|bold"
+            android:alpha="0.7" />
+
+        <!-- Loading Indicator -->
+        <ProgressBar
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="48dp"
+            android:indeterminateTint="@color/black" />
 
     </LinearLayout>
-
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:layout_width="180dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="80dp"
-        android:indeterminate="true"
-        app:indicatorColor="@color/simpsons_gold"
-        app:trackColor="@color/charcoal_surface" />
 
 </RelativeLayout>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Shadow (Black Solid) -->
+    <item android:top="12dp" android:left="12dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/black" />
+        </shape>
+    </item>
+    <!-- Button Body (Yellow with Thick Black Stroke) -->
+    <item android:bottom="12dp" android:right="12dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/simpsons_yellow" />
+            <stroke android:width="8dp" android:color="@color/black" />
+        </shape>
+    </item>
+</layer-list>

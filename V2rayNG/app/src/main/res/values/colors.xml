@@ -1,43 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Manus Choice: Charcoal & Gold (The Simpsons Premium Medieval) -->
-    <color name="charcoal_black">#0F0F0F</color> <!-- Fundo Ultra Escuro / Carvão -->
-    <color name="charcoal_surface">#1A1A1A</color> <!-- Superfícies / Cards -->
-    <color name="simpsons_gold">#FFD700</color> <!-- Ouro Simpsons Vibrante (Highlight) -->
-    <color name="simpsons_gold_dark">#B8860B</color> <!-- Ouro Velho (Medieval) -->
-    <color name="parchment_white">#E0E0E0</color> <!-- Texto Principal (Quase Branco) -->
-    <color name="parchment_grey">#9E9E9E</color> <!-- Texto Secundário (Cinza) -->
-    <color name="medieval_red">#B22222</color> <!-- Vermelho Medieval para Erros -->
-
-    <!-- Status Colors -->
-    <color name="colorPing">#4CAF50</color> <!-- Verde Material -->
-    <color name="colorPingRed">@color/medieval_red</color>
-    <color name="colorConfigType">@color/simpsons_gold_dark</color>
-    <color name="colorWhite">#FFFFFF</color>
-    <color name="color_fab_active">@color/simpsons_gold</color> <!-- FAB Ouro sobre Preto -->
-    <color name="color_fab_inactive">#424242</color>
-    <color name="divider_color_light">#262626</color>
-    <color name="colorIndicator">@color/simpsons_gold</color>
-
-    <!-- Material Theme Mapping (Sempre Dark) -->
-    <color name="md_theme_primary">@color/simpsons_gold</color>
-    <color name="md_theme_onPrimary">@color/charcoal_black</color>
-    <color name="md_theme_primaryContainer">@color/charcoal_surface</color>
-    <color name="md_theme_onPrimaryContainer">@color/simpsons_gold</color>
-
-    <color name="md_theme_secondary">@color/simpsons_gold_dark</color>
-    <color name="md_theme_onSecondary">@color/charcoal_black</color>
-    <color name="md_theme_secondaryContainer">@color/charcoal_black</color>
-    <color name="md_theme_onSecondaryContainer">@color/simpsons_gold</color>
-
-    <color name="md_theme_background">@color/charcoal_black</color>
-    <color name="md_theme_onBackground">@color/parchment_white</color>
-
-    <color name="md_theme_surface">@color/charcoal_surface</color>
-    <color name="md_theme_onSurface">@color/parchment_white</color>
-    <color name="md_theme_surfaceVariant">@color/charcoal_black</color>
-    <color name="md_theme_onSurfaceVariant">@color/parchment_grey</color>
+    <!-- Neobrutalist / Simpsons Palette (Fiel à Inspiração) -->
+    <color name="simpsons_sky">#48CBFF</color> <!-- Fundo Azul Céu -->
+    <color name="simpsons_yellow">#FFD90F</color> <!-- Amarelo Simpsons (Header/Botão) -->
+    <color name="simpsons_pink">#FF81C6</color> <!-- Rosa (Status Desconectado) -->
+    <color name="simpsons_green">#50C878</color> <!-- Verde (Status Conectado) -->
+    <color name="simpsons_red">#F32013</color> <!-- Vermelho (Botão Desconectar) -->
     
-    <color name="md_theme_outline">@color/simpsons_gold_dark</color>
-    <color name="md_theme_error">@color/medieval_red</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="transparent">#00000000</color>
+    
+    <!-- Shadow Color -->
+    <color name="black_shadow">#000000</color>
+
+    <!-- Compatibility mappings -->
+    <color name="medieval_dark">@color/black</color>
+    <color name="medieval_brown">@color/white</color>
+    <color name="parchment">@color/white</color>
+    <color name="simpsons_yellow_dirty">#E1AD01</color>
+    
+    <color name="md_theme_primary">@color/simpsons_yellow</color>
+    <color name="md_theme_onPrimary">@color/black</color>
+    <color name="md_theme_background">@color/simpsons_sky</color>
+    <color name="md_theme_onBackground">@color/black</color>
+    <color name="md_theme_surface">@color/white</color>
+    <color name="md_theme_onSurface">@color/black</color>
 </resources>

@@ -5,16 +5,17 @@ import android.content.res.ColorStateList
 import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
@@ -54,57 +55,59 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             startV2Ray()
         }
     }
-    private val requestActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (SettingsChangeManager.consumeRestartService() && mainViewModel.isRunning.value == true) {
-            restartV2Ray()
-        }
-        if (SettingsChangeManager.consumeSetupGroupTab()) {
-            setupGroupTab()
-        }
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        setupToolbar(binding.toolbar, false, getString(R.string.title_server))
+        
+        // Ocultar Toolbar original para usar o cabeçalho flutuante Neobrutalista
+        setSupportActionBar(null)
 
-        // setup viewpager and tablayout
+        // Iniciar Animações
+        startCloudAnimations()
+        val pulseAnim = AnimationUtils.loadAnimation(this, R.anim.button_pulse)
+        binding.fab.startAnimation(pulseAnim)
+
+        // setup viewpager and tablayout (Ocultos mas mantidos para lógica)
         groupPagerAdapter = GroupPagerAdapter(this, emptyList())
         binding.viewPager.adapter = groupPagerAdapter
         binding.viewPager.isUserInputEnabled = true
 
-        // setup navigation drawer (Desativado para base clean tipo DTunnel)
-        /*
-        val toggle = ActionBarDrawerToggle(
-            this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
-        )
-        binding.drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-        */
         binding.drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         binding.navView.setNavigationItemSelectedListener(this)
+        
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (binding.drawerLayout.isDrawerOpen(androidx.core.view.GravityCompat.START)) {
-                    binding.drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
-                } else {
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
-                    isEnabled = true
-                }
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+                isEnabled = true
             }
         })
 
         binding.fab.setOnClickListener { handleFabAction() }
-        binding.layoutTest.setOnClickListener { handleLayoutTestClick() }
+        binding.serverSelectionCard.setOnClickListener { 
+            // Simular clique na aba de servidores ou abrir diálogo de importação
+            toast("Select Server")
+        }
 
         setupGroupTab()
         setupViewModel()
         mainViewModel.reloadServerList()
 
-        checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {
-        }
+        checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) { }
+    }
+
+    private fun startCloudAnimations() {
+        val cloudAnim = AnimationUtils.loadAnimation(this, R.anim.cloud_float)
+        binding.cloud1.startAnimation(cloudAnim)
+        
+        val cloudAnim2 = AnimationUtils.loadAnimation(this, R.anim.cloud_float)
+        cloudAnim2.startOffset = 5000
+        binding.cloud2.startAnimation(cloudAnim2)
+        
+        val cloudAnim3 = AnimationUtils.loadAnimation(this, R.anim.cloud_float)
+        cloudAnim3.startOffset = 10000
+        binding.cloud3.startAnimation(cloudAnim3)
     }
 
     private fun setupViewModel() {
@@ -119,7 +122,6 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     private fun setupGroupTab() {
         val groups = mainViewModel.getSubscriptions(this)
         groupPagerAdapter.update(groups)
-
         tabMediator?.detach()
         tabMediator = TabLayoutMediator(binding.tabGroup, binding.viewPager) { tab, position ->
             groupPagerAdapter.groups.getOrNull(position)?.let {
@@ -127,16 +129,10 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 tab.tag = it.id
             }
         }.also { it.attach() }
-
-        val targetIndex = groups.indexOfFirst { it.id == mainViewModel.subscriptionId }.takeIf { it >= 0 } ?: (groups.size - 1)
-        binding.viewPager.setCurrentItem(targetIndex, false)
-
-        binding.tabGroup.isVisible = true // Sempre visível para base clean tipo Simpsons VPN
     }
 
     private fun handleFabAction() {
         applyRunningState(isLoading = true, isRunning = false)
-
         if (mainViewModel.isRunning.value == true) {
             V2RayServiceManager.stopVService(this)
         } else if (SettingsManager.isVpnMode()) {
@@ -151,15 +147,6 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         }
     }
 
-    private fun handleLayoutTestClick() {
-        if (mainViewModel.isRunning.value == true) {
-            setTestState(getString(R.string.connection_test_testing))
-            mainViewModel.testCurrentServerRealPing()
-        } else {
-            // service not running: keep existing no-op (could show a message if desired)
-        }
-    }
-
     private fun startV2Ray() {
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
             toast(R.string.title_file_chooser)
@@ -168,282 +155,24 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         V2RayServiceManager.startVService(this)
     }
 
-    fun restartV2Ray() {
-        if (mainViewModel.isRunning.value == true) {
-            V2RayServiceManager.stopVService(this)
-        }
-        lifecycleScope.launch {
-            delay(500)
-            startV2Ray()
-        }
-    }
-
     private fun setTestState(content: String?) {
-        binding.tvTestState.text = content
+        binding.tvTestState.text = content?.uppercase() ?: "DISCONNECTED"
     }
 
-    private  fun applyRunningState(isLoading: Boolean, isRunning: Boolean) {
+    private fun applyRunningState(isLoading: Boolean, isRunning: Boolean) {
         if (isLoading) {
-            binding.fab.setImageResource(R.drawable.ic_fab_check)
-            binding.fab.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.charcoal_black))
+            binding.ivPower_icon.setImageResource(R.drawable.ic_fab_check)
             return
         }
-
         if (isRunning) {
-            binding.fab.setImageResource(R.drawable.ic_stop_24dp)
-            binding.fab.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.charcoal_black))
-            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.simpsons_gold))
-            binding.fab.contentDescription = getString(R.string.action_stop_service)
-            setTestState(getString(R.string.connection_connected))
-            binding.layoutTest.isFocusable = true
+            binding.ivPower_icon.setImageResource(R.drawable.ic_stop_24dp)
+            binding.status_container.setBackgroundResource(R.drawable.bg_neobrutalist_status) // Aqui poderiamos mudar para verde
+            setTestState("CONNECTED")
         } else {
-            binding.fab.setImageResource(R.drawable.ic_play_24dp)
-            binding.fab.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.charcoal_black))
-            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.simpsons_gold_dark))
-            binding.fab.contentDescription = getString(R.string.tasker_start_service)
-            setTestState(getString(R.string.connection_not_connected))
-            binding.layoutTest.isFocusable = false
+            binding.ivPower_icon.setImageResource(R.drawable.ic_play_24dp)
+            setTestState("DISCONNECTED")
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.import_qrcode -> {
-            importQRcode()
-            true
-        }
-
-        R.id.import_clipboard -> {
-            importClipboard()
-            true
-        }
-
-        R.id.import_local -> {
-            importConfigLocal()
-            true
-        }
-
-        R.id.import_manually_policy_group -> {
-            importManually(EConfigType.POLICYGROUP.value)
-            true
-        }
-
-        R.id.import_manually_vmess -> {
-            importManually(EConfigType.VMESS.value)
-            true
-        }
-
-        R.id.import_manually_vless -> {
-            importManually(EConfigType.VLESS.value)
-            true
-        }
-
-        R.id.import_manually_ss -> {
-            importManually(EConfigType.SHADOWSOCKS.value)
-            true
-        }
-
-        R.id.import_manually_socks -> {
-            importManually(EConfigType.SOCKS.value)
-            true
-        }
-
-        R.id.import_manually_http -> {
-            importManually(EConfigType.HTTP.value)
-            true
-        }
-
-        R.id.import_manually_trojan -> {
-            importManually(EConfigType.TROJAN.value)
-            true
-        }
-
-        R.id.import_manually_wireguard -> {
-            importManually(EConfigType.WIREGUARD.value)
-            true
-        }
-
-        R.id.import_manually_hysteria2 -> {
-            importManually(EConfigType.HYSTERIA2.value)
-            true
-        }
-
-        else -> super.onOptionsItemSelected(item)
-    }
-
-    private fun importManually(createConfigType: Int) {
-        if (createConfigType == EConfigType.POLICYGROUP.value) {
-            startActivity(
-                Intent()
-                    .putExtra("subscriptionId", mainViewModel.subscriptionId)
-                    .setClass(this, ServerGroupActivity::class.java)
-            )
-        } else {
-            startActivity(
-                Intent()
-                    .putExtra("createConfigType", createConfigType)
-                    .putExtra("subscriptionId", mainViewModel.subscriptionId)
-                    .setClass(this, ServerActivity::class.java)
-            )
-        }
-    }
-
-    /**
-     * import config from qrcode
-     */
-    private fun importQRcode(): Boolean {
-        launchQRCodeScanner { scanResult ->
-            if (scanResult != null) {
-                importBatchConfig(scanResult)
-            }
-        }
-        return true
-    }
-
-    /**
-     * import config from clipboard
-     */
-    private fun importClipboard()
-            : Boolean {
-        try {
-            val clipboard = Utils.getClipboard(this)
-            importBatchConfig(clipboard)
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to import config from clipboard", e)
-            return false
-        }
-        return true
-    }
-
-    private fun importBatchConfig(server: String?) {
-        showLoading()
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val (count, countSub) = AngConfigManager.importBatchConfig(server, mainViewModel.subscriptionId, true)
-                delay(500L)
-                withContext(Dispatchers.Main) {
-                    when {
-                        count > 0 -> {
-                            toast(getString(R.string.title_import_config_count, count))
-                            mainViewModel.reloadServerList()
-                        }
-
-                        countSub > 0 -> setupGroupTab()
-                        else -> toastError(R.string.toast_failure)
-                    }
-                    hideLoading()
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    toastError(R.string.toast_failure)
-                    hideLoading()
-                }
-                Log.e(AppConfig.TAG, "Failed to import batch config", e)
-            }
-        }
-    }
-
-    /**
-     * import config from local config file
-     */
-    private fun importConfigLocal(): Boolean {
-        try {
-            showFileChooser()
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to import config from local file", e)
-            return false
-        }
-        return true
-    }
-
-
-    /**
-     * import config from sub
-     */
-    fun importConfigViaSub(): Boolean {
-        showLoading()
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            val result = mainViewModel.updateConfigViaSubAll()
-            delay(500L)
-            launch(Dispatchers.Main) {
-                if (result.successCount + result.failureCount + result.skipCount == 0) {
-                    toast(R.string.title_update_subscription_no_subscription)
-                } else if (result.successCount > 0 && result.failureCount + result.skipCount == 0) {
-                    toast(getString(R.string.title_update_config_count, result.configCount))
-                } else {
-                    toast(
-                        getString(
-                            R.string.title_update_subscription_result,
-                            result.configCount, result.successCount, result.failureCount, result.skipCount
-                        )
-                    )
-                }
-                if (result.configCount > 0) {
-                    mainViewModel.reloadServerList()
-                }
-                hideLoading()
-            }
-        }
-        return true
-    }
-
-    /**
-     * show file chooser
-     */
-    private fun showFileChooser() {
-        launchFileChooser { uri ->
-            if (uri == null) {
-                return@launchFileChooser
-            }
-
-            readContentFromUri(uri)
-        }
-    }
-
-    /**
-     * read content from uri
-     */
-    private fun readContentFromUri(uri: Uri) {
-        try {
-            contentResolver.openInputStream(uri).use { input ->
-                importBatchConfig(input?.bufferedReader()?.readText())
-            }
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to read content from URI", e)
-        }
-    }
-
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            onBackPressedDispatcher.onBackPressed()
-            return true
-        }
-        return super.onKeyDown(keyCode, event)
-    }
-
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
-        binding.drawerLayout.closeDrawer(GravityCompat.START)
-        return true
-    }
-
-    override fun onDestroy() {
-        tabMediator?.detach()
-        super.onDestroy()
-    }
+    override fun onNavigationItemSelected(item: MenuItem): Boolean = false
 }

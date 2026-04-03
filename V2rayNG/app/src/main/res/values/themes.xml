@@ -1,39 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Manus Choice: Charcoal & Gold (Always Dark Theme) -->
-    <style name="AppThemeDayNight" parent="Theme.Material3.Dark.NoActionBar">
-        <!-- Main colors (Charcoal Black Background) -->
-        <item name="colorPrimary">@color/simpsons_gold</item>
-        <item name="colorOnPrimary">@color/charcoal_black</item>
-        <item name="colorPrimaryContainer">@color/charcoal_surface</item>
-        <item name="colorOnPrimaryContainer">@color/simpsons_gold</item>
+    <!-- Base application theme. -->
+    <style name="AppThemeDayNight" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/simpsons_yellow</item>
+        <item name="colorOnPrimary">@color/black</item>
         
-        <item name="colorSecondary">@color/simpsons_gold_dark</item>
-        <item name="colorOnSecondary">@color/charcoal_black</item>
-        <item name="colorSecondaryContainer">@color/charcoal_black</item>
-        <item name="colorOnSecondaryContainer">@color/simpsons_gold</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/simpsons_pink</item>
+        <item name="colorOnSecondary">@color/black</item>
         
-        <item name="android:windowBackground">@color/charcoal_black</item>
-        <item name="android:statusBarColor">@color/charcoal_black</item>
-        <item name="android:navigationBarColor">@color/charcoal_black</item>
+        <!-- Background and Status bar colors -->
+        <item name="android:windowBackground">@color/simpsons_sky</item>
+        <item name="android:statusBarColor">@color/simpsons_sky</item>
+        <item name="android:navigationBarColor">@color/simpsons_sky</item>
+        <item name="android:windowLightStatusBar">true</item>
         
         <!-- Surface and background colors -->
-        <item name="android:colorBackground">@color/charcoal_black</item>
-        <item name="colorSurface">@color/charcoal_surface</item>
-        <item name="colorOnSurface">@color/parchment_white</item>
-        <item name="colorSurfaceVariant">@color/charcoal_black</item>
-        <item name="colorOnSurfaceVariant">@color/parchment_grey</item>
-        
-        <item name="colorOutline">@color/simpsons_gold_dark</item>
+        <item name="android:colorBackground">@color/simpsons_sky</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/black</item>
         
         <!-- Typography -->
-        <item name="android:textColor">@color/parchment_white</item>
-        <item name="android:textColorSecondary">@color/parchment_grey</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorSecondary">#88000000</item>
         
         <!-- Tab Layout styling -->
-        <item name="tabIndicatorColor">@color/simpsons_gold</item>
-        <item name="tabSelectedTextColor">@color/simpsons_gold</item>
-        <item name="tabTextColor">@color/parchment_grey</item>
+        <item name="tabIndicatorColor">@color/black</item>
+        <item name="tabSelectedTextColor">@color/black</item>
+        <item name="tabTextColor">#88000000</item>
     </style>
 
     <!-- AppThemeBase required by other activities and resources -->
@@ -52,7 +47,14 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
+    <style name="TabLayoutTextStyle" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
     <style name="BrandedSwitch" parent="AppThemeDayNight">
-        <item name="colorPrimary">@color/simpsons_gold</item>
+        <item name="colorPrimary">@color/simpsons_yellow</item>
     </style>
 </resources>
