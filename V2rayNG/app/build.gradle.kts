@@ -14,7 +14,12 @@ android {
         targetSdk = 36
         versionCode = 717
         versionName = "2.0.17"
-        multiDexEnabled = true
+            multiDexEnabled = true
+
+            ndkVersion = "25.1.8937393"
+            ndk {
+                abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+            }
 
         val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')
         splits {
@@ -64,6 +69,12 @@ android {
     sourceSets {
         getByName("main") {
             jniLibs.srcDirs("libs")
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
         }
     }
 
