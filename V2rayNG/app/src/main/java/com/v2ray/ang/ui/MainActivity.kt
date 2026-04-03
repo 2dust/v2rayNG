@@ -105,8 +105,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
         // Gatilho para o painel de debug (Easter Egg)
         binding.headerContainer.setOnClickListener { // Usando o header_container como gatilho
-            // Painel de debug ativado para todas as versões
-            if (true) {
+            if (BuildConfig.DEBUG) {
                 debugClickCount++
                 if (debugClickCount >= DEBUG_CLICK_THRESHOLD) {
                     DebugPanelFragment().show(supportFragmentManager, DebugPanelFragment.TAG)
@@ -139,10 +138,10 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 debugViewModel.updateStatus("UPDATING SERVERS...")
                 
                 // 1. Baixar e descriptografar servidores em memória
-                val servers = VpnConfigManager.getVpnServers(this@MainActivity)
+                val servers = VpnConfigManager.getVpnServers()
                 
                 // 2. Importar para o Core do v2rayNG
-                VpnConfigManager.importServersToCore(this@MainActivity, servers)
+                VpnConfigManager.importServersToCore(servers)
                 
                 // 3. Atualizar a UI
                 mainViewModel.reloadServerList()
