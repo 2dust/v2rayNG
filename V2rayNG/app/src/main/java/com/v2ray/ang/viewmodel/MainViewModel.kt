@@ -167,7 +167,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = updateConfigViaSubAll()
             withContext(Dispatchers.Main) {
-                if (result.count > 0) {
+                if (result.configCount > 0) {
                     context.toastSuccess(R.string.toast_success)
                     reloadServerList()
                 } else {
