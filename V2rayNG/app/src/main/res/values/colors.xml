@@ -14,6 +14,15 @@
     <!-- Shadow Color -->
     <color name="black_shadow">#000000</color>
 
+    <!-- Missing System Colors (Restored for Build) -->
+    <color name="divider_color_light">#40000000</color>
+    <color name="color_fab_active">@color/simpsons_yellow</color>
+    <color name="color_fab_inactive">#424242</color>
+    <color name="colorConfigType">@color/black</color>
+    <color name="colorPing">@color/simpsons_green</color>
+    <color name="colorPingRed">@color/simpsons_red</color>
+    <color name="colorWhite">#FFFFFF</color>
+
     <!-- Compatibility mappings -->
     <color name="medieval_dark">@color/black</color>
     <color name="medieval_brown">@color/white</color>

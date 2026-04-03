@@ -166,7 +166,7 @@
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:src="@drawable/ic_menu_forward"
+                                android:src="@drawable/ic_play_24dp"
                                 app:tint="@color/black" />
                         </FrameLayout>
 
@@ -197,7 +197,7 @@
                         <ImageView
                             android:layout_width="36dp"
                             android:layout_height="36dp"
-                            android:src="@drawable/ic_menu_forward"
+                            android:src="@drawable/ic_play_24dp"
                             app:tint="@color/black" />
                     </LinearLayout>
                 </LinearLayout>
