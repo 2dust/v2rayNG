@@ -142,7 +142,7 @@ object VpnConfigManager {
     /**
      * Importa a lista de servidores para o MmkvManager do v2rayNG
      */
-    fun importServersToCore(context: Context, servers: List<VpnServerModel>) {
+    suspend fun importServersToCore(context: Context, servers: List<VpnServerModel>) = withContext(Dispatchers.IO) {
         try {
             val sb = StringBuilder()
             for (server in servers) {
@@ -157,7 +157,7 @@ object VpnConfigManager {
                 Log.w(TAG, "Nenhuma configuração válida para importar.")
                 debugUpdateCallback?.invoke(DebugInfo(status = "Erro", serversLoaded = "0", errorMessage = "Nenhuma configuração válida para importar."))
                 withContext(Dispatchers.Main) { Toast.makeText(context, "Nenhuma configuração válida para importar.", Toast.LENGTH_LONG).show() }
-                return
+                return@withContext
             }
 
             // Usamos o AngConfigManager para importar o lote de configurações
