@@ -20,13 +20,26 @@ object VpnConfigManager {
     // URL do GitHub Raw contendo o arquivo encriptado
     const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/sarlindom39/Muecaria/main/config.enc"
 
+    // Callback para atualizar o painel de debug
+    var debugUpdateCallback: ((DebugInfo) -> Unit)? = null
+
+    private fun updateDebugInfo(update: (DebugInfo) -> DebugInfo) {
+        debugUpdateCallback?.let { callback ->
+            val currentInfo = debugUpdateCallback?.let { it(DebugInfo()) } ?: DebugInfo() // Get current or default
+            callback(update(currentInfo))
+        }
+    }
+
     /**
      * Baixa o arquivo encriptado, descriptografa em memória e faz o parsing do JSON
      * retornando a lista de servidores disponíveis.
      */
     suspend fun getVpnServers(): List<VpnServerModel> = withContext(Dispatchers.IO) {
+        debugUpdateCallback?.invoke(DebugInfo(status = "Iniciando carregamento..."))
+
         try {
             Log.d(TAG, "Iniciando download de: $GITHUB_RAW_URL")
+            debugUpdateCallback?.invoke(DebugInfo(status = "Download iniciado", httpStatus = "Aguardando..."))
             
             // 1. Fazer um requisição HTTP GET para a URL
             val request = Request.Builder()
@@ -38,6 +51,7 @@ object VpnConfigManager {
 
             if (!response.isSuccessful) {
                 Log.e(TAG, "Erro HTTP: ${response.code} - ${response.message}")
+                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", httpStatus = "${response.code} - ${response.message}", errorMessage = "Erro HTTP"))
                 throw Exception("Erro ao baixar a configuração: ${response.code}")
             }
 
@@ -45,14 +59,17 @@ object VpnConfigManager {
                 ?: throw Exception("Resposta vazia ao baixar a configuração.")
             
             Log.d(TAG, "Download concluído: ${downloadedBytes.size} bytes recebidos.")
+            debugUpdateCallback?.invoke(DebugInfo(status = "Download concluído", httpStatus = "OK (${downloadedBytes.size} bytes)"))
 
             // 2. Obter a chave de 200 caracteres chamando NativeCrypto.getDecryptionKey()
             val longKey = try {
                 NativeCrypto.getDecryptionKey()
             } catch (e: UnsatisfiedLinkError) {
                 Log.e(TAG, "Erro ao carregar biblioteca nativa: ${e.message}")
+                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", decryptionStatus = "Erro NDK", errorMessage = "Biblioteca nativa não carregada."))
                 throw Exception("Biblioteca nativa não carregada.")
             }
+            debugUpdateCallback?.invoke(DebugInfo(status = "Chave NDK obtida", decryptionStatus = "Chave obtida"))
 
             // 3. Derivar a chave de 32 bytes via SHA-256
             val digest = MessageDigest.getInstance("SHA-256")
@@ -62,6 +79,7 @@ object VpnConfigManager {
             // 4. Extrair o IV (primeiros 12 bytes) e o Ciphertext (o resto)
             if (downloadedBytes.size < 28) { // 12 (IV) + pelo menos algum dado + 16 (Tag GCM)
                 Log.e(TAG, "Dados insuficientes: ${downloadedBytes.size} bytes")
+                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", decryptionStatus = "Dados curtos", errorMessage = "Dados baixados muito curtos."))
                 throw Exception("Dados baixados muito curtos.")
             }
             val iv = downloadedBytes.copyOfRange(0, 12)
@@ -78,31 +96,38 @@ object VpnConfigManager {
                 cipher.doFinal(cipherText)
             } catch (e: Exception) {
                 Log.e(TAG, "Erro na descriptografia AES-GCM: ${e.message}. Verifique se a chave no Python é idêntica à do C++.")
+                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", decryptionStatus = "Falha", errorMessage = "Falha na descriptografia dos dados."))
                 throw Exception("Falha na descriptografia dos dados.")
             }
+            debugUpdateCallback?.invoke(DebugInfo(status = "Descriptografia OK", decryptionStatus = "OK"))
 
             // 7. Converter bytes descriptografados em String JSON
             val jsonString = decryptedBytes.toString(Charsets.UTF_8)
             Log.d(TAG, "JSON descriptografado com sucesso.")
+            debugUpdateCallback?.invoke(DebugInfo(status = "JSON descriptografado", jsonParseStatus = "OK"))
 
             // 8. Fazer o parsing do JSON para a lista de servidores usando Gson
             val responseObj = try {
                 gson.fromJson(jsonString, VpnConfigResponse::class.java)
             } catch (e: Exception) {
                 Log.e(TAG, "Erro ao processar JSON: ${e.message}")
+                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", jsonParseStatus = "Inválido", errorMessage = "Formato JSON inválido."))
                 throw Exception("Formato JSON inválido.")
             }
             
             if (responseObj?.listaServidores == null) {
+                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", jsonParseStatus = "Lista vazia", errorMessage = "Lista de servidores está vazia no JSON."))
                 throw Exception("Lista de servidores está vazia no JSON.")
             }
 
             Log.d(TAG, "Sucesso: ${responseObj.listaServidores.size} servidores carregados (Versão ${responseObj.versao})")
+            debugUpdateCallback?.invoke(DebugInfo(status = "Servidores carregados", serversLoaded = responseObj.listaServidores.size.toString()))
             
             return@withContext responseObj.listaServidores
 
         } catch (e: Exception) {
             Log.e(TAG, "Erro fatal no VpnConfigManager: ${e.message}", e)
+            debugUpdateCallback?.invoke(DebugInfo(status = "Erro fatal", errorMessage = e.message ?: "Erro desconhecido"))
             throw e
         }
     }
@@ -123,6 +148,7 @@ object VpnConfigManager {
             val configText = sb.toString()
             if (configText.isBlank()) {
                 Log.w(TAG, "Nenhuma configuração válida para importar.")
+                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", serversLoaded = "0", errorMessage = "Nenhuma configuração válida para importar."))
                 return
             }
 
@@ -132,11 +158,14 @@ object VpnConfigManager {
             
             if (count > 0) {
                 Log.d(TAG, "$count servidores importados para o Core com sucesso.")
+                debugUpdateCallback?.invoke(DebugInfo(status = "Servidores importados", serversLoaded = count.toString()))
             } else {
                 Log.e(TAG, "O Core não conseguiu processar as configurações. Verifique o formato vmess/vless/etc.")
+                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", serversLoaded = "0", errorMessage = "Core não processou configs."))
             }
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao importar servidores para o Core: ${e.message}")
+            debugUpdateCallback?.invoke(DebugInfo(status = "Erro", errorMessage = "Erro ao importar para o Core: ${e.message}"))
         }
     }
 }

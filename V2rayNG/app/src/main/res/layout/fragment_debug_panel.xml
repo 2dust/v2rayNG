@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/bg_neobrutalist_card">
+
+    <TextView
+        android:id="@+id/tvDebugTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Simpsons VPN Debug Panel"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorText"
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/tvDebugStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Status: Initializing..."
+        android:textColor="@color/colorText"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/tvDebugHttp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="HTTP: N/A"
+        android:textColor="@color/colorText"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/tvDebugDecryption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Decryption: N/A"
+        android:textColor="@color/colorText"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/tvDebugJson"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="JSON Parse: N/A"
+        android:textColor="@color/colorText"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/tvDebugServersLoaded"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Servers Loaded: N/A"
+        android:textColor="@color/colorText"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/tvDebugError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Error: None"
+        android:textColor="@color/colorError"
+        android:maxLines="5"
+        android:ellipsize="end"
+        android:scrollbars="vertical"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnRefreshDebug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Refresh"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@color/colorAccent"
+        android:textColor="@color/colorText"/>
+
+</LinearLayout>

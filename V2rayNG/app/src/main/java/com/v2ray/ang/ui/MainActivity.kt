@@ -41,6 +41,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.daggomostudios.simpsonsvpn.DebugPanelFragment
+import com.daggomostudios.simpsonsvpn.DebugViewModel
+import com.daggomostudios.simpsonsvpn.DebugInfo
+import com.daggomostudios.simpsonsvpn.VpnConfigManager
+import com.v2ray.ang.BuildConfig
 
 /**
  * MainActivity for Simpsons VPN
@@ -52,8 +57,11 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     val mainViewModel: MainViewModel by viewModels()
+    private val debugViewModel: DebugViewModel by viewModels()
     private lateinit var groupPagerAdapter: GroupPagerAdapter
     private var tabMediator: TabLayoutMediator? = null
+    private var debugClickCount = 0
+    private val DEBUG_CLICK_THRESHOLD = 5
 
     private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
@@ -95,6 +103,17 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             toast("Select Server")
         }
 
+        // Gatilho para o painel de debug (Easter Egg)
+        binding.headerContainer.setOnClickListener { // Usando o header_container como gatilho
+            if (BuildConfig.DEBUG) {
+                debugClickCount++
+                if (debugClickCount >= DEBUG_CLICK_THRESHOLD) {
+                    DebugPanelFragment().show(supportFragmentManager, DebugPanelFragment.TAG)
+                    debugClickCount = 0 // Resetar contador após abrir
+                }
+            }
+        }
+
         setupGroupTab()
         setupViewModel()
         mainViewModel.reloadServerList()
@@ -107,29 +126,40 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
     private fun loadVpnServers() {
         lifecycleScope.launch {
+            // Resetar info de debug no início de cada carregamento
+            debugViewModel.reset()
+            VpnConfigManager.debugUpdateCallback = { info ->
+                debugViewModel.debugInfo.postValue(info)
+            }
+
             try {
                 // Exibir estado de carregamento na UI
                 setTestState("UPDATING SERVERS...")
+                debugViewModel.updateStatus("UPDATING SERVERS...")
                 
                 // 1. Baixar e descriptografar servidores em memória
-                val servers = com.daggomostudios.simpsonsvpn.VpnConfigManager.getVpnServers()
+                val servers = VpnConfigManager.getVpnServers()
                 
                 // 2. Importar para o Core do v2rayNG
-                com.daggomostudios.simpsonsvpn.VpnConfigManager.importServersToCore(servers)
+                VpnConfigManager.importServersToCore(servers)
                 
                 // 3. Atualizar a UI
                 mainViewModel.reloadServerList()
                 setupGroupTab()
                 
                 setTestState("SERVERS UPDATED")
+                debugViewModel.updateStatus("SERVERS UPDATED")
                 delay(2000)
                 setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
+                debugViewModel.updateStatus(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
                 
             } catch (e: Exception) {
                 Log.e("SimpsonsVPN", "Erro ao carregar servidores: ${e.message}")
                 withContext(Dispatchers.Main) {
                     toast("Falha ao atualizar servidores. Verifique sua conexão.")
                     setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
+                    debugViewModel.updateError(e.message ?: "Erro desconhecido")
+                    debugViewModel.updateStatus("ERROR")
                 }
             }
         }
