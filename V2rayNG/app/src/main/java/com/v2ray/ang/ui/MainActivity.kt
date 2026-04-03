@@ -41,6 +41,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * MainActivity for Simpsons VPN
+ * Redesigned with Neobrutalist style and animations.
+ */
 class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelectedListener {
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -155,6 +159,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         V2RayServiceManager.startVService(this)
     }
 
+    /**
+     * Restarts V2Ray service. Used by GroupServerFragment.
+     */
     fun restartV2Ray() {
         if (mainViewModel.isRunning.value == true) {
             V2RayServiceManager.stopVService(this)
@@ -165,6 +172,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         }
     }
 
+    /**
+     * Imports configuration via subscription. Used by GroupServerFragment.
+     */
     fun importConfigViaSub() {
         mainViewModel.importConfigViaSub(this)
     }
