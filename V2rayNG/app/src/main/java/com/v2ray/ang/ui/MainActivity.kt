@@ -124,7 +124,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) { }
     }
 
-    private fun loadVpnServers() {
+    fun loadVpnServers() {
         lifecycleScope.launch {
             // Resetar info de debug no início de cada carregamento
             debugViewModel.reset()

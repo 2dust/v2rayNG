@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.v2ray.ang.databinding.FragmentDebugPanelBinding
+import com.v2ray.ang.ui.MainActivity
 
 class DebugPanelFragment : BottomSheetDialogFragment() {
 
@@ -36,7 +37,7 @@ class DebugPanelFragment : BottomSheetDialogFragment() {
         }
 
         binding.btnRefreshDebug.setOnClickListener {
-            // Disparar o refresh na MainActivity/ViewModel
+            // Disparar o refresh na MainActivity
             (activity as? MainActivity)?.loadVpnServers()
         }
     }

@@ -23,13 +23,6 @@ object VpnConfigManager {
     // Callback para atualizar o painel de debug
     var debugUpdateCallback: ((DebugInfo) -> Unit)? = null
 
-    private fun updateDebugInfo(update: (DebugInfo) -> DebugInfo) {
-        debugUpdateCallback?.let { callback ->
-            val currentInfo = debugUpdateCallback?.let { it(DebugInfo()) } ?: DebugInfo() // Get current or default
-            callback(update(currentInfo))
-        }
-    }
-
     /**
      * Baixa o arquivo encriptado, descriptografa em memória e faz o parsing do JSON
      * retornando a lista de servidores disponíveis.
