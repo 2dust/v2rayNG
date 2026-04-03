@@ -1,6 +1,7 @@
 package com.daggomostudios.simpsonsvpn
 
 import android.util.Log
+import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import kotlinx.coroutines.Dispatchers
@@ -13,11 +14,16 @@ import javax.crypto.spec.SecretKeySpec
 object VpnConfigManager {
 
     private val client = OkHttpClient()
+    private val gson = Gson()
 
     // Variável para a URL do GitHub Raw, a ser preenchida posteriormente
     var githubRawUrl: String = "COLOQUE_A_URL_AQUI"
 
-    suspend fun downloadAndDecryptConfig(): String = withContext(Dispatchers.IO) {
+    /**
+     * Baixa o arquivo encriptado, descriptografa em memória e faz o parsing do JSON
+     * retornando a lista de servidores disponíveis.
+     */
+    suspend fun getVpnServers(): List<VpnServerModel> = withContext(Dispatchers.IO) {
         if (githubRawUrl == "COLOQUE_A_URL_AQUI") {
             throw IllegalStateException("githubRawUrl não foi configurada.")
         }
@@ -57,11 +63,18 @@ object VpnConfigManager {
             cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmSpec)
             val decryptedBytes = cipher.doFinal(cipherText)
 
-            // 7. Retornar o resultado final como uma String pura
-            decryptedBytes.toString(Charsets.UTF_8)
+            // 7. Converter bytes descriptografados em String JSON
+            val jsonString = decryptedBytes.toString(Charsets.UTF_8)
+
+            // 8. Fazer o parsing do JSON para a lista de servidores usando Gson
+            val responseObj = gson.fromJson(jsonString, VpnConfigResponse::class.java)
+            
+            Log.d("VpnConfigManager", "Sucesso: ${responseObj.listaServidores.size} servidores carregados (Versão ${responseObj.versao})")
+            
+            return@withContext responseObj.listaServidores
 
         } catch (e: Exception) {
-            Log.e("VpnConfigManager", "Erro ao baixar ou descriptografar a configuração: ${e.message}", e)
+            Log.e("VpnConfigManager", "Erro ao carregar servidores: ${e.message}", e)
             throw e
         }
     }
