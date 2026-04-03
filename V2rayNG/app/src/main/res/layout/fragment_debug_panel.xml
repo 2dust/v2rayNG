@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="@drawable/bg_neobrutalist_card">
+    android:background="@android:color/white">
 
     <TextView
         android:id="@+id/tvDebugTitle"
@@ -15,7 +15,7 @@
         android:text="Simpsons VPN Debug Panel"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@color/colorText"
+        android:textColor="@android:color/black"
         android:gravity="center_horizontal"
         android:layout_marginBottom="16dp"/>
 
@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Status: Initializing..."
-        android:textColor="@color/colorText"
+        android:textColor="@android:color/black"
         android:layout_marginBottom="8dp"/>
 
     <TextView
@@ -32,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="HTTP: N/A"
-        android:textColor="@color/colorText"
+        android:textColor="@android:color/black"
         android:layout_marginBottom="8dp"/>
 
     <TextView
@@ -40,7 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Decryption: N/A"
-        android:textColor="@color/colorText"
+        android:textColor="@android:color/black"
         android:layout_marginBottom="8dp"/>
 
     <TextView
@@ -48,7 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="JSON Parse: N/A"
-        android:textColor="@color/colorText"
+        android:textColor="@android:color/black"
         android:layout_marginBottom="8dp"/>
 
     <TextView
@@ -56,7 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Servers Loaded: N/A"
-        android:textColor="@color/colorText"
+        android:textColor="@android:color/black"
         android:layout_marginBottom="8dp"/>
 
     <TextView
@@ -64,7 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Error: None"
-        android:textColor="@color/colorError"
+        android:textColor="@android:color/holo_red_dark"
         android:maxLines="5"
         android:ellipsize="end"
         android:scrollbars="vertical"
@@ -76,7 +76,7 @@
         android:layout_height="wrap_content"
         android:text="Refresh"
         android:layout_gravity="center_horizontal"
-        android:backgroundTint="@color/colorAccent"
-        android:textColor="@color/colorText"/>
+        android:backgroundTint="@android:color/holo_blue_dark"
+        android:textColor="@android:color/white"/>
 
 </LinearLayout>
