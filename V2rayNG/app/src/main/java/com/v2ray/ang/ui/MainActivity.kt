@@ -162,7 +162,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     /**
      * Restarts V2Ray service. Used by GroupServerFragment.
      */
-    fun restartV2Ray() {
+    public fun restartV2Ray() {
         if (mainViewModel.isRunning.value == true) {
             V2RayServiceManager.stopVService(this)
         }
@@ -175,7 +175,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     /**
      * Imports configuration via subscription. Used by GroupServerFragment.
      */
-    fun importConfigViaSub() {
+    public fun importConfigViaSub() {
         mainViewModel.importConfigViaSub(this)
     }
 

@@ -160,6 +160,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
+     * Imports configuration via subscription.
+     * @param context The context to show toast messages.
+     */
+    fun importConfigViaSub(context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = updateConfigViaSubAll()
+            withContext(Dispatchers.Main) {
+                if (result.count > 0) {
+                    context.toastSuccess(R.string.toast_success)
+                    reloadServerList()
+                } else {
+                    context.toastError(R.string.toast_failure)
+                }
+            }
+        }
+    }
+
+    /**
      * Exports all servers.
      * @return The number of exported servers.
      */
