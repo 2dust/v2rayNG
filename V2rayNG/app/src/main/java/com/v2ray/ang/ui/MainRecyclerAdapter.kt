@@ -94,7 +94,13 @@ class MainRecyclerAdapter(
             holder.itemMainBinding.layoutMore.visibility = View.GONE
 
             holder.itemMainBinding.infoContainer.setOnClickListener {
-                adapterListener?.onSelectServer(guid)
+                it.startAnimation(android.view.animation.AnimationUtils.loadAnimation(context, R.anim.shake))
+                val profileRemarks = profile.remarks
+                if (profileRemarks != null && profileRemarks.contains("Clique para atualizar")) {
+                    (context as? com.v2ray.ang.ui.MainActivity)?.loadVpnServers()
+                } else {
+                    adapterListener?.onSelectServer(guid)
+                }
             }
         }
  

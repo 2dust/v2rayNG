@@ -8,7 +8,7 @@
         </shape>
     </item>
     <!-- Header Body (Yellow with Thick Black Stroke) -->
-    <item android:bottom="6dp" android:right="6dp">
+    <item android:bottom="6dp" android:right="6dp" android:top="0dp" android:left="0dp">
         <shape android:shape="rectangle">
             <solid android:color="@color/simpsons_yellow" />
             <stroke android:width="4dp" android:color="@color/black" />

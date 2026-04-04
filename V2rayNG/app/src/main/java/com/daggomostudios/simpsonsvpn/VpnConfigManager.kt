@@ -161,7 +161,8 @@ object VpnConfigManager {
         } catch (e: Exception) {
             Log.e(TAG, "Erro fatal no VpnConfigManager: ${e.message}", e)
             debugUpdateCallback?.invoke(DebugInfo(status = "Erro fatal", errorMessage = e.message ?: "Erro desconhecido"))
-            throw e
+            // Retornar lista vazia em vez de lançar exceção para permitir o servidor "Clique para atualizar"
+            return@withContext emptyList<VpnServerModel>()
         }
     }
 
@@ -180,7 +181,19 @@ object VpnConfigManager {
             var updated = 0
             var removed = 0
 
-            for (server in servers) {
+            // Se a lista estiver vazia, adicionar o servidor especial "Clique para atualizar"
+            val finalServers = if (servers.isEmpty()) {
+                listOf(VpnServerModel(
+                    id = "000_update",
+                    nome = "🍩 Clique para atualizar os servidores",
+                    protocolo = "vmess",
+                    config = "vmess://eyJhZGQiOiIxMjcuMC4wLjEiLCJhaWQiOiIwIiwiYWxwaCI6IiIsImZwIjoiIiwiaG9zdCI6IiIsImlkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAwIiwiaW5zZWN1cmUiOiIwIiwibmV0Ijoid3MiLCJwYXRoIjoiLyIsInBvcnQiOiI4MCIsInBzIjoiQ2xpcXVlIHBhcmEgYXR1YWxpemFyIiwic2N5IjoiYXV0byIsInNuaSI6IiIsInRscyI6IiIsInR5cGUiOiJub25lIiwidiI6IjIifQ=="
+                ))
+            } else {
+                servers
+            }
+
+            for (server in finalServers) {
                 val vpnId = server.id.trim()
 
                 // --- Lógica de REMOÇÃO: ID termina em "rem" ---

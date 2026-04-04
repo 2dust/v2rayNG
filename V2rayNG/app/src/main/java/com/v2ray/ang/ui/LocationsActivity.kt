@@ -27,6 +27,7 @@ class LocationsActivity : HelperBaseActivity() {
 
         // Botão de fechar (X)
         binding.btnClose.setOnClickListener {
+            it.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.shake))
             finish()
         }
 

@@ -76,6 +76,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     
     // Simpsons VPN: Controlo de carregamento inicial
     private var isServersLoaded = false
+    
+    // Simpsons VPN: Constantes de primeiro arranque
+    private val PREF_FIRST_RUN = "pref_first_run_v1"
 
     private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
@@ -180,8 +183,13 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             }
         })
 
-        binding.fab.setOnClickListener { handleFabAction() }
+        binding.fab.setOnClickListener { 
+            it.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.shake))
+            handleFabAction() 
+        }
+        
         binding.serverSelectionCard.setOnClickListener { 
+            it.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.shake))
             // Abrir a lista de servidores (Locations) para seleção
             val intent = Intent(this, LocationsActivity::class.java)
             startActivity(intent)
@@ -189,6 +197,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
         // Header clicável para abrir Logs e Definições
         binding.headerContainer.setOnClickListener {
+            it.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.shake))
             showMainBottomSheet()
         }
 
@@ -214,47 +223,76 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     fun loadVpnServers() {
+        val isFirstRun = MmkvManager.decodeSettingsBool(PREF_FIRST_RUN, true)
+        if (!isFirstRun && isServersLoaded) return
+
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                withContext(Dispatchers.Main) {
-                    debugViewModel.reset()
-                    setTestState("UPDATING SERVERS...")
-                    debugViewModel.updateStatus("UPDATING SERVERS...")
+                // Verificar conectividade
+                val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+                val activeNetwork = cm.activeNetworkInfo
+                val isConnected = activeNetwork?.isConnectedOrConnecting == true
+
+                if (!isConnected && isFirstRun) {
+                    withContext(Dispatchers.Main) {
+                        showNoDataDialog()
+                    }
+                    return@launch
                 }
 
-                VpnConfigManager.debugUpdateCallback = { info ->
-                    debugViewModel.debugInfo.postValue(info)
+                withContext(Dispatchers.Main) {
+                    setTestState("UPDATING SERVERS...")
                 }
 
                 // 1. Baixar e descriptografar servidores em memória
-                val servers = VpnConfigManager.getVpnServers()
+                val servers = com.daggomostudios.simpsonsvpn.VpnConfigManager.getVpnServers(this@MainActivity)
                 
-                // 2. Importar para o Core do v2rayNG
-                VpnConfigManager.importServersToCore(servers)
-                
-                withContext(Dispatchers.Main) {
-                    // 3. Atualizar a UI
-                    mainViewModel.reloadServerList()
+                if (servers != null && servers.isNotEmpty()) {
+                    // 2. Importar para o Core do v2rayNG
+                    com.daggomostudios.simpsonsvpn.VpnConfigManager.importServersToCore(servers)
+                    isServersLoaded = true
+                    if (isFirstRun) MmkvManager.encodeSettings(PREF_FIRST_RUN, false)
                     
-                    // Simpsons VPN: Apenas notificar sucesso, sem interferir no estado da VPN ligada
-                    toast("Servidores actualizados com sucesso! 🍩")
-                    
-                    setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
-                    debugViewModel.updateStatus(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
+                    withContext(Dispatchers.Main) {
+                        mainViewModel.reloadServerList()
+                        toast("Servidores actualizados com sucesso! 🍩")
+                        setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
+                    }
+                } else if (isFirstRun) {
+                    withContext(Dispatchers.Main) {
+                        showNoBalanceDialog()
+                        setTestState("UPDATE FAILED")
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("SimpsonsVPN", "Erro ao carregar servidores: ${e.message}")
-                withContext(Dispatchers.Main) {
-                    // Evitar toast se a actividade estiver a ser destruída
-                    if (!isFinishing) {
-                        toast("Falha ao atualizar servidores. Verifique sua conexão.")
-                        setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
-                        debugViewModel.updateError(e.message ?: "Erro desconhecido")
-                        debugViewModel.updateStatus("ERROR")
-                    }
-                }
             }
         }
+    }
+
+    private fun showNoDataDialog() {
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_AppCompat_Light_Dialog_Alert)
+            .setTitle(getString(R.string.dialog_no_data_title))
+            .setMessage(getString(R.string.dialog_no_data_msg))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
+                loadVpnServers() // Tentar novamente
+            }
+            .create()
+        dialog.show()
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setTextColor(android.graphics.Color.BLACK)
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setBackgroundColor(android.graphics.Color.parseColor("#FFD428"))
+    }
+
+    private fun showNoBalanceDialog() {
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_AppCompat_Light_Dialog_Alert)
+            .setTitle(getString(R.string.dialog_no_balance_title))
+            .setMessage(getString(R.string.dialog_no_balance_msg))
+            .setPositiveButton(getString(R.string.btn_ok), null)
+            .create()
+        dialog.show()
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setTextColor(android.graphics.Color.BLACK)
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setBackgroundColor(android.graphics.Color.parseColor("#FFD428"))
     }
 
     private fun startCloudAnimations() {

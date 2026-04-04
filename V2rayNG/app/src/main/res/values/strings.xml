@@ -15,6 +15,12 @@
     <string name="server_select_prompt">SELECT SERVER</string>
     <string name="toast_settings_soon">Definições em breve! 🍩</string>
     <string name="toast_enable_mobile_data">Por favor, ligue os Dados Móveis para conectar</string>
+    <string name="dialog_no_data_title">SEM INTERNET!</string>
+    <string name="dialog_no_data_msg">Precisamos que ligues os dados móveis para o primeiro arranque do Simpsons VPN. 🍩</string>
+    <string name="dialog_no_balance_title">ESTÁS SEM SALDO?</string>
+    <string name="dialog_no_balance_msg">Não conseguimos carregar os servidores. Verifica se tens saldo ou internet no teu telemóvel. 🍩</string>
+    <string name="server_update_manual">Clique para atualizar os servidores</string>
+    <string name="btn_ok">OK, ENTENDI!</string>
 
     <!-- Notifications -->
     <string name="notification_action_stop_simpsons">Parar</string>
