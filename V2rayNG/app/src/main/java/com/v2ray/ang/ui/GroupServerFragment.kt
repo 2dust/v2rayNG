@@ -231,29 +231,24 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
      */
     private fun setSelectServer(guid: String) {
         val selected = MmkvManager.getSelectServer()
+        
+        // Se o servidor clicado for diferente do actual
         if (guid != selected) {
             MmkvManager.setSelectServer(guid)
             val fromPosition = mainViewModel.getPosition(selected.orEmpty())
             val toPosition = mainViewModel.getPosition(guid)
             adapter.setSelectServer(fromPosition, toPosition)
 
+            // Apenas reinicia se a VPN estiver ligada E o servidor mudou
             if (mainViewModel.isRunning.value == true) {
-                // Simpsons VPN: Usar o MessageUtil para reiniciar o serviço de forma segura e desacoplada
+                // Simpsons VPN: Reiniciar o serviço de forma segura para aplicar o novo servidor
                 MessageUtil.sendMsg2Service(ownerActivity, AppConfig.MSG_STATE_RESTART, "")
             }
-            
-            // Simpsons VPN: Fechar a tela de seleção após escolher o servidor
-            if (ownerActivity is LocationsActivity) {
-                ownerActivity.finish()
-            } else if (ownerActivity is MainActivity) {
-                // Se o utilizador estiver a usar o ViewPager/Tabs original (raro neste design), 
-                // não fechamos o MainActivity, apenas actualizamos a UI.
-            }
-        } else {
-            // Se o servidor já estiver selecionado, apenas fechamos a tela de Locations
-            if (ownerActivity is LocationsActivity) {
-                ownerActivity.finish()
-            }
+        }
+        
+        // Em qualquer caso (servidor novo ou igual), se estivermos na tela de Locations, fechamos para voltar à Home
+        if (ownerActivity is LocationsActivity) {
+            ownerActivity.finish()
         }
     }
 
