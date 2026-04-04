@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Shadow (Black Solid) -->
+    <item android:top="8dp" android:left="8dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/black" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+    <!-- Card Body (White with Thick Black Stroke) -->
+    <item android:bottom="8dp" android:right="8dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white" />
+            <stroke android:width="4dp" android:color="@color/black" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+</layer-list>

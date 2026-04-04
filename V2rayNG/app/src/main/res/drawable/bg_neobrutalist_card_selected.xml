@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Shadow (Black Solid) -->
+    <item android:top="6dp" android:left="6dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/black" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <!-- Card Body (Simpsons Yellow with Thick Black Stroke) -->
+    <item android:bottom="6dp" android:right="6dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/simpsons_yellow" />
+            <stroke android:width="4dp" android:color="@color/black" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</layer-list>

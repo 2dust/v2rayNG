@@ -31,8 +31,8 @@ import kotlinx.coroutines.launch
 
 class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
     SwipeRefreshLayout.OnRefreshListener {
-    private val ownerActivity: MainActivity
-        get() = requireActivity() as MainActivity
+    private val ownerActivity: HelperBaseActivity
+        get() = requireActivity() as HelperBaseActivity
     private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var adapter: MainRecyclerAdapter
     private var itemTouchHelper: ItemTouchHelper? = null
@@ -64,7 +64,8 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
         } else {
             binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 1)
         }
-        addCustomDividerToRecyclerView(binding.recyclerView, R.drawable.custom_divider)
+        // Simpsons VPN: Divisor removido para usar o espaçamento dos cards neobrutalistas
+        // addCustomDividerToRecyclerView(binding.recyclerView, R.drawable.custom_divider)
         binding.recyclerView.adapter = adapter
 
         itemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(adapter, allowSwipe = false))
@@ -237,7 +238,24 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
             adapter.setSelectServer(fromPosition, toPosition)
 
             if (mainViewModel.isRunning.value == true) {
-                ownerActivity.restartV2Ray()
+                if (ownerActivity is MainActivity) {
+                    (ownerActivity as MainActivity).restartV2Ray()
+                } else if (ownerActivity is LocationsActivity) {
+                    (ownerActivity as LocationsActivity).restartV2Ray()
+                }
+            }
+            
+            // Simpsons VPN: Fechar a tela de seleção após escolher o servidor
+            if (ownerActivity is LocationsActivity) {
+                ownerActivity.finish()
+            } else if (ownerActivity is MainActivity) {
+                // Se o utilizador estiver a usar o ViewPager/Tabs original (raro neste design), 
+                // não fechamos o MainActivity, apenas actualizamos a UI.
+            }
+        } else {
+            // Se o servidor já estiver selecionado, apenas fechamos a tela de Locations
+            if (ownerActivity is LocationsActivity) {
+                ownerActivity.finish()
             }
         }
     }
@@ -280,7 +298,11 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
     }
 
     override fun onRefresh() {
-        ownerActivity.importConfigViaSub()
+        if (ownerActivity is MainActivity) {
+            (ownerActivity as MainActivity).importConfigViaSub()
+        } else if (ownerActivity is LocationsActivity) {
+            (ownerActivity as LocationsActivity).importConfigViaSub()
+        }
         //binding.refreshLayout.isRefreshing = false
     }
 

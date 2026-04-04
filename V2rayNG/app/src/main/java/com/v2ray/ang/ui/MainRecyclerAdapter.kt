@@ -69,11 +69,17 @@ class MainRecyclerAdapter(
                 holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(context, R.color.colorPing))
             }
 
-            //layoutIndicator
+            // Simpsons VPN Neobrutalist Selection Logic
             if (guid == MmkvManager.getSelectServer()) {
-                holder.itemMainBinding.layoutIndicator.setBackgroundResource(R.color.colorIndicator)
+                holder.itemMainBinding.infoContainer.setBackgroundResource(R.drawable.bg_neobrutalist_card_selected)
+                holder.itemMainBinding.layoutIndicator.setBackgroundTintList(null)
+                holder.itemMainBinding.layoutIndicator.setBackgroundResource(R.drawable.ic_check_circle_24dp)
+                holder.itemMainBinding.layoutIndicator.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.black))
             } else {
-                holder.itemMainBinding.layoutIndicator.setBackgroundResource(0)
+                holder.itemMainBinding.infoContainer.setBackgroundResource(R.drawable.bg_neobrutalist_card_normal)
+                holder.itemMainBinding.layoutIndicator.setBackgroundTintList(null)
+                holder.itemMainBinding.layoutIndicator.setBackgroundResource(R.drawable.ic_circle)
+                holder.itemMainBinding.layoutIndicator.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.simpsons_yellow))
             }
 
             //subscription remarks
