@@ -10,6 +10,11 @@
     <string name="action_stop_service">Parar Serviço</string>
     <string name="migration_fail">Falha na migração!</string>
     <string name="pull_down_to_refresh">Puxe para baixo para atualizar servidores!</string>
+    <string name="title_logs">Logs</string>
+    <string name="title_settings_short">Definições</string>
+    <string name="server_select_prompt">SELECT SERVER</string>
+    <string name="toast_settings_soon">Definições em breve! 🍩</string>
+    <string name="toast_enable_mobile_data">Por favor, ligue os Dados Móveis para conectar</string>
 
     <!-- Notifications -->
     <string name="notification_action_stop_simpsons">Parar</string>

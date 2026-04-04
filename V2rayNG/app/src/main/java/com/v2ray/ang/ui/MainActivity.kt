@@ -67,8 +67,12 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     private val debugViewModel: DebugViewModel by viewModels()
     // groupPagerAdapter e tabMediator removidos para estabilidade neobrutalista
     private var debugClickCount = 0
-    private val DEBUG_CLICK_THRESHOLD = 5
-    private var isServersLoaded = false
+    private val DEBUG_CLICK_THRESHOLD = 7
+    private var lastDebugClickTime = 0L
+
+    // Bottom Sheet for Logs & Settings
+    private var bottomSheetDialog: com.google.android.material.bottomsheet.BottomSheetDialog? = null
+    private var tvLogsContent: android.widget.TextView? = null
 
     private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
@@ -180,20 +184,17 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             startActivity(intent)
         }
 
-        binding.btnSettings.setOnClickListener {
-            // Futura aba de Definições
-            toast("Definições em breve! 🍩")
+        // Header clicável para abrir Logs e Definições
+        binding.headerContainer.setOnClickListener {
+            showMainBottomSheet()
         }
 
-        // Gatilho para o painel de debug (Easter Egg)
-        binding.headerContainer.setOnClickListener { // Usando o header_container como gatilho
+        // Gatilho para o painel de debug (Easter Egg) - Agora via Long Click no Header
+        binding.headerContainer.setOnLongClickListener {
             if (AngBuildConfig.DEBUG) {
-                debugClickCount++
-                if (debugClickCount >= DEBUG_CLICK_THRESHOLD) {
-                    DebugPanelFragment().show(supportFragmentManager, DebugPanelFragment.TAG)
-                    debugClickCount = 0 // Resetar contador após abrir
-                }
-            }
+                DebugPanelFragment().show(supportFragmentManager, DebugPanelFragment.TAG)
+                true
+            } else false
         }
 
         setupViewModel()
@@ -232,9 +233,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                     // 3. Atualizar a UI
                     mainViewModel.reloadServerList()
                     
-                    setTestState("SERVERS UPDATED")
-                    debugViewModel.updateStatus("SERVERS UPDATED")
-                    delay(2000)
+                    // Simpsons VPN: Apenas notificar sucesso, sem interferir no estado da VPN ligada
+                    toast("Servidores actualizados com sucesso! 🍩")
+                    
                     setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
                     debugViewModel.updateStatus(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
                 }
@@ -279,6 +280,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             // Apenas actualizamos se a MainActivity estiver visível.
             try { updateSelectedServerUI() } catch (e: Exception) {}
         }
+        mainViewModel.vpnLog.observe(this) { log ->
+            try { tvLogsContent?.text = log } catch (e: Exception) {}
+        }
         mainViewModel.startListenBroadcast()
         mainViewModel.initAssets(assets)
     }
@@ -287,7 +291,8 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         try {
             val guid = MmkvManager.getSelectServer()
             if (guid.isNullOrEmpty()) {
-                binding.tvServerName.text = "SELECT SERVER"
+                // Simpsons VPN: Corrigido para manter SELECT SERVER se nada for escolhido
+                binding.tvServerName.text = getString(R.string.server_select_prompt)
                 binding.tvServerPing.text = "Ping: --"
             } else {
                 val config = MmkvManager.decodeServerConfig(guid)
@@ -324,14 +329,46 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
     private fun startV2Ray() {
         if (!Utils.isMobileDataEnabled(this)) {
-            toast("Please enable Mobile Data to connect")
+            toast(R.string.toast_enable_mobile_data)
             return
         }
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
-            toast(R.string.title_file_chooser)
+            toast(R.string.server_select_prompt)
             return
         }
         V2RayServiceManager.startVService(this)
+    }
+
+    private fun showMainBottomSheet() {
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.layout_main_bottom_sheet, null)
+        
+        val tvTabLogs = view.findViewById<android.widget.TextView>(R.id.tv_tab_logs)
+        val tvTabSettings = view.findViewById<android.widget.TextView>(R.id.tv_tab_settings)
+        val scrollLogs = view.findViewById<android.view.View>(R.id.scroll_logs)
+        val layoutSettings = view.findViewById<android.view.View>(R.id.layout_settings_content)
+        tvLogsContent = view.findViewById<android.widget.TextView>(R.id.tv_logs_content)
+
+        // Restaurar logs se o serviço estiver a correr
+        tvLogsContent?.text = mainViewModel.vpnLog.value ?: "[System] Waiting for connection..."
+
+        tvTabLogs.setOnClickListener {
+            tvTabLogs.setBackgroundResource(R.drawable.bg_neobrutalist_card_selected)
+            tvTabSettings.setBackgroundResource(R.drawable.bg_neobrutalist_card_normal)
+            scrollLogs.visibility = android.view.View.VISIBLE
+            layoutSettings.visibility = android.view.View.GONE
+        }
+
+        tvTabSettings.setOnClickListener {
+            tvTabSettings.setBackgroundResource(R.drawable.bg_neobrutalist_card_selected)
+            tvTabLogs.setBackgroundResource(R.drawable.bg_neobrutalist_card_normal)
+            layoutSettings.visibility = android.view.View.VISIBLE
+            scrollLogs.visibility = android.view.View.GONE
+        }
+
+        dialog.setContentView(view)
+        bottomSheetDialog = dialog
+        dialog.show()
     }
 
     // Simpsons VPN: O restartV2Ray agora é feito via MessageUtil no fragmento

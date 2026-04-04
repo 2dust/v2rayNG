@@ -46,6 +46,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
     val updateTestResultAction by lazy { MutableLiveData<String>() }
+    val vpnLog by lazy { MutableLiveData<String>() }
     private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
     
     // Simpsons VPN: Flag para evitar erros de "Receiver not registered"
@@ -520,6 +521,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val content = intent.getStringExtra("content")
                     if (content == "0") {
                         onTestsFinished()
+                    }
+                }
+
+                AppConfig.MSG_STATE_LOG -> {
+                    val content = intent.getStringExtra("content")
+                    if (content != null) {
+                        vpnLog.value = content
                     }
                 }
             }

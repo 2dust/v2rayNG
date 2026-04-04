@@ -166,9 +166,10 @@ object MmkvManager {
         if (!serverList.contains(key)) {
             serverList.add(0, key)
             encodeServerList(serverList, subId)
-            if (getSelectServer().isNullOrBlank()) {
-                mainStorage.encode(KEY_SELECTED_SERVER, key)
-            }
+            // Simpsons VPN: Removida a seleção automática para manter "SELECT SERVER" no arranque
+            // if (getSelectServer().isNullOrBlank()) {
+            //     mainStorage.encode(KEY_SELECTED_SERVER, key)
+            // }
         }
 
         return key

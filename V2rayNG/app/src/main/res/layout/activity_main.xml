@@ -50,7 +50,7 @@
             android:layout_height="match_parent"
             android:padding="24dp">
 
-            <!-- Header Title (Floating Style) -->
+            <!-- Header Title (Floating Style) - Now Clickable for Settings/Logs -->
             <FrameLayout
                 android:id="@+id/header_container"
                 android:layout_width="wrap_content"
@@ -60,7 +60,10 @@
                 android:rotation="-2"
                 android:background="@drawable/bg_neobrutalist_header"
                 android:paddingHorizontal="24dp"
-                android:paddingVertical="12dp">
+                android:paddingVertical="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -71,19 +74,6 @@
                     android:textStyle="bold"
                     android:letterSpacing="0.1" />
             </FrameLayout>
-
-            <!-- Settings Button (Gear) -->
-            <ImageButton
-                android:id="@+id/btn_settings"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_alignParentEnd="true"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_neobrutalist_card"
-                android:contentDescription="Settings"
-                android:padding="12dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_settings_24dp" />
 
             <!-- Main Content Container -->
             <LinearLayout
