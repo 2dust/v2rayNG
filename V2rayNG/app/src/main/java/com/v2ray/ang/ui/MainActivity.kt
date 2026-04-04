@@ -24,8 +24,14 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayoutMediator
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
+import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.databinding.ActivityMainBinding
+import com.daggomostudios.simpsonsvpn.CrashHandler
+import android.widget.TextView
+import android.graphics.Typeface
+import android.view.Gravity
+import android.widget.ScrollView
+import android.widget.LinearLayout
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.PermissionType
 import com.v2ray.ang.extension.toast
@@ -71,6 +77,10 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Simpsons VPN: Inicializar o caçador de crashes
+        CrashHandler.init(this)
+        
         setContentView(binding.root)
         
         // Ocultar Toolbar original para usar o cabeçalho flutuante Neobrutalista
@@ -82,6 +92,61 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         binding.fab.startAnimation(pulseAnim)
         
         startMainActivityLogic()
+        
+        // Verificar se houve um crash na última vez
+        checkLastCrash()
+    }
+
+    private fun checkLastCrash() {
+        val crashLog = CrashHandler.getLastCrash()
+        if (!crashLog.isNullOrEmpty()) {
+            showCrashAlert(crashLog)
+            CrashHandler.clearLastCrash()
+        }
+    }
+
+    private fun showCrashAlert(log: String) {
+        val context = this
+        val layout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(40, 40, 40, 40)
+            setBackgroundColor(ContextCompat.getColor(context, R.color.simpsons_yellow))
+        }
+
+        val title = TextView(context).apply {
+            text = "DON'T PANIC! (APP CRASHED)"
+            textSize = 22f
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(Color.BLACK)
+            gravity = Gravity.CENTER
+            setPadding(0, 0, 0, 30)
+        }
+
+        val scroll = ScrollView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                800
+            )
+        }
+
+        val content = TextView(context).apply {
+            text = log
+            textSize = 12f
+            setTypeface(Typeface.MONOSPACE)
+            setTextColor(Color.BLACK)
+            setBackgroundResource(R.drawable.bg_neobrutalist_card)
+            setPadding(20, 20, 20, 20)
+        }
+
+        scroll.addView(content)
+        layout.addView(title)
+        layout.addView(scroll)
+
+        AlertDialog.Builder(context)
+            .setView(layout)
+            .setPositiveButton("I UNDERSTAND") { dialog, _ -> dialog.dismiss() }
+            .setCancelable(false)
+            .show()
     }
 
     override fun onResume() {
