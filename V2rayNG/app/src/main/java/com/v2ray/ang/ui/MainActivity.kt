@@ -88,10 +88,8 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         super.onResume()
         // Simpsons VPN: Actualizar a UI sempre que voltamos para a MainActivity
         // para garantir que o servidor selecionado aparece correctamente.
-        if (::binding.isInitialized) {
-            mainViewModel.reloadServerList()
-            updateSelectedServerUI()
-        }
+        mainViewModel.reloadServerList()
+        updateSelectedServerUI()
     }
 
     private fun startMainActivityLogic() {
