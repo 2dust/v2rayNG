@@ -86,10 +86,13 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
     override fun onResume() {
         super.onResume()
-        // Simpsons VPN: Actualizar a UI sempre que voltamos para a MainActivity
-        // para garantir que o servidor selecionado aparece correctamente.
-        mainViewModel.reloadServerList()
-        updateSelectedServerUI()
+        // Simpsons VPN: Actualizar a UI de forma segura ao voltar para a MainActivity
+        try {
+            mainViewModel.reloadServerList()
+            updateSelectedServerUI()
+        } catch (e: Exception) {
+            Log.e("SimpsonsVPN", "Erro ao retomar MainActivity: ${e.message}")
+        }
     }
 
     private fun startMainActivityLogic() {
@@ -193,31 +196,40 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun setupViewModel() {
-        mainViewModel.updateTestResultAction.observe(this) { setTestState(it) }
+        // Simpsons VPN: Observadores simplificados e protegidos contra crashes de UI
+        mainViewModel.updateTestResultAction.observe(this) { 
+            try { setTestState(it) } catch (e: Exception) {}
+        }
         mainViewModel.isRunning.observe(this) { isRunning ->
-            applyRunningState(false, isRunning)
+            try { applyRunningState(false, isRunning) } catch (e: Exception) {}
         }
         mainViewModel.updateListAction.observe(this) {
-            updateSelectedServerUI()
+            // Este observador pode disparar enquanto a LocationsActivity está aberta.
+            // Apenas actualizamos se a MainActivity estiver visível.
+            try { updateSelectedServerUI() } catch (e: Exception) {}
         }
         mainViewModel.startListenBroadcast()
         mainViewModel.initAssets(assets)
     }
 
     private fun updateSelectedServerUI() {
-        val guid = MmkvManager.getSelectServer()
-        if (guid.isNullOrEmpty()) {
-            binding.tvServerName.text = "SELECT SERVER"
-            binding.tvServerPing.text = "Ping: --"
-        } else {
-            val config = MmkvManager.decodeServerConfig(guid)
-            binding.tvServerName.text = config?.remarks ?: "UNKNOWN SERVER"
-            val aff = MmkvManager.decodeServerAffiliationInfo(guid)
-            binding.tvServerPing.text = if (aff != null && aff.testDelayMillis > 0) {
-                "Ping: ${aff.testDelayMillis}ms"
+        try {
+            val guid = MmkvManager.getSelectServer()
+            if (guid.isNullOrEmpty()) {
+                binding.tvServerName.text = "SELECT SERVER"
+                binding.tvServerPing.text = "Ping: --"
             } else {
-                "Ping: --"
+                val config = MmkvManager.decodeServerConfig(guid)
+                binding.tvServerName.text = config?.remarks ?: "UNKNOWN SERVER"
+                val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+                binding.tvServerPing.text = if (aff != null && aff.testDelayMillis > 0) {
+                    "Ping: ${aff.testDelayMillis}ms"
+                } else {
+                    "Ping: --"
+                }
             }
+        } catch (e: Exception) {
+            Log.e("SimpsonsVPN", "Erro ao atualizar UI do servidor: ${e.message}")
         }
     }
 
@@ -262,22 +274,26 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun setTestState(content: String?) {
-        binding.tvTestState.text = content?.uppercase() ?: "DISCONNECTED"
+        try {
+            binding.tvTestState.text = content?.uppercase() ?: "DISCONNECTED"
+        } catch (e: Exception) {}
     }
 
     private fun applyRunningState(isLoading: Boolean, isRunning: Boolean) {
-        if (isLoading) {
-            binding.ivPowerIcon.setImageResource(R.drawable.ic_fab_check)
-            return
-        }
-        if (isRunning) {
-            binding.ivPowerIcon.setImageResource(R.drawable.ic_stop_24dp)
-            binding.statusContainer.setBackgroundResource(R.drawable.bg_neobrutalist_status) 
-            setTestState("CONNECTED")
-        } else {
-            binding.ivPowerIcon.setImageResource(R.drawable.ic_play_24dp)
-            setTestState("DISCONNECTED")
-        }
+        try {
+            if (isLoading) {
+                binding.ivPowerIcon.setImageResource(R.drawable.ic_fab_check)
+                return
+            }
+            if (isRunning) {
+                binding.ivPowerIcon.setImageResource(R.drawable.ic_stop_24dp)
+                binding.statusContainer.setBackgroundResource(R.drawable.bg_neobrutalist_status) 
+                setTestState("CONNECTED")
+            } else {
+                binding.ivPowerIcon.setImageResource(R.drawable.ic_play_24dp)
+                setTestState("DISCONNECTED")
+            }
+        } catch (e: Exception) {}
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean = false
