@@ -239,11 +239,8 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
             val toPosition = mainViewModel.getPosition(guid)
             adapter.setSelectServer(fromPosition, toPosition)
 
-            // Apenas reinicia se a VPN estiver ligada E o servidor mudou
-            if (mainViewModel.isRunning.value == true) {
-                // Simpsons VPN: Reiniciar o serviço de forma segura para aplicar o novo servidor
-                MessageUtil.sendMsg2Service(ownerActivity, AppConfig.MSG_STATE_RESTART, "")
-            }
+            // Simpsons VPN: Apenas guardamos a seleção sem reiniciar o serviço.
+            // O utilizador pode reiniciar manualmente se desejar aplicar a mudança agora.
         }
         
         // Em qualquer caso (servidor novo ou igual), se estivermos na tela de Locations, fechamos para voltar à Home
