@@ -62,6 +62,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     private var tabMediator: TabLayoutMediator? = null
     private var debugClickCount = 0
     private val DEBUG_CLICK_THRESHOLD = 5
+    private var isServersLoaded = false
 
     private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
@@ -120,48 +121,55 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         mainViewModel.reloadServerList()
         updateSelectedServerUI()
 
-        // Carregar servidores automaticamente do GitHub
-        loadVpnServers()
+        // Carregar servidores automaticamente do GitHub apenas na primeira vez
+        if (!isServersLoaded) {
+            loadVpnServers()
+            isServersLoaded = true
+        }
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) { }
     }
 
     fun loadVpnServers() {
-        lifecycleScope.launch {
-            // Resetar info de debug no início de cada carregamento
-            debugViewModel.reset()
-            VpnConfigManager.debugUpdateCallback = { info ->
-                debugViewModel.debugInfo.postValue(info)
-            }
-
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // Exibir estado de carregamento na UI
-                setTestState("UPDATING SERVERS...")
-                debugViewModel.updateStatus("UPDATING SERVERS...")
-                
+                withContext(Dispatchers.Main) {
+                    debugViewModel.reset()
+                    setTestState("UPDATING SERVERS...")
+                    debugViewModel.updateStatus("UPDATING SERVERS...")
+                }
+
+                VpnConfigManager.debugUpdateCallback = { info ->
+                    debugViewModel.debugInfo.postValue(info)
+                }
+
                 // 1. Baixar e descriptografar servidores em memória
                 val servers = VpnConfigManager.getVpnServers()
                 
                 // 2. Importar para o Core do v2rayNG
                 VpnConfigManager.importServersToCore(servers)
                 
-                // 3. Atualizar a UI
-                mainViewModel.reloadServerList()
-                setupGroupTab()
-                
-                setTestState("SERVERS UPDATED")
-                debugViewModel.updateStatus("SERVERS UPDATED")
-                delay(2000)
-                setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
-                debugViewModel.updateStatus(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
-                
+                withContext(Dispatchers.Main) {
+                    // 3. Atualizar a UI
+                    mainViewModel.reloadServerList()
+                    setupGroupTab()
+                    
+                    setTestState("SERVERS UPDATED")
+                    debugViewModel.updateStatus("SERVERS UPDATED")
+                    delay(2000)
+                    setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
+                    debugViewModel.updateStatus(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
+                }
             } catch (e: Exception) {
                 Log.e("SimpsonsVPN", "Erro ao carregar servidores: ${e.message}")
                 withContext(Dispatchers.Main) {
-                    toast("Falha ao atualizar servidores. Verifique sua conexão.")
-                    setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
-                    debugViewModel.updateError(e.message ?: "Erro desconhecido")
-                    debugViewModel.updateStatus("ERROR")
+                    // Evitar toast se a actividade estiver a ser destruída
+                    if (!isFinishing) {
+                        toast("Falha ao atualizar servidores. Verifique sua conexão.")
+                        setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
+                        debugViewModel.updateError(e.message ?: "Erro desconhecido")
+                        debugViewModel.updateStatus("ERROR")
+                    }
                 }
             }
         }
