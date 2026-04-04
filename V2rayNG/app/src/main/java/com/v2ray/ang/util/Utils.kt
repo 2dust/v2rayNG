@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.os.Build
@@ -55,6 +56,16 @@ object Utils {
      */
     fun arrayFind(array: Array<out String>, value: String): Int {
         return array.indexOf(value)
+    }
+
+    /**
+     * Check if mobile data is enabled and active.
+     */
+    fun isMobileDataEnabled(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR)
     }
 
     /**

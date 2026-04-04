@@ -99,8 +99,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
         binding.fab.setOnClickListener { handleFabAction() }
         binding.serverSelectionCard.setOnClickListener { 
-            // Simular clique na aba de servidores ou abrir diálogo de importação
-            toast("Select Server")
+            // Abrir a lista de servidores para seleção
+            val intent = Intent(this, ServerActivity::class.java)
+            startActivity(intent)
         }
 
         // Gatilho para o painel de debug (Easter Egg)
@@ -117,6 +118,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         setupGroupTab()
         setupViewModel()
         mainViewModel.reloadServerList()
+        updateSelectedServerUI()
 
         // Carregar servidores automaticamente do GitHub
         loadVpnServers()
@@ -183,8 +185,28 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         mainViewModel.isRunning.observe(this) { isRunning ->
             applyRunningState(false, isRunning)
         }
+        mainViewModel.updateListAction.observe(this) {
+            updateSelectedServerUI()
+        }
         mainViewModel.startListenBroadcast()
         mainViewModel.initAssets(assets)
+    }
+
+    private fun updateSelectedServerUI() {
+        val guid = MmkvManager.getSelectServer()
+        if (guid.isNullOrEmpty()) {
+            binding.tvServerName.text = "SELECT SERVER"
+            binding.tvServerPing.text = "Ping: --"
+        } else {
+            val config = MmkvManager.decodeServerConfig(guid)
+            binding.tvServerName.text = config?.remarks ?: "UNKNOWN SERVER"
+            val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+            binding.tvServerPing.text = if (aff != null && aff.testDelayMillis > 0) {
+                "Ping: ${aff.testDelayMillis}ms"
+            } else {
+                "Ping: --"
+            }
+        }
     }
 
     private fun setupGroupTab() {
@@ -216,6 +238,10 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun startV2Ray() {
+        if (!Utils.isMobileDataEnabled(this)) {
+            toast("Please enable Mobile Data to connect")
+            return
+        }
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
             toast(R.string.title_file_chooser)
             return

@@ -178,17 +178,19 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/tv_server_name"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="SPRINGFIELD"
+                                android:text="SELECT SERVER"
                                 android:textColor="@color/black"
                                 android:textSize="20sp"
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_server_ping"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Ping: 12ms"
+                                android:text="Ping: --"
                                 android:textColor="#88000000"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
