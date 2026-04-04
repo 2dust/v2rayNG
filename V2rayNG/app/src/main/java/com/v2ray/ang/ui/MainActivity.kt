@@ -73,6 +73,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     // Bottom Sheet for Logs & Settings
     private var bottomSheetDialog: com.google.android.material.bottomsheet.BottomSheetDialog? = null
     private var tvLogsContent: android.widget.TextView? = null
+    
+    // Simpsons VPN: Controlo de carregamento inicial
+    private var isServersLoaded = false
 
     private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
