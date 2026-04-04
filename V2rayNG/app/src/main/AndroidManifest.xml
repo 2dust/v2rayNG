@@ -79,6 +79,10 @@
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged" />
         <activity
+            android:name=".ui.LocationsActivity"
+            android:exported="false"
+            android:theme="@style/AppThemeDayNight.NoActionBar" />
+        <activity
             android:name=".ui.ServerCustomConfigActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged" />

@@ -99,8 +99,8 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
         binding.fab.setOnClickListener { handleFabAction() }
         binding.serverSelectionCard.setOnClickListener { 
-            // Abrir a lista de servidores para seleção
-            val intent = Intent(this, ServerActivity::class.java)
+            // Abrir a lista de servidores (Locations) para seleção
+            val intent = Intent(this, LocationsActivity::class.java)
             startActivity(intent)
         }
 

@@ -81,33 +81,11 @@ class MainRecyclerAdapter(
             holder.itemMainBinding.tvSubscription.text = subRemarks
             holder.itemMainBinding.layoutSubscription.visibility = if (subRemarks.isEmpty()) View.GONE else View.VISIBLE
 
-            //layout
-            if (doubleColumnDisplay) {
-                holder.itemMainBinding.layoutShare.visibility = View.GONE
-                holder.itemMainBinding.layoutEdit.visibility = View.GONE
-                holder.itemMainBinding.layoutRemove.visibility = View.GONE
-                holder.itemMainBinding.layoutMore.visibility = View.VISIBLE
-
-                holder.itemMainBinding.layoutMore.setOnClickListener {
-                    adapterListener?.onShare(guid, profile, position, true)
-                }
-            } else {
-                holder.itemMainBinding.layoutShare.visibility = View.VISIBLE
-                holder.itemMainBinding.layoutEdit.visibility = View.VISIBLE
-                holder.itemMainBinding.layoutRemove.visibility = View.VISIBLE
-                holder.itemMainBinding.layoutMore.visibility = View.GONE
-
-                holder.itemMainBinding.layoutShare.setOnClickListener {
-                    adapterListener?.onShare(guid, profile, position, false)
-                }
-
-                holder.itemMainBinding.layoutEdit.setOnClickListener {
-                    adapterListener?.onEdit(guid, position, profile)
-                }
-                holder.itemMainBinding.layoutRemove.setOnClickListener {
-                    adapterListener?.onRemove(guid, position)
-                }
-            }
+            // Simpsons VPN: Botões de ação ocultos por padrão no layout
+            holder.itemMainBinding.layoutShare.visibility = View.GONE
+            holder.itemMainBinding.layoutEdit.visibility = View.GONE
+            holder.itemMainBinding.layoutRemove.visibility = View.GONE
+            holder.itemMainBinding.layoutMore.visibility = View.GONE
 
             holder.itemMainBinding.infoContainer.setOnClickListener {
                 adapterListener?.onSelectServer(guid)

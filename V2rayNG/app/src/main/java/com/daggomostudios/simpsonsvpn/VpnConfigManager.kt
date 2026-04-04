@@ -143,34 +143,44 @@ object VpnConfigManager {
 
     /**
      * Importa a lista de servidores para o MmkvManager do v2rayNG
+     * Protege a privacidade usando apenas o campo 'nome' do JSON e ocultando detalhes técnicos.
      */
     suspend fun importServersToCore(servers: List<VpnServerModel>) = withContext(Dispatchers.IO) {
         try {
-            val sb = StringBuilder()
+            val importedGuids = mutableListOf<Pair<String, String>>() // Pair(guid, customName)
+            
             for (server in servers) {
                 if (server.config.isNotBlank()) {
-                    sb.append(server.config.trim())
-                    sb.appendLine()
+                    // Importa um por um para capturar o GUID gerado e renomear imediatamente
+                    val (count, _) = com.v2ray.ang.handler.AngConfigManager.importBatchConfig(server.config.trim(), "", true)
+                    if (count > 0) {
+                        // O v2rayNG adiciona ao início da lista, então o último importado é o primeiro da lista total
+                        val allServers = com.v2ray.ang.handler.MmkvManager.decodeAllServerList()
+                        if (allServers.isNotEmpty()) {
+                            val newGuid = allServers[0]
+                            importedGuids.add(newGuid to server.nome)
+                        }
+                    }
+                }
+            }
+
+            // Pós-processamento: Renomear e sanitizar cada servidor importado
+            for ((guid, customName) in importedGuids) {
+                val profile = com.v2ray.ang.handler.MmkvManager.decodeServerConfig(guid)
+                if (profile != null) {
+                    profile.remarks = customName
+                    profile.description = "Simpsons VPN Secure Connection" // Oculta IP/Porta/Expiração
+                    com.v2ray.ang.handler.MmkvManager.encodeServerConfig(guid, profile)
                 }
             }
             
-            val configText = sb.toString()
-            if (configText.isBlank()) {
-                Log.w(TAG, "Nenhuma configuração válida para importar.")
-                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", serversLoaded = "0", errorMessage = "Nenhuma configuração válida para importar."))
-                return@withContext
-            }
-
-            // Usamos o AngConfigManager para importar o lote de configurações
-            // O v2rayNG retorna um Pair(count, countSub)
-            val (count, _) = com.v2ray.ang.handler.AngConfigManager.importBatchConfig(configText, "", true)
-            
-            if (count > 0) {
-                Log.d(TAG, "$count servidores importados para o Core com sucesso.")
-                debugUpdateCallback?.invoke(DebugInfo(status = "Servidores importados", serversLoaded = count.toString()))
+            val totalCount = importedGuids.size
+            if (totalCount > 0) {
+                Log.d(TAG, "$totalCount servidores importados e sanitizados com sucesso.")
+                debugUpdateCallback?.invoke(DebugInfo(status = "Servidores importados", serversLoaded = totalCount.toString()))
             } else {
-                Log.e(TAG, "O Core não conseguiu processar as configurações. Verifique o formato vmess/vless/etc.")
-                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", serversLoaded = "0", errorMessage = "Core não processou configs."))
+                Log.e(TAG, "Nenhum servidor foi importado. Verifique o formato das configurações.")
+                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", serversLoaded = "0", errorMessage = "Falha na importação."))
             }
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao importar servidores para o Core: ${e.message}")
