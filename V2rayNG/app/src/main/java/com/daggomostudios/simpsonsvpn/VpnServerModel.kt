@@ -3,6 +3,9 @@ package com.daggomostudios.simpsonsvpn
 import com.google.gson.annotations.SerializedName
 
 data class VpnServerModel(
+    @SerializedName("id")
+    val id: String,
+
     @SerializedName("nome")
     val nome: String,
     

@@ -28,8 +28,32 @@ object VpnConfigManager {
     // URL do GitHub Raw contendo o arquivo encriptado
     const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/sarlindom39/Muecaria/main/config.enc"
 
+    // Prefixo de chave no settingsStorage para mapear ID do servidor → GUID interno do v2rayNG
+    private const val KEY_VPN_ID_PREFIX = "SIMPSONS_VPN_ID_"
+
     // Callback para atualizar o painel de debug
     var debugUpdateCallback: ((DebugInfo) -> Unit)? = null
+
+    /**
+     * Guarda o mapeamento entre o ID do servidor VPN (do JSON) e o GUID interno do v2rayNG.
+     */
+    private fun saveVpnIdMapping(vpnId: String, guid: String) {
+        com.v2ray.ang.handler.MmkvManager.encodeSettings("$KEY_VPN_ID_PREFIX$vpnId", guid)
+    }
+
+    /**
+     * Obtém o GUID interno do v2rayNG associado a um ID do servidor VPN, ou null se não existir.
+     */
+    private fun getGuidForVpnId(vpnId: String): String? {
+        return com.v2ray.ang.handler.MmkvManager.decodeSettingsString("$KEY_VPN_ID_PREFIX$vpnId")
+    }
+
+    /**
+     * Remove o mapeamento de um ID do servidor VPN.
+     */
+    private fun removeVpnIdMapping(vpnId: String) {
+        com.v2ray.ang.handler.MmkvManager.encodeSettings("$KEY_VPN_ID_PREFIX$vpnId", null)
+    }
 
     /**
      * Baixa o arquivo encriptado, descriptografa em memória e faz o parsing do JSON
@@ -142,49 +166,112 @@ object VpnConfigManager {
     }
 
     /**
-     * Importa a lista de servidores para o MmkvManager do v2rayNG
+     * Importa/actualiza/remove servidores no MmkvManager do v2rayNG com base na lógica de IDs:
+     *
+     *  - ID termina em "rem" (ex: "001rem") → REMOVER a configuração correspondente do app.
+     *  - ID já existe localmente (mapeamento ID→GUID guardado) → ACTUALIZAR (subscrever) a configuração existente.
+     *  - ID novo (sem mapeamento local) → ADICIONAR como nova configuração.
+     *
      * Protege a privacidade usando apenas o campo 'nome' do JSON e ocultando detalhes técnicos.
      */
     suspend fun importServersToCore(servers: List<VpnServerModel>) = withContext(Dispatchers.IO) {
         try {
-            val importedGuids = mutableListOf<Pair<String, String>>() // Pair(guid, customName)
-            
+            var added = 0
+            var updated = 0
+            var removed = 0
+
             for (server in servers) {
-                if (server.config.isNotBlank()) {
-                    // Importa um por um para capturar o GUID gerado e renomear imediatamente
-                    val (count, _) = com.v2ray.ang.handler.AngConfigManager.importBatchConfig(server.config.trim(), "", true)
-                    if (count > 0) {
-                        // O v2rayNG adiciona ao início da lista, então o último importado é o primeiro da lista total
-                        val allServers = com.v2ray.ang.handler.MmkvManager.decodeAllServerList()
-                        if (allServers.isNotEmpty()) {
-                            val newGuid = allServers[0]
-                            importedGuids.add(newGuid to server.nome)
-                        }
+                val vpnId = server.id.trim()
+
+                // --- Lógica de REMOÇÃO: ID termina em "rem" ---
+                if (vpnId.endsWith("rem", ignoreCase = true)) {
+                    val baseId = vpnId.dropLast(3) // ex: "001rem" → "001"
+                    val existingGuid = getGuidForVpnId(baseId)
+                    if (existingGuid != null) {
+                        com.v2ray.ang.handler.MmkvManager.removeServer(existingGuid)
+                        removeVpnIdMapping(baseId)
+                        // Também limpar o mapeamento com o ID completo "rem" caso exista
+                        removeVpnIdMapping(vpnId)
+                        removed++
+                        Log.d(TAG, "Servidor '$baseId' (GUID: $existingGuid) removido.")
+                    } else {
+                        Log.w(TAG, "Servidor com ID base '$baseId' não encontrado para remoção.")
                     }
+                    continue
+                }
+
+                if (server.config.isBlank()) continue
+
+                val existingGuid = getGuidForVpnId(vpnId)
+
+                if (existingGuid != null) {
+                    // --- Lógica de ACTUALIZAÇÃO (subscrever): mesmo ID já existe ---
+                    val existingProfile = com.v2ray.ang.handler.MmkvManager.decodeServerConfig(existingGuid)
+                    if (existingProfile != null) {
+                        // Reimportar a configuração actualizada substituindo a entrada existente
+                        val (count, _) = com.v2ray.ang.handler.AngConfigManager.importBatchConfig(server.config.trim(), "", true)
+                        if (count > 0) {
+                            val allServers = com.v2ray.ang.handler.MmkvManager.decodeAllServerList()
+                            if (allServers.isNotEmpty()) {
+                                val newGuid = allServers[0]
+                                // Remover a entrada antiga e actualizar o mapeamento
+                                com.v2ray.ang.handler.MmkvManager.removeServer(existingGuid)
+                                val profile = com.v2ray.ang.handler.MmkvManager.decodeServerConfig(newGuid)
+                                if (profile != null) {
+                                    profile.remarks = server.nome
+                                    profile.description = "Simpsons VPN Secure Connection"
+                                    com.v2ray.ang.handler.MmkvManager.encodeServerConfig(newGuid, profile)
+                                }
+                                saveVpnIdMapping(vpnId, newGuid)
+                                updated++
+                                Log.d(TAG, "Servidor '$vpnId' actualizado (novo GUID: $newGuid).")
+                            }
+                        }
+                    } else {
+                        // O GUID guardado já não existe — tratar como novo
+                        removeVpnIdMapping(vpnId)
+                        importNewServer(server, vpnId)
+                        added++
+                    }
+                } else {
+                    // --- Lógica de ADIÇÃO: ID novo ---
+                    importNewServer(server, vpnId)
+                    added++
                 }
             }
 
-            // Pós-processamento: Renomear e sanitizar cada servidor importado
-            for ((guid, customName) in importedGuids) {
-                val profile = com.v2ray.ang.handler.MmkvManager.decodeServerConfig(guid)
-                if (profile != null) {
-                    profile.remarks = customName
-                    profile.description = "Simpsons VPN Secure Connection" // Oculta IP/Porta/Expiração
-                    com.v2ray.ang.handler.MmkvManager.encodeServerConfig(guid, profile)
-                }
-            }
-            
-            val totalCount = importedGuids.size
-            if (totalCount > 0) {
-                Log.d(TAG, "$totalCount servidores importados e sanitizados com sucesso.")
-                debugUpdateCallback?.invoke(DebugInfo(status = "Servidores importados", serversLoaded = totalCount.toString()))
-            } else {
-                Log.e(TAG, "Nenhum servidor foi importado. Verifique o formato das configurações.")
-                debugUpdateCallback?.invoke(DebugInfo(status = "Erro", serversLoaded = "0", errorMessage = "Falha na importação."))
-            }
+            Log.d(TAG, "Sincronização concluída: $added adicionados, $updated actualizados, $removed removidos.")
+            debugUpdateCallback?.invoke(
+                DebugInfo(
+                    status = "Sincronização concluída",
+                    serversLoaded = "${added + updated}"
+                )
+            )
+
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao importar servidores para o Core: ${e.message}")
             debugUpdateCallback?.invoke(DebugInfo(status = "Erro", errorMessage = "Erro ao importar para o Core: ${e.message}"))
+        }
+    }
+
+    /**
+     * Importa um servidor novo para o Core e guarda o mapeamento ID→GUID.
+     */
+    private fun importNewServer(server: VpnServerModel, vpnId: String) {
+        val (count, _) = com.v2ray.ang.handler.AngConfigManager.importBatchConfig(server.config.trim(), "", true)
+        if (count > 0) {
+            val allServers = com.v2ray.ang.handler.MmkvManager.decodeAllServerList()
+            if (allServers.isNotEmpty()) {
+                val newGuid = allServers[0]
+                val profile = com.v2ray.ang.handler.MmkvManager.decodeServerConfig(newGuid)
+                if (profile != null) {
+                    profile.remarks = server.nome
+                    profile.description = "Simpsons VPN Secure Connection"
+                    com.v2ray.ang.handler.MmkvManager.encodeServerConfig(newGuid, profile)
+                }
+                saveVpnIdMapping(vpnId, newGuid)
+                Log.d(TAG, "Servidor '$vpnId' adicionado (GUID: $newGuid).")
+            }
         }
     }
 }
