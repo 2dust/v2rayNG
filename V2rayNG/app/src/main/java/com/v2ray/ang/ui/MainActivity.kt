@@ -58,8 +58,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
     val mainViewModel: MainViewModel by viewModels()
     private val debugViewModel: DebugViewModel by viewModels()
-    private lateinit var groupPagerAdapter: GroupPagerAdapter
-    private var tabMediator: TabLayoutMediator? = null
+    // groupPagerAdapter e tabMediator removidos para estabilidade neobrutalista
     private var debugClickCount = 0
     private val DEBUG_CLICK_THRESHOLD = 5
     private var isServersLoaded = false
@@ -81,12 +80,21 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         startCloudAnimations()
         val pulseAnim = AnimationUtils.loadAnimation(this, R.anim.button_pulse)
         binding.fab.startAnimation(pulseAnim)
+        
+        startMainActivityLogic()
+    }
 
-        // setup viewpager and tablayout (Ocultos mas mantidos para lógica)
-        groupPagerAdapter = GroupPagerAdapter(this, emptyList())
-        binding.viewPager.adapter = groupPagerAdapter
-        binding.viewPager.isUserInputEnabled = true
+    override fun onResume() {
+        super.onResume()
+        // Simpsons VPN: Actualizar a UI sempre que voltamos para a MainActivity
+        // para garantir que o servidor selecionado aparece correctamente.
+        if (::binding.isInitialized) {
+            mainViewModel.reloadServerList()
+            updateSelectedServerUI()
+        }
+    }
 
+    private fun startMainActivityLogic() {
         binding.drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         binding.navView.setNavigationItemSelectedListener(this)
         
@@ -116,7 +124,6 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             }
         }
 
-        setupGroupTab()
         setupViewModel()
         mainViewModel.reloadServerList()
         updateSelectedServerUI()
@@ -152,7 +159,6 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 withContext(Dispatchers.Main) {
                     // 3. Atualizar a UI
                     mainViewModel.reloadServerList()
-                    setupGroupTab()
                     
                     setTestState("SERVERS UPDATED")
                     debugViewModel.updateStatus("SERVERS UPDATED")
@@ -217,17 +223,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         }
     }
 
-    private fun setupGroupTab() {
-        val groups = mainViewModel.getSubscriptions(this)
-        groupPagerAdapter.update(groups)
-        tabMediator?.detach()
-        tabMediator = TabLayoutMediator(binding.tabGroup, binding.viewPager) { tab, position ->
-            groupPagerAdapter.groups.getOrNull(position)?.let {
-                tab.text = it.remarks
-                tab.tag = it.id
-            }
-        }.also { it.attach() }
-    }
+    // setupGroupTab removido para evitar conflitos de fragmentos na MainActivity neobrutalista
 
     private fun handleFabAction() {
         applyRunningState(isLoading = true, isRunning = false)
