@@ -180,6 +180,11 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             startActivity(intent)
         }
 
+        binding.btnSettings.setOnClickListener {
+            // Futura aba de Definições
+            toast("Definições em breve! 🍩")
+        }
+
         // Gatilho para o painel de debug (Easter Egg)
         binding.headerContainer.setOnClickListener { // Usando o header_container como gatilho
             if (AngBuildConfig.DEBUG) {
@@ -349,15 +354,21 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         try {
             if (isLoading) {
                 binding.ivPowerIcon.setImageResource(R.drawable.ic_fab_check)
+                // Simpsons VPN: Amarelo durante o carregamento/ligação
+                binding.fab.setBackgroundResource(R.drawable.bg_neobrutalist_connect_button)
                 return
             }
             if (isRunning) {
                 binding.ivPowerIcon.setImageResource(R.drawable.ic_stop_24dp)
                 binding.statusContainer.setBackgroundResource(R.drawable.bg_neobrutalist_status) 
                 setTestState("CONNECTED")
+                // Simpsons VPN: Vermelho quando conectado (simboliza Desligar)
+                binding.fab.setBackgroundResource(R.drawable.bg_neobrutalist_fab_connected)
             } else {
                 binding.ivPowerIcon.setImageResource(R.drawable.ic_play_24dp)
                 setTestState("DISCONNECTED")
+                // Simpsons VPN: Amarelo quando desligado
+                binding.fab.setBackgroundResource(R.drawable.bg_neobrutalist_connect_button)
             }
         } catch (e: Exception) {}
     }

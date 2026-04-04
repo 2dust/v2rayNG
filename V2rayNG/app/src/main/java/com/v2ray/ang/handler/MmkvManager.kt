@@ -670,6 +670,15 @@ object MmkvManager {
     }
 
     /**
+     * Decodes all settings keys.
+     *
+     * @return The list of all settings keys.
+     */
+    fun decodeSettingsAllKeys(): Array<String>? {
+        return settingsStorage.allKeys()
+    }
+
+    /**
      * Decodes the settings string set.
      *
      * @param key The settings key.

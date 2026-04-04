@@ -241,6 +241,21 @@ object VpnConfigManager {
             }
 
             Log.d(TAG, "Sincronização concluída: $added adicionados, $updated actualizados, $removed removidos.")
+            
+            // --- Lógica de ORDENAÇÃO FIXA por ID ---
+            // Reordenar a lista global do v2rayNG com base na ordem dos IDs (001, 002, ...)
+            val allVpnIds = com.v2ray.ang.handler.MmkvManager.decodeSettingsAllKeys()
+                ?.filter { it.startsWith(KEY_VPN_ID_PREFIX) }
+                ?.map { it.removePrefix(KEY_VPN_ID_PREFIX) }
+                ?.filter { !it.endsWith("rem", ignoreCase = true) }
+                ?.sorted() ?: emptyList() // Ordenar por ID: 001, 002, 003...
+
+            val sortedGuids = allVpnIds.mapNotNull { getGuidForVpnId(it) }
+            if (sortedGuids.isNotEmpty()) {
+                com.v2ray.ang.handler.MmkvManager.encodeServerList(sortedGuids.toMutableList(), "")
+                Log.d(TAG, "Servidores reordenados por ID: $allVpnIds")
+            }
+
             debugUpdateCallback?.invoke(
                 DebugInfo(
                     status = "Sincronização concluída",
