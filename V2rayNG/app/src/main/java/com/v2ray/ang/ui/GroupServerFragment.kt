@@ -238,11 +238,8 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
             adapter.setSelectServer(fromPosition, toPosition)
 
             if (mainViewModel.isRunning.value == true) {
-                if (ownerActivity is MainActivity) {
-                    (ownerActivity as MainActivity).restartV2Ray()
-                } else if (ownerActivity is LocationsActivity) {
-                    (ownerActivity as LocationsActivity).restartV2Ray()
-                }
+                // Simpsons VPN: Usar o MessageUtil para reiniciar o serviço de forma segura e desacoplada
+                MessageUtil.sendMsg2Service(ownerActivity, AppConfig.MSG_STATE_RESTART, "")
             }
             
             // Simpsons VPN: Fechar a tela de seleção após escolher o servidor
@@ -298,11 +295,8 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
     }
 
     override fun onRefresh() {
-        if (ownerActivity is MainActivity) {
-            (ownerActivity as MainActivity).importConfigViaSub()
-        } else if (ownerActivity is LocationsActivity) {
-            (ownerActivity as LocationsActivity).importConfigViaSub()
-        }
+        // Simpsons VPN: A actualização agora é feita via MainViewModel para ser segura
+        mainViewModel.importConfigViaSub(ownerActivity)
         //binding.refreshLayout.isRefreshing = false
     }
 

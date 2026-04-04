@@ -55,12 +55,6 @@ class LocationsActivity : HelperBaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    // Métodos stubs para evitar o crash de casting em GroupServerFragment
-    public fun restartV2Ray() {
-        // No-op ou implementar se necessário em LocationsActivity
-    }
-
-    public fun importConfigViaSub() {
-        // No-op
-    }
+    // Simpsons VPN: O restartV2Ray e importConfigViaSub agora são desacoplados
+    // para evitar crashes de casting e garantir estabilidade total.
 }

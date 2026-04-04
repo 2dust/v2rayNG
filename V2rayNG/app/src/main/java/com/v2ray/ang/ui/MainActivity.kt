@@ -257,18 +257,8 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         V2RayServiceManager.startVService(this)
     }
 
-    /**
-     * Restarts V2Ray service. Used by GroupServerFragment.
-     */
-    public fun restartV2Ray() {
-        if (mainViewModel.isRunning.value == true) {
-            V2RayServiceManager.stopVService(this)
-        }
-        lifecycleScope.launch {
-            delay(500)
-            startV2Ray()
-        }
-    }
+    // Simpsons VPN: O restartV2Ray agora é feito via MessageUtil no fragmento
+    // para evitar crashes de casting e problemas de ciclo de vida.
 
     /**
      * Imports configuration via subscription. Used by GroupServerFragment.
