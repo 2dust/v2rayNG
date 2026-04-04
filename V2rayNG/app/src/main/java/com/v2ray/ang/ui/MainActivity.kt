@@ -24,12 +24,12 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayoutMediator
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.databinding.ActivityMainBinding
 import com.daggomostudios.simpsonsvpn.CrashHandler
 import android.widget.TextView
 import android.graphics.Typeface
 import android.view.Gravity
+import android.graphics.Color
 import android.widget.ScrollView
 import android.widget.LinearLayout
 import com.v2ray.ang.enums.EConfigType
@@ -51,7 +51,7 @@ import com.daggomostudios.simpsonsvpn.DebugPanelFragment
 import com.daggomostudios.simpsonsvpn.DebugViewModel
 import com.daggomostudios.simpsonsvpn.DebugInfo
 import com.daggomostudios.simpsonsvpn.VpnConfigManager
-import com.v2ray.ang.BuildConfig
+import com.v2ray.ang.BuildConfig as AngBuildConfig
 
 /**
  * MainActivity for Simpsons VPN
@@ -181,7 +181,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
         // Gatilho para o painel de debug (Easter Egg)
         binding.headerContainer.setOnClickListener { // Usando o header_container como gatilho
-            if (BuildConfig.DEBUG) {
+            if (AngBuildConfig.DEBUG) {
                 debugClickCount++
                 if (debugClickCount >= DEBUG_CLICK_THRESHOLD) {
                     DebugPanelFragment().show(supportFragmentManager, DebugPanelFragment.TAG)
