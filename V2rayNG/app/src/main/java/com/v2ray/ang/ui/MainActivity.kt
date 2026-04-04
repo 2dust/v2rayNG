@@ -1,7 +1,9 @@
 package com.v2ray.ang.ui
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
@@ -245,7 +247,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 }
 
                 // 1. Baixar e descriptografar servidores em memória
-                val servers = com.daggomostudios.simpsonsvpn.VpnConfigManager.getVpnServers(this@MainActivity)
+                val servers = com.daggomostudios.simpsonsvpn.VpnConfigManager.getVpnServers()
                 
                 if (servers != null && servers.isNotEmpty()) {
                     // 2. Importar para o Core do v2rayNG
@@ -271,7 +273,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun showNoDataDialog() {
-        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_AppCompat_Light_Dialog_Alert)
+        val dialog = AlertDialog.Builder(this)
             .setTitle(getString(R.string.dialog_no_data_title))
             .setMessage(getString(R.string.dialog_no_data_msg))
             .setCancelable(false)
@@ -280,19 +282,19 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             }
             .create()
         dialog.show()
-        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setTextColor(android.graphics.Color.BLACK)
-        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setBackgroundColor(android.graphics.Color.parseColor("#FFD428"))
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK)
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.parseColor("#FFD428"))
     }
 
     private fun showNoBalanceDialog() {
-        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_AppCompat_Light_Dialog_Alert)
+        val dialog = AlertDialog.Builder(this)
             .setTitle(getString(R.string.dialog_no_balance_title))
             .setMessage(getString(R.string.dialog_no_balance_msg))
             .setPositiveButton(getString(R.string.btn_ok), null)
             .create()
         dialog.show()
-        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setTextColor(android.graphics.Color.BLACK)
-        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setBackgroundColor(android.graphics.Color.parseColor("#FFD428"))
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK)
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.parseColor("#FFD428"))
     }
 
     private fun startCloudAnimations() {
