@@ -250,9 +250,10 @@ object AngConfigManager {
                 if (!append) {
                     MmkvManager.removeServerViaSubid(subid)
                 }
-                val keyToProfile = batchSaveConfigs(configs, subid)
-                val matchKey = findMatchedProfileKey(keyToProfile, removedSelected)
-                matchKey?.let { MmkvManager.setSelectServer(it) }
+                batchSaveConfigs(configs, subid)
+                // Simpsons VPN: Removed auto-selection to keep user's choice
+                // val matchKey = findMatchedProfileKey(keyToProfile, removedSelected)
+                // matchKey?.let { MmkvManager.setSelectServer(it) }
             }
 
             return configs.size
@@ -284,10 +285,13 @@ object AngConfigManager {
 
             if (!serverList.contains(key)) {
                 serverList.add(0, key)
+                // Simpsons VPN: Removed auto-selection of first server
+                /*
                 if (needSetSelected) {
                     MmkvManager.setSelectServer(key)
                     needSetSelected = false
                 }
+                */
             }
             keyToProfile[key] = config
         }

@@ -324,7 +324,17 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             try { updateSelectedServerUI() } catch (e: Exception) {}
         }
         mainViewModel.vpnLog.observe(this) { log ->
-            try { tvLogsContent?.text = log } catch (e: Exception) {}
+            try { 
+                if (tvLogsContent != null) {
+                    tvLogsContent?.text = log
+                    
+                    // Auto-scroll para o fim
+                    val scrollView = tvLogsContent?.parent as? android.widget.ScrollView
+                    scrollView?.post {
+                        scrollView.fullScroll(android.view.View.FOCUS_DOWN)
+                    }
+                }
+            } catch (e: Exception) {}
         }
         mainViewModel.startListenBroadcast()
         mainViewModel.initAssets(assets)
@@ -392,8 +402,14 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         val layoutSettings = view.findViewById<android.view.View>(R.id.layout_settings_content)
         tvLogsContent = view.findViewById<android.widget.TextView>(R.id.tv_logs_content)
 
-        // Restaurar logs se o serviço estiver a correr
-        tvLogsContent?.text = mainViewModel.vpnLog.value ?: "[System] Waiting for connection..."
+        // Restaurar logs se o serviço estiver a correr ou mostrar info do dispositivo
+        if (mainViewModel.vpnLog.value != null) {
+            tvLogsContent?.text = mainViewModel.vpnLog.value
+        } else {
+            val deviceInfo = "[${java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date())}] " +
+                "Running on ${android.os.Build.MODEL} (${android.os.Build.BOARD}), Android ${android.os.Build.VERSION.RELEASE} API ${android.os.Build.VERSION.SDK_INT}"
+            tvLogsContent?.text = deviceInfo
+        }
 
         tvTabLogs.setOnClickListener {
             tvTabLogs.setBackgroundResource(R.drawable.bg_neobrutalist_card_selected)

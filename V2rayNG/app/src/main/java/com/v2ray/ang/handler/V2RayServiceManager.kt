@@ -351,6 +351,10 @@ object V2RayServiceManager {
          * @return Always returns 0.
          */
         override fun onEmitStatus(l: Long, s: String?): Long {
+            val service = getService() ?: return 0
+            if (s != null) {
+                MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_LOG, s)
+            }
             return 0
         }
     }

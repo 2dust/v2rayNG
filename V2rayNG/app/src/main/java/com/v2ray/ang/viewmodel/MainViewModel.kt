@@ -527,7 +527,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 AppConfig.MSG_STATE_LOG -> {
                     val content = intent.getStringExtra("content")
                     if (content != null) {
-                        vpnLog.value = content
+                        val timestamp = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+                        val formattedLog = "[$timestamp] $content"
+                        val currentLogs = vpnLog.value ?: ""
+                        vpnLog.value = if (currentLogs.isEmpty()) formattedLog else "$currentLogs\n$formattedLog"
                     }
                 }
             }
