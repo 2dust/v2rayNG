@@ -168,6 +168,11 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         try {
             mainViewModel.reloadServerList()
             updateSelectedServerUI()
+            
+            // Simpsons VPN: Resetar o estado de "Updating Servers" se ficar preso ao voltar
+            if (binding.tvTestState.text == "UPDATING SERVERS...") {
+                setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
+            }
         } catch (e: Exception) {
             Log.e("SimpsonsVPN", "Erro ao retomar MainActivity: ${e.message}")
         }

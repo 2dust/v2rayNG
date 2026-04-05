@@ -181,16 +181,27 @@ object VpnConfigManager {
             var updated = 0
             var removed = 0
 
-            // Se a lista estiver vazia, adicionar o servidor especial "Clique para atualizar"
+            // Simpsons VPN: Sempre adicionar "Localização Inteligente" no topo
+            val smartLocation = VpnServerModel(
+                id = "000_smart_location",
+                nome = "🍩 Localização Inteligente",
+                protocolo = "vmess",
+                config = "vmess://eyJhZGQiOiIxMjcuMC4wLjEiLCJhaWQiOiIwIiwiYWxwaCI6IiIsImZwIjoiIiwiaG9zdCI6IiIsImlkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAwIiwiaW5zZWN1cmUiOiIwIiwibmV0Ijoid3MiLCJwYXRoIjoiLyIsInBvcnQiOiI4MCIsInBzIjoiTG9jYWxpemHDp8OjbyBJbnRlbGlnZW50ZSIsInNjeSI6ImF1dG8iLCJzbmkiOiIiLCJ0bHMiOiIiLCJ0eXBlIjoibm9uZSIsInYiOiIyIn0="
+            )
+
+            // Se a lista estiver vazia, adicionar também o servidor especial "Clique para atualizar"
             val finalServers = if (servers.isEmpty()) {
-                listOf(VpnServerModel(
-                    id = "000_update",
-                    nome = "🍩 Clique para atualizar os servidores",
-                    protocolo = "vmess",
-                    config = "vmess://eyJhZGQiOiIxMjcuMC4wLjEiLCJhaWQiOiIwIiwiYWxwaCI6IiIsImZwIjoiIiwiaG9zdCI6IiIsImlkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAwIiwiaW5zZWN1cmUiOiIwIiwibmV0Ijoid3MiLCJwYXRoIjoiLyIsInBvcnQiOiI4MCIsInBzIjoiQ2xpcXVlIHBhcmEgYXR1YWxpemFyIiwic2N5IjoiYXV0byIsInNuaSI6IiIsInRscyI6IiIsInR5cGUiOiJub25lIiwidiI6IjIifQ=="
-                ))
+                listOf(
+                    smartLocation,
+                    VpnServerModel(
+                        id = "000_update",
+                        nome = "🍩 Clique para atualizar os servidores",
+                        protocolo = "vmess",
+                        config = "vmess://eyJhZGQiOiIxMjcuMC4wLjEiLCJhaWQiOiIwIiwiYWxwaCI6IiIsImZwIjoiIiwiaG9zdCI6IiIsImlkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAwIiwiaW5zZWN1cmUiOiIwIiwibmV0Ijoid3MiLCJwYXRoIjoiLyIsInBvcnQiOiI4MCIsInBzIjoiQ2xpcXVlIHBhcmEgYXR1YWxpemFyIiwic2N5IjoiYXV0byIsInNuaSI6IiIsInRscyI6IiIsInR5cGUiOiJub25lIiwidiI6IjIifQ=="
+                    )
+                )
             } else {
-                servers
+                listOf(smartLocation) + servers
             }
 
             for (server in finalServers) {
@@ -267,6 +278,15 @@ object VpnConfigManager {
             if (sortedGuids.isNotEmpty()) {
                 com.v2ray.ang.handler.MmkvManager.encodeServerList(sortedGuids.toMutableList(), "")
                 Log.d(TAG, "Servidores reordenados por ID: $allVpnIds")
+
+                // Simpsons VPN: Definir Localização Inteligente como padrão se nada estiver selecionado
+                if (com.v2ray.ang.handler.MmkvManager.getSelectServer().isNullOrEmpty()) {
+                    val smartGuid = getGuidForVpnId("000_smart_location")
+                    if (smartGuid != null) {
+                        com.v2ray.ang.handler.MmkvManager.setSelectServer(smartGuid)
+                        Log.d(TAG, "Localização Inteligente definida como servidor padrão.")
+                    }
+                }
             }
 
             debugUpdateCallback?.invoke(

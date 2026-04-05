@@ -60,6 +60,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (isReceiverRegistered) return
         
         try {
+            // Simpsons VPN: Restaurar logs cacheados se existirem
+            vpnLog.value = MmkvManager.decodeSettingsString("vpn_logs_cache") ?: ""
+            
             isRunning.value = false
             val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY)
             ContextCompat.registerReceiver(getApplication(), mMsgReceiver, mFilter, Utils.receiverFlags())
@@ -499,6 +502,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                 AppConfig.MSG_STATE_STOP_SUCCESS -> {
                     isRunning.value = false
+                    // Simpsons VPN: Limpar logs apenas quando o serviço para
+                    vpnLog.value = ""
+                    MmkvManager.encodeSettings("vpn_logs_cache", "")
                 }
 
                 AppConfig.MSG_MEASURE_DELAY_SUCCESS -> {
@@ -530,7 +536,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         val timestamp = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
                         val formattedLog = "[$timestamp] $content"
                         val currentLogs = vpnLog.value ?: ""
-                        vpnLog.value = if (currentLogs.isEmpty()) formattedLog else "$currentLogs\n$formattedLog"
+                        val newLogs = if (currentLogs.isEmpty()) formattedLog else "$currentLogs\n$formattedLog"
+                        vpnLog.value = newLogs
+                        // Simpsons VPN: Persistir logs para manter entre recriações de Activity
+                        MmkvManager.encodeSettings("vpn_logs_cache", newLogs)
                     }
                 }
             }

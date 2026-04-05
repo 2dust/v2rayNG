@@ -182,6 +182,21 @@ object V2rayConfigManager {
      */
     private fun getV2rayNormalConfig(context: Context, guid: String, config: ProfileItem): ConfigResult {
         val result = ConfigResult(false)
+        
+        // Simpsons VPN: Se for Localização Inteligente, usar lógica de balanceamento (Least Ping)
+        if (config.remarks == "🍩 Localização Inteligente") {
+            val allServers = MmkvManager.decodeAllServerList()
+                .mapNotNull { MmkvManager.decodeServerConfig(it) }
+                .filter { it.remarks != "🍩 Localização Inteligente" && it.remarks != "🍩 Clique para atualizar os servidores" }
+            
+            if (allServers.isNotEmpty()) {
+                val v2rayConfig = getV2rayMultipleConfig(context, config, allServers) ?: return result
+                result.status = true
+                result.content = JsonUtil.toJsonPretty(v2rayConfig) ?: ""
+                result.guid = guid
+                return result
+            }
+        }
 
         val address = config.server ?: return result
         if (!Utils.isPureIpAddress(address)) {
