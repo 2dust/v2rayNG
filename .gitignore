@@ -20,6 +20,7 @@ V2rayNG/app/release/output.json
 V2rayNG/app/build
 V2rayNG/build
 V2rayNG/local.properties
+V2rayNG/gradle/gradle-daemon-jvm.properties
 
 # Ignore APK and AAR files
 *.apk

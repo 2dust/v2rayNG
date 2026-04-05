@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -63,7 +65,7 @@ android {
 
     sourceSets {
         getByName("main") {
-            jniLibs.srcDirs("libs")
+            jniLibs.directories.add("libs")
         }
     }
 
@@ -193,4 +195,69 @@ dependencies {
     testImplementation(libs.org.mockito.mockito.inline)
     testImplementation(libs.mockito.kotlin)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+}
+
+// builds hev and libXrayLite if not already built
+val repoRoot = rootProject.projectDir.parentFile ?: error("Expected git repo root above ${rootProject.projectDir}")
+
+fun readAndroidSdkDir(): File {
+    val lp = rootProject.projectDir.resolve("local.properties")
+    check(lp.isFile) { "Create V2rayNG/local.properties with sdk.dir (Android Studio does this when you open the project)." }
+    val props = Properties().apply { lp.reader().use { load(it) } }
+    val raw = props.getProperty("sdk.dir")?.trim() ?: error("sdk.dir missing in local.properties")
+    return File(raw).absoluteFile.also { check(it.isDirectory) { "SDK path does not exist: $it" } }
+}
+
+fun readNdkDir(sdkDir: File): File {
+    System.getenv("NDK_HOME")?.trim()?.takeIf { it.isNotEmpty() }?.let { File(it) }
+        ?.takeIf { it.isDirectory }?.let { return it.absoluteFile }
+    System.getenv("ANDROID_NDK_HOME")?.trim()?.takeIf { it.isNotEmpty() }?.let { File(it) }
+        ?.takeIf { it.isDirectory }?.let { return it.absoluteFile }
+    val ver = (findProperty("v2rayN.ndkVersion") as? String)?.trim()?.takeIf { it.isNotEmpty() }
+        ?: "28.2.13676358"
+    val ndk = File(sdkDir, "ndk/$ver")
+    check(ndk.isDirectory) { "Install Android NDK $ver or set NDK_HOME / ANDROID_NDK_HOME" }
+    return ndk.absoluteFile
+}
+
+val nativeSdkDir = lazy { readAndroidSdkDir() }
+val nativeNdkDir = lazy { readNdkDir(nativeSdkDir.value) }
+
+val hevtunSoOutputs = listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64").map { abi ->
+    layout.projectDirectory.file("libs/$abi/libhev-socks5-tunnel.so").asFile
+}
+val libv2rayAarOutput = layout.projectDirectory.file("libs/libv2ray.aar").asFile
+
+tasks.register<Exec>("prepareNativeHevtun") {
+    group = "build"
+    description = "Runs compile-hevtun.sh when any hevtun .so is missing under app/libs."
+    onlyIf("hevtun .so missing") { hevtunSoOutputs.any { !it.isFile } }
+    workingDir = repoRoot
+    environment("NDK_HOME", nativeNdkDir.value.absolutePath)
+    commandLine("bash", repoRoot.resolve("compile-hevtun.sh").absolutePath)
+}
+
+tasks.register<Exec>("prepareNativeLibXray") {
+    group = "build"
+    description = "Runs compile-libxray.sh when libv2ray.aar is missing under app/libs."
+    onlyIf("libv2ray.aar missing") { !libv2rayAarOutput.isFile }
+    workingDir = repoRoot
+    environment(
+        mapOf(
+            "ANDROID_HOME" to nativeSdkDir.value.absolutePath,
+            "ANDROID_NDK_HOME" to nativeNdkDir.value.absolutePath,
+            "NDK_HOME" to nativeNdkDir.value.absolutePath,
+        ),
+    )
+    commandLine("bash", repoRoot.resolve("compile-libxray.sh").absolutePath)
+}
+
+rootProject.tasks.register("prepareNativeDeps") {
+    group = "build"
+    description = "Build native deps into app/libs (both scripts)."
+    dependsOn(tasks.named("prepareNativeHevtun"), tasks.named("prepareNativeLibXray"))
+}
+
+tasks.named("preBuild") {
+    dependsOn(tasks.named("prepareNativeHevtun"), tasks.named("prepareNativeLibXray"))
 }

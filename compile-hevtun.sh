@@ -37,5 +37,8 @@ ln -s "$__dir/hev-socks5-tunnel" jni/hev-socks5-tunnel
 mkdir -p "$__dir/libs"
 cp -r "$TMPDIR/libs/"* "$__dir/libs/"
 
+mkdir -p "$__dir/V2rayNG/app/libs"
+cp -R "$__dir/libs/." "$__dir/V2rayNG/app/libs/"
+
 popd
 rm -rf $TMPDIR
