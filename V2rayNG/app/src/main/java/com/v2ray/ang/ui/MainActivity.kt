@@ -251,7 +251,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 val isVpnConnected = mainViewModel.isRunning.value == true
                 
                 if (isVpnConnected) {
-                    Log.d(TAG, "VPN conectada, mas permitindo atualização mesmo assim...")
+                    android.util.Log.d("SimpsonsVPN", "VPN conectada, mas permitindo atualização mesmo assim...")
                 }
 
                 // Verificar conectividade
