@@ -99,7 +99,7 @@ jobs:
         java-version: '21'
 
     - name: Decode Keystore
-      if: ${{ env.KEYSTORE_BASE64 != '' }}
+      if: ${{ secrets.KEYSTORE_BASE64 != '' }}
       env:
         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
       run: |
@@ -140,7 +140,7 @@ jobs:
 
     - name: Upload to release
       uses: svenstaro/upload-release-action@v2
-      if: github.event.inputs.release_tag != ''
+      if: ${{ github.event.inputs.release_tag != '' && secrets.KEYSTORE_BASE64 != '' }}
       with:
         file: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*universal*.apk
         tag: ${{ github.event.inputs.release_tag }}
