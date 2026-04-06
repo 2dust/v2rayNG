@@ -247,6 +247,13 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
+                // Simpsons VPN: Permitir atualização mesmo com VPN conectada
+                val isVpnConnected = mainViewModel.isRunning.value == true
+                
+                if (isVpnConnected) {
+                    Log.d(TAG, "VPN conectada, mas permitindo atualização mesmo assim...")
+                }
+
                 // Verificar conectividade
                 val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
                 val activeNetwork = cm.activeNetworkInfo
@@ -274,17 +281,25 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                     
                     withContext(Dispatchers.Main) {
                         mainViewModel.reloadServerList()
-                        toast("Servidores atualizados com sucesso!")
+                        toast("Servidores atualizados com sucesso!(${servers.size} servidores)")
                         setTestState(if (mainViewModel.isRunning.value == true) "CONECTADO" else "DESCONECTADO")
                     }
-                } else if (isFirstRun) {
+                } else {
                     withContext(Dispatchers.Main) {
-                        showNoBalanceDialog()
+                        if (isFirstRun) {
+                            showNoBalanceDialog()
+                        } else {
+                            toast("Nenhum servidor encontrado. Tente novamente.")
+                        }
                         setTestState("FALHA NA ATUALIZAÇÃO")
                     }
                 }
             } catch (e: Exception) {
                 Log.e("SimpsonsVPN", "Erro ao carregar servidores: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    toast("Erro ao atualizar: ${e.message}")
+                    setTestState("ERRO: ${e.message}")
+                }
             }
         }
     }
