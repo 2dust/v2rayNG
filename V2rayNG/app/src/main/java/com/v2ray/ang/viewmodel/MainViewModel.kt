@@ -188,11 +188,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = updateConfigViaSubAll()
             withContext(Dispatchers.Main) {
-                if (result.configCount > 0) {
-                    context.toastSuccess(R.string.toast_success)
-                    reloadServerList()
-                } else {
-                    context.toastError(R.string.toast_failure)
+                when {
+                    result.configCount > 0 -> {
+                        context.toastSuccess(context.getString(R.string.toast_success) + " (${result.configCount} servidores)")
+                        reloadServerList()
+                    }
+                    result.skipCount > 0 -> {
+                        context.toastError("Nenhuma subscrição ativa. Ative uma subscrição nas definições.")
+                    }
+                    result.failureCount > 0 -> {
+                        context.toastError("Falha ao atualizar. Verifique a ligação à internet e a URL da subscrição.")
+                    }
+                    else -> {
+                        context.toastError("Erro desconhecido. Verifique as definições da subscrição.")
+                    }
                 }
             }
         }

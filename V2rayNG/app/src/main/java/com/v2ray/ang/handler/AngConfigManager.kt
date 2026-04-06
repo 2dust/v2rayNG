@@ -495,7 +495,9 @@ object AngConfigManager {
     fun updateConfigViaSubAll(): SubscriptionUpdateResult {
         return try {
             val subscriptions = MmkvManager.decodeSubscriptions()
+            Log.i(AppConfig.TAG, "updateConfigViaSubAll: Found ${subscriptions.size} subscriptions")
             subscriptions.fold(SubscriptionUpdateResult()) { acc, subscription ->
+                Log.d(AppConfig.TAG, "Processing subscription: ${subscription.subscription.remarks}")
                 acc + updateConfigViaSub(subscription)
             }
         } catch (e: Exception) {
@@ -514,6 +516,7 @@ object AngConfigManager {
         try {
             // Check if disabled
             if (!it.subscription.enabled) {
+                Log.w(AppConfig.TAG, "Subscription ${it.subscription.remarks} is disabled, skipping")
                 return SubscriptionUpdateResult(skipCount = 1)
             }
 
@@ -522,23 +525,28 @@ object AngConfigManager {
                 || TextUtils.isEmpty(it.subscription.remarks)
                 || TextUtils.isEmpty(it.subscription.url)
             ) {
+                Log.w(AppConfig.TAG, "Subscription missing required fields (guid/remarks/url)")
                 return SubscriptionUpdateResult(skipCount = 1)
             }
 
             val url = HttpUtil.toIdnUrl(it.subscription.url)
             if (!Utils.isValidUrl(url)) {
+                Log.w(AppConfig.TAG, "Invalid URL: $url")
                 return SubscriptionUpdateResult(failureCount = 1)
             }
             if (!it.subscription.allowInsecureUrl) {
                 if (!Utils.isValidSubUrl(url)) {
+                    Log.w(AppConfig.TAG, "Invalid subscription URL: $url")
                     return SubscriptionUpdateResult(failureCount = 1)
                 }
             }
-            Log.i(AppConfig.TAG, url)
+            Log.i(AppConfig.TAG, "Updating subscription: ${it.subscription.remarks}")
+            Log.i(AppConfig.TAG, "URL: $url")
             val userAgent = it.subscription.userAgent
 
             var configText = try {
                 val httpPort = SettingsManager.getHttpPort()
+                Log.d(AppConfig.TAG, "Attempting update via proxy on port: $httpPort")
                 HttpUtil.getUrlContentWithUserAgent(url, userAgent, 15000, httpPort)
             } catch (e: Exception) {
                 Log.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
@@ -546,6 +554,7 @@ object AngConfigManager {
             }
             if (configText.isEmpty()) {
                 configText = try {
+                    Log.d(AppConfig.TAG, "Falling back to direct connection")
                     HttpUtil.getUrlContentWithUserAgent(url, userAgent)
                 } catch (e: Exception) {
                     Log.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
@@ -553,6 +562,7 @@ object AngConfigManager {
                 }
             }
             if (configText.isEmpty()) {
+                Log.e(AppConfig.TAG, "Update subscription: Both proxy and direct connection failed")
                 return SubscriptionUpdateResult(failureCount = 1)
             }
 
