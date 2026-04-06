@@ -12,7 +12,7 @@
     <string name="pull_down_to_refresh">Puxe para baixo para atualizar servidores!</string>
     <string name="title_logs">Logs</string>
     <string name="title_settings_short">Definições</string>
-    <string name="server_select_prompt">SELECT SERVER</string>
+    <string name="server_select_prompt">SELECIONAR SERVIDOR</string>
     <string name="toast_settings_soon">Definições em breve!</string>
     <string name="toast_enable_mobile_data">Por favor, ligue os Dados Móveis para conectar</string>
     <string name="dialog_no_data_title">SEM INTERNET!</string>

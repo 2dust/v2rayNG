@@ -614,4 +614,27 @@ object Utils {
             ""
         }
     }
+
+    /**
+     * Get the first non-loopback IPv4 address of the device.
+     * @return The IPv4 address string, or null if not found.
+     */
+    fun getIpv4Address(): String? {
+        try {
+            val interfaces = java.net.NetworkInterface.getNetworkInterfaces()
+            while (interfaces.hasMoreElements()) {
+                val iface = interfaces.nextElement()
+                val addresses = iface.inetAddresses
+                while (addresses.hasMoreElements()) {
+                    val addr = addresses.nextElement()
+                    if (!addr.isLoopbackAddress && addr is java.net.Inet4Address) {
+                        return addr.hostAddress
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to get IPv4 address", e)
+        }
+        return null
+    }
 }

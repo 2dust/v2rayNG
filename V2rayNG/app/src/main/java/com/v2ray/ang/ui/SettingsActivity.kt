@@ -28,6 +28,7 @@ class SettingsActivity : BaseActivity() {
 
     class SettingsFragment : PreferenceFragmentCompat() {
 
+        private val forceUpdateServers by lazy { findPreference<androidx.preference.Preference>("pref_force_update_servers") }
         private val localDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_LOCAL_DNS_ENABLED) }
         private val fakeDns by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_FAKE_DNS_ENABLED) }
         private val appendHttpProxy by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_APPEND_HTTP_PROXY) }
@@ -110,6 +111,14 @@ class SettingsActivity : BaseActivity() {
 
             useHevTun?.setOnPreferenceChangeListener { _, newValue ->
                 updateHevTunSettings(newValue as Boolean)
+                true
+            }
+
+            forceUpdateServers?.setOnPreferenceClickListener {
+                (activity as? BaseActivity)?.let {
+                    com.v2ray.ang.handler.MmkvManager.encodeSettings("pref_first_run", true)
+                    it.toast("A atualização forçada será iniciada ao voltar para a tela principal")
+                }
                 true
             }
         }

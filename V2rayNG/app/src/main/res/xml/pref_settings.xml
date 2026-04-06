@@ -2,6 +2,29 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <PreferenceCategory android:title="Configurações Principais">
+        <ListPreference
+            android:defaultValue="auto"
+            android:entries="@array/language_select"
+            android:entryValues="@array/language_select_value"
+            android:key="pref_language"
+            android:summary="%s"
+            android:title="@string/title_language" />
+
+        <Preference
+            android:key="pref_force_update_servers"
+            android:summary="Clique para forçar a atualização da lista de servidores"
+            android:title="Atualizar Servidores (Forçada)" />
+
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/ui_mode_night"
+            android:entryValues="@array/ui_mode_night_value"
+            android:key="pref_ui_mode_night"
+            android:summary="%s"
+            android:title="@string/title_pref_ui_mode_night" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/title_ui_settings">
         <CheckBoxPreference
             android:key="pref_speed_enabled"
@@ -27,23 +50,6 @@
             android:key="pref_group_all_display"
             android:summary="@string/summary_pref_group_all_display"
             android:title="@string/title_pref_group_all_display" />
-
-        <ListPreference
-            android:defaultValue="auto"
-            android:entries="@array/language_select"
-            android:entryValues="@array/language_select_value"
-            android:key="pref_language"
-            android:summary="%s"
-            android:title="@string/title_language" />
-
-        <ListPreference
-            android:defaultValue="0"
-            android:entries="@array/ui_mode_night"
-            android:entryValues="@array/ui_mode_night_value"
-            android:key="pref_ui_mode_night"
-            android:summary="%s"
-            android:title="@string/title_pref_ui_mode_night" />
-
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_vpn_settings">
