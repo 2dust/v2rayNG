@@ -309,7 +309,6 @@
     <string name="tasker_setting_confirm">Confirmar</string>
     <string name="tasker_start_service">Iniciar Serviço</string>
     <string name="title_configuration_backup_restore">Backup e Restauro</string>
-    <string name="title_configuration_restore">Restaurar</string>
     <string name="title_del_all_config">Eliminar tudo</string>
     <string name="title_del_config_count">Eliminar %d</string>
     <string name="title_del_duplicate_config">Eliminar duplicados</string>
