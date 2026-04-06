@@ -4,12 +4,14 @@ import android.util.Log
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Proxy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.security.MessageDigest
 import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import java.net.InetSocketAddress
 
 object VpnConfigManager {
 
@@ -21,10 +23,23 @@ object VpnConfigManager {
             .toByteArray()
     }
 
+    // Porta do proxy local quando a VPN está conectada
+    private const val LOCAL_PROXY_PORT = 10808
+    
+    // Cliente HTTP normal (sem proxy)
     private val client = OkHttpClient.Builder()
         .followRedirects(true)
         .followSslRedirects(true)
         .build()
+    
+    // Cliente HTTP via proxy local (para usar quando VPN está conectada)
+    private fun createProxyClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .followRedirects(true)
+            .followSslRedirects(true)
+            .proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress("127.0.0.1", LOCAL_PROXY_PORT)))
+            .build()
+    }
     private val gson = Gson()
     private const val TAG = "VpnConfigManager"
 
@@ -61,13 +76,22 @@ object VpnConfigManager {
     /**
      * Baixa o arquivo encriptado, descriptografa em memória e faz o parsing do JSON
      * retornando a lista de servidores disponíveis.
+     * @param useProxy Se true, usa o proxy local (para quando VPN está conectada)
      */
-    suspend fun getVpnServers(): List<VpnServerModel> = withContext(Dispatchers.IO) {
+    suspend fun getVpnServers(useProxy: Boolean = false): List<VpnServerModel> = withContext(Dispatchers.IO) {
         debugUpdateCallback?.invoke(DebugInfo(status = "Iniciando carregamento..."))
 
         try {
-            Log.d(TAG, "Iniciando download de: $GITHUB_RAW_URL")
+            Log.d(TAG, "Iniciando download de: $GITHUB_RAW_URL (useProxy=$useProxy)")
             debugUpdateCallback?.invoke(DebugInfo(status = "Download iniciado", httpStatus = "Aguardando..."))
+
+            // Selecionar cliente HTTP (com ou sem proxy)
+            val httpClient = if (useProxy) {
+                debugUpdateCallback?.invoke(DebugInfo(status = "Usando proxy local...", httpStatus = "SOCKS 127.0.0.1:$LOCAL_PROXY_PORT"))
+                createProxyClient()
+            } else {
+                client
+            }
             
             // 1. Fazer um requisição HTTP GET para a URL
             val request = Request.Builder()
@@ -75,7 +99,7 @@ object VpnConfigManager {
                 .header("User-Agent", "Mozilla/5.0 SimpsonsVPN")
                 .build()
                 
-            val response = client.newCall(request).execute()
+            val response = httpClient.newCall(request).execute()
 
             if (!response.isSuccessful) {
                 Log.e(TAG, "Erro HTTP: ${response.code} - ${response.message}")

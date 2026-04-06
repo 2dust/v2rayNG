@@ -251,7 +251,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 val isVpnConnected = mainViewModel.isRunning.value == true
                 
                 if (isVpnConnected) {
-                    android.util.Log.d("SimpsonsVPN", "VPN conectada, mas permitindo atualização mesmo assim...")
+                    android.util.Log.d("SimpsonsVPN", "VPN conectada, usando proxy local para baixar servidores...")
                 }
 
                 // Verificar conectividade
@@ -270,8 +270,8 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                     setTestState("A ATUALIZAR...")
                 }
 
-                // 1. Baixar e descriptografar servidores em memória
-                val servers = com.daggomostudios.simpsonsvpn.VpnConfigManager.getVpnServers()
+                // 1. Baixar e descriptografar servidores em memória (via proxy se VPN conectada)
+                val servers = com.daggomostudios.simpsonsvpn.VpnConfigManager.getVpnServers(useProxy = isVpnConnected)
                 
                 if (servers != null && servers.isNotEmpty()) {
                     // 2. Importar para o Core do v2rayNG
