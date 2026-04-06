@@ -4,14 +4,14 @@ import android.util.Log
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Proxy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.security.MessageDigest
+import java.net.Proxy
+import java.net.InetSocketAddress
 import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
-import java.net.InetSocketAddress
 
 object VpnConfigManager {
 
