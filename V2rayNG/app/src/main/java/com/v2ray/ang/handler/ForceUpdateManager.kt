@@ -25,12 +25,13 @@ object ForceUpdateManager {
     private const val BLOCK_AFTER_DAYS = 15
     private const val VERSION_JSON_URL = "https://raw.githubusercontent.com/sarlindom39/Simpsons-VPN/master/version.json"
 
+    private const val PREF_LAST_DOWNLOAD_URL = "pref_last_download_url"
+
     data class RemoteVersion(
         val versionCode: Int = 0,
         val versionName: String = "",
         val downloadUrl: String = "",
-        val releaseNotes: String = "",
-        val forceUpdate: Boolean = false
+        val releaseNotes: String = ""
     )
 
     suspend fun checkForUpdate(): RemoteVersion? = withContext(Dispatchers.IO) {
@@ -53,7 +54,7 @@ object ForceUpdateManager {
 
             Log.d(TAG, "Remote version: ${remoteVersion.versionName} (code: ${remoteVersion.versionCode}), current: ${BuildConfig.VERSION_NAME} (code: ${BuildConfig.VERSION_CODE})")
 
-            if (remoteVersion.versionCode > BuildConfig.VERSION_CODE) {
+            if (compareVersions(remoteVersion.versionName, BuildConfig.VERSION_NAME) > 0) {
                 return@withContext remoteVersion
             }
 
@@ -107,6 +108,27 @@ object ForceUpdateManager {
             .remove(PREF_UPDATE_FIRST_SEEN)
             .remove(PREF_APP_BLOCKED)
             .apply()
+    }
+
+    private fun compareVersions(version1: String, version2: String): Int {
+        val v1 = version1.split(".")
+        val v2 = version2.split(".")
+        for (i in 0 until maxOf(v1.size, v2.size)) {
+            val num1 = if (i < v1.size) v1[i].toIntOrNull() ?: 0 else 0
+            val num2 = if (i < v2.size) v2[i].toIntOrNull() ?: 0 else 0
+            if (num1 != num2) return num1 - num2
+        }
+        return 0
+    }
+
+    fun saveLastDownloadUrl(context: Context, url: String) {
+        val prefs = context.getSharedPreferences("simpsons_vpn_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putString(PREF_LAST_DOWNLOAD_URL, url).apply()
+    }
+
+    fun getLastDownloadUrl(context: Context): String {
+        val prefs = context.getSharedPreferences("simpsons_vpn_prefs", Context.MODE_PRIVATE)
+        return prefs.getString(PREF_LAST_DOWNLOAD_URL, "https://mediafire.com") ?: "https://mediafire.com"
     }
 
     private fun clearAppData(context: Context) {

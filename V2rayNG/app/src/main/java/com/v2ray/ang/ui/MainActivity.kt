@@ -620,13 +620,15 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     private fun checkForceUpdate() {
         // Verificar se o app está bloqueado
         if (ForceUpdateManager.isAppBlocked(this)) {
-            ForceUpdateManager.showBlockedDialog(this, "https://mediafire.com")
+            val lastUrl = ForceUpdateManager.getLastDownloadUrl(this)
+            ForceUpdateManager.showBlockedDialog(this, lastUrl)
             return
         }
 
         lifecycleScope.launch {
             val remoteVersion = ForceUpdateManager.checkForUpdate()
             if (remoteVersion != null) {
+                ForceUpdateManager.saveLastDownloadUrl(this@MainActivity, remoteVersion.downloadUrl)
                 ForceUpdateManager.markUpdateFirstSeen(this@MainActivity)
 
                 if (ForceUpdateManager.checkAndBlockIfExpired(this@MainActivity)) {
