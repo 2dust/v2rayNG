@@ -30,11 +30,11 @@ android {
                         "arm64-v8a",
                         "armeabi-v7a"
                     )
-                    // Explicitly exclude emulator architectures
+                    // Explicitly exclude emulator architectures  
                     exclude("x86")
                     exclude("x86_64")
                 }
-                isUniversalApk = true // Enable universal APK with ARM only
+                isUniversalApk = true // Universal APK with only ARM
             }
         }
 
