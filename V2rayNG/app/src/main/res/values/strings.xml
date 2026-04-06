@@ -325,7 +325,6 @@
     <string name="title_policy_group_subscription_filter">Filtro de grupo</string>
     <string name="title_policy_group_subscription_id">ID de grupo</string>
     <string name="title_policy_group_type">Tipo de grupo</string>
-    <string name="title_pref_feedback">Feedback</string>
     <string name="title_pref_local_dns_port">Porta DNS Local</string>
     <string name="title_pref_prefer_ipv6">Preferir IPv6</string>
     <string name="title_pref_promotion">Promoção</string>
