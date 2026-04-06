@@ -13,6 +13,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      HAS_KEYSTORE: ${{ secrets.KEYSTORE_BASE64 != '' }}
 
     steps:
     - name: Checkout code
@@ -99,14 +101,14 @@ jobs:
         java-version: '21'
 
     - name: Decode Keystore
-      if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+      if: env.HAS_KEYSTORE == 'true'
       env:
         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
       run: |
         echo "$KEYSTORE_BASE64" | base64 -d > ${{ github.workspace }}/V2rayNG/app/simpsons-vpn-keystore.jks
 
     - name: Build Signed Release APK
-      if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+      if: env.HAS_KEYSTORE == 'true'
       env:
         KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -117,7 +119,7 @@ jobs:
         ./gradlew assemblePlaystoreRelease
 
     - name: Build Debug APK (fallback when no keystore)
-      if: ${{ secrets.KEYSTORE_BASE64 == '' }}
+      if: env.HAS_KEYSTORE != 'true'
       run: |
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
@@ -126,21 +128,21 @@ jobs:
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
-      if: ${{ success() && secrets.KEYSTORE_BASE64 != '' }}
+      if: ${{ success() && env.HAS_KEYSTORE == 'true' }}
       with:
         name: SimpsonsVPN-Release
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*universal*.apk
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
-      if: ${{ success() && secrets.KEYSTORE_BASE64 == '' }}
+      if: ${{ success() && env.HAS_KEYSTORE != 'true' }}
       with:
         name: SimpsonsVPN-ARM
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/debug/*universal*.apk
 
     - name: Upload to release
       uses: svenstaro/upload-release-action@v2
-      if: ${{ github.event.inputs.release_tag != '' && secrets.KEYSTORE_BASE64 != '' }}
+      if: ${{ github.event.inputs.release_tag != '' && env.HAS_KEYSTORE == 'true' }}
       with:
         file: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*universal*.apk
         tag: ${{ github.event.inputs.release_tag }}
