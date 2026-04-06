@@ -44,6 +44,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.V2RayServiceManager
+import com.v2ray.ang.handler.ForceUpdateManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
@@ -273,6 +274,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         }
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) { }
+
+        // Verificar atualização forçada
+        checkForceUpdate()
     }
 
     fun loadVpnServers(force: Boolean = false) {
@@ -611,6 +615,33 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             binding.fab.setBackgroundResource(R.drawable.bg_neobrutalist_connect_button)
         }
         } catch (e: Exception) {}
+    }
+
+    private fun checkForceUpdate() {
+        // Verificar se o app está bloqueado
+        if (ForceUpdateManager.isAppBlocked(this)) {
+            val lastUrl = ForceUpdateManager.getLastDownloadUrl(this)
+            ForceUpdateManager.showBlockedDialog(this, lastUrl)
+            return
+        }
+
+        lifecycleScope.launch {
+            val remoteVersion = ForceUpdateManager.checkForUpdate()
+            if (remoteVersion != null) {
+                ForceUpdateManager.saveLastDownloadUrl(this@MainActivity, remoteVersion.downloadUrl)
+                ForceUpdateManager.markUpdateFirstSeen(this@MainActivity)
+
+                if (ForceUpdateManager.checkAndBlockIfExpired(this@MainActivity)) {
+                    ForceUpdateManager.showBlockedDialog(this@MainActivity, remoteVersion.downloadUrl)
+                } else {
+                    val daysRemaining = ForceUpdateManager.getDaysRemaining(this@MainActivity)
+                    ForceUpdateManager.showUpdateDialog(this@MainActivity, remoteVersion, daysRemaining)
+                }
+            } else {
+                // Sem atualização disponível — limpar estado de contagem
+                ForceUpdateManager.clearUpdateState(this@MainActivity)
+            }
+        }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean = false

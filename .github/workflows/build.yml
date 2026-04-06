@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       HAS_KEYSTORE: ${{ secrets.KEYSTORE_BASE64 != '' }}
+      HAS_GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
 
     steps:
     - name: Checkout code
@@ -99,6 +100,18 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '21'
+
+    - name: Decode google-services.json
+      if: env.HAS_GOOGLE_SERVICES == 'true'
+      env:
+        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+      run: |
+        echo "$GOOGLE_SERVICES_JSON" > ${{ github.workspace }}/V2rayNG/app/google-services.json
+
+    - name: Create placeholder google-services.json
+      if: env.HAS_GOOGLE_SERVICES != 'true'
+      run: |
+        echo '{"project_info":{"project_number":"","project_id":"","storage_bucket":""},"client":[{"client_info":{"mobilesdk_app_id":"1:000000000000:android:0000000000000000","android_client_info":{"package_name":"com.daggomostudios.simpsonsvpn"}},"oauth_client":[],"api_key":[{"current_key":""}],"services":{"appinvite_service":{"other_platform_oauth_client":[]}}}],"configuration_version":"1"}' > ${{ github.workspace }}/V2rayNG/app/google-services.json
 
     - name: Decode Keystore
       if: env.HAS_KEYSTORE == 'true'
