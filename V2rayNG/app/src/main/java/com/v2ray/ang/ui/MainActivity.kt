@@ -120,10 +120,20 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
     private fun showCrashAlert(log: String) {
         val context = this
-        val layout = LinearLayout(context).apply {
+
+        val outerLayout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(40, 40, 40, 40)
-            setBackgroundColor(ContextCompat.getColor(context, R.color.simpsons_yellow))
+            setPadding(0, 0, 0, 0)
+        }
+
+        val cardContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundResource(R.drawable.bg_neobrutalist_card)
+            setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(dpToPx(16), dpToPx(16), dpToPx(16), dpToPx(16)) }
         }
 
         val title = TextView(context).apply {
@@ -132,14 +142,15 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             setTypeface(null, Typeface.BOLD)
             setTextColor(Color.BLACK)
             gravity = Gravity.CENTER
-            setPadding(0, 0, 0, 30)
+            setPadding(0, 0, 0, dpToPx(12))
         }
 
         val scroll = ScrollView(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                800
+                dpToPx(300)
             )
+            setPadding(0, 0, 0, dpToPx(12))
         }
 
         val content = TextView(context).apply {
@@ -147,19 +158,42 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             textSize = 12f
             setTypeface(Typeface.MONOSPACE)
             setTextColor(Color.BLACK)
-            setBackgroundResource(R.drawable.bg_neobrutalist_card)
-            setPadding(20, 20, 20, 20)
+            setBackgroundResource(R.drawable.bg_neobrutalist_card_normal)
+            setPadding(dpToPx(10), dpToPx(10), dpToPx(10), dpToPx(10))
+        }
+
+        val button = TextView(context).apply {
+            text = "I UNDERSTAND"
+            textSize = 16f
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(Color.BLACK)
+            gravity = Gravity.CENTER
+            setBackgroundResource(R.drawable.bg_neobrutalist_card_selected)
+            setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
         }
 
         scroll.addView(content)
-        layout.addView(title)
-        layout.addView(scroll)
+        cardContainer.addView(title)
+        cardContainer.addView(scroll)
+        cardContainer.addView(button)
+        outerLayout.addView(cardContainer)
 
-        AlertDialog.Builder(context)
-            .setView(layout)
-            .setPositiveButton("I UNDERSTAND") { dialog, _ -> dialog.dismiss() }
+        val dialog = AlertDialog.Builder(context)
+            .setView(outerLayout)
             .setCancelable(false)
-            .show()
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        button.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     override fun onResume() {
@@ -243,7 +277,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
     fun loadVpnServers(force: Boolean = false) {
         val isFirstRun = MmkvManager.decodeSettingsBool(PREF_FIRST_RUN, true)
-        if (!force && !isFirstRun && isServersLoaded) return
+        if (!force && !isFirstRun) return
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -305,28 +339,100 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun showNoDataDialog() {
-        val dialog = AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_no_data_title))
-            .setMessage(getString(R.string.dialog_no_data_msg))
-            .setCancelable(false)
-            .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
-                loadVpnServers() // Tentar novamente
-            }
-            .create()
-        dialog.show()
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK)
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.parseColor("#FFD428"))
+        showCartoonDialog(
+            title = getString(R.string.dialog_no_data_title),
+            message = getString(R.string.dialog_no_data_msg),
+            buttonText = getString(R.string.btn_ok),
+            onButtonClick = { loadVpnServers(force = true) },
+            cancelable = false
+        )
     }
 
     private fun showNoBalanceDialog() {
-        val dialog = AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_no_balance_title))
-            .setMessage(getString(R.string.dialog_no_balance_msg))
-            .setPositiveButton(getString(R.string.btn_ok), null)
+        showCartoonDialog(
+            title = getString(R.string.dialog_no_balance_title),
+            message = getString(R.string.dialog_no_balance_msg),
+            buttonText = getString(R.string.btn_ok)
+        )
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density + 0.5f).toInt()
+    }
+
+    private fun showCartoonDialog(
+        title: String,
+        message: String,
+        buttonText: String,
+        onButtonClick: (() -> Unit)? = null,
+        cancelable: Boolean = true
+    ) {
+        val context = this
+
+        val layout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, 0, 0, 0)
+        }
+
+        val cardContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundResource(R.drawable.bg_neobrutalist_card)
+            setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(dpToPx(16), dpToPx(16), dpToPx(16), dpToPx(16)) }
+        }
+
+        val titleView = TextView(context).apply {
+            text = title
+            textSize = 22f
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(Color.BLACK)
+            gravity = Gravity.CENTER
+            setPadding(0, 0, 0, dpToPx(12))
+        }
+
+        val messageView = TextView(context).apply {
+            text = message
+            textSize = 16f
+            setTextColor(Color.BLACK)
+            gravity = Gravity.CENTER
+            setPadding(0, 0, 0, dpToPx(16))
+        }
+
+        val button = TextView(context).apply {
+            text = buttonText
+            textSize = 16f
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(Color.BLACK)
+            gravity = Gravity.CENTER
+            setBackgroundResource(R.drawable.bg_neobrutalist_card_selected)
+            setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+
+        cardContainer.addView(titleView)
+        cardContainer.addView(messageView)
+        cardContainer.addView(button)
+        layout.addView(cardContainer)
+
+        val dialog = AlertDialog.Builder(context)
+            .setView(layout)
+            .setCancelable(cancelable)
             .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        button.setOnClickListener {
+            dialog.dismiss()
+            onButtonClick?.invoke()
+        }
+
         dialog.show()
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK)
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.parseColor("#FFD428"))
     }
 
     private fun startCloudAnimations() {

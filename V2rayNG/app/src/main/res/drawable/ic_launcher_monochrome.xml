@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Shield outline -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M54,20 C54,20 28,28 28,28 C28,28 28,58 28,58 C28,74 54,90 54,90 C54,90 80,74 80,58 C80,58 80,28 80,28 C80,28 54,20 54,20 Z M54,24 C54,24 76,31 76,31 C76,31 76,58 76,58 C76,72 54,86 54,86 C54,86 32,72 32,58 C32,58 32,31 32,31 C32,31 54,24 54,24 Z" />
+    <!-- Globe circle -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M54,38 C45.2,38 38,45.2 38,54 C38,62.8 45.2,70 54,70 C62.8,70 70,62.8 70,54 C70,45.2 62.8,38 54,38 Z M54,41 C60.6,41 67,46.4 67,54 C67,61.6 60.6,67 54,67 C47.4,67 41,61.6 41,54 C41,46.4 47.4,41 54,41 Z" />
+    <!-- Globe horizontal line -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M39,53 L69,53 L69,55 L39,55 Z" />
+    <!-- Globe vertical ellipse -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M54,38 C50,38 47,45.2 47,54 C47,62.8 50,70 54,70 C58,70 61,62.8 61,54 C61,45.2 58,38 54,38 Z M54,41 C56.5,41 58,46.4 58,54 C58,61.6 56.5,67 54,67 C51.5,67 50,61.6 50,54 C50,46.4 51.5,41 54,41 Z" />
+</vector>
