@@ -23,7 +23,7 @@ object ForceUpdateManager {
     private const val PREF_UPDATE_FIRST_SEEN = "pref_force_update_first_seen"
     private const val PREF_APP_BLOCKED = "pref_app_blocked"
     private const val BLOCK_AFTER_DAYS = 15
-    private const val VERSION_JSON_URL = "https://raw.githubusercontent.com/sarlindom39/Simpsons-VPN/master/version.json"
+    private const val VERSION_JSON_URL = "https://raw.githubusercontent.com/sarlindom39/Muecaria/main/version.json"
 
     private const val PREF_LAST_DOWNLOAD_URL = "pref_last_download_url"
 
