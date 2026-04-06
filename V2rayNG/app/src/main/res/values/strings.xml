@@ -332,7 +332,6 @@
     <string name="title_service_restart">Reiniciar Serviço</string>
     <string name="title_sort_by_test_results">Ordenar por teste</string>
     <string name="title_sub_update">Atualizar subscrição</string>
-    <string name="title_tg_channel">Canal Telegram</string>
     <string name="title_update_config_count">Atualizar %d</string>
     <string name="title_update_subscription_no_subscription">Sem subscrição</string>
     <string name="title_update_subscription_result">Resultado da atualização</string>
