@@ -129,11 +129,11 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         val cardContainer = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundResource(R.drawable.bg_neobrutalist_card)
-            setPadding(48, 48, 48, 48)
+            setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { setMargins(32, 32, 32, 32) }
+            ).apply { setMargins(dpToPx(16), dpToPx(16), dpToPx(16), dpToPx(16)) }
         }
 
         val title = TextView(context).apply {
@@ -142,15 +142,15 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             setTypeface(null, Typeface.BOLD)
             setTextColor(Color.BLACK)
             gravity = Gravity.CENTER
-            setPadding(0, 0, 0, 24)
+            setPadding(0, 0, 0, dpToPx(12))
         }
 
         val scroll = ScrollView(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                800
+                dpToPx(300)
             )
-            setPadding(0, 0, 0, 24)
+            setPadding(0, 0, 0, dpToPx(12))
         }
 
         val content = TextView(context).apply {
@@ -159,7 +159,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             setTypeface(Typeface.MONOSPACE)
             setTextColor(Color.BLACK)
             setBackgroundResource(R.drawable.bg_neobrutalist_card_normal)
-            setPadding(20, 20, 20, 20)
+            setPadding(dpToPx(10), dpToPx(10), dpToPx(10), dpToPx(10))
         }
 
         val button = TextView(context).apply {
@@ -169,7 +169,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             setTextColor(Color.BLACK)
             gravity = Gravity.CENTER
             setBackgroundResource(R.drawable.bg_neobrutalist_card_selected)
-            setPadding(48, 24, 48, 24)
+            setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -343,7 +343,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             title = getString(R.string.dialog_no_data_title),
             message = getString(R.string.dialog_no_data_msg),
             buttonText = getString(R.string.btn_ok),
-            onButtonClick = { loadVpnServers() },
+            onButtonClick = { loadVpnServers(force = true) },
             cancelable = false
         )
     }
@@ -354,6 +354,10 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             message = getString(R.string.dialog_no_balance_msg),
             buttonText = getString(R.string.btn_ok)
         )
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density + 0.5f).toInt()
     }
 
     private fun showCartoonDialog(
@@ -373,11 +377,11 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         val cardContainer = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundResource(R.drawable.bg_neobrutalist_card)
-            setPadding(48, 48, 48, 48)
+            setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { setMargins(32, 32, 32, 32) }
+            ).apply { setMargins(dpToPx(16), dpToPx(16), dpToPx(16), dpToPx(16)) }
         }
 
         val titleView = TextView(context).apply {
@@ -386,7 +390,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             setTypeface(null, Typeface.BOLD)
             setTextColor(Color.BLACK)
             gravity = Gravity.CENTER
-            setPadding(0, 0, 0, 24)
+            setPadding(0, 0, 0, dpToPx(12))
         }
 
         val messageView = TextView(context).apply {
@@ -394,7 +398,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             textSize = 16f
             setTextColor(Color.BLACK)
             gravity = Gravity.CENTER
-            setPadding(0, 0, 0, 32)
+            setPadding(0, 0, 0, dpToPx(16))
         }
 
         val button = TextView(context).apply {
@@ -404,7 +408,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             setTextColor(Color.BLACK)
             gravity = Gravity.CENTER
             setBackgroundResource(R.drawable.bg_neobrutalist_card_selected)
-            setPadding(48, 24, 48, 24)
+            setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
