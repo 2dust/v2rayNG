@@ -98,16 +98,42 @@ jobs:
         distribution: 'temurin'
         java-version: '21'
 
-    - name: Build Universal ARM APK (armv7 + armv8)
+    - name: Decode Keystore
+      if: ${{ env.KEYSTORE_BASE64 != '' }}
+      env:
+        KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      run: |
+        echo "$KEYSTORE_BASE64" | base64 -d > ${{ github.workspace }}/V2rayNG/app/simpsons-vpn-keystore.jks
+
+    - name: Build Signed Release APK
+      if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+      env:
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      run: |
+        cd ${{ github.workspace }}/V2rayNG
+        echo "sdk.dir=${ANDROID_HOME}" > local.properties
+        chmod 755 gradlew
+        ./gradlew assemblePlaystoreRelease
+
+    - name: Build Debug APK (fallback when no keystore)
+      if: ${{ secrets.KEYSTORE_BASE64 == '' }}
       run: |
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
         chmod 755 gradlew
         ./gradlew assemblePlaystoreDebug
 
-    - name: Upload Universal ARM APK
+    - name: Upload Release APK
       uses: actions/upload-artifact@v4
-      if: ${{ success() }}
+      if: ${{ success() && secrets.KEYSTORE_BASE64 != '' }}
+      with:
+        name: SimpsonsVPN-Release
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*universal*.apk
+
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4
+      if: ${{ success() && secrets.KEYSTORE_BASE64 == '' }}
       with:
         name: SimpsonsVPN-ARM
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/debug/*universal*.apk
@@ -116,7 +142,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       if: github.event.inputs.release_tag != ''
       with:
-        file: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/debug/*universal*.apk
+        file: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*universal*.apk
         tag: ${{ github.event.inputs.release_tag }}
         file_glob: true
-        prerelease: true
+        prerelease: false
