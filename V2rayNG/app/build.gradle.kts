@@ -17,9 +17,6 @@ android {
             multiDexEnabled = true
 
             ndkVersion = "25.1.8937393"
-            ndk {
-                abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
-            }
 
         val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')
         splits {
