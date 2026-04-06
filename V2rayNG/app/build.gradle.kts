@@ -12,8 +12,8 @@ android {
         applicationId = "com.daggomostudios.simpsonsvpn"
         minSdk = 24
         targetSdk = 36
-        versionCode = 717
-        versionName = "2.0.17"
+        versionCode = 1
+        versionName = "1.0.0"
             multiDexEnabled = true
 
             ndkVersion = "25.1.8937393"
@@ -41,9 +41,19 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("simpsons-vpn-keystore.jks")
+            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
+            keyAlias = "simpsonsvpn"
+            keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
