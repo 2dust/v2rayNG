@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="Configurações Principais">
+    <PreferenceCategory android:title="Definições Principais">
         <ListPreference
             android:defaultValue="auto"
             android:entries="@array/language_select"

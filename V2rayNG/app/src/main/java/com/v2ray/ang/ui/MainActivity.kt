@@ -169,9 +169,16 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             mainViewModel.reloadServerList()
             updateSelectedServerUI()
             
-            // Simpsons VPN: Resetar o estado de "Updating Servers" se ficar preso ao voltar
-            if (binding.tvTestState.text == "UPDATING SERVERS...") {
-                setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
+            // Simpsons VPN: Resetar o estado de "A ATUALIZAR..." se ficar preso ao voltar
+            if (binding.tvTestState.text == "A ATUALIZAR...") {
+                setTestState(if (mainViewModel.isRunning.value == true) "CONECTADO" else "DESCONECTADO")
+            }
+
+            // Simpsons VPN: Verificar se a atualização forçada foi solicitada nas definições
+            val forceUpdate = MmkvManager.decodeSettingsBool("pref_first_run", false)
+            if (forceUpdate) {
+                MmkvManager.encodeSettings("pref_first_run", false)
+                loadVpnServers(force = true)
             }
         } catch (e: Exception) {
             Log.e("SimpsonsVPN", "Erro ao retomar MainActivity: ${e.message}")
@@ -202,6 +209,11 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             startActivity(intent)
         }
 
+        binding.btnRefreshServers.setOnClickListener {
+            it.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.shake))
+            loadVpnServers(force = true)
+        }
+
         // Header clicável para abrir Logs e Definições
         binding.headerContainer.setOnClickListener {
             it.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.shake))
@@ -229,9 +241,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) { }
     }
 
-    fun loadVpnServers() {
+    fun loadVpnServers(force: Boolean = false) {
         val isFirstRun = MmkvManager.decodeSettingsBool(PREF_FIRST_RUN, true)
-        if (!isFirstRun && isServersLoaded) return
+        if (!force && !isFirstRun && isServersLoaded) return
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -248,7 +260,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 }
 
                 withContext(Dispatchers.Main) {
-                    setTestState("UPDATING SERVERS...")
+                    setTestState("A ATUALIZAR...")
                 }
 
                 // 1. Baixar e descriptografar servidores em memória
@@ -262,13 +274,13 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                     
                     withContext(Dispatchers.Main) {
                         mainViewModel.reloadServerList()
-                        toast("Servidores actualizados com sucesso!")
-                        setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
+                        toast("Servidores atualizados com sucesso!")
+                        setTestState(if (mainViewModel.isRunning.value == true) "CONECTADO" else "DESCONECTADO")
                     }
                 } else if (isFirstRun) {
                     withContext(Dispatchers.Main) {
                         showNoBalanceDialog()
-                        setTestState("UPDATE FAILED")
+                        setTestState("FALHA NA ATUALIZAÇÃO")
                     }
                 }
             } catch (e: Exception) {
@@ -453,7 +465,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
     private fun setTestState(content: String?) {
         try {
-            binding.tvTestState.text = content?.uppercase() ?: "DISCONNECTED"
+            binding.tvTestState.text = content?.uppercase() ?: "DESCONECTADO"
         } catch (e: Exception) {}
     }
 
@@ -465,18 +477,18 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 binding.fab.setBackgroundResource(R.drawable.bg_neobrutalist_connect_button)
                 return
             }
-            if (isRunning) {
-                binding.ivPowerIcon.setImageResource(R.drawable.ic_stop_24dp)
-                binding.statusContainer.setBackgroundResource(R.drawable.bg_neobrutalist_status) 
-                setTestState("CONNECTED")
-                // Simpsons VPN: Vermelho quando conectado (simboliza Desligar)
-                binding.fab.setBackgroundResource(R.drawable.bg_neobrutalist_fab_connected)
-            } else {
-                binding.ivPowerIcon.setImageResource(R.drawable.ic_play_24dp)
-                setTestState("DISCONNECTED")
-                // Simpsons VPN: Amarelo quando desligado
-                binding.fab.setBackgroundResource(R.drawable.bg_neobrutalist_connect_button)
-            }
+        if (isRunning) {
+            binding.ivPowerIcon.setImageResource(R.drawable.ic_stop_24dp)
+            binding.statusContainer.setBackgroundResource(R.drawable.bg_neobrutalist_status) 
+            setTestState("CONECTADO")
+            // Simpsons VPN: Vermelho quando conectado (simboliza Desligar)
+            binding.fab.setBackgroundResource(R.drawable.bg_neobrutalist_fab_connected)
+        } else {
+            binding.ivPowerIcon.setImageResource(R.drawable.ic_play_24dp)
+            setTestState("DESCONECTADO")
+            // Simpsons VPN: Amarelo quando desligado
+            binding.fab.setBackgroundResource(R.drawable.bg_neobrutalist_connect_button)
+        }
         } catch (e: Exception) {}
     }
 

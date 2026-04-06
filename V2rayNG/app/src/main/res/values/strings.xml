@@ -35,11 +35,11 @@
     <!--ServerActivity-->
     <string name="title_server">Servidores</string>
     <string name="menu_item_add_config">Atualizar Lista</string>
-    <string name="menu_item_save_config">Guardar Config</string>
-    <string name="menu_item_edit_config">Editar Config</string>
-    <string name="menu_item_del_config">Remover Config</string>
+    <string name="menu_item_save_config">Guardar Configuração</string>
+    <string name="menu_item_edit_config">Editar Configuração</string>
+    <string name="menu_item_del_config">Remover Configuração</string>
     <string name="menu_item_import_config_qrcode">Importar QRcode</string>
-    <string name="menu_item_import_config_clipboard">Importar Clipboard</string>
+    <string name="menu_item_import_config_clipboard">Importar Área de Transferência</string>
     <string name="menu_item_import_config_local">Importar Ficheiro</string>
     <string name="menu_item_import_config_policy_group">Adicionar Grupo</string>
     <string name="menu_item_import_config_manually_vmess">Adicionar VMess</string>
@@ -105,7 +105,7 @@
     <string name="toast_none_data">Sem dados</string>
     <string name="toast_incorrect_protocol">Protocolo incorreto</string>
     <string name="toast_decoding_failed">Falha na descodificação</string>
-    <string name="title_file_chooser">Selecionar Config</string>
+    <string name="title_file_chooser">Selecionar Configuração</string>
     <string name="toast_require_file_manager">Instale um Gestor de Ficheiros.</string>
     <string name="server_customize_config">Configuração Personalizada</string>
     <string name="toast_config_file_invalid">Configuração Inválida</string>
@@ -117,7 +117,7 @@
     <string name="toast_malformed_josn">JSON malformado</string>
     <string name="server_lab_request_host6">Host (SNI)</string>
     <string name="toast_action_not_allowed">Ação não permitida</string>
-    <string name="server_obfs_password">Obfs password</string>
+    <string name="server_obfs_password">Palavra-passe Obfs</string>
     <string name="server_lab_port_hop">Port Hopping</string>
     <string name="server_lab_port_hop_interval">Intervalo Hopping</string>
     <string name="server_lab_bandwidth_down">Download (k/m/g/t)</string>
@@ -134,7 +134,7 @@
     <string name="menu_item_add_asset">Adicionar Asset</string>
     <string name="menu_item_add_file">Adicionar Ficheiros</string>
     <string name="menu_item_add_url">Adicionar URL</string>
-    <string name="menu_item_scan_qrcode">Scan QRcode</string>
+    <string name="menu_item_scan_qrcode">Digitalizar QRcode</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">Descarregar Ficheiros</string>
     <string name="title_user_asset_add_url">Adicionar URL Asset</string>
@@ -151,13 +151,13 @@
     <string name="switch_bypass_apps_mode">Modo Bypass</string>
     <string name="menu_item_select_proxy_app">Seleção automática</string>
     <string name="msg_downloading_content">A descarregar...</string>
-    <string name="menu_item_export_proxy_app">Exportar para Clipboard</string>
-    <string name="menu_item_import_proxy_app">Importar de Clipboard</string>
+    <string name="menu_item_export_proxy_app">Exportar para Área de Transferência</string>
+    <string name="menu_item_import_proxy_app">Importar da Área de Transferência</string>
     <string name="per_app_proxy_settings">Configurações por App</string>
     <string name="per_app_proxy_settings_enable">Ativar por App</string>
 
     <!-- Preferences -->
-    <string name="title_settings">Configurações</string>
+    <string name="title_settings">Definições</string>
     <string name="title_advanced">Avançadas</string>
     <string name="title_core_settings">Configurações Core</string>
     <string name="title_vpn_settings">Configurações VPN</string>
@@ -171,274 +171,78 @@
     <string name="title_pref_auto_sort_after_test">Ordenar após teste</string>
     <string name="summary_pref_auto_sort_after_test">Ordenar servidores por velocidade automaticamente.</string>
 
-    <string name="title_mux_settings">Mux Settings</string>
+    <string name="title_mux_settings">Definições Mux</string>
     <string name="title_pref_mux_enabled">Ativar Mux</string>
     <string name="summary_pref_mux_enabled">Pode aumentar a velocidade mas causar instabilidade.</string>
-    <string name="title_pref_mux_concurency">Conexões TCP (-1 a 1024)</string>
-    <string name="title_pref_mux_xudp_concurency">Conexões XUDP (-1 a 1024)</string>
-    <string name="title_pref_mux_xudp_quic">Tratamento QUIC em mux</string>
-    <string-array name="mux_xudp_quic_entries">
-        <item>rejeitar</item>
-        <item>permitir</item>
-        <item>ignorar</item>
-    </string-array>
+    <string name="title_pref_mux_concurency">Concorrência Mux</string>
+    <string name="title_pref_mux_xudp_concurency">Concorrência XUDP Mux</string>
+    <string name="title_pref_mux_xudp_quic">XUDP QUIC Mux</string>
 
-    <string name="title_pref_speed_enabled">Ativar Velocidade</string>
-    <string name="title_pref_vpn_mtu">VPN MTU (padrão 1500)</string>
+    <string name="title_fragment_settings">Definições Fragment</string>
+    <string name="title_pref_fragment_enabled">Ativar Fragment</string>
+    <string name="title_pref_fragment_packets">Pacotes Fragment</string>
+    <string name="title_pref_fragment_length">Comprimento Fragment</string>
+    <string name="title_pref_fragment_interval">Intervalo Fragment</string>
 
-    <string name="title_pref_domestic_dns">DNS Doméstico (Opcional)</string>
-    <string name="summary_pref_domestic_dns">DNS</string>
-
-    <string name="title_pref_dns_hosts">DNS hosts (Formato: domain:address,…)</string>
-    <string name="summary_pref_dns_hosts">domain:address,…</string>
-
-    <string name="title_pref_delay_test_url">URL Teste Atraso</string>
-    <string name="summary_pref_delay_test_url">Url</string>
-
-    <string name="title_pref_ip_api_url">URL Teste Info IP</string>
-    <string name="summary_pref_ip_api_url">Url</string>
-
-    <string name="title_pref_proxy_sharing_enabled">Permitir conexões LAN</string>
-    <string name="summary_pref_proxy_sharing_enabled">Partilhar a VPN com outros dispositivos na mesma rede.</string>
-    <string name="toast_warning_pref_proxysharing_short">Cuidado ao partilhar em redes públicas.</string>
-
-    <string name="title_pref_allow_insecure">Permitir Inseguro</string>
-    <string name="summary_pref_allow_insecure">Permitir conexões TLS inseguras por padrão.</string>
-
-    <string name="title_pref_socks_port">Porta Proxy Local</string>
-    <string name="summary_pref_socks_port">Porta do proxy local</string>
-
-    <string name="title_pref_local_dns_port">Porta DNS Local</string>
-    <string name="summary_pref_local_dns_port">Porta do DNS local</string>
-
+    <string name="title_ui_settings">Definições de Interface</string>
+    <string name="title_pref_speed_enabled">Mostrar velocidade</string>
+    <string name="summary_pref_speed_enabled">Mostrar velocidade de download/upload na notificação.</string>
     <string name="title_pref_confirm_remove">Confirmar remoção</string>
-    <string name="summary_pref_confirm_remove">Pedir confirmação antes de apagar uma configuração.</string>
-
-    <string name="title_pref_start_scan_immediate">Scan imediato</string>
-    <string name="summary_pref_start_scan_immediate">Abrir câmara para scan ao iniciar.</string>
-
-    <string name="title_pref_append_http_proxy">Anexar HTTP Proxy à VPN</string>
-    <string name="summary_pref_append_http_proxy">Otimização para Android 10+.</string>
-
-    <string name="title_pref_double_column_display">Exibição em duas colunas</string>
+    <string name="summary_pref_confirm_remove">Pedir confirmação antes de remover um servidor.</string>
+    <string name="title_pref_start_scan_immediate">Digitalizar imediatamente</string>
+    <string name="summary_pref_start_scan_immediate">Iniciar digitalização de QRcode ao abrir a câmara.</string>
+    <string name="title_pref_double_column_display">Coluna dupla</string>
     <string name="summary_pref_double_column_display">Mostrar lista de servidores em duas colunas.</string>
-
     <string name="title_pref_group_all_display">Mostrar todos os grupos</string>
-    <string name="summary_pref_group_all_display">Adicionar aba com todos os servidores.</string>
-
-    <!-- AboutActivity -->
-    <string name="title_pref_feedback">Feedback</string>
-    <string name="summary_pref_feedback">Reportar problemas no Simpsons VPN.</string>
-    <string name="summary_pref_tg_group">Grupo do Telegram</string>
-    <string name="toast_tg_app_not_found">Telegram não instalado</string>
-    <string name="title_privacy_policy">Política de Privacidade</string>
-    <string name="title_qr_code">QR code</string>
-    <string name="title_about">Sobre o Simpsons VPN</string>
-    <string name="title_source_code">Código Fonte</string>
-    <string name="title_oss_license">Licenças Open Source</string>
-    <string name="title_tg_channel">Canal do Telegram</string>
-
-    <string name="title_pref_promotion">Promoção</string>
-
-    <string name="title_pref_auto_update_subscription">Atualização automática</string>
-    <string name="summary_pref_auto_update_subscription">Atualizar lista de servidores automaticamente em segundo plano.</string>
-    <string name="title_pref_auto_update_interval">Intervalo de atualização (Minutos, Min 15)</string>
-
-    <string name="title_core_loglevel">Nível de Log</string>
-    <string name="title_outbound_domain_resolve_method">Método de resolução de domínio</string>
-    <string name="title_mode">Modo</string>
-    <string name="title_mode_help">Ajuda sobre modos</string>
+    <string name="summary_pref_group_all_display">Mostrar todos os grupos de subscrição na lista.</string>
     <string name="title_language">Idioma</string>
-    <string name="title_ui_settings">Configurações UI</string>
     <string name="title_pref_ui_mode_night">Modo Noite</string>
-    <string name="title_pref_use_hev_tunnel">Ativar Hev TUN</string>
-    <string name="summary_pref_use_hev_tunnel">Utilizar motor hev-socks5-tunnel para melhor performance.</string>
-    <string name="title_pref_hev_tunnel_loglevel">Hev Tun Log Level</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun timeout (segundos)</string>
 
-    <string name="title_logcat">Logs</string>
-    <string name="logcat_copy">Copiar</string>
-    <string name="logcat_clear">Limpar</string>
-    <string name="title_service_restart">Reiniciar Serviço</string>
-    <string name="title_del_all_config">Apagar Tudo</string>
-    <string name="title_del_duplicate_config">Apagar Duplicados</string>
-    <string name="title_del_invalid_config">Apagar Inválidos</string>
-    <string name="title_export_all">Exportar tudo para Clipboard</string>
-    <string name="title_sub_setting">Configuração de Grupos</string>
-    <string name="sub_setting_remarks">Nome</string>
-    <string name="sub_setting_url">URL do Servidor</string>
-    <string name="sub_setting_user_agent">User Agent</string>
-    <string name="sub_setting_filter">Filtro Regular</string>
-    <string name="sub_setting_enable">Ativar Atualização</string>
-    <string name="sub_auto_update">Ativar Auto-atualização</string>
-    <string name="sub_allow_insecure_url">Permitir HTTP Inseguro</string>
-    <string name="sub_setting_pre_profile">Configuração anterior</string>
-    <string name="sub_setting_next_profile">Próxima configuração</string>
-    <string name="sub_setting_pre_profile_tip">O nome deve ser único</string>
-    <string name="title_sub_update">Atualizar Servidores</string>
-    <string name="title_ping_all_server">Testar Latência</string>
-    <string name="title_real_ping_all_server">Testar Velocidade Real</string>
-    <string name="title_user_asset_setting">Ficheiros Asset</string>
-    <string name="title_sort_by_test_results">Ordenar por Velocidade</string>
-    <string name="title_filter_config">Filtrar</string>
-    <string name="filter_config_all">Todos</string>
-    <string name="title_del_duplicate_config_count">%d duplicados removidos</string>
-    <string name="title_del_config_count">%d configs removidas</string>
-    <string name="title_import_config_count">%d configs importadas</string>
-    <string name="title_export_config_count">%d configs exportadas</string>
-    <string name="title_update_config_count">%d configs atualizadas</string>
-    <string name="title_update_subscription_result">Atualização: %1$d configs (%2$d sucesso, %3$d falha)</string>
-    <string name="title_update_subscription_no_subscription">Nenhuma fonte de servidores configurada</string>
-    <string name="toast_server_not_found_in_group">Servidor não encontrado no grupo</string>
-    <string name="toast_fragment_not_available">Erro de visualização</string>
-    <string name="title_locate_selected_config">Localizar selecionado</string>
-
-    <string name="tasker_start_service">Ligar Simpsons VPN</string>
-    <string name="tasker_setting_confirm">Confirmar</string>
-
-    <!-- RoutingSettingActivity -->
-    <string name="routing_settings_domain_strategy">Estratégia de Domínio</string>
-    <string name="routing_settings_title">Regras de Rota</string>
-    <string name="routing_settings_tips">Separe por vírgulas (domain ou ip)</string>
-    <string name="routing_settings_save">Guardar</string>
-    <string name="routing_settings_delete">Limpar</string>
-    <string name="routing_settings_rule_title">Configurar Regras</string>
-    <string name="routing_settings_add_rule">Nova Regra</string>
-    <string name="routing_settings_import_predefined_rulesets">Importar Regras Predefinidas</string>
-    <string name="routing_settings_import_rulesets_tip">As regras atuais serão substituídas. Continuar?</string>
-    <string name="routing_settings_import_rulesets_from_clipboard">Importar de Clipboard</string>
-    <string name="routing_settings_import_rulesets_from_qrcode">Importar de QRcode</string>
-    <string name="routing_settings_export_rulesets_to_clipboard">Exportar para Clipboard</string>
-    <string name="routing_settings_locked">Bloqueado</string>
-    <string name="routing_settings_domain" translatable="false">domain</string>
-    <string name="routing_settings_ip" translatable="false">ip</string>
-    <string name="routing_settings_port" translatable="false">port</string>
-    <string name="routing_settings_protocol" translatable="false">protocol</string>
-    <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
-    <string name="routing_settings_network" translatable="false">network</string>
-    <string name="routing_settings_network_tip" translatable="false">[udp|tcp]</string>
-    <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
-
-    <string name="connection_test_pending">Verificar Conexão</string>
-    <string name="connection_test_testing">A testar...</string>
-    <string name="connection_test_testing_count">A testar %d configs...</string>
-    <string name="connection_test_available">Online: %dms</string>
-    <string name="connection_test_error">Erro de conexão: %s</string>
-    <string name="connection_test_fail">Sem Internet</string>
-    <string name="connection_test_error_status_code">Erro: #%d</string>
-    <string name="connection_connected">Conectado ao Simpsons VPN</string>
-    <string name="connection_not_connected">Desconectado</string>
-    <string name="connection_runing_task_left">Testes pendentes: %s</string>
-
-    <string name="import_subscription_success">Lista de Servidores Atualizada!</string>
-    <string name="import_subscription_failure">Falha ao atualizar lista</string>
-    <string name="title_fragment_settings">Configurações de Fragmento</string>
-    <string name="title_pref_fragment_packets">Pacotes de Fragmento</string>
-    <string name="title_pref_fragment_length">Comprimento (min-max)</string>
-    <string name="title_pref_fragment_interval">Intervalo (min-max)</string>
-    <string name="title_pref_fragment_enabled">Ativar Fragmentação</string>
-
-    <string name="update_check_for_update">Procurar Atualização</string>
-    <string name="update_already_latest_version">Já está na última versão</string>
-    <string name="update_new_version_found">Nova versão disponível: %s</string>
-    <string name="update_now">Atualizar agora</string>
-    <string name="update_check_pre_release">Verificar Pre-release</string>
-    <string name="update_checking_for_update">A procurar atualizações...</string>
-
-    <string name="title_policy_group_type">Tipo de Grupo</string>
-    <string name="title_policy_group_subscription_id">Da subscrição</string>
-    <string name="title_policy_group_subscription_filter">Filtro de Nome</string>
-
-    <!-- BackupActivity -->
-    <string name="title_configuration_backup_restore">Backup e Restauro</string>
-    <string name="title_configuration_backup">Fazer Backup</string>
-    <string name="title_configuration_restore">Restaurar Backup</string>
-    <string name="title_configuration_share">Partilhar Configuração</string>
-    <string name="title_webdav_config_setting">Configurações WebDAV</string>
-    <string name="title_webdav_config_setting_unknown">Configure o WebDAV primeiro.</string>
-    <string name="title_webdav_url">URL Servidor WebDAV</string>
-    <string name="title_webdav_user">Utilizador</string>
-    <string name="title_webdav_pass">Palavra-passe</string>
-    <string name="title_webdav_remote_path">Caminho Remoto</string>
-
-    <string-array name="share_method">
-        <item>QRcode</item>
-        <item>Exportar para clipboard</item>
-        <item>Exportar config completa</item>
-    </string-array>
-
-    <string-array name="share_method_more">
-        <item>QRcode</item>
-        <item>Exportar para clipboard</item>
-        <item>Exportar config completa</item>
-        <item>Editar</item>
-        <item>Apagar</item>
-    </string-array>
-
-    <string-array name="share_sub_method">
-        <item>QRcode</item>
-        <item>Exportar para clipboard</item>
-    </string-array>
-
-    <string-array name="mode_entries">
-        <item>VPN (Túnel Completo)</item>
-        <item>Apenas Proxy</item>
-    </string-array>
-
-    <string-array name="ui_mode_night">
-        <item>Seguir Sistema</item>
-        <item>Claro</item>
-        <item>Escuro</item>
-    </string-array>
-
-    <string-array name="preset_rulesets">
-        <item>Lista Branca China</item>
-        <item>Lista Negra China</item>
-        <item>Global</item>
-        <item>Lista Branca Irão</item>
-        <item>Lista Branca Rússia</item>
-    </string-array>
-
-    <string-array name="vpn_bypass_lan">
-        <item>Seguir Config</item>
-        <item>Bypass LAN</item>
-        <item>Não Bypass</item>
-    </string-array>
-
-    <string-array name="outbound_domain_resolve_method">
-        <item>Não resolver</item>
-        <item>Resolver e adicionar a Hosts</item>
-        <item>Resolver e substituir domínio</item>
-    </string-array>
-
-    <string-array name="policy_group_type">
-        <item>Menor Ping</item>
-        <item>Menor Carga</item>
-        <item>Aleatório</item>
-        <item>Round Robin</item>
-    </string-array>
-
-    <string-array name="config_backup_options">
-        <item>Local</item>
-        <item>WebDAV</item>
-    </string-array>
-
-    <!-- Restaurando strings para evitar erro de vinculação no pref_settings.xml -->
-    <string name="notification_action_stop_v2ray">Parar</string>
-    <string name="summary_pref_speed_enabled">Ativar medição de velocidade</string>
-    <string name="summary_pref_prefer_ipv6">Preferir IPv6</string>
-    <string name="title_pref_prefer_ipv6">Preferir IPv6</string>
-    <string name="summary_pref_local_dns_enabled">Ativar DNS Local</string>
-    <string name="title_pref_local_dns_enabled">Ativar DNS Local</string>
-    <string name="summary_pref_fake_dns_enabled">Ativar Fake DNS</string>
-    <string name="title_pref_fake_dns_enabled">Ativar Fake DNS</string>
-    <string name="summary_pref_remote_dns">DNS Remoto</string>
+    <string name="title_pref_local_dns_enabled">DNS Local</string>
+    <string name="summary_pref_local_dns_enabled">Utilizar DNS local para resolução de nomes.</string>
+    <string name="title_pref_fake_dns_enabled">Fake DNS</string>
+    <string name="summary_pref_fake_dns_enabled">Utilizar Fake DNS para melhorar a velocidade de conexão.</string>
+    <string name="title_pref_append_http_proxy">Anexar HTTP Proxy</string>
+    <string name="summary_pref_append_http_proxy">Anexar HTTP proxy às configurações de saída.</string>
     <string name="title_pref_vpn_dns">DNS da VPN</string>
     <string name="title_pref_vpn_bypass_lan">Bypass LAN</string>
-    <string name="title_pref_vpn_interface_address">Endereço da Interface VPN</string>
-    <string name="summary_pref_sniffing_enabled">Ativar Sniffing</string>
-    <string name="title_pref_sniffing_enabled">Ativar Sniffing</string>
-    <string name="summary_pref_route_only_enabled">Modo apenas rota</string>
-    <string name="title_pref_route_only_enabled">Modo apenas rota</string>
+    <string name="title_pref_vpn_interface_address">Endereço da Interface</string>
+    <string name="title_pref_vpn_mtu">MTU da VPN</string>
+    <string name="title_pref_use_hev_tunnel">Usar HEV Tunnel</string>
+    <string name="summary_pref_use_hev_tunnel">Utilizar túnel HEV para melhor performance.</string>
+    <string name="title_pref_hev_tunnel_loglevel">Log Level HEV</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">Timeout RW HEV</string>
+
+    <string name="title_pref_sniffing_enabled">Sniffing</string>
+    <string name="summary_pref_sniffing_enabled">Ativar sniffing de tráfego para roteamento.</string>
+    <string name="title_pref_route_only_enabled">Apenas Rota</string>
+    <string name="summary_pref_route_only_enabled">Utilizar apenas roteamento sem proxy.</string>
+    <string name="title_pref_proxy_sharing_enabled">Partilha de Proxy</string>
+    <string name="summary_pref_proxy_sharing_enabled">Permitir que outros dispositivos usem o proxy.</string>
+    <string name="title_pref_allow_insecure">Permitir Inseguro</string>
+    <string name="summary_pref_allow_insecure">Permitir conexões TLS inseguras.</string>
+    <string name="title_pref_socks_port">Porta SOCKS</string>
     <string name="title_pref_remote_dns">DNS Remoto</string>
+    <string name="summary_pref_remote_dns">Endereços DNS para servidores remotos.</string>
+    <string name="title_pref_domestic_dns">DNS Doméstico</string>
+    <string name="summary_pref_domestic_dns">Endereços DNS para sites locais.</string>
+    <string name="title_pref_dns_hosts">Hosts DNS</string>
+    <string name="summary_pref_dns_hosts">Mapeamento estático de hosts DNS.</string>
+    <string name="title_core_loglevel">Nível de Log Core</string>
+    <string name="title_outbound_domain_resolve_method">Resolução de Domínio Saída</string>
+
+    <string name="title_sub_setting">Definições de Subscrição</string>
+    <string name="title_pref_auto_update_subscription">Atualização Automática</string>
+    <string name="summary_pref_auto_update_subscription">Atualizar subscrições automaticamente em segundo plano.</string>
+    <string name="title_pref_auto_update_interval">Intervalo de Atualização</string>
+
+    <string name="title_pref_delay_test_url">URL de Teste de Atraso</string>
+    <string name="summary_pref_delay_test_url">URL utilizado para testar a latência da conexão.</string>
+    <string name="title_pref_ip_api_url">URL da API de IP</string>
+    <string name="summary_pref_ip_api_url">URL utilizado para obter o endereço IP externo.</string>
+    <string name="title_mode">Modo de Funcionamento</string>
+
+    <string name="connection_test_available">Disponível: %d ms</string>
+    <string name="connection_test_error">Erro: %s</string>
+    <string name="connection_test_error_status_code">Erro: Código de estado %d</string>
 </resources>
