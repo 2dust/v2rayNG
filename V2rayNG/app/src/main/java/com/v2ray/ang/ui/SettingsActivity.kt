@@ -115,9 +115,10 @@ class SettingsActivity : BaseActivity() {
             }
 
             forceUpdateServers?.setOnPreferenceClickListener {
-                (activity as? BaseActivity)?.let {
+                val baseActivity = activity as? BaseActivity
+                if (baseActivity != null) {
                     com.v2ray.ang.handler.MmkvManager.encodeSettings("pref_first_run", true)
-                    it.toast("A atualização forçada será iniciada ao voltar para a tela principal")
+                    baseActivity.toast("A atualização forçada será iniciada ao voltar para a tela principal")
                 }
                 true
             }
