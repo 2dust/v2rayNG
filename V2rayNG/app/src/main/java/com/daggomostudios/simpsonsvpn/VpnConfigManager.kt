@@ -21,7 +21,10 @@ object VpnConfigManager {
             .toByteArray()
     }
 
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .followRedirects(true)
+        .followSslRedirects(true)
+        .build()
     private val gson = Gson()
     private const val TAG = "VpnConfigManager"
 
@@ -184,7 +187,7 @@ object VpnConfigManager {
             // Simpsons VPN: Sempre adicionar "Localização Inteligente" no topo
             val smartLocation = VpnServerModel(
                 id = "000_smart_location",
-                nome = "🍩 Localização Inteligente",
+                nome = "Localização Inteligente",
                 protocolo = "vmess",
                 config = "vmess://eyJhZGQiOiIxMjcuMC4wLjEiLCJhaWQiOiIwIiwiYWxwaCI6IiIsImZwIjoiIiwiaG9zdCI6IiIsImlkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAwIiwiaW5zZWN1cmUiOiIwIiwibmV0Ijoid3MiLCJwYXRoIjoiLyIsInBvcnQiOiI4MCIsInBzIjoiTG9jYWxpemHDp8OjbyBJbnRlbGlnZW50ZSIsInNjeSI6ImF1dG8iLCJzbmkiOiIiLCJ0bHMiOiIiLCJ0eXBlIjoibm9uZSIsInYiOiIyIn0="
             )
@@ -195,7 +198,7 @@ object VpnConfigManager {
                     smartLocation,
                     VpnServerModel(
                         id = "000_update",
-                        nome = "🍩 Clique para atualizar os servidores",
+                        nome = "Clique para atualizar os servidores",
                         protocolo = "vmess",
                         config = "vmess://eyJhZGQiOiIxMjcuMC4wLjEiLCJhaWQiOiIwIiwiYWxwaCI6IiIsImZwIjoiIiwiaG9zdCI6IiIsImlkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAwIiwiaW5zZWN1cmUiOiIwIiwibmV0Ijoid3MiLCJwYXRoIjoiLyIsInBvcnQiOiI4MCIsInBzIjoiQ2xpcXVlIHBhcmEgYXR1YWxpemFyIiwic2N5IjoiYXV0byIsInNuaSI6IiIsInRscyI6IiIsInR5cGUiOiJub25lIiwidiI6IjIifQ=="
                     )

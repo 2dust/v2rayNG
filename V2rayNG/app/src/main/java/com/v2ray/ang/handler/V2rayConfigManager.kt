@@ -184,10 +184,10 @@ object V2rayConfigManager {
         val result = ConfigResult(false)
         
         // Simpsons VPN: Se for Localização Inteligente, usar lógica de balanceamento (Least Ping)
-        if (config.remarks == "🍩 Localização Inteligente") {
+        if (config.remarks == "Localização Inteligente") {
             val allServers = MmkvManager.decodeAllServerList()
                 .mapNotNull { MmkvManager.decodeServerConfig(it) }
-                .filter { it.remarks != "🍩 Localização Inteligente" && it.remarks != "🍩 Clique para atualizar os servidores" }
+                .filter { it.remarks != "Localização Inteligente" && it.remarks != "Clique para atualizar os servidores" }
             
             if (allServers.isNotEmpty()) {
                 val v2rayConfig = getV2rayMultipleConfig(context, config, allServers) ?: return result

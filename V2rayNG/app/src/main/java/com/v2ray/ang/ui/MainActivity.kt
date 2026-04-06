@@ -262,7 +262,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                     
                     withContext(Dispatchers.Main) {
                         mainViewModel.reloadServerList()
-                        toast("Servidores actualizados com sucesso! 🍩")
+                        toast("Servidores actualizados com sucesso!")
                         setTestState(if (mainViewModel.isRunning.value == true) "CONNECTED" else "DISCONNECTED")
                     }
                 } else if (isFirstRun) {
@@ -408,12 +408,18 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         tvLogsContent = view.findViewById<android.widget.TextView>(R.id.tv_logs_content)
 
         // Restaurar logs se o serviço estiver a correr ou mostrar info do dispositivo
-        if (mainViewModel.vpnLog.value != null) {
+        if (!mainViewModel.vpnLog.value.isNullOrEmpty()) {
             tvLogsContent?.text = mainViewModel.vpnLog.value
         } else {
-            val deviceInfo = "[${java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date())}] " +
-                "Running on ${android.os.Build.MODEL} (${android.os.Build.BOARD}), Android ${android.os.Build.VERSION.RELEASE} API ${android.os.Build.VERSION.SDK_INT}"
-            tvLogsContent?.text = deviceInfo
+            val timestamp = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+            val deviceInfo = "[$timestamp] ${android.os.Build.MODEL} | ${android.os.Build.VERSION.RELEASE} | ${android.os.Build.VERSION.SDK_INT} | ${android.os.Build.CPU_ABI.uppercase()}"
+            
+            // Tentar obter IP local
+            val localIp = Utils.getIpv4Address() ?: "Unknown"
+            val initialLog = "$deviceInfo\n[$timestamp] IP Local: $localIp"
+            
+            tvLogsContent?.text = initialLog
+            mainViewModel.vpnLog.value = initialLog
         }
 
         tvTabLogs.setOnClickListener {
