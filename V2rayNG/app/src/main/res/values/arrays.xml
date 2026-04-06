@@ -224,4 +224,69 @@
         <item>full</item>
     </string-array>
 
+    <string-array name="share_method">
+        <item>QR Code</item>
+        <item>Exportar para Área de Transferência</item>
+        <item>Exportar configuração completa</item>
+    </string-array>
+
+    <string-array name="share_method_more">
+        <item>QR Code</item>
+        <item>Exportar para Área de Transferência</item>
+        <item>Exportar configuração completa</item>
+        <item>Editar</item>
+        <item>Eliminar</item>
+    </string-array>
+
+    <string-array name="share_sub_method">
+        <item>QR Code</item>
+        <item>Exportar para Área de Transferência</item>
+    </string-array>
+
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>Apenas Proxy</item>
+    </string-array>
+
+    <string-array name="ui_mode_night">
+        <item>Seguir Sistema</item>
+        <item>Claro</item>
+        <item>Escuro</item>
+    </string-array>
+
+    <string-array name="preset_rulesets">
+        <item>Bypass Mainland</item>
+        <item>Blacklist</item>
+        <item>Global</item>
+    </string-array>
+
+    <string-array name="vpn_bypass_lan">
+        <item>Seguir Configuração</item>
+        <item>Bypass</item>
+        <item>Não Bypass</item>
+    </string-array>
+
+    <string-array name="outbound_domain_resolve_method">
+        <item>Não Resolver</item>
+        <item>Adicionar a DNS Hosts</item>
+        <item>Substituir IP</item>
+    </string-array>
+
+    <string-array name="policy_group_type">
+        <item>Menor Latência</item>
+        <item>Mais Estável</item>
+        <item>Aleatório</item>
+        <item>Round Robin</item>
+    </string-array>
+
+    <string-array name="config_backup_options">
+        <item>Local</item>
+        <item>WebDAV</item>
+    </string-array>
+
+    <string-array name="mux_xudp_quic_entries">
+        <item>Rejeitar</item>
+        <item>Permitir</item>
+        <item>Ignorar</item>
+    </string-array>
 </resources>
