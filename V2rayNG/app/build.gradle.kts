@@ -34,7 +34,7 @@ android {
                     exclude("x86")
                     exclude("x86_64")
                 }
-                isUniversalApk = false // No universal APK - only ARM separated
+                isUniversalApk = true // Universal APK with ARM only
             }
         }
 
