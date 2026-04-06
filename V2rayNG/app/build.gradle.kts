@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.services)
     id("com.jaredsburrows.license")
 }
 
@@ -182,6 +183,10 @@ dependencies {
 
     // Multidex Support
     implementation(libs.multidex)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 
     // Testing Libraries
     testImplementation(libs.junit)
