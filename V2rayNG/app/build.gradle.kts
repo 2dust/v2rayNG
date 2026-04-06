@@ -34,15 +34,7 @@ android {
                     exclude("x86")
                     exclude("x86_64")
                 }
-                isUniversalApk = true // Universal APK with ARM only
-            }
-        }
-        
-        // Exclude x86 libraries from final APK
-        packaging {
-            jniLibs {
-                excludePatterns += "*/lib/x86/*"
-                excludePatterns += "*/lib/x86_64/*"
+                isUniversalApk = false // No universal APK - only ARM separated
             }
         }
 
