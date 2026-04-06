@@ -343,6 +343,9 @@
     <string name="title_webdav_user">Utilizador WebDAV</string>
     <string name="toast_tg_app_not_found">Telegram não encontrado</string>
     <string name="toast_warning_pref_proxysharing_short">Aviso de partilha</string>
+    <string name="title_qr_code">Código QR</string>
+    <string name="toast_fragment_not_available">Visualização não disponível</string>
+    <string name="toast_server_not_found_in_group">Servidor não encontrado no grupo</string>
     <string name="update_already_latest_version">Já atualizado</string>
     <string name="update_checking_for_update">A verificar...</string>
     <string name="update_new_version_found">Nova versão: %s</string>
