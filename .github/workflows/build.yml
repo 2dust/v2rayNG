@@ -88,13 +88,13 @@ jobs:
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
         chmod 755 gradlew
-        ./gradlew assemblePlaystoreDebug -PABI_FILTERS="armeabi-v7a;arm64-v8a"
+        ./gradlew assemblePlaystoreDebug
 
     - name: Upload Universal ARM APK
       uses: actions/upload-artifact@v4
       if: ${{ success() }}
       with:
-        name: SimpsonsVPN-Universal-ARM
+        name: SimpsonsVPN-ARM
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/debug/*universal*.apk
 
     - name: Upload to release
