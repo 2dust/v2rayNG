@@ -57,6 +57,8 @@ class TProxyService(
 
     private fun buildConfig(): String {
         val socksPort = SettingsManager.getSocksPort()
+        val socksAuthUser = escapeYaml(SettingsManager.getLocalSocksAuthUser())
+        val socksAuthPass = escapeYaml(SettingsManager.getLocalSocksAuthPass())
         val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
         return buildString {
             appendLine("tunnel:")
@@ -70,6 +72,8 @@ class TProxyService(
             appendLine("socks5:")
             appendLine("  port: ${socksPort}")
             appendLine("  address: ${AppConfig.LOOPBACK}")
+            appendLine("  username: '${socksAuthUser}'")
+            appendLine("  password: '${socksAuthPass}'")
             appendLine("  udp: 'udp'")
 
             // Read-write timeout settings
@@ -85,6 +89,10 @@ class TProxyService(
             appendLine("  udp-read-write-timeout: ${udpTimeout * 1000}")
             appendLine("  log-level: ${MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) ?: "warn"}")
         }
+    }
+
+    private fun escapeYaml(value: String): String {
+        return value.replace("'", "''")
     }
 
     /**

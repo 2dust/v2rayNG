@@ -34,6 +34,11 @@ import java.util.Collections
 import java.util.Locale
 
 object SettingsManager {
+    @Volatile
+    private var localSocksAuthUser: String? = null
+
+    @Volatile
+    private var localSocksAuthPass: String? = null
 
     fun initApp(context: Context) {
         ensureDefaultSettings()
@@ -282,6 +287,44 @@ object SettingsManager {
      */
     fun getHttpPort(): Int {
         return getSocksPort() + if (Utils.isXray()) 0 else 1
+    }
+
+    /**
+     * Rotates local SOCKS credentials in-memory for a new service run.
+     */
+    @Synchronized
+    fun rotateLocalSocksAuth() {
+        val userSeed = (Utils.getUuid() + Utils.getUuid()).ifEmpty {
+            System.currentTimeMillis().toString(16) + System.nanoTime().toString(16)
+        }
+        val passSeed = (Utils.getUuid() + Utils.getUuid()).ifEmpty {
+            (System.currentTimeMillis().toString(16) + System.nanoTime().toString(16))
+        }
+        localSocksAuthUser = userSeed.take(12)
+        localSocksAuthPass = passSeed.take(24)
+    }
+
+    /**
+     * Returns the local SOCKS username for the current service run.
+     */
+    fun getLocalSocksAuthUser(): String {
+        ensureLocalSocksAuth()
+        return localSocksAuthUser.orEmpty()
+    }
+
+    /**
+     * Returns the local SOCKS password for the current service run.
+     */
+    fun getLocalSocksAuthPass(): String {
+        ensureLocalSocksAuth()
+        return localSocksAuthPass.orEmpty()
+    }
+
+    @Synchronized
+    private fun ensureLocalSocksAuth() {
+        if (localSocksAuthUser.isNullOrBlank() || localSocksAuthPass.isNullOrBlank()) {
+            rotateLocalSocksAuth()
+        }
     }
 
     /**

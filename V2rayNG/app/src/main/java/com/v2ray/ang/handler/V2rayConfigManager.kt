@@ -374,11 +374,23 @@ object V2rayConfigManager {
         try {
             val socksPort = SettingsManager.getSocksPort()
             val inbound1 = v2rayConfig.inbounds[0]
+            val socksAuthUser = SettingsManager.getLocalSocksAuthUser()
+            val socksAuthPass = SettingsManager.getLocalSocksAuthPass()
 
             if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING) != true) {
                 inbound1.listen = AppConfig.LOOPBACK
             }
             inbound1.port = socksPort
+            val inboundSettings = inbound1.settings ?: V2rayConfig.InboundBean.InSettingsBean().also {
+                inbound1.settings = it
+            }
+            inboundSettings.auth = "password"
+            inboundSettings.accounts = listOf(
+                V2rayConfig.InboundBean.InSettingsBean.SocksUsersBean(
+                    user = socksAuthUser,
+                    pass = socksAuthPass
+                )
+            )
             val fakedns = MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
             val sniffAllTlsAndHttp =
                 MmkvManager.decodeSettingsBool(AppConfig.PREF_SNIFFING_ENABLED, true) != false
