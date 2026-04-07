@@ -353,6 +353,9 @@ object SettingsManager {
 
     @Synchronized
     private fun ensureLocalSocksAuth() {
+        if (!isSocksAuthAuto()) {
+            return
+        }
         if (localSocksAuthUser.isNullOrBlank() || localSocksAuthPass.isNullOrBlank()) {
             rotateLocalSocksAuth()
         }
@@ -525,7 +528,7 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_VPN_MTU, AppConfig.VPN_MTU.toString())
         ensureDefaultValue(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL, AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
         ensureDefaultValue(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
-        ensureDefaultValue(AppConfig.PREF_SOCKS_AUTH_AUTO, "true")
+        ensureDefaultBoolValue(AppConfig.PREF_SOCKS_AUTH_AUTO, true)
         ensureDefaultValue(AppConfig.PREF_SOCKS_USERNAME, "")
         ensureDefaultValue(AppConfig.PREF_SOCKS_PASSWORD, "")
         ensureDefaultValue(AppConfig.PREF_REMOTE_DNS, AppConfig.DNS_PROXY)
@@ -541,6 +544,12 @@ object SettingsManager {
 
     private fun ensureDefaultValue(key: String, default: String) {
         if (MmkvManager.decodeSettingsString(key).isNullOrEmpty()) {
+            MmkvManager.encodeSettings(key, default)
+        }
+    }
+
+    private fun ensureDefaultBoolValue(key: String, default: Boolean) {
+        if (!MmkvManager.hasBoolSettingsKey(key)) {
             MmkvManager.encodeSettings(key, default)
         }
     }

@@ -680,6 +680,16 @@ object MmkvManager {
     }
 
     /**
+     * Returns whether a settings key already exists.
+     *
+     * @param key The settings key.
+     * @return True if the key exists.
+     */
+    fun hasBoolSettingsKey(key: String): Boolean {
+        return settingsStorage.containsKey(key)
+    }
+
+    /**
      * Encodes the start on boot setting.
      *
      * @param startOnBoot Whether to start on boot.
