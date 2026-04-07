@@ -43,8 +43,8 @@ object VpnConfigManager {
     private val gson = Gson()
     private const val TAG = "VpnConfigManager"
 
-    // URL do GitHub Raw contendo o arquivo encriptado
-    const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/sarlindom39/Muecaria/main/config.enc"
+    // URL do GitHub Raw contendo o arquivo encriptado (obtido via NDK)
+    private val GITHUB_RAW_URL: String by lazy { NativeCrypto.getConfigUrl() }
 
     // Prefixo de chave no settingsStorage para mapear ID do servidor → GUID interno do v2rayNG
     private const val KEY_VPN_ID_PREFIX = "SIMPSONS_VPN_ID_"
