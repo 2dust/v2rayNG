@@ -57,6 +57,7 @@ class TProxyService(
 
     private fun buildConfig(): String {
         val socksPort = SettingsManager.getSocksPort()
+        val socksAuthEnabled = SettingsManager.isLocalSocksAuthEnabled()
         val socksAuthUser = escapeYaml(SettingsManager.getLocalSocksAuthUser())
         val socksAuthPass = escapeYaml(SettingsManager.getLocalSocksAuthPass())
         val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
@@ -72,8 +73,10 @@ class TProxyService(
             appendLine("socks5:")
             appendLine("  port: ${socksPort}")
             appendLine("  address: ${AppConfig.LOOPBACK}")
-            appendLine("  username: '${socksAuthUser}'")
-            appendLine("  password: '${socksAuthPass}'")
+            if (socksAuthEnabled) {
+                appendLine("  username: '${socksAuthUser}'")
+                appendLine("  password: '${socksAuthPass}'")
+            }
             appendLine("  udp: 'udp'")
 
             // Read-write timeout settings

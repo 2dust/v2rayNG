@@ -121,8 +121,24 @@ object V2RayServiceManager {
 //        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
 //        if (!result.status) return
 
-        // Rotate local SOCKS credentials for every fresh service start.
-        SettingsManager.rotateLocalSocksAuth()
+        val isVpnMode = SettingsManager.isVpnMode()
+        val requireStrictCustomSocksAuth = isVpnMode && SettingsManager.isUsingHevTun()
+
+        if (config.configType == EConfigType.CUSTOM) {
+            val validCustomSocksAuth = SettingsManager.applyCustomLocalSocksAuth(MmkvManager.decodeServerRaw(guid))
+            if (!validCustomSocksAuth) {
+                if (requireStrictCustomSocksAuth) {
+                    context.toast(R.string.toast_config_file_invalid)
+                    Log.e(AppConfig.TAG, "StartCore-Manager: Custom config has invalid SOCKS auth credentials for HEV TUN")
+                    return
+                } else {
+                    Log.w(AppConfig.TAG, "StartCore-Manager: Custom config has invalid SOCKS auth credentials; continue (non-HEV or non-VPN mode)")
+                }
+            }
+        } else {
+            // Rotate local SOCKS credentials for every fresh service start.
+            SettingsManager.rotateLocalSocksAuth()
+        }
 
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)
@@ -130,7 +146,6 @@ object V2RayServiceManager {
             context.toast(R.string.toast_services_start)
         }
 
-        val isVpnMode = SettingsManager.isVpnMode()
         val intent = if (isVpnMode) {
             Log.i(AppConfig.TAG, "StartCore-Manager: Starting VPN service")
             Intent(context.applicationContext, V2RayVpnService::class.java)

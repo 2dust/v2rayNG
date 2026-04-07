@@ -374,6 +374,7 @@ object V2rayConfigManager {
         try {
             val socksPort = SettingsManager.getSocksPort()
             val inbound1 = v2rayConfig.inbounds[0]
+            SettingsManager.ensureManagedLocalSocksAuth()
             val socksAuthUser = SettingsManager.getLocalSocksAuthUser()
             val socksAuthPass = SettingsManager.getLocalSocksAuthPass()
 

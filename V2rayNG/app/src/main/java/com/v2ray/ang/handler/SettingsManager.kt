@@ -5,6 +5,7 @@ import android.content.res.AssetManager
 import android.text.TextUtils
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
@@ -34,6 +35,9 @@ import java.util.Collections
 import java.util.Locale
 
 object SettingsManager {
+    @Volatile
+    private var localSocksAuthEnabled: Boolean = true
+
     @Volatile
     private var localSocksAuthUser: String? = null
 
@@ -290,6 +294,19 @@ object SettingsManager {
     }
 
     /**
+     * Applies local SOCKS auth from custom JSON.
+     * Returns true when custom config provides usable password auth credentials for local SOCKS.
+     */
+    @Synchronized
+    fun applyCustomLocalSocksAuth(rawConfig: String?): Boolean {
+        val customAuth = resolveCustomLocalSocksAuth(rawConfig)
+        localSocksAuthEnabled = customAuth.enabled
+        localSocksAuthUser = customAuth.user
+        localSocksAuthPass = customAuth.pass
+        return customAuth.validForHevTun
+    }
+
+    /**
      * Rotates local SOCKS credentials in-memory for a new service run.
      */
     @Synchronized
@@ -300,15 +317,35 @@ object SettingsManager {
         val passSeed = (Utils.getUuid() + Utils.getUuid()).ifEmpty {
             (System.currentTimeMillis().toString(16) + System.nanoTime().toString(16))
         }
+        localSocksAuthEnabled = true
         localSocksAuthUser = userSeed.take(12)
         localSocksAuthPass = passSeed.take(24)
+    }
+
+    /**
+     * Returns true when the current local SOCKS runtime expects username/password auth.
+     */
+    fun isLocalSocksAuthEnabled(): Boolean {
+        return localSocksAuthEnabled
+    }
+
+    /**
+     * Ensures generated credentials exist for app-managed configs.
+     */
+    @Synchronized
+    fun ensureManagedLocalSocksAuth() {
+        if (!localSocksAuthEnabled || localSocksAuthUser == null || localSocksAuthPass == null) {
+            rotateLocalSocksAuth()
+        }
     }
 
     /**
      * Returns the local SOCKS username for the current service run.
      */
     fun getLocalSocksAuthUser(): String {
-        ensureLocalSocksAuth()
+        if (!localSocksAuthEnabled) {
+            return ""
+        }
         return localSocksAuthUser.orEmpty()
     }
 
@@ -316,14 +353,132 @@ object SettingsManager {
      * Returns the local SOCKS password for the current service run.
      */
     fun getLocalSocksAuthPass(): String {
-        ensureLocalSocksAuth()
+        if (!localSocksAuthEnabled) {
+            return ""
+        }
         return localSocksAuthPass.orEmpty()
     }
 
-    @Synchronized
-    private fun ensureLocalSocksAuth() {
-        if (localSocksAuthUser.isNullOrBlank() || localSocksAuthPass.isNullOrBlank()) {
-            rotateLocalSocksAuth()
+    private data class LocalSocksAuth(
+        val enabled: Boolean,
+        val user: String? = null,
+        val pass: String? = null,
+        val validForHevTun: Boolean = true
+    )
+
+    private fun resolveCustomLocalSocksAuth(rawConfig: String?): LocalSocksAuth {
+        val json = JsonUtil.parseString(rawConfig)
+        val inbounds = if (json?.has("inbounds") == true && json.get("inbounds")?.isJsonArray == true) {
+            json.getAsJsonArray("inbounds")
+        } else {
+            null
+        }
+        if (inbounds == null) {
+            Log.w(AppConfig.TAG, "Custom config has no inbounds array")
+            return LocalSocksAuth(enabled = false, validForHevTun = false)
+        }
+
+        val targetPort = getSocksPort()
+        var foundSocksInboundOnTargetPort = false
+        var foundPasswordAuthOnTargetPort = false
+        var foundAccountObjectOnTargetPort = false
+
+        for (element in inbounds) {
+            if (!element.isJsonObject) continue
+            val inbound = element.asJsonObject
+            if (!getJsonString(inbound, "protocol").equals("socks", ignoreCase = true)) {
+                continue
+            }
+            val inboundPort = getJsonInt(inbound, "port")
+            if (inboundPort != null && inboundPort != targetPort) {
+                continue
+            }
+            foundSocksInboundOnTargetPort = true
+
+            val settings = if (inbound.has("settings") && inbound.get("settings")?.isJsonObject == true) {
+                inbound.getAsJsonObject("settings")
+            } else {
+                null
+            }
+            val auth = getJsonString(settings, "auth")
+            if (!auth.equals("password", ignoreCase = true)) {
+                continue
+            }
+            foundPasswordAuthOnTargetPort = true
+
+            val accounts = if (settings?.has("accounts") == true && settings.get("accounts")?.isJsonArray == true) {
+                settings.getAsJsonArray("accounts")
+            } else {
+                null
+            }
+            if (accounts == null) {
+                continue
+            }
+
+            for (account in accounts) {
+                if (!account.isJsonObject) continue
+                foundAccountObjectOnTargetPort = true
+                val accountObject = account.asJsonObject
+                val user = getJsonString(accountObject, "user").orEmpty().trim()
+                val pass = getJsonString(accountObject, "pass").orEmpty().trim()
+                if (user.isBlank() || pass.isBlank()) {
+                    continue
+                }
+                return LocalSocksAuth(
+                    enabled = true,
+                    user = user,
+                    pass = pass,
+                    validForHevTun = true
+                )
+            }
+        }
+
+        if (!foundSocksInboundOnTargetPort) {
+            Log.w(AppConfig.TAG, "Custom config has no socks inbound on local port $targetPort")
+        } else if (!foundPasswordAuthOnTargetPort) {
+            Log.w(AppConfig.TAG, "Custom socks inbound on port $targetPort must use password auth")
+        } else if (!foundAccountObjectOnTargetPort) {
+            Log.w(AppConfig.TAG, "Custom socks inbound on port $targetPort must include at least one account")
+        } else {
+            Log.w(
+                AppConfig.TAG,
+                "Custom socks inbound on port $targetPort must include non-empty user and pass"
+            )
+        }
+        return LocalSocksAuth(enabled = false, validForHevTun = false)
+    }
+
+    private fun getJsonString(jsonObject: JsonObject?, name: String): String? {
+        if (jsonObject == null || !jsonObject.has(name)) {
+            return null
+        }
+        val element = jsonObject.get(name)
+        if (element == null || element.isJsonNull) {
+            return null
+        }
+        return try {
+            element.asString
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun getJsonInt(jsonObject: JsonObject?, name: String): Int? {
+        if (jsonObject == null || !jsonObject.has(name)) {
+            return null
+        }
+        val element = jsonObject.get(name)
+        if (element == null || element.isJsonNull) {
+            return null
+        }
+        return try {
+            if (element.isJsonPrimitive && element.asJsonPrimitive.isNumber) {
+                element.asInt
+            } else {
+                element.asString.toIntOrNull()
+            }
+        } catch (_: Exception) {
+            null
         }
     }
 
