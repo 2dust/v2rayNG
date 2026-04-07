@@ -143,6 +143,7 @@ object V2rayConfigManager {
 
     private fun updateCustomSocksInbounds(inboundsJson: JsonArray): Boolean {
         var updated = false
+        val socksPort = SettingsManager.getSocksPort()
         val socksUsername = SettingsManager.getEffectiveSocksUsername()
         val socksPassword = SettingsManager.getEffectiveSocksPassword()
 
@@ -160,6 +161,7 @@ object V2rayConfigManager {
                 continue
             }
 
+            inboundJson.addProperty("port", socksPort)
             val settingsJson = if (inboundJson.has("settings") && inboundJson.get("settings")?.isJsonObject == true) {
                 inboundJson.getAsJsonObject("settings")
             } else {
