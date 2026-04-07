@@ -618,28 +618,32 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun checkForceUpdate() {
-        // Verificar se o app está bloqueado
-        if (ForceUpdateManager.isAppBlocked(this)) {
-            val lastUrl = ForceUpdateManager.getLastDownloadUrl(this)
-            ForceUpdateManager.showBlockedDialog(this, lastUrl)
-            return
-        }
+        val isBlocked = ForceUpdateManager.isAppBlocked(this)
 
         lifecycleScope.launch {
-            val remoteVersion = ForceUpdateManager.checkForUpdate()
-            if (remoteVersion != null) {
-                ForceUpdateManager.saveLastDownloadUrl(this@MainActivity, remoteVersion.downloadUrl)
-                ForceUpdateManager.markUpdateFirstSeen(this@MainActivity)
+            when (val result = ForceUpdateManager.checkForUpdate()) {
+                is com.v2ray.ang.handler.UpdateCheckResult.NewVersion -> {
+                    val remoteVersion = result.remoteVersion
+                    ForceUpdateManager.saveLastDownloadUrl(this@MainActivity, remoteVersion.downloadUrl)
 
-                if (ForceUpdateManager.checkAndBlockIfExpired(this@MainActivity)) {
-                    ForceUpdateManager.showBlockedDialog(this@MainActivity, remoteVersion.downloadUrl)
-                } else {
-                    val daysRemaining = ForceUpdateManager.getDaysRemaining(this@MainActivity)
-                    ForceUpdateManager.showUpdateDialog(this@MainActivity, remoteVersion, daysRemaining)
+                    if (ForceUpdateManager.checkAndBlockIfExpired(this@MainActivity, remoteVersion)) {
+                        ForceUpdateManager.showBlockedDialog(this@MainActivity, remoteVersion.downloadUrl)
+                    } else {
+                        val daysRemaining = ForceUpdateManager.getDaysRemaining(remoteVersion)
+                        ForceUpdateManager.showUpdateDialog(this@MainActivity, remoteVersion, daysRemaining)
+                    }
                 }
-            } else {
-                // Sem atualização disponível — limpar estado de contagem
-                ForceUpdateManager.clearUpdateState(this@MainActivity)
+                is com.v2ray.ang.handler.UpdateCheckResult.UpToDate -> {
+                    // App atualizado — limpar estado de bloqueio se existir
+                    ForceUpdateManager.clearUpdateState(this@MainActivity)
+                }
+                is com.v2ray.ang.handler.UpdateCheckResult.Error -> {
+                    // Se houve erro na rede e já estava bloqueado, mostrar diálogo de bloqueio
+                    if (isBlocked) {
+                        val lastUrl = ForceUpdateManager.getLastDownloadUrl(this@MainActivity)
+                        ForceUpdateManager.showBlockedDialog(this@MainActivity, lastUrl)
+                    }
+                }
             }
         }
     }
