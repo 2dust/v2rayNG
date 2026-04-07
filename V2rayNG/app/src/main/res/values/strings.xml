@@ -220,6 +220,10 @@
     <string name="title_pref_allow_insecure">allowInsecure</string>
     <string name="summary_pref_allow_insecure">When TLS is selected, allow insecure connections by default</string>
 
+    <string name="title_pref_socks_port_auto">Auto-generate local proxy port</string>
+    <string name="summary_pref_socks_port_auto">Generate a new local proxy port on every service start</string>
+    <string name="title_pref_socks_port_auto_preview">Current generated local proxy port</string>
+    <string name="summary_pref_socks_port_auto_pending">Will be generated automatically</string>
     <string name="title_pref_socks_port">Local proxy port</string>
     <string name="summary_pref_socks_port">Local proxy port</string>
     <string name="title_pref_socks_auth_auto">Auto-generate SOCKS5 credentials</string>

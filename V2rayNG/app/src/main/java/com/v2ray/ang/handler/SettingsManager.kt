@@ -30,6 +30,7 @@ import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import java.io.File
 import java.io.FileOutputStream
+import java.net.ServerSocket
 import java.util.Collections
 import java.util.Locale
 
@@ -278,7 +279,37 @@ object SettingsManager {
      * @return The SOCKS port.
      */
     fun getSocksPort(): Int {
+        return if (isSocksPortAuto()) getLocalSocksPort() else getManualSocksPort()
+    }
+
+    fun getManualSocksPort(): Int {
         return Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+    }
+
+    fun isSocksPortAuto(): Boolean {
+        MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PORT_AUTO)?.let { legacyValue ->
+            val normalizedValue = legacyValue.equals("true", ignoreCase = true)
+            MmkvManager.encodeSettings(AppConfig.PREF_SOCKS_PORT_AUTO, normalizedValue)
+            return normalizedValue
+        }
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_SOCKS_PORT_AUTO, true)
+    }
+
+    @Synchronized
+    fun rotateLocalSocksPort() {
+        val port = try {
+            ServerSocket(0).use { it.localPort }
+        } catch (_: Exception) {
+            getManualSocksPort()
+        }
+        MmkvManager.encodeSettings(AppConfig.CACHE_SOCKS_PORT, port.toString())
+    }
+
+    fun getLocalSocksPort(): Int {
+        return Utils.parseInt(
+            MmkvManager.decodeSettingsString(AppConfig.CACHE_SOCKS_PORT),
+            getManualSocksPort()
+        )
     }
 
     /**
@@ -525,6 +556,7 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_VPN_MTU, AppConfig.VPN_MTU.toString())
         ensureDefaultValue(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL, AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
         ensureDefaultValue(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
+        ensureDefaultBoolValue(AppConfig.PREF_SOCKS_PORT_AUTO, true)
         ensureDefaultBoolValue(AppConfig.PREF_SOCKS_AUTH_AUTO, true)
         ensureDefaultValue(AppConfig.PREF_SOCKS_USERNAME, "")
         ensureDefaultValue(AppConfig.PREF_SOCKS_PASSWORD, "")

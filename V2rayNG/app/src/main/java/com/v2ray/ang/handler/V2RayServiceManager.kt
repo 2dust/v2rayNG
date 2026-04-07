@@ -121,6 +121,9 @@ object V2RayServiceManager {
 //        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
 //        if (!result.status) return
 
+        if (SettingsManager.isSocksPortAuto()) {
+            SettingsManager.rotateLocalSocksPort()
+        }
         if (SettingsManager.isSocksAuthAuto()) {
             SettingsManager.rotateLocalSocksAuth()
         }

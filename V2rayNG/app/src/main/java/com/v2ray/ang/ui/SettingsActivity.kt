@@ -54,6 +54,9 @@ class SettingsActivity : BaseActivity() {
         private val autoUpdateCheck by lazy { findPreference<CheckBoxPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE) }
         private val autoUpdateInterval by lazy { findPreference<EditTextPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL) }
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
+        private val socksPortAuto by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_SOCKS_PORT_AUTO) }
+        private val socksGeneratedPort by lazy { findPreference<CopyablePreference>("pref_socks_port_auto_preview") }
+        private val socksPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS_PORT) }
         private val socksAuthAuto by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_SOCKS_AUTH_AUTO) }
         private val socksGeneratedUsername by lazy { findPreference<CopyablePreference>("pref_socks_auth_auto_username_preview") }
         private val socksGeneratedPassword by lazy { findPreference<CopyablePreference>("pref_socks_auth_auto_password_preview") }
@@ -115,6 +118,16 @@ class SettingsActivity : BaseActivity() {
                 true
             }
             mode?.dialogLayoutResource = R.layout.preference_with_help_link
+            socksPortAuto?.setOnPreferenceChangeListener { _, newValue ->
+                val autoEnabled = newValue as Boolean
+                if (!autoEnabled) {
+                    val generatedPort = SettingsManager.getLocalSocksPort().toString()
+                    socksPort?.text = generatedPort
+                    socksPort?.summary = getEditTextSummary(socksPort!!, generatedPort)
+                }
+                updateSocksPortUi(autoEnabled)
+                true
+            }
             socksPassword?.setOnBindEditTextListener { editText ->
                 editText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
             }
@@ -130,6 +143,9 @@ class SettingsActivity : BaseActivity() {
                 }
                 updateSocksAuthUi(autoEnabled)
                 true
+            }
+            socksGeneratedPort?.onCopyClick = {
+                copyToClipboard(socksGeneratedPort?.summary?.toString().orEmpty())
             }
             socksGeneratedUsername?.onCopyClick = {
                 copyToClipboard(socksGeneratedUsername?.summary?.toString().orEmpty())
@@ -158,10 +174,13 @@ class SettingsActivity : BaseActivity() {
                         pref.setOnPreferenceChangeListener { p, newValue ->
                             val editTextPreference = p as EditTextPreference
                             editTextPreference.summary = getEditTextSummary(editTextPreference, newValue as? String)
-                            if (!MmkvManager.decodeSettingsBool(AppConfig.PREF_SOCKS_AUTH_AUTO, true) &&
+                            if (!SettingsManager.isSocksAuthAuto() &&
                                 (editTextPreference.key == AppConfig.PREF_SOCKS_USERNAME || editTextPreference.key == AppConfig.PREF_SOCKS_PASSWORD)
                             ) {
                                 updateSocksAuthUi(false)
+                            }
+                            if (!SettingsManager.isSocksPortAuto() && editTextPreference.key == AppConfig.PREF_SOCKS_PORT) {
+                                updateSocksPortUi(false)
                             }
                             true
                         }
@@ -196,6 +215,9 @@ class SettingsActivity : BaseActivity() {
 
         private fun getEditTextSummary(pref: EditTextPreference, value: String? = pref.text): String {
             return when (pref.key) {
+                AppConfig.PREF_SOCKS_PORT -> value?.takeIf { it.isNotEmpty() }
+                    ?: getString(R.string.summary_pref_socks_port)
+
                 AppConfig.PREF_SOCKS_USERNAME -> value?.takeIf { it.isNotEmpty() }
                     ?: getString(R.string.summary_pref_socks_username)
 
@@ -224,7 +246,8 @@ class SettingsActivity : BaseActivity() {
 
             // Initialize auto-update interval state
             autoUpdateInterval?.isEnabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
-            updateSocksAuthUi(MmkvManager.decodeSettingsBool(AppConfig.PREF_SOCKS_AUTH_AUTO, true))
+            updateSocksPortUi(SettingsManager.isSocksPortAuto())
+            updateSocksAuthUi(SettingsManager.isSocksAuthAuto())
         }
 
         private fun updateMode(value: String?) {
@@ -335,8 +358,25 @@ class SettingsActivity : BaseActivity() {
             socksPassword?.refreshCopyButton()
         }
 
+        private fun updateSocksPortUi(autoEnabled: Boolean) {
+            socksGeneratedPort?.isVisible = autoEnabled
+            socksPort?.isVisible = !autoEnabled
+
+            if (autoEnabled) {
+                val generatedPort = MmkvManager.decodeSettingsString(AppConfig.CACHE_SOCKS_PORT).orEmpty()
+                socksGeneratedPort?.summary = if (generatedPort.isNotEmpty()) {
+                    generatedPort
+                } else {
+                    getString(R.string.summary_pref_socks_port_auto_pending)
+                }
+                socksGeneratedPort?.title = getString(R.string.title_pref_socks_port_auto_preview)
+            }
+
+            socksGeneratedPort?.refreshCopyButton()
+        }
+
         private fun copyToClipboard(value: String) {
-            if (value.isBlank()) {
+            if (value.isBlank() || value == getString(R.string.summary_pref_socks_port_auto_pending)) {
                 return
             }
             Utils.setClipboard(requireContext(), value)

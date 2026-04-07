@@ -151,6 +151,17 @@
             android:summary="@string/summary_pref_allow_insecure"
             android:title="@string/title_pref_allow_insecure" />
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_socks_port_auto"
+            android:summary="@string/summary_pref_socks_port_auto"
+            android:title="@string/title_pref_socks_port_auto" />
+
+        <com.v2ray.ang.ui.CopyablePreference
+            android:key="pref_socks_port_auto_preview"
+            android:summary="@string/summary_pref_socks_port_auto_pending"
+            android:title="@string/title_pref_socks_port_auto_preview" />
+
         <EditTextPreference
             android:inputType="number"
             android:key="pref_socks_port"
