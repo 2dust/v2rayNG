@@ -22,10 +22,16 @@
     "port": 10808,
     "protocol": "socks",
     "settings": {
-      "auth": "noauth",
-      "udp": true,
-      "userLevel": 8
-    },
+    "auth": "password",
+    "accounts": [
+        {
+            "user": "vpnuser",
+            "pass": "Tgd4Rf4_T5fe"
+        }
+    ],
+    "udp": false,
+    "userLevel": 8
+},
     "sniffing": {
       "enabled": true,
       "destOverride": [
