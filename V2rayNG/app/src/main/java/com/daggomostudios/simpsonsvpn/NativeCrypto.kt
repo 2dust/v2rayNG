@@ -6,4 +6,6 @@ object NativeCrypto {
     }
 
     external fun getDecryptionKey(): String
+    external fun getConfigUrl(): String
+    external fun getVersionUrl(): String
 }
