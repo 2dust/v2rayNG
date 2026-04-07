@@ -448,8 +448,8 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DELAY_TEST_URL)
         ensureDefaultValue(AppConfig.PREF_IP_API_URL, AppConfig.IP_API_URL)
         ensureDefaultValue(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT, AppConfig.HEVTUN_RW_TIMEOUT)
-        ensureDefaultValue(AppConfig.PREF_MUX_CONCURRENCY, "8")
-        ensureDefaultValue(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
+        ensureDefaultValue(AppConfig.PREF_MUX_CONCURRENCY, "16")
+        ensureDefaultValue(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "16")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
     }

@@ -9,7 +9,8 @@
           "handshake": 4,
           "connIdle": 300,
           "uplinkOnly": 1,
-          "downlinkOnly": 1
+          "downlinkOnly": 1,
+          "bufferSize": 10240
         }
       },
       "system": {
