@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.TextUtils
 import android.util.Log
 import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.ProfileItem
@@ -92,11 +93,7 @@ object V2rayConfigManager {
     private fun getV2rayCustomConfig(context: Context, guid: String, config: ProfileItem): ConfigResult {
         val raw = MmkvManager.decodeServerRaw(guid) ?: return ConfigResult(false)
         val result = ConfigResult(true, guid, raw)
-        if (!needTun()) {
-            return result
-        }
 
-        // check if tun inbound exists
         val json = JsonUtil.parseString(raw) ?: return result
         val inboundsJson = if (json.has("inbounds") && json.get("inbounds")?.isJsonNull == false) {
             json.getAsJsonArray("inbounds")
@@ -104,28 +101,83 @@ object V2rayConfigManager {
             JsonArray()
         }
 
-        for (i in 0 until inboundsJson.size()) {
-            val elem = inboundsJson.get(i)
-            if (elem.isJsonObject) {
-                val inb = elem.asJsonObject
-                val tag = if (inb.has("tag") && inb.get("tag")?.isJsonNull == false) inb.get("tag").asString else ""
-                if (tag == "tun") return result
+        var updated = false
+        if (SettingsManager.hasSocksAuth()) {
+            updated = updateCustomSocksInbounds(inboundsJson) || updated
+        }
+
+        if (needTun()) {
+            var hasTunInbound = false
+            for (i in 0 until inboundsJson.size()) {
+                val elem = inboundsJson.get(i)
+                if (elem.isJsonObject) {
+                    val inboundJson = elem.asJsonObject
+                    val tag = if (inboundJson.has("tag") && inboundJson.get("tag")?.isJsonNull == false) inboundJson.get("tag").asString else ""
+                    if (tag == "tun") {
+                        hasTunInbound = true
+                        break
+                    }
+                }
+            }
+
+            if (!hasTunInbound) {
+                val templateConfig = initV2rayConfig(context) ?: return result
+                val inboundTun = templateConfig.inbounds.firstOrNull { it.tag == "tun" } ?: return result
+                inboundTun.settings?.mtu = SettingsManager.getVpnMtu()
+
+                inboundsJson.add(JsonUtil.parseString(JsonUtil.toJson(inboundTun)))
+                if (inboundsJson.size() == 1) {
+                    json.add("inbounds", inboundsJson)
+                }
+                updated = true
             }
         }
 
-        // add tun inbound from template
-        val templateConfig = initV2rayConfig(context) ?: return result
-        val inboundTun = templateConfig.inbounds.firstOrNull { it.tag == "tun" } ?: return result
-        inboundTun.settings?.mtu = SettingsManager.getVpnMtu()
-
-        // add to json
-        inboundsJson.add(JsonUtil.parseString(JsonUtil.toJson(inboundTun)))
-        if (inboundsJson.size() == 1) {
-            json.add("inbounds", inboundsJson)
+        if (!updated) {
+            return result
         }
 
         val updatedRaw = JsonUtil.toJsonPretty(json) ?: return result
         return ConfigResult(true, guid, updatedRaw)
+    }
+
+    private fun updateCustomSocksInbounds(inboundsJson: JsonArray): Boolean {
+        var updated = false
+        val socksUsername = SettingsManager.getEffectiveSocksUsername()
+        val socksPassword = SettingsManager.getEffectiveSocksPassword()
+
+        for (i in 0 until inboundsJson.size()) {
+            val elem = inboundsJson.get(i)
+            if (!elem.isJsonObject) continue
+
+            val inboundJson = elem.asJsonObject
+            val protocol = if (inboundJson.has("protocol") && inboundJson.get("protocol")?.isJsonNull == false) {
+                inboundJson.get("protocol").asString
+            } else {
+                ""
+            }
+            if (!protocol.equals(EConfigType.SOCKS.name, ignoreCase = true)) {
+                continue
+            }
+
+            val settingsJson = if (inboundJson.has("settings") && inboundJson.get("settings")?.isJsonObject == true) {
+                inboundJson.getAsJsonObject("settings")
+            } else {
+                JsonObject().also { inboundJson.add("settings", it) }
+            }
+
+            settingsJson.addProperty("auth", "password")
+            val accountsJson = JsonArray().apply {
+                add(JsonObject().apply {
+                    addProperty("user", socksUsername)
+                    addProperty("pass", socksPassword)
+                })
+            }
+            settingsJson.add("accounts", accountsJson)
+            updated = true
+        }
+
+        return updated
     }
 
     /**
