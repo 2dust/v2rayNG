@@ -77,9 +77,19 @@ object ForceUpdateManager {
 
     private fun parseDateToMillis(dateStr: String): Long {
         if (dateStr.isEmpty()) return 0L
+        val cleanDate = dateStr.replace("/", "-")
         return try {
             val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-            sdf.parse(dateStr)?.time ?: 0L
+            val date = sdf.parse(cleanDate)
+            if (date != null) {
+                val cal = java.util.Calendar.getInstance()
+                cal.time = date
+                cal.set(java.util.Calendar.HOUR_OF_DAY, 23)
+                cal.set(java.util.Calendar.MINUTE, 59)
+                cal.set(java.util.Calendar.SECOND, 59)
+                cal.set(java.util.Calendar.MILLISECOND, 999)
+                cal.timeInMillis
+            } else 0L
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing blockingDate: $dateStr")
             0L
@@ -91,7 +101,8 @@ object ForceUpdateManager {
         if (blockingMillis == 0L) return 999
 
         val diff = blockingMillis - System.currentTimeMillis()
-        return (diff / (1000 * 60 * 60 * 24)).toInt()
+        if (diff <= 0) return 0
+        return Math.ceil(diff.toDouble() / (1000 * 60 * 60 * 24)).toInt()
     }
 
     fun checkAndBlockIfExpired(context: Context, remoteVersion: RemoteVersion): Boolean {
@@ -101,6 +112,7 @@ object ForceUpdateManager {
         if (System.currentTimeMillis() >= blockingMillis) {
             val prefs = context.getSharedPreferences("simpsons_vpn_prefs", Context.MODE_PRIVATE)
             prefs.edit().putBoolean(PREF_APP_BLOCKED, true).apply()
+            V2RayServiceManager.stopVService(context)
             clearAppData(context)
             Log.w(TAG, "App blocked as blockingDate (${remoteVersion.blockingDate}) has passed")
             return true
