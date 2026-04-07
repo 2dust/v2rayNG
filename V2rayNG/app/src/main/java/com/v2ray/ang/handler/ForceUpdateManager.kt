@@ -17,6 +17,12 @@ import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+sealed class UpdateCheckResult {
+    data class NewVersion(val remoteVersion: ForceUpdateManager.RemoteVersion) : UpdateCheckResult()
+    object UpToDate : UpdateCheckResult()
+    object Error : UpdateCheckResult()
+}
+
 object ForceUpdateManager {
 
     private const val TAG = "SimpsonsVPN_ForceUpdate"
@@ -33,7 +39,7 @@ object ForceUpdateManager {
         val blockingDate: String = ""
     )
 
-    suspend fun checkForUpdate(): RemoteVersion? = withContext(Dispatchers.IO) {
+    suspend fun checkForUpdate(): UpdateCheckResult = withContext(Dispatchers.IO) {
         try {
             var response = HttpUtil.getUrlContent(VERSION_JSON_URL, 10000)
             if (response.isNullOrEmpty()) {
@@ -42,25 +48,25 @@ object ForceUpdateManager {
             }
             if (response.isNullOrEmpty()) {
                 Log.w(TAG, "Failed to fetch version.json")
-                return@withContext null
+                return@withContext UpdateCheckResult.Error
             }
 
             val remoteVersion = JsonUtil.fromJson(response, RemoteVersion::class.java)
             if (remoteVersion == null) {
                 Log.w(TAG, "Failed to parse version.json")
-                return@withContext null
+                return@withContext UpdateCheckResult.Error
             }
 
             Log.d(TAG, "Remote version: ${remoteVersion.versionName} (code: ${remoteVersion.versionCode}), current: ${BuildConfig.VERSION_NAME} (code: ${BuildConfig.VERSION_CODE})")
 
             if (compareVersions(remoteVersion.versionName, BuildConfig.VERSION_NAME) > 0) {
-                return@withContext remoteVersion
+                return@withContext UpdateCheckResult.NewVersion(remoteVersion)
             }
 
-            return@withContext null
+            return@withContext UpdateCheckResult.UpToDate
         } catch (e: Exception) {
             Log.e(TAG, "Error checking for update: ${e.message}")
-            return@withContext null
+            return@withContext UpdateCheckResult.Error
         }
     }
 
