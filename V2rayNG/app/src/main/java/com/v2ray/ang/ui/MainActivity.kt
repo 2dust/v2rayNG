@@ -629,12 +629,11 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             val remoteVersion = ForceUpdateManager.checkForUpdate()
             if (remoteVersion != null) {
                 ForceUpdateManager.saveLastDownloadUrl(this@MainActivity, remoteVersion.downloadUrl)
-                ForceUpdateManager.markUpdateFirstSeen(this@MainActivity)
 
-                if (ForceUpdateManager.checkAndBlockIfExpired(this@MainActivity)) {
+                if (ForceUpdateManager.checkAndBlockIfExpired(this@MainActivity, remoteVersion)) {
                     ForceUpdateManager.showBlockedDialog(this@MainActivity, remoteVersion.downloadUrl)
                 } else {
-                    val daysRemaining = ForceUpdateManager.getDaysRemaining(this@MainActivity)
+                    val daysRemaining = ForceUpdateManager.getDaysRemaining(remoteVersion)
                     ForceUpdateManager.showUpdateDialog(this@MainActivity, remoteVersion, daysRemaining)
                 }
             } else {
