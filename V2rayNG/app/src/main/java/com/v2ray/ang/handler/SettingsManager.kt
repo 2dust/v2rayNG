@@ -285,6 +285,11 @@ object SettingsManager {
      * Returns whether local SOCKS5 credentials are auto-generated.
      */
     fun isSocksAuthAuto(): Boolean {
+        MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_AUTH_AUTO)?.let { legacyValue ->
+            val normalizedValue = legacyValue.equals("true", ignoreCase = true)
+            MmkvManager.encodeSettings(AppConfig.PREF_SOCKS_AUTH_AUTO, normalizedValue)
+            return normalizedValue
+        }
         return MmkvManager.decodeSettingsBool(AppConfig.PREF_SOCKS_AUTH_AUTO, true)
     }
 
@@ -331,15 +336,17 @@ object SettingsManager {
         }
         localSocksAuthUser = userSeed.take(12)
         localSocksAuthPass = passSeed.take(24)
+        MmkvManager.encodeSettings(AppConfig.CACHE_SOCKS_AUTH_USER, localSocksAuthUser)
+        MmkvManager.encodeSettings(AppConfig.CACHE_SOCKS_AUTH_PASS, localSocksAuthPass)
     }
 
     fun getLocalSocksAuthUser(): String {
-        ensureLocalSocksAuth()
+        localSocksAuthUser = MmkvManager.decodeSettingsString(AppConfig.CACHE_SOCKS_AUTH_USER).orEmpty()
         return localSocksAuthUser.orEmpty()
     }
 
     fun getLocalSocksAuthPass(): String {
-        ensureLocalSocksAuth()
+        localSocksAuthPass = MmkvManager.decodeSettingsString(AppConfig.CACHE_SOCKS_AUTH_PASS).orEmpty()
         return localSocksAuthPass.orEmpty()
     }
 
@@ -349,16 +356,6 @@ object SettingsManager {
 
     fun getEffectiveSocksPassword(): String {
         return if (isSocksAuthAuto()) getLocalSocksAuthPass() else getSocksPassword()
-    }
-
-    @Synchronized
-    private fun ensureLocalSocksAuth() {
-        if (!isSocksAuthAuto()) {
-            return
-        }
-        if (localSocksAuthUser.isNullOrBlank() || localSocksAuthPass.isNullOrBlank()) {
-            rotateLocalSocksAuth()
-        }
     }
 
     /**
