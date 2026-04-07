@@ -268,7 +268,8 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         updateSelectedServerUI()
 
         // Carregar servidores automaticamente do GitHub apenas na primeira vez
-        if (!isServersLoaded) {
+        // Mas apenas se o app não estiver bloqueado
+        if (!isServersLoaded && !ForceUpdateManager.isAppBlocked(this)) {
             loadVpnServers()
             isServersLoaded = true
         }
@@ -618,7 +619,12 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun checkForceUpdate() {
-        val isBlocked = ForceUpdateManager.isAppBlocked(this)
+        // Se já está bloqueado localmente, reforçar o bloqueio imediatamente
+        if (ForceUpdateManager.isAppBlocked(this)) {
+            val lastUrl = ForceUpdateManager.getLastDownloadUrl(this)
+            ForceUpdateManager.showBlockedDialog(this, lastUrl)
+            ForceUpdateManager.clearAppData(this)
+        }
 
         lifecycleScope.launch {
             when (val result = ForceUpdateManager.checkForUpdate()) {
@@ -634,12 +640,13 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                     }
                 }
                 is com.v2ray.ang.handler.UpdateCheckResult.UpToDate -> {
-                    // App atualizado — limpar estado de bloqueio se existir
+                    // App atualizado — limpar estado de bloqueio e fechar diálogos
                     ForceUpdateManager.clearUpdateState(this@MainActivity)
+                    ForceUpdateManager.dismissCurrentDialog()
                 }
                 is com.v2ray.ang.handler.UpdateCheckResult.Error -> {
-                    // Se houve erro na rede e já estava bloqueado, mostrar diálogo de bloqueio
-                    if (isBlocked) {
+                    // Se houve erro na rede e já estava bloqueado, manter o diálogo de bloqueio
+                    if (ForceUpdateManager.isAppBlocked(this@MainActivity)) {
                         val lastUrl = ForceUpdateManager.getLastDownloadUrl(this@MainActivity)
                         ForceUpdateManager.showBlockedDialog(this@MainActivity, lastUrl)
                     }

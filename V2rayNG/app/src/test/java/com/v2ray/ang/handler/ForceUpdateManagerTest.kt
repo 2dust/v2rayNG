@@ -12,25 +12,33 @@ class ForceUpdateManagerTest {
     fun testGetDaysRemaining() {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.DAY_OF_YEAR, 5)
-        val futureDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(calendar.time)
+        val futureDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(calendar.time)
 
         val remoteVersion = ForceUpdateManager.RemoteVersion(blockingDate = futureDate)
         val daysRemaining = ForceUpdateManager.getDaysRemaining(remoteVersion)
 
-        // It should be 4 or 5 depending on the exact time, but let's just check it's positive
         assertTrue("Days remaining should be positive", daysRemaining >= 4)
+    }
+
+    @Test
+    fun testGetDaysRemainingToday() {
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+        val remoteVersion = ForceUpdateManager.RemoteVersion(blockingDate = today)
+        val daysRemaining = ForceUpdateManager.getDaysRemaining(remoteVersion)
+
+        assertEquals("Days remaining for today should be 0", 0, daysRemaining)
     }
 
     @Test
     fun testGetDaysRemainingPast() {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.DAY_OF_YEAR, -5)
-        val pastDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(calendar.time)
+        val pastDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(calendar.time)
 
         val remoteVersion = ForceUpdateManager.RemoteVersion(blockingDate = pastDate)
         val daysRemaining = ForceUpdateManager.getDaysRemaining(remoteVersion)
 
-        assertTrue("Days remaining should be negative", daysRemaining <= -5)
+        assertTrue("Days remaining should be negative", daysRemaining < 0)
     }
 
     @Test

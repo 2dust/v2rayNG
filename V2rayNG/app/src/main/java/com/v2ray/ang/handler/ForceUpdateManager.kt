@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.handler.V2RayServiceManager
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +29,8 @@ object ForceUpdateManager {
     private const val TAG = "SimpsonsVPN_ForceUpdate"
     private const val PREF_APP_BLOCKED = "pref_app_blocked"
     private val VERSION_JSON_URL: String by lazy { com.daggomostudios.simpsonsvpn.NativeCrypto.getVersionUrl() }
+
+    private var currentDialog: AlertDialog? = null
 
     private const val PREF_LAST_DOWNLOAD_URL = "pref_last_download_url"
 
@@ -78,8 +81,19 @@ object ForceUpdateManager {
     private fun parseDateToMillis(dateStr: String): Long {
         if (dateStr.isEmpty()) return 0L
         return try {
-            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-            sdf.parse(dateStr)?.time ?: 0L
+            // Suportar tanto YYYY-MM-DD quanto YYYY/MM/DD
+            val normalizedDate = dateStr.replace("/", "-")
+            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+            val date = sdf.parse(normalizedDate) ?: return 0L
+
+            // Definir o prazo para o FINAL do dia (23:59:59)
+            val calendar = java.util.Calendar.getInstance()
+            calendar.time = date
+            calendar.set(java.util.Calendar.HOUR_OF_DAY, 23)
+            calendar.set(java.util.Calendar.MINUTE, 59)
+            calendar.set(java.util.Calendar.SECOND, 59)
+            calendar.set(java.util.Calendar.MILLISECOND, 999)
+            calendar.timeInMillis
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing blockingDate: $dateStr")
             0L
@@ -90,7 +104,10 @@ object ForceUpdateManager {
         val blockingMillis = parseDateToMillis(remoteVersion.blockingDate)
         if (blockingMillis == 0L) return 999
 
-        val diff = blockingMillis - System.currentTimeMillis()
+        val now = System.currentTimeMillis()
+        if (now > blockingMillis) return -1
+
+        val diff = blockingMillis - now
         return (diff / (1000 * 60 * 60 * 24)).toInt()
     }
 
@@ -98,7 +115,7 @@ object ForceUpdateManager {
         val blockingMillis = parseDateToMillis(remoteVersion.blockingDate)
         if (blockingMillis == 0L) return false
 
-        if (System.currentTimeMillis() >= blockingMillis) {
+        if (System.currentTimeMillis() > blockingMillis) {
             val prefs = context.getSharedPreferences("simpsons_vpn_prefs", Context.MODE_PRIVATE)
             prefs.edit().putBoolean(PREF_APP_BLOCKED, true).apply()
             clearAppData(context)
@@ -136,10 +153,13 @@ object ForceUpdateManager {
         return prefs.getString(PREF_LAST_DOWNLOAD_URL, "https://mediafire.com") ?: "https://mediafire.com"
     }
 
-    private fun clearAppData(context: Context) {
+    fun clearAppData(context: Context) {
         try {
+            // Desconectar VPN imediatamente
+            V2RayServiceManager.stopVService(context)
+            // Apagar servidores
             MmkvManager.removeAllServer()
-            Log.d(TAG, "App data cleared due to expired update deadline")
+            Log.d(TAG, "App data cleared and VPN stopped due to expired update deadline")
         } catch (e: Exception) {
             Log.e(TAG, "Error clearing app data: ${e.message}")
         }
@@ -149,7 +169,13 @@ object ForceUpdateManager {
         return (dp * context.resources.displayMetrics.density + 0.5f).toInt()
     }
 
+    fun dismissCurrentDialog() {
+        currentDialog?.dismiss()
+        currentDialog = null
+    }
+
     fun showUpdateDialog(context: Context, remoteVersion: RemoteVersion, daysRemaining: Int) {
+        dismissCurrentDialog()
         val layout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(0, 0, 0, 0)
@@ -196,10 +222,11 @@ object ForceUpdateManager {
         }
 
         val warningView = TextView(context).apply {
-            text = if (daysRemaining > 0) {
-                "⚠ Tens $daysRemaining dias para atualizar.\nApós esse prazo, o APP será bloqueado."
-            } else {
-                "⚠ O prazo para atualizar expirou!"
+            text = when {
+                daysRemaining > 1 -> "⚠ Tens $daysRemaining dias para atualizar.\nApós esse prazo, o APP será bloqueado."
+                daysRemaining == 1 -> "⚠ Amanhã é o último dia para atualizar!\nO APP será bloqueado em seguida."
+                daysRemaining == 0 -> "⚠ HOJE é o último dia para atualizar!\nO APP será bloqueado à meia-noite."
+                else -> "⚠ O prazo para atualizar expirou!"
             }
             textSize = 14f
             setTypeface(null, Typeface.BOLD)
@@ -229,11 +256,13 @@ object ForceUpdateManager {
         cardContainer.addView(updateButton)
         layout.addView(cardContainer)
 
+        val isDeadlineReached = daysRemaining < 0
         val dialog = AlertDialog.Builder(context)
             .setView(layout)
-            .setCancelable(daysRemaining > 0)
+            .setCancelable(!isDeadlineReached)
             .create()
 
+        currentDialog = dialog
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         updateButton.setOnClickListener {
@@ -250,6 +279,7 @@ object ForceUpdateManager {
     }
 
     fun showBlockedDialog(context: Context, downloadUrl: String) {
+        dismissCurrentDialog()
         val layout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(0, 0, 0, 0)
@@ -306,6 +336,7 @@ object ForceUpdateManager {
             .setCancelable(false)
             .create()
 
+        currentDialog = dialog
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         updateButton.setOnClickListener {
