@@ -268,7 +268,8 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         updateSelectedServerUI()
 
         // Carregar servidores automaticamente do GitHub apenas na primeira vez
-        if (!isServersLoaded) {
+        // Mas apenas se o app não estiver bloqueado
+        if (!isServersLoaded && !ForceUpdateManager.isAppBlocked(this)) {
             loadVpnServers()
             isServersLoaded = true
         }
@@ -618,28 +619,38 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun checkForceUpdate() {
-        // Verificar se o app está bloqueado
+        // Se já está bloqueado localmente, reforçar o bloqueio imediatamente
         if (ForceUpdateManager.isAppBlocked(this)) {
             val lastUrl = ForceUpdateManager.getLastDownloadUrl(this)
             ForceUpdateManager.showBlockedDialog(this, lastUrl)
-            return
+            ForceUpdateManager.clearAppData(this)
         }
 
         lifecycleScope.launch {
-            val remoteVersion = ForceUpdateManager.checkForUpdate()
-            if (remoteVersion != null) {
-                ForceUpdateManager.saveLastDownloadUrl(this@MainActivity, remoteVersion.downloadUrl)
-                ForceUpdateManager.markUpdateFirstSeen(this@MainActivity)
+            when (val result = ForceUpdateManager.checkForUpdate()) {
+                is com.v2ray.ang.handler.UpdateCheckResult.NewVersion -> {
+                    val remoteVersion = result.remoteVersion
+                    ForceUpdateManager.saveLastDownloadUrl(this@MainActivity, remoteVersion.downloadUrl)
 
-                if (ForceUpdateManager.checkAndBlockIfExpired(this@MainActivity)) {
-                    ForceUpdateManager.showBlockedDialog(this@MainActivity, remoteVersion.downloadUrl)
-                } else {
-                    val daysRemaining = ForceUpdateManager.getDaysRemaining(this@MainActivity)
-                    ForceUpdateManager.showUpdateDialog(this@MainActivity, remoteVersion, daysRemaining)
+                    if (ForceUpdateManager.checkAndBlockIfExpired(this@MainActivity, remoteVersion)) {
+                        ForceUpdateManager.showBlockedDialog(this@MainActivity, remoteVersion.downloadUrl)
+                    } else {
+                        val daysRemaining = ForceUpdateManager.getDaysRemaining(remoteVersion)
+                        ForceUpdateManager.showUpdateDialog(this@MainActivity, remoteVersion, daysRemaining)
+                    }
                 }
-            } else {
-                // Sem atualização disponível — limpar estado de contagem
-                ForceUpdateManager.clearUpdateState(this@MainActivity)
+                is com.v2ray.ang.handler.UpdateCheckResult.UpToDate -> {
+                    // App atualizado — limpar estado de bloqueio e fechar diálogos
+                    ForceUpdateManager.clearUpdateState(this@MainActivity)
+                    ForceUpdateManager.dismissCurrentDialog()
+                }
+                is com.v2ray.ang.handler.UpdateCheckResult.Error -> {
+                    // Se houve erro na rede e já estava bloqueado, manter o diálogo de bloqueio
+                    if (ForceUpdateManager.isAppBlocked(this@MainActivity)) {
+                        val lastUrl = ForceUpdateManager.getLastDownloadUrl(this@MainActivity)
+                        ForceUpdateManager.showBlockedDialog(this@MainActivity, lastUrl)
+                    }
+                }
             }
         }
     }
