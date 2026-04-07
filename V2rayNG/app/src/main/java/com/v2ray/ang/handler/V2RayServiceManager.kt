@@ -121,6 +121,10 @@ object V2RayServiceManager {
 //        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
 //        if (!result.status) return
 
+        if (SettingsManager.isSocksAuthAuto()) {
+            SettingsManager.rotateLocalSocksAuth()
+        }
+
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)
         } else {

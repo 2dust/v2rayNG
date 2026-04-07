@@ -34,6 +34,11 @@ import java.util.Collections
 import java.util.Locale
 
 object SettingsManager {
+    @Volatile
+    private var localSocksAuthUser: String? = null
+
+    @Volatile
+    private var localSocksAuthPass: String? = null
 
     fun initApp(context: Context) {
         ensureDefaultSettings()
@@ -277,6 +282,83 @@ object SettingsManager {
     }
 
     /**
+     * Returns whether local SOCKS5 credentials are auto-generated.
+     */
+    fun isSocksAuthAuto(): Boolean {
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_SOCKS_AUTH_AUTO, true)
+    }
+
+    /**
+     * Get the SOCKS5 username.
+     * @return The SOCKS5 username.
+     */
+    fun getSocksUsername(): String {
+        return MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_USERNAME)?.trim().orEmpty()
+    }
+
+    /**
+     * Get the SOCKS5 password.
+     * @return The SOCKS5 password.
+     */
+    fun getSocksPassword(): String {
+        return MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PASSWORD)?.trim().orEmpty()
+    }
+
+    /**
+     * Check if SOCKS5 authentication is fully configured.
+     * Authentication is only enabled when both username and password are present.
+     *
+     * @return True if both username and password are configured.
+     */
+    fun hasSocksAuth(): Boolean {
+        return if (isSocksAuthAuto()) {
+            getLocalSocksAuthUser().isNotEmpty() && getLocalSocksAuthPass().isNotEmpty()
+        } else {
+            getSocksUsername().isNotEmpty() && getSocksPassword().isNotEmpty()
+        }
+    }
+
+    /**
+     * Rotates local SOCKS5 credentials in memory.
+     */
+    @Synchronized
+    fun rotateLocalSocksAuth() {
+        val userSeed = (Utils.getUuid() + Utils.getUuid()).ifEmpty {
+            System.currentTimeMillis().toString(16) + System.nanoTime().toString(16)
+        }
+        val passSeed = (Utils.getUuid() + Utils.getUuid()).ifEmpty {
+            System.currentTimeMillis().toString(16) + System.nanoTime().toString(16)
+        }
+        localSocksAuthUser = userSeed.take(12)
+        localSocksAuthPass = passSeed.take(24)
+    }
+
+    fun getLocalSocksAuthUser(): String {
+        ensureLocalSocksAuth()
+        return localSocksAuthUser.orEmpty()
+    }
+
+    fun getLocalSocksAuthPass(): String {
+        ensureLocalSocksAuth()
+        return localSocksAuthPass.orEmpty()
+    }
+
+    fun getEffectiveSocksUsername(): String {
+        return if (isSocksAuthAuto()) getLocalSocksAuthUser() else getSocksUsername()
+    }
+
+    fun getEffectiveSocksPassword(): String {
+        return if (isSocksAuthAuto()) getLocalSocksAuthPass() else getSocksPassword()
+    }
+
+    @Synchronized
+    private fun ensureLocalSocksAuth() {
+        if (localSocksAuthUser.isNullOrBlank() || localSocksAuthPass.isNullOrBlank()) {
+            rotateLocalSocksAuth()
+        }
+    }
+
+    /**
      * Get the HTTP port.
      * @return The HTTP port.
      */
@@ -443,6 +525,9 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_VPN_MTU, AppConfig.VPN_MTU.toString())
         ensureDefaultValue(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL, AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
         ensureDefaultValue(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
+        ensureDefaultValue(AppConfig.PREF_SOCKS_AUTH_AUTO, "true")
+        ensureDefaultValue(AppConfig.PREF_SOCKS_USERNAME, "")
+        ensureDefaultValue(AppConfig.PREF_SOCKS_PASSWORD, "")
         ensureDefaultValue(AppConfig.PREF_REMOTE_DNS, AppConfig.DNS_PROXY)
         ensureDefaultValue(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
         ensureDefaultValue(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DELAY_TEST_URL)

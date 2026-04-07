@@ -2,6 +2,7 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import android.view.View
+import android.text.InputType
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
@@ -14,7 +15,9 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toLongEx
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.helper.MmkvPreferenceDataStore
 import com.v2ray.ang.util.Utils
@@ -51,6 +54,11 @@ class SettingsActivity : BaseActivity() {
         private val autoUpdateCheck by lazy { findPreference<CheckBoxPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE) }
         private val autoUpdateInterval by lazy { findPreference<EditTextPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL) }
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
+        private val socksAuthAuto by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_SOCKS_AUTH_AUTO) }
+        private val socksGeneratedUsername by lazy { findPreference<CopyablePreference>("pref_socks_auth_auto_username_preview") }
+        private val socksGeneratedPassword by lazy { findPreference<CopyablePreference>("pref_socks_auth_auto_password_preview") }
+        private val socksUsername by lazy { findPreference<CopyableEditTextPreference>(AppConfig.PREF_SOCKS_USERNAME) }
+        private val socksPassword by lazy { findPreference<CopyableEditTextPreference>(AppConfig.PREF_SOCKS_PASSWORD) }
 
         private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
         private val hevTunRwTimeout by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) }
@@ -107,6 +115,34 @@ class SettingsActivity : BaseActivity() {
                 true
             }
             mode?.dialogLayoutResource = R.layout.preference_with_help_link
+            socksPassword?.setOnBindEditTextListener { editText ->
+                editText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
+            socksAuthAuto?.setOnPreferenceChangeListener { _, newValue ->
+                val autoEnabled = newValue as Boolean
+                if (!autoEnabled) {
+                    val generatedUser = SettingsManager.getLocalSocksAuthUser()
+                    val generatedPass = SettingsManager.getLocalSocksAuthPass()
+                    socksUsername?.text = generatedUser
+                    socksPassword?.text = generatedPass
+                    socksUsername?.summary = getEditTextSummary(socksUsername!!, generatedUser)
+                    socksPassword?.summary = getEditTextSummary(socksPassword!!, generatedPass)
+                }
+                updateSocksAuthUi(autoEnabled)
+                true
+            }
+            socksGeneratedUsername?.onCopyClick = {
+                copyToClipboard(socksGeneratedUsername?.summary?.toString().orEmpty())
+            }
+            socksGeneratedPassword?.onCopyClick = {
+                copyToClipboard(socksGeneratedPassword?.summary?.toString().orEmpty())
+            }
+            socksUsername?.onCopyClick = {
+                copyToClipboard(socksUsername?.text.orEmpty())
+            }
+            socksPassword?.onCopyClick = {
+                copyToClipboard(socksPassword?.text.orEmpty())
+            }
 
             useHevTun?.setOnPreferenceChangeListener { _, newValue ->
                 updateHevTunSettings(newValue as Boolean)
@@ -118,9 +154,15 @@ class SettingsActivity : BaseActivity() {
             fun updateSummary(pref: androidx.preference.Preference) {
                 when (pref) {
                     is EditTextPreference -> {
-                        pref.summary = pref.text.orEmpty()
+                        pref.summary = getEditTextSummary(pref)
                         pref.setOnPreferenceChangeListener { p, newValue ->
-                            p.summary = (newValue as? String).orEmpty()
+                            val editTextPreference = p as EditTextPreference
+                            editTextPreference.summary = getEditTextSummary(editTextPreference, newValue as? String)
+                            if (!MmkvManager.decodeSettingsBool(AppConfig.PREF_SOCKS_AUTH_AUTO, true) &&
+                                (editTextPreference.key == AppConfig.PREF_SOCKS_USERNAME || editTextPreference.key == AppConfig.PREF_SOCKS_PASSWORD)
+                            ) {
+                                updateSocksAuthUi(false)
+                            }
                             true
                         }
                     }
@@ -152,6 +194,21 @@ class SettingsActivity : BaseActivity() {
             preferenceScreen?.let { traverse(it) }
         }
 
+        private fun getEditTextSummary(pref: EditTextPreference, value: String? = pref.text): String {
+            return when (pref.key) {
+                AppConfig.PREF_SOCKS_USERNAME -> value?.takeIf { it.isNotEmpty() }
+                    ?: getString(R.string.summary_pref_socks_username)
+
+                AppConfig.PREF_SOCKS_PASSWORD -> if (value.isNullOrEmpty()) {
+                    getString(R.string.summary_pref_socks_password)
+                } else {
+                    "*".repeat(value.length.coerceAtMost(8))
+                }
+
+                else -> value.orEmpty()
+            }
+        }
+
         override fun onStart() {
             super.onStart()
             updateHevTunSettings(MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true))
@@ -167,6 +224,7 @@ class SettingsActivity : BaseActivity() {
 
             // Initialize auto-update interval state
             autoUpdateInterval?.isEnabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
+            updateSocksAuthUi(MmkvManager.decodeSettingsBool(AppConfig.PREF_SOCKS_AUTH_AUTO, true))
         }
 
         private fun updateMode(value: String?) {
@@ -256,6 +314,33 @@ class SettingsActivity : BaseActivity() {
             fragmentPackets?.isEnabled = enabled
             fragmentLength?.isEnabled = enabled
             fragmentInterval?.isEnabled = enabled
+        }
+
+        private fun updateSocksAuthUi(autoEnabled: Boolean) {
+            socksGeneratedUsername?.isVisible = autoEnabled
+            socksGeneratedPassword?.isVisible = autoEnabled
+            socksUsername?.isVisible = !autoEnabled
+            socksPassword?.isVisible = !autoEnabled
+
+            if (autoEnabled) {
+                socksGeneratedUsername?.summary = SettingsManager.getLocalSocksAuthUser()
+                socksGeneratedPassword?.summary = SettingsManager.getLocalSocksAuthPass()
+                socksGeneratedUsername?.title = getString(R.string.title_pref_socks_auth_auto_username_preview)
+                socksGeneratedPassword?.title = getString(R.string.title_pref_socks_auth_auto_password_preview)
+            }
+
+            socksGeneratedUsername?.refreshCopyButton()
+            socksGeneratedPassword?.refreshCopyButton()
+            socksUsername?.refreshCopyButton()
+            socksPassword?.refreshCopyButton()
+        }
+
+        private fun copyToClipboard(value: String) {
+            if (value.isBlank()) {
+                return
+            }
+            Utils.setClipboard(requireContext(), value)
+            requireContext().toast(R.string.toast_copied_to_clipboard)
         }
 
         private fun updateHevTunSettings(enabled: Boolean) {

@@ -222,6 +222,16 @@
 
     <string name="title_pref_socks_port">Local proxy port</string>
     <string name="summary_pref_socks_port">Local proxy port</string>
+    <string name="title_pref_socks_auth_auto">Auto-generate SOCKS5 credentials</string>
+    <string name="summary_pref_socks_auth_auto">Generate a new local SOCKS5 username and password on every service start</string>
+    <string name="title_pref_socks_auth_auto_username_preview">SOCKS5 generated username</string>
+    <string name="title_pref_socks_auth_auto_password_preview">SOCKS5 generated password</string>
+    <string name="summary_pref_socks_auth_auto_pending">Will be generated automatically</string>
+    <string name="toast_copied_to_clipboard">Copied to clipboard</string>
+    <string name="title_pref_socks_username">SOCKS5 username</string>
+    <string name="summary_pref_socks_username">Leave empty to disable authentication</string>
+    <string name="title_pref_socks_password">SOCKS5 password</string>
+    <string name="summary_pref_socks_password">Leave empty to disable authentication</string>
 
     <string name="title_pref_local_dns_port">Local DNS port</string>
     <string name="summary_pref_local_dns_port">Local DNS port</string>

@@ -157,6 +157,34 @@
             android:summary="10808"
             android:title="@string/title_pref_socks_port" />
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_socks_auth_auto"
+            android:summary="@string/summary_pref_socks_auth_auto"
+            android:title="@string/title_pref_socks_auth_auto" />
+
+        <com.v2ray.ang.ui.CopyablePreference
+            android:key="pref_socks_auth_auto_username_preview"
+            android:summary="@string/summary_pref_socks_auth_auto_pending"
+            android:title="@string/title_pref_socks_auth_auto_username_preview" />
+
+        <com.v2ray.ang.ui.CopyablePreference
+            android:key="pref_socks_auth_auto_password_preview"
+            android:summary="@string/summary_pref_socks_auth_auto_pending"
+            android:title="@string/title_pref_socks_auth_auto_password_preview" />
+
+        <com.v2ray.ang.ui.CopyableEditTextPreference
+            android:inputType="textNoSuggestions"
+            android:key="pref_socks_username"
+            android:summary="@string/summary_pref_socks_username"
+            android:title="@string/title_pref_socks_username" />
+
+        <com.v2ray.ang.ui.CopyableEditTextPreference
+            android:inputType="textPassword"
+            android:key="pref_socks_password"
+            android:summary="@string/summary_pref_socks_password"
+            android:title="@string/title_pref_socks_password" />
+
         <EditTextPreference
             android:key="pref_remote_dns"
             android:summary="@string/summary_pref_remote_dns"
