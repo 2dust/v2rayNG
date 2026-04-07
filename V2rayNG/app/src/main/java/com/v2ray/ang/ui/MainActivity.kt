@@ -95,6 +95,14 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         // Simpsons VPN: Inicializar o caçador de crashes
         CrashHandler.init(this)
         
+        // Verificar se o APP está bloqueado por expiração logo no arranque
+        if (ForceUpdateManager.isAppBlocked(this)) {
+            V2RayServiceManager.stopVService(this)
+            ForceUpdateManager.showBlockedDialog(this, ForceUpdateManager.getLastDownloadUrl(this))
+            // Não carregamos o resto da UI para impedir bypass
+            return
+        }
+
         setContentView(binding.root)
         
         // Ocultar Toolbar original para usar o cabeçalho flutuante Neobrutalista
@@ -199,6 +207,14 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
     override fun onResume() {
         super.onResume()
+
+        // Verificar bloqueio ao retomar para evitar bypass via Recents
+        if (ForceUpdateManager.isAppBlocked(this)) {
+            V2RayServiceManager.stopVService(this)
+            ForceUpdateManager.showBlockedDialog(this, ForceUpdateManager.getLastDownloadUrl(this))
+            return
+        }
+
         // Simpsons VPN: Actualizar a UI de forma segura ao voltar para a MainActivity
         try {
             mainViewModel.reloadServerList()
@@ -627,6 +643,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                     ForceUpdateManager.saveLastDownloadUrl(this@MainActivity, remoteVersion.downloadUrl)
 
                     if (ForceUpdateManager.checkAndBlockIfExpired(this@MainActivity, remoteVersion)) {
+                        V2RayServiceManager.stopVService(this@MainActivity)
                         ForceUpdateManager.showBlockedDialog(this@MainActivity, remoteVersion.downloadUrl)
                     } else {
                         val daysRemaining = ForceUpdateManager.getDaysRemaining(remoteVersion)

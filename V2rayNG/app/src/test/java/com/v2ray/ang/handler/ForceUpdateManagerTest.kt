@@ -17,8 +17,30 @@ class ForceUpdateManagerTest {
         val remoteVersion = ForceUpdateManager.RemoteVersion(blockingDate = futureDate)
         val daysRemaining = ForceUpdateManager.getDaysRemaining(remoteVersion)
 
-        // It should be 4 or 5 depending on the exact time, but let's just check it's positive
-        assertTrue("Days remaining should be positive", daysRemaining >= 4)
+        // It should be 5 or 6 depending on the exact time (inclusive of end of day)
+        assertTrue("Days remaining should be positive: $daysRemaining", daysRemaining >= 5)
+    }
+
+    @Test
+    fun testGetDaysRemainingWithSlash() {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, 2)
+        val futureDate = java.text.SimpleDateFormat("yyyy/MM/dd", java.util.Locale.getDefault()).format(calendar.time)
+
+        val remoteVersion = ForceUpdateManager.RemoteVersion(blockingDate = futureDate)
+        val daysRemaining = ForceUpdateManager.getDaysRemaining(remoteVersion)
+
+        assertTrue("Days remaining should be positive with slash: $daysRemaining", daysRemaining >= 2)
+    }
+
+    @Test
+    fun testGetDaysRemainingToday() {
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+        val remoteVersion = ForceUpdateManager.RemoteVersion(blockingDate = today)
+        val daysRemaining = ForceUpdateManager.getDaysRemaining(remoteVersion)
+
+        // Even if it's today, there should be some time left until 23:59:59
+        assertTrue("Days remaining should be 1 if it's today: $daysRemaining", daysRemaining >= 1)
     }
 
     @Test
@@ -30,7 +52,7 @@ class ForceUpdateManagerTest {
         val remoteVersion = ForceUpdateManager.RemoteVersion(blockingDate = pastDate)
         val daysRemaining = ForceUpdateManager.getDaysRemaining(remoteVersion)
 
-        assertTrue("Days remaining should be negative", daysRemaining <= -5)
+        assertTrue("Days remaining should be 0 for past dates: $daysRemaining", daysRemaining == 0)
     }
 
     @Test
