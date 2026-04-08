@@ -39,7 +39,10 @@ jobs:
       - name: Build Release APK
         working-directory: V2rayNG
         run: ./gradlew assembleRelease
-
+      
+      - name: Find APK
+        run: find V2rayNG/app/build/outputs -name "*.apk"
+        
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
