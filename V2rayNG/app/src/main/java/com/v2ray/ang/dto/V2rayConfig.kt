@@ -522,3 +522,13 @@ data class V2rayConfig(
         }
     }
 }
+
+fun V2rayConfig.OutboundBean.ensureSockopt(): V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean {
+    if (streamSettings == null) {
+        streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()
+    }
+    if (streamSettings?.sockopt == null) {
+        streamSettings?.sockopt = V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean()
+    }
+    return streamSettings?.sockopt!!
+}
