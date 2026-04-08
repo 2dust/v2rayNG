@@ -32,8 +32,10 @@ jobs:
         run: |
           cd V2rayNG
           mkdir -p app/libs
-          curl -L $(curl -s https://api.github.com/repos/2dust/v2rayNG/releases/latest | grep "libv2ray" | grep "browser_download_url" | cut -d '"' -f 4) -o app/libs/libv2ray.aar
-
+          LATEST=$(curl -s https://api.github.com/repos/2dust/v2rayNG/releases/latest | grep "browser_download_url" | grep "\.aar" | cut -d '"' -f 4)
+          echo "Downloading: $LATEST"
+          curl -L "$LATEST" -o app/libs/libv2ray.aar
+          
       - name: Build Release APK
         working-directory: V2rayNG
         run: ./gradlew assembleRelease
