@@ -25,8 +25,21 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      # Устанавливаем NDK, чтобы собрать недостающую библиотеку hev-socks5-tunnel
+      - name: Setup NDK
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;25.2.9519653"
+          echo "NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653" >> $GITHUB_ENV
+
       - name: Grant execute permission
-        run: chmod +x V2rayNG/gradlew
+        run: chmod +x V2rayNG/gradlew compile-hevtun.sh
+
+      # Собираем ту самую библиотеку, которой не хватало в логах
+      - name: Compile hev-socks5-tunnel
+        run: |
+          ./compile-hevtun.sh
+          mkdir -p V2rayNG/app/src/main/jniLibs
+          cp -r libs/* V2rayNG/app/src/main/jniLibs/
 
       - name: Download libv2ray
         run: |
