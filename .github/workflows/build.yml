@@ -1,4 +1,4 @@
-name: Build APK
+ name: Build APK
 
 on:
   push:
@@ -34,15 +34,34 @@ jobs:
           mkdir -p app/libs
           curl -L https://github.com/2dust/AndroidLibXrayLite/releases/latest/download/libv2ray.aar \
             -o app/libs/libv2ray.aar
-          ls -lh app/libs/
-          
+
+      - name: Generate signing key
+        run: |
+          keytool -genkeypair -v \
+            -keystore my.keystore \
+            -alias mykey \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass password123 \
+            -keypass password123 \
+            -dname "CN=My, OU=My, O=My, L=My, S=My, C=US"
+
       - name: Build Release APK
         working-directory: V2rayNG
         run: ./gradlew assembleRelease
-      
-      - name: Find APK
-        run: find V2rayNG/app/build/outputs -name "*.apk"
-        
+
+      - name: Sign APK
+        run: |
+          for apk in $(find V2rayNG/app/build/outputs/apk -name "*.apk"); do
+            $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/apksigner sign \
+              --ks my.keystore \
+              --ks-key-alias mykey \
+              --ks-pass pass:password123 \
+              --key-pass pass:password123 \
+              "$apk"
+          done
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
