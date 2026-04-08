@@ -1,46 +1,70 @@
 name: Build APK
+
 on:
   push:
     branches: [ master ]
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: 'recursive'
           fetch-depth: 0
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+
       - name: Grant execute permission
         run: chmod +x V2rayNG/gradlew
+
       - name: Download libv2ray
         run: |
           cd V2rayNG
           mkdir -p app/libs
-          curl -L https://github.com/2dust/AndroidLibXrayLite/releases/latest/download/libv2ray.aar -o app/libs/libv2ray.aar
+          curl -L https://github.com/2dust/AndroidLibXrayLite/releases/latest/download/libv2ray.aar \
+            -o app/libs/libv2ray.aar
+
       - name: Generate signing key
         run: |
-          keytool -genkeypair -v -keystore my.keystore -alias mykey -keyalg RSA -keysize 2048 -validity 10000 -storepass password123 -keypass password123 -dname "CN=My, OU=My, O=My, L=My, S=My, C=US"
+          keytool -genkeypair -v \
+            -keystore my.keystore \
+            -alias mykey \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass password123 \
+            -keypass password123 \
+            -dname "CN=My, OU=My, O=My, L=My, S=My, C=US"
+
       - name: Build Release APK
         working-directory: V2rayNG
         run: ./gradlew assembleRelease
+
       - name: Sign APK
         run: |
-          BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | tail -1)
-          find V2rayNG/app/build/outputs/apk/release -name "*.apk" | while read apk; do
-            $BUILD_TOOLS_DIR/apksigner sign --ks my.keystore --ks-key-alias mykey --ks-pass pass:password123 --key-pass pass:password123 "$apk"
+          for apk in $(find V2rayNG/app/build/outputs/apk -name "*.apk"); do
+            $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/apksigner sign \
+              --ks my.keystore \
+              --ks-key-alias mykey \
+              --ks-pass pass:password123 \
+              --key-pass pass:password123 \
+              "$apk"
           done
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: v2rayNG-patched
-          path: V2rayNG/app/build/outputs/apk/release/*.apk
+          path: V2rayNG/app/build/outputs/apk/**/*.apk
           retention-days: 7
