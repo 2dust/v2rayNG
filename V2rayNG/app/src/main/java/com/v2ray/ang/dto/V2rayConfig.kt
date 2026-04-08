@@ -44,7 +44,7 @@ data class V2rayConfig(
             var auth: String? = null,
             var accounts: List<AccountBean>? = null,
             var udp: Boolean? = null,
-            var userLevel: Int? = null,
+            var accounts: List<AccountBean>? = null, var userLevel: Int? = null,
             var name: String? = null,
             @SerializedName("MTU")
             var mtu: Int? = null

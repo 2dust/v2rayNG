@@ -72,6 +72,8 @@ class TProxyService(
             appendLine("  address: ${AppConfig.LOOPBACK}")
             appendLine("  user: '''vpnuser'''")
             appendLine("  pass: '''Tgd4Rf4_T5fe'''")
+            appendLine("  user: '''vpnuser'''")
+            appendLine("  pass: '''Tgd4Rf4_T5fe'''")
             appendLine("  user: 'vpnuser'")
             appendLine("  pass: 'Tgd4Rf4_T5fe'")
             appendLine("  udp: 'udp'")

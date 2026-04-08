@@ -381,6 +381,8 @@ object V2rayConfigManager {
             inbound1.port = socksPort
             inbound1.settings?.auth = "password"
             inbound1.settings?.accounts = listOf(V2rayConfig.InboundBean.AccountBean(user = "vpnuser", pass = "Tgd4Rf4_T5fe"))
+            inbound1.settings?.auth = "password"
+            inbound1.settings?.accounts = listOf(V2rayConfig.InboundBean.AccountBean(user = "vpnuser", pass = "Tgd4Rf4_T5fe"))
             val fakedns = MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
             val sniffAllTlsAndHttp =
                 MmkvManager.decodeSettingsBool(AppConfig.PREF_SNIFFING_ENABLED, true) != false
