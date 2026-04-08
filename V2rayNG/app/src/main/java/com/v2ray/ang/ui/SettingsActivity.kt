@@ -55,6 +55,9 @@ class SettingsActivity : BaseActivity() {
         private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
         private val hevTunRwTimeout by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) }
         private val useHevTun by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_USE_HEV_TUNNEL) }
+        private val socks5Username by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS5_USERNAME) }
+        private val socks5Password by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS5_PASSWORD) }
+        private val generateSocks5Auth by lazy { findPreference<androidx.preference.Preference>("pref_generate_socks5_auth") }
 
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             // Use MMKV as the storage backend for all Preferences
@@ -110,6 +113,20 @@ class SettingsActivity : BaseActivity() {
 
             useHevTun?.setOnPreferenceChangeListener { _, newValue ->
                 updateHevTunSettings(newValue as Boolean)
+                true
+            }
+
+            generateSocks5Auth?.setOnPreferenceClickListener {
+                val newUsername = "user_" + Utils.getUuid().substring(0, 8)
+                val newPassword = Utils.getUuid()
+                socks5Username?.text = newUsername
+                socks5Password?.text = newPassword
+                // Trigger manual save since we're setting text programmatically
+                MmkvManager.encodeSettings(AppConfig.PREF_SOCKS5_USERNAME, newUsername)
+                MmkvManager.encodeSettings(AppConfig.PREF_SOCKS5_PASSWORD, newPassword)
+                // Update summaries
+                socks5Username?.summary = newUsername
+                socks5Password?.summary = newPassword
                 true
             }
         }

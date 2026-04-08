@@ -270,6 +270,11 @@
     <string name="summary_pref_use_hev_tunnel">When enabled, TUN will use hev-socks5-tunnel; otherwise, it will use xray-core.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun Log Level</string>
     <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun read/write timeout (seconds) (tcp,udp default 300,60)</string>
+    <string name="title_pref_socks5_username">SOCKS5 Username</string>
+    <string name="title_pref_socks5_password">SOCKS5 Password</string>
+    <string name="summary_pref_socks5_auth">Credentials for internal SOCKS5 proxy between TUN and Core</string>
+    <string name="title_pref_generate_socks5_auth">Generate Random Credentials</string>
+    <string name="summary_pref_generate_socks5_auth">Generate new random username and password</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Copy</string>

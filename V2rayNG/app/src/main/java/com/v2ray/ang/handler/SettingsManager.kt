@@ -452,6 +452,8 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
+        ensureDefaultValue(AppConfig.PREF_SOCKS5_USERNAME, "vpnuser")
+        ensureDefaultValue(AppConfig.PREF_SOCKS5_PASSWORD, "Tgd4Rf4_T5fe")
     }
 
     private fun ensureDefaultValue(key: String, default: String) {

@@ -123,6 +123,21 @@
             android:key="pref_hev_tunnel_rw_timeout_v2"
             android:summary="300,60"
             android:title="@string/title_pref_hev_tunnel_rw_timeout" />
+
+        <EditTextPreference
+            android:key="pref_socks5_username"
+            android:title="@string/title_pref_socks5_username"
+            android:summary="@string/summary_pref_socks5_auth" />
+
+        <EditTextPreference
+            android:key="pref_socks5_password"
+            android:title="@string/title_pref_socks5_password"
+            android:summary="@string/summary_pref_socks5_auth" />
+
+        <Preference
+            android:key="pref_generate_socks5_auth"
+            android:title="@string/title_pref_generate_socks5_auth"
+            android:summary="@string/summary_pref_generate_socks5_auth" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_core_settings">

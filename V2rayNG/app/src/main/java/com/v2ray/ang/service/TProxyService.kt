@@ -70,6 +70,10 @@ class TProxyService(
             appendLine("socks5:")
             appendLine("  port: ${socksPort}")
             appendLine("  address: ${AppConfig.LOOPBACK}")
+            val user = MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS5_USERNAME) ?: "vpnuser"
+            val pass = MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS5_PASSWORD) ?: "Tgd4Rf4_T5fe"
+            appendLine("  user: '$user'")
+            appendLine("  pass: '$pass'")
             appendLine("  udp: 'udp'")
 
             // Read-write timeout settings

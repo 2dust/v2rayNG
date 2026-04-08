@@ -42,11 +42,17 @@ data class V2rayConfig(
 
         data class InSettingsBean(
             var auth: String? = null,
+            var accounts: List<AccountBean>? = null,
             var udp: Boolean? = null,
             var userLevel: Int? = null,
             var name: String? = null,
             @SerializedName("MTU")
             var mtu: Int? = null
+        )
+
+        data class AccountBean(
+            var user: String = "",
+            var pass: String = ""
         )
 
         data class SniffingBean(
@@ -515,4 +521,14 @@ data class V2rayConfig(
             EConfigType.entries.any { it.name.equals(outbound.protocol, ignoreCase = true) }
         }
     }
+}
+
+fun V2rayConfig.OutboundBean.ensureSockopt(): V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean {
+    if (streamSettings == null) {
+        streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean()
+    }
+    if (streamSettings?.sockopt == null) {
+        streamSettings?.sockopt = V2rayConfig.OutboundBean.StreamSettingsBean.SockoptBean()
+    }
+    return streamSettings?.sockopt!!
 }
