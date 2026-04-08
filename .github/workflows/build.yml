@@ -32,9 +32,9 @@ jobs:
         run: |
           cd V2rayNG
           mkdir -p app/libs
-          LATEST=$(curl -s https://api.github.com/repos/2dust/v2rayNG/releases/latest | grep "browser_download_url" | grep "\.aar" | cut -d '"' -f 4)
-          echo "Downloading: $LATEST"
-          curl -L "$LATEST" -o app/libs/libv2ray.aar
+          curl -L https://github.com/2dust/AndroidLibXrayLite/releases/latest/download/libv2ray.aar \
+            -o app/libs/libv2ray.aar
+          ls -lh app/libs/
           
       - name: Build Release APK
         working-directory: V2rayNG
