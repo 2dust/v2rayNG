@@ -1,80 +1,51 @@
 name: Build APK
-
 on:
   push:
     branches: [ master ]
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: 'recursive'
           fetch-depth: 0
-
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-
-      # Устанавливаем NDK, чтобы собрать недостающую библиотеку hev-socks5-tunnel
       - name: Setup NDK
         run: |
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;25.2.9519653"
           echo "NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653" >> $GITHUB_ENV
-
       - name: Grant execute permission
         run: chmod +x V2rayNG/gradlew compile-hevtun.sh
-
-      # Собираем ту самую библиотеку, которой не хватало в логах
       - name: Compile hev-socks5-tunnel
         run: |
           ./compile-hevtun.sh
           mkdir -p V2rayNG/app/src/main/jniLibs
           cp -r libs/* V2rayNG/app/src/main/jniLibs/
-
       - name: Download libv2ray
         run: |
           cd V2rayNG
           mkdir -p app/libs
-          curl -L https://github.com/2dust/AndroidLibXrayLite/releases/latest/download/libv2ray.aar \
-            -o app/libs/libv2ray.aar
-
+          curl -L https://github.com/2dust/AndroidLibXrayLite/releases/latest/download/libv2ray.aar -o app/libs/libv2ray.aar
       - name: Generate signing key
         run: |
-          keytool -genkeypair -v \
-            -keystore my.keystore \
-            -alias mykey \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -storepass password123 \
-            -keypass password123 \
-            -dname "CN=My, OU=My, O=My, L=My, S=My, C=US"
-
+          keytool -genkeypair -v -keystore my.keystore -alias mykey -keyalg RSA -keysize 2048 -validity 10000 -storepass password123 -keypass password123 -dname "CN=My, OU=My, O=My, L=My, S=My, C=US"
       - name: Build Release APK
         working-directory: V2rayNG
         run: ./gradlew assembleRelease
-
       - name: Sign APK
         run: |
           for apk in $(find V2rayNG/app/build/outputs/apk -name "*.apk"); do
-            $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/apksigner sign \
-              --ks my.keystore \
-              --ks-key-alias mykey \
-              --ks-pass pass:password123 \
-              --key-pass pass:password123 \
-              "$apk"
+            $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/apksigner sign --ks my.keystore --ks-key-alias mykey --ks-pass pass:password123 --key-pass pass:password123 "$apk"
           done
-
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
