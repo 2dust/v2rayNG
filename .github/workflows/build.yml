@@ -47,5 +47,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: v2rayNG-patched
-          path: V2rayNG/app/build/outputs/apk/release/*.apk
+          path: V2rayNG/app/build/outputs/apk/**/*.apk
           retention-days: 7
