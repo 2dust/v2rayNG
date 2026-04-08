@@ -44,7 +44,7 @@ data class V2rayConfig(
             var auth: String? = null,
             var accounts: List<AccountBean>? = null,
             var udp: Boolean? = null,
-            var accounts: List<AccountBean>? = null, var userLevel: Int? = null,
+            var userLevel: Int? = null,
             var name: String? = null,
             @SerializedName("MTU")
             var mtu: Int? = null
@@ -155,7 +155,7 @@ data class V2rayConfig(
             var grpcSettings: GrpcSettingsBean? = null,
             var hysteriaSettings: HysteriaSettingsBean? = null,
             var finalmask: Any? = null,
-            val dsSettings: Any? = null,
+            var dsSettings: Any? = null,
             var sockopt: SockoptBean? = null
         ) {
 
@@ -284,241 +284,109 @@ data class V2rayConfig(
 
             data class HysteriaSettingsBean(
                 var version: Int,
-                var auth: String? = null
-            )
-
-            //https://xtls.github.io/config/transport.html#finalmaskobject
-            data class FinalMaskBean(
-                var tcp: List<MaskBean>? = null,
-                var udp: List<MaskBean>? = null,
-                var quicParams: QuicParamsBean? = null
+                var auth: String? = null,
+                var opaquepPaddings: Boolean? = null,
+                var key: String? = null,
+                var value: String? = null,
+                var obfs: ObfsBean? = null,
+                var up_mbps: Int? = null,
+                var down_mbps: Int? = null,
+                var up: String? = null,
+                var down: String? = null,
             ) {
-                data class MaskBean(
-                    var type: String,
-                    var settings: MaskSettingsBean? = null
-                ) {
-                    data class MaskSettingsBean(
-                        val password: String? = null,
-                        val domain: String? = null,
-                        // fragment
-                        val packets: String? = null,
-                        val length: String? = null,
-                        val delay: String? = null,
-                        // val maxSplit: String? = null,
-                        // noise
-                        val reset: Int? = null,
-                        val noise: List<NoiseMaskBean>? = null
-                    ) {
-                        data class NoiseMaskBean(
-                            val rand: String? = null,
-                            // val randRange: String? = null,
-                            // val type: String? = null,
-                            // val packet: String? = null,
-                            val delay: String? = null,
-                        )
-                    }
-                }
+                data class ObfsBean(
+                    var type: String? = null,
+                    var password: String? = null,
+                )
+            }
+
+            data class FinalMaskBean(
+                var quicParams: QuicParamsBean? = null,
+                var udp: List<MaskBean>? = null,
+            ) {
                 data class QuicParamsBean(
-                    var congestion: String? = null,
-                    var brutalUp: String? = null,
-                    var brutalDown: String? = null,
-                    var udpHop: UdpHopBean? = null,
+                    var udpHop: UdpHopBean? = null
                 ) {
-                    // Nested data class for the udpHop JSON object
                     data class UdpHopBean(
                         var ports: String? = null,
                         var interval: String? = null
                     )
                 }
+
+                data class MaskBean(
+                    var type: String? = null,
+                    var settings: MaskSettingsBean? = null
+                )
+
+                data class MaskSettingsBean(
+                    val password: String? = null,
+                )
             }
         }
 
         data class MuxBean(
-            var enabled: Boolean,
-            var concurrency: Int? = null,
-            var xudpConcurrency: Int? = null,
-            var xudpProxyUDP443: String? = null,
+            var enabled: Boolean = false,
+            var concurrency: Int = 8,
+            var xudpConcurrency: Int = 16,
+            var xudpProxyUDP443: String = "reject"
         )
-
-        fun getServerAddress(): String? {
-            if (protocol.equals(EConfigType.VMESS.name, true)
-                || protocol.equals(EConfigType.VLESS.name, true)
-            ) {
-                return settings?.vnext?.first()?.address
-            } else if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)
-                || protocol.equals(EConfigType.SOCKS.name, true)
-                || protocol.equals(EConfigType.HTTP.name, true)
-                || protocol.equals(EConfigType.TROJAN.name, true)
-            ) {
-                return settings?.servers?.first()?.address
-            } else if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
-                return settings?.peers?.first()?.endpoint?.substringBeforeLast(":")
-            } else if (protocol.equals(EConfigType.HYSTERIA2.name, true)
-                || protocol.equals(EConfigType.HYSTERIA.name, true)
-            ) {
-                return settings?.address as String?
-            }
-            return null
-        }
-
-        fun getServerPort(): Int? {
-            if (protocol.equals(EConfigType.VMESS.name, true)
-                || protocol.equals(EConfigType.VLESS.name, true)
-            ) {
-                return settings?.vnext?.first()?.port
-            } else if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)
-                || protocol.equals(EConfigType.SOCKS.name, true)
-                || protocol.equals(EConfigType.HTTP.name, true)
-                || protocol.equals(EConfigType.TROJAN.name, true)
-            ) {
-                return settings?.servers?.first()?.port
-            } else if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
-                return settings?.peers?.first()?.endpoint?.substringAfterLast(":")?.toInt()
-            } else if (protocol.equals(EConfigType.HYSTERIA2.name, true)
-                || protocol.equals(EConfigType.HYSTERIA.name, true)
-            ) {
-                return settings?.port
-            }
-            return null
-        }
-
-        fun ensureSockopt(): StreamSettingsBean.SockoptBean {
-            val stream = streamSettings ?: StreamSettingsBean().also {
-                streamSettings = it
-            }
-
-            val sockopt = stream.sockopt ?: StreamSettingsBean.SockoptBean().also {
-                stream.sockopt = it
-            }
-
-            return sockopt
-        }
     }
 
     data class DnsBean(
-        var servers: ArrayList<Any>? = null,
         var hosts: Map<String, Any>? = null,
-        val clientIp: String? = null,
-        val disableCache: Boolean? = null,
-        val queryStrategy: String? = null,
-        val tag: String? = null
-    ) {
-        data class ServersBean(
-            var address: String = "",
-            var port: Int? = null,
-            var domains: List<String>? = null,
-            var expectIPs: List<String>? = null,
-            val clientIp: String? = null,
-            val skipFallback: Boolean? = null,
-            val tag: String? = null,
-        )
-    }
+        var servers: List<Any>? = null,
+        var tag: String? = null,
+        var clientIp: String? = null,
+        var queryStrategy: String? = null,
+        var disableCache: Boolean? = null,
+        var disableFallback: Boolean? = null,
+        var disableFallbackIfSmart: Boolean? = null
+    )
 
     data class RoutingBean(
-        var domainStrategy: String,
+        var domainStrategy: String? = null,
         var domainMatcher: String? = null,
-        var rules: ArrayList<RulesBean>,
-        var balancers: List<BalancerBean>? = null
+        var rules: ArrayList<RulesBean>
     ) {
-
         data class RulesBean(
             var type: String = "field",
-            var ip: ArrayList<String>? = null,
-            var domain: ArrayList<String>? = null,
-            var outboundTag: String? = null,
-            var balancerTag: String? = null,
             var port: String? = null,
-            val sourcePort: String? = null,
-            val network: String? = null,
-            val source: List<String>? = null,
-            val user: List<String>? = null,
             var inboundTag: List<String>? = null,
-            val protocol: List<String>? = null,
-            val attrs: String? = null,
-            val domainMatcher: String? = null
-        )
-
-        data class BalancerBean(
-            val tag: String,
-            val selector: List<String>,
-            val fallbackTag: String? = null,
-            val strategy: StrategyObject? = null
-        )
-
-        data class StrategyObject(
-            val type: String = "random", // "random" | "roundRobin" | "leastPing" | "leastLoad"
-            val settings: StrategySettingsObject? = null
-        )
-
-        data class StrategySettingsObject(
-            val expected: Int? = null,
-            val maxRTT: String? = null,
-            val tolerance: Double? = null,
-            val baselines: List<String>? = null,
-            val costs: List<CostObject>? = null
-        )
-
-        data class CostObject(
-            val regexp: Boolean = false,
-            val match: String,
-            val value: Double
+            var outboundTag: String? = null,
+            var ip: List<String>? = null,
+            var domain: List<String>? = null,
+            var protocol: List<String>? = null,
+            var attrs: String? = null,
+            var user: List<String>? = null,
+            var balancerTag: String? = null
         )
     }
 
     data class PolicyBean(
-        var levels: Map<String, LevelBean>,
-        var system: Any? = null
+        var levels: Map<String, LevelBean>? = null,
+        var system: SystemBean? = null
     ) {
         data class LevelBean(
             var handshake: Int? = null,
             var connIdle: Int? = null,
             var uplinkOnly: Int? = null,
             var downlinkOnly: Int? = null,
-            val statsUserUplink: Boolean? = null,
-            val statsUserDownlink: Boolean? = null,
+            var statsUserUplink: Boolean? = null,
+            var statsUserDownlink: Boolean? = null,
             var bufferSize: Int? = null
         )
-    }
 
-    data class ObservatoryObject(
-        val subjectSelector: List<String>,
-        val probeUrl: String,
-        val probeInterval: String,
-        val enableConcurrency: Boolean = false
-    )
-
-    data class BurstObservatoryObject(
-        val subjectSelector: List<String>,
-        val pingConfig: PingConfigObject
-    ) {
-        data class PingConfigObject(
-            val destination: String,
-            val connectivity: String? = null,
-            val interval: String,
-            val sampling: Int,
-            val timeout: String? = null
+        data class SystemBean(
+            var statsInboundUplink: Boolean? = null,
+            var statsInboundDownlink: Boolean? = null,
+            var statsOutboundUplink: Boolean? = null,
+            var statsOutboundDownlink: Boolean? = null
         )
     }
 
-    data class FakednsBean(
-        var ipPool: String = "198.18.0.0/15",
-        var poolSize: Int = 10000
-    ) // roughly 10 times smaller than total ip pool
-
-    fun getProxyOutbound(): OutboundBean? {
-        outbounds.forEach { outbound ->
-            EConfigType.entries.forEach {
-                if (outbound.protocol.equals(it.name, true)) {
-                    return outbound
-                }
-            }
-        }
-        return null
-    }
-
-    fun getAllProxyOutbound(): List<OutboundBean> {
-        return outbounds.filter { outbound ->
-            EConfigType.entries.any { it.name.equals(outbound.protocol, ignoreCase = true) }
-        }
-    }
+    data class ConfigResult(
+        var status: Boolean,
+        var content: String = "",
+        var guid: String = ""
+    )
 }
