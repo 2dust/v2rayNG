@@ -1,6 +1,8 @@
 package com.v2ray.ang.ui
 
+import android.app.ActivityManager
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -15,7 +17,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.CustomDividerItemDecoration
 import com.v2ray.ang.util.MyContextWrapper
@@ -44,6 +48,23 @@ abstract class BaseActivity : AppCompatActivity() {
         if (!Utils.getDarkModeStatus(this)) {
             WindowCompat.getInsetsController(window, window.decorView).apply {
                 isAppearanceLightStatusBars = true
+            }
+        }
+
+        val isHideFromRecents = MmkvManager.decodeSettingsBool(AppConfig.PREF_HIDE_FROM_RECENTS)
+        val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        activityManager.appTasks.forEach {
+            val taskInfo = it.taskInfo
+            // Adapted to different versions
+            val currentTaskId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                taskInfo.taskId
+            } else {
+                @Suppress("DEPRECATION")
+                taskInfo.id
+            }
+            if (currentTaskId == taskId) {
+                //set flag: Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+                it.setExcludeFromRecents(isHideFromRecents)
             }
         }
     }

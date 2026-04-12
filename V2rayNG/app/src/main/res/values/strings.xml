@@ -241,6 +241,9 @@
     <string name="title_pref_group_all_display">Enable show all groups</string>
     <string name="summary_pref_group_all_display">Add an extra "All Tabs" page</string>
 
+    <string name="title_pref_hide_from_recents">Hide from recent tasks</string>
+    <string name="summary_pref_hide_from_recents">Exclude the app from the recent tasks list (may need to restart the app)</string>
+
     <!-- AboutActivity -->
     <string name="title_pref_feedback">Feedback</string>
     <string name="summary_pref_feedback">Feedback enhancements or bugs to GitHub</string>

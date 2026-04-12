@@ -28,6 +28,11 @@
             android:summary="@string/summary_pref_group_all_display"
             android:title="@string/title_pref_group_all_display" />
 
+        <CheckBoxPreference
+            android:key="pref_hide_from_recents"
+            android:summary="@string/summary_pref_hide_from_recents"
+            android:title="@string/title_pref_hide_from_recents" />
+
         <ListPreference
             android:defaultValue="auto"
             android:entries="@array/language_select"
