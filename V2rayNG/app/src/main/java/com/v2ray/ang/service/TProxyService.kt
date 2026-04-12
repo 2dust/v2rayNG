@@ -56,7 +56,7 @@ class TProxyService(
     }
 
     private fun buildConfig(): String {
-        val socksPort = SettingsManager.getSocksPort()
+        val socksPort = SettingsManager.getEffectiveSocksPort()
         val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
         return buildString {
             appendLine("tunnel:")
@@ -71,6 +71,13 @@ class TProxyService(
             appendLine("  port: ${socksPort}")
             appendLine("  address: ${AppConfig.LOOPBACK}")
             appendLine("  udp: 'udp'")
+
+            val username = SettingsManager.getSocksAuthUsername()
+            val password = SettingsManager.getSocksAuthPassword()
+            if (username.isNotEmpty() && password.isNotEmpty()) {
+                appendLine("  username: '${username}'")
+                appendLine("  password: '${password}'")
+            }
 
             // Read-write timeout settings
             val timeoutSetting = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) ?: AppConfig.HEVTUN_RW_TIMEOUT

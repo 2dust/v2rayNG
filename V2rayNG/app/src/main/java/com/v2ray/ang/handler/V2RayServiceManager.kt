@@ -229,6 +229,7 @@ object V2RayServiceManager {
      */
     fun stopCoreLoop(): Boolean {
         val service = getService() ?: return false
+        SettingsManager.clearRuntimePort()
 
         if (coreController.isRunning) {
             CoroutineScope(Dispatchers.IO).launch {

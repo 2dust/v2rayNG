@@ -32,6 +32,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.Collections
 import java.util.Locale
+import java.util.UUID
 
 object SettingsManager {
 
@@ -276,12 +277,46 @@ object SettingsManager {
         return Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
     }
 
+    fun getSocksAuthUsername(): String =
+        MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_AUTH_USERNAME) ?: ""
+
+    fun getSocksAuthPassword(): String =
+        MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_AUTH_PASSWORD) ?: ""
+
+    @Volatile
+    private var runtimeSocksPort: Int = 0
+
+    fun getEffectiveSocksPort(): Int {
+        val port = runtimeSocksPort
+        return if (port > 0) port else getSocksPort()
+    }
+
+    fun randomizeSocksPort(): Int {
+        val random = java.security.SecureRandom()
+        repeat(10) {
+            val candidate = 49152 + random.nextInt(16384)
+            try {
+                java.net.ServerSocket(candidate, 0,
+                    java.net.InetAddress.getByName(AppConfig.LOOPBACK)).use {
+                    runtimeSocksPort = candidate
+                    return candidate
+                }
+            } catch (_: Exception) { }
+        }
+        runtimeSocksPort = getSocksPort()
+        return runtimeSocksPort
+    }
+
+    fun clearRuntimePort() {
+        runtimeSocksPort = 0
+    }
+
     /**
      * Get the HTTP port.
      * @return The HTTP port.
      */
     fun getHttpPort(): Int {
-        return getSocksPort() + if (Utils.isXray()) 0 else 1
+        return getEffectiveSocksPort() + if (Utils.isXray()) 0 else 1
     }
 
     /**
@@ -452,6 +487,22 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
+        ensureSocksAuthCredentials()
+    }
+
+    private fun ensureSocksAuthCredentials() {
+        if (MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_AUTH_USERNAME).isNullOrEmpty()) {
+            MmkvManager.encodeSettings(
+                AppConfig.PREF_SOCKS_AUTH_USERNAME,
+                UUID.randomUUID().toString().replace("-", "").take(16)
+            )
+        }
+        if (MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_AUTH_PASSWORD).isNullOrEmpty()) {
+            MmkvManager.encodeSettings(
+                AppConfig.PREF_SOCKS_AUTH_PASSWORD,
+                UUID.randomUUID().toString().replace("-", "").take(16)
+            )
+        }
     }
 
     private fun ensureDefaultValue(key: String, default: String) {

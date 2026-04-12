@@ -147,6 +147,11 @@ class V2RayVpnService : VpnService(), ServiceControl {
             return
         }
 
+        // Randomize SOCKS port before any config generation (hev-socks5-tunnel and xray-core)
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING) != true) {
+            SettingsManager.randomizeSocksPort()
+        }
+
         if (configureVpnService() != true) {
             Log.e(AppConfig.TAG, "StartCore-VPN: Configuration failed")
             stopSelf()

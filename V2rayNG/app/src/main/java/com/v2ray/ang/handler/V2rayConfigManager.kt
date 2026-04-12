@@ -372,13 +372,26 @@ object V2rayConfigManager {
      */
     private fun getInbounds(v2rayConfig: V2rayConfig): Boolean {
         try {
-            val socksPort = SettingsManager.getSocksPort()
+            val socksPort = SettingsManager.getEffectiveSocksPort()
             val inbound1 = v2rayConfig.inbounds[0]
 
             if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING) != true) {
                 inbound1.listen = AppConfig.LOOPBACK
             }
             inbound1.port = socksPort
+
+            // SOCKS5 authentication to prevent unauthorized proxy access from other apps
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING) != true) {
+                val username = SettingsManager.getSocksAuthUsername()
+                val password = SettingsManager.getSocksAuthPassword()
+                if (username.isNotEmpty() && password.isNotEmpty()) {
+                    inbound1.settings?.auth = "password"
+                    inbound1.settings?.accounts = listOf(
+                        V2rayConfig.InboundBean.InboundAccountBean(user = username, pass = password)
+                    )
+                }
+            }
+
             val fakedns = MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
             val sniffAllTlsAndHttp =
                 MmkvManager.decodeSettingsBool(AppConfig.PREF_SNIFFING_ENABLED, true) != false
@@ -397,6 +410,9 @@ object V2rayConfigManager {
                 inbound2.tag = EConfigType.HTTP.name.lowercase()
                 inbound2.port = SettingsManager.getHttpPort()
                 inbound2.protocol = EConfigType.HTTP.name.lowercase()
+                // Clear SOCKS-specific auth fields from HTTP inbound clone
+                inbound2.settings?.auth = null
+                inbound2.settings?.accounts = null
                 v2rayConfig.inbounds.add(inbound2)
             }
 
