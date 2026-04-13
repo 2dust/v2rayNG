@@ -276,6 +276,14 @@ object SettingsManager {
         return Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
     }
 
+    fun getSocksUsername(): String? {
+        return MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_USERNAME)?.trim()?.takeIf { it.isNotEmpty() }
+    }
+
+    fun getSocksPassword(): String? {
+        return MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PASSWORD)?.trim()?.takeIf { it.isNotEmpty() }
+    }
+
     /**
      * Get the HTTP port.
      * @return The HTTP port.

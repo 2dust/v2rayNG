@@ -44,10 +44,16 @@ data class V2rayConfig(
             var auth: String? = null,
             var udp: Boolean? = null,
             var userLevel: Int? = null,
+            var accounts: List<SocksAccountBean>? = null,
             var name: String? = null,
             @SerializedName("MTU")
             var mtu: Int? = null
-        )
+        ) {
+            data class SocksAccountBean(
+                var user: String = "",
+                var pass: String = ""
+            )
+        }
 
         data class SniffingBean(
             var enabled: Boolean,

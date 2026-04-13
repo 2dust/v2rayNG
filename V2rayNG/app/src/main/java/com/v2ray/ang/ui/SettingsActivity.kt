@@ -118,9 +118,17 @@ class SettingsActivity : BaseActivity() {
             fun updateSummary(pref: androidx.preference.Preference) {
                 when (pref) {
                     is EditTextPreference -> {
-                        pref.summary = pref.text.orEmpty()
+                        if (pref.key == AppConfig.PREF_SOCKS_PASSWORD) {
+                            pref.summary = if (pref.text.isNullOrEmpty()) "" else "******"
+                        } else {
+                            pref.summary = pref.text.orEmpty()
+                        }
                         pref.setOnPreferenceChangeListener { p, newValue ->
-                            p.summary = (newValue as? String).orEmpty()
+                            if (p.key == AppConfig.PREF_SOCKS_PASSWORD) {
+                                p.summary = if ((newValue as? String).isNullOrEmpty()) "" else "******"
+                            } else {
+                                p.summary = (newValue as? String).orEmpty()
+                            }
                             true
                         }
                     }

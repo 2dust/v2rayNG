@@ -219,6 +219,10 @@
 
     <string name="title_pref_socks_port">Cổng Proxy Local</string>
     <string name="summary_pref_socks_port">Cổng Proxy Local</string>
+    <string name="title_pref_socks_username">Tên người dùng Proxy Local (Không bắt buộc)</string>
+    <string name="summary_pref_socks_username">Tên người dùng</string>
+    <string name="title_pref_socks_password">Mật khẩu Proxy Local (Không bắt buộc)</string>
+    <string name="summary_pref_socks_password">Mật khẩu</string>
 
     <string name="title_pref_local_dns_port">Cổng Local DNS</string>
     <string name="summary_pref_local_dns_port">Cổng Local DNS</string>

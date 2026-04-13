@@ -158,6 +158,17 @@
             android:title="@string/title_pref_socks_port" />
 
         <EditTextPreference
+            android:key="pref_socks_username"
+            android:summary="@string/summary_pref_socks_username"
+            android:title="@string/title_pref_socks_username" />
+
+        <EditTextPreference
+            android:inputType="textPassword"
+            android:key="pref_socks_password"
+            android:summary="@string/summary_pref_socks_password"
+            android:title="@string/title_pref_socks_password" />
+
+        <EditTextPreference
             android:key="pref_remote_dns"
             android:summary="@string/summary_pref_remote_dns"
             android:title="@string/title_pref_remote_dns" />

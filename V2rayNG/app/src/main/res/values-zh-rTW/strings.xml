@@ -217,6 +217,10 @@
 
     <string name="title_pref_socks_port">本地代理埠</string>
     <string name="summary_pref_socks_port">本地代理埠</string>
+    <string name="title_pref_socks_username">本地代理使用者名稱 (選擇)</string>
+    <string name="summary_pref_socks_username">使用者名稱</string>
+    <string name="title_pref_socks_password">本地代理密碼 (選擇)</string>
+    <string name="summary_pref_socks_password">密碼</string>
 
     <string name="title_pref_local_dns_port">本機 DNS 埠</string>
     <string name="summary_pref_local_dns_port">本機 DNS 埠</string>

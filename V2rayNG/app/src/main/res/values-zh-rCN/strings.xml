@@ -214,10 +214,14 @@
     <string name="title_pref_allow_insecure">跳过证书验证 (allowInsecure)</string>
     <string name="summary_pref_allow_insecure">传输层安全选 tls 时，默认跳过证书验证 (allowInsecure)</string>
 
-    <string name="title_pref_socks_port">本地代理端口</string>
-    <string name="summary_pref_socks_port">本地代理端口</string>
+     <string name="title_pref_socks_port">本地代理端口</string>
+     <string name="summary_pref_socks_port">本地代理端口</string>
+     <string name="title_pref_socks_username">本地代理用户名 (可选)</string>
+     <string name="summary_pref_socks_username">用户名</string>
+     <string name="title_pref_socks_password">本地代理密码 (可选)</string>
+     <string name="summary_pref_socks_password">密码</string>
 
-    <string name="title_pref_local_dns_port">本地 DNS 端口</string>
+     <string name="title_pref_local_dns_port">本地 DNS 端口</string>
     <string name="summary_pref_local_dns_port">本地 DNS 端口</string>
 
     <string name="title_pref_confirm_remove">删除配置确认</string>
