@@ -31,7 +31,7 @@ data class V2rayConfig(
 
     data class InboundBean(
         var tag: String,
-        var port: Int,
+        var port: Int?,
         var protocol: String,
         var listen: String? = null,
         var settings: InSettingsBean? = null,
@@ -46,8 +46,7 @@ data class V2rayConfig(
             var userLevel: Int? = null,
             var accounts: List<SocksAccountBean>? = null,
             var name: String? = null,
-            @SerializedName("MTU")
-            var mtu: Int? = null
+            var mtu: List<Int>? = null
         ) {
             data class SocksAccountBean(
                 var user: String = "",
