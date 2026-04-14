@@ -219,6 +219,8 @@
 
     <string name="title_pref_socks_port">Cổng Proxy Local</string>
     <string name="summary_pref_socks_port">Cổng Proxy Local</string>
+    <string name="title_pref_dynamic_socks_port">Enable dynamic local proxy port</string>
+    <string name="summary_pref_dynamic_socks_port">Generate a random local proxy port each time the inbound is created</string>
     <string name="title_pref_socks_username">Tên người dùng Proxy Local (Không bắt buộc)</string>
     <string name="summary_pref_socks_username">Tên người dùng</string>
     <string name="title_pref_socks_password">Mật khẩu Proxy Local (Không bắt buộc)</string>
@@ -248,6 +250,7 @@
     <string name="toast_tg_app_not_found">Không tìm thấy ứng dụng Telegram!</string>
 
     <string name="title_privacy_policy">Chính sách bảo mật</string>
+    <string name="title_qr_code">Mã QR</string>
     <string name="title_about">Giới thiệu</string>
     <string name="title_source_code">Mã nguồn</string>
     <string name="title_oss_license">Open Source licenses</string>

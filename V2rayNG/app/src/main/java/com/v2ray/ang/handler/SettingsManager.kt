@@ -32,8 +32,12 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.Collections
 import java.util.Locale
+import kotlin.random.Random
 
 object SettingsManager {
+
+    @Volatile
+    private var runtimeSocksPort: Int? = null
 
     fun initApp(context: Context) {
         ensureDefaultSettings()
@@ -273,7 +277,22 @@ object SettingsManager {
      * @return The SOCKS port.
      */
     fun getSocksPort(): Int {
-        return Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+        val port =
+            if (IsDynamicSocksPort()) {
+                runtimeSocksPort ?: refreshRuntimeSocksPort()
+            } else {
+                Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+            }
+        return port ?: AppConfig.PORT_SOCKS.toInt()
+    }
+
+    @Synchronized
+    fun refreshRuntimeSocksPort(): Int? {
+        if (IsDynamicSocksPort()) {
+            runtimeSocksPort = generateRandomSocksPort()
+            return runtimeSocksPort
+        }
+        return null
     }
 
     fun getSocksUsername(): String? {
@@ -290,6 +309,18 @@ object SettingsManager {
      */
     fun getHttpPort(): Int {
         return getSocksPort() + if (Utils.isXray()) 0 else 1
+    }
+
+    private fun IsDynamicSocksPort(): Boolean {
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_DYNAMIC_SOCKS_PORT, false)
+    }
+
+    private fun generateRandomSocksPort(): Int {
+        return if (Utils.isXray()) {
+            Random.nextInt(10000, 65536)
+        } else {
+            Random.nextInt(10000, 65535)
+        }
     }
 
     /**

@@ -217,6 +217,8 @@
 
     <string name="title_pref_socks_port">پورت پروکسی محلی</string>
     <string name="summary_pref_socks_port">پورت پروکسی محلی</string>
+    <string name="title_pref_dynamic_socks_port">Enable dynamic local proxy port</string>
+    <string name="summary_pref_dynamic_socks_port">Generate a random local proxy port each time the inbound is created</string>
     <string name="title_pref_socks_username">Local proxy username (optional)</string>
     <string name="summary_pref_socks_username">Username</string>
     <string name="title_pref_socks_password">Local proxy password (optional)</string>
@@ -246,6 +248,7 @@
     <string name="toast_tg_app_not_found">برنامه تلگرام پیدا نشد</string>
 
     <string name="title_privacy_policy">حریم خصوصی</string>
+    <string name="title_qr_code">QR code</string>
     <string name="title_about">درباره</string>
     <string name="title_source_code">کد منبع</string>
     <string name="title_oss_license">مجوز های منبع باز</string>

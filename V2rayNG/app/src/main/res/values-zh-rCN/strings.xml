@@ -216,6 +216,8 @@
 
      <string name="title_pref_socks_port">本地代理端口</string>
      <string name="summary_pref_socks_port">本地代理端口</string>
+     <string name="title_pref_dynamic_socks_port">启用动态本地代理端口</string>
+     <string name="summary_pref_dynamic_socks_port">每次生成 inbound 时随机生成一个本地代理端口</string>
      <string name="title_pref_socks_username">本地代理用户名 (可选)</string>
      <string name="summary_pref_socks_username">用户名</string>
      <string name="title_pref_socks_password">本地代理密码 (可选)</string>
@@ -245,6 +247,7 @@
     <string name="summary_pref_tg_group">加入 Telegram Group</string>
     <string name="toast_tg_app_not_found">未找到 Telegram app</string>
     <string name="title_privacy_policy">隐私权政策</string>
+    <string name="title_qr_code">二维码</string>
     <string name="title_about">关于</string>
     <string name="title_source_code">源代码</string>
     <string name="title_oss_license">Open Source licenses</string>

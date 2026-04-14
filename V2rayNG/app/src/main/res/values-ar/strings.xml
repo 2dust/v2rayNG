@@ -219,6 +219,8 @@
 
     <string name="title_pref_socks_port">منفذ بروكسي Local</string>
     <string name="summary_pref_socks_port">منفذ بروكسي Local</string>
+    <string name="title_pref_dynamic_socks_port">Enable dynamic local proxy port</string>
+    <string name="summary_pref_dynamic_socks_port">Generate a random local proxy port each time the inbound is created</string>
     <string name="title_pref_socks_username">Local proxy username (optional)</string>
     <string name="summary_pref_socks_username">Username</string>
     <string name="title_pref_socks_password">Local proxy password (optional)</string>
@@ -247,6 +249,7 @@
     <string name="summary_pref_tg_group">الانضمام إلى مجموعة Telegram</string>
     <string name="toast_tg_app_not_found">لم يتم العثور على تطبيق Telegram</string>
     <string name="title_privacy_policy">سياسة الخصوصية</string>
+    <string name="title_qr_code">QR code</string>
     <string name="title_about">حول\nترجمة م. ابراهيم قاسم</string>
     <string name="title_source_code">الكود المصدري</string>
     <string name="title_oss_license">Open Source licenses</string>

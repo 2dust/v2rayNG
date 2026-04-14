@@ -173,6 +173,8 @@ object V2RayServiceManager {
         }
 
         Log.i(AppConfig.TAG, "StartCore-Manager: Starting core loop for ${config.remarks}")
+        // refresh socks port when enabled dynamic socks port
+        SettingsManager.refreshRuntimeSocksPort()
         val result = V2rayConfigManager.getV2rayConfig(service, guid)
         if (!result.status) {
             Log.e(AppConfig.TAG, "StartCore-Manager: Failed to get V2Ray config")

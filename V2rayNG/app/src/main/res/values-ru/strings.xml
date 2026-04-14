@@ -218,6 +218,8 @@
 
     <string name="title_pref_socks_port">Порт локального прокси</string>
     <string name="summary_pref_socks_port">Порт локального прокси</string>
+    <string name="title_pref_dynamic_socks_port">Enable dynamic local proxy port</string>
+    <string name="summary_pref_dynamic_socks_port">Generate a random local proxy port each time the inbound is created</string>
     <string name="title_pref_socks_username">Имя пользователя локального прокси (опционально)</string>
     <string name="summary_pref_socks_username">Имя пользователя</string>
     <string name="title_pref_socks_password">Пароль локального прокси (опционально)</string>
@@ -246,6 +248,7 @@
     <string name="summary_pref_tg_group">Присоединиться к группе в Telegram</string>
     <string name="toast_tg_app_not_found">Приложение Telegram не найдено</string>
     <string name="title_privacy_policy">Политика конфиденциальности</string>
+    <string name="title_qr_code">QR-код</string>
     <string name="title_about">О приложении</string>
     <string name="title_source_code">Исходный код</string>
     <string name="title_oss_license">Лицензии открытого исходного кода</string>
