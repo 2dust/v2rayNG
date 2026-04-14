@@ -5,7 +5,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.ParcelFileDescriptor
+import android.system.OsConstants
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
@@ -23,18 +25,26 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
+import libv2ray.ProcessFinder
 import java.lang.ref.SoftReference
+import java.net.InetSocketAddress
 
 object V2RayServiceManager {
 
     private val coreController: CoreController = V2RayNativeManager.newCoreController(CoreCallback())
     private val mMsgReceive = ReceiveMessageHandler()
     private var currentConfig: ProfileItem? = null
+    private var processFinder: XrayProcessFinder? = null
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
             field = value
-            V2RayNativeManager.initCoreEnv(value?.get()?.getService())
+            val service = value?.get()?.getService()
+            V2RayNativeManager.initCoreEnv(service)
+            if (service != null && processFinder == null) {
+                processFinder = XrayProcessFinder(service)
+                coreController.registerProcessFinder(processFinder)
+            }
         }
 
     /**
@@ -118,7 +128,6 @@ object V2RayServiceManager {
             Log.e(AppConfig.TAG, "StartCore-Manager: Invalid server configuration")
             return
         }
-
         // refresh socks port when enabled dynamic socks port
         SettingsManager.refreshRuntimeSocksPort()
 
@@ -178,6 +187,7 @@ object V2RayServiceManager {
 
         Log.i(AppConfig.TAG, "StartCore-Manager: Starting core loop for ${config.remarks}")
         val result = V2rayConfigManager.getV2rayConfig(service, guid)
+        Log.d(AppConfig.TAG, result.content)
         if (!result.status) {
             Log.e(AppConfig.TAG, "StartCore-Manager: Failed to get V2Ray config")
             return false
@@ -356,6 +366,34 @@ object V2RayServiceManager {
          */
         override fun onEmitStatus(l: Long, s: String?): Long {
             return 0
+        }
+    }
+
+    /**
+     * Process finder implementation for Xray core.
+     * Uses ConnectivityManager to find the owning UID of a connection based on network parameters.
+     */
+    private class XrayProcessFinder(context: Context) : ProcessFinder {
+        private val cm: ConnectivityManager? = context.getSystemService(ConnectivityManager::class.java)
+
+        override fun findProcessByConnection(network: String, srcIP: String, srcPort: Long, destIP: String, destPort: Long): Long {
+            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) return -1L
+            if (cm == null) return -1L
+            val proto = when (network) {
+                "tcp" -> OsConstants.IPPROTO_TCP
+                "udp" -> OsConstants.IPPROTO_UDP
+                else -> return -1L
+            }
+
+            return try {
+                cm.getConnectionOwnerUid(
+                    proto,
+                    InetSocketAddress(srcIP, srcPort.toInt()),
+                    InetSocketAddress(destIP, destPort.toInt())
+                ).toLong()
+            } catch (e: Exception) {
+                -1L
+            }
         }
     }
 
