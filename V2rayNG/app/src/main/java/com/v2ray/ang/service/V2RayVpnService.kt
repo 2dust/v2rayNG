@@ -14,7 +14,7 @@ import android.net.VpnService
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.StrictMode
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import androidx.annotation.RequiresApi
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
@@ -74,14 +74,14 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     override fun onCreate() {
         super.onCreate()
-        Log.i(AppConfig.TAG, "StartCore-VPN: Service created")
+        LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service created")
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         V2RayServiceManager.serviceControl = SoftReference(this)
     }
 
     override fun onRevoke() {
-        Log.w(AppConfig.TAG, "StartCore-VPN: Permission revoked")
+        LogUtil.w(AppConfig.TAG, "StartCore-VPN: Permission revoked")
         stopAllService()
     }
 
@@ -92,7 +92,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.i(AppConfig.TAG, "StartCore-VPN: Service destroyed")
+        LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service destroyed")
 
         // Ensure VPN interface is properly closed when the service is destroyed without
         // going through stopAllService() (e.g. when killed unexpectedly). isRunning is
@@ -101,10 +101,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
             try {
                 if (::mInterface.isInitialized) {
                     mInterface.close()
-                    Log.i(AppConfig.TAG, "StartCore-VPN: VPN interface closed in onDestroy")
+                    LogUtil.i(AppConfig.TAG, "StartCore-VPN: VPN interface closed in onDestroy")
                 }
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "StartCore-VPN: Failed to close interface in onDestroy", e)
+                LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to close interface in onDestroy", e)
             }
         }
 
@@ -112,7 +112,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i(AppConfig.TAG, "StartCore-VPN: Service command received")
+        LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service command received")
         setupVpnService()
         startService()
         return START_STICKY
@@ -125,11 +125,11 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     override fun startService() {
         if (!::mInterface.isInitialized) {
-            Log.e(AppConfig.TAG, "StartCore-VPN: Interface not initialized")
+            LogUtil.e(AppConfig.TAG, "StartCore-VPN: Interface not initialized")
             return
         }
         if (!V2RayServiceManager.startCoreLoop(mInterface)) {
-            Log.e(AppConfig.TAG, "StartCore-VPN: Failed to start core loop")
+            LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to start core loop")
             stopAllService()
             return
         }
@@ -157,13 +157,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
     private fun setupVpnService() {
         val prepare = prepare(this)
         if (prepare != null) {
-            Log.e(AppConfig.TAG, "StartCore-VPN: Permission not granted")
+            LogUtil.e(AppConfig.TAG, "StartCore-VPN: Permission not granted")
             stopSelf()
             return
         }
 
         if (configureVpnService() != true) {
-            Log.e(AppConfig.TAG, "StartCore-VPN: Configuration failed")
+            LogUtil.e(AppConfig.TAG, "StartCore-VPN: Configuration failed")
             stopSelf()
             return
         }
@@ -190,7 +190,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 mInterface.close()
             }
         } catch (e: Exception) {
-            Log.w(AppConfig.TAG, "Failed to close old interface", e)
+            LogUtil.w(AppConfig.TAG, "Failed to close old interface", e)
         }
 
         // Configure platform-specific features
@@ -202,7 +202,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             isRunning = true
             return true
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to establish VPN interface", e)
+            LogUtil.e(AppConfig.TAG, "Failed to establish VPN interface", e)
             stopAllService()
         }
         return false
@@ -267,7 +267,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             try {
                 connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "StartCore-VPN: Failed to request network", e)
+                LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to request network", e)
             }
         }
 
@@ -320,7 +320,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                     builder.addAllowedApplication(it)
                 }
             } catch (e: PackageManager.NameNotFoundException) {
-                Log.e(AppConfig.TAG, "StartCore-VPN: Failed to configure app", e)
+                LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to configure app", e)
             }
         }
     }
@@ -354,7 +354,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             try {
                 connectivity.unregisterNetworkCallback(defaultNetworkCallback)
             } catch (e: Exception) {
-                Log.w(AppConfig.TAG, "StartCore-VPN: Failed to unregister callback", e)
+                LogUtil.w(AppConfig.TAG, "StartCore-VPN: Failed to unregister callback", e)
             }
         }
 
@@ -377,16 +377,16 @@ class V2RayVpnService : VpnService(), ServiceControl {
             try {
                 Thread.sleep(100)
             } catch (e: InterruptedException) {
-                Log.w(AppConfig.TAG, "StartCore-VPN: Sleep interrupted", e)
+                LogUtil.w(AppConfig.TAG, "StartCore-VPN: Sleep interrupted", e)
             }
 
             try {
                 if (::mInterface.isInitialized) {
                     mInterface.close()
-                    Log.i(AppConfig.TAG, "StartCore-VPN: VPN interface closed")
+                    LogUtil.i(AppConfig.TAG, "StartCore-VPN: VPN interface closed")
                 }
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "StartCore-VPN: Failed to close interface", e)
+                LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to close interface", e)
             }
         }
     }

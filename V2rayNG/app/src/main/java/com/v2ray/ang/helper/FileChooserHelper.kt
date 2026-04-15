@@ -3,7 +3,7 @@ package com.v2ray.ang.helper
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -58,7 +58,7 @@ class FileChooserHelper(private val activity: AppCompatActivity) {
                 Intent.createChooser(intent, activity.getString(R.string.title_file_chooser))
             )
         } catch (ex: ActivityNotFoundException) {
-            Log.e(AppConfig.TAG, "File chooser activity not found", ex)
+            LogUtil.e(AppConfig.TAG, "File chooser activity not found", ex)
             activity.toast(R.string.toast_require_file_manager)
             fileChooserCallback?.invoke(null)
             fileChooserCallback = null
@@ -79,7 +79,7 @@ class FileChooserHelper(private val activity: AppCompatActivity) {
         try {
             documentCreateLauncher.launch(fileName)
         } catch (ex: ActivityNotFoundException) {
-            Log.e(AppConfig.TAG, "Document creator activity not found", ex)
+            LogUtil.e(AppConfig.TAG, "Document creator activity not found", ex)
             activity.toast(R.string.toast_require_file_manager)
             documentCreateCallback?.invoke(null)
             documentCreateCallback = null

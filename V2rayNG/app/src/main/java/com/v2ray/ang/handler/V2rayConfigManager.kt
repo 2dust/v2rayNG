@@ -2,7 +2,7 @@ package com.v2ray.ang.handler
 
 import android.content.Context
 import android.text.TextUtils
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import com.google.gson.JsonArray
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ConfigResult
@@ -54,7 +54,7 @@ object V2rayConfigManager {
                 getV2rayNormalConfig(context, guid, config)
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to get V2ray config", e)
+            LogUtil.e(AppConfig.TAG, "Failed to get V2ray config", e)
             return ConfigResult(false)
         }
     }
@@ -78,7 +78,7 @@ object V2rayConfigManager {
                 getV2rayNormalConfig4Speedtest(context, guid, config)
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to get V2ray config for speedtest", e)
+            LogUtil.e(AppConfig.TAG, "Failed to get V2ray config for speedtest", e)
             return ConfigResult(false)
         }
     }
@@ -187,7 +187,7 @@ object V2rayConfigManager {
         val address = config.server ?: return result
         if (!Utils.isPureIpAddress(address)) {
             if (!Utils.isValidUrl(address)) {
-                Log.w(AppConfig.TAG, "$address is an invalid ip or domain")
+                LogUtil.w(AppConfig.TAG, "$address is an invalid ip or domain")
                 return result
             }
         }
@@ -234,7 +234,7 @@ object V2rayConfigManager {
             .toList()
 
         if (validConfigs.isEmpty()) {
-            Log.w(AppConfig.TAG, "All configs are invalid")
+            LogUtil.w(AppConfig.TAG, "All configs are invalid")
             return null
         }
 
@@ -296,7 +296,7 @@ object V2rayConfigManager {
         val address = config.server ?: return result
         if (!Utils.isPureIpAddress(address)) {
             if (!Utils.isValidUrl(address)) {
-                Log.w(AppConfig.TAG, "$address is an invalid ip or domain")
+                LogUtil.w(AppConfig.TAG, "$address is an invalid ip or domain")
                 return result
             }
         }
@@ -424,7 +424,7 @@ object V2rayConfigManager {
                 inboundTun?.sniffing = inbound1.sniffing
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to configure inbounds", e)
+            LogUtil.e(AppConfig.TAG, "Failed to configure inbounds", e)
             return false
         }
         return true
@@ -465,7 +465,7 @@ object V2rayConfigManager {
                 getRoutingUserRule(context, key, v2rayConfig)
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to configure routing", e)
+            LogUtil.e(AppConfig.TAG, "Failed to configure routing", e)
             return false
         }
         return true
@@ -509,7 +509,7 @@ object V2rayConfigManager {
             v2rayConfig.routing.rules.add(rule)
 
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to apply routing user rule", e)
+            LogUtil.e(AppConfig.TAG, "Failed to apply routing user rule", e)
         }
     }
 
@@ -598,7 +598,7 @@ object V2rayConfigManager {
                 )
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to configure custom local DNS", e)
+            LogUtil.e(AppConfig.TAG, "Failed to configure custom local DNS", e)
             return false
         }
         return true
@@ -679,7 +679,7 @@ object V2rayConfigManager {
                     if (userHostsMap != null) hosts.putAll(userHostsMap)
                 }
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to configure user DNS hosts", e)
+                LogUtil.e(AppConfig.TAG, "Failed to configure user DNS hosts", e)
             }
 
             // DNS dns
@@ -705,7 +705,7 @@ object V2rayConfigManager {
                 )
             )
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to configure DNS", e)
+            LogUtil.e(AppConfig.TAG, "Failed to configure DNS", e)
             return false
         }
         return true
@@ -788,7 +788,7 @@ object V2rayConfigManager {
                 }
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to configure more outbounds", e)
+            LogUtil.e(AppConfig.TAG, "Failed to configure more outbounds", e)
             return false
         }
 
@@ -869,7 +869,7 @@ object V2rayConfigManager {
 
 
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to update outbound with global settings", e)
+            LogUtil.e(AppConfig.TAG, "Failed to update outbound with global settings", e)
             return false
         }
         return true
@@ -970,7 +970,7 @@ object V2rayConfigManager {
                 )
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to configure balance", e)
+            LogUtil.e(AppConfig.TAG, "Failed to configure balance", e)
         }
     }
 
@@ -1054,7 +1054,7 @@ object V2rayConfigManager {
             prependMask("udp", noiseMask)
             streamSettings.finalmask = finalMaskObj
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to update outbound fragment", e)
+            LogUtil.e(AppConfig.TAG, "Failed to update outbound fragment", e)
             return false
         }
         return true
@@ -1388,7 +1388,7 @@ object V2rayConfigManager {
             if (parsedFinalMask != null) {
                 streamSettings.finalmask = parsedFinalMask
             } else {
-                Log.w("V2rayConfigManager", "Invalid finalMask JSON, keeping previously generated finalmask")
+                LogUtil.w("V2rayConfigManager", "Invalid finalMask JSON, keeping previously generated finalmask")
             }
         }
         return sni

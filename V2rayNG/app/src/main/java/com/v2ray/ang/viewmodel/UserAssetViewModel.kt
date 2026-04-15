@@ -1,6 +1,6 @@
 package com.v2ray.ang.viewmodel
 
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import androidx.lifecycle.ViewModel
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.AssetUrlCache
@@ -95,7 +95,7 @@ class UserAssetViewModel : ViewModel() {
                 return true
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to download geo file: ${item.remarks}", e)
+            LogUtil.e(AppConfig.TAG, "Failed to download geo file: ${item.remarks}", e)
         } finally {
             conn.disconnect()
         }

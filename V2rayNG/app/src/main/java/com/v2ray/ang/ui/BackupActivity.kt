@@ -3,7 +3,7 @@ package com.v2ray.ang.ui
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.tencent.mmkv.MMKV
@@ -149,7 +149,7 @@ class BackupActivity : HelperBaseActivity() {
                     toastError(R.string.toast_failure)
                 }
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Error during file restore", e)
+                LogUtil.e(AppConfig.TAG, "Error during file restore", e)
                 toastError(R.string.toast_failure)
             }
         }
@@ -180,7 +180,7 @@ class BackupActivity : HelperBaseActivity() {
                         toastError(R.string.toast_failure)
                     }
                 } catch (e: Exception) {
-                    Log.e(AppConfig.TAG, "Failed to backup configuration", e)
+                    LogUtil.e(AppConfig.TAG, "Failed to backup configuration", e)
                     toastError(R.string.toast_failure)
                 }
             }
@@ -217,7 +217,7 @@ class BackupActivity : HelperBaseActivity() {
                 val ok = try {
                     WebDavManager.uploadFile(tempFile, WEBDAV_BACKUP_FILE_NAME)
                 } catch (e: Exception) {
-                    Log.e(AppConfig.TAG, "WebDAV upload error", e)
+                    LogUtil.e(AppConfig.TAG, "WebDAV upload error", e)
                     false
                 }
 
@@ -225,7 +225,7 @@ class BackupActivity : HelperBaseActivity() {
                     if (ok) toastSuccess(R.string.toast_success) else toastError(R.string.toast_failure)
                 }
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "WebDAV backup error", e)
+                LogUtil.e(AppConfig.TAG, "WebDAV backup error", e)
                 withContext(Dispatchers.Main) {
                     toastError(R.string.toast_failure)
                 }
@@ -272,7 +272,7 @@ class BackupActivity : HelperBaseActivity() {
                     }
                 }
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "WebDAV download error", e)
+                LogUtil.e(AppConfig.TAG, "WebDAV download error", e)
                 withContext(Dispatchers.Main) { toastError(R.string.toast_failure) }
             } finally {
                 try {

@@ -1,6 +1,6 @@
 package com.v2ray.ang.ui
 
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -33,7 +33,7 @@ class LogcatRecyclerAdapter(
                 onLongClick?.invoke(log) ?: false
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Error binding log view data", e)
+            LogUtil.e(AppConfig.TAG, "Error binding log view data", e)
         }
     }
 

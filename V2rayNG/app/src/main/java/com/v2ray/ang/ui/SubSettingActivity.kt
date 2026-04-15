@@ -3,7 +3,7 @@ package com.v2ray.ang.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -156,7 +156,7 @@ class SubSettingActivity : BaseActivity() {
                             else -> ownerActivity.toast("else")
                         }
                     } catch (e: Exception) {
-                        Log.e(AppConfig.TAG, "Share subscription failed", e)
+                        LogUtil.e(AppConfig.TAG, "Share subscription failed", e)
                     }
                 }.show()
         }

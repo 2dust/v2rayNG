@@ -1,7 +1,7 @@
 package com.v2ray.ang.handler
 
 import android.content.Context
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.util.Utils
 import go.Seq
@@ -32,14 +32,14 @@ object V2RayNativeManager {
                 val assetPath = Utils.userAssetPath(context)
                 val deviceId = Utils.getDeviceIdForXUDPBaseKey()
                 Libv2ray.initCoreEnv(assetPath, deviceId)
-                Log.i(AppConfig.TAG, "V2Ray core environment initialized successfully")
+                LogUtil.i(AppConfig.TAG, "V2Ray core environment initialized successfully")
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to initialize V2Ray core environment", e)
+                LogUtil.e(AppConfig.TAG, "Failed to initialize V2Ray core environment", e)
                 initialized.set(false)
                 throw e
             }
         } else {
-            Log.d(AppConfig.TAG, "V2Ray core environment already initialized, skipping")
+            LogUtil.d(AppConfig.TAG, "V2Ray core environment already initialized, skipping")
         }
     }
 
@@ -53,7 +53,7 @@ object V2RayNativeManager {
         return try {
             Libv2ray.checkVersionX()
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to check V2Ray version", e)
+            LogUtil.e(AppConfig.TAG, "Failed to check V2Ray version", e)
             "Unknown"
         }
     }
@@ -69,7 +69,7 @@ object V2RayNativeManager {
         return try {
             Libv2ray.measureOutboundDelay(config, testUrl)
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to measure outbound delay", e)
+            LogUtil.e(AppConfig.TAG, "Failed to measure outbound delay", e)
             -1L
         }
     }
@@ -84,7 +84,7 @@ object V2RayNativeManager {
         return try {
             Libv2ray.newCoreController(handler)
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to create core controller", e)
+            LogUtil.e(AppConfig.TAG, "Failed to create core controller", e)
             throw e
         }
     }

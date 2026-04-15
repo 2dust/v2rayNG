@@ -4,7 +4,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.handler.SettingsManager
@@ -18,7 +18,7 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
      */
     override fun onCreate() {
         super.onCreate()
-        Log.i(AppConfig.TAG, "StartCore-Proxy: Service created")
+        LogUtil.i(AppConfig.TAG, "StartCore-Proxy: Service created")
         V2RayServiceManager.serviceControl = SoftReference(this)
     }
 
@@ -30,7 +30,7 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
      * @return The start mode.
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i(AppConfig.TAG, "StartCore-Proxy: Service command received")
+        LogUtil.i(AppConfig.TAG, "StartCore-Proxy: Service command received")
         V2RayServiceManager.startCoreLoop(null)
         return START_STICKY
     }

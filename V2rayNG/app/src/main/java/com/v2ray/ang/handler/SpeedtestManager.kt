@@ -2,7 +2,7 @@ package com.v2ray.ang.handler
 
 import android.content.Context
 import android.os.SystemClock
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.IPAPIInfo
@@ -62,11 +62,11 @@ object SpeedtestManager {
             socket.close()
             return time
         } catch (e: UnknownHostException) {
-            Log.e(AppConfig.TAG, "Unknown host: $url", e)
+            LogUtil.e(AppConfig.TAG, "Unknown host: $url", e)
         } catch (e: IOException) {
-            Log.e(AppConfig.TAG, "socketConnectTime IOException: $e")
+            LogUtil.e(AppConfig.TAG, "socketConnectTime IOException: $e")
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to establish socket connection to $url:$port", e)
+            LogUtil.e(AppConfig.TAG, "Failed to establish socket connection to $url:$port", e)
         }
         return -1
     }
@@ -108,10 +108,10 @@ object SpeedtestManager {
                 )
             }
         } catch (e: IOException) {
-            Log.e(AppConfig.TAG, "Connection test IOException", e)
+            LogUtil.e(AppConfig.TAG, "Connection test IOException", e)
             result = context.getString(R.string.connection_test_error, e.message)
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Connection test Exception", e)
+            LogUtil.e(AppConfig.TAG, "Connection test Exception", e)
             result = context.getString(R.string.connection_test_error, e.message)
         } finally {
             conn.disconnect()

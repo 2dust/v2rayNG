@@ -1,6 +1,6 @@
 package com.v2ray.ang.fmt
 
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
@@ -85,7 +85,7 @@ object ShadowsocksFmt : FmtBase() {
                 config.remarks =
                     Utils.decodeURIComponent(result.substring(indexSplit + 1, result.length))
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to decode remarks in SS legacy URL", e)
+                LogUtil.e(AppConfig.TAG, "Failed to decode remarks in SS legacy URL", e)
             }
 
             result = result.substring(0, indexSplit)

@@ -2,7 +2,7 @@ package com.v2ray.ang.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -79,11 +79,11 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
             if (mainViewModel.subscriptionId != subId) {
                 return@observe
             }
-            // Log.d(TAG, "GroupServerFragment updateListAction subId=$subId")
+            // LogUtil.d(TAG, "GroupServerFragment updateListAction subId=$subId")
             adapter.setData(mainViewModel.serversCache, index)
         }
 
-        // Log.d(TAG, "GroupServerFragment onViewCreated: subId=$subId")
+        // LogUtil.d(TAG, "GroupServerFragment onViewCreated: subId=$subId")
     }
 
     override fun onResume() {
@@ -112,7 +112,7 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
                     else -> ownerActivity.toast("else")
                 }
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Error when sharing server", e)
+                LogUtil.e(AppConfig.TAG, "Error when sharing server", e)
             }
         }.show()
     }

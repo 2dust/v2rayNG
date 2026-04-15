@@ -3,7 +3,7 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.graphics.Bitmap
 import android.text.TextUtils
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.HY2
 import com.v2ray.ang.R
@@ -47,7 +47,7 @@ object AngConfigManager {
             Utils.setClipboard(context, conf)
 
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to share config to clipboard", e)
+            LogUtil.e(AppConfig.TAG, "Failed to share config to clipboard", e)
             return -1
         }
         return 0
@@ -76,7 +76,7 @@ object AngConfigManager {
             }
             return sb.lines().count() - 1
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to share non-custom configs to clipboard", e)
+            LogUtil.e(AppConfig.TAG, "Failed to share non-custom configs to clipboard", e)
             return -1
         }
     }
@@ -96,7 +96,7 @@ object AngConfigManager {
             return QRCodeDecoder.createQRCode(conf)
 
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to share config as QR code", e)
+            LogUtil.e(AppConfig.TAG, "Failed to share config as QR code", e)
             return null
         }
     }
@@ -118,7 +118,7 @@ object AngConfigManager {
                 return -1
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to share full content to clipboard", e)
+            LogUtil.e(AppConfig.TAG, "Failed to share full content to clipboard", e)
             return -1
         }
         return 0
@@ -148,7 +148,7 @@ object AngConfigManager {
                 else -> {}
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to share config for GUID: $guid", e)
+            LogUtil.e(AppConfig.TAG, "Failed to share config for GUID: $guid", e)
             return ""
         }
     }
@@ -203,7 +203,7 @@ object AngConfigManager {
                 }
             return count
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to parse batch subscription", e)
+            LogUtil.e(AppConfig.TAG, "Failed to parse batch subscription", e)
         }
         return 0
     }
@@ -257,7 +257,7 @@ object AngConfigManager {
 
             return configs.size
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to parse batch config", e)
+            LogUtil.e(AppConfig.TAG, "Failed to parse batch config", e)
         }
         return 0
     }
@@ -388,7 +388,7 @@ object AngConfigManager {
                     return count
                 }
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to parse custom config server JSON array", e)
+                LogUtil.e(AppConfig.TAG, "Failed to parse custom config server JSON array", e)
             }
 
             try {
@@ -403,7 +403,7 @@ object AngConfigManager {
                 MmkvManager.encodeServerRaw(key, server)
                 return 1
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to parse custom config server as single config", e)
+                LogUtil.e(AppConfig.TAG, "Failed to parse custom config server as single config", e)
             }
             return 0
         } else if (server.startsWith("[Interface]") && server.contains("[Peer]")) {
@@ -417,7 +417,7 @@ object AngConfigManager {
                 MmkvManager.encodeServerRaw(key, server)
                 return 1
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to parse WireGuard config file", e)
+                LogUtil.e(AppConfig.TAG, "Failed to parse WireGuard config file", e)
             }
             return 0
         } else {
@@ -478,7 +478,7 @@ object AngConfigManager {
 
             return config
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to parse config", e)
+            LogUtil.e(AppConfig.TAG, "Failed to parse config", e)
             return null
         }
     }
@@ -495,7 +495,7 @@ object AngConfigManager {
                 acc + updateConfigViaSub(subscription)
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to update config via all subscriptions", e)
+            LogUtil.e(AppConfig.TAG, "Failed to update config via all subscriptions", e)
             SubscriptionUpdateResult()
         }
     }
@@ -530,21 +530,21 @@ object AngConfigManager {
                     return SubscriptionUpdateResult(failureCount = 1)
                 }
             }
-            Log.i(AppConfig.TAG, url)
+            LogUtil.i(AppConfig.TAG, url)
             val userAgent = it.subscription.userAgent
 
             var configText = try {
                 val httpPort = SettingsManager.getHttpPort()
                 HttpUtil.getUrlContentWithUserAgent(url, userAgent, 15000, httpPort)
             } catch (e: Exception) {
-                Log.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
+                LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
                 ""
             }
             if (configText.isEmpty()) {
                 configText = try {
                     HttpUtil.getUrlContentWithUserAgent(url, userAgent)
                 } catch (e: Exception) {
-                    Log.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
+                    LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
                     ""
                 }
             }
@@ -556,7 +556,7 @@ object AngConfigManager {
             if (count > 0) {
                 it.subscription.lastUpdated = System.currentTimeMillis()
                 MmkvManager.encodeSubscription(it.guid, it.subscription)
-                Log.i(AppConfig.TAG, "Subscription updated: ${it.subscription.remarks}, $count configs")
+                LogUtil.i(AppConfig.TAG, "Subscription updated: ${it.subscription.remarks}, $count configs")
                 return SubscriptionUpdateResult(
                     configCount = count,
                     successCount = 1
@@ -566,7 +566,7 @@ object AngConfigManager {
                 return SubscriptionUpdateResult(failureCount = 1)
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to update config via subscription", e)
+            LogUtil.e(AppConfig.TAG, "Failed to update config via subscription", e)
             return SubscriptionUpdateResult(failureCount = 1)
         }
     }

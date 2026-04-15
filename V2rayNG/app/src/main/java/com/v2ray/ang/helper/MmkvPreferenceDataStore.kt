@@ -5,6 +5,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.util.LogUtil
 
 /**
  * PreferenceDataStore implementation that bridges AndroidX Preference framework to MMKV storage.
@@ -73,6 +74,10 @@ class MmkvPreferenceDataStore : PreferenceDataStore() {
 
     // Internal helper: notify other modules about setting changes
     private fun notifySettingChanged(key: String) {
+        if (key == AppConfig.PREF_LOGLEVEL) {
+            LogUtil.refreshLogLevel()
+        }
+
         // Call SettingsManager.setNightMode if UI mode changed
         if (key == AppConfig.PREF_UI_MODE_NIGHT) {
             SettingsManager.setNightMode()

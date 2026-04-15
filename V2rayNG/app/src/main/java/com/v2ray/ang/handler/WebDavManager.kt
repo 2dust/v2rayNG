@@ -1,6 +1,6 @@
 package com.v2ray.ang.handler
 
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.WebDavConfig
 import kotlinx.coroutines.Dispatchers
@@ -67,14 +67,14 @@ object WebDavManager {
             cl.newCall(req).execute().use { resp ->
                 val success = resp.isSuccessful
                 if (success) {
-                    Log.i(AppConfig.TAG, "WebDAV upload success: $remote")
+                    LogUtil.i(AppConfig.TAG, "WebDAV upload success: $remote")
                 } else {
-                    Log.e(AppConfig.TAG, "WebDAV upload failed: $remote (HTTP ${resp.code})")
+                    LogUtil.e(AppConfig.TAG, "WebDAV upload failed: $remote (HTTP ${resp.code})")
                 }
                 return@withContext success
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "WebDAV upload exception: $remote", e)
+            LogUtil.e(AppConfig.TAG, "WebDAV upload exception: $remote", e)
             return@withContext false
         }
     }
@@ -93,7 +93,7 @@ object WebDavManager {
             val req = applyAuth(Request.Builder().url(remote).get()).build()
             cl.newCall(req).execute().use { resp ->
                 if (!resp.isSuccessful) {
-                    Log.e(AppConfig.TAG, "WebDAV download failed: $remote (HTTP ${resp.code})")
+                    LogUtil.e(AppConfig.TAG, "WebDAV download failed: $remote (HTTP ${resp.code})")
                     return@withContext false
                 }
 
@@ -104,11 +104,11 @@ object WebDavManager {
                     }
                 }
 
-                Log.i(AppConfig.TAG, "WebDAV download success: $remote")
+                LogUtil.i(AppConfig.TAG, "WebDAV download success: $remote")
                 return@withContext true
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "WebDAV download exception: $remote", e)
+            LogUtil.e(AppConfig.TAG, "WebDAV download exception: $remote", e)
             return@withContext false
         }
     }
@@ -169,7 +169,7 @@ object WebDavManager {
                     cl.newCall(req).execute().use { resp ->
                         // 201 Created or 405 Method Not Allowed (already exists) are acceptable
                         if (resp.code != 201 && resp.code != 405 && resp.code != 409) {
-                            Log.w(AppConfig.TAG, "WebDAV MKCOL $mkUrl returned ${resp.code}")
+                            LogUtil.w(AppConfig.TAG, "WebDAV MKCOL $mkUrl returned ${resp.code}")
                         }
                     }
                 } catch (_: Exception) {
@@ -177,7 +177,7 @@ object WebDavManager {
                 }
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "WebDAV ensureRemoteDirs error", e)
+            LogUtil.e(AppConfig.TAG, "WebDAV ensureRemoteDirs error", e)
         }
     }
 }

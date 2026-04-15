@@ -2,7 +2,7 @@ package com.v2ray.ang.handler
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.dto.CheckUpdateResult
@@ -42,7 +42,7 @@ object UpdateCheckerManager {
         }
 
         val latestVersion = latestRelease.tagName.removePrefix("v")
-        Log.i(
+        LogUtil.i(
             AppConfig.TAG,
             "Found new version: $latestVersion (current: ${BuildConfig.VERSION_NAME})"
         )
@@ -69,27 +69,27 @@ object UpdateCheckerManager {
 
             try {
                 val apkFile = File(context.cacheDir, "update.apk")
-                Log.i(AppConfig.TAG, "Downloading APK to: ${apkFile.absolutePath}")
+                LogUtil.i(AppConfig.TAG, "Downloading APK to: ${apkFile.absolutePath}")
 
                 FileOutputStream(apkFile).use { outputStream ->
                     connection.inputStream.use { inputStream ->
                         inputStream.copyTo(outputStream)
                     }
                 }
-                Log.i(AppConfig.TAG, "APK download completed")
+                LogUtil.i(AppConfig.TAG, "APK download completed")
                 return@withContext apkFile
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to download APK: ${e.message}")
+                LogUtil.e(AppConfig.TAG, "Failed to download APK: ${e.message}")
                 return@withContext null
             } finally {
                 try {
                     connection.disconnect()
                 } catch (e: Exception) {
-                    Log.e(AppConfig.TAG, "Error closing connection: ${e.message}")
+                    LogUtil.e(AppConfig.TAG, "Error closing connection: ${e.message}")
                 }
             }
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to initiate download: ${e.message}")
+            LogUtil.e(AppConfig.TAG, "Failed to initiate download: ${e.message}")
             return@withContext null
         }
     }

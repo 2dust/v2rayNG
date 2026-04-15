@@ -6,7 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -84,7 +84,7 @@ class UserAssetActivity : HelperBaseActivity() {
                 MmkvManager.encodeSettings(AppConfig.PREF_GEO_FILES_SOURCES, value)
                 binding.tvGeoFilesSourcesSummary.text = value
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to set geo files sources", e)
+                LogUtil.e(AppConfig.TAG, "Failed to set geo files sources", e)
             }
         }.show()
     }
@@ -136,7 +136,7 @@ class UserAssetActivity : HelperBaseActivity() {
             }.also { cursor.close() }
         }
     } catch (e: Exception) {
-        Log.e(AppConfig.TAG, "Failed to get cursor name", e)
+        LogUtil.e(AppConfig.TAG, "Failed to get cursor name", e)
         null
     }
 
@@ -162,7 +162,7 @@ class UserAssetActivity : HelperBaseActivity() {
                     .putExtra(UserAssetUrlActivity.ASSET_URL_QRCODE, url)
             )
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to import asset from URL", e)
+            LogUtil.e(AppConfig.TAG, "Failed to import asset from URL", e)
             return false
         }
         return true

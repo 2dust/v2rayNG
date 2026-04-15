@@ -3,6 +3,7 @@ package com.v2ray.ang.viewmodel
 import androidx.lifecycle.ViewModel
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import com.v2ray.ang.util.LogUtil
 import java.io.IOException
 
 class LogcatViewModel : ViewModel() {
@@ -28,7 +29,7 @@ class LogcatViewModel : ViewModel() {
             logsetsAll.addAll(allText)
             applyFilter()
         } catch (e: IOException) {
-            android.util.Log.e(AppConfig.TAG, "Failed to get logcat", e)
+            LogUtil.e(AppConfig.TAG, "Failed to get logcat", e)
         }
     }
 
@@ -43,7 +44,7 @@ class LogcatViewModel : ViewModel() {
             logsetsAll.clear()
             filteredLogs = emptyList()
         } catch (e: IOException) {
-            android.util.Log.e(AppConfig.TAG, "Failed to clear logcat", e)
+           LogUtil.e(AppConfig.TAG, "Failed to clear logcat", e)
         }
     }
 

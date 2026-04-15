@@ -1,7 +1,7 @@
 package com.v2ray.ang.fmt
 
 import android.text.TextUtils
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
@@ -34,7 +34,7 @@ object VmessFmt : FmtBase() {
         var result = str.replace(EConfigType.VMESS.protocolScheme, "")
         result = Utils.decode(result)
         if (TextUtils.isEmpty(result)) {
-            Log.w(AppConfig.TAG, "Toast decoding failed")
+            LogUtil.w(AppConfig.TAG, "Toast decoding failed")
             return null
         }
         val vmessQRCode = JsonUtil.fromJson(result, VmessQRCode::class.java) ?: return null
@@ -44,7 +44,7 @@ object VmessFmt : FmtBase() {
             || TextUtils.isEmpty(vmessQRCode.id)
             || TextUtils.isEmpty(vmessQRCode.net)
         ) {
-            Log.w(AppConfig.TAG, "Toast incorrect protocol")
+            LogUtil.w(AppConfig.TAG, "Toast incorrect protocol")
             return null
         }
 

@@ -3,7 +3,7 @@ package com.v2ray.ang.ui
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import android.view.Menu
 import android.view.MenuItem
 import com.v2ray.ang.AppConfig
@@ -95,7 +95,7 @@ class ScannerActivity : HelperBaseActivity() {
                     finished(text)
                 }
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to decode QR code from file", e)
+                LogUtil.e(AppConfig.TAG, "Failed to decode QR code from file", e)
                 toast(R.string.toast_decoding_failed)
             }
         }

@@ -1,6 +1,5 @@
 package com.v2ray.ang.util
 
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -72,7 +71,7 @@ object JsonUtil {
         try {
             return JsonParser.parseString(src).getAsJsonObject()
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to parse JSON string", e)
+            LogUtil.e(AppConfig.TAG, "Failed to parse JSON string", e)
             return null
         }
     }

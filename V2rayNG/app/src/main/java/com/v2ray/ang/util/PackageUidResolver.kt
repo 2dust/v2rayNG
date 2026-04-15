@@ -2,7 +2,7 @@ package com.v2ray.ang.util
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import java.util.concurrent.ConcurrentHashMap
 
 object PackageUidResolver {
@@ -35,10 +35,10 @@ object PackageUidResolver {
     private fun resolveUid(context: Context, packageName: String): String? {
         return try {
             val uid = context.packageManager.getPackageUid(packageName, 0).toString()
-            Log.d(TAG, "Package: $packageName -> UID: $uid")
+            LogUtil.d(TAG, "Package: $packageName -> UID: $uid")
             uid
         } catch (_: PackageManager.NameNotFoundException) {
-            Log.w(TAG, "Package not found: $packageName")
+            LogUtil.w(TAG, "Package not found: $packageName")
             null
         }
     }

@@ -3,7 +3,6 @@ package com.v2ray.ang.util
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.service.V2RayTestService
@@ -47,7 +46,7 @@ object MessageUtil {
             intent.putExtra("content", message)
             ctx.startService(intent)
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to send message to test service", e)
+            LogUtil.e(AppConfig.TAG, "Failed to send message to test service", e)
         }
     }
 
@@ -68,7 +67,7 @@ object MessageUtil {
             intent.putExtra("content", content)
             ctx.sendBroadcast(intent)
         } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to send message with action: $action", e)
+            LogUtil.e(AppConfig.TAG, "Failed to send message with action: $action", e)
         }
     }
 }

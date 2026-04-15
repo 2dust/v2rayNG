@@ -2,7 +2,7 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
@@ -80,7 +80,7 @@ class UserAssetUrlActivity : BaseActivity() {
                 try {
                     file.delete()
                 } catch (e: Exception) {
-                    Log.e(AppConfig.TAG, "Failed to delete asset file: ${file.path}", e)
+                    LogUtil.e(AppConfig.TAG, "Failed to delete asset file: ${file.path}", e)
                 }
             }
         } else {

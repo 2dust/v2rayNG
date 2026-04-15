@@ -5,7 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import android.util.Log
+import com.v2ray.ang.util.LogUtil
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
@@ -34,7 +34,7 @@ object SubscriptionUpdater {
          */
         @SuppressLint("MissingPermission")
         override suspend fun doWork(): Result {
-            Log.i(AppConfig.TAG, "subscription automatic update starting")
+            LogUtil.i(AppConfig.TAG, "subscription automatic update starting")
 
             val subs = MmkvManager.decodeSubscriptions().filter { it.subscription.autoUpdate }
 
@@ -52,7 +52,7 @@ object SubscriptionUpdater {
                     notificationManager.createNotificationChannel(channel)
                 }
                 notificationManager.notify(3, notification.build())
-                Log.i(AppConfig.TAG, "subscription automatic update: ---${subItem.remarks}")
+                LogUtil.i(AppConfig.TAG, "subscription automatic update: ---${subItem.remarks}")
                 AngConfigManager.updateConfigViaSub(sub)
                 notification.setContentText("Updating ${subItem.remarks}")
             }
