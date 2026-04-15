@@ -185,8 +185,11 @@
     <string name="title_pref_fake_dns_enabled">Использовать поддельную DNS</string>
     <string name="summary_pref_fake_dns_enabled">Локальная DNS возвращает поддельные IP-адреса (быстрее, но может не работать с некоторыми приложениями)</string>
 
+    <string name="title_pref_ipv6_enabled">Включить IPv6</string>
+    <string name="summary_pref_ipv6_enabled">Добавить IPv6-адрес и маршруты в VPN-интерфейс</string>
+
     <string name="title_pref_prefer_ipv6">Предпочитать IPv6</string>
-    <string name="summary_pref_prefer_ipv6">Использовать маршрутизацию IPv6 предпочитать IPv6-адреса</string>
+    <string name="summary_pref_prefer_ipv6">Предпочитать IPv6-адреса при разрешении доменных имён</string>
 
     <string name="title_pref_remote_dns">Удалённая DNS (UDP/TCP/HTTPS/QUIC) (необязательно)</string>
     <string name="summary_pref_remote_dns">DNS</string>

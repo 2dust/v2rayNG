@@ -183,8 +183,11 @@
     <string name="title_pref_fake_dns_enabled">启用虚拟 DNS</string>
     <string name="summary_pref_fake_dns_enabled">本地返回虚构解析结果 (减低延时 但个别应用可能无法使用)</string>
 
+    <string name="title_pref_ipv6_enabled">启用 IPv6</string>
+    <string name="summary_pref_ipv6_enabled">为 VPN 接口添加 IPv6 地址和路由</string>
+
     <string name="title_pref_prefer_ipv6">IPv6 优先</string>
-    <string name="summary_pref_prefer_ipv6">App 优先使用 IPv6 地址连接服务器, 同时开启 VPN 的 IPv6 路由</string>
+    <string name="summary_pref_prefer_ipv6">解析域名时优先使用 IPv6 地址</string>
 
     <string name="title_pref_remote_dns">远程 DNS (udp/tcp/https/quic)(可选)</string>
     <string name="summary_pref_remote_dns">DNS</string>

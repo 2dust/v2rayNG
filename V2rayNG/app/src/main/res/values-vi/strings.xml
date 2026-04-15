@@ -186,8 +186,11 @@
     <string name="title_pref_fake_dns_enabled">Bật FakeDNS</string>
     <string name="summary_pref_fake_dns_enabled">FakeDNS lấy tên miền mục tiêu bằng cách giả mạo DNS (Nhanh hơn, nhưng có thể không hoạt động cho một số ứng dụng).</string>
 
+    <string name="title_pref_ipv6_enabled">Bật IPv6</string>
+    <string name="summary_pref_ipv6_enabled">Thêm địa chỉ và tuyến IPv6 vào giao diện VPN</string>
+
     <string name="title_pref_prefer_ipv6">Ưu tiên IPv6</string>
-    <string name="summary_pref_prefer_ipv6">Ưu tiên sử dụng địa chỉ IPv6 cho kết nối và định tuyến.</string>
+    <string name="summary_pref_prefer_ipv6">Ưu tiên địa chỉ IPv6 khi phân giải tên miền</string>
 
     <string name="title_pref_remote_dns">DNS ngoại quốc (UDP / TCP / HTTPS / QUIC) (Không bắt buộc)</string>
     <string name="summary_pref_remote_dns">DNS</string>

@@ -186,8 +186,11 @@
     <string name="title_pref_fake_dns_enabled">ره وندن DNS جئلی</string>
     <string name="summary_pref_fake_dns_enabled">DNS مهلی نشۊویا IP جئلی ن وورگنه (زل تر، ٱما گاشڌ من یقرد ز برنومه یل کار نکونه)</string>
 
+    <string name="title_pref_ipv6_enabled">ره وندن IPv6</string>
+    <string name="summary_pref_ipv6_enabled">نشۊویا IPv6 وو تورا IPv6 ن ز رابط VPN ره وند کۊنین</string>
+
     <string name="title_pref_prefer_ipv6">ترجی داڌن IPv6</string>
-    <string name="summary_pref_prefer_ipv6">تورا IPv6 ن فعال کۊنین وو نشۊویا IPv6 ن ترجی بڌین</string>
+    <string name="summary_pref_prefer_ipv6">مون حل کردن نوم دامنه، نشۊویا IPv6 ن ترجی بڌین</string>
 
     <string name="title_pref_remote_dns">DNS ز ره دیر (اختیاری) (udp/tcp/https/quic) (اختیاری)</string>
     <string name="summary_pref_remote_dns">DNS</string>

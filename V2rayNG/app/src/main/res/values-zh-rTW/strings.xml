@@ -185,8 +185,11 @@
     <string name="title_pref_fake_dns_enabled">啟用假 DNS</string>
     <string name="summary_pref_fake_dns_enabled">本機退回假解析結果 (減低延時，但個別應用可能無法使用)</string>
 
+    <string name="title_pref_ipv6_enabled">啟用 IPv6</string>
+    <string name="summary_pref_ipv6_enabled">為 VPN 介面新增 IPv6 位址和路由</string>
+
     <string name="title_pref_prefer_ipv6">IPv6 偏好</string>
-    <string name="summary_pref_prefer_ipv6">App 優先使用 IPv6 位址連線伺服器，同時開啟 VPN 的 IPv6 路由</string>
+    <string name="summary_pref_prefer_ipv6">解析網域名稱時優先使用 IPv6 位址</string>
 
     <string name="title_pref_remote_dns">遠端 DNS (udp/tcp/https/quic)(可選)</string>
     <string name="summary_pref_remote_dns">DNS</string>
