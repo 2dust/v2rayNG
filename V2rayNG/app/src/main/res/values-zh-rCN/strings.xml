@@ -15,8 +15,8 @@
     <string name="toast_permission_denied">无法取得权限</string>
     <string name="toast_permission_denied_notification">无法取得通知权限</string>
     <string name="notification_action_more">点击了解更多</string>
-    <string name="toast_services_start">启动服务中</string>
-    <string name="toast_services_stop">关闭中</string>
+    <string name="toast_services_start">启动服务</string>
+    <string name="toast_services_stop">关闭服务</string>
     <string name="toast_services_success">启动服务成功</string>
     <string name="toast_services_failure">启动服务失败</string>
 

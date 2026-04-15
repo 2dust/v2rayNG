@@ -28,4 +28,32 @@
             android:targetPackage="com.v2ray.ang" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_qu_start_24dp"
+        android:shortcutDisabledMessage="@string/toast_services_start"
+        android:shortcutId="shortcuts_start"
+        android:shortcutLongLabel="@string/toast_services_start"
+        android:shortcutShortLabel="@string/toast_services_start">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.v2ray.ang.ui.ScStartActivity"
+            android:targetPackage="com.v2ray.ang" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_qu_stop_24dp"
+        android:shortcutDisabledMessage="@string/toast_services_stop"
+        android:shortcutId="shortcuts_stop"
+        android:shortcutLongLabel="@string/toast_services_stop"
+        android:shortcutShortLabel="@string/toast_services_stop">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.v2ray.ang.ui.ScStopActivity"
+            android:targetPackage="com.v2ray.ang" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
 </shortcuts>
