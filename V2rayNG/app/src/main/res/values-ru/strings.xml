@@ -315,7 +315,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">Доменная стратегия</string>
     <string name="routing_settings_title">Маршрутизация</string>
-    <string name="routing_settings_tips">Введите требуемые домены/IP через запятую</string>
+    <string name="routing_settings_tips">Разделяйте запятой (,). Укажите только одно: domain, ip или process</string>
     <string name="routing_settings_save">Сохранить</string>
     <string name="routing_settings_delete">Очистить</string>
     <string name="routing_settings_rule_title">Настройка правил маршрутизации</string>

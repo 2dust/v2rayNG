@@ -315,7 +315,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">網域策略</string>
     <string name="routing_settings_title">轉送設定</string>
-    <string name="routing_settings_tips">以半形逗號「,」分隔,domain和ip二選一填寫</string>
+    <string name="routing_settings_tips">用逗號（,）分隔，選擇填寫 domain、ip 或 process 中的一項</string>
     <string name="routing_settings_save">儲存</string>
     <string name="routing_settings_delete">清除</string>
     <string name="routing_settings_rule_title">路由規則設定</string>

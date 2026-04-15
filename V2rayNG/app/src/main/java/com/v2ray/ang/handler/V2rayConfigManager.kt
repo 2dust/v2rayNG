@@ -27,6 +27,7 @@ import com.v2ray.ang.fmt.VmessFmt
 import com.v2ray.ang.fmt.WireguardFmt
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.util.PackageUidResolver
 import com.v2ray.ang.util.Utils
 
 object V2rayConfigManager {
@@ -200,7 +201,7 @@ object V2rayConfigManager {
         getOutbounds(v2rayConfig, config) ?: return result
         getMoreOutbounds(v2rayConfig, config.subscriptionId)
 
-        getRouting(v2rayConfig)
+        getRouting(context, v2rayConfig)
 
         getFakeDns(v2rayConfig)
 
@@ -257,7 +258,7 @@ object V2rayConfigManager {
         outboundsList.addAll(v2rayConfig.outbounds)
         v2rayConfig.outbounds = ArrayList(outboundsList)
 
-        getRouting(v2rayConfig)
+        getRouting(context, v2rayConfig)
 
         getFakeDns(v2rayConfig)
 
@@ -452,7 +453,7 @@ object V2rayConfigManager {
      * @param v2rayConfig The V2ray configuration object to be modified
      * @return true if routing configuration was successful, false otherwise
      */
-    private fun getRouting(v2rayConfig: V2rayConfig): Boolean {
+    private fun getRouting(context: Context, v2rayConfig: V2rayConfig): Boolean {
         try {
 
             v2rayConfig.routing.domainStrategy =
@@ -461,7 +462,7 @@ object V2rayConfigManager {
 
             val rulesetItems = MmkvManager.decodeRoutingRulesets()
             rulesetItems?.forEach { key ->
-                getRoutingUserRule(key, v2rayConfig)
+                getRoutingUserRule(context, key, v2rayConfig)
             }
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to configure routing", e)
@@ -476,7 +477,7 @@ object V2rayConfigManager {
      * @param item The ruleset item to add
      * @param v2rayConfig The V2ray configuration object to be modified
      */
-    private fun getRoutingUserRule(item: RulesetItem?, v2rayConfig: V2rayConfig) {
+    private fun getRoutingUserRule(context: Context, item: RulesetItem?, v2rayConfig: V2rayConfig) {
         try {
             if (item == null || !item.enabled) {
                 return
@@ -495,6 +496,14 @@ object V2rayConfigManager {
                     }
                 }
                 rule.ip = updatedIpList
+            }
+
+            // Convert process package names to UIDs
+            rule.process?.let { processList ->
+                if (processList.isNotEmpty()) {
+                    val uids = PackageUidResolver.packageNamesToUids(context, processList)
+                    rule.process = uids.ifEmpty { null }
+                }
             }
 
             v2rayConfig.routing.rules.add(rule)

@@ -317,7 +317,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">استراتيجية النطاق</string>
     <string name="routing_settings_title">إعدادات التوجيه</string>
-    <string name="routing_settings_tips">مفصولة بفواصل (،)، تذكر الحفظ</string>
+    <string name="routing_settings_tips">افصل بعلامة الفاصلة (,) واختر أحد: domain أو ip أو process</string>
     <string name="routing_settings_save">حفظ</string>
     <string name="routing_settings_delete">مسح</string>
     <string name="routing_settings_rule_title">Routing Rule Settings</string>

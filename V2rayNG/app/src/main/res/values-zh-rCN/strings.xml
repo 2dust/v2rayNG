@@ -315,7 +315,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">域名策略</string>
     <string name="routing_settings_title">路由设置</string>
-    <string name="routing_settings_tips">用逗号(,)隔开, domain 和 ip 二选一填写</string>
+    <string name="routing_settings_tips">用逗号（,）分隔，选择填写 domain、ip 或 process 中的一项</string>
     <string name="routing_settings_save">保存</string>
     <string name="routing_settings_delete">清空</string>
     <string name="routing_settings_rule_title">路由规则设置</string>

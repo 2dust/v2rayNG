@@ -42,6 +42,7 @@ class RoutingEditActivity : BaseActivity() {
         binding.chkLocked.isChecked = rulesetItem.locked == true
         binding.etDomain.text = Utils.getEditable(rulesetItem.domain?.joinToString(","))
         binding.etIp.text = Utils.getEditable(rulesetItem.ip?.joinToString(","))
+        binding.etProcess.text = Utils.getEditable(rulesetItem.process?.joinToString(","))
         binding.etPort.text = Utils.getEditable(rulesetItem.port)
         binding.etProtocol.text = Utils.getEditable(rulesetItem.protocol?.joinToString(","))
         binding.etNetwork.text = Utils.getEditable(rulesetItem.network)
@@ -65,6 +66,7 @@ class RoutingEditActivity : BaseActivity() {
             locked = binding.chkLocked.isChecked
             domain = binding.etDomain.text.toString().nullIfBlank()?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
             ip = binding.etIp.text.toString().nullIfBlank()?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
+            process = binding.etProcess.text.toString().nullIfBlank()?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
             protocol = binding.etProtocol.text.toString().nullIfBlank()?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
             port = binding.etPort.text.toString().nullIfBlank()
             network = binding.etNetwork.text.toString().nullIfBlank()

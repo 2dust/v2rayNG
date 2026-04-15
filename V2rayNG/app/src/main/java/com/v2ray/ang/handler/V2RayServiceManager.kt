@@ -19,6 +19,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.service.V2RayProxyOnlyService
 import com.v2ray.ang.service.V2RayVpnService
 import com.v2ray.ang.util.MessageUtil
+import com.v2ray.ang.util.PackageUidResolver
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -385,12 +386,21 @@ object V2RayServiceManager {
                 else -> return -1L
             }
 
+            if (destIP.isBlank() || destPort == 0L) {
+                Log.d(AppConfig.TAG, "ProcessFinder: Find $network connection from $srcIP:$srcPort to :$destPort, (no dest)")
+                return -1L
+            }
+
             return try {
-                cm.getConnectionOwnerUid(
+                val uid = cm.getConnectionOwnerUid(
                     proto,
                     InetSocketAddress(srcIP, srcPort.toInt()),
                     InetSocketAddress(destIP, destPort.toInt())
                 ).toLong()
+                Log.d(AppConfig.TAG, "ProcessFinder: Find $network connection from $srcIP:$srcPort to $destIP:$destPort, uid=$uid")
+                //Log.d(AppConfig.TAG, "ProcessFinder: Find $network connection from $srcIP:$srcPort to $destIP:$destPort, uid=$uid,${PackageUidResolver.uidToPackageName(uid.toString())}")
+
+                uid
             } catch (e: Exception) {
                 -1L
             }

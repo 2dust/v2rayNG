@@ -316,7 +316,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">ডোমেইন কৌশল</string>
     <string name="routing_settings_title">রাউটিং সেটিংস</string>
-    <string name="routing_settings_tips">কমা (,) দ্বারা আলাদা করুন, মনে রাখবেন সেভ করতে</string>
+    <string name="routing_settings_tips">কমা (,) দিয়ে আলাদা করুন। domain, ip বা process-এ একটি নির্বাচন করুন</string>
     <string name="routing_settings_save">সেভ করুন</string>
     <string name="routing_settings_delete">মুছে ফেলুন</string>
     <string name="routing_settings_rule_title">Routing Rule Settings</string>

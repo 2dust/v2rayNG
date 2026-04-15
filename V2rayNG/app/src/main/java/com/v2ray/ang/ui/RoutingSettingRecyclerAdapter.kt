@@ -25,7 +25,7 @@ class RoutingSettingRecyclerAdapter(
         val ruleset = rulesets[position]
 
         holder.itemRoutingSettingBinding.remarks.text = ruleset.remarks
-        holder.itemRoutingSettingBinding.domainIp.text = (ruleset.domain ?: ruleset.ip ?: ruleset.port)?.toString()
+        holder.itemRoutingSettingBinding.domainIp.text = (ruleset.domain ?: ruleset.ip ?: ruleset.process ?: ruleset.port)?.toString()
         holder.itemRoutingSettingBinding.outboundTag.text = ruleset.outboundTag
         holder.itemRoutingSettingBinding.chkEnable.isChecked = ruleset.enabled
         holder.itemRoutingSettingBinding.imgLocked.isVisible = ruleset.locked == true

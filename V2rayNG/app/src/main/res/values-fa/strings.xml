@@ -314,7 +314,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">استراتژی دامنه</string>
     <string name="routing_settings_title">تنظیمات مسیریابی</string>
-    <string name="routing_settings_tips">با کاما (،) از هم جدا شوند، ذخیره کردن فراموش نشود</string>
+    <string name="routing_settings_tips">با کاما (,) جدا کنید. یکی از موارد domain، ip یا process را وارد کنید</string>
     <string name="routing_settings_save">ذخیره</string>
     <string name="routing_settings_delete">حذف</string>
     <string name="routing_settings_rule_title">تنظیمات قانون مسیریابی</string>

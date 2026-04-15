@@ -317,7 +317,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">نشقه دامنه</string>
     <string name="routing_settings_title">سامووا تور جوستن</string>
-    <string name="routing_settings_tips">وا کاما ز یک جوڌا ابۊن (،) پسند دامنه یا آی پی</string>
+    <string name="routing_settings_tips">وا کاما ز یک جوڌا ابۊن (،)؛ یکی را وارد کنید: domain، ip یا process</string>
     <string name="routing_settings_save">زفت کردن</string>
     <string name="routing_settings_delete">روفتن</string>
     <string name="routing_settings_rule_title">سامووا قانۉݩ تور جوستن</string>
