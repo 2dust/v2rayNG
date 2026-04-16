@@ -498,12 +498,16 @@ object V2rayConfigManager {
                 rule.ip = updatedIpList
             }
 
-            // Convert process package names to UIDs
-            rule.process?.let { processList ->
-                if (processList.isNotEmpty()) {
-                    val uids = PackageUidResolver.packageNamesToUids(context, processList)
-                    rule.process = uids.ifEmpty { null }
+            if (SettingsManager.canUseProcessRouting()) {
+                // Convert process package names to UIDs
+                rule.process?.let { processList ->
+                    if (processList.isNotEmpty()) {
+                        val uids = PackageUidResolver.packageNamesToUids(context, processList)
+                        rule.process = uids.ifEmpty { null }
+                    }
                 }
+            } else {
+                rule.process = null
             }
 
             v2rayConfig.routing.rules.add(rule)

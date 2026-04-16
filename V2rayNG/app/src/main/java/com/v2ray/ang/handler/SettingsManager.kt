@@ -2,6 +2,7 @@ package com.v2ray.ang.handler
 
 import android.content.Context
 import android.content.res.AssetManager
+import android.os.Build
 import android.text.TextUtils
 import com.v2ray.ang.util.LogUtil
 import androidx.appcompat.app.AppCompatDelegate
@@ -470,6 +471,28 @@ object SettingsManager {
     fun isVpnMode(): Boolean {
         val mode = MmkvManager.decodeSettingsString(AppConfig.PREF_MODE)
         return mode == null || mode == VPN
+    }
+
+    /**
+     *  Check if process routing can be used.
+     */
+    fun canUseProcessRouting(): Boolean {
+        // Android 10+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            return false
+        }
+
+        // Must xray tun
+        if (isUsingHevTun()) {
+            return false
+        }
+
+        // Must have route only enabled
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_ROUTE_ONLY_ENABLED, false) == false) {
+            return false
+        }
+
+        return true
     }
 
     /**

@@ -35,6 +35,10 @@ class RoutingEditActivity : BaseActivity() {
         } else {
             clearServer()
         }
+
+        SettingsManager.canUseProcessRouting().let { canUse ->
+            binding.etProcess.isEnabled = canUse
+        }
     }
 
     private fun bindingServer(rulesetItem: RulesetItem): Boolean {
