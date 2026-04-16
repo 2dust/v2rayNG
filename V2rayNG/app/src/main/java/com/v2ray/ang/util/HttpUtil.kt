@@ -4,6 +4,7 @@ import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.Utils.encode
 import com.v2ray.ang.util.Utils.urlDecode
 import java.io.IOException
@@ -16,8 +17,23 @@ import java.net.MalformedURLException
 import java.net.Proxy
 import java.net.URI
 import java.net.URL
+import java.util.UUID
 
 object HttpUtil {
+
+    private var cachedFakeHwid: String? = null
+
+    // Stable fake HWID for x-hwid; generated once, then reused.
+    @Synchronized
+    private fun getFakeHwid(): String {
+        cachedFakeHwid?.let { return it }
+        val stored = MmkvManager.decodeSettingsString(AppConfig.PREF_FAKE_HWID)
+        val hwid = stored?.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString().also {
+            MmkvManager.encodeSettings(AppConfig.PREF_FAKE_HWID, it)
+        }
+        cachedFakeHwid = hwid
+        return hwid
+    }
 
     /**
      * Converts the domain part of a URL string to its IDN (Punycode, ASCII Compatible Encoding) format.
@@ -110,6 +126,9 @@ object HttpUtil {
     fun getUrlContent(url: String, timeout: Int, httpPort: Int = 0): String? {
         val conn = createProxyConnection(url, httpPort, timeout, timeout) ?: return null
         try {
+            // x-hwid required by Remnawave.
+            conn.setRequestProperty(AppConfig.HWID_HEADER_NAME, getFakeHwid())
+            conn.connect()
             return conn.inputStream.bufferedReader().readText()
         } catch (_: Exception) {
         } finally {
@@ -142,6 +161,8 @@ object HttpUtil {
                 userAgent
             }
             conn.setRequestProperty("User-agent", finalUserAgent)
+            // x-hwid required by Remnawave.
+            conn.setRequestProperty(AppConfig.HWID_HEADER_NAME, getFakeHwid())
             conn.connect()
 
             val responseCode = conn.responseCode

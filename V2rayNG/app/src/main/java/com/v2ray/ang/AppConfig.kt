@@ -46,6 +46,9 @@ object AppConfig {
     const val SUBSCRIPTION_AUTO_UPDATE = "pref_auto_update_subscription"
     const val SUBSCRIPTION_AUTO_UPDATE_INTERVAL = "pref_auto_update_interval"
     const val SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL = "1440" // Default is 24 hours
+    // Remnawave HWID header (stable per install).
+    const val HWID_HEADER_NAME = "x-hwid"
+    const val PREF_FAKE_HWID = "pref_fake_hwid"
     const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
     const val PREF_SPEED_ENABLED = "pref_speed_enabled"
     const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
