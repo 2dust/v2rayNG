@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
+import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.system.OsConstants
 import com.v2ray.ang.util.LogUtil
@@ -42,7 +43,7 @@ object V2RayServiceManager {
             field = value
             val service = value?.get()?.getService()
             V2RayNativeManager.initCoreEnv(service)
-            if (service != null && processFinder == null) {
+            if (service != null && processFinder == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 processFinder = XrayProcessFinder(service)
                 coreController.registerProcessFinder(processFinder)
             }
