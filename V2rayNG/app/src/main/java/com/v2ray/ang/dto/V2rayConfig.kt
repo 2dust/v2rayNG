@@ -46,7 +46,8 @@ data class V2rayConfig(
             var userLevel: Int? = null,
             var accounts: List<SocksAccountBean>? = null,
             var name: String? = null,
-            var mtu: List<Int>? = null
+
+            var mtu: Int? = null
         ) {
             data class SocksAccountBean(
                 var user: String = "",

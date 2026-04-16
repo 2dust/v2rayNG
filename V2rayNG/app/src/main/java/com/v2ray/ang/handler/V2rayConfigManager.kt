@@ -117,7 +117,7 @@ object V2rayConfigManager {
         // add tun inbound from template
         val templateConfig = initV2rayConfig(context) ?: return result
         val inboundTun = templateConfig.inbounds.firstOrNull { it.tag == "tun" } ?: return result
-        inboundTun.settings?.mtu = arrayListOf(SettingsManager.getVpnMtu())
+        inboundTun.settings?.mtu = SettingsManager.getVpnMtu()
 
         // add to json
         inboundsJson.add(JsonUtil.parseString(JsonUtil.toJson(inboundTun)))
@@ -420,7 +420,7 @@ object V2rayConfigManager {
 
             if (needTun()) {
                 val inboundTun = v2rayConfig.inbounds.firstOrNull { e -> e.tag == "tun" }
-                inboundTun?.settings?.mtu = arrayListOf(SettingsManager.getVpnMtu())
+                inboundTun?.settings?.mtu = SettingsManager.getVpnMtu()
                 inboundTun?.sniffing = inbound1.sniffing
             }
         } catch (e: Exception) {
