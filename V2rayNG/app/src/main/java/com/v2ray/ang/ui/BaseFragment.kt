@@ -39,7 +39,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
      * @param drawableResId The resource ID of the drawable to be used as the divider.
      * @param orientation   The orientation of the divider (DividerItemDecoration.VERTICAL or DividerItemDecoration.HORIZONTAL).
      */
-    fun addCustomDividerToRecyclerView(recyclerView: RecyclerView,  drawableResId: Int, orientation: Int = DividerItemDecoration.VERTICAL) {
+    fun addCustomDividerToRecyclerView(recyclerView: RecyclerView, drawableResId: Int, orientation: Int = DividerItemDecoration.VERTICAL) {
         // Get the drawable from resources
         val drawable = ContextCompat.getDrawable(requireContext(), drawableResId)
         requireNotNull(drawable) { "Drawable resource not found" }

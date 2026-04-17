@@ -18,7 +18,7 @@ object TrojanFmt : FmtBase() {
      * @param str the Trojan URI string to parse
      * @return the parsed ProfileItem object, or null if parsing fails
      */
-    fun parse(str: String): ProfileItem? {
+    fun parse(str: String): ProfileItem {
         var allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.TROJAN)
 

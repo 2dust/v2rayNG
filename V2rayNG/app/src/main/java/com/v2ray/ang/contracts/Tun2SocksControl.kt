@@ -11,7 +11,7 @@ interface Tun2SocksControl {
      * This initializes the VPN tunnel and connects it to the SOCKS proxy.
      */
     fun startTun2Socks()
-    
+
     /**
      * Stops the tun2socks process and cleans up resources.
      */

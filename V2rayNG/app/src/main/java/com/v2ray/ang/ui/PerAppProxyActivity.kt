@@ -3,7 +3,6 @@ package com.v2ray.ang.ui
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.TextUtils
-import com.v2ray.ang.util.LogUtil
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -23,6 +22,7 @@ import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.AppManagerUtil
 import com.v2ray.ang.util.HttpUtil
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.PerAppProxyViewModel
 import es.dmoral.toasty.Toasty
@@ -133,6 +133,7 @@ class PerAppProxyActivity : BaseActivity() {
             allowPerAppProxy()
             true
         }
+
         R.id.invert_selection -> {
             invertSelection()
             allowPerAppProxy()

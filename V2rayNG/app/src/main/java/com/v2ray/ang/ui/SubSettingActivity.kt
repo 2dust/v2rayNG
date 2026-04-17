@@ -3,7 +3,6 @@ package com.v2ray.ang.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import com.v2ray.ang.util.LogUtil
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -21,6 +20,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.SubscriptionsViewModel

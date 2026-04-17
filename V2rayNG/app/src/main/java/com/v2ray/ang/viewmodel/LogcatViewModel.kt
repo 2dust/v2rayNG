@@ -44,7 +44,7 @@ class LogcatViewModel : ViewModel() {
             logsetsAll.clear()
             filteredLogs = emptyList()
         } catch (e: IOException) {
-           LogUtil.e(AppConfig.TAG, "Failed to clear logcat", e)
+            LogUtil.e(AppConfig.TAG, "Failed to clear logcat", e)
         }
     }
 

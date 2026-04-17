@@ -2,7 +2,6 @@ package com.v2ray.ang.handler
 
 import android.content.Context
 import android.text.TextUtils
-import com.v2ray.ang.util.LogUtil
 import com.google.gson.JsonArray
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ConfigResult
@@ -27,6 +26,7 @@ import com.v2ray.ang.fmt.VmessFmt
 import com.v2ray.ang.fmt.WireguardFmt
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.PackageUidResolver
 import com.v2ray.ang.util.Utils
 
@@ -568,7 +568,7 @@ object V2rayConfigManager {
                 )
             }
 
-            if(SettingsManager.isVpnMode()) {
+            if (SettingsManager.isVpnMode()) {
                 if (SettingsManager.isUsingHevTun()) {
                     //hev-socks5-tunnel dns routing
                     v2rayConfig.routing.rules.add(
@@ -894,7 +894,7 @@ object V2rayConfigManager {
                 }
             }
 
-            val lstSelector =  listOf("proxy-")
+            val lstSelector = listOf("proxy-")
             when (config.policyGroupType) {
                 // Least Ping goto else
                 "1" -> {
@@ -917,6 +917,7 @@ object V2rayConfigManager {
                         )
                     )
                 }
+
                 "2" -> {
                     // Random
                     val balancer = V2rayConfig.RoutingBean.BalancerBean(
@@ -928,6 +929,7 @@ object V2rayConfigManager {
                     )
                     v2rayConfig.routing.balancers = listOf(balancer)
                 }
+
                 "3" -> {
                     // Round Robin
                     val balancer = V2rayConfig.RoutingBean.BalancerBean(
@@ -939,6 +941,7 @@ object V2rayConfigManager {
                     )
                     v2rayConfig.routing.balancers = listOf(balancer)
                 }
+
                 else -> {
                     // Default: Least Ping
                     val balancer = V2rayConfig.RoutingBean.BalancerBean(
@@ -1244,28 +1247,34 @@ object V2rayConfigManager {
                         headerType == "wechat-video" -> "header-wechat"
                         else -> "header-$headerType"
                     }
-                    udpMaskList.add(StreamSettingsBean.FinalMaskBean.MaskBean(
-                        type = kcpHeaderType,
-                        settings = if (headerType == "dns" && !host.isNullOrEmpty()) {
-                            StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
-                                domain = host
-                            )
-                        } else {
-                            null
-                        }
-                    ))
+                    udpMaskList.add(
+                        StreamSettingsBean.FinalMaskBean.MaskBean(
+                            type = kcpHeaderType,
+                            settings = if (headerType == "dns" && !host.isNullOrEmpty()) {
+                                StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
+                                    domain = host
+                                )
+                            } else {
+                                null
+                            }
+                        )
+                    )
                 }
                 if (seed.isNullOrEmpty()) {
-                    udpMaskList.add(StreamSettingsBean.FinalMaskBean.MaskBean(
-                        type = "mkcp-original"
-                    ))
-                } else {
-                    udpMaskList.add(StreamSettingsBean.FinalMaskBean.MaskBean(
-                        type = "mkcp-aes128gcm",
-                        settings = StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
-                            password = seed
+                    udpMaskList.add(
+                        StreamSettingsBean.FinalMaskBean.MaskBean(
+                            type = "mkcp-original"
                         )
-                    ))
+                    )
+                } else {
+                    udpMaskList.add(
+                        StreamSettingsBean.FinalMaskBean.MaskBean(
+                            type = "mkcp-aes128gcm",
+                            settings = StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
+                                password = seed
+                            )
+                        )
+                    )
                 }
                 streamSettings.finalmask = StreamSettingsBean.FinalMaskBean(
                     udp = udpMaskList.toList()
@@ -1356,7 +1365,7 @@ object V2rayConfigManager {
                                 if (start != null && end != null) {
                                     val minStart = maxOf(5, start)
                                     val minEnd = maxOf(minStart, end)
-                                        "$minStart-$minEnd"
+                                    "$minStart-$minEnd"
                                 } else {
                                     "30"
                                 }
@@ -1426,7 +1435,7 @@ object V2rayConfigManager {
             allowInsecure = allowInsecure,
             serverName = sni.nullIfBlank(),
             fingerprint = profileItem.fingerPrint.nullIfBlank(),
-            alpn =  profileItem.alpn?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }.takeIf { !it.isNullOrEmpty() },
+            alpn = profileItem.alpn?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }.takeIf { !it.isNullOrEmpty() },
             echConfigList = profileItem.echConfigList.nullIfBlank(),
             echForceQuery = profileItem.echForceQuery.nullIfBlank(),
             pinnedPeerCertSha256 = profileItem.pinnedCA256.nullIfBlank(),

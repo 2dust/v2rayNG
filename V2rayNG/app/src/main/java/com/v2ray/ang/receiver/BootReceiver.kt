@@ -3,10 +3,10 @@ package com.v2ray.ang.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.V2RayServiceManager
+import com.v2ray.ang.util.LogUtil
 
 class BootReceiver : BroadcastReceiver() {
     /**

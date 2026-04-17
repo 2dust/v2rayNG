@@ -2,12 +2,12 @@ package com.v2ray.ang.handler
 
 import android.content.Context
 import android.os.SystemClock
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.IPAPIInfo
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import java.io.IOException

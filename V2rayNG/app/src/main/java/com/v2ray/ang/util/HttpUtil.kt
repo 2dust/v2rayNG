@@ -1,6 +1,5 @@
 package com.v2ray.ang.util
 
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
@@ -128,7 +127,7 @@ object HttpUtil {
      * @throws IOException If an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun getUrlContentWithUserAgent(url: String?, userAgent: String?,  timeout: Int = 15000, httpPort: Int = 0): String {
+    fun getUrlContentWithUserAgent(url: String?, userAgent: String?, timeout: Int = 15000, httpPort: Int = 0): String {
         var currentUrl = url
         var redirects = 0
         val maxRedirects = 3

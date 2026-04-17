@@ -11,7 +11,6 @@ import android.os.LocaleList
 import android.provider.Settings
 import android.text.Editable
 import android.util.Base64
-import com.v2ray.ang.util.LogUtil
 import android.util.Patterns
 import android.webkit.URLUtil
 import androidx.core.content.ContextCompat
@@ -139,7 +138,7 @@ object Utils {
      * @param removePadding
      * @return The base64 encoded string, or an empty string if encoding fails.
      */
-    fun encode(text: String, removePadding : Boolean = false): String {
+    fun encode(text: String, removePadding: Boolean = false): String {
         return try {
             var encoded = Base64.encodeToString(text.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
             if (removePadding) {

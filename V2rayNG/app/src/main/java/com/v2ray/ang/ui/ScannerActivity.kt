@@ -3,7 +3,6 @@ package com.v2ray.ang.ui
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import com.v2ray.ang.util.LogUtil
 import android.view.Menu
 import android.view.MenuItem
 import com.v2ray.ang.AppConfig
@@ -11,6 +10,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityNoneBinding
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
@@ -18,7 +18,7 @@ import io.github.g00fy2.quickie.config.BarcodeFormat
 import io.github.g00fy2.quickie.config.ScannerConfig
 
 class ScannerActivity : HelperBaseActivity() {
-    private val binding by lazy {  ActivityNoneBinding.inflate(layoutInflater) }
+    private val binding by lazy { ActivityNoneBinding.inflate(layoutInflater) }
 
     private val scanQrCode = registerForActivityResult(ScanCustomCode(), ::handleResult)
 

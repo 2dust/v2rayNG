@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.os.Build
 import android.text.TextUtils
-import com.v2ray.ang.util.LogUtil
 import androidx.appcompat.app.AppCompatDelegate
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
@@ -28,6 +27,7 @@ import com.v2ray.ang.handler.MmkvManager.decodeSubscription
 import com.v2ray.ang.handler.MmkvManager.encodeSubscription
 import com.v2ray.ang.handler.MmkvManager.removeSubscription
 import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import java.io.File
 import java.io.FileOutputStream
@@ -224,7 +224,7 @@ object SettingsManager {
      * @param toPosition The position to swap to.
      */
     fun swapSubscriptions(fromPosition: Int, toPosition: Int) {
-        val subsList = MmkvManager.decodeSubsList()
+        val subsList = decodeSubsList()
         if (subsList.isEmpty()) return
 
         Collections.swap(subsList, fromPosition, toPosition)
@@ -500,7 +500,7 @@ object SettingsManager {
      */
     private fun ensureDefaultSettings() {
         // Write defaults in the exact order requested by the user
-        ensureDefaultValue(AppConfig.PREF_MODE, AppConfig.VPN)
+        ensureDefaultValue(AppConfig.PREF_MODE, VPN)
         ensureDefaultValue(AppConfig.PREF_VPN_DNS, AppConfig.DNS_VPN)
         ensureDefaultValue(AppConfig.PREF_VPN_MTU, AppConfig.VPN_MTU.toString())
         ensureDefaultValue(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL, AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)

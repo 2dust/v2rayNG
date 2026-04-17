@@ -20,7 +20,7 @@ object Hysteria2Fmt : FmtBase() {
      * @param str the Hysteria2 URI string to parse
      * @return the parsed ProfileItem object, or null if parsing fails
      */
-    fun parse(str: String): ProfileItem? {
+    fun parse(str: String): ProfileItem {
         var allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.HYSTERIA2)
 

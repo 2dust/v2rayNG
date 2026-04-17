@@ -12,7 +12,7 @@ object CustomFmt : FmtBase() {
      * @param str the JSON string to parse
      * @return the parsed ProfileItem object, or null if parsing fails
      */
-    fun parse(str: String): ProfileItem? {
+    fun parse(str: String): ProfileItem {
         val config = ProfileItem.create(EConfigType.CUSTOM)
 
         val fullConfig = JsonUtil.fromJson(str, V2rayConfig::class.java)

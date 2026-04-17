@@ -10,8 +10,8 @@ object AppConfig {
     /** Directory names used in the app's file system. */
     const val DIR_ASSETS = "assets"
 
-    const val  WEBDAV_BACKUP_DIR = "backups"
-    const val  WEBDAV_BACKUP_FILE_NAME = "backup_ng.zip"
+    const val WEBDAV_BACKUP_DIR = "backups"
+    const val WEBDAV_BACKUP_FILE_NAME = "backup_ng.zip"
 
     /** Legacy configuration keys. */
     const val ANG_CONFIG = "ang_config"
@@ -124,7 +124,8 @@ object AppConfig {
     const val TG_CHANNEL_URL = "https://t.me/github_2dust"
     const val DELAY_TEST_URL = "https://www.gstatic.com/generate_204"
     const val DELAY_TEST_URL2 = "https://www.google.com/generate_204"
-//    const val IP_API_URL = "https://speed.cloudflare.com/meta"
+
+    //    const val IP_API_URL = "https://speed.cloudflare.com/meta"
     const val IP_API_URL = "https://api.ip.sb/geoip"
 
     /** DNS server addresses. */

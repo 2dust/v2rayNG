@@ -97,7 +97,7 @@ class ServerGroupActivity : BaseActivity() {
             config.subscriptionId = subscriptionId.orEmpty()
         }
 
-        config.description =  "${binding.spPolicyGroupType.selectedItem} - ${binding.spPolicyGroupSubId.selectedItem} - ${config.policyGroupFilter}"
+        config.description = "${binding.spPolicyGroupType.selectedItem} - ${binding.spPolicyGroupSubId.selectedItem} - ${config.policyGroupFilter}"
 
         MmkvManager.encodeServerConfig(editGuid, config)
         toastSuccess(R.string.toast_success)
