@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.TextUtils
 import com.google.gson.JsonArray
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
@@ -446,6 +447,45 @@ object V2rayConfigManager {
     }
 
     /**
+     * Pre-pass: scans all routing rulesets for non-builtin outbound tags,
+     * looks up the matching profile by remarks, converts it to an OutboundBean,
+     * and appends it to v2rayConfig.outbounds. This must run before getRouting
+     * so that every custom tag is already present when routing rules are applied.
+     *
+     * @param v2rayConfig The V2ray configuration object to be modified
+     */
+    private fun injectCustomOutbounds(v2rayConfig: V2rayConfig) {
+        val existingTags = v2rayConfig.outbounds.mapTo(mutableSetOf()) { it.tag }
+        val rulesetItems = MmkvManager.decodeRoutingRulesets() ?: return
+
+        rulesetItems
+            .filter { it.enabled }
+            .mapNotNull { it.outboundTag.takeIf { tag -> tag.isNotBlank() } }
+            .filter { it !in BUILTIN_OUTBOUND_TAGS }
+            .distinct()
+            .forEach { tag ->
+                if (tag in existingTags) return@forEach
+                try {
+                    val profile = SettingsManager.getServerViaRemarks(tag) ?: run {
+                        LogUtil.w(AppConfig.TAG, "Custom outbound tag '$tag' not found by remarks, skipping")
+                        return@forEach
+                    }
+                    val outbound = convertProfile2Outbound(profile) ?: run {
+                        LogUtil.w(AppConfig.TAG, "Could not convert profile '$tag' to outbound, skipping")
+                        return@forEach
+                    }
+                    updateOutboundWithGlobalSettings(outbound)
+                    outbound.tag = tag
+                    v2rayConfig.outbounds.add(outbound)
+                    existingTags.add(tag)
+                    LogUtil.d(AppConfig.TAG, "Injected custom outbound: tag='$tag'")
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Failed to inject custom outbound for tag '$tag', skipping", e)
+                }
+            }
+    }
+
+    /**
      * Configures routing settings for V2ray.
      *
      * Sets up the domain strategy and adds routing rules from saved rulesets.
@@ -459,6 +499,9 @@ object V2rayConfigManager {
             v2rayConfig.routing.domainStrategy =
                 MmkvManager.decodeSettingsString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY)
                     ?: "AsIs"
+
+            // Pre-pass: inject outbounds referenced by remarks in routing rules
+            injectCustomOutbounds(v2rayConfig)
 
             val rulesetItems = MmkvManager.decodeRoutingRulesets()
             rulesetItems?.forEach { key ->
@@ -508,6 +551,16 @@ object V2rayConfigManager {
                 }
             } else {
                 rule.process = null
+            }
+
+            // If the outbound tag is a custom one that failed to inject, fall back to proxy
+            val outboundTag = rule.outboundTag
+            if (!outboundTag.isNullOrBlank()
+                && outboundTag !in BUILTIN_OUTBOUND_TAGS
+                && v2rayConfig.outbounds.none { it.tag == outboundTag }
+            ) {
+                LogUtil.w(AppConfig.TAG, "Outbound tag '$outboundTag' not found, falling back to '${AppConfig.TAG_PROXY}'")
+                rule.outboundTag = AppConfig.TAG_PROXY
             }
 
             v2rayConfig.routing.rules.add(rule)
@@ -888,7 +941,7 @@ object V2rayConfigManager {
     private fun getBalance(v2rayConfig: V2rayConfig, config: ProfileItem) {
         try {
             v2rayConfig.routing.rules.forEach { rule ->
-                if (rule.outboundTag == "proxy") {
+                if (rule.outboundTag == AppConfig.TAG_PROXY) {
                     rule.outboundTag = null
                     rule.balancerTag = AppConfig.TAG_BALANCER
                 }

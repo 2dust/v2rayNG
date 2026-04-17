@@ -279,4 +279,9 @@ object AppConfig {
         "Chocolate4U/Iran-v2ray-rules"
     )
 
+    val BUILTIN_OUTBOUND_TAGS = setOf(
+        TAG_PROXY,
+        TAG_DIRECT,
+        TAG_BLOCKED,
+    )
 }
