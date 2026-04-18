@@ -189,7 +189,7 @@
     <string name="summary_pref_ipv6_enabled">Добавить IPv6-адрес и маршруты в VPN-интерфейс</string>
 
     <string name="title_pref_prefer_ipv6">Предпочитать IPv6</string>
-    <string name="summary_pref_prefer_ipv6">Предпочитать IPv6-адреса при разрешении доменных имён</string>
+    <string name="summary_pref_prefer_ipv6">Предпочитать IPv6-адреса при определении доменных имён</string>
 
     <string name="title_pref_remote_dns">Удалённая DNS (UDP/TCP/HTTPS/QUIC) (необязательно)</string>
     <string name="summary_pref_remote_dns">DNS</string>
@@ -198,7 +198,9 @@
     <string name="title_pref_vpn_bypass_lan">VPN обходит LAN</string>
 
     <string name="title_pref_vpn_interface_address">Адрес интерфейса VPN</string>
+
     <string name="title_pref_vpn_mtu">VPN MTU (по умолчанию 1500)</string>
+
 
     <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -221,7 +223,7 @@
 
     <string name="title_pref_socks_port">Порт локального прокси</string>
     <string name="summary_pref_socks_port">Порт локального прокси</string>
-    <string name="title_pref_dynamic_socks_port">Динамически менять порт</string>
+    <string name="title_pref_dynamic_socks_port">Динамически менять порт локального прокси</string>
     <string name="summary_pref_dynamic_socks_port">Использовать случайный порт локального прокси при каждом создании соединения</string>
     <string name="title_pref_socks_username">Пользователь локального прокси (необязательно)</string>
     <string name="summary_pref_socks_username">Имя пользователя</string>
@@ -245,6 +247,7 @@
 
     <string name="title_pref_group_all_display">Общая вкладка групп</string>
     <string name="summary_pref_group_all_display">Показывать дополнительную вкладку со всеми профилями групп</string>
+
     <!-- AboutActivity -->
     <string name="title_pref_feedback">Обратная связь</string>
     <string name="summary_pref_feedback">Предложить улучшение или сообщить об ошибке на GitHub</string>
@@ -306,7 +309,7 @@
     <string name="title_import_config_count">Импортировано профилей: %d</string>
     <string name="title_export_config_count">Экспортировано профилей: %d</string>
     <string name="title_update_config_count">Обновлено профилей: %d</string>
-    <string name="title_update_subscription_result">Обновлено профилей: %1$d (успешно: %2$d, ошибок: %3$d, пропущено: %4$d)</string>
+    <string name="title_update_subscription_result">Обновлено профилей: %1$d (успешно: %2$d, ошибки: %3$d, пропущено: %4$d)</string>
     <string name="title_update_subscription_no_subscription">Нет подписок</string>
     <string name="toast_server_not_found_in_group">Выбранный профиль не найден в текущей группе</string>
     <string name="toast_fragment_not_available">Фрагмент недоступен</string>
@@ -318,7 +321,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">Доменная стратегия</string>
     <string name="routing_settings_title">Маршрутизация</string>
-    <string name="routing_settings_tips">Разделяйте запятой (,). Укажите только одно: domain, ip или process</string>
+    <string name="routing_settings_tips">Через запятую (,)\nТолько что-то одно: домен, IP или процесс</string>
     <string name="routing_settings_save">Сохранить</string>
     <string name="routing_settings_delete">Очистить</string>
     <string name="routing_settings_rule_title">Настройка правил маршрутизации</string>
@@ -331,6 +334,7 @@
     <string name="routing_settings_locked">Постоянное (сохранится при импорте правил)</string>
     <string name="routing_settings_domain">Домен</string>
     <string name="routing_settings_ip">IP</string>
+    <string name="routing_settings_process">Процесс (название пакета — поддерживается только при использовании Xray TUN, включённой функции routeOnly и ОС Android 10+)</string>
     <string name="routing_settings_port">Порт</string>
     <string name="routing_settings_protocol">Протокол</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
@@ -353,8 +357,8 @@
     <string name="import_subscription_failure">Невозможно импортировать подписку</string>
     <string name="title_fragment_settings">Настройки фрагментирования</string>
     <string name="title_pref_fragment_packets">Фрагментирование пакетов</string>
-    <string name="title_pref_fragment_length">Длина фрагмента (от - до)</string>
-    <string name="title_pref_fragment_interval">Интервал фрагментов (от - до)</string>
+    <string name="title_pref_fragment_length">Длина фрагмента (от — до)</string>
+    <string name="title_pref_fragment_interval">Интервал фрагментов (от — до)</string>
     <string name="title_pref_fragment_enabled">Использовать фрагментирование</string>
 
     <string name="update_check_for_update">Проверить обновление</string>
@@ -429,6 +433,7 @@
         <item>Определять и добавлять к узлам DNS</item>
         <item>Определять и заменять домен</item>
     </string-array>
+
     <string-array name="policy_group_type">
         <item>Наименьшая задержка</item>
         <item>Наименьшая нагрузка</item>
