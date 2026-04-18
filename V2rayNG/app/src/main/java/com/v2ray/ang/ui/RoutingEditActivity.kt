@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
@@ -23,12 +24,19 @@ import kotlinx.coroutines.launch
 class RoutingEditActivity : BaseActivity() {
     private val binding by lazy { ActivityRoutingEditBinding.inflate(layoutInflater) }
     private val position by lazy { intent.getIntExtra("position", -1) }
+    private val processPickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val selectedPackages = AppPickerActivity.getSelectedPackages(result.data)
+            binding.etProcess.text = Utils.getEditable(selectedPackages.joinToString(","))
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.routing_settings_rule_title))
 
         setupOutboundTagInput()
+        setupProcessPicker()
 
         val rulesetItem = SettingsManager.getRoutingRuleset(position)
         if (rulesetItem != null) {
@@ -39,7 +47,29 @@ class RoutingEditActivity : BaseActivity() {
 
         SettingsManager.canUseProcessRouting().let { canUse ->
             binding.etProcess.isEnabled = canUse
+            binding.btnProcessPicker.isEnabled = canUse
         }
+    }
+
+    private fun setupProcessPicker() {
+        binding.btnProcessPicker.setOnClickListener {
+            processPickerLauncher.launch(
+                AppPickerActivity.createIntent(
+                    context = this,
+                    selectedPackages = getSelectedProcessPackages(),
+                    title = getString(R.string.routing_settings_process)
+                )
+            )
+        }
+    }
+
+    private fun getSelectedProcessPackages(): List<String> {
+        return binding.etProcess.text
+            .toString()
+            .split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
     }
 
     /**
