@@ -32,6 +32,13 @@ object PackageUidResolver {
     }
 
     private fun resolveUid(context: Context, packageName: String): String? {
+        // Special token for connections whose UID cannot be resolved (mapped to -1)
+        if (packageName == "__unidentified__") {
+            val uid = "-1" 
+            LogUtil.d(TAG, "Special package: $packageName -> UID: $uid")
+            return uid
+        }
+
         return try {
             val uid = context.packageManager.getPackageUid(packageName, 0).toString()
             LogUtil.d(TAG, "Package: $packageName -> UID: $uid")
