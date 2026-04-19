@@ -144,6 +144,7 @@
     <string name="menu_item_import_proxy_app">Import from Clipboard</string>
     <string name="per_app_proxy_settings">Per-app settings</string>
     <string name="per_app_proxy_settings_enable">Enable per-app</string>
+    <string name="app_picker_unknown_app">Unknown app (unidentified UID)</string>
 
     <!-- Preferences -->
     <string name="title_settings">Settings</string>

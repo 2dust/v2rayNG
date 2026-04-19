@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -7,11 +8,13 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityAppPickerBinding
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.util.AppManagerUtil
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.PackageUidResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -101,11 +104,15 @@ class AppPickerActivity : BaseActivity() {
         addCustomDividerToRecyclerView(binding.recyclerView, this, R.drawable.custom_divider)
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun createSpecialItemUnidentified(): AppInfo {
-        val icon = getDrawable(android.R.drawable.ic_menu_manage) ?: getDrawable(android.R.drawable.sym_def_app_icon)!!
+        val icon = requireNotNull(
+            getDrawable(android.R.drawable.ic_menu_help)
+                ?: getDrawable(android.R.drawable.sym_def_app_icon)
+        ) { "No fallback drawable available" }
         return AppInfo(
-            appName = "Catch missing process UID (-1)",
-            packageName = "__unidentified__",
+            appName = getString(R.string.app_picker_unknown_app),
+            packageName = AppConfig.UNIDENTIFIED_PACKAGE,
             appIcon = icon,
             isSystemApp = false,
             isSelected = 0
