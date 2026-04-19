@@ -101,6 +101,17 @@ class AppPickerActivity : BaseActivity() {
         addCustomDividerToRecyclerView(binding.recyclerView, this, R.drawable.custom_divider)
     }
 
+    private fun createSpecialItemUnidentified(): AppInfo {
+        val icon = getDrawable(android.R.drawable.ic_menu_manage) ?: getDrawable(android.R.drawable.sym_def_app_icon)!!
+        return AppInfo(
+            appName = "Catch missing process UID (-1)",
+            packageName = "__unidentified__",
+            appIcon = icon,
+            isSystemApp = false,
+            isSelected = 0
+        )
+    }
+
     private fun loadApps() {
         showLoading()
 
@@ -108,7 +119,8 @@ class AppPickerActivity : BaseActivity() {
             try {
                 val apps = withContext(Dispatchers.IO) {
                     val appsList = AppManagerUtil.loadNetworkAppList(this@AppPickerActivity)
-                    sortApps(appsList)
+                    val sortedApps = sortApps(appsList)
+                    listOf(createSpecialItemUnidentified()) + sortedApps
                 }
 
                 appsAll = apps
