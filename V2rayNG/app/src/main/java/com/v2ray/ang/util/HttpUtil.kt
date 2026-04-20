@@ -25,7 +25,7 @@ object HttpUtil {
 
     // Stable fake HWID for x-hwid; generated once, then reused.
     @Synchronized
-    private fun getFakeHwid(): String {
+    internal fun getFakeHwid(): String {
         cachedFakeHwid?.let { return it }
         val stored = MmkvManager.decodeSettingsString(AppConfig.PREF_FAKE_HWID)
         val hwid = stored?.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString().also {

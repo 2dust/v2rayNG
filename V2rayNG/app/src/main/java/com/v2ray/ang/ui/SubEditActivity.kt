@@ -16,6 +16,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.HttpUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -85,6 +86,9 @@ class SubEditActivity : BaseActivity() {
     private fun updateXHwidInputState(enabled: Boolean) {
         binding.etCustomXHwid.isEnabled = enabled
         binding.etCustomXHwid.alpha = if (enabled) 1f else 0.6f
+        if (enabled && binding.etCustomXHwid.text.isEmpty()) {
+            binding.etCustomXHwid.setText(HttpUtil.getFakeHwid())
+        }
     }
 
     /**
