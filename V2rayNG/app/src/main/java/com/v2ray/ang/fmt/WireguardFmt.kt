@@ -46,7 +46,7 @@ object WireguardFmt : FmtBase() {
      * @param str the Wireguard configuration file string to parse
      * @return the parsed ProfileItem object, or null if parsing fails
      */
-    fun parseWireguardConfFile(str: String): ProfileItem? {
+    fun parseWireguardConfFile(str: String): ProfileItem {
         val config = ProfileItem.create(EConfigType.WIREGUARD)
 
         val interfaceParams: MutableMap<String, String> = mutableMapOf()

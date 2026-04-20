@@ -114,13 +114,34 @@
                     android:layout_height="wrap_content"
                     android:text="@string/routing_settings_process" />
 
-                <EditText
-                    android:id="@+id/et_process"
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/routing_settings_tips"
-                    android:inputType="textMultiLine"
-                    android:maxLines="10" />
+                    android:layout_marginTop="@dimen/padding_spacing_dp8"
+                    android:layout_marginBottom="@dimen/padding_spacing_dp8">
+
+                    <EditText
+                        android:id="@+id/et_process"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/routing_settings_tips"
+                        android:inputType="textMultiLine"
+                        android:maxLines="10"
+                        android:minHeight="48dp"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="48dp" />
+
+                    <ImageButton
+                        android:id="@+id/btn_process_picker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/routing_settings_process"
+                        android:src="@drawable/ic_per_apps_24dp" />
+
+                </RelativeLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -190,13 +211,33 @@
                     android:layout_height="wrap_content"
                     android:text="@string/routing_settings_outbound_tag" />
 
-                <Spinner
-                    android:id="@+id/sp_outbound_tag"
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/padding_spacing_dp8"
-                    android:layout_marginBottom="@dimen/padding_spacing_dp8"
-                    android:entries="@array/outbound_tag" />
+                    android:layout_marginBottom="@dimen/padding_spacing_dp8">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/sp_outbound_tag"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:completionThreshold="0"
+                        android:hint="@string/routing_settings_outbound_tag_hint"
+                        android:inputType="text"
+                        android:imeOptions="actionDone"
+                        android:paddingEnd="40dp" />
+
+                    <ImageButton
+                        android:id="@+id/btn_outbound_tag_dropdown"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/routing_settings_outbound_tag"
+                        android:src="@drawable/ic_arrow_drop_down" />
+
+                </RelativeLayout>
             </LinearLayout>
 
         </LinearLayout>

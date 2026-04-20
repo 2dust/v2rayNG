@@ -1,6 +1,5 @@
 package com.v2ray.ang.viewmodel
 
-import com.v2ray.ang.util.LogUtil
 import androidx.lifecycle.ViewModel
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.AssetUrlCache
@@ -8,6 +7,7 @@ import com.v2ray.ang.dto.AssetUrlItem
 import com.v2ray.ang.extension.concatUrl
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.HttpUtil
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import java.io.File
 import java.io.FileOutputStream

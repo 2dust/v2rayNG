@@ -113,7 +113,7 @@ class MainRecyclerAdapter(
                 adapterListener?.onSelectServer(guid)
             }
         }
- 
+
     }
 
     /**

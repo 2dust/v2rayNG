@@ -2,7 +2,7 @@ package com.v2ray.ang.contracts
 
 import com.v2ray.ang.dto.ProfileItem
 
-interface MainAdapterListener :BaseAdapterListener {
+interface MainAdapterListener : BaseAdapterListener {
 
     fun onEdit(guid: String, position: Int, profile: ProfileItem)
 

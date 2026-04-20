@@ -318,6 +318,7 @@ data class V2rayConfig(
                         )
                     }
                 }
+
                 data class QuicParamsBean(
                     var congestion: String? = null,
                     var brutalUp: String? = null,

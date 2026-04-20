@@ -20,9 +20,9 @@ import com.v2ray.ang.helper.QRCodeScannerHelper
  * - Provide QR code scanning helpers with camera permission handling.
  */
 abstract class HelperBaseActivity : BaseActivity() {
-    private lateinit var fileChooser : FileChooserHelper
-    private lateinit var permissionRequester : PermissionHelper
-    private lateinit var qrCodeScanner : QRCodeScannerHelper
+    private lateinit var fileChooser: FileChooserHelper
+    private lateinit var permissionRequester: PermissionHelper
+    private lateinit var qrCodeScanner: QRCodeScannerHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

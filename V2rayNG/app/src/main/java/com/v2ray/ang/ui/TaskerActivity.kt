@@ -3,7 +3,6 @@ package com.v2ray.ang.ui
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import com.v2ray.ang.util.LogUtil
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -13,6 +12,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityTaskerBinding
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.util.LogUtil
 
 class TaskerActivity : BaseActivity() {
     private val binding by lazy { ActivityTaskerBinding.inflate(layoutInflater) }

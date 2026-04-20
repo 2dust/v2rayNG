@@ -1,11 +1,11 @@
 package com.v2ray.ang.ui
 
-import com.v2ray.ang.util.LogUtil
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.databinding.ItemRecyclerLogcatBinding
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.viewmodel.LogcatViewModel
 
 class LogcatRecyclerAdapter(

@@ -9,7 +9,6 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.system.OsConstants
-import com.v2ray.ang.util.LogUtil
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -19,8 +18,8 @@ import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.service.V2RayProxyOnlyService
 import com.v2ray.ang.service.V2RayVpnService
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MessageUtil
-import com.v2ray.ang.util.PackageUidResolver
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -379,7 +378,7 @@ object V2RayServiceManager {
         private val cm: ConnectivityManager? = context.getSystemService(ConnectivityManager::class.java)
 
         override fun findProcessByConnection(network: String, srcIP: String, srcPort: Long, destIP: String, destPort: Long): Long {
-            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) return -1L
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return -1L
             if (cm == null) return -1L
             val proto = when (network) {
                 "tcp" -> OsConstants.IPPROTO_TCP

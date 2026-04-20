@@ -89,6 +89,9 @@
             android:name=".ui.PerAppProxyActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.AppPickerActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.ScannerActivity"
             android:exported="false" />
         <activity

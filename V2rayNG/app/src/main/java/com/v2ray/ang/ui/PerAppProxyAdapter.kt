@@ -11,7 +11,7 @@ import com.v2ray.ang.viewmodel.PerAppProxyViewModel
 class PerAppProxyAdapter(
     val apps: List<AppInfo>,
     val viewModel: PerAppProxyViewModel
-) :RecyclerView.Adapter<PerAppProxyAdapter.BaseViewHolder>() {
+) : RecyclerView.Adapter<PerAppProxyAdapter.BaseViewHolder>() {
 
     companion object {
         private const val VIEW_TYPE_HEADER = 0

@@ -2,11 +2,11 @@ package com.v2ray.ang.service
 
 import android.content.Context
 import android.os.ParcelFileDescriptor
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.contracts.Tun2SocksControl
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.util.LogUtil
 import java.io.File
 
 /**
@@ -22,9 +22,11 @@ class TProxyService(
         @JvmStatic
         @Suppress("FunctionName")
         private external fun TProxyStartService(configPath: String, fd: Int)
+
         @JvmStatic
         @Suppress("FunctionName")
         private external fun TProxyStopService()
+
         @JvmStatic
         @Suppress("FunctionName")
         private external fun TProxyGetStats(): LongArray?

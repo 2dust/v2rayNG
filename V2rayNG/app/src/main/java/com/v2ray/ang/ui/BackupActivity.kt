@@ -3,7 +3,6 @@ package com.v2ray.ang.ui
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import com.v2ray.ang.util.LogUtil
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.tencent.mmkv.MMKV
@@ -20,6 +19,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.WebDavManager
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.ZipUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,7 +38,7 @@ class BackupActivity : HelperBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-       //setContentView(binding.root)
+        //setContentView(binding.root)
         setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.title_configuration_backup_restore))
 
         binding.layoutBackup.setOnClickListener {

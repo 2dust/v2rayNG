@@ -1,6 +1,5 @@
 package com.v2ray.ang.util
 
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
 import java.io.BufferedOutputStream
 import java.io.File
