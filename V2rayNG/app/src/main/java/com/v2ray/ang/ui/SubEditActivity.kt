@@ -48,12 +48,18 @@ class SubEditActivity : BaseActivity() {
         binding.etRemarks.text = Utils.getEditable(subItem.remarks)
         binding.etUrl.text = Utils.getEditable(subItem.url)
         binding.etUserAgent.text = Utils.getEditable(subItem.userAgent)
+        binding.etCustomXHwid.text = Utils.getEditable(subItem.customXHwid)
         binding.etFilter.text = Utils.getEditable(subItem.filter)
         binding.chkEnable.isChecked = subItem.enabled
+        binding.chkEnableXHwid.isChecked = subItem.enableXHwid
         binding.autoUpdateCheck.isChecked = subItem.autoUpdate
         binding.allowInsecureUrl.isChecked = subItem.allowInsecureUrl
         binding.etPreProfile.text = Utils.getEditable(subItem.prevProfile)
         binding.etNextProfile.text = Utils.getEditable(subItem.nextProfile)
+        updateXHwidInputState(subItem.enableXHwid)
+        binding.chkEnableXHwid.setOnCheckedChangeListener { _, isChecked ->
+            updateXHwidInputState(isChecked)
+        }
         return true
     }
 
@@ -63,11 +69,22 @@ class SubEditActivity : BaseActivity() {
     private fun clearServer(): Boolean {
         binding.etRemarks.text = null
         binding.etUrl.text = null
+        binding.etCustomXHwid.text = null
         binding.etFilter.text = null
         binding.chkEnable.isChecked = true
+        binding.chkEnableXHwid.isChecked = false
         binding.etPreProfile.text = null
         binding.etNextProfile.text = null
+        updateXHwidInputState(false)
+        binding.chkEnableXHwid.setOnCheckedChangeListener { _, isChecked ->
+            updateXHwidInputState(isChecked)
+        }
         return true
+    }
+
+    private fun updateXHwidInputState(enabled: Boolean) {
+        binding.etCustomXHwid.isEnabled = enabled
+        binding.etCustomXHwid.alpha = if (enabled) 1f else 0.6f
     }
 
     /**
@@ -79,6 +96,8 @@ class SubEditActivity : BaseActivity() {
         subItem.remarks = binding.etRemarks.text.toString()
         subItem.url = binding.etUrl.text.toString()
         subItem.userAgent = binding.etUserAgent.text.toString()
+        subItem.enableXHwid = binding.chkEnableXHwid.isChecked
+        subItem.customXHwid = binding.etCustomXHwid.text.toString().trim().ifEmpty { null }
         subItem.filter = binding.etFilter.text.toString()
         subItem.enabled = binding.chkEnable.isChecked
         subItem.autoUpdate = binding.autoUpdateCheck.isChecked

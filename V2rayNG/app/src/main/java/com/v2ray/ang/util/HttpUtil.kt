@@ -147,7 +147,14 @@ object HttpUtil {
      * @throws IOException If an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun getUrlContentWithUserAgent(url: String?, userAgent: String?,  timeout: Int = 15000, httpPort: Int = 0): String {
+    fun getUrlContentWithUserAgent(
+        url: String?,
+        userAgent: String?,
+        timeout: Int = 15000,
+        httpPort: Int = 0,
+        enableXHwid: Boolean = false,
+        customXHwid: String? = null
+    ): String {
         var currentUrl = url
         var redirects = 0
         val maxRedirects = 3
@@ -161,8 +168,10 @@ object HttpUtil {
                 userAgent
             }
             conn.setRequestProperty("User-agent", finalUserAgent)
-            // x-hwid required by Remnawave.
-            conn.setRequestProperty(AppConfig.HWID_HEADER_NAME, getFakeHwid())
+            if (enableXHwid) {
+                val hwid = customXHwid?.trim().takeUnless { it.isNullOrEmpty() } ?: getFakeHwid()
+                conn.setRequestProperty(AppConfig.HWID_HEADER_NAME, hwid)
+            }
             conn.connect()
 
             val responseCode = conn.responseCode
