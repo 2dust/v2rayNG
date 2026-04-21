@@ -68,6 +68,8 @@ class MainRecyclerAdapter(
             } else {
                 holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(context, R.color.colorPing))
             }
+            holder.itemMainBinding.tvSpeedResult.text = aff?.getTestSpeedString().orEmpty()
+            holder.itemMainBinding.tvSpeedResult.setTextColor(ContextCompat.getColor(context, R.color.colorSpeedTest))
 
             //layoutIndicator
             if (guid == MmkvManager.getSelectServer()) {

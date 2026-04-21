@@ -210,6 +210,10 @@
 
     <string name="title_pref_delay_test_url">Сервис проверки задержки</string>
     <string name="summary_pref_delay_test_url">URL</string>
+    <string name="title_pref_speed_test_url">Сервис проверки скорости</string>
+    <string name="summary_pref_speed_test_url">Один или несколько URL через запятую</string>
+    <string name="title_pref_speed_test_timeout">Таймаут проверки скорости, секунды</string>
+    <string name="title_pref_speed_test_concurrency">Параллельность проверки скорости (1-8)</string>
 
     <string name="title_pref_ip_api_url">Сервис проверки текущего соединения</string>
     <string name="summary_pref_ip_api_url">URL</string>
@@ -300,6 +304,7 @@
     <string name="title_sub_update">Обновить подписку</string>
     <string name="title_ping_all_server">Проверить профили</string>
     <string name="title_real_ping_all_server">Проверить задержку профилей</string>
+    <string name="title_speed_test_all_server">Проверить скорость</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
     <string name="title_filter_config">Фильтр профилей</string>

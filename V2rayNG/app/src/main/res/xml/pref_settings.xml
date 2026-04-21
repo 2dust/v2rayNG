@@ -306,6 +306,23 @@
             android:title="@string/title_pref_delay_test_url" />
 
         <EditTextPreference
+            android:key="pref_speed_test_url"
+            android:summary="@string/summary_pref_speed_test_url"
+            android:title="@string/title_pref_speed_test_url" />
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_speed_test_timeout"
+            android:summary="15"
+            android:title="@string/title_pref_speed_test_timeout" />
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_speed_test_concurrency"
+            android:summary="4"
+            android:title="@string/title_pref_speed_test_concurrency" />
+
+        <EditTextPreference
             android:key="pref_ip_api_url"
             android:summary="@string/summary_pref_ip_api_url"
             android:title="@string/title_pref_ip_api_url" />

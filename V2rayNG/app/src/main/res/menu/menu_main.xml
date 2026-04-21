@@ -95,6 +95,10 @@
         android:title="@string/title_real_ping_all_server"
         app:showAsAction="never" />
     <item
+        android:id="@+id/speed_test_all"
+        android:title="@string/title_speed_test_all_server"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/sort_by_test_results"
         android:title="@string/title_sort_by_test_results"
         app:showAsAction="never" />

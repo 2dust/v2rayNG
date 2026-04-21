@@ -402,6 +402,39 @@ object SettingsManager {
         }
     }
 
+    fun getSpeedTestUrl(): String {
+        return MmkvManager.decodeSettingsString(AppConfig.PREF_SPEED_TEST_URL)
+            ?.takeIf { it.isNotBlank() }
+            ?: AppConfig.SPEED_TEST_URL
+    }
+
+    fun getSpeedTestUrls(): List<String> {
+        val savedUrls = getSpeedTestUrl()
+            .split(",", "\n", ";")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+        val defaultUrls = AppConfig.SPEED_TEST_URL
+            .split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+        return (savedUrls + defaultUrls).distinct()
+    }
+
+    fun getSpeedTestTimeoutMillis(): Int {
+        val seconds = Utils.parseInt(
+            MmkvManager.decodeSettingsString(AppConfig.PREF_SPEED_TEST_TIMEOUT),
+            AppConfig.SPEED_TEST_TIMEOUT.toInt()
+        ).coerceIn(3, 120)
+        return seconds * 1000
+    }
+
+    fun getSpeedTestConcurrency(): Int {
+        return Utils.parseInt(
+            MmkvManager.decodeSettingsString(AppConfig.PREF_SPEED_TEST_CONCURRENCY),
+            AppConfig.SPEED_TEST_CONCURRENCY.toInt()
+        ).coerceIn(1, 8)
+    }
+
     /**
      * Get the locale.
      * @return The locale.
@@ -508,6 +541,9 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_REMOTE_DNS, AppConfig.DNS_PROXY)
         ensureDefaultValue(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
         ensureDefaultValue(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DELAY_TEST_URL)
+        ensureDefaultValue(AppConfig.PREF_SPEED_TEST_URL, AppConfig.SPEED_TEST_URL)
+        ensureDefaultValue(AppConfig.PREF_SPEED_TEST_TIMEOUT, AppConfig.SPEED_TEST_TIMEOUT)
+        ensureDefaultValue(AppConfig.PREF_SPEED_TEST_CONCURRENCY, AppConfig.SPEED_TEST_CONCURRENCY)
         ensureDefaultValue(AppConfig.PREF_IP_API_URL, AppConfig.IP_API_URL)
         ensureDefaultValue(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT, AppConfig.HEVTUN_RW_TIMEOUT)
         ensureDefaultValue(AppConfig.PREF_MUX_CONCURRENCY, "8")

@@ -309,6 +309,12 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             true
         }
 
+        R.id.speed_test_all -> {
+            toast(getString(R.string.connection_test_testing_count, mainViewModel.serversCache.count()))
+            mainViewModel.testAllSpeed()
+            true
+        }
+
         R.id.service_restart -> {
             restartV2Ray()
             true

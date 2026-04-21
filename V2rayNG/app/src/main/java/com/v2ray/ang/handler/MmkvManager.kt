@@ -265,6 +265,15 @@ object MmkvManager {
         serverAffStorage.encode(guid, JsonUtil.toJson(aff))
     }
 
+    fun encodeServerTestSpeedMbps(guid: String, testResult: Double) {
+        if (guid.isBlank()) {
+            return
+        }
+        val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
+        aff.testSpeedMbps = testResult
+        serverAffStorage.encode(guid, JsonUtil.toJson(aff))
+    }
+
     /**
      * Clears all test delay results.
      *
@@ -274,6 +283,15 @@ object MmkvManager {
         keys?.forEach { key ->
             decodeServerAffiliationInfo(key)?.let { aff ->
                 aff.testDelayMillis = 0
+                serverAffStorage.encode(key, JsonUtil.toJson(aff))
+            }
+        }
+    }
+
+    fun clearAllTestSpeedResults(keys: List<String>?) {
+        keys?.forEach { key ->
+            decodeServerAffiliationInfo(key)?.let { aff ->
+                aff.testSpeedMbps = 0.0
                 serverAffStorage.encode(key, JsonUtil.toJson(aff))
             }
         }

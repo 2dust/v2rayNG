@@ -213,6 +213,10 @@
 
     <string name="title_pref_delay_test_url">True delay test url </string>
     <string name="summary_pref_delay_test_url">Url</string>
+    <string name="title_pref_speed_test_url">Speed test url</string>
+    <string name="summary_pref_speed_test_url">One or more URLs separated by comma</string>
+    <string name="title_pref_speed_test_timeout">Speed test timeout, seconds</string>
+    <string name="title_pref_speed_test_concurrency">Speed test concurrency (1-8)</string>
 
     <string name="title_pref_ip_api_url">Current connection info test url</string>
     <string name="summary_pref_ip_api_url">Url</string>
@@ -303,6 +307,7 @@
     <string name="title_sub_update">Update subscription</string>
     <string name="title_ping_all_server">Tcping config</string>
     <string name="title_real_ping_all_server">Real delay config</string>
+    <string name="title_speed_test_all_server">Speed test</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sorting by test results</string>
     <string name="title_filter_config">Filter config</string>

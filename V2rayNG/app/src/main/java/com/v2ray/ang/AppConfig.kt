@@ -66,6 +66,9 @@ object AppConfig {
     const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
     const val PREF_DNS_HOSTS = "pref_dns_hosts"
     const val PREF_DELAY_TEST_URL = "pref_delay_test_url"
+    const val PREF_SPEED_TEST_URL = "pref_speed_test_url"
+    const val PREF_SPEED_TEST_TIMEOUT = "pref_speed_test_timeout"
+    const val PREF_SPEED_TEST_CONCURRENCY = "pref_speed_test_concurrency"
     const val PREF_IP_API_URL = "pref_ip_api_url"
     const val PREF_LOGLEVEL = "pref_core_loglevel"
     const val PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD = "pref_outbound_domain_resolve_method"
@@ -124,7 +127,9 @@ object AppConfig {
     const val TG_CHANNEL_URL = "https://t.me/github_2dust"
     const val DELAY_TEST_URL = "https://www.gstatic.com/generate_204"
     const val DELAY_TEST_URL2 = "https://www.google.com/generate_204"
-
+    const val SPEED_TEST_URL = "https://speed.cloudflare.com/__down?bytes=10000000,https://cachefly.cachefly.net/50mb.test"
+    const val SPEED_TEST_TIMEOUT = "15"
+    const val SPEED_TEST_CONCURRENCY = "4"
     //    const val IP_API_URL = "https://speed.cloudflare.com/meta"
     const val IP_API_URL = "https://api.ip.sb/geoip"
 
@@ -169,6 +174,8 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG_CANCEL = 72
     const val MSG_MEASURE_CONFIG_NOTIFY = 73
     const val MSG_MEASURE_CONFIG_FINISH = 74
+    const val MSG_MEASURE_CONFIG_SPEED = 75
+    const val MSG_MEASURE_CONFIG_SPEED_SUCCESS = 76
 
     /** Notification channel IDs and names. */
     const val RAY_NG_CHANNEL_ID = "RAY_NG_M_CH_ID"

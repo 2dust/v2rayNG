@@ -230,6 +230,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun testAllSpeed() {
+        MessageUtil.sendMsg2TestService(
+            getApplication(),
+            TestServiceMessage(key = AppConfig.MSG_MEASURE_CONFIG_CANCEL)
+        )
+        val guids = serversCache.map { it.guid }.toList()
+        MmkvManager.clearAllTestDelayResults(guids)
+        MmkvManager.clearAllTestSpeedResults(guids)
+        updateListAction.value = -1
+
+        viewModelScope.launch(Dispatchers.Default) {
+            if (serversCache.isEmpty()) {
+                return@launch
+            }
+            MessageUtil.sendMsg2TestService(
+                getApplication(),
+                TestServiceMessage(
+                    key = AppConfig.MSG_MEASURE_CONFIG_SPEED,
+                    subscriptionId = subscriptionId,
+                    serverGuids = if (keywordFilter.isNotEmpty()) guids else emptyList()
+                )
+            )
+        }
+    }
+
     /**
      * Tests the real ping for the current server.
      */
@@ -472,6 +497,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> {
                     val resultPair = intent.serializable<Pair<String, Long>>("content") ?: return
                     MmkvManager.encodeServerTestDelayMillis(resultPair.first, resultPair.second)
+                    updateListAction.value = getPosition(resultPair.first)
+                }
+
+                AppConfig.MSG_MEASURE_CONFIG_SPEED_SUCCESS -> {
+                    val resultPair = intent.serializable<Pair<String, Double>>("content") ?: return
+                    MmkvManager.encodeServerTestSpeedMbps(resultPair.first, resultPair.second)
                     updateListAction.value = getPosition(resultPair.first)
                 }
 

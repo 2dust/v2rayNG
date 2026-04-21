@@ -214,6 +214,17 @@
                     android:textSize="11sp"
                     tools:text="214ms" />
 
+                <TextView
+                    android:id="@+id/tv_speed_result"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/padding_spacing_dp8"
+                    android:lines="1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/colorSpeedTest"
+                    android:textSize="11sp"
+                    tools:text="24 Mbps" />
+
             </LinearLayout>
 
         </LinearLayout>
