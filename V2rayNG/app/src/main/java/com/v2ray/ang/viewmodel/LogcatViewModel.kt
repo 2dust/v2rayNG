@@ -15,14 +15,15 @@ class LogcatViewModel : ViewModel() {
 
     fun loadLogcat() {
         try {
-            val lst = LinkedHashSet<String>()
-            lst.add("logcat")
-            lst.add("-d")
-            lst.add("-v")
-            lst.add("time")
-            lst.add("-s")
-            lst.add("GoLog,${ANG_PACKAGE},AndroidRuntime,System.err")
-            val process = Runtime.getRuntime().exec(lst.toTypedArray())
+            val allowedTags = listOf("GoLog", ANG_PACKAGE, "AndroidRuntime", "System.err")
+            val tagFilter = allowedTags.joinToString(",") { tag ->
+                require(tag.matches(Regex("[A-Za-z0-9_.:]+"))) { "Invalid logcat tag: $tag" }
+                tag
+            }
+            val cmd = listOf("logcat", "-d", "-v", "time", "-s", tagFilter)
+            val process = ProcessBuilder(cmd)
+                .redirectErrorStream(false)
+                .start()
             val allText = process.inputStream.bufferedReader().use { it.readLines() }.reversed()
 
             logsetsAll.clear()
@@ -35,10 +36,10 @@ class LogcatViewModel : ViewModel() {
 
     fun clearLogcat() {
         try {
-            val lst = LinkedHashSet<String>()
-            lst.add("logcat")
-            lst.add("-c")
-            val process = Runtime.getRuntime().exec(lst.toTypedArray())
+            val cmd = listOf("logcat", "-c")
+            val process = ProcessBuilder(cmd)
+                .redirectErrorStream(false)
+                .start()
             process.waitFor()
 
             logsetsAll.clear()
