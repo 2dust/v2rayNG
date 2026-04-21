@@ -537,14 +537,14 @@ object AngConfigManager {
 
             var configText = try {
                 val httpPort = SettingsManager.getHttpPort()
-                HttpUtil.getUrlContentWithUserAgent(url, userAgent, 15000, httpPort, enableXHwid, customXHwid)
+                HttpUtil.getUrlContentWithUserAgent(url, userAgent, 15000, httpPort, enableXHwid, customXHwid, it.guid)
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
                 ""
             }
             if (configText.isEmpty()) {
                 configText = try {
-                    HttpUtil.getUrlContentWithUserAgent(url, userAgent, enableXHwid = enableXHwid, customXHwid = customXHwid)
+                    HttpUtil.getUrlContentWithUserAgent(url, userAgent, enableXHwid = enableXHwid, customXHwid = customXHwid, subId = it.guid)
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
                     ""

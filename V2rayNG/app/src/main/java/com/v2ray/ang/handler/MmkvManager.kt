@@ -393,6 +393,9 @@ object MmkvManager {
         encodeSubsList(subsList)
 
         removeServerViaSubid(subid)
+        // Clean up per-subscription HWID
+        val hwidKey = "sub_hwid_$subid"
+        settingsStorage.remove(hwidKey)
     }
 
     /**

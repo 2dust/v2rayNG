@@ -86,8 +86,9 @@ class SubEditActivity : BaseActivity() {
     private fun updateXHwidInputState(enabled: Boolean) {
         binding.etCustomXHwid.isEnabled = enabled
         binding.etCustomXHwid.alpha = if (enabled) 1f else 0.6f
-        if (enabled && binding.etCustomXHwid.text.isEmpty()) {
-            binding.etCustomXHwid.setText(HttpUtil.getFakeHwid())
+        if (enabled && binding.etCustomXHwid.text.isEmpty() && editSubId.isNotEmpty()) {
+            // Generate or retrieve per-subscription HWID for existing subscriptions
+            binding.etCustomXHwid.setText(HttpUtil.getSubscriptionHwid(editSubId))
         }
     }
 

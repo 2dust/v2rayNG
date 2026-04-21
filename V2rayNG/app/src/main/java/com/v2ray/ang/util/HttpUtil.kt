@@ -113,6 +113,14 @@ object HttpUtil {
         }
     }
 
+    // Per-subscription HWID: generate once and persist
+    @Synchronized
+    fun getSubscriptionHwid(subId: String): String {
+        val stored = MmkvManager.decodeSettingsString("sub_hwid_$subId")
+        return stored?.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString().also {
+            MmkvManager.encodeSettings("sub_hwid_$subId", it)
+        }
+    }
 
     /**
      * Retrieves the content of a URL as a string.
@@ -125,8 +133,7 @@ object HttpUtil {
     fun getUrlContent(url: String, timeout: Int, httpPort: Int = 0): String? {
         val conn = createProxyConnection(url, httpPort, timeout, timeout) ?: return null
         try {
-            // x-hwid required by Remnawave.
-            conn.setRequestProperty(AppConfig.HWID_HEADER_NAME, getFakeHwid())
+            // Do NOT add x-hwid by default for generic requests
             conn.connect()
             return conn.inputStream.bufferedReader().readText()
         } catch (_: Exception) {
@@ -142,6 +149,9 @@ object HttpUtil {
      * @param url The URL to fetch content from.
      * @param timeout The timeout value in milliseconds.
      * @param httpPort The HTTP port to use.
+     * @param enableXHwid Whether to include x-hwid header.
+     * @param customXHwid Custom x-hwid value (if null and enableXHwid is true, generates per-subscription or global fallback).
+     * @param subId Optional subscription ID for per-sub HWID generation.
      * @return The content of the URL as a string.
      * @throws IOException If an I/O error occurs.
      */
@@ -152,7 +162,8 @@ object HttpUtil {
         timeout: Int = 15000,
         httpPort: Int = 0,
         enableXHwid: Boolean = false,
-        customXHwid: String? = null
+        customXHwid: String? = null,
+        subId: String? = null
     ): String {
         var currentUrl = url
         var redirects = 0
@@ -168,7 +179,13 @@ object HttpUtil {
             }
             conn.setRequestProperty("User-agent", finalUserAgent)
             if (enableXHwid) {
-                val hwid = customXHwid?.trim().takeUnless { it.isNullOrEmpty() } ?: getFakeHwid()
+                val hwid = if (!customXHwid.isNullOrBlank()) {
+                    customXHwid.trim()
+                } else if (subId != null) {
+                    getSubscriptionHwid(subId)
+                } else {
+                    getFakeHwid()
+                }
                 conn.setRequestProperty(AppConfig.HWID_HEADER_NAME, hwid)
             }
             conn.connect()
@@ -280,4 +297,3 @@ object HttpUtil {
         }
     }
 }
-
