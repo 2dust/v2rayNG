@@ -98,7 +98,7 @@ object V2rayConfigManager {
             return result
         }
 
-        // check if package names need to replaced on UIDs
+        // Check whether package names need to be replaced with UIDs
         val json = JsonUtil.parseString(raw)?.takeIf { it.isJsonObject }?.asJsonObject ?: return result
         val rulesJson = json.get("routing")?.takeIf { it.isJsonObject }?.asJsonObject
             ?.get("rules")?.takeIf { it.isJsonArray }?.asJsonArray
