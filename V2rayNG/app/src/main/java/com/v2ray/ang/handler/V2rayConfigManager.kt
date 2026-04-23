@@ -416,6 +416,8 @@ object V2rayConfigManager {
                 inbound2.tag = EConfigType.HTTP.name.lowercase()
                 inbound2.port = SettingsManager.getHttpPort()
                 inbound2.protocol = EConfigType.HTTP.name.lowercase()
+                inbound2.settings?.auth = null
+                inbound2.settings?.udp = null
                 v2rayConfig.inbounds.add(inbound2)
             }
 

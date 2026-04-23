@@ -532,10 +532,12 @@ object AngConfigManager {
             }
             LogUtil.i(AppConfig.TAG, url)
             val userAgent = it.subscription.userAgent
+            val proxyUsername = SettingsManager.getSocksUsername()
+            val proxyPassword = SettingsManager.getSocksPassword()
 
             var configText = try {
                 val httpPort = SettingsManager.getHttpPort()
-                HttpUtil.getUrlContentWithUserAgent(url, userAgent, 15000, httpPort)
+                HttpUtil.getUrlContentWithUserAgent(url, userAgent, 15000, httpPort, proxyUsername, proxyPassword)
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
                 ""

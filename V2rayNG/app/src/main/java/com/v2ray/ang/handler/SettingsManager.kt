@@ -317,11 +317,7 @@ object SettingsManager {
     }
 
     private fun generateRandomSocksPort(): Int {
-        return if (Utils.isXray()) {
-            Random.nextInt(10000, 65536)
-        } else {
-            Random.nextInt(10000, 65535)
-        }
+        return Random.nextInt(10000, 65535)
     }
 
     /**

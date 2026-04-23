@@ -191,8 +191,10 @@ class PerAppProxyActivity : BaseActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             var content = HttpUtil.getUrlContent(url, 5000)
             if (content.isNullOrEmpty()) {
+                val proxyUsername = SettingsManager.getSocksUsername()
+                val proxyPassword = SettingsManager.getSocksPassword()
                 val httpPort = SettingsManager.getHttpPort()
-                content = HttpUtil.getUrlContent(url, 5000, httpPort) ?: ""
+                content = HttpUtil.getUrlContent(url, 5000, httpPort, proxyUsername, proxyPassword) ?: ""
             }
             launch(Dispatchers.Main) {
                 //LogUtil.i(AppConfig.TAG, content)

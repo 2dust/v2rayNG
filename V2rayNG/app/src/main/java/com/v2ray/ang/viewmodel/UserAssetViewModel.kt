@@ -10,8 +10,6 @@ import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import java.io.File
-import java.io.FileOutputStream
-import java.net.HttpURLConnection
 
 class UserAssetViewModel : ViewModel() {
     private val assets = mutableListOf<AssetUrlCache>()
@@ -61,7 +59,12 @@ class UserAssetViewModel : ViewModel() {
         }
     }
 
-    fun downloadGeoFiles(extDir: File, httpPort: Int): GeoDownloadResult {
+    fun downloadGeoFiles(
+        extDir: File,
+        httpPort: Int,
+        proxyUsername: String? = null,
+        proxyPassword: String? = null
+    ): GeoDownloadResult {
         val snapshot = getAssets()
         var successCount = 0
         val failures = mutableListOf<String>()
@@ -69,7 +72,7 @@ class UserAssetViewModel : ViewModel() {
         snapshot.forEach { cache ->
             val item = cache.assetUrl
             val portsToTry = if (httpPort == 0) listOf(0) else listOf(httpPort, 0)
-            if (portsToTry.any { tryDownload(item, extDir, it) }) {
+            if (portsToTry.any { tryDownload(item, extDir, it, proxyUsername, proxyPassword) }) {
                 successCount++
             } else {
                 failures.add(item.remarks)
@@ -79,25 +82,22 @@ class UserAssetViewModel : ViewModel() {
         return GeoDownloadResult(successCount, failures.size, failures)
     }
 
-    private fun tryDownload(item: AssetUrlItem, extDir: File, httpPort: Int): Boolean {
+    private fun tryDownload(
+        item: AssetUrlItem,
+        extDir: File,
+        httpPort: Int,
+        proxyUsername: String? = null,
+        proxyPassword: String? = null
+    ): Boolean {
         val targetTemp = File(extDir, item.remarks + "_temp")
         val target = File(extDir, item.remarks)
-        val conn = HttpUtil.createProxyConnection(item.url, httpPort, 15000, 15000, needStream = true) ?: return false
         try {
-            val responseCode = conn.responseCode
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                conn.inputStream.use { inputStream ->
-                    FileOutputStream(targetTemp).use { output ->
-                        inputStream.copyTo(output)
-                    }
-                }
+            if (HttpUtil.downloadToFile(item.url, targetTemp, 15000, httpPort, proxyUsername, proxyPassword)) {
                 targetTemp.renameTo(target)
                 return true
             }
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to download geo file: ${item.remarks}", e)
-        } finally {
-            conn.disconnect()
         }
         return false
     }

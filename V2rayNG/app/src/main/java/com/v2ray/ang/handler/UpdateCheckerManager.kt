@@ -23,10 +23,13 @@ object UpdateCheckerManager {
             AppConfig.APP_API_URL.concatUrl("latest")
         }
 
+        val proxyUsername = SettingsManager.getSocksUsername()
+        val proxyPassword = SettingsManager.getSocksPassword()
+
         var response = HttpUtil.getUrlContent(url, 5000)
         if (response.isNullOrEmpty()) {
             val httpPort = SettingsManager.getHttpPort()
-            response = HttpUtil.getUrlContent(url, 5000, httpPort)
+            response = HttpUtil.getUrlContent(url, 5000, httpPort, proxyUsername, proxyPassword)
                 ?: throw IllegalStateException("Failed to get response")
         }
 
@@ -58,39 +61,6 @@ object UpdateCheckerManager {
             )
         } else {
             CheckUpdateResult(hasUpdate = false)
-        }
-    }
-
-    suspend fun downloadApk(context: Context, downloadUrl: String): File? = withContext(Dispatchers.IO) {
-        try {
-            val httpPort = SettingsManager.getHttpPort()
-            val connection = HttpUtil.createProxyConnection(downloadUrl, httpPort, 10000, 10000, true)
-                ?: throw IllegalStateException("Failed to create connection")
-
-            try {
-                val apkFile = File(context.cacheDir, "update.apk")
-                LogUtil.i(AppConfig.TAG, "Downloading APK to: ${apkFile.absolutePath}")
-
-                FileOutputStream(apkFile).use { outputStream ->
-                    connection.inputStream.use { inputStream ->
-                        inputStream.copyTo(outputStream)
-                    }
-                }
-                LogUtil.i(AppConfig.TAG, "APK download completed")
-                return@withContext apkFile
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to download APK: ${e.message}")
-                return@withContext null
-            } finally {
-                try {
-                    connection.disconnect()
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Error closing connection: ${e.message}")
-                }
-            }
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to initiate download: ${e.message}")
-            return@withContext null
         }
     }
 

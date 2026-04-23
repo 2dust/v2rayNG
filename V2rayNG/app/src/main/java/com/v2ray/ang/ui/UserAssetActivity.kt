@@ -173,9 +173,11 @@ class UserAssetActivity : HelperBaseActivity() {
         showLoading()
         toast(R.string.msg_downloading_content)
 
+        val proxyUsername = SettingsManager.getSocksUsername()
+        val proxyPassword = SettingsManager.getSocksPassword()
         val httpPort = SettingsManager.getHttpPort()
         lifecycleScope.launch(Dispatchers.IO) {
-            val result = viewModel.downloadGeoFiles(extDir, httpPort)
+            val result = viewModel.downloadGeoFiles(extDir, httpPort, proxyUsername, proxyPassword)
             withContext(Dispatchers.Main) {
                 if (result.successCount > 0) {
                     toast(getString(R.string.title_update_config_count, result.successCount))
