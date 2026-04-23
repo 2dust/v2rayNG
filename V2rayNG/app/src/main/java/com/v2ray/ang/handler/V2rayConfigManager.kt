@@ -104,15 +104,17 @@ object V2rayConfigManager {
             ?.get("rules")?.takeIf { it.isJsonArray }?.asJsonArray
             ?: JsonArray()
 
-        for (elem in rulesJson) {
-            val rule = elem.takeIf { it.isJsonObject }?.asJsonObject ?: continue
-            val process = rule.get("process")?.takeIf { it.isJsonArray }?.asJsonArray ?: continue
-            val packages = process.mapNotNull {
-                it.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }?.asString
-            }.takeIf { it.isNotEmpty() } ?: continue
-            val uids = PackageUidResolver.packageNamesToUids(context, packages).takeIf { it.isNotEmpty() } ?: continue
+        if (SettingsManager.canUseProcessRouting()) {
+            for (elem in rulesJson) {
+                val rule = elem.takeIf { it.isJsonObject }?.asJsonObject ?: continue
+                val process = rule.get("process")?.takeIf { it.isJsonArray }?.asJsonArray ?: continue
+                val packages = process.mapNotNull {
+                    it.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }?.asString
+                }.takeIf { it.isNotEmpty() } ?: continue
+                val uids = PackageUidResolver.packageNamesToUids(context, packages).takeIf { it.isNotEmpty() } ?: continue
 
-            rule.add("process", JsonArray().apply { uids.forEach { add(it) } })
+                rule.add("process", JsonArray().apply { uids.forEach { add(it) } })
+            }
         }
 
         // check if tun inbound exists
