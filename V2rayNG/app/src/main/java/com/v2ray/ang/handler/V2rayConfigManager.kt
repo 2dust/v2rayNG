@@ -98,13 +98,14 @@ object V2rayConfigManager {
             return result
         }
 
-        // Check whether package names need to be replaced with UIDs
         val json = JsonUtil.parseString(raw)?.takeIf { it.isJsonObject }?.asJsonObject ?: return result
-        val rulesJson = json.get("routing")?.takeIf { it.isJsonObject }?.asJsonObject
-            ?.get("rules")?.takeIf { it.isJsonArray }?.asJsonArray
-            ?: JsonArray()
 
+        // Check whether package names need to be replaced with UIDs
         if (SettingsManager.canUseProcessRouting()) {
+            val rulesJson = json.get("routing")?.takeIf { it.isJsonObject }?.asJsonObject
+                ?.get("rules")?.takeIf { it.isJsonArray }?.asJsonArray
+                ?: JsonArray()
+
             for (elem in rulesJson) {
                 val rule = elem.takeIf { it.isJsonObject }?.asJsonObject ?: continue
                 val process = rule.get("process")?.takeIf { it.isJsonArray }?.asJsonArray ?: continue
@@ -118,31 +119,25 @@ object V2rayConfigManager {
         }
 
         // check if tun inbound exists
-        val inboundsJson = json.get("inbounds")?.takeIf { it.isJsonArray }?.asJsonArray ?: JsonArray()
+        val inboundsJson = json.get("inbounds")?.takeIf { it.isJsonArray }?.asJsonArray
+            ?: JsonArray().also { json.add("inbounds", it) }
         val tunNotExists = inboundsJson.none { elem ->
-            val inbound = elem.takeIf { it.isJsonObject }?.asJsonObject ?: return@none false
-            val protocol = inbound.get("protocol")
+            elem.isJsonObject && elem.asJsonObject.get("protocol")
                 ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }
-                ?.asString ?: return@none false
-
-            protocol == "tun"
+                ?.asString == "tun"
         }
 
         if (tunNotExists) {
             // add tun inbound from template
-            val templateConfig = initV2rayConfig(context) ?: return result
-            val inboundTun = templateConfig.inbounds.firstOrNull { it.tag == "tun" } ?: return result
-            inboundTun.settings?.mtu = SettingsManager.getVpnMtu()
-
-            // add to json
-            inboundsJson.add(JsonUtil.parseString(JsonUtil.toJson(inboundTun)))
-            if (inboundsJson.size() == 1) {
-                json.add("inbounds", inboundsJson)
+            initV2rayConfig(context)?.let { templateConfig ->
+                templateConfig.inbounds.firstOrNull { it.tag == "tun" }?.let { inboundTun ->
+                    inboundTun.settings?.mtu = SettingsManager.getVpnMtu()
+                    inboundsJson.add(JsonUtil.parseString(JsonUtil.toJson(inboundTun)))
+                }
             }
         }
 
-        val updatedRaw = JsonUtil.toJsonPretty(json) ?: return result
-        return ConfigResult(true, guid, updatedRaw)
+        return JsonUtil.toJsonPretty(json)?.let { ConfigResult(true, guid, it) } ?: result
     }
 
     /**
