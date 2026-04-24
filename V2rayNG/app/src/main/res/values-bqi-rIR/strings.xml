@@ -341,6 +341,7 @@
     <string name="routing_settings_locked">چفت هڌ، ای قانؤنن مجال و من ٱووردن ز پؽش سامووا زفت کۊنین</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
     <string name="routing_settings_ip" translatable="false">ip</string>
+    <string name="routing_settings_process">پردازشت (نوم بئسته — تینا مجال استفاڌه ز Xray TUN، فعال بیڌن routeOnly وو Android 10+ لادراری ابۊ)</string>
     <string name="routing_settings_port" translatable="false">port</string>
     <string name="routing_settings_protocol" translatable="false">protocol</string>
     <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
