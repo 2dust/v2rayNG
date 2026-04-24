@@ -202,6 +202,20 @@
 
     <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
 
+    <string name="title_pref_vpn_network_category">Network</string>
+    <string name="title_pref_enable_local_proxy">Enable local proxy</string>
+    <string name="summary_pref_enable_local_proxy">Create local SOCKS5 and HTTP proxy inbounds</string>
+    <string name="title_pref_enable_socks_udp">Enable UDP for SOCKS</string>
+    <string name="summary_pref_socks_udp_warning">Warning: SOCKS5 password authentication does not provide full protection for UDP connection.</string>
+    <string name="title_pref_tun_type">TUN implementation</string>
+    <string-array name="tun_types">
+        <item>Xray-core</item>
+        <item>Hev TUN</item>
+    </string-array>
+    <string-array name="tun_types_value">
+        <item>false</item>
+        <item>true</item>
+    </string-array>
     <string name="title_pref_vpn_mtu">VPN MTU (default 1500)</string>
 
 
@@ -266,6 +280,7 @@
     <string name="title_pref_promotion">Promotion</string>
 
     <string name="title_pref_auto_update_subscription">Automatic update subscriptions</string>
+    <string name="title_pref_subscription_settings">Subscription settings</string>
     <string name="summary_pref_auto_update_subscription">Update your subscriptions automatically at set intervals in the background. Depending on the device, this feature may not always work</string>
     <string name="title_pref_auto_update_interval">Auto Update Interval (Minutes, Min value 15)</string>
 

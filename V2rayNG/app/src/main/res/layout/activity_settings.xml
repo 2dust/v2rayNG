@@ -7,9 +7,8 @@
     android:orientation="vertical"
     tools:context=".ui.SettingsActivity">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_settings"
-        android:name="com.v2ray.ang.ui.SettingsActivity$SettingsFragment"
+    <FrameLayout
+        android:id="@+id/settings_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

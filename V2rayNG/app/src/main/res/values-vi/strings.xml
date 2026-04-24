@@ -199,6 +199,12 @@
     <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
 
     <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
+    <string name="title_pref_vpn_network_category">Mạng</string>
+    <string name="title_pref_enable_local_proxy">Bật proxy cục bộ</string>
+    <string name="summary_pref_enable_local_proxy">Tạo các inbound proxy SOCKS5 và HTTP cục bộ</string>
+    <string name="title_pref_tun_type">Triển khai TUN</string>
+    <string name="title_pref_enable_socks_udp">Bật UDP cho SOCKS</string>
+    <string name="summary_pref_socks_udp_warning">Cảnh báo: Xác thực mật khẩu SOCKS5 không cung cấp sự bảo vệ đầy đủ cho kết nối UDP.</string>
     <string name="title_pref_vpn_mtu">VPN MTU (default 1500)</string>
 
     <string name="title_pref_domestic_dns">DNS nội địa (Không bắt buộc)</string>
@@ -261,6 +267,7 @@
     <string name="title_pref_promotion">Quảng bá server</string>
 
     <string name="title_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký</string>
+    <string name="title_pref_subscription_settings">Cài đặt gói đăng ký</string>
     <string name="summary_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký của bạn ở trong nền với khoảng thời gian cố định. Tùy thiết bị, tính năng này có thể không luôn hoạt động đúng như mong đợi.</string>
     <string name="title_pref_auto_update_interval">Thời gian cập nhật tự động (Phút, giá trị tối thiểu là 15)</string>
 

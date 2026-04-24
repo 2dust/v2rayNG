@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="pref_auto_update_subscription"
+        android:summary="@string/summary_pref_auto_update_subscription"
+        android:title="@string/title_pref_auto_update_subscription" />
+    <EditTextPreference
+        android:inputType="number"
+        android:key="pref_auto_update_interval"
+        android:summary="1440"
+        android:title="@string/title_pref_auto_update_interval" />
+
+</PreferenceScreen>

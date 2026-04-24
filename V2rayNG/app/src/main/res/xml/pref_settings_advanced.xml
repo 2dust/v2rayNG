@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <CheckBoxPreference
+        android:key="pref_is_booted"
+        android:summary="@string/summary_pref_is_booted"
+        android:title="@string/title_pref_is_booted" />
+
+    <CheckBoxPreference
+        android:key="pref_auto_remove_invalid_after_test"
+        android:defaultValue="false"
+        android:summary="@string/summary_pref_auto_remove_invalid_after_test"
+        android:title="@string/title_pref_auto_remove_invalid_after_test" />
+
+    <CheckBoxPreference
+        android:key="pref_auto_sort_after_test"
+        android:defaultValue="false"
+        android:summary="@string/summary_pref_auto_sort_after_test"
+        android:title="@string/title_pref_auto_sort_after_test" />
+
+    <EditTextPreference
+        android:key="pref_delay_test_url"
+        android:summary="@string/summary_pref_delay_test_url"
+        android:title="@string/title_pref_delay_test_url" />
+
+    <EditTextPreference
+        android:key="pref_ip_api_url"
+        android:summary="@string/summary_pref_ip_api_url"
+        android:title="@string/title_pref_ip_api_url" />
+
+</PreferenceScreen>

@@ -199,7 +199,12 @@
 
     <string name="title_pref_vpn_interface_address">Адрес интерфейса VPN</string>
 
-    <string name="title_pref_vpn_mtu">VPN MTU (по умолчанию 1500)</string>
+    <string name="title_pref_vpn_network_category">Сеть</string>
+    <string name="title_pref_enable_local_proxy">Включить локальный прокси</string>
+    <string name="summary_pref_enable_local_proxy">Создавать входящие SOCKS5 и HTTP соединения</string>
+    <string name="title_pref_enable_socks_udp">Включить UDP для SOCKS</string>
+    <string name="summary_pref_socks_udp_warning">Внимание: пароль SOCKS5 не обеспечивает полную защиту UDP-соединения.</string>
+    <string name="title_pref_tun_type">Реализация TUN</string>
 
 
     <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
@@ -263,6 +268,7 @@
     <string name="title_pref_promotion">Содействие</string>
 
     <string name="title_pref_auto_update_subscription">Автоматически обновлять подписки</string>
+    <string name="title_pref_subscription_settings">Настройки подписок</string>
     <string name="summary_pref_auto_update_subscription">Автоматическое обновление подписок в фоновом режиме с указанным интервалом. В зависимости от устройства эта функция может работать не всегда.</string>
     <string name="title_pref_auto_update_interval">Интервал автообновления (минут, не менее 15)</string>
 

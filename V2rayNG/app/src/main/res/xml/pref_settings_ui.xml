@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="pref_speed_enabled"
+        android:summary="@string/summary_pref_speed_enabled"
+        android:title="@string/title_pref_speed_enabled" />
+
+    <CheckBoxPreference
+        android:key="pref_confirm_remove"
+        android:summary="@string/summary_pref_confirm_remove"
+        android:title="@string/title_pref_confirm_remove" />
+
+    <CheckBoxPreference
+        android:key="pref_start_scan_immediate"
+        android:summary="@string/summary_pref_start_scan_immediate"
+        android:title="@string/title_pref_start_scan_immediate" />
+
+    <CheckBoxPreference
+        android:key="pref_double_column_display"
+        android:summary="@string/summary_pref_double_column_display"
+        android:title="@string/title_pref_double_column_display" />
+
+    <CheckBoxPreference
+        android:key="pref_group_all_display"
+        android:summary="@string/summary_pref_group_all_display"
+        android:title="@string/title_pref_group_all_display" />
+
+    <ListPreference
+        android:defaultValue="auto"
+        android:entries="@array/language_select"
+        android:entryValues="@array/language_select_value"
+        android:key="pref_language"
+        android:summary="%s"
+        android:title="@string/title_language" />
+
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/ui_mode_night"
+        android:entryValues="@array/ui_mode_night_value"
+        android:key="pref_ui_mode_night"
+        android:summary="%s"
+        android:title="@string/title_pref_ui_mode_night" />
+
+</PreferenceScreen>

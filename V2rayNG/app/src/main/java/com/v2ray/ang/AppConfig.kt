@@ -70,6 +70,8 @@ object AppConfig {
     const val PREF_LOGLEVEL = "pref_core_loglevel"
     const val PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD = "pref_outbound_domain_resolve_method"
     const val PREF_MODE = "pref_mode"
+    const val PREF_ENABLE_LOCAL_PROXY = "pref_enable_local_proxy"
+    const val PREF_ENABLE_SOCKS_UDP = "pref_enable_socks_udp"
     const val PREF_IS_BOOTED = "pref_is_booted"
     const val PREF_CHECK_UPDATE_PRE_RELEASE = "pref_check_update_pre_release"
     const val PREF_GEO_FILES_SOURCES = "pref_geo_files_sources"

@@ -278,6 +278,9 @@ object SettingsManager {
      * @return The SOCKS port.
      */
     fun getSocksPort(): Int {
+        if (!isLocalProxyEnabled()) {
+            return 0
+        }
         val port =
             if (IsDynamicSocksPort()) {
                 runtimeSocksPort ?: refreshRuntimeSocksPort()
@@ -309,6 +312,9 @@ object SettingsManager {
      * @return The HTTP port.
      */
     fun getHttpPort(): Int {
+        if (!isLocalProxyEnabled()) {
+            return 0
+        }
         return getSocksPort() + if (Utils.isXray()) 0 else 1
     }
 
@@ -457,7 +463,26 @@ object SettingsManager {
      * @return True if HEV TUN is used, false otherwise.
      */
     fun isUsingHevTun(): Boolean {
-        return MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true)
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, false)
+    }
+
+    /**
+     * Check if local proxy is enabled.
+     * @return True if local proxy is enabled, false otherwise.
+     */
+    fun isLocalProxyEnabled(): Boolean {
+        if (!isVpnMode() || isUsingHevTun()) {
+            return true
+        }
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_ENABLE_LOCAL_PROXY, true)
+    }
+
+    /**
+     * Check if SOCKS UDP is enabled.
+     * @return True if SOCKS UDP is enabled, false otherwise.
+     */
+    fun isSocksUdpEnabled(): Boolean {
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_ENABLE_SOCKS_UDP, true)
     }
 
     /**

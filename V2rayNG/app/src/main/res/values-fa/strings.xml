@@ -197,6 +197,12 @@
     <string name="title_pref_vpn_bypass_lan">آیا VPN از شبکه محلی عبور می کند؟</string>
 
     <string name="title_pref_vpn_interface_address">آدرس واسط VPN</string>
+    <string name="title_pref_vpn_network_category">شبکه</string>
+    <string name="title_pref_enable_local_proxy">فعال‌سازی پروکسی محلی</string>
+    <string name="summary_pref_enable_local_proxy">ایجاد ورودی‌های پروکسی SOCKS5 و HTTP محلی</string>
+    <string name="title_pref_tun_type">پیاده‌سازی TUN</string>
+    <string name="title_pref_enable_socks_udp">فعال‌سازی UDP برای SOCKS</string>
+    <string name="summary_pref_socks_udp_warning">هشدار: احراز هویت با رمز عبور SOCKS5 محافظت کاملی برای اتصال UDP فراهم نمی‌کند.</string>
     <string name="title_pref_vpn_mtu">VPN MTU (default 1500)</string>
 
     <string name="title_pref_domestic_dns">DNS داخلی (اختیاری)</string>
@@ -259,6 +265,7 @@
     <string name="title_pref_promotion">تبلیغات</string>
 
     <string name="title_pref_auto_update_subscription">به‌ روزرسانی خودکار اشتراک ها</string>
+    <string name="title_pref_subscription_settings">تنظیمات اشتراک</string>
     <string name="summary_pref_auto_update_subscription">اشتراک های خود را به طور خودکار با فاصله زمانی در پس زمینه به روز کنید. بسته به دستگاه، این ویژگی ممکن است همیشه کار نکند.</string>
     <string name="title_pref_auto_update_interval">فاصله به‌ روزرسانی خودکار ( حداقل مقدار ، 15 دقیقه )</string>
     <string name="title_core_loglevel">سطح گزارشات</string>

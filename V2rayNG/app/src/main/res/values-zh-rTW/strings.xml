@@ -198,6 +198,10 @@
     <string name="title_pref_vpn_bypass_lan">VPN 是否繞過區域網</string>
 
     <string name="title_pref_vpn_interface_address">VPN 介面位址</string>
+    <string name="title_pref_vpn_network_category">網路</string>
+    <string name="title_pref_tun_type">TUN 實現</string>
+    <string name="title_pref_enable_socks_udp">啟用 SOCKS 的 UDP</string>
+    <string name="summary_pref_socks_udp_warning">警告：SOCKS5 密碼驗證無法為 UDP 連線提供完整保護。</string>
     <string name="title_pref_vpn_mtu">VPN MTU (預設 1500)</string>
 
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -260,6 +264,7 @@
     <string name="title_pref_promotion">推廣</string>
 
     <string name="title_pref_auto_update_subscription">自動更新訂閱</string>
+    <string name="title_pref_subscription_settings">訂閱設定</string>
     <string name="summary_pref_auto_update_subscription">在後台以一定時間間隔自動更新您的訂閱。受設備影響，此功能不一定總是有效</string>
     <string name="title_pref_auto_update_interval">自動更新間隔（分鐘，最小值 15）</string>
 

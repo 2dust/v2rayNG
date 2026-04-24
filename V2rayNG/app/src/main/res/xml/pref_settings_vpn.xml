@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:defaultValue="VPN"
+        android:entries="@array/mode_entries"
+        android:entryValues="@array/mode_value"
+        android:key="pref_mode"
+        android:summary="%s"
+        android:title="@string/title_mode" />
+
+    <PreferenceCategory
+        android:key="pref_category_tun"
+        android:title="TUN">
+        <ListPreference
+            android:defaultValue="false"
+            android:entries="@array/tun_types"
+            android:entryValues="@array/tun_types_value"
+            android:key="pref_use_hev_tunnel_v2"
+            android:summary="%s"
+            android:title="@string/title_pref_tun_type" />
+
+        <ListPreference
+            android:defaultValue="warn"
+            android:entries="@array/hev_tunnel_loglevel"
+            android:entryValues="@array/hev_tunnel_loglevel"
+            android:key="pref_hev_tunnel_loglevel"
+            android:summary="%s"
+            android:title="@string/title_pref_hev_tunnel_loglevel" />
+
+        <EditTextPreference
+            android:key="pref_hev_tunnel_rw_timeout_v2"
+            android:summary="300,60"
+            android:title="@string/title_pref_hev_tunnel_rw_timeout" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="SOCKS5, HTTP Proxy">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_enable_local_proxy"
+            android:summary="@string/summary_pref_enable_local_proxy"
+            android:title="@string/title_pref_enable_local_proxy" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_proxy_sharing_enabled"
+            android:summary="@string/summary_pref_proxy_sharing_enabled"
+            android:title="@string/title_pref_proxy_sharing_enabled" />
+
+        <CheckBoxPreference
+            android:key="pref_append_http_proxy"
+            android:summary="@string/summary_pref_append_http_proxy"
+            android:title="@string/title_pref_append_http_proxy" />
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_socks_port"
+            android:summary="10808"
+            android:title="@string/title_pref_socks_port" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_dynamic_socks_port"
+            android:summary="@string/summary_pref_dynamic_socks_port"
+            android:title="@string/title_pref_dynamic_socks_port" />
+
+        <EditTextPreference
+            android:key="pref_socks_username"
+            android:summary="@string/summary_pref_socks_username"
+            android:title="@string/title_pref_socks_username" />
+
+        <EditTextPreference
+            android:inputType="textPassword"
+            android:key="pref_socks_password"
+            android:summary="@string/summary_pref_socks_password"
+            android:title="@string/title_pref_socks_password" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_enable_socks_udp"
+            android:summary="@string/summary_pref_socks_udp_warning"
+            android:title="@string/title_pref_enable_socks_udp" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="DNS">
+        <CheckBoxPreference
+            android:key="pref_local_dns_enabled"
+            android:summary="@string/summary_pref_local_dns_enabled"
+            android:title="@string/title_pref_local_dns_enabled" />
+
+        <CheckBoxPreference
+            android:key="pref_fake_dns_enabled"
+            android:summary="@string/summary_pref_fake_dns_enabled"
+            android:title="@string/title_pref_fake_dns_enabled" />
+
+        <EditTextPreference
+            android:key="pref_vpn_dns"
+            android:summary="@string/summary_pref_remote_dns"
+            android:title="@string/title_pref_vpn_dns" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="IPv6">
+        <CheckBoxPreference
+            android:key="pref_ipv6_enabled"
+            android:summary="@string/summary_pref_ipv6_enabled"
+            android:title="@string/title_pref_ipv6_enabled" />
+
+        <CheckBoxPreference
+            android:key="pref_prefer_ipv6"
+            android:summary="@string/summary_pref_prefer_ipv6"
+            android:title="@string/title_pref_prefer_ipv6" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_pref_vpn_network_category">
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/vpn_bypass_lan"
+            android:entryValues="@array/vpn_bypass_lan_value"
+            android:key="pref_vpn_bypass_lan"
+            android:summary="%s"
+            android:title="@string/title_pref_vpn_bypass_lan" />
+
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/vpn_interface_address"
+            android:entryValues="@array/vpn_interface_address_value"
+            android:key="pref_vpn_interface_address_config_index"
+            android:summary="%s"
+            android:title="@string/title_pref_vpn_interface_address" />
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_vpn_mtu"
+            android:summary="1500"
+            android:title="@string/title_pref_vpn_mtu" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -199,6 +199,12 @@
     <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
 
     <string name="title_pref_vpn_interface_address">VPN Interface Address</string>
+    <string name="title_pref_vpn_network_category">شبكة</string>
+    <string name="title_pref_enable_local_proxy">تمكين البروكسي المحلي</string>
+    <string name="summary_pref_enable_local_proxy">إنشاء اتصالات SOCKS5 و HTTP محلية</string>
+    <string name="title_pref_tun_type">تنفيذ TUN</string>
+    <string name="title_pref_enable_socks_udp">تمكين UDP لـ SOCKS</string>
+    <string name="summary_pref_socks_udp_warning">تحذير: لا توفر مصادقة كلمة مرور SOCKS5 حماية كاملة لاتصال UDP.</string>
     <string name="title_pref_vpn_mtu">VPN MTU (default 1500)</string>
 
     <string name="title_pref_domestic_dns">DNS المحلي (اختياري)</string>
@@ -261,6 +267,7 @@
     <string name="title_pref_promotion">ترويج</string>
 
     <string name="title_pref_auto_update_subscription">اشتراكات التحديث التلقائي</string>
+    <string name="title_pref_subscription_settings">إعدادات الاشتراك</string>
     <string name="summary_pref_auto_update_subscription">قم بتحديث اشتراكاتك تلقائيًا بفترة زمنية في الخلفية. اعتمادًا على الجهاز، قد لا تعمل هذه الميزة دائمًا</string>
     <string name="title_pref_auto_update_interval">فاصل التحديث التلقائي (بالدقائق، الحد الأدنى للقيمة 15)</string>
 
