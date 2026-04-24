@@ -84,6 +84,7 @@ jobs:
         java-version: '21'
 
     - name: Decode Keystore
+      if: github.repository == '2dust/v2rayNG'
       uses: timheuer/base64-to-file@v1.2.4
       id: android_keystore
       with:
