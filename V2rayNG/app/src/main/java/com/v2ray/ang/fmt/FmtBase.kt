@@ -68,6 +68,8 @@ open class FmtBase {
         config.xhttpMode = queryParam["mode"]
         config.xhttpExtra = queryParam["extra"]
         config.finalMask = queryParam["fm"]
+        config.mtu = queryParam["mtu"]?.toIntOrNull()
+        config.tti = queryParam["tti"]?.toIntOrNull()
 
         config.security = queryParam["security"]
         if (config.security != AppConfig.TLS && config.security != AppConfig.REALITY) {
@@ -112,6 +114,8 @@ open class FmtBase {
         config.mldsa65Verify?.nullIfBlank()?.let { dicQuery["pqv"] = it }
         config.flow?.nullIfBlank()?.let { dicQuery["flow"] = it }
         config.finalMask?.nullIfBlank()?.let { dicQuery["fm"] = it }
+        config.mtu?.let { dicQuery["mtu"] = it.toString() }
+        config.tti?.let { dicQuery["tti"] = it.toString() }
         // Add two keys for compatibility: "insecure" and "allowInsecure"
         if (config.security == AppConfig.TLS) {
             val insecureFlag = if (config.insecure == true) "1" else "0"

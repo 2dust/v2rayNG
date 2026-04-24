@@ -132,6 +132,9 @@ class ServerActivity : BaseActivity() {
     private val et_port_hop_interval: EditText? by lazy { findViewById(R.id.et_port_hop_interval) }
     private val et_bandwidth_down: EditText? by lazy { findViewById(R.id.et_bandwidth_down) }
     private val et_bandwidth_up: EditText? by lazy { findViewById(R.id.et_bandwidth_up) }
+    private val et_kcp_mtu: EditText? by lazy { findViewById(R.id.et_kcp_mtu) }
+    private val et_kcp_tti: EditText? by lazy { findViewById(R.id.et_kcp_tti) }
+    private val layout_kcp: LinearLayout? by lazy { findViewById(R.id.layout_kcp) }
     private val et_extra: EditText? by lazy { findViewById(R.id.et_extra) }
     private val et_fm: EditText? by lazy { findViewById(R.id.et_fm) }
     private val layout_extra: LinearLayout? by lazy { findViewById(R.id.layout_extra) }
@@ -244,6 +247,14 @@ class ServerActivity : BaseActivity() {
                     }.orEmpty()
                 )
                 et_fm?.text = Utils.getEditable(config?.finalMask)
+
+                layout_kcp?.visibility =
+                    when (networks[position]) {
+                        NetworkType.KCP.type -> View.VISIBLE
+                        else -> View.GONE
+                    }
+                et_kcp_mtu?.text = Utils.getEditable(config?.mtu?.toString().orEmpty())
+                et_kcp_tti?.text = Utils.getEditable(config?.tti?.toString().orEmpty())
 
                 layout_extra?.visibility =
                     when (networks[position]) {
@@ -569,6 +580,8 @@ class ServerActivity : BaseActivity() {
         profileItem.xhttpMode = transportTypes(networks[network])[type]
         profileItem.xhttpExtra = et_extra?.text?.toString()?.trim().nullIfBlank()
         profileItem.finalMask = et_fm?.text?.toString()?.trim()?.nullIfBlank()
+        profileItem.mtu = et_kcp_mtu?.text?.toString()?.toIntOrNull()
+        profileItem.tti = et_kcp_tti?.text?.toString()?.toIntOrNull()
     }
 
     private fun saveTls(config: ProfileItem) {
