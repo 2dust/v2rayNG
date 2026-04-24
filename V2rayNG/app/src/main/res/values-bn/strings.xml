@@ -135,6 +135,7 @@
     <string name="menu_item_search">অনুসন্ধান করুন</string>
     <string name="menu_item_select_all">সবকিছু নির্বাচন করুন</string>
     <string name="menu_item_invert_selection">Invert selection</string>
+    <string name="app_picker_unknown_app">অজানা অ্যাপ (অনির্ধারিত UID)</string>
     <string name="msg_enter_keywords">কিওয়ার্ড লিখুন</string>
     <string name="switch_bypass_apps_mode">বাইপাস মোড</string>
     <string name="menu_item_select_proxy_app">অটো সিলেক্ট প্রক্সি অ্যাপ</string>

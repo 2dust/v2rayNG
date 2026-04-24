@@ -135,6 +135,7 @@
     <string name="menu_item_search">پیتینیڌن</string>
     <string name="menu_item_select_all">پسند پوی</string>
     <string name="menu_item_invert_selection">پسند چواسه</string>
+    <string name="app_picker_unknown_app">برنامه ناشناخته (UID شناسایی نشده)</string>
     <string name="msg_enter_keywords">کلمه کلیدی را وارد کنید</string>
     <string name="switch_bypass_apps_mode">هالت Bypass</string>
     <string name="menu_item_select_proxy_app">پسند خوتکار پروکسی برنومه</string>

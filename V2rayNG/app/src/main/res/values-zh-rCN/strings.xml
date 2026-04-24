@@ -133,6 +133,7 @@
     <string name="menu_item_search">搜索</string>
     <string name="menu_item_select_all">全选</string>
     <string name="menu_item_invert_selection">反选</string>
+    <string name="app_picker_unknown_app">未知应用 (未识别 UID)</string>
     <string name="msg_enter_keywords">输入关键字</string>
     <string name="switch_bypass_apps_mode">绕行模式</string>
     <string name="menu_item_select_proxy_app">自动选中需代理应用</string>
@@ -197,6 +198,8 @@
 
     <string name="title_pref_vpn_interface_address">VPN 接口地址</string>
     <string name="title_pref_vpn_network_category">网络</string>
+    <string name="title_pref_enable_local_proxy">启用本地代理</string>
+    <string name="summary_pref_enable_local_proxy">创建本地 SOCKS5 和 HTTP 代理入口</string>
     <string name="title_pref_tun_type">TUN 实现</string>
     <string name="title_pref_enable_socks_udp">启用 SOCKS 的 UDP</string>
     <string name="summary_pref_socks_udp_warning">警告：SOCKS5 密码验证无法为 UDP 连接提供完整保护。</string>

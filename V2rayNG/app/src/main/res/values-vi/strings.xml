@@ -133,6 +133,7 @@
     <string name="menu_item_search">Tìm kiếm</string>
     <string name="menu_item_select_all">Chọn tất cả</string>
     <string name="menu_item_invert_selection">Đảo chọn</string>
+    <string name="app_picker_unknown_app">Ứng dụng không xác định (UID không xác định)</string>
     <string name="msg_enter_keywords">Nhập từ khoá</string>
     <string name="switch_bypass_apps_mode">Chế độ Bypass</string>
     <string name="menu_item_select_proxy_app">Tự động chọn ứng dụng Proxy</string>

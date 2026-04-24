@@ -136,6 +136,7 @@
     <string name="menu_item_search">بحث</string>
     <string name="menu_item_select_all">تحديد الكل</string>
     <string name="menu_item_invert_selection">عكس الاختيار</string>
+    <string name="app_picker_unknown_app">تطبيق غير معروف (UID غير معروف)</string>
     <string name="msg_enter_keywords">أدخل الكلمات الرئيسية</string>
     <string name="switch_bypass_apps_mode">وضع التجاوز</string>
     <string name="menu_item_select_proxy_app">تحديد تطبيق الوكيل تلقائيًا</string>

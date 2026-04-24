@@ -133,6 +133,7 @@
     <string name="menu_item_search">جستجو</string>
     <string name="menu_item_select_all">انتخاب همه</string>
     <string name="menu_item_invert_selection">Invert selection</string>
+    <string name="app_picker_unknown_app">برنامه ناشناخته (UID شناسایی نشده)</string>
     <string name="msg_enter_keywords">کلمه ی کلیدی را وارد نمایید</string>
     <string name="switch_bypass_apps_mode">حالت دور زدن</string>
     <string name="menu_item_select_proxy_app">انتخاب خودکار پروکسی برنامه</string>
@@ -340,6 +341,7 @@
     <string name="routing_settings_port">پورت</string>
     <string name="routing_settings_protocol">پورتکل</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
+    <string name="routing_settings_process">فرآیند (نام بسته — فقط هنگام استفاده از Xray TUN، فعال بودن routeOnly و اندروید 10+ پشتیبانی می‌شود)</string>
     <string name="routing_settings_network">شبکه</string>
     <string name="routing_settings_network_tip">[udp|tcp]</string>
     <string name="routing_settings_outbound_tag">برچسب خروجی</string>
