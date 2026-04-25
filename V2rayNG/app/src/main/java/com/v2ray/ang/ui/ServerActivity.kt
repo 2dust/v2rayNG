@@ -254,7 +254,7 @@ class ServerActivity : BaseActivity() {
                         else -> View.GONE
                     }
                 et_kcp_mtu?.text = Utils.getEditable(config?.mtu?.toString().orEmpty())
-                et_kcp_tti?.text = Utils.getEditable(config?.tti?.toString().orEmpty())
+                et_kcp_tti?.text = Utils.getEditable(config?.kcpTti?.toString().orEmpty())
 
                 layout_extra?.visibility =
                     when (networks[position]) {
@@ -581,7 +581,7 @@ class ServerActivity : BaseActivity() {
         profileItem.xhttpExtra = et_extra?.text?.toString()?.trim().nullIfBlank()
         profileItem.finalMask = et_fm?.text?.toString()?.trim()?.nullIfBlank()
         profileItem.mtu = et_kcp_mtu?.text?.toString()?.toIntOrNull()
-        profileItem.tti = et_kcp_tti?.text?.toString()?.toIntOrNull()
+        profileItem.kcpTti = et_kcp_tti?.text?.toString()?.toIntOrNull()
     }
 
     private fun saveTls(config: ProfileItem) {

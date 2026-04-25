@@ -56,7 +56,7 @@ data class ProfileItem(
     var localAddress: String? = null,
     var reserved: String? = null,
     var mtu: Int? = null,
-    var tti: Int? = null,
+    var kcpTti: Int? = null,
 
     var obfsPassword: String? = null,
     var portHopping: String? = null,
@@ -121,7 +121,7 @@ data class ProfileItem(
                 && this.localAddress == obj.localAddress
                 && this.reserved == obj.reserved
                 && this.mtu == obj.mtu
-                && this.tti == obj.tti
+                && this.kcpTti == obj.kcpTti
 
                 && this.obfsPassword == obj.obfsPassword
                 && this.portHopping == obj.portHopping
