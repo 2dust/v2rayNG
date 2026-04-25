@@ -253,7 +253,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
         }
 
-        builder.setSession(V2RayServiceManager.getRunningServerName())
+        //builder.setSession(V2RayServiceManager.getRunningServerName())
     }
 
     /**
