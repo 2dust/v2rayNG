@@ -253,7 +253,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
             }
         }
 
-        builder.setSession(V2RayServiceManager.getRunningServerName())
+        val remarks = MmkvManager.getSelectServer()?.let { MmkvManager.decodeServerConfig(it)?.remarks }
+        builder.setSession(remarks ?: "v2rayNG")
     }
 
     /**
