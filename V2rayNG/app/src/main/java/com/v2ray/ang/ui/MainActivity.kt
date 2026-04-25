@@ -99,7 +99,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
         setupGroupTab()
         setupViewModel()
-        SubscriptionUpdater.scheduleAllTasks(this, force = false)
+        SubscriptionUpdater.scheduleAllTasks(this)
         mainViewModel.reloadServerList()
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {

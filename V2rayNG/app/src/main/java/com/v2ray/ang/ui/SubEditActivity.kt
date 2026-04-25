@@ -129,7 +129,7 @@ class SubEditActivity : BaseActivity() {
         }
 
         MmkvManager.encodeSubscription(editSubId, subItem)
-        SubscriptionUpdater.scheduleTask(this, editSubId, force = true)
+        SubscriptionUpdater.scheduleTask(this, editSubId)
         toastSuccess(R.string.toast_success)
         finish()
         return true

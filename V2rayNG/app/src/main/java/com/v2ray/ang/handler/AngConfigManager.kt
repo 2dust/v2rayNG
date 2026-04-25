@@ -573,7 +573,7 @@ object AngConfigManager {
                 it.subscription.lastUpdated = System.currentTimeMillis()
                 MmkvManager.encodeSubscription(it.guid, it.subscription)
                 LogUtil.i(AppConfig.TAG, "Subscription updated: ${it.subscription.remarks}, $count configs")
-                SubscriptionUpdater.scheduleTask(AngApplication.application, it.guid, force = true)
+                SubscriptionUpdater.scheduleTask(AngApplication.application, it.guid)
                 return SubscriptionUpdateResult(
                     configCount = count,
                     successCount = 1

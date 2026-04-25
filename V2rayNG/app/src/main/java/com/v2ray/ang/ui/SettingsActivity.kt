@@ -96,7 +96,7 @@ class SettingsActivity : BaseActivity() {
                 autoUpdateCheck?.isChecked = value
                 autoUpdateInterval?.isEnabled = value
                 if (value) {
-                    SubscriptionUpdater.scheduleAllTasks(AngApplication.application, force = false)
+                    SubscriptionUpdater.scheduleAllTasks(AngApplication.application)
                 } else {
                     SubscriptionUpdater.cancelAllTasks(AngApplication.application)
                 }

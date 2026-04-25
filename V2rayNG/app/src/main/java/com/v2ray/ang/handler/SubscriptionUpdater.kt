@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 
 object SubscriptionUpdater {
 
-    fun scheduleAllTasks(context: Context, force: Boolean = false) {
+    fun scheduleAllTasks(context: Context) {
         val enabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
         if (!enabled) {
             cancelAllTasks(context)
@@ -26,12 +26,12 @@ object SubscriptionUpdater {
 
         MmkvManager.decodeSubscriptions().forEach { sub ->
             if (sub.subscription.autoUpdate) {
-                scheduleTask(context, sub.guid, force)
+                scheduleTask(context, sub.guid)
             }
         }
     }
 
-    fun scheduleTask(context: Context, subId: String, force: Boolean = false) {
+    fun scheduleTask(context: Context, subId: String) {
         val globalEnabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
         val subItem = MmkvManager.decodeSubscription(subId)
 
@@ -56,15 +56,11 @@ object SubscriptionUpdater {
         val lastAttempt = subItem.lastUpdateAttempt
         val intervalMillis = intervalMinutes.toLong() * 60 * 1000
         
-        val initialDelayMillis = if (force) {
-            intervalMillis
+        val initialDelayMillis = if (lastAttempt <= 0) {
+            0L // Never tried before, run immediately
         } else {
-            if (lastAttempt <= 0) {
-                0L // Never tried before, run immediately
-            } else {
-                val nextExpectedRun = lastAttempt + intervalMillis
-                Math.max(0L, nextExpectedRun - currentTime)
-            }
+            val nextExpectedRun = lastAttempt + intervalMillis
+            Math.max(0L, nextExpectedRun - currentTime)
         }
 
         val constraints = Constraints.Builder()
@@ -82,13 +78,11 @@ object SubscriptionUpdater {
             .addTag(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
             .build()
 
-        // If not force, use KEEP. WorkManager will do nothing if it's already there.
-        // If force, use REPLACE. It will reset the timer using our calculated initialDelay.
-        val policy = if (force) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP
-
+        // Always use REPLACE to ensure our calculated initialDelay is applied.
+        // This handles app launch (smart delay), manual update (timer reset), and global toggle.
         rw.enqueueUniquePeriodicWork(
             "${AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME}_$subId",
-            policy,
+            ExistingPeriodicWorkPolicy.REPLACE,
             request
         )
 
