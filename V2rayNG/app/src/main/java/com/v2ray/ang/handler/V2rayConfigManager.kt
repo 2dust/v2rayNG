@@ -384,6 +384,12 @@ object V2rayConfigManager {
      */
     private fun getInbounds(v2rayConfig: V2rayConfig): Boolean {
         try {
+            val vpn = SettingsManager.isVpnMode()
+            val useHev = SettingsManager.isUsingHevTun()
+            val forcedByHev = vpn && useHev
+
+            val enableLocalProxy = forcedByHev || MmkvManager.decodeSettingsBool(AppConfig.PREF_ENABLE_LOCAL_PROXY, true)
+
             val socksPort = SettingsManager.getSocksPort()
             val socksUsername = SettingsManager.getSocksUsername()
             val socksPassword = SettingsManager.getSocksPassword()
@@ -396,6 +402,7 @@ object V2rayConfigManager {
                 inbound1.listen = AppConfig.LOOPBACK
             }
             inbound1.port = socksPort
+            inbound1.settings?.udp = MmkvManager.decodeSettingsBool(AppConfig.PREF_SOCKS_ENABLE_UDP, true)
             if (socksUsername != null && socksPassword != null) {
                 inbound1.settings?.auth = "password"
                 inbound1.settings?.accounts = listOf(
@@ -429,6 +436,10 @@ object V2rayConfigManager {
                 inbound2.settings?.auth = null
                 inbound2.settings?.udp = null
                 v2rayConfig.inbounds.add(inbound2)
+            }
+
+            if (!enableLocalProxy) {
+                v2rayConfig.inbounds.removeIf { it.protocol == "socks" || it.protocol == "http" }
             }
 
             if (needTun()) {

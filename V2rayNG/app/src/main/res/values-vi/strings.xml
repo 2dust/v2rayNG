@@ -223,6 +223,9 @@
     <string name="summary_pref_allow_insecure">Khi nhập những cấu hình có bảo mật TLS, mặc định sẽ không xác minh chứng chỉ.</string>
 
     <string name="title_pref_socks_port">Cổng Proxy Local</string>
+    <string name="title_pref_enable_local_proxy">Bật proxy cục bộ</string>
+    <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
+    <string name="summary_pref_socks_enable_udp">Xác thực socks5 không hoàn toàn an toàn khi sử dụng UDP</string>
     <string name="summary_pref_socks_port">Cổng Proxy Local</string>
     <string name="title_pref_dynamic_socks_port">Enable dynamic local proxy port</string>
     <string name="summary_pref_dynamic_socks_port">Generate a random local proxy port each time the inbound is created</string>

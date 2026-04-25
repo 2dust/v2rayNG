@@ -225,6 +225,9 @@
     <string name="summary_pref_allow_insecure">Для TLS по умолчанию разрешены небезопасные соединения</string>
 
     <string name="title_pref_socks_port">Порт локального прокси</string>
+    <string name="title_pref_enable_local_proxy">Включить локальный прокси</string>
+    <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
+    <string name="summary_pref_socks_enable_udp">Аутентификация socks5 не полностью безопасна при использовании UDP</string>
     <string name="summary_pref_socks_port">Порт локального прокси</string>
     <string name="title_pref_dynamic_socks_port">Динамически менять порт локального прокси</string>
     <string name="summary_pref_dynamic_socks_port">Использовать случайный порт локального прокси при каждом создании соединения</string>

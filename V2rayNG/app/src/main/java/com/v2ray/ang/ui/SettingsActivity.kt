@@ -51,12 +51,18 @@ class SettingsActivity : BaseActivity() {
         private val autoUpdateCheck by lazy { findPreference<CheckBoxPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE) }
         private val autoUpdateInterval by lazy { findPreference<EditTextPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL) }
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
-        private val socksPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS_PORT) }
-        private val dynamicSocksPort by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_DYNAMIC_SOCKS_PORT) }
 
         private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
         private val hevTunRwTimeout by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) }
         private val useHevTun by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_USE_HEV_TUNNEL) }
+
+        private val enableLocalProxy by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_ENABLE_LOCAL_PROXY) }
+        private val socksPort by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS_PORT) }
+        private val dynamicSocksPort by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_DYNAMIC_SOCKS_PORT) }
+        private val socksUsername by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS_USERNAME) }
+        private val socksPassword by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS_PASSWORD) }
+        private val socksEnableUdp by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_SOCKS_ENABLE_UDP) }
+        private val proxySharing by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_PROXY_SHARING) }
 
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             // Use MMKV as the storage backend for all Preferences
@@ -112,6 +118,11 @@ class SettingsActivity : BaseActivity() {
 
             useHevTun?.setOnPreferenceChangeListener { _, newValue ->
                 updateHevTunSettings(newValue as Boolean)
+                true
+            }
+
+            enableLocalProxy?.setOnPreferenceChangeListener { _, newValue ->
+                updateEnableLocalProxy(newValue as Boolean)
                 true
             }
 
@@ -276,12 +287,33 @@ class SettingsActivity : BaseActivity() {
         }
 
         private fun updateDynamicSocksPort(enabled: Boolean) {
-            socksPort?.isEnabled = !enabled
+            socksPort?.isEnabled = (enableLocalProxy?.isChecked == true) && !enabled
+        }
+
+        private fun updateEnableLocalProxy(enabled: Boolean) {
+            val dynamic = MmkvManager.decodeSettingsBool(AppConfig.PREF_DYNAMIC_SOCKS_PORT, false)
+            socksPort?.isEnabled = enabled && !dynamic
+            dynamicSocksPort?.isEnabled = enabled
+            socksUsername?.isEnabled = enabled
+            socksPassword?.isEnabled = enabled
+            socksEnableUdp?.isEnabled = enabled
+            proxySharing?.isEnabled = enabled
         }
 
         private fun updateHevTunSettings(enabled: Boolean) {
             hevTunLogLevel?.isEnabled = enabled
             hevTunRwTimeout?.isEnabled = enabled
+
+            if (enabled) {
+                if (enableLocalProxy?.isChecked == false) {
+                    enableLocalProxy?.isChecked = true
+                    MmkvManager.encodeSettings(AppConfig.PREF_ENABLE_LOCAL_PROXY, true)
+                }
+                enableLocalProxy?.isEnabled = false
+            } else {
+                enableLocalProxy?.isEnabled = true
+            }
+            updateEnableLocalProxy(enableLocalProxy?.isChecked == true)
         }
     }
 
