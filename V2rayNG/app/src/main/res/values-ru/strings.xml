@@ -271,7 +271,7 @@
 
     <string name="title_pref_auto_update_subscription">Автоматически обновлять подписки</string>
     <string name="summary_pref_auto_update_subscription">Автоматическое обновление подписок в фоновом режиме с указанным интервалом. В зависимости от устройства эта функция может работать не всегда.</string>
-    <string name="title_pref_auto_update_interval">Интервал автообновления (минут, не менее 15)</string>
+    <string name="title_pref_auto_update_interval">Интервал автообновления по умолчанию (минут, не менее 15)</string>
 
     <string name="title_core_loglevel">Подробность ведения журнала</string>
     <string name="title_outbound_domain_resolve_method">Предопределение исходящего домена</string>
@@ -305,6 +305,8 @@
     <string name="sub_setting_next_profile">Следующий профиль прокси</string>
     <string name="sub_setting_pre_profile_tip">Профиль должен быть уникальным</string>
     <string name="title_sub_update">Обновить подписку</string>
+    <string name="sub_setting_update_interval">Интервал обновления в минутах (необязательно, переопределяет значение по умолчанию)</string>
+    <string name="sub_auto_update_global_disabled_warning">Чтобы использовать автообновление, включите его в настройках</string>
     <string name="title_ping_all_server">Проверить профили</string>
     <string name="title_real_ping_all_server">Проверить задержку профилей</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>

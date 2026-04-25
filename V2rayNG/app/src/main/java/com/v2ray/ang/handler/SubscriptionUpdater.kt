@@ -7,13 +7,82 @@ import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
+import androidx.work.*
+import androidx.work.multiprocess.RemoteWorkManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.SubscriptionCache
+import com.v2ray.ang.extension.toLongEx
 import com.v2ray.ang.util.LogUtil
+import java.util.concurrent.TimeUnit
 
 object SubscriptionUpdater {
+
+    fun scheduleAllTasks(context: Context, force: Boolean = false) {
+        val enabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
+        if (!enabled) {
+            cancelAllTasks(context)
+            return
+        }
+
+        MmkvManager.decodeSubscriptions().forEach { sub ->
+            if (sub.subscription.autoUpdate) {
+                scheduleTask(context, sub.guid, force)
+            }
+        }
+    }
+
+    fun scheduleTask(context: Context, subId: String, force: Boolean = false) {
+        val globalEnabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
+        val subItem = MmkvManager.decodeSubscription(subId)
+
+        if (!globalEnabled || subItem == null || !subItem.autoUpdate) {
+            cancelTask(context, subId)
+            return
+        }
+
+        val interval = subItem.updateInterval?.toLong()
+            ?: MmkvManager.decodeSettingsString(
+                AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,
+                AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL
+            ).orEmpty().toLongEx()
+
+        if (interval <= 0) return
+
+        val rw = RemoteWorkManager.getInstance(context)
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val data = Data.Builder()
+            .putString("subId", subId)
+            .build()
+
+        val request = PeriodicWorkRequest.Builder(UpdateTask::class.java, interval, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .setInputData(data)
+            .setInitialDelay(interval, TimeUnit.MINUTES)
+            .addTag(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
+            .build()
+
+        val policy = if (force) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP
+
+        rw.enqueueUniquePeriodicWork(
+            "${AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME}_$subId",
+            policy,
+            request
+        )
+    }
+
+    fun cancelAllTasks(context: Context) {
+        val rw = RemoteWorkManager.getInstance(context)
+        rw.cancelAllWorkByTag(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
+    }
+
+    fun cancelTask(context: Context, subId: String) {
+        val rw = RemoteWorkManager.getInstance(context)
+        rw.cancelUniqueWork("${AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME}_$subId")
+    }
 
     class UpdateTask(context: Context, params: WorkerParameters) :
         CoroutineWorker(context, params) {
@@ -34,9 +103,16 @@ object SubscriptionUpdater {
          */
         @SuppressLint("MissingPermission")
         override suspend fun doWork(): Result {
-            LogUtil.i(AppConfig.TAG, "subscription automatic update starting")
+            val subId = inputData.getString("subId")
+            LogUtil.i(AppConfig.TAG, "subscription automatic update starting: $subId")
 
-            val subs = MmkvManager.decodeSubscriptions().filter { it.subscription.autoUpdate }
+            val subs = if (subId.isNullOrEmpty()) {
+                MmkvManager.decodeSubscriptions().filter { it.subscription.autoUpdate }
+            } else {
+                MmkvManager.decodeSubscription(subId)?.let {
+                    listOf(SubscriptionCache(subId, it))
+                } ?: emptyList()
+            }
 
             for (sub in subs) {
                 val subItem = sub.subscription

@@ -3,6 +3,7 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.graphics.Bitmap
 import android.text.TextUtils
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.HY2
 import com.v2ray.ang.R
@@ -537,14 +538,24 @@ object AngConfigManager {
 
             var configText = try {
                 val httpPort = SettingsManager.getHttpPort()
-                HttpUtil.getUrlContentWithUserAgent(url, userAgent, 15000, httpPort, proxyUsername, proxyPassword)
+                HttpUtil.getUrlContentWithUserAgent(url, userAgent, 15000, httpPort, proxyUsername, proxyPassword) { response ->
+                    response.header("Profile-Update-Interval")?.toIntOrNull()?.let { intervalHours ->
+                        it.subscription.updateInterval = intervalHours * 60
+                        it.subscription.autoUpdate = true
+                    }
+                }
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
                 ""
             }
             if (configText.isEmpty()) {
                 configText = try {
-                    HttpUtil.getUrlContentWithUserAgent(url, userAgent)
+                    HttpUtil.getUrlContentWithUserAgent(url, userAgent) { response ->
+                        response.header("Profile-Update-Interval")?.toIntOrNull()?.let { intervalHours ->
+                            it.subscription.updateInterval = intervalHours * 60
+                            it.subscription.autoUpdate = true
+                        }
+                    }
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
                     ""
@@ -559,6 +570,7 @@ object AngConfigManager {
                 it.subscription.lastUpdated = System.currentTimeMillis()
                 MmkvManager.encodeSubscription(it.guid, it.subscription)
                 LogUtil.i(AppConfig.TAG, "Subscription updated: ${it.subscription.remarks}, $count configs")
+                SubscriptionUpdater.scheduleTask(AngApplication.application, it.guid, force = true)
                 return SubscriptionUpdateResult(
                     configCount = count,
                     successCount = 1

@@ -7,7 +7,7 @@ data class SubscriptionItem(
     val addedTime: Long = System.currentTimeMillis(),
     var lastUpdated: Long = -1,
     var autoUpdate: Boolean = false,
-    val updateInterval: Int? = null,
+    var updateInterval: Int? = null,
     var prevProfile: String? = null,
     var nextProfile: String? = null,
     var filter: String? = null,

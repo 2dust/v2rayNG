@@ -266,7 +266,7 @@
 
     <string name="title_pref_auto_update_subscription">به‌ روزرسانی خودکار اشتراک ها</string>
     <string name="summary_pref_auto_update_subscription">اشتراک های خود را به طور خودکار با فاصله زمانی در پس زمینه به روز کنید. بسته به دستگاه، این ویژگی ممکن است همیشه کار نکند.</string>
-    <string name="title_pref_auto_update_interval">فاصله به‌ روزرسانی خودکار ( حداقل مقدار ، 15 دقیقه )</string>
+    <string name="title_pref_auto_update_interval">فاصله به‌ روزرسانی خودکار پیش‌فرض (حداقل مقدار، 15 دقیقه)</string>
     <string name="title_core_loglevel">سطح گزارشات</string>
     <string name="title_outbound_domain_resolve_method">Outbound domain pre-resolve method</string>
     <string name="title_mode">حالت</string>
@@ -299,6 +299,8 @@
     <string name="sub_setting_next_profile">نام مستعار پروکسی بعدی</string>
     <string name="sub_setting_pre_profile_tip">لطفاً مطمئن شوید که نام مستعار وجود دارد و منحصر به فرد است</string>
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
+    <string name="sub_setting_update_interval">فاصله زمانی به روز رسانی در دقیقه (اختیاری، پیش فرض را نادیده می گیرد)</string>
+    <string name="sub_auto_update_global_disabled_warning">برای استفاده از به‌روزرسانی خودکار، آن را در تنظیمات فعال کنید</string>
     <string name="title_ping_all_server">TCPING کانفیگ های گروه فعلی</string>
     <string name="title_real_ping_all_server">تاخیر واقعی کانفیگ های گروه فعلی</string>
     <string name="title_user_asset_setting">فایل های منبع جغرافیایی</string>
