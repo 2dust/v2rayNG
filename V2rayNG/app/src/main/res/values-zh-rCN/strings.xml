@@ -300,7 +300,7 @@
     <string name="sub_setting_next_profile">落地代理配置別名</string>
     <string name="sub_setting_pre_profile_tip">请确保配置别名存在并唯一</string>
     <string name="title_sub_update">更新订阅</string>
-    <string name="sub_setting_update_interval">更新间隔分钟（可选，将覆盖默认值）</string>
+    <string name="sub_setting_update_interval">更新间隔分钟（可选，将覆盖默认值，最小值 15）</string>
     <string name="sub_auto_update_global_disabled_warning">若要使用自动更新，请在设置中启用</string>
     <string name="title_ping_all_server">测试配置 Tcping</string>
     <string name="title_real_ping_all_server">测试配置真连接</string>

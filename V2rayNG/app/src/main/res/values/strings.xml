@@ -307,7 +307,7 @@
     <string name="sub_setting_next_profile">Next proxy config remarks</string>
     <string name="sub_setting_pre_profile_tip">The config remarks exist and are unique</string>
     <string name="title_sub_update">Update subscription</string>
-    <string name="sub_setting_update_interval">Update interval in minutes (optional, will override default)</string>
+    <string name="sub_setting_update_interval">Update interval in minutes (optional, override default, min 15)</string>
     <string name="sub_auto_update_global_disabled_warning">To use auto-update, enable it in Settings</string>
     <string name="title_ping_all_server">Tcping config</string>
     <string name="title_real_ping_all_server">Real delay config</string>

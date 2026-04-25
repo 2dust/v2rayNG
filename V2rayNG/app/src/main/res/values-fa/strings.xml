@@ -299,7 +299,7 @@
     <string name="sub_setting_next_profile">نام مستعار پروکسی بعدی</string>
     <string name="sub_setting_pre_profile_tip">لطفاً مطمئن شوید که نام مستعار وجود دارد و منحصر به فرد است</string>
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
-    <string name="sub_setting_update_interval">فاصله زمانی به روز رسانی در دقیقه (اختیاری، پیش فرض را نادیده می گیرد)</string>
+    <string name="sub_setting_update_interval">فاصله زمانی به روز رسانی در دقیقه (اختیاری، پیش فرض را نادیده می گیرد، حداقل 15)</string>
     <string name="sub_auto_update_global_disabled_warning">برای استفاده از به‌روزرسانی خودکار، آن را در تنظیمات فعال کنید</string>
     <string name="title_ping_all_server">TCPING کانفیگ های گروه فعلی</string>
     <string name="title_real_ping_all_server">تاخیر واقعی کانفیگ های گروه فعلی</string>

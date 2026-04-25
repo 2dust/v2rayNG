@@ -302,7 +302,7 @@
     <string name="sub_setting_next_profile">Next proxy configuration remarks</string>
     <string name="sub_setting_pre_profile_tip">The configuration remarks exists and is unique</string>
     <string name="title_sub_update">সাবস্ক্রিপশন আপডেট</string>
-    <string name="sub_setting_update_interval">মিনিটে আপডেটের ব্যবধান (ঐচ্ছিক, ডিফল্টকে ওভাররাইড করবে)</string>
+    <string name="sub_setting_update_interval">মিনিটে আপডেটের ব্যবধান (ঐচ্ছিক, ডিফল্টকে ওভাররাইড করবে, সর্বনিম্ন ১৫)</string>
     <string name="sub_auto_update_global_disabled_warning">অটো-আপডেট ব্যবহার করতে, সেটিংসে এটি সক্ষম করুন</string>
     <string name="title_ping_all_server">সব কনফিগারেশন TCPing</string>
     <string name="title_real_ping_all_server">সব কনফিগারেশন প্রকৃত বিলম্ব</string>

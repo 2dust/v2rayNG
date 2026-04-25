@@ -46,6 +46,15 @@ class SubEditActivity : BaseActivity() {
             binding.autoUpdateCheck.isEnabled = false
             binding.tvGlobalWarning.visibility = android.view.View.VISIBLE
         }
+
+        binding.etUpdateInterval.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                val interval = binding.etUpdateInterval.text.toString().toIntOrNull()
+                if (interval != null && interval < 15) {
+                    binding.etUpdateInterval.setText("15")
+                }
+            }
+        }
     }
 
     /**
@@ -92,7 +101,11 @@ class SubEditActivity : BaseActivity() {
         subItem.filter = binding.etFilter.text.toString()
         subItem.enabled = binding.chkEnable.isChecked
         subItem.autoUpdate = binding.autoUpdateCheck.isChecked
-        subItem.updateInterval = binding.etUpdateInterval.text.toString().toIntOrNull()
+        var interval = binding.etUpdateInterval.text.toString().toIntOrNull()
+        if (interval != null && interval < 15) {
+            interval = 15
+        }
+        subItem.updateInterval = interval
         subItem.prevProfile = binding.etPreProfile.text.toString()
         subItem.nextProfile = binding.etNextProfile.text.toString()
         subItem.allowInsecureUrl = binding.allowInsecureUrl.isChecked

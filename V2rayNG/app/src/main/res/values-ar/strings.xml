@@ -302,7 +302,7 @@
     <string name="sub_setting_next_profile">Next proxy configuration remarks</string>
     <string name="sub_setting_pre_profile_tip">The configuration remarks exists and is unique</string>
     <string name="title_sub_update">تحديث الاشتراك (أول خطوة)</string>
-    <string name="sub_setting_update_interval">فاصل التحديث بالدقائق (اختياري، سوف يتجاوز الافتراضي)</string>
+    <string name="sub_setting_update_interval">فاصل التحديث بالدقائق (اختياري، سوف يتجاوز الافتراضي، الحد الأدنى 15)</string>
     <string name="sub_auto_update_global_disabled_warning">لاستخدام التحديث التلقائي، قم بتمكينه في الإعدادات</string>
     <string name="title_ping_all_server">Tcping لجميع الإعدادات</string>
     <string name="title_real_ping_all_server"> اختبر جميع الإعدادات (3)</string>

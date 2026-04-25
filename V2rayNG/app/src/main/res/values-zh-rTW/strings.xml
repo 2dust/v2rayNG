@@ -301,7 +301,7 @@
     <string name="sub_setting_next_profile">落地代理設定檔別名</string>
     <string name="sub_setting_pre_profile_tip">请确保設定檔别名存在并唯一</string>
     <string name="title_sub_update">更新訂閱</string>
-    <string name="sub_setting_update_interval">更新間隔分鐘（可選，將覆蓋預設值）</string>
+    <string name="sub_setting_update_interval">更新間隔分鐘（可選，將覆蓋預設值，最小值 15）</string>
     <string name="sub_auto_update_global_disabled_warning">若要使用自動更新，請在設定中啟用</string>
     <string name="title_ping_all_server">偵測設定 Tcping</string>
     <string name="title_real_ping_all_server">偵測設定真延遲</string>

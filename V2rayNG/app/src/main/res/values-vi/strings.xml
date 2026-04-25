@@ -302,7 +302,7 @@
     <string name="sub_setting_next_profile">Next proxy configuration remarks</string>
     <string name="sub_setting_pre_profile_tip">The configuration remarks exists and is unique</string>
     <string name="title_sub_update">Cập nhật các gói đăng ký</string>
-    <string name="sub_setting_update_interval">Khoảng thời gian cập nhật tính bằng phút (tùy chọn, sẽ ghi đè mặc định)</string>
+    <string name="sub_setting_update_interval">Khoảng thời gian cập nhật tính bằng phút (tùy chọn, sẽ ghi đè mặc định, tối thiểu 15)</string>
     <string name="sub_auto_update_global_disabled_warning">Để sử dụng cập nhật tự động, hãy bật nó trong Cài đặt</string>
     <string name="title_ping_all_server">Ping tất cả máy chủ</string>
     <string name="title_real_ping_all_server">Kiểm tra HTTP tất cả máy chủ</string>

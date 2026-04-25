@@ -40,12 +40,14 @@ object SubscriptionUpdater {
             return
         }
 
-        val intervalMinutes = subItem.updateInterval ?: MmkvManager.decodeSettingsString(
+        var intervalMinutes = subItem.updateInterval ?: MmkvManager.decodeSettingsString(
             AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,
             AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL
         ).orEmpty().toIntOrNull() ?: AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL.toInt()
 
-        if (intervalMinutes <= 0) return
+        if (intervalMinutes < 15) {
+            intervalMinutes = 15
+        }
 
         val rw = RemoteWorkManager.getInstance(context)
 

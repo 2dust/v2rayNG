@@ -305,7 +305,7 @@
     <string name="sub_setting_next_profile">Следующий профиль прокси</string>
     <string name="sub_setting_pre_profile_tip">Профиль должен быть уникальным</string>
     <string name="title_sub_update">Обновить подписку</string>
-    <string name="sub_setting_update_interval">Интервал обновления в минутах (необязательно, переопределяет значение по умолчанию)</string>
+    <string name="sub_setting_update_interval">Интервал обновления в минутах (необязательно, переопределяет значение по умолчанию, не менее 15)</string>
     <string name="sub_auto_update_global_disabled_warning">Чтобы использовать автообновление, включите его в настройках</string>
     <string name="title_ping_all_server">Проверить профили</string>
     <string name="title_real_ping_all_server">Проверить задержку профилей</string>

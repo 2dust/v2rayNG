@@ -543,7 +543,7 @@ object AngConfigManager {
                 val httpPort = SettingsManager.getHttpPort()
                 HttpUtil.getUrlContentWithUserAgent(url, userAgent, 15000, httpPort, proxyUsername, proxyPassword) { response ->
                     response.header("Profile-Update-Interval")?.toIntOrNull()?.let { intervalHours ->
-                        it.subscription.updateInterval = intervalHours * 60
+                        it.subscription.updateInterval = Math.max(1, intervalHours) * 60
                         it.subscription.autoUpdate = true
                     }
                 }
@@ -555,7 +555,7 @@ object AngConfigManager {
                 configText = try {
                     HttpUtil.getUrlContentWithUserAgent(url, userAgent) { response ->
                         response.header("Profile-Update-Interval")?.toIntOrNull()?.let { intervalHours ->
-                            it.subscription.updateInterval = intervalHours * 60
+                            it.subscription.updateInterval = Math.max(1, intervalHours) * 60
                             it.subscription.autoUpdate = true
                         }
                     }
