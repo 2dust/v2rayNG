@@ -185,6 +185,9 @@ class SettingsActivity : BaseActivity() {
             // Initialize mode-dependent UI states
             updateMode(MmkvManager.decodeSettingsString(AppConfig.PREF_MODE, VPN))
 
+            // Initialize local proxy state
+            updateEnableLocalProxy(MmkvManager.decodeSettingsBool(AppConfig.PREF_ENABLE_LOCAL_PROXY, true))
+
             // Initialize mux-dependent UI states
             updateMux(MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false))
 
