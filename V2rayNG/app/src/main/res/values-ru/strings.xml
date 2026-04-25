@@ -2,7 +2,7 @@
 <resources>
     <string name="app_widget_name">v2rayNG</string>
     <string name="app_tile_name">v2rayNG</string>
-    <string name="app_tile_first_use">Первое использование этой функции, пожалуйста, используйте приложение, чтобы добавить сервер</string>
+    <string name="app_tile_first_use">Первое использование этой функции, пожалуйста, используйте приложение, чтобы добавить профиль</string>
     <string name="navigation_drawer_open">Открыть панель навигации</string>
     <string name="navigation_drawer_close">Закрыть панель навигации</string>
     <string name="migration_success">Успешный перенос данных!</string>
@@ -145,6 +145,7 @@
     <string name="menu_item_import_proxy_app">Импорт из буфера обмена</string>
     <string name="per_app_proxy_settings">Выбор приложений</string>
     <string name="per_app_proxy_settings_enable">Использовать выбор приложений</string>
+    <string name="app_picker_unknown_app">Неизвестное приложение (неопознанный UID)</string>
 
     <!-- Preferences -->
     <string name="title_settings">Настройки</string>
@@ -323,7 +324,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">Доменная стратегия</string>
     <string name="routing_settings_title">Маршрутизация</string>
-    <string name="routing_settings_tips">Через запятую (,)\nТолько что-то одно: домен, IP или процесс</string>
+    <string name="routing_settings_tips">Через запятую (,)\nЧто-то одно: домен, IP или процесс</string>
     <string name="routing_settings_save">Сохранить</string>
     <string name="routing_settings_delete">Очистить</string>
     <string name="routing_settings_rule_title">Настройка правил маршрутизации</string>
@@ -336,7 +337,7 @@
     <string name="routing_settings_locked">Постоянное (сохранится при импорте правил)</string>
     <string name="routing_settings_domain">Домен</string>
     <string name="routing_settings_ip">IP</string>
-    <string name="routing_settings_process">Процесс (название пакета — поддерживается только при использовании Xray TUN, включённой функции routeOnly и ОС Android 10+)</string>
+    <string name="routing_settings_process">Процесс (название пакета; поддерживается только при использовании Xray TUN, включённой функции routeOnly и ОС Android 10+)</string>
     <string name="routing_settings_port">Порт</string>
     <string name="routing_settings_protocol">Протокол</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
