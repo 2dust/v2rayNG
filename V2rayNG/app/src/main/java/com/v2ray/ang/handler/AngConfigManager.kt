@@ -522,6 +522,9 @@ object AngConfigManager {
                 return SubscriptionUpdateResult(skipCount = 1)
             }
 
+            it.subscription.lastUpdateAttempt = System.currentTimeMillis()
+            MmkvManager.encodeSubscription(it.guid, it.subscription)
+
             val url = HttpUtil.toIdnUrl(it.subscription.url)
             if (!Utils.isValidUrl(url)) {
                 return SubscriptionUpdateResult(failureCount = 1)

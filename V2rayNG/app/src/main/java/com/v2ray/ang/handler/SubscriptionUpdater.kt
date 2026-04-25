@@ -12,7 +12,6 @@ import androidx.work.multiprocess.RemoteWorkManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.SubscriptionCache
-import com.v2ray.ang.extension.toLongEx
 import com.v2ray.ang.util.LogUtil
 import java.util.concurrent.TimeUnit
 
@@ -41,15 +40,31 @@ object SubscriptionUpdater {
             return
         }
 
-        val interval = subItem.updateInterval?.toLong()
-            ?: MmkvManager.decodeSettingsString(
-                AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,
-                AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL
-            ).orEmpty().toLongEx()
+        val intervalMinutes = subItem.updateInterval ?: MmkvManager.decodeSettingsString(
+            AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,
+            AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL
+        ).orEmpty().toIntOrNull() ?: AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL.toInt()
 
-        if (interval <= 0) return
+        if (intervalMinutes <= 0) return
 
         val rw = RemoteWorkManager.getInstance(context)
+
+        // Calculate initial delay for smart rescheduling
+        val currentTime = System.currentTimeMillis()
+        val lastAttempt = subItem.lastUpdateAttempt
+        val intervalMillis = intervalMinutes.toLong() * 60 * 1000
+        
+        val initialDelayMillis = if (force) {
+            intervalMillis
+        } else {
+            if (lastAttempt <= 0) {
+                0L // Never tried before, run immediately
+            } else {
+                val nextExpectedRun = lastAttempt + intervalMillis
+                Math.max(0L, nextExpectedRun - currentTime)
+            }
+        }
+
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -58,13 +73,15 @@ object SubscriptionUpdater {
             .putString("subId", subId)
             .build()
 
-        val request = PeriodicWorkRequest.Builder(UpdateTask::class.java, interval, TimeUnit.MINUTES)
+        val request = PeriodicWorkRequest.Builder(UpdateTask::class.java, intervalMinutes.toLong(), TimeUnit.MINUTES)
             .setConstraints(constraints)
             .setInputData(data)
-            .setInitialDelay(interval, TimeUnit.MINUTES)
+            .setInitialDelay(initialDelayMillis, TimeUnit.MILLISECONDS)
             .addTag(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
             .build()
 
+        // If not force, use KEEP. WorkManager will do nothing if it's already there.
+        // If force, use REPLACE. It will reset the timer using our calculated initialDelay.
         val policy = if (force) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP
 
         rw.enqueueUniquePeriodicWork(
@@ -72,6 +89,9 @@ object SubscriptionUpdater {
             policy,
             request
         )
+
+        // Cancel legacy global task if it exists
+        rw.cancelUniqueWork(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
     }
 
     fun cancelAllTasks(context: Context) {
