@@ -1,6 +1,5 @@
 package com.v2ray.ang.handler
 
-import android.content.Context
 import android.os.SystemClock
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -90,6 +89,7 @@ object SpeedtestManager {
         val proxyUsername = SettingsManager.getSocksUsername()
         val proxyPassword = SettingsManager.getSocksPassword()
         val httpPort = SettingsManager.getHttpPort()
+        if (httpPort == 0) return null
         val content = HttpUtil.getUrlContent(url, 5000, httpPort, proxyUsername, proxyPassword) ?: return null
         val ipInfo = JsonUtil.fromJson(content, IPAPIInfo::class.java) ?: return null
 
