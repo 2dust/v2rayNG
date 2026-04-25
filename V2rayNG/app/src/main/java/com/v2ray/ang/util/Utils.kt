@@ -489,6 +489,16 @@ object Utils {
     }
 
     /**
+     * Find a random free port.
+     *
+     * @return A random free port.
+     * @throws IOException If no free port is found.
+     */
+    fun findRandomFreePort(): Int {
+        return ServerSocket(0).use { it.localPort }
+    }
+
+    /**
      * Check if a string is a valid subscription URL.
      *
      * @param value The string to check.

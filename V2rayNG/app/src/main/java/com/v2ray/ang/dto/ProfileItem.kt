@@ -71,6 +71,8 @@ data class ProfileItem(
     var policyGroupFilter: String? = null,
     var proxyChainProfiles: String? = null,
 
+    var browserDialerMode: String? = null,
+
     ) {
     companion object {
         fun create(configType: EConfigType): ProfileItem {

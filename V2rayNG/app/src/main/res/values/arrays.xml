@@ -117,6 +117,12 @@
         <item>VPN</item>
         <item>Proxy only</item>
     </string-array>
+    
+    <string-array name="browser_dialer_mode_value" translatable="false">
+        <item>Disable</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
+    </string-array>
 
     <string-array name="hev_tunnel_loglevel" translatable="false">
         <item>error</item>
