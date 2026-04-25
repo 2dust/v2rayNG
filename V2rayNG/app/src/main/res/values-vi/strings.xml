@@ -88,6 +88,8 @@
     <string name="server_lab_reserved">Reserved (Không bắt buộc)</string>
     <string name="server_lab_local_address">Địa chỉ cục bộ (IPv4 / IPv6, phân cách bằng dấu phẩy)</string>
     <string name="server_lab_local_mtu">MTU (Không bắt buộc, mặc định là 1420)</string>
+    <string name="server_lab_kcp_mtu">mKCP MTU (Không bắt buộc, mặc định core là 1350)</string>
+    <string name="server_lab_kcp_tti">mKCP TTI (Không bắt buộc, mặc định core là 50)</string>
     <string name="toast_success">Thành công!</string>
     <string name="toast_failure">Đã xảy ra lỗi, vui lòng thử lại!</string>
     <string name="toast_none_data">Không có gì ở đây!</string>

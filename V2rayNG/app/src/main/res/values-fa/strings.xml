@@ -88,6 +88,8 @@
     <string name="server_lab_reserved">Reserved (اختیاری، جدا شده با کاما)</string>
     <string name="server_lab_local_address">آدرس محلی (IPv4/IPv6 اختیاری، جدا شده با کاما)</string>
     <string name="server_lab_local_mtu">MTU (اختیاری، پیش‌فرض 1420)</string>
+    <string name="server_lab_kcp_mtu">mKCP MTU (اختیاری، پیش‌فرض هسته 1350)</string>
+    <string name="server_lab_kcp_tti">mKCP TTI (اختیاری، پیش‌فرض هسته 50)</string>
     <string name="toast_success">با موفقیت انجام شد</string>
     <string name="toast_failure">شکست</string>
     <string name="toast_none_data">هیچ داده ای وجود ندارد</string>

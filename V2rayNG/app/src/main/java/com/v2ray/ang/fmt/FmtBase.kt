@@ -60,6 +60,8 @@ open class FmtBase {
         config.path = queryParam["path"]
 
         config.seed = queryParam["seed"]
+        config.kcpMtu = queryParam["mtu"]?.toIntOrNull()
+        config.kcpTti = queryParam["tti"]?.toIntOrNull()
         config.quicSecurity = queryParam["quicSecurity"]
         config.quicKey = queryParam["key"]
         config.mode = queryParam["mode"]
@@ -112,6 +114,8 @@ open class FmtBase {
         config.mldsa65Verify?.nullIfBlank()?.let { dicQuery["pqv"] = it }
         config.flow?.nullIfBlank()?.let { dicQuery["flow"] = it }
         config.finalMask?.nullIfBlank()?.let { dicQuery["fm"] = it }
+        config.kcpMtu?.let { dicQuery["mtu"] = it.toString() }
+        config.kcpTti?.let { dicQuery["tti"] = it.toString() }
         // Add two keys for compatibility: "insecure" and "allowInsecure"
         if (config.security == AppConfig.TLS) {
             val insecureFlag = if (config.insecure == true) "1" else "0"

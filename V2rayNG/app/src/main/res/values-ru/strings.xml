@@ -88,6 +88,8 @@
     <string name="server_lab_reserved">Reserved (необязательно, через запятую)</string>
     <string name="server_lab_local_address">Локальный адрес (необязательно, IPv4/IPv6 через запятую)</string>
     <string name="server_lab_local_mtu">MTU (необязательно, по умолчанию 1420)</string>
+    <string name="server_lab_kcp_mtu">mKCP MTU (необязательно, по умолчанию 1350)</string>
+    <string name="server_lab_kcp_tti">mKCP TTI (необязательно, по умолчанию 50)</string>
     <string name="toast_success">Успешно</string>
     <string name="toast_failure">Ошибка</string>
     <string name="toast_none_data">Ничего нет</string>

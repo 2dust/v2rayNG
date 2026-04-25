@@ -1305,7 +1305,10 @@ object V2rayConfigManager {
             }
 
             NetworkType.KCP.type -> {
-                streamSettings.kcpSettings = StreamSettingsBean.KcpSettingsBean()
+                val kcpSetting = StreamSettingsBean.KcpSettingsBean()
+                profileItem.kcpMtu?.let { kcpSetting.mtu = it }
+                profileItem.kcpTti?.let { kcpSetting.tti = it }
+                streamSettings.kcpSettings = kcpSetting
                 val udpMaskList = mutableListOf<StreamSettingsBean.FinalMaskBean.MaskBean>()
                 if (!headerType.isNullOrEmpty() && headerType != "none") {
                     val kcpHeaderType = when {

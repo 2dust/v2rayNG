@@ -89,6 +89,8 @@
     <string name="server_lab_reserved">محجوز (اختياري)</string>
     <string name="server_lab_local_address">العنوان المحلي (اختياري IPv4/IPv6، مفصولة بفواصل)</string>
     <string name="server_lab_local_mtu">Mtu (اختياري، الافتراضي 1420)</string>
+    <string name="server_lab_kcp_mtu">mKCP MTU (اختياري، الافتراضي في النواة 1350)</string>
+    <string name="server_lab_kcp_tti">mKCP TTI (اختياري، الافتراضي في النواة 50)</string>
     <string name="toast_success">نجاح</string>
     <string name="toast_failure">فشل</string>
     <string name="toast_none_data">لا يوجد شيء</string>
