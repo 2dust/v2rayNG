@@ -301,6 +301,17 @@ class SettingsActivity : BaseActivity() {
             socksPassword?.isEnabled = enabled
             socksEnableUdp?.isEnabled = enabled
             proxySharing?.isEnabled = enabled
+
+            if (!enabled) {
+                if (appendHttpProxy?.isChecked == true) {
+                    appendHttpProxy?.isChecked = false
+                    MmkvManager.encodeSettings(AppConfig.PREF_APPEND_HTTP_PROXY, false)
+                }
+                appendHttpProxy?.isEnabled = false
+            } else {
+                val vpn = MmkvManager.decodeSettingsString(AppConfig.PREF_MODE) == VPN
+                appendHttpProxy?.isEnabled = vpn
+            }
         }
 
         private fun updateHevTunSettings(enabled: Boolean) {
