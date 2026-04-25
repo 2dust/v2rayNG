@@ -29,6 +29,9 @@ data class ProfileItem(
     var host: String? = null,
     var path: String? = null,
     var seed: String? = null,
+    var kcpMtu: Int? = null,
+    var kcpTti: Int? = null,
+
     var quicSecurity: String? = null,
     var quicKey: String? = null,
     var mode: String? = null,
@@ -56,7 +59,6 @@ data class ProfileItem(
     var localAddress: String? = null,
     var reserved: String? = null,
     var mtu: Int? = null,
-    var kcpTti: Int? = null,
 
     var obfsPassword: String? = null,
     var portHopping: String? = null,
@@ -103,6 +105,8 @@ data class ProfileItem(
                 && this.host == obj.host
                 && this.path == obj.path
                 && this.seed == obj.seed
+                && this.kcpMtu == obj.kcpMtu
+                && this.kcpTti == obj.kcpTti
                 && this.quicSecurity == obj.quicSecurity
                 && this.quicKey == obj.quicKey
                 && this.mode == obj.mode
@@ -121,7 +125,6 @@ data class ProfileItem(
                 && this.localAddress == obj.localAddress
                 && this.reserved == obj.reserved
                 && this.mtu == obj.mtu
-                && this.kcpTti == obj.kcpTti
 
                 && this.obfsPassword == obj.obfsPassword
                 && this.portHopping == obj.portHopping

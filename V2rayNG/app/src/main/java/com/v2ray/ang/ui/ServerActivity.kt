@@ -253,7 +253,7 @@ class ServerActivity : BaseActivity() {
                         NetworkType.KCP.type -> View.VISIBLE
                         else -> View.GONE
                     }
-                et_kcp_mtu?.text = Utils.getEditable(config?.mtu?.toString().orEmpty())
+                et_kcp_mtu?.text = Utils.getEditable(config?.kcpMtu?.toString().orEmpty())
                 et_kcp_tti?.text = Utils.getEditable(config?.kcpTti?.toString().orEmpty())
 
                 layout_extra?.visibility =
@@ -580,7 +580,7 @@ class ServerActivity : BaseActivity() {
         profileItem.xhttpMode = transportTypes(networks[network])[type]
         profileItem.xhttpExtra = et_extra?.text?.toString()?.trim().nullIfBlank()
         profileItem.finalMask = et_fm?.text?.toString()?.trim()?.nullIfBlank()
-        profileItem.mtu = et_kcp_mtu?.text?.toString()?.toIntOrNull()
+        profileItem.kcpMtu = et_kcp_mtu?.text?.toString()?.toIntOrNull()
         profileItem.kcpTti = et_kcp_tti?.text?.toString()?.toIntOrNull()
     }
 
