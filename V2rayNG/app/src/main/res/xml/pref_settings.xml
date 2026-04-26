@@ -146,15 +146,20 @@
 
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="pref_proxy_sharing_enabled"
-            android:summary="@string/summary_pref_proxy_sharing_enabled"
-            android:title="@string/title_pref_proxy_sharing_enabled" />
+            android:key="pref_allow_insecure"
+            android:title="@string/title_pref_allow_insecure" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_enable_local_proxy"
+            android:summary="@string/summary_pref_enable_local_proxy"
+            android:title="@string/title_pref_enable_local_proxy" />
 
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="pref_allow_insecure"
-            android:summary="@string/summary_pref_allow_insecure"
-            android:title="@string/title_pref_allow_insecure" />
+            android:key="pref_proxy_sharing_enabled"
+            android:summary="@string/summary_pref_proxy_sharing_enabled"
+            android:title="@string/title_pref_proxy_sharing_enabled" />
 
         <EditTextPreference
             android:inputType="number"
@@ -178,6 +183,12 @@
             android:key="pref_socks_password"
             android:summary="@string/summary_pref_socks_password"
             android:title="@string/title_pref_socks_password" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_socks_enable_udp"
+            android:summary="@string/summary_pref_socks_enable_udp"
+            android:title="@string/title_pref_socks_enable_udp" />
 
         <EditTextPreference
             android:key="pref_remote_dns"

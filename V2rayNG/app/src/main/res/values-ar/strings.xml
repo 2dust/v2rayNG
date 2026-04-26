@@ -223,6 +223,10 @@
     <string name="summary_pref_allow_insecure">عند TLS، الافتراضي هو السماح غير الآمن</string>
 
     <string name="title_pref_socks_port">منفذ بروكسي Local</string>
+    <string name="title_pref_enable_local_proxy">تفعيل الوكيل المحلي</string>
+    <string name="summary_pref_enable_local_proxy">When disabled, no SOCKS proxy is available, so subscription updates and similar actions cannot use the proxy</string>
+    <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
+    <string name="summary_pref_socks_enable_udp">مصادقة socks5 ليست آمنة تمامًا عند استخدام UDP</string>
     <string name="summary_pref_socks_port">منفذ بروكسي Local</string>
     <string name="title_pref_dynamic_socks_port">Enable dynamic local proxy port</string>
     <string name="summary_pref_dynamic_socks_port">Generate a random local proxy port each time the inbound is created</string>
