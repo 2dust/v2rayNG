@@ -15,6 +15,7 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,6 +40,21 @@ class SubEditActivity : BaseActivity() {
         } else {
             clearServer()
         }
+
+        val globalAutoUpdate = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
+        if (!globalAutoUpdate) {
+            binding.autoUpdateCheck.isEnabled = false
+            binding.tvGlobalWarning.visibility = android.view.View.VISIBLE
+        }
+
+        binding.etUpdateInterval.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                val interval = binding.etUpdateInterval.text.toString().toIntOrNull()
+                if (interval != null && interval < 15) {
+                    binding.etUpdateInterval.setText("15")
+                }
+            }
+        }
     }
 
     /**
@@ -51,6 +67,7 @@ class SubEditActivity : BaseActivity() {
         binding.etFilter.text = Utils.getEditable(subItem.filter)
         binding.chkEnable.isChecked = subItem.enabled
         binding.autoUpdateCheck.isChecked = subItem.autoUpdate
+        binding.etUpdateInterval.text = Utils.getEditable(subItem.updateInterval?.toString() ?: "")
         binding.allowInsecureUrl.isChecked = subItem.allowInsecureUrl
         binding.etPreProfile.text = Utils.getEditable(subItem.prevProfile)
         binding.etNextProfile.text = Utils.getEditable(subItem.nextProfile)
@@ -65,6 +82,8 @@ class SubEditActivity : BaseActivity() {
         binding.etUrl.text = null
         binding.etFilter.text = null
         binding.chkEnable.isChecked = true
+        binding.autoUpdateCheck.isChecked = false
+        binding.etUpdateInterval.text = null
         binding.etPreProfile.text = null
         binding.etNextProfile.text = null
         return true
@@ -82,6 +101,11 @@ class SubEditActivity : BaseActivity() {
         subItem.filter = binding.etFilter.text.toString()
         subItem.enabled = binding.chkEnable.isChecked
         subItem.autoUpdate = binding.autoUpdateCheck.isChecked
+        var interval = binding.etUpdateInterval.text.toString().toIntOrNull()
+        if (interval != null && interval < 15) {
+            interval = 15
+        }
+        subItem.updateInterval = interval
         subItem.prevProfile = binding.etPreProfile.text.toString()
         subItem.nextProfile = binding.etNextProfile.text.toString()
         subItem.allowInsecureUrl = binding.allowInsecureUrl.isChecked
@@ -105,6 +129,7 @@ class SubEditActivity : BaseActivity() {
         }
 
         MmkvManager.encodeSubscription(editSubId, subItem)
+        SubscriptionUpdater.scheduleTask(this, editSubId)
         toastSuccess(R.string.toast_success)
         finish()
         return true

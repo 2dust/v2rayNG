@@ -153,7 +153,8 @@ object HttpUtil {
         timeout: Int = 15000,
         httpPort: Int = 0,
         proxyUsername: String? = null,
-        proxyPassword: String? = null
+        proxyPassword: String? = null,
+        onResponse: ((okhttp3.Response) -> Unit)? = null
     ): String {
         var currentUrl = url
         var redirects = 0
@@ -191,6 +192,7 @@ object HttpUtil {
                     }
 
                     response.isSuccessful -> {
+                        onResponse?.invoke(response)
                         return response.body?.string() ?: ""
                     }
 

@@ -268,7 +268,7 @@
 
     <string name="title_pref_auto_update_subscription">ورۊ کردن خوتکار اشتراکا</string>
     <string name="summary_pref_auto_update_subscription">اشتراکا خوتۉ ن و تۉر خوتکار وا فاسله زمۊوی من پس زمینه ورۊ کۊنین. ای ویژیی من پوی دسگایل گاشڌ همیشه کار نکونه</string>
-    <string name="title_pref_auto_update_interval">فاسله ورۊ کردن خوتکار (اقلن وا 15 دؽقه بۊ)</string>
+    <string name="title_pref_auto_update_interval">فاسله ورۊ کردن خوتکار پیش‌فرض (اقلن وا 15 دؽقه بۊ)</string>
 
     <string name="title_core_loglevel">سئت گوزارشا</string>
     <string name="title_outbound_domain_resolve_method">بارت پؽش هل دامنه دری</string>
@@ -302,6 +302,8 @@
     <string name="sub_setting_next_profile">نوم موستعار پروکسی نیایی</string>
     <string name="sub_setting_pre_profile_tip">موتمعن بۊ ک نوم موستعار هڌس وو جۊرس نی</string>
     <string name="title_sub_update">ورۊ کردن اشتراک بونکۊ سکویی</string>
+    <string name="sub_setting_update_interval">فاسله ورۊ کردن د دئقه (اختیاری، پیش‌فرض نه لغو مؽ‌کنه، اقلن 15)</string>
+    <string name="sub_auto_update_global_disabled_warning">سی استفاده د ورۊ کردن خوتکار، د تنظیمات فعالش بکن</string>
     <string name="title_ping_all_server">Tcping کانفیگا بونکۊ سکویی</string>
     <string name="title_real_ping_all_server">تئخیر واقعی کانفیگا بونکۊ سکویی</string>
     <string name="title_user_asset_setting">فایلا بونچک جوقرافیایی</string>
