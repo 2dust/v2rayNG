@@ -114,7 +114,7 @@
     <string name="server_lab_bandwidth_up">وا روء رئڌن پئنا باند (واهڌ)</string>
     <string name="server_lab_xhttp_mode">هالت XHTTP</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra خام JSON، قالوو: { XHTTPObject }</string>
-    <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
+    <string name="server_lab_final_mask">finalMask خام JSON، قالوو: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list">نومگه کانفیگ Ech</string>
     <string name="server_lab_ech_force_query">پورس وو جۊ اجباری Ech</string>
     <string name="server_lab_pinned_ca256">Certificate fingerprint (SHA-256)</string>
@@ -137,8 +137,8 @@
     <string name="menu_item_search">پیتینیڌن</string>
     <string name="menu_item_select_all">پسند پوی</string>
     <string name="menu_item_invert_selection">پسند چواسه</string>
-    <string name="msg_enter_keywords">کلمه کلیدی را وارد کنید</string>
-    <string name="switch_bypass_apps_mode">هالت Bypass</string>
+    <string name="msg_enter_keywords">کلمه کلیدی ن بزنین</string>
+    <string name="switch_bypass_apps_mode">هالت دور زیڌن</string>
     <string name="menu_item_select_proxy_app">پسند خوتکار پروکسی برنومه</string>
     <string name="msg_downloading_content">موئتوا هونی دانلود ابۊن</string>
     <string name="menu_item_export_proxy_app">و در کشیڌن من کلیپ بورد</string>
@@ -153,7 +153,7 @@
     <string name="title_core_settings">سامووا هسته</string>
     <string name="title_vpn_settings">سامووا VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی و ری برنومه</string>
-    <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه واجۊری بیڌه پروکسی هڌ، منپیز موستقیم بؽ نشووه هڌ. هالت دور زیڌن: برنومه نشووک ناڌه موستقیمن منپیز هڌ، پروکسی نشووک زیڌه نؽڌ. گۊزینه پسند خوتکار برنومه پروکسی من نومگه</string>
+    <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه پسند وابیڌه وا ی پروکسی منپیز ابۊ، برنومه پسند نوابیڌه موستقیمن منپیز ابۊ. \nحالت دور زیڌن: برنومه پسند وابیڌه موستقیمن منپیز ابۊ، برنومه پسند نوابیڌه وا ی پروکسی منپیز ابۊ. \nپسند خوتکار برنومه یل پروکسی من نومگه امکووݩ پزیر هڌ.</string>
     <string name="title_pref_is_booted">منپیز خوتکار مجال ره ونی</string>
     <string name="summary_pref_is_booted">مجال ره وندن، خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
 
@@ -189,10 +189,10 @@
     <string name="summary_pref_fake_dns_enabled">DNS مهلی نشۊویا IP جئلی ن وورگنه (زل تر، ٱما گاشڌ من یقرد ز برنومه یل کار نکونه)</string>
 
     <string name="title_pref_ipv6_enabled">ره وندن IPv6</string>
-    <string name="summary_pref_ipv6_enabled">نشۊویا IPv6 وو تورا IPv6 ن ز رابط VPN ره وند کۊنین</string>
+    <string name="summary_pref_ipv6_enabled">نشۊویا IPv6 وو تورا IPv6 ن ز رابت VPN ره ونین</string>
 
     <string name="title_pref_prefer_ipv6">ترجی داڌن IPv6</string>
-    <string name="summary_pref_prefer_ipv6">مون حل کردن نوم دامنه، نشۊویا IPv6 ن ترجی بڌین</string>
+    <string name="summary_pref_prefer_ipv6">مجال هل وو فسل نوم دامنه، نشۊویا IPv6 ن ترجی بڌین</string>
 
     <string name="title_pref_remote_dns">DNS ز ره دیر (اختیاری) (udp/tcp/https/quic) (اختیاری)</string>
     <string name="summary_pref_remote_dns">DNS</string>
@@ -223,17 +223,17 @@
     <string name="summary_pref_allow_insecure">مجال و کار بوردن TLS ب تۉر پؽش فرز، موجوز نا ٱمن فعال هڌ.</string>
 
     <string name="title_pref_socks_port">پورت پروکسی مهلی</string>
-    <string name="title_pref_enable_local_proxy">فعال‌سازی پروکسی محلی</string>
-    <string name="summary_pref_enable_local_proxy">When disabled, no SOCKS proxy is available, so subscription updates and similar actions cannot use the proxy</string>
+    <string name="title_pref_enable_local_proxy">ره وندن پروکسی مهلی</string>
+    <string name="summary_pref_enable_local_proxy">هرسا قیرفعال بۊ، هیچ پروکسی SOCKS من دسرس نؽ، سی دل هیمو ورۊ رسۊوی یل اشتراک وو کارا جۊر یو نترن ز پروکسی استفاڌه کونن.</string>
     <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
-    <string name="summary_pref_socks_enable_udp">احراز هویت socks5 هنگام استفاده از UDP کاملاً ایمن نیست</string>
+    <string name="summary_pref_socks_enable_udp">ائراز هۊویت socks5 مجال استفاڌه ز UDP کاملن ایمن نؽ</string>
     <string name="summary_pref_socks_port">پورت پروکسی مهلی</string>
-    <string name="title_pref_dynamic_socks_port">Enable dynamic local proxy port</string>
-    <string name="summary_pref_dynamic_socks_port">Generate a random local proxy port each time the inbound is created</string>
-    <string name="title_pref_socks_username">Local proxy username (optional)</string>
-    <string name="summary_pref_socks_username">Username</string>
-    <string name="title_pref_socks_password">Local proxy password (optional)</string>
-    <string name="summary_pref_socks_password">Password</string>
+    <string name="title_pref_dynamic_socks_port">ره وندن پورت پروکسی مهلی پۊیا</string>
+    <string name="summary_pref_dynamic_socks_port">هر کرت ک و من ٱووڌنی وورکل ابۊ، ی پورت پروکسی مهلی تساڌۊفی وورکل کۊنین</string>
+    <string name="title_pref_socks_username">نوم منتوری پروکسی مهلی (اختیاری)</string>
+    <string name="summary_pref_socks_username">نوم منتوری</string>
+    <string name="title_pref_socks_password">رزم پروکسی مهلی (اختیاری)</string>
+    <string name="summary_pref_socks_password">رزم</string>
 
     <string name="title_pref_local_dns_port">پورت DNS مهلی</string>
     <string name="summary_pref_local_dns_port">پورت DNS مهلی</string>
@@ -251,7 +251,7 @@
     <string name="summary_pref_double_column_display">نومگه نمایه یل من دو سۊتۊن نشووݩ داڌه ابۊن وو چینۉ ترین موئتوا بیشتری ن سیل کۊنین. سی ره وستن، وا برنومه ن ز نۊ ره ونین.</string>
 
     <string name="title_pref_group_all_display">نشووݩ داڌن پوی بونکۊ یل ن فعال کۊنین</string>
-    <string name="summary_pref_group_all_display">ی بلگه «پوی بلگه یل» ازاف کۊنین</string>
+    <string name="summary_pref_group_all_display">ی بلگه «پوی بونکۊ یل کانفیگ» ازاف کۊنین</string>
     <!-- AboutActivity -->
     <string name="title_pref_feedback">فشناڌن منشڌ</string>
     <string name="summary_pref_feedback">فشناڌن منشڌ یا گوزارش موشکلا من Github</string>
@@ -316,9 +316,9 @@
     <string name="title_update_config_count">ورۊ کردن %d کانفیگ</string>
     <string name="title_update_subscription_result">%1$d کانفیگ ورۊ وابی (مووفق: %2$d، شکست خرده: %3$d، رڌ وابیڌه: %4$d)</string>
     <string name="title_update_subscription_no_subscription">بؽ اشتراک</string>
-    <string name="toast_server_not_found_in_group">Selected server not found in current group</string>
-    <string name="toast_fragment_not_available">Unable to locate current view</string>
-    <string name="title_locate_selected_config">Locate the selected config</string>
+    <string name="toast_server_not_found_in_group">سرور پسند وابیڌه من بونکۊ سکویی نجۊرست</string>
+    <string name="toast_fragment_not_available">نتره نما سکویی ن بجۊره</string>
+    <string name="title_locate_selected_config">کانفیگ پسند وابیڌه ن بجۊرین</string>
 
     <string name="tasker_start_service">ره وندن خدمات</string>
     <string name="tasker_setting_confirm">قوۊل</string>
@@ -326,7 +326,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">نشقه دامنه</string>
     <string name="routing_settings_title">سامووا تور جوستن</string>
-    <string name="routing_settings_tips">وا کاما ز یک جوڌا ابۊن (،)؛ یکی را وارد کنید: domain، ip یا process</string>
+    <string name="routing_settings_tips">وا کاما ز یک جوڌا ابۊن (,)؛ یکی ن بزنین: domain، ip یا process</string>
     <string name="routing_settings_save">زفت کردن</string>
     <string name="routing_settings_delete">روفتن</string>
     <string name="routing_settings_rule_title">سامووا قانۉݩ تور جوستن</string>
