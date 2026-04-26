@@ -1,12 +1,14 @@
 package com.v2ray.ang
 
 import android.content.Context
+import android.content.res.Configuration as AndroidConfiguration
 import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.util.MyContextWrapper
 
 class AngApplication : MultiDexApplication() {
     companion object {
@@ -14,12 +16,26 @@ class AngApplication : MultiDexApplication() {
     }
 
     /**
-     * Attaches the base context to the application.
+     * Attaches the base context, wrapped with the user-selected locale.
      * @param base The base context.
      */
     override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
+        if (base == null) {
+            super.attachBaseContext(base)
+            return
+        }
+        // MMKV must be initialized before SettingsManager.getLocale() is called.
+        MMKV.initialize(base)
+        super.attachBaseContext(MyContextWrapper.wrap(base, SettingsManager.getLocale()))
         application = this
+    }
+
+    /**
+     * Re-apply the user-selected locale when the system configuration changes.
+     */
+    override fun onConfigurationChanged(newConfig: AndroidConfiguration) {
+        super.onConfigurationChanged(newConfig)
+        MyContextWrapper.wrap(this, SettingsManager.getLocale())
     }
 
     private val workManagerConfiguration: Configuration = Configuration.Builder()
