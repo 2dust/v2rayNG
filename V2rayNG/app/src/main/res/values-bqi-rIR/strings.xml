@@ -224,6 +224,7 @@
 
     <string name="title_pref_socks_port">پورت پروکسی مهلی</string>
     <string name="title_pref_enable_local_proxy">فعال‌سازی پروکسی محلی</string>
+    <string name="summary_pref_enable_local_proxy">When disabled, no SOCKS proxy is available, so subscription updates and similar actions cannot use the proxy</string>
     <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">احراز هویت socks5 هنگام استفاده از UDP کاملاً ایمن نیست</string>
     <string name="summary_pref_socks_port">پورت پروکسی مهلی</string>

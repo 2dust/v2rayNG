@@ -222,6 +222,7 @@
 
     <string name="title_pref_socks_port">本地代理埠</string>
     <string name="title_pref_enable_local_proxy">啟用本地代理</string>
+    <string name="summary_pref_enable_local_proxy">未開啟時沒有 socks 代理，無法透過代理更新訂閱等</string>
     <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">使用 UDP 時，socks5 認證並不完全安全</string>
     <string name="summary_pref_socks_port">本地代理埠</string>

@@ -152,6 +152,7 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_enable_local_proxy"
+            android:summary="@string/summary_pref_enable_local_proxy"
             android:title="@string/title_pref_enable_local_proxy" />
 
         <CheckBoxPreference

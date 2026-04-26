@@ -224,6 +224,7 @@
 
     <string name="title_pref_socks_port">Local প্রক্সি পোর্ট</string>
     <string name="title_pref_enable_local_proxy">লোকাল প্রক্সি সক্ষম করুন</string>
+    <string name="summary_pref_enable_local_proxy">When disabled, no SOCKS proxy is available, so subscription updates and similar actions cannot use the proxy</string>
     <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">UDP ব্যবহার করার সময় socks5 প্রমাণীকরণ সম্পূর্ণরূপে নিরাপদ নয়</string>
     <string name="summary_pref_socks_port">Local প্রক্সি পোর্ট</string>
