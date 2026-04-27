@@ -105,6 +105,15 @@ class SettingsActivity : BaseActivity() {
                 }
                 true
             }
+
+            autoUpdateInterval?.setOnPreferenceChangeListener { _, newValue ->
+                val interval = (newValue as? String)?.toLongEx()
+                if (interval != null && autoUpdateCheck?.isChecked == true) {
+                    configureUpdateTask(interval)
+                }
+                true
+            }
+
             mode?.setOnPreferenceChangeListener { pref, newValue ->
                 val valueStr = newValue.toString()
                 (pref as? ListPreference)?.let { lp ->
