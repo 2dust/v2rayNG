@@ -28,13 +28,19 @@
             android:layout_height="wrap_content"
             android:text="@string/server_lab_network" />
 
-        <Spinner
-            android:id="@+id/sp_network"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_spacing_dp8"
-            android:layout_marginBottom="@dimen/padding_spacing_dp8"
-            android:entries="@array/networks" />
+            android:layout_marginBottom="@dimen/padding_spacing_dp8">
+
+            <AutoCompleteTextView
+                android:id="@+id/sp_network"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -49,12 +55,19 @@
             android:layout_height="wrap_content"
             android:text="@string/server_lab_head_type" />
 
-        <Spinner
-            android:id="@+id/sp_header_type"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_spacing_dp8"
-            android:layout_marginBottom="@dimen/padding_spacing_dp8" />
+            android:layout_marginBottom="@dimen/padding_spacing_dp8">
+
+            <AutoCompleteTextView
+                android:id="@+id/sp_header_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
     <LinearLayout

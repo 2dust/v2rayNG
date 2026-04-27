@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".ui.ServerActivity">
 
     <LinearLayout
@@ -44,13 +43,19 @@
                 android:layout_height="wrap_content"
                 android:text="@string/server_lab_security" />
 
-            <Spinner
-                android:id="@+id/sp_security"
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/padding_spacing_dp8"
-                android:layout_marginBottom="@dimen/padding_spacing_dp8"
-                android:entries="@array/securitys" />
+                android:layout_marginBottom="@dimen/padding_spacing_dp8">
+
+                <AutoCompleteTextView
+                    android:id="@+id/sp_security"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
         <include layout="@layout/layout_transport" />

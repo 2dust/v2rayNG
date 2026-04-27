@@ -18,14 +18,19 @@
             android:layout_height="wrap_content"
             android:text="@string/server_lab_stream_security" />
 
-        <Spinner
-            android:id="@+id/sp_stream_security"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_spacing_dp8"
-            android:layout_marginBottom="@dimen/padding_spacing_dp8"
-            android:entries="@array/streamsecuritys"
-            android:nextFocusDown="@+id/et_sni" />
+            android:layout_marginBottom="@dimen/padding_spacing_dp8">
+
+            <AutoCompleteTextView
+                android:id="@+id/sp_stream_security"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 
@@ -62,13 +67,19 @@
             android:layout_height="wrap_content"
             android:text="@string/server_lab_allow_insecure" />
 
-        <Spinner
-            android:id="@+id/sp_allow_insecure"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_spacing_dp8"
-            android:layout_marginBottom="@dimen/padding_spacing_dp8"
-            android:entries="@array/allowinsecures" />
+            android:layout_marginBottom="@dimen/padding_spacing_dp8">
+
+            <AutoCompleteTextView
+                android:id="@+id/sp_allow_insecure"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
 
 
         <LinearLayout
