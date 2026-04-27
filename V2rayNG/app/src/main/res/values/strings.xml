@@ -456,4 +456,21 @@
         <item>WebDAV</item>
     </string-array>
 
+    <!-- Network Trigger -->
+    <string name="pref_network_triggers_title">Network Triggers</string>
+    <string name="pref_network_triggers_summary">Auto-control VPN based on network conditions</string>
+    <string name="title_add_network_trigger">Add Trigger</string>
+    <string name="title_edit_network_trigger">Edit Trigger</string>
+    <string name="trigger_type_wifi_any">Connected to any Wi-Fi</string>
+    <string name="trigger_type_mobile_data">Using mobile data</string>
+    <string name="trigger_type_wifi_ssid">Connected to specific Wi-Fi</string>
+    <string name="trigger_action_start">Auto start VPN</string>
+    <string name="trigger_action_stop">Auto stop VPN</string>
+    <string name="label_trigger_type">Trigger condition</string>
+    <string name="label_trigger_action">Action</string>
+    <string name="label_target_ssid">Wi-Fi SSID</string>
+    <string name="hint_ssid">Enter Wi-Fi name</string>
+    <string name="toast_trigger_vpn_start">Network trigger: VPN started</string>
+    <string name="toast_trigger_vpn_stop">Network trigger: VPN stopped</string>
+
 </resources>

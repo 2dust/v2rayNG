@@ -453,4 +453,21 @@
         <item>WebDAV</item>
     </string-array>
 
+    <!-- Network Trigger -->
+    <string name="pref_network_triggers_title">Сетевые триггеры</string>
+    <string name="pref_network_triggers_summary">Автоматическое управление VPN в зависимости от сети</string>
+    <string name="title_add_network_trigger">Добавить триггер</string>
+    <string name="title_edit_network_trigger">Редактировать триггер</string>
+    <string name="trigger_type_wifi_any">Подключение к любой Wi-Fi</string>
+    <string name="trigger_type_mobile_data">Использование мобильных данных</string>
+    <string name="trigger_type_wifi_ssid">Подключение к определённой Wi-Fi</string>
+    <string name="trigger_action_start">Автоматически включить VPN</string>
+    <string name="trigger_action_stop">Автоматически отключить VPN</string>
+    <string name="label_trigger_type">Условие триггера</string>
+    <string name="label_trigger_action">Действие</string>
+    <string name="label_target_ssid">Имя Wi-Fi (SSID)</string>
+    <string name="hint_ssid">Введите имя Wi-Fi</string>
+    <string name="toast_trigger_vpn_start">Сетевой триггер: VPN включён</string>
+    <string name="toast_trigger_vpn_stop">Сетевой триггер: VPN отключён</string>
+
 </resources>

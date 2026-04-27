@@ -329,6 +329,11 @@
             android:summary="%s"
             android:title="@string/title_mode" />
 
+        <Preference
+            android:key="pref_network_triggers"
+            android:title="@string/pref_network_triggers_title"
+            android:summary="@string/pref_network_triggers_summary" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

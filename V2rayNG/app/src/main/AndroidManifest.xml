@@ -28,6 +28,8 @@
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="PackageVisibilityPolicy,QueryAllPackagesPermission" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -157,6 +159,9 @@
                 <data android:host="install-sub" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.NetworkTriggerActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.CheckUpdateActivity"
             android:exported="false" />

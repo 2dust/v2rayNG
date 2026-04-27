@@ -130,6 +130,12 @@ class SettingsActivity : BaseActivity() {
                 updateDynamicSocksPort(newValue as Boolean)
                 true
             }
+
+            findPreference<androidx.preference.Preference>(AppConfig.PREF_NETWORK_TRIGGERS)
+                ?.setOnPreferenceClickListener {
+                    startActivity(android.content.Intent(requireContext(), NetworkTriggerActivity::class.java))
+                    true
+                }
         }
 
         private fun initPreferenceSummaries() {

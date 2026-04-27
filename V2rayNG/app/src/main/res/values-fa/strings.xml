@@ -448,4 +448,21 @@
         <item>WebDAV</item>
     </string-array>
 
+    <!-- Network Trigger -->
+    <string name="pref_network_triggers_title">محرک‌های شبکه</string>
+    <string name="pref_network_triggers_summary">کنترل خودکار VPN بر اساس وضعیت شبکه</string>
+    <string name="title_add_network_trigger">افزودن محرک</string>
+    <string name="title_edit_network_trigger">ویرایش محرک</string>
+    <string name="trigger_type_wifi_any">اتصال به هر Wi-Fi</string>
+    <string name="trigger_type_mobile_data">استفاده از داده موبایل</string>
+    <string name="trigger_type_wifi_ssid">اتصال به Wi-Fi مشخص</string>
+    <string name="trigger_action_start">روشن کردن خودکار VPN</string>
+    <string name="trigger_action_stop">خاموش کردن خودکار VPN</string>
+    <string name="label_trigger_type">شرط فعال‌سازی</string>
+    <string name="label_trigger_action">عملکرد</string>
+    <string name="label_target_ssid">نام Wi-Fi (SSID)</string>
+    <string name="hint_ssid">نام Wi-Fi را وارد کنید</string>
+    <string name="toast_trigger_vpn_start">محرک شبکه: VPN روشن شد</string>
+    <string name="toast_trigger_vpn_stop">محرک شبکه: VPN خاموش شد</string>
+
 </resources>

@@ -80,6 +80,13 @@ object AppConfig {
     const val PREF_HEV_TUNNEL_RW_TIMEOUT = "pref_hev_tunnel_rw_timeout_v2"
     const val PREF_AUTO_REMOVE_INVALID_AFTER_TEST = "pref_auto_remove_invalid_after_test"
     const val PREF_AUTO_SORT_AFTER_TEST = "pref_auto_sort_after_test"
+    const val PREF_NETWORK_TRIGGERS = "pref_network_triggers"
+
+    const val TRIGGER_TYPE_WIFI_ANY = "wifi_any"
+    const val TRIGGER_TYPE_MOBILE_DATA = "mobile_data"
+    const val TRIGGER_TYPE_WIFI_SSID = "wifi_ssid"
+    const val TRIGGER_ACTION_START = "start"
+    const val TRIGGER_ACTION_STOP = "stop"
 
     /** Cache keys. */
     const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"

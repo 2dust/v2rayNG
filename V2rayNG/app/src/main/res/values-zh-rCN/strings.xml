@@ -450,4 +450,21 @@
         <item>WebDAV</item>
     </string-array>
 
+    <!-- Network Trigger -->
+    <string name="pref_network_triggers_title">网络触发器</string>
+    <string name="pref_network_triggers_summary">根据网络状态自动控制 VPN</string>
+    <string name="title_add_network_trigger">添加触发器</string>
+    <string name="title_edit_network_trigger">编辑触发器</string>
+    <string name="trigger_type_wifi_any">连接到任意 Wi-Fi</string>
+    <string name="trigger_type_mobile_data">使用移动流量</string>
+    <string name="trigger_type_wifi_ssid">连接到指定 Wi-Fi</string>
+    <string name="trigger_action_start">自动开启 VPN</string>
+    <string name="trigger_action_stop">自动关闭 VPN</string>
+    <string name="label_trigger_type">触发条件</string>
+    <string name="label_trigger_action">执行动作</string>
+    <string name="label_target_ssid">Wi-Fi 名称（SSID）</string>
+    <string name="hint_ssid">输入 Wi-Fi 名称</string>
+    <string name="toast_trigger_vpn_start">网络触发器：开启VPN</string>
+    <string name="toast_trigger_vpn_stop">网络触发器：关闭VPN</string>
+
 </resources>

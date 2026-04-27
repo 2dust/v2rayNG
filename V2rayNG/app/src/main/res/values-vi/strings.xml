@@ -444,4 +444,21 @@
         <item>WebDAV</item>
     </string-array>
 
+    <!-- Network Trigger -->
+    <string name="pref_network_triggers_title">Kích hoạt mạng</string>
+    <string name="pref_network_triggers_summary">Tự động điều khiển VPN theo trạng thái mạng</string>
+    <string name="title_add_network_trigger">Thêm kích hoạt</string>
+    <string name="title_edit_network_trigger">Sửa kích hoạt</string>
+    <string name="trigger_type_wifi_any">Kết nối Wi-Fi bất kỳ</string>
+    <string name="trigger_type_mobile_data">Đang dùng dữ liệu di động</string>
+    <string name="trigger_type_wifi_ssid">Kết nối Wi-Fi cụ thể</string>
+    <string name="trigger_action_start">Tự động bật VPN</string>
+    <string name="trigger_action_stop">Tự động tắt VPN</string>
+    <string name="label_trigger_type">Điều kiện kích hoạt</string>
+    <string name="label_trigger_action">Hành động</string>
+    <string name="label_target_ssid">Tên Wi-Fi (SSID)</string>
+    <string name="hint_ssid">Nhập tên Wi-Fi</string>
+    <string name="toast_trigger_vpn_start">Kích hoạt mạng: VPN đã bật</string>
+    <string name="toast_trigger_vpn_stop">Kích hoạt mạng: VPN đã tắt</string>
+
 </resources>

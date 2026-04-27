@@ -6,6 +6,7 @@ import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
 import com.v2ray.ang.dto.AssetUrlCache
 import com.v2ray.ang.dto.AssetUrlItem
+import com.v2ray.ang.dto.NetworkTrigger
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.dto.RulesetItem
 import com.v2ray.ang.dto.ServerAffiliationInfo
@@ -695,6 +696,21 @@ object MmkvManager {
      */
     fun decodeStartOnBoot(): Boolean {
         return decodeSettingsBool(PREF_IS_BOOTED, false)
+    }
+
+    //endregion
+
+    //region NetworkTrigger
+
+    private const val KEY_NETWORK_TRIGGERS = "NETWORK_TRIGGERS"
+
+    fun encodeNetworkTriggers(triggers: List<NetworkTrigger>) {
+        mainStorage.encode(KEY_NETWORK_TRIGGERS, JsonUtil.toJson(triggers))
+    }
+
+    fun decodeNetworkTriggers(): List<NetworkTrigger> {
+        val json = mainStorage.decodeString(KEY_NETWORK_TRIGGERS) ?: return emptyList()
+        return JsonUtil.fromJson(json, Array<NetworkTrigger>::class.java)?.toList() ?: emptyList()
     }
 
     //endregion

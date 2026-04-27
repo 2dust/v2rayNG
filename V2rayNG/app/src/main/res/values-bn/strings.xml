@@ -448,4 +448,21 @@
         <item>WebDAV</item>
     </string-array>
 
+    <!-- Network Trigger -->
+    <string name="pref_network_triggers_title">নেটওয়ার্ক ট্রিগার</string>
+    <string name="pref_network_triggers_summary">নেটওয়ার্ক অবস্থার উপর ভিত্তি করে স্বয়ংক্রিয়ভাবে VPN নিয়ন্ত্রণ করুন</string>
+    <string name="title_add_network_trigger">ট্রিগার যোগ করুন</string>
+    <string name="title_edit_network_trigger">ট্রিগার সম্পাদনা করুন</string>
+    <string name="trigger_type_wifi_any">যেকোনো Wi-Fi এ সংযুক্ত</string>
+    <string name="trigger_type_mobile_data">মোবাইল ডেটা ব্যবহার করছে</string>
+    <string name="trigger_type_wifi_ssid">নির্দিষ্ট Wi-Fi এ সংযুক্ত</string>
+    <string name="trigger_action_start">স্বয়ংক্রিয়ভাবে VPN চালু করুন</string>
+    <string name="trigger_action_stop">স্বয়ংক্রিয়ভাবে VPN বন্ধ করুন</string>
+    <string name="label_trigger_type">ট্রিগার শর্ত</string>
+    <string name="label_trigger_action">কার্যক্রম</string>
+    <string name="label_target_ssid">Wi-Fi নাম (SSID)</string>
+    <string name="hint_ssid">Wi-Fi নাম লিখুন</string>
+    <string name="toast_trigger_vpn_start">নেটওয়ার্ক ট্রিগার: VPN চালু হয়েছে</string>
+    <string name="toast_trigger_vpn_stop">নেটওয়ার্ক ট্রিগার: VPN বন্ধ হয়েছে</string>
+
 </resources>

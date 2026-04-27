@@ -442,4 +442,21 @@
         <item>WebDAV</item>
     </string-array>
 
+    <!-- Network Trigger -->
+    <string name="pref_network_triggers_title">محفزات الشبكة</string>
+    <string name="pref_network_triggers_summary">التحكم التلقائي في VPN بناءً على حالة الشبكة</string>
+    <string name="title_add_network_trigger">إضافة محفز</string>
+    <string name="title_edit_network_trigger">تعديل المحفز</string>
+    <string name="trigger_type_wifi_any">الاتصال بأي Wi-Fi</string>
+    <string name="trigger_type_mobile_data">استخدام بيانات الجوال</string>
+    <string name="trigger_type_wifi_ssid">الاتصال بشبكة Wi-Fi محددة</string>
+    <string name="trigger_action_start">تشغيل VPN تلقائياً</string>
+    <string name="trigger_action_stop">إيقاف VPN تلقائياً</string>
+    <string name="label_trigger_type">شرط التشغيل</string>
+    <string name="label_trigger_action">الإجراء</string>
+    <string name="label_target_ssid">اسم شبكة Wi-Fi (SSID)</string>
+    <string name="hint_ssid">أدخل اسم الشبكة</string>
+    <string name="toast_trigger_vpn_start">محفز الشبكة: تم تشغيل VPN</string>
+    <string name="toast_trigger_vpn_stop">محفز الشبكة: تم إيقاف VPN</string>
+
 </resources>
