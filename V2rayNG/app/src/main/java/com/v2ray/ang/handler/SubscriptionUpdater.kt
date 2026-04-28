@@ -30,16 +30,9 @@ object SubscriptionUpdater {
 
     /**
      * Sync all subscription tasks with current settings.
-     * Call from: MainActivity.onCreate(), BootReceiver.onReceive(),
-     *            global auto-update toggle, global interval change.
+     * Call from: MainActivity.onCreate(), BootReceiver.onReceive().
      */
     fun sync(context: Context = AngApplication.application) {
-        val globalEnabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
-        if (!globalEnabled) {
-            cancelAll(context)
-            LogUtil.i(AppConfig.TAG, "SubscriptionUpdater: global switch OFF, all tasks cancelled")
-            return
-        }
         MmkvManager.decodeSubscriptions().forEach { sub ->
             scheduleOne(context, sub.guid, sub.subscription.autoUpdate)
         }
@@ -51,9 +44,8 @@ object SubscriptionUpdater {
      * Call from: SubEditActivity after saving, after a manual update (to reset the timer).
      */
     fun syncOne(context: Context = AngApplication.application, subId: String) {
-        val globalEnabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
         val subItem = MmkvManager.decodeSubscription(subId) ?: return
-        scheduleOne(context, subId, globalEnabled && subItem.autoUpdate)
+        scheduleOne(context, subId, subItem.autoUpdate)
     }
 
     /**
@@ -90,24 +82,19 @@ object SubscriptionUpdater {
 
         val subItem = MmkvManager.decodeSubscription(subId) ?: return
 
-        val globalDefault = MmkvManager.decodeSettingsString(
-            AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,
-            AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL
-        )?.toLongOrNull() ?: AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL.toLong()
-
         val intervalMinutes = maxOf(
             AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES,
-            subItem.updateInterval?.toLong() ?: globalDefault
+            subItem.updateInterval
         )
 
-        // Smart initialDelay: avoid a burst of updates immediately after reboot/reinstall
-        val lastAttempt = MmkvManager.decodeSubLastAttempt(subId)
+        // Base initial delay on the last successful update time persisted in subscription.
+        val lastUpdated = subItem.lastUpdated
         val intervalMillis = intervalMinutes * 60 * 1000L
         val now = System.currentTimeMillis()
-        val initialDelayMillis = if (lastAttempt <= 0L) {
+        val initialDelayMillis = if (lastUpdated <= 0L) {
             0L
         } else {
-            maxOf(0L, lastAttempt + intervalMillis - now)
+            maxOf(0L, lastUpdated + intervalMillis - now)
         }
 
         val request = PeriodicWorkRequestBuilder<UpdateTask>(intervalMinutes, TimeUnit.MINUTES)
@@ -156,26 +143,26 @@ object SubscriptionUpdater {
         @SuppressLint("MissingPermission")
         override suspend fun doWork(): Result {
             val subId = inputData.getString(KEY_SUB_ID)
-            LogUtil.i(AppConfig.TAG, "subscription automatic update starting: $subId")
+            LogUtil.i(AppConfig.TAG, "SubscriptionUpdater automatic update starting: $subId")
 
-            if (!subId.isNullOrEmpty()) {
-                MmkvManager.encodeSubLastAttempt(subId, System.currentTimeMillis())
+            if (subId.isNullOrEmpty()) {
+                LogUtil.w(AppConfig.TAG, "SubscriptionUpdater: missing subId in worker input")
+                return Result.success()
             }
 
-            val subs = if (!subId.isNullOrEmpty()) {
-                MmkvManager.decodeSubscription(subId)
-                    ?.let { listOf(SubscriptionCache(subId, it)) }
-                    ?: emptyList()
-            } else {
-                // TODO: Remove this fallback once all tasks are migrated to per-subscription scheduling
-                // Fallback: legacy global task compatibility
-                MmkvManager.decodeSubscriptions().filter { it.subscription.autoUpdate }
-            }
 
-            if (subs.isEmpty()) {
+            val subItem = MmkvManager.decodeSubscription(subId)
+            if (subItem == null) {
                 LogUtil.w(AppConfig.TAG, "SubscriptionUpdater: no subscription found for $subId")
                 return Result.success()
             }
+
+            if (!subItem.autoUpdate) {
+                LogUtil.i(AppConfig.TAG, "SubscriptionUpdater: auto-update disabled for $subId, skip")
+                return Result.success()
+            }
+
+            val sub = SubscriptionCache(subId, subItem)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 notificationManager.createNotificationChannel(
@@ -187,12 +174,10 @@ object SubscriptionUpdater {
                 )
             }
 
-            for (sub in subs) {
-                notificationManager.notify(3, notification.build())
-                LogUtil.i(AppConfig.TAG, "subscription automatic update: ---${sub.subscription.remarks}")
-                AngConfigManager.updateConfigViaSub(sub)
-                notification.setContentText("Updating ${sub.subscription.remarks}")
-            }
+            notificationManager.notify(3, notification.build())
+            LogUtil.i(AppConfig.TAG, "SubscriptionUpdater automatic update: ---${sub.subscription.remarks}")
+            AngConfigManager.updateConfigViaSub(sub)
+            notification.setContentText("Updating ${sub.subscription.remarks}")
 
             notificationManager.cancel(3)
             return Result.success()

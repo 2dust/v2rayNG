@@ -679,25 +679,6 @@ object MmkvManager {
         return settingsStorage.decodeStringSet(key)
     }
 
-    /**
-     * Encodes the last subscription update attempt timestamp.
-     *
-     * @param subId The subscription ID.
-     * @param time The timestamp in milliseconds.
-     */
-    fun encodeSubLastAttempt(subId: String, time: Long) {
-        settingsStorage.encode(AppConfig.PREF_LAST_UPDATE_ATTEMPT_PREFIX + subId, time)
-    }
-
-    /**
-     * Decodes the last subscription update attempt timestamp.
-     *
-     * @param subId The subscription ID.
-     * @return The timestamp in milliseconds, or -1 if not set.
-     */
-    fun decodeSubLastAttempt(subId: String): Long {
-        return settingsStorage.decodeLong(AppConfig.PREF_LAST_UPDATE_ATTEMPT_PREFIX + subId, -1L)
-    }
 
     /**
      * Encodes the start on boot setting.

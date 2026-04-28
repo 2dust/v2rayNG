@@ -278,19 +278,6 @@
             android:title="@string/title_pref_fragment_packets" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/title_sub_setting"
-        app:initialExpandedChildrenCount="0">
-        <CheckBoxPreference
-            android:key="pref_auto_update_subscription"
-            android:summary="@string/summary_pref_auto_update_subscription"
-            android:title="@string/title_pref_auto_update_subscription" />
-        <EditTextPreference
-            android:inputType="number"
-            android:key="pref_auto_update_interval"
-            android:summary="1440"
-            android:title="@string/title_pref_auto_update_interval" />
-    </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_advanced">
 

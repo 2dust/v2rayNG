@@ -299,6 +299,7 @@
     <string name="sub_setting_pre_profile">前置代理配置别名</string>
     <string name="sub_setting_next_profile">落地代理配置別名</string>
     <string name="sub_setting_pre_profile_tip">请确保配置别名存在并唯一</string>
+    <string name="toast_invalid_update_interval">更新间隔无效，最小值为 15 分钟。</string>
     <string name="title_sub_update">更新订阅</string>
     <string name="title_ping_all_server">测试配置 Tcping</string>
     <string name="title_real_ping_all_server">测试配置真连接</string>

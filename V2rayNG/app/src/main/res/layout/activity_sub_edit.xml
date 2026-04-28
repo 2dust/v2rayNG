@@ -146,7 +146,6 @@
                     android:layout_weight="1.0"
                     android:text="@string/sub_auto_update" />
 
-
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/auto_update_check"
                     android:layout_width="wrap_content"
@@ -154,6 +153,26 @@
                     android:paddingStart="@dimen/padding_spacing_dp16"
                     android:paddingEnd="@dimen/padding_spacing_dp16"
                     app:theme="@style/BrandedSwitch" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_spacing_dp16"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_pref_auto_update_interval" />
+
+                <EditText
+                    android:id="@+id/et_update_interval"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    tools:ignore="TextFields" />
 
             </LinearLayout>
 

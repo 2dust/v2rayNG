@@ -52,6 +52,7 @@ class SubEditActivity : BaseActivity() {
         binding.etFilter.text = Utils.getEditable(subItem.filter)
         binding.chkEnable.isChecked = subItem.enabled
         binding.autoUpdateCheck.isChecked = subItem.autoUpdate
+        binding.etUpdateInterval.text = Utils.getEditable(subItem.updateInterval.toString())
         binding.allowInsecureUrl.isChecked = subItem.allowInsecureUrl
         binding.etPreProfile.text = Utils.getEditable(subItem.prevProfile)
         binding.etNextProfile.text = Utils.getEditable(subItem.nextProfile)
@@ -66,6 +67,7 @@ class SubEditActivity : BaseActivity() {
         binding.etUrl.text = null
         binding.etFilter.text = null
         binding.chkEnable.isChecked = true
+        binding.etUpdateInterval.text = null
         binding.etPreProfile.text = null
         binding.etNextProfile.text = null
         return true
@@ -83,6 +85,27 @@ class SubEditActivity : BaseActivity() {
         subItem.filter = binding.etFilter.text.toString()
         subItem.enabled = binding.chkEnable.isChecked
         subItem.autoUpdate = binding.autoUpdateCheck.isChecked
+
+        val intervalInput = binding.etUpdateInterval.text.toString().trim()
+        val intervalMinutes = intervalInput.toLongOrNull()
+        if (subItem.autoUpdate) {
+            // autoUpdate is enabled: interval must be valid
+            if (intervalMinutes == null) {
+                // field is empty, reset to default
+                subItem.updateInterval = SubscriptionItem().updateInterval
+            } else if (intervalMinutes < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
+                toast(R.string.toast_invalid_update_interval)
+                return false
+            } else {
+                subItem.updateInterval = intervalMinutes
+            }
+        } else {
+            // autoUpdate is disabled: save only if the value is valid, otherwise keep the existing value
+            if (intervalMinutes != null && intervalMinutes >= AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
+                subItem.updateInterval = intervalMinutes
+            }
+        }
+
         subItem.prevProfile = binding.etPreProfile.text.toString()
         subItem.nextProfile = binding.etNextProfile.text.toString()
         subItem.allowInsecureUrl = binding.allowInsecureUrl.isChecked

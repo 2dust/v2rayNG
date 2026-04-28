@@ -10,7 +10,6 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.helper.MmkvPreferenceDataStore
 import com.v2ray.ang.util.Utils
 
@@ -42,8 +41,6 @@ class SettingsActivity : BaseActivity() {
         private val fragmentLength by lazy { findPreference<EditTextPreference>(AppConfig.PREF_FRAGMENT_LENGTH) }
         private val fragmentInterval by lazy { findPreference<EditTextPreference>(AppConfig.PREF_FRAGMENT_INTERVAL) }
 
-        private val autoUpdateCheck by lazy { findPreference<CheckBoxPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE) }
-        private val autoUpdateInterval by lazy { findPreference<EditTextPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL) }
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
 
         private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
@@ -87,20 +84,6 @@ class SettingsActivity : BaseActivity() {
 
             fragment?.setOnPreferenceChangeListener { _, newValue ->
                 updateFragment(newValue as Boolean)
-                true
-            }
-
-            autoUpdateCheck?.setOnPreferenceChangeListener { _, newValue ->
-                val value = newValue as Boolean
-                autoUpdateCheck?.isChecked = value
-                autoUpdateInterval?.isEnabled = value
-                SubscriptionUpdater.sync()
-                true
-            }
-
-            autoUpdateInterval?.setOnPreferenceChangeListener { preference, newValue ->
-                preference.summary = newValue as? String
-                SubscriptionUpdater.sync()
                 true
             }
 
@@ -192,9 +175,6 @@ class SettingsActivity : BaseActivity() {
 
             // Initialize fragment-dependent UI states
             updateFragment(MmkvManager.decodeSettingsBool(AppConfig.PREF_FRAGMENT_ENABLED, false))
-
-            // Initialize auto-update interval state
-            autoUpdateInterval?.isEnabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
 
             updateDynamicSocksPort(MmkvManager.decodeSettingsBool(AppConfig.PREF_DYNAMIC_SOCKS_PORT, false))
         }
