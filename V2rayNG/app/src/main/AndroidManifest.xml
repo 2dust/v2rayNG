@@ -273,6 +273,11 @@
 
         </provider>
 
+        <service
+            android:name="androidx.work.multiprocess.RemoteWorkManagerService"
+            android:exported="false"
+            android:process=":bg" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.cache"

@@ -15,6 +15,7 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -105,6 +106,7 @@ class SubEditActivity : BaseActivity() {
         }
 
         MmkvManager.encodeSubscription(editSubId, subItem)
+        SubscriptionUpdater.syncOne(subId = editSubId)
         toastSuccess(R.string.toast_success)
         finish()
         return true

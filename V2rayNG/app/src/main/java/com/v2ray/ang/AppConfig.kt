@@ -47,6 +47,8 @@ object AppConfig {
     const val SUBSCRIPTION_AUTO_UPDATE_INTERVAL = "pref_auto_update_interval"
     const val SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL = "1440" // Default is 24 hours
     const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
+    const val PREF_LAST_UPDATE_ATTEMPT_PREFIX = "pref_last_update_attempt_"
+    const val SUBSCRIPTION_MIN_INTERVAL_MINUTES = 15L
     const val PREF_SPEED_ENABLED = "pref_speed_enabled"
     const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
     const val PREF_START_SCAN_IMMEDIATE = "pref_start_scan_immediate"
