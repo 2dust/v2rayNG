@@ -84,7 +84,7 @@ jobs:
         java-version: '21'
 
     - name: Decode Keystore
-      uses: timheuer/base64-to-file@v1.2.4
+      uses: timheuer/base64-to-file@v2.0.0
       id: android_keystore
       with:
         fileName: "android_keystore.jks"
