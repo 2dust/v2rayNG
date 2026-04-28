@@ -167,6 +167,7 @@ object SubscriptionUpdater {
                     ?.let { listOf(SubscriptionCache(subId, it)) }
                     ?: emptyList()
             } else {
+                // TODO: Remove this fallback once all tasks are migrated to per-subscription scheduling
                 // Fallback: legacy global task compatibility
                 MmkvManager.decodeSubscriptions().filter { it.subscription.autoUpdate }
             }
