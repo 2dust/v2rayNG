@@ -11,9 +11,15 @@ android {
     defaultConfig {
         applicationId = "com.v2ray.ang"
         minSdk = 24
+<<<<<<< HEAD
         targetSdk = 36
         versionCode = 724
         versionName = "2.1.4"
+=======
+        targetSdk = 35
+        versionCode = 721
+        versionName = "2.1.1"
+>>>>>>> 4680f6a (Add TV navigation groundwork)
         multiDexEnabled = true
 
         val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')

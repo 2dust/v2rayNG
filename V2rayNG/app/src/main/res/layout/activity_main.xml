@@ -18,7 +18,7 @@
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize" />
+                android:layout_height="?attr/actionBarSize"/>
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -91,21 +91,27 @@
                 </LinearLayout>
 
                 <FrameLayout
+                    android:id="@+id/fab_wrapper"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|end"
-                    android:layout_marginBottom="-16dp"
-                    android:layout_marginEnd="@dimen/padding_spacing_dp16">
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginEnd="@dimen/padding_spacing_dp4"
+                    android:focusable="true"
+                    android:focusedByDefault="true"
+                    android:clickable="true"
+                    android:background="@drawable/tv_focusable_item_bg"
+                    >
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/fab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="@dimen/view_height_dp36"
+                        android:layout_marginBottom="@dimen/padding_spacing_dp8"
                         android:clickable="true"
                         android:contentDescription="@string/tasker_start_service"
-                        android:focusable="true"
+                        android:focusable="false"
                         android:nextFocusLeft="@+id/layout_test"
                         android:src="@drawable/ic_play_24dp"
                         app:tint="@color/colorWhite"

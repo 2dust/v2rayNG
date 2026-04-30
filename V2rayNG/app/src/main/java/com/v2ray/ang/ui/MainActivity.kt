@@ -5,14 +5,19 @@ import android.content.res.ColorStateList
 import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -81,6 +86,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
+        // Burger будет настроен в setupGroupTab()
         binding.navView.setNavigationItemSelectedListener(this)
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -95,6 +101,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         })
 
         binding.fab.setOnClickListener { handleFabAction() }
+        binding.fabWrapper.setOnClickListener { handleFabAction() }
         binding.layoutTest.setOnClickListener { handleLayoutTestClick() }
 
         setupGroupTab()
@@ -104,12 +111,49 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {
         }
+
+        binding.fabWrapper.post {
+            binding.fabWrapper.requestFocus()
+        }
+
+        binding.fabWrapper.setOnKeyListener { _, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_DPAD_UP && event.action == KeyEvent.ACTION_DOWN) {
+                // Проверяем видимость компонентов для определения маршрута фокуса
+                val toolbarTarget = findPrimaryToolbarFocusTarget()
+                val hasVisibleTabs = binding.tabGroup.isVisible &&
+                    ::groupPagerAdapter.isInitialized && groupPagerAdapter.itemCount > 1
+                val hasVisibleProgress = binding.progressBar.isVisible
+                
+                when {
+                    // Если видны табы - переходим на TabLayout
+                    toolbarTarget == null -> false
+                    hasVisibleTabs && mainViewModel.serversCache.isNotEmpty() -> {
+                        binding.tabGroup.requestFocus()
+                        return@setOnKeyListener true
+                    }
+                    // Если прогресс бар виден - переходим на него
+                    hasVisibleProgress -> {
+                        binding.progressBar.requestFocus()
+                        return@setOnKeyListener true
+                    }
+                    // Иначе переходим напрямую на кнопки toolbar (burger)
+                    else -> {
+                        toolbarTarget.requestFocus()
+                        return@setOnKeyListener true
+                    }
+                }
+            }
+            false
+        }
     }
 
     private fun setupViewModel() {
         mainViewModel.updateTestResultAction.observe(this) { setTestState(it) }
         mainViewModel.isRunning.observe(this) { isRunning ->
             applyRunningState(false, isRunning)
+        }
+        mainViewModel.updateListAction.observe(this) {
+            setupFocusNavigation(groupPagerAdapter.groups)
         }
         mainViewModel.startListenBroadcast()
         mainViewModel.initAssets(assets)
@@ -118,6 +162,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     private fun setupGroupTab() {
         val groups = mainViewModel.getSubscriptions(this)
         groupPagerAdapter.update(groups)
+
+        // Настроить фокус на burger-кнопку и связать с табами/fab
+        setupFocusNavigation(groups)
 
         tabMediator?.detach()
         tabMediator = TabLayoutMediator(binding.tabGroup, binding.viewPager) { tab, position ->
@@ -131,6 +178,101 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         binding.viewPager.setCurrentItem(targetIndex, false)
 
         binding.tabGroup.isVisible = groups.size > 1
+
+        val hasServers = mainViewModel.serversCache.isNotEmpty()
+        binding.viewPager.isFocusable = hasServers
+    }
+
+    /**
+     * Настраивает навигацию фокуса для TV.
+     * Логика:
+     * - Есть группы: UP с FAB → TabLayout → burger
+     * - Нет групп: UP с FAB → burger
+     */
+    private fun setupFocusNavigation(groups: List<*>) {
+        // Найти и настроить burger-кнопку (hamburger меню)
+        val toolbarTargets = findToolbarFocusTargets()
+        val navigationButton = toolbarTargets.firstOrNull()
+        if (navigationButton != null) {
+            if (navigationButton.id == View.NO_ID) {
+                navigationButton.id = View.generateViewId()
+            }
+            navigationButton.isFocusable = true
+            navigationButton.isFocusableInTouchMode = true
+            navigationButton.setBackgroundResource(R.drawable.tv_focusable_item_bg)
+            
+            // burger DOWN идёт на табы (если есть) или на fab
+            val hasServers = mainViewModel.serversCache.isNotEmpty()
+            val hasTabs = hasServers && groups.size > 1
+            val downTargetId = when {
+                hasTabs -> binding.tabGroup.id
+                hasServers -> binding.viewPager.id
+                else -> binding.fabWrapper.id
+            }
+            toolbarTargets.forEach { target ->
+                target.nextFocusDownId = downTargetId
+            }
+        }
+
+        val hasServers = mainViewModel.serversCache.isNotEmpty()
+        val hasTabs = hasServers && groups.size > 1
+        if (hasTabs) {
+            // Есть группы
+            binding.tabGroup.isFocusable = true
+            binding.tabGroup.nextFocusDownId = binding.viewPager.id
+            
+            // UP с FAB → на TabLayout
+            binding.fabWrapper.nextFocusUpId = binding.tabGroup.id
+            
+            // UP с TabLayout → на burger
+            if (navigationButton != null) {
+                binding.tabGroup.nextFocusUpId = navigationButton.id
+            }
+        } else {
+            // Нет групп
+            binding.tabGroup.isFocusable = false
+            binding.tabGroup.nextFocusDownId = View.NO_ID
+            binding.viewPager.isFocusable = hasServers
+            
+            // UP с FAB → сразу на burger
+            if (navigationButton != null) {
+                binding.fabWrapper.nextFocusUpId = navigationButton.id
+                binding.viewPager.nextFocusUpId = navigationButton.id
+            }
+        }
+    }
+
+    private fun findPrimaryToolbarFocusTarget(): View? {
+        return findToolbarFocusTargets().firstOrNull()
+    }
+
+    private fun findToolbarFocusTargets(): List<View> {
+        val targets = mutableListOf<View>()
+
+        fun collect(view: View) {
+            if (view.visibility != View.VISIBLE) return
+
+            when (view) {
+                is ImageButton, is ActionMenuItemView -> {
+                    if (view.id == View.NO_ID) {
+                        view.id = View.generateViewId()
+                    }
+                    view.isFocusable = true
+                    view.isFocusableInTouchMode = true
+                    view.setBackgroundResource(R.drawable.tv_focusable_item_bg)
+                    targets.add(view)
+                }
+
+                is ViewGroup -> {
+                    for (index in 0 until view.childCount) {
+                        collect(view.getChildAt(index))
+                    }
+                }
+            }
+        }
+
+        collect(binding.toolbar)
+        return targets.distinctBy { it.id }
     }
 
     private fun handleFabAction() {
@@ -229,6 +371,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 mainViewModel.filterConfig("")
                 false
             }
+        }
+        binding.toolbar.post {
+            setupFocusNavigation(groupPagerAdapter.groups)
         }
         return super.onCreateOptionsMenu(menu)
     }

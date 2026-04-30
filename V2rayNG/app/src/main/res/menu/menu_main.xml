@@ -5,11 +5,14 @@
         android:id="@+id/search_view"
         android:icon="@drawable/ic_outline_filter_alt_24"
         android:title="@string/menu_item_search"
+        android:background="@drawable/tv_focusable_item_bg"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
+
     <item
         android:icon="@drawable/ic_add_24dp"
         android:title="@string/menu_item_add_config"
+        android:background="@drawable/tv_focusable_item_bg"
         app:showAsAction="ifRoom">
         <menu>
             <item
