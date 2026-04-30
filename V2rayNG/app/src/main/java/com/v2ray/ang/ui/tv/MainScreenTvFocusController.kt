@@ -67,11 +67,21 @@ class MainScreenTvFocusController(
             target.nextFocusDownId = toolbarDownTarget.id
             target.setOnKeyListener { _, keyCode, event ->
                 if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN && event.action == KeyEvent.ACTION_DOWN) {
-                    if (hasServers && focusCurrentServerList()) {
-                        return@setOnKeyListener true
+                    when {
+                        hasTabs -> {
+                            tabGroup.requestFocus()
+                            return@setOnKeyListener true
+                        }
+
+                        hasServers && focusCurrentServerList() -> {
+                            return@setOnKeyListener true
+                        }
+
+                        else -> {
+                            toolbarDownTarget.requestFocus()
+                            return@setOnKeyListener true
+                        }
                     }
-                    toolbarDownTarget.requestFocus()
-                    return@setOnKeyListener true
                 }
                 false
             }

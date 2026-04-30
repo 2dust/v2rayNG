@@ -30,6 +30,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.ui.tv.FormTvFocusBinder
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 
@@ -695,45 +696,7 @@ class ServerActivity : BaseActivity() {
     }
 
     private fun updateTvFocusNavigation() {
-        val formViews = orderedFormViews()
-            .filterNotNull()
-            .filter { it.isActuallyFocusable() }
-
-        val toolbarTargets = findToolbarActionTargets()
-        val firstToolbarTarget = toolbarTargets.firstOrNull()
-        val lastToolbarTarget = toolbarTargets.lastOrNull()
-
-        formViews.forEachIndexed { index, view ->
-            ensureViewId(view)
-            view.isFocusable = true
-            view.isFocusableInTouchMode = true
-
-            val previous = formViews.getOrNull(index - 1) ?: lastToolbarTarget
-            val next = formViews.getOrNull(index + 1) ?: firstToolbarTarget
-
-            view.nextFocusUpId = previous?.id ?: View.NO_ID
-            view.nextFocusDownId = next?.id ?: View.NO_ID
-        }
-
-        if (formViews.isNotEmpty()) {
-            toolbarTargets.forEachIndexed { index, view ->
-                ensureViewId(view)
-                view.isFocusable = true
-                view.isFocusableInTouchMode = true
-                view.nextFocusDownId = formViews.first().id
-                view.nextFocusUpId = toolbarTargets.getOrNull(index - 1)?.id ?: View.NO_ID
-                view.setOnKeyListener { _, keyCode, event ->
-                    if (keyCode == android.view.KeyEvent.KEYCODE_DPAD_DOWN && event.action == android.view.KeyEvent.ACTION_DOWN) {
-                        formViews.first().requestFocus()
-                        return@setOnKeyListener true
-                    }
-                    false
-                }
-            }
-
-            formViews.first().nextFocusUpId = lastToolbarTarget?.id ?: View.NO_ID
-            formViews.last().nextFocusDownId = firstToolbarTarget?.id ?: View.NO_ID
-        }
+        FormTvFocusBinder.bind(findViewById<Toolbar>(R.id.toolbar), orderedFormViews())
     }
 
     private fun orderedFormViews(): List<View?> {
@@ -774,53 +737,5 @@ class ServerActivity : BaseActivity() {
             et_bandwidth_down,
             et_bandwidth_up
         )
-    }
-
-    private fun findToolbarActionTargets(): List<View> {
-        val toolbar = findViewById<Toolbar>(R.id.toolbar) ?: return emptyList()
-        val targets = mutableListOf<View>()
-
-        fun collect(view: View) {
-            if (view.visibility != View.VISIBLE) return
-
-            val isToolbarActionTarget =
-                view !== toolbar &&
-                    (
-                        view.isClickable &&
-                            !view.contentDescription.isNullOrBlank()
-                        )
-
-            if (isToolbarActionTarget) {
-                ensureViewId(view)
-                targets.add(view)
-            }
-
-            if (view is android.view.ViewGroup) {
-                for (index in 0 until view.childCount) {
-                    collect(view.getChildAt(index))
-                }
-            }
-        }
-
-        collect(toolbar)
-        return targets.distinctBy { it.id }
-    }
-
-    private fun ensureViewId(view: View) {
-        if (view.id == View.NO_ID) {
-            view.id = View.generateViewId()
-        }
-    }
-
-    private fun View.isActuallyFocusable(): Boolean {
-        if (visibility != View.VISIBLE || !isEnabled) return false
-
-        var current: View? = this
-        while (current != null) {
-            if (current.visibility != View.VISIBLE) return false
-            val parent = current.parent
-            current = if (parent is View) parent else null
-        }
-        return true
     }
 }
