@@ -30,13 +30,35 @@ object SubscriptionUpdater {
 
     /**
      * Sync all subscription tasks with current settings.
+     *
+     * Startup/boot callers should use the default mode so existing periodic work is kept.
+     * Use forceReschedule=true only when the next run time needs to be recalculated from
+     * the latest persisted subscription state (for example after a manual refresh).
      * Call from: MainActivity.onCreate(), BootReceiver.onReceive().
      */
-    fun sync(context: Context = AngApplication.application) {
+    fun sync(
+        context: Context = AngApplication.application,
+        forceReschedule: Boolean = false
+    ) {
+        val existingWorkPolicy =
+            if (forceReschedule) {
+                ExistingPeriodicWorkPolicy.REPLACE
+            } else {
+                ExistingPeriodicWorkPolicy.KEEP
+            }
+
         MmkvManager.decodeSubscriptions().forEach { sub ->
-            scheduleOne(context, sub.guid, sub.subscription.autoUpdate)
+            scheduleOne(
+                context = context,
+                subId = sub.guid,
+                shouldRun = sub.subscription.autoUpdate,
+                existingWorkPolicy = existingWorkPolicy
+            )
         }
-        LogUtil.i(AppConfig.TAG, "SubscriptionUpdater: sync complete")
+        LogUtil.i(
+            AppConfig.TAG,
+            "SubscriptionUpdater: sync complete forceReschedule=$forceReschedule"
+        )
     }
 
     /**
@@ -45,16 +67,12 @@ object SubscriptionUpdater {
      */
     fun syncOne(context: Context = AngApplication.application, subId: String) {
         val subItem = MmkvManager.decodeSubscription(subId) ?: return
-        scheduleOne(context, subId, subItem.autoUpdate)
-    }
-
-    /**
-     * Cancel all auto-update tasks.
-     * Normally called internally by sync(); exposed for edge cases.
-     */
-    fun cancelAll(context: Context = AngApplication.application) {
-        RemoteWorkManager.getInstance(context)
-            .cancelAllWorkByTag(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
+        scheduleOne(
+            context = context,
+            subId = subId,
+            shouldRun = subItem.autoUpdate,
+            existingWorkPolicy = ExistingPeriodicWorkPolicy.REPLACE
+        )
     }
 
     /**
@@ -72,7 +90,12 @@ object SubscriptionUpdater {
 
     private fun taskName(subId: String) = "${AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME}_$subId"
 
-    private fun scheduleOne(context: Context, subId: String, shouldRun: Boolean) {
+    private fun scheduleOne(
+        context: Context,
+        subId: String,
+        shouldRun: Boolean,
+        existingWorkPolicy: ExistingPeriodicWorkPolicy
+    ) {
         val rw = RemoteWorkManager.getInstance(context)
         if (!shouldRun) {
             rw.cancelUniqueWork(taskName(subId))
@@ -110,14 +133,14 @@ object SubscriptionUpdater {
 
         rw.enqueueUniquePeriodicWork(
             taskName(subId),
-            ExistingPeriodicWorkPolicy.REPLACE,
+            existingWorkPolicy,
             request
         )
 
         LogUtil.i(
             AppConfig.TAG,
             "SubscriptionUpdater: scheduled [$subId] interval=${intervalMinutes}min " +
-                "initialDelay=${initialDelayMillis / 1000}s"
+                "initialDelay=${initialDelayMillis / 1000}s policy=$existingWorkPolicy"
         )
     }
 
