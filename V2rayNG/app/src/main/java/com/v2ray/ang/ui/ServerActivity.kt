@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.DEFAULT_PORT
 import com.v2ray.ang.AppConfig.PREF_ALLOW_INSECURE
@@ -256,6 +257,7 @@ class ServerActivity : BaseActivity() {
                         NetworkType.XHTTP.type -> View.VISIBLE
                         else -> View.GONE
                     }
+                updateTvFocusNavigation()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -327,6 +329,7 @@ class ServerActivity : BaseActivity() {
                         ).forEach { it?.visibility = View.VISIBLE }
                     }
                 }
+                updateTvFocusNavigation()
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -338,6 +341,7 @@ class ServerActivity : BaseActivity() {
         } else {
             clearServer()
         }
+        updateTvFocusNavigation()
     }
 
     /**
@@ -670,6 +674,9 @@ class ServerActivity : BaseActivity() {
             delButton?.isVisible = false
         }
 
+        findViewById<View>(R.id.toolbar)?.post {
+            updateTvFocusNavigation()
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -685,5 +692,135 @@ class ServerActivity : BaseActivity() {
         }
 
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun updateTvFocusNavigation() {
+        val formViews = orderedFormViews()
+            .filterNotNull()
+            .filter { it.isActuallyFocusable() }
+
+        val toolbarTargets = findToolbarActionTargets()
+        val firstToolbarTarget = toolbarTargets.firstOrNull()
+        val lastToolbarTarget = toolbarTargets.lastOrNull()
+
+        formViews.forEachIndexed { index, view ->
+            ensureViewId(view)
+            view.isFocusable = true
+            view.isFocusableInTouchMode = true
+
+            val previous = formViews.getOrNull(index - 1) ?: lastToolbarTarget
+            val next = formViews.getOrNull(index + 1) ?: firstToolbarTarget
+
+            view.nextFocusUpId = previous?.id ?: View.NO_ID
+            view.nextFocusDownId = next?.id ?: View.NO_ID
+        }
+
+        if (formViews.isNotEmpty()) {
+            toolbarTargets.forEachIndexed { index, view ->
+                ensureViewId(view)
+                view.isFocusable = true
+                view.isFocusableInTouchMode = true
+                view.nextFocusDownId = formViews.first().id
+                view.nextFocusUpId = toolbarTargets.getOrNull(index - 1)?.id ?: View.NO_ID
+                view.setOnKeyListener { _, keyCode, event ->
+                    if (keyCode == android.view.KeyEvent.KEYCODE_DPAD_DOWN && event.action == android.view.KeyEvent.ACTION_DOWN) {
+                        formViews.first().requestFocus()
+                        return@setOnKeyListener true
+                    }
+                    false
+                }
+            }
+
+            formViews.first().nextFocusUpId = lastToolbarTarget?.id ?: View.NO_ID
+            formViews.last().nextFocusDownId = firstToolbarTarget?.id ?: View.NO_ID
+        }
+    }
+
+    private fun orderedFormViews(): List<View?> {
+        return listOf(
+            et_remarks,
+            et_address,
+            et_port,
+            et_id,
+            sp_flow,
+            et_security,
+            sp_security,
+            sp_network,
+            sp_header_type,
+            et_request_host,
+            et_path,
+            et_kcp_mtu,
+            et_kcp_tti,
+            et_extra,
+            et_fm,
+            sp_stream_security,
+            et_sni,
+            sp_stream_fingerprint,
+            sp_stream_alpn,
+            sp_allow_insecure,
+            et_public_key,
+            et_short_id,
+            et_spider_x,
+            et_mldsa65_verify,
+            et_ech_config_list,
+            et_pinned_ca256,
+            et_preshared_key,
+            et_reserved1,
+            et_local_address,
+            et_local_mtu,
+            et_obfs_password,
+            et_port_hop,
+            et_port_hop_interval,
+            et_bandwidth_down,
+            et_bandwidth_up
+        )
+    }
+
+    private fun findToolbarActionTargets(): List<View> {
+        val toolbar = findViewById<Toolbar>(R.id.toolbar) ?: return emptyList()
+        val targets = mutableListOf<View>()
+
+        fun collect(view: View) {
+            if (view.visibility != View.VISIBLE) return
+
+            val isToolbarActionTarget =
+                view !== toolbar &&
+                    (
+                        view.isClickable &&
+                            !view.contentDescription.isNullOrBlank()
+                        )
+
+            if (isToolbarActionTarget) {
+                ensureViewId(view)
+                targets.add(view)
+            }
+
+            if (view is android.view.ViewGroup) {
+                for (index in 0 until view.childCount) {
+                    collect(view.getChildAt(index))
+                }
+            }
+        }
+
+        collect(toolbar)
+        return targets.distinctBy { it.id }
+    }
+
+    private fun ensureViewId(view: View) {
+        if (view.id == View.NO_ID) {
+            view.id = View.generateViewId()
+        }
+    }
+
+    private fun View.isActuallyFocusable(): Boolean {
+        if (visibility != View.VISIBLE || !isEnabled) return false
+
+        var current: View? = this
+        while (current != null) {
+            if (current.visibility != View.VISIBLE) return false
+            val parent = current.parent
+            current = if (parent is View) parent else null
+        }
+        return true
     }
 }

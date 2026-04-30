@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityServerGroupBinding
 import com.v2ray.ang.dto.ProfileItem
@@ -43,6 +45,7 @@ class ServerGroupActivity : BaseActivity() {
         } else {
             clearServer()
         }
+        updateTvFocusNavigation()
     }
 
     /**
@@ -155,6 +158,9 @@ class ServerGroupActivity : BaseActivity() {
             delButton?.isVisible = false
         }
 
+        findViewById<View>(R.id.toolbar)?.post {
+            updateTvFocusNavigation()
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -170,5 +176,71 @@ class ServerGroupActivity : BaseActivity() {
         }
 
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun updateTvFocusNavigation() {
+        val formViews = listOf(
+            binding.etRemarks,
+            binding.spPolicyGroupType,
+            binding.spPolicyGroupSubId,
+            binding.etPolicyGroupFilter
+        ).filter { it.visibility == View.VISIBLE && it.isEnabled }
+
+        val toolbarTargets = findToolbarActionTargets()
+        val firstToolbarTarget = toolbarTargets.firstOrNull()
+        val lastToolbarTarget = toolbarTargets.lastOrNull()
+
+        formViews.forEachIndexed { index, view ->
+            ensureViewId(view)
+            view.isFocusable = true
+            view.isFocusableInTouchMode = true
+            view.nextFocusUpId = formViews.getOrNull(index - 1)?.id ?: lastToolbarTarget?.id ?: View.NO_ID
+            view.nextFocusDownId = formViews.getOrNull(index + 1)?.id ?: firstToolbarTarget?.id ?: View.NO_ID
+        }
+
+        if (formViews.isNotEmpty()) {
+            toolbarTargets.forEach { target ->
+                ensureViewId(target)
+                target.isFocusable = true
+                target.isFocusableInTouchMode = true
+                target.nextFocusDownId = formViews.first().id
+                target.setOnKeyListener { _, keyCode, event ->
+                    if (keyCode == android.view.KeyEvent.KEYCODE_DPAD_DOWN && event.action == android.view.KeyEvent.ACTION_DOWN) {
+                        formViews.first().requestFocus()
+                        return@setOnKeyListener true
+                    }
+                    false
+                }
+            }
+        }
+    }
+
+    private fun findToolbarActionTargets(): List<View> {
+        val toolbar = findViewById<Toolbar>(R.id.toolbar) ?: return emptyList()
+        val targets = mutableListOf<View>()
+
+        fun collect(view: View) {
+            if (view.visibility != View.VISIBLE) return
+
+            if (view !== toolbar && view.isClickable && !view.contentDescription.isNullOrBlank()) {
+                ensureViewId(view)
+                targets.add(view)
+            }
+
+            if (view is android.view.ViewGroup) {
+                for (index in 0 until view.childCount) {
+                    collect(view.getChildAt(index))
+                }
+            }
+        }
+
+        collect(toolbar)
+        return targets.distinctBy { it.id }
+    }
+
+    private fun ensureViewId(view: View) {
+        if (view.id == View.NO_ID) {
+            view.id = View.generateViewId()
+        }
     }
 }

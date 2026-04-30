@@ -317,4 +317,19 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
             ownerActivity.toast(R.string.toast_server_not_found_in_group)
         }
     }
+
+    fun focusFirstServer(): Boolean {
+        if (!isAdded || view == null || adapter.itemCount <= 1) {
+            return false
+        }
+
+        val recyclerView = binding.recyclerView
+        recyclerView.scrollToPosition(0)
+        recyclerView.post {
+            val firstItemView = recyclerView.layoutManager?.findViewByPosition(0)
+            val focusTarget = firstItemView?.findViewById<View>(R.id.info_container) ?: firstItemView
+            focusTarget?.requestFocus()
+        }
+        return true
+    }
 }
