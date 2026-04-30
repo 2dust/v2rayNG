@@ -106,11 +106,11 @@
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/fab"
                         android:layout_width="wrap_content"
-                        android:layout_height="69dp"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"
                         android:clickable="true"
                         android:contentDescription="@string/tasker_start_service"
-                        android:focusable="false"
+                        android:focusable="true"
                         android:nextFocusLeft="@+id/layout_test"
                         android:src="@drawable/ic_play_24dp"
                         app:layout_anchorGravity="bottom|right|end"
