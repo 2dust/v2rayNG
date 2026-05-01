@@ -98,7 +98,6 @@
                     android:layout_marginBottom="5dp"
                     android:layout_marginEnd="@dimen/padding_spacing_dp4"
                     android:focusable="true"
-                    android:focusedByDefault="true"
                     android:clickable="true"
                     android:background="@drawable/tv_focusable_item_bg"
                     >

@@ -1,9 +1,11 @@
 package com.v2ray.ang.ui
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -122,8 +124,14 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {
         }
 
-        binding.fabWrapper.post {
-            binding.fabWrapper.requestFocus()
+        val isTvDevice = isTvDevice()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            binding.fabWrapper.isFocusedByDefault = isTvDevice
+        }
+        if (isTvDevice) {
+            binding.fabWrapper.post {
+                binding.fabWrapper.requestFocus()
+            }
         }
 
         binding.fabWrapper.setOnKeyListener { _, keyCode, event ->
@@ -704,5 +712,11 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         tvFocusController.detach()
         tabMediator?.detach()
         super.onDestroy()
+    }
+
+    private fun isTvDevice(): Boolean {
+        val currentUiMode = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK
+        return currentUiMode == Configuration.UI_MODE_TYPE_TELEVISION ||
+            packageManager.hasSystemFeature("android.hardware.type.television")
     }
 }
