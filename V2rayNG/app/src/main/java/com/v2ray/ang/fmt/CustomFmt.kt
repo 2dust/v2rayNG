@@ -20,7 +20,7 @@ object CustomFmt : FmtBase() {
 
         config.remarks = fullConfig?.remarks ?: System.currentTimeMillis().toString()
         config.server = outbound?.getServerAddress()
-        config.serverPort = outbound?.getServerPort().toString()
+        config.serverPort = outbound?.getServerPort()?.toString()
 
         return config
     }

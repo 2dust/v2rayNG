@@ -620,17 +620,15 @@ object AngConfigManager {
      */
     fun generateDescription(profile: ProfileItem): String {
         // Hide xxx:xxx:***/xxx.xxx.xxx.***
-        val server = profile.server
+        val server = profile.server ?: return "—"
         val port = profile.serverPort
-        if (server.isNullOrBlank() && port.isNullOrBlank()) return ""
 
-        val addrPart = server?.let {
-            if (it.contains(":"))
-                it.split(":").take(2).joinToString(":", postfix = ":***")
-            else
-                it.split('.').dropLast(1).joinToString(".", postfix = ".***")
-        } ?: ""
+        val addrPart = if (server.contains(":")) {
+            server.split(":").take(2).joinToString(":", postfix = ":***")
+        } else {
+            server.split('.').dropLast(1).joinToString(".", postfix = ".***")
+        }
 
-        return "$addrPart : ${port ?: ""}"
+        return addrPart + (port?.takeIf { it.isNotBlank() }?.let { " : $it" } ?: "")
     }
 }
