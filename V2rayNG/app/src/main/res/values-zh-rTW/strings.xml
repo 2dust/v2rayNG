@@ -156,7 +156,7 @@
     <string name="summary_pref_is_booted">開機時自動連線選擇的伺服器，可能會不成功</string>
 
     <string name="title_pref_auto_remove_invalid_after_test">測試後自動刪除無效配置</string>
-    <string name="summary_pref_auto_remove_invalid_after_test">測試結果可能不準確；已刪除的配置無法復原。 </string>
+    <string name="summary_pref_auto_remove_invalid_after_test">測試結果可能不準確且已刪除的配置無法復原</string>
     <string name="title_pref_auto_sort_after_test">測試後自動排序</string>
     <string name="summary_pref_auto_sort_after_test">測試結果可能不準確</string>
 
