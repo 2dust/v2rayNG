@@ -274,7 +274,7 @@
     <string name="title_mode_help">点此查看更多帮助</string>
     <string name="title_language">语言</string>
     <string name="title_ui_settings">用户界面设置</string>
-    <string name="title_pref_ui_mode_night">界面颜色设置</string>
+    <string name="title_pref_ui_mode_night">深色模式</string>
     <string name="title_pref_use_hev_tunnel">启用 Hev TUN 功能</string>
     <string name="summary_pref_use_hev_tunnel">选择启用后 TUN 将使用 hev-socks5-tunnel 否则使用 xray-core</string>
     <string name="title_pref_hev_tunnel_loglevel">HevTun 日志级别</string>
