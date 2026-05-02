@@ -158,7 +158,7 @@
     <string name="title_pref_auto_remove_invalid_after_test">測試後自動刪除無效配置</string>
     <string name="summary_pref_auto_remove_invalid_after_test">測試結果可能不準確；已刪除的配置無法復原。 </string>
     <string name="title_pref_auto_sort_after_test">測試後自動排序</string>
-    <string name="summary_pref_auto_sort_after_test">測試結果可能不準確；</string>
+    <string name="summary_pref_auto_sort_after_test">測試結果可能不準確</string>
 
     <string name="title_mux_settings">Mux 設定</string>
     <string name="title_pref_mux_enabled">啟用 Mux 多路復用</string>
@@ -274,8 +274,8 @@
     <string name="title_mode">模式</string>
     <string name="title_mode_help">輕觸以檢視說明</string>
     <string name="title_language">語言</string>
-    <string name="title_ui_settings">介面顏色設定</string>
-    <string name="title_pref_ui_mode_night">介面顯示模式</string>
+    <string name="title_ui_settings">介面顯示設定</string>
+    <string name="title_pref_ui_mode_night">深色模式</string>
     <string name="title_pref_use_hev_tunnel">啟用 Hev TUN 功能</string>
     <string name="summary_pref_use_hev_tunnel">選擇啟用後 TUN 將使用 hev-socks5-tunnel 否則使用 xray-core</string>
     <string name="title_pref_hev_tunnel_loglevel">HevTun 日誌級別</string>
@@ -316,8 +316,8 @@
     <string name="title_update_subscription_result">更新了 %1$d 個配置（%2$d 個成功，%3$d 個失敗，%4$d 個跳過）</string>
     <string name="title_update_subscription_no_subscription">無訂閱</string>
     <string name="toast_server_not_found_in_group">當前分組中未找到選中的伺服器</string>
-    <string name="toast_fragment_not_available">定位所選配置</string>
-    <string name="title_locate_selected_config">Locate the selected config</string>
+    <string name="toast_fragment_not_available">無法定位當前視圖</string>
+    <string name="title_locate_selected_config">定位所選配置</string>
 
     <string name="tasker_start_service">啟動服務</string>
     <string name="tasker_setting_confirm">確定</string>
@@ -385,7 +385,7 @@
     <string name="server_proxy_chain_members_invalid">無效的鏈路成員: %1$s</string>
 
     <!-- BackupActivity -->
-    <string name="title_configuration_backup_restore">Backup &amp; Restore</string>
+    <string name="title_configuration_backup_restore">備份與恢復</string>
     <string name="title_configuration_backup">備份設定</string>
     <string name="title_configuration_restore">還原設定</string>
     <string name="title_configuration_share">分享設定</string>
@@ -417,7 +417,7 @@
 
     <string-array name="mode_entries">
         <item>VPN</item>
-        <item>僅 Proxy</item>
+        <item>僅代理</item>
     </string-array>
 
     <string-array name="ui_mode_night">
