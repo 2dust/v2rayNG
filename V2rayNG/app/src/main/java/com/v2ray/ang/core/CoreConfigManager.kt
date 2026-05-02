@@ -584,6 +584,34 @@ object CoreConfigManager {
     }
 
     /**
+     * Retrieves domain rules for custom outbound tags.
+     *
+     * Searches through all rulesets to find domains targeting any custom outbound tags.
+     *
+     * @return ArrayList of domain rules matching custom outbound tags
+     */
+    private fun getCustomOutboundUserRule2Domain(): ArrayList<String> {
+        val domain = ArrayList<String>()
+
+        val rulesetItems = MmkvManager.decodeRoutingRulesets()
+        rulesetItems?.forEach { key ->
+            if (key.enabled && !AppConfig.BUILTIN_OUTBOUND_TAGS.contains(key.outboundTag)
+                && !key.domain.isNullOrEmpty()
+            ) {
+                key.domain?.forEach {
+                    if (it != AppConfig.GEOSITE_PRIVATE
+                        && (it.startsWith("geosite:") || it.startsWith("domain:"))
+                    ) {
+                        domain.add(it)
+                    }
+                }
+            }
+        }
+
+        return domain
+    }
+
+    /**
      * Configures custom local DNS settings.
      *
      * Sets up DNS inbound, outbound, and routing rules for local DNS resolution.
@@ -662,7 +690,7 @@ object CoreConfigManager {
 
             //remote Dns
             val remoteDns = SettingsManager.getRemoteDnsServers()
-            val proxyDomain = getUserRule2Domain(AppConfig.TAG_PROXY)
+            val proxyDomain = getUserRule2Domain(AppConfig.TAG_PROXY) + getCustomOutboundUserRule2Domain()
             remoteDns.forEach {
                 servers.add(it)
             }
@@ -678,18 +706,36 @@ object CoreConfigManager {
             // domestic DNS
             val domesticDns = SettingsManager.getDomesticDnsServers()
             val directDomain = getUserRule2Domain(AppConfig.TAG_DIRECT)
-            val isCnRoutingMode = directDomain.contains(AppConfig.GEOSITE_CN)
-            val geoipCn = arrayListOf(AppConfig.GEOIP_CN)
-            if (directDomain.isNotEmpty()) {
+            val finalDirectDomain = directDomain.filter { it != AppConfig.GEOSITE_CN }
+            val domesticDnsTags = mutableListOf<String>()
+            domesticDns.forEachIndexed { index, element ->
+                val tag = AppConfig.TAG_DOMESTIC_DNS + index
                 servers.add(
                     V2rayConfig.DnsBean.ServersBean(
-                        address = domesticDns.first(),
-                        domains = directDomain,
-                        expectIPs = if (isCnRoutingMode) geoipCn else null,
+                        address = element,
+                        domains = finalDirectDomain,
                         skipFallback = true,
-                        tag = AppConfig.TAG_DOMESTIC_DNS
+                        tag = tag
                     )
                 )
+                domesticDnsTags.add(tag)
+            }
+            val isCnRoutingMode = directDomain.contains(AppConfig.GEOSITE_CN)
+            val geoipCn = arrayListOf(AppConfig.GEOIP_CN)
+            if (isCnRoutingMode) {
+                domesticDns.forEachIndexed { index, element ->
+                    val geositeCnDnsTag = AppConfig.TAG_DOMESTIC_DNS + index + "_geosite_cn"
+                    servers.add(
+                        V2rayConfig.DnsBean.ServersBean(
+                            address = element,
+                            domains = arrayListOf(AppConfig.GEOSITE_CN),
+                            expectIPs = geoipCn,
+                            skipFallback = true,
+                            tag = geositeCnDnsTag
+                        )
+                    )
+                    domesticDnsTags.add(geositeCnDnsTag)
+                }
             }
 
             //block dns
@@ -736,7 +782,7 @@ object CoreConfigManager {
             v2rayConfig.routing.rules.add(
                 V2rayConfig.RoutingBean.RulesBean(
                     outboundTag = AppConfig.TAG_DIRECT,
-                    inboundTag = arrayListOf(AppConfig.TAG_DOMESTIC_DNS),
+                    inboundTag = domesticDnsTags,
                     domain = null
                 )
             )
