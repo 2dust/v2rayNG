@@ -571,11 +571,7 @@ object CoreConfigManager {
         rulesetItems?.forEach { key ->
             if (key.enabled && key.outboundTag == tag && !key.domain.isNullOrEmpty()) {
                 key.domain?.forEach {
-                    if (it != AppConfig.GEOSITE_PRIVATE
-                        && (it.startsWith("geosite:") || it.startsWith("domain:"))
-                    ) {
-                        domain.add(it)
-                    }
+                    domain.add(it)
                 }
             }
         }
@@ -599,11 +595,7 @@ object CoreConfigManager {
                 && !key.domain.isNullOrEmpty()
             ) {
                 key.domain?.forEach {
-                    if (it != AppConfig.GEOSITE_PRIVATE
-                        && (it.startsWith("geosite:") || it.startsWith("domain:"))
-                    ) {
-                        domain.add(it)
-                    }
+                    domain.add(it)
                 }
             }
         }
@@ -625,12 +617,13 @@ object CoreConfigManager {
                 val geositeCn = arrayListOf(AppConfig.GEOSITE_CN)
                 val proxyDomain = getUserRule2Domain(AppConfig.TAG_PROXY)
                 val directDomain = getUserRule2Domain(AppConfig.TAG_DIRECT)
+                val finalDomain = geositeCn.plus(proxyDomain).plus(directDomain).distinct()
                 // fakedns with all domains to make it always top priority
                 v2rayConfig.dns?.servers?.add(
                     0,
                     V2rayConfig.DnsBean.ServersBean(
                         address = "fakedns",
-                        domains = geositeCn.plus(proxyDomain).plus(directDomain)
+                        domains = finalDomain
                     )
                 )
             }
@@ -690,7 +683,7 @@ object CoreConfigManager {
 
             //remote Dns
             val remoteDns = SettingsManager.getRemoteDnsServers()
-            val proxyDomain = getUserRule2Domain(AppConfig.TAG_PROXY) + getCustomOutboundUserRule2Domain()
+            val proxyDomain = (getUserRule2Domain(AppConfig.TAG_PROXY) + getCustomOutboundUserRule2Domain()).distinct()
             remoteDns.forEach {
                 servers.add(it)
             }
@@ -706,7 +699,13 @@ object CoreConfigManager {
             // domestic DNS
             val domesticDns = SettingsManager.getDomesticDnsServers()
             val directDomain = getUserRule2Domain(AppConfig.TAG_DIRECT)
-            val finalDirectDomain = directDomain.filter { it != AppConfig.GEOSITE_CN }
+            val isCnRoutingMode = directDomain.contains(AppConfig.GEOSITE_CN)
+            val cnRegionFilter = { domain: String ->
+                domain.startsWith("geosite:") && (domain.endsWith("-cn") || domain.endsWith("@cn"))
+            }
+            val finalDirectDomain = if (isCnRoutingMode) directDomain.filterNot {
+                cnRegionFilter(it)
+            } else directDomain
             val domesticDnsTags = mutableListOf<String>()
             domesticDns.forEachIndexed { index, element ->
                 val tag = AppConfig.TAG_DOMESTIC_DNS + index
@@ -720,15 +719,15 @@ object CoreConfigManager {
                 )
                 domesticDnsTags.add(tag)
             }
-            val isCnRoutingMode = directDomain.contains(AppConfig.GEOSITE_CN)
-            val geoipCn = arrayListOf(AppConfig.GEOIP_CN)
             if (isCnRoutingMode) {
+                val geoipCn = arrayListOf(AppConfig.GEOIP_CN)
+                val cnRegionDomain = directDomain.filter { cnRegionFilter(it) }
                 domesticDns.forEachIndexed { index, element ->
-                    val geositeCnDnsTag = AppConfig.TAG_DOMESTIC_DNS + index + "_geosite_cn"
+                    val geositeCnDnsTag = AppConfig.TAG_DOMESTIC_DNS + index + "_cn_expect"
                     servers.add(
                         V2rayConfig.DnsBean.ServersBean(
                             address = element,
-                            domains = arrayListOf(AppConfig.GEOSITE_CN),
+                            domains = cnRegionDomain,
                             expectIPs = geoipCn,
                             skipFallback = true,
                             tag = geositeCnDnsTag
@@ -775,7 +774,8 @@ object CoreConfigManager {
             v2rayConfig.dns = V2rayConfig.DnsBean(
                 servers = servers,
                 hosts = hosts,
-                tag = AppConfig.TAG_DNS
+                tag = AppConfig.TAG_DNS,
+                enableParallelQuery = if ((domesticDns.size + remoteDns.size) > 2) true else null
             )
 
             // DNS routing
