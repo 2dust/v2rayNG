@@ -702,6 +702,7 @@ object CoreConfigManager {
             val isCnRoutingMode = directDomain.contains(AppConfig.GEOSITE_CN)
             val cnRegionFilter = { domain: String ->
                 domain.startsWith("geosite:") && (domain.endsWith("-cn") || domain.endsWith("@cn"))
+                        || domain == AppConfig.GEOSITE_CN
             }
             val finalDirectDomain = if (isCnRoutingMode) directDomain.filterNot {
                 cnRegionFilter(it)
