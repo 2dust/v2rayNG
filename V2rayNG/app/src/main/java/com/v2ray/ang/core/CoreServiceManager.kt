@@ -12,6 +12,12 @@ import android.system.OsConstants
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.core.engine.AppProcessFinder
+import com.v2ray.ang.core.engine.CoreEngine
+import com.v2ray.ang.core.engine.CoreEngineFactory
+import com.v2ray.ang.core.engine.CoreEventHandler
+import com.v2ray.ang.core.engine.CoreSelector
+import com.v2ray.ang.core.engine.CoreType
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.enums.EConfigType
@@ -28,15 +34,13 @@ import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import libv2ray.CoreCallbackHandler
-import libv2ray.CoreController
-import libv2ray.ProcessFinder
 import java.lang.ref.SoftReference
 import java.net.InetSocketAddress
 
 object CoreServiceManager {
 
-    private val coreController: CoreController = CoreNativeManager.newCoreController(CoreCallback())
+    private val coreEventHandler = CoreCallback()
+    private var coreEngine: CoreEngine = CoreEngineFactory.create(CoreType.XRAY, coreEventHandler)
     private val mMsgReceive = ReceiveMessageHandler()
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
@@ -45,10 +49,10 @@ object CoreServiceManager {
         set(value) {
             field = value
             val service = value?.get()?.getService()
-            CoreNativeManager.initCoreEnv(service)
+            coreEngine.initCoreEnv(service)
             if (service != null && processFinder == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 processFinder = XrayProcessFinder(service)
-                coreController.registerProcessFinder(processFinder)
+                coreEngine.registerProcessFinder(processFinder!!)
             }
         }
 
@@ -94,7 +98,8 @@ object CoreServiceManager {
      * Checks if the V2Ray service is running.
      * @return True if the service is running, false otherwise.
      */
-    fun isRunning() = coreController.isRunning
+    fun isRunning() = coreEngine.isRunning
+
 
     /**
      * Gets the name of the currently running server.
@@ -108,7 +113,7 @@ object CoreServiceManager {
      * @param context The context from which the service is started.
      */
     private fun startContextService(context: Context) {
-        if (coreController.isRunning) {
+        if (coreEngine.isRunning) {
             LogUtil.w(AppConfig.TAG, "StartCore-Manager: Core already running")
             return
         }
@@ -122,6 +127,11 @@ object CoreServiceManager {
         val config = MmkvManager.decodeServerConfig(guid)
         if (config == null) {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to decode server config")
+            return
+        }
+
+        if (!ensureCoreEngine(config)) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to resolve core engine")
             return
         }
 
@@ -168,7 +178,7 @@ object CoreServiceManager {
      * Starts the V2Ray core service.
      */
     fun startCoreLoop(vpnInterface: ParcelFileDescriptor?): Boolean {
-        if (coreController.isRunning) {
+        if (coreEngine.isRunning) {
             LogUtil.w(AppConfig.TAG, "StartCore-Manager: Core already running")
             return false
         }
@@ -188,6 +198,11 @@ object CoreServiceManager {
         val config = MmkvManager.decodeServerConfig(guid)
         if (config == null) {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to decode server config")
+            return false
+        }
+
+        if (!ensureCoreEngine(config)) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to resolve core engine")
             return false
         }
 
@@ -218,13 +233,13 @@ object CoreServiceManager {
 
         try {
             NotificationManager.showNotification(currentConfig)
-            coreController.startLoop(result.content, tunFd)
+            coreEngine.startLoop(result.content, tunFd)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to start core loop", e)
             return false
         }
 
-        if (coreController.isRunning == false) {
+        if (coreEngine.isRunning == false) {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Core failed to start")
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
             NotificationManager.cancelNotification()
@@ -250,10 +265,10 @@ object CoreServiceManager {
     fun stopCoreLoop(): Boolean {
         val service = getService() ?: return false
 
-        if (coreController.isRunning) {
+        if (coreEngine.isRunning) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    coreController.stopLoop()
+                    coreEngine.stopLoop()
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to stop V2Ray loop", e)
                 }
@@ -279,7 +294,7 @@ object CoreServiceManager {
      * @return The statistics value.
      */
     fun queryStats(tag: String, link: String): Long {
-        return coreController.queryStats(tag, link)
+        return coreEngine.queryStats(tag, link)
     }
 
     /**
@@ -288,7 +303,7 @@ object CoreServiceManager {
      * Also fetches remote IP information if the delay test was successful.
      */
     private fun measureV2rayDelay() {
-        if (coreController.isRunning == false) {
+        if (coreEngine.isRunning == false) {
             return
         }
 
@@ -298,14 +313,14 @@ object CoreServiceManager {
             var errorStr = ""
 
             try {
-                time = coreController.measureDelay(SettingsManager.getDelayTestUrl())
+                time = coreEngine.measureDelay(SettingsManager.getDelayTestUrl())
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to measure delay", e)
                 errorStr = e.message?.substringAfter("\":") ?: "empty message"
             }
             if (time == -1L) {
                 try {
-                    time = coreController.measureDelay(SettingsManager.getDelayTestUrl(true))
+                    time = coreEngine.measureDelay(SettingsManager.getDelayTestUrl(true))
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to measure delay", e)
                     errorStr = e.message?.substringAfter("\":") ?: "empty message"
@@ -336,11 +351,33 @@ object CoreServiceManager {
         return serviceControl?.get()?.getService()
     }
 
+    private fun ensureCoreEngine(config: ProfileItem): Boolean {
+        val resolvedCore = CoreSelector.resolve(config)
+        if (coreEngine.type == resolvedCore) {
+            return true
+        }
+        if (coreEngine.isRunning) {
+            LogUtil.w(AppConfig.TAG, "StartCore-Manager: Cannot switch core while running")
+            return false
+        }
+
+        return try {
+            coreEngine = CoreEngineFactory.create(resolvedCore, coreEventHandler)
+            val service = getService()
+            coreEngine.initCoreEnv(service)
+            processFinder?.let { coreEngine.registerProcessFinder(it) }
+            true
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to create core engine $resolvedCore", e)
+            false
+        }
+    }
+
     /**
      * Core callback handler implementation for handling V2Ray core events.
      * Handles startup, shutdown, socket protection, and status emission.
      */
-    private class CoreCallback : CoreCallbackHandler {
+    private class CoreCallback : CoreEventHandler {
         /**
          * Called when V2Ray core starts up.
          * @return 0 for success, any other value for failure.
@@ -370,7 +407,7 @@ object CoreServiceManager {
          * @param s Status message.
          * @return Always returns 0.
          */
-        override fun onEmitStatus(l: Long, s: String?): Long {
+        override fun onEmitStatus(statusCode: Long, message: String?): Long {
             return 0
         }
     }
@@ -379,7 +416,7 @@ object CoreServiceManager {
      * Process finder implementation for Xray core.
      * Uses ConnectivityManager to find the owning UID of a connection based on network parameters.
      */
-    private class XrayProcessFinder(context: Context) : ProcessFinder {
+    private class XrayProcessFinder(context: Context) : AppProcessFinder {
         private val cm: ConnectivityManager? = context.getSystemService(ConnectivityManager::class.java)
 
         override fun findProcessByConnection(network: String, srcIP: String, srcPort: Long, destIP: String, destPort: Long): Long {
@@ -427,7 +464,7 @@ object CoreServiceManager {
             val serviceControl = serviceControl?.get() ?: return
             when (intent?.getIntExtra("key", 0)) {
                 AppConfig.MSG_REGISTER_CLIENT -> {
-                    if (coreController.isRunning) {
+                    if (coreEngine.isRunning) {
                         MessageUtil.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_RUNNING, "")
                     } else {
                         MessageUtil.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_NOT_RUNNING, "")
