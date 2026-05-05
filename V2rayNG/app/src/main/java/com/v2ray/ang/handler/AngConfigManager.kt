@@ -13,8 +13,11 @@ import com.v2ray.ang.dto.SubscriptionItem
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.fmt.AnytlsFmt
+import com.v2ray.ang.fmt.ClashYamlFmt
 import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.fmt.Hysteria2Fmt
+import com.v2ray.ang.fmt.RawProfileImport
 import com.v2ray.ang.fmt.ShadowsocksFmt
 import com.v2ray.ang.fmt.SocksFmt
 import com.v2ray.ang.fmt.TrojanFmt
@@ -29,6 +32,10 @@ import com.v2ray.ang.util.Utils
 import java.net.URI
 
 object AngConfigManager {
+    private data class ParsedConfig(
+        val profile: ProfileItem,
+        val rawConfig: String? = null,
+    )
 
 
     /**
@@ -160,7 +167,13 @@ object AngConfigManager {
      * @return A pair containing the number of configurations and subscriptions imported.
      */
     fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
-        var count = parseBatchConfig(Utils.decode(server), subid, append)
+        var count = parseClashYamlServer(Utils.decode(server), subid, append)
+        if (count <= 0) {
+            count = parseClashYamlServer(server, subid, append)
+        }
+        if (count <= 0) {
+            count = parseBatchConfig(Utils.decode(server), subid, append)
+        }
         if (count <= 0) {
             count = parseBatchConfig(server, subid, append)
         }
@@ -232,7 +245,7 @@ object AngConfigManager {
             val subItem = MmkvManager.decodeSubscription(subid)
 
             // Parse all configs first (no I/O during parsing)
-            val configs = mutableListOf<ProfileItem>()
+            val configs = mutableListOf<ParsedConfig>()
             servers.lines()
                 .distinct()
                 .reversed()
@@ -260,6 +273,63 @@ object AngConfigManager {
         return 0
     }
 
+    private fun parseClashYamlServer(server: String?, subid: String, append: Boolean): Int {
+        try {
+            if (server.isNullOrBlank() || !ClashYamlFmt.isClashYaml(server)) {
+                return 0
+            }
+
+            val removedSelected = if (subid.isNotBlank() && !append) {
+                MmkvManager.getSelectServer()
+                    .takeIf { it?.isNotBlank() == true }
+                    ?.let { MmkvManager.decodeServerConfig(it) }
+                    ?.takeIf { it.subscriptionId == subid }
+            } else {
+                null
+            }
+
+            val subItem = MmkvManager.decodeSubscription(subid)
+            val configs = ClashYamlFmt.parse(server)
+                .mapNotNull { parsed ->
+                    toParsedConfig(parsed, subid, subItem)
+                }
+
+            if (configs.isEmpty()) {
+                return 0
+            }
+
+            if (!append) {
+                MmkvManager.removeServerViaSubid(subid)
+            }
+            val keyToProfile = batchSaveConfigs(configs, subid)
+            val matchKey = findMatchedProfileKey(keyToProfile, removedSelected)
+            matchKey?.let { MmkvManager.setSelectServer(it) }
+            return configs.size
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to parse Clash YAML config server", e)
+        }
+        return 0
+    }
+
+    private fun toParsedConfig(
+        parsed: RawProfileImport,
+        subid: String,
+        subItem: SubscriptionItem?,
+    ): ParsedConfig? {
+        val config = parsed.profile
+        val filter = subItem?.filter
+
+        if (filter.isNotNullEmpty() && config.remarks.isNotNullEmpty()) {
+            val matched = Regex(pattern = filter.orEmpty())
+                .containsMatchIn(input = config.remarks)
+            if (!matched) return null
+        }
+
+        config.subscriptionId = subid
+        config.description = generateDescription(config)
+        return ParsedConfig(profile = config, rawConfig = parsed.rawConfig)
+    }
+
     /**
      * Batch save configurations to reduce serverList read/write operations.
      * Reads serverList once, saves all configs, then writes serverList once.
@@ -268,17 +338,19 @@ object AngConfigManager {
      * @param subid The subscription ID.
      * @return Map of generated keys to their corresponding ProfileItem.
      */
-    private fun batchSaveConfigs(configs: List<ProfileItem>, subid: String): Map<String, ProfileItem> {
+    private fun batchSaveConfigs(configs: List<ParsedConfig>, subid: String): Map<String, ProfileItem> {
         val keyToProfile = mutableMapOf<String, ProfileItem>()
 
         // Read serverList once
         val serverList = MmkvManager.decodeServerList(subid)
         var needSetSelected = MmkvManager.getSelectServer().isNullOrBlank()
 
-        configs.forEach { config ->
+        configs.forEach { imported ->
+            val config = imported.profile
             val key = Utils.getUuid()
             // Save profile directly without updating serverList
             MmkvManager.encodeProfileDirect(key, JsonUtil.toJson(config))
+            imported.rawConfig?.let { MmkvManager.encodeServerRaw(key, it) }
 
             if (!serverList.contains(key)) {
                 serverList.add(0, key)
@@ -376,7 +448,7 @@ object AngConfigManager {
                     }
                     var count = 0
                     for (srv in serverList.reversed()) {
-                        val config = CustomFmt.parse(JsonUtil.toJson(srv)) ?: continue
+                        val config = CustomFmt.parse(JsonUtil.toJson(srv))
                         config.subscriptionId = subid
                         config.description = generateDescription(config)
                         val key = MmkvManager.encodeServerConfig("", config)
@@ -391,7 +463,7 @@ object AngConfigManager {
 
             try {
                 // For compatibility
-                val config = CustomFmt.parse(server) ?: return 0
+                val config = CustomFmt.parse(server)
                 config.subscriptionId = subid
                 config.description = generateDescription(config)
                 if (!append) {
@@ -436,10 +508,13 @@ object AngConfigManager {
         str: String?,
         subid: String,
         subItem: SubscriptionItem?
-    ): ProfileItem? {
+    ): ParsedConfig? {
         try {
             if (str == null || TextUtils.isEmpty(str)) {
                 return null
+            }
+            if (str.startsWith("anytls://", ignoreCase = true)) {
+                return toParsedConfig(AnytlsFmt.parse(str) ?: return null, subid, subItem)
             }
 
             val config = if (str.startsWith(EConfigType.VMESS.protocolScheme)) {
@@ -474,7 +549,7 @@ object AngConfigManager {
             config.subscriptionId = subid
             config.description = generateDescription(config)
 
-            return config
+            return ParsedConfig(config)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to parse config", e)
             return null
@@ -580,7 +655,13 @@ object AngConfigManager {
      * @return The number of configurations parsed.
      */
     private fun parseConfigViaSub(server: String?, subid: String, append: Boolean): Int {
-        var count = parseBatchConfig(Utils.decode(server), subid, append)
+        var count = parseClashYamlServer(Utils.decode(server), subid, append)
+        if (count <= 0) {
+            count = parseClashYamlServer(server, subid, append)
+        }
+        if (count <= 0) {
+            count = parseBatchConfig(Utils.decode(server), subid, append)
+        }
         if (count <= 0) {
             count = parseBatchConfig(server, subid, append)
         }

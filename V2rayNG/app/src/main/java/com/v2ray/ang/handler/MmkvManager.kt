@@ -208,6 +208,7 @@ object MmkvManager {
             mainStorage.remove(KEY_SELECTED_SERVER)
         }
         profileFullStorage.remove(guid)
+        serverRawStorage.remove(guid)
         serverAffStorage.remove(guid)
     }
 
@@ -226,6 +227,7 @@ object MmkvManager {
                 mainStorage.remove(KEY_SELECTED_SERVER)
             }
             profileFullStorage.remove(guid)
+            serverRawStorage.remove(guid)
             serverAffStorage.remove(guid)
         }
 

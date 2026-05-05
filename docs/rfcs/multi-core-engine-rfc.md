@@ -116,6 +116,13 @@ Current local test entry:
 - a profile remark prefixed with `[sing-box]` is resolved to `SingBoxEngine`;
 - the runtime uses the raw custom JSON from MMKV instead of the Xray config builder.
 
+Current parser bridge status:
+
+- `Clash YAML` documents with a top-level `proxies:` list can be converted into `CUSTOM` profiles backed by raw `sing-box` JSON;
+- direct `anytls://` import can be converted into `CUSTOM` profiles backed by raw `sing-box` JSON;
+- base64 subscriptions that decode into mixed URI lines can now keep native Xray-supported links on the legacy path while routing `anytls://` lines to `SingBoxEngine`;
+- subscription metadata lines such as remaining-traffic or expiry notices should be filtered before profile creation.
+
 Follow-up phases:
 
 1. Add `SingBoxEngine` bootstrap and runtime lifecycle.
