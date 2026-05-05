@@ -6,6 +6,7 @@ import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 
 class ProcessService {
     private var process: Process? = null
@@ -15,14 +16,23 @@ class ProcessService {
      * @param context The context.
      * @param cmd The command to run.
      */
-    fun runProcess(context: Context, cmd: MutableList<String>) {
+    fun runProcess(
+        context: Context,
+        cmd: MutableList<String>,
+        workingDirectory: File = context.filesDir,
+        logFile: File? = null,
+    ) {
         LogUtil.i(AppConfig.TAG, cmd.toString())
 
         try {
             val proBuilder = ProcessBuilder(cmd)
             proBuilder.redirectErrorStream(true)
+            if (logFile != null) {
+                logFile.parentFile?.mkdirs()
+                proBuilder.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile))
+            }
             process = proBuilder
-                .directory(context.filesDir)
+                .directory(workingDirectory)
                 .start()
 
             CoroutineScope(Dispatchers.IO).launch {
@@ -38,6 +48,10 @@ class ProcessService {
         }
     }
 
+    fun isRunning(): Boolean {
+        return process?.isAlive == true
+    }
+
     /**
      * Stops the running process.
      */
@@ -45,6 +59,7 @@ class ProcessService {
         try {
             LogUtil.i(AppConfig.TAG, "runProcess destroy")
             process?.destroy()
+            process = null
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to destroy process", e)
         }

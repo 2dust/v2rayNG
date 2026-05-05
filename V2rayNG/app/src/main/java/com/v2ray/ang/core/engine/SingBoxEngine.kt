@@ -17,8 +17,9 @@ class SingBoxEngine(
     override val supportedCapabilities: Set<CoreCapability> = emptySet()
 
     override val isRunning: Boolean
-        get() = started
+        get() = started || processService.isRunning()
 
+    private val binaryInstaller = SingBoxBinaryInstaller()
     private val processService = ProcessService()
     private var runtimeLayout: SingBoxRuntimeLayout? = null
     private var processFinder: AppProcessFinder? = null
@@ -32,11 +33,12 @@ class SingBoxEngine(
         runtimeLayout = SingBoxRuntimeLayout.fromContext(context.applicationContext).also {
             it.ensureDirectories()
         }
+        ensureBinaryInstalled()
         LogUtil.i(AppConfig.TAG, "Sing-box runtime layout initialized at ${runtimeLayout?.rootDir}")
     }
 
     override fun startLoop(configContent: String, tunFd: Int) {
-        appContext ?: throw IllegalStateException("Sing-box engine context is not initialized")
+        val context = appContext ?: throw IllegalStateException("Sing-box engine context is not initialized")
         val layout = runtimeLayout ?: throw IllegalStateException("Sing-box runtime layout is not initialized")
 
         layout.ensureDirectories()
@@ -48,14 +50,23 @@ class SingBoxEngine(
         if (processFinder != null) {
             LogUtil.d(AppConfig.TAG, "Sing-box skeleton has a process finder registered for future per-app routing support")
         }
-        if (!layout.binaryFile.exists()) {
-            throw UnsupportedOperationException("Sing-box binary is not installed yet")
+        ensureBinaryInstalled()
+        require(layout.binaryFile.exists()) {
+            "Sing-box binary is not installed. Expected apk assets in: ${binaryInstaller.expectedAssetLocations().joinToString()}"
         }
 
         LogUtil.i(AppConfig.TAG, "Sing-box bootstrap command prepared: ${buildStartCommand(layout)}")
         processService.stopProcess()
-        started = false
-        throw UnsupportedOperationException("Sing-box runtime bootstrap is not implemented yet")
+        processService.runProcess(
+            context = context,
+            cmd = buildStartCommand(layout),
+            workingDirectory = layout.workingDir,
+            logFile = layout.logFile,
+        )
+        started = processService.isRunning()
+        if (!started) {
+            throw IllegalStateException("Sing-box process failed to start")
+        }
     }
 
     override fun stopLoop() {
@@ -84,5 +95,16 @@ class SingBoxEngine(
             "-c",
             layout.configFile.absolutePath,
         )
+    }
+
+    private fun ensureBinaryInstalled() {
+        val context = appContext ?: return
+        val layout = runtimeLayout ?: return
+        if (layout.binaryFile.exists()) {
+            return
+        }
+        if (!binaryInstaller.install(context, layout)) {
+            LogUtil.i(AppConfig.TAG, "No bundled sing-box binary found in assets yet")
+        }
     }
 }

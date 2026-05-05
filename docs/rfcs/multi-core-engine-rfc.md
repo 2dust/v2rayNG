@@ -99,7 +99,14 @@ The follow-up skeleton adds:
 
 - `SingBoxEngine` as a non-selected runtime implementation;
 - `SingBoxRuntimeLayout` to define stable locations for the future binary, config, and log files;
-- a placeholder process bootstrap path that writes config and prepares the future `sing-box run -c ...` command.
+- a process bootstrap path that writes config, installs the binary from apk assets when available, and prepares `sing-box run -c ...`.
+
+Expected apk asset layout for future runtime packaging:
+
+- `app/src/main/assets/sing-box/arm64-v8a/sing-box`
+- `app/src/main/assets/sing-box/armeabi-v7a/sing-box`
+- `app/src/main/assets/sing-box/x86_64/sing-box`
+- `app/src/main/assets/sing-box/x86/sing-box`
 
 The selector still resolves all profiles to `Xray`, so there is no behavior change for end users yet.
 
