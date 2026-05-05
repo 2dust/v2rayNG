@@ -93,6 +93,16 @@ The recommended Android path is:
 - integrate `sing-box` as a dedicated runtime implementation;
 - prefer process or executable isolation for `sing-box` if JNI or Go runtime conflicts appear.
 
+### Current scaffold status
+
+The follow-up skeleton adds:
+
+- `SingBoxEngine` as a non-selected runtime implementation;
+- `SingBoxRuntimeLayout` to define stable locations for the future binary, config, and log files;
+- a placeholder process bootstrap path that writes config and prepares the future `sing-box run -c ...` command.
+
+The selector still resolves all profiles to `Xray`, so there is no behavior change for end users yet.
+
 Follow-up phases:
 
 1. Add `SingBoxEngine` bootstrap and runtime lifecycle.
