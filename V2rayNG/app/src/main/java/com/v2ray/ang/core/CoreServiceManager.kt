@@ -19,6 +19,7 @@ import com.v2ray.ang.core.engine.CoreEventHandler
 import com.v2ray.ang.core.engine.CoreSelector
 import com.v2ray.ang.core.engine.CoreType
 import com.v2ray.ang.contracts.ServiceControl
+import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
@@ -207,10 +208,10 @@ object CoreServiceManager {
         }
 
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting core loop for ${config.remarks}")
-        val result = CoreConfigManager.getV2rayConfig(service, guid)
+        val result = buildRuntimeConfig(service, guid, config)
         LogUtil.d(AppConfig.TAG, result.content)
         if (!result.status) {
-            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to get V2Ray config")
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to build runtime config for ${coreEngine.type}")
             return false
         }
 
@@ -371,6 +372,28 @@ object CoreServiceManager {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to create core engine $resolvedCore", e)
             false
         }
+    }
+
+    private fun buildRuntimeConfig(service: Service, guid: String, config: ProfileItem): ConfigResult {
+        return when (coreEngine.type) {
+            CoreType.XRAY -> CoreConfigManager.getV2rayConfig(service, guid)
+            CoreType.SING_BOX -> buildSingBoxRuntimeConfig(guid, config)
+        }
+    }
+
+    private fun buildSingBoxRuntimeConfig(guid: String, config: ProfileItem): ConfigResult {
+        if (!CoreSelector.isExplicitSingBoxTestProfile(config)) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Sing-box runtime is currently limited to explicitly marked CUSTOM profiles")
+            return ConfigResult(false)
+        }
+
+        val raw = MmkvManager.decodeServerRaw(guid)
+        if (raw.isNullOrBlank()) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Missing raw sing-box config for $guid")
+            return ConfigResult(false)
+        }
+
+        return ConfigResult(true, guid, raw)
     }
 
     /**

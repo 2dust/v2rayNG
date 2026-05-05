@@ -110,6 +110,12 @@ Expected apk asset layout for future runtime packaging:
 
 The selector still resolves all profiles to `Xray`, so there is no behavior change for end users yet.
 
+Current local test entry:
+
+- only `CUSTOM` profiles are eligible;
+- a profile remark prefixed with `[sing-box]` is resolved to `SingBoxEngine`;
+- the runtime uses the raw custom JSON from MMKV instead of the Xray config builder.
+
 Follow-up phases:
 
 1. Add `SingBoxEngine` bootstrap and runtime lifecycle.
