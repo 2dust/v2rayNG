@@ -99,7 +99,9 @@ object CoreServiceManager {
      * Checks if the V2Ray service is running.
      * @return True if the service is running, false otherwise.
      */
-    fun isRunning() = coreEngine.isRunning
+    fun isRunning(): Boolean {
+        return coreEngine.isRunning || (serviceControl?.get()?.isServiceRunning() == true)
+    }
 
 
     /**
@@ -119,15 +121,17 @@ object CoreServiceManager {
             return
         }
 
-        val guid = MmkvManager.getSelectServer()
+        val guid = resolveLaunchServerGuid()
         if (guid == null) {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: No server selected")
+            context.toast(R.string.app_tile_first_use)
             return
         }
 
         val config = MmkvManager.decodeServerConfig(guid)
         if (config == null) {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to decode server config")
+            context.toast(R.string.toast_services_failure)
             return
         }
 
@@ -170,7 +174,25 @@ object CoreServiceManager {
             ContextCompat.startForegroundService(context, intent)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to start service", e)
+            context.toast(R.string.toast_services_failure)
         }
+    }
+
+    private fun resolveLaunchServerGuid(): String? {
+        val selectedGuid = MmkvManager.getSelectServer()
+        if (!selectedGuid.isNullOrBlank() && MmkvManager.decodeServerConfig(selectedGuid) != null) {
+            return selectedGuid
+        }
+
+        val fallbackGuid = MmkvManager.decodeAllServerList()
+            .firstOrNull { guid -> MmkvManager.decodeServerConfig(guid) != null }
+
+        if (!fallbackGuid.isNullOrBlank()) {
+            MmkvManager.setSelectServer(fallbackGuid)
+            LogUtil.w(AppConfig.TAG, "StartCore-Manager: Recovered missing selected server with fallback guid=$fallbackGuid")
+        }
+
+        return fallbackGuid
     }
 
     /**
@@ -211,8 +233,7 @@ object CoreServiceManager {
         val result = buildRuntimeConfig(service, guid, config)
         LogUtil.d(AppConfig.TAG, result.content)
         if (!result.status) {
-            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to build runtime config for ${coreEngine.type}")
-            return false
+            return failStart(service, "StartCore-Manager: Failed to build runtime config for ${coreEngine.type}")
         }
 
         try {
@@ -222,8 +243,7 @@ object CoreServiceManager {
             mFilter.addAction(Intent.ACTION_USER_PRESENT)
             ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to register receiver", e)
-            return false
+            return failStart(service, "StartCore-Manager: Failed to register receiver", e)
         }
 
         currentConfig = config
@@ -236,15 +256,11 @@ object CoreServiceManager {
             NotificationManager.showNotification(currentConfig)
             coreEngine.startLoop(result.content, tunFd)
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to start core loop", e)
-            return false
+            return failStart(service, "StartCore-Manager: Failed to start core loop", e)
         }
 
         if (coreEngine.isRunning == false) {
-            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Core failed to start")
-            MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
-            NotificationManager.cancelNotification()
-            return false
+            return failStart(service, "StartCore-Manager: Core failed to start")
         }
 
         try {
@@ -256,6 +272,17 @@ object CoreServiceManager {
             return false
         }
         return true
+    }
+
+    private fun failStart(service: Service, message: String, error: Exception? = null): Boolean {
+        if (error == null) {
+            LogUtil.e(AppConfig.TAG, message)
+        } else {
+            LogUtil.e(AppConfig.TAG, message, error)
+        }
+        MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, error?.message ?: message)
+        NotificationManager.cancelNotification()
+        return false
     }
 
     /**
@@ -327,6 +354,9 @@ object CoreServiceManager {
                     errorStr = e.message?.substringAfter("\":") ?: "empty message"
                 }
             }
+            if (time == -1L && errorStr.isBlank()) {
+                errorStr = service.getString(R.string.toast_failure)
+            }
 
             val result = if (time >= 0) {
                 service.getString(R.string.connection_test_available, time)
@@ -393,7 +423,7 @@ object CoreServiceManager {
             return ConfigResult(false)
         }
 
-        return ConfigResult(true, guid, raw)
+        return ConfigResult(true, guid, CoreConfigManager.normalizeSingBoxCustomConfig(raw))
     }
 
     /**
@@ -487,7 +517,7 @@ object CoreServiceManager {
             val serviceControl = serviceControl?.get() ?: return
             when (intent?.getIntExtra("key", 0)) {
                 AppConfig.MSG_REGISTER_CLIENT -> {
-                    if (coreEngine.isRunning) {
+                    if (isRunning()) {
                         MessageUtil.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_RUNNING, "")
                     } else {
                         MessageUtil.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_NOT_RUNNING, "")

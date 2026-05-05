@@ -147,6 +147,8 @@ object AppConfig {
     /** Ports and addresses for various services. */
     const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"
+    const val HEV_MAP_DNS_NETWORK = "100.64.0.0"
+    const val HEV_MAP_DNS_NETMASK = "255.192.0.0"
     const val WIREGUARD_LOCAL_ADDRESS_V4 = "172.16.0.2/32"
     const val WIREGUARD_LOCAL_ADDRESS_V6 = "2606:4700:110:8f81:d551:a0:532e:a2b3/128"
     const val WIREGUARD_LOCAL_MTU = "1420"

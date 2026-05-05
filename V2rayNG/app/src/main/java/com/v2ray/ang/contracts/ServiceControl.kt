@@ -20,6 +20,11 @@ interface ServiceControl {
     fun stopService()
 
     /**
+     * Returns whether the underlying Android service is currently active.
+     */
+    fun isServiceRunning(): Boolean
+
+    /**
      * Protects the VPN socket.
      * @param socket The socket to protect.
      * @return True if the socket is protected, false otherwise.

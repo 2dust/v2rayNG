@@ -13,6 +13,8 @@ import com.v2ray.ang.util.MyContextWrapper
 import java.lang.ref.SoftReference
 
 class CoreProxyOnlyService : Service(), ServiceControl {
+    private var isRunning = false
+
     /**
      * Initializes the service.
      */
@@ -31,6 +33,7 @@ class CoreProxyOnlyService : Service(), ServiceControl {
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         LogUtil.i(AppConfig.TAG, "StartCore-Proxy: Service command received")
+        isRunning = true
         CoreServiceManager.startCoreLoop(null)
         return START_STICKY
     }
@@ -40,6 +43,7 @@ class CoreProxyOnlyService : Service(), ServiceControl {
      */
     override fun onDestroy() {
         super.onDestroy()
+        isRunning = false
         CoreServiceManager.stopCoreLoop()
     }
 
@@ -62,7 +66,12 @@ class CoreProxyOnlyService : Service(), ServiceControl {
      * Stops the service.
      */
     override fun stopService() {
+        isRunning = false
         stopSelf()
+    }
+
+    override fun isServiceRunning(): Boolean {
+        return isRunning
     }
 
     /**

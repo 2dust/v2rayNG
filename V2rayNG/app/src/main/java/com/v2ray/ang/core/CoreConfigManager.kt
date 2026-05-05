@@ -3,7 +3,10 @@ package com.v2ray.ang.core
 import android.content.Context
 import android.text.TextUtils
 import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.core.engine.CoreSelector
+import com.v2ray.ang.core.engine.CoreType
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.CoreConfigContext
 import com.v2ray.ang.dto.ProfileItem
@@ -91,12 +94,17 @@ object CoreConfigManager {
     private fun getV2rayCustomConfig(configContext: CoreConfigContext): ConfigResult {
         val context = configContext.context
         val raw = MmkvManager.decodeServerRaw(configContext.guid) ?: return ConfigResult(false)
-        val result = ConfigResult(true, configContext.guid, raw)
+        val normalizedRaw = if (CoreSelector.resolve(configContext.selectedProfile) == CoreType.SING_BOX) {
+            normalizeSingBoxCustomConfig(raw)
+        } else {
+            raw
+        }
+        val result = ConfigResult(true, configContext.guid, normalizedRaw)
         if (!needTun()) {
             return result
         }
 
-        val json = JsonUtil.parseString(raw)?.takeIf { it.isJsonObject }?.asJsonObject ?: return result
+        val json = JsonUtil.parseString(normalizedRaw)?.takeIf { it.isJsonObject }?.asJsonObject ?: return result
 
         // Check whether package names need to be replaced with UIDs
         if (SettingsManager.canUseProcessRouting()) {
@@ -136,6 +144,185 @@ object CoreConfigManager {
         }
 
         return JsonUtil.toJsonPretty(json)?.let { ConfigResult(true, configContext.guid, it) } ?: result
+    }
+
+    fun normalizeSingBoxCustomConfig(raw: String): String {
+        val root = JsonUtil.parseString(raw)?.takeIf { it.isJsonObject }?.asJsonObject ?: return raw
+        val outboundDomain = findSingBoxOutboundDomain(root)
+        ensureSingBoxDnsBootstrap(root, outboundDomain)
+        resolveSingBoxOutboundDomains(root)
+        return JsonUtil.toJsonPretty(root) ?: raw
+    }
+
+    private fun findSingBoxOutboundDomain(root: JsonObject): String? {
+        val outbounds = root.getAsJsonArray("outbounds") ?: return null
+        outbounds.forEach { element ->
+            val outbound = element.takeIf { it.isJsonObject }?.asJsonObject ?: return@forEach
+            val tag = outbound.get("tag")?.takeIf { it.isJsonPrimitive }?.asString
+            if (tag == AppConfig.TAG_DIRECT) return@forEach
+
+            val server = outbound.get("server")?.takeIf { it.isJsonPrimitive }?.asString ?: return@forEach
+            if (!Utils.isPureIpAddress(server)) {
+                return server
+            }
+        }
+        return null
+    }
+
+    private fun ensureSingBoxDnsBootstrap(root: JsonObject, outboundDomain: String?) {
+        val directDnsDomains = listOf(
+            "alidns.com",
+            "doh.pub",
+            "dot.pub",
+            "onedns.net",
+            "dns.alidns.com",
+        )
+
+        val dnsServers = JsonArray().apply {
+            add(
+                JsonObject().apply {
+                    addProperty("type", "hosts")
+                    addProperty("tag", "hosts_dns")
+                    add(
+                        "predefined",
+                        JsonObject().apply {
+                            add("cloudflare-dns.com", JsonArray().apply {
+                                add("104.16.249.249")
+                                add("104.16.248.249")
+                            })
+                            add("one.one.one.one", JsonArray().apply {
+                                add("1.1.1.1")
+                                add("1.0.0.1")
+                            })
+                            add("dns.google", JsonArray().apply {
+                                add("8.8.8.8")
+                                add("8.8.4.4")
+                            })
+                            add("dns.alidns.com", JsonArray().apply {
+                                add("223.5.5.5")
+                                add("223.6.6.6")
+                            })
+                        }
+                    )
+                }
+            )
+            add(
+                JsonObject().apply {
+                    addProperty("type", "udp")
+                    addProperty("tag", "direct_dns")
+                    addProperty("server", AppConfig.DNS_DIRECT)
+                }
+            )
+            add(
+                JsonObject().apply {
+                    addProperty("type", "https")
+                    addProperty("tag", "remote_dns")
+                    addProperty("server", "cloudflare-dns.com")
+                    addProperty("path", "/dns-query")
+                    addProperty("domain_resolver", "hosts_dns")
+                    addProperty("detour", AppConfig.TAG_PROXY)
+                }
+            )
+        }
+
+        val dnsRules = JsonArray().apply {
+            if (!outboundDomain.isNullOrBlank()) {
+                add(
+                    JsonObject().apply {
+                        addProperty("action", "route")
+                        addProperty("server", "direct_dns")
+                        add("domain", JsonArray().apply { add(outboundDomain) })
+                    }
+                )
+            }
+            add(
+                JsonObject().apply {
+                    addProperty("action", "route")
+                    addProperty("server", "direct_dns")
+                    add("domain_suffix", JsonArray().apply {
+                        directDnsDomains.forEach { add(it) }
+                    })
+                }
+            )
+        }
+
+        root.add(
+            "dns",
+            JsonObject().apply {
+                add("servers", dnsServers)
+                add("rules", dnsRules)
+                addProperty("final", "remote_dns")
+                addProperty("independent_cache", true)
+                addProperty("strategy", "prefer_ipv4")
+            }
+        )
+
+        val route = root.getAsJsonObject("route") ?: JsonObject().also { root.add("route", it) }
+        route.add(
+            "default_domain_resolver",
+            JsonObject().apply {
+                addProperty("server", "direct_dns")
+                addProperty("strategy", "prefer_ipv4")
+            }
+        )
+        route.add(
+            "rules",
+            JsonArray().apply {
+                add(
+                    JsonObject().apply {
+                        addProperty("action", "sniff")
+                    }
+                )
+                add(
+                    JsonObject().apply {
+                        add("protocol", JsonArray().apply { add("dns") })
+                        addProperty("action", "hijack-dns")
+                    }
+                )
+                add(
+                    JsonObject().apply {
+                        addProperty("ip_is_private", true)
+                        addProperty("action", "route")
+                        addProperty("outbound", AppConfig.TAG_DIRECT)
+                    }
+                )
+                add(
+                    JsonObject().apply {
+                        add("domain_suffix", JsonArray().apply {
+                            directDnsDomains.forEach { add(it) }
+                        })
+                        addProperty("action", "route")
+                        addProperty("outbound", AppConfig.TAG_DIRECT)
+                    }
+                )
+            }
+        )
+        if (!route.has("final")) {
+            route.addProperty("final", AppConfig.TAG_PROXY)
+        }
+    }
+
+    private fun resolveSingBoxOutboundDomains(root: JsonObject) {
+        val outbounds = root.getAsJsonArray("outbounds") ?: return
+        val preferIpv6 = MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true
+
+        outbounds.forEach { element ->
+            val outbound = element.takeIf { it.isJsonObject }?.asJsonObject ?: return@forEach
+            val serverElement = outbound.get("server") ?: return@forEach
+            if (!serverElement.isJsonPrimitive || !serverElement.asJsonPrimitive.isString) return@forEach
+
+            val server = serverElement.asString
+            if (server.isBlank() || Utils.isPureIpAddress(server)) return@forEach
+
+            val resolvedIps = HttpUtil.resolveHostToIP(server, preferIpv6)
+            if (resolvedIps.isNullOrEmpty()) {
+                LogUtil.w(AppConfig.TAG, "Failed to pre-resolve sing-box outbound host: $server")
+                return@forEach
+            }
+
+            outbound.addProperty("server", resolvedIps.first())
+            LogUtil.i(AppConfig.TAG, "Pre-resolved sing-box outbound host $server -> ${resolvedIps.first()}")
+        }
     }
 
     /** Builds full config for policy-group mode. */

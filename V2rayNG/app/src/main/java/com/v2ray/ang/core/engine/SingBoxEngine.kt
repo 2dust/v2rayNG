@@ -2,8 +2,13 @@ package com.v2ray.ang.core.engine
 
 import android.content.Context
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.service.ProcessService
 import com.v2ray.ang.util.LogUtil
+import java.net.HttpURLConnection
+import java.net.InetSocketAddress
+import java.net.Proxy
+import java.net.URL
 
 class SingBoxEngine(
     private val _eventHandler: CoreEventHandler,
@@ -42,6 +47,10 @@ class SingBoxEngine(
         val layout = runtimeLayout ?: throw IllegalStateException("Sing-box runtime layout is not initialized")
 
         layout.ensureDirectories()
+        layout.logFile.parentFile?.mkdirs()
+        if (layout.logFile.exists()) {
+            layout.logFile.writeText("")
+        }
         layout.configFile.writeText(configContent)
 
         if (tunFd != 0) {
@@ -63,9 +72,19 @@ class SingBoxEngine(
             workingDirectory = layout.workingDir,
             logFile = layout.logFile,
         )
+        Thread.sleep(300L)
         started = processService.isRunning()
         if (!started) {
-            throw IllegalStateException("Sing-box process failed to start")
+            val logTail = readStartupLogTail(layout)
+            throw IllegalStateException(
+                buildString {
+                    append("Sing-box process failed to start")
+                    if (logTail.isNotBlank()) {
+                        append(": ")
+                        append(logTail)
+                    }
+                }
+            )
         }
     }
 
@@ -80,8 +99,32 @@ class SingBoxEngine(
     }
 
     override fun measureDelay(testUrl: String): Long {
-        LogUtil.d(AppConfig.TAG, "Sing-box delay test requested before runtime implementation: $testUrl")
-        return -1L
+        val url = runCatching { URL(testUrl) }.getOrElse { error ->
+            LogUtil.e(AppConfig.TAG, "Invalid sing-box delay test url: $testUrl", error)
+            return -1L
+        }
+        val proxy = Proxy(Proxy.Type.HTTP, InetSocketAddress("127.0.0.1", AppConfig.PORT_SOCKS.toInt()))
+        val startAt = System.nanoTime()
+
+        return runCatching {
+            val connection = (url.openConnection(proxy) as HttpURLConnection).apply {
+                requestMethod = "GET"
+                instanceFollowRedirects = false
+                connectTimeout = 5000
+                readTimeout = 5000
+                useCaches = false
+            }
+            connection.responseCode
+            connection.inputStream.use { it.read() }
+            ((System.nanoTime() - startAt) / 1_000_000L).coerceAtLeast(0L)
+        }.onFailure { error ->
+            LogUtil.e(AppConfig.TAG, "Sing-box delay test failed for $testUrl", error)
+        }.getOrElse { error ->
+            throw IllegalStateException(
+                error.message ?: appContext?.getString(R.string.toast_failure) ?: "Failure",
+                error
+            )
+        }
     }
 
     override fun registerProcessFinder(processFinder: AppProcessFinder) {
@@ -106,5 +149,12 @@ class SingBoxEngine(
         if (!binaryInstaller.install(context, layout)) {
             LogUtil.i(AppConfig.TAG, "No bundled sing-box binary found in assets yet")
         }
+    }
+
+    private fun readStartupLogTail(layout: SingBoxRuntimeLayout): String {
+        return runCatching {
+            if (!layout.logFile.exists()) return ""
+            layout.logFile.readText().trim().takeLast(1500)
+        }.getOrDefault("")
     }
 }

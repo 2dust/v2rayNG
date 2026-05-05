@@ -204,6 +204,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
     override fun onResume() {
         super.onResume()
+        mainViewModel.syncRunningState()
     }
 
     override fun onPause() {

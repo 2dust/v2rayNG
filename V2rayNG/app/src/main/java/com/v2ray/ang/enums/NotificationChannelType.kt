@@ -9,6 +9,11 @@ enum class NotificationChannelType(
     val channelName: String,
     val notificationId: Int
 ) {
+    SERVICE_RUNNING(
+        channelId = "service_running_channel",
+        channelName = "Service Running",
+        notificationId = 11
+    ),
     SUBSCRIPTION_UPDATE(
         channelId = "subscription_update_channel",
         channelName = "Subscription Update Service",

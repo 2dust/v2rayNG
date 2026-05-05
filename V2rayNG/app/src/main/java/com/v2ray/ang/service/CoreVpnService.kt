@@ -18,14 +18,18 @@ import androidx.annotation.RequiresApi
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.contracts.Tun2SocksControl
+import com.v2ray.ang.core.engine.CoreSelector
+import com.v2ray.ang.core.engine.CoreType
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MyContextWrapper
+import com.v2ray.ang.util.NotificationHelper
 import com.v2ray.ang.util.Utils
 import java.lang.ref.SoftReference
 
@@ -113,6 +117,7 @@ class CoreVpnService : VpnService(), ServiceControl {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service command received")
+        ensureForegroundStarted()
         setupVpnService()
         startService()
         return START_STICKY
@@ -135,8 +140,25 @@ class CoreVpnService : VpnService(), ServiceControl {
         }
     }
 
+    private fun ensureForegroundStarted() {
+        try {
+            NotificationHelper.startForeground(
+                service = this,
+                channelType = com.v2ray.ang.enums.NotificationChannelType.SERVICE_RUNNING,
+                title = getString(R.string.app_name),
+                content = getString(R.string.toast_services_start)
+            )
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to enter foreground early", e)
+        }
+    }
+
     override fun stopService() {
         stopAllService(true)
+    }
+
+    override fun isServiceRunning(): Boolean {
+        return isRunning
     }
 
     override fun vpnProtect(socket: Int): Boolean {
@@ -243,13 +265,15 @@ class CoreVpnService : VpnService(), ServiceControl {
             }
         }
 
-        // Configure DNS servers
-        //if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
-        //  builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
-        //} else {
-        SettingsManager.getVpnDnsServers().forEach {
-            if (Utils.isPureIpAddress(it)) {
-                builder.addDnsServer(it)
+        // Use the bridge-local DNS endpoint for sing-box tun2socks profiles so
+        // Android resolves hostnames through HEV mapdns instead of external UDP DNS.
+        if (shouldUseBridgeLocalDns()) {
+            builder.addDnsServer(vpnConfig.ipv4Router)
+        } else {
+            SettingsManager.getVpnDnsServers().forEach {
+                if (Utils.isPureIpAddress(it)) {
+                    builder.addDnsServer(it)
+                }
             }
         }
 
@@ -330,7 +354,8 @@ class CoreVpnService : VpnService(), ServiceControl {
      * Starts the tun2socks process with the appropriate parameters.
      */
     private fun runTun2socks() {
-        if (SettingsManager.isUsingHevTun()) {
+        val useTunBridge = shouldUseTun2SocksBridge()
+        if (useTunBridge) {
             tun2SocksService = TProxyService(
                 context = applicationContext,
                 vpnInterface = mInterface,
@@ -342,6 +367,34 @@ class CoreVpnService : VpnService(), ServiceControl {
         }
 
         tun2SocksService?.startTun2Socks()
+    }
+
+    private fun shouldUseTun2SocksBridge(): Boolean {
+        if (SettingsManager.isUsingHevTun()) {
+            return true
+        }
+
+        if (!isSingBoxProfileSelected()) {
+            return false
+        }
+
+        if (!HevTunNative.isBundled()) {
+            LogUtil.w(AppConfig.TAG, "StartCore-VPN: sing-box selected but HEV bridge is not bundled correctly")
+            return false
+        }
+
+        LogUtil.i(AppConfig.TAG, "StartCore-VPN: enabling HEV tun2socks bridge for sing-box profile")
+        return true
+    }
+
+    private fun shouldUseBridgeLocalDns(): Boolean {
+        return shouldUseTun2SocksBridge() && isSingBoxProfileSelected()
+    }
+
+    private fun isSingBoxProfileSelected(): Boolean {
+        val guid = MmkvManager.getSelectServer() ?: return false
+        val profile = MmkvManager.decodeServerConfig(guid) ?: return false
+        return CoreSelector.resolve(profile) == CoreType.SING_BOX
     }
 
     private fun stopAllService(isForced: Boolean = true) {

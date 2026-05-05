@@ -26,6 +26,7 @@ import com.v2ray.ang.handler.MmkvManager.decodeSubsList
 import com.v2ray.ang.handler.MmkvManager.decodeSubscription
 import com.v2ray.ang.handler.MmkvManager.encodeSubscription
 import com.v2ray.ang.handler.MmkvManager.removeSubscription
+import com.v2ray.ang.service.HevTunNative
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
@@ -461,7 +462,8 @@ object SettingsManager {
      * @return True if HEV TUN is used, false otherwise.
      */
     fun isUsingHevTun(): Boolean {
-        return MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true)
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true) &&
+                HevTunNative.isBundled()
     }
 
     /**

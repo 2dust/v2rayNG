@@ -3,6 +3,7 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.graphics.Bitmap
 import android.text.TextUtils
+import android.webkit.URLUtil
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.HY2
 import com.v2ray.ang.R
@@ -208,7 +209,7 @@ object AngConfigManager {
             servers.lines()
                 .distinct()
                 .forEach { str ->
-                    if (Utils.isValidSubUrl(str)) {
+                    if (isImportableSubscriptionUrl(str)) {
                         count += importUrlAsSubscription(str)
                     }
                 }
@@ -688,8 +689,15 @@ object AngConfigManager {
         val subItem = SubscriptionItem()
         subItem.remarks = uri.fragment ?: "import sub"
         subItem.url = url
+        subItem.allowInsecureUrl = URLUtil.isHttpUrl(url)
         MmkvManager.encodeSubscription("", subItem)
         return 1
+    }
+
+    private fun isImportableSubscriptionUrl(value: String?): Boolean {
+        if (value.isNullOrBlank()) return false
+        if (Utils.isValidSubUrl(value)) return true
+        return URLUtil.isHttpUrl(value) && Utils.isValidUrl(value)
     }
 
     /** Generates a description for the profile.

@@ -18,28 +18,11 @@ class TProxyService(
     private val isRunningProvider: () -> Boolean,
     private val restartCallback: () -> Unit
 ) : Tun2SocksControl {
-    companion object {
-        @JvmStatic
-        @Suppress("FunctionName")
-        private external fun TProxyStartService(configPath: String, fd: Int)
-
-        @JvmStatic
-        @Suppress("FunctionName")
-        private external fun TProxyStopService()
-
-        @JvmStatic
-        @Suppress("FunctionName")
-        private external fun TProxyGetStats(): LongArray?
-
-        init {
-            System.loadLibrary("hev-socks5-tunnel")
-        }
-    }
-
     /**
      * Starts the tun2socks process with the appropriate parameters.
      */
     override fun startTun2Socks() {
+        HevTunNative.ensureLoaded()
 //        LogUtil.i(AppConfig.TAG, "Starting HevSocks5Tunnel via JNI")
 
         val configContent = buildConfig()
@@ -51,8 +34,8 @@ class TProxyService(
 
         try {
 //            LogUtil.i(AppConfig.TAG, "TProxyStartService...")
-            TProxyStartService(configFile.absolutePath, vpnInterface.fd)
-        } catch (e: Exception) {
+            hev.htproxy.TProxyService.TProxyStartService(configFile.absolutePath, vpnInterface.fd)
+        } catch (e: Throwable) {
             LogUtil.e(AppConfig.TAG, "HevSocks5Tunnel exception: ${e.message}")
         }
     }
@@ -82,6 +65,15 @@ class TProxyService(
                 appendLine("  password: '${escapedSocksPassword}'")
             }
 
+            // Expose a DNS endpoint inside the VPN subnet so Android can resolve
+            // hostnames before the traffic reaches sing-box.
+            appendLine("mapdns:")
+            appendLine("  address: ${vpnConfig.ipv4Router}")
+            appendLine("  port: 53")
+            appendLine("  network: ${AppConfig.HEV_MAP_DNS_NETWORK}")
+            appendLine("  netmask: ${AppConfig.HEV_MAP_DNS_NETMASK}")
+            appendLine("  cache-size: 10000")
+
             // Read-write timeout settings
             val timeoutSetting = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) ?: AppConfig.HEVTUN_RW_TIMEOUT
             val parts = timeoutSetting.split(",")
@@ -102,9 +94,10 @@ class TProxyService(
      */
     override fun stopTun2Socks() {
         try {
+            HevTunNative.ensureLoaded()
             LogUtil.i(AppConfig.TAG, "TProxyStopService...")
-            TProxyStopService()
-        } catch (e: Exception) {
+            hev.htproxy.TProxyService.TProxyStopService()
+        } catch (e: Throwable) {
             LogUtil.e(AppConfig.TAG, "Failed to stop hev-socks5-tunnel", e)
         }
     }

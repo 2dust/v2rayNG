@@ -4,11 +4,11 @@
 
 This proposal introduces a runtime abstraction layer for `v2rayNG` so the app can evolve from a single embedded Xray runtime into a multi-core client that can host both `Xray` and `sing-box`.
 
-The first PR intentionally keeps runtime behavior unchanged:
+The current branch is no longer architecture-only:
 
-- `Xray` remains the only active engine.
-- Existing startup, shutdown, stats, and delay flows keep their current behavior.
-- New abstractions are added to reduce coupling between the app layer and `libv2ray`.
+- native `VMESS` / `VLESS` / `TROJAN` profiles continue to run on `Xray`;
+- explicitly marked `[sing-box]` `CUSTOM` profiles run on `SingBoxEngine`;
+- Android VPN startup, foreground-service sync, line testing, and AnyTLS raw runtime bootstrap have been exercised on device.
 
 ## Background
 
@@ -26,15 +26,16 @@ That design works well for an embedded Xray runtime, but it becomes a blocker fo
 - Introduce a stable app-level `CoreEngine` interface.
 - Isolate Xray-specific bindings behind `XrayCoreEngine`.
 - Add a single selection hook for future per-profile core resolution.
-- Keep this PR reviewable by avoiding functional changes.
-- Prepare follow-up work for `sing-box` support on Android.
+- Keep runtime selection centralized and reviewable.
+- Add a minimal but usable `sing-box` path for Android `CUSTOM` profiles.
+- Preserve existing `Xray` behavior for native profile types.
 
 ## Non-goals
 
-- Shipping `sing-box` in this PR.
-- Changing subscription parsing in this PR.
-- Changing current profile storage in this PR.
-- Claiming feature parity between `Xray` and `sing-box` yet.
+- Full feature parity between `Xray` and `sing-box`.
+- Automatic per-subscription routing for every protocol family.
+- Replacing native `Xray` handling for `VMESS` / `VLESS` / `TROJAN`.
+- Final UI or storage model for long-term multi-core metadata.
 
 ## Proposed Architecture
 
@@ -69,7 +70,8 @@ Add `CoreSelector.resolve(profile)` as a central decision point.
 
 Current behavior:
 
-- always returns `CoreType.XRAY`.
+- profiles marked as `[sing-box]` and stored as `CUSTOM` resolve to `CoreType.SING_BOX`;
+- all other native profile types currently resolve to `CoreType.XRAY`.
 
 Future behavior:
 
@@ -108,13 +110,20 @@ Expected apk asset layout for future runtime packaging:
 - `app/src/main/assets/sing-box/x86_64/sing-box`
 - `app/src/main/assets/sing-box/x86/sing-box`
 
-The selector still resolves all profiles to `Xray`, so there is no behavior change for end users yet.
-
 Current local test entry:
 
 - only `CUSTOM` profiles are eligible;
 - a profile remark prefixed with `[sing-box]` is resolved to `SingBoxEngine`;
 - the runtime uses the raw custom JSON from MMKV instead of the Xray config builder.
+
+Current Android runtime status:
+
+- `HEV tun2socks` JNI loading is gated so capability probing does not crash the VPN process;
+- `CoreVpnService` foreground startup has been tightened to avoid the prior stuck-on-start path;
+- `sing-box 1.12` DNS bootstrap is generated with `hosts_dns`, `direct_dns`, `remote_dns`, `dns.rules`, and `route.default_domain_resolver`;
+- old `SERVER_RAW` entries are normalized at runtime so existing imported nodes do not require manual re-import after every DNS-template fix;
+- `SingBoxEngine.measureDelay()` now performs a real local-proxy HTTP delay check instead of returning a placeholder failure;
+- foreground UI state is refreshed against the actual service/runtime state when returning to the app.
 
 Current parser bridge status:
 
@@ -144,13 +153,33 @@ Expected `sing-box` support areas:
 
 These targets should be implemented behind the common engine contract instead of leaking engine-specific branching into UI and service code.
 
+## Validation status
+
+Device-side regression checks completed on the current branch:
+
+- `sing-box` path:
+  - scanned/imported `[sing-box]` `CUSTOM` profiles start through `CoreVpnService`;
+  - runtime config is written under `no_backup/core-sing-box/runtime/config.json`;
+  - line test succeeds with a real delay result;
+  - `Google` is reachable in Chrome after the VPN is enabled.
+- `xray` path:
+  - imported native `VMESS` and `VLESS` profiles remain visible as native types in the server list;
+  - starting a `VMESS` node logs `Xray 26.5.3 started`;
+  - line test succeeds with a real delay result;
+  - `Google` is reachable in Chrome after the VPN is enabled.
+
+Current evidence supports the intended split:
+
+- `[sing-box]` `CUSTOM` -> `SingBoxEngine`
+- native `VMESS` / `VLESS` / `TROJAN` -> `XrayCoreEngine`
+
 ## Review strategy
 
-This PR is intentionally scoped as an architectural pre-step:
+This PR is still structured to keep the architecture understandable, but it now includes a constrained functional slice:
 
-- small enough to review safely;
-- no behavior change for current users;
-- unlocks future multi-core work without forcing a one-shot rewrite.
+- common engine abstractions and centralized selection;
+- a minimal Android-usable `sing-box` runtime path for explicit `CUSTOM` profiles;
+- regression coverage to verify that enabling `sing-box` does not break the existing `Xray` path.
 
 ## Open questions
 

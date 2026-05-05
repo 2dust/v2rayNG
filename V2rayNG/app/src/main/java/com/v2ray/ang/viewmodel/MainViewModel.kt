@@ -18,6 +18,7 @@ import com.v2ray.ang.dto.ServersCache
 import com.v2ray.ang.dto.SubscriptionCache
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.TestServiceMessage
+import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toastError
@@ -53,9 +54,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * `registerReceiver(Context, BroadcastReceiver, IntentFilter, int)`.
      */
     fun startListenBroadcast() {
-        isRunning.value = false
+        isRunning.value = CoreServiceManager.isRunning()
         val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY)
         ContextCompat.registerReceiver(getApplication(), mMsgReceiver, mFilter, Utils.receiverFlags())
+        syncRunningState()
+    }
+
+    fun syncRunningState() {
+        isRunning.value = CoreServiceManager.isRunning()
         MessageUtil.sendMsg2Service(getApplication(), AppConfig.MSG_REGISTER_CLIENT, "")
     }
 
@@ -458,6 +464,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                 AppConfig.MSG_STATE_START_FAILURE -> {
                     getApplication<AngApplication>().toastError(R.string.toast_services_failure)
+                    updateTestResultAction.value = intent.getStringExtra("content")
                     isRunning.value = false
                 }
 
