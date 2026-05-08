@@ -5,11 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.contracts.ServiceControl
+import com.v2ray.ang.enums.NotificationChannelType
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MyContextWrapper
+import com.v2ray.ang.util.NotificationHelper
 import java.lang.ref.SoftReference
 
 class CoreProxyOnlyService : Service(), ServiceControl {
@@ -33,9 +36,29 @@ class CoreProxyOnlyService : Service(), ServiceControl {
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         LogUtil.i(AppConfig.TAG, "StartCore-Proxy: Service command received")
-        isRunning = true
-        CoreServiceManager.startCoreLoop(null)
+        ensureForegroundStarted()
+        CoreServiceManager.startCoreLoopAsync(null) { ok ->
+            if (!ok) {
+                isRunning = false
+                stopSelf()
+            } else {
+                isRunning = true
+            }
+        }
         return START_STICKY
+    }
+
+    private fun ensureForegroundStarted() {
+        try {
+            NotificationHelper.startForeground(
+                service = this,
+                channelType = NotificationChannelType.SERVICE_RUNNING,
+                title = getString(R.string.app_name),
+                content = getString(R.string.toast_services_start),
+            )
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Proxy: Failed to enter foreground", e)
+        }
     }
 
     /**

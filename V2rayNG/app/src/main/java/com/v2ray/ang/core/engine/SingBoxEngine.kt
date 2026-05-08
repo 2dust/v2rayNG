@@ -1,6 +1,7 @@
 package com.v2ray.ang.core.engine
 
 import android.content.Context
+import android.os.SystemClock
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.service.ProcessService
@@ -38,7 +39,8 @@ class SingBoxEngine(
         runtimeLayout = SingBoxRuntimeLayout.fromContext(context.applicationContext).also {
             it.ensureDirectories()
         }
-        ensureBinaryInstalled()
+        // Binary install can be tens of MB from assets; keep it out of Service.onCreate / main thread.
+        // [SingBoxEngine.startLoop] runs on CoreLoopStart thread via CoreServiceManager.startCoreLoopAsync.
         LogUtil.i(AppConfig.TAG, "Sing-box runtime layout initialized at ${runtimeLayout?.rootDir}")
     }
 
@@ -72,8 +74,7 @@ class SingBoxEngine(
             workingDirectory = layout.workingDir,
             logFile = layout.logFile,
         )
-        Thread.sleep(300L)
-        started = processService.isRunning()
+        started = waitForProcessAlive(timeoutMs = 12_000L)
         if (!started) {
             val logTail = readStartupLogTail(layout)
             throw IllegalStateException(
@@ -149,6 +150,21 @@ class SingBoxEngine(
         if (!binaryInstaller.install(context, layout)) {
             LogUtil.i(AppConfig.TAG, "No bundled sing-box binary found in assets yet")
         }
+    }
+
+    /** Busy waits with short sleeps; must run off the main thread (see [CoreServiceManager.startCoreLoopAsync]). */
+    private fun waitForProcessAlive(timeoutMs: Long): Boolean {
+        val deadline = SystemClock.elapsedRealtime() + timeoutMs
+        while (SystemClock.elapsedRealtime() < deadline) {
+            if (processService.isRunning()) return true
+            try {
+                Thread.sleep(50L)
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+                return processService.isRunning()
+            }
+        }
+        return processService.isRunning()
     }
 
     private fun readStartupLogTail(layout: SingBoxRuntimeLayout): String {

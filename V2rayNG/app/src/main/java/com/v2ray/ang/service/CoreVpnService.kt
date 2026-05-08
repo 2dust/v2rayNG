@@ -133,10 +133,11 @@ class CoreVpnService : VpnService(), ServiceControl {
             LogUtil.e(AppConfig.TAG, "StartCore-VPN: Interface not initialized")
             return
         }
-        if (!CoreServiceManager.startCoreLoop(mInterface)) {
-            LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to start core loop")
-            stopAllService()
-            return
+        CoreServiceManager.startCoreLoopAsync(mInterface) { ok ->
+            if (!ok) {
+                LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to start core loop")
+                stopAllService()
+            }
         }
     }
 

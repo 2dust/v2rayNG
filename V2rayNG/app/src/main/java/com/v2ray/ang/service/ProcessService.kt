@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 class ProcessService {
     private var process: Process? = null
@@ -56,12 +57,22 @@ class ProcessService {
      * Stops the running process.
      */
     fun stopProcess() {
+        val active = process ?: return
+        process = null
         try {
             LogUtil.i(AppConfig.TAG, "runProcess destroy")
-            process?.destroy()
-            process = null
+            active.destroy()
+            val exited = active.waitFor(2L, TimeUnit.SECONDS)
+            if (!exited && active.isAlive) {
+                LogUtil.w(AppConfig.TAG, "runProcess destroy timed out; destroyForcibly")
+                active.destroyForcibly()
+                active.waitFor(500L, TimeUnit.MILLISECONDS)
+            }
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to destroy process", e)
+            runCatching {
+                if (active.isAlive) active.destroyForcibly()
+            }
         }
     }
 }

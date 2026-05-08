@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.system.OsConstants
 import androidx.core.content.ContextCompat
@@ -35,8 +37,11 @@ import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.ref.SoftReference
 import java.net.InetSocketAddress
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 object CoreServiceManager {
 
@@ -45,6 +50,21 @@ object CoreServiceManager {
     private val mMsgReceive = ReceiveMessageHandler()
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
+
+    /**
+     * Bumped when [stopCoreLoop] runs so an in-flight [startCoreLoop] (e.g. sing-box binary install)
+     * can abort cleanly instead of racing the next session — common when toggling quickly on OEM ROMs.
+     */
+    private val coreLifecycleGeneration = AtomicInteger(0)
+
+    private val coreLoopStartExecutor = Executors.newSingleThreadExecutor { runnable ->
+        Thread(runnable, "CoreLoopStart").apply {
+            isDaemon = true
+            priority = Thread.NORM_PRIORITY
+        }
+    }
+
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -200,7 +220,21 @@ object CoreServiceManager {
      * `registerReceiver(Context, BroadcastReceiver, IntentFilter, int)`.
      * Starts the V2Ray core service.
      */
+    fun startCoreLoopAsync(vpnInterface: ParcelFileDescriptor?, callback: (Boolean) -> Unit) {
+        coreLoopStartExecutor.execute {
+            val result = try {
+                startCoreLoop(vpnInterface)
+            } catch (t: Throwable) {
+                LogUtil.e(AppConfig.TAG, "StartCore-Manager: Unexpected failure starting core loop", t)
+                false
+            }
+            mainHandler.post { callback(result) }
+        }
+    }
+
     fun startCoreLoop(vpnInterface: ParcelFileDescriptor?): Boolean {
+        val generationAtStart = coreLifecycleGeneration.get()
+
         if (coreEngine.isRunning) {
             LogUtil.w(AppConfig.TAG, "StartCore-Manager: Core already running")
             return false
@@ -236,6 +270,10 @@ object CoreServiceManager {
             return failStart(service, "StartCore-Manager: Failed to build runtime config for ${coreEngine.type}")
         }
 
+        if (abortStartIfStale(service, generationAtStart, "after config build")) {
+            return false
+        }
+
         try {
             val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
             mFilter.addAction(Intent.ACTION_SCREEN_ON)
@@ -244,6 +282,10 @@ object CoreServiceManager {
             ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
         } catch (e: Exception) {
             return failStart(service, "StartCore-Manager: Failed to register receiver", e)
+        }
+
+        if (abortStartIfStale(service, generationAtStart, "after registerReceiver")) {
+            return false
         }
 
         currentConfig = config
@@ -259,6 +301,11 @@ object CoreServiceManager {
             return failStart(service, "StartCore-Manager: Failed to start core loop", e)
         }
 
+        if (abortStartIfStale(service, generationAtStart, "after startLoop")) {
+            runCatching { coreEngine.stopLoop() }
+            return false
+        }
+
         if (coreEngine.isRunning == false) {
             return failStart(service, "StartCore-Manager: Core failed to start")
         }
@@ -268,9 +315,21 @@ object CoreServiceManager {
             NotificationManager.startSpeedNotification(currentConfig)
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to complete startup", e)
+            return failStart(service, "StartCore-Manager: Failed to complete startup", e)
+        }
+        return true
+    }
+
+    private fun abortStartIfStale(service: Service, generationAtStart: Int, phase: String): Boolean {
+        if (generationAtStart == coreLifecycleGeneration.get()) {
             return false
         }
+        LogUtil.w(AppConfig.TAG, "StartCore-Manager: Aborted start ($phase) — lifecycle generation changed")
+        runCatching {
+            service.unregisterReceiver(mMsgReceive)
+        }
+        NotificationManager.cancelNotification()
+        currentConfig = null
         return true
     }
 
@@ -279,6 +338,9 @@ object CoreServiceManager {
             LogUtil.e(AppConfig.TAG, message)
         } else {
             LogUtil.e(AppConfig.TAG, message, error)
+        }
+        runCatching {
+            service.unregisterReceiver(mMsgReceive)
         }
         MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, error?.message ?: message)
         NotificationManager.cancelNotification()
@@ -291,15 +353,17 @@ object CoreServiceManager {
      * @return True if the core was stopped successfully, false otherwise.
      */
     fun stopCoreLoop(): Boolean {
+        coreLifecycleGeneration.incrementAndGet()
+
         val service = getService() ?: return false
 
         if (coreEngine.isRunning) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
+            try {
+                runBlocking(Dispatchers.IO) {
                     coreEngine.stopLoop()
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to stop V2Ray loop", e)
                 }
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to stop core loop", e)
             }
         }
 
