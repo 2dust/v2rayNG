@@ -70,7 +70,7 @@
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">Отпечаток</string>
     <string name="server_lab_stream_alpn">ALPN</string>
-    <string name="server_lab_allow_insecure">Разрешать небезопасные</string>
+    <string name="server_lab_allow_insecure">Разрешать небезопасные соединения</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">Адрес</string>
     <string name="server_lab_port3">Порт</string>
@@ -118,6 +118,8 @@
     <string name="server_lab_final_mask">Необработанный JSON FinalMask, формат: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list">ECHConfigList</string>
     <string name="server_lab_pinned_ca256">Отпечаток сертификата (SHA-256)</string>
+    <string name="server_lab_browser_dialer">Использовать переадресацию браузера</string>
+    <string name="server_lab_browser_dialer_tip">Поддерживаются только исходящие соединения XHTTP (packet-up) и WS; настройки, связанные с TLS, могут быть проигнорированы или конфликтовать</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">Невозможно скопировать файл, используйте файловый менеджер</string>
@@ -343,7 +345,7 @@
     <string name="routing_settings_locked">Постоянное (сохранится при импорте правил)</string>
     <string name="routing_settings_domain">Домен</string>
     <string name="routing_settings_ip">IP</string>
-    <string name="routing_settings_process">Процесс (название пакета; поддерживается только при использовании Xray TUN, включённой функции routeOnly и ОС Android 10+)</string>
+    <string name="routing_settings_process">Процесс (название пакета; поддерживается только при использовании Xray TUN, включённой функции «Домен только для маршрутизации» и ОС Android 10+)</string>
     <string name="routing_settings_port">Порт</string>
     <string name="routing_settings_protocol">Протокол</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
