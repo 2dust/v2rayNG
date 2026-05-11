@@ -279,7 +279,7 @@
     <string name="title_ui_settings">سامووا رابت منتوری</string>
     <string name="title_pref_ui_mode_night">سامووا هالت رابت منتوری</string>
     <string name="title_pref_use_hev_tunnel">ره وندن ویژیی Hev TUN</string>
-    <string name="summary_pref_use_hev_tunnel">مجالی ک ره ونده بۊ، TUN ز hev-socks5-tunnel و کار اگره؛ ٱر ره نوۊفته، زهمو xray-core و کار اگره.</string>
+    <string name="summary_pref_use_hev_tunnel">مجالی ک ره ونده بۊ، TUN ایا hev-socks5-tunnel ن و کار اگره؛ ٱر ره نوۊفته بۊ، همو xray-core ن و کار اگره.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun سئت گوزارشا</string>
     <string name="title_pref_hev_tunnel_rw_timeout">زمووݩ مندیر بیڌن خوندن/هؽل کردن Hev Tun (سانیه) (پؽش فرز tcp، udp 300،60)</string>
 
