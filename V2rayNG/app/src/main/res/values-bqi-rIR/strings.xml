@@ -14,7 +14,7 @@
     <string name="notification_action_stop_v2ray">واڌاشتن</string>
     <string name="toast_permission_denied">گرؽڌن موجوز مومکن نؽڌ</string>
     <string name="toast_permission_denied_notification">گرؽڌن موجوز وارسۊوی مومکن نؽڌ</string>
-    <string name="notification_action_more">سی گرؽڌن دۉسمندیا بیشتر کیلیک کوݩ</string>
+    <string name="notification_action_more">سی گرؽڌن دووسمندیا قلوه کیلیک کوݩ</string>
     <string name="toast_services_start">ره وستن خدمات</string>
     <string name="toast_services_stop">واڌاشتن خدمات</string>
     <string name="toast_services_success">ره وستن خدمات وا مووفقیت ٱنجوم وابی</string>
@@ -86,8 +86,8 @@
     <string name="server_lab_spider_x">SpiderX</string>
     <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
     <string name="server_lab_secret_key">کیلیت سیخومی</string>
-    <string name="server_lab_reserved">Reserved(اختیاری، وا کاما ز یک جوڌا ابۊن)</string>
-    <string name="server_lab_local_address">نشۊوی مهلی (اختیاری IPv4/IPv6، وا کاما ز یک جوڌا ابۊن)</string>
+    <string name="server_lab_reserved">Reserved(اختیاری، وا کاما (,) ز یک جوڌا ابۊن)</string>
+    <string name="server_lab_local_address">نشۊوی مهلی (اختیاری IPv4/IPv6، وا کاما (,) ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_mtu">Mtu(اختیاری، پؽش فرز 1420)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU (اختیاری، پؽش فرز هسته 1350)</string>
     <string name="server_lab_kcp_tti">mKCP TTI (اختیاری، پؽش فرز هسته 50)</string>
@@ -217,7 +217,7 @@
     <string name="summary_pref_ip_api_url">نشۊوی اینترنتی</string>
 
     <string name="title_pref_proxy_sharing_enabled">هشتن منپیزا ز شبکه مهلی</string>
-    <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا نشۊوی IP ایسا، ز ره socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل اعتماد ره ونده بۊ تا ز منپیز غیر موجاز جلو گری بۊ.</string>
+    <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا نشۊوی IP ایسا، ز ره socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل ائتماد ره ونده بۊ تا ز منپیز قیر موجاز جلو گری بۊ.</string>
     <string name="toast_warning_pref_proxysharing_short">منپیزا ز شبکه مهلی ن موجار کۊنین، موتمعن بۊین ک من ی شبکه قابل ائتماڌ هڌین.</string>
 
     <string name="title_pref_allow_insecure">اجازه نا ٱمن</string>
@@ -249,7 +249,7 @@
     <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موسقیمن ز (مۊرۊرگر/ی قرد ز برنومه یل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
 
     <string name="title_pref_double_column_display">ره وندن نشووݩ داڌن دو سۊتۊنی</string>
-    <string name="summary_pref_double_column_display">نومگه نمایه یل من دو سۊتۊن نشووݩ داڌه ابۊن وو چینۉ ترین موئتوا بیشتری ن سیل کۊنین. سی ره وستن، وا برنومه ن ز نۊ ره ونین.</string>
+    <string name="summary_pref_double_column_display">نومگه نمایه یل من دو سۊتۊن نشووݩ داڌه ابۊن وو چینوو ترین موئتوا بیشتری ن سیل کۊنین. سی ره وستن، وا برنومه ن ز نۊ ره ونین.</string>
 
     <string name="title_pref_group_all_display">نشووݩ داڌن پوی بونکۊ یل ن ره ونین</string>
     <string name="summary_pref_group_all_display">ی بلگه «پوی بونکۊ یل کانفیگ» ازاف کۊنین</string>
@@ -268,7 +268,7 @@
     <string name="title_pref_promotion">تبلیقات</string>
 
     <string name="title_pref_auto_update_subscription">ورۊ کردن خوتکار اشتراکا</string>
-    <string name="summary_pref_auto_update_subscription">اشتراکا خوتۉ ن و تۉر خوتکار وا فاسله زمۊوی من پس زمینه ورۊ کۊنین. ای ویژیی من پوی دسگایل گاشڌ همیشه کار نکونه</string>
+    <string name="summary_pref_auto_update_subscription">اشتراکا خوتووݩ ن و تۉر خوتکار وا فاسله زمۊوی من پس زمینه ورۊ کۊنین. ای ویژیی من پوی دسگایل گاشڌ همیشه کار نکونه</string>
     <string name="title_pref_auto_update_interval">فاسله ورۊ کردن خوتکار (اقلن وا 15 دؽقه بۊ)</string>
 
     <string name="title_core_loglevel">سئت گوزارشا</string>
@@ -290,7 +290,7 @@
     <string name="title_del_all_config">پاک کردن پوی کانفیگا بونکۊ سکویی</string>
     <string name="title_del_duplicate_config">پاک کردن کانفیگا تکراری بونکۊ سکویی</string>
     <string name="title_del_invalid_config">پاک کردن کانفیگا نا موئتبر بونکۊ سکویی</string>
-    <string name="title_export_all">و در کشیڌن کانفیگا غیر سفارشی بونکۊ سکویی من کلیپ بورد</string>
+    <string name="title_export_all">و در کشیڌن کانفیگا قیر سفارشی بونکۊ سکویی من کلیپ بورد</string>
     <string name="title_sub_setting">سامووا بونکۊ اشتراک</string>
     <string name="sub_setting_remarks">نیشتنا</string>
     <string name="sub_setting_url">نشۊوی اینترنتی اختیاری</string>
@@ -328,17 +328,17 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">نشقه دامنه</string>
     <string name="routing_settings_title">سامووا تور جوستن</string>
-    <string name="routing_settings_tips">وا کاما ز یک جوڌا ابۊن (,)؛ یکی ن بزنین: domain، ip یا process</string>
+    <string name="routing_settings_tips">وا کاما (,) ز یک جوڌا ابۊن؛ یکی ن بزنین: domain، ip یا process</string>
     <string name="routing_settings_save">زفت کردن</string>
     <string name="routing_settings_delete">روفتن</string>
-    <string name="routing_settings_rule_title">سامووا قانۉݩ تور جوستن</string>
-    <string name="routing_settings_add_rule">ازاف کردن قانۉݩ</string>
+    <string name="routing_settings_rule_title">سامووا قانووݩ تور جوستن</string>
+    <string name="routing_settings_add_rule">ازاف کردن قانووݩ</string>
     <string name="routing_settings_import_predefined_rulesets">و من ٱووردن قانووا</string>
-    <string name="routing_settings_import_rulesets_tip">قانووایی ک هیم سکو هڌسۉݩ پاک ابۊن، هنی هم اخۊی پاکسۉݩ کۊنی؟</string>
+    <string name="routing_settings_import_rulesets_tip">قانووایی ک هیم سکو هڌسووݩ پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="routing_settings_import_rulesets_from_clipboard">و من ٱووردن قانووا ز کلیپ بورد</string>
     <string name="routing_settings_import_rulesets_from_qrcode">و من ٱووردن قانووا ز QRcode</string>
     <string name="routing_settings_export_rulesets_to_clipboard">و در کشیڌن قانووا وو زفت من کلیپ بورد</string>
-    <string name="routing_settings_locked">چفت هڌ، ای قانؤنن مجال و من ٱووردن ز پؽش سامووا زفت کۊنین</string>
+    <string name="routing_settings_locked">چفت هڌ، ای قانووݩ ن مجال و من ٱووردن ز پؽش سامووا زفت کۊنین</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
     <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_port" translatable="false">port</string>
