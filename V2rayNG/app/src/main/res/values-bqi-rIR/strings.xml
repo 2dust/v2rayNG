@@ -30,7 +30,7 @@
     <string name="menu_item_import_config_clipboard">و من ٱووردن کانفیگ ز کلیپ بورد</string>
     <string name="menu_item_import_config_local">و من ٱووردن کانفیگ ز مهلی</string>
     <string name="menu_item_import_config_policy_group">ٱووردن [بونکۊ سیاست]</string>
-    <string name="menu_item_import_config_proxy_chain">Add [Proxy chain]</string>
+    <string name="menu_item_import_config_proxy_chain">ٱووردن [زنجیره پروکسی]</string>
     <string name="menu_item_import_config_manually_vmess">هؽل دستی[VMess]</string>
     <string name="menu_item_import_config_manually_vless">هؽل دستی[VLESS]</string>
     <string name="menu_item_import_config_manually_ss">هؽل دستی[Shadowsocks]</string>
@@ -177,16 +177,16 @@
     <string name="title_pref_speed_enabled">ره وندن نشووݩ داڌن سورعت</string>
     <string name="summary_pref_speed_enabled">نشووݩ داڌن سورعت هیم سکویی من وارسۊویا. نماڌ وارسۊوی و ری و کار گرؽڌن کانفیگ آلشت ابۊ.</string>
 
-    <string name="title_pref_sniffing_enabled">ره وندن Sniffing</string>
-    <string name="summary_pref_sniffing_enabled">دامنه sniff ن ز کتن امتهووݩ کۊنین (پؽش فرز رۊشن)</string>
+    <string name="title_pref_sniffing_enabled">ره وندن تجزیه وو تئلیل کتنا (Sniffing)</string>
+    <string name="summary_pref_sniffing_enabled">و کار گرؽڌن تشخیس نوم دامنه (Sniff) من کتنا (پؽش فرز رۊشن)</string>
     <string name="title_pref_route_only_enabled">ره وندن routeOnly</string>
-    <string name="summary_pref_route_only_enabled">ز نوم دامنه sniffed تینا سی تور جوستن استفاڌه کۊنین وو نشۊوی موورد نزرن و عونوان نشۊوی IP ووردارین.</string>
+    <string name="summary_pref_route_only_enabled">نوم دامنه sniffed ن تینا سی تور جوستن و کار بگیرین وو نشۊوی موورد نزرن و عونوان نشۊوی IP ووردارین.</string>
 
     <string name="title_pref_local_dns_enabled">ره وندن DNS مهلی</string>
-    <string name="summary_pref_local_dns_enabled">درخاستا DNS و هسته و من ایان وو و دست ماژول DNS پردازشت ابۊن (پؽشنهاڌ ابۊ ٱر لنگ تور جوستن سی دور زیڌن نشۊویا LAN وو وولات ٱسلی هڌین فعال بۊ)</string>
+    <string name="summary_pref_local_dns_enabled">درخاستا DNS و هسته و من ایان وو و دست ماژول DNS پردازشت ابۊن (پؽشنهاڌ ابۊ ٱر لنگ تور جوستن سی دور زیڌن نشۊویا LAN وو وولات ٱسلی هڌین ره ونده بۊ)</string>
 
     <string name="title_pref_fake_dns_enabled">ره وندن DNS جئلی</string>
-    <string name="summary_pref_fake_dns_enabled">DNS مهلی نشۊویا IP جئلی ن وورگنه (زل تر، ٱما گاشڌ من یقرد ز برنومه یل کار نکونه)</string>
+    <string name="summary_pref_fake_dns_enabled">DNS مهلی نشۊویا IP جئلی ن وورگنه (زل تر، ٱما گاشڌ من ی قرده ز برنومه یل کار نکونه)</string>
 
     <string name="title_pref_ipv6_enabled">ره وندن IPv6</string>
     <string name="summary_pref_ipv6_enabled">نشۊویا IPv6 وو تورا IPv6 ن ز رابت VPN ره ونین</string>
@@ -211,21 +211,21 @@
 
     <string name="title_pref_delay_test_url">نشۊوی اینترنتی آزمایش تئخیر واقعی</string>
     <string name="summary_pref_delay_test_url">نشۊوی اینترنتی</string>
-    <string name="title_pref_real_ping_concurrency">هموورگی آزمایش تئخیر واقعی</string>
+    <string name="title_pref_real_ping_concurrency">تعداد هوم زمووی تست تئخیر واقعی</string>
 
     <string name="title_pref_ip_api_url">نشۊوی اینترنتی آزمایش دووسمندیا منپیز هیم سکویی</string>
     <string name="summary_pref_ip_api_url">نشۊوی اینترنتی</string>
 
     <string name="title_pref_proxy_sharing_enabled">هشتن منپیزا ز شبکه مهلی</string>
-    <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا نشۊوی IP ایسا، ز ره socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل اعتماد فعال بۊ تا ز منپیز غیر موجاز جلو گری بۊ.</string>
+    <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا نشۊوی IP ایسا، ز ره socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل اعتماد ره ونده بۊ تا ز منپیز غیر موجاز جلو گری بۊ.</string>
     <string name="toast_warning_pref_proxysharing_short">منپیزا ز شبکه مهلی ن موجار کۊنین، موتمعن بۊین ک من ی شبکه قابل ائتماڌ هڌین.</string>
 
     <string name="title_pref_allow_insecure">اجازه نا ٱمن</string>
-    <string name="summary_pref_allow_insecure">مجال و کار بوردن TLS ب تۉر پؽش فرز، موجوز نا ٱمن فعال هڌ.</string>
+    <string name="summary_pref_allow_insecure">مجال و کار بوردن TLS ب تۉر پؽش فرز، موجوز نا ٱمن ره ونده هڌ.</string>
 
     <string name="title_pref_socks_port">پورت پروکسی مهلی</string>
     <string name="title_pref_enable_local_proxy">ره وندن پروکسی مهلی</string>
-    <string name="summary_pref_enable_local_proxy">هرسا قیرفعال بۊ، هیچ پروکسی SOCKS من دسرس نؽ، سی دل هیمو ورۊ رسۊوی یل اشتراک وو کارا جۊر یو نترن ز پروکسی استفاڌه کونن.</string>
+    <string name="summary_pref_enable_local_proxy">هرسا ره نوسته بۊ، هیچ پروکسی SOCKS من دسرس نؽ، سی دل هیمو ورۊ رسۊوی یل اشتراک وو کارا جۊر یو نترن پروکسی ن و کار گرن.</string>
     <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">ائراز هۊویت socks5 مجال استفاڌه ز UDP کاملن ایمن نؽ</string>
     <string name="summary_pref_socks_port">پورت پروکسی مهلی</string>
@@ -251,7 +251,7 @@
     <string name="title_pref_double_column_display">ره وندن نشووݩ داڌن دو سۊتۊنی</string>
     <string name="summary_pref_double_column_display">نومگه نمایه یل من دو سۊتۊن نشووݩ داڌه ابۊن وو چینۉ ترین موئتوا بیشتری ن سیل کۊنین. سی ره وستن، وا برنومه ن ز نۊ ره ونین.</string>
 
-    <string name="title_pref_group_all_display">نشووݩ داڌن پوی بونکۊ یل ن فعال کۊنین</string>
+    <string name="title_pref_group_all_display">نشووݩ داڌن پوی بونکۊ یل ن ره ونین</string>
     <string name="summary_pref_group_all_display">ی بلگه «پوی بونکۊ یل کانفیگ» ازاف کۊنین</string>
     <!-- AboutActivity -->
     <string name="title_pref_feedback">فشناڌن منشڌ</string>
@@ -274,12 +274,12 @@
     <string name="title_core_loglevel">سئت گوزارشا</string>
     <string name="title_outbound_domain_resolve_method">بارت پؽش هل دامنه دری</string>
     <string name="title_mode">هالت</string>
-    <string name="title_mode_help">سی دووسمندیا وو هیاری بیشتر، ری ای هؽل بزݩ</string>
+    <string name="title_mode_help">سی دووسمندیا وو هیاری قلوه، ری ای هؽل بزݩ</string>
     <string name="title_language">زووݩ</string>
     <string name="title_ui_settings">سامووا رابت منتوری</string>
     <string name="title_pref_ui_mode_night">سامووا هالت رابت منتوری</string>
-    <string name="title_pref_use_hev_tunnel">فعال کردن ویژیی Hev TUN</string>
-    <string name="summary_pref_use_hev_tunnel">مجالی ک فعال بۊ، TUN ز hev-socks5-tunnel استفاڌه اکونه؛ ٱر فعال نبۊ، زهمو xray-core استفاڌه اکونه.</string>
+    <string name="title_pref_use_hev_tunnel">ره وندن ویژیی Hev TUN</string>
+    <string name="summary_pref_use_hev_tunnel">مجالی ک ره ونده بۊ، TUN ز hev-socks5-tunnel و کار اگره؛ ٱر ره نوۊفته، زهمو xray-core و کار اگره.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun سئت گوزارشا</string>
     <string name="title_pref_hev_tunnel_rw_timeout">زمووݩ مندیر بیڌن خوندن/هؽل کردن Hev Tun (سانیه) (پؽش فرز tcp، udp 300،60)</string>
 
@@ -296,13 +296,13 @@
     <string name="sub_setting_url">نشۊوی اینترنتی اختیاری</string>
     <string name="sub_setting_user_agent">User Agent</string>
     <string name="sub_setting_filter">نوم موستعار فیلتر</string>
-    <string name="sub_setting_enable">فعال بیڌن ورۊ کردن</string>
-    <string name="sub_auto_update">فعال بیڌن ورۊ کردن خوتکار</string>
+    <string name="sub_setting_enable">ره وندن ورۊ کردن</string>
+    <string name="sub_auto_update">ره وندن ورۊ کردن خوتکار</string>
     <string name="sub_allow_insecure_url">موجاز کردن نشۊوی HTTP نا ٱمن</string>
     <string name="sub_setting_pre_profile">نوم موستعار پروکسی دیندایی</string>
     <string name="sub_setting_next_profile">نوم موستعار پروکسی نیایی</string>
     <string name="sub_setting_pre_profile_tip">موتمعن بۊ ک نوم موستعار هڌس وو جۊرس نی</string>
-    <string name="toast_invalid_update_interval">فاسله ورۊ کردن نا موئتبر هڌ. اقل مقدار 15 دؽقه هڌ.</string>
+    <string name="toast_invalid_update_interval">فاسله ورۊ کردن نا موئتبر هڌ. هدقل مقدار 15 دؽقه هڌ.</string>
     <string name="title_sub_update">ورۊ کردن اشتراک بونکۊ سکویی</string>
     <string name="title_ping_all_server">Tcping کانفیگا بونکۊ سکویی</string>
     <string name="title_real_ping_all_server">تئخیر واقعی کانفیگا بونکۊ سکویی</string>
@@ -377,12 +377,12 @@
     <string name="title_policy_group_type">نوع بونکۊ سیاست</string>
     <string name="title_policy_group_subscription_id">ز بونکۊ اشتراک</string>
     <string name="title_policy_group_subscription_filter">توزیهات فیلتر معمۊلی</string>
-    <string name="server_proxy_chain_members">اعضای زنجیره پروکسی</string>
-    <string name="server_proxy_chain_pick_members">اینجا بزنین تا عضو اِنتخاب اکه</string>
-    <string name="server_proxy_chain_member_unselected">یه عضو اِنتخاب کۊنین</string>
-    <string name="server_proxy_chain_members_unselected">لطفا سی هر ردیو زنجیره، remark اِنتخاب کۊنین</string>
-    <string name="server_proxy_chain_members_insufficient">تعداد عضوها کافی نیس</string>
-    <string name="server_proxy_chain_members_invalid">اعضای نامعتبر زنجیره: %1$s</string>
+    <string name="server_proxy_chain_members">ٱئزا زنجیره پروکسی</string>
+    <string name="server_proxy_chain_pick_members">سی پسند عوزو ایچو بزنین</string>
+    <string name="server_proxy_chain_member_unselected">ی عوزو پسند کۊنین</string>
+    <string name="server_proxy_chain_members_unselected">سی هر ردیف زنجیره remark پسند کۊنین</string>
+    <string name="server_proxy_chain_members_insufficient">تعداد ٱئزا بس نؽ</string>
+    <string name="server_proxy_chain_members_invalid">ٱئزا ناموئتبر زنجیره: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">لادراری گرؽڌن &amp; وورگندن</string>
