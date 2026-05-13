@@ -311,6 +311,16 @@ object AngConfigManager {
     private fun findMatchedProfileKey(keyToProfile: Map<String, ProfileItem>, target: ProfileItem?): String? {
         if (keyToProfile.isEmpty() || target == null) return null
 
+        // Level 0: Full match (remarks + server + port + password)
+        if (target.remarks.isNotBlank()) {
+            keyToProfile.entries.firstOrNull { (_, saved) ->
+                isSameText(saved.remarks, target.remarks) &&
+                        isSameText(saved.server, target.server) &&
+                        isSameText(saved.serverPort, target.serverPort) &&
+                        isSameText(saved.password, target.password)
+            }?.key?.let { return it }
+        }
+
         // Level 1: Match by remarks
         if (target.remarks.isNotBlank()) {
             keyToProfile.entries.firstOrNull { (_, saved) ->
