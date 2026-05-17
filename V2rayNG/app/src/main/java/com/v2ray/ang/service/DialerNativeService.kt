@@ -61,6 +61,45 @@ class DialerNativeService : IDialerService {
         private const val UNARY_BODY_WAIT_TIMEOUT_MS = 15_000L
         private val TOKEN_REGEX = Regex("""/websocket\?token=([^"'\s]+)""")
         private val METHODS_WITHOUT_BODY = setOf("GET", "HEAD")
+        private val HEADERS_BLACKLIST = hashSetOf(
+            // AI suggest:
+            "host",
+            "content-length",
+            "transfer-encoding",
+            "content-encoding",
+            "connection",
+            "upgrade",
+            "sec-websocket-key",
+            "sec-websocket-version",
+            "sec-websocket-protocol",
+            "Timing-Allow-Origin",
+            // xray
+            "Set-Cookie",
+            "Cookie",
+            "Origin",
+            "Sec-CH-UA",
+            "Sec-CH-UA-Mobile",
+            "Sec-CH-UA-Platform",
+            "DNT",
+            "User-Agent",
+            "Accept-Language",
+            "Cache-Control",
+            "Upgrade-Insecure-Requests",
+            "Sec-Fetch-Site",
+            "Sec-Fetch-Mode",
+            "Sec-Fetch-User",
+            "Sec-Fetch-Dest",
+            "Referer",
+            "Accept",
+            "Priority",
+            "Pragma",
+            "Access-Control-Allow-Origin",
+            "Access-Control-Allow-Credentials",
+            "Access-Control-Allow-Methods",
+            "Access-Control-Allow-Headers",
+            "Access-Control-Expose-Headers",
+            "Access-Control-Max-Age",
+        )
     }
 
     @Volatile
@@ -630,6 +669,11 @@ class DialerNativeService : IDialerService {
             requestBuilder.header("Cache-Control", "no-cache, no-store, must-revalidate")
             task.extra.referrer?.takeIf { it.isNotBlank() }
                 ?.let { requestBuilder.header("Referer", it) }
+            val taskHeaders = task.extra.headers.filterKeys { key ->
+                val lowerKey = key.lowercase()
+                !HEADERS_BLACKLIST.any { blackKey -> blackKey.equals(lowerKey, ignoreCase = true) }
+            }
+            taskHeaders.forEach { (key, value) -> requestBuilder.header(key, value) }
 
             val method = task.method.uppercase()
             val methodAllowsBody = method !in METHODS_WITHOUT_BODY
@@ -663,7 +707,7 @@ class DialerNativeService : IDialerService {
         val extra: Extra
     ) {
         data class Extra(
-            // val headers: Map<String, String> = emptyMap(),
+            val headers: Map<String, String> = emptyMap(),
             // val cookies: Map<String, String> = emptyMap(),
             val protocols: List<String> = emptyList(),
             val referrer: String? = null
@@ -679,7 +723,7 @@ class DialerNativeService : IDialerService {
 
                     val streamResponse = root.optBoolean("streamResponse", false)
                     val extraObject = root.optJSONObject("extra")
-                    // val headers = extraObject.optStringMap("headers")
+                    val headers = extraObject.optStringMap("headers")
                     // val cookies = extraObject.optStringMap("cookies")
                     val referrer = extraObject?.optString("referrer")?.takeIf { it.isNotBlank() }
                     val protocols = extraObject.optProtocols()
@@ -689,7 +733,7 @@ class DialerNativeService : IDialerService {
                         url = url,
                         streamResponse = streamResponse,
                         extra = Extra(
-                            // headers = headers,
+                            headers = headers,
                             // cookies = cookies,
                             protocols = protocols,
                             referrer = referrer
@@ -698,16 +742,16 @@ class DialerNativeService : IDialerService {
                 }.getOrNull()
             }
 
-            // private fun JSONObject?.optStringMap(name: String): Map<String, String> {
-            //     val child = this?.optJSONObject(name) ?: return emptyMap()
-            //     val map = LinkedHashMap<String, String>()
-            //     val iter = child.keys()
-            //     while (iter.hasNext()) {
-            //         val key = iter.next()
-            //         map[key] = child.optString(key)
-            //     }
-            //     return map
-            // }
+            private fun JSONObject?.optStringMap(name: String): Map<String, String> {
+                val child = this?.optJSONObject(name) ?: return emptyMap()
+                val map = LinkedHashMap<String, String>()
+                val iter = child.keys()
+                while (iter.hasNext()) {
+                    val key = iter.next()
+                    map[key] = child.optString(key)
+                }
+                return map
+            }
 
             private fun JSONObject?.optProtocols(): List<String> {
                 val raw = this?.opt("protocol") ?: return emptyList()
