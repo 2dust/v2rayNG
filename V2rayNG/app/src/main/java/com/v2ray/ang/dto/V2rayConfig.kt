@@ -68,7 +68,6 @@ data class V2rayConfig(
         var protocol: String,
         var settings: OutSettingsBean? = null,
         var streamSettings: StreamSettingsBean? = null,
-        val proxySettings: Any? = null,
         val sendThrough: String? = null,
         var mux: MuxBean? = MuxBean(false)
     ) {
@@ -82,7 +81,6 @@ data class V2rayConfig(
             var address: Any? = null,
             var port: Int? = null,
             /*Freedom*/
-            var domainStrategy: String? = null,
             val redirect: String? = null,
             val userLevel: Int? = null,
             /*Loopback*/
