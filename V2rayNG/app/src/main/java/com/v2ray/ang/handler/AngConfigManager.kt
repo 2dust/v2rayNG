@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.text.TextUtils
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.HY2
 import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreConfigManager
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -31,6 +30,21 @@ import java.net.URI
 
 object AngConfigManager {
 
+    // Parser mapping for different config types (lazy initialized)
+    private val configFmtParsers: Map<String, (String) -> ProfileItem?> by lazy {
+        mapOf(
+            EConfigType.VMESS.protocolScheme to VmessFmt::parse,
+            EConfigType.SHADOWSOCKS.protocolScheme to ShadowsocksFmt::parse,
+            EConfigType.SOCKS.protocolScheme to SocksFmt::parse,
+            AppConfig.SOCKS4 to SocksFmt::parse,
+            AppConfig.SOCKS5 to SocksFmt::parse,
+            EConfigType.TROJAN.protocolScheme to TrojanFmt::parse,
+            EConfigType.VLESS.protocolScheme to VlessFmt::parse,
+            EConfigType.WIREGUARD.protocolScheme to WireguardFmt::parse,
+            EConfigType.HYSTERIA2.protocolScheme to Hysteria2Fmt::parse,
+            AppConfig.HY2 to Hysteria2Fmt::parse
+        )
+    }
 
     /**
      * Shares the configuration to the clipboard.
@@ -453,22 +467,8 @@ object AngConfigManager {
                 return null
             }
 
-            val config = if (str.startsWith(EConfigType.VMESS.protocolScheme)) {
-                VmessFmt.parse(str)
-            } else if (str.startsWith(EConfigType.SHADOWSOCKS.protocolScheme)) {
-                ShadowsocksFmt.parse(str)
-            } else if (str.startsWith(EConfigType.SOCKS.protocolScheme)) {
-                SocksFmt.parse(str)
-            } else if (str.startsWith(EConfigType.TROJAN.protocolScheme)) {
-                TrojanFmt.parse(str)
-            } else if (str.startsWith(EConfigType.VLESS.protocolScheme)) {
-                VlessFmt.parse(str)
-            } else if (str.startsWith(EConfigType.WIREGUARD.protocolScheme)) {
-                WireguardFmt.parse(str)
-            } else if (str.startsWith(EConfigType.HYSTERIA2.protocolScheme) || str.startsWith(HY2)) {
-                Hysteria2Fmt.parse(str)
-            } else {
-                null
+            val config = configFmtParsers.firstNotNullOfOrNull { (scheme, parser) ->
+                if (str.startsWith(scheme)) parser(str) else null
             }
 
             if (config == null) {

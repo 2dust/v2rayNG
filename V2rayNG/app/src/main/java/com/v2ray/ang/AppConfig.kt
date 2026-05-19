@@ -180,6 +180,8 @@ object AppConfig {
     const val CUSTOM = ""
     const val SHADOWSOCKS = "ss://"
     const val SOCKS = "socks://"
+    const val SOCKS4 = "socks4://"
+    const val SOCKS5 = "socks5://"
     const val HTTP = "http://"
     const val VLESS = "vless://"
     const val TROJAN = "trojan://"
