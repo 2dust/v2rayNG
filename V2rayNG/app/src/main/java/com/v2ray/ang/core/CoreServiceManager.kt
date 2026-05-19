@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.contracts.ServiceControl
+import com.v2ray.ang.dto.OutboundTrafficStat
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
@@ -257,7 +258,7 @@ object CoreServiceManager {
         }
 
         MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
-        NotificationManager.startSpeedNotification(currentConfig)
+        NotificationManager.startSpeedNotification()
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
     }
 
@@ -299,13 +300,32 @@ object CoreServiceManager {
     }
 
     /**
-     * Queries the statistics for a given tag and link.
-     * @param tag The tag to query.
-     * @param link The link to query.
-     * @return The statistics value.
+     * Queries and resets all outbound traffic counters in one core call.
+     * Go side format: tag,direction,value;tag,direction,value;
      */
-    fun queryStats(tag: String, link: String): Long {
-        return coreController.queryStats(tag, link)
+    fun queryAllOutboundTrafficStats(): List<OutboundTrafficStat> {
+        val payload = coreController.queryAllOutboundTrafficStats()
+
+        val result = ArrayList<OutboundTrafficStat>()
+
+        payload.split(';').forEach { entry ->
+            if (entry.isBlank()) return@forEach
+
+            val parts = entry.split(',', limit = 3)
+            if (parts.size != 3) return@forEach
+
+            val value = parts[2].toLongOrNull() ?: return@forEach
+
+            result.add(
+                OutboundTrafficStat(
+                    tag = parts[0],
+                    direction = parts[1],
+                    value = value,
+                )
+            )
+        }
+//        LogUtil.d(AppConfig.TAG, "Queried outbound traffic stats: $result")
+        return result
     }
 
     /**
@@ -488,12 +508,12 @@ object CoreServiceManager {
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
                     LogUtil.i(AppConfig.TAG, "StartCore-Manager: Screen off")
-                    NotificationManager.stopSpeedNotification(currentConfig)
+                    NotificationManager.stopSpeedNotification()
                 }
 
                 Intent.ACTION_SCREEN_ON -> {
                     LogUtil.i(AppConfig.TAG, "StartCore-Manager: Screen on")
-                    NotificationManager.startSpeedNotification(currentConfig)
+                    NotificationManager.startSpeedNotification()
                 }
             }
         }

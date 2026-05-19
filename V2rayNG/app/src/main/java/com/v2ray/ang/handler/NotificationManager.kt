@@ -43,53 +43,15 @@ object NotificationManager {
      * Starts the speed notification.
      * @param currentConfig The current profile configuration.
      */
-    fun startSpeedNotification(currentConfig: ProfileItem?) {
+    fun startSpeedNotification() {
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) != true) return
         if (speedNotificationJob != null || CoreServiceManager.isRunning() == false) return
 
         var lastZeroSpeed = false
-        val outboundTags = currentConfig?.getAllOutboundTags()
-        outboundTags?.remove(AppConfig.TAG_DIRECT)
 
         speedNotificationJob = CoroutineScope(Dispatchers.IO).launch {
             while (isActive) {
-                val queryTime = System.currentTimeMillis()
-                val sinceLastQueryIn = (queryTime - lastQueryTime)
-
-                // If the query interval is too short, skip this round to avoid excessive CPU usage
-                if (sinceLastQueryIn < QUERY_INTERVAL_MS) {
-                    LogUtil.w(AppConfig.TAG, "Query interval too short: ${sinceLastQueryIn}ms, skipping")
-                    lastQueryTime = queryTime
-                    delay(QUERY_INTERVAL_MS)
-                    continue
-                }
-                val sinceLastQueryInSeconds = sinceLastQueryIn / 1000.0
-
-                var proxyTotal = 0L
-                val text = StringBuilder()
-                outboundTags?.forEach {
-                    val up = CoreServiceManager.queryStats(it, AppConfig.UPLINK)
-                    val down = CoreServiceManager.queryStats(it, AppConfig.DOWNLINK)
-                    if (up + down > 0) {
-                        appendSpeedString(text, it, up / sinceLastQueryInSeconds, down / sinceLastQueryInSeconds)
-                        proxyTotal += up + down
-                    }
-                }
-                val directUplink = CoreServiceManager.queryStats(AppConfig.TAG_DIRECT, AppConfig.UPLINK)
-                val directDownlink = CoreServiceManager.queryStats(AppConfig.TAG_DIRECT, AppConfig.DOWNLINK)
-                val zeroSpeed = proxyTotal == 0L && directUplink == 0L && directDownlink == 0L
-                if (!zeroSpeed || !lastZeroSpeed) {
-                    if (proxyTotal == 0L) {
-                        appendSpeedString(text, outboundTags?.firstOrNull(), 0.0, 0.0)
-                    }
-                    appendSpeedString(
-                        text, AppConfig.TAG_DIRECT, directUplink / sinceLastQueryInSeconds,
-                        directDownlink / sinceLastQueryInSeconds
-                    )
-                    updateNotification(text.toString(), proxyTotal, directDownlink + directUplink)
-                }
-                lastZeroSpeed = zeroSpeed
-                lastQueryTime = queryTime
+                lastZeroSpeed = updateSpeedNotificationOnce(lastZeroSpeed)
                 delay(QUERY_INTERVAL_MS)
             }
         }
@@ -168,13 +130,12 @@ object NotificationManager {
 
     /**
      * Stops the speed notification.
-     * @param currentConfig The current profile configuration.
      */
-    fun stopSpeedNotification(currentConfig: ProfileItem?) {
+    fun stopSpeedNotification() {
         speedNotificationJob?.let {
             it.cancel()
             speedNotificationJob = null
-            updateNotification(currentConfig?.remarks, 0, 0)
+            updateNotification("", 0, 0)
         }
     }
 
@@ -245,6 +206,69 @@ object NotificationManager {
             text.append("\t")
         }
         text.append("•  ${up.toLong().toSpeedString()}↑  ${down.toLong().toSpeedString()}↓\n")
+    }
+
+    /**
+     * Updates the speed notification once.
+     * Queries traffic stats, separates proxy and direct, and updates the notification.
+     * @param lastZeroSpeed The previous zero speed state.
+     * @return The current zero speed state.
+     */
+    private fun updateSpeedNotificationOnce(lastZeroSpeed: Boolean): Boolean {
+        val queryTime = System.currentTimeMillis()
+        val sinceLastQueryIn = (queryTime - lastQueryTime)
+
+        // If the query interval is too short, skip this round to avoid excessive CPU usage
+        if (sinceLastQueryIn < QUERY_INTERVAL_MS) {
+            LogUtil.w(AppConfig.TAG, "Query interval too short: ${sinceLastQueryIn}ms, skipping")
+            lastQueryTime = queryTime
+            return lastZeroSpeed
+        }
+        val sinceLastQueryInSeconds = sinceLastQueryIn / 1000.0
+
+        var proxyUplink = 0L
+        var proxyDownlink = 0L
+        var directUplink = 0L
+        var directDownlink = 0L
+
+        CoreServiceManager.queryAllOutboundTrafficStats().forEach { stat ->
+            when {
+                stat.tag == AppConfig.TAG_DIRECT -> {
+                    when (stat.direction) {
+                        AppConfig.UPLINK -> directUplink += stat.value
+                        AppConfig.DOWNLINK -> directDownlink += stat.value
+                    }
+                }
+
+                stat.tag.startsWith(AppConfig.TAG_PROXY) -> {
+                    when (stat.direction) {
+                        AppConfig.UPLINK -> proxyUplink += stat.value
+                        AppConfig.DOWNLINK -> proxyDownlink += stat.value
+                    }
+                }
+            }
+        }
+
+        val proxyTotal = proxyUplink + proxyDownlink
+        val directTotal = directUplink + directDownlink
+        val zeroSpeed = proxyTotal + directTotal == 0L
+        if (!zeroSpeed || !lastZeroSpeed) {
+            val text = StringBuilder()
+            appendSpeedString(
+                text, AppConfig.TAG_PROXY,
+                proxyUplink / sinceLastQueryInSeconds,
+                proxyDownlink / sinceLastQueryInSeconds
+            )
+
+            appendSpeedString(
+                text, AppConfig.TAG_DIRECT,
+                directUplink / sinceLastQueryInSeconds,
+                directDownlink / sinceLastQueryInSeconds
+            )
+            updateNotification(text.toString(), proxyTotal, directTotal)
+        }
+        lastQueryTime = queryTime
+        return zeroSpeed
     }
 
     /**

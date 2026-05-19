@@ -76,10 +76,6 @@ data class ProfileItem(
         }
     }
 
-    fun getAllOutboundTags(): MutableList<String> {
-        return mutableListOf(AppConfig.TAG_PROXY, AppConfig.TAG_DIRECT, AppConfig.TAG_BLOCKED)
-    }
-
     fun getServerAddressAndPort(): String {
         if (server.isNullOrEmpty() && configType == EConfigType.CUSTOM) {
             return "${AppConfig.LOOPBACK}:${AppConfig.PORT_SOCKS}"
