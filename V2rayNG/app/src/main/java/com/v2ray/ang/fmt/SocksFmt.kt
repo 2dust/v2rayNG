@@ -26,7 +26,11 @@ object SocksFmt : FmtBase() {
         config.serverPort = uri.port.toString()
 
         if (uri.userInfo?.isEmpty() == false) {
-            val result = Utils.decode(uri.userInfo).split(":", limit = 2)
+            val result = if (uri.userInfo.contains(":")) {
+                uri.userInfo.split(":", limit = 2)
+            } else {
+                Utils.decode(uri.userInfo).split(":", limit = 2)
+            }
             if (result.count() == 2) {
                 config.username = result.first()
                 config.password = result.last()
