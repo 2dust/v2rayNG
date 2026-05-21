@@ -36,6 +36,23 @@ object JsonUtil {
     }
 
     /**
+     * Safely parses a JSON string into an object of the specified class.
+     * Returns null if parsing fails instead of throwing an exception.
+     *
+     * @param src The JSON string to parse.
+     * @param cls The class of the object to parse into.
+     * @return The parsed object, or null if parsing fails.
+     */
+    fun <T> fromJsonSafe(src: String, cls: Class<T>): T? {
+        return try {
+            gson.fromJson(src, cls)
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to parse JSON", e)
+            null
+        }
+    }
+
+    /**
      * Converts an object to its pretty-printed JSON representation.
      *
      * @param src The object to convert.

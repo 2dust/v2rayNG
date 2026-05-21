@@ -45,11 +45,11 @@ object UpdateCheckerManager {
         }
 
         val latestRelease = if (includePreRelease) {
-            JsonUtil.fromJson(response, Array<GitHubRelease>::class.java)
+            JsonUtil.fromJsonSafe(response, Array<GitHubRelease>::class.java)
                 ?.firstOrNull()
                 ?: throw IllegalStateException("No pre-release found")
         } else {
-            JsonUtil.fromJson(response, GitHubRelease::class.java)
+            JsonUtil.fromJsonSafe(response, GitHubRelease::class.java)
         }
         if (latestRelease == null) {
             return@withContext CheckUpdateResult(hasUpdate = false)

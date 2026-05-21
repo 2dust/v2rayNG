@@ -98,7 +98,7 @@ object SpeedtestManager {
                 proxyPassword = proxyPassword
             )
         ) ?: return null
-        val ipInfo = JsonUtil.fromJson(content, IPAPIInfo::class.java) ?: return null
+        val ipInfo = JsonUtil.fromJsonSafe(content, IPAPIInfo::class.java) ?: return null
 
         val ip = listOf(
             ipInfo.ip,

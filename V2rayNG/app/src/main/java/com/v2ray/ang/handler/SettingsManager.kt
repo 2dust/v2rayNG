@@ -73,7 +73,7 @@ object SettingsManager {
             return null
         }
 
-        return JsonUtil.fromJson(assets, Array<RulesetItem>::class.java)?.toMutableList()
+        return JsonUtil.fromJsonSafe(assets, Array<RulesetItem>::class.java)?.toMutableList()
     }
 
     /**
@@ -97,7 +97,7 @@ object SettingsManager {
         }
 
         try {
-            val rulesetList = JsonUtil.fromJson(content, Array<RulesetItem>::class.java)?.toMutableList()
+            val rulesetList = JsonUtil.fromJsonSafe(content, Array<RulesetItem>::class.java)?.toMutableList()
             if (rulesetList.isNullOrEmpty()) {
                 return false
             }
@@ -191,7 +191,7 @@ object SettingsManager {
         val config = decodeServerConfig(guid) ?: return false
         if (config.configType == EConfigType.CUSTOM) {
             val raw = MmkvManager.decodeServerRaw(guid) ?: return false
-            val v2rayConfig = JsonUtil.fromJson(raw, V2rayConfig::class.java)
+            val v2rayConfig = JsonUtil.fromJsonSafe(raw, V2rayConfig::class.java)
             val exist = v2rayConfig?.routing?.rules?.filter { it.outboundTag == TAG_DIRECT }?.any {
                 it.domain?.contains(GEOSITE_PRIVATE) == true || it.ip?.contains(GEOIP_PRIVATE) == true
             }
@@ -571,7 +571,7 @@ object SettingsManager {
             return
         }
 
-        val guids = JsonUtil.fromJson(oldJson, Array<String>::class.java) ?: run {
+        val guids = JsonUtil.fromJsonSafe(oldJson, Array<String>::class.java) ?: run {
             MmkvManager.encodeSettings(migrationKey, true)
             return
         }
