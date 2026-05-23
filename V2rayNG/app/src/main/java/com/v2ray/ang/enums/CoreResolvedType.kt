@@ -5,5 +5,4 @@ enum class CoreResolvedType {
     NORMAL,
     POLICYGROUP,
     PROXYCHAIN,
-    CUSTOM,
 }

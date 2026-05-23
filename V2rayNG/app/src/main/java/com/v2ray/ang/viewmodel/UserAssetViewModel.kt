@@ -2,9 +2,9 @@ package com.v2ray.ang.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
-import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.extension.concatUrl
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.HttpUtil

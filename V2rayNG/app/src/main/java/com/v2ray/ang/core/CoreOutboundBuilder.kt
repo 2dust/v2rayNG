@@ -3,8 +3,8 @@ package com.v2ray.ang.core
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
+import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.isNotNullEmpty

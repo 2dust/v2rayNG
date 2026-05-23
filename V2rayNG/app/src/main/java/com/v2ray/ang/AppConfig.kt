@@ -105,7 +105,8 @@ object AppConfig {
     const val TAG_FRAGMENT = "fragment"
     const val TAG_DNS = "dns-module"
     const val TAG_DOMESTIC_DNS = "domestic-dns"
-    const val TAG_BALANCER = "proxy-round"
+    const val TAG_BALANCER = "balancer-main"
+    const val TAG_BALANCER_PRE = "balancer"
 
     /** Network-related constants. */
     const val UPLINK = "uplink"
