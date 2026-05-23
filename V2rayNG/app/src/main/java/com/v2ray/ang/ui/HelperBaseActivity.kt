@@ -56,9 +56,7 @@ abstract class HelperBaseActivity : BaseActivity() {
         mimeType: String = "*/*",
         onResult: (Uri?) -> Unit
     ) {
-        checkAndRequestPermission(PermissionType.READ_STORAGE) {
-            fileChooser.launch(mimeType, onResult)
-        }
+        fileChooser.launch(mimeType, onResult)
     }
 
     /**

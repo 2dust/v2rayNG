@@ -176,7 +176,20 @@ object CoreServiceManager {
             Intent(context.applicationContext, CoreProxyOnlyService::class.java)
         }
 
-        ContextCompat.startForegroundService(context, intent)
+        try {
+            ContextCompat.startForegroundService(context, intent)
+        } catch (e: SecurityException) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Missing permission to start foreground service", e)
+            throw IllegalStateException(e.message ?: e.javaClass.simpleName, e)
+        } catch (e: RuntimeException) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                e.javaClass.name == "android.app.ForegroundServiceStartNotAllowedException"
+            ) {
+                LogUtil.e(AppConfig.TAG, "StartCore-Manager: Foreground service start not allowed", e)
+                throw IllegalStateException(e.message ?: e.javaClass.simpleName, e)
+            }
+            throw e
+        }
     }
 
     /**
