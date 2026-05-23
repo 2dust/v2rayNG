@@ -55,18 +55,13 @@ class ServerProxyChainActivity : BaseActivity() {
     }
 
     private fun loadAvailableRemarks() {
-        allRemarks = MmkvManager.decodeAllServerList()
-            .asSequence()
-            .mapNotNull { guid -> MmkvManager.decodeServerConfig(guid) }
-            .filter { profile ->
-                profile.configType != EConfigType.CUSTOM
-                        && profile.configType != EConfigType.POLICYGROUP
-                        && profile.configType != EConfigType.PROXYCHAIN
-            }
-            .map { it.remarks.trim() }
-            .filter { it.isNotEmpty() }
-            .distinct()
-            .toList()
+        allRemarks = SettingsManager.getProfileRemarks(
+            excludeConfigTypes = setOf(
+                EConfigType.CUSTOM,
+                EConfigType.POLICYGROUP,
+                EConfigType.PROXYCHAIN,
+            )
+        )
     }
 
     private fun setupRecycler() {

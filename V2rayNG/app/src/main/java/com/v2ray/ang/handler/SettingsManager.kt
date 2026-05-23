@@ -247,6 +247,20 @@ object SettingsManager {
     }
 
     /**
+     * Collects non-empty profile remarks while excluding specific config types.
+     */
+    fun getProfileRemarks(excludeConfigTypes: Set<EConfigType> = setOf(EConfigType.CUSTOM)): List<String> {
+        return decodeAllServerList()
+            .asSequence()
+            .mapNotNull { guid -> decodeServerConfig(guid) }
+            .filter { profile -> profile.configType !in excludeConfigTypes }
+            .map { it.remarks.trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
+            .toList()
+    }
+
+    /**
      * Removes the subscription.
      * If there are no remaining subscriptions,
      * it creates a new default subscription to ensure that ungroup

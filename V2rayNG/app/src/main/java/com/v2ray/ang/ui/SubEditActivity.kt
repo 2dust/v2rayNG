@@ -13,6 +13,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivitySubEditBinding
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
@@ -78,10 +79,13 @@ class SubEditActivity : BaseActivity() {
     }
 
     private fun setupProfileRemarkInputs() {
-        val suggestions = MmkvManager.decodeAllServerList()
-            .mapNotNull { id -> MmkvManager.decodeServerConfig(id)?.remarks }
-            .filter { it.isNotBlank() }
-            .distinct()
+        val suggestions = SettingsManager.getProfileRemarks(
+            excludeConfigTypes = setOf(
+                EConfigType.CUSTOM,
+                EConfigType.POLICYGROUP,
+                EConfigType.PROXYCHAIN,
+            )
+        )
 
         setupProfileRemarkInput(binding.etPreProfile, binding.btnPreProfileDropdown, suggestions)
         setupProfileRemarkInput(binding.etNextProfile, binding.btnNextProfileDropdown, suggestions)

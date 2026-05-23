@@ -15,7 +15,6 @@ import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
@@ -78,9 +77,7 @@ class RoutingEditActivity : BaseActivity() {
      * The dropdown button triggers showing the full list without typing.
      */
     private fun setupOutboundTagInput() {
-        val profileRemarks = MmkvManager.decodeAllServerList()
-            .mapNotNull { id -> MmkvManager.decodeServerConfig(id)?.remarks }
-            .filter { it.isNotBlank() }
+        val profileRemarks = SettingsManager.getProfileRemarks()
 
         val suggestions = (BUILTIN_OUTBOUND_TAGS.toList() + profileRemarks).distinct()
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, suggestions)
