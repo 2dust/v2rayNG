@@ -286,6 +286,7 @@
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">复制</string>
     <string name="logcat_clear">清除</string>
+    <string name="logcat_share">分享日志</string>
     <string name="title_service_restart">服务重启</string>
     <string name="title_del_all_config">删除配置</string>
     <string name="title_del_duplicate_config">删除重复配置</string>

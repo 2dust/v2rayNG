@@ -286,6 +286,7 @@
     <string name="title_logcat">گوزارشا</string>
     <string name="logcat_copy">لف گیری</string>
     <string name="logcat_clear">روفتن</string>
+    <string name="logcat_share">Share log</string>
     <string name="title_service_restart">ره وندن دووارته خدمات</string>
     <string name="title_del_all_config">پاک کردن پوی کانفیگا بونکۊ سکویی</string>
     <string name="title_del_duplicate_config">پاک کردن کانفیگا تکراری بونکۊ سکویی</string>

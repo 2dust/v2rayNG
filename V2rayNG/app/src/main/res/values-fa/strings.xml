@@ -283,6 +283,7 @@
     <string name="title_logcat">گزارشات</string>
     <string name="logcat_copy">کپی</string>
     <string name="logcat_clear">پاک کردن</string>
+    <string name="logcat_share">اشتراک‌گذاری گزارش</string>
     <string name="title_service_restart">راه‌اندازی مجدد خدمات</string>
     <string name="title_del_all_config">حذف تمام کانفیگ های گروه فعلی</string>
     <string name="title_del_duplicate_config">حذف کانفیگ های تکراری گروه فعلی</string>

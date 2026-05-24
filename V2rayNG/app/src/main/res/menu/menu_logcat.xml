@@ -17,4 +17,9 @@
         android:icon="@drawable/ic_copy"
         android:title="@string/logcat_copy"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/share_all"
+        android:icon="@drawable/ic_share_24dp"
+        android:title="@string/logcat_share"
+        app:showAsAction="ifRoom" />
 </menu>
