@@ -279,11 +279,12 @@ object AngConfigManager {
      * @return Map of generated keys to their corresponding ProfileItem.
      */
     private fun batchSaveConfigs(configs: List<ProfileItem>, subid: String): Map<String, ProfileItem> {
+        var firstProfileKey: String? = null
         val keyToProfile = mutableMapOf<String, ProfileItem>()
 
         // Read serverList once
         val serverList = MmkvManager.decodeServerList(subid)
-        var needSetSelected = MmkvManager.getSelectServer().isNullOrBlank()
+        val needSetSelected = MmkvManager.getSelectServer().isNullOrBlank()
 
         configs.forEach { config ->
             val key = Utils.getUuid()
@@ -292,12 +293,13 @@ object AngConfigManager {
 
             if (!serverList.contains(key)) {
                 serverList.add(0, key)
-                if (needSetSelected) {
-                    MmkvManager.setSelectServer(key)
-                    needSetSelected = false
-                }
             }
             keyToProfile[key] = config
+            firstProfileKey = key
+        }
+
+        if (needSetSelected) {
+            firstProfileKey?.let { MmkvManager.setSelectServer(it) }
         }
 
         // Write serverList once
@@ -414,6 +416,8 @@ object AngConfigManager {
                         MmkvManager.removeServerViaSubid(subid)
                     }
 
+                    val needSetSelected = MmkvManager.getSelectServer().isNullOrBlank()
+                    var firstProfileKey: String? = null
                     val keyToProfile = mutableMapOf<String, ProfileItem>()
 
                     var count = 0
@@ -424,11 +428,18 @@ object AngConfigManager {
                         val key = MmkvManager.encodeServerConfig("", config)
                         MmkvManager.encodeServerRaw(key, JsonUtil.toJsonPretty(srv) ?: "")
                         keyToProfile[key] = config
+                        firstProfileKey = key
                         count += 1
                     }
 
+                    // Restore previous active profile or select the first profile on fresh import
                     val matchKey = findMatchedProfileKey(keyToProfile, activeSubProfile)
-                    matchKey?.let { MmkvManager.setSelectServer(it) }
+                    if (matchKey != null) {
+                        MmkvManager.setSelectServer(matchKey)
+                    } else if (needSetSelected) {
+                        firstProfileKey?.let { MmkvManager.setSelectServer(it) }
+                    }
+
                     return count
                 }
             } catch (e: Exception) {
