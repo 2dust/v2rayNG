@@ -234,15 +234,10 @@ object AngConfigManager {
             if (servers == null) {
                 return 0
             }
+
             //  Find the currently selected server that matches the subscription ID
-            val removedSelected = if (subid.isNotBlank() && !append) {
-                MmkvManager.getSelectServer()
-                    .takeIf { it?.isNotBlank() == true }
-                    ?.let { MmkvManager.decodeServerConfig(it) }
-                    ?.takeIf { it.subscriptionId == subid }
-            } else {
-                null
-            }
+            val activeSubProfile = if (!append) getActiveSubProfile(subid)
+            else null
 
             val subItem = MmkvManager.decodeSubscription(subid)
 
@@ -264,7 +259,7 @@ object AngConfigManager {
                     MmkvManager.removeServerViaSubid(subid)
                 }
                 val keyToProfile = batchSaveConfigs(configs, subid)
-                val matchKey = findMatchedProfileKey(keyToProfile, removedSelected)
+                val matchKey = findMatchedProfileKey(keyToProfile, activeSubProfile)
                 matchKey?.let { MmkvManager.setSelectServer(it) }
             }
 
@@ -308,6 +303,21 @@ object AngConfigManager {
         // Write serverList once
         MmkvManager.encodeServerList(serverList, subid)
         return keyToProfile
+    }
+
+    /**
+     * Gets the currently selected profile for the specified subscription.
+     *
+     * @param subid The subscription ID.
+     * @return The selected profile if it belongs to the subscription; otherwise null.
+     */
+    private fun getActiveSubProfile(subid: String): ProfileItem? {
+        if (subid.isBlank()) return null
+
+        return MmkvManager.getSelectServer()
+            .takeIf { it?.isNotBlank() == true }
+            ?.let { MmkvManager.decodeServerConfig(it) }
+            ?.takeIf { it.subscriptionId == subid }
     }
 
     /**
@@ -392,6 +402,10 @@ object AngConfigManager {
             && server.contains("routing")
         ) {
             try {
+                //  Find the currently selected server that matches the subscription ID
+                val activeSubProfile = if (!append) getActiveSubProfile(subid)
+                else null
+
                 val serverList: Array<Any> =
                     JsonUtil.fromJson(server, Array<Any>::class.java) ?: arrayOf()
 
@@ -399,6 +413,9 @@ object AngConfigManager {
                     if (!append) {
                         MmkvManager.removeServerViaSubid(subid)
                     }
+
+                    val keyToProfile = mutableMapOf<String, ProfileItem>()
+
                     var count = 0
                     for (srv in serverList.reversed()) {
                         val config = CustomFmt.parse(JsonUtil.toJson(srv)) ?: continue
@@ -406,8 +423,12 @@ object AngConfigManager {
                         config.description = generateDescription(config)
                         val key = MmkvManager.encodeServerConfig("", config)
                         MmkvManager.encodeServerRaw(key, JsonUtil.toJsonPretty(srv) ?: "")
+                        keyToProfile[key] = config
                         count += 1
                     }
+
+                    val matchKey = findMatchedProfileKey(keyToProfile, activeSubProfile)
+                    matchKey?.let { MmkvManager.setSelectServer(it) }
                     return count
                 }
             } catch (e: Exception) {
