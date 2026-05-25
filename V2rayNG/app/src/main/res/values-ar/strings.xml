@@ -286,6 +286,7 @@
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">نسخ</string>
     <string name="logcat_clear">مسح</string>
+    <string name="logcat_share">مشاركة السجل</string>
     <string name="title_service_restart">إعادة تشغيل الخدمة</string>
     <string name="title_del_all_config">حذف جميع الإعدادات (قبل أول خطوة)</string>
     <string name="title_del_duplicate_config">حذف الإعدادات المكررة (2)</string>

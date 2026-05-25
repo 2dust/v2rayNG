@@ -286,6 +286,7 @@
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Sao chép</string>
     <string name="logcat_clear">Xoá</string>
+    <string name="logcat_share">Chia sẻ nhật ký</string>
     <string name="title_service_restart">Khởi động lại dịch vụ lõi</string>
     <string name="title_del_all_config">Xoá tất cả cấu hình</string>
     <string name="title_del_duplicate_config">Xoá cấu hình trùng lặp</string>

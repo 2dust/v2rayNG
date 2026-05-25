@@ -291,6 +291,7 @@
     <string name="title_logcat">Журнал</string>
     <string name="logcat_copy">Копировать</string>
     <string name="logcat_clear">Очистить</string>
+    <string name="logcat_share">Поделиться логом</string>
     <string name="title_service_restart">Перезапуск службы</string>
     <string name="title_del_all_config">Удалить профили</string>
     <string name="title_del_duplicate_config">Удалить дубликаты профилей</string>
