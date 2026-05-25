@@ -19,6 +19,7 @@ import com.v2ray.ang.databinding.FragmentGroupServerBinding
 import com.v2ray.ang.databinding.ItemQrcodeBinding
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -269,9 +270,7 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
         }
 
         override fun onShare(guid: String, profile: ProfileItem, position: Int, more: Boolean) {
-            val isCustom = profile.configType == EConfigType.CUSTOM
-                    || profile.configType == EConfigType.POLICYGROUP
-                    || profile.configType == EConfigType.PROXYCHAIN
+            val isCustom = profile.configType.isComplexType()
 
             val (shareOptions, skip) = if (more) {
                 val options = if (isCustom) share_method_more.asList().takeLast(3) else share_method_more.asList()
