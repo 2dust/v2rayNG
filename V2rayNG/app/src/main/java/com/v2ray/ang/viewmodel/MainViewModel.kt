@@ -18,6 +18,7 @@ import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -296,16 +297,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Removes duplicate servers.
+     * Excludes servers with complex types (Custom, PolicyGroup, or ProxyChain) from duplicate comparison.
      * @return The number of removed servers.
      */
     fun removeDuplicateServer(): Int {
         val serversCacheCopy = serversCache.toList().toMutableList()
         val deleteServer = mutableListOf<String>()
+
         serversCacheCopy.forEachIndexed { index, sc ->
             val profile = sc.profile
+            // Skip if this profile has a complex config type
+            if (profile.configType.isComplexType()) {
+                return@forEachIndexed
+            }
+
             serversCacheCopy.forEachIndexed { index2, sc2 ->
                 if (index2 > index) {
                     val profile2 = sc2.profile
+                    // Skip if the second profile has a complex config type
+                    if (profile2.configType.isComplexType()) {
+                        return@forEachIndexed
+                    }
+
                     if (profile == profile2 && !deleteServer.contains(sc2.guid)) {
                         deleteServer.add(sc2.guid)
                     }
