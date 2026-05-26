@@ -58,7 +58,7 @@ class MainRecyclerAdapter(
             //Name address
             holder.itemMainBinding.tvName.text = profile.remarks
             holder.itemMainBinding.tvStatistics.text = getAddress(profile)
-            holder.itemMainBinding.tvType.text = profile.configType.name
+            holder.itemMainBinding.tvType.text = getProtocolDescription(profile)
 
             //TestResult
             val aff = MmkvManager.decodeServerAffiliationInfo(guid)
@@ -138,6 +138,36 @@ class MainRecyclerAdapter(
             else
                 null
         return subRemarks?.toString() ?: ""
+    }
+
+    private fun getProtocolDescription(profile: ProfileItem): String {
+        val parts = mutableListOf<String>()
+
+        parts.add(profile.configType.name)
+
+        // Flow: only show vision / vision-udp443
+        profile.flow?.lowercase()?.let { flow ->
+            when {
+                flow.contains("vision-udp443") -> parts.add("vision-udp443")
+                flow.contains("vision") -> parts.add("vision")
+            }
+        }
+
+        // Transport: hide tcp or blank
+        profile.network?.let { net ->
+            if (net.isNotBlank() && !net.equals("tcp", ignoreCase = true)) {
+                parts.add(net)
+            }
+        }
+
+        // Security: hide blank or tls
+        profile.security?.let { sec ->
+            if (sec.isNotBlank() && !sec.equals("tls", ignoreCase = true)) {
+                parts.add(sec)
+            }
+        }
+
+        return parts.joinToString("/")
     }
 
     fun removeServerSub(guid: String, position: Int) {
