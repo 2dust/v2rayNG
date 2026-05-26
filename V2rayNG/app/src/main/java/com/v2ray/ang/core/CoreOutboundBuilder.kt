@@ -410,7 +410,7 @@ object CoreOutboundBuilder {
 
             NetworkType.WS.type -> {
                 val wssetting = OutboundBean.StreamSettingsBean.WsSettingsBean()
-                wssetting.headers.Host = host.orEmpty()
+                wssetting.host = host.orEmpty()
                 sni = host
                 wssetting.path = path ?: "/"
                 streamSettings.wsSettings = wssetting

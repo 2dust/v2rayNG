@@ -197,13 +197,12 @@ data class V2rayConfig(
 
             data class WsSettingsBean(
                 var path: String? = null,
-                var headers: HeadersBean = HeadersBean(),
+                var host: String? = null,
+                var headers: Map<String, String>? = null,
                 val maxEarlyData: Int? = null,
                 val useBrowserForwarding: Boolean? = null,
                 val acceptProxyProtocol: Boolean? = null
-            ) {
-                data class HeadersBean(var Host: String = "")
-            }
+            )
 
             data class HttpupgradeSettingsBean(
                 var path: String? = null,
