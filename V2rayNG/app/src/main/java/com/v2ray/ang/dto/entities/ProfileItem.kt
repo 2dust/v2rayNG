@@ -69,6 +69,8 @@ data class ProfileItem(
 
     var browserDialerMode: String? = null,
 
+    var shortcutEnabled: Boolean = false,
+
     ) {
     companion object {
         fun create(configType: EConfigType): ProfileItem {

@@ -94,6 +94,7 @@ class ServerActivity : BaseActivity() {
     // We don't use AndroidViewBinding because, it is better to share similar logics for different
     // protocols. Use findViewById manually ensures the xml are de-coupled with the activity logic.
     private val et_remarks: EditText by lazy { findViewById(R.id.et_remarks) }
+    private val sw_shortcut_enabled: androidx.appcompat.widget.SwitchCompat by lazy { findViewById(R.id.sw_shortcut_enabled) }
     private val et_address: EditText by lazy { findViewById(R.id.et_address) }
     private val et_port: EditText by lazy { findViewById(R.id.et_port) }
     private val et_id: EditText by lazy { findViewById(R.id.et_id) }
@@ -357,6 +358,7 @@ class ServerActivity : BaseActivity() {
     private fun bindingServer(config: ProfileItem): Boolean {
 
         et_remarks.text = Utils.getEditable(config.remarks)
+        sw_shortcut_enabled.isChecked = config.shortcutEnabled
         et_address.text = Utils.getEditable(config.server.orEmpty())
         et_port.text = Utils.getEditable(config.serverPort ?: DEFAULT_PORT.toString())
         et_id.text = Utils.getEditable(config.password.orEmpty())
@@ -537,6 +539,7 @@ class ServerActivity : BaseActivity() {
 
     private fun saveCommon(config: ProfileItem) {
         config.remarks = et_remarks.text.toString().trim()
+        config.shortcutEnabled = sw_shortcut_enabled.isChecked
         config.server = et_address.text.toString().trim()
         config.serverPort = et_port.text.toString().trim()
         config.password = et_id.text.toString().trim()
