@@ -53,6 +53,7 @@ class ServerCustomConfigActivity : BaseActivity() {
      */
     private fun bindingServer(config: ProfileItem): Boolean {
         binding.etRemarks.text = Utils.getEditable(config.remarks)
+        binding.swShortcutEnabled.isChecked = config.shortcutEnabled
         val raw = MmkvManager.decodeServerRaw(editGuid)
         val configContent = raw.orEmpty()
 
@@ -89,6 +90,7 @@ class ServerCustomConfigActivity : BaseActivity() {
         binding.etRemarks.text.let {
             config.remarks = if (it.isNullOrEmpty()) profileItem?.remarks.orEmpty() else it.toString()
         }
+        config.shortcutEnabled = binding.swShortcutEnabled.isChecked
         config.server = profileItem?.server
         config.serverPort = profileItem?.serverPort
         config.description = AngConfigManager.generateDescription(config)

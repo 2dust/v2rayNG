@@ -78,6 +78,7 @@ class ServerProxyChainActivity : BaseActivity() {
 
     private fun bindingServer(config: ProfileItem): Boolean {
         binding.etRemarks.text = Utils.getEditable(config.remarks)
+        binding.swShortcutEnabled.isChecked = config.shortcutEnabled
         val rows = parseChainMembers(config.proxyChainProfiles)
         memberAdapter.replaceAll(rows)
         if (rows.isEmpty()) {
@@ -119,6 +120,7 @@ class ServerProxyChainActivity : BaseActivity() {
 
         val config = MmkvManager.decodeServerConfig(editGuid) ?: ProfileItem.create(EConfigType.PROXYCHAIN)
         config.remarks = binding.etRemarks.text.toString().trim()
+        config.shortcutEnabled = binding.swShortcutEnabled.isChecked
         config.proxyChainProfiles = chainMembers.joinToString(",")
         config.description = chainMembers.joinToString(" -> ")
 
