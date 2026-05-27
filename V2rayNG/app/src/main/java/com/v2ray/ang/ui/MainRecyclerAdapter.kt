@@ -15,6 +15,7 @@ import com.v2ray.ang.databinding.ItemRecyclerFooterBinding
 import com.v2ray.ang.databinding.ItemRecyclerMainBinding
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
+import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
@@ -142,8 +143,11 @@ class MainRecyclerAdapter(
     }
 
     private fun getProtocolDescription(profile: ProfileItem): String {
-        val parts = mutableListOf<String>()
+        if (profile.configType.isComplexType()) {
+            return profile.configType.name
+        }
 
+        val parts = mutableListOf<String>()
         parts.add(profile.configType.name)
 
         // Transport: hide tcp or blank
@@ -160,7 +164,7 @@ class MainRecyclerAdapter(
             }
         }
 
-        return parts.joinToString("/")
+        return parts.joinToString(" / ")
     }
 
     fun removeServerSub(guid: String, position: Int) {
