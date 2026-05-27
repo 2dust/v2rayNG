@@ -1,3 +1,4 @@
+
 package com.v2ray.ang.ui
 
 import android.annotation.SuppressLint
@@ -58,7 +59,7 @@ class MainRecyclerAdapter(
             //Name address
             holder.itemMainBinding.tvName.text = profile.remarks
             holder.itemMainBinding.tvStatistics.text = getAddress(profile)
-            holder.itemMainBinding.tvType.text = profile.configType.name
+            holder.itemMainBinding.tvType.text = getProtocolDescription(profile)
 
             //TestResult
             val aff = MmkvManager.decodeServerAffiliationInfo(guid)
@@ -138,6 +139,28 @@ class MainRecyclerAdapter(
             else
                 null
         return subRemarks?.toString() ?: ""
+    }
+
+    private fun getProtocolDescription(profile: ProfileItem): String {
+        val parts = mutableListOf<String>()
+
+        parts.add(profile.configType.name)
+
+        // Transport: hide tcp or blank
+        profile.network?.let { net ->
+            if (net.isNotBlank() && !net.equals("tcp", ignoreCase = true)) {
+                parts.add(net)
+            }
+        }
+
+        // Security: hide blank or tls
+        profile.security?.let { sec ->
+            if (sec.isNotBlank() && !sec.equals("tls", ignoreCase = true)) {
+                parts.add(sec)
+            }
+        }
+
+        return parts.joinToString("/")
     }
 
     fun removeServerSub(guid: String, position: Int) {
