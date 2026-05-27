@@ -163,7 +163,7 @@ object CoreConfigContextBuilder {
                     }
                 }
                 .filter { it.server.isNotNullEmpty() }
-                .filter { !Utils.isPureIpAddress(it.server!!) || Utils.isValidUrl(it.server!!) }
+                .filter { Utils.isPureIpAddress(it.server!!) || Utils.isValidUrl(it.server!!) }
                 .filter { !it.configType.isComplexType() }
                 .toList()
         } catch (e: Exception) {
@@ -182,7 +182,7 @@ object CoreConfigContextBuilder {
                 .asSequence()
                 .mapNotNull { remark -> SettingsManager.getServerViaRemarks(remark) }
                 .filter { it.server.isNotNullEmpty() }
-                .filter { !Utils.isPureIpAddress(it.server!!) || Utils.isValidUrl(it.server!!) }
+                .filter { Utils.isPureIpAddress(it.server!!) || Utils.isValidUrl(it.server!!) }
                 .filter { !it.configType.isComplexType() }
                 .toList()
                 .reversed()
