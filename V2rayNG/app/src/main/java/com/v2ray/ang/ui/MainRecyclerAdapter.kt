@@ -1,3 +1,4 @@
+
 package com.v2ray.ang.ui
 
 import android.annotation.SuppressLint
@@ -144,14 +145,6 @@ class MainRecyclerAdapter(
         val parts = mutableListOf<String>()
 
         parts.add(profile.configType.name)
-
-        // Flow: only show vision / vision-udp443
-        profile.flow?.lowercase()?.let { flow ->
-            when {
-                flow.contains("vision-udp443") -> parts.add("vision-udp443")
-                flow.contains("vision") -> parts.add("vision")
-            }
-        }
 
         // Transport: hide tcp or blank
         profile.network?.let { net ->
