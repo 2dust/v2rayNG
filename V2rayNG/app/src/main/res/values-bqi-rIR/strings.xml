@@ -175,7 +175,7 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">ره وندن نشووݩ داڌن سورعت</string>
-    <string name="summary_pref_speed_enabled">نشووݩ داڌن سورعت هیم سکویی من وارسۊویا. نماڌ وارسۊوی و ری و کار گرؽڌن کانفیگ آلشت ابۊ.</string>
+    <string name="summary_pref_speed_enabled">نشووݩ داڌن سورعت هیم سکویی من وارسۊویا.\nنماڌ وارسۊوی و ری و کار گرؽڌن کانفیگ آلشت ابۊ.</string>
 
     <string name="title_pref_sniffing_enabled">ره وندن تجزیه وو تئلیل کتنا (Sniffing)</string>
     <string name="summary_pref_sniffing_enabled">و کار گرؽڌن تشخیس نوم دامنه (Sniff) من کتنا (پؽش فرز رۊشن)</string>
@@ -186,10 +186,10 @@
     <string name="summary_pref_local_dns_enabled">درخاستا DNS و هسته و من ایان وو و دست ماژول DNS پردازشت ابۊن (پؽشنهاڌ ابۊ ٱر لنگ تور جوستن سی دور زیڌن نشۊویا LAN وو وولات ٱسلی هڌین ره ونده بۊ)</string>
 
     <string name="title_pref_fake_dns_enabled">ره وندن DNS جئلی</string>
-    <string name="summary_pref_fake_dns_enabled">DNS مهلی نشۊویا IP جئلی ن وورگنه (زل تر، ٱما گاشڌ من ی قرده ز برنومه یل کار نکونه)</string>
+    <string name="summary_pref_fake_dns_enabled">دی ان اس مهلی نشۊویا آی پی جئلی ن اوورگنه (زل تر، ٱما گاشڌ من ی قرده ز برنومه یل کار نکونه)</string>
 
     <string name="title_pref_ipv6_enabled">ره وندن IPv6</string>
-    <string name="summary_pref_ipv6_enabled">نشۊویا IPv6 وو تورا IPv6 ن ز رابت VPN ره ونین</string>
+    <string name="summary_pref_ipv6_enabled">نشۊویا وو تورا IPv6 ن و رابت VPN ازاف کۊنین</string>
 
     <string name="title_pref_prefer_ipv6">ترجی داڌن IPv6</string>
     <string name="summary_pref_prefer_ipv6">مجال هل وو فسل نوم دامنه، نشۊویا IPv6 ن ترجی بڌین</string>
@@ -240,7 +240,7 @@
     <string name="summary_pref_local_dns_port">پورت DNS مهلی</string>
 
     <string name="title_pref_confirm_remove">قوۊل کردن پاک کردن کانفیگ</string>
-    <string name="summary_pref_confirm_remove">سی پاک وابیڌن فایل کانفیگ نیاز به قوۊل کردن دووارته ز سمت منتور هڌ.</string>
+    <string name="summary_pref_confirm_remove">سی پاک وابیڌن فایل کانفیگ، لنگ قوۊل کردن دووارته ز سمت منتور هڌ.</string>
 
     <string name="title_pref_start_scan_immediate">زی اسکنن ره ون</string>
     <string name="summary_pref_start_scan_immediate">شؽواتگرن سی اسکن، زی مجال ره وندن بۊگۊشین، ٱندی ترین کودن اسکن کۊنین یا شؽواتی ن منه نوار ٱوزار پسند کۊنین.</string>
@@ -249,7 +249,7 @@
     <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موسقیمن ز (مۊرۊرگر/ی قرد ز برنومه یل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
 
     <string name="title_pref_double_column_display">ره وندن نشووݩ داڌن دو سۊتۊنی</string>
-    <string name="summary_pref_double_column_display">نومگه نمایه یل من دو سۊتۊن نشووݩ داڌه ابۊن وو چینوو ترین موئتوا بیشتری ن سیل کۊنین. سی ره وستن، وا برنومه ن ز نۊ ره ونین.</string>
+    <string name="summary_pref_double_column_display">نومگه نمایه یل من دو سۊتۊن نشووݩ داڌه ابۊن وو چینوو ترین موئتوا بیشتری ن سیل کۊنین.\nسی ره وستن، وا برنومه ن ز نۊ ره ونین.</string>
 
     <string name="title_pref_group_all_display">نشووݩ داڌن پوی بونکۊ یل ن ره ونین</string>
     <string name="summary_pref_group_all_display">ی بلگه «پوی بونکۊ یل کانفیگ» ازاف کۊنین</string>
