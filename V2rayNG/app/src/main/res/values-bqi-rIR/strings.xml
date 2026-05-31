@@ -153,7 +153,7 @@
     <string name="title_core_settings">سامووا هسته</string>
     <string name="title_vpn_settings">سامووا VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی و ری برنومه</string>
-    <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه پسند وابیڌه وا ی پروکسی منپیز ابۊ، برنومه پسند نوابیڌه موستقیمن منپیز ابۊ. \nحالت دور زیڌن: برنومه پسند وابیڌه موستقیمن منپیز ابۊ، برنومه پسند نوابیڌه وا ی پروکسی منپیز ابۊ. \nپسند خوتکار برنومه یل پروکسی من نومگه امکووݩ پزیر هڌ.</string>
+    <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه پسند وابیڌه وا ی پروکسی منپیز ابۊ، برنومه پسند نوابیڌه موستقیمن منپیز ابۊ. \nهالت دور زیڌن: برنومه پسند وابیڌه موستقیمن منپیز ابۊ، برنومه پسند نوابیڌه وا ی پروکسی منپیز ابۊ. \nپسند خوتکار برنومه یل پروکسی من نومگه امکووݩ پزیر هڌ.</string>
     <string name="title_pref_is_booted">منپیز خوتکار مجال ره ونی</string>
     <string name="summary_pref_is_booted">مجال ره وندن، خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
 
@@ -286,7 +286,7 @@
     <string name="title_logcat">گوزارشا</string>
     <string name="logcat_copy">لف گیری</string>
     <string name="logcat_clear">روفتن</string>
-    <string name="logcat_share">Share log</string>
+    <string name="logcat_share">یک رسۊوی گوزارش</string>
     <string name="title_service_restart">ره وندن دووارته خدمات</string>
     <string name="title_del_all_config">پاک کردن پوی کانفیگا بونکۊ سکویی</string>
     <string name="title_del_duplicate_config">پاک کردن کانفیگا تکراری بونکۊ سکویی</string>
