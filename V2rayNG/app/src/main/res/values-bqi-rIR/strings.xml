@@ -220,9 +220,6 @@
     <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا نشۊوی IP ایسا، ز ره socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل ائتماد ره ونده بۊ تا ز منپیز قیر موجاز جلو گری بۊ.</string>
     <string name="toast_warning_pref_proxysharing_short">منپیزا ز شبکه مهلی ن موجار کۊنین، موتمعن بۊین ک من ی شبکه قابل ائتماڌ هڌین.</string>
 
-    <string name="title_pref_allow_insecure">اجازه نا ٱمن</string>
-    <string name="summary_pref_allow_insecure">مجال و کار بوردن TLS ب تۉر پؽش فرز، موجوز نا ٱمن ره ونده هڌ.</string>
-
     <string name="title_pref_socks_port">پورت پروکسی مهلی</string>
     <string name="title_pref_enable_local_proxy">ره وندن پروکسی مهلی</string>
     <string name="summary_pref_enable_local_proxy">هرسا ره نوسته بۊ، هیچ پروکسی SOCKS من دسرس نؽ، سی دل هیمو ورۊ رسۊوی یل اشتراک وو کارا جۊر یو نترن پروکسی ن و کار گرن.</string>

@@ -17,7 +17,6 @@ object VlessFmt : FmtBase() {
      * @return the parsed ProfileItem object, or null if parsing fails
      */
     fun parse(str: String): ProfileItem? {
-        var allowInsecure = MmkvManager.decodeSettingsBool(AppConfig.PREF_ALLOW_INSECURE, false)
         val config = ProfileItem.create(EConfigType.VLESS)
 
         val uri = URI(Utils.fixIllegalUrl(str))
@@ -30,7 +29,7 @@ object VlessFmt : FmtBase() {
         config.password = uri.userInfo
         config.method = queryParam["encryption"] ?: "none"
 
-        getItemFormQuery(config, queryParam, allowInsecure)
+        getItemFormQuery(config, queryParam)
 
         return config
     }

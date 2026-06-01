@@ -50,9 +50,8 @@ open class FmtBase {
      *
      * @param config the ProfileItem object to populate
      * @param queryParam the query parameters to use for populating the ProfileItem
-     * @param allowInsecure whether to allow insecure connections
      */
-    fun getItemFormQuery(config: ProfileItem, queryParam: Map<String, String>, allowInsecure: Boolean) {
+    fun getItemFormQuery(config: ProfileItem, queryParam: Map<String, String>) {
         config.network = queryParam["type"] ?: NetworkType.TCP.type
         config.headerType = queryParam["headerType"]
         config.host = queryParam["host"]
@@ -79,7 +78,7 @@ open class FmtBase {
         config.insecure = when {
             allowInsecureKeys.any { queryParam[it] == "1" } -> true
             allowInsecureKeys.any { queryParam[it] == "0" } -> false
-            else -> allowInsecure
+            else -> false
         }
         config.sni = queryParam["sni"]
         config.fingerPrint = queryParam["fp"]

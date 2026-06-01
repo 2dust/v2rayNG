@@ -220,9 +220,6 @@
     <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác trong cùng mạng LAN có thể kết nối đến SOCKS / HTTP proxy trên thiết bị của bạn. \nChỉ bật tính năng này trong các mạng đáng tin cậy để tránh kết nối trái phép.</string>
     <string name="toast_warning_pref_proxysharing_short">Đang bật cho phép kết nối từ mạng LAN</string>
 
-    <string name="title_pref_allow_insecure">Bỏ qua xác minh chứng chỉ</string>
-    <string name="summary_pref_allow_insecure">Khi nhập những cấu hình có bảo mật TLS, mặc định sẽ không xác minh chứng chỉ.</string>
-
     <string name="title_pref_socks_port">Cổng Proxy Local</string>
     <string name="title_pref_enable_local_proxy">Bật proxy cục bộ</string>
     <string name="summary_pref_enable_local_proxy">When disabled, no SOCKS proxy is available, so subscription updates and similar actions cannot use the proxy</string>

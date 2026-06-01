@@ -218,9 +218,6 @@
     <string name="summary_pref_proxy_sharing_enabled">其他裝置可以使用 socks/http 協定透過您的 IP 位址連線到 Proxy，僅在受信任的網路中啟用以避免未經授權的連線</string>
     <string name="toast_warning_pref_proxysharing_short">允許來自區域網路的連線，請確保處於受信網路</string>
 
-    <string name="title_pref_allow_insecure">跳過憑證驗證 (allowInsecure)</string>
-    <string name="summary_pref_allow_insecure">傳輸層安全選 tls 時，預設跳過憑證驗證 (allowInsecure)</string>
-
     <string name="title_pref_socks_port">本地代理埠</string>
     <string name="title_pref_enable_local_proxy">啟用本地代理</string>
     <string name="summary_pref_enable_local_proxy">未開啟時沒有 socks 代理，無法透過代理更新訂閱等</string>

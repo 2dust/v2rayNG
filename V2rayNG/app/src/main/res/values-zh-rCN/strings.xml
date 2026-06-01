@@ -219,10 +219,7 @@
     <string name="summary_pref_proxy_sharing_enabled">其他设备可以使用 socks/http 协议通过您的 IP 地址连接到代理, 仅在受信任的网络中启用以避免未经授权的连接</string>
     <string name="toast_warning_pref_proxysharing_short">允许来自局域网的连接，请确保处于受信网络</string>
 
-    <string name="title_pref_allow_insecure">跳过证书验证 (allowInsecure)</string>
-    <string name="summary_pref_allow_insecure">传输层安全选 tls 时，默认跳过证书验证 (allowInsecure)</string>
-
-     <string name="title_pref_socks_port">本地代理端口</string>
+    <string name="title_pref_socks_port">本地代理端口</string>
     <string name="title_pref_enable_local_proxy">启用本地代理</string>
     <string name="summary_pref_enable_local_proxy">不开启时没有 socks 代理，无法通过代理更新订阅等</string>
     <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
