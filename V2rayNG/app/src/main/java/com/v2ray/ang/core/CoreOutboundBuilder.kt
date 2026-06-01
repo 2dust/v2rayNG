@@ -545,7 +545,7 @@ object CoreOutboundBuilder {
      */
     fun populateTlsSettings(streamSettings: OutboundBean.StreamSettingsBean, profileItem: ProfileItem, sniExt: String?) {
         val streamSecurity = profileItem.security.orEmpty()
-        val allowInsecure = profileItem.insecure == true
+        val allowInsecure = profileItem.insecure == true && profileItem.pinnedCA256.isNullOrEmpty()
         val sni = if (profileItem.sni.isNullOrEmpty()) {
             when {
                 sniExt.isNotNullEmpty() && Utils.isDomainName(sniExt) -> sniExt
