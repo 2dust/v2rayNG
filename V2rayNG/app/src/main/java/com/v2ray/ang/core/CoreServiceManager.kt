@@ -163,6 +163,7 @@ object CoreServiceManager {
 
         if (config.insecure == true) {
             context.toastError(R.string.toast_allow_insecure_deprecated)
+            context.toastError(R.string.toast_allow_insecure_deprecated)
         }
 
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {

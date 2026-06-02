@@ -118,6 +118,7 @@
     <string name="server_lab_final_mask">FinalMask 原始 JSON 格式: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list">EchConfigList</string>
     <string name="server_lab_pinned_ca256">證書指紋 (SHA-256)</string>
+    <string name="toast_allow_insecure_deprecated">警告：將在 2026.8.1 停用跳過憑證驗證 "allowInsecure" ，請盡快改用憑證指紋。到期後無法使用。 </string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">失敗，請使用檔案總管</string>
