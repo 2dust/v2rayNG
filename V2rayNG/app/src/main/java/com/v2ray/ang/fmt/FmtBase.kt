@@ -84,6 +84,7 @@ open class FmtBase {
         config.fingerPrint = queryParam["fp"]
         config.alpn = queryParam["alpn"]
         config.echConfigList = queryParam["ech"]
+        config.verifyPeerCertByName = queryParam["vcn"]
         config.pinnedCA256 = queryParam["pcs"]
         config.publicKey = queryParam["pbk"]
         config.shortId = queryParam["sid"]
@@ -104,6 +105,7 @@ open class FmtBase {
         config.sni?.nullIfBlank()?.let { dicQuery["sni"] = it }
         config.alpn?.nullIfBlank()?.let { dicQuery["alpn"] = it }
         config.echConfigList?.nullIfBlank()?.let { dicQuery["ech"] = it }
+        config.verifyPeerCertByName?.nullIfBlank()?.let { dicQuery["vcn"] = it }
         config.pinnedCA256?.nullIfBlank()?.let { dicQuery["pcs"] = it }
         config.fingerPrint?.nullIfBlank()?.let { dicQuery["fp"] = it }
         config.publicKey?.nullIfBlank()?.let { dicQuery["pbk"] = it }
