@@ -42,6 +42,7 @@ data class ProfileItem(
     var fingerPrint: String? = null,
     var insecure: Boolean? = null,
     var echConfigList: String? = null,
+    var verifyPeerCertByName: String? = null,
     var pinnedCA256: String? = null,
 
     var publicKey: String? = null,

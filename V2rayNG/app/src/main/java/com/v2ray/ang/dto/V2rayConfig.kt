@@ -253,6 +253,7 @@ data class V2rayConfig(
                 val disableSystemRoot: Boolean? = null,
                 val enableSessionResumption: Boolean? = null,
                 var echConfigList: String? = null,
+                var verifyPeerCertByName: String? = null,
                 var pinnedPeerCertSha256: String? = null,
                 // REALITY settings
                 val show: Boolean = false,
