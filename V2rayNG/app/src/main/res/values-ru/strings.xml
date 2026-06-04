@@ -29,7 +29,7 @@
     <string name="menu_item_import_config_qrcode">Импорт из QR-кода</string>
     <string name="menu_item_import_config_clipboard">Импорт из буфера обмена</string>
     <string name="menu_item_import_config_local">Импорт из файла</string>
-    <string name="menu_item_import_config_policy_group">Добавить группу политик</string>
+    <string name="menu_item_import_config_policy_group">Добавить политику группы</string>
     <string name="menu_item_import_config_proxy_chain">Добавить цепочку прокси</string>
     <string name="menu_item_import_config_manually_vmess">Добавить VMess</string>
     <string name="menu_item_import_config_manually_vless">Добавить VLESS</string>
@@ -117,10 +117,11 @@
     <string name="server_lab_xhttp_extra">Необработанный JSON XHTTP Extra, формат: { XHTTPObject }</string>
     <string name="server_lab_final_mask">Необработанный JSON FinalMask, формат: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list">ECHConfigList</string>
-    <string name="server_lab_verify_peer_cert_by_name">Verify Peer Cert By Name</string>
+    <string name="server_lab_verify_peer_cert_by_name">Проверять сертификат узла по имени</string>
     <string name="server_lab_pinned_ca256">Отпечаток сертификата (SHA-256)</string>
     <string name="server_lab_browser_dialer">Использовать переадресацию браузера</string>
     <string name="server_lab_browser_dialer_tip">Поддерживаются только исходящие соединения XHTTP (packet-up) и WS; настройки, связанные с TLS, могут быть проигнорированы или конфликтовать</string>
+    <string name="toast_allow_insecure_deprecated">ВНИМАНИЕ: пропуск проверки сертификата («Разрешать небезопасные соединения») будет отключён в августе 2026 года. Пожалуйста, используйте отпечатки сертификатов как можно скорее. Функция будет недоступна после истечения срока действия.</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">Невозможно скопировать файл, используйте файловый менеджер</string>
@@ -289,7 +290,7 @@
     <string name="title_logcat">Журнал</string>
     <string name="logcat_copy">Копировать</string>
     <string name="logcat_clear">Очистить</string>
-    <string name="logcat_share">Поделиться логом</string>
+    <string name="logcat_share">Поделиться журналом</string>
     <string name="title_service_restart">Перезапуск службы</string>
     <string name="title_del_all_config">Удалить профили</string>
     <string name="title_del_duplicate_config">Удалить дубликаты профилей</string>
@@ -378,7 +379,7 @@
     <string name="update_check_pre_release">Искать предварительный выпуск</string>
     <string name="update_checking_for_update">Проверка обновления…</string>
 
-    <string name="title_policy_group_type">Тип группы политик</string>
+    <string name="title_policy_group_type">Тип политики группы</string>
     <string name="title_policy_group_subscription_id">Из группы подписки</string>
     <string name="title_policy_group_subscription_filter">Название фильтра</string>
 
@@ -423,6 +424,12 @@
     <string-array name="mode_entries">
         <item>VPN</item>
         <item>Прокси</item>
+    </string-array>
+
+    <string-array name="browser_dialer_mode">
+        <item>Отключено</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
     </string-array>
 
     <string-array name="ui_mode_night">
