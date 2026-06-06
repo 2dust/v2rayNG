@@ -117,8 +117,8 @@
     <string name="server_lab_xhttp_extra">XHTTP Extra خام JSON، قالوو: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask خام JSON، قالوو: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list">نومگه کانفیگ Ech</string>
-    <string name="server_lab_verify_peer_cert_by_name">Verify Peer Cert By Name</string>
-    <string name="server_lab_pinned_ca256">Certificate fingerprint (SHA-256)</string>
+    <string name="server_lab_verify_peer_cert_by_name">تئیڌ گوواهی هومتا و ری نوم</string>
+    <string name="server_lab_pinned_ca256">جا کلک گوواهی (SHA-256)</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">لف گیری فایل ٱنجوم نوابی، ز ی برنومه دؽوۉداری فایل هیاری بگرین</string>
@@ -358,7 +358,7 @@
     <string name="connection_not_connected">منپیز نؽڌ</string>
     <string name="connection_runing_task_left">تعداد وزیفه یل آزمایشی ک ره اۊفتانه: %s</string>
 
-    <string name="import_subscription_success">اشتراک وا موفقیت زفت زابی</string>
+    <string name="import_subscription_success">اشتراک وا مووفقیت زفت وابی</string>
     <string name="import_subscription_failure">اشتراک زفت نوابی</string>
     <string name="title_fragment_settings">سامووا فرگمنت</string>
     <string name="title_pref_fragment_packets">کتنا فرگمنت</string>
@@ -446,7 +446,7 @@
     </string-array>
     <string-array name="policy_group_type">
         <item>کم ترین پینگ</item>
-        <item>کم ترین بار(لود)</item>
+        <item>کم ترین بار (لود)</item>
         <item>تساڌۊفی</item>
         <item>گردشی</item>
     </string-array>
