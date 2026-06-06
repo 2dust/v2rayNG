@@ -161,6 +161,9 @@ dependencies {
     implementation(libs.mmkv.static)
     implementation(libs.gson)
     implementation(libs.okhttp)
+    
+    // Security Libraries
+    implementation(libs.conscrypt.android)
 
     // Reactive and Utility Libraries
     implementation(libs.kotlinx.coroutines.android)

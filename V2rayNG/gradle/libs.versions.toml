@@ -1,5 +1,6 @@
 [versions]
 agp = "9.2.1"
+conscrypt = "2.5.2"
 desugarJdkLibs = "2.1.5"
 gradleLicensePlugin = "0.9.8"
 kotlin = "2.3.21"
@@ -33,6 +34,7 @@ fragment = "1.8.9"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
+conscrypt-android = { module = "org.conscrypt:conscrypt-android", version.ref = "conscrypt" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }
 gradle-license-plugin = { module = "com.jaredsburrows:gradle-license-plugin", version.ref = "gradleLicensePlugin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

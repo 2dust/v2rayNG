@@ -171,12 +171,28 @@
             android:layout_height="wrap_content"
             android:text="@string/server_lab_pinned_ca256" />
 
-        <EditText
-            android:id="@+id/et_pinned_ca256"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:nextFocusDown="@+id/et_public_key" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_pinned_ca256"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="text"
+                android:nextFocusDown="@+id/et_public_key" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_fetch_cert"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/fetch_certificate"
+                android:text="@string/fetch_certificate_short" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.DEFAULT_PORT
 import com.v2ray.ang.AppConfig.REALITY
@@ -29,8 +30,10 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
+import com.v2ray.ang.util.CertificateFetcher
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.launch
 
 class ServerActivity : BaseActivity() {
 
@@ -143,6 +146,7 @@ class ServerActivity : BaseActivity() {
     private val et_verify_peer_cert_by_name: EditText? by lazy { findViewById(R.id.et_verify_peer_cert_by_name) }
     private val container_verify_peer_cert_by_name: LinearLayout? by lazy { findViewById(R.id.lay_verify_peer_cert_by_name) }
     private val et_pinned_ca256: EditText? by lazy { findViewById(R.id.et_pinned_ca256) }
+    private val btn_fetch_cert: com.google.android.material.button.MaterialButton? by lazy { findViewById(R.id.btn_fetch_cert) }
     private val container_pinned_ca256: LinearLayout? by lazy { findViewById(R.id.lay_pinned_ca256) }
     private val layout_browser_dialer: LinearLayout? by lazy { findViewById(R.id.layout_browser_dialer) }
     private val sp_browser_dialer_mode: Spinner? by lazy { findViewById(R.id.sp_browser_dialer_mode) }
@@ -348,10 +352,93 @@ class ServerActivity : BaseActivity() {
                 // do nothing
             }
         }
+        
+        // Setup fetch certificate button
+        btn_fetch_cert?.setOnClickListener {
+            fetchCertificateFingerprint()
+        }
+        
         if (config != null) {
             bindingServer(config)
         } else {
             clearServer()
+        }
+    }
+
+    /**
+     * Fetch certificate fingerprint from server
+     */
+    private fun fetchCertificateFingerprint() {
+        // Get current stream security setting
+        val streamSecurity = sp_stream_security?.selectedItemPosition ?: return
+        if (streamSecuritys[streamSecurity] != TLS) {
+            toast(R.string.server_lab_stream_security)
+            return
+        }
+
+        // Get domain and port
+        val address = et_address.text.toString().trim()
+        if (address.isEmpty()) {
+            toast(R.string.server_lab_address)
+            return
+        }
+
+        val port = et_port.text.toString().trim()
+        val domain = if (port.isNotEmpty() && Utils.parseInt(port) > 0) {
+            "$address:$port"
+        } else {
+            address
+        }
+
+        // Get SNI (Server Name Indication)
+        var serverName = et_sni?.text?.toString()?.trim()
+        
+        // If SNI is empty, try to get from request host (for specific network types)
+        if (serverName.isNullOrEmpty()) {
+            val network = sp_network?.selectedItemPosition ?: 0
+            when (networks[network]) {
+                NetworkType.WS.type,
+                NetworkType.HTTP_UPGRADE.type,
+                NetworkType.XHTTP.type,
+                NetworkType.H2.type -> {
+                    serverName = et_request_host?.text?.toString()?.trim()
+                }
+            }
+        }
+        
+        // If still empty, use address
+        if (serverName.isNullOrEmpty()) {
+            serverName = address
+        }
+
+        // Get allowInsecure setting
+        val allowInsecureField = sp_allow_insecure?.selectedItemPosition ?: 0
+        val allowInsecure = if (allowinsecures[allowInsecureField].isBlank()) {
+            false
+        } else {
+            allowinsecures[allowInsecureField].toBoolean()
+        }
+
+        // Show loading message
+        toast(R.string.fetching_certificate)
+
+        // Fetch certificate in coroutine
+        lifecycleScope.launch {
+            val result = CertificateFetcher.fetchCertificateFingerprints(
+                domain = domain,
+                serverName = serverName,
+                allowInsecure = allowInsecure
+            )
+
+            if (result.error != null) {
+                toast(getString(R.string.certificate_fetch_error, result.error))
+            } else if (result.fingerprints.isEmpty()) {
+                toast(getString(R.string.certificate_fetch_error, "No certificates found"))
+            } else {
+                val concatenated = CertificateFetcher.concatenateFingerprints(result.fingerprints)
+                et_pinned_ca256?.text = Utils.getEditable(concatenated)
+                toast(R.string.certificate_fetched)
+            }
         }
     }
 
