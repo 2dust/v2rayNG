@@ -53,7 +53,12 @@ object CertificateFetcher {
             }
 
             val client = createOkHttpClient(capturingTrustManager, sni, host)
-            val request = Request.Builder().url("https://$host:$port/").build()
+            val url = okhttp3.HttpUrl.Builder()
+                .scheme("https")
+                .host(host)
+                .port(port)
+                .build()
+            val request = Request.Builder().url(url).build()
 
             runCatching {
                 client.newCall(request).execute().close()
