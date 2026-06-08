@@ -321,6 +321,8 @@ data class V2rayConfig(
                     var brutalUp: String? = null,
                     var brutalDown: String? = null,
                     var udpHop: UdpHopBean? = null,
+                    @SerializedName("keepAlivePeriod") var keepAlivePeriod: Int? = null,
+                    @SerializedName("maxIdleTimeout") var maxIdleTimeout: Int? = null,
                 ) {
                     // Nested data class for the udpHop JSON object
                     data class UdpHopBean(

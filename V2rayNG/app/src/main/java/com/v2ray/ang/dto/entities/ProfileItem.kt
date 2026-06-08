@@ -59,6 +59,8 @@ data class ProfileItem(
     var obfsPassword: String? = null,
     var portHopping: String? = null,
     var portHoppingInterval: String? = null,
+    var keepAlivePeriod: String? = null,
+    var maxIdleTimeout: String? = null,
     var pinSHA256: String? = null,
     var bandwidthDown: String? = null,
     var bandwidthUp: String? = null,
@@ -124,6 +126,8 @@ data class ProfileItem(
                 && this.obfsPassword == obj.obfsPassword
                 && this.portHopping == obj.portHopping
                 && this.portHoppingInterval == obj.portHoppingInterval
+                && this.keepAlivePeriod == obj.keepAlivePeriod
+                && this.maxIdleTimeout == obj.maxIdleTimeout
                 && this.pinnedCA256 == obj.pinnedCA256
                 && this.proxyChainProfiles == obj.proxyChainProfiles
                 )

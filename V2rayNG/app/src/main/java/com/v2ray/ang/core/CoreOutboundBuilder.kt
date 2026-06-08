@@ -472,6 +472,8 @@ object CoreOutboundBuilder {
                     brutalDown = profileItem.bandwidthDown?.nullIfBlank(),
                 )
                 quicParams.congestion = if (quicParams.brutalUp != null || quicParams.brutalDown != null) "brutal" else null
+                quicParams.keepAlivePeriod = profileItem.keepAlivePeriod?.toIntOrNull()?.coerceIn(2, 60)
+                quicParams.maxIdleTimeout = profileItem.maxIdleTimeout?.toIntOrNull()?.coerceIn(4, 120)
                 if (profileItem.portHopping.isNotNullEmpty()) {
                     val rawInterval = profileItem.portHoppingInterval?.trim().nullIfBlank()
                     val interval = if (rawInterval == null) {

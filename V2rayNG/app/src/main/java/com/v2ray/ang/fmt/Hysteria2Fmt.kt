@@ -41,6 +41,8 @@ object Hysteria2Fmt : FmtBase() {
                 config.portHoppingInterval = queryParam["mportHopInt"]
             }
             config.pinnedCA256 = queryParam["pinSHA256"]
+            config.keepAlivePeriod = queryParam["keepalive"]
+            config.maxIdleTimeout = queryParam["idle"]
 
         }
 
@@ -104,6 +106,8 @@ object Hysteria2Fmt : FmtBase() {
         if (config.pinnedCA256.isNotNullEmpty()) {
             dicQuery["pinSHA256"] = config.pinnedCA256.orEmpty()
         }
+        config.keepAlivePeriod?.nullIfBlank()?.let { dicQuery["keepalive"] = it }
+        config.maxIdleTimeout?.nullIfBlank()?.let { dicQuery["idle"] = it }
 
         return toUri(config, config.password, dicQuery)
     }

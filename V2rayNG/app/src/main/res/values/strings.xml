@@ -114,6 +114,8 @@
     <string name="server_lab_port_hop_interval">Port Hopping Interval</string>
     <string name="server_lab_bandwidth_down">Bandwidth down (Supported units: k/m/g/t)</string>
     <string name="server_lab_bandwidth_up">Bandwidth up (Supported units: k/m/g/t)</string>
+    <string name="server_lab_keepalive">QUIC keepAlivePeriod in seconds (2-60)</string>
+    <string name="server_lab_idle">QUIC idleTimeout in seconds (4-120)</string>
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>

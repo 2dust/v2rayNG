@@ -128,6 +128,8 @@ class ServerActivity : BaseActivity() {
     private val et_local_address: EditText? by lazy { findViewById(R.id.et_local_address) }
     private val et_local_mtu: EditText? by lazy { findViewById(R.id.et_local_mtu) }
     private val et_obfs_password: EditText? by lazy { findViewById(R.id.et_obfs_password) }
+    private val et_keepalive: EditText? by lazy { findViewById(R.id.et_keepalive) }
+    private val et_idle: EditText? by lazy { findViewById(R.id.et_idle) }
     private val et_port_hop: EditText? by lazy { findViewById(R.id.et_port_hop) }
     private val et_port_hop_interval: EditText? by lazy { findViewById(R.id.et_port_hop_interval) }
     private val et_bandwidth_down: EditText? by lazy { findViewById(R.id.et_bandwidth_down) }
@@ -389,6 +391,8 @@ class ServerActivity : BaseActivity() {
             et_port_hop_interval?.text = Utils.getEditable(config.portHoppingInterval)
             et_bandwidth_down?.text = Utils.getEditable(config.bandwidthDown)
             et_bandwidth_up?.text = Utils.getEditable(config.bandwidthUp)
+            et_keepalive?.text = Utils.getEditable(config.keepAlivePeriod)
+            et_idle?.text = Utils.getEditable(config.maxIdleTimeout)
         }
         val securityEncryptions =
             if (config.configType == EConfigType.SHADOWSOCKS) shadowsocksSecuritys else securitys
@@ -571,6 +575,8 @@ class ServerActivity : BaseActivity() {
             config.portHoppingInterval = et_port_hop_interval?.text?.toString()?.trim()
             config.bandwidthDown = et_bandwidth_down?.text?.toString()
             config.bandwidthUp = et_bandwidth_up?.text?.toString()
+            config.keepAlivePeriod = et_keepalive?.text?.toString()?.trim()?.nullIfBlank()
+            config.maxIdleTimeout = et_idle?.text?.toString()?.trim()?.nullIfBlank()
         }
     }
 
