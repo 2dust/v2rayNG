@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.DEFAULT_PORT
 import com.v2ray.ang.AppConfig.REALITY
@@ -27,10 +28,14 @@ import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.handler.CertificateFingerprintManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ServerActivity : BaseActivity() {
 
@@ -143,6 +148,7 @@ class ServerActivity : BaseActivity() {
     private val et_verify_peer_cert_by_name: EditText? by lazy { findViewById(R.id.et_verify_peer_cert_by_name) }
     private val container_verify_peer_cert_by_name: LinearLayout? by lazy { findViewById(R.id.lay_verify_peer_cert_by_name) }
     private val et_pinned_ca256: EditText? by lazy { findViewById(R.id.et_pinned_ca256) }
+    private val sp_pinned_ca256_action: Spinner? by lazy { findViewById(R.id.sp_pinned_ca256_action) }
     private val container_pinned_ca256: LinearLayout? by lazy { findViewById(R.id.lay_pinned_ca256) }
     private val layout_browser_dialer: LinearLayout? by lazy { findViewById(R.id.layout_browser_dialer) }
     private val sp_browser_dialer_mode: Spinner? by lazy { findViewById(R.id.sp_browser_dialer_mode) }
@@ -345,6 +351,25 @@ class ServerActivity : BaseActivity() {
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
+                // do nothing
+            }
+        }
+        sp_pinned_ca256_action?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long,
+            ) {
+                if (position <= 0) {
+                    return
+                }
+
+                parent?.setSelection(0)
+                fetchPinnedCA256ForCurrentConfig()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
                 // do nothing
             }
         }
@@ -641,6 +666,44 @@ class ServerActivity : BaseActivity() {
         config.echConfigList = echConfigList
         config.verifyPeerCertByName = verifyPeerCertByName
         config.pinnedCA256 = pinnedCA256
+    }
+
+    private fun fetchPinnedCA256ForCurrentConfig() {
+        val config = buildCurrentProfileForCertificateFetch() ?: return
+        sp_pinned_ca256_action?.isEnabled = false
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val sha256 = CertificateFingerprintManager.fetchForManualFill(config)
+            withContext(Dispatchers.Main) {
+                sp_pinned_ca256_action?.isEnabled = true
+                if (sha256.isNullOrBlank()) {
+                    toast(R.string.toast_fetch_cert_sha256_failed)
+                } else {
+                    et_pinned_ca256?.text = Utils.getEditable(sha256)
+                    toastSuccess(R.string.toast_fetch_cert_sha256_success)
+                }
+            }
+        }
+    }
+
+    private fun buildCurrentProfileForCertificateFetch(): ProfileItem? {
+        if (TextUtils.isEmpty(et_address.text.toString())) {
+            toast(R.string.server_lab_address)
+            return null
+        }
+
+        val configType = MmkvManager.decodeServerConfig(editGuid)?.configType ?: createConfigType
+        if (configType != EConfigType.HYSTERIA2 && Utils.parseInt(et_port.text.toString()) <= 0) {
+            toast(R.string.server_lab_port)
+            return null
+        }
+
+        val config = ProfileItem.create(configType)
+        saveCommon(config)
+        saveStreamSettings(config)
+        saveTls(config)
+
+        return config
     }
 
     private fun transportTypes(network: String?): Array<out String> {

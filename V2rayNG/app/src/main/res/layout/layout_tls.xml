@@ -178,6 +178,12 @@
             android:inputType="text"
             android:nextFocusDown="@+id/et_public_key" />
 
+        <Spinner
+            android:id="@+id/sp_pinned_ca256_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/pinned_ca256_actions" />
+
     </LinearLayout>
 
     <LinearLayout

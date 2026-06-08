@@ -182,6 +182,11 @@
         <item>block</item>
     </string-array>
 
+    <string-array name="pinned_ca256_actions">
+        <item>@string/pinned_ca256_action_none</item>
+        <item>@string/pinned_ca256_action_fetch</item>
+    </string-array>
+
     <string-array name="xhttp_mode" translatable="false">
         <item>auto</item>
         <item>packet-up</item>

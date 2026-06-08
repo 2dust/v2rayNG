@@ -122,6 +122,10 @@
     <string name="server_lab_browser_dialer">启用浏览器转发</string>
     <string name="server_lab_browser_dialer_tip">仅支持 xhttp (packet-up) 和 ws。与优选域名冲突，utls, alpn, ech 等 TLS 设置将被忽略</string>
     <string name="toast_allow_insecure_deprecated">警告：将在 2026.8.1 禁用跳过证书验证 "allowInsecure" ，请尽快改用证书指纹。到期后无法使用。 </string>
+    <string name="pinned_ca256_action_none">手动操作</string>
+    <string name="pinned_ca256_action_fetch">获取并填充指纹证书</string>
+    <string name="toast_fetch_cert_sha256_success">获取指纹证书完成</string>
+    <string name="toast_fetch_cert_sha256_failed">获取证书指纹失败</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">失败, 请使用文件管理器</string>
