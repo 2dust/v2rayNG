@@ -113,6 +113,8 @@
     <string name="server_lab_port_hop_interval">Интервал смены портов</string>
     <string name="server_lab_bandwidth_down">Входящая пропускная способность (допускаются: k/m/g/t)</string>
     <string name="server_lab_bandwidth_up">Исходящая пропускная способность (допускаются: k/m/g/t)</string>
+    <string name="server_lab_keepalive">QUIC keepAlivePeriod, секунды (2–60)</string>
+    <string name="server_lab_idle">QUIC idleTimeout, секунды (4–120)</string>
     <string name="server_lab_xhttp_mode">Режим XHTTP</string>
     <string name="server_lab_xhttp_extra">Необработанный JSON XHTTP Extra, формат: { XHTTPObject }</string>
     <string name="server_lab_final_mask">Необработанный JSON FinalMask, формат: { FinalMaskObject }</string>
