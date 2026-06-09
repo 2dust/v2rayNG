@@ -670,18 +670,21 @@ class ServerActivity : BaseActivity() {
 
     private fun fetchPinnedCA256ForCurrentConfig() {
         val config = buildCurrentProfileForCertificateFetch() ?: return
-        sp_pinned_ca256_action?.isEnabled = false
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            val sha256 = CertificateFingerprintManager.fetchForManualFill(config)
-            withContext(Dispatchers.Main) {
-                sp_pinned_ca256_action?.isEnabled = true
+        lifecycleScope.launch {
+            sp_pinned_ca256_action?.isEnabled = false
+            try {
+                val sha256 = withContext(Dispatchers.IO) {
+                    CertificateFingerprintManager.fetchForManualFill(config)
+                }
                 if (sha256.isNullOrBlank()) {
                     toast(R.string.toast_fetch_cert_sha256_failed)
                 } else {
                     et_pinned_ca256?.text = Utils.getEditable(sha256)
                     toastSuccess(R.string.toast_fetch_cert_sha256_success)
                 }
+            } finally {
+                sp_pinned_ca256_action?.isEnabled = true
             }
         }
     }
