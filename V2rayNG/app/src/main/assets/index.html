@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galaxy Tunnel</title>
+  <link rel="icon" href="https://i.ibb.co/V0NYnWk9/1777224598110.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-primary: #fafaf8;
+      --bg-secondary: #f5f3f0;
+      --text-primary: #1a1a18;
+      --text-secondary: #6b6b68;
+      --border-color: #e8e6e3;
+      --card-bg: #ffffff;
+      --header-bg: #ffffff;
+      --button-bg: #2c2c2a;
+      --button-hover: #1a1a18;
+      --sidebar-bg: #ffffff;
+      --sidebar-border: #e8e6e3;
+      --accent: #2c5aa0;
+    }
+
+    body.dark-mode {
+      --bg-primary: #1a1a18;
+      --bg-secondary: #2a2a28;
+      --text-primary: #f5f3f0;
+      --text-secondary: #b8b8b5;
+      --border-color: #3a3a38;
+      --card-bg: #2a2a28;
+      --header-bg: #1f1f1d;
+      --button-bg: #3a3a38;
+      --button-hover: #4a4a48;
+      --sidebar-bg: #1f1f1d;
+      --sidebar-border: #3a3a38;
+      --accent: #3b7fd9;
+    }
+
+    body { 
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: -280px;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--sidebar-border);
+      transition: left 0.3s ease;
+      z-index: 40;
+      overflow-y: auto;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark-mode .sidebar {
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .sidebar-header {
+      padding: 20px 16px;
+      border-bottom: 1px solid var(--sidebar-border);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+      font-weight: 500;
+    }
+
+    .sidebar-item:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .sidebar-item.active {
+      background: var(--bg-secondary);
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+
+    .sidebar-item i {
+      font-size: 18px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 30;
+    }
+
+    .overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    header {
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text-primary);
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.3s ease;
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .lang-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+
+    .lang-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    main {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px 16px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .page-content {
+      display: none;
+    }
+
+    .page-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .server-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .server-card:hover {
+      border-color: var(--text-secondary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    body.dark-mode .server-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .server-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .server-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .server-status {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-online {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    body.dark-mode .status-online {
+      background: #1b4d2a;
+      color: #86efac;
+    }
+
+    .status-checking {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    body.dark-mode .status-checking {
+      background: #4d3a0f;
+      color: #fcd34d;
+    }
+
+    .status-offline {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    body.dark-mode .status-offline {
+      background: #4d1a1a;
+      color: #fca5a5;
+    }
+
+    .server-location {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .server-description {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .copy-btn {
+      width: 100%;
+      background: var(--button-bg);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .copy-btn:hover {
+      background: var(--button-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    body.dark-mode .copy-btn:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .copy-btn:active {
+      transform: translateY(0);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Courier New', monospace;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+    }
+
+    body.dark-mode .form-input:focus,
+    body.dark-mode .form-textarea:focus {
+      box-shadow: 0 0 0 3px rgba(59, 125, 217, 0.2);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .generate-btn {
+      width: 100%;
+      background: var(--button-bg);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .generate-btn:hover {
+      background: var(--button-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    body.dark-mode .generate-btn:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .result-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .result-box.active {
+      display: block;
+    }
+
+    .result-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .result-text {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+      color: var(--text-primary);
+      word-break: break-all;
+      margin-bottom: 12px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .qr-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .guide-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .guide-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .guide-description {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .read-btn {
+      width: 100%;
+      background: var(--bg-secondary);
+      color: var(--accent);
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .read-btn:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .app-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 8px;
+    }
+
+    .app-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .app-tag {
+      background: var(--bg-secondary);
+      color: var(--accent);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .app-description {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .download-btn {
+      width: 100%;
+      background: var(--button-bg);
+      color: #ffffff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .download-btn:hover {
+      background: var(--button-hover);
+      transform: translateY(-1px);
+    }
+
+    .contact-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .contact-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    body.dark-mode .contact-item:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .contact-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 18px;
+    }
+
+    .contact-info {
+      flex: 1;
+    }
+
+    .contact-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .contact-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+
+    .map-btn {
+      width: 100%;
+      background: var(--button-bg);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .map-btn:hover {
+      background: var(--button-hover);
+      transform: translateY(-1px);
+    }
+
+    .settings-group {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .settings-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .settings-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .settings-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .theme-toggle {
+      display: flex;
+      gap: 8px;
+    }
+
+    .theme-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .theme-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px 16px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      border-top: 1px solid var(--border-color);
+      margin-top: 20px;
+    }
+
+    @media (max-width: 480px) {
+      main {
+        padding: 16px 12px;
+      }
+
+      .page-title {
+        font-size: 24px;
+      }
+
+      .server-card {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header" data-i18n="sidebarHeader">Galaxy Tunnel</div>
+    <div onclick="switchPage('servers'); closeSidebar()" class="sidebar-item active" id="nav-servers">
+      <i class="fas fa-server"></i>
+      <span data-i18n="navServers">ဆာဗာများ</span>
+    </div>
+    <div onclick="switchPage('sublink'); closeSidebar()" class="sidebar-item" id="nav-sublink">
+      <i class="fas fa-link"></i>
+      <span data-i18n="navSublink">Sublink ထုတ်ရန်</span>
+    </div>
+    <div onclick="switchPage('guides'); closeSidebar()" class="sidebar-item" id="nav-guides">
+      <i class="fas fa-book"></i>
+      <span data-i18n="navGuides">လမ်းညွှန်များ</span>
+    </div>
+    <div onclick="switchPage('apps'); closeSidebar()" class="sidebar-item" id="nav-apps">
+      <i class="fas fa-th"></i>
+      <span data-i18n="navApps">ထည့်သွင်းနိုင်သည့် App များ</span>
+    </div>
+    <div onclick="switchPage('settings'); closeSidebar()" class="sidebar-item" id="nav-settings">
+      <i class="fas fa-cog"></i>
+      <span data-i18n="navSettings">Settings</span>
+    </div>
+    <div onclick="switchPage('contact'); closeSidebar()" class="sidebar-item" id="nav-contact">
+      <i class="fas fa-info-circle"></i>
+      <span data-i18n="navContact">ဆက်သွယ်ရန်</span>
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <button class="menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="header-title" data-i18n="headerTitle">Galaxy Tunnel</div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="lang-btn" id="btn-my" onclick="setLanguage('my')">MY</button>
+      <button class="lang-btn" id="btn-en" onclick="setLanguage('en')">EN</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Servers Page -->
+    <div class="page-content active" id="page-servers">
+      <div class="page-header">
+        <div class="page-title" data-i18n="serversTitle">Galaxy Tunnel</div>
+        <div class="page-subtitle" data-i18n="serversSubtitle">Secure. Fast. Limitless. — Your Gateway to the Digital World.</div>
+      </div>
+      <div id="servers-container"></div>
+    </div>
+
+    <!-- Settings Page -->
+    <div class="page-content" id="page-settings">
+      <div class="page-header">
+        <div class="page-title" data-i18n="settingsTitle">Settings</div>
+        <div class="page-subtitle" data-i18n="settingsSubtitle">Customize your experience</div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-item">
+          <div class="settings-label">
+            <i class="fas fa-palette" style="margin-right: 8px;"></i><span data-i18n="themeLabel">Theme</span>
+          </div>
+          <div class="theme-toggle">
+            <button class="theme-btn active" id="theme-light-btn" onclick="setTheme('light')">
+              <i class="fas fa-sun"></i> <span data-i18n="lightMode">Light</span>
+            </button>
+            <button class="theme-btn" id="theme-dark-btn" onclick="setTheme('dark')">
+              <i class="fas fa-moon"></i> <span data-i18n="darkMode">Dark</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sublink Page -->
+    <div class="page-content" id="page-sublink">
+      <div class="page-header">
+        <div class="page-title" data-i18n="sublinkTitle">Sublink ထုတ်ရန်</div>
+        <div class="page-subtitle" data-i18n="sublinkSubtitle">Sub Link ရယူရန် VLESS ကို ထည့်ပါ</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="vlessLabel">VLESS ကွန်ဖစ် ကို ဤနေရာတွင် ထည့်ပါ:</label>
+        <textarea class="form-textarea" id="vless-input" placeholder="vless://uuid@host:port?..."></textarea>
+      </div>
+      <button class="generate-btn" onclick="generateSubLink()">
+        <i class="fas fa-plus"></i>
+        <span data-i18n="generateBtn">Sub Link ထုတ်မည်</span>
+      </button>
+      <div class="result-box" id="result-box">
+        <div class="result-label" data-i18n="resultLabel">Generated Sub Link</div>
+        <div class="result-text" id="sub-link-text"></div>
+        <div class="qr-container" id="qr-container"></div>
+        <button class="generate-btn" onclick="copySubLink()" style="background: #10b981;">
+          <i class="fas fa-copy"></i>
+          <span data-i18n="copyBtn">Copy Sub Link</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Guides Page -->
+    <div class="page-content" id="page-guides">
+      <div class="page-header">
+        <div class="page-title" data-i18n="guidesTitle">လမ်းညွှန်များ</div>
+        <div class="page-subtitle" data-i18n="guidesSubtitle">အသုံးပြုပုံများကို အောက်တွင် လေ့လာနိုင်ပါသည်။</div>
+      </div>
+      
+      <div class="guide-card">
+        <div class="guide-title" data-i18n="guide1Title">Hiddify အသုံးပြုနည်း</div>
+        <div style="background: var(--bg-secondary); color: var(--accent); padding: 6px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 10px;">Recommended</div>
+        <div class="guide-description" data-i18n="guide1Desc">Platforms အားလုံးအတွက် ကြော်ငြာမပါ အကောင်းဆုံး App</div>
+        <button class="read-btn">
+          <i class="fas fa-book-open"></i> <span data-i18n="readBtn">ဖတ်ရန်</span>
+        </button>
+      </div>
+
+      <div class="guide-card">
+        <div class="guide-title" data-i18n="guide2Title">v2rayNG အသုံးပြုနည်း</div>
+        <div class="guide-description" data-i18n="guide2Desc">Android ဖုန်းများအတွက် အသုံးပြုရခြင်း အဆင်ပြေ အောင်မြင်</div>
+        <button class="read-btn">
+          <i class="fas fa-book-open"></i> <span data-i18n="readBtn">ဖတ်ရန်</span>
+        </button>
+      </div>
+
+      <div class="guide-card">
+        <div class="guide-title" data-i18n="guide3Title">v2raytun အသုံးပြုနည်း</div>
+        <div class="guide-description" data-i18n="guide3Desc">iOS နှင့် Android အတွက် အဆင်ပြေသော Design ရှိသည့် App</div>
+        <button class="read-btn">
+          <i class="fas fa-book-open"></i> <span data-i18n="readBtn">ဖတ်ရန်</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Apps Page -->
+    <div class="page-content" id="page-apps">
+      <div class="page-header">
+        <div class="page-title" data-i18n="appsTitle">ကြိုက်နှစ်သက်ရာ</div>
+        <div class="page-subtitle" data-i18n="appsSubtitle">အကောင်းဆုံး VPN App များ</div>
+      </div>
+
+      <div class="app-card">
+        <div class="app-header">
+          <div class="app-name">Hiddify Next</div>
+          <div class="app-tag">ALL PLATFORMS</div>
+        </div>
+        <div class="app-description" data-i18n="app1Desc">Platforms အားလုံးအတွက် ကြော်ငြာမပါ အကောင်းဆုံး App</div>
+        <button class="download-btn">
+          <i class="fas fa-download"></i>
+          <span data-i18n="downloadBtn">ဒေါင်းလုဒ် ရယူရန်</span>
+        </button>
+      </div>
+
+      <div class="app-card">
+        <div class="app-header">
+          <div class="app-name">v2rayNG</div>
+          <div class="app-tag">ANDROID</div>
+        </div>
+        <div class="app-description" data-i18n="app2Desc">Android ဖုန်းများအတွက် အသုံးပြုရခြင်း အဆင်ပြေ အောင်မြင်</div>
+        <button class="download-btn">
+          <i class="fas fa-download"></i>
+          <span data-i18n="downloadBtn">ဒေါင်းလုဒ် ရယူရန်</span>
+        </button>
+      </div>
+
+      <div class="app-card">
+        <div class="app-header">
+          <div class="app-name">v2raytun</div>
+          <div class="app-tag">iOS & ANDROID</div>
+        </div>
+        <div class="app-description" data-i18n="app3Desc">iOS နှင့် Android အတွက် အဆင်ပြေသော Design ရှိသည့် App</div>
+        <button class="download-btn">
+          <i class="fas fa-download"></i>
+          <span data-i18n="downloadBtn">ဒေါင်းလုဒ် ရယူရန်</span>
+        </button>
+      </div>
+
+      <div class="app-card">
+        <div class="app-header">
+          <div class="app-name">NekoBox</div>
+          <div class="app-tag">MULTI-PLATFORM</div>
+        </div>
+        <div class="app-description" data-i18n="app4Desc">Windows, macOS, Linux အတွက် အစွမ်းထက်သော VPN Client</div>
+        <button class="download-btn">
+          <i class="fas fa-download"></i>
+          <span data-i18n="downloadBtn">ဒေါင်းလုဒ် ရယူရန်</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contact Page -->
+    <div class="page-content" id="page-contact">
+      <div class="page-header">
+        <div class="page-title" data-i18n="contactTitle">ဆက်သွယ်ရန်</div>
+        <div class="page-subtitle" data-i18n="contactSubtitle">ကျွန်ုပ်တို့ကို အောက်ပါနည်းလမ်းဖြင့် ဆက်သွယ်နိုင်ပါသည်။</div>
+      </div>
+
+      <a href="https://t.me/Swnt7771" target="_blank" class="contact-item">
+        <div class="contact-icon">
+          <i class="fab fa-telegram"></i>
+        </div>
+        <div class="contact-info">
+          <div class="contact-label">Telegram</div>
+          <div class="contact-value">@Swnt7771</div>
+        </div>
+      </a>
+
+      <a href="https://www.facebook.com/share/14bd1ThErYb/" target="_blank" class="contact-item">
+        <div class="contact-icon">
+          <i class="fab fa-facebook"></i>
+        </div>
+        <div class="contact-info">
+          <div class="contact-label">Facebook</div>
+          <div class="contact-value">Sal W Tun</div>
+        </div>
+      </a>
+
+      <a href="https://m.me/sai.w.tun.311" target="_blank" class="contact-item">
+        <div class="contact-icon">
+          <i class="fab fa-facebook-messenger"></i>
+        </div>
+        <div class="contact-info">
+          <div class="contact-label">Messenger</div>
+          <div class="contact-value">Sal W Tun</div>
+        </div>
+      </a>
+
+      <a href="tel:09674688300" class="contact-item">
+        <div class="contact-icon">
+          <i class="fas fa-phone"></i>
+        </div>
+        <div class="contact-info">
+          <div class="contact-label" data-i18n="phoneLabel">Phone</div>
+          <div class="contact-value">09674688300</div>
+        </div>
+      </a>
+
+      <div class="contact-item">
+        <div class="contact-icon">
+          <i class="fas fa-map-marker-alt"></i>
+        </div>
+        <div class="contact-info">
+          <div class="contact-label" data-i18n="addressLabel">လိပ်စာ</div>
+          <div class="contact-value" data-i18n="addressValue">Kayin State, Myawaddy Township, Thin Gun Nyi Naung</div>
+        </div>
+      </div>
+
+      <button class="map-btn" onclick="openMap()">
+        <i class="fas fa-map"></i>
+        <span data-i18n="mapBtn">Google Map တွင်ကြည့်ရန်</span>
+      </button>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 Galaxy Tunnel Team. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const i18n = {
+      my: {
+        sidebarHeader: "Galaxy Tunnel",
+        navServers: "ဆာဗာများ",
+        navSublink: "Sublink ထုတ်ရန်",
+        navGuides: "လမ်းညွှန်များ",
+        navApps: "ထည့်သွင်းနိုင်သည့် App များ",
+        navSettings: "Settings",
+        navContact: "ဆက်သွယ်ရန်",
+        headerTitle: "Galaxy Tunnel",
+        serversTitle: "Galaxy Tunnel",
+        serversSubtitle: "Secure. Fast. Limitless. — Your Gateway to the Digital World.",
+        settingsTitle: "Settings",
+        settingsSubtitle: "စိတ်ကြိုက် ပြင်ဆင်ရန်",
+        themeLabel: "Theme",
+        lightMode: "အလင်း",
+        darkMode: "အမှောင်",
+        sublinkTitle: "Sublink ထုတ်ရန်",
+        sublinkSubtitle: "Sub Link ရယူရန် VLESS ကို ထည့်ပါ",
+        vlessLabel: "VLESS ကွန်ဖစ် ကို ဤနေရာတွင် ထည့်ပါ:",
+        generateBtn: "Sub Link ထုတ်မည်",
+        resultLabel: "ထုတ်ယူရရှိသော Sub Link",
+        copyBtn: "Copy ကူးယူမည်",
+        guidesTitle: "လမ်းညွှန်များ",
+        guidesSubtitle: "အသုံးပြုပုံများကို အောက်တွင် လေ့လာနိုင်ပါသည်။",
+        guide1Title: "Hiddify အသုံးပြုနည်း",
+        guide1Desc: "Platforms အားလုံးအတွက် ကြော်ငြာမပါ အကောင်းဆုံး App",
+        guide2Title: "v2rayNG အသုံးပြုနည်း",
+        guide2Desc: "Android ဖုန်းများအတွက် အသုံးပြုရခြင်း အဆင်ပြေ အောင်မြင်",
+        guide3Title: "v2raytun အသုံးပြုနည်း",
+        guide3Desc: "iOS နှင့် Android အတွက် အဆင်ပြေသော Design ရှိသည့် App",
+        readBtn: "ဖတ်ရန်",
+        appsTitle: "ကြိုက်နှစ်သက်ရာ",
+        appsSubtitle: "အကောင်းဆုံး VPN App များ",
+        app1Desc: "Platforms အားလုံးအတွက် ကြော်ငြာမပါ အကောင်းဆုံး App",
+        app2Desc: "Android ဖုန်းများအတွက် အသုံးပြုရခြင်း အဆင်ပြေ အောင်မြင်",
+        app3Desc: "iOS နှင့် Android အတွက် အဆင်ပြေသော Design ရှိသည့် App",
+        app4Desc: "Windows, macOS, Linux အတွက် အစွမ်းထက်သော VPN Client",
+        downloadBtn: "ဒေါင်းလုဒ် ရယူရန်",
+        contactTitle: "ဆက်သွယ်ရန်",
+        contactSubtitle: "ကျွန်ုပ်တို့ကို အောက်ပါနည်းလမ်းဖြင့် ဆက်သွယ်နိုင်ပါသည်။",
+        phoneLabel: "ဖုန်း",
+        addressLabel: "လိပ်စာ",
+        addressValue: "ကရင်ပြည်နယ်၊ မြဝတီမြို့နယ်၊ သင်္ကန်းညီနောင်",
+        mapBtn: "Google Map တွင်ကြည့်ရန်",
+        serverCopyBtn: "ကူးယူရန်",
+        checking: "စစ်ဆေးနေသည်...",
+        offline: "လိုင်းမရှိပါ"
+      },
+      en: {
+        sidebarHeader: "Galaxy Tunnel",
+        navServers: "Servers",
+        navSublink: "Generate Sublink",
+        navGuides: "Guides",
+        navApps: "Download Apps",
+        navSettings: "Settings",
+        navContact: "Contact Us",
+        headerTitle: "Galaxy Tunnel",
+        serversTitle: "Galaxy Tunnel",
+        serversSubtitle: "Secure. Fast. Limitless. — Your Gateway to the Digital World.",
+        settingsTitle: "Settings",
+        settingsSubtitle: "Customize your experience",
+        themeLabel: "Theme",
+        lightMode: "Light",
+        darkMode: "Dark",
+        sublinkTitle: "Generate Sublink",
+        sublinkSubtitle: "Enter VLESS config to get Sub Link",
+        vlessLabel: "Paste VLESS Config Here:",
+        generateBtn: "Generate Sub Link",
+        resultLabel: "Generated Sub Link",
+        copyBtn: "Copy Sub Link",
+        guidesTitle: "Guides",
+        guidesSubtitle: "Learn how to use our services below.",
+        guide1Title: "How to use Hiddify",
+        guide1Desc: "Best ad-free app for all platforms",
+        guide2Title: "How to use v2rayNG",
+        guide2Desc: "Reliable and easy to use for Android",
+        guide3Title: "How to use v2raytun",
+        guide3Desc: "Stylish app for both iOS and Android",
+        readBtn: "Read More",
+        appsTitle: "Favorites",
+        appsSubtitle: "Best VPN Apps Selection",
+        app1Desc: "Best ad-free app for all platforms",
+        app2Desc: "Reliable and easy to use for Android",
+        app3Desc: "Stylish app for both iOS and Android",
+        app4Desc: "Powerful VPN client for Windows, macOS, Linux",
+        downloadBtn: "Download Now",
+        contactTitle: "Contact Us",
+        contactSubtitle: "You can reach us through the following methods.",
+        phoneLabel: "Phone",
+        addressLabel: "Address",
+        addressValue: "Kayin State, Myawaddy Township, Thin Gun Nyi Naung",
+        mapBtn: "View on Google Map",
+        serverCopyBtn: "Copy Config",
+        checking: "Checking...",
+        offline: "Offline"
+      }
+    };
+
+    let currentLang = localStorage.getItem('lang') || 'my';
+
+    let servers = [
+      { 
+        id: 1, 
+        name: "SERVER 01 (Island)", 
+        description: "Low Ping - Stable Connection", 
+        location: "Singapore", 
+        vlessConfig: "vless://00852e77-3cb2-4921-b181-4c69328d0167@open.iceisland.workers.dev:443?path=%2F&security=tls&encryption=none&host=open.iceisland.workers.dev&type=ws&sni=open.iceisland.workers.dev#Galaxy-Tunnel",
+        pingUrl: "https://open.iceisland.workers.dev"
+      },
+      { 
+        id: 2, 
+        name: "SERVER 02 (Galaxy)", 
+        description: "High Speed - Premium", 
+        location: "USA", 
+        vlessConfig: "vless://199be581-6d1e-4f99-84a8-eb842dbf3c30@venus.marsvenusp01.workers.dev:443?path=%2F%3Fed%3D2560&security=tls&encryption=none&host=venus.marsvenusp01.workers.dev&type=ws&sni=venus.marsvenusp01.workers.dev#Galaxy-Tunnel",
+        pingUrl: "https://venus.marsvenusp01.workers.dev"
+      },
+      { 
+        id: 3, 
+        name: "SERVER 03 (Univers)", 
+        description: "Host: sub.galaxytunnel2026.workers.dev", 
+        location: "Global CDN", 
+        vlessConfig: "vless://8221a740-8218-4775-ab45-0bab948285ec@sub.galaxytunnel2026.workers.dev:443?security=tls&encryption=none&host=sub.galaxytunnel2026.workers.dev&type=ws&sni=sub.galaxytunnel2026.workers.dev#Galaxy-Tunnel",
+        pingUrl: "https://sub.galaxytunnel2026.workers.dev"
+      },
+      { 
+        id: 4, 
+        name: "SERVER 04 (Galaxy V2.0)", 
+        description: "Premium High Speed Node", 
+        location: "Multi-Region", 
+        vlessConfig: "vless://26fe5cdd-e772-4238-8adc-9bf53d4781fa@coca.nobless.workers.dev:443?path=%2F&security=tls&encryption=none&host=coca.nobless.workers.dev&type=ws&sni=coca.nobless.workers.dev#Galaxy-Tunnel",
+        pingUrl: "https://coca.nobless.workers.dev"
+      }
+    ];
+
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      setTheme(savedTheme);
+    }
+
+    function setTheme(theme) {
+      if (theme === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('theme-dark-btn').classList.add('active');
+        document.getElementById('theme-light-btn').classList.remove('active');
+      } else {
+        document.body.classList.remove('dark-mode');
+        document.getElementById('theme-light-btn').classList.add('active');
+        document.getElementById('theme-dark-btn').classList.remove('active');
+      }
+      localStorage.setItem('theme', theme);
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      
+      // Update buttons UI
+      document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`btn-${lang}`).classList.add('active');
+      
+      // Update all translatable elements
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (i18n[lang][key]) {
+          el.textContent = i18n[lang][key];
+        }
+      });
+
+      // Refresh servers list to update button text
+      renderServers();
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+      document.getElementById('overlay').classList.toggle('active');
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('active');
+      document.getElementById('overlay').classList.remove('active');
+    }
+
+    function switchPage(page) {
+      document.querySelectorAll('.page-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(`page-${page}`).classList.add('active');
+      document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+      document.getElementById(`nav-${page}`).classList.add('active');
+      if (page === 'servers') renderServers();
+    }
+
+    function renderServers() {
+      const container = document.getElementById('servers-container');
+      container.innerHTML = servers.map(server => `
+        <div class="server-card">
+          <div class="server-header">
+            <div class="server-name">${server.name}</div>
+            <div class="server-status status-checking">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span id="ping-${server.id}">${i18n[currentLang].checking}</span>
+            </div>
+          </div>
+          <div class="server-location">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>${server.location}</span>
+          </div>
+          <div class="server-description">${server.description}</div>
+          <button class="copy-btn" onclick="copyConfig(${server.id})">
+            <i class="fas fa-copy"></i>
+            <span>${i18n[currentLang].serverCopyBtn}</span>
+          </button>
+        </div>
+      `).join('');
+      servers.forEach(s => checkPing(s));
+    }
+
+    async function checkPing(server) {
+      const start = performance.now();
+      try {
+        await fetch(server.pingUrl, { method: 'HEAD', mode: 'no-cors' });
+        const ping = Math.round(performance.now() - start);
+        const pingEl = document.getElementById(`ping-${server.id}`);
+        const statusEl = pingEl.parentElement;
+        statusEl.classList.remove('status-checking');
+        if (ping < 200) {
+          statusEl.classList.add('status-online');
+          pingEl.innerHTML = '<i class="fas fa-circle-check"></i> ' + ping + ' ms';
+        } else if (ping < 500) {
+          statusEl.classList.add('status-checking');
+          pingEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + ping + ' ms';
+        } else {
+          statusEl.classList.add('status-offline');
+          pingEl.innerHTML = '<i class="fas fa-circle-xmark"></i> ' + ping + ' ms';
+        }
+      } catch {
+        const pingEl = document.getElementById(`ping-${server.id}`);
+        const statusEl = pingEl.parentElement;
+        statusEl.classList.remove('status-checking');
+        statusEl.classList.add('status-offline');
+        pingEl.innerHTML = `<i class="fas fa-circle-xmark"></i> ${i18n[currentLang].offline}`;
+      }
+    }
+
+    function copyConfig(id) {
+      const server = servers.find(s => s.id === id);
+      const btn = event.target.closest('.copy-btn');
+      const text = server.vlessConfig;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showCopySuccess(btn)).catch(() => fallbackCopy(text, btn));
+      } else {
+        fallbackCopy(text, btn);
+      }
+    }
+
+    function fallbackCopy(text, btn) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showCopySuccess(btn);
+      } catch (err) {
+        alert('Failed to copy');
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function showCopySuccess(btn) {
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-check"></i> <span>Copied!</span>';
+      btn.style.background = '#10b981';
+      setTimeout(() => {
+        btn.innerHTML = originalHTML;
+        btn.style.background = '';
+      }, 2000);
+    }
+
+    function generateSubLink() {
+      const input = document.getElementById('vless-input').value.trim();
+      if (!input.startsWith('vless://')) {
+        alert('Invalid VLESS format');
+        return;
+      }
+      try {
+        const parts = input.split('?');
+        const uuid = parts[0].replace('vless://', '').split('@')[0];
+        let sub = `https://infinityserver.pages.dev/sub?uuid=${uuid}`;
+        if (parts.length > 1) {
+          const queryPart = parts[1].split('#')[0];
+          sub += `&${queryPart}`;
+        }
+        document.getElementById('sub-link-text').textContent = sub;
+        document.getElementById('result-box').classList.add('active');
+        const qrContainer = document.getElementById('qr-container');
+        qrContainer.innerHTML = '';
+        if (typeof QRCode !== 'undefined') {
+          new QRCode(qrContainer, {
+            text: sub, width: 200, height: 200,
+            colorDark: document.body.classList.contains('dark-mode') ? '#f5f3f0' : '#2c2c2a',
+            colorLight: document.body.classList.contains('dark-mode') ? '#2a2a28' : '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        } else {
+          const qrImg = document.createElement('img');
+          qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(sub)}`;
+          qrImg.className = 'mx-auto';
+          qrContainer.appendChild(qrImg);
+        }
+      } catch (e) {
+        alert('Error generating sub link');
+      }
+    }
+
+    function copySubLink() {
+      const text = document.getElementById('sub-link-text').textContent;
+      const btn = event.target.closest('.generate-btn');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          const originalHTML = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-check"></i> <span>Copied!</span>';
+          setTimeout(() => btn.innerHTML = originalHTML, 2000);
+        }).catch(() => alert('Failed to copy'));
+      }
+    }
+
+    function openMap() {
+      window.open('https://maps.app.goo.gl/ZpUEue81VtVyY24J7', '_blank');
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+    document.head.appendChild(script);
+
+    window.addEventListener('load', () => {
+      loadTheme();
+      setLanguage(currentLang);
+    });
+  </script>
+</body>
+</html>
