@@ -341,11 +341,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
                 MmkvManager.removeAllServer()
             } else {
-                val serversCopy = serversCache.toList()
-                for (item in serversCopy) {
-                    MmkvManager.removeServer(item.guid)
+                val serverList = MmkvManager.decodeServerList(subscriptionId)
+                for (guid in serverList) {
+                    MmkvManager.removeServer(guid)
                 }
-                serversCache.toList().count()
+                serverList.count()
             }
         return count
     }
