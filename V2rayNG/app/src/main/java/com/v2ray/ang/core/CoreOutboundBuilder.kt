@@ -612,10 +612,6 @@ object CoreOutboundBuilder {
                 && packets == "tlshello"
             ) {
                 packets = "1-3"
-            } else if (streamSettings.security == AppConfig.TLS
-                && packets != "tlshello"
-            ) {
-                packets = "tlshello"
             }
 
             val fragmentMask = OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
