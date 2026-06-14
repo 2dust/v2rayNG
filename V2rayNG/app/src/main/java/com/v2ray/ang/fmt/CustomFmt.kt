@@ -14,8 +14,11 @@ object CustomFmt : FmtBase() {
      */
     fun parse(str: String): ProfileItem {
         val config = ProfileItem.create(EConfigType.CUSTOM)
-
-        val fullConfig = JsonUtil.fromJson(str, V2rayConfig::class.java)
+        val fullConfig = if (str.startsWith("http")) {
+            null
+        } else {
+            JsonUtil.fromJson(str, V2rayConfig::class.java)
+        }
         val outbound = fullConfig?.getProxyOutbound()
 
         config.remarks = fullConfig?.remarks ?: System.currentTimeMillis().toString()
