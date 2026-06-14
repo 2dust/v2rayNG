@@ -119,9 +119,9 @@
     <string name="server_lab_ech_config_list">نومگه کانفیگ Ech</string>
     <string name="server_lab_verify_peer_cert_by_name">تئیڌ گوواهی هومتا و ری نوم</string>
     <string name="server_lab_pinned_ca256">جا کلک گوواهی (SHA-256)</string>
-    <string name="pinned_ca256_action_fetch">Fetch and fill certificate fingerprint</string>
-    <string name="toast_fetch_cert_sha256_success">Certificate fingerprint fetched successfully</string>
-    <string name="toast_fetch_cert_sha256_failed">Failed to fetch certificate fingerprint</string>
+    <string name="pinned_ca256_action_fetch">گرؽڌن وو پور کردن جا کلک گوواهی</string>
+    <string name="toast_fetch_cert_sha256_success">جا کلک گوواهی وا مووفقیت گرؽڌه وابی</string>
+    <string name="toast_fetch_cert_sha256_failed">گرؽڌن جا کلک گوواهی مووفق نبی</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">لف گیری فایل ٱنجوم نوابی، ز ی برنومه دؽوۉداری فایل هیاری بگرین</string>
