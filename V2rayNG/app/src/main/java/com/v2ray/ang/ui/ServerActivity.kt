@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Spinner
@@ -148,7 +149,7 @@ class ServerActivity : BaseActivity() {
     private val et_verify_peer_cert_by_name: EditText? by lazy { findViewById(R.id.et_verify_peer_cert_by_name) }
     private val container_verify_peer_cert_by_name: LinearLayout? by lazy { findViewById(R.id.lay_verify_peer_cert_by_name) }
     private val et_pinned_ca256: EditText? by lazy { findViewById(R.id.et_pinned_ca256) }
-    private val sp_pinned_ca256_action: Spinner? by lazy { findViewById(R.id.sp_pinned_ca256_action) }
+    private val btn_pinned_ca256_action: Button? by lazy { findViewById(R.id.btn_pinned_ca256_action) }
     private val container_pinned_ca256: LinearLayout? by lazy { findViewById(R.id.lay_pinned_ca256) }
     private val layout_browser_dialer: LinearLayout? by lazy { findViewById(R.id.layout_browser_dialer) }
     private val sp_browser_dialer_mode: Spinner? by lazy { findViewById(R.id.sp_browser_dialer_mode) }
@@ -354,24 +355,8 @@ class ServerActivity : BaseActivity() {
                 // do nothing
             }
         }
-        sp_pinned_ca256_action?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long,
-            ) {
-                if (position <= 0) {
-                    return
-                }
-
-                parent?.setSelection(0)
-                fetchPinnedCA256ForCurrentConfig()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // do nothing
-            }
+        btn_pinned_ca256_action?.setOnClickListener {
+            fetchPinnedCA256ForCurrentConfig()
         }
         if (config != null) {
             bindingServer(config)
@@ -672,7 +657,7 @@ class ServerActivity : BaseActivity() {
         val config = buildCurrentProfileForCertificateFetch() ?: return
 
         lifecycleScope.launch {
-            sp_pinned_ca256_action?.isEnabled = false
+            btn_pinned_ca256_action?.isEnabled = false
             try {
                 val sha256 = withContext(Dispatchers.IO) {
                     CertificateFingerprintManager.fetchForManualFill(config)
@@ -684,7 +669,7 @@ class ServerActivity : BaseActivity() {
                     toastSuccess(R.string.toast_fetch_cert_sha256_success)
                 }
             } finally {
-                sp_pinned_ca256_action?.isEnabled = true
+                btn_pinned_ca256_action?.isEnabled = true
             }
         }
     }
