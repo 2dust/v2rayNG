@@ -122,9 +122,9 @@
     <string name="server_lab_browser_dialer">Использовать переадресацию браузера</string>
     <string name="server_lab_browser_dialer_tip">Поддерживаются только исходящие соединения XHTTP (packet-up) и WS; настройки, связанные с TLS, могут быть проигнорированы или конфликтовать</string>
     <string name="toast_allow_insecure_deprecated">ВНИМАНИЕ: пропуск проверки сертификата («Разрешать небезопасные соединения») будет отключён в августе 2026 года. Пожалуйста, используйте отпечатки сертификатов как можно скорее. Функция будет недоступна после истечения срока действия.</string>
-    <string name="pinned_ca256_action_fetch">Fetch and fill certificate fingerprint</string>
-    <string name="toast_fetch_cert_sha256_success">Certificate fingerprint fetched successfully</string>
-    <string name="toast_fetch_cert_sha256_failed">Failed to fetch certificate fingerprint</string>
+    <string name="pinned_ca256_action_fetch">Получить и заполнить отпечаток сертификата</string>
+    <string name="toast_fetch_cert_sha256_success">Отпечаток сертификата успешно получен</string>
+    <string name="toast_fetch_cert_sha256_failed">Отпечаток сертификата не получен</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">Невозможно скопировать файл, используйте файловый менеджер</string>
