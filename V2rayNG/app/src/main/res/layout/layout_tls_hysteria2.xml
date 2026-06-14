@@ -88,6 +88,14 @@
                 android:layout_height="wrap_content"
                 android:inputType="text" />
 
+            <Button
+                android:id="@+id/btn_pinned_ca256_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_spacing_dp8"
+                android:layout_marginBottom="@dimen/padding_spacing_dp8"
+                android:text="@string/pinned_ca256_action_fetch" />
+
         </LinearLayout>
     </LinearLayout>
 
