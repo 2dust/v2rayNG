@@ -85,7 +85,6 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         setupViewModel()
         SubscriptionUpdater.sync()
         mainViewModel.reloadServerList()
-        refreshGroupTabTitles(true)
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {
         }
@@ -141,6 +140,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         binding.viewPager.setCurrentItem(targetIndex, false)
 
         binding.tabGroup.isVisible = groups.size > 1
+        refreshGroupTabTitles(true)
     }
 
     fun refreshGroupTabTitles(refreshAll: Boolean = false) {
