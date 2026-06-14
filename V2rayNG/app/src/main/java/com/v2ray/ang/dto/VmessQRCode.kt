@@ -16,5 +16,7 @@ data class VmessQRCode(
     var sni: String = "",
     var alpn: String = "",
     var fp: String = "",
-    var insecure: String = ""
+    var insecure: String = "",
+    var vcn: String = "",
+    var pcs: String = ""
 )

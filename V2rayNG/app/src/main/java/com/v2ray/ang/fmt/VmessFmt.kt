@@ -88,6 +88,9 @@ object VmessFmt : FmtBase() {
             "0" -> false
             else -> false
         }
+        config.verifyPeerCertByName = vmessQRCode.vcn
+        config.pinnedCA256 = vmessQRCode.pcs
+
         return config
     }
 
@@ -141,6 +144,8 @@ object VmessFmt : FmtBase() {
             false -> "0"
             else -> ""
         }
+        vmessQRCode.vcn = config.verifyPeerCertByName.orEmpty()
+        vmessQRCode.pcs = config.pinnedCA256.orEmpty()
 
         val json = JsonUtil.toJson(vmessQRCode)
         return Utils.encode(json)
