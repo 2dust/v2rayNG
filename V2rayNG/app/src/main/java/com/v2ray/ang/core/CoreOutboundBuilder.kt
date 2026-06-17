@@ -368,37 +368,40 @@ object CoreOutboundBuilder {
                 profileItem.kcpMtu?.let { kcpSetting.mtu = it }
                 profileItem.kcpTti?.let { kcpSetting.tti = it }
                 streamSettings.kcpSettings = kcpSetting
-                val udpMaskList = mutableListOf<OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean>()
+                val udpMaskList =
+                    mutableListOf<OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean>()
                 if (!headerType.isNullOrEmpty() && headerType != "none") {
                     val kcpHeaderType = when {
-                        headerType == "wechat-video" -> "header-wechat"
-                        else -> "header-$headerType"
+                        headerType == "wechat-video" -> "wechat"
+                        else -> headerType
                     }
                     udpMaskList.add(
                         OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
-                            type = kcpHeaderType,
-                            settings = if (headerType == "dns" && !host.isNullOrEmpty()) {
+                            type = "mkcp-legacy",
+                            settings =
                                 OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
-                                    domain = host
+                                    header = kcpHeaderType,
+                                    value = if (headerType == "dns" && !host.isNullOrEmpty()) {
+                                        host
+                                    } else {
+                                        null
+                                    }
                                 )
-                            } else {
-                                null
-                            }
                         )
                     )
                 }
                 if (seed.isNullOrEmpty()) {
                     udpMaskList.add(
                         OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
-                            type = "mkcp-original"
+                            type = "mkcp-legacy"
                         )
                     )
                 } else {
                     udpMaskList.add(
                         OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
-                            type = "mkcp-aes128gcm",
+                            type = "mkcp-legacy",
                             settings = OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
-                                password = seed
+                                value = seed
                             )
                         )
                     )
