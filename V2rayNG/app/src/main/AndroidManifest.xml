@@ -202,6 +202,17 @@
         </service>
 
         <service
+            android:name=".service.CoreRootService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:label="@string/app_name"
+            android:process=":RunSoLibV2RayDaemon">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="proxy" />
+        </service>
+
+        <service
             android:name=".service.CoreTestService"
             android:exported="false"
             android:foregroundServiceType="specialUse"

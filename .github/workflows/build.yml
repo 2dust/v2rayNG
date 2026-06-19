@@ -57,6 +57,25 @@ jobs:
         path: ${{ github.workspace }}/libs
         key: libhevtun-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD') }}-${{ hashFiles('compile-hevtun.sh') }}
 
+    - name: Download tun2socks (root Tun2socks mode helper)
+      run: |
+        set -euo pipefail
+        TUN2SOCKS_VERSION="v2.6.0"
+        declare -A MAP=( ["arm64-v8a"]="arm64" ["armeabi-v7a"]="armv7" ["x86"]="386" ["x86_64"]="amd64" )
+        for abi in "${!MAP[@]}"; do
+          arch="${MAP[$abi]}"
+          url="https://github.com/xjasonlyu/tun2socks/releases/download/${TUN2SOCKS_VERSION}/tun2socks-linux-${arch}.zip"
+          echo "Fetching $url"
+          mkdir -p "${{ github.workspace }}/libs/${abi}"
+          curl -fsSL "$url" -o /tmp/t2s.zip
+          rm -rf /tmp/t2s && mkdir -p /tmp/t2s
+          unzip -o -j /tmp/t2s.zip -d /tmp/t2s
+          bin="$(find /tmp/t2s -type f -name 'tun2socks*' | head -n1)"
+          cp "$bin" "${{ github.workspace }}/libs/${abi}/libtun2socks.so"
+          chmod 755 "${{ github.workspace }}/libs/${abi}/libtun2socks.so"
+          rm -rf /tmp/t2s /tmp/t2s.zip
+        done
+
     - name: Copy libhevtun
       run: |
         cp -r ${{ github.workspace }}/libs ${{ github.workspace }}/V2rayNG/app

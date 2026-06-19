@@ -21,8 +21,10 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.contracts.Tun2SocksControl
 import com.v2ray.ang.core.CoreServiceManager
+import com.v2ray.ang.core.root.RootProxyManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
+import com.v2ray.ang.handler.RootManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MyContextWrapper
@@ -34,6 +36,7 @@ class CoreVpnService : VpnService(), ServiceControl {
     private lateinit var mInterface: ParcelFileDescriptor
     private var isRunning = false
     private var tun2SocksService: Tun2SocksControl? = null
+    private var lanSharingStarted = false
 
     /**destroy
      * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
@@ -133,6 +136,14 @@ class CoreVpnService : VpnService(), ServiceControl {
             LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to start core loop")
             stopAllService()
             return
+        }
+
+        // Optional root feature: share the proxy with tethered LAN/USB clients while the
+        // device itself stays on the VpnService. Runs a dedicated client tun2socks off the
+        // main thread so the su calls don't block service startup.
+        if (RootManager.cachedRoot() && MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)) {
+            lanSharingStarted = true
+            Thread { RootProxyManager.startClientSharing(this) }.apply { isDaemon = true }.start()
         }
     }
 
@@ -361,6 +372,12 @@ class CoreVpnService : VpnService(), ServiceControl {
 
         tun2SocksService?.stopTun2Socks()
         tun2SocksService = null
+
+        // Remove LAN/tethering sharing rules + helper before stopping the core.
+        if (lanSharingStarted) {
+            lanSharingStarted = false
+            RootProxyManager.stop(this)
+        }
 
         CoreServiceManager.stopCoreLoop()
 

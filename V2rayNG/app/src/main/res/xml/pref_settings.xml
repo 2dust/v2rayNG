@@ -317,6 +317,12 @@
             android:summary="%s"
             android:title="@string/title_mode" />
 
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_root_lan_sharing"
+            android:summary="@string/summary_root_lan_sharing"
+            android:title="@string/title_root_lan_sharing" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

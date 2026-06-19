@@ -17,6 +17,7 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.enums.ERunMode
 import com.v2ray.ang.enums.Language
 import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.enums.VpnInterfaceAddressConfig
@@ -479,12 +480,25 @@ object SettingsManager {
     }
 
     /**
+     * Get the configured run mode (defaults to VPN for unset/legacy values).
+     */
+    fun getRunMode(): ERunMode {
+        return ERunMode.fromPref(MmkvManager.decodeSettingsString(AppConfig.PREF_MODE))
+    }
+
+    /**
      * Check if VPN mode is enabled.
      * @return True if VPN mode is enabled, false otherwise.
      */
     fun isVpnMode(): Boolean {
-        val mode = MmkvManager.decodeSettingsString(AppConfig.PREF_MODE)
-        return mode == null || mode == VPN
+        return getRunMode() == ERunMode.VPN
+    }
+
+    /**
+     * Check if a root (system-wide) run mode is selected.
+     */
+    fun isRootMode(): Boolean {
+        return getRunMode().needsRoot
     }
 
     /**
