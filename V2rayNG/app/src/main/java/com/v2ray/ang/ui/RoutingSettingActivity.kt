@@ -34,6 +34,7 @@ class RoutingSettingActivity : HelperBaseActivity() {
     private val viewModel: RoutingSettingsViewModel by viewModels()
     private lateinit var adapter: RoutingSettingRecyclerAdapter
     private var mItemTouchHelper: ItemTouchHelper? = null
+    private val profileId by lazy { intent.getStringExtra("profileId").orEmpty() }
     private val routing_domain_strategy: Array<out String> by lazy {
         resources.getStringArray(R.array.routing_domain_strategy)
     }
@@ -43,8 +44,16 @@ class RoutingSettingActivity : HelperBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(binding.root)
-        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.routing_settings_title))
+
+        viewModel.setProfileId(profileId)
+
+        val profile = SettingsManager.getRoutingProfile(profileId)
+            ?: SettingsManager.getActiveRoutingProfile()
+        val titleStr = profile?.name?.let {
+            "$it — ${getString(R.string.routing_settings_title)}"
+        } ?: getString(R.string.routing_settings_title)
+
+        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = titleStr)
 
         adapter = RoutingSettingRecyclerAdapter(viewModel, ActivityAdapterListener())
 
@@ -73,7 +82,10 @@ class RoutingSettingActivity : HelperBaseActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.add_rule -> startActivity(Intent(this, RoutingEditActivity::class.java)).let { true }
+        R.id.add_rule -> startActivity(
+            Intent(this, RoutingEditActivity::class.java)
+                .putExtra("profileId", profileId)
+        ).let { true }
         R.id.import_predefined_rulesets -> importPredefined().let { true }
         R.id.import_rulesets_from_clipboard -> importFromClipboard().let { true }
         R.id.import_rulesets_from_qrcode -> importQRcode()
@@ -82,14 +94,24 @@ class RoutingSettingActivity : HelperBaseActivity() {
     }
 
     private fun getDomainStrategy(): String {
-        return MmkvManager.decodeSettingsString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY) ?: routing_domain_strategy.first()
+        val profile = SettingsManager.getRoutingProfile(profileId)
+            ?: SettingsManager.getActiveRoutingProfile()
+        return profile?.domainStrategy
+            ?: routing_domain_strategy.first()
     }
 
     private fun setDomainStrategy() {
         android.app.AlertDialog.Builder(this).setItems(routing_domain_strategy.asList().toTypedArray()) { _, i ->
             try {
                 val value = routing_domain_strategy[i]
-                MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, value)
+                val profile = SettingsManager.getRoutingProfile(profileId)
+                if (profile != null) {
+                    profile.domainStrategy = value
+                    SettingsManager.saveRoutingProfile(profile)
+                } else {
+                    // Fallback: save to legacy setting
+                    MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, value)
+                }
                 binding.tvDomainStrategySummary.text = value
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to set domain strategy", e)
@@ -103,7 +125,7 @@ class RoutingSettingActivity : HelperBaseActivity() {
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     try {
                         lifecycleScope.launch(Dispatchers.IO) {
-                            SettingsManager.resetRoutingRulesetsFromPresets(this@RoutingSettingActivity, i)
+                            SettingsManager.resetRoutingRulesetsFromPresetsForProfile(this@RoutingSettingActivity, profileId, i)
                             launch(Dispatchers.Main) {
                                 refreshData()
                                 toastSuccess(R.string.toast_success)
@@ -113,9 +135,7 @@ class RoutingSettingActivity : HelperBaseActivity() {
                         LogUtil.e(AppConfig.TAG, "Failed to import predefined ruleset", e)
                     }
                 }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    //do nothing
-                }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
                 .show()
         }.show()
     }
@@ -131,7 +151,7 @@ class RoutingSettingActivity : HelperBaseActivity() {
                     return@setPositiveButton
                 }
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val result = SettingsManager.resetRoutingRulesets(clipboard)
+                    val result = SettingsManager.resetRoutingRulesetsFromContentForProfile(profileId, clipboard)
                     withContext(Dispatchers.Main) {
                         if (result) {
                             refreshData()
@@ -142,9 +162,7 @@ class RoutingSettingActivity : HelperBaseActivity() {
                     }
                 }
             }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                //do nothing
-            }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> }
             .show()
     }
 
@@ -158,7 +176,8 @@ class RoutingSettingActivity : HelperBaseActivity() {
     }
 
     private fun export2Clipboard() {
-        val rulesetList = MmkvManager.decodeRoutingRulesets()
+        val profile = SettingsManager.getRoutingProfile(profileId)
+        val rulesetList = profile?.rulesets
         if (rulesetList.isNullOrEmpty()) {
             toastError(R.string.toast_failure)
         } else {
@@ -167,12 +186,11 @@ class RoutingSettingActivity : HelperBaseActivity() {
         }
     }
 
-
     private fun importRulesetsFromQRcode(qrcode: String?): Boolean {
         AlertDialog.Builder(this).setMessage(R.string.routing_settings_import_rulesets_tip)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val result = SettingsManager.resetRoutingRulesets(qrcode)
+                    val result = SettingsManager.resetRoutingRulesetsFromContentForProfile(profileId, qrcode)
                     withContext(Dispatchers.Main) {
                         if (result) {
                             refreshData()
@@ -183,9 +201,7 @@ class RoutingSettingActivity : HelperBaseActivity() {
                     }
                 }
             }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                //do nothing
-            }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> }
             .show()
         return true
     }
@@ -201,6 +217,7 @@ class RoutingSettingActivity : HelperBaseActivity() {
             startActivity(
                 Intent(ownerActivity, RoutingEditActivity::class.java)
                     .putExtra("position", position)
+                    .putExtra("profileId", profileId)
             )
         }
 

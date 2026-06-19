@@ -14,6 +14,7 @@ import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.dto.entities.RoutingProfile
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
@@ -46,6 +47,7 @@ object SettingsManager {
         initRoutingRulesets(context)
         migrateServerListToSubscriptions()
         migrateHysteria2PinSHA256()
+        migrateRoutingRulesetsToProfiles(context)
     }
 
     /**
@@ -175,6 +177,143 @@ object SettingsManager {
         MmkvManager.encodeRoutingRulesets(rulesetList)
     }
 
+    // region RoutingProfiles
+
+    private fun migrateRoutingRulesetsToProfiles(context: Context) {
+        val migrationKey = "routing_rulesets_to_profiles_migrated"
+        if (MmkvManager.decodeSettingsBool(migrationKey, false)) return
+
+        val existingProfileIds = MmkvManager.decodeRoutingProfileIds()
+        if (existingProfileIds.isNotEmpty()) {
+            MmkvManager.encodeSettings(migrationKey, true)
+            return
+        }
+
+        val existingRulesets = MmkvManager.decodeRoutingRulesets()
+        val domainStrategy = MmkvManager.decodeSettingsString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY) ?: "AsIs"
+        val defaultProfile = RoutingProfile(
+            id = Utils.getUuid(),
+            name = AppConfig.DEFAULT_ROUTING_PROFILE_NAME,
+            domainStrategy = domainStrategy,
+            rulesets = existingRulesets ?: mutableListOf()
+        )
+        MmkvManager.encodeRoutingProfile(defaultProfile)
+        MmkvManager.setActiveRoutingProfileId(defaultProfile.id)
+        MmkvManager.encodeSettings(migrationKey, true)
+    }
+
+    fun getAllRoutingProfiles(): List<RoutingProfile> {
+        val ids = MmkvManager.decodeRoutingProfileIds()
+        return ids.mapNotNull { MmkvManager.decodeRoutingProfile(it) }
+    }
+
+    fun getRoutingProfile(id: String): RoutingProfile? {
+        if (id.isBlank()) return null
+        return MmkvManager.decodeRoutingProfile(id)
+    }
+
+    fun saveRoutingProfile(profile: RoutingProfile) {
+        MmkvManager.encodeRoutingProfile(profile)
+    }
+
+    fun createRoutingProfile(name: String): RoutingProfile {
+        val profile = RoutingProfile(id = Utils.getUuid(), name = name)
+        MmkvManager.encodeRoutingProfile(profile)
+        return profile
+    }
+
+    fun removeRoutingProfileById(id: String) {
+        val activeId = MmkvManager.getActiveRoutingProfileId()
+        MmkvManager.removeRoutingProfile(id)
+        if (activeId == id) {
+            val remaining = MmkvManager.decodeRoutingProfileIds()
+            MmkvManager.setActiveRoutingProfileId(remaining.firstOrNull() ?: "")
+        }
+    }
+
+    fun getActiveRoutingProfileId(): String = MmkvManager.getActiveRoutingProfileId()
+
+    fun setActiveRoutingProfile(id: String) {
+        MmkvManager.setActiveRoutingProfileId(id)
+    }
+
+    fun getActiveRoutingProfile(): RoutingProfile? {
+        val id = MmkvManager.getActiveRoutingProfileId()
+        return if (id.isBlank()) null else MmkvManager.decodeRoutingProfile(id)
+    }
+
+    fun getEffectiveRoutingProfile(profileItem: ProfileItem): RoutingProfile? {
+        val profileId = profileItem.routingProfileId?.takeIf { it.isNotBlank() }
+            ?: MmkvManager.getActiveRoutingProfileId()
+        return if (profileId.isBlank()) null else MmkvManager.decodeRoutingProfile(profileId)
+    }
+
+    private fun resolveProfileId(profileId: String): String {
+        return profileId.ifBlank { MmkvManager.getActiveRoutingProfileId() }
+    }
+
+    fun getRoutingRulesetForProfile(profileId: String, index: Int): RulesetItem? {
+        if (index < 0) return null
+        val profile = getRoutingProfile(resolveProfileId(profileId)) ?: return null
+        return profile.rulesets.getOrNull(index)
+    }
+
+    fun saveRoutingRulesetForProfile(profileId: String, index: Int, ruleset: RulesetItem?) {
+        if (ruleset == null) return
+        val profile = getRoutingProfile(resolveProfileId(profileId)) ?: return
+        if (index < 0 || index >= profile.rulesets.size) {
+            profile.rulesets.add(0, ruleset)
+        } else {
+            profile.rulesets[index] = ruleset
+        }
+        saveRoutingProfile(profile)
+    }
+
+    fun removeRoutingRulesetForProfile(profileId: String, index: Int) {
+        if (index < 0) return
+        val profile = getRoutingProfile(resolveProfileId(profileId)) ?: return
+        if (index < profile.rulesets.size) {
+            profile.rulesets.removeAt(index)
+            saveRoutingProfile(profile)
+        }
+    }
+
+    fun swapRoutingRulesetForProfile(profileId: String, fromPosition: Int, toPosition: Int) {
+        val profile = getRoutingProfile(resolveProfileId(profileId)) ?: return
+        if (fromPosition in profile.rulesets.indices && toPosition in profile.rulesets.indices) {
+            Collections.swap(profile.rulesets, fromPosition, toPosition)
+            saveRoutingProfile(profile)
+        }
+    }
+
+    fun resetRoutingRulesetsForProfile(profileId: String, rulesetList: MutableList<RulesetItem>) {
+        val profile = getRoutingProfile(resolveProfileId(profileId)) ?: return
+        val locked = profile.rulesets.filter { it.locked == true }.toMutableList()
+        locked.addAll(rulesetList)
+        profile.rulesets = locked
+        saveRoutingProfile(profile)
+    }
+
+    fun resetRoutingRulesetsFromPresetsForProfile(context: Context, profileId: String, index: Int) {
+        val rulesetList = getPresetRoutingRulesets(context, index) ?: return
+        resetRoutingRulesetsForProfile(resolveProfileId(profileId), rulesetList)
+    }
+
+    fun resetRoutingRulesetsFromContentForProfile(profileId: String, content: String?): Boolean {
+        if (content.isNullOrEmpty()) return false
+        return try {
+            val rulesetList = JsonUtil.fromJsonSafe(content, Array<RulesetItem>::class.java)?.toMutableList()
+            if (rulesetList.isNullOrEmpty()) return false
+            resetRoutingRulesetsForProfile(resolveProfileId(profileId), rulesetList)
+            true
+        } catch (e: Exception) {
+            LogUtil.e(ANG_PACKAGE, "Failed to reset routing rulesets for profile", e)
+            false
+        }
+    }
+
+    // endregion
+
     /**
      * Check if routing rulesets bypass LAN.
      * @return True if bypassing LAN, false otherwise.
@@ -198,7 +337,7 @@ object SettingsManager {
             return exist == true
         }
 
-        val rulesetItems = MmkvManager.decodeRoutingRulesets()
+        val rulesetItems = getActiveRoutingProfile()?.rulesets ?: MmkvManager.decodeRoutingRulesets()
         val exist = rulesetItems?.filter { it.enabled && it.outboundTag == TAG_DIRECT }?.any {
             it.domain?.contains(GEOSITE_PRIVATE) == true || it.ip?.contains(GEOIP_PRIVATE) == true
         }

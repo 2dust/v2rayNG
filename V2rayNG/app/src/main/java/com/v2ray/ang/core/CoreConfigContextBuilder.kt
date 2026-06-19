@@ -35,6 +35,9 @@ object CoreConfigContextBuilder {
             return CoreConfigContext(context = context, guid = guid, isCustom = true)
         }
 
+        val routingProfileId = config.routingProfileId?.takeIf { it.isNotBlank() }
+            ?: SettingsManager.getActiveRoutingProfileId()
+
         // Step 1: Resolve the main outbound (always tag = TAG_PROXY).
         val primaryResolvedOutbound = resolveOutbound(AppConfig.TAG_PROXY, config) ?: run {
             LogUtil.e(AppConfig.TAG, "Failed to resolve main outbound for '${config.remarks}'")
@@ -42,12 +45,13 @@ object CoreConfigContextBuilder {
         }
 
         // Step 2: Resolve all non-builtin routing outbound tags.
-        val routingResolvedOutbounds = resolveRoutingOutbounds()
+        val routingResolvedOutbounds = resolveRoutingOutbounds(routingProfileId)
 
         return CoreConfigContext(
             context = context,
             guid = guid,
             resolvedOutbounds = listOf(primaryResolvedOutbound) + routingResolvedOutbounds,
+            routingProfileId = routingProfileId.ifBlank { null },
         )
     }
 
@@ -93,8 +97,12 @@ object CoreConfigContextBuilder {
      *
      * Invalid or empty targets are skipped and handled by fallback logic later.
      */
-    private fun resolveRoutingOutbounds(): List<CoreConfigContext.ResolvedOutbound> {
-        val rulesetItems = MmkvManager.decodeRoutingRulesets() ?: return emptyList()
+    private fun resolveRoutingOutbounds(profileId: String?): List<CoreConfigContext.ResolvedOutbound> {
+        val rulesetItems = if (!profileId.isNullOrBlank()) {
+            SettingsManager.getRoutingProfile(profileId)?.rulesets
+        } else {
+            MmkvManager.decodeRoutingRulesets()
+        } ?: return emptyList()
         val resolvedOutbounds = mutableListOf<CoreConfigContext.ResolvedOutbound>()
         val processedTags = mutableSetOf<String>()
 

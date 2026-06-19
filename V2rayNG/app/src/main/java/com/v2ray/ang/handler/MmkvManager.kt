@@ -2,11 +2,15 @@ package com.v2ray.ang.handler
 
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
+import com.v2ray.ang.AppConfig.KEY_ROUTING_PROFILE_PREFIX
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
+import com.v2ray.ang.AppConfig.PREF_ROUTING_ACTIVE_PROFILE_ID
+import com.v2ray.ang.AppConfig.PREF_ROUTING_PROFILE_IDS
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.dto.entities.RoutingProfile
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.dto.entities.ServerAffiliationInfo
 import com.v2ray.ang.dto.entities.SubscriptionCache
@@ -523,6 +527,50 @@ object MmkvManager {
             encodeSettings(PREF_ROUTING_RULESET, "")
         else
             encodeSettings(PREF_ROUTING_RULESET, JsonUtil.toJson(rulesetList))
+    }
+
+    //endregion
+
+    //region RoutingProfiles
+
+    fun decodeRoutingProfileIds(): MutableList<String> {
+        val json = settingsStorage.decodeString(PREF_ROUTING_PROFILE_IDS)
+        return if (json.isNullOrBlank()) mutableListOf()
+        else JsonUtil.fromJsonSafe(json, Array<String>::class.java)?.toMutableList() ?: mutableListOf()
+    }
+
+    fun encodeRoutingProfileIds(ids: MutableList<String>) {
+        settingsStorage.encode(PREF_ROUTING_PROFILE_IDS, JsonUtil.toJson(ids))
+    }
+
+    fun decodeRoutingProfile(id: String): RoutingProfile? {
+        if (id.isBlank()) return null
+        val json = settingsStorage.decodeString("$KEY_ROUTING_PROFILE_PREFIX$id") ?: return null
+        return JsonUtil.fromJsonSafe(json, RoutingProfile::class.java)
+    }
+
+    fun encodeRoutingProfile(profile: RoutingProfile) {
+        settingsStorage.encode("$KEY_ROUTING_PROFILE_PREFIX${profile.id}", JsonUtil.toJson(profile))
+        val ids = decodeRoutingProfileIds()
+        if (!ids.contains(profile.id)) {
+            ids.add(profile.id)
+            encodeRoutingProfileIds(ids)
+        }
+    }
+
+    fun removeRoutingProfile(id: String) {
+        settingsStorage.remove("$KEY_ROUTING_PROFILE_PREFIX$id")
+        val ids = decodeRoutingProfileIds()
+        ids.remove(id)
+        encodeRoutingProfileIds(ids)
+    }
+
+    fun getActiveRoutingProfileId(): String {
+        return settingsStorage.decodeString(PREF_ROUTING_ACTIVE_PROFILE_ID) ?: ""
+    }
+
+    fun setActiveRoutingProfileId(id: String) {
+        settingsStorage.encode(PREF_ROUTING_ACTIVE_PROFILE_ID, id)
     }
 
     //endregion

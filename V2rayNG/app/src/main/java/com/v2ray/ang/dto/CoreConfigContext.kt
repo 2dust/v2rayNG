@@ -9,6 +9,7 @@ data class CoreConfigContext(
     val guid: String,
     val isCustom: Boolean = false,
     val resolvedOutbounds: List<ResolvedOutbound> = emptyList(),
+    val routingProfileId: String? = null,
 ) {
     data class ResolvedOutbound(
         val tag: String,

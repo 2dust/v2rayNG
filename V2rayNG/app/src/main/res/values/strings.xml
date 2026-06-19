@@ -359,6 +359,20 @@
     <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;remarks&gt;</string>
     <string name="routing_settings_outbound_tag">outboundTag</string>
 
+    <!-- RoutingProfileListActivity -->
+    <string name="routing_profile_list_title">Routing Profiles</string>
+    <string name="routing_profile_active">Active</string>
+    <string name="routing_profile_add">Add Profile</string>
+    <string name="routing_profile_edit_name">Profile Name</string>
+    <string name="routing_profile_rename">Rename</string>
+    <string name="routing_profile_delete">Delete</string>
+    <string name="routing_profile_delete_confirm">Delete routing profile \"%s\"?</string>
+    <string name="routing_profile_cannot_delete_last">Cannot delete the last routing profile</string>
+    <string name="routing_profile_set_active">Set as Active</string>
+    <string name="routing_profile_default">Default</string>
+    <string name="server_routing_profile">Routing Profile</string>
+    <string name="server_routing_profile_default">Default (Active Profile)</string>
+
     <string name="connection_test_pending">Check Connectivity</string>
     <string name="connection_test_testing">Testing…</string>
     <string name="connection_test_testing_count">Testing %d configs…</string>
@@ -475,5 +489,11 @@
         <item>Local</item>
         <item>WebDAV</item>
     </string-array>
+
+    <plurals name="routing_profile_rules_count">
+        <item quantity="one">%d rule</item>
+        <item quantity="other">%d rules</item>
+    </plurals>
+
 
 </resources>

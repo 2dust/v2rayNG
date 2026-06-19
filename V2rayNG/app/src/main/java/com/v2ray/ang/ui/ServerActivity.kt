@@ -32,6 +32,7 @@ import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.CertificateFingerprintManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
@@ -153,6 +154,9 @@ class ServerActivity : BaseActivity() {
     private val container_pinned_ca256: LinearLayout? by lazy { findViewById(R.id.lay_pinned_ca256) }
     private val layout_browser_dialer: LinearLayout? by lazy { findViewById(R.id.layout_browser_dialer) }
     private val sp_browser_dialer_mode: Spinner? by lazy { findViewById(R.id.sp_browser_dialer_mode) }
+    private val sp_routing_profile: Spinner? by lazy { findViewById(R.id.sp_routing_profile) }
+
+    private var routingProfileIds: List<String> = emptyList()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -363,6 +367,8 @@ class ServerActivity : BaseActivity() {
         } else {
             clearServer()
         }
+
+        setupRoutingProfileSpinner(config?.routingProfileId)
     }
 
     /**
@@ -448,6 +454,22 @@ class ServerActivity : BaseActivity() {
         return true
     }
 
+    private fun setupRoutingProfileSpinner(existingProfileId: String?) {
+        val profiles = SettingsManager.getAllRoutingProfiles()
+        routingProfileIds = profiles.map { it.id }
+
+        val items = mutableListOf("")
+        items.addAll(profiles.map { it.name })
+
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        sp_routing_profile?.adapter = adapter
+
+        val idx = if (existingProfileId.isNullOrBlank()) 0
+        else routingProfileIds.indexOf(existingProfileId).let { if (it >= 0) it + 1 else 0 }
+        sp_routing_profile?.setSelection(idx)
+    }
+
     /**
      * clear or init server config
      */
@@ -474,6 +496,7 @@ class ServerActivity : BaseActivity() {
             Utils.getEditable(WIREGUARD_LOCAL_ADDRESS_V4)
         et_local_mtu?.text = Utils.getEditable(WIREGUARD_LOCAL_MTU)
         sp_browser_dialer_mode?.setSelection(0)
+        sp_routing_profile?.setSelection(0)
         return true
     }
 
@@ -555,6 +578,8 @@ class ServerActivity : BaseActivity() {
         config.server = et_address.text.toString().trim()
         config.serverPort = et_port.text.toString().trim()
         config.password = et_id.text.toString().trim()
+        val spIdx = sp_routing_profile?.selectedItemPosition ?: 0
+        config.routingProfileId = if (spIdx == 0) null else routingProfileIds.getOrNull(spIdx - 1)
 
         if (config.configType == EConfigType.VMESS) {
             config.method = securitys[sp_security?.selectedItemPosition ?: 0]

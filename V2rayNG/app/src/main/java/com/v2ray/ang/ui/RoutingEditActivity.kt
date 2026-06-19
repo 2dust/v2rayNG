@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 class RoutingEditActivity : BaseActivity() {
     private val binding by lazy { ActivityRoutingEditBinding.inflate(layoutInflater) }
     private val position by lazy { intent.getIntExtra("position", -1) }
+    private val profileId by lazy { intent.getStringExtra("profileId").orEmpty() }
     private val processPickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val selectedPackages = AppPickerActivity.getSelectedPackages(result.data)
@@ -37,7 +38,7 @@ class RoutingEditActivity : BaseActivity() {
         setupOutboundTagInput()
         setupProcessPicker()
 
-        val rulesetItem = SettingsManager.getRoutingRuleset(position)
+        val rulesetItem = SettingsManager.getRoutingRulesetForProfile(profileId, position)
         if (rulesetItem != null) {
             bindingServer(rulesetItem)
         } else {
@@ -71,26 +72,18 @@ class RoutingEditActivity : BaseActivity() {
             .distinct()
     }
 
-    /**
-     * Sets up the AutoCompleteTextView for outbound tag:
-     * suggestions = built-in tags (proxy/direct/block) + all existing profile remarks.
-     * The dropdown button triggers showing the full list without typing.
-     */
     private fun setupOutboundTagInput() {
         val profileRemarks = SettingsManager.getProfileRemarks()
 
         val suggestions = (BUILTIN_OUTBOUND_TAGS.toList() + profileRemarks).distinct()
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, suggestions)
         binding.spOutboundTag.setAdapter(adapter)
-        // threshold=0 means show all suggestions even before typing; still need focus+request
         binding.spOutboundTag.threshold = 0
 
-        // Dropdown arrow button shows the full suggestion list
         binding.btnOutboundTagDropdown.setOnClickListener {
             binding.spOutboundTag.requestFocus()
             binding.spOutboundTag.showDropDown()
         }
-        // Also show on field click when it already has focus
         binding.spOutboundTag.setOnClickListener {
             binding.spOutboundTag.showDropDown()
         }
@@ -105,7 +98,6 @@ class RoutingEditActivity : BaseActivity() {
         binding.etPort.text = Utils.getEditable(rulesetItem.port)
         binding.etProtocol.text = Utils.getEditable(rulesetItem.protocol?.joinToString(","))
         binding.etNetwork.text = Utils.getEditable(rulesetItem.network)
-        // Set text directly; filter won't fire because we're not using setText(filter=true)
         binding.spOutboundTag.setText(rulesetItem.outboundTag, false)
         return true
     }
@@ -117,7 +109,7 @@ class RoutingEditActivity : BaseActivity() {
     }
 
     private fun saveServer(): Boolean {
-        val rulesetItem = SettingsManager.getRoutingRuleset(position) ?: RulesetItem()
+        val rulesetItem = SettingsManager.getRoutingRulesetForProfile(profileId, position) ?: RulesetItem()
 
         rulesetItem.apply {
             remarks = binding.etRemarks.text.toString()
@@ -136,27 +128,24 @@ class RoutingEditActivity : BaseActivity() {
             return false
         }
 
-        SettingsManager.saveRoutingRuleset(position, rulesetItem)
+        SettingsManager.saveRoutingRulesetForProfile(profileId, position, rulesetItem)
         toastSuccess(R.string.toast_success)
         finish()
         return true
     }
-
 
     private fun deleteServer(): Boolean {
         if (position >= 0) {
             AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     lifecycleScope.launch(Dispatchers.IO) {
-                        SettingsManager.removeRoutingRuleset(position)
+                        SettingsManager.removeRoutingRulesetForProfile(profileId, position)
                         launch(Dispatchers.Main) {
                             finish()
                         }
                     }
                 }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    // do nothing
-                }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
                 .show()
         }
         return true
@@ -186,5 +175,4 @@ class RoutingEditActivity : BaseActivity() {
 
         else -> super.onOptionsItemSelected(item)
     }
-
 }
