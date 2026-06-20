@@ -6,37 +6,12 @@ import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.isActive
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.UnknownHostException
 
 object SpeedtestManager {
-
-    private val tcpTestingSockets = ArrayList<Socket?>()
-
-    /**
-     * Measures the TCP connection time to a given URL and port.
-     *
-     * @param url The URL to connect to.
-     * @param port The port to connect to.
-     * @return The connection time in milliseconds, or -1 if the connection failed.
-     */
-    suspend fun tcping(url: String, port: Int): Long {
-        var time = -1L
-        for (k in 0 until 2) {
-            val one = socketConnectTime(url, port)
-            if (!currentCoroutineContext().isActive) {
-                break
-            }
-            if (one != -1L && (time == -1L || one < time)) {
-                time = one
-            }
-        }
-        return time
-    }
 
     /**
      * Measures the time taken to establish a TCP connection to a given URL and port.
@@ -51,10 +26,6 @@ object SpeedtestManager {
 
         try {
             socket = Socket()
-            synchronized(this) {
-                tcpTestingSockets.add(socket)
-            }
-
             socket.connect(InetSocketAddress(url, port), timeoutMs)
 
             return System.currentTimeMillis() - start
@@ -66,9 +37,6 @@ object SpeedtestManager {
             LogUtil.e(AppConfig.TAG, "Failed to establish socket connection to $url:$port", e)
         } finally {
             socket?.let { s ->
-                synchronized(this) {
-                    tcpTestingSockets.remove(s)
-                }
                 try {
                     if (!s.isClosed) {
                         s.close()
@@ -78,18 +46,6 @@ object SpeedtestManager {
             }
         }
         return -1
-    }
-
-    /**
-     * Closes all TCP sockets that are currently being tested.
-     */
-    fun closeAllTcpSockets() {
-        synchronized(this) {
-            tcpTestingSockets.forEach {
-                it?.close()
-            }
-            tcpTestingSockets.clear()
-        }
     }
 
     fun getRemoteIPInfo(): String? {
