@@ -286,9 +286,13 @@ object MmkvManager {
      */
     fun removeAllServer(): Int {
         val count = profileFullStorage.allKeys()?.count() ?: 0
-        mainStorage.clearAll()
         profileFullStorage.clearAll()
         serverAffStorage.clearAll()
+        serverRawStorage.clearAll()
+
+        decodeSubscriptions().forEach { sub ->
+            encodeServerList(mutableListOf(), sub.guid)
+        }
         return count
     }
 
