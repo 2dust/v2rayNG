@@ -22,7 +22,7 @@ import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.enums.ERunMode
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
-import com.v2ray.ang.handler.RootManager
+import com.v2ray.ang.core.root.RootManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.service.CoreProxyOnlyService

@@ -24,7 +24,7 @@ import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.core.root.RootProxyManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
-import com.v2ray.ang.handler.RootManager
+import com.v2ray.ang.core.root.RootManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MyContextWrapper
@@ -139,9 +139,11 @@ class CoreVpnService : VpnService(), ServiceControl {
         }
 
         // Optional root feature: share the proxy with tethered LAN/USB clients while the
-        // device itself stays on the VpnService. Runs a dedicated client tun2socks off the
-        // main thread so the su calls don't block service startup.
-        if (RootManager.cachedRoot() && MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)) {
+        // device itself stays on the VpnService. Runs a dedicated client hev-socks5-tunnel
+        // off the main thread so the su calls don't block service startup.
+        // The cheap, usually-false preference is checked first so the common path
+        // short-circuits before touching root state.
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING) && RootManager.cachedRoot()) {
             lanSharingStarted = true
             Thread { RootProxyManager.startClientSharing(this) }.apply { isDaemon = true }.start()
         }
