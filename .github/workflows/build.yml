@@ -57,20 +57,6 @@ jobs:
         path: ${{ github.workspace }}/libs
         key: libhevtun-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD') }}-${{ hashFiles('compile-hevtun.sh') }}
 
-    - name: Download hev-socks5-tunnel (root mode helper)
-      run: |
-        set -euo pipefail
-        HEV_VERSION="2.15.0"
-        declare -A MAP=( ["arm64-v8a"]="arm64" ["armeabi-v7a"]="arm32v7" ["x86"]="i686" ["x86_64"]="x86_64" )
-        for abi in "${!MAP[@]}"; do
-          arch="${MAP[$abi]}"
-          url="https://github.com/heiher/hev-socks5-tunnel/releases/download/${HEV_VERSION}/hev-socks5-tunnel-linux-${arch}"
-          echo "Fetching $url"
-          mkdir -p "${{ github.workspace }}/libs/${abi}"
-          curl -fsSL "$url" -o "${{ github.workspace }}/libs/${abi}/libhevsockstun.so"
-          chmod 755 "${{ github.workspace }}/libs/${abi}/libhevsockstun.so"
-        done
-
     - name: Copy libhevtun
       run: |
         cp -r ${{ github.workspace }}/libs ${{ github.workspace }}/V2rayNG/app
