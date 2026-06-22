@@ -232,7 +232,7 @@ object RootProxyManager {
         bypassApps: Boolean,
         selectedUids: List<String>,
     ): String {
-        val proxyOnlySelected = perAppEnabled && !bypassApps && selectedUids.isNotEmpty()
+        val allowMode = perAppEnabled && !bypassApps
         val bypassSelected = perAppEnabled && bypassApps && selectedUids.isNotEmpty()
         return buildString {
             appendLine("$cmd -t mangle -N $CHAIN 2>/dev/null || true")
@@ -258,11 +258,16 @@ object RootProxyManager {
             // keep LAN / private destinations direct (per-family CIDR list)
             val cidrs = if (cmd == "ip6tables") bypassCidrsV6 else bypassCidrs
             cidrs.forEach { appendLine("$cmd -t mangle -A $CHAIN -d $it -j RETURN") }
-            if (proxyOnlySelected) {
-                // proxy only the selected apps
+            if (allowMode) {
+                // Proxy ONLY the explicitly selected apps. If nothing resolved (e.g. the
+                // selected packages failed to resolve to uids at early boot), mark nothing
+                // instead of falling through to the catch-all below: a fail-open here would
+                // tunnel every unselected app — both a privacy leak and the "per-app proxies
+                // everything after a reboot" bug.
                 selectedUids.forEach { appendLine("$cmd -t mangle -A $CHAIN -m owner --uid-owner $it -j MARK --set-xmark $MARK") }
             } else {
-                // all-apps / bypass: capture EVERY remaining uid (incl uid 0 + system uids)
+                // all-apps mode (per-app off) or bypass mode: capture EVERY remaining uid
+                // (incl uid 0 + system uids)
                 appendLine("$cmd -t mangle -A $CHAIN -j MARK --set-xmark $MARK")
             }
             appendLine("$cmd -t mangle -D OUTPUT -j $CHAIN 2>/dev/null || true")
@@ -289,7 +294,7 @@ object RootProxyManager {
         selectedUids: List<String>,
     ): String {
         val chain = AppConfig.ROOT_V6_CHAIN
-        val proxyOnlySelected = perAppEnabled && !bypassApps && selectedUids.isNotEmpty()
+        val allowMode = perAppEnabled && !bypassApps
         val bypassSelected = perAppEnabled && bypassApps && selectedUids.isNotEmpty()
         val reject = "-j REJECT --reject-with icmp6-adm-prohibited"
         return buildString {
@@ -304,8 +309,9 @@ object RootProxyManager {
             if (bypassSelected) {
                 selectedUids.forEach { appendLine("ip6tables -t filter -A $chain -m owner --uid-owner $it -j RETURN") }
             }
-            if (proxyOnlySelected) {
-                // proxy mode: only the selected apps lose v6 (so they fall back to v4-via-proxy)
+            if (allowMode) {
+                // proxy mode: only the selected apps lose v6 (so they fall back to v4-via-proxy).
+                // None resolved -> reject nothing, mirroring the v4 chain's fail-closed handling.
                 selectedUids.forEach { appendLine("ip6tables -t filter -A $chain -m owner --uid-owner $it $reject") }
             } else {
                 // all-apps / bypass: reject everyone left
