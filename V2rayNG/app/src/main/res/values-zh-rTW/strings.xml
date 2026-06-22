@@ -369,6 +369,7 @@
     <string name="title_pref_fragment_length">分片包長（最小-最大）</string>
     <string name="title_pref_fragment_interval">分片間隔（最小-最大）</string>
     <string name="title_pref_fragment_enabled">啟用分片（Fragment）</string>
+    <string name="title_pref_fragment_maxsplit">分片最大分割數</string>
 
     <string name="update_check_for_update">檢查更新</string>
     <string name="update_already_latest_version">当前已是最新版本</string>

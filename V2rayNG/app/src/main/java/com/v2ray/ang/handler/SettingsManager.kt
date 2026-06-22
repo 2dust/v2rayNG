@@ -527,6 +527,7 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
+        ensureDefaultValue(AppConfig.PREF_FRAGMENT_MAXSPLIT, "10")
     }
 
     private fun ensureDefaultValue(key: String, default: String) {

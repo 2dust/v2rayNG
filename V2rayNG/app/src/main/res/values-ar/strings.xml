@@ -368,6 +368,7 @@
     <string name="title_pref_fragment_length">طول الجزء (الحد الأدنى - الحد الأقصى)</string>
     <string name="title_pref_fragment_interval">فاصل الجزء (الحد الأدنى - الحد الأقصى)</string>
     <string name="title_pref_fragment_enabled">تفعيل الجزء</string>
+    <string name="title_pref_fragment_maxsplit">ماكس سبليت الجزء</string>
 
     <string name="update_check_for_update">Check for update</string>
     <string name="update_already_latest_version">Already on the latest version</string>

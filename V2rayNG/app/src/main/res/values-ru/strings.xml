@@ -373,6 +373,7 @@
     <string name="title_pref_fragment_length">Длина фрагмента (от — до)</string>
     <string name="title_pref_fragment_interval">Интервал фрагментов (от — до)</string>
     <string name="title_pref_fragment_enabled">Использовать фрагментирование</string>
+    <string name="title_pref_fragment_maxsplit">Максимальное число фрагментов</string>
 
     <string name="update_check_for_update">Проверить обновление</string>
     <string name="update_already_latest_version">Установлена последняя версия</string>

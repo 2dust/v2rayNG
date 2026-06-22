@@ -364,6 +364,7 @@
     <string name="title_pref_fragment_length">طول بسته های فرگمنت (حداقل-حداکثر)</string>
     <string name="title_pref_fragment_interval">فاصله بین بسته های فرگمنت (حداقل-حداکثر)</string>
     <string name="title_pref_fragment_enabled">فعال کردن فرگمنت</string>
+    <string name="title_pref_fragment_maxsplit">حداکثر تقسیم فرگمنت</string>
 
     <string name="update_check_for_update">بررسی به روز رسانی</string>
     <string name="update_already_latest_version">در حال حاضر آخرین نسخه نصب شده است</string>
