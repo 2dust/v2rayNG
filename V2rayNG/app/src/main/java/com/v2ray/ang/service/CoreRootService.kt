@@ -13,7 +13,10 @@ import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MyContextWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.ref.SoftReference
 
 /**
@@ -26,6 +29,8 @@ import java.lang.ref.SoftReference
  * main thread. On teardown the rules are removed before the core stops.
  */
 class CoreRootService : Service(), ServiceControl {
+
+    private var setupJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -45,7 +50,7 @@ class CoreRootService : Service(), ServiceControl {
             return START_NOT_STICKY
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        setupJob = CoroutineScope(Dispatchers.IO).launch {
             if (!RootProxyManager.start(this@CoreRootService, mode)) {
                 LogUtil.e(AppConfig.TAG, "StartCore-Root: failed to start root routing for $mode, stopping")
                 stopService()
@@ -57,6 +62,12 @@ class CoreRootService : Service(), ServiceControl {
 
     override fun onDestroy() {
         super.onDestroy()
+        // Wait for any in-flight async setup to finish before tearing down. The rules are
+        // installed off the main thread and can take seconds (the setup script waits for the
+        // tun to appear); if a stop arrives during that window, teardown would run first and
+        // the setup would then re-install the rules + tun pointing at a now-dead core,
+        // blackholing all traffic until the next start/stop cycle clears it.
+        runBlocking { setupJob?.cancelAndJoin() }
         // Remove routing rules BEFORE stopping the core so traffic is never redirected
         // to a dead listener. Synchronous on purpose — leaving rules behind breaks the net.
         RootProxyManager.stop(this)
