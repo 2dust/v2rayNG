@@ -139,18 +139,17 @@ object CoreConfigContextBuilder {
     private fun resolvePolicyGroupProfiles(config: ProfileItem): List<ProfileItem> {
         try {
             val serverList = MmkvManager.decodeAllServerList()
-            return serverList
+
+            val matchedProfiles = serverList
                 .asSequence()
-                .mapNotNull { id -> MmkvManager.decodeServerConfig(id) }
-                .filter { profile ->
-                    val subscriptionId = config.policyGroupSubscriptionId
-                    if (subscriptionId.isNullOrBlank()) {
-                        true
-                    } else {
-                        profile.subscriptionId == subscriptionId
-                    }
+                .mapNotNull { id ->
+                    MmkvManager.decodeServerConfig(id)?.let { profile -> id to profile }
                 }
-                .filter { profile ->
+                .filter { (_, profile) ->
+                    val subscriptionId = config.policyGroupSubscriptionId
+                    subscriptionId.isNullOrBlank() || profile.subscriptionId == subscriptionId
+                }
+                .filter { (_, profile) ->
                     val filter = config.policyGroupFilter
                     if (filter.isNullOrBlank()) {
                         true
@@ -162,14 +161,22 @@ object CoreConfigContextBuilder {
                         }
                     }
                 }
-                .filter { it.server.isNotNullEmpty() }
-                .filter { Utils.isPureIpAddress(it.server!!) || Utils.isValidUrl(it.server!!) }
-                .filter { !it.configType.isComplexType() }
+                .filter { (_, profile) -> profile.server.isNotNullEmpty() }
+                .filter { (_, profile) -> Utils.isPureIpAddress(profile.server!!) || Utils.isValidUrl(profile.server!!) }
+                .filter { (_, profile) -> !profile.configType.isComplexType() }
                 .toList()
+
+            return PolicyGroupLatencyFilter.filterForLowestLatency(
+                items = matchedProfiles,
+                policyGroupType = config.policyGroupType,
+            ) { (id, _) ->
+                MmkvManager.decodeServerAffiliationInfo(id)?.testDelayMillis
+            }.map { (_, profile) -> profile }
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to resolve policy group profiles for '${config.remarks}'", e)
-            return listOf(config)
+            Logs.e(e)
         }
+
+        return emptyList()
     }
 
     private fun resolveProxyChainProfiles(config: ProfileItem): List<ProfileItem> {
