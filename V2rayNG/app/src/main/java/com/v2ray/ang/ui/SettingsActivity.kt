@@ -2,6 +2,7 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
@@ -14,6 +15,7 @@ import com.v2ray.ang.core.root.RootManager
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.MmkvPreferenceDataStore
+import kotlinx.coroutines.launch
 
 class SettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -113,14 +115,13 @@ class SettingsActivity : BaseActivity() {
             // sharing, never at startup. If root is denied, leave the box unchecked.
             lanSharing?.setOnPreferenceChangeListener { _, newValue ->
                 if (newValue == true && !RootManager.cachedRoot()) {
-                    RootManager.refreshAsync { hasRoot ->
-                        activity?.runOnUiThread {
-                            if (!isAdded) return@runOnUiThread
-                            if (hasRoot) {
-                                lanSharing?.isChecked = true
-                            } else {
-                                context?.toastError(R.string.toast_root_required)
-                            }
+                    lifecycleScope.launch {
+                        val hasRoot = RootManager.refresh()
+                        if (!isAdded) return@launch
+                        if (hasRoot) {
+                            lanSharing?.isChecked = true
+                        } else {
+                            context?.toastError(R.string.toast_root_required)
                         }
                     }
                     false // accepted asynchronously once root is confirmed
@@ -256,12 +257,11 @@ class SettingsActivity : BaseActivity() {
                     val opt = modeOptions[which]
                     if (opt.rootOnly && !RootManager.cachedRoot()) {
                         dialog.dismiss()
-                        RootManager.refreshAsync { hasRoot ->
-                            activity?.runOnUiThread {
-                                if (!isAdded) return@runOnUiThread
-                                if (hasRoot) selectMode(opt, labels[which])
-                                else context?.toastError(R.string.toast_root_required)
-                            }
+                        lifecycleScope.launch {
+                            val hasRoot = RootManager.refresh()
+                            if (!isAdded) return@launch
+                            if (hasRoot) selectMode(opt, labels[which])
+                            else context?.toastError(R.string.toast_root_required)
                         }
                     } else {
                         selectMode(opt, labels[which])

@@ -29,6 +29,9 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.lang.ref.SoftReference
 
 @SuppressLint("VpnServicePolicy")
@@ -145,7 +148,7 @@ class CoreVpnService : VpnService(), ServiceControl {
         // short-circuits before touching root state.
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING) && RootManager.cachedRoot()) {
             lanSharingStarted = true
-            Thread { RootProxyManager.startClientSharing(this) }.apply { isDaemon = true }.start()
+            CoroutineScope(Dispatchers.IO).launch { RootProxyManager.startClientSharing(this@CoreVpnService) }
         }
     }
 
