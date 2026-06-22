@@ -624,7 +624,10 @@ object CoreOutboundBuilder {
                     length = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_LENGTH)
                         ?: "50-100",
                     delay = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_INTERVAL)
-                        ?: "10-20"
+                        ?: "10-20",
+                            maxSplit = FragmentSettings.normalizeMaxSplit(
+                                MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_MAX_SPLIT)
+                            )
                 )
             )
             val noiseMask = OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
