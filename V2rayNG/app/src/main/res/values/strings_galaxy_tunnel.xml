@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ===== GALAXY TUNNEL STRINGS (ADD TO EXISTING strings.xml) ===== -->
+    <!-- App Name -->
+    <string name="gt_app_name">Galaxy Tunnel</string>
+    <string name="gt_app_tagline">Secure. Fast. Limitless.</string>
+
+    <!-- Navigation -->
+    <string name="gt_nav_home">Home</string>
+    <string name="gt_nav_servers">Servers</string>
+    <string name="gt_nav_settings">Settings</string>
+    <string name="gt_nav_logs">Logs</string>
+    <string name="gt_nav_about">About</string>
+
+    <!-- Connection Status -->
+    <string name="gt_status_connected">Connected</string>
+    <string name="gt_status_connecting">Connecting...</string>
+    <string name="gt_status_disconnected">Disconnected</string>
+    <string name="gt_status_disconnecting">Disconnecting...</string>
+    <string name="gt_status_reconnecting">Reconnecting...</string>
+    <string name="gt_status_error">Connection Error</string>
+
+    <!-- Connection Button -->
+    <string name="gt_btn_connect">Connect</string>
+    <string name="gt_btn_disconnect">Disconnect</string>
+    <string name="gt_btn_connecting">Connecting...</string>
+    <string name="gt_btn_disconnecting">Disconnecting...</string>
+    <string name="gt_btn_reconnect">Reconnect</string>
+
+    <!-- Server List -->
+    <string name="gt_server_list_title">Server List</string>
+    <string name="gt_server_list_empty">No servers configured</string>
+    <string name="gt_server_add">Add Server</string>
+    <string name="gt_server_edit">Edit Server</string>
+    <string name="gt_server_delete">Delete Server</string>
+    <string name="gt_server_select">Select Server</string>
+    <string name="gt_server_test">Test Latency</string>
+    <string name="gt_server_refresh">Refresh</string>
+    <string name="gt_server_count">%d servers</string>
+
+    <!-- Latency -->
+    <string name="gt_latency_good">Good</string>
+    <string name="gt_latency_medium">Medium</string>
+    <string name="gt_latency_bad">Bad</string>
+    <string name="gt_latency_testing">Testing...</string>
+    <string name="gt_latency_unknown">--</string>
+    <string name="gt_latency_ms">%d ms</string>
+
+    <!-- Config Import -->
+    <string name="gt_config_import_title">Import Config</string>
+    <string name="gt_config_import_hint">Paste vless://, trojan://, vmess:// link</string>
+    <string name="gt_config_import_btn">Import</string>
+    <string name="gt_config_import_cancel">Cancel</string>
+    <string name="gt_config_import_success">Config imported successfully</string>
+    <string name="gt_config_import_error">Invalid config link</string>
+    <string name="gt_config_import_scan">Scan QR Code</string>
+    <string name="gt_config_import_file">Import from File</string>
+    <string name="gt_config_import_clipboard">Import from Clipboard</string>
+
+    <!-- Settings -->
+    <string name="gt_settings_title">Settings</string>
+    <string name="gt_settings_theme">Theme</string>
+    <string name="gt_settings_theme_dark">Dark</string>
+    <string name="gt_settings_theme_light">Light</string>
+    <string name="gt_settings_theme_system">System Default</string>
+    <string name="gt_settings_language">Language</string>
+    <string name="gt_settings_language_en">English</string>
+    <string name="gt_settings_language_my">Myanmar</string>
+    <string name="gt_settings_language_zh">Chinese</string>
+    <string name="gt_settings_auto_connect">Auto Connect</string>
+    <string name="gt_settings_auto_connect_summary">Connect on app start</string>
+    <string name="gt_settings_kill_switch">Kill Switch</string>
+    <string name="gt_settings_kill_switch_summary">Block internet when VPN disconnects</string>
+    <string name="gt_settings_dns">DNS Settings</string>
+    <string name="gt_settings_mtu">MTU Size</string>
+    <string name="gt_settings_logs">Connection Logs</string>
+    <string name="gt_settings_logs_clear">Clear Logs</string>
+    <string name="gt_settings_share">Share App</string>
+    <string name="gt_settings_rate">Rate App</string>
+    <string name="gt_settings_feedback">Send Feedback</string>
+    <string name="gt_settings_privacy">Privacy Policy</string>
+    <string name="gt_settings_terms">Terms of Service</string>
+    <string name="gt_settings_version">Version</string>
+
+    <!-- Stats -->
+    <string name="gt_stats_download">Download</string>
+    <string name="gt_stats_upload">Upload</string>
+    <string name="gt_stats_duration">Duration</string>
+    <string name="gt_stats_speed">Speed</string>
+    <string name="gt_stats_total">Total</string>
+    <string name="gt_stats_protocol">Protocol</string>
+    <string name="gt_stats_server">Server</string>
+    <string name="gt_stats_ip">IP Address</string>
+
+    <!-- Notifications -->
+    <string name="gt_notif_connected">Galaxy Tunnel - Connected</string>
+    <string name="gt_notif_connecting">Galaxy Tunnel - Connecting...</string>
+    <string name="gt_notif_disconnected">Galaxy Tunnel - Disconnected</string>
+    <string name="gt_notif_tap_to_connect">Tap to connect</string>
+    <string name="gt_notif_tap_to_disconnect">Tap to disconnect</string>
+
+    <!-- Errors -->
+    <string name="gt_error_no_server">No server selected</string>
+    <string name="gt_error_connection_failed">Connection failed</string>
+    <string name="gt_error_network_unavailable">Network unavailable</string>
+    <string name="gt_error_permission_denied">Permission denied</string>
+    <string name="gt_error_config_invalid">Invalid configuration</string>
+    <string name="gt_error_timeout">Connection timeout</string>
+    <string name="gt_error_unknown">Unknown error</string>
+
+    <!-- Dialogs -->
+    <string name="gt_dialog_confirm">Confirm</string>
+    <string name="gt_dialog_cancel">Cancel</string>
+    <string name="gt_dialog_ok">OK</string>
+    <string name="gt_dialog_yes">Yes</string>
+    <string name="gt_dialog_no">No</string>
+    <string name="gt_dialog_delete_title">Delete Server</string>
+    <string name="gt_dialog_delete_message">Are you sure you want to delete this server?</string>
+    <string name="gt_dialog_exit_title">Exit App</string>
+    <string name="gt_dialog_exit_message">Disconnect VPN and exit?</string>
+
+    <!-- Toast -->
+    <string name="gt_toast_copied">Copied to clipboard</string>
+    <string name="gt_toast_saved">Saved successfully</string>
+    <string name="gt_toast_deleted">Deleted successfully</string>
+    <string name="gt_toast_updated">Updated successfully</string>
+    <string name="gt_toast_failed">Failed</string>
+
+    <!-- About -->
+    <string name="gt_about_title">About Galaxy Tunnel</string>
+    <string name="gt_about_description">A secure and fast VPN client powered by Xray core</string>
+    <string name="gt_about_version">Version %s</string>
+    <string name="gt_about_copyright">© 2024 Galaxy Tunnel</string>
+    <string name="gt_about_contact">Contact Us</string>
+    <string name="gt_about_telegram">Telegram</string>
+    <string name="gt_about_facebook">Facebook</string>
+    <string name="gt_about_website">Website</string>
+
+    <!-- Myanmar Translations -->
+    <string name="gt_my_app_name">ဂလက်ဆီး တန်နယ်</string>
+    <string name="gt_my_connected">ချိတ်ဆက်ပြီးပြီ</string>
+    <string name="gt_my_connecting">ချိတ်ဆက်နေသည်...</string>
+    <string name="gt_my_disconnected">ချိတ်ဆက်မထားပါ</string>
+    <string name="gt_my_btn_connect">ချိတ်ဆက်မည်</string>
+    <string name="gt_my_btn_disconnect">ဖြတ်တောက်မည်</string>
+    <string name="gt_my_server_list">ဆာဗာစာရင်း</string>
+    <string name="gt_my_add_server">ဆာဗာထည့်မည်</string>
+    <string name="gt_my_settings">ဆက်တင်များ</string>
+    <string name="gt_my_theme">အသွင်အပြင်</string>
+    <string name="gt_my_dark">အနက်ရောင်</string>
+    <string name="gt_my_light">အဖြူရောင်</string>
+    <string name="gt_my_language">ဘာသာစကား</string>
+    <string name="gt_my_english">အင်္ဂလိပ်</string>
+    <string name="gt_my_myanmar">မြန်မာ</string>
+    <string name="gt_my_auto_connect">အလိုအလျောက် ချိတ်ဆက်မည်</string>
+    <string name="gt_my_kill_switch">Kill Switch</string>
+    <string name="gt_my_logs">မှတ်တမ်းများ</string>
+    <string name="gt_my_share">မျှဝေမည်</string>
+    <string name="gt_my_stats_download">ဒေါင်းလုဒ်</string>
+    <string name="gt_my_stats_upload">အပ်လုဒ်</string>
+    <string name="gt_my_stats_duration">ကြာချိန်</string>
+    <string name="gt_my_config_import">ကွန်ဖစ်ထည့်သွင်းရန်</string>
+    <string name="gt_my_config_paste">ကွန်ဖစ် လင့််ကို ပေ့စ်ထားပါ</string>
+    <string name="gt_my_config_import_btn">ထည့်သွင်းမည်</string>
+    <string name="gt_my_config_cancel">ပယ်ဖျက်မည်</string>
+    <string name="gt_my_error_no_server">ဆာဗာ မရွေးချယ်ထားပါ</string>
+    <string name="gt_my_error_connection">ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
+    <string name="gt_my_dialog_delete">ဆာဗာဖျက်ရန် သေချာပါသလား?</string>
+    <string name="gt_my_dialog_exit">ဖွင့်ထားတဲ့ VPN ဖြတ်တောက်ပြီး ထွက်မလား?</string>
+    <string name="gt_my_toast_copied">ကူးယူပြီးပြီ</string>
+    <string name="gt_my_toast_saved">သိမ်းပြီးပြီ</string>
+</resources>

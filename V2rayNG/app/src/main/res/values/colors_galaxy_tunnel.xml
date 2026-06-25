@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ===== GALAXY TUNNEL COLORS (ADD TO EXISTING colors.xml) ===== -->
+    <!-- Brand Colors -->
+    <color name="gt_primary">#00D4AA</color>
+    <color name="gt_primary_dark">#00B894</color>
+    <color name="gt_accent">#00D4AA</color>
+    <color name="gt_secondary">#7C3AED</color>
+
+    <!-- Background -->
+    <color name="gt_background">#0D1117</color>
+    <color name="gt_background_light">#F0F2F5</color>
+    <color name="gt_surface">#161B22</color>
+    <color name="gt_surface_light">#FFFFFF</color>
+    <color name="gt_elevated">#21262D</color>
+    <color name="gt_elevated_light">#E8E8E8</color>
+
+    <!-- Text -->
+    <color name="gt_text_primary">#FFFFFF</color>
+    <color name="gt_text_primary_light">#1A1A2E</color>
+    <color name="gt_text_secondary">#8B949E</color>
+    <color name="gt_text_secondary_light">#6B7280</color>
+    <color name="gt_text_disabled">#484F58</color>
+    <color name="gt_text_disabled_light">#9CA3AF</color>
+
+    <!-- Status -->
+    <color name="gt_connected">#00D4AA</color>
+    <color name="gt_connecting">#F39C12</color>
+    <color name="gt_disconnected">#FF6B6B</color>
+    <color name="gt_error">#EF4444</color>
+    <color name="gt_warning">#F59E0B</color>
+    <color name="gt_success">#10B981</color>
+    <color name="gt_info">#3B82F6</color>
+
+    <!-- Latency -->
+    <color name="gt_latency_good">#00D4AA</color>
+    <color name="gt_latency_medium">#F39C12</color>
+    <color name="gt_latency_bad">#FF6B6B</color>
+
+    <!-- Toggle -->
+    <color name="gt_toggle_track_on">#00D4AA</color>
+    <color name="gt_toggle_track_off">#30363D</color>
+    <color name="gt_toggle_track_off_light">#D1D5DB</color>
+    <color name="gt_toggle_thumb">#FFFFFF</color>
+    <color name="gt_toggle_thumb_light">#FFFFFF</color>
+
+    <!-- Button -->
+    <color name="gt_button_primary">#00D4AA</color>
+    <color name="gt_button_primary_pressed">#00B894</color>
+    <color name="gt_button_secondary">#21262D</color>
+    <color name="gt_button_secondary_light">#F3F4F6</color>
+    <color name="gt_button_outline">#8B949E</color>
+    <color name="gt_button_outline_light">#6B7280</color>
+    <color name="gt_button_ghost">#00000000</color>
+    <color name="gt_button_ghost_text">#00D4AA</color>
+
+    <!-- Card -->
+    <color name="gt_card_dark">#161B22</color>
+    <color name="gt_card_light">#FFFFFF</color>
+    <color name="gt_card_border">#30363D</color>
+    <color name="gt_card_border_light">#E5E7EB</color>
+    <color name="gt_card_ripple">#1FFFFFFF</color>
+
+    <!-- Input -->
+    <color name="gt_input_border">#30363D</color>
+    <color name="gt_input_border_light">#D1D5DB</color>
+    <color name="gt_input_bg">#0D1117</color>
+    <color name="gt_input_bg_light">#FFFFFF</color>
+    <color name="gt_input_focus">#00D4AA</color>
+    <color name="gt_input_hint">#484F58</color>
+    <color name="gt_input_hint_light">#9CA3AF</color>
+
+    <!-- Navigation -->
+    <color name="gt_nav_bg">#161B22</color>
+    <color name="gt_nav_bg_light">#FFFFFF</color>
+    <color name="gt_nav_item">#8B949E</color>
+    <color name="gt_nav_item_active">#00D4AA</color>
+    <color name="gt_nav_item_light">#6B7280</color>
+    <color name="gt_nav_item_active_light">#00B894</color>
+
+    <!-- Divider -->
+    <color name="gt_divider">#30363D</color>
+    <color name="gt_divider_light">#E5E7EB</color>
+
+    <!-- Shadow -->
+    <color name="gt_shadow">#000000</color>
+    <color name="gt_shadow_light">#000000</color>
+
+    <!-- Overlay -->
+    <color name="gt_overlay">#80000000</color>
+    <color name="gt_overlay_light">#80000000</color>
+
+    <!-- Gradient -->
+    <color name="gt_gradient_start">#00D4AA</color>
+    <color name="gt_gradient_end">#7C3AED</color>
+
+    <!-- Glow -->
+    <color name="gt_glow_connected">#1A00D4AA</color>
+    <color name="gt_glow_connecting">#1AF39C12</color>
+    <color name="gt_glow_disconnected">#1AFF6B6B</color>
+</resources>
