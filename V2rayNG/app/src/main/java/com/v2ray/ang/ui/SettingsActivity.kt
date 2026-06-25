@@ -40,6 +40,7 @@ class SettingsActivity : BaseActivity() {
         private val fragmentPackets by lazy { findPreference<ListPreference>(AppConfig.PREF_FRAGMENT_PACKETS) }
         private val fragmentLength by lazy { findPreference<EditTextPreference>(AppConfig.PREF_FRAGMENT_LENGTH) }
         private val fragmentInterval by lazy { findPreference<EditTextPreference>(AppConfig.PREF_FRAGMENT_INTERVAL) }
+        private val fragmentMaxSplit by lazy { findPreference<EditTextPreference>(AppConfig.PREF_FRAGMENT_MAXSPLIT) }
 
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
 
@@ -243,6 +244,7 @@ class SettingsActivity : BaseActivity() {
             fragmentPackets?.isEnabled = enabled
             fragmentLength?.isEnabled = enabled
             fragmentInterval?.isEnabled = enabled
+            fragmentMaxSplit?.isEnabled = enabled
         }
 
         private fun updateDynamicSocksPort(enabled: Boolean) {
