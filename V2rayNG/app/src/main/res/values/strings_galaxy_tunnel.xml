@@ -170,4 +170,5 @@
     <string name="gt_my_toast_copied">ကူးယူပြီးပြီ</string>
     <string name="gt_my_toast_saved">သိမ်းပြီးပြီ</string>
     <string name="gt_no_server_selected">No server selected</string>
+<string name="more_options">More options</string> 
 </resources>
