@@ -1,45 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout 
+<androidx.coordinatorlayout.widget.CoordinatorLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/gt_background">
+    android:background="?attr/colorSurface"
+    tools:context=".ui.MainActivityGalaxyTunnel">
 
-    <!-- Top Bar -->
-    <RelativeLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:background="@color/gt_surface">
+        android:layout_height="wrap_content"
+        android:theme="@style/Theme.V2rayNG.AppBarOverlay">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="@string/gt_app_name"
-            android:textColor="@color/gt_text_primary"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/Theme.V2rayNG.PopupOverlay" />
 
-        <ImageButton
-            android:id="@+id/btn_settings"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_settings"
-            android:tint="@color/gt_text_primary" />
-    </RelativeLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -47,238 +33,290 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Status Card -->
-            <androidx.cardview.widget.CardView
+            <!-- Connection Status Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardStats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="24dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="@color/gt_surface">
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutline">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="24dp"
+                    android:padding="20dp"
                     android:gravity="center">
 
-                    <RelativeLayout
-                        android:layout_width="160dp"
-                        android:layout_height="160dp"
-                        android:layout_marginBottom="24dp">
+                    <!-- Status Indicator -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
 
                         <View
-                            android:id="@+id/status_glow"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/gt_status_indicator" />
+                            android:id="@+id/statusIndicator"
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/circle_status_offline" />
 
-                        <ImageButton
-                            android:id="@+id/btn_connect"
-                            android:layout_width="120dp"
-                            android:layout_height="120dp"
-                            android:layout_centerInParent="true"
-                            android:background="@drawable/gt_circle_button"
-                            android:src="@drawable/ic_power"
-                            android:tint="@color/gt_text_primary"
-                            android:scaleType="centerInside" />
-                    </RelativeLayout>
+                        <TextView
+                            android:id="@+id/tvStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/galaxy_disconnected"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorOnSurface" />
 
+                    </LinearLayout>
+
+                    <!-- VPN Toggle Button -->
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/btnVpnToggle"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_marginBottom="16dp"
+                        android:src="@drawable/ic_power_off"
+                        android:contentDescription="@string/toggle_vpn"
+                        app:backgroundTint="?attr/colorErrorContainer"
+                        app:tint="?attr/colorOnErrorContainer"
+                        app:maxImageSize="40dp"
+                        app:elevation="6dp" />
+
+                    <!-- Selected Server -->
                     <TextView
-                        android:id="@+id/tv_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/gt_status_disconnected"
-                        android:textColor="@color/gt_text_primary"
-                        android:textSize="24sp"
+                        android:text="@string/selected_server"
+                        android:textSize="12sp"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.1"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tvServerName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No Node Selected"
+                        android:textSize="16sp"
                         android:textStyle="bold"
-                        android:layout_marginBottom="8dp" />
+                        android:textColor="?attr/colorOnSurface"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:layout_marginBottom="16dp" />
 
-                    <TextView
-                        android:id="@+id/tv_connected_server"
-                        android:layout_width="wrap_content"
+                    <!-- Telemetry HUD (Hidden by default) -->
+                    <LinearLayout
+                        android:id="@+id/layoutTelemetry"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/gt_no_server_selected"
-                        android:textColor="@color/gt_text_secondary"
-                        android:textSize="14sp" />
+                        android:orientation="horizontal"
+                        android:visibility="gone"
+                        android:layout_marginTop="8dp">
+
+                        <!-- Duration -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/duration"
+                                android:textSize="10sp"
+                                android:textAllCaps="true"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:id="@+id/tvDuration"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="00:00:00"
+                                android:textSize="14sp"
+                                android:fontFamily="monospace"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <!-- Download -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <ImageView
+                                    android:layout_width="12dp"
+                                    android:layout_height="12dp"
+                                    android:src="@drawable/ic_arrow_downward"
+                                    android:tint="@color/green_telemetry"
+                                    android:layout_marginEnd="4dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="DL"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/green_telemetry" />
+
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tvDownloadSpeed"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0 B/s"
+                                android:textSize="14sp"
+                                android:fontFamily="monospace"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <!-- Upload -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <ImageView
+                                    android:layout_width="12dp"
+                                    android:layout_height="12dp"
+                                    android:src="@drawable/ic_arrow_upward"
+                                    android:tint="@color/cyan_telemetry"
+                                    android:layout_marginEnd="4dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="UL"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/cyan_telemetry" />
+
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tvUploadSpeed"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0 B/s"
+                                android:textSize="14sp"
+                                android:fontFamily="monospace"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
-            <!-- Stats Row -->
-            <androidx.cardview.widget.CardView
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Server List Header -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="@color/gt_surface">
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutline"
+                android:clickable="true"
+                android:focusable="true"
+                android:id="@+id/cardServerToggle">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:padding="14dp"
+                    android:gravity="center_vertical">
 
-                    <!-- Download Stat -->
-                    <LinearLayout
+                    <ImageView
+                        android:id="@+id/imgExpandIcon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_expand_more"
+                        android:tint="?attr/colorOnSurface"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
+                        android:text="@string/server_list"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_download"
-                            android:tint="@color/gt_primary" />
-
-                        <TextView
-                            android:id="@+id/tv_download_speed"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 B/s"
-                            android:textColor="@color/gt_text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="4dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/gt_stats_download"
-                            android:textColor="@color/gt_text_secondary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/gt_divider"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp" />
-
-                    <!-- Upload Stat -->
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/tvServerCount"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_upload"
-                            android:tint="@color/gt_primary" />
-
-                        <TextView
-                            android:id="@+id/tv_upload_speed"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 B/s"
-                            android:textColor="@color/gt_text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="4dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/gt_stats_upload"
-                            android:textColor="@color/gt_text_secondary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/gt_divider"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp" />
-
-                    <!-- Duration Stat -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_timer"
-                            android:tint="@color/gt_primary" />
-
-                        <TextView
-                            android:id="@+id/tv_duration"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="00:00:00"
-                            android:textColor="@color/gt_text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="4dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/gt_stats_duration"
-                            android:textColor="@color/gt_text_secondary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
+                        android:text="(0)"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginEnd="4dp" />
 
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
-            <!-- Server List Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/gt_server_list_title"
-                android:textColor="@color/gt_text_primary"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
+            </com.google.android.material.card.MaterialCardView>
 
-            <!-- Server List -->
+            <!-- Server List RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_server_list"
+                android:id="@+id/recyclerServers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_server_galaxy_tunnel" />
-
-            <!-- Add Server Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_add_server"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/gt_server_add"
-                android:textColor="@color/gt_text_primary"
-                android:background="@drawable/gt_button_outline"
-                app:icon="@drawable/ic_add"
-                app:iconTint="@color/gt_primary"
-                app:iconGravity="textStart"
+                android:visibility="gone"
                 android:layout_marginBottom="16dp" />
 
+            <!-- Import Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnImport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/import_config"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                android:layout_marginTop="8dp" />
+
         </LinearLayout>
+
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_nav"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="@color/gt_nav_bg"
-        app:itemIconTint="@color/gt_nav_item"
-        app:itemTextColor="@color/gt_nav_item"
-        app:itemRippleColor="@color/gt_card_ripple"
-        app:menu="@menu/menu_bottom_nav" />
-
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
