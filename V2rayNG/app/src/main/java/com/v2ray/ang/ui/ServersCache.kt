@@ -1,10 +1,8 @@
 package com.v2ray.ang.ui
 
-import android.content.Context
 import com.v2ray.ang.dto.EConfigType
-import com.v2ray.ang.dto.ProfileItem
-import com.v2ray.ang.util.AngConfigManager
-import com.v2ray.ang.util.MmkvManager
+import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.handler.MmkvManager
 
 /**
  * Galaxy Tunnel UI - Servers Cache Wrapper
@@ -34,12 +32,14 @@ class ServersCache private constructor() {
 
     fun getAllServers(): List<ServerItem> {
         val serverList = MmkvManager.decodeServerList()
+
         return serverList.mapNotNull { guid ->
             val profile = MmkvManager.decodeServerConfig(guid)
+
             profile?.let {
                 ServerItem(
                     guid = guid,
-                    configType = EConfigType.fromInt(it.configType) ?: EConfigType.VMESS,
+                    configType = it.configType,
                     remarks = it.remarks ?: "Unknown",
                     serverAddress = it.serverAddress ?: "",
                     serverPort = it.serverPort ?: 0,
@@ -60,9 +60,10 @@ class ServersCache private constructor() {
     fun getActiveServer(): ServerItem? {
         val guid = getActiveServerGuid() ?: return null
         val profile = MmkvManager.decodeServerConfig(guid) ?: return null
+
         return ServerItem(
             guid = guid,
-            configType = EConfigType.fromInt(profile.configType) ?: EConfigType.VMESS,
+            configType = profile.configType,
             remarks = profile.remarks ?: "Unknown",
             serverAddress = profile.serverAddress ?: "",
             serverPort = profile.serverPort ?: 0,
@@ -71,7 +72,7 @@ class ServersCache private constructor() {
     }
 
     fun importConfig(config: String): Boolean {
-        return AngConfigManager.importBatchConfig(config, "" , true) > 0
+        return AngConfigManager.importBatchConfig(config, "", true) > 0
     }
 
     fun removeServer(guid: String) {
