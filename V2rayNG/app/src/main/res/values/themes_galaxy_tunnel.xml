@@ -1,248 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- ===== GALAXY TUNNEL DARK THEME (ADD TO EXISTING themes.xml) ===== -->
     <style name="Theme.GalaxyTunnel" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary Colors -->
         <item name="colorPrimary">@color/gt_primary</item>
-        <item name="colorPrimaryDark">@color/gt_primary_dark</item>
-        <item name="colorAccent">@color/gt_accent</item>
-        <item name="colorSecondary">@color/gt_secondary</item>
-
-        <!-- Background -->
+        <item name="colorPrimaryVariant">@color/gt_primary_dark</item>
+        <item name="colorOnPrimary">@color/gt_text_primary</item>
         <item name="android:windowBackground">@color/gt_background</item>
-        <item name="colorSurface">@color/gt_surface</item>
-        <item name="colorOnSurface">@color/gt_text_primary</item>
+        <item name="android:statusBarColor">@color/gt_surface</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 
-        <!-- Text -->
-        <item name="android:textColorPrimary">@color/gt_text_primary</item>
-        <item name="android:textColorSecondary">@color/gt_text_secondary</item>
-        <item name="android:textColorHint">@color/gt_text_disabled</item>
-
-        <!-- Status Bar -->
-        <item name="android:statusBarColor">@color/gt_background</item>
-        <item name="android:navigationBarColor">@color/gt_background</item>
-
-        <!-- Action Bar -->
-        <item name="actionBarStyle">@style/GalaxyTunnel.ActionBar</item>
-
-        <!-- Toolbar -->
-        <item name="toolbarStyle">@style/GalaxyTunnel.Toolbar</item>
-
-        <!-- Card -->
-        <item name="cardBackgroundColor">@color/gt_card_dark</item>
+    <style name="GalaxyTunnel.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/gt_surface</item>
         <item name="cardCornerRadius">16dp</item>
-        <item name="cardElevation">4dp</item>
-
-        <!-- Button -->
-        <item name="materialButtonStyle">@style/GalaxyTunnel.Button</item>
-
-        <!-- Input -->
-        <item name="textInputStyle">@style/GalaxyTunnel.TextInput</item>
-
-        <!-- Switch -->
-        <item name="switchStyle">@style/GalaxyTunnel.Switch</item>
-
-        <!-- Checkbox -->
-        <item name="checkboxStyle">@style/GalaxyTunnel.Checkbox</item>
-
-        <!-- Radio Button -->
-        <item name="radioButtonStyle">@style/GalaxyTunnel.RadioButton</item>
-
-        <!-- Progress Bar -->
-        <item name="progressBarStyle">@style/GalaxyTunnel.ProgressBar</item>
-
-        <!-- Slider -->
-        <item name="sliderStyle">@style/GalaxyTunnel.Slider</item>
-
-        <!-- Tab -->
-        <item name="tabStyle">@style/GalaxyTunnel.Tab</item>
-
-        <!-- Bottom Navigation -->
-        <item name="bottomNavigationStyle">@style/GalaxyTunnel.BottomNav</item>
-
-        <!-- Navigation Drawer -->
-        <item name="navigationViewStyle">@style/GalaxyTunnel.NavDrawer</item>
-
-        <!-- Dialog -->
-        <item name="materialAlertDialogTheme">@style/GalaxyTunnel.Dialog</item>
-
-        <!-- Snackbar -->
-        <item name="snackbarStyle">@style/GalaxyTunnel.Snackbar</item>
-
-        <!-- Tooltip -->
-        <item name="tooltipStyle">@style/GalaxyTunnel.Tooltip</item>
-
-        <!-- Chip -->
-        <item name="chipStyle">@style/GalaxyTunnel.Chip</item>
-
-        <!-- Ripple -->
-        <item name="colorControlHighlight">@color/gt_card_ripple</item>
-
-        <!-- Divider -->
-        <item name="dividerColor">@color/gt_divider</item>
+        <item name="cardElevation">2dp</item>
     </style>
 
-    <!-- ===== GALAXY TUNNEL LIGHT THEME ===== -->
-    <style name="Theme.GalaxyTunnel.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/gt_primary</item>
-        <item name="colorPrimaryDark">@color/gt_primary_dark</item>
-        <item name="colorAccent">@color/gt_accent</item>
-        <item name="colorSecondary">@color/gt_secondary</item>
-        <item name="android:windowBackground">@color/gt_background_light</item>
-        <item name="colorSurface">@color/gt_surface_light</item>
-        <item name="colorOnSurface">@color/gt_text_primary_light</item>
-        <item name="android:textColorPrimary">@color/gt_text_primary_light</item>
-        <item name="android:textColorSecondary">@color/gt_text_secondary_light</item>
-        <item name="android:textColorHint">@color/gt_text_disabled_light</item>
-        <item name="android:statusBarColor">@color/gt_background_light</item>
-        <item name="android:navigationBarColor">@color/gt_background_light</item>
-        <item name="cardBackgroundColor">@color/gt_card_light</item>
-        <item name="dividerColor">@color/gt_divider_light</item>
-        <item name="colorControlHighlight">@color/gt_card_ripple</item>
-    </style>
-
-    <!-- ===== COMPONENT STYLES ===== -->
-    <style name="GalaxyTunnel.ActionBar" parent="Widget.MaterialComponents.ActionBar.Primary">
-        <item name="background">@color/gt_background</item>
-        <item name="titleTextStyle">@style/GalaxyTunnel.Text.Title</item>
-    </style>
-
-    <style name="GalaxyTunnel.Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary">
-        <item name="background">@color/gt_background</item>
-        <item name="titleTextAppearance">@style/GalaxyTunnel.Text.Title</item>
-        <item name="subtitleTextAppearance">@style/GalaxyTunnel.Text.Subtitle</item>
-    </style>
-
-    <style name="GalaxyTunnel.Button" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">@color/gt_button_primary</item>
+    <style name="GalaxyTunnel.Button.Primary" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/gt_primary</item>
         <item name="android:textColor">@color/gt_text_primary</item>
         <item name="cornerRadius">12dp</item>
-        <item name="android:paddingStart">24dp</item>
-        <item name="android:paddingEnd">24dp</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
     </style>
 
-    <style name="GalaxyTunnel.Button.Secondary">
-        <item name="backgroundTint">@color/gt_button_secondary</item>
-        <item name="android:textColor">@color/gt_text_primary</item>
-    </style>
-
-    <style name="GalaxyTunnel.Button.Outline" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="strokeColor">@color/gt_button_outline</item>
-        <item name="android:textColor">@color/gt_button_outline</item>
-        <item name="cornerRadius">12dp</item>
-    </style>
-
-    <style name="GalaxyTunnel.Button.Ghost" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/gt_button_ghost_text</item>
-    </style>
-
-    <style name="GalaxyTunnel.TextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/gt_input_border</item>
-        <item name="boxBackgroundColor">@color/gt_input_bg</item>
-        <item name="hintTextColor">@color/gt_input_hint</item>
-        <item name="android:textColorHint">@color/gt_input_hint</item>
-        <item name="cornerRadius">12dp</item>
-    </style>
-
-    <style name="GalaxyTunnel.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
-        <item name="thumbTint">@color/gt_toggle_thumb</item>
-        <item name="trackTint">@color/gt_toggle_track_off</item>
-    </style>
-
-    <style name="GalaxyTunnel.Checkbox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
-        <item name="buttonTint">@color/gt_primary</item>
-    </style>
-
-    <style name="GalaxyTunnel.RadioButton" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
-        <item name="buttonTint">@color/gt_primary</item>
-    </style>
-
-    <style name="GalaxyTunnel.ProgressBar" parent="Widget.MaterialComponents.ProgressIndicator.Circular.Indeterminate">
-        <item name="indicatorColor">@color/gt_primary</item>
-        <item name="trackColor">@color/gt_surface</item>
-    </style>
-
-    <style name="GalaxyTunnel.Slider" parent="Widget.MaterialComponents.Slider">
-        <item name="thumbColor">@color/gt_primary</item>
-        <item name="trackColorActive">@color/gt_primary</item>
-        <item name="trackColorInactive">@color/gt_surface</item>
-    </style>
-
-    <style name="GalaxyTunnel.Tab" parent="Widget.MaterialComponents.TabLayout">
-        <item name="tabBackground">@color/gt_background</item>
-        <item name="tabIndicatorColor">@color/gt_primary</item>
-        <item name="tabSelectedTextColor">@color/gt_primary</item>
-        <item name="tabTextColor">@color/gt_text_secondary</item>
-    </style>
-
-    <style name="GalaxyTunnel.BottomNav" parent="Widget.MaterialComponents.BottomNavigationView">
-        <item name="background">@color/gt_nav_bg</item>
-        <item name="itemIconTint">@color/gt_nav_item</item>
-        <item name="itemTextColor">@color/gt_nav_item</item>
-        <item name="itemRippleColor">@color/gt_card_ripple</item>
-    </style>
-
-    <style name="GalaxyTunnel.NavDrawer" parent="Widget.MaterialComponents.NavigationView">
-        <item name="background">@color/gt_nav_bg</item>
-        <item name="itemIconTint">@color/gt_nav_item</item>
-        <item name="itemTextColor">@color/gt_nav_item</item>
-        <item name="itemRippleColor">@color/gt_card_ripple</item>
-    </style>
-
-    <style name="GalaxyTunnel.Dialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="colorSurface">@color/gt_surface</item>
-        <item name="materialAlertDialogTitleTextStyle">@style/GalaxyTunnel.Text.Title</item>
-        <item name="materialAlertDialogBodyTextStyle">@style/GalaxyTunnel.Text.Body</item>
-    </style>
-
-    <style name="GalaxyTunnel.Snackbar" parent="Widget.MaterialComponents.Snackbar">
-        <item name="backgroundTint">@color/gt_elevated</item>
-        <item name="actionTextColorAlpha">1.0</item>
-    </style>
-
-    <style name="GalaxyTunnel.Tooltip" parent="Widget.MaterialComponents.Tooltip">
-        <item name="backgroundTint">@color/gt_elevated</item>
-        <item name="android:textColor">@color/gt_text_primary</item>
-    </style>
-
-    <style name="GalaxyTunnel.Chip" parent="Widget.MaterialComponents.Chip.Action">
-        <item name="chipBackgroundColor">@color/gt_elevated</item>
-        <item name="android:textColor">@color/gt_text_primary</item>
-    </style>
-
-    <!-- ===== TEXT STYLES ===== -->
-    <style name="GalaxyTunnel.Text" parent="TextAppearance.MaterialComponents.Body1">
-        <item name="android:textColor">@color/gt_text_primary</item>
-    </style>
-
-    <style name="GalaxyTunnel.Text.Title" parent="TextAppearance.MaterialComponents.Headline6">
-        <item name="android:textColor">@color/gt_text_primary</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="GalaxyTunnel.Text.Subtitle" parent="TextAppearance.MaterialComponents.Subtitle1">
-        <item name="android:textColor">@color/gt_text_secondary</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="GalaxyTunnel.Text.Body" parent="TextAppearance.MaterialComponents.Body1">
-        <item name="android:textColor">@color/gt_text_primary</item>
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="GalaxyTunnel.Text.Caption" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="android:textColor">@color/gt_text_secondary</item>
-        <item name="android:textSize">12sp</item>
-    </style>
-
-    <style name="GalaxyTunnel.Text.Button" parent="TextAppearance.MaterialComponents.Button">
-        <item name="android:textColor">@color/gt_text_primary</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textStyle">bold</item>
+    <style name="GalaxyTunnel.ProgressBar" parent="Widget.AppCompat.ProgressBar">
+        <item name="android:indeterminateTint">@color/gt_primary</item>
     </style>
 </resources>
