@@ -1,123 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout 
+<LinearLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gt_background"
-    tools:context=".ui.MainActivity">
+    android:orientation="vertical"
+    android:background="@color/gt_background">
 
-    <!-- App Bar -->
-    <com.google.android.material.appbar.AppBarLayout
+    <!-- Top Bar -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/gt_background"
-        android:elevation="0dp"
-        app:elevation="0dp">
+        android:layout_height="?attr/actionBarSize"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="@color/gt_surface">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/gt_background"
-            app:title="@string/gt_app_name"
-            app:titleTextColor="@color/gt_text_primary"
-            app:titleTextAppearance="@style/GalaxyTunnel.Text.Title"
-            app:navigationIcon="@drawable/ic_menu"
-            app:menu="@menu/menu_main" />
-    </com.google.android.material.appbar.AppBarLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="@string/gt_app_name"
+            android:textColor="@color/gt_text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-    <!-- Main Content -->
+        <ImageButton
+            android:id="@+id/btn_settings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_settings"
+            android:tint="@color/gt_text_primary" />
+    </RelativeLayout>
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Connection Status Card -->
+            <!-- Status Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@color/gt_surface"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="4dp"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/gt_surface">
 
-                <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="24dp"
                     android:gravity="center">
 
-                    <!-- Status Text -->
+                    <RelativeLayout
+                        android:layout_width="160dp"
+                        android:layout_height="160dp"
+                        android:layout_marginBottom="24dp">
+
+                        <View
+                            android:id="@+id/status_glow"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/gt_status_indicator" />
+
+                        <ImageButton
+                            android:id="@+id/btn_connect"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:layout_centerInParent="true"
+                            android:background="@drawable/gt_circle_button"
+                            android:src="@drawable/ic_power"
+                            android:tint="@color/gt_text_primary"
+                            android:scaleType="centerInside" />
+                    </RelativeLayout>
+
                     <TextView
                         android:id="@+id/tv_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/gt_status_disconnected"
-                        android:textColor="@color/gt_disconnected"
-                        android:textSize="18sp"
+                        android:textColor="@color/gt_text_primary"
+                        android:textSize="24sp"
                         android:textStyle="bold"
                         android:layout_marginBottom="8dp" />
 
-                    <!-- Status Indicator -->
-                    <View
-                        android:id="@+id/status_indicator"
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:background="@drawable/gt_status_indicator"
-                        android:layout_marginBottom="24dp" />
-
-                    <!-- VPN Toggle Button -->
-                    <androidx.appcompat.widget.AppCompatImageButton
-                        android:id="@+id/btn_vpn_toggle"
-                        android:layout_width="140dp"
-                        android:layout_height="140dp"
-                        android:background="@drawable/gt_circle_button"
-                        android:src="@drawable/ic_power"
-                        android:scaleType="centerInside"
-                        android:padding="32dp"
-                        android:contentDescription="@string/gt_btn_connect" />
-
-                    <!-- Connection Info -->
                     <TextView
-                        android:id="@+id/tv_server_name"
+                        android:id="@+id/tv_connected_server"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/gt_error_no_server"
+                        android:text="@string/gt_no_server_selected"
                         android:textColor="@color/gt_text_secondary"
-                        android:textSize="14sp"
-                        android:layout_marginTop="16dp" />
+                        android:textSize="14sp" />
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Stats Card -->
+            <!-- Stats Row -->
             <androidx.cardview.widget.CardView
-                android:id="@+id/card_stats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="@color/gt_surface"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="4dp">
+                app:cardElevation="2dp"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/gt_surface">
 
-                <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="16dp">
 
                     <!-- Download Stat -->
-                    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -148,8 +153,15 @@
                             android:textSize="12sp" />
                     </LinearLayout>
 
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/gt_divider"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp" />
+
                     <!-- Upload Stat -->
-                    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -180,8 +192,15 @@
                             android:textSize="12sp" />
                     </LinearLayout>
 
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/gt_divider"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp" />
+
                     <!-- Duration Stat -->
-                    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -211,6 +230,7 @@
                             android:textColor="@color/gt_text_secondary"
                             android:textSize="12sp" />
                     </LinearLayout>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -261,4 +281,4 @@
         app:itemRippleColor="@color/gt_card_ripple"
         app:menu="@menu/menu_bottom_nav" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>
