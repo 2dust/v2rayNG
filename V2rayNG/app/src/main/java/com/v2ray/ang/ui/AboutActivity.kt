@@ -1,52 +1,140 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
+import android.webkit.WebView
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.compose.AppTheme
+import com.v2ray.ang.compose.AppTopBar
+import com.v2ray.ang.compose.SettingsMenuItem
+import com.v2ray.ang.compose.VersionInfoBlock
 import com.v2ray.ang.core.CoreNativeManager
-import com.v2ray.ang.databinding.ActivityAboutBinding
 import com.v2ray.ang.util.Utils
 
-class AboutActivity : BaseActivity() {
-    private val binding by lazy { ActivityAboutBinding.inflate(layoutInflater) }
+class AboutActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(binding.root)
-        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.title_about))
+        enableEdgeToEdge()
+        setContent {
+            AppTheme {
+                AboutScreen(onBackClick = { finish() })
+            }
+        }
+    }
+}
 
-        binding.layoutSoureCcode.setOnClickListener {
-            Utils.openUri(this, AppConfig.APP_URL)
-        }
+/**
+ * The Compose screen for the About page.
+ *
+ * Presents menu items for source code, OSS licenses, feedback, Telegram channel, privacy policy,
+ * and version info. Tapping the OSS license item shows a dialog with a WebView loading the license HTML.
+ *
+ * @param onBackClick Callback invoked when the back button is tapped, typically to close the activity.
+ */
+@Composable
+fun AboutScreen(onBackClick: () -> Unit) {
+    val context = LocalContext.current
+    var showOssDialog by remember { mutableStateOf(false) }
 
-        binding.layoutFeedback.setOnClickListener {
-            Utils.openUri(this, AppConfig.APP_ISSUES_URL)
-        }
+    val versionText = "v${BuildConfig.VERSION_NAME} (${CoreNativeManager.getLibVersion()})"
+    val appIdText = BuildConfig.APPLICATION_ID
 
-        binding.layoutOssLicenses.setOnClickListener {
-            val webView = android.webkit.WebView(this)
-            webView.loadUrl("file:///android_asset/open_source_licenses.html")
-            android.app.AlertDialog.Builder(this)
-                .setTitle("Open source licenses")
-                .setView(webView)
-                .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-                .show()
+    Scaffold(
+        topBar = {
+            AppTopBar(
+                title = stringResource(R.string.title_about),
+                onBackClick = onBackClick
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+        ) {
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.ic_source_code_24dp),
+                title = stringResource(R.string.title_source_code),
+                onClick = { Utils.openUri(context, AppConfig.APP_URL) }
+            )
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.license_24px),
+                title = stringResource(R.string.title_oss_license),
+                onClick = { showOssDialog = true }
+            )
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.ic_feedback_24dp),
+                title = stringResource(R.string.title_pref_feedback),
+                onClick = { Utils.openUri(context, AppConfig.APP_ISSUES_URL) }
+            )
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.ic_telegram_24dp),
+                title = stringResource(R.string.title_tg_channel),
+                onClick = { Utils.openUri(context, AppConfig.TG_CHANNEL_URL) }
+            )
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.ic_privacy_24dp),
+                title = stringResource(R.string.title_privacy_policy),
+                onClick = { Utils.openUri(context, AppConfig.APP_PRIVACY_POLICY) }
+            )
+            VersionInfoBlock(
+                versionText = versionText,
+                appIdText = appIdText
+            )
         }
+    }
 
-        binding.layoutTgChannel.setOnClickListener {
-            Utils.openUri(this, AppConfig.TG_CHANNEL_URL)
-        }
-
-        binding.layoutPrivacyPolicy.setOnClickListener {
-            Utils.openUri(this, AppConfig.APP_PRIVACY_POLICY)
-        }
-
-        "v${BuildConfig.VERSION_NAME} (${CoreNativeManager.getLibVersion()})".also {
-            binding.tvVersion.text = it
-        }
-        BuildConfig.APPLICATION_ID.also {
-            binding.tvAppId.text = it
-        }
+    if (showOssDialog) {
+        AlertDialog(
+            onDismissRequest = { showOssDialog = false },
+            title = { Text("Open source licenses") },
+            text = {
+                AndroidView(
+                    factory = { ctx ->
+                        WebView(ctx).apply {
+                            loadUrl("file:///android_asset/open_source_licenses.html")
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 300.dp)
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showOssDialog = false }) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.padding(bottom = 60.dp)
+        )
     }
 }

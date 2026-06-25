@@ -9,7 +9,7 @@ import android.os.Bundle
 import android.widget.Toast
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.enums.EConfigType
-import es.dmoral.toasty.Toasty
+import com.v2ray.ang.util.ComposeToast
 import java.io.Serializable
 import java.net.URI
 import java.util.Locale
@@ -17,58 +17,36 @@ import java.util.Locale
 val Context.v2RayApplication: AngApplication?
     get() = applicationContext as? AngApplication
 
-/**
- * Shows a toast message with the given resource ID.
- *
- * @param message The resource ID of the message to show.
- */
-fun Context.toast(message: Int) {
-    Toasty.normal(this, message).show()
-}
-
-/**
- * Shows a toast message with the given text.
- *
- * @param message The text of the message to show.
- */
 fun Context.toast(message: CharSequence) {
-    Toasty.normal(this, message).show()
+    ComposeToast.normal(this, message)
 }
 
-/**
- * Shows a toast message with the given resource ID.
- *
- * @param message The resource ID of the message to show.
- */
-fun Context.toastSuccess(message: Int) {
-    Toasty.success(this, message, Toast.LENGTH_SHORT, true).show()
+fun Context.toast(resId: Int) {
+    ComposeToast.normal(this, resId)
 }
 
-/**
- * Shows a toast message with the given text.
- *
- * @param message The text of the message to show.
- */
 fun Context.toastSuccess(message: CharSequence) {
-    Toasty.success(this, message, Toast.LENGTH_SHORT, true).show()
+    ComposeToast.success(this, message)
 }
 
-/**
- * Shows a toast message with the given resource ID.
- *
- * @param message The resource ID of the message to show.
- */
-fun Context.toastError(message: Int) {
-    Toasty.error(this, message, Toast.LENGTH_SHORT, true).show()
+fun Context.toastSuccess(resId: Int) {
+    ComposeToast.success(this, resId)
 }
 
-/**
- * Shows a toast message with the given text.
- *
- * @param message The text of the message to show.
- */
 fun Context.toastError(message: CharSequence) {
-    Toasty.error(this, message, Toast.LENGTH_SHORT, true).show()
+    ComposeToast.error(this, message)
+}
+
+fun Context.toastError(resId: Int) {
+    ComposeToast.error(this, resId)
+}
+
+fun Context.toastInfo(message: CharSequence) {
+    ComposeToast.info(this, message)
+}
+
+fun Context.toastInfo(resId: Int) {
+    ComposeToast.info(this, resId)
 }
 
 const val THRESHOLD = 1000L

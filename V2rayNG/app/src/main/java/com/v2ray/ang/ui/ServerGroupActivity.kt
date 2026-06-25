@@ -2,12 +2,32 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.ArrayAdapter
-import androidx.appcompat.app.AlertDialog
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
-import com.v2ray.ang.databinding.ActivityServerGroupBinding
+import com.v2ray.ang.compose.AppTheme
+import com.v2ray.ang.compose.AppTopBar
+import com.v2ray.ang.compose.ConfirmDialog
+import com.v2ray.ang.compose.FormDropdownField
+import com.v2ray.ang.compose.FormTextField
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
@@ -15,10 +35,8 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
-import com.v2ray.ang.util.Utils
 
-class ServerGroupActivity : BaseActivity() {
-    private val binding by lazy { ActivityServerGroupBinding.inflate(layoutInflater) }
+class ServerGroupActivity : ComponentActivity() {
 
     private val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
     private val isRunning by lazy {
@@ -26,79 +44,59 @@ class ServerGroupActivity : BaseActivity() {
                 && editGuid.isNotEmpty()
                 && editGuid == MmkvManager.getSelectServer()
     }
-    private val subscriptionId by lazy {
-        intent.getStringExtra("subscriptionId")
-    }
+    private val subscriptionId by lazy { intent.getStringExtra("subscriptionId") }
     private val subIds = mutableListOf<String>()
+    private val subDisplay = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(binding.root)
-        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = EConfigType.POLICYGROUP.toString())
+        enableEdgeToEdge()
 
         val config = MmkvManager.decodeServerConfig(editGuid)
         populateSubscriptionSpinner()
 
-        if (config != null) {
-            bindingServer(config)
-        } else {
-            clearServer()
+        val initialSubIndex: Int = if (config != null) {
+            subIds.indexOf(config.policyGroupSubscriptionId ?: "").let { if (it >= 0) it else 0 }
+        } else if (subscriptionId.isNotNullEmpty()) {
+            subIds.indexOf(subscriptionId).let { if (it >= 0) it else 0 }
+        } else 0
+
+        setContent {
+            AppTheme {
+                ServerGroupScreen(
+                    editGuid = editGuid,
+                    isRunning = isRunning,
+                    subDisplay = subDisplay,
+                    initialRemarks = config?.remarks ?: "",
+                    initialFilter = config?.policyGroupFilter ?: "",
+                    initialType = config?.policyGroupType?.toIntOrNull() ?: 0,
+                    initialSubIndex = initialSubIndex,
+                    onBackClick = { finish() },
+                    onSave = { remarks, filter, typeIdx, subIdx -> saveServer(remarks, filter, typeIdx, subIdx) },
+                    onDelete = { deleteServer() }
+                )
+            }
         }
     }
 
-    /**
-     * Binding selected server config
-     */
-    private fun bindingServer(config: ProfileItem): Boolean {
-        binding.etRemarks.text = Utils.getEditable(config.remarks)
-        binding.etPolicyGroupFilter.text = Utils.getEditable(config.policyGroupFilter)
-
-        val type = config.policyGroupType?.toInt() ?: 0
-        binding.spPolicyGroupType.setSelection(type)
-
-        val pos = subIds.indexOf(config.policyGroupSubscriptionId ?: "").let { if (it >= 0) it else 0 }
-        binding.spPolicyGroupSubId.setSelection(pos)
-
-        return true
-    }
-
-    /**
-     * clear or init server config
-     */
-    private fun clearServer(): Boolean {
-        binding.etRemarks.text = null
-        binding.etPolicyGroupFilter.text = null
-
-        if (subscriptionId.isNotNullEmpty()) {
-            val pos = subIds.indexOf(subscriptionId).let { if (it >= 0) it else 0 }
-            binding.spPolicyGroupSubId.setSelection(pos)
-        }
-        return true
-    }
-
-    /**
-     * save server config
-     */
-    private fun saveServer(): Boolean {
-        if (TextUtils.isEmpty(binding.etRemarks.text.toString())) {
+    private fun saveServer(remarks: String, filter: String, typeIdx: Int, subIdx: Int): Boolean {
+        if (TextUtils.isEmpty(remarks)) {
             toast(R.string.server_lab_remarks)
             return false
         }
 
         val config = MmkvManager.decodeServerConfig(editGuid) ?: ProfileItem.create(EConfigType.POLICYGROUP)
-        config.remarks = binding.etRemarks.text.toString().trim()
-        config.policyGroupFilter = binding.etPolicyGroupFilter.text.toString().trim()
-
-        config.policyGroupType = binding.spPolicyGroupType.selectedItemPosition.toString()
-
-        val selPos = binding.spPolicyGroupSubId.selectedItemPosition
-        config.policyGroupSubscriptionId = if (selPos >= 0 && selPos < subIds.size) subIds[selPos] else null
+        config.remarks = remarks.trim()
+        config.policyGroupFilter = filter.trim()
+        config.policyGroupType = typeIdx.toString()
+        config.policyGroupSubscriptionId = if (subIdx >= 0 && subIdx < subIds.size) subIds[subIdx] else null
 
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
 
-        config.description = "${binding.spPolicyGroupType.selectedItem} - ${binding.spPolicyGroupSubId.selectedItem} - ${config.policyGroupFilter}"
+        val typeDisplay = stringArrayPolicyGroupType().getOrNull(typeIdx).orEmpty()
+        config.description = "$typeDisplay - ${subDisplay.getOrNull(subIdx).orEmpty()} - ${config.policyGroupFilter}"
 
         MmkvManager.encodeServerConfig(editGuid, config)
         if (isRunning) {
@@ -109,62 +107,104 @@ class ServerGroupActivity : BaseActivity() {
         return true
     }
 
-    /**
-     * save server config
-     */
     private fun deleteServer(): Boolean {
         if (editGuid.isNotEmpty()) {
-            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    MmkvManager.removeServer(editGuid)
-                    finish()
-                }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    // do nothing
-                }
-                .show()
+            MmkvManager.removeServer(editGuid)
+            finish()
         }
         return true
     }
 
     private fun populateSubscriptionSpinner() {
         val subs = MmkvManager.decodeSubscriptions()
-        val displayList = mutableListOf(getString(R.string.filter_config_all)) //none
         subIds.clear()
-        subIds.add("") // index 0 => All
+        subDisplay.clear()
+        subDisplay.add(getString(R.string.filter_config_all))
+        subIds.add("")
         subs.forEach { sub ->
             val name = when {
                 sub.subscription.remarks.isNotBlank() -> sub.subscription.remarks
                 else -> sub.guid
             }
-            displayList.add(name)
+            subDisplay.add(name)
             subIds.add(sub.guid)
         }
-        val subAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, displayList)
-        subAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spPolicyGroupSubId.adapter = subAdapter
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.action_server, menu)
+    private fun stringArrayPolicyGroupType(): Array<String> =
+        resources.getStringArray(R.array.policy_group_type)
+}
 
-        val delButton = menu.findItem(R.id.del_config)
-        delButton?.isVisible = editGuid.isNotEmpty() && !isRunning
+@Composable
+fun ServerGroupScreen(
+    editGuid: String,
+    isRunning: Boolean,
+    subDisplay: List<String>,
+    initialRemarks: String,
+    initialFilter: String,
+    initialType: Int,
+    initialSubIndex: Int,
+    onBackClick: () -> Unit,
+    onSave: (String, String, Int, Int) -> Boolean,
+    onDelete: () -> Unit
+) {
+    val typeEntries = stringArrayResource(R.array.policy_group_type).toList()
 
-        return super.onCreateOptionsMenu(menu)
+    var remarks by remember { mutableStateOf(initialRemarks) }
+    var filter by remember { mutableStateOf(initialFilter) }
+    var typeValue by remember { mutableStateOf(typeEntries.getOrNull(initialType).orEmpty()) }
+    var subValue by remember { mutableStateOf(subDisplay.getOrNull(initialSubIndex).orEmpty()) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
+    val showDelete = editGuid.isNotEmpty() && !isRunning
+
+    Scaffold(
+        topBar = {
+            AppTopBar(
+                title = EConfigType.POLICYGROUP.toString(),
+                onBackClick = onBackClick,
+                actions = {
+                    if (showDelete) {
+                        IconButton(onClick = { showDeleteConfirm = true }) {
+                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.menu_item_del_config))
+                        }
+                    }
+                    IconButton(onClick = {
+                        val typeIdx = typeEntries.indexOf(typeValue).coerceAtLeast(0)
+                        val subIdx = subDisplay.indexOf(subValue).coerceAtLeast(0)
+                        onSave(remarks, filter, typeIdx, subIdx)
+                    }) {
+                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.menu_item_save_config))
+                    }
+                }
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding).padding(vertical = 8.dp)) {
+            FormTextField(stringResource(R.string.server_lab_remarks), remarks, { remarks = it })
+            FormDropdownField(
+                label = stringResource(R.string.title_policy_group_type),
+                value = typeValue,
+                options = typeEntries,
+                onValueChange = { typeValue = it }
+            )
+            FormDropdownField(
+                label = stringResource(R.string.title_policy_group_subscription_id),
+                value = subValue,
+                options = subDisplay,
+                onValueChange = { subValue = it }
+            )
+            FormTextField(stringResource(R.string.title_policy_group_subscription_filter), filter, { filter = it })
+        }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.del_config -> {
-            deleteServer()
-            true
-        }
-
-        R.id.save_config -> {
-            saveServer()
-            true
-        }
-
-        else -> super.onOptionsItemSelected(item)
+    if (showDeleteConfirm) {
+        ConfirmDialog(
+            message = stringResource(R.string.del_config_comfirm),
+            confirmText = stringResource(android.R.string.ok),
+            dismissText = stringResource(android.R.string.cancel),
+            onConfirm = onDelete,
+            onDismiss = { showDeleteConfirm = false }
+        )
     }
 }

@@ -1,5 +1,10 @@
 package com.v2ray.ang.handler
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
@@ -719,6 +724,54 @@ object MmkvManager {
     fun decodeWebDavConfig(): WebDavConfig? {
         val json = mainStorage.decodeString(KEY_WEBDAV_CONFIG) ?: return null
         return JsonUtil.fromJsonSafe(json, WebDavConfig::class.java)
+    }
+
+    //endregion
+
+    //region Compose helpers for Settings
+
+    /**
+     * Creates a [MutableState] backed by MMKV settings for a String value.
+     * Any change to the state will automatically persist to MMKV.
+     *
+     * @param key The settings key.
+     * @param default The default value if the key does not exist.
+     * @return A [MutableState] reflecting the current stored value.
+     */
+    @Composable
+    fun rememberMmkvString(
+        key: String,
+        default: String = ""
+    ): MutableState<String> {
+        val state = remember {
+            mutableStateOf(decodeSettingsString(key, default) ?: default)
+        }
+        LaunchedEffect(state.value) {
+            encodeSettings(key, state.value)
+        }
+        return state
+    }
+
+    /**
+     * Creates a [MutableState] backed by MMKV settings for a Boolean value.
+     * Any change to the state will automatically persist to MMKV.
+     *
+     * @param key The settings key.
+     * @param default The default value if the key does not exist.
+     * @return A [MutableState] reflecting the current stored value.
+     */
+    @Composable
+    fun rememberMmkvBool(
+        key: String,
+        default: Boolean = false
+    ): MutableState<Boolean> {
+        val state = remember {
+            mutableStateOf(decodeSettingsBool(key, default))
+        }
+        LaunchedEffect(state.value) {
+            encodeSettings(key, state.value)
+        }
+        return state
     }
 
     //endregion

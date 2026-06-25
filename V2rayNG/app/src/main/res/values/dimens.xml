@@ -9,4 +9,5 @@
     <dimen name="view_height_dp64">64dp</dimen>
     <dimen name="view_height_dp120">120dp</dimen>
     <dimen name="view_height_dp160">160dp</dimen>
+    <dimen name="highlight_alpha_material_colored">0.8</dimen>
 </resources>

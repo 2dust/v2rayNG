@@ -4,22 +4,49 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import androidx.appcompat.widget.SearchView
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.databinding.ActivityAppPickerBinding
+import com.v2ray.ang.compose.AppDivider
+import com.v2ray.ang.compose.AppListItem
+import com.v2ray.ang.compose.AppTopBar
+import com.v2ray.ang.compose.AppTheme
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.util.AppManagerUtil
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.Collator
 
-class AppPickerActivity : BaseActivity() {
+class AppPickerActivity : ComponentActivity() {
     companion object {
         private const val EXTRA_SELECTED_PACKAGES = "selected_packages"
         private const val EXTRA_PICKER_TITLE = "picker_title"
@@ -38,54 +65,42 @@ class AppPickerActivity : BaseActivity() {
         }
     }
 
-    private val binding by lazy { ActivityAppPickerBinding.inflate(layoutInflater) }
     private val initialSelectedPackages by lazy {
         intent.getStringArrayListExtra(EXTRA_SELECTED_PACKAGES).orEmpty()
     }
     private val selectedPackages = LinkedHashSet<String>()
     private var appsAll: List<AppInfo> = emptyList()
-    private val adapter = AppSelectorAdapter(selectedPackages)
+
+    private val displayedApps = MutableStateFlow<List<AppInfo>>(emptyList())
+    private val selectionVersion = MutableStateFlow(0)
+    private val isLoadingState = MutableStateFlow(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = resolveScreenTitle())
-
+        enableEdgeToEdge()
         selectedPackages.addAll(initialSelectedPackages)
-        setupRecyclerView()
+
+        setContent {
+            AppTheme {
+                AppPickerScreen(
+                    title = resolveScreenTitle(),
+                    displayedApps = displayedApps,
+                    selectionVersion = selectionVersion,
+                    isLoadingState = isLoadingState,
+                    isSelected = { selectedPackages.contains(it) },
+                    onBackClick = { finish() },
+                    onToggleApp = { pkg ->
+                        if (selectedPackages.contains(pkg)) selectedPackages.remove(pkg)
+                        else selectedPackages.add(pkg)
+                        selectionVersion.value++
+                    },
+                    onSearch = { filterApps(it) },
+                    onSelectAll = { selectAllVisible() },
+                    onInvertSelection = { invertVisibleSelection() }
+                )
+            }
+        }
         loadApps()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_app_picker, menu)
-
-        val searchItem = menu.findItem(R.id.search_view)
-        if (searchItem != null) {
-            val searchView = searchItem.actionView as SearchView
-            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean = false
-
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    filterApps(newText.orEmpty())
-                    return false
-                }
-            })
-        }
-
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.select_all -> {
-            selectAllVisible()
-            true
-        }
-
-        R.id.invert_selection -> {
-            invertVisibleSelection()
-            true
-        }
-
-        else -> super.onOptionsItemSelected(item)
     }
 
     override fun finish() {
@@ -96,11 +111,6 @@ class AppPickerActivity : BaseActivity() {
             }
         )
         super.finish()
-    }
-
-    private fun setupRecyclerView() {
-        binding.recyclerView.adapter = adapter
-        addCustomDividerToRecyclerView(binding.recyclerView, this, R.drawable.custom_divider)
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -119,8 +129,7 @@ class AppPickerActivity : BaseActivity() {
     }
 
     private fun loadApps() {
-        showLoading()
-
+        isLoadingState.value = true
         lifecycleScope.launch {
             try {
                 val apps = withContext(Dispatchers.IO) {
@@ -128,22 +137,19 @@ class AppPickerActivity : BaseActivity() {
                     val sortedApps = sortApps(appsList)
                     listOf(createSpecialItemUnidentified()) + sortedApps
                 }
-
                 appsAll = apps
                 updateDisplayedApps(apps)
             } catch (e: Exception) {
                 LogUtil.e("AppPickerActivity", "Failed to load app list", e)
             } finally {
-                hideLoading()
+                isLoadingState.value = false
             }
         }
     }
 
     private fun filterApps(content: String) {
         val key = content.uppercase()
-        val filteredApps = appsAll.filter { app ->
-            key.isEmpty() || matchesSearch(app, key)
-        }
+        val filteredApps = appsAll.filter { app -> key.isEmpty() || matchesSearch(app, key) }
         updateDisplayedApps(filteredApps)
     }
 
@@ -167,31 +173,114 @@ class AppPickerActivity : BaseActivity() {
     }
 
     private fun updateDisplayedApps(apps: List<AppInfo>) {
-        adapter.submitList(apps)
+        displayedApps.value = apps
     }
 
     private fun selectAllVisible() {
-        adapter.apps.forEach { app -> selectedPackages.add(app.packageName) }
-        adapter.refreshSelection()
+        displayedApps.value.forEach { app -> selectedPackages.add(app.packageName) }
+        selectionVersion.value++
     }
 
     private fun invertVisibleSelection() {
-        adapter.apps.forEach { app ->
-            if (selectedPackages.contains(app.packageName)) {
-                selectedPackages.remove(app.packageName)
-            } else {
-                selectedPackages.add(app.packageName)
-            }
+        displayedApps.value.forEach { app ->
+            if (selectedPackages.contains(app.packageName)) selectedPackages.remove(app.packageName)
+            else selectedPackages.add(app.packageName)
         }
-        adapter.refreshSelection()
+        selectionVersion.value++
     }
 
-    private fun getSelectedPackages(): ArrayList<String> {
-        return ArrayList(selectedPackages.sorted())
-    }
+    private fun getSelectedPackages(): ArrayList<String> = ArrayList(selectedPackages.sorted())
 
     private fun resolveScreenTitle(): String {
         return intent.getStringExtra(EXTRA_PICKER_TITLE) ?: getString(R.string.per_app_proxy_settings)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppPickerScreen(
+    title: String,
+    displayedApps: MutableStateFlow<List<AppInfo>>,
+    selectionVersion: MutableStateFlow<Int>,
+    isLoadingState: MutableStateFlow<Boolean>,
+    isSelected: (String) -> Boolean,
+    onBackClick: () -> Unit,
+    onToggleApp: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    onSelectAll: () -> Unit,
+    onInvertSelection: () -> Unit
+) {
+    val apps by displayedApps.collectAsState()
+    val version by selectionVersion.collectAsState()
+    val isLoading by isLoadingState.collectAsState()
+
+    var showSearch by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    var showMenu by remember { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            AppTopBar(
+                title = title,
+                onBackClick = onBackClick,
+                isLoading = isLoading,
+                isSearchActive = showSearch,
+                searchQuery = searchQuery,
+                onSearchQueryChange = { query ->
+                    searchQuery = query
+                    onSearch(query)
+                },
+                onSearchClose = {
+                    searchQuery = ""
+                    onSearch("")
+                    showSearch = false
+                },
+                searchPlaceholder = stringResource(R.string.menu_item_search),
+                actions = {
+                    if (!showSearch) {
+                        IconButton(onClick = { showSearch = true }) {
+                            Icon(
+                                painterResource(R.drawable.ic_search_24dp),
+                                contentDescription = stringResource(R.string.menu_item_search)
+                            )
+                        }
+                    }
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(painterResource(R.drawable.ic_more_vert_24dp), contentDescription = null)
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false },
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_item_select_all)) },
+                                onClick = { showMenu = false; onSelectAll() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_item_invert_selection)) },
+                                onClick = { showMenu = false; onInvertSelection() }
+                            )
+                        }
+                    }
+                }
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            items(items = apps, key = { it.packageName }) { app ->
+                val checked = remember(app.packageName, version) { isSelected(app.packageName) }
+                AppListItem(
+                    appName = app.appName,
+                    packageName = app.packageName,
+                    icon = app.appIcon,
+                    checked = checked,
+                    onCheckedChange = { onToggleApp(app.packageName) }
+                )
+                AppDivider()
+            }
+        }
+    }
+}

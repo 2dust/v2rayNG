@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.os.Build
 import android.text.TextUtils
-import androidx.appcompat.app.AppCompatDelegate
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
@@ -436,17 +435,6 @@ object SettingsManager {
             Language.ARABIC -> Locale.forLanguageTag("ar")
             Language.BANGLA -> Locale.forLanguageTag("bn")
             Language.BAKHTIARI -> Locale.forLanguageTag("bqi-IR")
-        }
-    }
-
-    /**
-     * Set night mode.
-     */
-    fun setNightMode() {
-        when (MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
-            "0" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            "1" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            "2" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
     }
 

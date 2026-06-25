@@ -1,56 +1,121 @@
 package com.v2ray.ang.ui
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
-import android.view.Menu
-import android.view.MenuItem
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.contracts.BaseAdapterListener
-import com.v2ray.ang.databinding.ActivityUserAssetBinding
+import com.v2ray.ang.compose.AppDivider
+import com.v2ray.ang.compose.AppTheme
+import com.v2ray.ang.compose.AppTopBar
+import com.v2ray.ang.compose.ConfirmDialog
+import com.v2ray.ang.compose.SelectListDialog
+import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
+import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.UserAssetViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.text.DateFormat
+import java.util.Date
 
-class UserAssetActivity : HelperBaseActivity() {
-    private val binding by lazy { ActivityUserAssetBinding.inflate(layoutInflater) }
-    private val ownerActivity: UserAssetActivity
-        get() = this
+class UserAssetActivity : ActivityHelper() {
+
     private val viewModel: UserAssetViewModel by viewModels()
-    private lateinit var adapter: UserAssetAdapter
-
     val extDir by lazy { File(Utils.userAssetPath(this)) }
+    private val isLoadingState = MutableStateFlow(false)
+    private val geoFilesSourceState = MutableStateFlow("")
+    private val refreshTrigger = MutableStateFlow(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.title_user_asset_setting))
+        enableEdgeToEdge()
+        geoFilesSourceState.value = getGeoFilesSources()
 
-        binding.recyclerView.setHasFixedSize(true)
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        addCustomDividerToRecyclerView(binding.recyclerView, this, R.drawable.custom_divider)
-        adapter = UserAssetAdapter(viewModel, extDir, ActivityAdapterListener())
-        binding.recyclerView.adapter = adapter
-
-        binding.tvGeoFilesSourcesSummary.text = getGeoFilesSources()
-        binding.layoutGeoFilesSources.setOnClickListener {
-            setGeoFilesSources()
+        setContent {
+            AppTheme {
+                UserAssetScreen(
+                    viewModel = viewModel,
+                    extDir = extDir,
+                    isLoadingState = isLoadingState,
+                    geoFilesSourceState = geoFilesSourceState,
+                    refreshTrigger = refreshTrigger,
+                    geoFilesSourcesList = AppConfig.GEO_FILES_SOURCES.toList(),
+                    onBackClick = { finish() },
+                    onGeoSourceSelected = { value ->
+                        MmkvManager.encodeSettings(AppConfig.PREF_GEO_FILES_SOURCES, value)
+                        geoFilesSourceState.value = value
+                        refreshData()
+                    },
+                    onAddFileClick = { showFileChooser() },
+                    onAddUrlClick = { startActivity(Intent(this, UserAssetUrlActivity::class.java)) },
+                    onAddQrcodeClick = { importAssetFromQRcode() },
+                    onDownloadClick = { downloadGeoFiles() },
+                    onEditAsset = { guid ->
+                        startActivity(Intent(this, UserAssetUrlActivity::class.java).putExtra("assetId", guid))
+                    },
+                    onRemoveAsset = { guid ->
+                        val asset = viewModel.getAssets().find { it.guid == guid }
+                        if (asset != null) {
+                            extDir.listFiles()?.find { it.name == asset.assetUrl.remarks }?.delete()
+                            MmkvManager.removeAssetUrl(guid)
+                            initAssets()
+                        }
+                    }
+                )
+            }
         }
     }
 
@@ -59,34 +124,8 @@ class UserAssetActivity : HelperBaseActivity() {
         refreshData()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_asset, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    // Use when to streamline the option selection
-    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.add_file -> showFileChooser().let { true }
-        R.id.add_url -> startActivity(Intent(this, UserAssetUrlActivity::class.java)).let { true }
-        R.id.add_qrcode -> importAssetFromQRcode().let { true }
-        R.id.download_file -> downloadGeoFiles().let { true }
-        else -> super.onOptionsItemSelected(item)
-    }
-
     private fun getGeoFilesSources(): String {
         return MmkvManager.decodeSettingsString(AppConfig.PREF_GEO_FILES_SOURCES) ?: AppConfig.GEO_FILES_SOURCES.first()
-    }
-
-    private fun setGeoFilesSources() {
-        AlertDialog.Builder(this).setItems(AppConfig.GEO_FILES_SOURCES.toTypedArray()) { _, i ->
-            try {
-                val value = AppConfig.GEO_FILES_SOURCES[i]
-                MmkvManager.encodeSettings(AppConfig.PREF_GEO_FILES_SOURCES, value)
-                binding.tvGeoFilesSourcesSummary.text = value
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to set geo files sources", e)
-            }
-        }.show()
     }
 
     private fun showFileChooser() {
@@ -149,14 +188,12 @@ class UserAssetActivity : HelperBaseActivity() {
         return true
     }
 
-
     private fun importAsset(url: String?): Boolean {
         try {
             if (!Utils.isValidUrl(url)) {
                 toast(R.string.toast_invalid_url)
                 return false
             }
-            // Send URL to UserAssetUrlActivity for Processing
             startActivity(
                 Intent(this, UserAssetUrlActivity::class.java)
                     .putExtra(UserAssetUrlActivity.ASSET_URL_QRCODE, url)
@@ -170,7 +207,7 @@ class UserAssetActivity : HelperBaseActivity() {
 
     private fun downloadGeoFiles() {
         refreshData()
-        showLoading()
+        isLoadingState.value = true
         toast(R.string.msg_downloading_content)
 
         val proxyUsername = SettingsManager.getSocksUsername()
@@ -185,7 +222,7 @@ class UserAssetActivity : HelperBaseActivity() {
                     toast(getString(R.string.toast_failure))
                 }
                 refreshData()
-                hideLoading()
+                isLoadingState.value = false
             }
         }
     }
@@ -202,40 +239,196 @@ class UserAssetActivity : HelperBaseActivity() {
     @SuppressLint("NotifyDataSetChanged")
     fun refreshData() {
         viewModel.reload(getGeoFilesSources())
-        adapter.notifyDataSetChanged()
+        refreshTrigger.value++
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UserAssetScreen(
+    viewModel: UserAssetViewModel,
+    extDir: File,
+    isLoadingState: MutableStateFlow<Boolean>,
+    geoFilesSourceState: MutableStateFlow<String>,
+    refreshTrigger: MutableStateFlow<Int>,
+    geoFilesSourcesList: List<String>,
+    onBackClick: () -> Unit,
+    onGeoSourceSelected: (String) -> Unit,
+    onAddFileClick: () -> Unit,
+    onAddUrlClick: () -> Unit,
+    onAddQrcodeClick: () -> Unit,
+    onDownloadClick: () -> Unit,
+    onEditAsset: (String) -> Unit,
+    onRemoveAsset: (String) -> Unit
+) {
+    val isLoading by isLoadingState.collectAsState()
+    val geoFilesSource by geoFilesSourceState.collectAsState()
+    val assets by viewModel.assetsFlow.collectAsStateWithLifecycle()
+    val trigger by refreshTrigger.collectAsState()
+
+    var showAddMenu by remember { mutableStateOf(false) }
+    var showGeoSourceDialog by remember { mutableStateOf(false) }
+    var deleteTargetGuid by remember { mutableStateOf<String?>(null) }
+
+    Scaffold(
+        topBar = {
+            AppTopBar(
+                title = stringResource(R.string.title_user_asset_setting),
+                onBackClick = onBackClick,
+                isLoading = isLoading,
+                actions = {
+                    Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
+                        IconButton(onClick = { showAddMenu = true }) {
+                            Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = stringResource(R.string.menu_item_add_asset))
+                        }
+                        DropdownMenu(
+                            expanded = showAddMenu,
+                            onDismissRequest = { showAddMenu = false },
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            offset = DpOffset(x = 0.dp, y = 0.dp),
+                            modifier = Modifier.wrapContentWidth(Alignment.End)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_item_add_file)) },
+                                onClick = { showAddMenu = false; onAddFileClick() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_item_add_url)) },
+                                onClick = { showAddMenu = false; onAddUrlClick() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_item_scan_qrcode)) },
+                                onClick = { showAddMenu = false; onAddQrcodeClick() }
+                            )
+                        }
+                    }
+                    IconButton(onClick = onDownloadClick) {
+                        Icon(painterResource(R.drawable.ic_cloud_download_24dp), contentDescription = stringResource(R.string.menu_item_download_file))
+                    }
+                }
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            item(key = "geo_source_$trigger") {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showGeoSourceDialog = true }
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.asset_geo_files_sources),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = geoFilesSource,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2
+                    )
+                }
+            }
+            item {
+                Text(
+                    text = stringResource(R.string.title_user_asset_setting),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+            itemsIndexed(items = assets, key = { _, item -> "${item.guid}_$trigger" }) { _, item ->
+                UserAssetItem(
+                    item = item,
+                    extDir = extDir,
+                    onEdit = { onEditAsset(item.guid) },
+                    onDeleteClick = { deleteTargetGuid = item.guid }
+                )
+                AppDivider()
+            }
+        }
     }
 
-    private inner class ActivityAdapterListener : BaseAdapterListener {
-        override fun onEdit(guid: String, position: Int) {
-            startActivity(
-                Intent(ownerActivity, UserAssetUrlActivity::class.java)
-                    .putExtra("assetId", guid)
+    if (showGeoSourceDialog) {
+        SelectListDialog(
+            title = stringResource(R.string.asset_geo_files_sources),
+            options = geoFilesSourcesList,
+            selectedOption = geoFilesSource,
+            showRadio = true,
+            onSelected = { _, value ->
+                onGeoSourceSelected(value)
+                showGeoSourceDialog = false
+            },
+            onDismiss = { showGeoSourceDialog = false }
+        )
+    }
+
+    if (deleteTargetGuid != null) {
+        val guid = deleteTargetGuid!!
+        val assetName = assets.find { it.guid == guid }?.assetUrl?.remarks ?: ""
+        ConfirmDialog(
+            message = stringResource(R.string.del_config_comfirm) + "\n$assetName",
+            confirmText = stringResource(android.R.string.ok),
+            dismissText = stringResource(android.R.string.cancel),
+            onConfirm = { onRemoveAsset(guid) },
+            onDismiss = { deleteTargetGuid = null }
+        )
+    }
+}
+
+@Composable
+private fun UserAssetItem(
+    item: AssetUrlCache,
+    extDir: File,
+    onEdit: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    val file = remember(item.guid, item.assetUrl.remarks) {
+        extDir.listFiles()?.find { it.name == item.assetUrl.remarks }
+    }
+    val propertiesText = if (file != null) {
+        val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
+        "${file.length().toTrafficString()}  •  ${dateFormat.format(Date(file.lastModified()))}"
+    } else {
+        stringResource(R.string.msg_file_not_found)
+    }
+    val showEditButton = item.assetUrl.locked != true && item.assetUrl.url != "file"
+
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f).padding(8.dp)) {
+            Text(
+                text = item.assetUrl.remarks,
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = propertiesText,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 1,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-
-        override fun onRemove(guid: String, position: Int) {
-            val asset = viewModel.getAsset(position)?.takeIf { it.guid == guid }
-                ?: viewModel.getAssets().find { it.guid == guid }
-                ?: return
-            val file = extDir.listFiles()?.find { it.name == asset.assetUrl.remarks }
-
-            AlertDialog.Builder(ownerActivity).setMessage(R.string.del_config_comfirm)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    file?.delete()
-                    MmkvManager.removeAssetUrl(guid)
-                    initAssets()
-                }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    // do nothing
-                }
-                .show()
+        if (showEditButton) {
+            IconButton(onClick = onEdit) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_edit_24dp),
+                    contentDescription = stringResource(R.string.menu_item_edit_config),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
-
-        override fun onShare(url: String) {
-        }
-
-        override fun onRefreshData() {
-            refreshData()
+        IconButton(onClick = onDeleteClick) {
+            Icon(
+                painter = painterResource(R.drawable.ic_delete_24dp),
+                contentDescription = stringResource(R.string.menu_item_del_config),
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }
