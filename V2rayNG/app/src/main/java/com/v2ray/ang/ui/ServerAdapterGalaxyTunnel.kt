@@ -8,60 +8,43 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ItemServerGalaxyTunnelBinding
-import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.dto.entities.ServersCache
 
 class ServerAdapterGalaxyTunnel(
-    private val onSelect: (ServerConfig) -> Unit,
-    private val onEdit: (ServerConfig) -> Unit,
-    private val onDelete: (ServerConfig) -> Unit,
-    private val onTest: (ServerConfig) -> Unit
-) : ListAdapter<ServerConfig, ServerAdapterGalaxyTunnel.ServerViewHolder>(DiffCallback()) {
+    private val onSelect: (ServersCache) -> Unit,
+    private val onEdit: (ServersCache) -> Unit,
+    private val onDelete: (ServersCache) -> Unit,
+    private val onTest: (ServersCache) -> Unit
+) : ListAdapter<ServersCache, ServerAdapterGalaxyTunnel.ServerViewHolder>(DiffCallback()) {
 
-    private var selectedPosition = -1
+    private var selectedGuid = ""
 
     inner class ServerViewHolder(
         val binding: ItemServerGalaxyTunnelBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(server: ServerConfig, position: Int) {
+        fun bind(item: ServersCache, position: Int) {
+            val server = item.profile
+            
             binding.tvServerName.text = server.remarks
-            binding.tvServerProtocol.text = "${server.configType.protocolScheme} • ${server.outboundBean?.streamSettings?.network ?: "tcp"}"
+            binding.tvServerProtocol.text = "${server.configType.protocolScheme} • ${server.network ?: "tcp"}"
 
             // Latency badge
-            val latency = server.testResult ?: -1
-            when {
-                latency < 0 -> {
-                    binding.tvLatency.text = "--"
-                    binding.tvLatency.background = ContextCompat.getDrawable(itemView.context, R.drawable.gt_latency_badge_medium)
-                }
-                latency < 200 -> {
-                    binding.tvLatency.text = "${latency}ms"
-                    binding.tvLatency.background = ContextCompat.getDrawable(itemView.context, R.drawable.gt_latency_badge_good)
-                }
-                latency < 500 -> {
-                    binding.tvLatency.text = "${latency}ms"
-                    binding.tvLatency.background = ContextCompat.getDrawable(itemView.context, R.drawable.gt_latency_badge_medium)
-                }
-                else -> {
-                    binding.tvLatency.text = "${latency}ms"
-                    binding.tvLatency.background = ContextCompat.getDrawable(itemView.context, R.drawable.gt_latency_badge_bad)
-                }
-            }
+            binding.tvLatency.text = "--"
+            binding.tvLatency.background = ContextCompat.getDrawable(itemView.context, R.drawable.gt_latency_badge_medium)
 
             // Radio button
-            binding.radioServer.isChecked = position == selectedPosition
+            binding.radioServer.isChecked = item.guid == selectedGuid
 
             // Click handlers
             binding.root.setOnClickListener {
-                val previousSelected = selectedPosition
-                selectedPosition = position
-                notifyItemChanged(previousSelected)
-                notifyItemChanged(selectedPosition)
-                onSelect(server)
+                selectedGuid = item.guid
+                notifyDataSetChanged()
+                onSelect(item)
             }
 
             binding.btnMore.setOnClickListener {
-                // Show popup menu
+                // Handle more options
             }
         }
     }
@@ -77,12 +60,12 @@ class ServerAdapterGalaxyTunnel(
         holder.bind(getItem(position), position)
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<ServerConfig>() {
-        override fun areItemsTheSame(oldItem: ServerConfig, newItem: ServerConfig): Boolean {
+    class DiffCallback : DiffUtil.ItemCallback<ServersCache>() {
+        override fun areItemsTheSame(oldItem: ServersCache, newItem: ServersCache): Boolean {
             return oldItem.guid == newItem.guid
         }
 
-        override fun areContentsTheSame(oldItem: ServerConfig, newItem: ServerConfig): Boolean {
+        override fun areContentsTheSame(oldItem: ServersCache, newItem: ServersCache): Boolean {
             return oldItem == newItem
         }
     }

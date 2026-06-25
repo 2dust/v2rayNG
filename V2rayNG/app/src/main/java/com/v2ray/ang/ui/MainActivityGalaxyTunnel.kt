@@ -138,22 +138,22 @@ class MainActivityGalaxyTunnel : AppCompatActivity() {
 
     private fun setupServerList() {
         serverAdapter = ServerAdapterGalaxyTunnel(
-            onSelect = { server ->
-                viewModel.selectedServer.value = server
-                binding.tvServerName.text = server.remarks
+            onSelect = { server, guid ->
+                viewModel.selectedServer.value = item.profile
+                binding.tvServerName.text = item.profile.remarks
                 if (isConnected) {
                     // Reconnect with new server
                     disconnectVPN()
                     connectVPN()
                 }
             },
-            onEdit = { server ->
+            onEdit = { server, guid ->
                 // Open edit dialog
             },
-            onDelete = { server ->
+            onDelete = { server, guid ->
                 // Show delete confirmation
             },
-            onTest = { server ->
+            onTest = { server, guid ->
                 // Test latency
             }
         )
