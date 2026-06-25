@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="green_telemetry_22">#2210B981</color>
+    <color name="text_primary">#FF111111</color>
+    <color name="text_secondary">#FF555555</color>
+</resources>

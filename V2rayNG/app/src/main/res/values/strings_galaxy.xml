@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Galaxy Tunnel UI Strings -->
+    <string name="galaxy_disconnected">Disconnected</string>
+    <string name="galaxy_connected">Connected</string>
+    <string name="galaxy_connecting">Connecting...</string>
+    <string name="toggle_vpn">Toggle VPN</string>
+    <string name="selected_server">Selected Server</string>
+    <string name="duration">Duration</string>
+    <string name="server_list">Server List</string>
+    <string name="import_config">Import Configuration</string>
+    <string name="menu_logs">Logs</string>
+    <string name="menu_settings">Settings</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Galaxy Tunnel UI Colors -->
+    <color name="green_telemetry">#FF10B981</color>
+    <color name="cyan_telemetry">#FF06B6D4</color>
+    <color name="status_offline">#FFDC2626</color>
+    <color name="status_online">#FF10B981</color>
+    <color name="status_connecting">#FFF59E0B</color>
+</resources>
