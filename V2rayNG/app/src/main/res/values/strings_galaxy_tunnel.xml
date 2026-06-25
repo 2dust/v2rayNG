@@ -169,4 +169,4 @@
     <string name="gt_my_dialog_exit">ဖွင့်ထားတဲ့ VPN ဖြတ်တောက်ပြီး ထွက်မလား?</string>
     <string name="gt_my_toast_copied">ကူးယူပြီးပြီ</string>
     <string name="gt_my_toast_saved">သိမ်းပြီးပြီ</string>
-</resources>
+</resources><string name="gt_no_server_selected">No server selected</string>
