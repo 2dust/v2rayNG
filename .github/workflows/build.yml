@@ -10,6 +10,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -119,11 +122,34 @@ jobs:
         name: x86-apk
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*x86*.apk
 
-    - name: Upload to release
-      uses: svenstaro/upload-release-action@v2
-      if: github.event.inputs.release_tag != ''
-      with:
-        file: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*.apk
-        tag: ${{ github.event.inputs.release_tag }}
-        file_glob: true
-        prerelease: true
+  sign-and-release:
+    needs: build
+    runs-on: ubuntu-26.04
+    if: github.event_name == 'workflow_dispatch' && inputs.release_tag != ''
+
+    steps:
+      - name: Download APK artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: release
+
+      - name: Sign APK files
+        run: |
+          printf '%s' "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+          KEY=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/ {print $10; exit}')
+          mkdir -p release-files
+
+          find release -type f -name '*.apk' | while read apk; do
+            cp "$apk" release-files/
+            gpg --batch --yes --local-user "$KEY" --detach-sign --output "release-files/$(basename "$apk").sig" "$apk"
+          done
+
+          gpg --armor --export "$KEY" > release-files/v2rayNG-public-key.asc
+
+      - name: Upload APKs, signatures and public key to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: release-files/*
+          tag: ${{ inputs.release_tag }}
+          file_glob: true
+          prerelease: true
