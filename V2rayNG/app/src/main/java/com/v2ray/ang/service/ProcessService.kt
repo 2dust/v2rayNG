@@ -16,6 +16,10 @@ class ProcessService {
      * @param cmd The command to run.
      */
     fun runProcess(context: Context, cmd: MutableList<String>) {
+        if (cmd.isEmpty() || !cmd[0].startsWith(context.filesDir.absolutePath)) {
+            LogUtil.e(AppConfig.TAG, "runProcess rejected: invalid or untrusted command path")
+            return
+        }
         LogUtil.i(AppConfig.TAG, cmd.toString())
 
         try {
