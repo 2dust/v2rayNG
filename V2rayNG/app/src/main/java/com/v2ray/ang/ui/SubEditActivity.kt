@@ -1,17 +1,24 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
-import android.text.TextUtils
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.ImageButton
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.databinding.ActivitySubEditBinding
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
@@ -25,142 +32,50 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SubEditActivity : BaseActivity() {
-    private val binding by lazy { ActivitySubEditBinding.inflate(layoutInflater) }
-
-    private var del_config: MenuItem? = null
-    private var save_config: MenuItem? = null
-
     private val editSubId by lazy { intent.getStringExtra("subId").orEmpty() }
+    private var subItemState = mutableStateOf(SubscriptionItem())
+    private val profileSuggestions = mutableStateListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(binding.root)
-        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.title_sub_setting))
-
-        setupProfileRemarkInputs()
         SettingsChangeManager.makeSetupGroupTab()
-        val subItem = MmkvManager.decodeSubscription(editSubId)
-        if (subItem != null) {
-            bindingServer(subItem)
-        } else {
-            clearServer()
-        }
-    }
-
-    /**
-     * binding selected server config
-     */
-    private fun bindingServer(subItem: SubscriptionItem): Boolean {
-        binding.etRemarks.text = Utils.getEditable(subItem.remarks)
-        binding.etUrl.text = Utils.getEditable(subItem.url)
-        binding.etUserAgent.text = Utils.getEditable(subItem.userAgent)
-        binding.etFilter.text = Utils.getEditable(subItem.filter)
-        binding.chkEnable.isChecked = subItem.enabled
-        binding.autoUpdateCheck.isChecked = subItem.autoUpdate
-        binding.etUpdateInterval.text = Utils.getEditable(subItem.updateInterval.toString())
-        binding.allowInsecureUrl.isChecked = subItem.allowInsecureUrl
-        binding.etPreProfile.text = Utils.getEditable(subItem.prevProfile)
-        binding.etNextProfile.text = Utils.getEditable(subItem.nextProfile)
-        return true
-    }
-
-    /**
-     * clear or init server config
-     */
-    private fun clearServer(): Boolean {
-        binding.etRemarks.text = null
-        binding.etUrl.text = null
-        binding.etFilter.text = null
-        binding.chkEnable.isChecked = true
-        binding.etUpdateInterval.text = null
-        binding.etPreProfile.text = null
-        binding.etNextProfile.text = null
-        return true
-    }
-
-    private fun setupProfileRemarkInputs() {
-        val suggestions = SettingsManager.getProfileRemarks(
-            excludeConfigTypes = setOf(
-                EConfigType.CUSTOM,
-                EConfigType.POLICYGROUP,
-                EConfigType.PROXYCHAIN,
-            )
-        )
-
-        setupProfileRemarkInput(binding.etPreProfile, binding.btnPreProfileDropdown, suggestions)
-        setupProfileRemarkInput(binding.etNextProfile, binding.btnNextProfileDropdown, suggestions)
-    }
-
-    private fun setupProfileRemarkInput(
-        input: AutoCompleteTextView,
-        dropdownButton: ImageButton,
-        suggestions: List<String>
-    ) {
-        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, suggestions)
-        input.setAdapter(adapter)
-        input.threshold = 0
-
-        dropdownButton.setOnClickListener {
-            input.requestFocus()
-            input.showDropDown()
-        }
-        input.setOnClickListener {
-            input.showDropDown()
-        }
-    }
-
-    /**
-     * save server config
-     */
-    private fun saveServer(): Boolean {
+        
         val subItem = MmkvManager.decodeSubscription(editSubId) ?: SubscriptionItem()
+        subItemState.value = subItem
 
-        subItem.remarks = binding.etRemarks.text.toString()
-        subItem.url = binding.etUrl.text.toString()
-        subItem.userAgent = binding.etUserAgent.text.toString()
-        subItem.filter = binding.etFilter.text.toString()
-        subItem.enabled = binding.chkEnable.isChecked
-        subItem.autoUpdate = binding.autoUpdateCheck.isChecked
+        profileSuggestions.addAll(SettingsManager.getProfileRemarks(
+            excludeConfigTypes = setOf(EConfigType.CUSTOM, EConfigType.POLICYGROUP, EConfigType.PROXYCHAIN)
+        ))
 
-        val intervalInput = binding.etUpdateInterval.text.toString().trim()
-        val intervalMinutes = intervalInput.toLongOrNull()
-        if (subItem.autoUpdate) {
-            // autoUpdate is enabled: interval must be valid
-            if (intervalMinutes == null) {
-                // field is empty, reset to default
-                subItem.updateInterval = SubscriptionItem().updateInterval
-            } else if (intervalMinutes < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
-                toast(R.string.toast_invalid_update_interval)
-                return false
-            } else {
-                subItem.updateInterval = intervalMinutes
-            }
-        } else {
-            // autoUpdate is disabled: save only if the value is valid, otherwise keep the existing value
-            if (intervalMinutes != null && intervalMinutes >= AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
-                subItem.updateInterval = intervalMinutes
+        setContent {
+            MaterialTheme {
+                SubEditScreen(
+                    subItem = subItemState.value,
+                    suggestions = profileSuggestions,
+                    canDelete = editSubId.isNotEmpty(),
+                    onBack = { finish() },
+                    onDelete = { deleteServer() },
+                    onSave = { saveServer() },
+                    onSubItemChange = { subItemState.value = it }
+                )
             }
         }
+    }
 
-        subItem.prevProfile = binding.etPreProfile.text.toString()
-        subItem.nextProfile = binding.etNextProfile.text.toString()
-        subItem.allowInsecureUrl = binding.allowInsecureUrl.isChecked
-
-        if (TextUtils.isEmpty(subItem.remarks)) {
+    private fun saveServer() {
+        val subItem = subItemState.value
+        if (subItem.remarks.isEmpty()) {
             toast(R.string.sub_setting_remarks)
-            return false
+            return
         }
         if (subItem.url.isNotEmpty()) {
             if (!Utils.isValidUrl(subItem.url)) {
                 toast(R.string.toast_invalid_url)
-                return false
+                return
             }
-
-            if (!Utils.isValidSubUrl(subItem.url)) {
+            if (!Utils.isValidSubUrl(subItem.url) && !subItem.allowInsecureUrl) {
                 toast(R.string.toast_insecure_url_protocol)
-                if (!subItem.allowInsecureUrl) {
-                    return false
-                }
+                return
             }
         }
 
@@ -168,60 +83,174 @@ class SubEditActivity : BaseActivity() {
         SubscriptionUpdater.syncOne(subId = editSubId)
         toastSuccess(R.string.toast_success)
         finish()
-        return true
     }
 
-    /**
-     * save server config
-     */
-    private fun deleteServer(): Boolean {
+    private fun deleteServer() {
         if (editSubId.isNotEmpty()) {
             if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE)) {
                 AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         lifecycleScope.launch(Dispatchers.IO) {
                             SettingsManager.removeSubscriptionWithDefault(editSubId)
-                            launch(Dispatchers.Main) {
-                                finish()
-                            }
+                            launch(Dispatchers.Main) { finish() }
                         }
                     }
-                    .setNegativeButton(android.R.string.cancel) { _, _ ->
-                        // do nothing
-                    }
+                    .setNegativeButton(android.R.string.cancel, null)
                     .show()
             } else {
                 lifecycleScope.launch(Dispatchers.IO) {
                     SettingsManager.removeSubscriptionWithDefault(editSubId)
-                    launch(Dispatchers.Main) {
-                        finish()
-                    }
+                    launch(Dispatchers.Main) { finish() }
                 }
             }
         }
-        return true
     }
+}
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.action_server, menu)
-        del_config = menu.findItem(R.id.del_config)
-        save_config = menu.findItem(R.id.save_config)
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.del_config -> {
-            deleteServer()
-            true
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SubEditScreen(
+    subItem: SubscriptionItem,
+    suggestions: List<String>,
+    canDelete: Boolean,
+    onBack: () -> Unit,
+    onDelete: () -> Unit,
+    onSave: () -> Unit,
+    onSubItemChange: (SubscriptionItem) -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.title_sub_setting)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                    }
+                },
+                actions = {
+                    if (canDelete) {
+                        IconButton(onClick = onDelete) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        }
+                    }
+                    IconButton(onClick = onSave) {
+                        Icon(Icons.Default.Done, contentDescription = "Save")
+                    }
+                }
+            )
         }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            OutlinedTextField(
+                value = subItem.remarks,
+                onValueChange = { onSubItemChange(subItem.copy(remarks = it)) },
+                label = { Text(stringResource(R.string.sub_setting_remarks)) },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        R.id.save_config -> {
-            saveServer()
-            true
+            OutlinedTextField(
+                value = subItem.url,
+                onValueChange = { onSubItemChange(subItem.copy(url = it)) },
+                label = { Text("URL") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(checked = subItem.enabled, onCheckedChange = { onSubItemChange(subItem.copy(enabled = it)) })
+                Text("Enabled")
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(checked = subItem.autoUpdate, onCheckedChange = { onSubItemChange(subItem.copy(autoUpdate = it)) })
+                Text("Auto update")
+            }
+
+            OutlinedTextField(
+                value = subItem.updateInterval.toString(),
+                onValueChange = { val v = it.toLongOrNull() ?: 0L; onSubItemChange(subItem.copy(updateInterval = v)) },
+                label = { Text("Update interval (minutes)") },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = subItem.autoUpdate
+            )
+
+            OutlinedTextField(
+                value = subItem.userAgent.orEmpty(),
+                onValueChange = { onSubItemChange(subItem.copy(userAgent = it)) },
+                label = { Text("User Agent") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = subItem.filter.orEmpty(),
+                onValueChange = { onSubItemChange(subItem.copy(filter = it)) },
+                label = { Text("Filter (Regex)") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(checked = subItem.allowInsecureUrl, onCheckedChange = { onSubItemChange(subItem.copy(allowInsecureUrl = it)) })
+                Text("Allow insecure URL")
+            }
+            
+            ProfileRemarkSelector(
+                label = "Pre Profile",
+                selected = subItem.prevProfile.orEmpty(),
+                suggestions = suggestions,
+                onSelected = { onSubItemChange(subItem.copy(prevProfile = it)) }
+            )
+
+            ProfileRemarkSelector(
+                label = "Next Profile",
+                selected = subItem.nextProfile.orEmpty(),
+                suggestions = suggestions,
+                onSelected = { onSubItemChange(subItem.copy(nextProfile = it)) }
+            )
         }
-
-        else -> super.onOptionsItemSelected(item)
     }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileRemarkSelector(
+    label: String,
+    selected: String,
+    suggestions: List<String>,
+    onSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = selected,
+            onValueChange = onSelected,
+            label = { Text(label) },
+            modifier = Modifier.menuAnchor(),
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            suggestions.forEach { suggestion ->
+                DropdownMenuItem(
+                    text = { Text(suggestion) },
+                    onClick = {
+                        onSelected(suggestion)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
 }

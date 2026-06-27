@@ -1,20 +1,32 @@
 package com.v2ray.ang.ui
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
-import android.view.Menu
-import android.view.MenuItem
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.contracts.BaseAdapterListener
-import com.v2ray.ang.databinding.ActivityUserAssetBinding
+import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
@@ -30,47 +42,36 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class UserAssetActivity : HelperBaseActivity() {
-    private val binding by lazy { ActivityUserAssetBinding.inflate(layoutInflater) }
-    private val ownerActivity: UserAssetActivity
-        get() = this
     private val viewModel: UserAssetViewModel by viewModels()
-    private lateinit var adapter: UserAssetAdapter
-
     val extDir by lazy { File(Utils.userAssetPath(this)) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.title_user_asset_setting))
-
-        binding.recyclerView.setHasFixedSize(true)
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        addCustomDividerToRecyclerView(binding.recyclerView, this, R.drawable.custom_divider)
-        adapter = UserAssetAdapter(viewModel, extDir, ActivityAdapterListener())
-        binding.recyclerView.adapter = adapter
-
-        binding.tvGeoFilesSourcesSummary.text = getGeoFilesSources()
-        binding.layoutGeoFilesSources.setOnClickListener {
-            setGeoFilesSources()
+        
+        setContent {
+            MaterialTheme {
+                UserAssetScreen(
+                    viewModel = viewModel,
+                    isLoadingFlow = isLoadingFlow,
+                    getGeoFilesSources = { getGeoFilesSources() },
+                    onBack = { finish() },
+                    onAddFile = { showFileChooser() },
+                    onAddUrl = { startActivity(Intent(this, UserAssetUrlActivity::class.java)) },
+                    onImportQRcode = { importAssetFromQRcode() },
+                    onDownloadGeoFiles = { downloadGeoFiles() },
+                    onSetGeoFilesSources = { setGeoFilesSources() },
+                    onEditAsset = { guid ->
+                        startActivity(Intent(this, UserAssetUrlActivity::class.java).putExtra("assetId", guid))
+                    },
+                    onRemoveAsset = { guid, remarks -> removeAsset(guid, remarks) }
+                )
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        refreshData()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_asset, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    // Use when to streamline the option selection
-    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.add_file -> showFileChooser().let { true }
-        R.id.add_url -> startActivity(Intent(this, UserAssetUrlActivity::class.java)).let { true }
-        R.id.add_qrcode -> importAssetFromQRcode().let { true }
-        R.id.download_file -> downloadGeoFiles().let { true }
-        else -> super.onOptionsItemSelected(item)
+        viewModel.reload(getGeoFilesSources())
     }
 
     private fun getGeoFilesSources(): String {
@@ -82,7 +83,7 @@ class UserAssetActivity : HelperBaseActivity() {
             try {
                 val value = AppConfig.GEO_FILES_SOURCES[i]
                 MmkvManager.encodeSettings(AppConfig.PREF_GEO_FILES_SOURCES, value)
-                binding.tvGeoFilesSourcesSummary.text = value
+                viewModel.reload(value)
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to set geo files sources", e)
             }
@@ -91,17 +92,10 @@ class UserAssetActivity : HelperBaseActivity() {
 
     private fun showFileChooser() {
         launchFileChooser { uri ->
-            if (uri == null) {
-                return@launchFileChooser
-            }
-
+            if (uri == null) return@launchFileChooser
             val assetId = Utils.getUuid()
             runCatching {
-                val assetItem = AssetUrlItem(
-                    getCursorName(uri) ?: uri.toString(),
-                    "file"
-                )
-
+                val assetItem = AssetUrlItem(getCursorName(uri) ?: uri.toString(), "file")
                 val assetList = MmkvManager.decodeAssetUrls()
                 if (assetList.any { it.assetUrl.remarks == assetItem.remarks && it.guid != assetId }) {
                     toast(R.string.msg_remark_is_duplicate)
@@ -116,126 +110,157 @@ class UserAssetActivity : HelperBaseActivity() {
         }
     }
 
-    private fun copyFile(uri: Uri): String {
+    private fun copyFile(uri: Uri) {
         val targetFile = File(extDir, getCursorName(uri) ?: uri.toString())
         contentResolver.openInputStream(uri).use { inputStream ->
             targetFile.outputStream().use { fileOut ->
                 inputStream?.copyTo(fileOut)
                 toastSuccess(R.string.toast_success)
-                refreshData()
+                viewModel.reload(getGeoFilesSources())
             }
         }
-        return targetFile.path
     }
 
     private fun getCursorName(uri: Uri): String? = try {
-        contentResolver.query(uri, null, null, null, null)?.let { cursor ->
-            cursor.run {
-                if (moveToFirst()) getString(getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
-                else null
-            }.also { cursor.close() }
+        contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME)) else null
         }
     } catch (e: Exception) {
         LogUtil.e(AppConfig.TAG, "Failed to get cursor name", e)
         null
     }
 
-    private fun importAssetFromQRcode(): Boolean {
+    private fun importAssetFromQRcode() {
         launchQRCodeScanner { scanResult ->
-            if (scanResult != null) {
-                importAsset(scanResult)
-            }
-        }
-        return true
-    }
-
-
-    private fun importAsset(url: String?): Boolean {
-        try {
-            if (!Utils.isValidUrl(url)) {
+            if (scanResult != null && Utils.isValidUrl(scanResult)) {
+                startActivity(Intent(this, UserAssetUrlActivity::class.java).putExtra(UserAssetUrlActivity.ASSET_URL_QRCODE, scanResult))
+            } else if (scanResult != null) {
                 toast(R.string.toast_invalid_url)
-                return false
             }
-            // Send URL to UserAssetUrlActivity for Processing
-            startActivity(
-                Intent(this, UserAssetUrlActivity::class.java)
-                    .putExtra(UserAssetUrlActivity.ASSET_URL_QRCODE, url)
-            )
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to import asset from URL", e)
-            return false
         }
-        return true
     }
 
     private fun downloadGeoFiles() {
-        refreshData()
         showLoading()
         toast(R.string.msg_downloading_content)
-
         val proxyUsername = SettingsManager.getSocksUsername()
         val proxyPassword = SettingsManager.getSocksPassword()
         val httpPort = SettingsManager.getHttpPort()
         lifecycleScope.launch(Dispatchers.IO) {
             val result = viewModel.downloadGeoFiles(extDir, httpPort, proxyUsername, proxyPassword)
             withContext(Dispatchers.Main) {
-                if (result.successCount > 0) {
-                    toast(getString(R.string.title_update_config_count, result.successCount))
-                } else {
-                    toast(getString(R.string.toast_failure))
-                }
-                refreshData()
+                if (result.successCount > 0) toast(getString(R.string.title_update_config_count, result.successCount))
+                else toast(getString(R.string.toast_failure))
+                viewModel.reload(getGeoFilesSources())
                 hideLoading()
             }
         }
     }
 
-    fun initAssets() {
-        lifecycleScope.launch(Dispatchers.Default) {
-            SettingsManager.initAssets(this@UserAssetActivity, assets)
-            withContext(Dispatchers.Main) {
-                refreshData()
+    private fun removeAsset(guid: String, remarks: String) {
+        val file = extDir.listFiles()?.find { it.name == remarks }
+        AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                file?.delete()
+                MmkvManager.removeAssetUrl(guid)
+                lifecycleScope.launch(Dispatchers.Default) {
+                    SettingsManager.initAssets(this@UserAssetActivity, assets)
+                    withContext(Dispatchers.Main) { viewModel.reload(getGeoFilesSources()) }
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UserAssetScreen(
+    viewModel: UserAssetViewModel,
+    isLoadingFlow: kotlinx.coroutines.flow.StateFlow<Boolean>,
+    getGeoFilesSources: () -> String,
+    onBack: () -> Unit,
+    onAddFile: () -> Unit,
+    onAddUrl: () -> Unit,
+    onImportQRcode: () -> Unit,
+    onDownloadGeoFiles: () -> Unit,
+    onSetGeoFilesSources: () -> Unit,
+    onEditAsset: (String) -> Unit,
+    onRemoveAsset: (String, String) -> Unit
+) {
+    val assets by viewModel.assetsFlow.collectAsStateWithLifecycle()
+    val isLoading by isLoadingFlow.collectAsStateWithLifecycle()
+    var showMenu by remember { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.title_user_asset_setting)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                    }
+                },
+                actions = {
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "More")
+                        }
+                        DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                            DropdownMenuItem(text = { Text(stringResource(R.string.menu_item_add_file)) }, onClick = { showMenu = false; onAddFile() })
+                            DropdownMenuItem(text = { Text(stringResource(R.string.menu_item_add_url)) }, onClick = { showMenu = false; onAddUrl() })
+                            DropdownMenuItem(text = { Text(stringResource(R.string.menu_item_scan_qrcode)) }, onClick = { showMenu = false; onImportQRcode() })
+                            DropdownMenuItem(text = { Text(stringResource(R.string.menu_item_download_file)) }, onClick = { showMenu = false; onDownloadGeoFiles() })
+                        }
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding)) {
+            if (isLoading) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                item {
+                    ListItem(
+                        headlineContent = { Text(stringResource(R.string.asset_geo_files_sources)) },
+                        supportingContent = { Text(getGeoFilesSources()) },
+                        modifier = Modifier.clickable(onClick = onSetGeoFilesSources)
+                    )
+                    HorizontalDivider()
+                }
+                
+                items(assets, key = { it.guid }) { asset ->
+                    AssetItem(
+                        asset = asset,
+                        onEdit = { onEditAsset(asset.guid) },
+                        onRemove = { onRemoveAsset(asset.guid, asset.assetUrl.remarks) }
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                }
             }
         }
     }
+}
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun refreshData() {
-        viewModel.reload(getGeoFilesSources())
-        adapter.notifyDataSetChanged()
-    }
-
-    private inner class ActivityAdapterListener : BaseAdapterListener {
-        override fun onEdit(guid: String, position: Int) {
-            startActivity(
-                Intent(ownerActivity, UserAssetUrlActivity::class.java)
-                    .putExtra("assetId", guid)
-            )
-        }
-
-        override fun onRemove(guid: String, position: Int) {
-            val asset = viewModel.getAsset(position)?.takeIf { it.guid == guid }
-                ?: viewModel.getAssets().find { it.guid == guid }
-                ?: return
-            val file = extDir.listFiles()?.find { it.name == asset.assetUrl.remarks }
-
-            AlertDialog.Builder(ownerActivity).setMessage(R.string.del_config_comfirm)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    file?.delete()
-                    MmkvManager.removeAssetUrl(guid)
-                    initAssets()
+@Composable
+fun AssetItem(asset: AssetUrlCache, onEdit: () -> Unit, onRemove: () -> Unit) {
+    var showMenu by remember { mutableStateOf(false) }
+    
+    ListItem(
+        modifier = Modifier.clickable(onClick = onEdit),
+        headlineContent = { Text(asset.assetUrl.remarks) },
+        supportingContent = { Text(asset.assetUrl.url, maxLines = 1) },
+        trailingContent = {
+            Box {
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(Icons.Default.MoreVert, contentDescription = null)
                 }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    // do nothing
+                DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                    DropdownMenuItem(text = { Text("Edit") }, onClick = { showMenu = false; onEdit() })
+                    DropdownMenuItem(text = { Text("Remove") }, onClick = { showMenu = false; onRemove() })
                 }
-                .show()
+            }
         }
-
-        override fun onShare(url: String) {
-        }
-
-        override fun onRefreshData() {
-            refreshData()
-        }
-    }
+    )
 }

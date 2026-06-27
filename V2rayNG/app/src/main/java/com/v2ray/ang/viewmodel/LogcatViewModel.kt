@@ -4,12 +4,17 @@ import androidx.lifecycle.ViewModel
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.util.LogUtil
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.io.IOException
 
 class LogcatViewModel : ViewModel() {
     private val logsetsAll: MutableList<String> = mutableListOf()
     private var filteredLogs: List<String> = emptyList()
     private var currentFilter: String = ""
+
+    private val _logsFlow = MutableStateFlow<List<String>>(emptyList())
+    val logsFlow = _logsFlow.asStateFlow()
 
     fun getAll(): List<String> = filteredLogs
 
@@ -59,5 +64,6 @@ class LogcatViewModel : ViewModel() {
         } else {
             logsetsAll.filter { it.contains(currentFilter) }
         }
+        _logsFlow.value = filteredLogs
     }
 }

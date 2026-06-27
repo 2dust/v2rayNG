@@ -41,9 +41,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var subscriptionId: String = MmkvManager.decodeSettingsString(AppConfig.CACHE_SUBSCRIPTION_ID, "").orEmpty()
     var keywordFilter = ""
     val serversCache = mutableListOf<ServersCache>()
+    private val _isRunningFlow = MutableStateFlow(false)
+    val isRunningFlow = _isRunningFlow.asStateFlow()
+
+    @Deprecated("Use isRunningFlow in Compose")
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
     val updateTestResultAction by lazy { MutableLiveData<String>() }
+
+    private val _isLoadingFlow = MutableStateFlow(false)
+    val isLoadingFlow = _isLoadingFlow.asStateFlow()
+
+    fun setLoading(loading: Boolean) {
+        _isLoadingFlow.value = loading
+    }
 
     private val _serversCacheFlow = MutableStateFlow<List<ServersCache>>(emptyList())
     val serversCacheFlow = _serversCacheFlow.asStateFlow()
@@ -60,7 +71,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateTestResults() {
         val results = mutableMapOf<String, String>()
-        serversCache.forEach {
+        val currentCache = synchronized(this) { serversCache.toList() }
+        currentCache.forEach {
             val aff = MmkvManager.decodeServerAffiliationInfo(it.guid)
             results[it.guid] = aff?.getTestDelayString().orEmpty()
         }
@@ -197,12 +209,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * @return The number of exported servers.
      */
     fun exportAllServer(): Int {
-        val serverListCopy =
+        val serverListCopy = synchronized(this) {
             if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
-                serverList
+                serverList.toList()
             } else {
                 serversCache.map { it.guid }.toList()
             }
+        }
 
         val ret = AngConfigManager.shareNonCustomConfigsToClipboard(
             getApplication<AngApplication>(),
@@ -219,12 +232,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             getApplication(),
             TestServiceMessage(key = AppConfig.MSG_MEASURE_CONFIG_CANCEL)
         )
-        MmkvManager.clearAllTestDelayResults(serversCache.map { it.guid }.toList())
+        val guids = synchronized(this) { serversCache.map { it.guid }.toList() }
+        MmkvManager.clearAllTestDelayResults(guids)
         updateListAction.value = -1
         updateTestResults()
 
         viewModelScope.launch(Dispatchers.Default) {
-            if (serversCache.isEmpty()) {
+            if (guids.isEmpty()) {
                 return@launch
             }
             MessageUtil.sendMsg2TestService(
@@ -232,7 +246,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 TestServiceMessage(
                     key = AppConfig.MSG_MEASURE_CONFIG_START,
                     subscriptionId = subscriptionId,
-                    serverGuids = if (keywordFilter.isNotEmpty()) serversCache.map { it.guid } else emptyList()
+                    serverGuids = if (keywordFilter.isNotEmpty()) guids else emptyList()
                 )
             )
         }
@@ -295,12 +309,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * @param guid The GUID of the server.
      * @return The position of the server.
      */
-    fun getPosition(guid: String): Int {
+    fun getPosition(guid: String): Int = synchronized(this) {
         serversCache.forEachIndexed { index, it ->
             if (it.guid == guid)
                 return index
         }
-        return -1
+        -1
     }
 
     /**
@@ -309,7 +323,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * @return The number of removed servers.
      */
     fun removeDuplicateServer(): Int {
-        val serversCacheCopy = serversCache.toList().toMutableList()
+        val serversCacheCopy = synchronized(this) { serversCache.toList() }
         val deleteServer = mutableListOf<String>()
 
         serversCacheCopy.forEachIndexed { index, sc ->
@@ -349,11 +363,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
                 MmkvManager.removeAllServer()
             } else {
-                val serversCopy = serversCache.toList()
+                val serversCopy = synchronized(this) { serversCache.toList() }
                 for (item in serversCopy) {
                     MmkvManager.removeServer(item.guid)
                 }
-                serversCache.toList().count()
+                serversCopy.count()
             }
         return count
     }
@@ -367,7 +381,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
             count += MmkvManager.removeInvalidServer("")
         } else {
-            val serversCopy = serversCache.toList()
+            val serversCopy = synchronized(this) { serversCache.toList() }
             for (item in serversCopy) {
                 count += MmkvManager.removeInvalidServer(item.guid)
             }
@@ -468,15 +482,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 when (key) {
                     AppConfig.MSG_STATE_RUNNING -> {
                         isRunning.value = true
+                        _isRunningFlow.value = true
                     }
 
                     AppConfig.MSG_STATE_NOT_RUNNING -> {
                         isRunning.value = false
+                        _isRunningFlow.value = false
                     }
 
                     AppConfig.MSG_STATE_START_SUCCESS -> {
                         getApplication<Application>().toastSuccess(R.string.toast_services_success)
                         isRunning.value = true
+                        _isRunningFlow.value = true
                     }
 
                     AppConfig.MSG_STATE_START_FAILURE -> {
@@ -486,10 +503,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             getApplication<Application>().toastError(R.string.toast_services_failure)
                         }
                         isRunning.value = false
+                        _isRunningFlow.value = false
                     }
 
                     AppConfig.MSG_STATE_STOP_SUCCESS -> {
                         isRunning.value = false
+                        _isRunningFlow.value = false
                     }
 
                     AppConfig.MSG_MEASURE_DELAY_SUCCESS -> {

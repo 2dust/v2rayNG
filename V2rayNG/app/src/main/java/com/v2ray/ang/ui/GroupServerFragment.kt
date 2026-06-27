@@ -15,7 +15,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.databinding.ItemQrcodeBinding
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
@@ -110,7 +109,7 @@ class GroupServerFragment : Fragment() {
         AlertDialog.Builder(ownerActivity).setItems(shareOptions.toTypedArray()) { _, i ->
             try {
                 when (i + skip) {
-                    0 -> showQRCode(guid)
+                    0 -> ownerActivity.showQRCode(guid)
                     1 -> share2Clipboard(guid)
                     2 -> shareFullContent(guid)
                     3 -> editServer(guid, profile)
@@ -121,21 +120,6 @@ class GroupServerFragment : Fragment() {
                 LogUtil.e(AppConfig.TAG, "Error when sharing server", e)
             }
         }.show()
-    }
-
-    /**
-     * Displays QR code for the server configuration
-     * @param guid The server unique identifier
-     */
-    private fun showQRCode(guid: String) {
-        val ivBinding = ItemQrcodeBinding.inflate(LayoutInflater.from(ownerActivity))
-        ivBinding.ivQcode.setImageBitmap(AngConfigManager.share2QRCode(guid))
-        if (share_method.isNotEmpty()) {
-            ivBinding.ivQcode.contentDescription = share_method[0]
-        } else {
-            ivBinding.ivQcode.contentDescription = "QR Code"
-        }
-        AlertDialog.Builder(ownerActivity).setView(ivBinding.root).show()
     }
 
     /**
@@ -205,23 +189,20 @@ class GroupServerFragment : Fragment() {
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE)) {
             AlertDialog.Builder(ownerActivity).setMessage(R.string.del_config_comfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    removeServerSub(guid, position)
+                    removeServerSub(guid)
                 }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    //do noting
-                }
+                .setNegativeButton(android.R.string.cancel, null)
                 .show()
         } else {
-            removeServerSub(guid, position)
+            removeServerSub(guid)
         }
     }
 
     /**
      * Executes the actual server removal process
      * @param guid The server unique identifier
-     * @param position The position in the list
      */
-    private fun removeServerSub(guid: String, position: Int) {
+    private fun removeServerSub(guid: String) {
         mainViewModel.removeServer(guid)
         mainViewModel.updateSelectedGuid()
         ownerActivity.refreshGroupTabTitles()

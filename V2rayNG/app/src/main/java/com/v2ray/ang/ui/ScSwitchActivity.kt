@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreServiceManager
 
@@ -9,7 +10,7 @@ class ScSwitchActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         moveTaskToBack(true)
 
-        setContentView(R.layout.activity_none)
+        setContent { }
 
         if (CoreServiceManager.isRunning()) {
             CoreServiceManager.stopVService(this)

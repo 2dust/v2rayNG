@@ -1,33 +1,42 @@
 package com.v2ray.ang.ui
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.Menu
-import android.view.MenuItem
+import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog as ComposeAlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.GravityCompat
-import androidx.core.view.isVisible
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.tabs.TabLayoutMediator
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreServiceManager
-import com.v2ray.ang.databinding.ActivityMainBinding
+import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.PermissionType
+import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
@@ -38,17 +47,13 @@ import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelectedListener {
-    private val binding by lazy {
-        ActivityMainBinding.inflate(layoutInflater)
-    }
-
+class MainActivity : HelperBaseActivity() {
     val mainViewModel: MainViewModel by viewModels()
-    private lateinit var groupPagerAdapter: GroupPagerAdapter
-    private var tabMediator: TabLayoutMediator? = null
+    private val groupsState = MutableStateFlow<List<com.v2ray.ang.dto.GroupMapItem>>(emptyList())
 
     private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
@@ -66,23 +71,64 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         }
     }
 
+    private var qrCodeGuid = mutableStateOf<String?>(null)
+
+    fun showQRCode(guid: String) {
+        qrCodeGuid.value = guid
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-        setupToolbar(binding.toolbar, false, getString(R.string.title_server))
+        setContent {
+            MaterialTheme {
+                val groups by groupsState.collectAsStateWithLifecycle()
+                val isRunning by mainViewModel.isRunningFlow.collectAsStateWithLifecycle()
+                val qrGuid by qrCodeGuid
+                
+                MainScreen(
+                    mainViewModel = mainViewModel,
+                    groups = groups,
+                    isRunning = isRunning,
+                    onFabClick = { handleFabAction() },
+                    onMenuClick = { id -> handleMenuClick(id) },
+                    onDrawerItemClick = { id -> onDrawerItemClick(id) },
+                    onSelectServer = { guid -> setSelectServer(guid) },
+                    onMoreClick = { guid, profile, position ->
+                        val isCustom = profile.configType.isComplexType()
+                        val more = true 
 
-        // setup viewpager and tablayout
-        groupPagerAdapter = GroupPagerAdapter(this, emptyList())
-        binding.viewPager.adapter = groupPagerAdapter
-        binding.viewPager.isUserInputEnabled = true
+                        val (shareOptions, skip) = if (more) {
+                            val options = if (isCustom) share_method_more.asList().takeLast(3) else share_method_more.asList()
+                            options to if (isCustom) 2 else 0
+                        } else {
+                            val options = if (isCustom) share_method.asList().takeLast(1) else share_method.asList()
+                            options to if (isCustom) 2 else 0
+                        }
 
-        // setup navigation drawer
-        setupNavigationDrawer()
+                        shareServer(guid, profile, position, shareOptions, skip)
+                    }
+                )
 
-        binding.fab.setOnClickListener { handleFabAction() }
+                if (qrGuid != null) {
+                    ComposeAlertDialog(
+                        onDismissRequest = { qrCodeGuid.value = null },
+                        confirmButton = { TextButton(onClick = { qrCodeGuid.value = null }) { Text("OK") } },
+                        title = { Text("QR Code") },
+                        text = {
+                            val bitmap = remember(qrGuid) { AngConfigManager.share2QRCode(qrGuid!!) }
+                            bitmap?.let {
+                                androidx.compose.foundation.Image(
+                                    bitmap = it.asImageBitmap(),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(300.dp).padding(16.dp)
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+        }
 
-        setupGroupTab()
         setupViewModel()
         SubscriptionUpdater.sync()
         mainViewModel.reloadServerList()
@@ -93,31 +139,52 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {
         }
+        
+        setupGroupTab()
     }
 
-    private fun setupNavigationDrawer() {
-        val toggle = ActionBarDrawerToggle(
-            this,
-            binding.drawerLayout,
-            binding.toolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-        binding.drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-        binding.navView.setNavigationItemSelectedListener(this)
-
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    binding.drawerLayout.closeDrawer(GravityCompat.START)
-                } else {
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
-                    isEnabled = true
-                }
+    private fun handleMenuClick(id: Int) {
+        when (id) {
+            R.id.import_qrcode -> importQRcode()
+            R.id.import_clipboard -> importClipboard()
+            R.id.import_local -> importConfigLocal()
+            R.id.import_manually_policy_group -> importManually(EConfigType.POLICYGROUP.value)
+            R.id.import_manually_proxy_chain -> importManually(EConfigType.PROXYCHAIN.value)
+            R.id.import_manually_vmess -> importManually(EConfigType.VMESS.value)
+            R.id.import_manually_vless -> importManually(EConfigType.VLESS.value)
+            R.id.import_manually_ss -> importManually(EConfigType.SHADOWSOCKS.value)
+            R.id.import_manually_socks -> importManually(EConfigType.SOCKS.value)
+            R.id.import_manually_http -> importManually(EConfigType.HTTP.value)
+            R.id.import_manually_trojan -> importManually(EConfigType.TROJAN.value)
+            R.id.import_manually_wireguard -> importManually(EConfigType.WIREGUARD.value)
+            R.id.import_manually_hysteria2 -> importManually(EConfigType.HYSTERIA2.value)
+            R.id.export_all -> exportAll()
+            R.id.real_ping_all -> {
+                toast(getString(R.string.connection_test_testing_count, mainViewModel.serversCache.count()))
+                mainViewModel.testAllRealPing()
             }
-        })
+            R.id.service_restart -> restartV2Ray()
+            R.id.del_all_config -> delAllConfig()
+            R.id.del_duplicate_config -> delDuplicateConfig()
+            R.id.del_invalid_config -> delInvalidConfig()
+            R.id.sort_by_test_results -> sortByTestResults()
+            R.id.sub_update -> importConfigViaSub()
+            R.id.locate_selected_config -> locateSelectedServer()
+        }
+    }
+
+    private fun onDrawerItemClick(id: Int) {
+        when (id) {
+            R.id.sub_setting -> requestActivityLauncher.launch(Intent(this, SubSettingActivity::class.java))
+            R.id.per_app_proxy_settings -> requestActivityLauncher.launch(Intent(this, PerAppProxyActivity::class.java))
+            R.id.routing_setting -> requestActivityLauncher.launch(Intent(this, RoutingSettingActivity::class.java))
+            R.id.user_asset_setting -> requestActivityLauncher.launch(Intent(this, UserAssetActivity::class.java))
+            R.id.promotion -> Utils.openUri(this, "${Utils.decode(AppConfig.APP_PROMOTION_URL)}?t=${System.currentTimeMillis()}")
+            R.id.logcat -> startActivity(Intent(this, LogcatActivity::class.java))
+            R.id.check_for_update -> startActivity(Intent(this, CheckUpdateActivity::class.java))
+            R.id.backup_restore -> requestActivityLauncher.launch(Intent(this, BackupActivity::class.java))
+            R.id.about -> startActivity(Intent(this, AboutActivity::class.java))
+        }
     }
 
     private fun setupViewModel() {
@@ -130,38 +197,117 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
     private fun setupGroupTab() {
         val groups = mainViewModel.getSubscriptions(this)
-        groupPagerAdapter.update(groups)
-
-        tabMediator?.detach()
-        tabMediator = TabLayoutMediator(binding.tabGroup, binding.viewPager) { tab, position ->
-            groupPagerAdapter.groups.getOrNull(position)?.let {
-                tab.text = it.remarks
-                tab.tag = it.id
-            }
-        }.also { it.attach() }
-
-        val targetIndex = groups.indexOfFirst { it.id == mainViewModel.subscriptionId }.takeIf { it >= 0 } ?: (groups.size - 1)
-        binding.viewPager.setCurrentItem(targetIndex, false)
-
-        binding.tabGroup.isVisible = groups.size > 1
-        refreshGroupTabTitles(true)
+        groupsState.value = groups
+        refreshGroupTabTitles()
     }
 
-    fun refreshGroupTabTitles(refreshAll: Boolean = false) {
-        val groupsToRefresh = if (refreshAll || mainViewModel.subscriptionId.isEmpty()) {
-            groupPagerAdapter.groups
+    fun refreshGroupTabTitles() {
+        val groups = groupsState.value
+        val updatedGroups = groups.map { group ->
+            if (group.id.isEmpty()) {
+                group
+            } else {
+                val count = MmkvManager.decodeServerList(group.id).size
+                group.copy(remarks = "${group.remarks} ($count)")
+            }
+        }
+        groupsState.value = updatedGroups
+    }
+
+    private val share_method: Array<out String> by lazy {
+        resources.getStringArray(R.array.share_method)
+    }
+    private val share_method_more: Array<out String> by lazy {
+        resources.getStringArray(R.array.share_method_more)
+    }
+
+    private fun shareServer(guid: String, profile: ProfileItem, position: Int, shareOptions: List<String>, skip: Int) {
+        androidx.appcompat.app.AlertDialog.Builder(this).setItems(shareOptions.toTypedArray()) { _, i ->
+            try {
+                when (i + skip) {
+                    0 -> qrCodeGuid.value = guid
+                    1 -> share2Clipboard(guid)
+                    2 -> shareFullContent(guid)
+                    3 -> editServer(guid, profile)
+                    4 -> removeServer(guid, position)
+                    else -> toast("else")
+                }
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Error when sharing server", e)
+            }
+        }.show()
+    }
+
+    private fun share2Clipboard(guid: String) {
+        if (AngConfigManager.share2Clipboard(this, guid) == 0) {
+            toastSuccess(R.string.toast_success)
         } else {
-            groupPagerAdapter.groups.filter { it.id == mainViewModel.subscriptionId }
+            toastError(R.string.toast_failure)
+        }
+    }
+
+    private fun shareFullContent(guid: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val result = AngConfigManager.shareFullContent2Clipboard(this@MainActivity, guid)
+            launch(Dispatchers.Main) {
+                if (result == 0) {
+                    toastSuccess(R.string.toast_success)
+                } else {
+                    toastError(R.string.toast_failure)
+                }
+            }
+        }
+    }
+
+    private fun editServer(guid: String, profile: ProfileItem) {
+        val activityClass = when (profile.configType) {
+            EConfigType.CUSTOM -> ServerCustomConfigActivity::class.java
+            EConfigType.POLICYGROUP -> ServerGroupActivity::class.java
+            EConfigType.PROXYCHAIN -> ServerProxyChainActivity::class.java
+            else -> ServerActivity::class.java
         }
 
-        groupsToRefresh.forEach { group ->
-            if (group.id.isEmpty()) {
-                return@forEach
-            }
-            val tabIndex = groupPagerAdapter.groups.indexOfFirst { it.id == group.id }
-            if (tabIndex >= 0) {
-                val count = MmkvManager.decodeServerList(group.id).size
-                binding.tabGroup.getTabAt(tabIndex)?.text = "${group.remarks} ($count)"
+        val intent = Intent(this, activityClass)
+            .putExtra("guid", guid)
+            .putExtra("isRunning", mainViewModel.isRunning.value)
+            .putExtra("createConfigType", profile.configType.value)
+            .putExtra("subscriptionId", mainViewModel.subscriptionId)
+
+        requestActivityLauncher.launch(intent)
+    }
+
+    private fun removeServer(guid: String, position: Int) {
+        if (guid == MmkvManager.getSelectServer()) {
+            toast(R.string.toast_action_not_allowed)
+            return
+        }
+
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE)) {
+            androidx.appcompat.app.AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    removeServerSub(guid)
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        } else {
+            removeServerSub(guid)
+        }
+    }
+
+    private fun removeServerSub(guid: String) {
+        mainViewModel.removeServer(guid)
+        mainViewModel.updateSelectedGuid()
+        refreshGroupTabTitles()
+    }
+
+    private fun setSelectServer(guid: String) {
+        val selected = MmkvManager.getSelectServer()
+        if (guid != selected) {
+            MmkvManager.setSelectServer(guid)
+            mainViewModel.updateSelectedGuid()
+
+            if (mainViewModel.isRunning.value == true) {
+                restartV2Ray()
             }
         }
     }
@@ -188,14 +334,6 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         }
     }
 
-    private fun handleLayoutTestClick() {
-        if (mainViewModel.isRunning.value == true) {
-            mainViewModel.testCurrentServerRealPing()
-        } else {
-            // service not running: keep existing no-op (could show a message if desired)
-        }
-    }
-
     private fun startV2Ray() {
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
             toast(R.string.title_file_chooser)
@@ -215,172 +353,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun applyRunningState(isLoading: Boolean, isRunning: Boolean) {
-        if (isLoading) {
-            binding.fab.setIconResource(R.drawable.ic_fab_check)
-            binding.fab.text = getString(R.string.connection_test_testing)
-            binding.progressBar.isVisible = true
-            return
-        }
-
-        binding.progressBar.isVisible = false
-
-        if (isRunning) {
-            binding.fab.setIconResource(R.drawable.ic_stop_24dp)
-            binding.fab.text = getString(R.string.notification_action_stop_v2ray)
-            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.md_theme_error))
-            binding.fab.contentDescription = getString(R.string.action_stop_service)
-        } else {
-            binding.fab.setIconResource(R.drawable.ic_play_24dp)
-            binding.fab.text = getString(R.string.tasker_start_service)
-            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.md_theme_primary))
-            binding.fab.contentDescription = getString(R.string.tasker_start_service)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-
-        val searchItem = menu.findItem(R.id.search_view)
-        if (searchItem != null) {
-            val searchView = searchItem.actionView as SearchView
-            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean = false
-
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    mainViewModel.filterConfig(newText.orEmpty())
-                    return false
-                }
-            })
-
-            searchView.setOnCloseListener {
-                mainViewModel.filterConfig("")
-                false
-            }
-        }
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.import_qrcode -> {
-            importQRcode()
-            true
-        }
-
-        R.id.import_clipboard -> {
-            importClipboard()
-            true
-        }
-
-        R.id.import_local -> {
-            importConfigLocal()
-            true
-        }
-
-        R.id.import_manually_policy_group -> {
-            importManually(EConfigType.POLICYGROUP.value)
-            true
-        }
-
-        R.id.import_manually_proxy_chain -> {
-            importManually(EConfigType.PROXYCHAIN.value)
-            true
-        }
-
-        R.id.import_manually_vmess -> {
-            importManually(EConfigType.VMESS.value)
-            true
-        }
-
-        R.id.import_manually_vless -> {
-            importManually(EConfigType.VLESS.value)
-            true
-        }
-
-        R.id.import_manually_ss -> {
-            importManually(EConfigType.SHADOWSOCKS.value)
-            true
-        }
-
-        R.id.import_manually_socks -> {
-            importManually(EConfigType.SOCKS.value)
-            true
-        }
-
-        R.id.import_manually_http -> {
-            importManually(EConfigType.HTTP.value)
-            true
-        }
-
-        R.id.import_manually_trojan -> {
-            importManually(EConfigType.TROJAN.value)
-            true
-        }
-
-        R.id.import_manually_wireguard -> {
-            importManually(EConfigType.WIREGUARD.value)
-            true
-        }
-
-        R.id.import_manually_hysteria2 -> {
-            importManually(EConfigType.HYSTERIA2.value)
-            true
-        }
-
-        R.id.export_all -> {
-            exportAll()
-            true
-        }
-
-        R.id.real_ping_all -> {
-            toast(getString(R.string.connection_test_testing_count, mainViewModel.serversCache.count()))
-            mainViewModel.testAllRealPing()
-            true
-        }
-
-        R.id.service_restart -> {
-            restartV2Ray()
-            true
-        }
-
-        R.id.del_all_config -> {
-            delAllConfig()
-            true
-        }
-
-        R.id.del_duplicate_config -> {
-            delDuplicateConfig()
-            true
-        }
-
-        R.id.del_invalid_config -> {
-            delInvalidConfig()
-            true
-        }
-
-        R.id.sort_by_test_results -> {
-            sortByTestResults()
-            true
-        }
-
-        R.id.sub_update -> {
-            importConfigViaSub()
-            true
-        }
-
-        R.id.locate_selected_config -> {
-            locateSelectedServer()
-            true
-        }
-
-        else -> super.onOptionsItemSelected(item)
+        mainViewModel.setLoading(isLoading)
     }
 
     private fun importManually(createConfigType: Int) {
@@ -406,9 +379,6 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         }
     }
 
-    /**
-     * import config from qrcode
-     */
     private fun importQRcode(): Boolean {
         launchQRCodeScanner { scanResult ->
             if (scanResult != null) {
@@ -418,11 +388,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         return true
     }
 
-    /**
-     * import config from clipboard
-     */
-    private fun importClipboard()
-            : Boolean {
+    private fun importClipboard(): Boolean {
         try {
             val clipboard = Utils.getClipboard(this)
             importBatchConfig(clipboard)
@@ -434,8 +400,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun importBatchConfig(server: String?) {
-        showLoading()
-
+        mainViewModel.setLoading(true)
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val (count, countSub) = AngConfigManager.importBatchConfig(server, mainViewModel.subscriptionId, true)
@@ -447,7 +412,6 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                             mainViewModel.reloadServerList()
                             refreshGroupTabTitles()
                         }
-
                         countSub > 0 -> setupGroupTab()
                         else -> toastError(R.string.toast_failure)
                     }
@@ -459,15 +423,12 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
             } finally {
                 withContext(Dispatchers.Main) {
-                    hideLoading()
+                    mainViewModel.setLoading(false)
                 }
             }
         }
     }
 
-    /**
-     * import config from local config file
-     */
     private fun importConfigLocal(): Boolean {
         try {
             showFileChooser()
@@ -478,13 +439,8 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         return true
     }
 
-
-    /**
-     * import config from sub
-     */
     fun importConfigViaSub(): Boolean {
-        showLoading()
-
+        mainViewModel.setLoading(true)
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val result = mainViewModel.updateConfigViaSubAll()
@@ -495,12 +451,8 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                     } else if (result.successCount > 0 && result.failureCount + result.skipCount == 0) {
                         toast(getString(R.string.title_update_config_count, result.configCount))
                     } else {
-                        toast(
-                            getString(
-                                R.string.title_update_subscription_result,
-                                result.configCount, result.successCount, result.failureCount, result.skipCount
-                            )
-                        )
+                        toast(getString(R.string.title_update_subscription_result,
+                            result.configCount, result.successCount, result.failureCount, result.skipCount))
                     }
                     if (result.configCount > 0) {
                         mainViewModel.reloadServerList()
@@ -514,7 +466,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 LogUtil.e(AppConfig.TAG, "importConfigViaSub", e)
             } finally {
                 withContext(Dispatchers.Main) {
-                    hideLoading()
+                    mainViewModel.setLoading(false)
                 }
             }
         }
@@ -522,7 +474,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun exportAll() {
-        showLoading()
+        mainViewModel.setLoading(true)
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val ret = mainViewModel.exportAllServer()
@@ -536,16 +488,16 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 LogUtil.e(AppConfig.TAG, "exportAll", e)
             } finally {
                 withContext(Dispatchers.Main) {
-                    hideLoading()
+                    mainViewModel.setLoading(false)
                 }
             }
         }
     }
 
     private fun delAllConfig() {
-        AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+        androidx.appcompat.app.AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                showLoading()
+                mainViewModel.setLoading(true)
                 lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         val ret = mainViewModel.removeAllServer()
@@ -558,21 +510,19 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                         LogUtil.e(AppConfig.TAG, "delAllConfig", e)
                     } finally {
                         withContext(Dispatchers.Main) {
-                            hideLoading()
+                            mainViewModel.setLoading(false)
                         }
                     }
                 }
             }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                //do noting
-            }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> }
             .show()
     }
 
     private fun delDuplicateConfig() {
-        AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+        androidx.appcompat.app.AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                showLoading()
+                mainViewModel.setLoading(true)
                 lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         val ret = mainViewModel.removeDuplicateServer()
@@ -585,21 +535,19 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                         LogUtil.e(AppConfig.TAG, "delDuplicateConfig", e)
                     } finally {
                         withContext(Dispatchers.Main) {
-                            hideLoading()
+                            mainViewModel.setLoading(false)
                         }
                     }
                 }
             }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                //do noting
-            }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> }
             .show()
     }
 
     private fun delInvalidConfig() {
-        AlertDialog.Builder(this).setMessage(R.string.del_invalid_config_comfirm)
+        androidx.appcompat.app.AlertDialog.Builder(this).setMessage(R.string.del_invalid_config_comfirm)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                showLoading()
+                mainViewModel.setLoading(true)
                 lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         val ret = mainViewModel.removeInvalidServer()
@@ -612,19 +560,17 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                         LogUtil.e(AppConfig.TAG, "delInvalidConfig", e)
                     } finally {
                         withContext(Dispatchers.Main) {
-                            hideLoading()
+                            mainViewModel.setLoading(false)
                         }
                     }
                 }
             }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                //do noting
-            }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> }
             .show()
     }
 
     private fun sortByTestResults() {
-        showLoading()
+        mainViewModel.setLoading(true)
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 mainViewModel.sortByTestResults()
@@ -635,28 +581,19 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 LogUtil.e(AppConfig.TAG, "sortByTestResults", e)
             } finally {
                 withContext(Dispatchers.Main) {
-                    hideLoading()
+                    mainViewModel.setLoading(false)
                 }
             }
         }
     }
 
-    /**
-     * show file chooser
-     */
     private fun showFileChooser() {
         launchFileChooser { uri ->
-            if (uri == null) {
-                return@launchFileChooser
-            }
-
+            if (uri == null) return@launchFileChooser
             readContentFromUri(uri)
         }
     }
 
-    /**
-     * read content from uri
-     */
     private fun readContentFromUri(uri: Uri) {
         try {
             contentResolver.openInputStream(uri).use { input ->
@@ -667,45 +604,20 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         }
     }
 
-    /**
-     * Locates and scrolls to the currently selected server.
-     * If the selected server is in a different group, automatically switches to that group first.
-     */
     private fun locateSelectedServer() {
         val targetSubscriptionId = mainViewModel.findSubscriptionIdBySelect()
         if (targetSubscriptionId.isNullOrEmpty()) {
             toast(R.string.title_file_chooser)
             return
         }
-
-        val targetGroupIndex = groupPagerAdapter.groups.indexOfFirst { it.id == targetSubscriptionId }
-        if (targetGroupIndex < 0) {
-            toast(R.string.toast_server_not_found_in_group)
-            return
-        }
-
-        // Switch to target group if needed, then scroll to the server
-        if (binding.viewPager.currentItem != targetGroupIndex) {
-            binding.viewPager.setCurrentItem(targetGroupIndex, true)
-            binding.viewPager.postDelayed({ scrollToSelectedServer(targetGroupIndex) }, 1000)
-        } else {
-            scrollToSelectedServer(targetGroupIndex)
-        }
+        mainViewModel.subscriptionIdChanged(targetSubscriptionId)
+        // Auto scrolls via State sync in MainScreen
     }
 
-    /**
-     * Scrolls to the selected server in the specified fragment.
-     * @param groupIndex The index of the group/fragment to scroll in
-     */
-    private fun scrollToSelectedServer(groupIndex: Int) {
-        val itemId = groupPagerAdapter.getItemId(groupIndex)
-        val fragment = supportFragmentManager.findFragmentByTag("f$itemId") as? GroupServerFragment
-
-        if (fragment?.isAdded == true && fragment.view != null) {
-            fragment.scrollToSelectedServer()
-        } else {
-            toast(R.string.toast_fragment_not_available)
-        }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        setupGroupTab()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -716,28 +628,7 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         return super.onKeyDown(keyCode, event)
     }
 
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
-        when (item.itemId) {
-            R.id.sub_setting -> requestActivityLauncher.launch(Intent(this, SubSettingActivity::class.java))
-            R.id.per_app_proxy_settings -> requestActivityLauncher.launch(Intent(this, PerAppProxyActivity::class.java))
-            R.id.routing_setting -> requestActivityLauncher.launch(Intent(this, RoutingSettingActivity::class.java))
-            R.id.user_asset_setting -> requestActivityLauncher.launch(Intent(this, UserAssetActivity::class.java))
-            R.id.settings -> requestActivityLauncher.launch(Intent(this, SettingsActivity::class.java))
-            R.id.promotion -> Utils.openUri(this, "${Utils.decode(AppConfig.APP_PROMOTION_URL)}?t=${System.currentTimeMillis()}")
-            R.id.logcat -> startActivity(Intent(this, LogcatActivity::class.java))
-            R.id.check_for_update -> startActivity(Intent(this, CheckUpdateActivity::class.java))
-            R.id.backup_restore -> requestActivityLauncher.launch(Intent(this, BackupActivity::class.java))
-            R.id.about -> startActivity(Intent(this, AboutActivity::class.java))
-        }
-
-        binding.drawerLayout.closeDrawer(GravityCompat.START)
-        return true
-    }
-
     override fun onDestroy() {
-        tabMediator?.detach()
         super.onDestroy()
     }
 }

@@ -1,13 +1,24 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreNativeManager
-import com.v2ray.ang.databinding.ActivityCheckUpdateBinding
 import com.v2ray.ang.dto.CheckUpdateResult
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
@@ -20,27 +31,25 @@ import kotlinx.coroutines.launch
 
 class CheckUpdateActivity : BaseActivity() {
 
-    private val binding by lazy { ActivityCheckUpdateBinding.inflate(layoutInflater) }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(binding.root)
-        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.update_check_for_update))
+        
+        val initialPreRelease = MmkvManager.decodeSettingsBool(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, false)
 
-        binding.layoutCheckUpdate.setOnClickListener {
-            checkForUpdates(binding.checkPreRelease.isChecked)
+        setContent {
+            MaterialTheme {
+                CheckUpdateScreen(
+                    version = "v${BuildConfig.VERSION_NAME} (${CoreNativeManager.getLibVersion()})",
+                    initialPreRelease = initialPreRelease,
+                    isLoadingFlow = isLoadingFlow,
+                    onBack = { finish() },
+                    onCheckUpdate = { checkForUpdates(it) },
+                    onPreReleaseChanged = { MmkvManager.encodeSettings(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, it) }
+                )
+            }
         }
 
-        binding.checkPreRelease.setOnCheckedChangeListener { _, isChecked ->
-            MmkvManager.encodeSettings(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, isChecked)
-        }
-        binding.checkPreRelease.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, false)
-
-        "v${BuildConfig.VERSION_NAME} (${CoreNativeManager.getLibVersion()})".also {
-            binding.tvVersion.text = it
-        }
-
-        checkForUpdates(binding.checkPreRelease.isChecked)
+        checkForUpdates(initialPreRelease)
     }
 
     private fun checkForUpdates(includePreRelease: Boolean) {
@@ -75,5 +84,70 @@ class CheckUpdateActivity : BaseActivity() {
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CheckUpdateScreen(
+    version: String,
+    initialPreRelease: Boolean,
+    isLoadingFlow: kotlinx.coroutines.flow.StateFlow<Boolean>,
+    onBack: () -> Unit,
+    onCheckUpdate: (Boolean) -> Unit,
+    onPreReleaseChanged: (Boolean) -> Unit
+) {
+    var checkPreRelease by remember { mutableStateOf(initialPreRelease) }
+    val isLoading by isLoadingFlow.collectAsStateWithLifecycle()
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.update_check_for_update)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            if (isLoading) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
+            
+            Column(modifier = Modifier.padding(16.dp)) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.update_check_for_update)) },
+                    supportingContent = { Text(version) },
+                    modifier = Modifier.clickable { onCheckUpdate(checkPreRelease) }
+                )
+                
+                HorizontalDivider()
+                
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(text = stringResource(R.string.update_check_pre_release), style = MaterialTheme.typography.bodyLarge)
+                    }
+                    Switch(
+                        checked = checkPreRelease,
+                        onCheckedChange = {
+                            checkPreRelease = it
+                            onPreReleaseChanged(it)
+                        }
+                    )
+                }
+            }
+        }
     }
 }
