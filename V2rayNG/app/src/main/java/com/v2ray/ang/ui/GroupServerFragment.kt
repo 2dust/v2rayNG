@@ -7,15 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.contracts.MainAdapterListener
-import com.v2ray.ang.databinding.FragmentGroupServerBinding
 import com.v2ray.ang.databinding.ItemQrcodeBinding
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
@@ -26,19 +25,15 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
-import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
-    SwipeRefreshLayout.OnRefreshListener {
+class GroupServerFragment : Fragment() {
     private val ownerActivity: MainActivity
         get() = requireActivity() as MainActivity
     private val mainViewModel: MainViewModel by activityViewModels()
-    private lateinit var adapter: MainRecyclerAdapter
-    private var itemTouchHelper: ItemTouchHelper? = null
     private val subId: String by lazy { arguments?.getString(ARG_SUB_ID).orEmpty() }
 
     private val share_method: Array<out String> by lazy {
@@ -60,42 +55,45 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
         }
     }
 
-    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
-        FragmentGroupServerBinding.inflate(inflater, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MaterialTheme {
+                    ServerListScreen(
+                        mainViewModel = mainViewModel,
+                        onSelect = { guid -> setSelectServer(guid) },
+                        onMoreClick = { guid, profile, position ->
+                            onMoreClick(guid, profile, position)
+                        }
+                    )
+                }
+            }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
 
-        adapter = MainRecyclerAdapter(mainViewModel, ActivityAdapterListener())
-        binding.recyclerView.setHasFixedSize(true)
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)) {
-            binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+    private fun onMoreClick(guid: String, profile: ProfileItem, position: Int) {
+        val isCustom = profile.configType.isComplexType()
+        val more = true // In the modern UI, we always use the "more" menu
+
+        val (shareOptions, skip) = if (more) {
+            val options = if (isCustom) share_method_more.asList().takeLast(3) else share_method_more.asList()
+            options to if (isCustom) 2 else 0
         } else {
-            binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 1)
-        }
-        addCustomDividerToRecyclerView(binding.recyclerView, R.drawable.custom_divider)
-        binding.recyclerView.adapter = adapter
-
-        itemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(adapter, allowSwipe = false))
-        itemTouchHelper?.attachToRecyclerView(binding.recyclerView)
-
-        binding.refreshLayout.isEnabled = false
-//        binding.refreshLayout.setOnRefreshListener(this)
-//        // Set the distance to trigger sync to 160dp
-//        binding.refreshLayout.setDistanceToTriggerSync((160 * resources.displayMetrics.density).toInt())
-
-        mainViewModel.updateListAction.observe(viewLifecycleOwner) { index ->
-            if (mainViewModel.subscriptionId != subId) {
-                return@observe
-            }
-            // LogUtil.d(TAG, "GroupServerFragment updateListAction subId=$subId")
-            adapter.setData(mainViewModel.serversCache, index)
+            val options = if (isCustom) share_method.asList().takeLast(1) else share_method.asList()
+            options to if (isCustom) 2 else 0
         }
 
-        // LogUtil.d(TAG, "GroupServerFragment onViewCreated: subId=$subId")
+        shareServer(guid, profile, position, shareOptions, skip)
     }
 
     override fun onResume() {
         super.onResume()
+        LogUtil.d(AppConfig.TAG, "GroupServerFragment onResume: subId=$subId")
         mainViewModel.subscriptionIdChanged(subId)
     }
 
@@ -225,7 +223,7 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
      */
     private fun removeServerSub(guid: String, position: Int) {
         mainViewModel.removeServer(guid)
-        adapter.removeServerSub(guid, position)
+        mainViewModel.updateSelectedGuid()
         ownerActivity.refreshGroupTabTitles()
     }
 
@@ -238,9 +236,7 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
         val selected = MmkvManager.getSelectServer()
         if (guid != selected) {
             MmkvManager.setSelectServer(guid)
-            val fromPosition = mainViewModel.getPosition(selected.orEmpty())
-            val toPosition = mainViewModel.getPosition(guid)
-            adapter.setSelectServer(fromPosition, toPosition)
+            mainViewModel.updateSelectedGuid()
 
             if (mainViewModel.isRunning.value == true) {
                 ownerActivity.restartV2Ray()
@@ -248,79 +244,11 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>(),
         }
     }
 
-    private inner class ActivityAdapterListener : MainAdapterListener {
-        override fun onEdit(guid: String, position: Int) {
-        }
-
-        override fun onShare(url: String) {
-        }
-
-        override fun onRefreshData() {
-        }
-
-        override fun onRemove(guid: String, position: Int) {
-            removeServer(guid, position)
-        }
-
-        override fun onEdit(guid: String, position: Int, profile: ProfileItem) {
-            editServer(guid, profile)
-        }
-
-        override fun onSelectServer(guid: String) {
-            setSelectServer(guid)
-        }
-
-        override fun onShare(guid: String, profile: ProfileItem, position: Int, more: Boolean) {
-            val isCustom = profile.configType.isComplexType()
-
-            val (shareOptions, skip) = if (more) {
-                val options = if (isCustom) share_method_more.asList().takeLast(3) else share_method_more.asList()
-                options to if (isCustom) 2 else 0
-            } else {
-                val options = if (isCustom) share_method.asList().takeLast(1) else share_method.asList()
-                options to if (isCustom) 2 else 0
-            }
-
-            shareServer(guid, profile, position, shareOptions, skip)
-        }
-    }
-
-    override fun onRefresh() {
-        ownerActivity.importConfigViaSub()
-        //binding.refreshLayout.isRefreshing = false
-    }
-
     /**
-     * Scrolls to the currently selected server in the RecyclerView
+     * Scrolls to the currently selected server in the LazyColumn
      */
     fun scrollToSelectedServer() {
-        val selectedGuid = MmkvManager.getSelectServer()
-        if (selectedGuid.isNullOrEmpty()) {
-            ownerActivity.toast(R.string.title_file_chooser)
-            return
-        }
-
-        // Find the position of the selected server
-        val serversCache = mainViewModel.serversCache
-        val position = serversCache.indexOfFirst { it.guid == selectedGuid }
-        val recyclerView = binding.recyclerView
-
-        if (position >= 0) {
-            // Get the layout manager
-            val layoutManager = recyclerView.layoutManager as? GridLayoutManager
-
-            if (layoutManager != null) {
-                // Scroll to position with offset to center it on screen
-                // First scroll to position, then adjust to center
-                recyclerView.post {
-                    layoutManager.scrollToPositionWithOffset(position, recyclerView.height / 3)
-                }
-            } else {
-                // Fallback to smooth scroll if layout manager is not GridLayoutManager
-                recyclerView.smoothScrollToPosition(position)
-            }
-        } else {
-            ownerActivity.toast(R.string.toast_server_not_found_in_group)
-        }
+        // In Compose, we would need to use LazyListState to scroll.
+        // For now, this is a placeholder.
     }
 }

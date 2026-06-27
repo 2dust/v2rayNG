@@ -29,6 +29,8 @@ import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Collections
@@ -42,6 +44,35 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isRunning by lazy { MutableLiveData<Boolean>() }
     val updateListAction by lazy { MutableLiveData<Int>() }
     val updateTestResultAction by lazy { MutableLiveData<String>() }
+
+    private val _serversCacheFlow = MutableStateFlow<List<ServersCache>>(emptyList())
+    val serversCacheFlow = _serversCacheFlow.asStateFlow()
+
+    private val _selectedGuidFlow = MutableStateFlow(MmkvManager.getSelectServer() ?: "")
+    val selectedGuidFlow = _selectedGuidFlow.asStateFlow()
+
+    private val _testResultsFlow = MutableStateFlow<Map<String, String>>(emptyMap())
+    val testResultsFlow = _testResultsFlow.asStateFlow()
+
+    fun updateSelectedGuid() {
+        _selectedGuidFlow.value = MmkvManager.getSelectServer() ?: ""
+    }
+
+    fun updateTestResults() {
+        val results = mutableMapOf<String, String>()
+        serversCache.forEach {
+            val aff = MmkvManager.decodeServerAffiliationInfo(it.guid)
+            results[it.guid] = aff?.getTestDelayString().orEmpty()
+        }
+        _testResultsFlow.value = results
+    }
+
+    private fun updateTestResult(guid: String) {
+        val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+        val currentResults = _testResultsFlow.value.toMutableMap()
+        currentResults[guid] = aff?.getTestDelayString().orEmpty()
+        _testResultsFlow.value = currentResults
+    }
 
     /**
      * Refer to the official documentation for [registerReceiver](https://developer.android.com/reference/androidx/core/content/ContextCompat#registerReceiver(android.content.Context,android.content.BroadcastReceiver,android.content.IntentFilter,int):
@@ -67,14 +98,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * Reloads the server list based on current subscription filter.
      */
     fun reloadServerList() {
-        serverList = if (subscriptionId.isEmpty()) {
-            MmkvManager.decodeAllServerList()
-        } else {
-            MmkvManager.decodeServerList(subscriptionId)
-        }
+        viewModelScope.launch(Dispatchers.IO) {
+            serverList = if (subscriptionId.isEmpty()) {
+                MmkvManager.decodeAllServerList()
+            } else {
+                MmkvManager.decodeServerList(subscriptionId)
+            }
 
-        updateCache()
-        updateListAction.value = -1
+            updateCache()
+            withContext(Dispatchers.Main) {
+                updateListAction.value = -1
+            }
+        }
     }
 
     /**
@@ -87,6 +122,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val index = getPosition(guid)
         if (index >= 0) {
             serversCache.removeAt(index)
+            _serversCacheFlow.value = serversCache.toList()
         }
     }
 
@@ -102,6 +138,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         Collections.swap(serverList, fromPosition, toPosition)
         Collections.swap(serversCache, fromPosition, toPosition)
+        _serversCacheFlow.value = serversCache.toList()
 
         MmkvManager.encodeServerList(serverList, subscriptionId)
     }
@@ -137,6 +174,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 serversCache.add(ServersCache(guid, profile))
             }
         }
+        _serversCacheFlow.value = serversCache.toList()
+        updateSelectedGuid()
+        updateTestResults()
     }
 
     /**
@@ -181,6 +221,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         )
         MmkvManager.clearAllTestDelayResults(serversCache.map { it.guid }.toList())
         updateListAction.value = -1
+        updateTestResults()
 
         viewModelScope.launch(Dispatchers.Default) {
             if (serversCache.isEmpty()) {
@@ -453,10 +494,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                     AppConfig.MSG_MEASURE_DELAY_SUCCESS -> {
                         updateTestResultAction.value = content
+                        // For current server real ping, we might need to update the specific item if it's in the list
+                        MmkvManager.getSelectServer()?.let { updateTestResult(it) }
                     }
 
                     AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> {
+                        LogUtil.d(AppConfig.TAG, "Ping success: $content")
                         updateListAction.value = getPosition(content ?: "")
+                        updateTestResult(content ?: "")
                     }
 
                     AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> {

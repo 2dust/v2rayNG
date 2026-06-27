@@ -451,14 +451,16 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                         countSub > 0 -> setupGroupTab()
                         else -> toastError(R.string.toast_failure)
                     }
-                    hideLoading()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     toastError(R.string.toast_failure)
-                    hideLoading()
                 }
                 LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
+            } finally {
+                withContext(Dispatchers.Main) {
+                    hideLoading()
+                }
             }
         }
     }
@@ -484,29 +486,36 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         showLoading()
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val result = mainViewModel.updateConfigViaSubAll()
-            delay(500L)
-            launch(Dispatchers.Main) {
-                if (result.successCount + result.failureCount + result.skipCount == 0) {
-                    toast(R.string.title_update_subscription_no_subscription)
-                } else if (result.successCount > 0 && result.failureCount + result.skipCount == 0) {
-                    toast(getString(R.string.title_update_config_count, result.configCount))
-                } else {
-                    toast(
-                        getString(
-                            R.string.title_update_subscription_result,
-                            result.configCount, result.successCount, result.failureCount, result.skipCount
+            try {
+                val result = mainViewModel.updateConfigViaSubAll()
+                delay(500L)
+                withContext(Dispatchers.Main) {
+                    if (result.successCount + result.failureCount + result.skipCount == 0) {
+                        toast(R.string.title_update_subscription_no_subscription)
+                    } else if (result.successCount > 0 && result.failureCount + result.skipCount == 0) {
+                        toast(getString(R.string.title_update_config_count, result.configCount))
+                    } else {
+                        toast(
+                            getString(
+                                R.string.title_update_subscription_result,
+                                result.configCount, result.successCount, result.failureCount, result.skipCount
+                            )
                         )
-                    )
-                }
-                if (result.configCount > 0) {
-                    mainViewModel.reloadServerList()
-                    refreshGroupTabTitles()
-                    if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_PING_ON_START, true)) {
-                        mainViewModel.testAllRealPing()
+                    }
+                    if (result.configCount > 0) {
+                        mainViewModel.reloadServerList()
+                        refreshGroupTabTitles()
+                        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_PING_ON_START, true)) {
+                            mainViewModel.testAllRealPing()
+                        }
                     }
                 }
-                hideLoading()
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "importConfigViaSub", e)
+            } finally {
+                withContext(Dispatchers.Main) {
+                    hideLoading()
+                }
             }
         }
         return true
@@ -515,13 +524,20 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     private fun exportAll() {
         showLoading()
         lifecycleScope.launch(Dispatchers.IO) {
-            val ret = mainViewModel.exportAllServer()
-            launch(Dispatchers.Main) {
-                if (ret > 0)
-                    toast(getString(R.string.title_export_config_count, ret))
-                else
-                    toastError(R.string.toast_failure)
-                hideLoading()
+            try {
+                val ret = mainViewModel.exportAllServer()
+                withContext(Dispatchers.Main) {
+                    if (ret > 0)
+                        toast(getString(R.string.title_export_config_count, ret))
+                    else
+                        toastError(R.string.toast_failure)
+                }
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "exportAll", e)
+            } finally {
+                withContext(Dispatchers.Main) {
+                    hideLoading()
+                }
             }
         }
     }
@@ -531,12 +547,19 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 showLoading()
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val ret = mainViewModel.removeAllServer()
-                    launch(Dispatchers.Main) {
-                        mainViewModel.reloadServerList()
-                        refreshGroupTabTitles()
-                        toast(getString(R.string.title_del_config_count, ret))
-                        hideLoading()
+                    try {
+                        val ret = mainViewModel.removeAllServer()
+                        withContext(Dispatchers.Main) {
+                            mainViewModel.reloadServerList()
+                            refreshGroupTabTitles()
+                            toast(getString(R.string.title_del_config_count, ret))
+                        }
+                    } catch (e: Exception) {
+                        LogUtil.e(AppConfig.TAG, "delAllConfig", e)
+                    } finally {
+                        withContext(Dispatchers.Main) {
+                            hideLoading()
+                        }
                     }
                 }
             }
@@ -551,12 +574,19 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 showLoading()
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val ret = mainViewModel.removeDuplicateServer()
-                    launch(Dispatchers.Main) {
-                        mainViewModel.reloadServerList()
-                        refreshGroupTabTitles()
-                        toast(getString(R.string.title_del_duplicate_config_count, ret))
-                        hideLoading()
+                    try {
+                        val ret = mainViewModel.removeDuplicateServer()
+                        withContext(Dispatchers.Main) {
+                            mainViewModel.reloadServerList()
+                            refreshGroupTabTitles()
+                            toast(getString(R.string.title_del_duplicate_config_count, ret))
+                        }
+                    } catch (e: Exception) {
+                        LogUtil.e(AppConfig.TAG, "delDuplicateConfig", e)
+                    } finally {
+                        withContext(Dispatchers.Main) {
+                            hideLoading()
+                        }
                     }
                 }
             }
@@ -571,12 +601,19 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 showLoading()
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val ret = mainViewModel.removeInvalidServer()
-                    launch(Dispatchers.Main) {
-                        mainViewModel.reloadServerList()
-                        refreshGroupTabTitles()
-                        toast(getString(R.string.title_del_config_count, ret))
-                        hideLoading()
+                    try {
+                        val ret = mainViewModel.removeInvalidServer()
+                        withContext(Dispatchers.Main) {
+                            mainViewModel.reloadServerList()
+                            refreshGroupTabTitles()
+                            toast(getString(R.string.title_del_config_count, ret))
+                        }
+                    } catch (e: Exception) {
+                        LogUtil.e(AppConfig.TAG, "delInvalidConfig", e)
+                    } finally {
+                        withContext(Dispatchers.Main) {
+                            hideLoading()
+                        }
                     }
                 }
             }
@@ -589,10 +626,17 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     private fun sortByTestResults() {
         showLoading()
         lifecycleScope.launch(Dispatchers.IO) {
-            mainViewModel.sortByTestResults()
-            launch(Dispatchers.Main) {
-                mainViewModel.reloadServerList()
-                hideLoading()
+            try {
+                mainViewModel.sortByTestResults()
+                withContext(Dispatchers.Main) {
+                    mainViewModel.reloadServerList()
+                }
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "sortByTestResults", e)
+            } finally {
+                withContext(Dispatchers.Main) {
+                    hideLoading()
+                }
             }
         }
     }
