@@ -131,6 +131,9 @@ android {
     packaging {
         jniLibs {
             useLegacyPackaging = true
+            // tun2socks is a standalone executable shipped as lib*.so so the installer
+            // extracts it (executable) into nativeLibraryDir. Keep AGP from stripping it.
+            keepDebugSymbols.add("**/libtun2socks.so")
         }
     }
 

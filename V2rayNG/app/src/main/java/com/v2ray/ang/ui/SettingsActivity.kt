@@ -2,6 +2,7 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
@@ -9,9 +10,12 @@ import androidx.preference.PreferenceFragmentCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
+import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.MmkvPreferenceDataStore
+import com.v2ray.ang.root.RootManager
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.launch
 
 class SettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +47,8 @@ class SettingsActivity : BaseActivity() {
         private val fragmentMaxSplit by lazy { findPreference<EditTextPreference>(AppConfig.PREF_FRAGMENT_MAXSPLIT) }
 
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
+        private val enableRootMode by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_ROOT_MODE_ENABLE) }
+        private val lanSharing by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_ROOT_LAN_SHARING) }
 
         private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
         private val hevTunRwTimeout by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) }
@@ -97,6 +103,7 @@ class SettingsActivity : BaseActivity() {
                 updateMode(valueStr)
                 true
             }
+
             mode?.dialogLayoutResource = R.layout.preference_with_help_link
 
             useHevTun?.setOnPreferenceChangeListener { _, newValue ->
@@ -112,6 +119,42 @@ class SettingsActivity : BaseActivity() {
             dynamicSocksPort?.setOnPreferenceChangeListener { _, newValue ->
                 updateDynamicSocksPort(newValue as Boolean)
                 true
+            }
+
+            enableRootMode?.setOnPreferenceChangeListener { _, newValue ->
+                if (newValue == true && !RootManager.cachedRoot()) {
+                    lifecycleScope.launch {
+                        val hasRoot = RootManager.refresh()
+                        if (!isAdded) return@launch
+                        if (hasRoot) {
+                            enableRootMode?.isChecked = true
+                        } else {
+                            context?.toastError(R.string.toast_root_required)
+                        }
+                    }
+                    false // accepted asynchronously once root is confirmed
+                } else {
+                    true
+                }
+            }
+
+            // Root is an opt-in feature: probe su only when the user actually enables LAN
+            // sharing, never at startup. If root is denied, leave the box unchecked.
+            lanSharing?.setOnPreferenceChangeListener { _, newValue ->
+                if (newValue == true && !RootManager.cachedRoot()) {
+                    lifecycleScope.launch {
+                        val hasRoot = RootManager.refresh()
+                        if (!isAdded) return@launch
+                        if (hasRoot) {
+                            lanSharing?.isChecked = true
+                        } else {
+                            context?.toastError(R.string.toast_root_required)
+                        }
+                    }
+                    false // accepted asynchronously once root is confirmed
+                } else {
+                    true
+                }
             }
         }
 

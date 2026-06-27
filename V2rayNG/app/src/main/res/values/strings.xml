@@ -284,6 +284,11 @@
     <string name="title_outbound_domain_resolve_method">Outbound domain pre-resolve method</string>
     <string name="title_mode">Mode</string>
     <string name="title_mode_help">Click me for more help</string>
+    <string name="title_root_mode_enabled">Root mode enabled</string>
+    <string name="summary_root_mode_enabled">Enable root mode for advanced features</string>
+    <string name="toast_root_required">Root access is required for this mode</string>
+    <string name="title_root_lan_sharing">LAN / tethering sharing (Root Users)</string>
+    <string name="summary_root_lan_sharing">Route Wi-Fi hotspot and USB-tethered devices through the VPN</string>
     <string name="title_language">Language</string>
     <string name="title_ui_settings">UI settings</string>
     <string name="title_pref_ui_mode_night">UI mode settings</string>

@@ -24,6 +24,7 @@ import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.root.RootLanSharing
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
@@ -134,6 +135,9 @@ class CoreVpnService : VpnService(), ServiceControl {
             stopAllService()
             return
         }
+
+        // Start LAN sharing if enabled in settings
+        RootLanSharing.startClientSharing(this)
     }
 
     override fun stopService() {
@@ -361,6 +365,8 @@ class CoreVpnService : VpnService(), ServiceControl {
 
         tun2SocksService?.stopTun2Socks()
         tun2SocksService = null
+
+        RootLanSharing.stopClientSharing(this)
 
         CoreServiceManager.stopCoreLoop()
 
