@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/md_theme_background"
+    tools:ignore="MissingDefaultResource">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,108 +16,72 @@
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@color/md_theme_surface"
+            app:elevation="0dp">
 
-            <androidx.appcompat.widget.Toolbar
+            <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize" />
+                android:layout_height="?attr/actionBarSize"
+                app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabIndicatorFullWidth="false"
+                app:tabMode="scrollable"
+                app:tabSelectedTextColor="@color/md_theme_primary"
+                app:tabTextColor="@color/md_theme_onSurfaceVariant"
+                app:tabRippleColor="@android:color/transparent"
+                app:tabIndicatorColor="@color/md_theme_primary"
+                app:tabIndicatorHeight="3dp"
+                app:tabTextAppearance="@style/TabLayoutTextStyle" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <RelativeLayout
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/main_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.coordinatorlayout.widget.CoordinatorLayout
-                android:id="@+id/main_content"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-                <LinearLayout
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progress_bar"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <com.google.android.material.progressindicator.LinearProgressIndicator
-                        android:id="@+id/progress_bar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:indeterminate="true"
-                        android:visibility="invisible"
-                        app:indicatorColor="@color/color_fab_active" />
-
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/tab_group"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:tabIndicatorFullWidth="false"
-                        app:tabMode="scrollable"
-                        app:tabTextAppearance="@style/TabLayoutTextStyle" />
-
-                    <androidx.viewpager2.widget.ViewPager2
-                        android:id="@+id/view_pager"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:nextFocusRight="@+id/fab"
-                        android:scrollbars="vertical"
-                        android:layout_weight="1" />
-
-                    <LinearLayout
-                        android:id="@+id/layout_test"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/view_height_dp64"
-                        android:clickable="true"
-                        android:contentDescription="@string/connection_test_pending"
-                        android:focusable="true"
-                        android:nextFocusLeft="@+id/view_pager"
-                        android:nextFocusRight="@+id/fab"
-                        android:orientation="vertical">
-
-                        <View
-                            android:layout_width="wrap_content"
-                            android:layout_height="1dp"
-                            android:background="@color/divider_color_light" />
-
-                        <TextView
-                            android:id="@+id/tv_test_state"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:gravity="start|center"
-                            android:maxLines="2"
-                            android:minLines="1"
-                            android:paddingStart="@dimen/padding_spacing_dp16"
-                            android:text="@string/connection_test_pending"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                    </LinearLayout>
-                </LinearLayout>
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|end"
-                    android:layout_marginBottom="-16dp"
-                    android:layout_marginEnd="@dimen/padding_spacing_dp16">
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:indicatorColor="@color/md_theme_secondary" />
 
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/fab"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="@dimen/view_height_dp36"
-                        android:clickable="true"
-                        android:contentDescription="@string/tasker_start_service"
-                        android:focusable="true"
-                        android:nextFocusLeft="@+id/layout_test"
-                        android:src="@drawable/ic_play_24dp"
-                        app:tint="@color/colorWhite"
-                        app:useCompatPadding="true"
-                        app:layout_anchorGravity="bottom|right|end" />
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/view_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
-                </FrameLayout>
-            </androidx.coordinatorlayout.widget.CoordinatorLayout>
-        </RelativeLayout>
+            </LinearLayout>
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_margin="32dp"
+                android:contentDescription="@string/tasker_start_service"
+                android:text="@string/tasker_start_service"
+                app:icon="@drawable/ic_play_24dp"
+                app:iconTint="@color/md_theme_onPrimary"
+                android:textColor="@color/md_theme_onPrimary"
+                app:backgroundTint="@color/md_theme_primary"
+                app:elevation="8dp" />
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -122,9 +89,10 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="@color/md_theme_surface"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/menu_drawer">
-
-    </com.google.android.material.navigation.NavigationView>
+        app:menu="@menu/menu_drawer"
+        app:itemShapeInsetStart="12dp"
+        app:itemShapeInsetEnd="12dp" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

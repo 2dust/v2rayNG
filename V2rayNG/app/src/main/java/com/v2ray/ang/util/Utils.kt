@@ -612,4 +612,16 @@ object Utils {
             ""
         }
     }
+
+    /**
+     * Convert dp to px.
+     *
+     * @param context The context to use.
+     * @param dp The dp value to convert.
+     * @return The pixel value.
+     */
+    fun dp2px(context: Context, dp: Int): Int {
+        val density = context.resources.displayMetrics.density
+        return (dp * density + 0.5f).toInt()
+    }
 }

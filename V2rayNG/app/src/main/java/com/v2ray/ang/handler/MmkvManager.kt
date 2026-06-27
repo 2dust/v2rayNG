@@ -272,10 +272,9 @@ object MmkvManager {
      */
     fun clearAllTestDelayResults(keys: List<String>?) {
         keys?.forEach { key ->
-            decodeServerAffiliationInfo(key)?.let { aff ->
-                aff.testDelayMillis = 0
-                serverAffStorage.encode(key, JsonUtil.toJson(aff))
-            }
+            val aff = decodeServerAffiliationInfo(key) ?: ServerAffiliationInfo()
+            aff.testDelayMillis = 0
+            serverAffStorage.encode(key, JsonUtil.toJson(aff))
         }
     }
 
@@ -681,6 +680,10 @@ object MmkvManager {
      */
     fun decodeSettingsStringSet(key: String): MutableSet<String>? {
         return settingsStorage.decodeStringSet(key)
+    }
+
+    fun containsSettingsKey(key: String): Boolean {
+        return settingsStorage.containsKey(key)
     }
 
 

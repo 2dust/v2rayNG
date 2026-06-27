@@ -20,6 +20,7 @@ import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.PackageUidResolver
 import com.v2ray.ang.util.Utils
+import java.io.File
 
 object CoreConfigManager {
     private var initConfigCache: String? = null
@@ -907,13 +908,20 @@ object CoreConfigManager {
         val rule = JsonUtil.fromJson(JsonUtil.toJson(item), V2rayConfig.RoutingBean.RulesBean::class.java) ?: return
 
         // Replace specific geoip rules with ext versions
+        val assetPath = Utils.userAssetPath(context)
+        val geoIpOnlyFileExists = File(assetPath, AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT).exists()
+
         rule.ip?.let { ipList ->
             val updatedIpList = ArrayList<String>()
             ipList.forEach { ip ->
-                when (ip) {
-                    AppConfig.GEOIP_CN -> updatedIpList.add("ext:${AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT}:cn")
-                    AppConfig.GEOIP_PRIVATE -> updatedIpList.add("ext:${AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT}:private")
-                    else -> updatedIpList.add(ip)
+                if (geoIpOnlyFileExists) {
+                    when (ip) {
+                        AppConfig.GEOIP_CN -> updatedIpList.add("ext:${AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT}:cn")
+                        AppConfig.GEOIP_PRIVATE -> updatedIpList.add("ext:${AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT}:private")
+                        else -> updatedIpList.add(ip)
+                    }
+                } else {
+                    updatedIpList.add(ip)
                 }
             }
             rule.ip = updatedIpList

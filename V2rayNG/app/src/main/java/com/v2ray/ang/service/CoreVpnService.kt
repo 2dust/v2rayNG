@@ -27,6 +27,7 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
+import hev.htproxy.TProxyService
 import java.lang.ref.SoftReference
 
 @SuppressLint("VpnServicePolicy")

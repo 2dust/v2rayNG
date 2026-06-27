@@ -42,7 +42,7 @@ import java.net.InetSocketAddress
 
 object CoreServiceManager {
 
-    private val coreController: CoreController = CoreNativeManager.newCoreController(CoreCallback())
+    private val coreController: CoreController by lazy { CoreNativeManager.newCoreController(CoreCallback()) }
     private val mMsgReceive = ReceiveMessageHandler()
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
@@ -95,7 +95,9 @@ object CoreServiceManager {
             startContextService(context)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
+            val message = e.message ?: e.javaClass.simpleName
+            context.toast(message)
+            MessageUtil.sendMsg2UI(context, AppConfig.MSG_STATE_START_FAILURE, message)
         }
     }
 
@@ -214,16 +216,18 @@ object CoreServiceManager {
             return false
         }
 
-        try {
-            doStartCoreLoop(service, vpnInterface)
-            return true
-        } catch (e: Exception) {
-            val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
-            LogUtil.e(AppConfig.TAG, "StartCore-Manager: $message", e)
-            MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
-            NotificationManager.cancelNotification()
-            return false
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                doStartCoreLoop(service, vpnInterface)
+            } catch (e: Exception) {
+                val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
+                LogUtil.e(AppConfig.TAG, "StartCore-Manager: $message", e)
+                MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+                NotificationManager.cancelNotification()
+                serviceControl?.get()?.stopService()
+            }
         }
+        return true
     }
 
     @Throws(Exception::class)

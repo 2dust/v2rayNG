@@ -293,6 +293,12 @@
             android:title="@string/title_pref_auto_remove_invalid_after_test" />
 
         <CheckBoxPreference
+            android:key="pref_auto_ping_on_start"
+            android:defaultValue="true"
+            android:summary="@string/summary_pref_auto_ping_on_start"
+            android:title="@string/title_pref_auto_ping_on_start" />
+
+        <CheckBoxPreference
             android:key="pref_auto_sort_after_test"
             android:defaultValue="false"
             android:summary="@string/summary_pref_auto_sort_after_test"

@@ -26,9 +26,13 @@ object CoreNativeManager {
      *
      */
     fun initCoreEnv(context: Context?) {
+        if (context == null) {
+            LogUtil.w(AppConfig.TAG, "V2Ray core environment initialization skipped: context is null")
+            return
+        }
         if (initialized.compareAndSet(false, true)) {
             try {
-                Seq.setContext(context?.applicationContext)
+                Seq.setContext(context.applicationContext)
                 val assetPath = Utils.userAssetPath(context)
                 val deviceId = Utils.getDeviceIdForXUDPBaseKey()
                 Libv2ray.initCoreEnv(assetPath, deviceId)

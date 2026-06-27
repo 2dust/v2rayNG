@@ -48,7 +48,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * `registerReceiver(Context, BroadcastReceiver, IntentFilter, int)`.
      */
     fun startListenBroadcast() {
-        isRunning.value = false
+        isRunning.postValue(false)
         val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY)
         ContextCompat.registerReceiver(getApplication(), mMsgReceiver, mFilter, Utils.receiverFlags())
         MessageUtil.sendMsg2Service(getApplication(), AppConfig.MSG_REGISTER_CLIENT, "")
@@ -58,7 +58,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * Called when the ViewModel is cleared.
      */
     override fun onCleared() {
-        getApplication<AngApplication>().unregisterReceiver(mMsgReceiver)
+        getApplication<Application>().unregisterReceiver(mMsgReceiver)
         LogUtil.i(AppConfig.TAG, "Main ViewModel is cleared")
         super.onCleared()
     }
@@ -421,53 +421,53 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val mMsgReceiver = object : BroadcastReceiver() {
         override fun onReceive(ctx: Context?, intent: Intent?) {
-            when (intent?.getIntExtra("key", 0)) {
-                AppConfig.MSG_STATE_RUNNING -> {
-                    isRunning.value = true
-                }
-
-                AppConfig.MSG_STATE_NOT_RUNNING -> {
-                    isRunning.value = false
-                }
-
-                AppConfig.MSG_STATE_START_SUCCESS -> {
-                    getApplication<AngApplication>().toastSuccess(R.string.toast_services_success)
-                    isRunning.value = true
-                }
-
-                AppConfig.MSG_STATE_START_FAILURE -> {
-                    val errorMessage = intent.getStringExtra("content")
-                    if (!errorMessage.isNullOrBlank()) {
-                        getApplication<AngApplication>().toastError(errorMessage)
-                    } else {
-                        getApplication<AngApplication>().toastError(R.string.toast_services_failure)
+            val key = intent?.getIntExtra("key", 0) ?: return
+            val content = intent.getStringExtra("content")
+            viewModelScope.launch(Dispatchers.Main) {
+                when (key) {
+                    AppConfig.MSG_STATE_RUNNING -> {
+                        isRunning.value = true
                     }
-                    isRunning.value = false
-                }
 
-                AppConfig.MSG_STATE_STOP_SUCCESS -> {
-                    isRunning.value = false
-                }
+                    AppConfig.MSG_STATE_NOT_RUNNING -> {
+                        isRunning.value = false
+                    }
 
-                AppConfig.MSG_MEASURE_DELAY_SUCCESS -> {
-                    updateTestResultAction.value = intent.getStringExtra("content")
-                }
+                    AppConfig.MSG_STATE_START_SUCCESS -> {
+                        getApplication<Application>().toastSuccess(R.string.toast_services_success)
+                        isRunning.value = true
+                    }
 
-                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> {
-                    val content = intent.getStringExtra("content")
-                    updateListAction.value = getPosition(content ?: "")
-                }
+                    AppConfig.MSG_STATE_START_FAILURE -> {
+                        if (!content.isNullOrBlank()) {
+                            getApplication<Application>().toastError(content)
+                        } else {
+                            getApplication<Application>().toastError(R.string.toast_services_failure)
+                        }
+                        isRunning.value = false
+                    }
 
-                AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> {
-                    val content = intent.getStringExtra("content")
-                    updateTestResultAction.value =
-                        getApplication<AngApplication>().getString(R.string.connection_runing_task_left, content)
-                }
+                    AppConfig.MSG_STATE_STOP_SUCCESS -> {
+                        isRunning.value = false
+                    }
 
-                AppConfig.MSG_MEASURE_CONFIG_FINISH -> {
-                    val content = intent.getStringExtra("content")
-                    if (content == "0") {
-                        onTestsFinished()
+                    AppConfig.MSG_MEASURE_DELAY_SUCCESS -> {
+                        updateTestResultAction.value = content
+                    }
+
+                    AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> {
+                        updateListAction.value = getPosition(content ?: "")
+                    }
+
+                    AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> {
+                        updateTestResultAction.value =
+                            getApplication<Application>().getString(R.string.connection_runing_task_left, content)
+                    }
+
+                    AppConfig.MSG_MEASURE_CONFIG_FINISH -> {
+                        if (content == "0") {
+                            onTestsFinished()
+                        }
                     }
                 }
             }

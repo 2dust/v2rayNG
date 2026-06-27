@@ -2,6 +2,7 @@
 package com.v2ray.ang.ui
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +22,7 @@ import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.ItemTouchHelperAdapter
 import com.v2ray.ang.helper.ItemTouchHelperViewHolder
+import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
 import java.util.Collections
 
@@ -33,7 +35,6 @@ class MainRecyclerAdapter(
         private const val VIEW_TYPE_FOOTER = 2
     }
 
-    private val doubleColumnDisplay = MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
     private var data: MutableList<ServersCache> = mutableListOf()
 
     @SuppressLint("NotifyDataSetChanged")
@@ -66,49 +67,32 @@ class MainRecyclerAdapter(
             val aff = MmkvManager.decodeServerAffiliationInfo(guid)
             holder.itemMainBinding.tvTestResult.text = aff?.getTestDelayString().orEmpty()
             if ((aff?.testDelayMillis ?: 0L) < 0L) {
-                holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(context, R.color.colorPingRed))
+                holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(context, R.color.md_theme_error))
             } else {
-                holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(context, R.color.colorPing))
+                holder.itemMainBinding.tvTestResult.setTextColor(ContextCompat.getColor(context, R.color.md_theme_tertiary))
             }
 
-            //layoutIndicator
+            // Selection state
             if (guid == MmkvManager.getSelectServer()) {
-                holder.itemMainBinding.layoutIndicator.setBackgroundResource(R.color.colorIndicator)
+                holder.itemMainBinding.cardContainer.strokeColor = ContextCompat.getColor(context, R.color.md_theme_primary)
+                holder.itemMainBinding.cardContainer.strokeWidth = Utils.dp2px(context, 2)
+                holder.itemMainBinding.cardContainer.cardElevation = Utils.dp2px(context, 8).toFloat()
+                holder.itemMainBinding.cardContainer.setCardBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.md_theme_surfaceVariant)))
             } else {
-                holder.itemMainBinding.layoutIndicator.setBackgroundResource(0)
+                holder.itemMainBinding.cardContainer.strokeColor = ContextCompat.getColor(context, R.color.md_theme_outlineVariant)
+                holder.itemMainBinding.cardContainer.strokeWidth = Utils.dp2px(context, 1)
+                holder.itemMainBinding.cardContainer.cardElevation = 0f
+                holder.itemMainBinding.cardContainer.setCardBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.md_theme_surface)))
             }
 
             //subscription remarks
             val subRemarks = getSubscriptionRemarks(profile)
             holder.itemMainBinding.tvSubscription.text = subRemarks
-            holder.itemMainBinding.layoutSubscription.visibility = if (subRemarks.isEmpty()) View.GONE else View.VISIBLE
+            holder.itemMainBinding.layoutSubscriptionCard.visibility = if (subRemarks.isEmpty()) View.GONE else View.VISIBLE
 
-            //layout
-            if (doubleColumnDisplay) {
-                holder.itemMainBinding.layoutShare.visibility = View.GONE
-                holder.itemMainBinding.layoutEdit.visibility = View.GONE
-                holder.itemMainBinding.layoutRemove.visibility = View.GONE
-                holder.itemMainBinding.layoutMore.visibility = View.VISIBLE
-
-                holder.itemMainBinding.layoutMore.setOnClickListener {
-                    adapterListener?.onShare(guid, profile, position, true)
-                }
-            } else {
-                holder.itemMainBinding.layoutShare.visibility = View.VISIBLE
-                holder.itemMainBinding.layoutEdit.visibility = View.VISIBLE
-                holder.itemMainBinding.layoutRemove.visibility = View.VISIBLE
-                holder.itemMainBinding.layoutMore.visibility = View.GONE
-
-                holder.itemMainBinding.layoutShare.setOnClickListener {
-                    adapterListener?.onShare(guid, profile, position, false)
-                }
-
-                holder.itemMainBinding.layoutEdit.setOnClickListener {
-                    adapterListener?.onEdit(guid, position, profile)
-                }
-                holder.itemMainBinding.layoutRemove.setOnClickListener {
-                    adapterListener?.onRemove(guid, position)
-                }
+            // Modern Minimal actions: always use 'more' menu
+            holder.itemMainBinding.layoutMore.setOnClickListener {
+                adapterListener?.onShare(guid, profile, position, true)
             }
 
             holder.itemMainBinding.infoContainer.setOnClickListener {

@@ -53,6 +53,8 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
             startV2Ray()
+        } else {
+            applyRunningState(isLoading = false, isRunning = mainViewModel.isRunning.value == true)
         }
     }
     private val requestActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -79,12 +81,15 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         setupNavigationDrawer()
 
         binding.fab.setOnClickListener { handleFabAction() }
-        binding.layoutTest.setOnClickListener { handleLayoutTestClick() }
 
         setupGroupTab()
         setupViewModel()
         SubscriptionUpdater.sync()
         mainViewModel.reloadServerList()
+
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_PING_ON_START, true)) {
+            mainViewModel.testAllRealPing()
+        }
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {
         }
@@ -116,7 +121,6 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun setupViewModel() {
-        mainViewModel.updateTestResultAction.observe(this) { setTestState(it) }
         mainViewModel.isRunning.observe(this) { isRunning ->
             applyRunningState(false, isRunning)
         }
@@ -163,7 +167,12 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun handleFabAction() {
-        applyRunningState(isLoading = true, isRunning = false)
+        if (mainViewModel.isRunning.value != true && MmkvManager.getSelectServer().isNullOrEmpty()) {
+            toast(R.string.title_file_chooser)
+            return
+        }
+
+        applyRunningState(isLoading = true, isRunning = mainViewModel.isRunning.value == true)
 
         if (mainViewModel.isRunning.value == true) {
             CoreServiceManager.stopVService(this)
@@ -181,7 +190,6 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
 
     private fun handleLayoutTestClick() {
         if (mainViewModel.isRunning.value == true) {
-            setTestState(getString(R.string.connection_test_testing))
             mainViewModel.testCurrentServerRealPing()
         } else {
             // service not running: keep existing no-op (could show a message if desired)
@@ -206,28 +214,26 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         }
     }
 
-    private fun setTestState(content: String?) {
-        binding.tvTestState.text = content
-    }
-
     private fun applyRunningState(isLoading: Boolean, isRunning: Boolean) {
         if (isLoading) {
-            binding.fab.setImageResource(R.drawable.ic_fab_check)
+            binding.fab.setIconResource(R.drawable.ic_fab_check)
+            binding.fab.text = getString(R.string.connection_test_testing)
+            binding.progressBar.isVisible = true
             return
         }
 
+        binding.progressBar.isVisible = false
+
         if (isRunning) {
-            binding.fab.setImageResource(R.drawable.ic_stop_24dp)
-            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_active))
+            binding.fab.setIconResource(R.drawable.ic_stop_24dp)
+            binding.fab.text = getString(R.string.notification_action_stop_v2ray)
+            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.md_theme_error))
             binding.fab.contentDescription = getString(R.string.action_stop_service)
-            setTestState(getString(R.string.connection_connected))
-            binding.layoutTest.isFocusable = true
         } else {
-            binding.fab.setImageResource(R.drawable.ic_play_24dp)
-            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_inactive))
+            binding.fab.setIconResource(R.drawable.ic_play_24dp)
+            binding.fab.text = getString(R.string.tasker_start_service)
+            binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.md_theme_primary))
             binding.fab.contentDescription = getString(R.string.tasker_start_service)
-            setTestState(getString(R.string.connection_not_connected))
-            binding.layoutTest.isFocusable = false
         }
     }
 
@@ -496,6 +502,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
                 if (result.configCount > 0) {
                     mainViewModel.reloadServerList()
                     refreshGroupTabTitles()
+                    if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_PING_ON_START, true)) {
+                        mainViewModel.testAllRealPing()
+                    }
                 }
                 hideLoading()
             }
