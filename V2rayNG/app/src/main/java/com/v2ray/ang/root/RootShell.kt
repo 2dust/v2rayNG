@@ -1,4 +1,4 @@
-package com.v2ray.ang.core.root
+package com.v2ray.ang.root
 
 import android.content.Context
 import com.v2ray.ang.AppConfig

@@ -1,6 +1,7 @@
-package com.v2ray.ang.core.root
+package com.v2ray.ang.root
 
 import android.content.Context
+import android.os.Process
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.enums.ERunMode
 import com.v2ray.ang.handler.MmkvManager
@@ -122,7 +123,7 @@ object RootProxyManager {
         val oomGuardPid = File(runDir, "oomguard.pid").absolutePath
         val ipv6 = MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED)
         val lanShare = forceLanShare || MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)
-        val corePid = android.os.Process.myPid()
+        val corePid = Process.myPid()
 
         // Per-app proxy/bypass (mirrors what VpnService does via allowed/disallowed apps).
         val perAppEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY)
@@ -382,7 +383,7 @@ object RootProxyManager {
         val runDir = File(context.filesDir, AppConfig.ROOT_RUNTIME_DIR)
         val pidFile = File(runDir, "tun2socks.pid").absolutePath
         val oomGuardPid = File(runDir, "oomguard.pid").absolutePath
-        val corePid = android.os.Process.myPid()
+        val corePid = Process.myPid()
         return buildString {
             // mangle (TUN2SOCKS), both families
             for (cmd in listOf("iptables", "ip6tables")) {

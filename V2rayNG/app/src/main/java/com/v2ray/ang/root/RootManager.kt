@@ -1,4 +1,4 @@
-package com.v2ray.ang.core.root
+package com.v2ray.ang.root
 
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.util.LogUtil

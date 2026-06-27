@@ -21,20 +21,13 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.contracts.Tun2SocksControl
 import com.v2ray.ang.core.CoreServiceManager
-import com.v2ray.ang.core.root.RootProxyManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
-import com.v2ray.ang.core.root.RootManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.root.RootLanSharing
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.lang.ref.SoftReference
 
 @SuppressLint("VpnServicePolicy")
@@ -42,8 +35,6 @@ class CoreVpnService : VpnService(), ServiceControl {
     private lateinit var mInterface: ParcelFileDescriptor
     private var isRunning = false
     private var tun2SocksService: Tun2SocksControl? = null
-    private var lanSharingStarted = false
-    private var lanShareJob: Job? = null
 
     /**destroy
      * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
@@ -145,15 +136,8 @@ class CoreVpnService : VpnService(), ServiceControl {
             return
         }
 
-        // Optional root feature: share the proxy with tethered LAN/USB clients while the
-        // device itself stays on the VpnService. Runs a dedicated client hev-socks5-tunnel
-        // off the main thread so the su calls don't block service startup.
-        // The cheap, usually-false preference is checked first so the common path
-        // short-circuits before touching root state.
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING) && RootManager.cachedRoot()) {
-            lanSharingStarted = true
-            lanShareJob = CoroutineScope(Dispatchers.IO).launch { RootProxyManager.startClientSharing(this@CoreVpnService) }
-        }
+        // Start LAN sharing if enabled in settings
+        RootLanSharing.startClientSharing(this)
     }
 
     override fun stopService() {
@@ -382,14 +366,7 @@ class CoreVpnService : VpnService(), ServiceControl {
         tun2SocksService?.stopTun2Socks()
         tun2SocksService = null
 
-        // Remove LAN/tethering sharing rules + helper before stopping the core. Wait for the
-        // async setup to finish first, otherwise a stop during setup tears down before the
-        // rules are installed and they leak (orphan FORWARD/policy-routing rules + client tun).
-        if (lanSharingStarted) {
-            lanSharingStarted = false
-            runBlocking { lanShareJob?.cancelAndJoin() }
-            RootProxyManager.stop(this)
-        }
+        RootLanSharing.stopClientSharing(this)
 
         CoreServiceManager.stopCoreLoop()
 
