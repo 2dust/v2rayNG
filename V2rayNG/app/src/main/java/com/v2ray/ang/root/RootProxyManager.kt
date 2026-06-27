@@ -165,7 +165,7 @@ object RootProxyManager {
             }
             // optionally route hotspot / USB-tethered clients through the tun too
             if (lanShare) {
-                append(buildLanShareSetup())
+                append(buildLanShareSetup(captureDeviceTraffic, ipv6))
             }
             if (captureDeviceTraffic) {
                 // IPv6 is best-effort: never fail the (working) IPv4 setup over it.
@@ -322,9 +322,11 @@ object RootProxyManager {
      * Mirrors Magic_V2Ray's hotspot rules (FORWARD accept, DNS DNAT, source-based policy
      * routing for private client ranges, MSS clamp).
      */
-    private fun buildLanShareSetup(): String {
+    private fun buildLanShareSetup(captureDeviceTraffic: Boolean, ipv6: Boolean): String {
         val fwd = AppConfig.ROOT_FWD_CHAIN
         val dnsChain = AppConfig.ROOT_DNS_CHAIN
+        val v6fwd = AppConfig.ROOT_V6_FWD_CHAIN
+        val v6pre = AppConfig.ROOT_V6_PRE_CHAIN
         // Use the app's configured remote DNS (first plain IPv4) as the DNAT target for
         // tethered clients; fall back to the default when it's a DoH/DoT/IPv6 value that
         // can't be a DNAT target.
@@ -365,6 +367,48 @@ object RootProxyManager {
             appendLine("ip rule add from 172.16.0.0/12 lookup $TABLE pref 5040 2>/dev/null || true")
             appendLine("ip rule add from 192.168.0.0/16 lookup $TABLE pref 5050 2>/dev/null || true")
             appendLine("ip rule add nop pref 6000 2>/dev/null || true")
+
+            // ---------------------------------------------------------- IPv6 clients
+            // Tethered/hotspot clients get a native (RA-assigned) global IPv6. The IPv4 rules
+            // above don't touch it, so it egresses the upstream interface directly, bypassing
+            // the proxy = IPv6 leak. Handle it explicitly (mirrors vincentng295/Magic_V2Ray
+            // cae4f7f): route it through the tun when v6 is enabled, reject it when it isn't.
+            appendLine("ip6tables -N $v6fwd 2>/dev/null || true")
+            appendLine("ip6tables -F $v6fwd")
+            appendLine("ip6tables -D FORWARD -j $v6fwd 2>/dev/null || true")
+            appendLine("ip6tables -I FORWARD -j $v6fwd")
+            if (ipv6) {
+                // When the device itself isn't capturing v6 (VPN-mode sharing) the tun table
+                // has no v6 default and the tun has no v6 address — add them so marked client
+                // v6 has somewhere to go. In Root mode the device-capture block already did.
+                if (!captureDeviceTraffic) {
+                    appendLine("ip -6 addr add ${AppConfig.ROOT_TUN_ADDR_V6} dev $TUN 2>/dev/null || true")
+                    appendLine("ip -6 route replace default dev $TUN table $TABLE 2>/dev/null || true")
+                    appendLine("ip -6 rule add fwmark $MARK table $TABLE priority $PRIORITY 2>/dev/null || true")
+                }
+                // allow forwarding to/from the tun
+                appendLine("ip6tables -A $v6fwd -i $TUN -j ACCEPT")
+                appendLine("ip6tables -A $v6fwd -o $TUN -j ACCEPT")
+                // mark forwarded (non-locally-sourced) client v6 into the tun table. DNS first
+                // so a query to a LAN/router resolver is still tunneled (MARK survives RETURN);
+                // keep loopback, link-local (NDP/RA) and ULA/multicast direct.
+                appendLine("ip6tables -t mangle -N $v6pre 2>/dev/null || true")
+                appendLine("ip6tables -t mangle -F $v6pre")
+                appendLine("ip6tables -t mangle -A $v6pre ! -i $TUN -p udp --dport 53 -j MARK --set-xmark $MARK")
+                appendLine("ip6tables -t mangle -A $v6pre ! -i $TUN -p tcp --dport 53 -j MARK --set-xmark $MARK")
+                bypassCidrsV6.forEach { appendLine("ip6tables -t mangle -A $v6pre ! -i $TUN -d $it -j RETURN") }
+                appendLine("ip6tables -t mangle -A $v6pre ! -i $TUN -m addrtype ! --src-type LOCAL -j MARK --set-xmark $MARK")
+                appendLine("ip6tables -t mangle -D PREROUTING -j $v6pre 2>/dev/null || true")
+                appendLine("ip6tables -t mangle -A PREROUTING -j $v6pre")
+                // fail closed: any forwarded v6 that wasn't marked into the tun (e.g. the
+                // addrtype match is unavailable, or marking failed) is rejected rather than
+                // leaked straight out the upstream interface.
+                appendLine("ip6tables -A $v6fwd -j REJECT --reject-with icmp6-no-route")
+            } else {
+                // v6 disabled: reject forwarded clients' native v6 so it can't leak past the
+                // proxy (the device's own v6 is blackholed separately in OUTPUT).
+                appendLine("ip6tables -A $v6fwd -j REJECT --reject-with icmp6-no-route")
+            }
         }
     }
 
@@ -399,6 +443,13 @@ object RootProxyManager {
             appendLine("iptables -t nat -D PREROUTING -j ${AppConfig.ROOT_DNS_CHAIN} 2>/dev/null || true")
             appendLine("iptables -t nat -F ${AppConfig.ROOT_DNS_CHAIN} 2>/dev/null || true")
             appendLine("iptables -t nat -X ${AppConfig.ROOT_DNS_CHAIN} 2>/dev/null || true")
+            // IPv6 LAN-sharing chains (forward accept/reject + forwarded-client marking)
+            appendLine("ip6tables -D FORWARD -j ${AppConfig.ROOT_V6_FWD_CHAIN} 2>/dev/null || true")
+            appendLine("ip6tables -F ${AppConfig.ROOT_V6_FWD_CHAIN} 2>/dev/null || true")
+            appendLine("ip6tables -X ${AppConfig.ROOT_V6_FWD_CHAIN} 2>/dev/null || true")
+            appendLine("ip6tables -t mangle -D PREROUTING -j ${AppConfig.ROOT_V6_PRE_CHAIN} 2>/dev/null || true")
+            appendLine("ip6tables -t mangle -F ${AppConfig.ROOT_V6_PRE_CHAIN} 2>/dev/null || true")
+            appendLine("ip6tables -t mangle -X ${AppConfig.ROOT_V6_PRE_CHAIN} 2>/dev/null || true")
             for (pref in listOf(5000, 5010, 5020, 5025, 5026, 5027, 5030, 5040, 5050, 6000)) {
                 appendLine("ip rule del pref $pref 2>/dev/null || true")
             }
