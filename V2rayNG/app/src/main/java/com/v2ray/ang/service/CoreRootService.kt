@@ -39,8 +39,7 @@ class CoreRootService : Service(), ServiceControl {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val mode = SettingsManager.getRunMode()
-        LogUtil.i(AppConfig.TAG, "StartCore-Root: command received, mode=$mode")
+        LogUtil.i(AppConfig.TAG, "StartCore-Root: command received")
 
         // Start the in-process core first (this also posts the foreground notification),
         // then install the root routing off the main thread.
@@ -51,8 +50,8 @@ class CoreRootService : Service(), ServiceControl {
         }
 
         setupJob = CoroutineScope(Dispatchers.IO).launch {
-            if (!RootProxyManager.start(this@CoreRootService, mode)) {
-                LogUtil.e(AppConfig.TAG, "StartCore-Root: failed to start root routing for $mode, stopping")
+            if (!RootProxyManager.start(this@CoreRootService)) {
+                LogUtil.e(AppConfig.TAG, "StartCore-Root: failed to start root mode, stopping")
                 stopService()
             }
         }

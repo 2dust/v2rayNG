@@ -12,7 +12,6 @@ import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.enums.BalancerStrategyType
 import com.v2ray.ang.enums.CoreResolvedType
 import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.enums.ERunMode
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
@@ -454,10 +453,8 @@ object CoreConfigManager {
         val vpn = SettingsManager.isVpnMode()
         val useHev = SettingsManager.isUsingHevTun()
         val forcedByHev = vpn && useHev
-        // Tun2socks (root) and LAN/tethering sharing both forward into the in-process SOCKS
-        // inbound (the latter even in VPN mode), so it must exist.
-        val lanShare = MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)
-        val forcedBySocksRoot = SettingsManager.getRunMode() == ERunMode.TUN2SOCKS || lanShare
+        val forcedBySocksRoot = SettingsManager.isRootMode()
+                || MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)
 
         val enableLocalProxy = forcedByHev || forcedBySocksRoot || MmkvManager.decodeSettingsBool(AppConfig.PREF_ENABLE_LOCAL_PROXY, true)
 
@@ -629,14 +626,14 @@ object CoreConfigManager {
     }
 
     /**
-     * In the root Tun2socks mode the whole device's traffic (incl. raw DNS) is funneled
+     * In the root mode the whole device's traffic (incl. raw DNS) is funneled
      * into the core's SOCKS inbound, exactly like the VPN+hev path. Hijack port-53 to the
      * core's DNS module so queries are resolved via the configured resolver through the
      * proxy instead of leaking to (or being mis-resolved by) the local network resolver.
      * Independent of the local-DNS toggle, which is not exposed for root mode.
      */
     private fun configureRootModeDns(v2rayConfig: V2rayConfig) {
-        if (SettingsManager.getRunMode() != ERunMode.TUN2SOCKS) return
+        if (!SettingsManager.isRootMode()) return
 
         if (v2rayConfig.routing.rules.none { it.outboundTag == "dns-out" && it.port == "53" }) {
             v2rayConfig.routing.rules.add(

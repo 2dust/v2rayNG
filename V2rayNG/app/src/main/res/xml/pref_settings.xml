@@ -319,6 +319,12 @@
 
         <CheckBoxPreference
             android:defaultValue="false"
+            android:key="pref_root_mode_enabled"
+            android:summary="@string/summary_root_mode_enabled"
+            android:title="@string/title_root_mode_enabled" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_root_lan_sharing"
             android:summary="@string/summary_root_lan_sharing"
             android:title="@string/title_root_lan_sharing" />

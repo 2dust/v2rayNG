@@ -69,6 +69,7 @@ object AppConfig {
     const val PREF_LOGLEVEL = "pref_core_loglevel"
     const val PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD = "pref_outbound_domain_resolve_method"
     const val PREF_MODE = "pref_mode"
+    const val PREF_ROOT_MODE_ENABLE = "pref_root_mode_enabled"
     const val PREF_ROOT_LAN_SHARING = "pref_root_lan_sharing"
     const val PREF_IS_BOOTED = "pref_is_booted"
     const val PREF_CHECK_UPDATE_PRE_RELEASE = "pref_check_update_pre_release"
@@ -195,11 +196,6 @@ object AppConfig {
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"
     const val VPN_MTU = 1500
-
-    /** Run-mode values stored under [PREF_MODE]. VPN / PROXY_ONLY need no root. */
-    const val MODE_VPN = VPN
-    const val MODE_PROXY_ONLY = "Proxy only"
-    const val MODE_TUN2SOCKS = "Tun2socks"   // shown as "Root mode" in the UI
 
     /** Root (system-wide) mode runtime constants. */
     const val ROOT_RUNTIME_DIR = "root"

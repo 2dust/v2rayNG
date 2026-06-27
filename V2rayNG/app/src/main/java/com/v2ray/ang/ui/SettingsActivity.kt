@@ -1,20 +1,20 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
+import android.view.View
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
-import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
-import com.v2ray.ang.root.RootManager
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.MmkvPreferenceDataStore
+import com.v2ray.ang.root.RootManager
+import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.launch
 
 class SettingsActivity : BaseActivity() {
@@ -46,6 +46,7 @@ class SettingsActivity : BaseActivity() {
         private val fragmentInterval by lazy { findPreference<EditTextPreference>(AppConfig.PREF_FRAGMENT_INTERVAL) }
 
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
+        private val enableRootMode by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_ROOT_MODE_ENABLE) }
         private val lanSharing by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_ROOT_LAN_SHARING) }
 
         private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
@@ -66,9 +67,6 @@ class SettingsActivity : BaseActivity() {
             preferenceManager.preferenceDataStore = MmkvPreferenceDataStore()
 
             addPreferencesFromResource(R.xml.pref_settings)
-
-            // Populate run-mode options (root modes stay selectable; root is probed on demand).
-            applyModeOptions()
 
             initPreferenceSummaries()
 
@@ -95,6 +93,17 @@ class SettingsActivity : BaseActivity() {
                 true
             }
 
+            mode?.setOnPreferenceChangeListener { pref, newValue ->
+                val valueStr = newValue.toString()
+                (pref as? ListPreference)?.let { lp ->
+                    val idx = lp.findIndexOfValue(valueStr)
+                    lp.summary = if (idx >= 0) lp.entries[idx] else valueStr
+                }
+                updateMode(valueStr)
+                true
+            }
+
+            mode?.dialogLayoutResource = R.layout.preference_with_help_link
 
             useHevTun?.setOnPreferenceChangeListener { _, newValue ->
                 updateHevTunSettings(newValue as Boolean)
@@ -109,6 +118,23 @@ class SettingsActivity : BaseActivity() {
             dynamicSocksPort?.setOnPreferenceChangeListener { _, newValue ->
                 updateDynamicSocksPort(newValue as Boolean)
                 true
+            }
+
+            enableRootMode?.setOnPreferenceChangeListener { _, newValue ->
+                if (newValue == true && !RootManager.cachedRoot()) {
+                    lifecycleScope.launch {
+                        val hasRoot = RootManager.refresh()
+                        if (!isAdded) return@launch
+                        if (hasRoot) {
+                            enableRootMode?.isChecked = true
+                        } else {
+                            context?.toastError(R.string.toast_root_required)
+                        }
+                    }
+                    false // accepted asynchronously once root is confirmed
+                } else {
+                    true
+                }
             }
 
             // Root is an opt-in feature: probe su only when the user actually enables LAN
@@ -129,17 +155,6 @@ class SettingsActivity : BaseActivity() {
                     true
                 }
             }
-        }
-
-        override fun onDisplayPreferenceDialog(preference: Preference) {
-            // Use the custom chooser for the run-mode preference so root modes can be shown
-            // greyed-out; every other preference keeps the standard dialog. Intercepting here
-            // (instead of a click listener) guarantees a single dialog.
-            if (preference.key == AppConfig.PREF_MODE) {
-                showModeDialog()
-                return
-            }
-            super.onDisplayPreferenceDialog(preference)
         }
 
         private fun initPreferenceSummaries() {
@@ -190,7 +205,6 @@ class SettingsActivity : BaseActivity() {
 
         override fun onStart() {
             super.onStart()
-
             updateHevTunSettings(MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true))
 
             // Initialize mode-dependent UI states
@@ -208,78 +222,6 @@ class SettingsActivity : BaseActivity() {
             updateDynamicSocksPort(MmkvManager.decodeSettingsBool(AppConfig.PREF_DYNAMIC_SOCKS_PORT, false))
         }
 
-        private data class ModeOption(val value: String, val labelRes: Int, val rootOnly: Boolean)
-
-        // Single source of truth for the offered run modes. All are always shown; root
-        // modes are greyed-out (not hidden) for non-root users.
-        // REDIRECT is intentionally retired (Tun2socks supersedes it, full TCP+UDP).
-        // TPROXY is not offered yet (needs a bundled root xray binary).
-        private val modeOptions = listOf(
-            ModeOption(AppConfig.MODE_VPN, R.string.mode_vpn, false),
-            ModeOption(AppConfig.MODE_PROXY_ONLY, R.string.mode_proxy_only, false),
-            ModeOption(AppConfig.MODE_TUN2SOCKS, R.string.mode_tun2socks, true),
-        )
-
-        /**
-         * Keep the ListPreference's entries/values in sync. Falls back to VPN only when the
-         * persisted value is unknown; a valid root selection is left intact — root is probed
-         * on demand when the user picks a root mode and re-checked on service start.
-         */
-        private fun applyModeOptions() {
-            mode?.entryValues = modeOptions.map { it.value }.toTypedArray()
-            mode?.entries = modeOptions.map { getString(it.labelRes) }.toTypedArray()
-
-            val current = MmkvManager.decodeSettingsString(AppConfig.PREF_MODE, AppConfig.MODE_VPN)
-            if (modeOptions.firstOrNull { it.value == current } == null) {
-                MmkvManager.encodeSettings(AppConfig.PREF_MODE, AppConfig.MODE_VPN)
-                mode?.value = AppConfig.MODE_VPN
-            }
-            mode?.let { lp ->
-                val idx = lp.findIndexOfValue(lp.value)
-                lp.summary = if (idx >= 0) lp.entries[idx] else lp.value
-            }
-            updateMode(MmkvManager.decodeSettingsString(AppConfig.PREF_MODE, AppConfig.MODE_VPN))
-        }
-
-        /**
-         * Custom mode chooser. Root modes are always selectable; choosing one probes su on
-         * demand (no startup prompt) and, if root is denied, drops the selection with a toast.
-         */
-        private fun showModeDialog() {
-            val ctx = context ?: return
-            val labels = modeOptions.map { getString(it.labelRes) }
-            val current = MmkvManager.decodeSettingsString(AppConfig.PREF_MODE, AppConfig.MODE_VPN)
-            val checked = modeOptions.indexOfFirst { it.value == current }.coerceAtLeast(0)
-
-            AlertDialog.Builder(ctx)
-                .setTitle(R.string.title_mode)
-                .setSingleChoiceItems(labels.toTypedArray(), checked) { dialog, which ->
-                    val opt = modeOptions[which]
-                    if (opt.rootOnly && !RootManager.cachedRoot()) {
-                        dialog.dismiss()
-                        lifecycleScope.launch {
-                            val hasRoot = RootManager.refresh()
-                            if (!isAdded) return@launch
-                            if (hasRoot) selectMode(opt, labels[which])
-                            else context?.toastError(R.string.toast_root_required)
-                        }
-                    } else {
-                        selectMode(opt, labels[which])
-                        dialog.dismiss()
-                    }
-                }
-                .setNegativeButton(android.R.string.cancel, null)
-                .show()
-        }
-
-        /** Persist and apply a chosen run mode. */
-        private fun selectMode(opt: ModeOption, label: String) {
-            mode?.value = opt.value
-            MmkvManager.encodeSettings(AppConfig.PREF_MODE, opt.value)
-            updateMode(opt.value)
-            mode?.summary = label
-        }
-
         private fun updateMode(value: String?) {
             val vpn = value == VPN
             localDns?.isEnabled = vpn
@@ -291,11 +233,6 @@ class SettingsActivity : BaseActivity() {
             vpnInterfaceAddress?.isEnabled = vpn
             vpnMtu?.isEnabled = vpn
             useHevTun?.isEnabled = vpn
-            // Transparent LAN / tethering sharing applies to VPN and Root modes. Root is
-            // verified on demand when the box is checked, so the toggle stays enabled here.
-            // Proxy-only already has its own "allow connections from other devices" option
-            // (PREF_PROXY_SHARING), so it's excluded.
-            lanSharing?.isEnabled = value != AppConfig.MODE_PROXY_ONLY
             updateHevTunSettings(false)
             if (vpn) {
                 updateLocalDns(
@@ -391,5 +328,9 @@ class SettingsActivity : BaseActivity() {
             }
             updateEnableLocalProxy(enableLocalProxy?.isChecked == true)
         }
+    }
+
+    fun onModeHelpClicked(view: View) {
+        Utils.openUri(this, AppConfig.APP_WIKI_MODE)
     }
 }

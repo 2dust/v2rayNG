@@ -18,7 +18,6 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.enums.ERunMode
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.root.RootManager
@@ -174,27 +173,21 @@ object CoreServiceManager {
             context.toast(R.string.toast_services_start)
         }
 
-        val mode = SettingsManager.getRunMode()
-        if (mode.needsRoot && !RootManager.isRootAvailable()) {
-            LogUtil.e(AppConfig.TAG, "StartCore-Manager: mode $mode requires root but none available")
+        val isRootMode = SettingsManager.isRootMode()
+        if (isRootMode && !RootManager.isRootAvailable()) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: root mode requires root but none available")
             error(context.getString(R.string.toast_root_required))
         }
 
-        val intent = when (mode) {
-            ERunMode.VPN -> {
-                LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting VPN service")
-                Intent(context.applicationContext, CoreVpnService::class.java)
-            }
-
-            ERunMode.PROXY_ONLY -> {
-                LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting Proxy service")
-                Intent(context.applicationContext, CoreProxyOnlyService::class.java)
-            }
-
-            else -> {
-                LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting Root service ($mode)")
-                Intent(context.applicationContext, CoreRootService::class.java)
-            }
+        val intent = if (isRootMode) {
+            LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting Root service")
+            Intent(context.applicationContext, CoreRootService::class.java)
+        } else if (SettingsManager.isVpnMode()) {
+            LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting VPN service")
+            Intent(context.applicationContext, CoreVpnService::class.java)
+        } else {
+            LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting Proxy service")
+            Intent(context.applicationContext, CoreProxyOnlyService::class.java)
         }
 
         try {

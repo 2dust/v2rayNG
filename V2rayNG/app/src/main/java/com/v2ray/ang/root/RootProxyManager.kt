@@ -3,7 +3,6 @@ package com.v2ray.ang.root
 import android.content.Context
 import android.os.Process
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.enums.ERunMode
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.LogUtil
@@ -13,7 +12,6 @@ import java.io.File
 
 /**
  * Installs and removes the iptables / ip-rule routing that pushes system-wide traffic
- * into the core for the root run mode ("Root mode", [ERunMode.TUN2SOCKS]).
  *
  * A bundled `hev-socks5-tunnel` binary (run as root) creates a tun device and forwards it to
  * the in-process core's SOCKS inbound; a mangle MARK chain plus a dedicated routing table /
@@ -46,22 +44,15 @@ object RootProxyManager {
         "::1/128", "fe80::/10", "fc00::/7", "ff00::/8"
     )
 
-    fun start(context: Context, mode: ERunMode): Boolean {
+    fun start(context: Context): Boolean {
         teardown(context)
-        val script = when (mode) {
-            ERunMode.TUN2SOCKS -> buildTun2socksSetup(context) ?: return false
-            else -> {
-                LogUtil.w(AppConfig.TAG, "RootProxyManager: mode $mode not supported")
-                return false
-            }
-        }
+        val script = buildTun2socksSetup(context) ?: return false
         val result = RootShell.runScript(context, "setup_rules.sh", script)
         if (!result.success) {
             LogUtil.e(AppConfig.TAG, "RootProxyManager: setup failed, rolling back:\n${result.output}")
             teardown(context)
             return false
         }
-        LogUtil.i(AppConfig.TAG, "RootProxyManager: $mode rules installed")
         return true
     }
 
