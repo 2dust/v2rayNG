@@ -283,6 +283,13 @@
     <string name="summary_pref_use_hev_tunnel">選擇啟用後 TUN 將使用 hev-socks5-tunnel 否則使用 xray-core</string>
     <string name="title_pref_hev_tunnel_loglevel">HevTun 日誌級別</string>
     <string name="title_pref_hev_tunnel_rw_timeout">HevTun 讀寫逾時(秒) (tcp,udp 預設 300,60)</string>
+    <string name="title_mode_settings">模式設定</string>
+    <string name="title_root_mode_enabled">啟用 Root 模式 (僅限 Root 使用者)</string>
+    <string name="summary_root_mode_enabled">透過 Root 權限啟用底層透明代理。此模式將不再透過 Android 常規系統 VPN 建立連線，而是直接接管系統底層所有網路流量。開啟後，原有的常规模式、應用分流及相關 VPN 設定將直接失效。</string>
+    <string name="toast_root_required">此功能需要 Root 權限</string>
+    <string name="title_root_lan_sharing">區域網路 / 熱點網路共享 (僅限 Root 使用者)</string>
+    <string name="summary_root_lan_sharing">允許透過 Wi-Fi 熱點和 USB 共享網路連線的裝置走 VPN 代理流量</string>
+
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">複製</string>

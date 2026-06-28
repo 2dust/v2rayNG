@@ -123,38 +123,29 @@ class SettingsActivity : BaseActivity() {
             enableRootMode?.setOnPreferenceChangeListener { _, newValue ->
                 if (newValue == true && !RootManager.cachedRoot()) {
                     lifecycleScope.launch {
-                        val hasRoot = RootManager.refresh()
-                        if (!isAdded) return@launch
-                        if (hasRoot) {
+                        if (checkAndRequestRoot()) {
                             enableRootMode?.isChecked = true
-                        } else {
-                            context?.toastError(R.string.toast_root_required)
                         }
                     }
-                    false // accepted asynchronously once root is confirmed
+                    false
                 } else {
                     true
                 }
             }
 
-            // Root is an opt-in feature: probe su only when the user actually enables LAN
-            // sharing, never at startup. If root is denied, leave the box unchecked.
             lanSharing?.setOnPreferenceChangeListener { _, newValue ->
                 if (newValue == true && !RootManager.cachedRoot()) {
                     lifecycleScope.launch {
-                        val hasRoot = RootManager.refresh()
-                        if (!isAdded) return@launch
-                        if (hasRoot) {
+                        if (checkAndRequestRoot()) {
                             lanSharing?.isChecked = true
-                        } else {
-                            context?.toastError(R.string.toast_root_required)
                         }
                     }
-                    false // accepted asynchronously once root is confirmed
+                    false
                 } else {
                     true
                 }
             }
+
         }
 
         private fun initPreferenceSummaries() {
@@ -201,6 +192,15 @@ class SettingsActivity : BaseActivity() {
             }
 
             preferenceScreen?.let { traverse(it) }
+        }
+
+        private suspend fun checkAndRequestRoot(): Boolean {
+            val hasRoot = RootManager.refresh()
+            if (!isAdded) return false
+            if (!hasRoot) {
+                context?.toastError(R.string.toast_root_required)
+            }
+            return hasRoot
         }
 
         override fun onStart() {
