@@ -1,14 +1,15 @@
 package com.v2ray.ang
 
+import android.app.Application
 import android.content.Context
-import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+//import com.v2ray.ang.compose.ThemeManager
 import com.v2ray.ang.handler.SettingsManager
 
-class AngApplication : MultiDexApplication() {
+class AngApplication : Application() {
     companion object {
         lateinit var application: AngApplication
     }
@@ -44,5 +45,8 @@ class AngApplication : MultiDexApplication() {
         es.dmoral.toasty.Toasty.Config.getInstance()
             .setGravity(android.view.Gravity.BOTTOM, 0, 300)
             .apply()
+
+        // Initialize theme state from MMKV
+        //ThemeManager.refresh()
     }
 }

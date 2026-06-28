@@ -1,9 +1,10 @@
 package com.v2ray.ang.helper
 
+import android.app.Activity
 import android.content.Intent
+import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import com.v2ray.ang.ui.ScannerActivity
 
 /**
@@ -12,12 +13,12 @@ import com.v2ray.ang.ui.ScannerActivity
  * This class encapsulates the logic for launching the QR code scanner activity
  * and handling the scan result.
  */
-class QRCodeScannerHelper(private val activity: AppCompatActivity) {
+class QRCodeScannerHelper(private val activity: ComponentActivity) {
     private var scanCallback: ((String?) -> Unit)? = null
 
     private val scanLauncher: ActivityResultLauncher<Intent> =
         activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == AppCompatActivity.RESULT_OK) {
+            if (result.resultCode == Activity.RESULT_OK) {
                 val scanResult = result.data?.getStringExtra("SCAN_RESULT")
                 scanCallback?.invoke(scanResult)
             } else {
