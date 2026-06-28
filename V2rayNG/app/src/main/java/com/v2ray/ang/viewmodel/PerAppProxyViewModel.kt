@@ -4,15 +4,19 @@ import androidx.lifecycle.ViewModel
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class PerAppProxyViewModel : ViewModel() {
     private val blacklist: MutableSet<String> = MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)?.let {
         HashSet(it)
     } ?: HashSet()
 
-    fun contains(packageName: String): Boolean = blacklist.contains(packageName)
+    private val _blacklistFlow = MutableStateFlow(blacklist.toSet())
+    val blacklistFlow: StateFlow<Set<String>> = _blacklistFlow.asStateFlow()
 
-    fun getAll(): Set<String> = blacklist.toSet()
+    fun contains(packageName: String): Boolean = blacklist.contains(packageName)
 
     fun add(packageName: String): Boolean {
         val changed = blacklist.add(packageName)
@@ -60,5 +64,6 @@ class PerAppProxyViewModel : ViewModel() {
     private fun save() {
         MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY_SET, blacklist)
         SettingsChangeManager.makeRestartService()
+        _blacklistFlow.value = blacklist.toSet()
     }
 }
