@@ -167,7 +167,6 @@ dependencies {
 
     // UI Libraries
     implementation(libs.material)
-    implementation(libs.toasty)
     implementation(libs.editorkit)
     implementation(libs.flexbox)
 
@@ -184,9 +183,12 @@ dependencies {
     implementation(libs.language.base)
     implementation(libs.language.json)
 
-    // Intent and Utility Libraries
-    implementation(libs.quickie.foss)
-    implementation(libs.core)
+    // QR Code: CameraX + ZXing
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.compose)
+    implementation(libs.core) // zxing core
 
     // AndroidX Lifecycle and Architecture Components
     implementation(libs.lifecycle.viewmodel.ktx)

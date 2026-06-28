@@ -2,7 +2,6 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import android.text.TextUtils
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -59,11 +58,11 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.AppManagerUtil
+import com.v2ray.ang.util.ComposeToast
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.PerAppProxyViewModel
-import es.dmoral.toasty.Toasty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -105,10 +104,10 @@ class PerAppProxyActivity : ComponentActivity() {
                         MmkvManager.encodeSettings(AppConfig.PREF_BYPASS_APPS, it)
                     },
                     onInfoClick = {
-                        Toasty.info(
+                        ComposeToast.info(
                             this,
                             getString(R.string.summary_pref_per_app_proxy),
-                            Toast.LENGTH_LONG
+                            android.widget.Toast.LENGTH_LONG
                         )
                     },
                     onToggleApp = { pkg ->
