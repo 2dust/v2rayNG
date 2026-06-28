@@ -1,190 +1,302 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.ArrayAdapter
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.R
-import com.v2ray.ang.databinding.ActivityRoutingEditBinding
+import com.v2ray.ang.compose.AppTheme
+import com.v2ray.ang.compose.AppTopBar
+import com.v2ray.ang.compose.ConfirmDialog
+import com.v2ray.ang.compose.FormDropdownField
+import com.v2ray.ang.compose.FormTextField
+import com.v2ray.ang.compose.SettingsSwitchItem
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.UUID
 
-class RoutingEditActivity : BaseActivity() {
-    private val binding by lazy { ActivityRoutingEditBinding.inflate(layoutInflater) }
+class RoutingEditActivity : ComponentActivity() {
     private val position by lazy { intent.getIntExtra("position", -1) }
-    private val processPickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val selectedPackages = AppPickerActivity.getSelectedPackages(result.data)
-            binding.etProcess.text = Utils.getEditable(selectedPackages.joinToString(","))
+
+    private var processState: MutableState<String>? = null
+
+    private val processPickerLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val selectedPackages = AppPickerActivity.getSelectedPackages(result.data)
+                processState?.value = selectedPackages.joinToString(",")
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.routing_settings_rule_title))
-
-        setupOutboundTagInput()
-        setupProcessPicker()
+        enableEdgeToEdge()
 
         val rulesetItem = SettingsManager.getRoutingRuleset(position)
-        if (rulesetItem != null) {
-            bindingServer(rulesetItem)
-        } else {
-            clearServer()
-        }
-
-        SettingsManager.canUseProcessRouting().let { canUse ->
-            binding.etProcess.isEnabled = canUse
-            binding.btnProcessPicker.isEnabled = canUse
-        }
-    }
-
-    private fun setupProcessPicker() {
-        binding.btnProcessPicker.setOnClickListener {
-            processPickerLauncher.launch(
-                AppPickerActivity.createIntent(
-                    context = this,
-                    selectedPackages = getSelectedProcessPackages(),
-                    title = getString(R.string.routing_settings_process)
-                )
-            )
-        }
-    }
-
-    private fun getSelectedProcessPackages(): List<String> {
-        return binding.etProcess.text
-            .toString()
-            .split(",")
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .distinct()
-    }
-
-    /**
-     * Sets up the AutoCompleteTextView for outbound tag:
-     * suggestions = built-in tags (proxy/direct/block) + all existing profile remarks.
-     * The dropdown button triggers showing the full list without typing.
-     */
-    private fun setupOutboundTagInput() {
         val profileRemarks = SettingsManager.getProfileRemarks()
+        val outboundSuggestions = (BUILTIN_OUTBOUND_TAGS.toList() + profileRemarks).distinct()
+        val canUseProcess = SettingsManager.canUseProcessRouting()
 
-        val suggestions = (BUILTIN_OUTBOUND_TAGS.toList() + profileRemarks).distinct()
-        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, suggestions)
-        binding.spOutboundTag.setAdapter(adapter)
-        // threshold=0 means show all suggestions even before typing; still need focus+request
-        binding.spOutboundTag.threshold = 0
+        setContent {
+            AppTheme {
+                val processText = remember {
+                    mutableStateOf(rulesetItem?.process?.joinToString(",") ?: "")
+                }
+                processState = processText
 
-        // Dropdown arrow button shows the full suggestion list
-        binding.btnOutboundTagDropdown.setOnClickListener {
-            binding.spOutboundTag.requestFocus()
-            binding.spOutboundTag.showDropDown()
-        }
-        // Also show on field click when it already has focus
-        binding.spOutboundTag.setOnClickListener {
-            binding.spOutboundTag.showDropDown()
+                RoutingEditScreen(
+                    position = position,
+                    initial = rulesetItem,
+                    outboundSuggestions = outboundSuggestions,
+                    canUseProcess = canUseProcess,
+                    processText = processText,
+                    onPickProcess = { current ->
+                        processPickerLauncher.launch(
+                            AppPickerActivity.createIntent(
+                                context = this,
+                                selectedPackages = current,
+                                title = getString(R.string.routing_settings_process)
+                            )
+                        )
+                    },
+                    onBackClick = { finish() },
+                    onSave = { saveServer(it) },
+                    onDelete = { deleteServer() }
+                )
+            }
         }
     }
 
-    private fun bindingServer(rulesetItem: RulesetItem): Boolean {
-        binding.etRemarks.text = Utils.getEditable(rulesetItem.remarks)
-        binding.chkLocked.isChecked = rulesetItem.locked == true
-        binding.etDomain.text = Utils.getEditable(rulesetItem.domain?.joinToString(","))
-        binding.etIp.text = Utils.getEditable(rulesetItem.ip?.joinToString(","))
-        binding.etProcess.text = Utils.getEditable(rulesetItem.process?.joinToString(","))
-        binding.etPort.text = Utils.getEditable(rulesetItem.port)
-        binding.etProtocol.text = Utils.getEditable(rulesetItem.protocol?.joinToString(","))
-        binding.etNetwork.text = Utils.getEditable(rulesetItem.network)
-        // Set text directly; filter won't fire because we're not using setText(filter=true)
-        binding.spOutboundTag.setText(rulesetItem.outboundTag, false)
-        return true
-    }
-
-    private fun clearServer(): Boolean {
-        binding.etRemarks.text = null
-        binding.spOutboundTag.setText(BUILTIN_OUTBOUND_TAGS.first(), false)
-        return true
-    }
-
-    private fun saveServer(): Boolean {
-        val rulesetItem = SettingsManager.getRoutingRuleset(position) ?: RulesetItem()
-
-        rulesetItem.apply {
-            remarks = binding.etRemarks.text.toString()
-            locked = binding.chkLocked.isChecked
-            domain = binding.etDomain.text.toString().nullIfBlank()?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
-            ip = binding.etIp.text.toString().nullIfBlank()?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
-            process = binding.etProcess.text.toString().nullIfBlank()?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
-            protocol = binding.etProtocol.text.toString().nullIfBlank()?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
-            port = binding.etPort.text.toString().nullIfBlank()
-            network = binding.etNetwork.text.toString().nullIfBlank()
-            outboundTag = binding.spOutboundTag.text.toString().trim().ifEmpty { TAG_PROXY }
-        }
-
+    private fun saveServer(rulesetItem: RulesetItem): Boolean {
         if (rulesetItem.remarks.isNullOrEmpty()) {
             toast(R.string.sub_setting_remarks)
             return false
         }
-
+        if (position < 0 && rulesetItem.id.isEmpty()) {
+            rulesetItem.id = UUID.randomUUID().toString()
+        }
         SettingsManager.saveRoutingRuleset(position, rulesetItem)
         toastSuccess(R.string.toast_success)
         finish()
         return true
     }
 
-
     private fun deleteServer(): Boolean {
         if (position >= 0) {
-            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        SettingsManager.removeRoutingRuleset(position)
-                        launch(Dispatchers.Main) {
-                            finish()
-                        }
-                    }
-                }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    // do nothing
-                }
-                .show()
+            lifecycleScope.launch(Dispatchers.IO) {
+                SettingsManager.removeRoutingRuleset(position)
+                withContext(Dispatchers.Main) { finish() }
+            }
         }
         return true
     }
+}
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.action_server, menu)
-        val delConfig = menu.findItem(R.id.del_config)
+@Composable
+fun RoutingEditScreen(
+    position: Int,
+    initial: RulesetItem?,
+    outboundSuggestions: List<String>,
+    canUseProcess: Boolean,
+    processText: MutableState<String>,
+    onPickProcess: (List<String>) -> Unit,
+    onBackClick: () -> Unit,
+    onSave: (RulesetItem) -> Boolean,
+    onDelete: () -> Unit
+) {
+    var remarks by remember { mutableStateOf(initial?.remarks ?: "") }
+    var locked by remember { mutableStateOf(initial?.locked == true) }
+    var domain by remember { mutableStateOf(initial?.domain?.joinToString(",") ?: "") }
+    var ip by remember { mutableStateOf(initial?.ip?.joinToString(",") ?: "") }
+    var port by remember { mutableStateOf(initial?.port ?: "") }
+    var protocol by remember { mutableStateOf(initial?.protocol?.joinToString(",") ?: "") }
+    var network by remember { mutableStateOf(initial?.network ?: "") }
+    var outboundTag by remember {
+        mutableStateOf(initial?.outboundTag ?: BUILTIN_OUTBOUND_TAGS.first())
+    }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
 
-        if (position < 0) {
-            delConfig?.isVisible = false
+    fun buildRuleset(): RulesetItem {
+        val rulesetItem = SettingsManager.getRoutingRuleset(position) ?: RulesetItem()
+        rulesetItem.apply {
+            this.remarks = remarks
+            this.locked = locked
+            this.domain = domain.nullIfBlank()
+                ?.split(",")
+                ?.map { it.trim() }
+                ?.filter { it.isNotEmpty() }
+                ?.takeIf { it.isNotEmpty() }
+            this.ip = ip.nullIfBlank()
+                ?.split(",")
+                ?.map { it.trim() }
+                ?.filter { it.isNotEmpty() }
+                ?.takeIf { it.isNotEmpty() }
+            this.process = processText.value.nullIfBlank()
+                ?.split(",")
+                ?.map { it.trim() }
+                ?.filter { it.isNotEmpty() }
+                ?.takeIf { it.isNotEmpty() }
+            this.protocol = protocol.nullIfBlank()
+                ?.split(",")
+                ?.map { it.trim() }
+                ?.filter { it.isNotEmpty() }
+                ?.takeIf { it.isNotEmpty() }
+            this.port = port.nullIfBlank()
+            this.network = network.nullIfBlank()
+            this.outboundTag = outboundTag.trim().ifEmpty { TAG_PROXY }
         }
-
-        return super.onCreateOptionsMenu(menu)
+        return rulesetItem
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.del_config -> {
-            deleteServer()
-            true
+    Scaffold(
+        topBar = {
+            AppTopBar(
+                title = stringResource(R.string.routing_settings_rule_title),
+                onBackClick = onBackClick,
+                actions = {
+                    if (position >= 0) {
+                        IconButton(onClick = { showDeleteConfirm = true }) {
+                            Icon(
+                                painterResource(R.drawable.ic_delete_24dp),
+                                contentDescription = stringResource(R.string.menu_item_del_config)
+                            )
+                        }
+                    }
+                    IconButton(onClick = { onSave(buildRuleset()) }) {
+                        Icon(
+                            painterResource(R.drawable.ic_fab_check),
+                            contentDescription = stringResource(R.string.menu_item_save_config)
+                        )
+                    }
+                }
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 8.dp)
+                .padding(bottom = 36.dp)
+        ) {
+            FormTextField(
+                label = stringResource(R.string.sub_setting_remarks),
+                value = remarks,
+                onValueChange = { remarks = it }
+            )
+            SettingsSwitchItem(
+                title = stringResource(R.string.routing_settings_locked),
+                checked = locked,
+                onCheckedChange = { locked = it }
+            )
+            FormTextField(
+                label = stringResource(R.string.routing_settings_domain),
+                placeholder = stringResource(R.string.routing_settings_tips),
+                value = domain,
+                onValueChange = { domain = it }
+            )
+            FormTextField(
+                label = stringResource(R.string.routing_settings_ip),
+                placeholder = stringResource(R.string.routing_settings_tips),
+                value = ip,
+                onValueChange = { ip = it }
+            )
+            FormTextField(
+                label = stringResource(R.string.routing_settings_process),
+                placeholder = stringResource(R.string.routing_settings_tips),
+                value = processText.value,
+                onValueChange = { processText.value = it },
+                enabled = canUseProcess
+            )
+            if (canUseProcess) {
+                TextButton(
+                    onClick = {
+                        val current = processText.value
+                            .split(",")
+                            .map { it.trim() }
+                            .filter { it.isNotEmpty() }
+                            .distinct()
+                        onPickProcess(current)
+                    },
+                    modifier = Modifier.padding(start = 16.dp)
+                ) {
+                    Icon(
+                        painterResource(R.drawable.ic_per_apps_24dp),
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.routing_settings_process))
+                }
+            }
+            FormTextField(
+                label = stringResource(R.string.routing_settings_port),
+                value = port,
+                onValueChange = { port = it }
+            )
+            FormTextField(
+                label = stringResource(R.string.routing_settings_protocol),
+                placeholder = stringResource(R.string.routing_settings_protocol_tip),
+                value = protocol,
+                onValueChange = { protocol = it }
+            )
+            FormTextField(
+                label = stringResource(R.string.routing_settings_network),
+                placeholder = stringResource(R.string.routing_settings_network_tip),
+                value = network,
+                onValueChange = { network = it }
+            )
+            FormDropdownField(
+                label = stringResource(R.string.routing_settings_outbound_tag),
+                value = outboundTag,
+                options = outboundSuggestions,
+                onValueChange = { outboundTag = it },
+                editable = true
+            )
         }
-
-        R.id.save_config -> {
-            saveServer()
-            true
-        }
-
-        else -> super.onOptionsItemSelected(item)
     }
 
+    if (showDeleteConfirm) {
+        ConfirmDialog(
+            message = stringResource(R.string.del_config_comfirm),
+            confirmText = stringResource(android.R.string.ok),
+            dismissText = stringResource(android.R.string.cancel),
+            onConfirm = onDelete,
+            onDismiss = { showDeleteConfirm = false }
+        )
+    }
 }

@@ -1,20 +1,23 @@
 package com.v2ray.ang.ui
 
+import android.content.Context
 import android.os.Bundle
-import com.v2ray.ang.R
+import androidx.activity.ComponentActivity
 import com.v2ray.ang.core.CoreServiceManager
+import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.util.MyContextWrapper
 
-class ScStartActivity : BaseActivity() {
+class ScStartActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         moveTaskToBack(true)
-
-        setContentView(R.layout.activity_none)
-
         if (!CoreServiceManager.isRunning()) {
             CoreServiceManager.startVServiceFromToggle(this)
         }
         finish()
     }
-}
 
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(MyContextWrapper.wrap(newBase ?: return, SettingsManager.getLocale()))
+    }
+}
