@@ -15,15 +15,16 @@ import com.v2ray.ang.R
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.dto.OutboundTrafficStat
 import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
+import com.v2ray.ang.root.RootManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.service.CoreProxyOnlyService
+import com.v2ray.ang.service.CoreRootService
 import com.v2ray.ang.service.CoreVpnService
 import com.v2ray.ang.service.DialerNativeService
 import com.v2ray.ang.service.DialerWebviewService
@@ -172,8 +173,16 @@ object CoreServiceManager {
             context.toast(R.string.toast_services_start)
         }
 
-        val isVpnMode = SettingsManager.isVpnMode()
-        val intent = if (isVpnMode) {
+        val isRootMode = SettingsManager.isRootMode()
+        if (isRootMode && !RootManager.isRootAvailable()) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: root mode requires root but none available")
+            error(context.getString(R.string.toast_root_required))
+        }
+
+        val intent = if (isRootMode) {
+            LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting Root service")
+            Intent(context.applicationContext, CoreRootService::class.java)
+        } else if (SettingsManager.isVpnMode()) {
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting VPN service")
             Intent(context.applicationContext, CoreVpnService::class.java)
         } else {

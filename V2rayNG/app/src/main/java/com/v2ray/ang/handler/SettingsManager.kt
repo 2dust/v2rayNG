@@ -488,6 +488,13 @@ object SettingsManager {
     }
 
     /**
+     * Check if a root (system-wide) run mode is selected.
+     */
+    fun isRootMode(): Boolean {
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_MODE_ENABLE, false)
+    }
+
+    /**
      *  Check if process routing can be used.
      */
     fun canUseProcessRouting(): Boolean {

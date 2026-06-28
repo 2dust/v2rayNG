@@ -314,6 +314,10 @@
             android:summary="@string/summary_pref_ip_api_url"
             android:title="@string/title_pref_ip_api_url" />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_mode_settings">
+
         <ListPreference
             android:defaultValue="VPN"
             android:entries="@array/mode_entries"
@@ -321,6 +325,19 @@
             android:key="pref_mode"
             android:summary="%s"
             android:title="@string/title_mode" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_root_mode_enabled"
+            android:summary="@string/summary_root_mode_enabled"
+            android:title="@string/title_root_mode_enabled" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_root_lan_sharing"
+            android:summary="@string/summary_root_lan_sharing"
+            android:title="@string/title_root_lan_sharing" />
+
 
     </PreferenceCategory>
 
