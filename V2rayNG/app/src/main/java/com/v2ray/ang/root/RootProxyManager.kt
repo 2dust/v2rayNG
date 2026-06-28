@@ -397,7 +397,7 @@ object RootProxyManager {
                 appendLine("ip6tables -t mangle -A $v6pre ! -i $TUN -p udp --dport 53 -j MARK --set-xmark $MARK")
                 appendLine("ip6tables -t mangle -A $v6pre ! -i $TUN -p tcp --dport 53 -j MARK --set-xmark $MARK")
                 bypassCidrsV6.forEach { appendLine("ip6tables -t mangle -A $v6pre ! -i $TUN -d $it -j RETURN") }
-                appendLine("ip6tables -t mangle -A $v6pre ! -i $TUN -m addrtype ! --src-type LOCAL -j MARK --set-xmark $MARK")
+                appendLine("ip6tables -t mangle -A $v6pre ! -i $TUN -j MARK --set-xmark $MARK")
                 appendLine("ip6tables -t mangle -D PREROUTING -j $v6pre 2>/dev/null || true")
                 appendLine("ip6tables -t mangle -A PREROUTING -j $v6pre")
                 // fail closed: any forwarded v6 that wasn't marked into the tun (e.g. the
