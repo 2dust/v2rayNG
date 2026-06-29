@@ -167,7 +167,6 @@ dependencies {
 
     // UI Libraries
     implementation(libs.material)
-    implementation(libs.editorkit)
     implementation(libs.flexbox)
 
     // Data and Storage Libraries
@@ -178,10 +177,6 @@ dependencies {
     // Reactive and Utility Libraries
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
-
-    // Language and Processing Libraries
-    implementation(libs.language.base)
-    implementation(libs.language.json)
 
     // QR Code: CameraX + ZXing
     implementation(libs.camerax.core)

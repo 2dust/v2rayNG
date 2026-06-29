@@ -1,16 +1,43 @@
 package com.v2ray.ang.ui
 
+import android.content.Context
 import android.os.Bundle
-import android.text.TextUtils
-import android.view.Menu
-import android.view.MenuItem
-import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.v2ray.ang.AppConfig
+import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
-import com.v2ray.ang.contracts.BaseAdapterListener
-import com.v2ray.ang.databinding.ActivityServerProxyChainBinding
+import com.v2ray.ang.compose.AppTheme
+import com.v2ray.ang.compose.AppTopBar
+import com.v2ray.ang.compose.ConfirmDialog
+import com.v2ray.ang.compose.FormDropdownField
+import com.v2ray.ang.compose.FormTextField
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
@@ -19,87 +46,57 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
-import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.MyContextWrapper
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
-class ServerProxyChainActivity : BaseActivity() {
-    private val binding by lazy { ActivityServerProxyChainBinding.inflate(layoutInflater) }
+class ServerProxyChainActivity : ComponentActivity() {
     private val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
     private val isRunning by lazy {
         intent.getBooleanExtra("isRunning", false)
                 && editGuid.isNotEmpty()
                 && editGuid == MmkvManager.getSelectServer()
     }
-    private val subscriptionId by lazy {
-        intent.getStringExtra("subscriptionId")
-    }
-    private lateinit var memberAdapter: ServerProxyChainMemberAdapter
-
-    private var allRemarks: List<String> = emptyList()
+    private val subscriptionId by lazy { intent.getStringExtra("subscriptionId") }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = EConfigType.PROXYCHAIN.toString())
+        enableEdgeToEdge()
 
-        loadAvailableRemarks()
-        setupRecycler()
-        binding.fabAddProxyChainMember.setOnClickListener {
-            addMemberRow()
-        }
-
+        val allRemarks = SettingsManager.getProfileRemarks(
+            excludeConfigTypes = setOf(EConfigType.CUSTOM, EConfigType.POLICYGROUP, EConfigType.PROXYCHAIN)
+        )
         val config = MmkvManager.decodeServerConfig(editGuid)
-        if (config != null) {
-            bindingServer(config)
-        } else {
-            clearServer()
+        val initialRemarks = config?.remarks ?: ""
+        val initialMembers = config?.proxyChainProfiles?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: listOf("", "")
+
+        setContent {
+            AppTheme {
+                ProxyChainScreen(
+                    editGuid = editGuid,
+                    isRunning = isRunning,
+                    initialRemarks = initialRemarks,
+                    initialMembers = initialMembers,
+                    allRemarks = allRemarks,
+                    onBackClick = { finish() },
+                    onSave = { remarks, members -> saveServer(remarks, members) },
+                    onDelete = { deleteServer() }
+                )
+            }
         }
     }
 
-    private fun loadAvailableRemarks() {
-        allRemarks = SettingsManager.getProfileRemarks(
-            excludeConfigTypes = setOf(
-                EConfigType.CUSTOM,
-                EConfigType.POLICYGROUP,
-                EConfigType.PROXYCHAIN,
-            )
-        )
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(MyContextWrapper.wrap(newBase, SettingsManager.getLocale()))
     }
 
-    private fun setupRecycler() {
-        memberAdapter = ServerProxyChainMemberAdapter(
-            members = mutableListOf(),
-            suggestions = allRemarks,
-            adapterListener = ActivityAdapterListener()
-        )
-        binding.recyclerProxyChainMembers.layoutManager = LinearLayoutManager(this)
-        binding.recyclerProxyChainMembers.adapter = memberAdapter
-        ItemTouchHelper(SimpleItemTouchHelperCallback(memberAdapter)).attachToRecyclerView(binding.recyclerProxyChainMembers)
-    }
-
-    private fun bindingServer(config: ProfileItem): Boolean {
-        binding.etRemarks.text = Utils.getEditable(config.remarks)
-        val rows = parseChainMembers(config.proxyChainProfiles)
-        memberAdapter.replaceAll(rows)
-        if (rows.isEmpty()) {
-            memberAdapter.addRow()
-        }
-        return true
-    }
-
-    private fun clearServer(): Boolean {
-        binding.etRemarks.text = null
-        memberAdapter.replaceAll(listOf("", ""))
-        return true
-    }
-
-    private fun saveServer(): Boolean {
-        if (TextUtils.isEmpty(binding.etRemarks.text.toString())) {
+    private fun saveServer(remarks: String, members: List<String>): Boolean {
+        if (remarks.isBlank()) {
             toast(R.string.server_lab_remarks)
             return false
         }
-
-        val chainMembers = memberAdapter.getMembers().map { it.trim() }.filter { it.isNotEmpty() }
-        if (chainMembers.size != memberAdapter.getMembers().size) {
+        val chainMembers = members.map { it.trim() }.filter { it.isNotEmpty() }
+        if (chainMembers.size != members.size) {
             toast(R.string.server_proxy_chain_members_unselected)
             return false
         }
@@ -107,7 +104,6 @@ class ServerProxyChainActivity : BaseActivity() {
             toast(R.string.server_proxy_chain_members_insufficient)
             return false
         }
-
         val invalidMembers = chainMembers.filter { member ->
             val profile = SettingsManager.getServerViaRemarks(member)
             profile == null || profile.configType.isComplexType()
@@ -116,102 +112,156 @@ class ServerProxyChainActivity : BaseActivity() {
             toast(getString(R.string.server_proxy_chain_members_invalid, invalidMembers.joinToString(", ")))
             return false
         }
-
         val config = MmkvManager.decodeServerConfig(editGuid) ?: ProfileItem.create(EConfigType.PROXYCHAIN)
-        config.remarks = binding.etRemarks.text.toString().trim()
+        config.remarks = remarks.trim()
         config.proxyChainProfiles = chainMembers.joinToString(",")
         config.description = chainMembers.joinToString(" -> ")
-
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
-
         MmkvManager.encodeServerConfig(editGuid, config)
-        if (isRunning) {
-            SettingsChangeManager.makeRestartService()
-        }
+        if (isRunning) SettingsChangeManager.makeRestartService()
         toastSuccess(R.string.toast_success)
         finish()
         return true
     }
 
     private fun deleteServer(): Boolean {
-        if (editGuid.isNotEmpty()) {
-            if (editGuid != MmkvManager.getSelectServer()) {
-                if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE)) {
-                    AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
-                        .setPositiveButton(android.R.string.ok) { _, _ ->
-                            MmkvManager.removeServer(editGuid)
-                            finish()
-                        }
-                        .setNegativeButton(android.R.string.cancel) { _, _ ->
-                            // do nothing
-                        }
-                        .show()
-                } else {
-                    MmkvManager.removeServer(editGuid)
-                    finish()
-                }
-            } else {
-                toast(R.string.toast_action_not_allowed)
-            }
+        if (editGuid.isEmpty()) return false
+        if (editGuid == MmkvManager.getSelectServer()) {
+            toast(R.string.toast_action_not_allowed)
+            return false
         }
+        MmkvManager.removeServer(editGuid)
+        finish()
         return true
-    }
-
-    private fun addMemberRow() {
-        if (allRemarks.isEmpty()) {
-            toast(R.string.toast_none_data)
-            return
-        }
-        memberAdapter.addRow()
-    }
-
-    private fun parseChainMembers(raw: String?): List<String> {
-        return raw.orEmpty()
-            .split(",")
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-    }
-
-    private inner class ActivityAdapterListener : BaseAdapterListener {
-        override fun onEdit(guid: String, position: Int) {
-            // Row selection is handled directly by AutoCompleteTextView in the adapter.
-        }
-
-        override fun onRemove(guid: String, position: Int) {
-            memberAdapter.removeRow(position)
-        }
-
-        override fun onShare(url: String) {
-        }
-
-        override fun onRefreshData() {
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.action_server, menu)
-
-        val delButton = menu.findItem(R.id.del_config)
-        delButton?.isVisible = editGuid.isNotEmpty() && !isRunning
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.del_config -> {
-            deleteServer()
-            true
-        }
-
-        R.id.save_config -> {
-            saveServer()
-            true
-        }
-
-        else -> super.onOptionsItemSelected(item)
     }
 }
 
+@Composable
+fun ProxyChainScreen(
+    editGuid: String,
+    isRunning: Boolean,
+    initialRemarks: String,
+    initialMembers: List<String>,
+    allRemarks: List<String>,
+    onBackClick: () -> Unit,
+    onSave: (String, List<String>) -> Boolean,
+    onDelete: () -> Unit
+) {
+    var remarks by remember { mutableStateOf(initialRemarks) }
+    var members by remember { mutableStateOf(initialMembers.toMutableList()) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
+    val showDelete = editGuid.isNotEmpty() && !isRunning
 
+    val lazyListState = rememberLazyListState()
+    val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        val fromIdx = from.index - 1
+        val toIdx = to.index - 1
+        if (fromIdx in members.indices && toIdx in members.indices) {
+            members = members.toMutableList().apply { add(toIdx, removeAt(fromIdx)) }
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            AppTopBar(
+                title = EConfigType.PROXYCHAIN.toString(),
+                onBackClick = onBackClick,
+                actions = {
+                    if (showDelete) {
+                        IconButton(onClick = { showDeleteConfirm = true }) {
+                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.menu_item_del_config))
+                        }
+                    }
+                    IconButton(onClick = { onSave(remarks, members) }) {
+                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.menu_item_save_config))
+                    }
+                }
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { members = (members + "").toMutableList() },
+                modifier = Modifier.offset(y = -20.dp)
+            ) {
+                Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = "Add member")
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
+        LazyColumn(
+            state = lazyListState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            item(key = "remarks_field") {
+                FormTextField(
+                    label = stringResource(R.string.server_lab_remarks),
+                    value = remarks,
+                    onValueChange = { remarks = it }
+                )
+            }
+
+            item {
+                Text(
+                    text = stringResource(R.string.server_proxy_chain_members),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
+                )
+            }
+
+            itemsIndexed(items = members, key = { idx, _ -> "member_$idx" }) { index, member ->
+                ReorderableItem(reorderableState, key = "member_$index") { isDragging ->
+                    val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
+                    Surface(shadowElevation = elevation) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 4.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "${index + 1}",
+                                modifier = Modifier
+                                    .padding(start = 16.dp)
+                                    .width(10.dp)
+                            )
+                            FormDropdownField(
+                                label = stringResource(R.string.server_lab_remarks),
+                                placeholder = stringResource(R.string.server_proxy_chain_member_unselected),
+                                value = member,
+                                options = allRemarks,
+                                onValueChange = { newVal ->
+                                    members = members.toMutableList().also { it[index] = newVal }
+                                },
+                                editable = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                            IconButton(onClick = {
+                                members = members.toMutableList().also { it.removeAt(index) }
+                            }) {
+                                Icon(
+                                    painterResource(R.drawable.ic_delete_24dp),
+                                    contentDescription = "Remove"
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (showDeleteConfirm) {
+        ConfirmDialog(
+            message = stringResource(R.string.del_config_comfirm),
+            confirmText = stringResource(android.R.string.ok),
+            dismissText = stringResource(android.R.string.cancel),
+            onConfirm = { showDeleteConfirm = false; onDelete() },
+            onDismiss = { showDeleteConfirm = false }
+        )
+    }
+}
