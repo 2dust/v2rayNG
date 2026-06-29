@@ -35,11 +35,18 @@ class RealPingWorkerService(
     private val scope = CoroutineScope(job + dispatcher + CoroutineName("RealPingBatchWorker"))
 
     private val runningCount = AtomicInteger(0)
-    private val totalCount = AtomicInteger(0)
+    private val remainingCount = AtomicInteger(0)
+    private val totalTaskCount = AtomicInteger(0)
 
     fun start() {
+        totalTaskCount.set(guids.size)
+        remainingCount.set(guids.size)
+
+        if (guids.isNotEmpty()) {
+            onEvent(RealPingEvent.Progress("${remainingCount.get()} / ${totalTaskCount.get()}"))
+        }
+
         val jobs = guids.map { guid ->
-            totalCount.incrementAndGet()
             scope.launch {
                 runningCount.incrementAndGet()
                 try {
@@ -48,9 +55,9 @@ class RealPingWorkerService(
                 } catch (_: Throwable) {
                     // ignore
                 } finally {
-                    val count = totalCount.decrementAndGet()
-                    val left = runningCount.decrementAndGet()
-                    onEvent(RealPingEvent.Progress("$left / $count"))
+                    runningCount.decrementAndGet()
+                    val remaining = remainingCount.decrementAndGet().coerceAtLeast(0)
+                    onEvent(RealPingEvent.Progress("$remaining / ${totalTaskCount.get()}"))
                 }
             }
         }
