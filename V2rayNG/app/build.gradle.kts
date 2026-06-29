@@ -124,7 +124,6 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true
         buildConfig = true
         compose = true
     }
@@ -143,14 +142,6 @@ dependencies {
 
     // AndroidX Core Libraries
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.preference.ktx)
-    implementation(libs.recyclerview)
-    implementation(libs.androidx.swiperefreshlayout)
-    implementation(libs.androidx.viewpager2)
-    implementation(libs.androidx.fragment)
 
     // Compose Libraries
     implementation(platform(libs.androidx.compose.bom))
@@ -164,10 +155,6 @@ dependencies {
     implementation(libs.lifecycle.runtime.compose)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
-
-    // UI Libraries
-    implementation(libs.material)
-    implementation(libs.flexbox)
 
     // Data and Storage Libraries
     implementation(libs.mmkv.static)
@@ -187,7 +174,6 @@ dependencies {
 
     // AndroidX Lifecycle and Architecture Components
     implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.runtime.ktx)
 
     // Background Task Libraries

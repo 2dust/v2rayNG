@@ -138,7 +138,7 @@ fun SubEditScreen(
     var nextProfile by remember { mutableStateOf(initial.nextProfile ?: "") }
 
     var showDeleteConfirm by remember { mutableStateOf(false) }
-    val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, true)
+    val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
 
     fun buildSubItem(): SubscriptionItem? {
         val subItem = MmkvManager.decodeSubscription(editSubId) ?: SubscriptionItem()

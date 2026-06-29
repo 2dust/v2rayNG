@@ -545,7 +545,7 @@ fun MainScreen(
         MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
     }
     val confirmRemove = remember {
-        MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, true)
+        MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
     }
 
     val initialPage = remember(groups) {

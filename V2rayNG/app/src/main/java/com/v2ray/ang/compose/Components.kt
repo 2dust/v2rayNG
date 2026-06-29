@@ -477,7 +477,7 @@ fun FormDropdownField(
             label = { Text(label) },
             placeholder = { if (placeholder != null) Text(placeholder) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = TextFieldDefaults.colors(cursorColor = colorFabActive), // ✅ 添加光标颜色
+            colors = TextFieldDefaults.colors(cursorColor = colorFabActive),
             modifier = Modifier
                 .menuAnchor(
                     type = if (editable) ExposedDropdownMenuAnchorType.PrimaryEditable
@@ -587,7 +587,7 @@ fun InputDialog(
                         singleLine = false,
                         maxLines = 5,
                         visualTransformation = field.visualTransformation,
-                        colors = TextFieldDefaults.colors(cursorColor = colorFabActive), // ✅ 添加光标颜色
+                        colors = TextFieldDefaults.colors(cursorColor = colorFabActive),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

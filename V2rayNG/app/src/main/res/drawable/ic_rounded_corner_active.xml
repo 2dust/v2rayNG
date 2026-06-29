@@ -6,5 +6,5 @@
         android:left="0dp"
         android:right="0dp"
         android:top="0dp" />
-    <solid android:color="@color/color_fab_active" />
+    <solid android:color="#f97910" />
 </shape>
