@@ -289,6 +289,12 @@
     <string name="summary_pref_use_hev_tunnel">Если включено, TUN будет использовать hev-socks5-tunnel; иначе будет использован xray-core</string>
     <string name="title_pref_hev_tunnel_loglevel">Подробность журнала HevTun</string>
     <string name="title_pref_hev_tunnel_rw_timeout">Ожидание чтения/записи HevTun (секунд, по умолчанию TCP,UDP 300,60)</string>
+    <string name="title_mode_settings">Настройки режима</string>
+    <string name="title_root_mode_enabled">Использовать root-режим</string>
+    <string name="summary_root_mode_enabled">Низкоуровневое прозрачное проксирование с помощью привилегий root. Этот режим обходит стандартный VPN системы Android, чтобы напрямую управлять всем сетевым трафиком. После включения первоначальный обычный режим, маршрутизация отдельных приложений и связанные с ними настройки VPN станут полностью недействительными.</string>
+    <string name="toast_root_required">Для этой функции требуется доступ с правами root</string>
+    <string name="title_root_lan_sharing">Совместное использование LAN/точки доступа (root)</string>
+    <string name="summary_root_lan_sharing">Маршрутизация точек доступа Wi-Fi и устройств, подключённых к USB, через VPN</string>
 
     <string name="title_logcat">Журнал</string>
     <string name="logcat_copy">Копировать</string>
