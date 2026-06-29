@@ -413,6 +413,8 @@
     <string name="title_webdav_user">Username</string>
     <string name="title_webdav_pass">Password</string>
     <string name="title_webdav_remote_path">Remote directory (optional)</string>
+    <string name="subscription_request_headers_invalid">Invalid JSON format</string>
+    <string name="subscription_request_headers">Request Headers (JSON format)</string>
 
     <string-array name="share_method">
         <item>QRcode</item>

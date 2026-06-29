@@ -21,6 +21,10 @@ import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.JsonUtil
+import android.util.JsonReader
+import android.util.JsonToken
+import java.io.StringReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -54,6 +58,7 @@ class SubEditActivity : BaseActivity() {
         binding.etRemarks.text = Utils.getEditable(subItem.remarks)
         binding.etUrl.text = Utils.getEditable(subItem.url)
         binding.etUserAgent.text = Utils.getEditable(subItem.userAgent)
+        binding.etRequestHeaders.setText(subItem.requestHeaders)
         binding.etFilter.text = Utils.getEditable(subItem.filter)
         binding.chkEnable.isChecked = subItem.enabled
         binding.autoUpdateCheck.isChecked = subItem.autoUpdate
@@ -75,6 +80,8 @@ class SubEditActivity : BaseActivity() {
         binding.etUpdateInterval.text = null
         binding.etPreProfile.text = null
         binding.etNextProfile.text = null
+        binding.etRequestHeaders.setText(null)
+        binding.etRequestHeaders.error = null
         return true
     }
 
@@ -106,6 +113,51 @@ class SubEditActivity : BaseActivity() {
         }
         input.setOnClickListener {
             input.showDropDown()
+        }
+    }
+
+    /**
+     * validate custom request headers JSON
+     */
+    private fun isValidRequestHeadersJson(headersJson: String): Boolean {
+        return try {
+            JsonReader(StringReader(headersJson)).use { reader ->
+                reader.isLenient = false
+
+                reader.beginObject()
+
+                while (reader.hasNext()) {
+                    val name = reader.nextName().trim()
+
+                    if (name.isBlank()) {
+                        return false
+                    }
+
+                    if (name.contains(":") || name.any { it.code <= 32 || it.code >= 127 }) {
+                        return false
+                    }
+
+                    if (reader.peek() != JsonToken.STRING) {
+                        return false
+                    }
+
+                    val value = reader.nextString()
+
+                    if (value.isBlank()) {
+                        return false
+                    }
+
+                    if (value.contains('\r') || value.contains('\n')) {
+                        return false
+                    }
+                }
+
+                reader.endObject()
+
+                reader.peek() == JsonToken.END_DOCUMENT
+            }
+        } catch (_: Exception) {
+            false
         }
     }
 
@@ -145,6 +197,20 @@ class SubEditActivity : BaseActivity() {
         subItem.prevProfile = binding.etPreProfile.text.toString()
         subItem.nextProfile = binding.etNextProfile.text.toString()
         subItem.allowInsecureUrl = binding.allowInsecureUrl.isChecked
+
+        val requestHeaders = binding.etRequestHeaders.text.toString().trim()
+        if (requestHeaders.isNotEmpty()) {
+            if (!isValidRequestHeadersJson(requestHeaders)) {
+                binding.etRequestHeaders.error = getString(R.string.subscription_request_headers_invalid)
+                return false
+            }
+
+            binding.etRequestHeaders.error = null
+            subItem.requestHeaders = requestHeaders
+        } else {
+            binding.etRequestHeaders.error = null
+            subItem.requestHeaders = null
+        }
 
         if (TextUtils.isEmpty(subItem.remarks)) {
             toast(R.string.sub_setting_remarks)

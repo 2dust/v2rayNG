@@ -18,6 +18,7 @@ import java.net.Proxy
 import java.net.URI
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import org.json.JSONObject
 
 object HttpUtil {
 
@@ -163,6 +164,23 @@ object HttpUtil {
                 .header("Connection", "close")
 
             applyEmbeddedBasicAuthHeader(currentUrl, requestBuilder)
+
+            request.requestHeaders?.takeIf { it.isNotBlank() }?.let { headers ->
+                try {
+                    val jsonObject = JSONObject(headers)
+                    val keys = jsonObject.keys()
+
+                    while (keys.hasNext()) {
+                        val key = keys.next()
+                        val value = jsonObject.opt(key)
+
+                        if (value != null && value != JSONObject.NULL) {
+                            requestBuilder.header(key, value.toString())
+                        }
+                    }
+                } catch (_: Exception) {
+                }
+            }
 
             if (request.httpPort != 0 && !request.proxyUsername.isNullOrBlank() && !request.proxyPassword.isNullOrBlank()) {
                 requestBuilder.header("Proxy-Authorization", Credentials.basic(request.proxyUsername, request.proxyPassword))
