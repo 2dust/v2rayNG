@@ -1,5 +1,10 @@
 package com.v2ray.ang.handler
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
@@ -719,6 +724,54 @@ object MmkvManager {
     fun decodeWebDavConfig(): WebDavConfig? {
         val json = mainStorage.decodeString(KEY_WEBDAV_CONFIG) ?: return null
         return JsonUtil.fromJsonSafe(json, WebDavConfig::class.java)
+    }
+
+    //endregion
+
+    //region Compose helpers for Settings
+
+    /**
+     * MMKV-backed String state, auto-persists and notifies on change.
+     */
+    @Composable
+    fun rememberMmkvString(
+        key: String,
+        default: String = ""
+    ): MutableState<String> {
+        val initialValue = remember { decodeSettingsString(key, default) ?: default }
+        val state = remember { mutableStateOf(initialValue) }
+        val prevValue = remember { mutableStateOf(initialValue) }
+
+        LaunchedEffect(state.value) {
+            if (state.value != prevValue.value) {
+                prevValue.value = state.value
+                encodeSettings(key, state.value)
+                SettingsChangeManager.notifySettingChanged(key)
+            }
+        }
+        return state
+    }
+
+    /**
+     * MMKV-backed Boolean state, auto-persists and notifies on change.
+     */
+    @Composable
+    fun rememberMmkvBool(
+        key: String,
+        default: Boolean = false
+    ): MutableState<Boolean> {
+        val initialValue = remember { decodeSettingsBool(key, default) }
+        val state = remember { mutableStateOf(initialValue) }
+        val prevValue = remember { mutableStateOf(initialValue) }
+
+        LaunchedEffect(state.value) {
+            if (state.value != prevValue.value) {
+                prevValue.value = state.value
+                encodeSettings(key, state.value)
+                SettingsChangeManager.notifySettingChanged(key)
+            }
+        }
+        return state
     }
 
     //endregion

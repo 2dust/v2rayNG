@@ -6,7 +6,7 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
-//import com.v2ray.ang.compose.ThemeManager
+import com.v2ray.ang.compose.ThemeManager
 import com.v2ray.ang.handler.SettingsManager
 
 class AngApplication : Application() {
@@ -40,9 +40,8 @@ class AngApplication : Application() {
 
         // Ensure critical preference defaults are present in MMKV early
         SettingsManager.initApp(this)
-        SettingsManager.setNightMode()
 
         // Initialize theme state from MMKV
-        //ThemeManager.refresh()
+        ThemeManager.refresh()
     }
 }
