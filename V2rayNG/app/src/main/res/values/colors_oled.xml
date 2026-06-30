@@ -37,12 +37,4 @@
     <color name="oled_theme_shadow">#000000</color>
     <color name="oled_theme_surfaceTint">#D0D0D0</color>
     <color name="oled_theme_scrim">#000000</color>
-
-    <!-- Surface container colors for elevation depth -->
-    <color name="oled_theme_surfaceContainerLowest">#FF000000</color>
-    <color name="oled_theme_surfaceContainerLow">#FF000000</color>
-    <color name="oled_theme_surfaceContainer">#FF0A0A0A</color>
-    <color name="oled_theme_surfaceContainerHigh">#FF141414</color>
-    <color name="oled_theme_surfaceContainerHighest">#FF1E1E1E</color>
-
 </resources>
