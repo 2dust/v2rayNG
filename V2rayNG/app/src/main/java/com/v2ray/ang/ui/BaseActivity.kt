@@ -36,13 +36,19 @@ import com.v2ray.ang.util.Utils
  * - Wrap base context according to user locale settings.
  */
 abstract class BaseActivity : AppCompatActivity() {
+    companion object {
+        private var appliedThemeId: String? = null
+    }
+
     // Progress indicator that sits at the bottom of the toolbar
     private var progressBar: LinearProgressIndicator? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0") == "3") {
+        val themeId = MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0") ?: "0"
+        if (themeId == "3") {
             setTheme(R.style.AppThemeOled)
         }
+        appliedThemeId = themeId
         super.onCreate(savedInstanceState)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -50,6 +56,15 @@ abstract class BaseActivity : AppCompatActivity() {
             WindowCompat.getInsetsController(window, window.decorView).apply {
                 isAppearanceLightStatusBars = true
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val currentThemeId = MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0") ?: "0"
+        if (currentThemeId != appliedThemeId) {
+            appliedThemeId = currentThemeId
+            recreate()
         }
     }
 
