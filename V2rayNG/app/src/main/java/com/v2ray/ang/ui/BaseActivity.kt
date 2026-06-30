@@ -57,8 +57,8 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         val currentThemeId = MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0") ?: "0"
         if (currentThemeId != appliedThemeId) {
             appliedThemeId = currentThemeId
