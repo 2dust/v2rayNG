@@ -108,11 +108,11 @@
         <item name="colorOnSurfaceVariant">@color/oled_theme_onSurfaceVariant</item>
         <item name="colorSurfaceInverse">@color/oled_theme_inverseSurface</item>
         <item name="colorOnSurfaceInverse">@color/oled_theme_inverseOnSurface</item>
-        <item name="colorSurfaceContainer">@color/oled_theme_surface</item>
-        <item name="colorSurfaceContainerHigh">@color/oled_theme_surface</item>
-        <item name="colorSurfaceContainerHighest">@color/oled_theme_surface</item>
-        <item name="colorSurfaceContainerLow">@color/oled_theme_surface</item>
-        <item name="colorSurfaceContainerLowest">@color/oled_theme_surface</item>
+        <item name="colorSurfaceContainerLowest">@color/oled_theme_surfaceContainerLowest</item>
+        <item name="colorSurfaceContainerLow">@color/oled_theme_surfaceContainerLow</item>
+        <item name="colorSurfaceContainer">@color/oled_theme_surfaceContainer</item>
+        <item name="colorSurfaceContainerHigh">@color/oled_theme_surfaceContainerHigh</item>
+        <item name="colorSurfaceContainerHighest">@color/oled_theme_surfaceContainerHighest</item>
 
         <item name="android:colorBackground">@color/oled_theme_background</item>
         <item name="colorOnBackground">@color/oled_theme_onBackground</item>
