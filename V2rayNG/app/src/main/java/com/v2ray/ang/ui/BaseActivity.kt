@@ -36,9 +36,7 @@ import com.v2ray.ang.util.Utils
  * - Wrap base context according to user locale settings.
  */
 abstract class BaseActivity : AppCompatActivity() {
-    companion object {
-        private var appliedThemeId: String? = null
-    }
+    private var appliedThemeId: String? = null
 
     // Progress indicator that sits at the bottom of the toolbar
     private var progressBar: LinearProgressIndicator? = null
