@@ -177,6 +177,7 @@ class SettingsActivity : BaseActivity() {
                     }
 
                     is ListPreference -> {
+                        if (pref.key == AppConfig.PREF_UI_MODE_NIGHT) return@updateSummary
                         pref.summary = pref.entry ?: ""
                         pref.setOnPreferenceChangeListener { p, newValue ->
                             val lp = p as ListPreference
