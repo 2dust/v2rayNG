@@ -2,7 +2,6 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
@@ -76,7 +75,7 @@ class SettingsActivity : BaseActivity() {
                 val lp = p as ListPreference
                 val idx = lp.findIndexOfValue(newValue as? String)
                 lp.summary = (if (idx >= 0) lp.entries[idx] else newValue) as CharSequence?
-                Toast.makeText(context, "Restart to apply", Toast.LENGTH_SHORT).show()
+                activity?.recreate()
                 true
             }
 
