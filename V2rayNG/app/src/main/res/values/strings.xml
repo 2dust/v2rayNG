@@ -448,6 +448,7 @@
         <item>Follow system</item>
         <item>Light</item>
         <item>Dark</item>
+        <item>Oled Black</item>
     </string-array>
 
     <string-array name="preset_rulesets">

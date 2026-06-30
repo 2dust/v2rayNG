@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.CustomDividerItemDecoration
 import com.v2ray.ang.util.MyContextWrapper
@@ -38,6 +40,9 @@ abstract class BaseActivity : AppCompatActivity() {
     private var progressBar: LinearProgressIndicator? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0") == "3") {
+            setTheme(R.style.AppThemeOled)
+        }
         super.onCreate(savedInstanceState)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

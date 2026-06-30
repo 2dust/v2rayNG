@@ -78,4 +78,54 @@
         <item name="colorPrimary">@color/color_fab_active</item>
     </style>
 
+    <style name="AppThemeOled" parent="Theme.Material3.DarkTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <item name="colorPrimary">@color/oled_theme_primary</item>
+        <item name="colorOnPrimary">@color/oled_theme_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/oled_theme_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/oled_theme_onPrimaryContainer</item>
+
+        <item name="colorSecondary">@color/oled_theme_secondary</item>
+        <item name="colorOnSecondary">@color/oled_theme_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/oled_theme_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/oled_theme_onSecondaryContainer</item>
+
+        <item name="colorTertiary">@color/oled_theme_tertiary</item>
+        <item name="colorOnTertiary">@color/oled_theme_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/oled_theme_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/oled_theme_onTertiaryContainer</item>
+
+        <item name="colorError">@color/oled_theme_error</item>
+        <item name="colorOnError">@color/oled_theme_onError</item>
+        <item name="colorErrorContainer">@color/oled_theme_errorContainer</item>
+        <item name="colorOnErrorContainer">@color/oled_theme_onErrorContainer</item>
+
+        <item name="colorSurface">@color/oled_theme_surface</item>
+        <item name="colorOnSurface">@color/oled_theme_onSurface</item>
+        <item name="colorSurfaceVariant">@color/oled_theme_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/oled_theme_onSurfaceVariant</item>
+        <item name="colorSurfaceInverse">@color/oled_theme_inverseSurface</item>
+        <item name="colorOnSurfaceInverse">@color/oled_theme_inverseOnSurface</item>
+        <item name="colorSurfaceContainer">@color/oled_theme_surface</item>
+        <item name="colorSurfaceContainerHigh">@color/oled_theme_surface</item>
+        <item name="colorSurfaceContainerHighest">@color/oled_theme_surface</item>
+        <item name="colorSurfaceContainerLow">@color/oled_theme_surface</item>
+        <item name="colorSurfaceContainerLowest">@color/oled_theme_surface</item>
+
+        <item name="android:colorBackground">@color/oled_theme_background</item>
+        <item name="colorOnBackground">@color/oled_theme_onBackground</item>
+
+        <item name="colorOutline">@color/oled_theme_outline</item>
+        <item name="colorOutlineVariant">@color/oled_theme_outlineVariant</item>
+
+        <item name="colorPrimaryInverse">@color/oled_theme_inversePrimary</item>
+
+        <item name="android:statusBarColor">@color/oled_theme_surface</item>
+        <item name="android:navigationBarColor">@color/oled_theme_surface</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+    </style>
+
 </resources>
