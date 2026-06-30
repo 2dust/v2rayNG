@@ -78,7 +78,7 @@
         <item name="colorPrimary">@color/color_fab_active</item>
     </style>
 
-    <style name="AppThemeOled" parent="Theme.Material3.DarkTheme">
+    <style name="AppThemeOled" parent="AppThemeBase">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
 
