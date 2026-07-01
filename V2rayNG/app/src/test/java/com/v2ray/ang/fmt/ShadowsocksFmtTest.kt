@@ -1,7 +1,7 @@
 package com.v2ray.ang.fmt
 
 import android.util.Base64
-import com.v2ray.ang.util.LogUtil
+import android.util.Log
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.dto.entities.ProfileItem
 import org.junit.After

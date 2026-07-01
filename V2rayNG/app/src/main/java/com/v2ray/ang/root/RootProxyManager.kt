@@ -5,6 +5,9 @@ import android.os.Process
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.root.RootProxyManager.TABLE
+import com.v2ray.ang.root.RootProxyManager.TUN
+import com.v2ray.ang.root.RootProxyManager.teardown
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.PackageUidResolver
 import com.v2ray.ang.util.Utils

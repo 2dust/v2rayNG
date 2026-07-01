@@ -1,6 +1,8 @@
 package com.v2ray.ang.root
 
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.root.RootManager.isRootAvailable
+import com.v2ray.ang.root.RootManager.refresh
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

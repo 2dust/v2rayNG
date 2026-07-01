@@ -1,10 +1,8 @@
 package com.v2ray.ang.fmt
 
-import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.idnHost
-import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.Utils
 import java.net.URI
 

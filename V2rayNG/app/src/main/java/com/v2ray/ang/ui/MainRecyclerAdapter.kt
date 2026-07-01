@@ -1,4 +1,3 @@
-
 package com.v2ray.ang.ui
 
 import android.annotation.SuppressLint

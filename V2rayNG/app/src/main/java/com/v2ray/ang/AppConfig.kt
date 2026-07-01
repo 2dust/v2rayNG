@@ -208,6 +208,7 @@ object AppConfig {
     const val ROOT_TUN_NAME = "v2raytun0"
     const val ROOT_TUN_ADDR_V4 = "198.18.0.1/15"
     const val ROOT_TUN_ADDR_V6 = "fdfe:dcba:9876::1/64"
+
     // hev-socks5-tunnel run as a standalone root binary (reuses the same project already
     // bundled for the VPN hev path; distinct filename from the JNI lib to avoid collision).
     const val ROOT_TUN2SOCKS_BIN = "libhevsockstun.so"
