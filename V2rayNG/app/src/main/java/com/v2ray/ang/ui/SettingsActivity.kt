@@ -71,6 +71,14 @@ class SettingsActivity : BaseActivity() {
 
             initPreferenceSummaries()
 
+            findPreference<ListPreference>(AppConfig.PREF_UI_MODE_NIGHT)?.setOnPreferenceChangeListener { p, newValue ->
+                val lp = p as ListPreference
+                val idx = lp.findIndexOfValue(newValue as? String)
+                lp.summary = (if (idx >= 0) lp.entries[idx] else newValue) as CharSequence?
+                activity?.recreate()
+                true
+            }
+
             localDns?.setOnPreferenceChangeListener { _, any ->
                 updateLocalDns(any as Boolean)
                 true
@@ -169,6 +177,7 @@ class SettingsActivity : BaseActivity() {
                     }
 
                     is ListPreference -> {
+                        if (pref.key == AppConfig.PREF_UI_MODE_NIGHT) return@updateSummary
                         pref.summary = pref.entry ?: ""
                         pref.setOnPreferenceChangeListener { p, newValue ->
                             val lp = p as ListPreference

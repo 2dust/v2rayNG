@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="oled_theme_primary">#D0D0D0</color>
+    <color name="oled_theme_onPrimary">#2A2A2A</color>
+    <color name="oled_theme_primaryContainer">#2A2A2A</color>
+    <color name="oled_theme_onPrimaryContainer">#E0E0E0</color>
+
+    <color name="oled_theme_secondary">#FFB687</color>
+    <color name="oled_theme_onSecondary">#4E2600</color>
+    <color name="oled_theme_secondaryContainer">#6F3800</color>
+    <color name="oled_theme_onSecondaryContainer">#FFE8D6</color>
+
+    <color name="oled_theme_tertiary">#83D6B5</color>
+    <color name="oled_theme_onTertiary">#00382E</color>
+    <color name="oled_theme_tertiaryContainer">#005143</color>
+    <color name="oled_theme_onTertiaryContainer">#A0F2D0</color>
+
+    <color name="oled_theme_error">#FFB4AB</color>
+    <color name="oled_theme_errorContainer">#93000A</color>
+    <color name="oled_theme_onError">#690005</color>
+    <color name="oled_theme_onErrorContainer">#FFDAD6</color>
+
+    <color name="oled_theme_background">#FF000000</color>
+    <color name="oled_theme_onBackground">#E6E1E5</color>
+
+    <color name="oled_theme_surface">#FF000000</color>
+    <color name="oled_theme_onSurface">#E6E1E5</color>
+    <color name="oled_theme_surfaceVariant">#1A1A1A</color>
+    <color name="oled_theme_onSurfaceVariant">#CAC4D0</color>
+    <color name="oled_theme_inverseSurface">#E6E1E5</color>
+    <color name="oled_theme_inverseOnSurface">#1C1B1F</color>
+
+    <color name="oled_theme_outline">#938F99</color>
+    <color name="oled_theme_outlineVariant">#2A2A2A</color>
+
+    <color name="oled_theme_inversePrimary">#000000</color>
+    <color name="oled_theme_shadow">#000000</color>
+    <color name="oled_theme_surfaceTint">#D0D0D0</color>
+    <color name="oled_theme_scrim">#000000</color>
+</resources>
