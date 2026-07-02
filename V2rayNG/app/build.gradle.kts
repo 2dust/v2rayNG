@@ -167,7 +167,6 @@ dependencies {
 
     // UI Libraries
     implementation(libs.material)
-    implementation(libs.toasty)
     implementation(libs.editorkit)
     implementation(libs.flexbox)
 

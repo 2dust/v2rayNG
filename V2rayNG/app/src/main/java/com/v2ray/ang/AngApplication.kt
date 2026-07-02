@@ -43,10 +43,6 @@ class AngApplication : Application() {
         SettingsManager.setNightMode()
 
         // Initialize theme state from MMKV
-        ThemeManager.refresh()
-
-        es.dmoral.toasty.Toasty.Config.getInstance()
-            .setGravity(android.view.Gravity.BOTTOM, 0, 300)
-            .apply()
+        //ThemeManager.refresh()
     }
 }

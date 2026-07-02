@@ -6,10 +6,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import com.v2ray.ang.AngApplication
+import com.v2ray.ang.compose.AppSnackbarManager
+import com.v2ray.ang.compose.ToastType
 import com.v2ray.ang.enums.EConfigType
-import es.dmoral.toasty.Toasty
 import java.io.Serializable
 import java.net.URI
 import java.util.Locale
@@ -17,13 +20,40 @@ import java.util.Locale
 val Context.v2RayApplication: AngApplication?
     get() = applicationContext as? AngApplication
 
+private inline fun runOnMain(crossinline block: () -> Unit) {
+    if (Looper.myLooper() == Looper.getMainLooper()) {
+        block()
+    } else {
+        Handler(Looper.getMainLooper()).post { block() }
+    }
+}
+
+private inline fun Context.dispatchMessage(
+    message: CharSequence,
+    type: ToastType,
+    long: Boolean = false,
+    crossinline fallback: () -> Unit
+) {
+    val handledBySnackbar = AppSnackbarManager.show(
+        message = message,
+        type = type,
+        long = long
+    )
+    if (!handledBySnackbar) {
+        runOnMain { fallback() }
+    }
+}
+
 /**
  * Shows a toast message with the given resource ID.
  *
  * @param message The resource ID of the message to show.
  */
 fun Context.toast(message: Int) {
-    Toasty.normal(this, message).show()
+    val text = getString(message)
+    dispatchMessage(text, ToastType.NORMAL) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+    }
 }
 
 /**
@@ -32,7 +62,9 @@ fun Context.toast(message: Int) {
  * @param message The text of the message to show.
  */
 fun Context.toast(message: CharSequence) {
-    Toasty.normal(this, message).show()
+    dispatchMessage(message, ToastType.NORMAL) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
 }
 
 /**
@@ -41,7 +73,10 @@ fun Context.toast(message: CharSequence) {
  * @param message The resource ID of the message to show.
  */
 fun Context.toastSuccess(message: Int) {
-    Toasty.success(this, message, Toast.LENGTH_SHORT, true).show()
+    val text = getString(message)
+    dispatchMessage(text, ToastType.SUCCESS) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+    }
 }
 
 /**
@@ -50,7 +85,9 @@ fun Context.toastSuccess(message: Int) {
  * @param message The text of the message to show.
  */
 fun Context.toastSuccess(message: CharSequence) {
-    Toasty.success(this, message, Toast.LENGTH_SHORT, true).show()
+    dispatchMessage(message, ToastType.SUCCESS) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
 }
 
 /**
@@ -59,7 +96,10 @@ fun Context.toastSuccess(message: CharSequence) {
  * @param message The resource ID of the message to show.
  */
 fun Context.toastError(message: Int) {
-    Toasty.error(this, message, Toast.LENGTH_SHORT, true).show()
+    val text = getString(message)
+    dispatchMessage(text, ToastType.ERROR) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+    }
 }
 
 /**
@@ -68,7 +108,32 @@ fun Context.toastError(message: Int) {
  * @param message The text of the message to show.
  */
 fun Context.toastError(message: CharSequence) {
-    Toasty.error(this, message, Toast.LENGTH_SHORT, true).show()
+    dispatchMessage(message, ToastType.ERROR) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+}
+
+/**
+ * Shows an info toast message with the given resource ID.
+ *
+ * @param message The resource ID of the message to show.
+ */
+fun Context.toastInfo(message: Int) {
+    val text = getString(message)
+    dispatchMessage(text, ToastType.INFO) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+    }
+}
+
+/**
+ * Shows an info toast message with the given text.
+ *
+ * @param message The text of the message to show.
+ */
+fun Context.toastInfo(message: CharSequence) {
+    dispatchMessage(message, ToastType.INFO) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
 }
 
 const val THRESHOLD = 1000L

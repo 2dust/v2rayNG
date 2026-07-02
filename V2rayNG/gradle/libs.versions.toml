@@ -18,7 +18,6 @@ quickieFoss = "1.14.0"
 kotlinxCoroutinesAndroid = "1.10.2"
 kotlinxCoroutinesCore = "1.10.2"
 swiperefreshlayout = "1.2.0"
-toasty = "1.5.2"
 editorkit = "2.9.0"
 core = "3.5.4"
 workRuntimeKtx = "2.11.1"
@@ -49,7 +48,6 @@ okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 quickie-foss = { module = "com.github.T8RIN.QuickieExtended:quickie-foss", version.ref = "quickieFoss" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
-toasty = { module = "com.github.GrenderG:Toasty", version.ref = "toasty" }
 editorkit = { module = "com.blacksquircle.ui:editorkit", version.ref = "editorkit" }
 language-base = { module = "com.blacksquircle.ui:language-base", version.ref = "editorkit" }
 language-json = { module = "com.blacksquircle.ui:language-json", version.ref = "editorkit" }

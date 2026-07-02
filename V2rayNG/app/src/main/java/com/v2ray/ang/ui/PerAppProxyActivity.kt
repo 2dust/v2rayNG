@@ -1,322 +1,269 @@
 package com.v2ray.ang.ui
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.text.TextUtils
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.lifecycleScope
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
-import com.v2ray.ang.databinding.ActivityBypassListBinding
+import com.v2ray.ang.compose.AppDivider
+import com.v2ray.ang.compose.AppListItem
+import com.v2ray.ang.compose.AppScaffold
+import com.v2ray.ang.compose.AppTopBar
+import com.v2ray.ang.compose.colorFabActive
 import com.v2ray.ang.dto.AppInfo
-import com.v2ray.ang.dto.UrlContentRequest
-import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastInfo
 import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.extension.v2RayApplication
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsChangeManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.util.AppManagerUtil
-import com.v2ray.ang.util.HttpUtil
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.PerAppProxyViewModel
-import es.dmoral.toasty.Toasty
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.text.Collator
 
-class PerAppProxyActivity : BaseActivity() {
-    private val binding by lazy { ActivityBypassListBinding.inflate(layoutInflater) }
+class PerAppProxyActivity : BaseComponentActivity() {
 
-    private var adapter: PerAppProxyAdapter? = null
-    private var appsAll: List<AppInfo>? = null
     private val viewModel: PerAppProxyViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(binding.root)
-        setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.per_app_proxy_settings))
-
-        addCustomDividerToRecyclerView(binding.recyclerView, this, R.drawable.custom_divider)
-
-        initList()
-
-        binding.switchPerAppProxy.setOnCheckedChangeListener { _, isChecked ->
-            MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY, isChecked)
-        }
-        binding.switchPerAppProxy.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY, false)
-
-        binding.switchBypassApps.setOnCheckedChangeListener { _, isChecked ->
-            MmkvManager.encodeSettings(AppConfig.PREF_BYPASS_APPS, isChecked)
-        }
-        binding.switchBypassApps.isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS, false)
-
-        binding.layoutSwitchBypassAppsTips.setOnClickListener {
-            Toasty.info(this, R.string.summary_pref_per_app_proxy, Toast.LENGTH_LONG, true).show()
-        }
+        viewModel.loadApps(this)
     }
 
-    private fun initList() {
-        showLoading()
+    @Composable
+    override fun ScreenContent() {
+        val apps by viewModel.displayedApps.collectAsStateWithLifecycle()
+        val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+        val blacklist by viewModel.blacklist.collectAsStateWithLifecycle()
+        val perAppProxyEnabled by viewModel.perAppProxyEnabled.collectAsStateWithLifecycle()
+        val bypassApps by viewModel.bypassApps.collectAsStateWithLifecycle()
 
-        lifecycleScope.launch {
-            try {
-                val apps = withContext(Dispatchers.IO) {
-                    val appsList = AppManagerUtil.loadNetworkAppList(this@PerAppProxyActivity)
-
-                    val blacklistSet = viewModel.getAll()
-                    if (blacklistSet.isNotEmpty()) {
-                        appsList.forEach { app ->
-                            app.isSelected = if (blacklistSet.contains(app.packageName)) 1 else 0
-                        }
-                        appsList.sortedWith { p1, p2 ->
-                            when {
-                                p1.isSelected > p2.isSelected -> -1
-                                p1.isSelected < p2.isSelected -> 1
-                                p1.isSystemApp > p2.isSystemApp -> 1
-                                p1.isSystemApp < p2.isSystemApp -> -1
-                                p1.appName.lowercase() > p2.appName.lowercase() -> 1
-                                p1.appName.lowercase() < p2.appName.lowercase() -> -1
-                                p1.packageName > p2.packageName -> 1
-                                p1.packageName < p2.packageName -> -1
-                                else -> 0
-                            }
-                        }
-                    } else {
-                        val collator = Collator.getInstance()
-                        appsList.sortedWith(compareBy(collator) { it.appName })
-                    }
-                }
-
-                appsAll = apps
-                adapter = PerAppProxyAdapter(apps, viewModel)
-                binding.recyclerView.adapter = adapter
-
-            } catch (e: Exception) {
-                LogUtil.e(ANG_PACKAGE, "Error loading apps", e)
-            } finally {
-                hideLoading()
-            }
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_bypass_list, menu)
-
-        val searchItem = menu.findItem(R.id.search_view)
-        if (searchItem != null) {
-            val searchView = searchItem.actionView as SearchView
-            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean = false
-
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    filterProxyApp(newText.orEmpty())
-                    return false
-                }
-            })
-        }
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.select_all -> {
-            selectAllApp()
-            allowPerAppProxy()
-            true
-        }
-
-        R.id.invert_selection -> {
-            invertSelection()
-            allowPerAppProxy()
-            true
-        }
-
-        R.id.select_proxy_app -> {
-            selectProxyAppAuto()
-            allowPerAppProxy()
-            true
-        }
-
-        R.id.import_proxy_app -> {
-            importProxyApp()
-            allowPerAppProxy()
-            true
-        }
-
-        R.id.export_proxy_app -> {
-            exportProxyApp()
-            true
-        }
-
-        else -> super.onOptionsItemSelected(item)
-    }
-
-    private fun selectAllApp() {
-        adapter?.let { adapter ->
-            val pkgNames = adapter.apps.map { it.packageName }
-            val allSelected = pkgNames.all { viewModel.contains(it) }
-
-            if (allSelected) {
-                viewModel.removeAll(pkgNames)
-            } else {
-                viewModel.addAll(pkgNames)
-            }
-            refreshData()
-        }
-    }
-
-    private fun invertSelection() {
-        adapter?.let { adapter ->
-            adapter.apps.forEach { app ->
-                viewModel.toggle(app.packageName)
-            }
-            refreshData()
-        }
-    }
-
-    private fun selectProxyAppAuto() {
-        toast(R.string.msg_downloading_content)
-        showLoading()
-
-        val url = AppConfig.ANDROID_PACKAGE_NAME_LIST_URL
-        lifecycleScope.launch(Dispatchers.IO) {
-            var content = HttpUtil.getUrlContent(
-                UrlContentRequest(
-                    url = url,
-                    timeout = 5000
-                )
-            )
-            if (content.isNullOrEmpty()) {
-                val proxyUsername = SettingsManager.getSocksUsername()
-                val proxyPassword = SettingsManager.getSocksPassword()
-                val httpPort = SettingsManager.getHttpPort()
-                content = HttpUtil.getUrlContent(
-                    UrlContentRequest(
-                        url = url,
-                        timeout = 5000,
-                        httpPort = httpPort,
-                        proxyUsername = proxyUsername,
-                        proxyPassword = proxyPassword
-                    )
-                ) ?: ""
-            }
-            launch(Dispatchers.Main) {
-                //LogUtil.i(AppConfig.TAG, content)
-                selectProxyApp(content, true)
+        PerAppProxyScreen(
+            apps = apps,
+            isLoading = isLoading,
+            blacklist = blacklist,
+            perAppProxyEnabled = perAppProxyEnabled,
+            bypassApps = bypassApps,
+            onBackClick = { finish() },
+            onPerAppProxyChanged = { viewModel.setPerAppProxyEnabled(it) },
+            onBypassAppsChanged = { viewModel.setBypassAppsEnabled(it) },
+            onInfoClick = {
+                toastInfo(R.string.summary_pref_per_app_proxy)
+            },
+            onToggleApp = { viewModel.toggle(it) },
+            onSearch = { viewModel.filterApps(it) },
+            onSelectAll = { viewModel.selectAll() },
+            onInvertSelection = { viewModel.invertSelection() },
+            onSelectProxyAuto = { viewModel.selectProxyAppAuto(this) },
+            onImportProxyApp = {
+                val content = Utils.getClipboard(applicationContext)
+                viewModel.importProxyApp(content, this)
+            },
+            onExportProxyApp = {
+                val export = viewModel.exportProxyApp()
+                Utils.setClipboard(applicationContext, export)
                 toastSuccess(R.string.toast_success)
-                hideLoading()
             }
-        }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PerAppProxyScreen(
+    apps: List<AppInfo>,
+    isLoading: Boolean,
+    blacklist: Set<String>,
+    perAppProxyEnabled: Boolean,
+    bypassApps: Boolean,
+    onBackClick: () -> Unit,
+    onPerAppProxyChanged: (Boolean) -> Unit,
+    onBypassAppsChanged: (Boolean) -> Unit,
+    onInfoClick: () -> Unit,
+    onToggleApp: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    onSelectAll: () -> Unit,
+    onInvertSelection: () -> Unit,
+    onSelectProxyAuto: () -> Unit,
+    onImportProxyApp: () -> Unit,
+    onExportProxyApp: () -> Unit
+) {
+    var showSearch by rememberSaveable { mutableStateOf(false) }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var showMenu by remember { mutableStateOf(false) }
+
+    LaunchedEffect(searchQuery) {
+        onSearch(searchQuery)
     }
 
-    private fun importProxyApp() {
-        val content = Utils.getClipboard(applicationContext)
-        if (TextUtils.isEmpty(content)) return
-        selectProxyApp(content, false)
-        toastSuccess(R.string.toast_success)
-    }
-
-    private fun exportProxyApp() {
-        var lst = binding.switchBypassApps.isChecked.toString()
-
-        viewModel.getAll().forEach { pkg ->
-            lst = lst + System.lineSeparator() + pkg
-        }
-        Utils.setClipboard(applicationContext, lst)
-        toastSuccess(R.string.toast_success)
-    }
-
-    private fun allowPerAppProxy() {
-        binding.switchPerAppProxy.isChecked = true
-        SettingsChangeManager.makeRestartService()
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun selectProxyApp(content: String, force: Boolean): Boolean {
-        try {
-            val proxyApps = if (TextUtils.isEmpty(content)) {
-                Utils.readTextFromAssets(v2RayApplication, "proxy_package_name")
-            } else {
-                content
-            }
-            if (TextUtils.isEmpty(proxyApps)) return false
-
-            viewModel.clear()
-
-            if (binding.switchBypassApps.isChecked) {
-                adapter?.let { adapter ->
-                    adapter.apps.forEach { app ->
-                        val packageName = app.packageName
-                        if (!inProxyApps(proxyApps, packageName, force)) {
-                            viewModel.add(packageName)
+    AppScaffold(
+        topBar = {
+            AppTopBar(
+                title = stringResource(R.string.per_app_proxy_settings),
+                onBackClick = onBackClick,
+                isLoading = isLoading,
+                isSearchActive = showSearch,
+                searchQuery = searchQuery,
+                onSearchQueryChange = { query ->
+                    searchQuery = query
+                },
+                onSearchClose = {
+                    searchQuery = ""
+                    showSearch = false
+                },
+                searchPlaceholder = stringResource(R.string.menu_item_search),
+                actions = {
+                    if (!showSearch) {
+                        IconButton(onClick = { showSearch = true }) {
+                            Icon(
+                                painterResource(R.drawable.ic_search_24dp),
+                                contentDescription = stringResource(R.string.menu_item_search)
+                            )
                         }
                     }
-                    refreshData()
-                }
-            } else {
-                adapter?.let { adapter ->
-                    adapter.apps.forEach { app ->
-                        val packageName = app.packageName
-                        if (inProxyApps(proxyApps, packageName, force)) {
-                            viewModel.add(packageName)
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(
+                                painterResource(R.drawable.ic_more_vert_24dp),
+                                contentDescription = null
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false },
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_item_select_all)) },
+                                onClick = { showMenu = false; onSelectAll() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_item_invert_selection)) },
+                                onClick = { showMenu = false; onInvertSelection() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_item_select_proxy_app)) },
+                                onClick = { showMenu = false; onSelectProxyAuto() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_item_import_proxy_app)) },
+                                onClick = { showMenu = false; onImportProxyApp() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_item_export_proxy_app)) },
+                                onClick = { showMenu = false; onExportProxyApp() }
+                            )
                         }
                     }
-                    refreshData()
                 }
-            }
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Error selecting proxy app", e)
-            return false
+            )
         }
-        return true
-    }
-
-    private fun inProxyApps(proxyApps: String, packageName: String, force: Boolean): Boolean {
-        println(packageName)
-        if (force) {
-            if (packageName == "com.google.android.webview") return false
-            if (packageName.startsWith("com.google")) return true
-        }
-
-        return proxyApps.indexOf(packageName) >= 0
-    }
-
-    private fun filterProxyApp(content: String): Boolean {
-        val apps = ArrayList<AppInfo>()
-
-        val key = content.uppercase()
-        if (key.isNotEmpty()) {
-            appsAll?.forEach {
-                if (it.appName.uppercase().indexOf(key) >= 0
-                    || it.packageName.uppercase().indexOf(key) >= 0
+    ) { innerPadding ->
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    apps.add(it)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.per_app_proxy_settings_enable),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Switch(
+                            checked = perAppProxyEnabled,
+                            modifier = Modifier.scale(0.65f),
+                            onCheckedChange = onPerAppProxyChanged,
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                                checkedTrackColor = colorFabActive
+                            )
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.switch_bypass_apps_mode),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Switch(
+                            checked = bypassApps,
+                            modifier = Modifier.scale(0.65f),
+                            onCheckedChange = onBypassAppsChanged,
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                                checkedTrackColor = colorFabActive
+                            )
+                        )
+                    }
+                    IconButton(onClick = onInfoClick) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_about_24dp),
+                            contentDescription = stringResource(R.string.summary_pref_per_app_proxy),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
-        } else {
-            appsAll?.forEach {
-                apps.add(it)
+            AppDivider()
+
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(items = apps, key = { it.packageName }) { app ->
+                    val checked = blacklist.contains(app.packageName)
+                    AppListItem(
+                        appName = app.appName,
+                        packageName = app.packageName,
+                        icon = app.appIcon,
+                        checked = checked,
+                        onCheckedChange = { onToggleApp(app.packageName) }
+                    )
+                    AppDivider()
+                }
             }
         }
-
-        adapter = PerAppProxyAdapter(apps, adapter?.viewModel ?: viewModel)
-        binding.recyclerView.adapter = adapter
-        refreshData()
-        return true
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun refreshData() {
-        adapter?.notifyDataSetChanged()
     }
 }
