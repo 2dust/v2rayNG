@@ -325,6 +325,7 @@
     <string name="title_sort_by_test_results">Sorting by test results</string>
     <string name="title_filter_config">Filter config</string>
     <string name="filter_config_all">All</string>
+    <string name="summary_scan_qrcode">Click screen open the camera scan</string>
     <string name="title_del_duplicate_config_count">Delete %d duplicate configs</string>
     <string name="title_del_config_count">Delete %d configs</string>
     <string name="title_import_config_count">Import %d configs</string>
