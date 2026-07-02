@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     id("com.jaredsburrows.license")
 }
 
@@ -126,6 +127,7 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+        compose = true
     }
 
     packaging {
@@ -150,6 +152,19 @@ dependencies {
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.fragment)
+
+    // Compose Libraries
+    implementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.lifecycle.runtime.compose)
+
+    debugImplementation(libs.androidx.compose.ui.tooling)
 
     // UI Libraries
     implementation(libs.material)
@@ -185,6 +200,9 @@ dependencies {
 
     // Multidex Support
     implementation(libs.multidex)
+
+    // Reorderable list
+    implementation(libs.reorderable)
 
     // Testing Libraries
     testImplementation(libs.junit)
