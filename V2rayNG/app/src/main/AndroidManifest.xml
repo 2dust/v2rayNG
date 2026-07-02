@@ -73,7 +73,7 @@
         <activity
             android:name=".ui.ServerActivity"
             android:exported="false"
-            android:windowSoftInputMode="stateUnchanged" />
+            android:windowSoftInputMode="adjustResize|stateUnchanged" />
         <activity
             android:name=".ui.ServerCustomConfigActivity"
             android:exported="false"
