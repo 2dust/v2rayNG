@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/search_view"
-        android:icon="@drawable/ic_outline_filter_alt_24"
+        android:icon="@drawable/ic_outline_filter_alt_20"
         android:title="@string/menu_item_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
     <item
-        android:icon="@drawable/ic_add_24dp"
+        android:icon="@drawable/ic_add_20dp"
         android:title="@string/menu_item_add_config"
-        app:showAsAction="ifRoom">
+        app:showAsAction="always">
         <menu>
             <item
                 android:id="@+id/import_qrcode"
@@ -67,6 +67,21 @@
         </menu>
     </item>
     <item
+        android:id="@+id/sub_update"
+        android:icon="@drawable/ic_sync_24dp"
+        android:title="@string/title_sub_update"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/sort_by_test_results"
+        android:icon="@drawable/ic_sort_24dp"
+        android:title="@string/title_sort_by_test_results"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/real_ping_all"
+        android:icon="@drawable/ic_timer_24dp"
+        android:title="@string/title_real_ping_all_server"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/service_restart"
         android:title="@string/title_service_restart"
         app:showAsAction="never" />
@@ -91,19 +106,7 @@
         android:title="@string/title_export_all"
         app:showAsAction="never" />
     <item
-        android:id="@+id/real_ping_all"
-        android:title="@string/title_real_ping_all_server"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/sort_by_test_results"
-        android:title="@string/title_sort_by_test_results"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/locate_selected_config"
         android:title="@string/title_locate_selected_config"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/sub_update"
-        android:title="@string/title_sub_update"
         app:showAsAction="never" />
 </menu>
