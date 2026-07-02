@@ -40,9 +40,8 @@ class AngApplication : Application() {
 
         // Ensure critical preference defaults are present in MMKV early
         SettingsManager.initApp(this)
-        SettingsManager.setNightMode()
 
         // Initialize theme state from MMKV
-        //ThemeManager.refresh()
+        ThemeManager.refresh()
     }
 }
