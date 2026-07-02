@@ -1,19 +1,24 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
-import com.v2ray.ang.R
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import com.v2ray.ang.core.CoreServiceManager
 
-class ScStopActivity : BaseActivity() {
+class ScStopActivity : BaseComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        moveTaskToBack(true)
+    }
 
-        setContentView(R.layout.activity_none)
-
-        if (CoreServiceManager.isRunning()) {
-            CoreServiceManager.stopVService(this)
+    @Composable
+    override fun ScreenContent() {
+        LaunchedEffect(Unit) {
+            moveTaskToBack(true)
+            if (CoreServiceManager.isRunning()) {
+                CoreServiceManager.stopVService(this@ScStopActivity)
+            }
+            finish()
         }
-        finish()
     }
 }
