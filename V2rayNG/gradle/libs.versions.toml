@@ -23,7 +23,6 @@ editorkit = "2.9.0"
 core = "3.5.4"
 workRuntimeKtx = "2.11.1"
 lifecycleViewmodelKtx = "2.10.0"
-multidex = "2.0.1"
 mockitoMockitoInline = "5.2.0"
 flexbox = "3.0.0"
 preferenceKtx = "1.2.1"
@@ -60,7 +59,6 @@ work-multiprocess = { module = "androidx.work:work-multiprocess", version.ref = 
 lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleViewmodelKtx" }
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleViewmodelKtx" }
-multidex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 org-mockito-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoMockitoInline" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoMockitoInline" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }

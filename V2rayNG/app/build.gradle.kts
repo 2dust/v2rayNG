@@ -15,7 +15,6 @@ android {
         targetSdk = 37
         versionCode = 736
         versionName = "2.2.6"
-        multiDexEnabled = true
 
         val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')
         splits {
@@ -197,9 +196,6 @@ dependencies {
     // Background Task Libraries
     implementation(libs.work.runtime.ktx)
     implementation(libs.work.multiprocess)
-
-    // Multidex Support
-    implementation(libs.multidex)
 
     // Reorderable list
     implementation(libs.reorderable)
