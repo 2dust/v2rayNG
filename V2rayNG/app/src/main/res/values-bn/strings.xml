@@ -145,6 +145,9 @@
     <string name="switch_bypass_apps_mode">বাইপাস মোড</string>
     <string name="menu_item_select_proxy_app">অটো সিলেক্ট প্রক্সি অ্যাপ</string>
     <string name="msg_downloading_content">বিষয়বস্তু ডাউনলোড হচ্ছে</string>
+    <string name="msg_apply_russia_lite_config">এই geo ফাইলগুলি \"রাশিয়া হোয়াইটলিস্ট (lite)\" রাউটিং এবং \"IPOnDemand\" ডোমেইন কৌশল ব্যবহার করে। এই কনফিগারেশন প্রয়োগ করবেন? পুরনোটি মুছে ফেলা হবে</string>
+    <string name="yes">হ্যাঁ</string>
+    <string name="no">না</string>
     <string name="menu_item_export_proxy_app">ক্লিপবোর্ডে রপ্তানি করুন</string>
     <string name="menu_item_import_proxy_app">ক্লিপবোর্ড থেকে আমদানি করুন</string>
     <string name="per_app_proxy_settings">Per-app settings</string>

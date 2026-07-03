@@ -146,6 +146,9 @@
     <string name="switch_bypass_apps_mode">绕行模式</string>
     <string name="menu_item_select_proxy_app">自动选中需代理应用</string>
     <string name="msg_downloading_content">正在下载内容</string>
+    <string name="msg_apply_russia_lite_config">这些 geo 文件使用\"俄罗斯白名单 (Russia Whitelist lite)\"路由和\"IPOnDemand\"域名策略。是否应用此配置？旧配置将被清除</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
     <string name="menu_item_export_proxy_app">导出至剪贴板</string>
     <string name="menu_item_import_proxy_app">从剪贴板导入</string>
     <string name="per_app_proxy_settings">分应用设置</string>

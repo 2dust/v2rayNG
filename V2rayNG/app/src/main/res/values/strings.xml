@@ -149,6 +149,9 @@
     <string name="switch_bypass_apps_mode">Bypass Mode</string>
     <string name="menu_item_select_proxy_app">Auto select proxy app</string>
     <string name="msg_downloading_content">Downloading content</string>
+    <string name="msg_apply_russia_lite_config">These geo files use the \"Russia Whitelist (lite)\" routing and the \"IPOnDemand\" domain strategy. Apply this configuration? The old one will be erased</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="menu_item_export_proxy_app">Export to Clipboard</string>
     <string name="menu_item_import_proxy_app">Import from Clipboard</string>
     <string name="per_app_proxy_settings">Per-app settings</string>

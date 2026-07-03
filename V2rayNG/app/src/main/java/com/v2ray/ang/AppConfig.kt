@@ -313,10 +313,13 @@ object AppConfig {
         "224.0.0.0/4"
     )
 
+    const val GEO_FILES_SOURCE_RUSSIA_LITE = "golukon/russia-v2ray-rules-lite"
+    const val RUSSIA_LITE_DOMAIN_STRATEGY = "IPOnDemand"
+
     val GEO_FILES_SOURCES = arrayListOf(
         "Loyalsoldier/v2ray-rules-dat",
         "runetfreedom/russia-v2ray-rules-dat",
-        "golukon/russia-v2ray-rules-lite",
+        GEO_FILES_SOURCE_RUSSIA_LITE,
         "Chocolate4U/Iran-v2ray-rules"
     )
 

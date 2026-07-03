@@ -16,6 +16,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.contracts.BaseAdapterListener
 import com.v2ray.ang.databinding.ActivityUserAssetBinding
 import com.v2ray.ang.dto.entities.AssetUrlItem
+import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -169,6 +170,22 @@ class UserAssetActivity : HelperBaseActivity() {
     }
 
     private fun downloadGeoFiles() {
+        if (getGeoFilesSources() == AppConfig.GEO_FILES_SOURCE_RUSSIA_LITE) {
+            AlertDialog.Builder(this)
+                .setMessage(R.string.msg_apply_russia_lite_config)
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    startDownloadGeoFiles(applyRussiaLiteConfig = true)
+                }
+                .setNegativeButton(R.string.no) { _, _ ->
+                    startDownloadGeoFiles(applyRussiaLiteConfig = false)
+                }
+                .show()
+        } else {
+            startDownloadGeoFiles(applyRussiaLiteConfig = false)
+        }
+    }
+
+    private fun startDownloadGeoFiles(applyRussiaLiteConfig: Boolean) {
         refreshData()
         showLoading()
         toast(R.string.msg_downloading_content)
@@ -177,6 +194,10 @@ class UserAssetActivity : HelperBaseActivity() {
         val proxyPassword = SettingsManager.getSocksPassword()
         val httpPort = SettingsManager.getHttpPort()
         lifecycleScope.launch(Dispatchers.IO) {
+            if (applyRussiaLiteConfig) {
+                SettingsManager.resetRoutingRulesetsFromPresets(this@UserAssetActivity, RoutingType.WHITE_RUSSIA_LITE.ordinal)
+                MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, AppConfig.RUSSIA_LITE_DOMAIN_STRATEGY)
+            }
             val result = viewModel.downloadGeoFiles(extDir, httpPort, proxyUsername, proxyPassword)
             withContext(Dispatchers.Main) {
                 if (result.successCount > 0) {

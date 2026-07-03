@@ -145,6 +145,9 @@
     <string name="switch_bypass_apps_mode">هالت دور زیڌن</string>
     <string name="menu_item_select_proxy_app">پسند خوتکار پروکسی برنومه</string>
     <string name="msg_downloading_content">موئتوا هونی دانلود ابۊن</string>
+    <string name="msg_apply_russia_lite_config">اینا فایل‌یا جغرافیایی د مسیریابی \"نومگه اسبؽڌ رۊسیه (lite)\" و استراتژی دامنه \"IPOnDemand\" استفاده ایکنن. اؽ پیکربندی اعمال بوئه؟ پیکربندی کهنه پاک ابۊ</string>
+    <string name="yes">هری</string>
+    <string name="no">نه</string>
     <string name="menu_item_export_proxy_app">و در کشیڌن من کلیپ بورد</string>
     <string name="menu_item_import_proxy_app">و من ٱووردن ز کلیپ بورد</string>
     <string name="per_app_proxy_settings">سامووا ب تفکیک برنومه</string>

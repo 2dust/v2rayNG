@@ -143,6 +143,9 @@
     <string name="switch_bypass_apps_mode">حالت دور زدن</string>
     <string name="menu_item_select_proxy_app">انتخاب خودکار پروکسی برنامه</string>
     <string name="msg_downloading_content">در حال دانلود محتوا</string>
+    <string name="msg_apply_russia_lite_config">این فایل‌های جغرافیایی از مسیریابی \"لیست سفید روسیه (lite)\" و استراتژی دامنه \"IPOnDemand\" استفاده می‌کنند. این پیکربندی اعمال شود؟ پیکربندی قبلی پاک خواهد شد</string>
+    <string name="yes">بله</string>
+    <string name="no">خیر</string>
     <string name="menu_item_export_proxy_app">خروجی گرفتن در کلیپ‌ بورد</string>
     <string name="menu_item_import_proxy_app">وارد کردن از کلیپ‌ بورد</string>
     <string name="per_app_proxy_settings">تنظیمات به تفکیک برنامه</string>

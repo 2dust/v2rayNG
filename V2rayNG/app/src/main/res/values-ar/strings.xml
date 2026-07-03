@@ -146,6 +146,9 @@
     <string name="switch_bypass_apps_mode">وضع التجاوز</string>
     <string name="menu_item_select_proxy_app">تحديد تطبيق الوكيل تلقائيًا</string>
     <string name="msg_downloading_content">جارٍ تنزيل المحتوى</string>
+    <string name="msg_apply_russia_lite_config">تستخدم ملفات geo هذه توجيه \"القائمة البيضاء لروسيا (lite)\" واستراتيجية النطاق \"IPOnDemand\". هل تريد تطبيق هذا الإعداد؟ سيتم مسح الإعداد القديم</string>
+    <string name="yes">نعم</string>
+    <string name="no">لا</string>
     <string name="menu_item_export_proxy_app">تصدير إلى الحافظة</string>
     <string name="menu_item_import_proxy_app">استيراد من الحافظة</string>
     <string name="per_app_proxy_settings">Per-app settings</string>
