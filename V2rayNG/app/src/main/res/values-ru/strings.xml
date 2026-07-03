@@ -453,6 +453,7 @@
         <item>Общие</item>
         <item>Белый список Ирана</item>
         <item>Белый список России</item>
+        <item>Белый список России (lite)</item>
     </string-array>
 
     <string-array name="vpn_bypass_lan">

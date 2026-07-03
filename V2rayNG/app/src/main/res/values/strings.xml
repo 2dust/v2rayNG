@@ -456,6 +456,7 @@
         <item>Global</item>
         <item>Iran Whitelist</item>
         <item>Russia Whitelist</item>
+        <item>Russia Whitelist (lite)</item>
     </string-array>
 
     <string-array name="vpn_bypass_lan">

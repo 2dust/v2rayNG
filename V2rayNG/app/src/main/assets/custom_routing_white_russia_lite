@@ -1,0 +1,36 @@
+[
+    {
+        "enabled": true,
+        "ip": [
+            "geoip:private"
+        ],
+        "locked": false,
+        "outboundTag": "direct",
+        "remarks": "RU-0 [Приватные сети напрямую]"
+    },
+    {
+        "enabled": true,
+        "ip": [
+            "geoip:ru"
+        ],
+        "locked": false,
+        "outboundTag": "direct",
+        "remarks": "RU-0 [Российские IPv4 напрямую]"
+    },
+    {
+        "domain": [
+            "geosite:ru-inside"
+        ],
+        "enabled": true,
+        "locked": false,
+        "outboundTag": "direct",
+        "remarks": "RU-0 [Российские домены напрямую]"
+    },
+    {
+        "enabled": true,
+        "locked": false,
+        "outboundTag": "proxy",
+        "port": "0-65535",
+        "remarks": "RU-0 [Остальное прокси]"
+    }
+]

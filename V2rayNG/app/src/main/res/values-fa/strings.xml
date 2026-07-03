@@ -433,6 +433,7 @@
         <item>جهانی(GLOBAL)</item>
         <item>ایران</item>
         <item>لیست سفید روسیه</item>
+        <item>لیست سفید روسیه (lite)</item>
     </string-array>
 
     <string-array name="vpn_bypass_lan">
