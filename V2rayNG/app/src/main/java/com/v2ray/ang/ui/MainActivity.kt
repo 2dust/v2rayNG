@@ -193,7 +193,9 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             toast(R.string.title_file_chooser)
             return
         }
-        CoreServiceManager.startVService(this)
+        checkAndRequestPermission(PermissionType.ACCESS_LOCAL_NETWORK) {
+            CoreServiceManager.startVService(this)
+        }
     }
 
     fun restartV2Ray() {
