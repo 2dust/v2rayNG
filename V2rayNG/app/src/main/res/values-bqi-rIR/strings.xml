@@ -283,6 +283,12 @@
     <string name="summary_pref_use_hev_tunnel">مجالی ک ره ونده بۊ، TUN ایا hev-socks5-tunnel ن و کار اگره؛ ٱر ره نوۊفته بۊ، همو xray-core ن و کار اگره.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun سئت گوزارشا</string>
     <string name="title_pref_hev_tunnel_rw_timeout">زمووݩ مندیر بیڌن خوندن/هؽل کردن Hev Tun (سانیه) (پؽش فرز tcp، udp 300،60)</string>
+    <string name="title_mode_settings">سامووا هالت</string>
+    <string name="title_root_mode_enabled">هالت رۊت ره وست (منتورووݩ رۊت)</string>
+    <string name="summary_root_mode_enabled">ره وستن پروکسی شفاف سئت بلم وا امتیازا ریشه. ای هالت، VPN استاندارد سیستوم ٱندروید ن دور ازنه تا موستقیمن پوی ترافیک شبکه لمی ن وا دست بگره. بئڌ ره وندن، هالت معمۊلی ٱسلی، تور جۊری هر برنومه وو سامووا VPN مربۊته کاملن ناموعتبر ابۊن.</string>
+    <string name="toast_root_required">دسرسی رۊت سی ای ویژیی لازوم هڌ</string>
+    <string name="title_root_lan_sharing">یک رسۊوی LAN / تترینگ (منتورووݩ رۊت وابیڌه)</string>
+    <string name="summary_root_lan_sharing">ترافیک هات‌اسپات وای‌فای وو دسگا یل منپیز وابیڌه وا USB (تترینگ) ن ز تور VPN بفشنین.</string>
 
     <string name="title_logcat">گوزارشا</string>
     <string name="logcat_copy">لف گیری</string>
@@ -367,7 +373,7 @@
     <string name="title_pref_fragment_length">تۊل کتنا فرگمنت (هدقل-هدکسر)</string>
     <string name="title_pref_fragment_interval">فاسله منجا کتنا فرگمنت (هدقل-هدکسر)</string>
     <string name="title_pref_fragment_enabled">ره وندن فرگمنت</string>
-    <string name="title_pref_fragment_maxsplit">مکسیمم تقسیم فرگمنت</string>
+    <string name="title_pref_fragment_maxsplit">هدکسر تقسیم فرگمنت</string>
 
     <string name="update_check_for_update">واجۊری سی ورۊ رسۊوی</string>
     <string name="update_already_latest_version">سکو نوسخه دیندایی پۊرنیڌه هڌ</string>
