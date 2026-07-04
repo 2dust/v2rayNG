@@ -2,19 +2,19 @@
 <resources>
     <string name="app_widget_name">آلشت</string>
     <string name="app_tile_name">آلشت</string>
-    <string name="app_tile_first_use">سی کرت ٱولی و کار بوردن ای ویژیی، ز برنومه سی ازاف کردن سرور استفاڌه کۊنین</string>
+    <string name="app_tile_first_use">سی کرت ٱولی و کار بوردن ای ویژیی، ٱول ز من برنومه ی سرور ازاف کۊنین</string>
     <string name="navigation_drawer_open">گۊشیڌن نومگه کشاری</string>
     <string name="navigation_drawer_close">بستن نومگه کشاری</string>
-    <string name="migration_success">مووفقیت من جاگورویی داده</string>
+    <string name="migration_success">جاگورویی داده یل وا مووفقیت ٱنجوم وابی!</string>
     <string name="action_stop_service">واڌاشتن خدمات</string>
-    <string name="migration_fail">جاگورویی داده ٱنجوم نگرؽڌ</string>
-    <string name="pull_down_to_refresh">سی وانۊ کردن، بکشینس بلم!</string>
+    <string name="migration_fail">جاگورویی داده یل شکست خرد!</string>
+    <string name="pull_down_to_refresh">سی وانۊ کردن، بلگه ن بلم بکشین!</string>
 
     <!-- Notifications -->↓
     <string name="notification_action_stop_v2ray">واڌاشتن</string>
     <string name="toast_permission_denied">گرؽڌن موجوز مومکن نؽڌ</string>
     <string name="toast_permission_denied_notification">گرؽڌن موجوز وارسۊوی مومکن نؽڌ</string>
-    <string name="notification_action_more">سی گرؽڌن دووسمندیا قلوه کیلیک کوݩ</string>
+    <string name="notification_action_more">سی دووسمندیا قلوه کیلیک کوݩ</string>
     <string name="toast_services_start">ره وستن خدمات</string>
     <string name="toast_services_stop">واڌاشتن خدمات</string>
     <string name="toast_services_success">ره وستن خدمات وا مووفقیت ٱنجوم وابی</string>
@@ -31,14 +31,14 @@
     <string name="menu_item_import_config_local">و من ٱووردن کانفیگ ز مهلی</string>
     <string name="menu_item_import_config_policy_group">ٱووردن [بونکۊ سیاست]</string>
     <string name="menu_item_import_config_proxy_chain">ٱووردن [زنجیره پروکسی]</string>
-    <string name="menu_item_import_config_manually_vmess">هؽل دستی[VMess]</string>
-    <string name="menu_item_import_config_manually_vless">هؽل دستی[VLESS]</string>
-    <string name="menu_item_import_config_manually_ss">هؽل دستی[Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">هؽل دستی[SOCKS]</string>
-    <string name="menu_item_import_config_manually_http">هؽل دستی[HTTP]</string>
-    <string name="menu_item_import_config_manually_trojan">هؽل دستی[Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">هؽل دستی[Wireguard]</string>
-    <string name="menu_item_import_config_manually_hysteria2">هؽل دستی[Hysteria2]</string>
+    <string name="menu_item_import_config_manually_vmess">ٱووردن [VMess]</string>
+    <string name="menu_item_import_config_manually_vless">ٱووردن [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">ٱووردن [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">ٱووردن [SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">ٱووردن [HTTP]</string>
+    <string name="menu_item_import_config_manually_trojan">ٱووردن [Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">ٱووردن [Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">ٱووردن [Hysteria2]</string>
     <string name="del_config_comfirm">پاک بۊ؟</string>
     <string name="del_invalid_config_comfirm">پؽش ز پاک کردن کانفیگ نا موئتبر واجۊری کوݩ! پاک کردن کانفیگن قوۊل اکۊنی؟</string>
     <string name="server_lab_remarks">نیشتنا</string>
@@ -70,7 +70,7 @@
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint" translatable="false">Fingerprint</string>
     <string name="server_lab_stream_alpn">Alpn</string>
-    <string name="server_lab_allow_insecure">اجازه نا ٱمن</string>
+    <string name="server_lab_allow_insecure">هشتن SSL نا ٱمن</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">نشۊوی</string>
     <string name="server_lab_port3">پورت</string>
