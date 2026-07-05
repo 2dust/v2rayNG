@@ -17,6 +17,12 @@ enum class PermissionType {
     POST_NOTIFICATIONS {
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         override fun getPermission(): String = Manifest.permission.POST_NOTIFICATIONS
+    },
+
+    /** Local network access permission (Android 17+) */
+    ACCESS_LOCAL_NETWORK {
+        @RequiresApi(Build.VERSION_CODES.CINNAMON_BUN)
+        override fun getPermission(): String = Manifest.permission.ACCESS_LOCAL_NETWORK
     };
 
     /** Return the actual Android permission string */
@@ -27,6 +33,7 @@ enum class PermissionType {
         return when (this) {
             CAMERA -> "Camera"
             POST_NOTIFICATIONS -> "Notification"
+            ACCESS_LOCAL_NETWORK -> "Local Network"
         }
     }
 }

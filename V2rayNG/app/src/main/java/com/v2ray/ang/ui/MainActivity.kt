@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.Menu
@@ -193,6 +194,11 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
             toast(R.string.title_file_chooser)
             return
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN && MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
+            checkAndRequestPermission(PermissionType.ACCESS_LOCAL_NETWORK) {}
+        }
+
         CoreServiceManager.startVService(this)
     }
 
