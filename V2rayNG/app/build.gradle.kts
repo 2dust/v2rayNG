@@ -124,7 +124,6 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true
         buildConfig = true
         compose = true
     }
@@ -143,14 +142,6 @@ dependencies {
 
     // AndroidX Core Libraries
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.preference.ktx)
-    implementation(libs.recyclerview)
-    implementation(libs.androidx.swiperefreshlayout)
-    implementation(libs.androidx.viewpager2)
-    implementation(libs.androidx.fragment)
 
     // Compose Libraries
     implementation(platform(libs.androidx.compose.bom))
@@ -165,11 +156,6 @@ dependencies {
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 
-    // UI Libraries
-    implementation(libs.material)
-    implementation(libs.editorkit)
-    implementation(libs.flexbox)
-
     // Data and Storage Libraries
     implementation(libs.mmkv.static)
     implementation(libs.gson)
@@ -178,10 +164,6 @@ dependencies {
     // Reactive and Utility Libraries
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
-
-    // Language and Processing Libraries
-    implementation(libs.language.base)
-    implementation(libs.language.json)
 
     // QR Code: CameraX + ZXing
     implementation(libs.camerax.core)
@@ -192,7 +174,6 @@ dependencies {
 
     // AndroidX Lifecycle and Architecture Components
     implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.runtime.ktx)
 
     // Background Task Libraries
