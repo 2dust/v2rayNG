@@ -2,23 +2,23 @@
 <resources>
     <string name="app_widget_name">تعویض</string>
     <string name="app_tile_name">تعویض</string>
-    <string name="app_tile_first_use">برای اولین بار از این ویژگی استفاده می‌کنید، لطفا از برنامه برای افزودن سرور استفاده کنید</string>
+    <string name="app_tile_first_use">برای اولین استفاده از این قابلیت، لطفاً ابتدا از داخل برنامه یک سرور اضافه کنید</string>
     <string name="navigation_drawer_open">باز کردن منو کشویی</string>
     <string name="navigation_drawer_close">بستن منو کشویی</string>
-    <string name="migration_success">موفقیت در انتقال داده</string>
-    <string name="action_stop_service">توقف کردن سرویس</string>
-    <string name="migration_fail">انتقال داده انجام نشد!</string>
-    <string name="pull_down_to_refresh">لطفاً برای تازه کردن، پایین بکشید!</string>
+    <string name="migration_success">انتقال داده‌ها با موفقیت انجام شد!</string>
+    <string name="action_stop_service">توقف سرویس</string>
+    <string name="migration_fail">انتقال داده‌ها با شکست مواجه شد!</string>
+    <string name="pull_down_to_refresh">برای بروزرسانی، صفحه را به پایین بکشید!</string>
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">توقف</string>
-    <string name="toast_permission_denied">دریافت مجوز امکان پذیر نیست</string>
-    <string name="toast_permission_denied_notification">دریافت مجوز اعلان امکان پذیر نیست</string>
-    <string name="notification_action_more">برای کسب اطلاعات بیشتر کلیک کنید</string>
+    <string name="toast_permission_denied">امکان دریافت مجوز وجود ندارد</string>
+    <string name="toast_permission_denied_notification">امکان دریافت مجوز ارسال اعلان وجود ندارد</string>
+    <string name="notification_action_more">برای اطلاعات بیشتر کلیک کنید</string>
     <string name="toast_services_start">شروع خدمات</string>
-    <string name="toast_services_stop">توقف خدمات</string>
-    <string name="toast_services_success">شروع خدمات با موفقیت انجام شد</string>
-    <string name="toast_services_failure">شروع خدمات با موفقیت انجام نشد!</string>
+    <string name="toast_services_stop">توقف سرویس</string>
+    <string name="toast_services_success">سرویس با موفقیت شروع شد</string>
+    <string name="toast_services_failure">شروع سرویس با شکست مواجه شد</string>
 
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
@@ -29,18 +29,18 @@
     <string name="menu_item_import_config_qrcode">کانفیگ را از QRcode وارد کنید</string>
     <string name="menu_item_import_config_clipboard">کانفیگ را از کلیپ ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_local">کانفیگ را از محلی وارد کنید</string>
-    <string name="menu_item_import_config_policy_group">اضافه کردن [گروه خط مشی]</string>
-    <string name="menu_item_import_config_proxy_chain">Add [Proxy chain]</string>
-    <string name="menu_item_import_config_manually_vmess">تایپ دستی[VMESS]</string>
-    <string name="menu_item_import_config_manually_vless">تایپ دستی[VLESS]</string>
-    <string name="menu_item_import_config_manually_ss">تایپ دستی[SHADOWSOCKS]</string>
-    <string name="menu_item_import_config_manually_socks">تایپ دستی[SOCKS]</string>
-    <string name="menu_item_import_config_manually_http">تایپ دستی[HTTP]</string>
-    <string name="menu_item_import_config_manually_trojan">تایپ دستی[TROJAN]</string>
-    <string name="menu_item_import_config_manually_wireguard">‌تایپ دستی[WIREGUARD]</string>
-    <string name="menu_item_import_config_manually_hysteria2">تایپ دستی[HYSTERIA2]</string>
-    <string name="del_config_comfirm">حذف شود؟</string>
-    <string name="del_invalid_config_comfirm">لطفا قبل از حذف کانفیگ نامعتبر بررسی کنید! حذف کانفیگ را تایید می کنید؟</string>
+<string name="menu_item_import_config_policy_group">افزودن [گروه خط‌‌ مشی]</string>
+    <string name="menu_item_import_config_proxy_chain">افزودن [زنجیره پروکسی]</string>
+    <string name="menu_item_import_config_manually_vmess">افزودن [VMess]</string>
+    <string name="menu_item_import_config_manually_vless">افزودن [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">افزودن [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">افزودن [SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">افزودن [HTTP]</string>
+    <string name="menu_item_import_config_manually_trojan">افزودن [Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">افزودن [Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">افزودن [Hysteria2]</string>
+    <string name="del_config_comfirm">از حذف این کانفیگ اطمینان دارید؟</string>
+    <string name="del_invalid_config_comfirm">لطفاً قبل از حذف، پینگ بگیرید! آیا از حذف اطمینان دارید؟</string>
     <string name="server_lab_remarks">ملاحظات</string>
     <string name="server_lab_address">نشانی</string>
     <string name="server_lab_port">پورت</string>
@@ -49,7 +49,7 @@
     <string name="server_lab_security">امنیت</string>
     <string name="server_lab_network">شبکه</string>
     <string name="server_lab_more_function">انتقال</string>
-    <string name="server_lab_head_type">نوع سربرگ</string>
+    <string name="server_lab_head_type">نوع هدر</string>
     <string name="server_lab_mode_type">حالت gRPC</string>
     <string name="server_lab_request_host">هاست</string>
     <string name="server_lab_request_host_http">هاست HTTP</string>
@@ -57,7 +57,7 @@
     <string name="server_lab_request_host_httpupgrade">هاست HTTPUpgrade</string>
     <string name="server_lab_request_host_xhttp">هاست XHTTP</string>
     <string name="server_lab_request_host_h2">هاست H2</string>
-    <string name="server_lab_request_host_quic">QUIC security</string>
+    <string name="server_lab_request_host_quic">QUIC امنیت</string>
     <string name="server_lab_request_host_grpc">gRPC Authority</string>
     <string name="server_lab_path">مسیر</string>
     <string name="server_lab_path_ws">مسیر WS</string>
@@ -65,12 +65,12 @@
     <string name="server_lab_path_xhttp">مسیر XHTTP</string>
     <string name="server_lab_path_h2">مسیر H2</string>
     <string name="server_lab_path_quic">مسیر QUIC</string>
-    <string name="server_lab_path_kcp">KCP seed</string>
-    <string name="server_lab_path_grpc">gRPC ServiceName</string>
+    <string name="server_lab_path_kcp">KCP سید</string>
+    <string name="server_lab_path_grpc">gRPC نام سرویس</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">اثرانگشت</string>
     <string name="server_lab_stream_alpn">Alpn</string>
-    <string name="server_lab_allow_insecure">اعطای مجوز ناامن</string>
+    <string name="server_lab_allow_insecure">مجوز SSL ناامن</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">نشانی</string>
     <string name="server_lab_port3">پورت</string>
@@ -81,19 +81,19 @@
     <string name="server_lab_encryption">رمزنگاری</string>
     <string name="server_lab_flow">جریان</string>
     <string name="server_lab_public_key">کلید عمومی</string>
-    <string name="server_lab_preshared_key">کلید رمزگذاری اضافی (اختیاری)</string>
-    <string name="server_lab_short_id">ShortID</string>
+    <string name="server_lab_preshared_key">کلید پیش‌اشتراکی (اختیاری)</string>
+    <string name="server_lab_short_id">شناسه کوتاه</string>
     <string name="server_lab_spider_x">SpiderX</string>
-    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
+    <string name="server_lab_mldsa65_verify">تاییدیه Mldsa65Verify</string>
     <string name="server_lab_secret_key">کلید خصوصی</string>
     <string name="server_lab_reserved">Reserved (اختیاری، جدا شده با کاما)</string>
     <string name="server_lab_local_address">آدرس محلی (IPv4/IPv6 اختیاری، جدا شده با کاما)</string>
     <string name="server_lab_local_mtu">MTU (اختیاری، پیش‌فرض 1420)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU (اختیاری، پیش‌فرض هسته 1350)</string>
     <string name="server_lab_kcp_tti">mKCP TTI (اختیاری، پیش‌فرض هسته 50)</string>
-    <string name="toast_success">با موفقیت انجام شد</string>
-    <string name="toast_failure">شکست</string>
-    <string name="toast_none_data">هیچ داده ای وجود ندارد</string>
+    <string name="toast_success">موفقیت‌آمیز</string>
+    <string name="toast_failure">شکست!</string>
+    <string name="toast_none_data">داده‌ای یافت نشد</string>
     <string name="toast_incorrect_protocol">پروتکل نادرست</string>
     <string name="toast_decoding_failed">رمزگشایی انجام نشد</string>
     <string name="title_file_chooser">انتخاب فایل کانفیگ</string>
@@ -101,8 +101,8 @@
     <string name="server_customize_config">کانفیگ سفارشی</string>
     <string name="toast_config_file_invalid">کانفیگ معتبر نیست</string>
     <string name="server_lab_content">محتوا</string>
-    <string name="toast_none_data_clipboard">هیچ داده‌ ای در کلیپ ‌بورد وجود ندارد</string>
-    <string name="toast_invalid_url">نشانی اینترنتی معتبر نیست</string>
+    <string name="toast_none_data_clipboard">داده‌ای در کلیپ‌بورد وجود ندارد</string>
+    <string name="toast_invalid_url">نشانی اینترنتی نامعتبر است</string>
     <string name="toast_insecure_url_protocol">لطفاً از آدرس های اشتراک پروتکل HTTP ناامن استفاده نکنید</string>
     <string name="server_lab_need_inbound">اطمینان حاصل کنید که پورت ورودی با تنظیمات مطابقت دارد</string>
     <string name="toast_malformed_josn">کانفیگ درست نیست</string>
@@ -124,29 +124,29 @@
     <string name="toast_fetch_cert_sha256_failed">Failed to fetch certificate fingerprint</string>
 
     <!-- UserAssetActivity -->
-    <string name="toast_asset_copy_failed">کپی فایل انجام نشد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
+    <string name="toast_asset_copy_failed">کپی فایل شکست خورد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
     <string name="menu_item_add_file">افزودن فایل ‌ها</string>
     <string name="menu_item_scan_qrcode">اسکن QRcode</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">دانلود فایل‌ ها</string>
     <string name="title_user_asset_add_url">آدرس اینترنتی را اضافه کنید</string>
     <string name="msg_file_not_found">فایل پیدا نشد</string>
-    <string name="msg_remark_is_duplicate">نام قبلاً وجود دارد</string>
+    <string name="msg_remark_is_duplicate">این نام از قبل وجود دارد</string>
     <string name="asset_geo_files_sources">منبع فایل های جغرافیایی (اختیاری)</string>
 
     <!-- PerAppProxyActivity -->
-    <string name="msg_dialog_progress">بارگذاری</string>
+    <string name="msg_dialog_progress">در حال بارگذاری...</string>
     <string name="menu_item_search">جستجو</string>
     <string name="menu_item_select_all">انتخاب همه</string>
-    <string name="menu_item_invert_selection">Invert selection</string>
-    <string name="msg_enter_keywords">کلمه ی کلیدی را وارد نمایید</string>
+    <string name="menu_item_invert_selection">معکوس کردن انتخاب‌ها</string>
+    <string name="msg_enter_keywords">کلمات کلیدی را وارد کنید</string>
     <string name="switch_bypass_apps_mode">حالت دور زدن</string>
-    <string name="menu_item_select_proxy_app">انتخاب خودکار پروکسی برنامه</string>
-    <string name="msg_downloading_content">در حال دانلود محتوا</string>
+    <string name="menu_item_select_proxy_app">انتخاب خودکار برنامه‌های نیازمند پروکسی</string>
+    <string name="msg_downloading_content">در حال دانلود محتوا...</string>
     <string name="menu_item_export_proxy_app">خروجی گرفتن در کلیپ‌ بورد</string>
     <string name="menu_item_import_proxy_app">وارد کردن از کلیپ‌ بورد</string>
     <string name="per_app_proxy_settings">تنظیمات به تفکیک برنامه</string>
-    <string name="per_app_proxy_settings_enable">فعال کردن به تفکیک برنامه</string>
+    <string name="per_app_proxy_settings_enable">فعال‌سازی به تفکیک برنامه</string>
 
     <!-- Preferences -->
     <string name="title_settings">تنظیمات</string>
@@ -158,10 +158,10 @@
     <string name="title_pref_is_booted">اتصال خودکار هنگام راه اندازی</string>
     <string name="summary_pref_is_booted">هنگام راه اندازی به طور خودکار به سرور انتخابی متصل می شود که ممکن است ناموفق باشد.</string>
 
-    <string name="title_pref_auto_remove_invalid_after_test">Auto delete invalid config after testing</string>
-    <string name="summary_pref_auto_remove_invalid_after_test">Test results may not be accurate; deleted config cannot be recovered.</string>
-    <string name="title_pref_auto_sort_after_test">Auto sort after testing</string>
-    <string name="summary_pref_auto_sort_after_test">Test results may not be accurate;</string>
+    <string name="title_pref_auto_remove_invalid_after_test">حذف خودکار کانفیگ‌های نامعتبر بعد از پینگ</string>
+    <string name="summary_pref_auto_remove_invalid_after_test">نتایج پینگ ممکن است همیشه دقیق نباشند؛ کانفیگ‌های حذف‌شده قابل بازیابی نیستند.</string>
+    <string name="title_pref_auto_sort_after_test">مرتب‌سازی خودکار بعد از پینگ گرفتن</string>
+    <string name="summary_pref_auto_sort_after_test">نتایج آزمایش ممکن است کاملاً دقیق نباشند.</string>
 
     <string name="title_mux_settings">تنظیمات MUX</string>
     <string name="title_pref_mux_enabled">فعال کردن MUX</string>
@@ -179,8 +179,8 @@
     <string name="summary_pref_speed_enabled">نمایش سرعت فعلی در قسمت اعلان. \nآیکون اعلان بر اساس استفاده تغییر می‌کند.</string>
 
     <string name="title_pref_sniffing_enabled">فعال کردن تجزیه و تحلیل بسته ها (Sniffing)</string>
-    <string name="summary_pref_sniffing_enabled">استفاده از تشخیص نام دامنه (Sniff) در بسته ها (به طور پیش فرض فعال است)</string>
-    <string name="title_pref_route_only_enabled">فعال کردن دامنه فقط مسیر یابی (RouteOnly)</string>
+    <string name="summary_pref_sniffing_enabled">تلاش برای استخراج نام دامنه واقعی از بسته‌های ترافیک (به‌طور پیش‌فرض روشن است)</string>
+    <string name="title_pref_route_only_enabled">فعال‌سازی فقط مسیر یابی (RouteOnly)</string>
     <string name="summary_pref_route_only_enabled">از نام دامنه (Snnifed) فقط برای مسیریابی استفاده کنید و آدرس مقصد را به عنوان IP ذخیره کنید.</string>
 
 
@@ -218,30 +218,30 @@
     <string name="title_pref_ip_api_url">تست اطلاعات اتصال فعلی url</string>
     <string name="summary_pref_ip_api_url">Url</string>
 
-    <string name="title_pref_proxy_sharing_enabled">اجازه اتصالات از طریق شبکه محلی</string>
-    <string name="summary_pref_proxy_sharing_enabled">سایر دستگاه ها می توانند با استفاده از آدرس آیپی شما برای استفاده از یک پروکسی محلی متصل شوند. فقط در یک شبکه قابل اعتماد برای جلوگیری از اتصالات غیرمجاز استفاده کنید.</string>
-    <string name="toast_warning_pref_proxysharing_short">اتصالات از طریق شبکه محلی را مجاز کنید، مطمئن شوید که در یک شبکه قابل اعتماد هستید.</string>
+    <string name="title_pref_proxy_sharing_enabled">اشتراک‌گذاری پروکسی در شبکه محلی (LAN)</string>
+    <string name="summary_pref_proxy_sharing_enabled">دستگاه‌های دیگر می‌توانند با وارد کردن IP شما، از پروکسی‌تان استفاده کنند. برای جلوگیری از سوءاستفاده، فقط در شبکه‌های امن و قابل اعتماد این گزینه را روشن کنید.</string>
+    <string name="toast_warning_pref_proxysharing_short">اشتراک‌گذاری در شبکه محلی فعال شد؛ مطمئن شوید در یک شبکه امن هستید.</string>
 
     <string name="title_pref_socks_port">پورت پروکسی محلی</string>
     <string name="title_pref_enable_local_proxy">فعال‌سازی پروکسی محلی</string>
-    <string name="summary_pref_enable_local_proxy">When disabled, no SOCKS proxy is available, so subscription updates and similar actions cannot use the proxy</string>
+    <string name="summary_pref_enable_local_proxy">اگر غیرفعال باشد، هیچ پروکسی SOCKS در دسترس نخواهد بود و کارهایی مثل آپدیت اشتراک‌ها نمی‌توانند از پروکسی استفاده کنند.</string>
     <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">احراز هویت socks5 هنگام استفاده از UDP کاملاً ایمن نیست</string>
     <string name="summary_pref_socks_port">پورت پروکسی محلی</string>
-    <string name="title_pref_dynamic_socks_port">Enable dynamic local proxy port</string>
-    <string name="summary_pref_dynamic_socks_port">Generate a random local proxy port each time the inbound is created</string>
-    <string name="title_pref_socks_username">Local proxy username (optional)</string>
-    <string name="summary_pref_socks_username">Username</string>
-    <string name="title_pref_socks_password">Local proxy password (optional)</string>
-    <string name="summary_pref_socks_password">Password</string>
+    <string name="title_pref_dynamic_socks_port">تولید پورت متغیر برای پروکسی محلی</string>
+    <string name="summary_pref_dynamic_socks_port">با هر بار ایجاد یک کانکشن ورودی، یک پورت تصادفی تولید می‌کند.</string>
+    <string name="title_pref_socks_username">نام کاربری پروکسی محلی (اختیاری)</string>
+    <string name="summary_pref_socks_username">نام کاربری</string>
+    <string name="title_pref_socks_password">رمز عبور پروکسی محلی (اختیاری)</string>
+    <string name="summary_pref_socks_password">رمز عبور</string>
 
     <string name="title_pref_local_dns_port">پورت DNS محلی</string>
     <string name="summary_pref_local_dns_port">پورت DNS محلی</string>
 
-    <string name="title_pref_confirm_remove">تایید حذف فایل کانفیگ</string>
-    <string name="summary_pref_confirm_remove">آیا برای حذف فایل کانفیگ نیاز به تایید دوم توسط کاربر است</string>
+    <string name="title_pref_confirm_remove">تایید حذف کانفیگ</string>
+    <string name="summary_pref_confirm_remove">آیا برای حذف کانفیگ نیاز به تایید دوم توسط کاربر است</string>
 
-    <string name="title_pref_start_scan_immediate">فورا اسکن را شروع کن</string>
+    <string name="title_pref_start_scan_immediate">شروع فوری اسکن QR کد</string>
     <string name="summary_pref_start_scan_immediate">دوربین را برای اسکن بلافاصله در هنگام راه اندازی باز کنید، در غیر این صورت می توانید کد را اسکن کنید یا عکسی را در نوار ابزار انتخاب کنید.</string>
 
     <string name="title_pref_append_http_proxy">پروکسی HTTP را به VPN اضافه کنید</string>
@@ -276,8 +276,8 @@
     <string name="title_language">زبان</string>
     <string name="title_ui_settings">تنظیمات رابط کاربری</string>
     <string name="title_pref_ui_mode_night">تنظیمات حالت رابط کاربری</string>
-    <string name="title_pref_use_hev_tunnel">Enable Hev TUN Feature</string>
-    <string name="summary_pref_use_hev_tunnel">When enabled, TUN will use hev-socks5-tunnel; otherwise, it will use xray-core.</string>
+    <string name="title_pref_use_hev_tunnel">استفاده از قابلیت Hev TUN</string>
+    <string name="summary_pref_use_hev_tunnel">اگر فعال باشد، تونل VPN از hev-socks5-tunnel استفاده می‌کند؛ در غیر این صورت از xray-core استفاده خواهد شد.</string>
     <string name="title_pref_hev_tunnel_loglevel">سطح گزارشات Hev Tun</string>
     <string name="title_pref_hev_tunnel_rw_timeout">زمان انتظار خواندن/نوشتن Hev Tun (ثانیه) (پیش‌فرض tcp,udp 300،60)</string>
 
@@ -307,18 +307,18 @@
     <string name="title_user_asset_setting">فایل های منبع جغرافیایی</string>
     <string name="title_sort_by_test_results">مرتب‌ سازی بر اساس نتایج آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگ‌ها</string>
-    <string name="filter_config_all">All</string>
+    <string name="filter_config_all">همه</string>
     <string name="title_del_duplicate_config_count">حذف %d کانفیگ تکراری</string>
 
     <string name="title_del_config_count">حذف %d کانفیگ</string>
     <string name="title_import_config_count">وارد کردن %d کانفیگ</string>
     <string name="title_export_config_count">صادر کردن %d کانفیگ</string>
     <string name="title_update_config_count">آپدیت کردن %d کانفیگ</string>
-    <string name="title_update_subscription_result">Updated %1$d configs (%2$d success, %3$d failed, %4$d skipped)</string>
-    <string name="title_update_subscription_no_subscription">No subscriptions</string>
-    <string name="toast_server_not_found_in_group">Selected server not found in current group</string>
-    <string name="toast_fragment_not_available">Unable to locate current view</string>
-    <string name="title_locate_selected_config">Locate the selected config</string>
+    <string name="title_update_subscription_result">بروزرسانی %1$d کانفیگ انجام شد (%2$d موفق، %3$d شکست خورده، %4$d نادیده گرفته شده)</string>
+    <string name="title_update_subscription_no_subscription">هیچ اشتراکی وجود ندارد</string>
+    <string name="toast_server_not_found_in_group">سرور انتخاب‌شده در گروه فعلی پیدا نشد</string>
+    <string name="toast_fragment_not_available">موقعیت صفحه فعلی پیدا نشد</string>
+    <string name="title_locate_selected_config">پیدا کردن کانفیگ متصل‌شده در لیست</string>
 
     <string name="tasker_start_service">شروع خدمات</string>
     <string name="tasker_setting_confirm">تایید</string>
@@ -390,7 +390,7 @@
     <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
     <string name="title_webdav_config_setting">تنظیمات WebDAV</string>
     <string name="title_webdav_config_setting_unknown">لطفا ابتدا WebDAV را پیکربندی کنید.</string>
-    <string name="title_webdav_url">WebDAV server URL</string>
+    <string name="title_webdav_url">لینک سرور WebDAV</string>
     <string name="title_webdav_user">یوزرنیم</string>
     <string name="title_webdav_pass">پسورد</string>
     <string name="title_webdav_remote_path">دایرکتوری راه دور (اختیاری)</string>
