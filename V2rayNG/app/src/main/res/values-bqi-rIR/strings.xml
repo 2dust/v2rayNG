@@ -2,23 +2,23 @@
 <resources>
     <string name="app_widget_name">آلشت</string>
     <string name="app_tile_name">آلشت</string>
-    <string name="app_tile_first_use">سی کرت ٱولی و کار بوردن ای ویژیی، ز برنومه سی ازاف کردن سرور استفاڌه کۊنین</string>
+    <string name="app_tile_first_use">سی کرت ٱولی و کار بوردن ای ویژیی، ٱول ز من برنومه ی سرور ازاف کۊنین</string>
     <string name="navigation_drawer_open">گۊشیڌن نومگه کشاری</string>
     <string name="navigation_drawer_close">بستن نومگه کشاری</string>
-    <string name="migration_success">مووفقیت من جاگورویی داده</string>
-    <string name="action_stop_service">واڌاشتن خدمات</string>
-    <string name="migration_fail">جاگورویی داده ٱنجوم نگرؽڌ</string>
-    <string name="pull_down_to_refresh">سی وانۊ کردن، بکشینس بلم!</string>
+    <string name="migration_success">جاگورویی داده یل وا مووفقیت ٱنجوم وابی!</string>
+    <string name="action_stop_service">واڌاشتن سرویس</string>
+    <string name="migration_fail">جاگورویی داده یل شکست خرد!</string>
+    <string name="pull_down_to_refresh">سی وانۊ کردن، بلگه ن بلم بکشین!</string>
 
     <!-- Notifications -->↓
     <string name="notification_action_stop_v2ray">واڌاشتن</string>
     <string name="toast_permission_denied">گرؽڌن موجوز مومکن نؽڌ</string>
     <string name="toast_permission_denied_notification">گرؽڌن موجوز وارسۊوی مومکن نؽڌ</string>
-    <string name="notification_action_more">سی گرؽڌن دووسمندیا قلوه کیلیک کوݩ</string>
-    <string name="toast_services_start">ره وستن خدمات</string>
-    <string name="toast_services_stop">واڌاشتن خدمات</string>
-    <string name="toast_services_success">ره وستن خدمات وا مووفقیت ٱنجوم وابی</string>
-    <string name="toast_services_failure">ره وستن خدمات وا مووفقیت ٱنجوم نوابی</string>
+    <string name="notification_action_more">سی دووسمندیا قلوه کیلیک کوݩ</string>
+    <string name="toast_services_start">ره وستن سرویس</string>
+    <string name="toast_services_stop">واڌاشتن سرویس</string>
+    <string name="toast_services_success">ره وستن سرویس وا مووفقیت ٱنجوم وابی</string>
+    <string name="toast_services_failure">ره وستن سرویس وا مووفقیت ٱنجوم نوابی</string>
 
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
@@ -31,16 +31,16 @@
     <string name="menu_item_import_config_local">و من ٱووردن کانفیگ ز مهلی</string>
     <string name="menu_item_import_config_policy_group">ٱووردن [بونکۊ سیاست]</string>
     <string name="menu_item_import_config_proxy_chain">ٱووردن [زنجیره پروکسی]</string>
-    <string name="menu_item_import_config_manually_vmess">هؽل دستی[VMess]</string>
-    <string name="menu_item_import_config_manually_vless">هؽل دستی[VLESS]</string>
-    <string name="menu_item_import_config_manually_ss">هؽل دستی[Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">هؽل دستی[SOCKS]</string>
-    <string name="menu_item_import_config_manually_http">هؽل دستی[HTTP]</string>
-    <string name="menu_item_import_config_manually_trojan">هؽل دستی[Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">هؽل دستی[Wireguard]</string>
-    <string name="menu_item_import_config_manually_hysteria2">هؽل دستی[Hysteria2]</string>
+    <string name="menu_item_import_config_manually_vmess">ٱووردن [VMess]</string>
+    <string name="menu_item_import_config_manually_vless">ٱووردن [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">ٱووردن [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">ٱووردن [SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">ٱووردن [HTTP]</string>
+    <string name="menu_item_import_config_manually_trojan">ٱووردن [Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">ٱووردن [Wireguard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">ٱووردن [Hysteria2]</string>
     <string name="del_config_comfirm">پاک بۊ؟</string>
-    <string name="del_invalid_config_comfirm">پؽش ز پاک کردن کانفیگ نا موئتبر واجۊری کوݩ! پاک کردن کانفیگن قوۊل اکۊنی؟</string>
+    <string name="del_invalid_config_comfirm">پؽش ز پاک کردن، پینگ بگرین! الن اخۊین پاک کۊنین؟</string>
     <string name="server_lab_remarks">نیشتنا</string>
     <string name="server_lab_address">نشۊوی</string>
     <string name="server_lab_port">پورت</string>
@@ -49,7 +49,7 @@
     <string name="server_lab_security">ٱمنیت</string>
     <string name="server_lab_network">شبکه</string>
     <string name="server_lab_more_function">جاگورو</string>
-    <string name="server_lab_head_type">نوء سر بلگ</string>
+    <string name="server_lab_head_type">نوع هدر</string>
     <string name="server_lab_mode_type">هالت gRPC</string>
     <string name="server_lab_request_host">هاست</string>
     <string name="server_lab_request_host_http">هاست http</string>
@@ -66,11 +66,11 @@
     <string name="server_lab_path_h2">تور H2</string>
     <string name="server_lab_path_quic">تور QUIC</string>
     <string name="server_lab_path_kcp">KCP seed</string>
-    <string name="server_lab_path_grpc">نوم خدمات gRPC</string>
+    <string name="server_lab_path_grpc">نوم سرویس gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint" translatable="false">Fingerprint</string>
     <string name="server_lab_stream_alpn">Alpn</string>
-    <string name="server_lab_allow_insecure">اجازه نا ٱمن</string>
+    <string name="server_lab_allow_insecure">هشتن SSL نا ٱمن</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">نشۊوی</string>
     <string name="server_lab_port3">پورت</string>
@@ -81,10 +81,10 @@
     <string name="server_lab_encryption">رزم نگاری</string>
     <string name="server_lab_flow">جریان</string>
     <string name="server_lab_public_key">کیلیت پوی وولاتی</string>
-    <string name="server_lab_preshared_key">کیلیت رزم ناهاڌن ازاف (اختیاری)</string>
-    <string name="server_lab_short_id">ShortID</string>
+    <string name="server_lab_preshared_key">کیلیت پؽش اشتراکی (اختیاری)</string>
+    <string name="server_lab_short_id">شناسه کۊتال</string>
     <string name="server_lab_spider_x">SpiderX</string>
-    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
+    <string name="server_lab_mldsa65_verify">تاییدیه Mldsa65Verify</string>
     <string name="server_lab_secret_key">کیلیت سیخومی</string>
     <string name="server_lab_reserved">Reserved(اختیاری، وا کاما (,) ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_address">نشۊوی مهلی (اختیاری IPv4/IPv6، وا کاما (,) ز یک جوڌا ابۊن)</string>
@@ -125,26 +125,26 @@
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">لف گیری فایل ٱنجوم نوابی، ز ی برنومه دؽوۉداری فایل هیاری بگرین</string>
-    <string name="menu_item_add_asset">ازاف کردن دارایی</string>
-    <string name="menu_item_add_file">ازاف کردن فایل</string>
-    <string name="menu_item_add_url">ازاف کردن لینگ</string>
+    <string name="menu_item_add_asset">ٱووردن دارایی</string>
+    <string name="menu_item_add_file">ٱووردن فایل</string>
+    <string name="menu_item_add_url">ٱووردن لینگ</string>
     <string name="menu_item_scan_qrcode">اسکن QRcode</string>
     <string name="title_url">نشۊوی اینترنتی</string>
     <string name="menu_item_download_file">دانلود فایلا</string>
-    <string name="title_user_asset_add_url">نشۊوی اینترنتی دارایین ازاف کۊنین</string>
+    <string name="title_user_asset_add_url">نشۊوی اینترنتی دارایی ن ازاف کۊنین</string>
     <string name="msg_file_not_found">فایلن نجوست</string>
-    <string name="msg_remark_is_duplicate">نوم ز زیتر بیڌس</string>
+    <string name="msg_remark_is_duplicate">ای نوم ز زیتر بیڌس</string>
     <string name="asset_geo_files_sources">بونچک فایلا جوقرافیایی (اختیاری)</string>
 
     <!-- PerAppProxyActivity -->
-    <string name="msg_dialog_progress">هونی بار ونی بۊ</string>
+    <string name="msg_dialog_progress">هونی بار ونی ابۊ...</string>
     <string name="menu_item_search">پیتینیڌن</string>
     <string name="menu_item_select_all">پسند پوی</string>
-    <string name="menu_item_invert_selection">پسند چواسه</string>
-    <string name="msg_enter_keywords">کلمه کلیدی ن بزنین</string>
+    <string name="menu_item_invert_selection">چواسه کردن پسندا</string>
+    <string name="msg_enter_keywords">کلمه یل کلیدی ن بزنین</string>
     <string name="switch_bypass_apps_mode">هالت دور زیڌن</string>
-    <string name="menu_item_select_proxy_app">پسند خوتکار پروکسی برنومه</string>
-    <string name="msg_downloading_content">موئتوا هونی دانلود ابۊن</string>
+    <string name="menu_item_select_proxy_app">پسند خوتکار برنومه یلی ک پروکسی اخون</string>
+    <string name="msg_downloading_content">موئتوا هونی دانلود ابۊن...</string>
     <string name="menu_item_export_proxy_app">و در کشیڌن من کلیپ بورد</string>
     <string name="menu_item_import_proxy_app">و من ٱووردن ز کلیپ بورد</string>
     <string name="per_app_proxy_settings">سامووا ب تفکیک برنومه</string>
@@ -161,10 +161,10 @@
     <string name="title_pref_is_booted">منپیز خوتکار مجال ره ونی</string>
     <string name="summary_pref_is_booted">مجال ره وندن، خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
 
-    <string name="title_pref_auto_remove_invalid_after_test">پاک کردن خوتکار کانفیگ نا موئتبر بئڌ آزمایش</string>
-    <string name="summary_pref_auto_remove_invalid_after_test">نتیجه یل آزمایش گاشڌ دییق نبۊن؛ کانفیگ پاک وابیڌه ن نتری وورگنی.</string>
-    <string name="title_pref_auto_sort_after_test">ترتیب خوتکار بئڌ آزمایش</string>
-    <string name="summary_pref_auto_sort_after_test">نتیجه یل آزمایش گاشڌ دییق نبۊن؛</string>
+    <string name="title_pref_auto_remove_invalid_after_test">پاک کردن خوتکار کانفیگا نا موئتبر بئڌ پینگ</string>
+    <string name="summary_pref_auto_remove_invalid_after_test">نتیجه یل پینگ گاشڌ دییق نبۊن؛ کانفیگا پاک وابیڌه ن نتری وورگنی.</string>
+    <string name="title_pref_auto_sort_after_test">ترتیب خوتکار بئڌ پینگ گرؽڌن</string>
+    <string name="summary_pref_auto_sort_after_test">نتیجه یل پینگ گاشڌ دییق نبۊن.</string>
 
     <string name="title_mux_settings">سامووا Mux</string>
     <string name="title_pref_mux_enabled">ره وندن Mux</string>
@@ -182,8 +182,8 @@
     <string name="summary_pref_speed_enabled">نشووݩ داڌن سورعت هیم سکویی من وارسۊویا.\nنماڌ وارسۊوی و ری و کار گرؽڌن کانفیگ آلشت ابۊ.</string>
 
     <string name="title_pref_sniffing_enabled">ره وندن تجزیه وو تئلیل کتنا (Sniffing)</string>
-    <string name="summary_pref_sniffing_enabled">و کار گرؽڌن تشخیس نوم دامنه (Sniff) من کتنا (پؽش فرز رۊشن)</string>
-    <string name="title_pref_route_only_enabled">ره وندن routeOnly</string>
+    <string name="summary_pref_sniffing_enabled">قپ ریت سی و در کشیڌن نوم دامنه واقعی ز کتنا (پؽش فرز رۊشن هڌ)</string>
+    <string name="title_pref_route_only_enabled">ره وندن تینا تور جوستن routeOnly</string>
     <string name="summary_pref_route_only_enabled">نوم دامنه sniffed ن تینا سی تور جوستن و کار بگیرین وو نشۊوی موورد نزرن و عونوان نشۊوی IP ووردارین.</string>
 
     <string name="title_pref_local_dns_enabled">ره وندن DNS مهلی</string>
@@ -220,18 +220,18 @@
     <string name="title_pref_ip_api_url">نشۊوی اینترنتی آزمایش دووسمندیا منپیز هیم سکویی</string>
     <string name="summary_pref_ip_api_url">نشۊوی اینترنتی</string>
 
-    <string name="title_pref_proxy_sharing_enabled">هشتن منپیزا ز شبکه مهلی</string>
+    <string name="title_pref_proxy_sharing_enabled">یک رسۊوی پروکسی من شبکه مهلی LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا نشۊوی IP ایسا، ز ره socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل ائتماد ره ونده بۊ تا ز منپیز قیر موجاز جلو گری بۊ.</string>
-    <string name="toast_warning_pref_proxysharing_short">منپیزا ز شبکه مهلی ن موجار کۊنین، موتمعن بۊین ک من ی شبکه قابل ائتماڌ هڌین.</string>
+    <string name="toast_warning_pref_proxysharing_short">یک رسۊوی من شبکه مهلی ره وست؛ موتمعن بۊین ک من ی شبکه  ٱمن هڌین.</string>
 
     <string name="title_pref_socks_port">پورت پروکسی مهلی</string>
     <string name="title_pref_enable_local_proxy">ره وندن پروکسی مهلی</string>
-    <string name="summary_pref_enable_local_proxy">هرسا ره نوسته بۊ، هیچ پروکسی SOCKS من دسرس نؽ، سی دل هیمو ورۊ رسۊوی یل اشتراک وو کارا جۊر یو نترن پروکسی ن و کار گرن.</string>
+    <string name="summary_pref_enable_local_proxy">هرسا ره نوسته بۊ، هیچ پروکسی SOCKS من دسرس نؽ، سی دل هیمو کارایی جۊر ورۊ رسۊوی یل اشتراک نترن پروکسی ن و کار گرن.</string>
     <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">ائراز هۊویت socks5 مجال استفاڌه ز UDP کاملن ایمن نؽ</string>
     <string name="summary_pref_socks_port">پورت پروکسی مهلی</string>
-    <string name="title_pref_dynamic_socks_port">ره وندن پورت پروکسی مهلی پۊیا</string>
-    <string name="summary_pref_dynamic_socks_port">هر کرت ک و من ٱووڌنی وورکل ابۊ، ی پورت پروکسی مهلی تساڌۊفی وورکل کۊنین</string>
+    <string name="title_pref_dynamic_socks_port">وورکل پورت موتقیر سی پروکسی مهلی</string>
+    <string name="summary_pref_dynamic_socks_port">هر کرت ک و من ٱووڌنی وورکل ابۊ، ی پورت پروکسی مهلی تساڌۊفی وورکل اکونه.</string>
     <string name="title_pref_socks_username">نوم منتوری پروکسی مهلی (اختیاری)</string>
     <string name="summary_pref_socks_username">نوم منتوری</string>
     <string name="title_pref_socks_password">رزم پروکسی مهلی (اختیاری)</string>
@@ -243,7 +243,7 @@
     <string name="title_pref_confirm_remove">قوۊل کردن پاک کردن کانفیگ</string>
     <string name="summary_pref_confirm_remove">سی پاک وابیڌن فایل کانفیگ، لنگ قوۊل کردن دووارته ز سمت منتور هڌ.</string>
 
-    <string name="title_pref_start_scan_immediate">زی اسکنن ره ون</string>
+    <string name="title_pref_start_scan_immediate">زی بنه پا اسکن کود QR</string>
     <string name="summary_pref_start_scan_immediate">شؽواتگرن سی اسکن، زی مجال ره وندن بۊگۊشین، ٱندی ترین کودن اسکن کۊنین یا شؽواتی ن منه نوار ٱوزار پسند کۊنین.</string>
 
     <string name="title_pref_append_http_proxy">پروکسی HTTP ن و VPN ازاف کۊنین</string>
@@ -279,16 +279,22 @@
     <string name="title_language">زووݩ</string>
     <string name="title_ui_settings">سامووا رابت منتوری</string>
     <string name="title_pref_ui_mode_night">سامووا هالت رابت منتوری</string>
-    <string name="title_pref_use_hev_tunnel">ره وندن ویژیی Hev TUN</string>
+    <string name="title_pref_use_hev_tunnel">و کار گرؽڌن ویژیی Hev TUN</string>
     <string name="summary_pref_use_hev_tunnel">مجالی ک ره ونده بۊ، TUN ایا hev-socks5-tunnel ن و کار اگره؛ ٱر ره نوۊفته بۊ، همو xray-core ن و کار اگره.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun سئت گوزارشا</string>
     <string name="title_pref_hev_tunnel_rw_timeout">زمووݩ مندیر بیڌن خوندن/هؽل کردن Hev Tun (سانیه) (پؽش فرز tcp، udp 300،60)</string>
+    <string name="title_mode_settings">سامووا هالت</string>
+    <string name="title_root_mode_enabled">هالت رۊت ره وست (منتورووݩ رۊت)</string>
+    <string name="summary_root_mode_enabled">ره وستن پروکسی شفاف سئت بلم وا امتیازا ریشه. ای هالت، VPN استاندارد سیستوم ٱندروید ن دور ازنه تا موستقیمن پوی ترافیک شبکه لمی ن وا دست بگره. بئڌ ره وندن، هالت معمۊلی ٱسلی، تور جۊری هر برنومه وو سامووا VPN مربۊته کاملن ناموعتبر ابۊن.</string>
+    <string name="toast_root_required">دسرسی رۊت سی ای ویژیی لازوم هڌ</string>
+    <string name="title_root_lan_sharing">یک رسۊوی LAN / تترینگ (منتورووݩ رۊت وابیڌه)</string>
+    <string name="summary_root_lan_sharing">ترافیک هات‌اسپات وای‌فای وو دسگا یل منپیز وابیڌه وا USB (تترینگ) ن ز تور VPN بفشنین.</string>
 
     <string name="title_logcat">گوزارشا</string>
     <string name="logcat_copy">لف گیری</string>
     <string name="logcat_clear">روفتن</string>
     <string name="logcat_share">یک رسۊوی گوزارش</string>
-    <string name="title_service_restart">ره وندن دووارته خدمات</string>
+    <string name="title_service_restart">ره وندن دووارته سرویس</string>
     <string name="title_del_all_config">پاک کردن پوی کانفیگا بونکۊ سکویی</string>
     <string name="title_del_duplicate_config">پاک کردن کانفیگا تکراری بونکۊ سکویی</string>
     <string name="title_del_invalid_config">پاک کردن کانفیگا نا موئتبر بونکۊ سکویی</string>
@@ -308,9 +314,9 @@
     <string name="title_sub_update">ورۊ کردن اشتراک بونکۊ سکویی</string>
     <string name="title_real_ping_all_server">تئخیر واقعی کانفیگا بونکۊ سکویی</string>
     <string name="title_user_asset_setting">فایلا بونچک جوقرافیایی</string>
-    <string name="title_sort_by_test_results">ترتیب و ری نتیجه یل آزمایش</string>
+    <string name="title_sort_by_test_results">ترتیب و ری نتیجه یل پینگ</string>
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>
-    <string name="filter_config_all">پوی بونکۊ یل کانفیگ</string>
+    <string name="filter_config_all">پوی</string>
     <string name="title_del_duplicate_config_count">پاک کردن %d کانفیگ تکراری</string>
 
     <string name="title_del_config_count">پاک کردن %d کانفیگ</string>
@@ -323,7 +329,7 @@
     <string name="toast_fragment_not_available">نتره نما سکویی ن بجۊره</string>
     <string name="title_locate_selected_config">کانفیگ پسند وابیڌه ن بجۊرین</string>
 
-    <string name="tasker_start_service">ره وندن خدمات</string>
+    <string name="tasker_start_service">ره وندن سرویس</string>
     <string name="tasker_setting_confirm">قوۊل</string>
 
     <!-- RoutingSettingActivity -->
@@ -333,7 +339,7 @@
     <string name="routing_settings_save">زفت کردن</string>
     <string name="routing_settings_delete">روفتن</string>
     <string name="routing_settings_rule_title">سامووا قانووݩ تور جوستن</string>
-    <string name="routing_settings_add_rule">ازاف کردن قانووݩ</string>
+    <string name="routing_settings_add_rule">ٱووردن قانووݩ</string>
     <string name="routing_settings_import_predefined_rulesets">و من ٱووردن قانووا</string>
     <string name="routing_settings_import_rulesets_tip">قانووایی ک هیم سکو هڌسووݩ پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="routing_settings_import_rulesets_from_clipboard">و من ٱووردن قانووا ز کلیپ بورد</string>
@@ -367,7 +373,7 @@
     <string name="title_pref_fragment_length">تۊل کتنا فرگمنت (هدقل-هدکسر)</string>
     <string name="title_pref_fragment_interval">فاسله منجا کتنا فرگمنت (هدقل-هدکسر)</string>
     <string name="title_pref_fragment_enabled">ره وندن فرگمنت</string>
-    <string name="title_pref_fragment_maxsplit">مکسیمم تقسیم فرگمنت</string>
+    <string name="title_pref_fragment_maxsplit">هدکسر تقسیم فرگمنت</string>
 
     <string name="update_check_for_update">واجۊری سی ورۊ رسۊوی</string>
     <string name="update_already_latest_version">سکو نوسخه دیندایی پۊرنیڌه هڌ</string>
