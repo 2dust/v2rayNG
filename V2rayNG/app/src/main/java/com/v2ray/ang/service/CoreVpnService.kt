@@ -114,8 +114,14 @@ class CoreVpnService : VpnService(), ServiceControl {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service command received")
+        if (CoreServiceManager.isRunning()) {
+            LogUtil.i(AppConfig.TAG, "StartCore-VPN: Core already running, ignoring duplicate start")
+            return START_STICKY
+        }
         NotificationManager.showNotification(null)
-        setupVpnService()
+        if (!setupVpnService()) {
+            return START_NOT_STICKY
+        }
         startService()
         return START_STICKY
         //return super.onStartCommand(intent, flags, startId)
@@ -159,21 +165,22 @@ class CoreVpnService : VpnService(), ServiceControl {
      * Sets up the VPN service.
      * Prepares the VPN and configures it if preparation is successful.
      */
-    private fun setupVpnService() {
+    private fun setupVpnService(): Boolean {
         val prepare = prepare(this)
         if (prepare != null) {
             LogUtil.e(AppConfig.TAG, "StartCore-VPN: Permission not granted")
             stopSelf()
-            return
+            return false
         }
 
         if (configureVpnService() != true) {
             LogUtil.e(AppConfig.TAG, "StartCore-VPN: Configuration failed")
             stopSelf()
-            return
+            return false
         }
 
         runTun2socks()
+        return true
     }
 
     /**
