@@ -115,6 +115,7 @@ import com.v2ray.ang.compose.colorFabInactiveDark
 import com.v2ray.ang.compose.colorFabInactiveLight
 import com.v2ray.ang.compose.colorPing
 import com.v2ray.ang.compose.colorPingRed
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -523,7 +524,7 @@ fun MainScreen(
         MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
     }
     val confirmRemove = remember {
-        MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, true)
+        MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
     }
 
     val initialPage = remember(groups) {
@@ -545,6 +546,14 @@ fun MainScreen(
 
     val lazyListStates = remember { mutableStateMapOf<Int, LazyListState>() }
     val lazyGridStates = remember { mutableStateMapOf<Int, LazyGridState>() }
+
+    val drawerScrollState = rememberScrollState()
+    val importMenuScrollState = rememberScrollState()
+    val moreMenuScrollState = rememberScrollState()
+
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val navBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val maxMenuHeight = LocalConfiguration.current.screenHeightDp.dp - statusBarHeight - navBarHeight - 20.dp
 
     var locateInProgress by remember { mutableStateOf(false) }
 
@@ -669,7 +678,8 @@ fun MainScreen(
             ) {
                 Column(
                     modifier = Modifier
-                        .verticalScroll(rememberScrollState())
+                        .verticalScroll(drawerScrollState)
+                        .verticalScrollbar(drawerScrollState)
                         .padding(bottom = 80.dp)
                 ) {
                     Surface(modifier = Modifier
@@ -807,14 +817,14 @@ fun MainScreen(
                                     contentDescription = "Add"
                                 )
                             }
-                            val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                            val navBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-                            val maxMenuHeight = LocalConfiguration.current.screenHeightDp.dp - statusBarHeight - navBarHeight - 20.dp
                             DropdownMenu(
                                 expanded = showImportMenu,
                                 onDismissRequest = { showImportMenu = false },
+                                scrollState = importMenuScrollState,
                                 containerColor = MaterialTheme.colorScheme.surface,
-                                modifier = Modifier.heightIn(max = maxMenuHeight)
+                                modifier = Modifier
+                                    .heightIn(max = maxMenuHeight)
+                                    .verticalScrollbar(importMenuScrollState)
                             ) {
                                 listOf(
                                     R.string.menu_item_import_config_qrcode to {
@@ -874,7 +884,11 @@ fun MainScreen(
                             DropdownMenu(
                                 expanded = showMenu,
                                 onDismissRequest = { showMenu = false },
-                                containerColor = MaterialTheme.colorScheme.surface
+                                scrollState = moreMenuScrollState,
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                modifier = Modifier
+                                    .heightIn(max = maxMenuHeight)
+                                    .verticalScrollbar(moreMenuScrollState)
                             ) {
                                 listOf(
                                     R.string.title_service_restart to {
@@ -1119,7 +1133,9 @@ private fun ServerListPage(
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             state = gridState,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScrollbar(gridState),
             contentPadding = PaddingValues(bottom = 80.dp)
         ) {
             itemsIndexed(items = servers, key = { _, item -> item.guid }) { _, serverCache ->
@@ -1164,7 +1180,9 @@ private fun ServerListPage(
 
         LazyColumn(
             state = listState,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScrollbar(listState),
             contentPadding = PaddingValues(bottom = 80.dp)
         ) {
             itemsIndexed(items = servers, key = { _, item -> item.guid }) { _, serverCache ->

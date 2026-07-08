@@ -36,6 +36,7 @@ import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
 import com.v2ray.ang.compose.FormTextField
 import com.v2ray.ang.compose.SettingsSwitchItem
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.extension.toast
@@ -110,6 +111,7 @@ fun RoutingEditScreen(
     onDelete: () -> Unit
 ) {
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
 
     var remarks by rememberSaveable { mutableStateOf(initial?.remarks ?: "") }
     var locked by rememberSaveable { mutableStateOf(initial?.locked == true) }
@@ -193,7 +195,8 @@ fun RoutingEditScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
+                .verticalScrollbar(scrollState)
                 .padding(vertical = 8.dp)
                 .padding(bottom = 36.dp)
         ) {

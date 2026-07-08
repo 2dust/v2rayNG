@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +33,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.SettingsSwitchItem
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.LogUtil
 
@@ -123,6 +125,7 @@ fun TaskerScreen(
     onBackClick: () -> Unit,
     onSave: () -> Unit
 ) {
+    val listState = rememberLazyListState()
     AppScaffold(
         topBar = {
             AppTopBar(
@@ -142,7 +145,12 @@ fun TaskerScreen(
                 checked = switchState.value,
                 onCheckedChange = { switchState.value = it }
             )
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScrollbar(listState)
+            ) {
                 itemsIndexed(items) { index, remarks ->
                     Row(
                         modifier = Modifier

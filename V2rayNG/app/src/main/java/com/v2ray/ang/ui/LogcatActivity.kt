@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +41,7 @@ import com.v2ray.ang.compose.AppDivider
 import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.LocalAppSnackbar
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.LogcatViewModel
@@ -136,6 +138,7 @@ fun LogcatScreen(
     LaunchedEffect(Unit) {
         snackbar.show(context.getString(R.string.pull_down_to_refresh))
     }
+    val listState = rememberLazyListState()
 
     AppScaffold(
         topBar = {
@@ -200,7 +203,12 @@ fun LogcatScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScrollbar(listState)
+            ) {
                 itemsIndexed(items = logs, key = { index, _ -> index }) { _, log ->
                     LogcatItem(log = log, onLongClick = { Utils.setClipboard(context, log) })
                     AppDivider()

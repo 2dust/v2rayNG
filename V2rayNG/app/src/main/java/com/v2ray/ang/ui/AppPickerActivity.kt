@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +33,7 @@ import com.v2ray.ang.compose.AppDivider
 import com.v2ray.ang.compose.AppListItem
 import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTopBar
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.viewmodel.AppPickerViewModel
 
@@ -114,6 +116,7 @@ fun AppPickerScreen(
     var showSearch by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var showMenu by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
 
     LaunchedEffect(searchQuery) {
         onSearch(searchQuery)
@@ -170,7 +173,13 @@ fun AppPickerScreen(
             )
         }
     ) { innerPadding ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScrollbar(listState)
+        ) {
             items(items = apps, key = { it.packageName }) { app ->
                 val checked = selectedPackages.contains(app.packageName)
                 AppListItem(

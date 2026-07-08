@@ -46,6 +46,7 @@ import com.v2ray.ang.compose.SelectListDialog
 import com.v2ray.ang.compose.QRCodeDialog
 import com.v2ray.ang.compose.ReorderableListItem
 import com.v2ray.ang.compose.colorFabActive
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
@@ -169,7 +170,10 @@ fun SubSettingScreen(
     ) { innerPadding ->
         LazyColumn(
             state = lazyListState,
-            modifier = Modifier.fillMaxSize().padding(innerPadding)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScrollbar(lazyListState)
         ) {
             itemsIndexed(
                 items = subscriptions,

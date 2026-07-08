@@ -51,6 +51,7 @@ import com.v2ray.ang.compose.ReorderableListItem
 import com.v2ray.ang.compose.SelectListDialog
 import com.v2ray.ang.compose.colorConfigType
 import com.v2ray.ang.compose.colorFabActive
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
@@ -248,6 +249,7 @@ fun RoutingSettingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .verticalScrollbar(lazyListState)
         ) {
             item(key = "domain_strategy") {
                 Column(

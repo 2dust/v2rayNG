@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +50,7 @@ import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.SelectListDialog
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
 import com.v2ray.ang.extension.toast
@@ -264,6 +266,7 @@ fun UserAssetScreen(
     var showAddMenu by remember { mutableStateOf(false) }
     var showGeoSourceDialog by remember { mutableStateOf(false) }
     var deleteTargetGuid by remember { mutableStateOf<String?>(null) }
+    val listState = rememberLazyListState()
 
     AppScaffold(
         topBar = {
@@ -304,7 +307,13 @@ fun UserAssetScreen(
             )
         }
     ) { innerPadding ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScrollbar(listState)
+        ) {
             item(key = "geo_source_$trigger") {
                 Column(
                     modifier = Modifier

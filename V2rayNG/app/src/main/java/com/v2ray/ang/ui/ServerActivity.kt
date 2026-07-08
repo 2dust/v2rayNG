@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +37,7 @@ import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
 import com.v2ray.ang.compose.FormTextField
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
@@ -218,6 +220,7 @@ fun ServerScreen(
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     var isFetchingCert by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
 
     AppScaffold(
         topBar = {
@@ -266,7 +269,11 @@ fun ServerScreen(
         }
     ) { padding ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScrollbar(listState),
             contentPadding = PaddingValues(bottom = 36.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {

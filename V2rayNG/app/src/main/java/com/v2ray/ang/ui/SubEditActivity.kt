@@ -30,6 +30,7 @@ import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
 import com.v2ray.ang.compose.FormTextField
 import com.v2ray.ang.compose.SettingsSwitchItem
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
@@ -135,6 +136,7 @@ fun SubEditScreen(
 
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
+    val scrollState = rememberScrollState()
 
     fun buildSubItem(): SubscriptionItem? {
         val subItem = MmkvManager.decodeSubscription(editSubId) ?: SubscriptionItem()
@@ -190,7 +192,8 @@ fun SubEditScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
+                .verticalScrollbar(scrollState)
                 .padding(vertical = 8.dp)
                 .padding(bottom = 36.dp)
         ) {

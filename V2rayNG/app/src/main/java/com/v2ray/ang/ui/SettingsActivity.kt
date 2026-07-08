@@ -31,6 +31,7 @@ import com.v2ray.ang.compose.SettingsListItem
 import com.v2ray.ang.compose.SettingsMenuItem
 import com.v2ray.ang.compose.SettingsSwitchItem
 import com.v2ray.ang.compose.ThemeManager
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvString
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
@@ -65,6 +66,7 @@ fun SettingsScreen(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
 
     suspend fun checkAndRequestRoot(context: Context): Boolean {
         val hasRoot = withContext(Dispatchers.IO) { RootManager.refresh() }
@@ -173,7 +175,8 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
+                .verticalScrollbar(scrollState)
         ) {
             PreferenceGroupHeader(title = stringResource(R.string.title_ui_settings))
             SettingsSwitchItem(

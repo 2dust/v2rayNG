@@ -34,6 +34,7 @@ import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
 import com.v2ray.ang.compose.FormTextField
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
@@ -187,6 +188,7 @@ fun ProxyChainScreen(
             state = lazyListState,
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScrollbar(lazyListState)
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
