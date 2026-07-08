@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Checkbox
@@ -250,15 +251,6 @@ fun AppDivider(modifier: Modifier = Modifier) {
     HorizontalDivider(modifier = modifier.fillMaxWidth(), thickness = 1.dp, color = color)
 }
 
-/**
- * Unified Scaffold that automatically handles status bar, navigation bar, and IME insets.
- *
- * - For pages **without** a bottom bar: `contentWindowInsets = safeDrawing`
- *   → the innerPadding already excludes the navigation bar, so UI code can simply use `.padding(innerPadding)`.
- * - For pages **with** a bottom bar: `contentWindowInsets` only includes top + IME insets.
- *   The navigation bar insets are consumed by the bottom bar slot itself, which should apply
- *   `.windowInsetsPadding(WindowInsets.navigationBars)` internally.
- */
 @Composable
 fun AppScaffold(
     modifier: Modifier = Modifier,
@@ -283,7 +275,7 @@ fun AppScaffold(
                 WindowInsetsSides.Top + WindowInsetsSides.Horizontal
             )
         } else {
-            WindowInsets.safeDrawing
+            WindowInsets.systemBars
         },
         content = content
     )
