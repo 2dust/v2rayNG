@@ -3,6 +3,7 @@ package com.v2ray.ang.compose
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.DropdownMenuItem
@@ -17,10 +18,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
@@ -75,10 +79,20 @@ fun FormDropdownField(
     enabled: Boolean = true,
     placeholder: String? = null,
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val menuScrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { if (enabled) expanded = it },
+        onExpandedChange = { newExpanded ->
+            if (!enabled) return@ExposedDropdownMenuBox
+            if (!editable && newExpanded) {
+                keyboardController?.hide()
+            }
+            expanded = newExpanded
+        },
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
@@ -106,10 +120,17 @@ fun FormDropdownField(
                     else ExposedDropdownMenuAnchorType.PrimaryNotEditable
                 )
                 .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                    if (!editable && focusState.isFocused) {
+                        keyboardController?.hide()
+                    }
+                }
         )
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
+            modifier = Modifier.verticalScrollbar(menuScrollState),
+            scrollState = menuScrollState,
             containerColor = MaterialTheme.colorScheme.surface
         ) {
             options.forEach { option ->
@@ -118,6 +139,7 @@ fun FormDropdownField(
                     onClick = {
                         onValueChange(option)
                         expanded = false
+                        focusManager.clearFocus()
                     }
                 )
             }
