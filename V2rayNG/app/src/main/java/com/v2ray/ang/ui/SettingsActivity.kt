@@ -553,7 +553,6 @@ fun SettingsScreen(
                 title = stringResource(R.string.title_root_lan_sharing),
                 summary = stringResource(R.string.summary_root_lan_sharing),
                 checked = lanSharing,
-                enabled = enableRootMode,
                 onCheckedChange = { newValue ->
                     if (newValue && !RootManager.cachedRoot()) {
                         scope.launch {
