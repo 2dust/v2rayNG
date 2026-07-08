@@ -1,39 +1,55 @@
 package com.v2ray.ang.ui
 
+import android.app.Activity
 import android.os.Bundle
 import android.text.TextUtils
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.v2ray.ang.AppConfig
@@ -42,7 +58,8 @@ import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormTextField
-import com.v2ray.ang.compose.LocalDarkTheme
+import com.v2ray.ang.compose.horizontalScrollbar
+import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
@@ -52,6 +69,7 @@ import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.util.LogUtil
+import kotlinx.coroutines.flow.collectLatest
 
 class ServerCustomConfigActivity : BaseComponentActivity() {
 
@@ -62,15 +80,14 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
                 && editGuid == MmkvManager.getSelectServer()
     }
 
-    private lateinit var initialRemarks: String
-    private lateinit var initialContent: String
+    private var initialRemarks: String = ""
+    private var initialContent: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
         val config = MmkvManager.decodeServerConfig(editGuid)
         initialRemarks = config?.remarks ?: ""
         initialContent = MmkvManager.decodeServerRaw(editGuid).orEmpty()
+        super.onCreate(savedInstanceState)
     }
 
     @Composable
@@ -91,7 +108,6 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
             toast(R.string.server_lab_remarks)
             return false
         }
-
         val profileItem = try {
             CustomFmt.parse(content)
         } catch (e: Exception) {
@@ -99,18 +115,18 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
             toast("${getString(R.string.toast_malformed_josn)} ${e.cause?.message}")
             return false
         }
-
-        val config = MmkvManager.decodeServerConfig(editGuid) ?: ProfileItem.create(EConfigType.CUSTOM)
-        config.remarks = if (remarks.isEmpty()) profileItem?.remarks.orEmpty() else remarks
+        val config = MmkvManager.decodeServerConfig(editGuid)
+            ?: ProfileItem.create(EConfigType.CUSTOM)
+        config.remarks = remarks.ifEmpty { profileItem?.remarks.orEmpty() }
         config.server = profileItem?.server
         config.serverPort = profileItem?.serverPort
         config.description = AngConfigManager.generateDescription(config)
-
         MmkvManager.encodeServerConfig(editGuid, config)
         MmkvManager.encodeServerRaw(editGuid, content)
         if (isRunning) {
             SettingsChangeManager.makeRestartService()
         }
+        setResult(Activity.RESULT_OK)
         toastSuccess(R.string.toast_success)
         finish()
         return true
@@ -119,31 +135,20 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
     private fun deleteServer(): Boolean {
         if (editGuid.isNotEmpty()) {
             MmkvManager.removeServer(editGuid)
+            setResult(Activity.RESULT_OK)
             finish()
         }
         return true
     }
 }
 
-/**
- * Visual transformation that highlights JSON syntax symbols ( { } [ ] : , )
- * with a color that adapts to the current theme.
- */
-class JsonSyntaxVisualTransformation(private val isDarkTheme: Boolean) : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        val builder = AnnotatedString.Builder(text.text)
-        val symbolColor = if (isDarkTheme) Color(0xFFFFD700) else Color(0xFF000000)
-        text.text.forEachIndexed { index, c ->
-            if (c in setOf('{', '}', '[', ']', ':', ',')) {
-                builder.addStyle(
-                    SpanStyle(color = symbolColor),
-                    index,
-                    index + 1
-                )
-            }
-        }
-        return TransformedText(builder.toAnnotatedString(), OffsetMapping.Identity)
-    }
+private object EditorConstants {
+    val FONT_SIZE = 14.sp
+    val LINE_HEIGHT = 20.sp
+    val LINE_NUMBER_HORIZONTAL_PADDING = 8.dp
+    val SCROLLBAR_THICKNESS = 4.dp
+    val SCROLLBAR_PADDING = 2.dp
+    val SCROLL_PADDING = 60.dp
 }
 
 @Composable
@@ -157,38 +162,92 @@ fun ServerCustomConfigScreen(
     onDelete: () -> Unit
 ) {
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
-    var textFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(initialContent))
-    }
+    val textFieldState = rememberTextFieldState(initialText = initialContent)
     var showDeleteConfirm by remember { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
-    val scrollState = rememberScrollState()
-    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+
+    val verticalScroll = rememberScrollState()
+    val horizontalScroll = rememberScrollState()
     val density = LocalDensity.current
-    val isDarkTheme = LocalDarkTheme.current
 
-    LaunchedEffect(textFieldValue.selection, textLayoutResult) {
-        val layout = textLayoutResult ?: return@LaunchedEffect
-        val cursorPos = textFieldValue.selection.start
-        if (cursorPos < 0 || cursorPos > layout.layoutInput.text.length) return@LaunchedEffect
+    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
 
-        val line = layout.getLineForOffset(cursorPos)
-        val lineTop = layout.getLineTop(line)
-        val lineBottom = layout.getLineBottom(line)
-        val viewportSize = scrollState.viewportSize
-        val currentScroll = scrollState.value
-
-        val padding = with(density) { 60.dp.toPx() }
-
-        // Scroll down if the cursor line is near the bottom of the viewport.
-        if (lineBottom > currentScroll + viewportSize - padding) {
-            val target = (lineBottom - viewportSize + padding).toInt().coerceAtLeast(0)
-            scrollState.animateScrollTo(target)
+    val textMeasurer = rememberTextMeasurer()
+    val lineCount = remember(textFieldState.text.toString()) {
+        textFieldState.text.toString().count { it == '\n' } + 1
+    }
+    val lineNumberStyle = TextStyle(
+        fontFamily = FontFamily.Monospace,
+        fontSize = EditorConstants.FONT_SIZE,
+        lineHeight = EditorConstants.LINE_HEIGHT,
+    )
+    val lineNumberWidth: Dp = remember(lineCount, density) {
+        val sampleText = lineCount.toString()
+        val measured = textMeasurer.measure(
+            text = sampleText,
+            style = lineNumberStyle,
+        )
+        with(density) {
+            measured.size.width.toDp() +
+                    EditorConstants.LINE_NUMBER_HORIZONTAL_PADDING * 2
         }
-        // Scroll up if the cursor line is near the top of the viewport.
-        else if (lineTop < currentScroll + padding) {
-            val target = (lineTop - padding).toInt().coerceAtLeast(0)
-            scrollState.animateScrollTo(target)
+    }
+
+    LaunchedEffect(textFieldState, verticalScroll, horizontalScroll) {
+        snapshotFlow {
+            Triple(
+                textFieldState.selection,
+                verticalScroll.viewportSize,
+                horizontalScroll.viewportSize
+            )
+        }.collectLatest { (selection, _, _) ->
+            val layout = textLayoutResult ?: return@collectLatest
+            val cursor = selection.start
+            val textLen = layout.layoutInput.text.length
+
+            if (textLen == 0 || cursor < 0 || cursor > textLen) return@collectLatest
+
+            val line = layout.getLineForOffset(cursor)
+            val lineTop = layout.getLineTop(line)
+            val lineBottom = layout.getLineBottom(line)
+
+            val vh = verticalScroll.viewportSize.toFloat()
+            if (vh > 0f) {
+                val scrollY = verticalScroll.value.toFloat()
+                val pad = with(density) { EditorConstants.SCROLL_PADDING.toPx() }
+
+                val targetY = when {
+                    lineBottom > scrollY + vh - pad ->
+                        (lineBottom - vh + pad).toInt()
+                    lineTop < scrollY + pad ->
+                        (lineTop - pad).toInt()
+                    else -> null
+                }
+                targetY?.let {
+                    verticalScroll.animateScrollTo(
+                        it.coerceIn(0, verticalScroll.maxValue)
+                    )
+                }
+            }
+
+            val cursorX = layout.getHorizontalPosition(cursor, true)
+            val vw = horizontalScroll.viewportSize.toFloat()
+            if (vw > 0f) {
+                val scrollX = horizontalScroll.value.toFloat()
+                val pad = with(density) { EditorConstants.SCROLL_PADDING.toPx() }
+
+                val targetX = when {
+                    cursorX < scrollX + pad ->
+                        (cursorX - pad).toInt().coerceAtLeast(0)
+                    cursorX > scrollX + vw - pad ->
+                        (cursorX - vw + pad).toInt()
+                            .coerceAtMost(horizontalScroll.maxValue)
+                    else -> null
+                }
+                targetX?.let {
+                    horizontalScroll.animateScrollTo(it)
+                }
+            }
         }
     }
 
@@ -200,44 +259,168 @@ fun ServerCustomConfigScreen(
                 actions = {
                     if (showDelete) {
                         IconButton(onClick = { showDeleteConfirm = true }) {
-                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.menu_item_del_config))
+                            Icon(
+                                painterResource(R.drawable.ic_delete_24dp),
+                                contentDescription = stringResource(R.string.menu_item_del_config)
+                            )
                         }
                     }
-                    IconButton(onClick = { onSave(remarks, textFieldValue.text) }) {
-                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.menu_item_save_config))
+                    IconButton(onClick = { onSave(remarks, textFieldState.text.toString()) }) {
+                        Icon(
+                            painterResource(R.drawable.ic_fab_check),
+                            contentDescription = stringResource(R.string.menu_item_save_config)
+                        )
                     }
                 }
             )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            FormTextField(stringResource(R.string.server_lab_remarks), remarks, { remarks = it })
-
-            BasicTextField(
-                value = textFieldValue,
-                onValueChange = { textFieldValue = it },
+        },
+        content = { padding ->
+            Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .verticalScroll(scrollState)
-                    .padding(horizontal = 16.dp, vertical = 4.dp)
-                    .padding(bottom = 36.dp),
-                textStyle = TextStyle(
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
-                    color = Color(0xFF009966)
-                ),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                visualTransformation = remember(isDarkTheme) { JsonSyntaxVisualTransformation(isDarkTheme) },
-                onTextLayout = { textLayoutResult = it }
-            )
+                    .fillMaxSize()
+                    .padding(padding)
+                    .imePadding()
+            ) {
+                FormTextField(
+                    label = stringResource(R.string.server_lab_remarks),
+                    value = remarks,
+                    onValueChange = { remarks = it }
+                )
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(verticalScroll)
+                    ) {
+                        val lineNumberColor =
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                        val layoutForLineNumbers = textLayoutResult
+
+                        if (layoutForLineNumbers != null && layoutForLineNumbers.lineCount > 0) {
+                            val totalTextHeight = layoutForLineNumbers.size.height
+                            Canvas(
+                                modifier = Modifier
+                                    .width(lineNumberWidth)
+                                    .height(with(density) { totalTextHeight.toDp() })
+                            ) {
+                                val lc = layoutForLineNumbers.lineCount
+                                for (i in 0 until lc) {
+                                    val lineLabel = (i + 1).toString()
+                                    val measured = textMeasurer.measure(
+                                        text = lineLabel,
+                                        style = lineNumberStyle.copy(
+                                            color = lineNumberColor,
+                                            textAlign = TextAlign.End,
+                                        ),
+                                    )
+                                    val lineTop = layoutForLineNumbers.getLineTop(i)
+                                    val lineBaseline = layoutForLineNumbers.getLineBaseline(i)
+                                    val measuredBaseline = measured.firstBaseline
+                                    val yOffset = lineBaseline - measuredBaseline
+                                    val xOffset = size.width -
+                                            EditorConstants.LINE_NUMBER_HORIZONTAL_PADDING.toPx() -
+                                            measured.size.width
+                                    drawText(
+                                        textLayoutResult = measured,
+                                        topLeft = Offset(
+                                            x = xOffset.coerceAtLeast(0f),
+                                            y = yOffset
+                                        )
+                                    )
+                                }
+                            }
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .width(lineNumberWidth)
+                                    .padding(end = EditorConstants.LINE_NUMBER_HORIZONTAL_PADDING),
+                                contentAlignment = Alignment.TopEnd
+                            ) {
+                                Text(
+                                    text = "1",
+                                    style = lineNumberStyle.copy(color = lineNumberColor),
+                                )
+                            }
+                        }
+
+                        CompositionLocalProvider(
+                            LocalTextSelectionColors provides TextSelectionColors(
+                                handleColor = MaterialTheme.colorScheme.secondary,
+                                backgroundColor = MaterialTheme.colorScheme.secondary.copy(
+                                    alpha = 0.4f
+                                )
+                            )
+                        ) {
+                            BasicTextField(
+                                state = textFieldState,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .horizontalScroll(horizontalScroll)
+                                    .padding(end = 24.dp)
+                                    .padding(bottom = 36.dp),
+                                textStyle = TextStyle(
+                                    fontFamily = FontFamily.Monospace,
+                                    fontSize = EditorConstants.FONT_SIZE,
+                                    lineHeight = EditorConstants.LINE_HEIGHT,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                ),
+                                lineLimits = TextFieldLineLimits.MultiLine(),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
+                                onTextLayout = { resultProvider ->
+                                    textLayoutResult = resultProvider()
+                                },
+                                decorator = { innerTextField ->
+                                    Box {
+                                        if (textFieldState.text.isEmpty()) {
+                                            Text(
+                                                text = "{ }",
+                                                style = TextStyle(
+                                                    fontFamily = FontFamily.Monospace,
+                                                    fontSize = EditorConstants.FONT_SIZE,
+                                                    lineHeight = EditorConstants.LINE_HEIGHT,
+                                                    color = MaterialTheme.colorScheme.onSurface.copy(
+                                                        alpha = 0.38f
+                                                    )
+                                                )
+                                            )
+                                        }
+                                        innerTextField()
+                                    }
+                                }
+                            )
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .fillMaxHeight()
+                            .width(
+                                EditorConstants.SCROLLBAR_THICKNESS +
+                                        EditorConstants.SCROLLBAR_PADDING * 2
+                            )
+                            .verticalScrollbar(scrollState = verticalScroll)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .height(
+                                EditorConstants.SCROLLBAR_THICKNESS +
+                                        EditorConstants.SCROLLBAR_PADDING * 2
+                            )
+                            .horizontalScrollbar(scrollState = horizontalScroll)
+                    )
+                }
+            }
         }
-    }
+    )
 
     if (showDeleteConfirm) {
         ConfirmDialog(
