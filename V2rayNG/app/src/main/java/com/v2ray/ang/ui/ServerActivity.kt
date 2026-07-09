@@ -121,6 +121,8 @@ class ServerActivity : BaseActivity() {
     private val et_path: EditText? by lazy { findViewById(R.id.et_path) }
     private val sp_stream_alpn: Spinner? by lazy { findViewById(R.id.sp_stream_alpn) } //uTLS
     private val container_alpn: LinearLayout? by lazy { findViewById(R.id.lay_stream_alpn) }
+    private val et_cipher_suites: EditText? by lazy { findViewById(R.id.et_cipher_suites) }
+    private val container_cipher_suites: LinearLayout? by lazy { findViewById(R.id.lay_cipher_suites) }
     private val et_public_key: EditText? by lazy { findViewById(R.id.et_public_key) }
     private val et_preshared_key: EditText? by lazy { findViewById(R.id.et_preshared_key) }
     private val container_public_key: LinearLayout? by lazy { findViewById(R.id.lay_public_key) }
@@ -298,6 +300,7 @@ class ServerActivity : BaseActivity() {
                             container_sni,
                             container_fingerprint,
                             container_alpn,
+                            container_cipher_suites,
                             container_allow_insecure,
                             container_public_key,
                             container_short_id,
@@ -315,6 +318,7 @@ class ServerActivity : BaseActivity() {
                             container_sni,
                             container_fingerprint,
                             container_alpn,
+                            container_cipher_suites,
                             container_allow_insecure,
                             container_ech_config_list,
                             container_verify_peer_cert_by_name,
@@ -336,6 +340,7 @@ class ServerActivity : BaseActivity() {
                         ).forEach { it?.visibility = View.VISIBLE }
                         listOf(
                             container_alpn,
+                            container_cipher_suites,
                             container_allow_insecure,
                             container_ech_config_list,
                             container_verify_peer_cert_by_name,
@@ -424,6 +429,7 @@ class ServerActivity : BaseActivity() {
                 if (allowinsecure >= 0) {
                     sp_allow_insecure?.setSelection(allowinsecure)
                 }
+                et_cipher_suites?.text = Utils.getEditable(config.cipherSuites)
                 et_ech_config_list?.text = Utils.getEditable(config.echConfigList)
                 et_verify_peer_cert_by_name?.text = Utils.getEditable(config.verifyPeerCertByName)
                 et_pinned_ca256?.text = Utils.getEditable(config.pinnedCA256)
@@ -628,6 +634,7 @@ class ServerActivity : BaseActivity() {
         val shortId = et_short_id?.text?.toString()
         val spiderX = et_spider_x?.text?.toString()
         val mldsa65Verify = et_mldsa65_verify?.text?.toString()
+        val cipherSuites = et_cipher_suites?.text?.toString()
         val echConfigList = et_ech_config_list?.text?.toString()
         val verifyPeerCertByName = et_verify_peer_cert_by_name?.text?.toString()
         val pinnedCA256 = et_pinned_ca256?.text?.toString()
@@ -644,6 +651,7 @@ class ServerActivity : BaseActivity() {
         config.sni = sniField
         config.fingerPrint = uTlsItems[utlsIndex]
         config.alpn = alpns[alpnIndex]
+        config.cipherSuites = cipherSuites
         config.publicKey = publicKey
         config.shortId = shortId
         config.spiderX = spiderX
