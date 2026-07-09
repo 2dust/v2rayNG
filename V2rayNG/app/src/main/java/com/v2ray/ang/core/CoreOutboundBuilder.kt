@@ -566,6 +566,7 @@ object CoreOutboundBuilder {
             serverName = sni.nullIfBlank(),
             fingerprint = profileItem.fingerPrint.nullIfBlank(),
             alpn = profileItem.alpn?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }.takeIf { !it.isNullOrEmpty() },
+            cipherSuites = profileItem.cipherSuites.nullIfBlank(),
             echConfigList = profileItem.echConfigList.nullIfBlank(),
             verifyPeerCertByName = profileItem.verifyPeerCertByName.nullIfBlank(),
             pinnedPeerCertSha256 = profileItem.pinnedCA256.nullIfBlank(),
