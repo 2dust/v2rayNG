@@ -70,6 +70,7 @@
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">Отпечаток</string>
     <string name="server_lab_stream_alpn">ALPN</string>
+    <string name="server_lab_cipher_suites">Наборы шифров (Cipher Suites)</string>
     <string name="server_lab_allow_insecure">Разрешать небезопасные соединения</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">Адрес</string>

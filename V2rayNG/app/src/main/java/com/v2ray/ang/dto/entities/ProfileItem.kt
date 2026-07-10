@@ -114,6 +114,7 @@ data class ProfileItem(
                 && this.sni == obj.sni
                 && this.alpn == obj.alpn
                 && this.fingerPrint == obj.fingerPrint
+                && this.cipherSuites == obj.cipherSuites
                 && this.publicKey == obj.publicKey
                 && this.shortId == obj.shortId
 

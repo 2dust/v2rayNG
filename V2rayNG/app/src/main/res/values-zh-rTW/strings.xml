@@ -70,6 +70,7 @@
     <string name="server_lab_stream_security">傳輸層安全 (TLS)</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn">Alpn</string>
+    <string name="server_lab_cipher_suites">加密套件 (Cipher Suites)</string>
     <string name="server_lab_allow_insecure">跳過憑證驗證 (allowInsecure)</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">伺服器位址</string>
