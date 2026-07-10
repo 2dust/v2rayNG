@@ -31,6 +31,21 @@ class TProxyService(
         @Suppress("FunctionName")
         private external fun TProxyGetStats(): LongArray?
 
+        /**
+         * Starts a second HEV instance from a dedicated process.
+         *
+         * The Shizuku tethering UserService runs in its own process, so HEV's process-global
+         * native state is independent from the instance serving the regular VpnService TUN.
+         */
+        fun startExternalTunnel(configPath: String, fd: Int) {
+            TProxyStartService(configPath, fd)
+        }
+
+        /** Stops the HEV instance started in the current process. */
+        fun stopExternalTunnel() {
+            TProxyStopService()
+        }
+
         init {
             System.loadLibrary("hev-socks5-tunnel")
         }

@@ -9,10 +9,13 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.system.OsConstants
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.contracts.ServiceControl
+import com.v2ray.ang.dto.HotspotRoutingSnapshot
+import com.v2ray.ang.dto.HotspotRoutingSync
 import com.v2ray.ang.dto.OutboundTrafficStat
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.extension.isComplexType
@@ -48,6 +51,9 @@ object CoreServiceManager {
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
+    @Volatile private var runningConfigContent = ""
+    @Volatile private var runningUsesHevTun = false
+    @Volatile private var runningInVpnMode = false
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -223,12 +229,18 @@ object CoreServiceManager {
             return false
         }
 
+        clearHotspotSnapshot()
         try {
             doStartCoreLoop(service, vpnInterface)
             return true
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: $message", e)
+            sendHotspotSync(
+                service,
+                HotspotRoutingSync.EVENT_CORE_START_FAILED,
+                detail = message
+            )
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
             NotificationManager.cancelNotification()
             return false
@@ -254,13 +266,14 @@ object CoreServiceManager {
         ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
 
         currentConfig = config
+        val usesHevTun = SettingsManager.isUsingHevTun()
         var tunFd = vpnInterface?.fd ?: 0
         val dialerAddr = if (currentConfig?.browserDialerMode.isNullOrEmpty()) {
             ""
         } else {
             "127.0.0.1:${Utils.findRandomFreePort()}"
         }
-        if (SettingsManager.isUsingHevTun()) {
+        if (usesHevTun) {
             tunFd = 0
         }
 
@@ -271,6 +284,10 @@ object CoreServiceManager {
         if (!coreController.isRunning) {
             error("Core failed to start")
         }
+
+        runningConfigContent = result.content
+        runningUsesHevTun = usesHevTun
+        runningInVpnMode = service is CoreVpnService
 
         if (browserDialer != null) {
             browserDialer!!.stop()
@@ -284,6 +301,11 @@ object CoreServiceManager {
             browserDialer!!.start(service, dialerAddr)
         }
 
+        sendHotspotSync(
+            service,
+            HotspotRoutingSync.EVENT_CORE_STARTED,
+            createHotspotSnapshot()
+        )
         MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
         NotificationManager.startSpeedNotification()
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
@@ -295,7 +317,13 @@ object CoreServiceManager {
      * @return True if the core was stopped successfully, false otherwise.
      */
     fun stopCoreLoop(): Boolean {
-        val service = getService() ?: return false
+        val service = getService()
+        if (service == null) {
+            clearHotspotSnapshot()
+            return false
+        }
+        sendHotspotSync(service, HotspotRoutingSync.EVENT_CORE_STOPPING)
+        clearHotspotSnapshot()
 
         if (coreController.isRunning) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -324,6 +352,61 @@ object CoreServiceManager {
         }
 
         return true
+    }
+
+    private fun clearHotspotSnapshot() {
+        runningConfigContent = ""
+        runningUsesHevTun = false
+        runningInVpnMode = false
+    }
+
+    private fun createHotspotSnapshot(): HotspotRoutingSnapshot {
+        if (!coreController.isRunning || runningConfigContent.isBlank()) {
+            return HotspotRoutingSnapshot.stopped()
+        }
+
+        val timeoutSetting = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT)
+            ?: AppConfig.HEVTUN_RW_TIMEOUT
+        val timeoutParts = timeoutSetting.split(',').map { it.trim() }
+
+        return HotspotRoutingSnapshot(
+            running = true,
+            vpnMode = runningInVpnMode,
+            profileName = currentConfig?.remarks.orEmpty(),
+            useHev = runningUsesHevTun,
+            coreConfig = runningConfigContent,
+            socksPort = SettingsManager.getSocksPort(),
+            socksUsername = SettingsManager.getSocksUsername(),
+            socksPassword = SettingsManager.getSocksPassword(),
+            mtu = SettingsManager.getVpnMtu(),
+            hevTcpTimeoutSeconds = timeoutParts.getOrNull(0)?.toIntOrNull() ?: 300,
+            hevUdpTimeoutSeconds = timeoutParts.getOrNull(1)?.toIntOrNull() ?: 60,
+            hevLogLevel = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL)
+                ?: "warn",
+        )
+    }
+
+    private fun sendHotspotSync(
+        service: Service,
+        event: Int,
+        snapshot: HotspotRoutingSnapshot? = null,
+        detail: String = "",
+    ) {
+        val token = MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN)
+            ?.takeIf { it.isNotBlank() }
+            ?: run {
+                Log.i(AppConfig.TAG, "Hotspot sync event $event skipped: no active Shizuku session")
+                return
+            }
+        Log.i(
+            AppConfig.TAG,
+            "Sending hotspot sync event $event${snapshot?.profileName?.let { " for $it" }.orEmpty()}",
+        )
+        MessageUtil.sendMsg2Shizuku(
+            service,
+            AppConfig.MSG_HOTSPOT_SYNC,
+            HotspotRoutingSync(token, event, snapshot, detail)
+        )
     }
 
     /**
@@ -505,6 +588,14 @@ object CoreServiceManager {
                     } else {
                         MessageUtil.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_NOT_RUNNING, "")
                     }
+                }
+
+                AppConfig.MSG_QUERY_HOTSPOT_CONFIG -> {
+                    MessageUtil.sendMsg2UI(
+                        serviceControl.getService(),
+                        AppConfig.MSG_HOTSPOT_CONFIG_RESPONSE,
+                        createHotspotSnapshot()
+                    )
                 }
 
                 AppConfig.MSG_UNREGISTER_CLIENT -> {

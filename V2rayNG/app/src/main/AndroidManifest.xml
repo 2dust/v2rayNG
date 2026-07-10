@@ -198,8 +198,26 @@
             android:name=".ui.backup.BackupActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.ShizukuActivity"
+            android:exported="false" />
+        <receiver
+            android:name=".shizuku.ShizukuRoutingSyncReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="${applicationId}.action.shizuku" />
+            </intent-filter>
+        </receiver>
+        <activity
             android:name=".ui.AboutActivity"
             android:exported="false" />
+
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:enabled="true"
+            android:exported="true"
+            android:multiprocess="false"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
         <service
             android:name=".service.CoreVpnService"

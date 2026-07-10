@@ -92,6 +92,7 @@ fun MainDrawerContent(onNavigate: (String) -> Unit) {
                     DrawerMenuItemData(R.drawable.ic_logcat_24dp, R.string.title_logcat, "logcat"),
                     DrawerMenuItemData(R.drawable.ic_check_update_24dp, R.string.update_check_for_update, "check_update"),
                     DrawerMenuItemData(R.drawable.ic_restore_24dp, R.string.title_configuration_backup_restore, "backup_restore"),
+                    DrawerMenuItemData(R.drawable.ic_device_hub_24dp, R.string.title_tethering, "tethering"),
                     DrawerMenuItemData(R.drawable.ic_about_24dp, R.string.title_about, "about")
                 ),
                 onNavigate = onNavigate
