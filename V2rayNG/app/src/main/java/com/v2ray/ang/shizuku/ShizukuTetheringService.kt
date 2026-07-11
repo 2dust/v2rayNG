@@ -8,9 +8,9 @@ import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.net.TetheringInterface
 import android.net.TetheringManager
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.util.Log
@@ -92,27 +92,19 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     }
 
     override fun getActiveTetheringTypes(): Int {
-        var types = TETHERING_TYPES_UNKNOWN
-        val callbackReceived = CountDownLatch(1)
-        val callback = object : TetheringManager.TetheringEventCallback {
-            override fun onTetheredInterfacesChanged(interfaces: Set<TetheringInterface>) {
-                types = interfaces.fold(0) { mask, item -> mask or tetheringTypeBit(item.type) }
-                callbackReceived.countDown()
-            }
-        }
-
         return try {
-            tetheringManager.registerTetheringEventCallback(executor, callback)
-            if (!callbackReceived.await(CALLBACK_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                TETHERING_TYPES_UNKNOWN
+            if (Build.VERSION.SDK_INT >= 36) {
+                TetheringApi36.getActiveTetheringTypes(
+                    tetheringManager,
+                    executor,
+                    CALLBACK_TIMEOUT_SECONDS,
+                )
             } else {
-                types
+                getLegacyActiveTetheringTypes()
             }
         } catch (error: Throwable) {
             Log.e(TAG, "Unable to read tethering state", error)
             TETHERING_TYPES_UNKNOWN
-        } finally {
-            runCatching { tetheringManager.unregisterTetheringEventCallback(callback) }
         }
     }
 
@@ -397,44 +389,42 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             if (enabled == alreadyEnabled) return RESULT_OK
         }
 
-        val request = TetheringManager.TetheringRequest.Builder(type).build()
+        if (!enabled) {
+            return if (Build.VERSION.SDK_INT >= 36) {
+                runCatching {
+                    TetheringApi36.stopTethering(
+                        tetheringManager,
+                        TetheringManager.TetheringRequest.Builder(type).build(),
+                        executor,
+                        CALLBACK_TIMEOUT_SECONDS,
+                    )
+                }.onFailure {
+                    Log.e(TAG, "Unable to stop API 36 tethering type $type", it)
+                }.getOrDefault(RESULT_INTERNAL_ERROR)
+            } else {
+                stopLegacyTethering(type)
+            }
+        }
+
         val callbackReceived = CountDownLatch(1)
         var result = RESULT_INTERNAL_ERROR
 
         return try {
-            if (enabled) {
-                tetheringManager.startTethering(
-                    request,
-                    executor,
-                    object : TetheringManager.StartTetheringCallback {
-                        override fun onTetheringStarted() {
-                            result = RESULT_OK
-                            callbackReceived.countDown()
-                        }
-
-                        override fun onTetheringFailed(error: Int) {
-                            result = error
-                            callbackReceived.countDown()
-                        }
+            tetheringManager.startTethering(
+                TetheringManager.TetheringRequest.Builder(type).build(),
+                executor,
+                object : TetheringManager.StartTetheringCallback {
+                    override fun onTetheringStarted() {
+                        result = RESULT_OK
+                        callbackReceived.countDown()
                     }
-                )
-            } else {
-                tetheringManager.stopTethering(
-                    request,
-                    executor,
-                    object : TetheringManager.StopTetheringCallback {
-                        override fun onStopTetheringSucceeded() {
-                            result = RESULT_OK
-                            callbackReceived.countDown()
-                        }
 
-                        override fun onStopTetheringFailed(error: Int) {
-                            result = error
-                            callbackReceived.countDown()
-                        }
+                    override fun onTetheringFailed(error: Int) {
+                        result = error
+                        callbackReceived.countDown()
                     }
-                )
-            }
+                }
+            )
 
             if (!callbackReceived.await(CALLBACK_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                 RESULT_INTERNAL_ERROR
@@ -443,6 +433,83 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             }
         } catch (error: Throwable) {
             Log.e(TAG, "Unable to change tethering type $type to $enabled", error)
+            RESULT_INTERNAL_ERROR
+        }
+    }
+
+    private fun getLegacyActiveTetheringTypes(): Int {
+        val method = tetheringManager.javaClass.methods.firstOrNull {
+            it.name == "getTetheredIfaces" && it.parameterCount == 0
+        } ?: error("TetheringManager.getTetheredIfaces is unavailable")
+        val interfaces = when (val result = method.invoke(tetheringManager)) {
+            is Array<*> -> result.filterIsInstance<String>()
+            is Collection<*> -> result.filterIsInstance<String>()
+            else -> error("TetheringManager returned an unsupported tethered-interface list")
+        }
+        if (interfaces.isEmpty()) return 0
+
+        val regexesByType = mapOf(
+            TetheringManager.TETHERING_WIFI to getLegacyTetheringRegexes("getTetherableWifiRegexs"),
+            LEGACY_TETHERING_TYPE_USB to getLegacyTetheringRegexes("getTetherableUsbRegexs"),
+            LEGACY_TETHERING_TYPE_BLUETOOTH to
+                getLegacyTetheringRegexes("getTetherableBluetoothRegexs"),
+        )
+        return interfaces.fold(0) { mask, interfaceName ->
+            val type = regexesByType.entries.firstOrNull { (_, regexes) ->
+                regexes.any { pattern -> runCatching { Regex(pattern).matches(interfaceName) }.getOrDefault(false) }
+            }?.key ?: inferLegacyTetheringType(interfaceName)
+            if (type == null) mask else mask or tetheringTypeBit(type)
+        }
+    }
+
+    private fun getLegacyTetheringRegexes(methodName: String): List<String> {
+        val method = tetheringManager.javaClass.methods.firstOrNull {
+            it.name == methodName && it.parameterCount == 0
+        } ?: return emptyList()
+        return when (val result = method.invoke(tetheringManager)) {
+            is Array<*> -> result.filterIsInstance<String>()
+            is Collection<*> -> result.filterIsInstance<String>()
+            else -> emptyList()
+        }
+    }
+
+    private fun inferLegacyTetheringType(interfaceName: String): Int? {
+        val name = interfaceName.lowercase()
+        return when {
+            name.startsWith("wlan") || name.startsWith("ap") || name.startsWith("softap") ->
+                TetheringManager.TETHERING_WIFI
+            name.startsWith("usb") || name.startsWith("rndis") || name.startsWith("ncm") ->
+                LEGACY_TETHERING_TYPE_USB
+            name.startsWith("bt-pan") || name.startsWith("bnep") ->
+                LEGACY_TETHERING_TYPE_BLUETOOTH
+            else -> null
+        }
+    }
+
+    private fun stopLegacyTethering(type: Int): Int {
+        return try {
+            val method = tetheringManager.javaClass.methods.firstOrNull {
+                it.name == "stopTethering" &&
+                    it.parameterTypes.contentEquals(arrayOf(Integer.TYPE))
+            } ?: error("TetheringManager.stopTethering(int) is unavailable")
+            method.invoke(tetheringManager, type)
+
+            val deadline = System.nanoTime() +
+                TimeUnit.SECONDS.toNanos(CALLBACK_TIMEOUT_SECONDS)
+            val bit = tetheringTypeBit(type)
+            while (System.nanoTime() < deadline) {
+                val activeTypes = getLegacyActiveTetheringTypes()
+                if (activeTypes and bit == 0) return RESULT_OK
+                Thread.sleep(LEGACY_STOP_POLL_MILLIS)
+            }
+            Log.e(TAG, "Timed out waiting for legacy tethering type $type to stop")
+            RESULT_INTERNAL_ERROR
+        } catch (error: InterruptedException) {
+            Thread.currentThread().interrupt()
+            Log.e(TAG, "Interrupted while stopping legacy tethering type $type", error)
+            RESULT_INTERNAL_ERROR
+        } catch (error: Throwable) {
+            Log.e(TAG, "Unable to stop legacy tethering type $type", error)
             RESULT_INTERNAL_ERROR
         }
     }
@@ -710,13 +777,16 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_711
+        const val USER_SERVICE_VERSION = 20_260_712
         private const val SHELL_PACKAGE_NAME = "com.android.shell"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"
         private const val TRANSPORT_TEST = 7
         private const val MAX_TETHERING_TYPE = 15
+        private const val LEGACY_TETHERING_TYPE_USB = 1
+        private const val LEGACY_TETHERING_TYPE_BLUETOOTH = 2
         private const val CALLBACK_TIMEOUT_SECONDS = 10L
+        private const val LEGACY_STOP_POLL_MILLIS = 100L
         private const val TEST_NETWORK_TIMEOUT_SECONDS = 15L
 
         const val TETHERING_TYPE_USB = 1
