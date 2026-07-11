@@ -17,7 +17,6 @@ import java.text.Collator
 
 /**
  * ViewModel for AppPicker screen.
- * Holds selected packages and displayed app list.
  */
 class AppPickerViewModel : ViewModel() {
 
@@ -30,8 +29,9 @@ class AppPickerViewModel : ViewModel() {
     private val _displayedApps = MutableStateFlow<List<AppInfo>>(emptyList())
     val displayedApps: StateFlow<List<AppInfo>> = _displayedApps.asStateFlow()
 
-    // Cached full list
     private var appsAll: List<AppInfo> = emptyList()
+    private var currentQuery: String = ""
+    private var SelectedSnapshot: Set<String> = emptySet()
 
     fun initialize(initialSelected: Collection<String>) {
         _selectedPackages.value = initialSelected.toSet()
@@ -41,14 +41,14 @@ class AppPickerViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                SelectedSnapshot = _selectedPackages.value.toSet()
                 val apps = withContext(Dispatchers.IO) {
                     val list = AppManagerUtil.loadNetworkAppList(context)
                     val special = createSpecialItemUnidentified(context)
-                    val sorted = sortApps(list + special)
-                    sorted
+                    sortApps(list + special)
                 }
                 appsAll = apps
-                _displayedApps.value = apps
+                _displayedApps.value = applyFilter(currentQuery)
             } catch (e: Exception) {
                 LogUtil.e("AppPickerViewModel", "Failed to load app list", e)
             } finally {
@@ -58,53 +58,47 @@ class AppPickerViewModel : ViewModel() {
     }
 
     fun filterApps(query: String) {
-        val key = query.uppercase()
-        _displayedApps.value = if (key.isNotEmpty()) {
-            appsAll.filter {
-                it.appName.uppercase().contains(key) || it.packageName.uppercase().contains(key)
-            }
-        } else {
-            appsAll
-        }
+        currentQuery = query
+        _displayedApps.value = applyFilter(query)
     }
 
     fun toggleApp(packageName: String) {
         val current = _selectedPackages.value
-        val newSet = if (current.contains(packageName)) {
+        _selectedPackages.value = if (current.contains(packageName)) {
             current - packageName
         } else {
             current + packageName
         }
-        _selectedPackages.value = newSet
-        // Re‑sort when selection changes
-        sortAndUpdateDisplayed()
     }
 
     fun selectAll() {
-        val allPackages = _displayedApps.value.map { it.packageName }.toSet()
-        _selectedPackages.value = allPackages
-        sortAndUpdateDisplayed()
+        val displayedPackages = _displayedApps.value.map { it.packageName }.toSet()
+        _selectedPackages.value = _selectedPackages.value + displayedPackages
     }
 
     fun invertSelection() {
         val current = _selectedPackages.value
-        val allPackages = _displayedApps.value.map { it.packageName }.toSet()
-        val inverted = allPackages.filter { !current.contains(it) }.toSet()
-        _selectedPackages.value = inverted
-        sortAndUpdateDisplayed()
+        val displayedPackages = _displayedApps.value.map { it.packageName }.toSet()
+        _selectedPackages.value = (current - displayedPackages) +
+                (displayedPackages - current)
     }
 
     fun getSelectedPackages(): List<String> = _selectedPackages.value.sorted()
 
-    private fun sortAndUpdateDisplayed() {
-        _displayedApps.value = sortApps(appsAll)
+    private fun applyFilter(query: String): List<AppInfo> {
+        if (query.isBlank()) return appsAll
+        val key = query.uppercase()
+        return appsAll.filter {
+            it.appName.uppercase().contains(key) || it.packageName.uppercase().contains(key)
+        }
     }
 
     private fun sortApps(apps: List<AppInfo>): List<AppInfo> {
         val collator = Collator.getInstance()
+        val snapshot = SelectedSnapshot
         return apps.sortedWith { p1, p2 ->
-            val p1Selected = _selectedPackages.value.contains(p1.packageName)
-            val p2Selected = _selectedPackages.value.contains(p2.packageName)
+            val p1Selected = snapshot.contains(p1.packageName)
+            val p2Selected = snapshot.contains(p2.packageName)
             when {
                 p1Selected && !p2Selected -> -1
                 !p1Selected && p2Selected -> 1
