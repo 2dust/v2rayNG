@@ -35,6 +35,7 @@ class CoreVpnService : VpnService(), ServiceControl {
     private lateinit var mInterface: ParcelFileDescriptor
     private var isRunning = false
     private var tun2SocksService: Tun2SocksControl? = null
+    private val underlyingNetworkState = UnderlyingNetworkStateTracker<Network>()
 
     /**destroy
      * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
@@ -60,15 +61,23 @@ class CoreVpnService : VpnService(), ServiceControl {
         object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 setUnderlyingNetworks(arrayOf(network))
+                if (underlyingNetworkState.onAvailable(network)) {
+                    LogUtil.i(AppConfig.TAG, "StartCore-VPN: Underlying network changed to $network")
+                    CoreServiceManager.resetCoreNetworkState()
+                }
             }
 
             override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
                 // it's a good idea to refresh capabilities
-                setUnderlyingNetworks(arrayOf(network))
+                if (underlyingNetworkState.isCurrent(network)) {
+                    setUnderlyingNetworks(arrayOf(network))
+                }
             }
 
             override fun onLost(network: Network) {
-                setUnderlyingNetworks(null)
+                if (underlyingNetworkState.onLost(network)) {
+                    setUnderlyingNetworks(null)
+                }
             }
         }
     }
@@ -269,6 +278,7 @@ class CoreVpnService : VpnService(), ServiceControl {
     private fun configurePlatformFeatures(builder: Builder) {
         // Android P (API 28) and above: Configure network callbacks
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            underlyingNetworkState.reset()
             try {
                 connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
             } catch (e: Exception) {
@@ -361,6 +371,7 @@ class CoreVpnService : VpnService(), ServiceControl {
             } catch (e: Exception) {
                 LogUtil.w(AppConfig.TAG, "StartCore-VPN: Failed to unregister callback", e)
             }
+            underlyingNetworkState.reset()
         }
 
         tun2SocksService?.stopTun2Socks()

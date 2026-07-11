@@ -116,6 +116,23 @@ object CoreServiceManager {
     fun isRunning() = coreController.isRunning
 
     /**
+     * Recreates the in-process Xray instance after Android changes the VPN's
+     * underlying network. The VPN interface and service remain active.
+     */
+    fun resetCoreNetworkState() {
+        if (!coreController.isRunning) return
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                coreController.resetNetworkState()
+                LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core network state reset")
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to reset core network state", e)
+            }
+        }
+    }
+
+    /**
      * Gets the name of the currently running server.
      * @return The name of the running server.
      */
