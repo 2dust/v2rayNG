@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
@@ -172,6 +173,16 @@ fun ServerCustomConfigScreen(
     val density = LocalDensity.current
 
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+    var hasInitializedCursor by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (!hasInitializedCursor) {
+            textFieldState.edit {
+                selection = TextRange(0, 0)
+            }
+            hasInitializedCursor = true
+        }
+    }
 
     val textMeasurer = rememberTextMeasurer()
     val lineCount = remember(textFieldState.text.toString()) {
