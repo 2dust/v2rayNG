@@ -9,6 +9,7 @@ import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,6 +49,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -74,7 +76,9 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -165,11 +169,13 @@ class MainActivity : HelperBaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         mainViewModel.startListenBroadcast()
-        mainViewModel.initAssets(assets)
-        SubscriptionUpdater.sync()
         mainViewModel.setupGroupTab(this)
+
+        lifecycleScope.launch {
+            mainViewModel.initAssets(assets)
+            SubscriptionUpdater.sync()
+        }
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
     }
@@ -473,6 +479,113 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 }
 
+@Composable
+private fun MainDialogs(
+    showDelAllConfirm: Boolean,
+    onDismissDelAll: () -> Unit,
+    onConfirmDelAll: () -> Unit,
+    showDelDuplicateConfirm: Boolean,
+    onDismissDelDuplicate: () -> Unit,
+    onConfirmDelDuplicate: () -> Unit,
+    showDelInvalidConfirm: Boolean,
+    onDismissDelInvalid: () -> Unit,
+    onConfirmDelInvalid: () -> Unit,
+    showRemoveConfirm: String?,
+    onDismissRemove: () -> Unit,
+    onConfirmRemove: (String) -> Unit,
+) {
+    if (showDelAllConfirm) {
+        ConfirmDialog(
+            message = stringResource(R.string.del_config_comfirm),
+            confirmText = stringResource(android.R.string.ok),
+            dismissText = stringResource(android.R.string.cancel),
+            onConfirm = onConfirmDelAll,
+            onDismiss = onDismissDelAll
+        )
+    }
+    if (showDelDuplicateConfirm) {
+        ConfirmDialog(
+            message = stringResource(R.string.del_config_comfirm),
+            confirmText = stringResource(android.R.string.ok),
+            dismissText = stringResource(android.R.string.cancel),
+            onConfirm = onConfirmDelDuplicate,
+            onDismiss = onDismissDelDuplicate
+        )
+    }
+    if (showDelInvalidConfirm) {
+        ConfirmDialog(
+            message = stringResource(R.string.del_invalid_config_comfirm),
+            confirmText = stringResource(android.R.string.ok),
+            dismissText = stringResource(android.R.string.cancel),
+            onConfirm = onConfirmDelInvalid,
+            onDismiss = onDismissDelInvalid
+        )
+    }
+    if (showRemoveConfirm != null) {
+        val guid = showRemoveConfirm
+        ConfirmDialog(
+            message = stringResource(R.string.del_config_comfirm),
+            confirmText = stringResource(android.R.string.ok),
+            dismissText = stringResource(android.R.string.cancel),
+            onConfirm = { onConfirmRemove(guid) },
+            onDismiss = onDismissRemove
+        )
+    }
+}
+
+@Composable
+private fun MainBottomBar(
+    displayText: String,
+    isRunning: Boolean,
+    isDarkTheme: Boolean,
+    onTestClick: () -> Unit,
+    onFabClick: () -> Unit
+) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            AppDivider()
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .height(64.dp)
+                    .clickable(onClick = onTestClick),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 0.dp
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = displayText, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+        FloatingActionButton(
+            onClick = onFabClick,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = 24.dp)
+                .offset(y = (-28).dp)
+                .navigationBarsPadding(),
+            containerColor = if (isRunning) colorFabActive
+            else if (isDarkTheme) colorFabInactiveDark
+            else colorFabInactiveLight
+        ) {
+            Icon(
+                painter = if (isRunning) painterResource(R.drawable.ic_stop_24dp)
+                else painterResource(R.drawable.ic_play_24dp),
+                contentDescription = if (isRunning) "Stop" else "Start",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -510,6 +623,7 @@ fun MainScreen(
     val displayText by mainViewModel.displayText.collectAsStateWithLifecycle()
     val perGroupServers by mainViewModel.perGroupServers.collectAsStateWithLifecycle()
     val selectedGuid by mainViewModel.selectedGuid.collectAsStateWithLifecycle()
+    val pageChangeSource by mainViewModel.pageChangeSource.collectAsStateWithLifecycle()
 
     val isDarkTheme = LocalDarkTheme.current
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -533,25 +647,14 @@ fun MainScreen(
         MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
     }
 
-    val initialPage = remember(groups) {
-        (groups.indexOfFirst { it.id == mainViewModel.subscriptionId }
-            .takeIf { it >= 0 } ?: (groups.size - 1).coerceAtLeast(0))
-            .coerceIn(0, (groups.size - 1).coerceAtLeast(0))
-    }
-
     val pagerState = rememberPagerState(
-        initialPage = initialPage,
+        initialPage = groups.indexOfFirst { it.id == mainViewModel.subscriptionId }
+            .takeIf { it >= 0 } ?: 0,
         pageCount = { groups.size.coerceAtLeast(1) }
     )
 
-    DisposableEffect(pagerState.currentPage) {
-        onDispose {
-            mainViewModel.cancelAllPing()
-        }
-    }
-
-    val lazyListStates = remember { mutableStateMapOf<Int, LazyListState>() }
-    val lazyGridStates = remember { mutableStateMapOf<Int, LazyGridState>() }
+    val lazyListStates = remember { mutableStateMapOf<String, LazyListState>() }
+    val lazyGridStates = remember { mutableStateMapOf<String, LazyGridState>() }
 
     val drawerScrollState = rememberScrollState()
     val importMenuScrollState = rememberScrollState()
@@ -563,11 +666,15 @@ fun MainScreen(
 
     var locateInProgress by remember { mutableStateOf(false) }
 
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.settledPage }.collect { page ->
-            if (groups.isNotEmpty() && page in groups.indices && !locateInProgress) {
-                onSubscriptionIdChanged(groups[page].id)
-            }
+    LaunchedEffect(groups) {
+        val validGroupIds = groups.map { it.id }.toSet()
+        lazyListStates.keys.retainAll(validGroupIds)
+        lazyGridStates.keys.retainAll(validGroupIds)
+    }
+
+    DisposableEffect(pagerState.currentPage) {
+        onDispose {
+            mainViewModel.cancelAllPing()
         }
     }
 
@@ -580,22 +687,26 @@ fun MainScreen(
                         target.groupIndex,
                         animationSpec = tween(durationMillis = 400)
                     )
-                    snapshotFlow { pagerState.settledPage }
-                        .first { it == target.groupIndex }
                 }
 
                 onSubscriptionIdChanged(target.groupId)
                 delay(100)
 
                 if (doubleColumnDisplay) {
-                    val gridState = lazyGridStates[target.groupIndex]
+                    val gridState = lazyGridStates[target.groupId]
                     if (gridState != null) {
-                        scrollToPositionWithOffset(gridState, target.itemPosition)
+                        gridState.scrollToItem(
+                            target.itemPosition,
+                            -gridState.layoutInfo.viewportSize.height / 3
+                        )
                     }
                 } else {
-                    val listState = lazyListStates[target.groupIndex]
+                    val listState = lazyListStates[target.groupId]
                     if (listState != null) {
-                        scrollToPositionWithOffset(listState, target.itemPosition)
+                        listState.scrollToItem(
+                            target.itemPosition,
+                            -listState.layoutInfo.viewportSize.height / 3
+                        )
                     }
                 }
             } finally {
@@ -605,43 +716,32 @@ fun MainScreen(
         }
     }
 
-    if (showDelAllConfirm) {
-        ConfirmDialog(
-            message = stringResource(R.string.del_config_comfirm),
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
-            onConfirm = { showDelAllConfirm = false; onDelAllConfig() },
-            onDismiss = { showDelAllConfirm = false }
-        )
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }
+            .collect { page ->
+                if (groups.isNotEmpty() && page in groups.indices && !locateInProgress) {
+                    if (pageChangeSource != MainViewModel.PageChangeSource.LOCATE) {
+                        onSubscriptionIdChanged(groups[page].id)
+                    }
+                }
+            }
     }
-    if (showDelDuplicateConfirm) {
-        ConfirmDialog(
-            message = stringResource(R.string.del_config_comfirm),
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
-            onConfirm = { showDelDuplicateConfirm = false; onDelDuplicateConfig() },
-            onDismiss = { showDelDuplicateConfirm = false }
-        )
-    }
-    if (showDelInvalidConfirm) {
-        ConfirmDialog(
-            message = stringResource(R.string.del_invalid_config_comfirm),
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
-            onConfirm = { showDelInvalidConfirm = false; onDelInvalidConfig() },
-            onDismiss = { showDelInvalidConfirm = false }
-        )
-    }
-    if (showRemoveConfirm != null) {
-        val guid = showRemoveConfirm!!
-        ConfirmDialog(
-            message = stringResource(R.string.del_config_comfirm),
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
-            onConfirm = { showRemoveConfirm = null; onRemoveServer(guid) },
-            onDismiss = { showRemoveConfirm = null }
-        )
-    }
+
+    MainDialogs(
+        showDelAllConfirm = showDelAllConfirm,
+        onDismissDelAll = { showDelAllConfirm = false },
+        onConfirmDelAll = { showDelAllConfirm = false; onDelAllConfig() },
+        showDelDuplicateConfirm = showDelDuplicateConfirm,
+        onDismissDelDuplicate = { showDelDuplicateConfirm = false },
+        onConfirmDelDuplicate = { showDelDuplicateConfirm = false; onDelDuplicateConfig() },
+        showDelInvalidConfirm = showDelInvalidConfirm,
+        onDismissDelInvalid = { showDelInvalidConfirm = false },
+        onConfirmDelInvalid = { showDelInvalidConfirm = false; onDelInvalidConfig() },
+        showRemoveConfirm = showRemoveConfirm,
+        onDismissRemove = { showRemoveConfirm = null },
+        onConfirmRemove = { guid -> showRemoveConfirm = null; onRemoveServer(guid) }
+    )
+
     if (shareTarget != null) {
         val (guid, profile, more) = shareTarget!!
         val isCustom = profile.configType.isComplexType()
@@ -935,57 +1035,13 @@ fun MainScreen(
                 )
             },
             bottomBar = {
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        AppDivider()
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .windowInsetsPadding(WindowInsets.navigationBars)
-                                .height(64.dp)
-                                .clickable(onClick = onTestClick),
-                            color = MaterialTheme.colorScheme.surface,
-                            tonalElevation = 0.dp
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = displayText,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                        }
-                    }
-
-                    FloatingActionButton(
-                        onClick = onFabClick,
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(end = 24.dp)
-                            .offset(y = (-28).dp)
-                            .navigationBarsPadding(),
-                        containerColor = if (isRunning) colorFabActive
-                        else if (isDarkTheme) colorFabInactiveDark
-                        else colorFabInactiveLight
-                    ) {
-                        Icon(
-                            painter = if (isRunning) painterResource(R.drawable.ic_stop_24dp)
-                            else painterResource(R.drawable.ic_play_24dp),
-                            contentDescription = if (isRunning) "Stop" else "Start",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
+                MainBottomBar(
+                    displayText = displayText,
+                    isRunning = isRunning,
+                    isDarkTheme = isDarkTheme,
+                    onTestClick = onTestClick,
+                    onFabClick = onFabClick
+                )
             },
             floatingActionButton = {},
         ) { innerPadding ->
@@ -1044,8 +1100,16 @@ fun MainScreen(
                         state = pagerState,
                         modifier = Modifier.fillMaxSize(),
                         userScrollEnabled = true,
-                        beyondViewportPageCount = 1,
-                        key = { page -> groups.getOrNull(page)?.id ?: page }
+                        beyondViewportPageCount = 0,
+                        key = { page -> groups.getOrNull(page)?.id ?: page.toString() },
+                        flingBehavior = PagerDefaults.flingBehavior(
+                            state = pagerState,
+                            snapAnimationSpec = spring(
+                                dampingRatio = 0.9f,
+                                stiffness = 400f
+                            ),
+                            snapPositionalThreshold = 0.35f
+                        )
                     ) { page ->
                         val groupId = groups.getOrNull(page)?.id ?: ""
                         val servers = perGroupServers[groupId] ?: emptyList()
@@ -1058,7 +1122,7 @@ fun MainScreen(
                             doubleColumnDisplay = doubleColumnDisplay,
                             subscriptionId = groupId,
                             confirmRemove = confirmRemove,
-                            page = page,
+                            groupId = groupId,
                             lazyListStates = lazyListStates,
                             lazyGridStates = lazyGridStates,
                             onSelectServer = onSelectServer,
@@ -1088,34 +1152,6 @@ fun MainScreen(
     }
 }
 
-private suspend fun scrollToPositionWithOffset(listState: LazyListState, targetIndex: Int) {
-    listState.scrollToItem(targetIndex, 0)
-
-    val layoutInfo = listState.layoutInfo
-    val viewportHeight = layoutInfo.viewportSize.height
-    val targetItem = layoutInfo.visibleItemsInfo.firstOrNull { it.index == targetIndex }
-
-    if (targetItem != null) {
-        val desiredOffset = viewportHeight / 3
-        val scrollOffset = -desiredOffset
-        listState.scrollToItem(targetIndex, scrollOffset)
-    }
-}
-
-private suspend fun scrollToPositionWithOffset(gridState: LazyGridState, targetIndex: Int) {
-    gridState.scrollToItem(targetIndex, 0)
-
-    val layoutInfo = gridState.layoutInfo
-    val viewportHeight = layoutInfo.viewportSize.height
-    val targetItem = layoutInfo.visibleItemsInfo.firstOrNull { it.index == targetIndex }
-
-    if (targetItem != null) {
-        val desiredOffset = viewportHeight / 3
-        val scrollOffset = -desiredOffset
-        gridState.scrollToItem(targetIndex, scrollOffset)
-    }
-}
-
 @Composable
 private fun ServerListPage(
     servers: List<ServersCache>,
@@ -1124,9 +1160,9 @@ private fun ServerListPage(
     doubleColumnDisplay: Boolean,
     subscriptionId: String,
     confirmRemove: Boolean,
-    page: Int,
-    lazyListStates: MutableMap<Int, LazyListState>,
-    lazyGridStates: MutableMap<Int, LazyGridState>,
+    groupId: String,
+    lazyListStates: MutableMap<String, LazyListState>,
+    lazyGridStates: MutableMap<String, LazyGridState>,
     onSelectServer: (String) -> Unit,
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
@@ -1136,10 +1172,9 @@ private fun ServerListPage(
     contentPadding: PaddingValues
 ) {
     if (doubleColumnDisplay) {
-        val gridState = rememberLazyGridState()
-        LaunchedEffect(gridState) { lazyGridStates[page] = gridState }
-        DisposableEffect(page) { onDispose { lazyGridStates.remove(page) } }
-
+        val gridState = remember(groupId) {
+            lazyGridStates.getOrPut(groupId) { LazyGridState() }
+        }
         val reorderableGridState = if (canReorder) {
             rememberReorderableLazyGridState(gridState) { from, to ->
                 onSwapServer(from.index, to.index)
@@ -1184,10 +1219,9 @@ private fun ServerListPage(
             }
         }
     } else {
-        val listState = rememberLazyListState()
-        LaunchedEffect(listState) { lazyListStates[page] = listState }
-        DisposableEffect(page) { onDispose { lazyListStates.remove(page) } }
-
+        val listState = remember(groupId) {
+            lazyListStates.getOrPut(groupId) { LazyListState() }
+        }
         val reorderableState = if (canReorder) {
             rememberReorderableLazyListState(listState) { from, to ->
                 onSwapServer(from.index, to.index)

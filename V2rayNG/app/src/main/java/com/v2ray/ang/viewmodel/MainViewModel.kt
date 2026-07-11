@@ -30,6 +30,8 @@ import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -39,15 +41,20 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.PatternSyntaxException
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    // ==================== 状态定义 ====================
+    // ===== State definitions =====
+
+    enum class PageChangeSource { INIT, LOCATE, USER_SWIPE }
+
+    private val _pageChangeSource = MutableStateFlow(PageChangeSource.INIT)
+    val pageChangeSource: StateFlow<PageChangeSource> = _pageChangeSource.asStateFlow()
 
     private var serverList = mutableListOf<String>()
     var subscriptionId: String = MmkvManager.decodeSettingsString(AppConfig.CACHE_SUBSCRIPTION_ID, "").orEmpty()
@@ -103,7 +110,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _isTesting = MutableStateFlow(false)
     val isTesting: StateFlow<Boolean> = _isTesting.asStateFlow()
 
-    // ==================== 广播监听 ====================
+    // ===== Performance optimization =====
+
+    private var initialLoadCompleted = false
+    private val groupDataCache = mutableMapOf<String, List<ServersCache>>()
+    private val subscriptionCache = mutableListOf<SubscriptionCache>()
+    private val loadedGroups = ConcurrentHashMap.newKeySet<String>()
+    private var lastReloadTime = 0L
+    private val RELOAD_DEBOUNCE_MS = 300L
+    private var reloadJob: Job? = null
+
+    // ===== Broadcast listeners =====
 
     fun startListenBroadcast() {
         _isRunning.value = false
@@ -118,89 +135,219 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         super.onCleared()
     }
 
-    // ==================== 分组与列表加载 ====================
+    // ===== Group and list loading =====
 
-    fun setupGroupTab(context: Context) {
-        val raw = getSubscriptions(context)
-        val newGroups = raw.map { GroupMapItem(it.guid, it.subscription.remarks) }
-        _groups.value = newGroups
-        reloadAllGroups(newGroups.map { it.id })
+    fun setupGroupTab(context: Context, forceRefresh: Boolean = false) {
+        if (initialLoadCompleted && !forceRefresh) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val subs = getSubscriptionsInternal(context)
+            val newGroups = subs.map { GroupMapItem(it.guid, it.subscription.remarks) }
+
+            if (_groups.value != newGroups || forceRefresh) {
+                _groups.value = newGroups
+                val currentGroupId = subscriptionId.ifEmpty { newGroups.firstOrNull()?.id ?: "" }
+
+                loadSingleGroup(currentGroupId, forceRefresh)
+
+                preloadOtherGroups(newGroups.map { it.id }, currentGroupId)
+            }
+
+            initialLoadCompleted = true
+            _pageChangeSource.value = PageChangeSource.INIT
+        }
+    }
+
+    private fun loadSingleGroup(groupId: String, forceRefresh: Boolean = false) {
+        if (!forceRefresh && loadedGroups.contains(groupId)) {
+            groupDataCache[groupId]?.let { servers ->
+                updateCurrentGroupCache(groupId, servers)
+                return
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val list = if (groupId.isEmpty()) {
+                MmkvManager.decodeAllServerList()
+            } else {
+                MmkvManager.decodeServerList(groupId)
+            }
+
+            val servers = list.mapNotNull { guid ->
+                val profile = MmkvManager.decodeServerConfig(guid) ?: return@mapNotNull null
+                val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+                ServersCache(
+                    guid = guid,
+                    profile = profile,
+                    testDelayMillis = aff?.testDelayMillis ?: 0L,
+                    testDelayString = aff?.getTestDelayString() ?: ""
+                )
+            }
+
+            groupDataCache[groupId] = servers
+            loadedGroups.add(groupId)
+
+            if (groupId == subscriptionId) {
+                serverList = list.toMutableList()
+            }
+
+            updateCurrentGroupCache(groupId, servers)
+        }
+    }
+
+    private fun preloadOtherGroups(allGroupIds: List<String>, currentGroupId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            allGroupIds
+                .filter { it != currentGroupId && !loadedGroups.contains(it) }
+                .forEachIndexed { index, groupId ->
+                    if (index > 0) delay(50)
+
+                    val list = if (groupId.isEmpty()) {
+                        MmkvManager.decodeAllServerList()
+                    } else {
+                        MmkvManager.decodeServerList(groupId)
+                    }
+
+                    val servers = list.mapNotNull { guid ->
+                        val profile = MmkvManager.decodeServerConfig(guid) ?: return@mapNotNull null
+                        val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+                        ServersCache(
+                            guid = guid,
+                            profile = profile,
+                            testDelayMillis = aff?.testDelayMillis ?: 0L,
+                            testDelayString = aff?.getTestDelayString() ?: ""
+                        )
+                    }
+
+                    groupDataCache[groupId] = servers
+                    loadedGroups.add(groupId)
+
+                    val updated = _perGroupServers.value.toMutableMap()
+                    updated[groupId] = applyKeywordFilter(servers)
+                    _perGroupServers.value = updated
+                }
+        }
+    }
+
+    @Synchronized
+    private fun updateCurrentGroupCache(groupId: String, servers: List<ServersCache>) {
+        val filtered = applyKeywordFilter(servers)
+        _serversCache.value = filtered
+
+        val updated = _perGroupServers.value.toMutableMap()
+        updated[groupId] = filtered
+        _perGroupServers.value = updated
+
+        _updateListEvent.tryEmit(-1)
     }
 
     fun reloadAllGroups(groupIds: List<String>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        val now = System.currentTimeMillis()
+        if (now - lastReloadTime < RELOAD_DEBOUNCE_MS) return
+        lastReloadTime = now
+
+        reloadJob?.cancel()
+
+        reloadJob = viewModelScope.launch(Dispatchers.IO) {
             val allGroupServers = linkedMapOf<String, List<ServersCache>>()
+
             for (groupId in groupIds) {
-                val list = if (groupId.isEmpty()) {
-                    MmkvManager.decodeAllServerList()
-                } else {
-                    MmkvManager.decodeServerList(groupId)
+                val servers = groupDataCache[groupId] ?: run {
+                    val list = if (groupId.isEmpty()) {
+                        MmkvManager.decodeAllServerList()
+                    } else {
+                        MmkvManager.decodeServerList(groupId)
+                    }
+
+                    list.mapNotNull { guid ->
+                        val profile = MmkvManager.decodeServerConfig(guid) ?: return@mapNotNull null
+                        val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+                        ServersCache(
+                            guid = guid,
+                            profile = profile,
+                            testDelayMillis = aff?.testDelayMillis ?: 0L,
+                            testDelayString = aff?.getTestDelayString() ?: ""
+                        )
+                    }.also {
+                        groupDataCache[groupId] = it
+                        loadedGroups.add(groupId)
+                    }
                 }
-                val servers = list.mapNotNull { guid ->
-                    val profile = MmkvManager.decodeServerConfig(guid) ?: return@mapNotNull null
-                    val aff = MmkvManager.decodeServerAffiliationInfo(guid)
-                    val delayMillis = aff?.testDelayMillis ?: 0L
-                    val delayString = aff?.getTestDelayString() ?: ""
-                    ServersCache(
-                        guid = guid,
-                        profile = profile,
-                        testDelayMillis = delayMillis,
-                        testDelayString = delayString
-                    )
-                }
+
                 allGroupServers[groupId] = servers
+
                 if (groupId == subscriptionId) {
-                    serverList = list.toMutableList()
+                    serverList = (groupDataCache[groupId]?.map { it.guid } ?: emptyList()).toMutableList()
                 }
             }
+
             val current = applyKeywordFilter(allGroupServers[subscriptionId] ?: emptyList())
             _serversCache.value = current
-            _perGroupServers.value = allGroupServers.toMutableMap().apply {
+
+            val finalMap = allGroupServers.toMutableMap().apply {
                 put(subscriptionId, current)
             }
+            _perGroupServers.value = finalMap
+
             _updateListEvent.tryEmit(-1)
         }
     }
 
     fun reloadServerList() {
-        serverList = if (subscriptionId.isEmpty()) {
-            MmkvManager.decodeAllServerList()
-        } else {
-            MmkvManager.decodeServerList(subscriptionId)
+        groupDataCache[subscriptionId]?.let { servers ->
+            serverList = (if (subscriptionId.isEmpty()) {
+                MmkvManager.decodeAllServerList()
+            } else {
+                MmkvManager.decodeServerList(subscriptionId)
+            }).toMutableList()
+
+            updateCurrentGroupCache(subscriptionId, servers)
+            return
         }
-        updateCache()
-        _updateListEvent.tryEmit(-1)
+
+        loadSingleGroup(subscriptionId)
     }
 
     @Synchronized
     fun updateCache() {
-        val newCache = applyKeywordFilter(serverList.mapNotNull { guid ->
-            val profile = MmkvManager.decodeServerConfig(guid) ?: return@mapNotNull null
-            val aff = MmkvManager.decodeServerAffiliationInfo(guid)
-            val delayMillis = aff?.testDelayMillis ?: 0L
-            val delayString = aff?.getTestDelayString() ?: ""
-            ServersCache(
-                guid = guid,
-                profile = profile,
-                testDelayMillis = delayMillis,
-                testDelayString = delayString
-            )
-        })
-        _serversCache.value = newCache
+        val source = groupDataCache[subscriptionId]
+        if (source != null) {
+            val newCache = applyKeywordFilter(source)
+            _serversCache.value = newCache
 
-        val updated = _perGroupServers.value.toMutableMap()
-        updated[subscriptionId] = _serversCache.value
-        _perGroupServers.value = updated
+            val updated = _perGroupServers.value.toMutableMap()
+            updated[subscriptionId] = newCache
+            _perGroupServers.value = updated
+        } else {
+            val newCache = applyKeywordFilter(serverList.mapNotNull { guid ->
+                val profile = MmkvManager.decodeServerConfig(guid) ?: return@mapNotNull null
+                val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+                ServersCache(
+                    guid = guid,
+                    profile = profile,
+                    testDelayMillis = aff?.testDelayMillis ?: 0L,
+                    testDelayString = aff?.getTestDelayString() ?: ""
+                )
+            })
+
+            _serversCache.value = newCache
+
+            val updated = _perGroupServers.value.toMutableMap()
+            updated[subscriptionId] = newCache
+            _perGroupServers.value = updated
+        }
     }
 
     private fun applyKeywordFilter(servers: List<ServersCache>): List<ServersCache> {
         val kw = keywordFilter.trim()
         if (kw.isEmpty()) return servers
+
         val regex = try {
-            Regex(kw, setOf(RegexOption.IGNORE_CASE))
+            Regex(kw, RegexOption.IGNORE_CASE)
         } catch (e: PatternSyntaxException) {
             null
         }
+
         return if (regex == null) servers else servers.filter {
             matchesFilter(it.profile, regex, kw)
         }
@@ -208,10 +355,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun matchesFilter(profile: ProfileItem, regex: Regex?, keyword: String): Boolean {
         if (regex == null) return true
+
         val remarks = profile.remarks
         val description = profile.description.orEmpty()
         val server = profile.server.orEmpty()
         val protocol = profile.configType.name
+
         return remarks.matchesPattern(regex, keyword)
                 || description.matchesPattern(regex, keyword)
                 || server.matchesPattern(regex, keyword)
@@ -237,7 +386,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _testResultText.value = null
     }
 
-    // ==================== 服务器操作 ====================
+    // ===== Server operations =====
 
     fun removeServer(guid: String) {
         serverList.remove(guid)
@@ -248,13 +397,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun swapServer(fromPosition: Int, toPosition: Int) {
         if (subscriptionId.isEmpty()) return
+
         Collections.swap(serverList, fromPosition, toPosition)
         MmkvManager.encodeServerList(serverList, subscriptionId)
         updateCache()
         _updateListEvent.tryEmit(-1)
     }
 
-    // ==================== 测试相关 ====================
+    // ===== Testing =====
 
     fun testAllRealPing() {
         MessageUtil.sendMsg2TestService(
@@ -276,6 +426,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _testResultText.value = null
                 return@launch
             }
+
             MessageUtil.sendMsg2TestService(
                 getApplication(),
                 TestServiceMessage(
@@ -302,9 +453,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SORT_AFTER_TEST)) {
                 sortByTestResults()
             }
+
             withContext(Dispatchers.Main) {
+                groupDataCache.remove(subscriptionId)
+                loadedGroups.remove(subscriptionId)
+
                 val currentGroups = _groups.value.map { it.id }
                 reloadAllGroups(currentGroups)
+
                 _isTesting.value = false
                 _testState.value = ""
                 _testResultText.value = null
@@ -312,28 +468,47 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // ==================== 订阅管理 ====================
+    // ===== Subscription management =====
 
     fun subscriptionIdChanged(id: String) {
+        if (subscriptionId == id && loadedGroups.contains(id)) {
+            groupDataCache[id]?.let { servers ->
+                serverList = (if (id.isEmpty()) {
+                    MmkvManager.decodeAllServerList()
+                } else {
+                    MmkvManager.decodeServerList(id)
+                }).toMutableList()
+
+                updateCurrentGroupCache(id, servers)
+                return
+            }
+        }
+
         if (subscriptionId != id) {
             subscriptionId = id
             MmkvManager.encodeSettings(AppConfig.CACHE_SUBSCRIPTION_ID, subscriptionId)
         }
-        reloadServerList()
+
+        if (_pageChangeSource.value == PageChangeSource.INIT ||
+            _pageChangeSource.value == PageChangeSource.LOCATE) {
+            _pageChangeSource.value = PageChangeSource.USER_SWIPE
+        }
+
+        loadSingleGroup(id)
         _updateListEvent.tryEmit(-1)
     }
 
-    fun getSubscriptions(context: Context): List<SubscriptionCache> {
+    private fun getSubscriptionsInternal(context: Context): List<SubscriptionCache> {
         val subscriptions = MmkvManager.decodeSubscriptions()
-        if (subscriptionId.isNotEmpty()
-            && !subscriptions.map { it.guid }.contains(subscriptionId)
-        ) {
+
+        if (subscriptionId.isNotEmpty() && !subscriptions.map { it.guid }.contains(subscriptionId)) {
             subscriptionIdChanged("")
         }
 
-        val list = mutableListOf<SubscriptionCache>()
+        subscriptionCache.clear()
+
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_GROUP_ALL_DISPLAY)) {
-            list.add(
+            subscriptionCache.add(
                 SubscriptionCache(
                     guid = "",
                     subscription = com.v2ray.ang.dto.entities.SubscriptionItem().apply {
@@ -342,9 +517,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 )
             )
         }
-        list.addAll(subscriptions)
-        return list
+
+        subscriptionCache.addAll(subscriptions)
+        return subscriptionCache
     }
+
+    fun getSubscriptions(context: Context): List<SubscriptionCache> = getSubscriptionsInternal(context)
 
     fun updateConfigViaSubAll(): SubscriptionUpdateResult {
         return if (subscriptionId.isEmpty()) {
@@ -355,15 +533,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // ==================== 导出/删除/排序 ====================
+    // ===== Export/Delete/Sort =====
 
     fun exportAllServer(): Int {
-        val serverListCopy =
-            if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
-                serverList
-            } else {
-                _serversCache.value.map { it.guid }
-            }
+        val serverListCopy = if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
+            serverList
+        } else {
+            _serversCache.value.map { it.guid }
+        }
+
         return AngConfigManager.shareNonCustomConfigsToClipboard(
             getApplication<AngApplication>(),
             serverListCopy
@@ -388,9 +566,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
+
         for (it in deleteServer) {
             MmkvManager.removeServer(it)
         }
+
         return deleteServer.count()
     }
 
@@ -440,24 +620,59 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val delay = MmkvManager.decodeServerAffiliationInfo(key)?.testDelayMillis ?: 0L
             serverDelays.add(ServerDelay(key, if (delay <= 0L) 999999 else delay))
         }
+
         serverDelays.sortBy { it.testDelayMillis }
 
         val sortedServerList = serverDelays.map { it.guid }.toMutableList()
         MmkvManager.encodeServerList(sortedServerList, subId)
+
+        groupDataCache.remove(subId)
+        loadedGroups.remove(subId)
     }
 
-    // ==================== 定位 ====================
+    // ===== Location =====
 
     fun triggerLocateSelectedServer() {
         val selectedGuid = MmkvManager.getSelectServer() ?: return
-        val groupId = MmkvManager.decodeServerConfig(selectedGuid)?.subscriptionId ?: return
-        val groupIndex = _perGroupServers.value.keys.indexOf(groupId).takeIf { it >= 0 } ?: return
-        val servers = _perGroupServers.value[groupId] ?: return
-        val itemPosition = servers.indexOfFirst { it.guid == selectedGuid }.takeIf { it >= 0 } ?: return
-        _locateEvent.tryEmit(LocateTarget(groupId, groupIndex, itemPosition))
+        val profile = MmkvManager.decodeServerConfig(selectedGuid) ?: return
+        val groupId = profile.subscriptionId
+
+        val currentGroups = _groups.value
+        val groupIndex = currentGroups.indexOfFirst { it.id == groupId }
+            .takeIf { it >= 0 } ?: return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            if (!loadedGroups.contains(groupId)) {
+                val list = if (groupId.isEmpty()) {
+                    MmkvManager.decodeAllServerList()
+                } else {
+                    MmkvManager.decodeServerList(groupId)
+                }
+                val servers = list.mapNotNull { guid ->
+                    val p = MmkvManager.decodeServerConfig(guid) ?: return@mapNotNull null
+                    val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+                    ServersCache(
+                        guid = guid,
+                        profile = p,
+                        testDelayMillis = aff?.testDelayMillis ?: 0L,
+                        testDelayString = aff?.getTestDelayString() ?: ""
+                    )
+                }
+                groupDataCache[groupId] = servers
+                loadedGroups.add(groupId)
+                updateCurrentGroupCache(groupId, servers)
+            }
+
+            val servers = _perGroupServers.value[groupId] ?: return@launch
+            val itemPosition = servers.indexOfFirst { it.guid == selectedGuid }
+                .takeIf { it >= 0 } ?: return@launch
+
+            _pageChangeSource.value = PageChangeSource.LOCATE
+            _locateEvent.tryEmit(LocateTarget(groupId, groupIndex, itemPosition))
+        }
     }
 
-    // ==================== 工具方法 ====================
+    // ===== Utility methods =====
 
     fun initAssets(assets: AssetManager) {
         viewModelScope.launch(Dispatchers.Default) {
@@ -468,14 +683,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun filterConfig(keyword: String) {
         if (keyword == keywordFilter) return
         keywordFilter = keyword
-        reloadServerList()
+
+        reloadJob?.cancel()
+        reloadJob = viewModelScope.launch {
+            delay(300)
+            reloadServerList()
+        }
     }
 
     fun getPosition(guid: String): Int {
         return _serversCache.value.indexOfFirst { it.guid == guid }
     }
 
-    // ==================== 广播接收器 ====================
+    // ===== Broadcast receiver =====
 
     private val mMsgReceiver = object : BroadcastReceiver() {
         override fun onReceive(ctx: Context?, intent: Intent?) {
@@ -527,8 +747,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                 AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> {
                     val content = intent.getStringExtra("content")
-                    val progressText =
-                        getApplication<AngApplication>().getString(R.string.connection_runing_task_left, content)
+                    val progressText = getApplication<AngApplication>().getString(
+                        R.string.connection_runing_task_left,
+                        content
+                    )
                     _testState.value = progressText
                     _testResultText.value = progressText
                 }
