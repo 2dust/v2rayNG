@@ -8,6 +8,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -24,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.LocalAppSnackbar
 import com.v2ray.ang.compose.SettingsMenuItem
@@ -98,7 +99,8 @@ fun CheckUpdateScreen(onBackClick: () -> Unit) {
 
     LaunchedEffect(Unit) { checkForUpdates(checkPreRelease) }
 
-    AppScaffold(
+    Scaffold(
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.update_check_for_update),

@@ -7,14 +7,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -31,7 +33,6 @@ import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
@@ -58,7 +59,7 @@ class RoutingEditActivity : BaseComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initial = SettingsManager.getRoutingRuleset(position)
-        val profileRemarks = SettingsManager.getProfileRemarks()
+        val profileRemarks = intent.getStringExtra("profileRemarks") ?: ""
         outboundSuggestions = (BUILTIN_OUTBOUND_TAGS.toList() + profileRemarks).distinct()
         canUseProcess = SettingsManager.canUseProcessRouting()
     }
@@ -168,7 +169,8 @@ fun RoutingEditScreen(
         return rulesetItem
     }
 
-    AppScaffold(
+    Scaffold(
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.routing_settings_rule_title),
@@ -196,11 +198,9 @@ fun RoutingEditScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .imePadding()
                 .verticalScroll(scrollState)
                 .verticalScrollbar(scrollState)
                 .padding(vertical = 8.dp)
-                .padding(bottom = 36.dp)
         ) {
             FormTextField(
                 label = stringResource(R.string.sub_setting_remarks),
@@ -281,16 +281,17 @@ fun RoutingEditScreen(
                 onValueChange = { outboundTag = it },
                 editable = true
             )
+            Spacer(modifier = Modifier.height(36.dp))
         }
-    }
 
-    if (showDeleteConfirm) {
-        ConfirmDialog(
-            message = stringResource(R.string.del_config_comfirm),
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
-            onConfirm = onDelete,
-            onDismiss = { showDeleteConfirm = false }
-        )
+        if (showDeleteConfirm) {
+            ConfirmDialog(
+                message = stringResource(R.string.del_config_comfirm),
+                confirmText = stringResource(android.R.string.ok),
+                dismissText = stringResource(android.R.string.cancel),
+                onConfirm = onDelete,
+                onDismiss = { showDeleteConfirm = false }
+            )
+        }
     }
 }

@@ -23,6 +23,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -45,7 +47,6 @@ import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppDivider
-import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ReorderableListItem
 import com.v2ray.ang.compose.SelectListDialog
@@ -198,7 +199,8 @@ fun RoutingSettingScreen(
         viewModel.swap(from.index - 1, to.index - 1)
     }
 
-    AppScaffold(
+    Scaffold(
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.routing_settings_title),

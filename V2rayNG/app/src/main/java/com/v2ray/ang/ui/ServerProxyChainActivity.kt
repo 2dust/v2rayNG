@@ -5,9 +5,10 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -16,6 +17,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +33,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
@@ -159,7 +161,8 @@ fun ProxyChainScreen(
         }
     }
 
-    AppScaffold(
+    Scaffold(
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
         topBar = {
             AppTopBar(
                 title = EConfigType.PROXYCHAIN.toString(),
@@ -179,7 +182,9 @@ fun ProxyChainScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { members = members.toMutableList().also { it.add("") } },
-                modifier = Modifier.offset(y = -20.dp)
+                modifier = Modifier
+                    .offset(y = -20.dp)
+                    .navigationBarsPadding()
             ) {
                 Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = "Add member")
             }
@@ -190,9 +195,13 @@ fun ProxyChainScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScrollbar(lazyListState)
-                .padding(innerPadding)
-                .imePadding()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(innerPadding),
+            contentPadding = PaddingValues(
+                top = 8.dp,
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 36.dp
+            )
         ) {
             item(key = "remarks_field") {
                 FormTextField(

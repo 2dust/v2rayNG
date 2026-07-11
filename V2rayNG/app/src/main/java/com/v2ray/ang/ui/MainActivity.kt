@@ -6,6 +6,7 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.animation.core.tween
@@ -35,6 +36,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -61,6 +64,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.PrimaryScrollableTabRow
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
@@ -84,6 +89,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -93,6 +99,7 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -100,7 +107,6 @@ import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppDivider
-import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTheme
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
@@ -579,7 +585,6 @@ fun MainScreen(
                 }
 
                 onSubscriptionIdChanged(target.groupId)
-
                 delay(100)
 
                 if (doubleColumnDisplay) {
@@ -761,8 +766,8 @@ fun MainScreen(
             }
         }
     ) {
-        AppScaffold(
-            hasBottomBar = true,
+        Scaffold(
+            contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
             topBar = {
                 AppTopBar(
                     title = stringResource(R.string.title_server),
@@ -966,7 +971,8 @@ fun MainScreen(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(end = 24.dp)
-                            .offset(y = (-28).dp),
+                            .offset(y = (-28).dp)
+                            .navigationBarsPadding(),
                         containerColor = if (isRunning) colorFabActive
                         else if (isDarkTheme) colorFabInactiveDark
                         else colorFabInactiveLight
@@ -983,17 +989,20 @@ fun MainScreen(
             },
             floatingActionButton = {},
         ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
+            val layoutDirection = LocalLayoutDirection.current
+            val topPadding = innerPadding.calculateTopPadding()
+            val startPadding = innerPadding.calculateStartPadding(layoutDirection)
+            val endPadding = innerPadding.calculateEndPadding(layoutDirection)
+
+            Column(modifier = Modifier.fillMaxSize()) {
                 if (groups.size > 1) {
                     PrimaryScrollableTabRow(
                         selectedTabIndex = pagerState.currentPage.coerceIn(
                             0, (groups.size - 1).coerceAtLeast(0)
                         ),
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = topPadding),
                         containerColor = MaterialTheme.colorScheme.surface,
                         contentColor = MaterialTheme.colorScheme.onSurface,
                         edgePadding = 0.dp,
@@ -1064,7 +1073,13 @@ fun MainScreen(
                                 if (confirmRemove) showRemoveConfirm = guid
                                 else onRemoveServer(guid)
                             },
-                            onSwapServer = mainViewModel::swapServer
+                            onSwapServer = mainViewModel::swapServer,
+                            contentPadding = PaddingValues(
+                                start = startPadding,
+                                top = if (groups.size > 1) 0.dp else topPadding,
+                                end = endPadding,
+                                bottom = 80.dp
+                            )
                         )
                     }
                 }
@@ -1117,7 +1132,8 @@ private fun ServerListPage(
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
     onRemoveServer: (String) -> Unit,
-    onSwapServer: (Int, Int) -> Unit
+    onSwapServer: (Int, Int) -> Unit,
+    contentPadding: PaddingValues
 ) {
     if (doubleColumnDisplay) {
         val gridState = rememberLazyGridState()
@@ -1136,7 +1152,7 @@ private fun ServerListPage(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScrollbar(gridState),
-            contentPadding = PaddingValues(bottom = 80.dp)
+            contentPadding = contentPadding
         ) {
             itemsIndexed(items = servers, key = { _, item -> item.guid }) { _, serverCache ->
                 val content: @Composable () -> Unit = {
@@ -1183,7 +1199,7 @@ private fun ServerListPage(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScrollbar(listState),
-            contentPadding = PaddingValues(bottom = 80.dp)
+            contentPadding = contentPadding
         ) {
             itemsIndexed(items = servers, key = { _, item -> item.guid }) { _, serverCache ->
                 if (canReorder && reorderableState != null) {

@@ -5,12 +5,13 @@ import android.text.TextUtils
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
@@ -51,7 +51,6 @@ class SubEditActivity : BaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        SettingsChangeManager.makeSetupGroupTab()
 
         suggestions = SettingsManager.getProfileRemarks(
             excludeConfigTypes = setOf(
@@ -97,6 +96,7 @@ class SubEditActivity : BaseComponentActivity() {
 
         MmkvManager.encodeSubscription(editSubId, subItem)
         SubscriptionUpdater.syncOne(subId = editSubId)
+        SettingsChangeManager.makeSetupGroupTab()
         toastSuccess(R.string.toast_success)
         finish()
         return true
@@ -106,6 +106,7 @@ class SubEditActivity : BaseComponentActivity() {
         if (editSubId.isNotEmpty()) {
             lifecycleScope.launch(Dispatchers.IO) {
                 SettingsManager.removeSubscriptionWithDefault(editSubId)
+                SettingsChangeManager.makeSetupGroupTab()
                 launch(Dispatchers.Main) { finish() }
             }
         }
@@ -169,7 +170,8 @@ fun SubEditScreen(
         return subItem
     }
 
-    AppScaffold(
+    Scaffold(
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.title_sub_setting),
@@ -193,7 +195,6 @@ fun SubEditScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .imePadding()
                 .verticalScroll(scrollState)
                 .verticalScrollbar(scrollState)
                 .padding(vertical = 8.dp)

@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,7 +30,6 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.WEBDAV_BACKUP_FILE_NAME
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.InputDialog
 import com.v2ray.ang.compose.InputField
@@ -332,7 +333,8 @@ fun BackupScreen(
         "${currentWebDavConfig!!.baseUrl} | ${currentWebDavConfig!!.username ?: ""}"
     } else null
 
-    AppScaffold(
+    Scaffold(
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.title_configuration_backup_restore),

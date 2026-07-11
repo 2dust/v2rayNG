@@ -8,11 +8,11 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -25,6 +25,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -54,7 +56,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppScaffold
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormTextField
@@ -251,7 +252,8 @@ fun ServerCustomConfigScreen(
         }
     }
 
-    AppScaffold(
+    Scaffold(
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
         topBar = {
             AppTopBar(
                 title = EConfigType.CUSTOM.toString(),
@@ -274,153 +276,151 @@ fun ServerCustomConfigScreen(
                 }
             )
         },
-        content = { padding ->
-            Column(
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            FormTextField(
+                label = stringResource(R.string.server_lab_remarks),
+                value = remarks,
+                onValueChange = { remarks = it }
+            )
+
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .imePadding()
+                    .weight(1f)
+                    .fillMaxWidth()
             ) {
-                FormTextField(
-                    label = stringResource(R.string.server_lab_remarks),
-                    value = remarks,
-                    onValueChange = { remarks = it }
-                )
-
-                Box(
+                Row(
                     modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .verticalScroll(verticalScroll)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(verticalScroll)
-                    ) {
-                        val lineNumberColor =
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                        val layoutForLineNumbers = textLayoutResult
+                    val lineNumberColor =
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                    val layoutForLineNumbers = textLayoutResult
 
-                        if (layoutForLineNumbers != null && layoutForLineNumbers.lineCount > 0) {
-                            val totalTextHeight = layoutForLineNumbers.size.height
-                            Canvas(
-                                modifier = Modifier
-                                    .width(lineNumberWidth)
-                                    .height(with(density) { totalTextHeight.toDp() })
-                            ) {
-                                val lc = layoutForLineNumbers.lineCount
-                                for (i in 0 until lc) {
-                                    val lineLabel = (i + 1).toString()
-                                    val measured = textMeasurer.measure(
-                                        text = lineLabel,
-                                        style = lineNumberStyle.copy(
-                                            color = lineNumberColor,
-                                            textAlign = TextAlign.End,
-                                        ),
+                    if (layoutForLineNumbers != null && layoutForLineNumbers.lineCount > 0) {
+                        val totalTextHeight = layoutForLineNumbers.size.height
+                        Canvas(
+                            modifier = Modifier
+                                .width(lineNumberWidth)
+                                .height(with(density) { totalTextHeight.toDp() })
+                        ) {
+                            val lc = layoutForLineNumbers.lineCount
+                            for (i in 0 until lc) {
+                                val lineLabel = (i + 1).toString()
+                                val measured = textMeasurer.measure(
+                                    text = lineLabel,
+                                    style = lineNumberStyle.copy(
+                                        color = lineNumberColor,
+                                        textAlign = TextAlign.End,
+                                    ),
+                                )
+                                val lineTop = layoutForLineNumbers.getLineTop(i)
+                                val lineBaseline = layoutForLineNumbers.getLineBaseline(i)
+                                val measuredBaseline = measured.firstBaseline
+                                val yOffset = lineBaseline - measuredBaseline
+                                val xOffset = size.width -
+                                        EditorConstants.LINE_NUMBER_HORIZONTAL_PADDING.toPx() -
+                                        measured.size.width
+                                drawText(
+                                    textLayoutResult = measured,
+                                    topLeft = Offset(
+                                        x = xOffset.coerceAtLeast(0f),
+                                        y = yOffset
                                     )
-                                    val lineTop = layoutForLineNumbers.getLineTop(i)
-                                    val lineBaseline = layoutForLineNumbers.getLineBaseline(i)
-                                    val measuredBaseline = measured.firstBaseline
-                                    val yOffset = lineBaseline - measuredBaseline
-                                    val xOffset = size.width -
-                                            EditorConstants.LINE_NUMBER_HORIZONTAL_PADDING.toPx() -
-                                            measured.size.width
-                                    drawText(
-                                        textLayoutResult = measured,
-                                        topLeft = Offset(
-                                            x = xOffset.coerceAtLeast(0f),
-                                            y = yOffset
-                                        )
-                                    )
-                                }
-                            }
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .width(lineNumberWidth)
-                                    .padding(end = EditorConstants.LINE_NUMBER_HORIZONTAL_PADDING),
-                                contentAlignment = Alignment.TopEnd
-                            ) {
-                                Text(
-                                    text = "1",
-                                    style = lineNumberStyle.copy(color = lineNumberColor),
                                 )
                             }
                         }
-
-                        CompositionLocalProvider(
-                            LocalTextSelectionColors provides TextSelectionColors(
-                                handleColor = MaterialTheme.colorScheme.secondary,
-                                backgroundColor = MaterialTheme.colorScheme.secondary.copy(
-                                    alpha = 0.4f
-                                )
-                            )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .width(lineNumberWidth)
+                                .padding(end = EditorConstants.LINE_NUMBER_HORIZONTAL_PADDING),
+                            contentAlignment = Alignment.TopEnd
                         ) {
-                            BasicTextField(
-                                state = textFieldState,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .horizontalScroll(horizontalScroll)
-                                    .padding(end = 24.dp)
-                                    .padding(bottom = 36.dp),
-                                textStyle = TextStyle(
-                                    fontFamily = FontFamily.Monospace,
-                                    fontSize = EditorConstants.FONT_SIZE,
-                                    lineHeight = EditorConstants.LINE_HEIGHT,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                ),
-                                lineLimits = TextFieldLineLimits.MultiLine(),
-                                cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
-                                onTextLayout = { resultProvider ->
-                                    textLayoutResult = resultProvider()
-                                },
-                                decorator = { innerTextField ->
-                                    Box {
-                                        if (textFieldState.text.isEmpty()) {
-                                            Text(
-                                                text = "{ }",
-                                                style = TextStyle(
-                                                    fontFamily = FontFamily.Monospace,
-                                                    fontSize = EditorConstants.FONT_SIZE,
-                                                    lineHeight = EditorConstants.LINE_HEIGHT,
-                                                    color = MaterialTheme.colorScheme.onSurface.copy(
-                                                        alpha = 0.38f
-                                                    )
-                                                )
-                                            )
-                                        }
-                                        innerTextField()
-                                    }
-                                }
+                            Text(
+                                text = "1",
+                                style = lineNumberStyle.copy(color = lineNumberColor),
                             )
                         }
                     }
 
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .fillMaxHeight()
-                            .width(
-                                EditorConstants.SCROLLBAR_THICKNESS +
-                                        EditorConstants.SCROLLBAR_PADDING * 2
+                    CompositionLocalProvider(
+                        LocalTextSelectionColors provides TextSelectionColors(
+                            handleColor = MaterialTheme.colorScheme.secondary,
+                            backgroundColor = MaterialTheme.colorScheme.secondary.copy(
+                                alpha = 0.4f
                             )
-                            .verticalScrollbar(scrollState = verticalScroll)
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .fillMaxWidth()
-                            .height(
-                                EditorConstants.SCROLLBAR_THICKNESS +
-                                        EditorConstants.SCROLLBAR_PADDING * 2
-                            )
-                            .horizontalScrollbar(scrollState = horizontalScroll)
-                    )
+                        )
+                    ) {
+                        BasicTextField(
+                            state = textFieldState,
+                            modifier = Modifier
+                                .weight(1f)
+                                .horizontalScroll(horizontalScroll)
+                                .padding(end = 24.dp)
+                                .padding(bottom = 36.dp),
+                            textStyle = TextStyle(
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = EditorConstants.FONT_SIZE,
+                                lineHeight = EditorConstants.LINE_HEIGHT,
+                                color = MaterialTheme.colorScheme.onSurface
+                            ),
+                            lineLimits = TextFieldLineLimits.MultiLine(),
+                            cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
+                            onTextLayout = { resultProvider ->
+                                textLayoutResult = resultProvider()
+                            },
+                            decorator = { innerTextField ->
+                                Box {
+                                    if (textFieldState.text.isEmpty()) {
+                                        Text(
+                                            text = "{ }",
+                                            style = TextStyle(
+                                                fontFamily = FontFamily.Monospace,
+                                                fontSize = EditorConstants.FONT_SIZE,
+                                                lineHeight = EditorConstants.LINE_HEIGHT,
+                                                color = MaterialTheme.colorScheme.onSurface.copy(
+                                                    alpha = 0.38f
+                                                )
+                                            )
+                                        )
+                                    }
+                                    innerTextField()
+                                }
+                            }
+                        )
+                    }
                 }
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .fillMaxHeight()
+                        .width(
+                            EditorConstants.SCROLLBAR_THICKNESS +
+                                    EditorConstants.SCROLLBAR_PADDING * 2
+                        )
+                        .verticalScrollbar(scrollState = verticalScroll)
+                )
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .height(
+                            EditorConstants.SCROLLBAR_THICKNESS +
+                                    EditorConstants.SCROLLBAR_PADDING * 2
+                        )
+                        .horizontalScrollbar(scrollState = horizontalScroll)
+                )
             }
         }
-    )
+    }
 
     if (showDeleteConfirm) {
         ConfirmDialog(

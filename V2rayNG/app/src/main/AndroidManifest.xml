@@ -73,11 +73,11 @@
         <activity
             android:name=".ui.ServerActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize|stateUnchanged" />
+            android:windowSoftInputMode="stateUnchanged" />
         <activity
             android:name=".ui.ServerCustomConfigActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize|stateUnchanged" />
+            android:windowSoftInputMode="stateUnchanged" />
         <activity
             android:name=".ui.ServerGroupActivity"
             android:exported="false"
@@ -85,7 +85,7 @@
         <activity
             android:name=".ui.ServerProxyChainActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize|stateUnchanged" />
+            android:windowSoftInputMode="stateUnchanged" />
         <activity
             android:name=".ui.SettingsActivity"
             android:exported="false" />
@@ -106,8 +106,7 @@
             android:exported="false" />
         <activity
             android:name=".ui.RoutingEditActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize|stateUnchanged" />
+            android:exported="false" />
         <activity
             android:name=".ui.SubSettingActivity"
             android:exported="false" />
@@ -120,8 +119,7 @@
 
         <activity
             android:name=".ui.SubEditActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize|stateUnchanged" />
+            android:exported="false" />
         <activity
             android:name=".ui.ScScannerActivity"
             android:exported="false" />
