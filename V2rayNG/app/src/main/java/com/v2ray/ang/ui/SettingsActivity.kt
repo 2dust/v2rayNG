@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import android.content.Context
 import android.os.Bundle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,15 +34,14 @@ import com.v2ray.ang.compose.SettingsSwitchItem
 import com.v2ray.ang.compose.ThemeManager
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.handler.MmkvManager.rememberMmkvString
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
-import com.v2ray.ang.root.RootManager
+import com.v2ray.ang.handler.MmkvManager.rememberMmkvString
 import com.v2ray.ang.handler.SettingsChangeManager
+import com.v2ray.ang.root.RootManager
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.content.Context
 
 class SettingsActivity : BaseComponentActivity() {
 
@@ -175,8 +175,8 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(scrollState)
                 .verticalScrollbar(scrollState)
+                .verticalScroll(scrollState)
         ) {
             PreferenceGroupHeader(title = stringResource(R.string.title_ui_settings))
             SettingsSwitchItem(

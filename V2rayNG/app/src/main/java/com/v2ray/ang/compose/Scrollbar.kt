@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -59,7 +60,7 @@ fun Modifier.verticalScrollbar(
     LaunchedEffect(Unit) {
         scrollChanged.collectLatest {
             alpha.snapTo(1f)
-            kotlinx.coroutines.delay(config.fadeOutDurationMs.toLong())
+            delay(config.fadeOutDurationMs.toLong())
             alpha.animateTo(0f, animationSpec = tween(config.fadeAnimDurationMs))
         }
     }
@@ -130,7 +131,7 @@ fun Modifier.horizontalScrollbar(
     LaunchedEffect(Unit) {
         scrollChanged.collectLatest {
             alpha.snapTo(1f)
-            kotlinx.coroutines.delay(config.fadeOutDurationMs.toLong())
+            delay(config.fadeOutDurationMs.toLong())
             alpha.animateTo(0f, animationSpec = tween(config.fadeAnimDurationMs))
         }
     }
@@ -202,7 +203,7 @@ fun Modifier.verticalScrollbar(
     LaunchedEffect(Unit) {
         scrollChanged.collectLatest {
             alpha.snapTo(1f)
-            kotlinx.coroutines.delay(config.fadeOutDurationMs.toLong())
+            delay(config.fadeOutDurationMs.toLong())
             alpha.animateTo(0f, animationSpec = tween(config.fadeAnimDurationMs))
         }
     }
@@ -289,7 +290,7 @@ fun Modifier.verticalScrollbar(
     LaunchedEffect(Unit) {
         scrollChanged.collectLatest {
             alpha.snapTo(1f)
-            kotlinx.coroutines.delay(config.fadeOutDurationMs.toLong())
+            delay(config.fadeOutDurationMs.toLong())
             alpha.animateTo(0f, animationSpec = tween(config.fadeAnimDurationMs))
         }
     }
