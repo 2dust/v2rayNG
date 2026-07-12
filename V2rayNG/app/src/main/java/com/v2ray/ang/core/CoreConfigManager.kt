@@ -394,7 +394,18 @@ object CoreConfigManager {
     private fun postProcessForSpeedtest(v2rayConfig: V2rayConfig) {
         v2rayConfig.log.loglevel = MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL) ?: "warning"
         v2rayConfig.inbounds.clear()
+        val usesPrimaryBalancer = v2rayConfig.routing.balancers
+            ?.any { it.tag == AppConfig.TAG_BALANCER }
+            ?: false
         v2rayConfig.routing.rules.clear()
+        if (usesPrimaryBalancer) {
+            v2rayConfig.routing.rules.add(
+                V2rayConfig.RoutingBean.RulesBean(
+                    network = "tcp,udp",
+                    balancerTag = AppConfig.TAG_BALANCER,
+                )
+            )
+        }
         v2rayConfig.dns = null
         v2rayConfig.fakedns = null
         v2rayConfig.stats = null
