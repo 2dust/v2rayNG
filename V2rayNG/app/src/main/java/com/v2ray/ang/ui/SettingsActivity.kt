@@ -1,7 +1,11 @@
 package com.v2ray.ang.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
@@ -61,6 +65,19 @@ class SettingsActivity : BaseActivity() {
         private val socksPassword by lazy { findPreference<EditTextPreference>(AppConfig.PREF_SOCKS_PASSWORD) }
         private val socksEnableUdp by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_SOCKS_ENABLE_UDP) }
         private val proxySharing by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_PROXY_SHARING) }
+        private val rememberRoutesPerWifiNetwork by lazy {
+            findPreference<CheckBoxPreference>(AppConfig.PREF_REMEMBER_ROUTES_PER_WIFI_NETWORK)
+        }
+
+        private val requestWifiIdentityPermission =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grants ->
+                val fineLocationGranted =
+                    grants[Manifest.permission.ACCESS_FINE_LOCATION] == true || hasFineLocationPermission()
+                rememberRoutesPerWifiNetwork?.isChecked = fineLocationGranted
+                if (!fineLocationGranted) {
+                    context?.toastError(R.string.toast_precise_location_required_for_wifi_route_memory)
+                }
+            }
 
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             // Use MMKV as the storage backend for all Preferences
@@ -92,6 +109,20 @@ class SettingsActivity : BaseActivity() {
             fragment?.setOnPreferenceChangeListener { _, newValue ->
                 updateFragment(newValue as Boolean)
                 true
+            }
+
+            rememberRoutesPerWifiNetwork?.setOnPreferenceChangeListener { _, newValue ->
+                if (newValue != true || hasFineLocationPermission()) {
+                    true
+                } else {
+                    requestWifiIdentityPermission.launch(
+                        arrayOf(
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                        )
+                    )
+                    false
+                }
             }
 
             mode?.setOnPreferenceChangeListener { pref, newValue ->
@@ -203,6 +234,12 @@ class SettingsActivity : BaseActivity() {
             }
             return hasRoot
         }
+
+        private fun hasFineLocationPermission(): Boolean =
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            ) == PackageManager.PERMISSION_GRANTED
 
         override fun onStart() {
             super.onStart()

@@ -282,6 +282,12 @@
     <PreferenceCategory android:title="@string/title_advanced">
 
         <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_remember_routes_per_wifi_network"
+            android:summary="@string/summary_pref_remember_routes_per_wifi_network"
+            android:title="@string/title_pref_remember_routes_per_wifi_network" />
+
+        <CheckBoxPreference
             android:key="pref_is_booted"
             android:summary="@string/summary_pref_is_booted"
             android:title="@string/title_pref_is_booted" />

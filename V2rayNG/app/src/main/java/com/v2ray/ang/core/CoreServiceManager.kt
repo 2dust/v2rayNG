@@ -34,12 +34,17 @@ import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
 import libv2ray.ProcessFinder
 import java.lang.ref.SoftReference
 import java.net.InetSocketAddress
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 object CoreServiceManager {
 
@@ -48,6 +53,11 @@ object CoreServiceManager {
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
+    @Volatile private var runningProfileGuid = ""
+    private val networkResetMutex = Mutex()
+    private val coreScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val networkTransitions = AtomicInteger(0)
+    private val policyRouteCallbacksEnabled = AtomicBoolean(false)
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -119,16 +129,69 @@ object CoreServiceManager {
      * Recreates the in-process Xray instance after Android changes the VPN's
      * underlying network. The VPN interface and service remain active.
      */
-    fun resetCoreNetworkState() {
-        if (!coreController.isRunning) return
+    fun resetCoreNetworkState(previousNetworkKey: String?, newNetworkKey: String) {
+        networkTransitions.incrementAndGet()
+        PolicyRouteCache.setCurrentNetwork(newNetworkKey)
+        if (!coreController.isRunning) {
+            networkTransitions.decrementAndGet()
+            return
+        }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                coreController.resetNetworkState()
-                LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core network state reset")
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to reset core network state", e)
+        val profileGuid = runningProfileGuid
+        val cacheGeneration = PolicyRouteCache.snapshot().generation
+        coreScope.launch {
+            networkResetMutex.withLock {
+                try {
+                    val currentTarget = coreController.getBalancerPrincipleTarget(AppConfig.TAG_BALANCER)
+                    PolicyRouteCache.remember(
+                        previousNetworkKey,
+                        profileGuid,
+                        currentTarget,
+                        cacheGeneration,
+                    )
+                    val warmTarget = PolicyRouteCache.lookup(newNetworkKey, profileGuid).orEmpty()
+                    coreController.resetNetworkStateWithWarmRoute(AppConfig.TAG_BALANCER, warmTarget)
+                    LogUtil.i(
+                        AppConfig.TAG,
+                        "StartCore-Manager: Core network state reset" +
+                            if (warmTarget.isNotEmpty()) " with cached policy route" else "",
+                    )
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to reset core network state", e)
+                } finally {
+                    if (networkTransitions.decrementAndGet() == 0 && policyRouteCallbacksEnabled.get()) {
+                        refreshFreshPolicyRoute()
+                    }
+                }
             }
+        }
+    }
+
+    fun updateCoreNetworkIdentity(newNetworkKey: String) {
+        PolicyRouteCache.setCurrentNetwork(newNetworkKey)
+        if (coreController.isRunning && policyRouteCallbacksEnabled.get()) {
+            coreScope.launch { refreshFreshPolicyRoute() }
+        }
+    }
+
+    private fun refreshFreshPolicyRoute() {
+        val cacheSnapshot = PolicyRouteCache.snapshot()
+        val freshTarget = try {
+            coreController.getBalancerPrincipleTarget(AppConfig.TAG_BALANCER)
+        } catch (_: Exception) {
+            ""
+        }
+        rememberFreshPolicyRoute(freshTarget, cacheSnapshot)
+    }
+
+    private fun rememberFreshPolicyRoute(
+        target: String?,
+        cacheSnapshot: PolicyRouteCache.Snapshot = PolicyRouteCache.snapshot(),
+    ) {
+        if (!policyRouteCallbacksEnabled.get() || networkTransitions.get() != 0 || target.isNullOrBlank()) return
+        val profileGuid = runningProfileGuid
+        if (PolicyRouteCache.rememberCurrent(cacheSnapshot, profileGuid, target)) {
+            LogUtil.i(AppConfig.TAG, "Policy route cache updated from fresh observatory result")
         }
     }
 
@@ -283,11 +346,23 @@ object CoreServiceManager {
 
         NotificationManager.showNotification(currentConfig)
         CoreNativeManager.reconcileBrowserDialer(dialerAddr)
-        coreController.startLoop(result.content, tunFd)
+        runningProfileGuid = guid
+        policyRouteCallbacksEnabled.set(true)
+        try {
+            coreController.startLoop(result.content, tunFd)
+        } catch (e: Exception) {
+            policyRouteCallbacksEnabled.set(false)
+            runningProfileGuid = ""
+            throw e
+        }
 
         if (!coreController.isRunning) {
+            policyRouteCallbacksEnabled.set(false)
+            runningProfileGuid = ""
             error("Core failed to start")
         }
+
+        coreScope.launch { refreshFreshPolicyRoute() }
 
         if (browserDialer != null) {
             browserDialer!!.stop()
@@ -312,6 +387,9 @@ object CoreServiceManager {
      * @return True if the core was stopped successfully, false otherwise.
      */
     fun stopCoreLoop(): Boolean {
+        policyRouteCallbacksEnabled.set(false)
+        PolicyRouteCache.clear()
+        runningProfileGuid = ""
         val service = getService() ?: return false
 
         if (coreController.isRunning) {
@@ -461,6 +539,13 @@ object CoreServiceManager {
          * @return Always returns 0.
          */
         override fun onEmitStatus(l: Long, s: String?): Long {
+            return 0
+        }
+
+        override fun onBalancerTargetChanged(balancerTag: String?, target: String?): Long {
+            if (balancerTag == AppConfig.TAG_BALANCER) {
+                rememberFreshPolicyRoute(target)
+            }
             return 0
         }
     }

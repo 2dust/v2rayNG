@@ -21,6 +21,7 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.contracts.Tun2SocksControl
 import com.v2ray.ang.core.CoreServiceManager
+import com.v2ray.ang.core.PolicyRouteCache
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
@@ -36,6 +37,7 @@ class CoreVpnService : VpnService(), ServiceControl {
     private var isRunning = false
     private var tun2SocksService: Tun2SocksControl? = null
     private val underlyingNetworkState = UnderlyingNetworkStateTracker<Network>()
+    private var pendingNetworkReset: Network? = null
 
     /**destroy
      * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
@@ -58,27 +60,63 @@ class CoreVpnService : VpnService(), ServiceControl {
 
     @delegate:RequiresApi(Build.VERSION_CODES.P)
     private val defaultNetworkCallback by lazy {
-        object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                setUnderlyingNetworks(arrayOf(network))
-                if (underlyingNetworkState.onAvailable(network)) {
-                    LogUtil.i(AppConfig.TAG, "StartCore-VPN: Underlying network changed to $network")
-                    CoreServiceManager.resetCoreNetworkState()
-                }
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+            NetworkIdentityResolver.canReadWifiIdentity(applicationContext)
+        ) {
+            object : ConnectivityManager.NetworkCallback(
+                ConnectivityManager.NetworkCallback.FLAG_INCLUDE_LOCATION_INFO
+            ) {
+                override fun onAvailable(network: Network) = handleNetworkAvailable(network)
 
-            override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-                // it's a good idea to refresh capabilities
-                if (underlyingNetworkState.isCurrent(network)) {
-                    setUnderlyingNetworks(arrayOf(network))
-                }
-            }
+                override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) =
+                    handleNetworkCapabilitiesChanged(network, capabilities)
 
-            override fun onLost(network: Network) {
-                if (underlyingNetworkState.onLost(network)) {
-                    setUnderlyingNetworks(null)
-                }
+                override fun onLost(network: Network) = handleNetworkLost(network)
             }
+        } else {
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) = handleNetworkAvailable(network)
+
+                override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) =
+                    handleNetworkCapabilitiesChanged(network, capabilities)
+
+                override fun onLost(network: Network) = handleNetworkLost(network)
+            }
+        }
+    }
+
+    private fun handleNetworkAvailable(network: Network) {
+        setUnderlyingNetworks(arrayOf(network))
+        if (underlyingNetworkState.onAvailable(network)) {
+            pendingNetworkReset = network
+            LogUtil.i(AppConfig.TAG, "StartCore-VPN: Underlying network changed to $network")
+        }
+    }
+
+    private fun handleNetworkCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
+        if (!underlyingNetworkState.isCurrent(network)) return
+
+        setUnderlyingNetworks(arrayOf(network))
+        val newNetworkKey = NetworkIdentityResolver.resolve(applicationContext, capabilities)
+        val previousNetworkKey = PolicyRouteCache.snapshot().networkKey
+        if (previousNetworkKey != newNetworkKey) {
+            LogUtil.i(
+                AppConfig.TAG,
+                "StartCore-VPN: Underlay identity resolved as ${newNetworkKey.substringBefore(':')}",
+            )
+        }
+
+        if (pendingNetworkReset == network) {
+            pendingNetworkReset = null
+            CoreServiceManager.resetCoreNetworkState(previousNetworkKey, newNetworkKey)
+        } else if (previousNetworkKey != newNetworkKey) {
+            CoreServiceManager.updateCoreNetworkIdentity(newNetworkKey)
+        }
+    }
+
+    private fun handleNetworkLost(network: Network) {
+        if (underlyingNetworkState.onLost(network)) {
+            setUnderlyingNetworks(null)
         }
     }
 
@@ -279,6 +317,7 @@ class CoreVpnService : VpnService(), ServiceControl {
         // Android P (API 28) and above: Configure network callbacks
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             underlyingNetworkState.reset()
+            pendingNetworkReset = null
             try {
                 connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
             } catch (e: Exception) {
@@ -372,6 +411,7 @@ class CoreVpnService : VpnService(), ServiceControl {
                 LogUtil.w(AppConfig.TAG, "StartCore-VPN: Failed to unregister callback", e)
             }
             underlyingNetworkState.reset()
+            pendingNetworkReset = null
         }
 
         tun2SocksService?.stopTun2Socks()

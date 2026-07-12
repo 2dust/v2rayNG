@@ -1,8 +1,10 @@
 package com.v2ray.ang.service
 
 import android.content.Context
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.CoreConfigManager
 import com.v2ray.ang.core.CoreNativeManager
+import com.v2ray.ang.core.PolicyRouteCache
 import com.v2ray.ang.dto.RealPingEvent
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
@@ -10,6 +12,7 @@ import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SpeedtestManager
+import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -102,6 +105,21 @@ class RealPingWorkerService(
         if (!configResult.status) {
             return retFailure
         }
-        return CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
+        val cacheSnapshot = PolicyRouteCache.snapshot()
+        val warmTarget = PolicyRouteCache.lookup(cacheSnapshot.networkKey, guid).orEmpty()
+        LogUtil.i(
+            AppConfig.TAG,
+            "Policy route cache ${if (warmTarget.isEmpty()) "miss" else "hit"} for delay test",
+        )
+        val result = CoreNativeManager.measureOutboundDelayWithWarmRoute(
+            configResult.content,
+            SettingsManager.getDelayTestUrl(),
+            warmTarget,
+        )
+        val remembered = PolicyRouteCache.rememberCurrent(cacheSnapshot, guid, result.outboundTag)
+        if (remembered) {
+            LogUtil.i(AppConfig.TAG, "Policy route cache updated from successful delay test")
+        }
+        return result.delay
     }
 }

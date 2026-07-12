@@ -3,6 +3,7 @@ package com.v2ray.ang.core
 import android.content.Context
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import go.Seq
 import libv2ray.CoreCallbackHandler
@@ -17,6 +18,11 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Provides initialization protection and unified API for V2Ray core operations.
  */
 object CoreNativeManager {
+    data class OutboundDelayResult(
+        val delay: Long = -1L,
+        val outboundTag: String = "",
+    )
+
     private val initialized = AtomicBoolean(false)
 
     /**
@@ -80,6 +86,20 @@ object CoreNativeManager {
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to measure outbound delay", e)
             -1L
+        }
+    }
+
+    fun measureOutboundDelayWithWarmRoute(
+        config: String,
+        testUrl: String,
+        warmTarget: String,
+    ): OutboundDelayResult {
+        return try {
+            val payload = Libv2ray.measureOutboundDelayWithWarmRoute(config, testUrl, warmTarget)
+            JsonUtil.fromJsonSafe(payload, OutboundDelayResult::class.java) ?: OutboundDelayResult()
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to measure outbound delay with warm route", e)
+            OutboundDelayResult()
         }
     }
 
