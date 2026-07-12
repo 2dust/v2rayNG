@@ -157,7 +157,17 @@ object CoreServiceManager {
                             if (warmTarget.isNotEmpty()) " with cached policy route" else "",
                     )
                 } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to reset core network state", e)
+                    policyRouteCallbacksEnabled.set(false)
+                    LogUtil.e(
+                        AppConfig.TAG,
+                        "StartCore-Manager: Core network reset and recovery failed; keeping VPN fail-closed",
+                        e,
+                    )
+                    getService()?.let { service ->
+                        val message = service.getString(R.string.notification_core_recovery_failed)
+                        MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+                        NotificationManager.showCoreFailure(message)
+                    }
                 } finally {
                     if (networkTransitions.decrementAndGet() == 0 && policyRouteCallbacksEnabled.get()) {
                         refreshFreshPolicyRoute()

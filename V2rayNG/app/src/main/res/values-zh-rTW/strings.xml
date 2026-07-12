@@ -19,6 +19,7 @@
     <string name="toast_services_stop">停止服務</string>
     <string name="toast_services_success">啟動服務成功</string>
     <string name="toast_services_failure">啟動服務失敗</string>
+    <string name="notification_core_recovery_failed">連線復原失敗。流量將保持封鎖以防洩漏；請重新啟動 v2rayNG。</string>
 
     <!-- ServerActivity -->
     <string name="title_server">設定檔</string>

@@ -19,6 +19,7 @@
     <string name="toast_services_stop">সার্ভিস বন্ধ করুন</string>
     <string name="toast_services_success">সার্ভিস সফলভাবে শুরু হয়েছে</string>
     <string name="toast_services_failure">সার্ভিস শুরু হতে ব্যর্থ হয়েছে</string>
+    <string name="notification_core_recovery_failed">সংযোগ পুনরুদ্ধার ব্যর্থ হয়েছে। ট্রাফিক লিক রোধে অবরুদ্ধ থাকবে; v2rayNG পুনরায় চালু করুন।</string>
 
     <!--ServerActivity-->
     <string name="title_server">কনফিগারেশন ফাইল</string>

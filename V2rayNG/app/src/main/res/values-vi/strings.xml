@@ -19,6 +19,7 @@
     <string name="toast_services_stop">Đã dừng v2rayNG!</string>
     <string name="toast_services_success">Đã khởi động v2rayNG!</string>
     <string name="toast_services_failure">Không thể khởi động v2rayNG, kiểm tra lại cấu hình!</string>
+    <string name="notification_core_recovery_failed">Không thể khôi phục kết nối. Lưu lượng vẫn bị chặn để tránh rò rỉ; hãy khởi động lại v2rayNG.</string>
 
     <!--ServerActivity-->
     <string name="title_server">v2rayNG</string>

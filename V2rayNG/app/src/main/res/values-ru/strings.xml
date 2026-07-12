@@ -19,6 +19,7 @@
     <string name="toast_services_stop">Остановка служб</string>
     <string name="toast_services_success">Службы успешно запущены</string>
     <string name="toast_services_failure">Сбой при запуске служб</string>
+    <string name="notification_core_recovery_failed">Не удалось восстановить подключение. Трафик заблокирован для предотвращения утечки; перезапустите v2rayNG.</string>
 
     <!--ServerActivity-->
     <string name="title_server">Профиль</string>

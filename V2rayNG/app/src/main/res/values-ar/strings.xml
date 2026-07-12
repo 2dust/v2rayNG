@@ -19,6 +19,7 @@
     <string name="toast_services_stop">إيقاف الخدمات</string>
     <string name="toast_services_success">نجاح بدء الخدمات</string>
     <string name="toast_services_failure">فشل بدء الخدمات</string>
+    <string name="notification_core_recovery_failed">فشل استرداد الاتصال. ستظل حركة المرور محظورة لمنع التسرب؛ أعد تشغيل v2rayNG.</string>
 
     <!--ServerActivity-->
     <string name="title_server">ملف التكوين</string>

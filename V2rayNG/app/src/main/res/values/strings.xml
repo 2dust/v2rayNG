@@ -20,6 +20,7 @@
     <string name="toast_services_stop">Stop Services</string>
     <string name="toast_services_success">Start Services Success</string>
     <string name="toast_services_failure">Start Services Failure</string>
+    <string name="notification_core_recovery_failed">Connection recovery failed. Traffic remains blocked to prevent leaks; restart v2rayNG.</string>
 
     <!--ServerActivity-->
     <string name="title_server">Config</string>

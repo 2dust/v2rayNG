@@ -19,6 +19,7 @@
     <string name="toast_services_stop">واڌاشتن سرویس</string>
     <string name="toast_services_success">ره وستن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_failure">ره وستن سرویس وا مووفقیت ٱنجوم نوابی</string>
+    <string name="notification_core_recovery_failed">بازیابی اتصال ناموفق بود. برای جلوگیری از نشت، ترافیک مسدود می‌ماند؛ v2rayNG را دوباره راه‌اندازی کنید.</string>
 
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>

@@ -19,6 +19,7 @@
     <string name="toast_services_stop">توقف سرویس</string>
     <string name="toast_services_success">سرویس با موفقیت شروع شد</string>
     <string name="toast_services_failure">شروع سرویس با شکست مواجه شد</string>
+    <string name="notification_core_recovery_failed">بازیابی اتصال ناموفق بود. برای جلوگیری از نشت، ترافیک مسدود می‌ماند؛ v2rayNG را دوباره راه‌اندازی کنید.</string>
 
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
