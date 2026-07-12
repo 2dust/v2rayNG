@@ -32,10 +32,21 @@ object NetworkIdentityResolver {
         else -> "other"
     }
 
-    fun canReadWifiIdentity(context: Context): Boolean =
-        MmkvManager.decodeSettingsBool(AppConfig.PREF_REMEMBER_ROUTES_PER_WIFI_NETWORK, false) &&
+    fun canReadWifiIdentity(context: Context): Boolean {
+        val enabled = MmkvManager.decodeSettingsBool(
+            AppConfig.PREF_REMEMBER_ROUTES_PER_WIFI_NETWORK,
+            false,
+        )
+        if (!enabled) return false
+
+        val permissionGranted =
             context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
-            PackageManager.PERMISSION_GRANTED
+                PackageManager.PERMISSION_GRANTED
+        if (!permissionGranted) {
+            MmkvManager.encodeSettings(AppConfig.PREF_REMEMBER_ROUTES_PER_WIFI_NETWORK, false)
+        }
+        return permissionGranted
+    }
 
     internal fun wifiKey(ssid: String?, rememberPerNetwork: Boolean = true): String {
         if (!rememberPerNetwork) return "wifi"

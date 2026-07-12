@@ -63,6 +63,15 @@ fun Context.toastError(message: Int) {
 }
 
 /**
+ * Shows a long error toast message with the given resource ID.
+ *
+ * @param message The resource ID of the message to show.
+ */
+fun Context.toastErrorLong(message: Int) {
+    Toasty.error(this, message, Toast.LENGTH_LONG, true).show()
+}
+
+/**
  * Shows a toast message with the given text.
  *
  * @param message The text of the message to show.

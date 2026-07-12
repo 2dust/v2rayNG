@@ -15,6 +15,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toastError
+import com.v2ray.ang.extension.toastErrorLong
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.MmkvPreferenceDataStore
 import com.v2ray.ang.root.RootManager
@@ -75,7 +76,7 @@ class SettingsActivity : BaseActivity() {
                     grants[Manifest.permission.ACCESS_FINE_LOCATION] == true || hasFineLocationPermission()
                 rememberRoutesPerWifiNetwork?.isChecked = fineLocationGranted
                 if (!fineLocationGranted) {
-                    context?.toastError(R.string.toast_precise_location_required_for_wifi_route_memory)
+                    context?.toastErrorLong(R.string.toast_precise_location_required_for_wifi_route_memory)
                 }
             }
 
@@ -243,6 +244,7 @@ class SettingsActivity : BaseActivity() {
 
         override fun onStart() {
             super.onStart()
+            disableWifiRouteMemoryWithoutPermission()
             updateHevTunSettings(MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true))
 
             // Initialize mode-dependent UI states
@@ -258,6 +260,12 @@ class SettingsActivity : BaseActivity() {
             updateFragment(MmkvManager.decodeSettingsBool(AppConfig.PREF_FRAGMENT_ENABLED, false))
 
             updateDynamicSocksPort(MmkvManager.decodeSettingsBool(AppConfig.PREF_DYNAMIC_SOCKS_PORT, false))
+        }
+
+        private fun disableWifiRouteMemoryWithoutPermission() {
+            if (rememberRoutesPerWifiNetwork?.isChecked == true && !hasFineLocationPermission()) {
+                rememberRoutesPerWifiNetwork?.isChecked = false
+            }
         }
 
         private fun updateMode(value: String?) {
