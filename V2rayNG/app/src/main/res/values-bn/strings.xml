@@ -159,6 +159,9 @@
     <string name="summary_pref_per_app_proxy">সাধারণ: চেকড অ্যাপ প্রক্সি, আনচেকড সরাসরি সংযোগ; \nবাইপাস মোড: চেকড অ্যাপ সরাসরি সংযুক্ত, আনচেকড প্রক্সি। \nমেনুতে প্রক্সি অ্যাপ্লিকেশন স্বয়ংক্রিয়ভাবে নির্বাচন করার বিকল্প</string>
     <string name="title_pref_is_booted">Auto connect at startup</string>
     <string name="summary_pref_is_booted">Automatically connects to the selected server at startup, which may be unsuccessful</string>
+    <string name="title_pref_remember_routes_per_wifi_network">প্রতিটি Wi-Fi নেটওয়ার্কের জন্য কার্যকর রুট মনে রাখুন</string>
+    <string name="summary_pref_remember_routes_per_wifi_network">আলাদা রুটের ইতিহাস রাখতে সংযুক্ত Wi-Fi নেটওয়ার্কের নাম ব্যবহার করে। সুনির্দিষ্ট লোকেশন অনুমতি প্রয়োজন, কারণ Android Wi-Fi নেটওয়ার্কের নামকে লোকেশন তথ্য হিসেবে সুরক্ষিত রাখে।</string>
+    <string name="toast_precise_location_required_for_wifi_route_memory">Wi-Fi নেটওয়ার্কের নাম পড়তে সুনির্দিষ্ট লোকেশন অনুমতি প্রয়োজন</string>
 
     <string name="title_pref_auto_remove_invalid_after_test">Auto delete invalid config after testing</string>
     <string name="summary_pref_auto_remove_invalid_after_test">Test results may not be accurate; deleted config cannot be recovered.</string>

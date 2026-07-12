@@ -161,6 +161,9 @@
     <string name="summary_pref_per_app_proxy">عام: التطبيق المحدد هو وكيل، غير المحدد اتصال مباشر؛ \nوضع التجاوز: التطبيق المحدد متصل مباشرة، غير المحدد وكيل. \nخيار تحديد تطبيق الوكيل تلقائيًا في القائمة</string>
     <string name="title_pref_is_booted">Auto connect at startup</string>
     <string name="summary_pref_is_booted">Automatically connects to the selected server at startup, which may be unsuccessful</string>
+    <string name="title_pref_remember_routes_per_wifi_network">تذكّر المسارات الصالحة لكل شبكة Wi-Fi</string>
+    <string name="summary_pref_remember_routes_per_wifi_network">يستخدم اسم شبكة Wi-Fi المتصلة للاحتفاظ بسجل مسارات منفصل. يتطلب إذن الموقع الدقيق لأن Android يحمي أسماء شبكات Wi-Fi باعتبارها معلومات موقع.</string>
+    <string name="toast_precise_location_required_for_wifi_route_memory">يلزم إذن الموقع الدقيق لقراءة اسم شبكة Wi-Fi</string>
 
     <string name="title_pref_auto_remove_invalid_after_test">Auto delete invalid config after testing</string>
     <string name="summary_pref_auto_remove_invalid_after_test">Test results may not be accurate; deleted config cannot be recovered.</string>
