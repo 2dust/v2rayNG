@@ -312,6 +312,7 @@
     <string name="title_filter_config">تصفية ملف التكوين</string>
     <string name="filter_config_all">All</string>
     <string name="title_del_duplicate_config_count">حذف %d من الإعدادات المكررة</string>
+    <string name="summary_scan_qrcode">Click screen open the camera scan</string>
 
     <string name="title_del_config_count">Delete %d configurations</string>
     <string name="title_import_config_count">Import %d configurations</string>
