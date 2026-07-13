@@ -24,17 +24,11 @@ object CoreNativeManager {
         val outboundTag: String = "",
         val alive: Boolean = false,
         val delay: Long = -1L,
-        val lastError: String = "",
         val samples: Long = 0L,
-        val failedSamples: Long = 0L,
-        val deviation: Long = 0L,
     )
 
     data class OutboundProbeBatchResult(
-        val completed: Boolean = false,
         val cancelled: Boolean = false,
-        val networkUnavailable: Boolean = false,
-        val error: String = "",
         val results: List<OutboundProbeStatus> = emptyList(),
         val balancerTargets: Map<String, String> = emptyMap(),
     )
@@ -89,20 +83,12 @@ object CoreNativeManager {
         }
     }
 
-    /**
-     * Measure outbound connection delay.
-     *
-     * @param config The configuration JSON string
-     * @param testUrl The URL to test against
-     * @return Delay in milliseconds, or -1 if test failed
-     */
-    fun measureOutboundDelay(config: String, testUrl: String): Long {
-        return try {
-            Libv2ray.measureOutboundDelay(config, testUrl)
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to measure outbound delay", e)
-            -1L
-        }
+    fun validateOutboundProbeConfig(config: String): Boolean = try {
+        Libv2ray.validateOutboundProbeConfig(config)
+        true
+    } catch (e: Exception) {
+        LogUtil.w(AppConfig.TAG, "Rejected invalid outbound probe source: ${e.message}")
+        false
     }
 
     fun newOutboundProbeController(): OutboundProbeController =
@@ -126,7 +112,7 @@ object CoreNativeManager {
             handler,
         )
         return JsonUtil.fromJsonSafe(payload, OutboundProbeBatchResult::class.java)
-            ?: OutboundProbeBatchResult(error = "Invalid outbound probe response")
+            ?: throw IllegalStateException("Invalid outbound probe response")
     }
 
     /**

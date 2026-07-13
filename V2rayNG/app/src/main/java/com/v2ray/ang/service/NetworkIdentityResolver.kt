@@ -3,6 +3,7 @@ package com.v2ray.ang.service
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
@@ -14,6 +15,16 @@ import com.v2ray.ang.handler.MmkvManager
 
 /** Resolves reconnect-stable underlay identities without phone-state access. */
 object NetworkIdentityResolver {
+    data class Identity(val key: String, val networkHandle: Long)
+
+    /** Captures both the reconnect-stable cache key and this network instance. */
+    fun resolveCurrent(context: Context): Identity? {
+        val connectivity = context.getSystemService(ConnectivityManager::class.java) ?: return null
+        val network = connectivity.activeNetwork ?: return null
+        val capabilities = connectivity.getNetworkCapabilities(network) ?: return null
+        return Identity(resolve(context, capabilities), network.networkHandle)
+    }
+
     fun resolve(context: Context, capabilities: NetworkCapabilities): String = when {
         capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
             val rememberPerNetwork = canReadWifiIdentity(context)

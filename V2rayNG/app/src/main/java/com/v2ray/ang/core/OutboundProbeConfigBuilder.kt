@@ -44,42 +44,92 @@ object OutboundProbeConfigBuilder {
             }
 
             val namespace = "probe-$index-"
-            val tagMap = linkedMapOf<String, String>()
-            val outboundObjects = outbounds.mapIndexedNotNull { outboundIndex, element ->
-                element.takeIf { it.isJsonObject }?.asJsonObject?.deepCopy()?.also { outbound ->
-                    val originalTag = outbound.string("tag") ?: "outbound-$outboundIndex"
-                    val probeTag = "$namespace$originalTag"
-                    tagMap[originalTag] = probeTag
-                    outbound.addProperty("tag", probeTag)
-                }
-            }
-            if (outboundObjects.isEmpty()) {
+            val outboundElements = outbounds.toList()
+            if (outboundElements.any { !it.isJsonObject }) {
                 failedGuids += source.guid
                 return@forEachIndexed
             }
-            outboundObjects.forEach { outbound ->
-                remapOutboundReferences(outbound, tagMap)
-                mergedOutbounds.add(outbound)
+            val outboundObjects = outboundElements.map { it.asJsonObject.deepCopy() }
+            val originalTags = outboundObjects.mapIndexed { outboundIndex, outbound ->
+                outbound.string("tag") ?: "outbound-$outboundIndex"
+            }
+            if (originalTags.toSet().size != originalTags.size) {
+                failedGuids += source.guid
+                return@forEachIndexed
+            }
+
+            val tagMap = linkedMapOf<String, String>()
+            outboundObjects.forEachIndexed { outboundIndex, outbound ->
+                val originalTag = originalTags[outboundIndex]
+                val probeTag = "$namespace$originalTag"
+                tagMap[originalTag] = probeTag
+                outbound.addProperty("tag", probeTag)
+            }
+            if (outboundObjects.any { !remapOutboundReferences(it, tagMap) }) {
+                failedGuids += source.guid
+                return@forEachIndexed
             }
 
             val routing = root.obj("routing")
-            val primaryBalancerTag = routing?.array("rules")
+            val routingRules = routing?.array("rules")
                 ?.mapNotNull { it.takeIf { rule -> rule.isJsonObject }?.asJsonObject }
-                ?.lastOrNull { it.isCatchAllRule() && it.string("balancerTag") != null }
+                .orEmpty()
+            val primaryBalancerTag = routingRules
+                .lastOrNull { it.isCatchAllRule() && it.string("balancerTag") != null }
                 ?.string("balancerTag")
-                ?: routing?.array("rules")
-                    ?.mapNotNull { it.takeIf { rule -> rule.isJsonObject }?.asJsonObject }
-                    ?.firstOrNull { it.string("balancerTag") != null }
-                    ?.string("balancerTag")
 
             val originalBalancer = primaryBalancerTag?.let { wanted ->
                 routing?.array("balancers")
                     ?.mapNotNull { it.takeIf { balancer -> balancer.isJsonObject }?.asJsonObject }
                     ?.firstOrNull { it.string("tag") == wanted }
             }
+            if ((primaryBalancerTag != null && originalBalancer == null) ||
+                (primaryBalancerTag == null && routingRules.any { it.string("balancerTag") != null })
+            ) {
+                // Direct batch probing cannot reproduce conditional routing.
+                // Accept only the catch-all policy-group form emitted by v2rayNG.
+                failedGuids += source.guid
+                return@forEachIndexed
+            }
 
+            val localBalancers = JsonArray()
             val profile = if (originalBalancer != null) {
-                if (originalBalancer.obj("strategy")?.string("type")
+                buildPolicyProfile(
+                    source.guid,
+                    namespace,
+                    originalBalancer,
+                    tagMap,
+                    localBalancers,
+                )
+            } else {
+                val catchAllOutbound = routingRules.lastOrNull {
+                    it.isCatchAllRule() && it.string("outboundTag") != null
+                }?.string("outboundTag")
+                if (catchAllOutbound != null && catchAllOutbound !in tagMap) {
+                    failedGuids += source.guid
+                    return@forEachIndexed
+                }
+                if (catchAllOutbound == null && routingRules.isNotEmpty()) {
+                    failedGuids += source.guid
+                    return@forEachIndexed
+                }
+                val routedTag = catchAllOutbound
+                val runtimeTag = routedTag ?: tagMap.keys.first()
+                OutboundProbeProfilePlan(
+                    guid = source.guid,
+                    candidates = listOf(
+                        OutboundProbeCandidate(
+                            probeTag = tagMap.getValue(runtimeTag),
+                            runtimeTag = runtimeTag,
+                        )
+                    ),
+                )
+            }
+
+            if (profile == null || profile.candidates.isEmpty()) {
+                failedGuids += source.guid
+            } else {
+                if (originalBalancer?.obj("strategy")?.string("type")
                         ?.equals("leastLoad", ignoreCase = true) == true
                 ) {
                     root.obj("burstObservatory")?.obj("pingConfig")?.let { pingConfig ->
@@ -99,36 +149,8 @@ object OutboundProbeConfigBuilder {
                         }
                     }
                 }
-                buildPolicyProfile(
-                    source.guid,
-                    namespace,
-                    originalBalancer,
-                    tagMap,
-                    mergedBalancers,
-                )
-            } else {
-                val routedTag = routing?.array("rules")
-                    ?.mapNotNull { it.takeIf { rule -> rule.isJsonObject }?.asJsonObject }
-                    ?.lastOrNull {
-                        it.isCatchAllRule() &&
-                            it.string("outboundTag")?.let(tagMap::containsKey) == true
-                    }
-                    ?.string("outboundTag")
-                val runtimeTag = routedTag ?: tagMap.keys.first()
-                OutboundProbeProfilePlan(
-                    guid = source.guid,
-                    candidates = listOf(
-                        OutboundProbeCandidate(
-                            probeTag = tagMap.getValue(runtimeTag),
-                            runtimeTag = runtimeTag,
-                        )
-                    ),
-                )
-            }
-
-            if (profile == null || profile.candidates.isEmpty()) {
-                failedGuids += source.guid
-            } else {
+                outboundObjects.forEach { mergedOutbounds.add(it) }
+                localBalancers.forEach { mergedBalancers.add(it) }
                 profiles += profile
             }
         }
@@ -168,6 +190,17 @@ object OutboundProbeConfigBuilder {
         tagMap: Map<String, String>,
         mergedBalancers: JsonArray,
     ): OutboundProbeProfilePlan? {
+        val strategy = sourceBalancer.obj("strategy") ?: return null
+        val strategyType = strategy.string("type")
+        if (strategyType?.equals("leastPing", ignoreCase = true) != true &&
+            strategyType?.equals("leastLoad", ignoreCase = true) != true
+        ) return null
+        if ((strategy.obj("settings")?.array("costs")?.size() ?: 0) > 0) {
+            // Cost matchers refer to original outbound tags. Silently carrying
+            // them into a namespaced batch would change leastLoad semantics.
+            return null
+        }
+
         val selectors = sourceBalancer.array("selector")
             ?.mapNotNull { it.takeIf { selector -> selector.isJsonPrimitive }?.asString }
             .orEmpty()
@@ -183,26 +216,33 @@ object OutboundProbeConfigBuilder {
             selectors.forEach { add("$namespace$it") }
         })
         sourceBalancer.string("fallbackTag")?.let { fallback ->
-            tagMap[fallback]?.let { balancer.addProperty("fallbackTag", it) }
-                ?: balancer.remove("fallbackTag")
+            val mappedFallback = tagMap[fallback] ?: return null
+            balancer.addProperty("fallbackTag", mappedFallback)
         }
         mergedBalancers.add(balancer)
         return OutboundProbeProfilePlan(guid, candidates, probeBalancerTag)
     }
 
-    private fun remapOutboundReferences(outbound: JsonObject, tagMap: Map<String, String>) {
+    private fun remapOutboundReferences(outbound: JsonObject, tagMap: Map<String, String>): Boolean {
         outbound.obj("streamSettings")
             ?.obj("sockopt")
             ?.let { sockopt ->
                 sockopt.string("dialerProxy")?.let { old ->
-                    tagMap[old]?.let { sockopt.addProperty("dialerProxy", it) }
+                    if (old.isNotBlank()) {
+                        val mapped = tagMap[old] ?: return false
+                        sockopt.addProperty("dialerProxy", mapped)
+                    }
                 }
             }
         outbound.obj("proxySettings")?.let { proxySettings ->
             proxySettings.string("tag")?.let { old ->
-                tagMap[old]?.let { proxySettings.addProperty("tag", it) }
+                if (old.isNotBlank()) {
+                    val mapped = tagMap[old] ?: return false
+                    proxySettings.addProperty("tag", mapped)
+                }
             }
         }
+        return true
     }
 
     private fun JsonObject.obj(name: String): JsonObject? =

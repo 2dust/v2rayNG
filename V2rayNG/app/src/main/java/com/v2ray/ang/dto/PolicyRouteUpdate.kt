@@ -6,4 +6,6 @@ import java.io.Serializable
 data class PolicyRouteUpdate(
     val profileGuid: String,
     val outboundTag: String,
+    val networkKey: String,
+    val networkHandle: Long,
 ) : Serializable

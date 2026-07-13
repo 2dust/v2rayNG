@@ -132,9 +132,9 @@ object CoreServiceManager {
      * Recreates the in-process Xray instance after Android changes the VPN's
      * underlying network. The VPN interface and service remain active.
      */
-    fun resetCoreNetworkState(previousNetworkKey: String?, newNetworkKey: String) {
+    fun resetCoreNetworkState(previousNetworkKey: String?, newNetworkKey: String, newNetworkHandle: Long) {
         networkTransitions.incrementAndGet()
-        PolicyRouteCache.setCurrentNetwork(newNetworkKey)
+        PolicyRouteCache.setCurrentNetwork(newNetworkKey, newNetworkHandle)
         if (!coreController.isRunning) {
             networkTransitions.decrementAndGet()
             return
@@ -180,8 +180,8 @@ object CoreServiceManager {
         }
     }
 
-    fun updateCoreNetworkIdentity(newNetworkKey: String) {
-        PolicyRouteCache.setCurrentNetwork(newNetworkKey)
+    fun updateCoreNetworkIdentity(newNetworkKey: String, newNetworkHandle: Long) {
+        PolicyRouteCache.setCurrentNetwork(newNetworkKey, newNetworkHandle)
         if (coreController.isRunning && policyRouteCallbacksEnabled.get()) {
             coreScope.launch { refreshFreshPolicyRoute() }
         }
@@ -212,8 +212,9 @@ object CoreServiceManager {
         if (!policyRouteCallbacksEnabled.get() || networkTransitions.get() != 0 ||
             update == null || update.profileGuid.isBlank() || update.outboundTag.isBlank()
         ) return
-        if (PolicyRouteCache.rememberCurrent(
-                PolicyRouteCache.snapshot(),
+        if (PolicyRouteCache.rememberObserved(
+                update.networkKey,
+                update.networkHandle,
                 update.profileGuid,
                 update.outboundTag,
             )

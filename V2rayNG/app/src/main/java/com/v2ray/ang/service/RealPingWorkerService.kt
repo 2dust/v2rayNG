@@ -14,8 +14,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import libv2ray.OutboundProbeHandler
 import java.util.concurrent.atomic.AtomicBoolean
@@ -32,9 +31,10 @@ class RealPingWorkerService(
     private val guids: List<String>,
     private val onEvent: (RealPingEvent) -> Unit = {},
 ) {
-    private val job = SupervisorJob()
+    private val job = Job()
     private val scope = CoroutineScope(job + Dispatchers.IO + CoroutineName("OutboundProbeBatch"))
     private val controller = CoreNativeManager.newOutboundProbeController()
+    private val networkIdentity = NetworkIdentityResolver.resolveCurrent(context)
     private val finished = AtomicBoolean(false)
     private val emittedDelays = mutableMapOf<String, Long>()
     private val emittedRoutes = mutableMapOf<String, String>()
@@ -77,8 +77,6 @@ class RealPingWorkerService(
             } catch (error: Throwable) {
                 LogUtil.e(AppConfig.TAG, "Outbound probe batch failed", error)
                 finish("-1")
-            } finally {
-                scope.cancel()
             }
         }
     }
@@ -160,7 +158,15 @@ class RealPingWorkerService(
         ) {
             emittedDelays[guid] = delay
             if (viableOutboundTag.isNotEmpty()) emittedRoutes[guid] = viableOutboundTag
-            onEvent(RealPingEvent.Result(guid, delay, viableOutboundTag))
+            onEvent(
+                RealPingEvent.Result(
+                    guid = guid,
+                    delayMillis = delay,
+                    viableOutboundTag = viableOutboundTag,
+                    networkKey = networkIdentity?.key,
+                    networkHandle = networkIdentity?.networkHandle,
+                )
+            )
         }
         if (completed && completedGuids.add(guid)) {
             val remaining = (totalProfiles - completedGuids.size).coerceAtLeast(0)

@@ -10,6 +10,8 @@ sealed class RealPingEvent {
         val guid: String,
         val delayMillis: Long,
         val viableOutboundTag: String = "",
+        val networkKey: String? = null,
+        val networkHandle: Long? = null,
     ) : RealPingEvent()
 
     /** The entire batch has finished or been cancelled. */

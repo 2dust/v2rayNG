@@ -24,7 +24,7 @@ class CoreTestService : Service() {
 
     @Volatile
     private var activeWorker: RealPingWorkerService? = null
-    private val batchStarted = AtomicBoolean(false)
+    private var batchStarted = false
     private val batchFinished = AtomicBoolean(false)
 
     /**
@@ -78,7 +78,6 @@ class CoreTestService : Service() {
 
         when (message.key) {
             AppConfig.MSG_MEASURE_CONFIG_START -> handleMeasureStart(message, startId)
-            AppConfig.MSG_MEASURE_CONFIG_CANCEL -> handleMeasureCancel()
             else -> {
                 NotificationHelper.stopForeground(this); stopSelf(startId)
             }
@@ -87,13 +86,14 @@ class CoreTestService : Service() {
     }
 
     private fun handleMeasureStart(message: TestServiceMessage, startId: Int) {
-        if (!batchStarted.compareAndSet(false, true)) {
+        if (batchStarted) {
             // This process is intentionally single-use. Even a request racing
             // with service teardown must wait for Android to create the next
             // :OutboundProbe process instead of starting a second native core.
             LogUtil.w(AppConfig.TAG, "CoreTestService ignored a second batch in its disposable process")
             return
         }
+        batchStarted = true
         LogUtil.i(AppConfig.TAG, "CoreTestService starting batch for subscription ${message.subscriptionId}")
 
         NotificationHelper.startForeground(
@@ -110,7 +110,6 @@ class CoreTestService : Service() {
         }
 
         if (guidsList.isNotEmpty()) {
-            batchFinished.set(false)
             activeWorker = RealPingWorkerService(
                 context = this,
                 guids = guidsList,
@@ -138,11 +137,18 @@ class CoreTestService : Service() {
 
             is RealPingEvent.Result -> {
                 MmkvManager.encodeServerTestDelayMillis(event.guid, event.delayMillis)
-                if (event.viableOutboundTag.isNotEmpty()) {
+                val networkKey = event.networkKey
+                val networkHandle = event.networkHandle
+                if (event.viableOutboundTag.isNotEmpty() && networkKey != null && networkHandle != null) {
                     MessageUtil.sendMsg2Service(
                         this,
                         AppConfig.MSG_POLICY_ROUTE_OBSERVED,
-                        PolicyRouteUpdate(event.guid, event.viableOutboundTag),
+                        PolicyRouteUpdate(
+                            event.guid,
+                            event.viableOutboundTag,
+                            networkKey,
+                            networkHandle,
+                        ),
                     )
                 }
                 MessageUtil.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_SUCCESS, event.guid)
@@ -158,11 +164,4 @@ class CoreTestService : Service() {
         }
     }
 
-    private fun handleMeasureCancel() {
-        LogUtil.i(AppConfig.TAG, "CoreTestService received cancel message")
-        activeWorker?.cancel()
-        activeWorker = null
-        NotificationHelper.stopForeground(this)
-        stopSelf()
-    }
 }

@@ -24,7 +24,7 @@ class PolicyRouteCacheTest {
 
     @Test
     fun clearInvalidatesInFlightWrites() {
-        PolicyRouteCache.setCurrentNetwork("wifi:home")
+        PolicyRouteCache.setCurrentNetwork("wifi:home", 100L)
         val snapshot = PolicyRouteCache.snapshot()
 
         PolicyRouteCache.clear()
@@ -44,12 +44,22 @@ class PolicyRouteCacheTest {
 
     @Test
     fun networkSwitchInvalidatesInFlightCurrentRouteWrite() {
-        PolicyRouteCache.setCurrentNetwork("wifi:home")
+        PolicyRouteCache.setCurrentNetwork("wifi:home", 100L)
         val snapshot = PolicyRouteCache.snapshot()
 
-        PolicyRouteCache.setCurrentNetwork("cellular:310260")
+        PolicyRouteCache.setCurrentNetwork("cellular:310260", 200L)
 
         assertFalse(PolicyRouteCache.rememberCurrent(snapshot, "group-a", "proxy-a"))
         assertNull(PolicyRouteCache.lookup("wifi:home", "group-a"))
+    }
+
+    @Test
+    fun batchResultMustMatchExactNetworkInstance() {
+        PolicyRouteCache.setCurrentNetwork("wifi:home", 100L)
+
+        assertFalse(PolicyRouteCache.rememberObserved("wifi:home", 99L, "group-a", "proxy-old"))
+        assertFalse(PolicyRouteCache.rememberObserved("cellular:310260", 100L, "group-a", "proxy-old"))
+        assertTrue(PolicyRouteCache.rememberObserved("wifi:home", 100L, "group-a", "proxy-current"))
+        assertEquals("proxy-current", PolicyRouteCache.lookup("wifi:home", "group-a"))
     }
 }

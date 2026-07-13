@@ -85,7 +85,9 @@ object CoreConfigManager {
         val failedGuids = mutableListOf<String>()
         guids.distinct().forEach { guid ->
             val result = getV2rayConfig4Speedtest(context, guid)
-            if (result.status && result.content.isNotBlank()) {
+            if (result.status && result.content.isNotBlank() &&
+                CoreNativeManager.validateOutboundProbeConfig(result.content)
+            ) {
                 sources += OutboundProbeConfigBuilder.Source(guid, result.content)
             } else {
                 failedGuids += guid

@@ -108,9 +108,9 @@ class CoreVpnService : VpnService(), ServiceControl {
 
         if (pendingNetworkReset == network) {
             pendingNetworkReset = null
-            CoreServiceManager.resetCoreNetworkState(previousNetworkKey, newNetworkKey)
+            CoreServiceManager.resetCoreNetworkState(previousNetworkKey, newNetworkKey, network.networkHandle)
         } else if (previousNetworkKey != newNetworkKey) {
-            CoreServiceManager.updateCoreNetworkIdentity(newNetworkKey)
+            CoreServiceManager.updateCoreNetworkIdentity(newNetworkKey, network.networkHandle)
         }
     }
 

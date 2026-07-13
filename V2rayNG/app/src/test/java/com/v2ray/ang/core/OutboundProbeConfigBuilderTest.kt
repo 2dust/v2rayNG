@@ -138,6 +138,80 @@ class OutboundProbeConfigBuilderTest {
     }
 
     @Test
+    fun rejectsPolicyStrategiesWithoutOneStableViableTarget() {
+        val plan = OutboundProbeConfigBuilder.build(
+            sources = listOf(
+                OutboundProbeConfigBuilder.Source(
+                    "random-policy",
+                    """
+                    {
+                      "outbounds": [
+                        {"tag":"proxy-a","protocol":"freedom"},
+                        {"tag":"proxy-b","protocol":"freedom"}
+                      ],
+                      "routing": {
+                        "rules": [{"type":"field","balancerTag":"balancer-main"}],
+                        "balancers": [{
+                          "tag":"balancer-main",
+                          "selector":["proxy-"],
+                          "strategy":{"type":"random"}
+                        }]
+                      }
+                    }
+                    """.trimIndent(),
+                )
+            ),
+            destination = "https://example.com/generate_204",
+        )
+
+        assertEquals(listOf("random-policy"), plan.failedGuids)
+        assertTrue(plan.profiles.isEmpty())
+        assertEquals(0, JsonParser.parseString(plan.content).asJsonObject.getAsJsonArray("outbounds").size())
+    }
+
+    @Test
+    fun rejectsAmbiguousOrBrokenSourceReferencesBeforeMerge() {
+        val plan = OutboundProbeConfigBuilder.build(
+            sources = listOf(
+                OutboundProbeConfigBuilder.Source(
+                    "duplicate-tags",
+                    """{"outbounds":[
+                      {"tag":"proxy","protocol":"freedom"},
+                      {"tag":"proxy","protocol":"freedom"}
+                    ]}""",
+                ),
+                OutboundProbeConfigBuilder.Source(
+                    "missing-dialer",
+                    """{"outbounds":[{
+                      "tag":"proxy",
+                      "protocol":"freedom",
+                      "streamSettings":{"sockopt":{"dialerProxy":"missing"}}
+                    }]}""",
+                ),
+                OutboundProbeConfigBuilder.Source(
+                    "conditional-route",
+                    """{
+                      "outbounds":[{"tag":"proxy","protocol":"freedom"}],
+                      "routing":{"rules":[{
+                        "type":"field",
+                        "domain":["example.com"],
+                        "outboundTag":"proxy"
+                      }]}
+                    }""",
+                ),
+            ),
+            destination = "https://example.com/generate_204",
+        )
+
+        assertEquals(
+            listOf("duplicate-tags", "missing-dialer", "conditional-route"),
+            plan.failedGuids,
+        )
+        assertTrue(plan.profiles.isEmpty())
+        assertEquals(0, JsonParser.parseString(plan.content).asJsonObject.getAsJsonArray("outbounds").size())
+    }
+
+    @Test
     fun isolatesMalformedProfilesFromTheViableBatch() {
         val plan = OutboundProbeConfigBuilder.build(
             sources = listOf(
