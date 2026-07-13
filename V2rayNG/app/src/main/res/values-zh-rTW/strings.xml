@@ -116,6 +116,12 @@
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
     <string name="server_lab_final_mask">FinalMask 原始 JSON 格式: { FinalMaskObject }</string>
+    <string name="server_lab_xmc_enable">啟用 XMC（Minecraft FinalMask）</string>
+    <string name="server_lab_xmc_tip">僅支援 TCP。用戶端密碼必須與 Xray 伺服器一致；hostname 和使用者名稱可留空。</string>
+    <string name="server_lab_xmc_hostname">Minecraft hostname（可選）</string>
+    <string name="server_lab_xmc_usernames">Minecraft 使用者名稱（逗號分隔，可選）</string>
+    <string name="server_lab_xmc_password">XMC 密碼</string>
+    <string name="server_lab_xmc_password_required">必須填寫 XMC 密碼</string>
     <string name="server_lab_ech_config_list">EchConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify Peer Cert By Name</string>
     <string name="server_lab_pinned_ca256">證書指紋 (SHA-256)</string>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -159,6 +160,90 @@
             android:inputType="textMultiLine"
             android:maxLines="20"
             android:minLines="4" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_xmc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_spacing_dp16"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/server_lab_xmc_enable"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/sw_xmc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/padding_spacing_dp16"
+                android:paddingEnd="@dimen/padding_spacing_dp16"
+                app:theme="@style/BrandedSwitch" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_spacing_dp4"
+            android:text="@string/server_lab_xmc_tip"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:id="@+id/layout_xmc_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_spacing_dp16"
+                android:text="@string/server_lab_xmc_hostname" />
+
+            <EditText
+                android:id="@+id/et_xmc_hostname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="mc.example.com"
+                android:inputType="textUri" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_spacing_dp16"
+                android:text="@string/server_lab_xmc_usernames" />
+
+            <EditText
+                android:id="@+id/et_xmc_usernames"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Steve, Alex"
+                android:inputType="text" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_spacing_dp16"
+                android:text="@string/server_lab_xmc_password" />
+
+            <EditText
+                android:id="@+id/et_xmc_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout

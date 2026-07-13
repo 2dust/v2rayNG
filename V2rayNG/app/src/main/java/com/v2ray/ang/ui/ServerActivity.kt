@@ -13,6 +13,7 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.DEFAULT_PORT
@@ -34,6 +35,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.XmcFinalMaskUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -144,6 +146,12 @@ class ServerActivity : BaseActivity() {
     private val et_extra: EditText? by lazy { findViewById(R.id.et_extra) }
     private val et_fm: EditText? by lazy { findViewById(R.id.et_fm) }
     private val layout_extra: LinearLayout? by lazy { findViewById(R.id.layout_extra) }
+    private val layout_xmc: LinearLayout? by lazy { findViewById(R.id.layout_xmc) }
+    private val sw_xmc: SwitchCompat? by lazy { findViewById(R.id.sw_xmc) }
+    private val layout_xmc_settings: LinearLayout? by lazy { findViewById(R.id.layout_xmc_settings) }
+    private val et_xmc_hostname: EditText? by lazy { findViewById(R.id.et_xmc_hostname) }
+    private val et_xmc_usernames: EditText? by lazy { findViewById(R.id.et_xmc_usernames) }
+    private val et_xmc_password: EditText? by lazy { findViewById(R.id.et_xmc_password) }
     private val et_ech_config_list: EditText? by lazy { findViewById(R.id.et_ech_config_list) }
     private val container_ech_config_list: LinearLayout? by lazy { findViewById(R.id.lay_ech_config_list) }
     private val et_verify_peer_cert_by_name: EditText? by lazy { findViewById(R.id.et_verify_peer_cert_by_name) }
@@ -269,6 +277,12 @@ class ServerActivity : BaseActivity() {
                         else -> View.GONE
                     }
 
+                layout_xmc?.visibility =
+                    when (networks[position]) {
+                        NetworkType.TCP.type -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
                 layout_browser_dialer?.visibility =
                     when (networks[position]) {
                         NetworkType.WS.type -> View.VISIBLE
@@ -358,6 +372,9 @@ class ServerActivity : BaseActivity() {
         btn_pinned_ca256_action?.setOnClickListener {
             fetchPinnedCA256ForCurrentConfig()
         }
+        sw_xmc?.setOnCheckedChangeListener { _, isChecked ->
+            layout_xmc_settings?.visibility = if (isChecked) View.VISIBLE else View.GONE
+        }
         if (config != null) {
             bindingServer(config)
         } else {
@@ -445,6 +462,8 @@ class ServerActivity : BaseActivity() {
             sp_browser_dialer_mode?.setSelection(browserDialerMode)
         }
 
+        bindXmcSettings(config.finalMask)
+
         return true
     }
 
@@ -474,6 +493,7 @@ class ServerActivity : BaseActivity() {
             Utils.getEditable(WIREGUARD_LOCAL_ADDRESS_V4)
         et_local_mtu?.text = Utils.getEditable(WIREGUARD_LOCAL_MTU)
         sp_browser_dialer_mode?.setSelection(0)
+        bindXmcSettings(null)
         return true
     }
 
@@ -529,6 +549,14 @@ class ServerActivity : BaseActivity() {
                 toast(R.string.server_lab_final_mask)
                 return false
             }
+        }
+        val selectedNetwork = networks.getOrNull(sp_network?.selectedItemPosition ?: -1)
+        if (selectedNetwork == NetworkType.TCP.type
+            && sw_xmc?.isChecked == true
+            && et_xmc_password?.text?.toString().isNullOrEmpty()
+        ) {
+            toast(R.string.server_lab_xmc_password_required)
+            return false
         }
 
         saveCommon(config)
@@ -603,7 +631,20 @@ class ServerActivity : BaseActivity() {
         profileItem.authority = requestHost
         profileItem.xhttpMode = transportTypes(networks[network])[type]
         profileItem.xhttpExtra = et_extra?.text?.toString()?.trim().nullIfBlank()
-        profileItem.finalMask = et_fm?.text?.toString()?.trim()?.nullIfBlank()
+        val rawFinalMask = et_fm?.text?.toString()?.trim()?.nullIfBlank()
+        val xmcSettings = if (networks[network] == NetworkType.TCP.type && sw_xmc?.isChecked == true) {
+            XmcFinalMaskUtil.Settings(
+                hostname = et_xmc_hostname?.text?.toString()?.trim().orEmpty(),
+                usernames = et_xmc_usernames?.text?.toString().orEmpty()
+                    .split(',')
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() },
+                password = et_xmc_password?.text?.toString().orEmpty(),
+            )
+        } else {
+            null
+        }
+        profileItem.finalMask = XmcFinalMaskUtil.update(rawFinalMask, xmcSettings)?.nullIfBlank()
         profileItem.kcpMtu = et_kcp_mtu?.text?.toString()?.toIntOrNull()
         profileItem.kcpTti = et_kcp_tti?.text?.toString()?.toIntOrNull()
         if (networks[network] == NetworkType.WS.type || networks[network] == NetworkType.XHTTP.type) {
@@ -616,6 +657,14 @@ class ServerActivity : BaseActivity() {
         } else {
             profileItem.browserDialerMode = null
         }
+    }
+
+    private fun bindXmcSettings(finalMask: String?) {
+        val settings = XmcFinalMaskUtil.extract(finalMask)
+        sw_xmc?.isChecked = settings != null
+        et_xmc_hostname?.text = Utils.getEditable(settings?.hostname)
+        et_xmc_usernames?.text = Utils.getEditable(settings?.usernames?.joinToString(", "))
+        et_xmc_password?.text = Utils.getEditable(settings?.password)
     }
 
     private fun saveTls(config: ProfileItem) {

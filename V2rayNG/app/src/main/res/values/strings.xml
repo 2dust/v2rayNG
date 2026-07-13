@@ -117,6 +117,12 @@
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
+    <string name="server_lab_xmc_enable">Enable XMC (Minecraft FinalMask)</string>
+    <string name="server_lab_xmc_tip">TCP only. The client password must match the Xray server; hostname and usernames are optional.</string>
+    <string name="server_lab_xmc_hostname">Minecraft hostname (optional)</string>
+    <string name="server_lab_xmc_usernames">Minecraft usernames (comma-separated, optional)</string>
+    <string name="server_lab_xmc_password">XMC password</string>
+    <string name="server_lab_xmc_password_required">XMC password is required</string>
     <string name="server_lab_ech_config_list">EchConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify Peer Cert By Name</string>
     <string name="server_lab_pinned_ca256">Certificate fingerprint (SHA-256)</string>
