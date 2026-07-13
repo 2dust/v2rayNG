@@ -59,7 +59,7 @@ class RoutingEditActivity : BaseComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initial = SettingsManager.getRoutingRuleset(position)
-        val profileRemarks = intent.getStringExtra("profileRemarks") ?: ""
+        val profileRemarks = SettingsManager.getProfileRemarks()
         outboundSuggestions = (BUILTIN_OUTBOUND_TAGS.toList() + profileRemarks).distinct()
         canUseProcess = SettingsManager.canUseProcessRouting()
     }
