@@ -248,7 +248,7 @@
     <string name="summary_pref_append_http_proxy">پروکسی HTTP مستقیماً از (مرورگر/برخی برنامه‌های پشتیبانی‌شده)، بدون استفاده از دستگاه NIC مجازی (Android 10+) استفاده می‌شود.</string>
 
     <string name="title_pref_double_column_display">فعال کردن نمایش دو ستون</string>
-    <string name="summary_pref_double_column_display">لیست نمایه در دو ستون نمایش داده می شود و امکان نمایش محتوای بیشتری را بر روی صفحه نمایش می دهد. برای اجرا باید برنامه را مجددا راه اندازی کنید.</string>
+    <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen.</string>
 
     <string name="title_pref_group_all_display">Enable show all groups</string>
     <string name="summary_pref_group_all_display">Add an extra "All Tabs" page</string>
