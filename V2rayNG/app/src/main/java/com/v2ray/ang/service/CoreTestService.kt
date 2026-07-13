@@ -24,6 +24,8 @@ class CoreTestService : Service() {
 
     @Volatile
     private var activeWorker: RealPingWorkerService? = null
+    @Volatile
+    private var replacementRequested = false
     private var batchStarted = false
     private val batchFinished = AtomicBoolean(false)
 
@@ -51,7 +53,7 @@ class CoreTestService : Service() {
         LogUtil.i(AppConfig.TAG, "CoreTestService is being destroyed")
         activeWorker?.cancel()
         activeWorker = null
-        if (batchFinished.compareAndSet(false, true)) {
+        if (!replacementRequested && batchFinished.compareAndSet(false, true)) {
             MessageUtil.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_FINISH, "-1")
         }
         NotificationHelper.stopForeground(this)
@@ -76,32 +78,34 @@ class CoreTestService : Service() {
             return START_NOT_STICKY
         }
 
-        when (message.key) {
+        return when (message.key) {
             AppConfig.MSG_MEASURE_CONFIG_START -> handleMeasureStart(message, startId)
             else -> {
-                NotificationHelper.stopForeground(this); stopSelf(startId)
+                NotificationHelper.stopForeground(this)
+                stopSelf(startId)
+                START_NOT_STICKY
             }
         }
-        return START_NOT_STICKY
     }
 
-    private fun handleMeasureStart(message: TestServiceMessage, startId: Int) {
+    private fun handleMeasureStart(message: TestServiceMessage, startId: Int): Int {
         if (batchStarted) {
-            // This process is intentionally single-use. Even a request racing
-            // with service teardown must wait for Android to create the next
-            // :OutboundProbe process instead of starting a second native core.
-            LogUtil.w(AppConfig.TAG, "CoreTestService ignored a second batch in its disposable process")
-            return
+            replacementRequested = true
+            startProbeForeground()
+            LogUtil.i(AppConfig.TAG, "CoreTestService handing the next batch to a fresh process")
+
+            // The latest start intent must remain start-requested while this
+            // single-use process exits. Returning REDELIVER before killing the
+            // process makes Android replay that exact request in a new process;
+            // stopService followed by startForegroundService can instead lose
+            // the replacement to a lifecycle race in the dying service.
+            Handler(Looper.getMainLooper()).post { Process.killProcess(Process.myPid()) }
+            return START_REDELIVER_INTENT
         }
         batchStarted = true
         LogUtil.i(AppConfig.TAG, "CoreTestService starting batch for subscription ${message.subscriptionId}")
 
-        NotificationHelper.startForeground(
-            this,
-            NotificationChannelType.CORE_TEST,
-            getString(R.string.app_name),
-            getString(R.string.title_real_ping_all_server)
-        )
+        startProbeForeground()
 
         val guidsList = when {
             message.serverGuids.isNotEmpty() -> message.serverGuids
@@ -122,9 +126,22 @@ class CoreTestService : Service() {
             MessageUtil.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_FINISH, "0")
             stopSelf(startId)
         }
+        return START_NOT_STICKY
+    }
+
+    private fun startProbeForeground() {
+        NotificationHelper.startForeground(
+            this,
+            NotificationChannelType.CORE_TEST,
+            getString(R.string.app_name),
+            getString(R.string.title_real_ping_all_server)
+        )
     }
 
     private fun handleWorkerEvent(event: RealPingEvent) {
+        // Once another start has claimed the service, the old process must not
+        // publish stale progress or results while waiting for its final kill.
+        if (replacementRequested) return
         when (event) {
             is RealPingEvent.Progress -> {
                 NotificationHelper.updateNotification(
