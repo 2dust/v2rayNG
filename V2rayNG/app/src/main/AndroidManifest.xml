@@ -220,7 +220,7 @@
             android:name=".service.CoreTestService"
             android:exported="false"
             android:foregroundServiceType="specialUse"
-            android:process=":RunSoLibV2RayDaemon">
+            android:process=":OutboundProbe">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="test" />

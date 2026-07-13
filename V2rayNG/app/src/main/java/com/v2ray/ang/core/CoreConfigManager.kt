@@ -6,6 +6,7 @@ import com.google.gson.JsonArray
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.CoreConfigContext
+import com.v2ray.ang.dto.OutboundProbePlan
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.RulesetItem
@@ -72,6 +73,29 @@ object CoreConfigManager {
                 errorMessage = "Failed to get V2ray config for speedtest: ${e.message ?: e.javaClass.simpleName}"
             )
         }
+    }
+
+    /**
+     * Build one short-lived core configuration for a complete UI delay-test
+     * batch. Invalid profiles are retained as failed GUIDs so one malformed
+     * entry cannot prevent viable outbounds from being measured.
+     */
+    fun getV2rayConfig4BatchSpeedtest(context: Context, guids: List<String>): OutboundProbePlan {
+        val sources = mutableListOf<OutboundProbeConfigBuilder.Source>()
+        val failedGuids = mutableListOf<String>()
+        guids.distinct().forEach { guid ->
+            val result = getV2rayConfig4Speedtest(context, guid)
+            if (result.status && result.content.isNotBlank()) {
+                sources += OutboundProbeConfigBuilder.Source(guid, result.content)
+            } else {
+                failedGuids += guid
+            }
+        }
+        val plan = OutboundProbeConfigBuilder.build(
+            sources = sources,
+            destination = SettingsManager.getDelayTestUrl(),
+        )
+        return plan.copy(failedGuids = (failedGuids + plan.failedGuids).distinct())
     }
 
     /**

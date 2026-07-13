@@ -9,6 +9,8 @@ import go.Seq
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
 import libv2ray.Libv2ray
+import libv2ray.OutboundProbeController
+import libv2ray.OutboundProbeHandler
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -18,9 +20,23 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Provides initialization protection and unified API for V2Ray core operations.
  */
 object CoreNativeManager {
-    data class OutboundDelayResult(
-        val delay: Long = -1L,
+    data class OutboundProbeStatus(
         val outboundTag: String = "",
+        val alive: Boolean = false,
+        val delay: Long = -1L,
+        val lastError: String = "",
+        val samples: Long = 0L,
+        val failedSamples: Long = 0L,
+        val deviation: Long = 0L,
+    )
+
+    data class OutboundProbeBatchResult(
+        val completed: Boolean = false,
+        val cancelled: Boolean = false,
+        val networkUnavailable: Boolean = false,
+        val error: String = "",
+        val results: List<OutboundProbeStatus> = emptyList(),
+        val balancerTargets: Map<String, String> = emptyMap(),
     )
 
     private val initialized = AtomicBoolean(false)
@@ -89,18 +105,28 @@ object CoreNativeManager {
         }
     }
 
-    fun measureOutboundDelayWithWarmRoute(
+    fun newOutboundProbeController(): OutboundProbeController =
+        Libv2ray.newOutboundProbeController()
+
+    fun probeOutbounds(
+        controller: OutboundProbeController,
         config: String,
-        testUrl: String,
-        warmTarget: String,
-    ): OutboundDelayResult {
-        return try {
-            val payload = Libv2ray.measureOutboundDelayWithWarmRoute(config, testUrl, warmTarget)
-            JsonUtil.fromJsonSafe(payload, OutboundDelayResult::class.java) ?: OutboundDelayResult()
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to measure outbound delay with warm route", e)
-            OutboundDelayResult()
-        }
+        outboundTagsJson: String,
+        balancerTagsJson: String,
+        maxConcurrency: Int,
+        samples: Int,
+        handler: OutboundProbeHandler,
+    ): OutboundProbeBatchResult {
+        val payload = controller.probeOutbounds(
+            config,
+            outboundTagsJson,
+            balancerTagsJson,
+            maxConcurrency,
+            samples,
+            handler,
+        )
+        return JsonUtil.fromJsonSafe(payload, OutboundProbeBatchResult::class.java)
+            ?: OutboundProbeBatchResult(error = "Invalid outbound probe response")
     }
 
     /**

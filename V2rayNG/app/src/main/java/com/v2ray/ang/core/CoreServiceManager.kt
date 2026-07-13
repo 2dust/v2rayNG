@@ -14,8 +14,10 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.dto.OutboundTrafficStat
+import com.v2ray.ang.dto.PolicyRouteUpdate
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.extension.isComplexType
+import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager
@@ -50,6 +52,7 @@ object CoreServiceManager {
 
     private val coreController: CoreController = CoreNativeManager.newCoreController(CoreCallback())
     private val mMsgReceive = ReceiveMessageHandler()
+    private val mSystemEventReceive = SystemEventHandler()
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
@@ -205,6 +208,20 @@ object CoreServiceManager {
         }
     }
 
+    private fun rememberProbedPolicyRoute(update: PolicyRouteUpdate?) {
+        if (!policyRouteCallbacksEnabled.get() || networkTransitions.get() != 0 ||
+            update == null || update.profileGuid.isBlank() || update.outboundTag.isBlank()
+        ) return
+        if (PolicyRouteCache.rememberCurrent(
+                PolicyRouteCache.snapshot(),
+                update.profileGuid,
+                update.outboundTag,
+            )
+        ) {
+            LogUtil.i(AppConfig.TAG, "Policy route cache updated from batch observatory result")
+        }
+    }
+
     /**
      * Gets the name of the currently running server.
      * @return The name of the running server.
@@ -337,11 +354,21 @@ object CoreServiceManager {
             error(result.errorMessage.ifBlank { "Failed to get V2Ray config" })
         }
 
-        val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
-        mFilter.addAction(Intent.ACTION_SCREEN_ON)
-        mFilter.addAction(Intent.ACTION_SCREEN_OFF)
-        mFilter.addAction(Intent.ACTION_USER_PRESENT)
-        ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
+        // Commands and probe results originate only from another process of
+        // this application. Keeping this receiver non-exported prevents other
+        // apps from forging control or policy-route cache messages.
+        ContextCompat.registerReceiver(
+            service,
+            mMsgReceive,
+            IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
+        val systemFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_USER_PRESENT)
+        }
+        ContextCompat.registerReceiver(service, mSystemEventReceive, systemFilter, Utils.receiverFlags())
 
         currentConfig = config
         var tunFd = vpnInterface?.fd ?: 0
@@ -373,7 +400,6 @@ object CoreServiceManager {
         }
 
         coreScope.launch { refreshFreshPolicyRoute() }
-
         if (browserDialer != null) {
             browserDialer!!.stop()
             browserDialer = null
@@ -426,6 +452,11 @@ object CoreServiceManager {
             service.unregisterReceiver(mMsgReceive)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to unregister receiver", e)
+        }
+        try {
+            service.unregisterReceiver(mSystemEventReceive)
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to unregister system receiver", e)
         }
 
         return true
@@ -598,13 +629,12 @@ object CoreServiceManager {
     }
 
     /**
-     * Broadcast receiver for handling messages sent to the service.
-     * Handles registration, service control, and screen events.
+     * App-private receiver for control messages sent to the service.
      */
     private class ReceiveMessageHandler : BroadcastReceiver() {
         /**
          * Handles received broadcast messages.
-         * Processes service control messages and screen state changes.
+         * Processes service control messages from another app process.
          * @param ctx The context in which the receiver is running.
          * @param intent The intent being received.
          */
@@ -642,8 +672,17 @@ object CoreServiceManager {
                 AppConfig.MSG_MEASURE_DELAY -> {
                     measureV2rayDelay()
                 }
+
+                AppConfig.MSG_POLICY_ROUTE_OBSERVED -> {
+                    rememberProbedPolicyRoute(intent.serializable("content"))
+                }
             }
 
+        }
+    }
+
+    private class SystemEventHandler : BroadcastReceiver() {
+        override fun onReceive(ctx: Context?, intent: Intent?) {
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
                     LogUtil.i(AppConfig.TAG, "StartCore-Manager: Screen off")

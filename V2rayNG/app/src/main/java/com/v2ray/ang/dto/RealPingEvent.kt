@@ -6,7 +6,11 @@ sealed class RealPingEvent {
     data class Progress(val text: String) : RealPingEvent()
 
     /** A single server result is available. */
-    data class Result(val guid: String, val delayMillis: Long) : RealPingEvent()
+    data class Result(
+        val guid: String,
+        val delayMillis: Long,
+        val viableOutboundTag: String = "",
+    ) : RealPingEvent()
 
     /** The entire batch has finished or been cancelled. */
     data class Finish(val status: String) : RealPingEvent()
