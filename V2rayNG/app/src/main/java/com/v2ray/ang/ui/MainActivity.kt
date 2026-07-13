@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.VpnService
@@ -161,21 +162,65 @@ class MainActivity : HelperBaseComponentActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK) startV2Ray()
         }
-    private val requestActivityLauncher =
+
+    // Launcher for profile editor activities (ServerActivity, ServerCustomConfigActivity, etc.)
+    private val profileEditorLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+
+            val data = result.data ?: return@registerForActivityResult
+            val action = data.getStringExtra(ProfileEditorResult.EXTRA_ACTION)
+                ?: return@registerForActivityResult
+
+            if (action != ProfileEditorResult.ACTION_SAVED &&
+                action != ProfileEditorResult.ACTION_DELETED
+            ) {
+                return@registerForActivityResult
+            }
+
+            val restartService = data.getBooleanExtra(
+                ProfileEditorResult.EXTRA_RESTART_SERVICE,
+                false
+            )
+
+            // Single entry point for config refresh – forces a full reload from MMKV.
+            mainViewModel.setupGroupTab(
+                context = this,
+                forceRefresh = true
+            )
+
+            if (restartService && mainViewModel.isRunningFlow.value) {
+                restartV2Ray()
+            }
+        }
+
+    // Launcher for settings, subscription, routing, etc. (non-editor sever pages)
+    private val settingsActivityLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (SettingsChangeManager.consumeRestartService() && mainViewModel.isRunningFlow.value == true) restartV2Ray()
-            if (SettingsChangeManager.consumeSetupGroupTab()) mainViewModel.setupGroupTab(this)
+            val restartService = SettingsChangeManager.consumeRestartService()
+            val refreshGroups = SettingsChangeManager.consumeSetupGroupTab()
+
+            // Refresh UI settings (e.g. double-column display, confirm-remove)
+            mainViewModel.refreshUiSettings()
+
+            if (refreshGroups) {
+                mainViewModel.setupGroupTab(
+                    context = this,
+                    forceRefresh = true
+                )
+            }
+
+            if (restartService && mainViewModel.isRunningFlow.value) {
+                restartV2Ray()
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainViewModel.startListenBroadcast()
+        mainViewModel.initAssets(assets)
+        SubscriptionUpdater.sync()
         mainViewModel.setupGroupTab(this)
-
-        lifecycleScope.launch {
-            mainViewModel.initAssets(assets)
-            SubscriptionUpdater.sync()
-        }
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
     }
@@ -246,7 +291,7 @@ class MainActivity : HelperBaseComponentActivity() {
             }
             else -> return
         }
-        requestActivityLauncher.launch(intent)
+        settingsActivityLauncher.launch(intent)
     }
 
     private fun handleFabAction() {
@@ -268,7 +313,9 @@ class MainActivity : HelperBaseComponentActivity() {
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
             toast(R.string.title_file_chooser); return
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN && MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
+            MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)
+        ) {
             checkAndRequestPermission(PermissionType.ACCESS_LOCAL_NETWORK) {}
         }
         CoreServiceManager.startVService(this)
@@ -283,13 +330,13 @@ class MainActivity : HelperBaseComponentActivity() {
         val intent = when (createConfigType) {
             EConfigType.POLICYGROUP.value -> Intent(this, ServerGroupActivity::class.java)
             EConfigType.PROXYCHAIN.value -> Intent(this, ServerProxyChainActivity::class.java)
-            else -> Intent(this, ServerActivity::class.java).putExtra(
-                "createConfigType",
-                createConfigType
-            )
+            else -> Intent(this, ServerActivity::class.java).apply {
+                putExtra("createConfigType", createConfigType)
+            }
+        }.apply {
+            putExtra("subscriptionId", mainViewModel.subscriptionId)
         }
-        intent.putExtra("subscriptionId", mainViewModel.subscriptionId)
-        startActivity(intent)
+        profileEditorLauncher.launch(intent)
     }
 
     private fun importQRcode() {
@@ -320,9 +367,9 @@ class MainActivity : HelperBaseComponentActivity() {
                     when {
                         count > 0 -> {
                             toast(getString(R.string.title_import_config_count, count))
-                            mainViewModel.setupGroupTab(this@MainActivity)
+                            mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
                         }
-                        countSub > 0 -> mainViewModel.setupGroupTab(this@MainActivity)
+                        countSub > 0 -> mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
                         else -> toastError(R.string.toast_failure)
                     }
                     mainViewModel.setLoading(false)
@@ -358,10 +405,8 @@ class MainActivity : HelperBaseComponentActivity() {
                 when {
                     result.successCount + result.failureCount + result.skipCount == 0 ->
                         toast(R.string.title_update_subscription_no_subscription)
-
                     result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
                         toast(getString(R.string.title_update_config_count, result.configCount))
-
                     else ->
                         toast(
                             getString(
@@ -373,7 +418,9 @@ class MainActivity : HelperBaseComponentActivity() {
                             )
                         )
                 }
-                if (result.configCount > 0) mainViewModel.setupGroupTab(this@MainActivity)
+                if (result.configCount > 0) {
+                    mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
+                }
                 mainViewModel.setLoading(false)
             }
         }
@@ -396,7 +443,7 @@ class MainActivity : HelperBaseComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             val ret = mainViewModel.removeAllServer()
             launch(Dispatchers.Main) {
-                mainViewModel.setupGroupTab(this@MainActivity)
+                mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
                 toast(getString(R.string.title_del_config_count, ret))
                 mainViewModel.setLoading(false)
             }
@@ -408,7 +455,7 @@ class MainActivity : HelperBaseComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             val ret = mainViewModel.removeDuplicateServer()
             launch(Dispatchers.Main) {
-                mainViewModel.setupGroupTab(this@MainActivity)
+                mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
                 toast(getString(R.string.title_del_duplicate_config_count, ret))
                 mainViewModel.setLoading(false)
             }
@@ -420,7 +467,7 @@ class MainActivity : HelperBaseComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             val ret = mainViewModel.removeInvalidServer()
             launch(Dispatchers.Main) {
-                mainViewModel.setupGroupTab(this@MainActivity)
+                mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
                 toast(getString(R.string.title_del_config_count, ret))
                 mainViewModel.setLoading(false)
             }
@@ -432,7 +479,7 @@ class MainActivity : HelperBaseComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             mainViewModel.sortByTestResults()
             launch(Dispatchers.Main) {
-                mainViewModel.setupGroupTab(this@MainActivity)
+                mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
                 mainViewModel.setLoading(false)
             }
         }
@@ -445,13 +492,13 @@ class MainActivity : HelperBaseComponentActivity() {
             EConfigType.PROXYCHAIN -> ServerProxyChainActivity::class.java
             else -> ServerActivity::class.java
         }
-        startActivity(
-            Intent(this, activityClass)
-                .putExtra("guid", guid)
-                .putExtra("isRunning", mainViewModel.isRunningFlow.value)
-                .putExtra("createConfigType", profile.configType.value)
-                .putExtra("subscriptionId", mainViewModel.subscriptionId)
-        )
+        val intent = Intent(this, activityClass).apply {
+            putExtra("guid", guid)
+            putExtra("isRunning", mainViewModel.isRunningFlow.value)
+            putExtra("createConfigType", profile.configType.value)
+            putExtra("subscriptionId", mainViewModel.subscriptionId)
+        }
+        profileEditorLauncher.launch(intent)
     }
 
     private fun removeServer(guid: String) {
@@ -459,7 +506,7 @@ class MainActivity : HelperBaseComponentActivity() {
             toast(R.string.toast_action_not_allowed); return
         }
         mainViewModel.removeServer(guid)
-        mainViewModel.setupGroupTab(this)
+        mainViewModel.setupGroupTab(this, forceRefresh = true)
     }
 
     private fun setSelectServer(guid: String) {
@@ -625,6 +672,10 @@ fun MainScreen(
     val selectedGuid by mainViewModel.selectedGuid.collectAsStateWithLifecycle()
     val pageChangeSource by mainViewModel.pageChangeSource.collectAsStateWithLifecycle()
 
+    // Read UI settings from ViewModel's StateFlow (not a one-time snapshot)
+    val doubleColumnDisplay by mainViewModel.doubleColumnDisplay.collectAsStateWithLifecycle()
+    val confirmRemove by mainViewModel.confirmRemove.collectAsStateWithLifecycle()
+
     val isDarkTheme = LocalDarkTheme.current
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -639,13 +690,6 @@ fun MainScreen(
 
     var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
     var showQRCodeBitmap by remember { mutableStateOf<Bitmap?>(null) }
-
-    val doubleColumnDisplay = remember {
-        MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
-    }
-    val confirmRemove = remember {
-        MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
-    }
 
     val pagerState = rememberPagerState(
         initialPage = groups.indexOfFirst { it.id == mainViewModel.subscriptionId }

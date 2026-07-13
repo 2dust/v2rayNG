@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
@@ -48,7 +47,6 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.CertificateFingerprintManager
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -90,41 +88,108 @@ class ServerActivity : BaseComponentActivity() {
     }
 
     private fun saveServer(config: ProfileItem): Boolean {
-        if (config.remarks.isBlank()) { toast(R.string.server_lab_remarks); return false }
-        if (config.server.isNullOrBlank()) { toast(R.string.server_lab_address); return false }
-        if (config.configType != EConfigType.HYSTERIA2 && (config.serverPort?.toIntOrNull() ?: 0) <= 0) {
-            toast(R.string.server_lab_port); return false
-        }
-        if (config.configType != EConfigType.SOCKS && config.configType != EConfigType.HTTP && config.password.isNullOrBlank()) {
-            toast(if (config.configType == EConfigType.TROJAN || config.configType == EConfigType.SHADOWSOCKS || config.configType == EConfigType.HYSTERIA2) R.string.server_lab_id3 else R.string.server_lab_id)
+        if (config.remarks.isBlank()) {
+            toast(R.string.server_lab_remarks)
             return false
         }
-        if (config.configType == EConfigType.TROJAN && config.security.isNullOrBlank()) {
-            toast(R.string.server_lab_stream_security); return false
+
+        if (config.server.isNullOrBlank()) {
+            toast(R.string.server_lab_address)
+            return false
         }
-        if (!config.xhttpExtra.isNullOrBlank() && JsonUtil.parseString(config.xhttpExtra) == null) {
-            toast(R.string.server_lab_xhttp_extra); return false
+
+        if (
+            config.configType != EConfigType.HYSTERIA2 &&
+            (config.serverPort?.toIntOrNull() ?: 0) <= 0
+        ) {
+            toast(R.string.server_lab_port)
+            return false
         }
-        if (!config.finalMask.isNullOrBlank() && JsonUtil.parseString(config.finalMask) == null) {
-            toast(R.string.server_lab_final_mask); return false
+
+        if (
+            config.configType != EConfigType.SOCKS &&
+            config.configType != EConfigType.HTTP &&
+            config.password.isNullOrBlank()
+        ) {
+            val message = when (config.configType) {
+                EConfigType.TROJAN,
+                EConfigType.SHADOWSOCKS,
+                EConfigType.HYSTERIA2 -> R.string.server_lab_id3
+
+                else -> R.string.server_lab_id
+            }
+            toast(message)
+            return false
         }
-        config.description = AngConfigManager.generateDescription(config)
-        if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
+
+        if (
+            config.configType == EConfigType.TROJAN &&
+            config.security.isNullOrBlank()
+        ) {
+            toast(R.string.server_lab_stream_security)
+            return false
+        }
+
+        if (
+            !config.xhttpExtra.isNullOrBlank() &&
+            JsonUtil.parseString(config.xhttpExtra) == null
+        ) {
+            toast(R.string.server_lab_xhttp_extra)
+            return false
+        }
+
+        if (
+            !config.finalMask.isNullOrBlank() &&
+            JsonUtil.parseString(config.finalMask) == null
+        ) {
+            toast(R.string.server_lab_final_mask)
+            return false
+        }
+
+        config.description =
+            AngConfigManager.generateDescription(config)
+
+        if (
+            config.subscriptionId.isEmpty() &&
+            !subscriptionId.isNullOrEmpty()
+        ) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
-        MmkvManager.encodeServerConfig(editGuid, config)
-        if (isRunning) SettingsChangeManager.makeRestartService()
+
+        val savedGuid = MmkvManager.encodeServerConfig(
+            editGuid,
+            config
+        )
+
         toastSuccess(R.string.toast_success)
-        finish()
+
+        ProfileEditorResult.run {
+            finishSaved(
+                guid = savedGuid,
+                restartService = isRunning
+            )
+        }
+
         return true
     }
 
-    private fun deleteServer(guid: String, isRunning: Boolean) {
-        if (guid.isEmpty() || guid == MmkvManager.getSelectServer()) {
-            toast(R.string.toast_action_not_allowed); return
+    private fun deleteServer(
+        guid: String,
+        isRunning: Boolean
+    ) {
+        if (
+            guid.isEmpty() ||
+            guid == MmkvManager.getSelectServer()
+        ) {
+            toast(R.string.toast_action_not_allowed)
+            return
         }
+
         MmkvManager.removeServer(guid)
-        finish()
+
+        ProfileEditorResult.run {
+            finishDeleted(guid)
+        }
     }
 }
 

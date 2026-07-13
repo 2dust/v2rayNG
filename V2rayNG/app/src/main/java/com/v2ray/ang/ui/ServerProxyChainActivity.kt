@@ -2,13 +2,13 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -44,7 +44,6 @@ import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -88,50 +87,95 @@ class ServerProxyChainActivity : BaseComponentActivity() {
         )
     }
 
-    private fun saveServer(remarks: String, members: List<String>): Boolean {
+    private fun saveServer(
+        remarks: String,
+        members: List<String>
+    ): Boolean {
         if (remarks.isBlank()) {
             toast(R.string.server_lab_remarks)
             return false
         }
-        val chainMembers = members.map { it.trim() }.filter { it.isNotEmpty() }
+
+        val chainMembers = members
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+
         if (chainMembers.size != members.size) {
             toast(R.string.server_proxy_chain_members_unselected)
             return false
         }
+
         if (chainMembers.size < 2) {
             toast(R.string.server_proxy_chain_members_insufficient)
             return false
         }
+
         val invalidMembers = chainMembers.filter { member ->
             val profile = SettingsManager.getServerViaRemarks(member)
             profile == null || profile.configType.isComplexType()
         }
+
         if (invalidMembers.isNotEmpty()) {
-            toast(getString(R.string.server_proxy_chain_members_invalid, invalidMembers.joinToString(", ")))
+            toast(
+                getString(
+                    R.string.server_proxy_chain_members_invalid,
+                    invalidMembers.joinToString(", ")
+                )
+            )
             return false
         }
-        val config = MmkvManager.decodeServerConfig(editGuid) ?: ProfileItem.create(EConfigType.PROXYCHAIN)
+
+        val config =
+            MmkvManager.decodeServerConfig(editGuid)
+                ?: ProfileItem.create(EConfigType.PROXYCHAIN)
+
         config.remarks = remarks.trim()
-        config.proxyChainProfiles = chainMembers.joinToString(",")
-        config.description = chainMembers.joinToString(" -> ")
-        if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
+        config.proxyChainProfiles =
+            chainMembers.joinToString(",")
+
+        config.description =
+            chainMembers.joinToString(" -> ")
+
+        if (
+            config.subscriptionId.isEmpty() &&
+            !subscriptionId.isNullOrEmpty()
+        ) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
-        MmkvManager.encodeServerConfig(editGuid, config)
-        if (isRunning) SettingsChangeManager.makeRestartService()
+
+        val savedGuid = MmkvManager.encodeServerConfig(
+            editGuid,
+            config
+        )
+
         toastSuccess(R.string.toast_success)
-        finish()
+
+        ProfileEditorResult.run {
+            finishSaved(
+                guid = savedGuid,
+                restartService = isRunning
+            )
+        }
+
         return true
     }
 
     private fun deleteServer(): Boolean {
-        if (editGuid.isEmpty()) return false
+        if (editGuid.isEmpty()) {
+            return false
+        }
+
         if (editGuid == MmkvManager.getSelectServer()) {
             toast(R.string.toast_action_not_allowed)
             return false
         }
+
         MmkvManager.removeServer(editGuid)
-        finish()
+
+        ProfileEditorResult.run {
+            finishDeleted(editGuid)
+        }
+
         return true
     }
 }

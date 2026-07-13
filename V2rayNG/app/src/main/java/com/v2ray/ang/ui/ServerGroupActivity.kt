@@ -1,13 +1,11 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
-import android.text.TextUtils
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
@@ -32,7 +30,6 @@ import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsChangeManager
 
 class ServerGroupActivity : BaseComponentActivity() {
 
@@ -83,39 +80,80 @@ class ServerGroupActivity : BaseComponentActivity() {
         )
     }
 
-    private fun saveServer(remarks: String, filter: String, typeIdx: Int, subIdx: Int): Boolean {
-        if (TextUtils.isEmpty(remarks)) {
+    private fun saveServer(
+        remarks: String,
+        filter: String,
+        typeIdx: Int,
+        subIdx: Int
+    ): Boolean {
+        if (remarks.isBlank()) {
             toast(R.string.server_lab_remarks)
             return false
         }
 
-        val config = MmkvManager.decodeServerConfig(editGuid) ?: ProfileItem.create(EConfigType.POLICYGROUP)
+        val config =
+            MmkvManager.decodeServerConfig(editGuid)
+                ?: ProfileItem.create(EConfigType.POLICYGROUP)
+
         config.remarks = remarks.trim()
         config.policyGroupFilter = filter.trim()
         config.policyGroupType = typeIdx.toString()
-        config.policyGroupSubscriptionId = if (subIdx >= 0 && subIdx < subIds.size) subIds[subIdx] else null
+        config.policyGroupSubscriptionId =
+            subIds.getOrNull(subIdx)
 
-        if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
+        if (
+            config.subscriptionId.isEmpty() &&
+            !subscriptionId.isNullOrEmpty()
+        ) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
 
-        val typeDisplay = stringArrayPolicyGroupType().getOrNull(typeIdx).orEmpty()
-        config.description = "$typeDisplay - ${subDisplay.getOrNull(subIdx).orEmpty()} - ${config.policyGroupFilter}"
+        val typeDisplay =
+            stringArrayPolicyGroupType()
+                .getOrNull(typeIdx)
+                .orEmpty()
 
-        MmkvManager.encodeServerConfig(editGuid, config)
-        if (isRunning) {
-            SettingsChangeManager.makeRestartService()
+        config.description = buildString {
+            append(typeDisplay)
+            append(" - ")
+            append(subDisplay.getOrNull(subIdx).orEmpty())
+            append(" - ")
+            append(config.policyGroupFilter)
         }
+
+        val savedGuid = MmkvManager.encodeServerConfig(
+            editGuid,
+            config
+        )
+
         toastSuccess(R.string.toast_success)
-        finish()
+
+        ProfileEditorResult.run {
+            finishSaved(
+                guid = savedGuid,
+                restartService = isRunning
+            )
+        }
+
         return true
     }
 
     private fun deleteServer(): Boolean {
-        if (editGuid.isNotEmpty()) {
-            MmkvManager.removeServer(editGuid)
-            finish()
+        if (editGuid.isEmpty()) {
+            return false
         }
+
+        if (editGuid == MmkvManager.getSelectServer()) {
+            toast(R.string.toast_action_not_allowed)
+            return false
+        }
+
+        MmkvManager.removeServer(editGuid)
+
+        ProfileEditorResult.run {
+            finishDeleted(editGuid)
+        }
+
         return true
     }
 

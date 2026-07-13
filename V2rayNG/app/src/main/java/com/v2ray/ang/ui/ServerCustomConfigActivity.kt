@@ -2,13 +2,12 @@ package com.v2ray.ang.ui
 
 import android.app.Activity
 import android.os.Bundle
-import android.text.TextUtils
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -69,7 +68,6 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.flow.collectLatest
 
@@ -105,41 +103,80 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
         )
     }
 
-    private fun saveServer(remarks: String, content: String): Boolean {
-        if (TextUtils.isEmpty(remarks)) {
+    private fun saveServer(
+        remarks: String,
+        content: String
+    ): Boolean {
+        if (remarks.isBlank()) {
             toast(R.string.server_lab_remarks)
             return false
         }
-        val profileItem = try {
+
+        val parsedProfile = try {
             CustomFmt.parse(content)
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to parse custom configuration", e)
-            toast("${getString(R.string.toast_malformed_josn)} ${e.cause?.message}")
+            LogUtil.e(
+                AppConfig.TAG,
+                "Failed to parse custom configuration",
+                e
+            )
+            toast(
+                "${getString(R.string.toast_malformed_josn)} " +
+                        "${e.cause?.message.orEmpty()}"
+            )
             return false
         }
-        val config = MmkvManager.decodeServerConfig(editGuid)
-            ?: ProfileItem.create(EConfigType.CUSTOM)
-        config.remarks = remarks.ifEmpty { profileItem?.remarks.orEmpty() }
-        config.server = profileItem?.server
-        config.serverPort = profileItem?.serverPort
-        config.description = AngConfigManager.generateDescription(config)
-        MmkvManager.encodeServerConfig(editGuid, config)
-        MmkvManager.encodeServerRaw(editGuid, content)
-        if (isRunning) {
-            SettingsChangeManager.makeRestartService()
-        }
-        setResult(Activity.RESULT_OK)
+
+        val config =
+            MmkvManager.decodeServerConfig(editGuid)
+                ?: ProfileItem.create(EConfigType.CUSTOM)
+
+        config.remarks =
+            remarks.ifEmpty { parsedProfile?.remarks.orEmpty() }
+
+        config.server = parsedProfile?.server
+        config.serverPort = parsedProfile?.serverPort
+        config.description =
+            AngConfigManager.generateDescription(config)
+
+        val savedGuid = MmkvManager.encodeServerConfig(
+            editGuid,
+            config
+        )
+
+        MmkvManager.encodeServerRaw(
+            savedGuid,
+            content
+        )
+
         toastSuccess(R.string.toast_success)
-        finish()
+
+        ProfileEditorResult.run {
+            finishSaved(
+                guid = savedGuid,
+                restartService = isRunning
+            )
+        }
+
         return true
     }
 
     private fun deleteServer(): Boolean {
-        if (editGuid.isNotEmpty()) {
-            MmkvManager.removeServer(editGuid)
-            setResult(Activity.RESULT_OK)
-            finish()
+        if (editGuid.isEmpty()) {
+            return false
         }
+
+        if (editGuid == MmkvManager.getSelectServer()) {
+            toast(R.string.toast_action_not_allowed)
+            return false
+        }
+
+        MmkvManager.removeServer(editGuid)
+
+        ProfileEditorResult.run {
+            finishDeleted(editGuid)
+        }
+
         return true
     }
 }
