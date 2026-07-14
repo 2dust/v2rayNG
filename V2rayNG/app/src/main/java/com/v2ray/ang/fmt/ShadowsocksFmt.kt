@@ -28,16 +28,13 @@ object ShadowsocksFmt : FmtBase() {
      */
     fun parseSip002(str: String): ProfileItem? {
         val config = ProfileItem.create(EConfigType.SHADOWSOCKS)
-
         val uri = URI(Utils.fixIllegalUrl(str))
         if (uri.idnHost.isEmpty()) return null
         if (uri.port <= 0) return null
         if (uri.userInfo.isNullOrEmpty()) return null
-
         config.remarks = Utils.decodeURIComponent(uri.fragment.orEmpty()).let { it.ifEmpty { "none" } }
         config.server = uri.idnHost
         config.serverPort = uri.port.toString()
-
         val result = if (uri.userInfo.contains(":")) {
             uri.userInfo.split(":", limit = 2)
         } else {
@@ -47,9 +44,9 @@ object ShadowsocksFmt : FmtBase() {
             config.method = result.first()
             config.password = result.last()
         }
-
         if (!uri.rawQuery.isNullOrEmpty()) {
             val queryParam = getQueryParam(uri)
+            getItemFormQuery(config, queryParam, false)
             if (queryParam["plugin"]?.contains("obfs=http") == true) {
                 val queryPairs = HashMap<String, String>()
                 for (pair in queryParam["plugin"]?.split(";") ?: listOf()) {
@@ -64,7 +61,6 @@ object ShadowsocksFmt : FmtBase() {
                 config.path = queryPairs["path"]
             }
         }
-
         return config
     }
 
@@ -119,7 +115,6 @@ object ShadowsocksFmt : FmtBase() {
      */
     fun toUri(config: ProfileItem): String {
         val pw = "${config.method}:${config.password}"
-
-        return toUri(config, Utils.encode(pw, true), null)
+        return toUri(config, Utils.encode(pw, true), getQueryDic(config))
     }
 }
