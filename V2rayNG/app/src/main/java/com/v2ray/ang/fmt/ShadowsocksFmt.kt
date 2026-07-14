@@ -46,7 +46,7 @@ object ShadowsocksFmt : FmtBase() {
         }
         if (!uri.rawQuery.isNullOrEmpty()) {
             val queryParam = getQueryParam(uri)
-            getItemFormQuery(config, queryParam, false)
+            getItemFormQuery(config, queryParam)
             if (queryParam["plugin"]?.contains("obfs=http") == true) {
                 val queryPairs = HashMap<String, String>()
                 for (pair in queryParam["plugin"]?.split(";") ?: listOf()) {
