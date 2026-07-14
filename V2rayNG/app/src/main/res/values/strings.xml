@@ -20,6 +20,7 @@
     <string name="toast_services_stop">Stop Services</string>
     <string name="toast_services_success">Start Services Success</string>
     <string name="toast_services_failure">Start Services Failure</string>
+    <string name="notification_core_recovery_failed">Connection recovery failed. Traffic remains blocked to prevent leaks; restart v2rayNG.</string>
 
     <!--ServerActivity-->
     <string name="title_server">Config</string>
@@ -164,6 +165,9 @@
     <string name="summary_pref_per_app_proxy">General: Checked apps use proxy, unchecked apps connect directly; \nBypass mode: checked apps connect directly, unchecked apps use proxy. \nThe option to automatically select proxy applications is in the menu</string>
     <string name="title_pref_is_booted">Auto connect at startup</string>
     <string name="summary_pref_is_booted">Automatically connects to the selected server at startup, which may be unsuccessful</string>
+    <string name="title_pref_remember_routes_per_wifi_network">Remember viable routes per Wi-Fi network</string>
+    <string name="summary_pref_remember_routes_per_wifi_network">Uses the connected Wi-Fi name to keep separate route histories. Requires precise location permission because Android protects Wi-Fi names as location information.</string>
+    <string name="toast_precise_location_required_for_wifi_route_memory">Precise location permission is required to read the Wi-Fi network name</string>
 
     <string name="title_pref_auto_remove_invalid_after_test">Auto delete invalid config after testing</string>
     <string name="summary_pref_auto_remove_invalid_after_test">Test results may not be accurate; deleted config cannot be recovered.</string>

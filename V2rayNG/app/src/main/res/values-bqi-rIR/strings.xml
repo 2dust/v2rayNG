@@ -19,6 +19,7 @@
     <string name="toast_services_stop">واڌاشتن سرویس</string>
     <string name="toast_services_success">ره وستن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_failure">ره وستن سرویس وا مووفقیت ٱنجوم نوابی</string>
+    <string name="notification_core_recovery_failed">بازیابی اتصال ناموفق بود. برای جلوگیری از نشت، ترافیک مسدود می‌ماند؛ v2rayNG را دوباره راه‌اندازی کنید.</string>
 
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
@@ -160,6 +161,9 @@
     <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه پسند وابیڌه وا ی پروکسی منپیز ابۊ، برنومه پسند نوابیڌه موستقیمن منپیز ابۊ.\nهالت دور زیڌن: برنومه پسند وابیڌه موستقیمن منپیز ابۊ، برنومه پسند نوابیڌه وا ی پروکسی منپیز ابۊ.\nپسند خوتکار برنومه یل پروکسی من نومگه امکووݩ پزیر هڌ.</string>
     <string name="title_pref_is_booted">منپیز خوتکار مجال ره ونی</string>
     <string name="summary_pref_is_booted">مجال ره وندن، خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
+    <string name="title_pref_remember_routes_per_wifi_network">تورا کارا سی هر شبکه وای‌فای ن و یاد ودارین</string>
+    <string name="summary_pref_remember_routes_per_wifi_network">نوم شبکه وای‌فای منپیز وابیڌه ن سی نگهداشتن تاریخچه تور جۊری و کار اگره. چۊ ٱندروید نوم وای‌فای ن دووسمندی جایونی دونسته، دسرسی جای دقیق لازوم هڌ.</string>
+    <string name="toast_precise_location_required_for_wifi_route_memory">دسرسی جای دقیق سی خوندن نوم شبکه وای‌فای لازوم هڌ</string>
 
     <string name="title_pref_auto_remove_invalid_after_test">پاک کردن خوتکار کانفیگا نا موئتبر بئڌ پینگ</string>
     <string name="summary_pref_auto_remove_invalid_after_test">نتیجه یل پینگ گاشڌ دییق نبۊن؛ کانفیگا پاک وابیڌه ن نتری وورگنی.</string>

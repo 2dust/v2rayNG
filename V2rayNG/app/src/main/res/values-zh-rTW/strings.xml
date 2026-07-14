@@ -19,6 +19,7 @@
     <string name="toast_services_stop">停止服務</string>
     <string name="toast_services_success">啟動服務成功</string>
     <string name="toast_services_failure">啟動服務失敗</string>
+    <string name="notification_core_recovery_failed">連線復原失敗。流量將保持封鎖以防洩漏；請重新啟動 v2rayNG。</string>
 
     <!-- ServerActivity -->
     <string name="title_server">設定檔</string>
@@ -159,6 +160,9 @@
     <string name="summary_pref_per_app_proxy">常規：勾選的 App 啟用 Proxy，未勾選的直接連線；\n繞行模式：勾選的 App 直接連線，未勾選的啟用 Proxy。\n可在選單中選擇自動選中需 Proxy 應用</string>
     <string name="title_pref_is_booted">開機時自動連線</string>
     <string name="summary_pref_is_booted">開機時自動連線選擇的伺服器，可能會不成功</string>
+    <string name="title_pref_remember_routes_per_wifi_network">依 Wi-Fi 網路記住可用路由</string>
+    <string name="summary_pref_remember_routes_per_wifi_network">使用目前連線的 Wi-Fi 名稱分別儲存路由記錄。由於 Android 將 Wi-Fi 名稱視為位置資訊加以保護，因此需要精確位置權限。</string>
+    <string name="toast_precise_location_required_for_wifi_route_memory">讀取 Wi-Fi 網路名稱需要精確位置權限</string>
 
     <string name="title_pref_auto_remove_invalid_after_test">測試後自動刪除無效配置</string>
     <string name="summary_pref_auto_remove_invalid_after_test">測試結果可能不準確且已刪除的配置無法復原</string>

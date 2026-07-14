@@ -684,13 +684,6 @@ class MainViewModel(
     }
 
     fun testAllRealPing() {
-        MessageUtil.sendMsg2TestService(
-            app,
-            TestServiceMessage(
-                key = AppConfig.MSG_MEASURE_CONFIG_CANCEL
-            )
-        )
-
         val groupId = subscriptionId
         val servers = currentServers()
 

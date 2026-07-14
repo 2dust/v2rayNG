@@ -1,7 +1,11 @@
 package com.v2ray.ang.ui
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -23,6 +28,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
@@ -35,6 +44,7 @@ import com.v2ray.ang.compose.SettingsSwitchItem
 import com.v2ray.ang.compose.ThemeManager
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.extension.toastError
+import com.v2ray.ang.extension.toastErrorLong
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvString
 import com.v2ray.ang.handler.SettingsChangeManager
@@ -111,6 +121,10 @@ fun SettingsScreen(
     var socksPassword by rememberMmkvString(AppConfig.PREF_SOCKS_PASSWORD, "")
     var socksEnableUdp by rememberMmkvBool(AppConfig.PREF_SOCKS_ENABLE_UDP, false)
     var proxySharing by rememberMmkvBool(AppConfig.PREF_PROXY_SHARING, false)
+    var rememberRoutesPerWifiNetwork by rememberMmkvBool(
+        AppConfig.PREF_REMEMBER_ROUTES_PER_WIFI_NETWORK,
+        false
+    )
 
     var speedEnabled by rememberMmkvBool(AppConfig.PREF_SPEED_ENABLED, false)
     var confirmRemove by rememberMmkvBool(AppConfig.PREF_CONFIRM_REMOVE, false)
@@ -163,6 +177,36 @@ fun SettingsScreen(
     val fragmentPacketsValues = stringArrayResource(R.array.fragment_packets).toList()
     val modeEntries = stringArrayResource(R.array.mode_entries).toList()
     val modeValues = stringArrayResource(R.array.mode_value).toList()
+
+    val requestWifiIdentityPermission = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { grants ->
+        val fineLocationGranted =
+            grants[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                context.hasFineLocationPermission()
+        rememberRoutesPerWifiNetwork = fineLocationGranted
+        if (!fineLocationGranted) {
+            context.toastErrorLong(R.string.toast_precise_location_required_for_wifi_route_memory)
+        }
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, rememberRoutesPerWifiNetwork) {
+        fun disableWifiRouteMemoryWithoutPermission() {
+            if (rememberRoutesPerWifiNetwork && !context.hasFineLocationPermission()) {
+                rememberRoutesPerWifiNetwork = false
+            }
+        }
+
+        disableWifiRouteMemoryWithoutPermission()
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                disableWifiRouteMemoryWithoutPermission()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
@@ -509,6 +553,23 @@ fun SettingsScreen(
                 checked = autoSortAfterTest,
                 onCheckedChange = { autoSortAfterTest = it }
             )
+            SettingsSwitchItem(
+                title = stringResource(R.string.title_pref_remember_routes_per_wifi_network),
+                summary = stringResource(R.string.summary_pref_remember_routes_per_wifi_network),
+                checked = rememberRoutesPerWifiNetwork,
+                onCheckedChange = { newValue ->
+                    if (!newValue || context.hasFineLocationPermission()) {
+                        rememberRoutesPerWifiNetwork = newValue
+                    } else {
+                        requestWifiIdentityPermission.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                            )
+                        )
+                    }
+                }
+            )
             SettingsEditItem(
                 title = stringResource(R.string.title_pref_delay_test_url),
                 value = delayTestUrl,
@@ -575,3 +636,9 @@ fun SettingsScreen(
         }
     }
 }
+
+private fun Context.hasFineLocationPermission(): Boolean =
+    ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED

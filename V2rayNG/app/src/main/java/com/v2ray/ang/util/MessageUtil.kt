@@ -56,7 +56,8 @@ object MessageUtil {
                 }
 
                 AppConfig.MSG_MEASURE_CONFIG_CANCEL -> {
-                    // Do not wake up service just to cancel; stop only if it is already running.
+                    // An explicit cancel only stops an already-running one-shot
+                    // probe process; it must not start a new service instance.
                     ctx.stopService(intent)
                 }
 

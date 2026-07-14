@@ -19,6 +19,7 @@
     <string name="toast_services_stop">Đã dừng v2rayNG!</string>
     <string name="toast_services_success">Đã khởi động v2rayNG!</string>
     <string name="toast_services_failure">Không thể khởi động v2rayNG, kiểm tra lại cấu hình!</string>
+    <string name="notification_core_recovery_failed">Không thể khôi phục kết nối. Lưu lượng vẫn bị chặn để tránh rò rỉ; hãy khởi động lại v2rayNG.</string>
 
     <!--ServerActivity-->
     <string name="title_server">v2rayNG</string>
@@ -158,6 +159,9 @@
     <string name="summary_pref_per_app_proxy">- Bình thường: Ứng dụng đã chọn sẽ kết nối thông qua Proxy, chưa chọn sẽ kết nối trực tiếp. \n- Chế độ Bypass: Ứng dụng đã chọn sẽ kết nối trực tiếp, chưa chọn sẽ kết nối qua Proxy. \n- Nếu bạn đang ở Trung Quốc thì vào Menu, chọn Tự động chọn ứng dụng Proxy.</string>
     <string name="title_pref_is_booted">Auto connect at startup</string>
     <string name="summary_pref_is_booted">Automatically connects to the selected server at startup, which may be unsuccessful</string>
+    <string name="title_pref_remember_routes_per_wifi_network">Ghi nhớ tuyến khả dụng cho từng mạng Wi-Fi</string>
+    <string name="summary_pref_remember_routes_per_wifi_network">Dùng tên mạng Wi-Fi đang kết nối để lưu lịch sử tuyến riêng. Cần quyền vị trí chính xác vì Android bảo vệ tên mạng Wi-Fi như thông tin vị trí.</string>
+    <string name="toast_precise_location_required_for_wifi_route_memory">Cần quyền vị trí chính xác để đọc tên mạng Wi-Fi</string>
 
     <string name="title_pref_auto_remove_invalid_after_test">Auto delete invalid config after testing</string>
     <string name="summary_pref_auto_remove_invalid_after_test">Test results may not be accurate; deleted config cannot be recovered.</string>

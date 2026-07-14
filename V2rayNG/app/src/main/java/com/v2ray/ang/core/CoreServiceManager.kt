@@ -14,8 +14,10 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.dto.OutboundTrafficStat
+import com.v2ray.ang.dto.PolicyRouteUpdate
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.extension.isComplexType
+import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager
@@ -34,20 +36,31 @@ import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
 import libv2ray.ProcessFinder
 import java.lang.ref.SoftReference
 import java.net.InetSocketAddress
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 object CoreServiceManager {
 
     private val coreController: CoreController = CoreNativeManager.newCoreController(CoreCallback())
     private val mMsgReceive = ReceiveMessageHandler()
+    private val mSystemEventReceive = SystemEventHandler()
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
+    @Volatile private var runningProfileGuid = ""
+    private val networkResetMutex = Mutex()
+    private val coreScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val networkTransitions = AtomicInteger(0)
+    private val policyRouteCallbacksEnabled = AtomicBoolean(false)
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -114,6 +127,105 @@ object CoreServiceManager {
      * @return True if the service is running, false otherwise.
      */
     fun isRunning() = coreController.isRunning
+
+    /**
+     * Sequentially closes and recreates the only Xray instance in this process
+     * after Android changes the VPN's underlying network. The VPN interface and
+     * service remain active, and unchanged upstream process-global state never
+     * overlaps two live instances.
+     */
+    fun resetCoreNetworkState(previousNetworkKey: String?, newNetworkKey: String, newNetworkHandle: Long) {
+        networkTransitions.incrementAndGet()
+        PolicyRouteCache.setCurrentNetwork(newNetworkKey, newNetworkHandle)
+        if (!coreController.isRunning) {
+            networkTransitions.decrementAndGet()
+            return
+        }
+
+        val profileGuid = runningProfileGuid
+        val cacheGeneration = PolicyRouteCache.snapshot().generation
+        coreScope.launch {
+            networkResetMutex.withLock {
+                try {
+                    val currentTarget = coreController.getBalancerPrincipleTarget(AppConfig.TAG_BALANCER)
+                    PolicyRouteCache.remember(
+                        previousNetworkKey,
+                        profileGuid,
+                        currentTarget,
+                        cacheGeneration,
+                    )
+                    val warmTarget = PolicyRouteCache.lookup(newNetworkKey, profileGuid).orEmpty()
+                    coreController.resetNetworkStateWithWarmRoute(AppConfig.TAG_BALANCER, warmTarget)
+                    LogUtil.i(
+                        AppConfig.TAG,
+                        "StartCore-Manager: Core network state reset" +
+                            if (warmTarget.isNotEmpty()) " with cached policy route" else "",
+                    )
+                } catch (e: Exception) {
+                    policyRouteCallbacksEnabled.set(false)
+                    LogUtil.e(
+                        AppConfig.TAG,
+                        "StartCore-Manager: Core network reset and recovery failed; keeping VPN fail-closed",
+                        e,
+                    )
+                    getService()?.let { service ->
+                        val message = service.getString(R.string.notification_core_recovery_failed)
+                        MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+                        NotificationManager.showCoreFailure(message)
+                    }
+                } finally {
+                    if (networkTransitions.decrementAndGet() == 0 && policyRouteCallbacksEnabled.get()) {
+                        refreshFreshPolicyRoute()
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateCoreNetworkIdentity(newNetworkKey: String, newNetworkHandle: Long) {
+        PolicyRouteCache.setCurrentNetwork(newNetworkKey, newNetworkHandle)
+        if (coreController.isRunning && policyRouteCallbacksEnabled.get()) {
+            coreScope.launch { refreshFreshPolicyRoute() }
+        }
+    }
+
+    private fun refreshFreshPolicyRoute() {
+        val cacheSnapshot = PolicyRouteCache.snapshot()
+        val freshTarget = try {
+            coreController.getBalancerPrincipleTarget(AppConfig.TAG_BALANCER)
+        } catch (_: Exception) {
+            ""
+        }
+        rememberFreshPolicyRoute(freshTarget, cacheSnapshot)
+    }
+
+    private fun rememberFreshPolicyRoute(
+        target: String?,
+        cacheSnapshot: PolicyRouteCache.Snapshot = PolicyRouteCache.snapshot(),
+    ): Boolean {
+        if (!policyRouteCallbacksEnabled.get() || networkTransitions.get() != 0 || target.isNullOrBlank()) return false
+        val profileGuid = runningProfileGuid
+        if (PolicyRouteCache.rememberCurrent(cacheSnapshot, profileGuid, target)) {
+            LogUtil.i(AppConfig.TAG, "Policy route cache accepted fresh observatory target")
+            return true
+        }
+        return false
+    }
+
+    private fun rememberProbedPolicyRoute(update: PolicyRouteUpdate?) {
+        if (!policyRouteCallbacksEnabled.get() || networkTransitions.get() != 0 ||
+            update == null || update.profileGuid.isBlank() || update.outboundTag.isBlank()
+        ) return
+        if (PolicyRouteCache.rememberObserved(
+                update.networkKey,
+                update.networkHandle,
+                update.profileGuid,
+                update.outboundTag,
+            )
+        ) {
+            LogUtil.i(AppConfig.TAG, "Policy route cache updated from batch observatory result")
+        }
+    }
 
     /**
      * Gets the name of the currently running server.
@@ -247,11 +359,21 @@ object CoreServiceManager {
             error(result.errorMessage.ifBlank { "Failed to get V2Ray config" })
         }
 
-        val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
-        mFilter.addAction(Intent.ACTION_SCREEN_ON)
-        mFilter.addAction(Intent.ACTION_SCREEN_OFF)
-        mFilter.addAction(Intent.ACTION_USER_PRESENT)
-        ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
+        // Commands and probe results originate only from another process of
+        // this application. Keeping this receiver non-exported prevents other
+        // apps from forging control or policy-route cache messages.
+        ContextCompat.registerReceiver(
+            service,
+            mMsgReceive,
+            IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
+        val systemFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_USER_PRESENT)
+        }
+        ContextCompat.registerReceiver(service, mSystemEventReceive, systemFilter, Utils.receiverFlags())
 
         currentConfig = config
         var tunFd = vpnInterface?.fd ?: 0
@@ -266,12 +388,23 @@ object CoreServiceManager {
 
         NotificationManager.showNotification(currentConfig)
         CoreNativeManager.reconcileBrowserDialer(dialerAddr)
-        coreController.startLoop(result.content, tunFd)
+        runningProfileGuid = guid
+        policyRouteCallbacksEnabled.set(true)
+        try {
+            coreController.startLoop(result.content, tunFd)
+        } catch (e: Exception) {
+            policyRouteCallbacksEnabled.set(false)
+            runningProfileGuid = ""
+            throw e
+        }
 
         if (!coreController.isRunning) {
+            policyRouteCallbacksEnabled.set(false)
+            runningProfileGuid = ""
             error("Core failed to start")
         }
 
+        coreScope.launch { refreshFreshPolicyRoute() }
         if (browserDialer != null) {
             browserDialer!!.stop()
             browserDialer = null
@@ -295,6 +428,9 @@ object CoreServiceManager {
      * @return True if the core was stopped successfully, false otherwise.
      */
     fun stopCoreLoop(): Boolean {
+        policyRouteCallbacksEnabled.set(false)
+        PolicyRouteCache.clear()
+        runningProfileGuid = ""
         val service = getService() ?: return false
 
         if (coreController.isRunning) {
@@ -321,6 +457,11 @@ object CoreServiceManager {
             service.unregisterReceiver(mMsgReceive)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to unregister receiver", e)
+        }
+        try {
+            service.unregisterReceiver(mSystemEventReceive)
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to unregister system receiver", e)
         }
 
         return true
@@ -446,6 +587,13 @@ object CoreServiceManager {
         override fun onEmitStatus(l: Long, s: String?): Long {
             return 0
         }
+
+        override fun onBalancerTargetChanged(balancerTag: String?, target: String?): Long {
+            if (balancerTag == AppConfig.TAG_BALANCER) {
+                return if (rememberFreshPolicyRoute(target)) 0 else 1
+            }
+            return 0
+        }
     }
 
     /**
@@ -486,13 +634,12 @@ object CoreServiceManager {
     }
 
     /**
-     * Broadcast receiver for handling messages sent to the service.
-     * Handles registration, service control, and screen events.
+     * App-private receiver for control messages sent to the service.
      */
     private class ReceiveMessageHandler : BroadcastReceiver() {
         /**
          * Handles received broadcast messages.
-         * Processes service control messages and screen state changes.
+         * Processes service control messages from another app process.
          * @param ctx The context in which the receiver is running.
          * @param intent The intent being received.
          */
@@ -530,8 +677,17 @@ object CoreServiceManager {
                 AppConfig.MSG_MEASURE_DELAY -> {
                     measureV2rayDelay()
                 }
+
+                AppConfig.MSG_POLICY_ROUTE_OBSERVED -> {
+                    rememberProbedPolicyRoute(intent.serializable("content"))
+                }
             }
 
+        }
+    }
+
+    private class SystemEventHandler : BroadcastReceiver() {
+        override fun onReceive(ctx: Context?, intent: Intent?) {
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
                     LogUtil.i(AppConfig.TAG, "StartCore-Manager: Screen off")

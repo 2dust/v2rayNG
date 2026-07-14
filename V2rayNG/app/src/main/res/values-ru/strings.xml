@@ -19,6 +19,7 @@
     <string name="toast_services_stop">Остановка служб</string>
     <string name="toast_services_success">Службы успешно запущены</string>
     <string name="toast_services_failure">Сбой при запуске служб</string>
+    <string name="notification_core_recovery_failed">Не удалось восстановить подключение. Трафик заблокирован для предотвращения утечки; перезапустите v2rayNG.</string>
 
     <!--ServerActivity-->
     <string name="title_server">Профиль</string>
@@ -163,6 +164,9 @@
     <string name="summary_pref_per_app_proxy">Основной: выбранное приложение соединяется через прокси, не выбранное — напрямую;\nРежим обхода: выбранное приложение соединяется напрямую, не выбранное — через прокси.\nЕсть возможность автоматического выбора проксируемых приложений в меню.</string>
     <string name="title_pref_is_booted">Автоподключение при запуске</string>
     <string name="summary_pref_is_booted">Автоматически подключаться к выбранному серверу при запуске приложения (может оказаться неудачным)</string>
+    <string name="title_pref_remember_routes_per_wifi_network">Запоминать рабочие маршруты для каждой сети Wi-Fi</string>
+    <string name="summary_pref_remember_routes_per_wifi_network">Использует имя подключённой сети Wi-Fi, чтобы хранить отдельную историю маршрутов. Требуется доступ к точному местоположению, поскольку Android защищает имена сетей Wi-Fi как данные о местоположении.</string>
+    <string name="toast_precise_location_required_for_wifi_route_memory">Для чтения имени сети Wi-Fi требуется доступ к точному местоположению</string>
 
     <string name="title_pref_auto_remove_invalid_after_test">Автоудаление нерабочих профилей</string>
     <string name="summary_pref_auto_remove_invalid_after_test">Автоматическое удаление нерабочих профилей после проверки (результаты проверки могут быть неточными; восстановить удалённые профили невозможно)</string>

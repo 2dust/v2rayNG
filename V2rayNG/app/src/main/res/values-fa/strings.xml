@@ -19,6 +19,7 @@
     <string name="toast_services_stop">توقف سرویس</string>
     <string name="toast_services_success">سرویس با موفقیت شروع شد</string>
     <string name="toast_services_failure">شروع سرویس با شکست مواجه شد</string>
+    <string name="notification_core_recovery_failed">بازیابی اتصال ناموفق بود. برای جلوگیری از نشت، ترافیک مسدود می‌ماند؛ v2rayNG را دوباره راه‌اندازی کنید.</string>
 
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
@@ -157,6 +158,9 @@
     <string name="summary_pref_per_app_proxy">عمومی: برنامه انتخاب شده از طریق یک پروکسی متصل می شود، برنامه انتخاب نشده مستقیماً متصل می شود. \nحالت دور زدن: برنامه انتخاب شده مستقیماً متصل می شود، برنامه انتخاب نشده از طریق یک پروکسی متصل می شود. \nانتخاب خودکار برنامه های پراکسی در منو امکان پذیر است.</string>
     <string name="title_pref_is_booted">اتصال خودکار هنگام راه اندازی</string>
     <string name="summary_pref_is_booted">هنگام راه اندازی به طور خودکار به سرور انتخابی متصل می شود که ممکن است ناموفق باشد.</string>
+    <string name="title_pref_remember_routes_per_wifi_network">به‌خاطر سپردن مسیرهای قابل استفاده برای هر شبکه Wi-Fi</string>
+    <string name="summary_pref_remember_routes_per_wifi_network">برای نگه‌داری سابقه مسیر جداگانه، از نام شبکه Wi-Fi متصل استفاده می‌کند. به مجوز مکان دقیق نیاز دارد، زیرا Android نام شبکه‌های Wi-Fi را به‌عنوان اطلاعات مکانی محافظت می‌کند.</string>
+    <string name="toast_precise_location_required_for_wifi_route_memory">برای خواندن نام شبکه Wi-Fi، مجوز مکان دقیق لازم است</string>
 
     <string name="title_pref_auto_remove_invalid_after_test">حذف خودکار کانفیگ‌های نامعتبر بعد از پینگ</string>
     <string name="summary_pref_auto_remove_invalid_after_test">نتایج پینگ ممکن است همیشه دقیق نباشند؛ کانفیگ‌های حذف‌شده قابل بازیابی نیستند.</string>

@@ -116,6 +116,29 @@ object NotificationManager {
     }
 
     /**
+     * Keeps the foreground VPN notification visible when Xray cannot be recovered.
+     * The VPN interface remains established so Android continues routing traffic into
+     * the nonfunctional tunnel instead of silently falling back to the physical network.
+     */
+    fun showCoreFailure(message: String) {
+        val service = getService() ?: return
+        speedNotificationJob?.cancel()
+        speedNotificationJob = null
+
+        val builder = mBuilder ?: run {
+            showNotification(null)
+            mBuilder
+        } ?: return
+
+        builder
+            .setSmallIcon(R.drawable.ic_stat_name)
+            .setContentTitle(service.getString(R.string.toast_services_failure))
+            .setContentText(message)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+        getNotificationManager()?.notify(NOTIFICATION_ID, builder.build())
+    }
+
+    /**
      * Cancels the notification.
      */
     fun cancelNotification() {

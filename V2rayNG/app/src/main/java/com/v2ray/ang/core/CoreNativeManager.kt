@@ -3,11 +3,14 @@ package com.v2ray.ang.core
 import android.content.Context
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import go.Seq
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
 import libv2ray.Libv2ray
+import libv2ray.OutboundProbeController
+import libv2ray.OutboundProbeHandler
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -17,6 +20,19 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Provides initialization protection and unified API for V2Ray core operations.
  */
 object CoreNativeManager {
+    data class OutboundProbeStatus(
+        val outboundTag: String = "",
+        val alive: Boolean = false,
+        val delay: Long = -1L,
+        val samples: Long = 0L,
+    )
+
+    data class OutboundProbeBatchResult(
+        val cancelled: Boolean = false,
+        val results: List<OutboundProbeStatus> = emptyList(),
+        val balancerTargets: Map<String, String> = emptyMap(),
+    )
+
     private val initialized = AtomicBoolean(false)
 
     /**
@@ -67,20 +83,42 @@ object CoreNativeManager {
         }
     }
 
+    fun validateOutboundProbeConfig(config: String): Boolean = try {
+        Libv2ray.validateOutboundProbeConfig(config)
+        true
+    } catch (e: Exception) {
+        LogUtil.w(AppConfig.TAG, "Rejected invalid outbound probe source: ${e.message}")
+        false
+    }
+
+    fun newOutboundProbeController(): OutboundProbeController =
+        Libv2ray.newOutboundProbeController()
+
     /**
-     * Measure outbound connection delay.
-     *
-     * @param config The configuration JSON string
-     * @param testUrl The URL to test against
-     * @return Delay in milliseconds, or -1 if test failed
+     * Runs the AndroidLib compatibility adapter around upstream Xray's existing
+     * BurstObservatory.Check and GetObservation APIs. Each nested tag list is
+     * one UI configuration, so maxConcurrency keeps its settings-level meaning.
+     * The dedicated service process remains the hard isolation boundary.
      */
-    fun measureOutboundDelay(config: String, testUrl: String): Long {
-        return try {
-            Libv2ray.measureOutboundDelay(config, testUrl)
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to measure outbound delay", e)
-            -1L
-        }
+    fun probeOutboundGroups(
+        controller: OutboundProbeController,
+        config: String,
+        outboundGroupsJson: String,
+        balancerTagsJson: String,
+        maxConcurrency: Int,
+        samples: Int,
+        handler: OutboundProbeHandler,
+    ): OutboundProbeBatchResult {
+        val payload = controller.probeOutboundGroups(
+            config,
+            outboundGroupsJson,
+            balancerTagsJson,
+            maxConcurrency,
+            samples,
+            handler,
+        )
+        return JsonUtil.fromJsonSafe(payload, OutboundProbeBatchResult::class.java)
+            ?: throw IllegalStateException("Invalid outbound probe response")
     }
 
     /**

@@ -19,6 +19,7 @@
     <string name="toast_services_stop">关闭服务</string>
     <string name="toast_services_success">启动服务成功</string>
     <string name="toast_services_failure">启动服务失败</string>
+    <string name="notification_core_recovery_failed">连接恢复失败。流量将保持阻断以防泄漏；请重启 v2rayNG。</string>
 
     <!--ServerActivity-->
     <string name="title_server">配置项</string>
@@ -160,6 +161,9 @@
     <string name="summary_pref_per_app_proxy">常规: 勾选的 App 被代理, 未勾选的直连;\n绕行模式: 勾选的 App 直连, 未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
     <string name="title_pref_is_booted">开机时自动连接</string>
     <string name="summary_pref_is_booted">开机时自动连接选择的服务器，可能会不成功</string>
+    <string name="title_pref_remember_routes_per_wifi_network">按 Wi-Fi 网络记住可用路由</string>
+    <string name="summary_pref_remember_routes_per_wifi_network">使用当前连接的 Wi-Fi 名称分别保存路由历史。由于 Android 将 Wi-Fi 名称作为位置信息加以保护，因此需要精确位置权限。</string>
+    <string name="toast_precise_location_required_for_wifi_route_memory">读取 Wi-Fi 网络名称需要精确位置权限</string>
 
     <string name="title_pref_auto_remove_invalid_after_test">测试后自动删除无效配置</string>
     <string name="summary_pref_auto_remove_invalid_after_test">测试结果可能不准确且已删除的配置无法恢复</string>
