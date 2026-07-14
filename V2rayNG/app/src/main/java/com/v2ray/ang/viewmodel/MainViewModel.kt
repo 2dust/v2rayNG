@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.AssetManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,623 +26,1163 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
+import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.regex.PatternSyntaxException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
-import java.util.Collections
-import java.util.regex.PatternSyntaxException
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+data class MainUiState(
+    val groups: List<GroupMapItem> = emptyList(),
+    val selectedGroupId: String = "",
+    val selectedGuid: String? = null,
+    val isRunning: Boolean = false,
+    val isLoading: Boolean = false,
+    val isTesting: Boolean = false,
+    val statusText: String = "",
+    val confirmRemove: Boolean = false,
+    val doubleColumnDisplay: Boolean = false
+)
 
-    // ===== State definitions =====
+class MainViewModel(
+    application: Application
+) : AndroidViewModel(application) {
 
-    enum class PageChangeSource { INIT, LOCATE, USER_SWIPE }
+    private val app: AngApplication
+        get() = getApplication()
 
-    private val _pageChangeSource = MutableStateFlow(PageChangeSource.INIT)
-    val pageChangeSource: StateFlow<PageChangeSource> = _pageChangeSource.asStateFlow()
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 
-    private var serverList = mutableListOf<String>()
-    var subscriptionId: String =
-        MmkvManager.decodeSettingsString(AppConfig.CACHE_SUBSCRIPTION_ID, "").orEmpty()
-        private set
-    var keywordFilter = ""
-        private set
+    private val preloadDispatcher: CoroutineDispatcher =
+        Dispatchers.IO.limitedParallelism(1)
 
-    private val _serversCache = MutableStateFlow<List<ServersCache>>(emptyList())
-    val serversCache: StateFlow<List<ServersCache>> = _serversCache.asStateFlow()
+    private val disconnectedText: String
+        get() = app.getString(R.string.connection_not_connected)
 
-    private val _perGroupServers = MutableStateFlow<Map<String, List<ServersCache>>>(emptyMap())
-    val perGroupServers: StateFlow<Map<String, List<ServersCache>>> = _perGroupServers.asStateFlow()
+    private val connectedText: String
+        get() = app.getString(R.string.connection_connected)
 
-    private val _selectedGuid = MutableStateFlow<String?>(MmkvManager.getSelectServer())
-    val selectedGuid: StateFlow<String?> = _selectedGuid.asStateFlow()
-
-    private val _isRunning = MutableStateFlow(false)
-    val isRunningFlow: StateFlow<Boolean> = _isRunning.asStateFlow()
-
-    private val _testState = MutableStateFlow("")
-    val testState: StateFlow<String> = _testState.asStateFlow()
-
-    private val _testResultText = MutableStateFlow<String?>(null)
-    val testResultText: StateFlow<String?> = _testResultText.asStateFlow()
-
-    val displayText: StateFlow<String> = combine(
-        _isRunning,
-        _testResultText
-    ) { running, testText ->
-        when {
-            testText != null -> testText
-            running -> getApplication<AngApplication>().getString(R.string.connection_connected)
-            else -> getApplication<AngApplication>().getString(R.string.connection_not_connected)
-        }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = getApplication<AngApplication>().getString(R.string.connection_not_connected)
+    private val _uiState = MutableStateFlow(
+        MainUiState(
+            selectedGroupId = MmkvManager.decodeSettingsString(
+                AppConfig.CACHE_SUBSCRIPTION_ID,
+                ""
+            ).orEmpty(),
+            selectedGuid = MmkvManager.getSelectServer(),
+            statusText = app.getString(R.string.connection_not_connected),
+            confirmRemove = MmkvManager.decodeSettingsBool(
+                AppConfig.PREF_CONFIRM_REMOVE,
+                false
+            ),
+            doubleColumnDisplay = MmkvManager.decodeSettingsBool(
+                AppConfig.PREF_DOUBLE_COLUMN_DISPLAY,
+                false
+            )
+        )
     )
+    val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    val subscriptionId: String
+        get() = _uiState.value.selectedGroupId
 
-    private val _groups = MutableStateFlow<List<GroupMapItem>>(emptyList())
-    val groups: StateFlow<List<GroupMapItem>> = _groups.asStateFlow()
+    @Volatile
+    var keywordFilter: String = ""
+        private set
 
-    private val _updateListEvent = MutableSharedFlow<Int>(extraBufferCapacity = 1)
-    val updateListEvent: SharedFlow<Int> = _updateListEvent.asSharedFlow()
-
-    private val _locateEvent = MutableSharedFlow<LocateTarget>(extraBufferCapacity = 1)
+    private val _locateEvent = MutableSharedFlow<LocateTarget>(
+        extraBufferCapacity = 1
+    )
     val locateEvent: SharedFlow<LocateTarget> = _locateEvent.asSharedFlow()
-
-    private val _isTesting = MutableStateFlow(false)
-    val isTesting: StateFlow<Boolean> = _isTesting.asStateFlow()
-
-    // ===== UI Settings =====
-
-    private val _confirmRemove = MutableStateFlow(
-        MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
-    )
-    val confirmRemove: StateFlow<Boolean> = _confirmRemove.asStateFlow()
-
-    private val _doubleColumnDisplay = MutableStateFlow(
-        MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
-    )
-    val doubleColumnDisplay: StateFlow<Boolean> = _doubleColumnDisplay.asStateFlow()
-
-    fun refreshUiSettings() {
-        _confirmRemove.value = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
-        _doubleColumnDisplay.value = MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
-    }
-
-    // ===== Thread-safe cache with Mutex =====
 
     private val cacheMutex = Mutex()
     private val groupDataCache = mutableMapOf<String, List<ServersCache>>()
-    private val loadedGroups = mutableSetOf<String>()
 
-    private var setupGroupTabJob: Job? = null
+    private val groupPageFlows =
+        ConcurrentHashMap<String, MutableStateFlow<List<ServersCache>>>()
+
+    private val groupLoadMutexes =
+        ConcurrentHashMap<String, Mutex>()
+
+    private val loadingCount = AtomicInteger(0)
+    private val initialPageReady = CompletableDeferred<Unit>()
+
+    private var setupGroupJob: Job? = null
+    private var preloadJob: Job? = null
+    private var filterJob: Job? = null
     private var reloadJob: Job? = null
+    private var selectedGroupLoadJob: Job? = null
 
-    // ===== Core loading helpers =====
+    private var receiverRegistered = false
+    private var initialized = false
+
+    @Volatile
+    private var testingGroupId: String? = null
+
+    fun serversForGroup(groupId: String): StateFlow<List<ServersCache>> =
+        groupPageFlows
+            .computeIfAbsent(groupId) {
+                MutableStateFlow(emptyList())
+            }
+            .asStateFlow()
+
+    private fun mutableServersForGroup(
+        groupId: String
+    ): MutableStateFlow<List<ServersCache>> =
+        groupPageFlows.computeIfAbsent(groupId) {
+            MutableStateFlow(emptyList())
+        }
+
+    private fun currentServers(): List<ServersCache> =
+        mutableServersForGroup(subscriptionId).value
+
+    fun initialize() {
+        if (initialized) return
+        initialized = true
+
+        startListenBroadcast()
+        setupGroupTab()
+
+        viewModelScope.launch(preloadDispatcher) {
+            try {
+                initialPageReady.await()
+                delay(32L)
+
+                SettingsManager.initAssets(app, app.assets)
+                SubscriptionUpdater.sync(app)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                LogUtil.e(
+                    AppConfig.TAG,
+                    "Main background initialization failed",
+                    error
+                )
+            }
+        }
+    }
+
+    fun refreshUiSettings() {
+        _uiState.update {
+            it.copy(
+                confirmRemove = MmkvManager.decodeSettingsBool(
+                    AppConfig.PREF_CONFIRM_REMOVE,
+                    false
+                ),
+                doubleColumnDisplay = MmkvManager.decodeSettingsBool(
+                    AppConfig.PREF_DOUBLE_COLUMN_DISPLAY,
+                    false
+                )
+            )
+        }
+    }
+
+    fun setLoading(loading: Boolean) {
+        if (loading) {
+            val count = loadingCount.incrementAndGet()
+            if (count == 1) {
+                _uiState.update { it.copy(isLoading = true) }
+            }
+        } else {
+            val count = loadingCount.updateAndGet {
+                if (it > 0) it - 1 else 0
+            }
+            if (count == 0) {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
 
     private fun getServerGuidList(groupId: String): List<String> =
-        if (groupId.isEmpty()) MmkvManager.decodeAllServerList()
-        else MmkvManager.decodeServerList(groupId)
+        if (groupId.isEmpty()) {
+            MmkvManager.decodeAllServerList()
+        } else {
+            MmkvManager.decodeServerList(groupId)
+        }
 
-    private fun buildServersCache(guids: List<String>): List<ServersCache> =
+    private suspend fun buildServersCache(
+        guids: List<String>
+    ): List<ServersCache> =
         guids.mapNotNull { guid ->
-            val profile = MmkvManager.decodeServerConfig(guid) ?: return@mapNotNull null
-            val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+            currentCoroutineContext().ensureActive()
+
+            val profile = MmkvManager.decodeServerConfig(guid)
+                ?: return@mapNotNull null
+
+            val affiliation =
+                MmkvManager.decodeServerAffiliationInfo(guid)
+
             ServersCache(
                 guid = guid,
-                profile = profile,
-                testDelayMillis = aff?.testDelayMillis ?: 0L,
-                testDelayString = aff?.getTestDelayString() ?: ""
+                profile = profile.copy(),
+                testDelayMillis =
+                    affiliation?.testDelayMillis ?: 0L,
+                testDelayString =
+                    affiliation?.getTestDelayString().orEmpty()
             )
         }
 
-    private suspend fun getOrLoadGroupData(groupId: String, forceRefresh: Boolean = false): List<ServersCache> {
-        return cacheMutex.withLock {
-            if (!forceRefresh && loadedGroups.contains(groupId)) {
-                return@withLock groupDataCache[groupId] ?: emptyList()
+    private suspend fun loadGroup(
+        groupId: String,
+        forceRefresh: Boolean = false
+    ): List<ServersCache> {
+        val loadMutex = groupLoadMutexes.computeIfAbsent(groupId) {
+            Mutex()
+        }
+
+        return loadMutex.withLock {
+            if (!forceRefresh) {
+                cacheMutex.withLock {
+                    groupDataCache[groupId]?.let {
+                        return@withLock it
+                    }
+                }
             }
-            val guids = getServerGuidList(groupId)
-            val servers = buildServersCache(guids)
-            groupDataCache[groupId] = servers
-            loadedGroups.add(groupId)
-            if (groupId == subscriptionId) {
-                serverList = guids.toMutableList()
+
+            val servers = buildServersCache(
+                getServerGuidList(groupId)
+            )
+
+            currentCoroutineContext().ensureActive()
+
+            cacheMutex.withLock {
+                groupDataCache[groupId] = servers
             }
+
             servers
         }
     }
 
-    private fun updateGroupUI(groupId: String, servers: List<ServersCache>) {
-        val filtered = applyKeywordFilter(servers)
-        if (groupId == subscriptionId || subscriptionId.isEmpty()) {
-            _serversCache.value = filtered
+    private fun applyKeywordFilter(
+        servers: List<ServersCache>
+    ): List<ServersCache> {
+        val keyword = keywordFilter.trim()
+        if (keyword.isEmpty()) return servers
+
+        val regex = try {
+            Regex(keyword, RegexOption.IGNORE_CASE)
+        } catch (_: PatternSyntaxException) {
+            return servers
         }
-        val newMap = _perGroupServers.value.toMutableMap()
-        newMap[groupId] = filtered
-        _perGroupServers.value = newMap
-        _updateListEvent.tryEmit(-1)
+
+        return servers.filter { cache ->
+            val profile = cache.profile
+
+            profile.remarks.matchesPattern(regex, keyword) ||
+                profile.description.orEmpty()
+                    .matchesPattern(regex, keyword) ||
+                profile.server.orEmpty()
+                    .matchesPattern(regex, keyword) ||
+                profile.configType.name
+                    .matchesPattern(regex, keyword)
+        }
     }
 
-    // ===== Group and list loading =====
+    private fun updateGroupUi(
+        groupId: String,
+        servers: List<ServersCache>
+    ) {
+        mutableServersForGroup(groupId).value =
+            applyKeywordFilter(servers)
+    }
 
-    fun setupGroupTab(context: Context, forceRefresh: Boolean = false) {
-        if (!forceRefresh && loadedGroups.isNotEmpty() && _groups.value.isNotEmpty()) {
-            return
-        }
-        if (forceRefresh) {
-            refreshUiSettings()
+    private fun getSubscriptionsInternal():
+        List<SubscriptionCache> {
+        val result = mutableListOf<SubscriptionCache>()
+
+        if (
+            MmkvManager.decodeSettingsBool(
+                AppConfig.PREF_GROUP_ALL_DISPLAY
+            )
+        ) {
+            result += SubscriptionCache(
+                guid = "",
+                subscription = SubscriptionItem().apply {
+                    remarks = app.getString(
+                        R.string.filter_config_all
+                    )
+                }
+            )
         }
 
-        setupGroupTabJob?.cancel()
-        setupGroupTabJob = viewModelScope.launch(Dispatchers.IO) {
-            if (forceRefresh) {
-                cacheMutex.withLock {
-                    groupDataCache.clear()
-                    loadedGroups.clear()
+        result += MmkvManager.decodeSubscriptions()
+        return result
+    }
+
+    fun getSubscriptions(): List<SubscriptionCache> =
+        getSubscriptionsInternal()
+
+    private fun resolveSelectedGroup(
+        groups: List<GroupMapItem>
+    ): String {
+        val current = subscriptionId
+
+        val resolved = when {
+            groups.isEmpty() -> ""
+            groups.any { it.id == current } -> current
+            else -> groups.first().id
+        }
+
+        if (resolved != current) {
+            MmkvManager.encodeSettings(
+                AppConfig.CACHE_SUBSCRIPTION_ID,
+                resolved
+            )
+        }
+
+        return resolved
+    }
+
+    private fun radialPreloadOrder(
+        groups: List<GroupMapItem>,
+        selectedIndex: Int
+    ): List<String> {
+        if (groups.isEmpty()) return emptyList()
+
+        val result = ArrayList<String>(
+            (groups.size - 1).coerceAtLeast(0)
+        )
+
+        for (distance in 1 until groups.size) {
+            val right = selectedIndex + distance
+            val left = selectedIndex - distance
+
+            if (right in groups.indices) {
+                result += groups[right].id
+            }
+            if (left in groups.indices) {
+                result += groups[left].id
+            }
+        }
+
+        return result
+    }
+
+    fun setupGroupTab(
+        forceRefresh: Boolean = false
+    ): Job {
+        setupGroupJob?.cancel()
+        preloadJob?.cancel()
+        selectedGroupLoadJob?.cancel()
+
+        return viewModelScope.launch(ioDispatcher) {
+            try {
+                if (forceRefresh) {
+                    cacheMutex.withLock {
+                        groupDataCache.clear()
+                    }
+                }
+
+                val groups = getSubscriptionsInternal().map {
+                    GroupMapItem(
+                        id = it.guid,
+                        remarks = it.subscription.remarks
+                    )
+                }
+
+                val selectedGroup =
+                    resolveSelectedGroup(groups)
+
+                val validIds =
+                    groups.mapTo(HashSet()) { it.id }
+
+                groupPageFlows.keys.removeAll { it !in validIds }
+                groupLoadMutexes.keys.removeAll { it !in validIds }
+
+                _uiState.update {
+                    it.copy(
+                        groups = groups,
+                        selectedGroupId = selectedGroup,
+                        selectedGuid =
+                            MmkvManager.getSelectServer()
+                    )
+                }
+                groups.forEach { mutableServersForGroup(it.id) }
+
+                if (groups.isEmpty()) {
+                    cacheMutex.withLock {
+                        groupDataCache.clear()
+                    }
+                    return@launch
+                }
+
+                val selectedServers = loadGroup(
+                    groupId = selectedGroup,
+                    forceRefresh = forceRefresh
+                )
+                updateGroupUi(
+                    selectedGroup,
+                    selectedServers
+                )
+
+                if (!initialPageReady.isCompleted) {
+                    initialPageReady.complete(Unit)
+                }
+
+                val selectedIndex = groups.indexOfFirst {
+                    it.id == selectedGroup
+                }.coerceAtLeast(0)
+
+                val preloadOrder = radialPreloadOrder(
+                    groups,
+                    selectedIndex
+                )
+
+                preloadJob = viewModelScope.launch(
+                    preloadDispatcher
+                ) {
+                    preloadOrder.forEach { groupId ->
+                        ensureActive()
+
+                        delay(32L)
+
+                        val servers = loadGroup(
+                            groupId = groupId,
+                            forceRefresh = forceRefresh
+                        )
+                        updateGroupUi(groupId, servers)
+                    }
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                LogUtil.e(
+                    AppConfig.TAG,
+                    "Failed to set up group tabs",
+                    error
+                )
+            } finally {
+                if (!initialPageReady.isCompleted) {
+                    initialPageReady.complete(Unit)
                 }
             }
-
-            val subs = getSubscriptionsInternal(context)
-            val newGroups = subs.map { GroupMapItem(it.guid, it.subscription.remarks) }
-            _groups.value = newGroups
-
-            val currentGroupId = subscriptionId.ifEmpty { newGroups.firstOrNull()?.id ?: "" }
-            val currentServers = getOrLoadGroupData(currentGroupId, forceRefresh)
-            updateGroupUI(currentGroupId, currentServers)
-
-            ensureActive()
-            preloadOtherGroupsSuspend(newGroups.map { it.id }, currentGroupId)
-            _pageChangeSource.value = PageChangeSource.INIT
+        }.also {
+            setupGroupJob = it
         }
     }
 
-    private suspend fun preloadOtherGroupsSuspend(allGroupIds: List<String>, currentGroupId: String) {
-        val toLoad = cacheMutex.withLock {
-            allGroupIds.filter { it != currentGroupId && !loadedGroups.contains(it) }
+    fun subscriptionIdChanged(id: String) {
+        if (_uiState.value.groups.none { it.id == id }) {
+            return
         }
-        for ((index, groupId) in toLoad.withIndex()) {
-            if (index > 0) delay(50)
-            currentCoroutineContext().ensureActive()
-            val servers = getOrLoadGroupData(groupId, forceRefresh = false)
-            val filtered = applyKeywordFilter(servers)
-            val newMap = _perGroupServers.value.toMutableMap()
-            newMap[groupId] = filtered
-            _perGroupServers.value = newMap
+        mutableServersForGroup(id)
+
+        if (subscriptionId != id) {
+            MmkvManager.encodeSettings(
+                AppConfig.CACHE_SUBSCRIPTION_ID,
+                id
+            )
+            _uiState.update {
+                it.copy(selectedGroupId = id)
+            }
+        }
+
+        selectedGroupLoadJob?.cancel()
+        selectedGroupLoadJob = viewModelScope.launch(
+            ioDispatcher
+        ) {
+            try {
+                updateGroupUi(
+                    id,
+                    loadGroup(id)
+                )
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                LogUtil.e(
+                    AppConfig.TAG,
+                    "Failed to load selected group: $id",
+                    error
+                )
+            }
         }
     }
 
     fun reloadServerList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val servers = getOrLoadGroupData(subscriptionId, forceRefresh = false)
-            updateGroupUI(subscriptionId, servers)
-        }
-    }
+        val groupId = subscriptionId
 
-    fun updateCache() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val servers = getOrLoadGroupData(subscriptionId, forceRefresh = false)
-            updateGroupUI(subscriptionId, servers)
+        selectedGroupLoadJob?.cancel()
+        selectedGroupLoadJob = viewModelScope.launch(
+            ioDispatcher
+        ) {
+            updateGroupUi(
+                groupId,
+                loadGroup(
+                    groupId,
+                    forceRefresh = true
+                )
+            )
         }
     }
 
     fun reloadAllGroups(groupIds: List<String>) {
         reloadJob?.cancel()
-        reloadJob = viewModelScope.launch(Dispatchers.IO) {
-            val allGroupServers = linkedMapOf<String, List<ServersCache>>()
-            for (groupId in groupIds) {
-                ensureActive()
-                val servers = getOrLoadGroupData(groupId, forceRefresh = false)
-                allGroupServers[groupId] = servers
-                if (groupId == subscriptionId) {
-                    serverList = cacheMutex.withLock {
-                        groupDataCache[groupId]?.map { it.guid }?.toMutableList() ?: mutableListOf()
-                    }
-                }
+
+        reloadJob = viewModelScope.launch(
+            preloadDispatcher
+        ) {
+            val selected = subscriptionId
+
+            val order = buildList {
+                if (selected in groupIds) add(selected)
+                addAll(groupIds.filter { it != selected })
             }
-            val finalMap = allGroupServers.mapValues { (_, v) -> applyKeywordFilter(v) }
-            _serversCache.value = finalMap[subscriptionId] ?: emptyList()
-            _perGroupServers.value = HashMap(finalMap)
-            _updateListEvent.tryEmit(-1)
+
+            order.forEachIndexed { index, groupId ->
+                ensureActive()
+
+                if (index > 0) {
+                    delay(32L)
+                }
+
+                updateGroupUi(
+                    groupId,
+                    loadGroup(
+                        groupId,
+                        forceRefresh = true
+                    )
+                )
+            }
         }
     }
 
-    private fun applyKeywordFilter(servers: List<ServersCache>): List<ServersCache> {
-        val kw = keywordFilter.trim()
-        if (kw.isEmpty()) return servers
-        val regex = try {
-            Regex(kw, RegexOption.IGNORE_CASE)
-        } catch (_: PatternSyntaxException) {
-            return servers
-        }
-        return servers.filter { profile ->
-            val p = profile.profile
-            p.remarks.matchesPattern(regex, kw) ||
-                    p.description.orEmpty().matchesPattern(regex, kw) ||
-                    p.server.orEmpty().matchesPattern(regex, kw) ||
-                    p.configType.name.matchesPattern(regex, kw)
+    fun filterConfig(keyword: String) {
+        if (keyword == keywordFilter) return
+
+        keywordFilter = keyword
+        filterJob?.cancel()
+
+        filterJob = viewModelScope.launch(
+            defaultDispatcher
+        ) {
+            delay(300L)
+
+            val snapshot = cacheMutex.withLock {
+                groupDataCache.toMap()
+            }
+
+            ensureActive()
+
+            snapshot.forEach { (groupId, servers) ->
+                ensureActive()
+                updateGroupUi(groupId, servers)
+            }
         }
     }
-
-    // ===== Server selection and loading state =====
 
     fun updateSelectedGuid(guid: String) {
         MmkvManager.setSelectServer(guid)
-        _selectedGuid.value = guid
+        _uiState.update {
+            it.copy(selectedGuid = guid)
+        }
     }
 
-    fun setLoading(loading: Boolean) { _isLoading.value = loading }
+    fun refreshSelectedGuid() {
+        _uiState.update {
+            it.copy(
+                selectedGuid =
+                    MmkvManager.getSelectServer()
+            )
+        }
+    }
+
+    fun removeServerAndRefresh(guid: String) {
+        viewModelScope.launch(ioDispatcher) {
+            MmkvManager.removeServer(guid)
+
+            cacheMutex.withLock {
+                groupDataCache.clear()
+            }
+
+            setupGroupTab(
+                forceRefresh = true
+            ).join()
+        }
+    }
+
+    fun swapServer(
+        fromPosition: Int,
+        toPosition: Int
+    ) {
+        val groupId = subscriptionId
+        if (groupId.isEmpty()) return
+
+        val servers = currentServers().toMutableList()
+
+        if (
+            fromPosition !in servers.indices ||
+            toPosition !in servers.indices
+        ) {
+            return
+        }
+
+        Collections.swap(
+            servers,
+            fromPosition,
+            toPosition
+        )
+
+        val guids = servers.mapTo(
+            ArrayList(servers.size)
+        ) { it.guid }
+
+        mutableServersForGroup(groupId).value = servers
+
+        viewModelScope.launch(ioDispatcher) {
+            MmkvManager.encodeServerList(
+                guids,
+                groupId
+            )
+
+            cacheMutex.withLock {
+                groupDataCache[groupId] = servers
+            }
+        }
+    }
 
     fun cancelAllPing() {
         MessageUtil.sendMsg2TestService(
-            getApplication(),
-            TestServiceMessage(key = AppConfig.MSG_MEASURE_CONFIG_CANCEL)
+            app,
+            TestServiceMessage(
+                key = AppConfig.MSG_MEASURE_CONFIG_CANCEL
+            )
         )
-        _isTesting.value = false
-        _testState.value = ""
-        _testResultText.value = null
-    }
 
-    // ===== Server CRUD operations =====
+        testingGroupId = null
 
-    fun removeServer(guid: String) {
-        serverList.remove(guid)
-        MmkvManager.removeServer(guid)
-        viewModelScope.launch(Dispatchers.IO) {
-            cacheMutex.withLock {
-                groupDataCache.remove(subscriptionId)
-                loadedGroups.remove(subscriptionId)
-            }
+        _uiState.update {
+            it.copy(
+                isTesting = false,
+                statusText = if (it.isRunning) {
+                    connectedText
+                } else {
+                    disconnectedText
+                }
+            )
         }
     }
-
-    fun swapServer(fromPosition: Int, toPosition: Int) {
-        if (subscriptionId.isEmpty()) return
-        val currentCache = _serversCache.value.toMutableList()
-        if (fromPosition !in currentCache.indices || toPosition !in currentCache.indices) return
-        Collections.swap(serverList, fromPosition, toPosition)
-        Collections.swap(currentCache, fromPosition, toPosition)
-        MmkvManager.encodeServerList(serverList, subscriptionId)
-        viewModelScope.launch(Dispatchers.IO) {
-            cacheMutex.withLock {
-                groupDataCache[subscriptionId] = currentCache
-            }
-        }
-        _serversCache.value = currentCache
-        val updated = HashMap(_perGroupServers.value)
-        updated[subscriptionId] = currentCache
-        _perGroupServers.value = updated
-    }
-
-    // ===== Testing / Ping =====
 
     fun testAllRealPing() {
         MessageUtil.sendMsg2TestService(
-            getApplication(),
-            TestServiceMessage(key = AppConfig.MSG_MEASURE_CONFIG_CANCEL)
+            app,
+            TestServiceMessage(
+                key = AppConfig.MSG_MEASURE_CONFIG_CANCEL
+            )
         )
-        val currentCache = _serversCache.value
-        MmkvManager.clearAllTestDelayResults(currentCache.map { it.guid })
-        _isTesting.value = true
-        val testingText = getApplication<AngApplication>().getString(R.string.connection_test_testing)
-        _testState.value = testingText
-        _testResultText.value = testingText
 
-        viewModelScope.launch(Dispatchers.IO) {
-            cacheMutex.withLock {
-                groupDataCache.remove(subscriptionId)
-                loadedGroups.remove(subscriptionId)
+        val groupId = subscriptionId
+        val servers = currentServers()
+
+        MmkvManager.clearAllTestDelayResults(
+            servers.map { it.guid }
+        )
+
+        if (servers.isEmpty()) {
+            _uiState.update {
+                it.copy(isTesting = false)
             }
+            return
         }
 
-        viewModelScope.launch(Dispatchers.Default) {
-            if (currentCache.isEmpty()) {
-                _isTesting.value = false
-                _testState.value = ""
-                _testResultText.value = null
-                return@launch
+        testingGroupId = groupId
+
+        _uiState.update {
+            it.copy(
+                isTesting = true,
+                statusText = app.getString(
+                    R.string.connection_test_testing
+                )
+            )
+        }
+
+        viewModelScope.launch(ioDispatcher) {
+            cacheMutex.withLock {
+                groupDataCache.remove(groupId)
             }
+
             MessageUtil.sendMsg2TestService(
-                getApplication(),
+                app,
                 TestServiceMessage(
-                    key = AppConfig.MSG_MEASURE_CONFIG_START,
-                    subscriptionId = subscriptionId,
-                    serverGuids = if (keywordFilter.isNotEmpty()) currentCache.map { it.guid } else emptyList()
+                    key =
+                        AppConfig.MSG_MEASURE_CONFIG_START,
+                    subscriptionId = groupId,
+                    serverGuids =
+                        if (keywordFilter.isNotEmpty()) {
+                            servers.map { it.guid }
+                        } else {
+                            emptyList()
+                        }
                 )
             )
         }
     }
 
     fun testCurrentServerRealPing() {
-        val testingText = getApplication<AngApplication>().getString(R.string.connection_test_testing)
-        _testState.value = testingText
-        _testResultText.value = testingText
-        MessageUtil.sendMsg2Service(getApplication(), AppConfig.MSG_MEASURE_DELAY, "")
-    }
-
-    fun onTestsFinished() {
-        viewModelScope.launch(Dispatchers.Default) {
-            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST)) {
-                removeInvalidServer()
-            }
-            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SORT_AFTER_TEST)) {
-                sortByTestResults()
-            }
-            withContext(Dispatchers.Main) {
-                cacheMutex.withLock {
-                    groupDataCache.remove(subscriptionId)
-                    loadedGroups.remove(subscriptionId)
-                }
-                reloadAllGroups(_groups.value.map { it.id })
-                _isTesting.value = false
-                _testState.value = ""
-                _testResultText.value = null
-            }
-        }
-    }
-
-    // ===== Subscription management =====
-
-    fun subscriptionIdChanged(id: String) {
-        if (subscriptionId != id) {
-            subscriptionId = id
-            MmkvManager.encodeSettings(AppConfig.CACHE_SUBSCRIPTION_ID, subscriptionId)
-        }
-        if (_pageChangeSource.value == PageChangeSource.INIT ||
-            _pageChangeSource.value == PageChangeSource.LOCATE) {
-            _pageChangeSource.value = PageChangeSource.USER_SWIPE
-        }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val servers = getOrLoadGroupData(id, forceRefresh = false)
-            updateGroupUI(id, servers)
-        }
-    }
-
-    private fun getSubscriptionsInternal(context: Context): List<SubscriptionCache> {
-        val subscriptions = MmkvManager.decodeSubscriptions()
-        if (subscriptionId.isNotEmpty() && !subscriptions.any { it.guid == subscriptionId }) {
-            subscriptionIdChanged("")
-        }
-        val result = mutableListOf<SubscriptionCache>()
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_GROUP_ALL_DISPLAY)) {
-            result.add(
-                SubscriptionCache(
-                    guid = "",
-                    subscription = SubscriptionItem().apply {
-                        remarks = context.getString(R.string.filter_config_all)
-                    }
+        _uiState.update {
+            it.copy(
+                statusText = app.getString(
+                    R.string.connection_test_testing
                 )
             )
         }
-        result.addAll(subscriptions)
-        return result
-    }
 
-    fun getSubscriptions(context: Context): List<SubscriptionCache> =
-        getSubscriptionsInternal(context)
-
-    fun updateConfigViaSubAll(): SubscriptionUpdateResult {
-        return if (subscriptionId.isEmpty()) {
-            AngConfigManager.updateConfigViaSubAll()
-        } else {
-            val subItem = MmkvManager.decodeSubscription(subscriptionId)
-                ?: return SubscriptionUpdateResult()
-            AngConfigManager.updateConfigViaSub(SubscriptionCache(subscriptionId, subItem))
-        }
-    }
-
-    // ===== Export / Delete / Sort =====
-
-    fun exportAllServer(): Int {
-        val list = if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
-            serverList
-        } else {
-            _serversCache.value.map { it.guid }
-        }
-        return AngConfigManager.shareNonCustomConfigsToClipboard(
-            getApplication<AngApplication>(),
-            list
+        MessageUtil.sendMsg2Service(
+            app,
+            AppConfig.MSG_MEASURE_DELAY,
+            ""
         )
     }
 
+    fun onTestsFinished() {
+        viewModelScope.launch(ioDispatcher) {
+            if (
+                MmkvManager.decodeSettingsBool(
+                    AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST
+                )
+            ) {
+                removeInvalidServerInternal()
+            }
+
+            if (
+                MmkvManager.decodeSettingsBool(
+                    AppConfig.PREF_AUTO_SORT_AFTER_TEST
+                )
+            ) {
+                sortByTestResultsInternal()
+            }
+
+            cacheMutex.withLock {
+                groupDataCache.clear()
+            }
+
+            testingGroupId = null
+
+            _uiState.update {
+                it.copy(
+                    isTesting = false,
+                    statusText = if (it.isRunning) {
+                        connectedText
+                    } else {
+                        disconnectedText
+                    }
+                )
+            }
+
+            reloadAllGroups(
+                _uiState.value.groups.map { it.id }
+            )
+        }
+    }
+
+    fun updateConfigViaSubAll():
+        SubscriptionUpdateResult =
+        if (subscriptionId.isEmpty()) {
+            AngConfigManager.updateConfigViaSubAll()
+        } else {
+            val item = MmkvManager.decodeSubscription(
+                subscriptionId
+            ) ?: return SubscriptionUpdateResult()
+
+            AngConfigManager.updateConfigViaSub(
+                SubscriptionCache(
+                    subscriptionId,
+                    item
+                )
+            )
+        }
+
+    fun exportAllServer(): Int {
+        val list =
+            if (
+                subscriptionId.isEmpty() &&
+                keywordFilter.isEmpty()
+            ) {
+                MmkvManager.decodeAllServerList()
+            } else {
+                currentServers().map { it.guid }
+            }
+
+        return AngConfigManager
+            .shareNonCustomConfigsToClipboard(
+                app,
+                list
+            )
+    }
+
     fun removeDuplicateServer(): Int {
-        val servers = _serversCache.value
-        val toDelete = mutableListOf<String>()
-        for (i in servers.indices) {
-            val p1 = servers[i].profile
-            if (p1.configType.isComplexType()) continue
-            for (j in i + 1 until servers.size) {
-                val p2 = servers[j].profile
-                if (p2.configType.isComplexType()) continue
-                if (p1 == p2 && !toDelete.contains(servers[j].guid)) {
-                    toDelete.add(servers[j].guid)
+        val seen = HashSet<ProfileItem>()
+        val duplicates = ArrayList<String>()
+
+        currentServers().forEach { server ->
+            val profile = server.profile
+
+            if (!profile.configType.isComplexType()) {
+                val identity =
+                    profile.duplicateIdentity()
+
+                if (!seen.add(identity)) {
+                    duplicates += server.guid
                 }
             }
         }
-        toDelete.forEach { MmkvManager.removeServer(it) }
-        return toDelete.size
+
+        duplicates.forEach(
+            MmkvManager::removeServer
+        )
+
+        return duplicates.size
     }
 
     fun removeAllServer(): Int {
-        val count = if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
-            MmkvManager.removeAllServer()
-        } else {
-            val guids = _serversCache.value.map { it.guid }
-            guids.forEach { MmkvManager.removeServer(it) }
-            guids.size
+        val count =
+            if (
+                subscriptionId.isEmpty() &&
+                keywordFilter.isEmpty()
+            ) {
+                MmkvManager.removeAllServer()
+            } else {
+                val guids =
+                    currentServers().map { it.guid }
+
+                guids.forEach(
+                    MmkvManager::removeServer
+                )
+
+                guids.size
+            }
+
+        viewModelScope.launch(ioDispatcher) {
+            cacheMutex.withLock {
+                groupDataCache.clear()
+            }
         }
+
         return count
     }
 
-    fun removeInvalidServer(): Int {
-        var count = 0
-        if (subscriptionId.isEmpty() && keywordFilter.isEmpty()) {
-            count += MmkvManager.removeInvalidServer("")
+    private fun removeInvalidServerInternal(): Int =
+        if (
+            subscriptionId.isEmpty() &&
+            keywordFilter.isEmpty()
+        ) {
+            MmkvManager.removeInvalidServer("")
         } else {
-            _serversCache.value.forEach {
-                count += MmkvManager.removeInvalidServer(it.guid)
+            currentServers().sumOf {
+                MmkvManager.removeInvalidServer(
+                    it.guid
+                )
             }
         }
+
+    fun removeInvalidServer(): Int {
+        val count = removeInvalidServerInternal()
+
+        viewModelScope.launch(ioDispatcher) {
+            cacheMutex.withLock {
+                groupDataCache.clear()
+            }
+
+            setupGroupTab(
+                forceRefresh = true
+            )
+        }
+
         return count
+    }
+
+    private fun sortByTestResultsForSub(
+        subId: String
+    ) {
+        val sorted =
+            MmkvManager.decodeServerList(subId)
+                .map { guid ->
+                    val delay =
+                        MmkvManager
+                            .decodeServerAffiliationInfo(guid)
+                            ?.testDelayMillis
+                            ?: 0L
+
+                    guid to if (delay <= 0L) {
+                        Long.MAX_VALUE
+                    } else {
+                        delay
+                    }
+                }
+                .sortedBy { it.second }
+                .mapTo(ArrayList()) { it.first }
+
+        MmkvManager.encodeServerList(
+            sorted,
+            subId
+        )
+    }
+
+    private fun sortByTestResultsInternal() {
+        if (subscriptionId.isEmpty()) {
+            MmkvManager.decodeSubsList()
+                .forEach(
+                    ::sortByTestResultsForSub
+                )
+        } else {
+            sortByTestResultsForSub(
+                subscriptionId
+            )
+        }
     }
 
     fun sortByTestResults() {
-        if (subscriptionId.isEmpty()) {
-            MmkvManager.decodeSubsList().forEach { sortByTestResultsForSub(it) }
-        } else {
-            sortByTestResultsForSub(subscriptionId)
-        }
-    }
+        sortByTestResultsInternal()
 
-    private fun sortByTestResultsForSub(subId: String) {
-        val list = MmkvManager.decodeServerList(subId)
-        val sorted = list.map { guid ->
-            val delay = MmkvManager.decodeServerAffiliationInfo(guid)?.testDelayMillis ?: 0L
-            guid to if (delay <= 0L) 999999L else delay
-        }.sortedBy { it.second }.map { it.first }.toMutableList()
-        MmkvManager.encodeServerList(sorted, subId)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             cacheMutex.withLock {
-                groupDataCache.remove(subId)
-                loadedGroups.remove(subId)
+                groupDataCache.clear()
             }
+
+            setupGroupTab(
+                forceRefresh = true
+            )
         }
     }
-
-    // ===== Locate selected server =====
 
     fun triggerLocateSelectedServer() {
-        val selected = MmkvManager.getSelectServer() ?: return
-        val profile = MmkvManager.decodeServerConfig(selected) ?: return
+        val selected =
+            MmkvManager.getSelectServer() ?: return
+
+        val profile =
+            MmkvManager.decodeServerConfig(selected)
+                ?: return
+
         val groupId = profile.subscriptionId
-        val currentGroups = _groups.value
-        val groupIndex = currentGroups.indexOfFirst { it.id == groupId }
-            .takeIf { it >= 0 } ?: return
 
-        viewModelScope.launch(Dispatchers.IO) {
-            val servers = getOrLoadGroupData(groupId, forceRefresh = false)
-            val itemPosition = servers.indexOfFirst { it.guid == selected }
-                .takeIf { it >= 0 } ?: return@launch
+        val groupIndex =
+            _uiState.value.groups
+                .indexOfFirst { it.id == groupId }
+                .takeIf { it >= 0 }
+                ?: return
 
-            _pageChangeSource.value = PageChangeSource.LOCATE
-            _locateEvent.tryEmit(LocateTarget(groupId, groupIndex, itemPosition))
-        }
-    }
+        viewModelScope.launch(ioDispatcher) {
+            val position =
+                loadGroup(groupId)
+                    .indexOfFirst {
+                        it.guid == selected
+                    }
+                    .takeIf { it >= 0 }
+                    ?: return@launch
 
-    // ===== Utility =====
-
-    fun initAssets(assets: AssetManager) {
-        viewModelScope.launch(Dispatchers.Default) {
-            SettingsManager.initAssets(getApplication<AngApplication>(), assets)
-        }
-    }
-
-    fun filterConfig(keyword: String) {
-        if (keyword == keywordFilter) return
-        keywordFilter = keyword
-        reloadJob?.cancel()
-        reloadJob = viewModelScope.launch {
-            delay(300)
-            reloadServerList()
+            _locateEvent.emit(
+                LocateTarget(
+                    groupId = groupId,
+                    groupIndex = groupIndex,
+                    itemPosition = position
+                )
+            )
         }
     }
 
     fun getPosition(guid: String): Int =
-        _serversCache.value.indexOfFirst { it.guid == guid }
-
-    // ===== Broadcast receiver =====
+        currentServers()
+            .indexOfFirst { it.guid == guid }
 
     fun startListenBroadcast() {
-        _isRunning.value = false
-        val filter = IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY)
-        ContextCompat.registerReceiver(getApplication(), mMsgReceiver, filter, Utils.receiverFlags())
-        MessageUtil.sendMsg2Service(getApplication(), AppConfig.MSG_REGISTER_CLIENT, "")
+        if (receiverRegistered) return
+
+        ContextCompat.registerReceiver(
+            app,
+            messageReceiver,
+            IntentFilter(
+                AppConfig.BROADCAST_ACTION_ACTIVITY
+            ),
+            Utils.receiverFlags()
+        )
+
+        receiverRegistered = true
+
+        MessageUtil.sendMsg2Service(
+            app,
+            AppConfig.MSG_REGISTER_CLIENT,
+            ""
+        )
     }
 
-    override fun onCleared() {
-        getApplication<AngApplication>().unregisterReceiver(mMsgReceiver)
-        LogUtil.i(AppConfig.TAG, "Main ViewModel cleared")
-        super.onCleared()
-    }
-
-    private val mMsgReceiver = object : BroadcastReceiver() {
-        override fun onReceive(ctx: Context?, intent: Intent?) {
-            when (intent?.getIntExtra("key", 0)) {
-                AppConfig.MSG_STATE_RUNNING -> _isRunning.value = true
-                AppConfig.MSG_STATE_NOT_RUNNING -> _isRunning.value = false
-                AppConfig.MSG_STATE_START_SUCCESS -> {
-                    getApplication<AngApplication>().toastSuccess(R.string.toast_services_success)
-                    _isRunning.value = true
-                    _testResultText.value = null
-                    _testState.value = ""
-                }
-                AppConfig.MSG_STATE_START_FAILURE -> {
-                    val error = intent.getStringExtra("content")
-                    if (!error.isNullOrBlank()) {
-                        getApplication<AngApplication>().toastError(error)
+    private fun updateRunningState(
+        running: Boolean,
+        clearTestingText: Boolean = true
+    ) {
+        _uiState.update { state ->
+            state.copy(
+                isRunning = running,
+                statusText =
+                    if (
+                        !clearTestingText &&
+                        state.isTesting
+                    ) {
+                        state.statusText
+                    } else if (running) {
+                        connectedText
                     } else {
-                        getApplication<AngApplication>().toastError(R.string.toast_services_failure)
+                        disconnectedText
                     }
-                    _isRunning.value = false
-                    _testResultText.value = null
-                    _testState.value = ""
-                }
-                AppConfig.MSG_STATE_STOP_SUCCESS -> {
-                    _isRunning.value = false
-                    _testResultText.value = null
-                    _testState.value = ""
-                }
-                AppConfig.MSG_MEASURE_DELAY_SUCCESS -> {
-                    val result = intent.getStringExtra("content").orEmpty()
-                    _testState.value = result
-                    _testResultText.value = result
-                }
-                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> {
-                    viewModelScope.launch(Dispatchers.IO) {
-                        cacheMutex.withLock {
-                            groupDataCache.remove(subscriptionId)
-                            loadedGroups.remove(subscriptionId)
+            )
+        }
+    }
+
+    private val messageReceiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(
+                context: Context?,
+                intent: Intent?
+            ) {
+                when (
+                    intent?.getIntExtra("key", 0)
+                ) {
+                    AppConfig.MSG_STATE_RUNNING -> {
+                        updateRunningState(
+                            running = true,
+                            clearTestingText = false
+                        )
+                    }
+
+                    AppConfig.MSG_STATE_NOT_RUNNING -> {
+                        updateRunningState(
+                            running = false,
+                            clearTestingText = false
+                        )
+                    }
+
+                    AppConfig.MSG_STATE_START_SUCCESS -> {
+                        app.toastSuccess(
+                            R.string.toast_services_success
+                        )
+                        updateRunningState(true)
+                    }
+
+                    AppConfig.MSG_STATE_START_FAILURE -> {
+                        val error =
+                            intent.getStringExtra("content")
+                                .orEmpty()
+
+                        if (error.isNotBlank()) {
+                            app.toastError(error)
+                        } else {
+                            app.toastError(
+                                R.string.toast_services_failure
+                            )
                         }
-                        val servers = getOrLoadGroupData(subscriptionId, forceRefresh = true)
-                        updateGroupUI(subscriptionId, servers)
+
+                        updateRunningState(false)
                     }
-                }
-                AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> {
-                    val content = intent.getStringExtra("content")
-                    val progress = getApplication<AngApplication>().getString(
-                        R.string.connection_runing_task_left, content
-                    )
-                    _testState.value = progress
-                    _testResultText.value = progress
-                }
-                AppConfig.MSG_MEASURE_CONFIG_FINISH -> {
-                    if (intent.getStringExtra("content") == "0") {
-                        onTestsFinished()
+
+                    AppConfig.MSG_STATE_STOP_SUCCESS -> {
+                        updateRunningState(false)
+                    }
+
+                    AppConfig.MSG_MEASURE_DELAY_SUCCESS -> {
+                        _uiState.update {
+                            it.copy(
+                                statusText =
+                                    intent.getStringExtra(
+                                        "content"
+                                    ).orEmpty()
+                            )
+                        }
+                    }
+
+                    AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> {
+                        val groupId =
+                            testingGroupId
+                                ?: subscriptionId
+
+                        viewModelScope.launch(
+                            ioDispatcher
+                        ) {
+                            cacheMutex.withLock {
+                                groupDataCache.remove(
+                                    groupId
+                                )
+                            }
+
+                            updateGroupUi(
+                                groupId,
+                                loadGroup(
+                                    groupId,
+                                    forceRefresh = true
+                                )
+                            )
+                        }
+                    }
+
+                    AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> {
+                        val progress = app.getString(
+                            R.string.connection_runing_task_left,
+                            intent.getStringExtra(
+                                "content"
+                            )
+                        )
+
+                        _uiState.update {
+                            it.copy(
+                                statusText = progress
+                            )
+                        }
+                    }
+
+                    AppConfig.MSG_MEASURE_CONFIG_FINISH -> {
+                        if (
+                            intent.getStringExtra(
+                                "content"
+                            ) == "0"
+                        ) {
+                            onTestsFinished()
+                        }
                     }
                 }
             }
         }
+
+    override fun onCleared() {
+        setupGroupJob?.cancel()
+        preloadJob?.cancel()
+        selectedGroupLoadJob?.cancel()
+        reloadJob?.cancel()
+        filterJob?.cancel()
+
+        if (receiverRegistered) {
+            runCatching {
+                app.unregisterReceiver(
+                    messageReceiver
+                )
+            }.onFailure {
+                LogUtil.e(
+                    AppConfig.TAG,
+                    "Failed to unregister MainViewModel receiver",
+                    it
+                )
+            }
+
+            receiverRegistered = false
+        }
+
+        super.onCleared()
     }
 }

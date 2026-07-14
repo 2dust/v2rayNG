@@ -51,6 +51,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -78,7 +79,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -87,6 +87,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -148,15 +149,20 @@ import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.yield
+import kotlin.math.abs
 
 class MainActivity : HelperBaseComponentActivity() {
-    val mainViewModel: MainViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
 
     private val requestVpnPermission =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -183,13 +189,9 @@ class MainActivity : HelperBaseComponentActivity() {
                 false
             )
 
-            // Single entry point for config refresh – forces a full reload from MMKV.
-            mainViewModel.setupGroupTab(
-                context = this,
-                forceRefresh = true
-            )
+            mainViewModel.setupGroupTab(forceRefresh = true)
 
-            if (restartService && mainViewModel.isRunningFlow.value) {
+            if (restartService && mainViewModel.uiState.value.isRunning) {
                 restartV2Ray()
             }
         }
@@ -200,27 +202,20 @@ class MainActivity : HelperBaseComponentActivity() {
             val restartService = SettingsChangeManager.consumeRestartService()
             val refreshGroups = SettingsChangeManager.consumeSetupGroupTab()
 
-            // Refresh UI settings (e.g. double-column display, confirm-remove)
             mainViewModel.refreshUiSettings()
 
             if (refreshGroups) {
-                mainViewModel.setupGroupTab(
-                    context = this,
-                    forceRefresh = true
-                )
+                mainViewModel.setupGroupTab(forceRefresh = true)
             }
 
-            if (restartService && mainViewModel.isRunningFlow.value) {
+            if (restartService && mainViewModel.uiState.value.isRunning) {
                 restartV2Ray()
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainViewModel.startListenBroadcast()
-        mainViewModel.initAssets(assets)
-        SubscriptionUpdater.sync()
-        mainViewModel.setupGroupTab(this)
+        mainViewModel.initialize()
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
     }
@@ -295,7 +290,7 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private fun handleFabAction() {
-        if (mainViewModel.isRunningFlow.value == true) {
+        if (mainViewModel.uiState.value.isRunning) {
             CoreServiceManager.stopVService(this)
         } else if (SettingsManager.isVpnMode()) {
             val intent = VpnService.prepare(this)
@@ -306,7 +301,7 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private fun handleLayoutTestClick() {
-        if (mainViewModel.isRunningFlow.value == true) mainViewModel.testCurrentServerRealPing()
+        if (mainViewModel.uiState.value.isRunning) mainViewModel.testCurrentServerRealPing()
     }
 
     private fun startV2Ray() {
@@ -322,7 +317,7 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private fun restartV2Ray() {
-        if (mainViewModel.isRunningFlow.value == true) CoreServiceManager.stopVService(this)
+        if (mainViewModel.uiState.value.isRunning) CoreServiceManager.stopVService(this)
         lifecycleScope.launch { delay(500); startV2Ray() }
     }
 
@@ -355,31 +350,30 @@ class MainActivity : HelperBaseComponentActivity() {
 
     private fun importBatchConfig(server: String?) {
         mainViewModel.setLoading(true)
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch {
             try {
-                val (count, countSub) = AngConfigManager.importBatchConfig(
-                    server,
-                    mainViewModel.subscriptionId,
-                    true
-                )
-                delay(500L)
-                withContext(Dispatchers.Main) {
-                    when {
-                        count > 0 -> {
-                            toast(getString(R.string.title_import_config_count, count))
-                            mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
-                        }
-                        countSub > 0 -> mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
-                        else -> toastError(R.string.toast_failure)
+                val (count, countSub) = withContext(Dispatchers.IO) {
+                    AngConfigManager.importBatchConfig(
+                        server,
+                        mainViewModel.subscriptionId,
+                        true
+                    )
+                }
+                when {
+                    count > 0 -> {
+                        toast(getString(R.string.title_import_config_count, count))
+                        mainViewModel.setupGroupTab(forceRefresh = true)
                     }
-                    mainViewModel.setLoading(false)
+                    countSub > 0 -> mainViewModel.setupGroupTab(forceRefresh = true)
+                    else -> toastError(R.string.toast_failure)
                 }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    toastError(R.string.toast_failure)
-                    mainViewModel.setLoading(false)
-                }
                 LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
+                toastError(R.string.toast_failure)
+            } finally {
+                mainViewModel.setLoading(false)
             }
         }
     }
@@ -398,10 +392,11 @@ class MainActivity : HelperBaseComponentActivity() {
 
     private fun importConfigViaSub() {
         mainViewModel.setLoading(true)
-        lifecycleScope.launch(Dispatchers.IO) {
-            val result = mainViewModel.updateConfigViaSubAll()
-            delay(500L)
-            launch(Dispatchers.Main) {
+        lifecycleScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    mainViewModel.updateConfigViaSubAll()
+                }
                 when {
                     result.successCount + result.failureCount + result.skipCount == 0 ->
                         toast(R.string.title_update_subscription_no_subscription)
@@ -419,8 +414,15 @@ class MainActivity : HelperBaseComponentActivity() {
                         )
                 }
                 if (result.configCount > 0) {
-                    mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
+                    mainViewModel.setupGroupTab(forceRefresh = true)
+                    mainViewModel.refreshSelectedGuid()
                 }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Subscription update failed", e)
+                toastError(R.string.toast_failure)
+            } finally {
                 mainViewModel.setLoading(false)
             }
         }
@@ -428,11 +430,19 @@ class MainActivity : HelperBaseComponentActivity() {
 
     private fun exportAll() {
         mainViewModel.setLoading(true)
-        lifecycleScope.launch(Dispatchers.IO) {
-            val ret = mainViewModel.exportAllServer()
-            launch(Dispatchers.Main) {
+        lifecycleScope.launch {
+            try {
+                val ret = withContext(Dispatchers.IO) {
+                    mainViewModel.exportAllServer()
+                }
                 if (ret > 0) toast(getString(R.string.title_export_config_count, ret))
                 else toastError(R.string.toast_failure)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Export failed", e)
+                toastError(R.string.toast_failure)
+            } finally {
                 mainViewModel.setLoading(false)
             }
         }
@@ -440,11 +450,19 @@ class MainActivity : HelperBaseComponentActivity() {
 
     private fun delAllConfig() {
         mainViewModel.setLoading(true)
-        lifecycleScope.launch(Dispatchers.IO) {
-            val ret = mainViewModel.removeAllServer()
-            launch(Dispatchers.Main) {
-                mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
+        lifecycleScope.launch {
+            try {
+                val ret = withContext(Dispatchers.IO) {
+                    mainViewModel.removeAllServer()
+                }
+                mainViewModel.setupGroupTab(forceRefresh = true)
                 toast(getString(R.string.title_del_config_count, ret))
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Delete all failed", e)
+                toastError(R.string.toast_failure)
+            } finally {
                 mainViewModel.setLoading(false)
             }
         }
@@ -452,11 +470,19 @@ class MainActivity : HelperBaseComponentActivity() {
 
     private fun delDuplicateConfig() {
         mainViewModel.setLoading(true)
-        lifecycleScope.launch(Dispatchers.IO) {
-            val ret = mainViewModel.removeDuplicateServer()
-            launch(Dispatchers.Main) {
-                mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
+        lifecycleScope.launch {
+            try {
+                val ret = withContext(Dispatchers.IO) {
+                    mainViewModel.removeDuplicateServer()
+                }
+                mainViewModel.setupGroupTab(forceRefresh = true)
                 toast(getString(R.string.title_del_duplicate_config_count, ret))
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Delete duplicate failed", e)
+                toastError(R.string.toast_failure)
+            } finally {
                 mainViewModel.setLoading(false)
             }
         }
@@ -464,11 +490,19 @@ class MainActivity : HelperBaseComponentActivity() {
 
     private fun delInvalidConfig() {
         mainViewModel.setLoading(true)
-        lifecycleScope.launch(Dispatchers.IO) {
-            val ret = mainViewModel.removeInvalidServer()
-            launch(Dispatchers.Main) {
-                mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
+        lifecycleScope.launch {
+            try {
+                val ret = withContext(Dispatchers.IO) {
+                    mainViewModel.removeInvalidServer()
+                }
+                mainViewModel.setupGroupTab(forceRefresh = true)
                 toast(getString(R.string.title_del_config_count, ret))
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Delete invalid failed", e)
+                toastError(R.string.toast_failure)
+            } finally {
                 mainViewModel.setLoading(false)
             }
         }
@@ -476,10 +510,18 @@ class MainActivity : HelperBaseComponentActivity() {
 
     private fun sortByTestResults() {
         mainViewModel.setLoading(true)
-        lifecycleScope.launch(Dispatchers.IO) {
-            mainViewModel.sortByTestResults()
-            launch(Dispatchers.Main) {
-                mainViewModel.setupGroupTab(this@MainActivity, forceRefresh = true)
+        lifecycleScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    mainViewModel.sortByTestResults()
+                }
+                mainViewModel.setupGroupTab(forceRefresh = true)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Sort by test results failed", e)
+                toastError(R.string.toast_failure)
+            } finally {
                 mainViewModel.setLoading(false)
             }
         }
@@ -494,7 +536,7 @@ class MainActivity : HelperBaseComponentActivity() {
         }
         val intent = Intent(this, activityClass).apply {
             putExtra("guid", guid)
-            putExtra("isRunning", mainViewModel.isRunningFlow.value)
+            putExtra("isRunning", mainViewModel.uiState.value.isRunning)
             putExtra("createConfigType", profile.configType.value)
             putExtra("subscriptionId", mainViewModel.subscriptionId)
         }
@@ -505,15 +547,14 @@ class MainActivity : HelperBaseComponentActivity() {
         if (guid == MmkvManager.getSelectServer()) {
             toast(R.string.toast_action_not_allowed); return
         }
-        mainViewModel.removeServer(guid)
-        mainViewModel.setupGroupTab(this, forceRefresh = true)
+        mainViewModel.removeServerAndRefresh(guid)
     }
 
     private fun setSelectServer(guid: String) {
         val selected = MmkvManager.getSelectServer()
         if (guid != selected) {
             mainViewModel.updateSelectedGuid(guid)
-            if (mainViewModel.isRunningFlow.value == true) restartV2Ray()
+            if (mainViewModel.uiState.value.isRunning) restartV2Ray()
         }
     }
 
@@ -633,6 +674,148 @@ private fun MainBottomBar(
     }
 }
 
+private suspend fun PagerState.navigateToPageOptimized(
+    targetPage: Int,
+    animateAdjacentPage: Boolean = true
+) {
+    if (pageCount <= 0) return
+
+    val target = targetPage.coerceIn(0, pageCount - 1)
+    val current = settledPage.coerceIn(0, pageCount - 1)
+
+    if (target == current) return
+
+    val distance = abs(target - current)
+
+    when {
+        distance == 1 && animateAdjacentPage -> animateScrollToPage(target)
+        animateAdjacentPage -> {
+            val adjacent = if (target > current) target - 1 else target + 1
+            scrollToPage(adjacent)
+            yield()
+            animateScrollToPage(target)
+        }
+        else -> scrollToPage(target)
+    }
+}
+
+@Composable
+private fun GroupTabBar(
+    groups: List<GroupMapItem>,
+    selectedTabIndex: Int,
+    mainViewModel: MainViewModel,
+    onTabClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    PrimaryScrollableTabRow(
+        selectedTabIndex = selectedTabIndex.coerceIn(0, groups.lastIndex),
+        modifier = modifier.fillMaxWidth(),
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        edgePadding = 16.dp,
+        minTabWidth = 56.dp,
+        indicator = {
+            TabRowDefaults.PrimaryIndicator(
+                modifier = Modifier
+                    .tabIndicatorOffset(
+                        selectedTabIndex = selectedTabIndex.coerceIn(0, groups.lastIndex),
+                        matchContentSize = true
+                    )
+                    .clip(RoundedCornerShape(3.dp)),
+                width = Dp.Unspecified,
+                color = colorFabActive
+            )
+        },
+        divider = {}
+    ) {
+        groups.forEachIndexed { index, group ->
+            GroupTabItem(
+                group = group,
+                selected = index == selectedTabIndex,
+                serverFlowProvider = {
+                    mainViewModel.serversForGroup(group.id)
+                },
+                onClick = { onTabClick(index) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun GroupTabItem(
+    group: GroupMapItem,
+    selected: Boolean,
+    serverFlowProvider: () -> StateFlow<List<ServersCache>>,
+    onClick: () -> Unit
+) {
+    val serverFlow = remember(group.id) {
+        serverFlowProvider()
+    }
+    val servers by serverFlow.collectAsStateWithLifecycle()
+
+    Tab(
+        selected = selected,
+        onClick = onClick,
+        text = {
+            val text = if (group.id.isEmpty()) {
+                group.remarks
+            } else {
+                "${group.remarks} (${servers.size})"
+            }
+            Text(
+                text = text,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    )
+}
+
+@Composable
+private fun GroupPagerPage(
+    groupId: String,
+    mainViewModel: MainViewModel,
+    selectedGuid: String?,
+    doubleColumnDisplay: Boolean,
+    confirmRemove: Boolean,
+    searchQuery: String,
+    lazyListStates: MutableMap<String, LazyListState>,
+    lazyGridStates: MutableMap<String, LazyGridState>,
+    onSelectServer: (String) -> Unit,
+    onEditServer: (String, ProfileItem) -> Unit,
+    onShareServer: (String, ProfileItem) -> Unit,
+    onMoreServer: (String, ProfileItem) -> Unit,
+    onRemoveServer: (String) -> Unit,
+    contentPadding: PaddingValues
+) {
+    val serverFlow = remember(groupId) {
+        mainViewModel.serversForGroup(groupId)
+    }
+    val servers by serverFlow.collectAsStateWithLifecycle()
+
+    val canReorder = groupId.isNotEmpty() && searchQuery.isEmpty()
+
+    ServerListPage(
+        servers = servers,
+        selectedGuid = selectedGuid,
+        canReorder = canReorder,
+        doubleColumnDisplay = doubleColumnDisplay,
+        subscriptionId = groupId,
+        confirmRemove = confirmRemove,
+        groupId = groupId,
+        lazyListStates = lazyListStates,
+        lazyGridStates = lazyGridStates,
+        onSelectServer = onSelectServer,
+        onEditServer = onEditServer,
+        onShareServer = onShareServer,
+        onMoreServer = onMoreServer,
+        onRemoveServer = onRemoveServer,
+        onSwapServer = mainViewModel::swapServer,
+        contentPadding = contentPadding
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -664,17 +847,14 @@ fun MainScreen(
     shareMethodMoreEntries: List<String>
 ) {
     val context = LocalContext.current
-    val groups by mainViewModel.groups.collectAsStateWithLifecycle()
-    val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
-    val isRunning by mainViewModel.isRunningFlow.collectAsStateWithLifecycle()
-    val displayText by mainViewModel.displayText.collectAsStateWithLifecycle()
-    val perGroupServers by mainViewModel.perGroupServers.collectAsStateWithLifecycle()
-    val selectedGuid by mainViewModel.selectedGuid.collectAsStateWithLifecycle()
-    val pageChangeSource by mainViewModel.pageChangeSource.collectAsStateWithLifecycle()
-
-    // Read UI settings from ViewModel's StateFlow (not a one-time snapshot)
-    val doubleColumnDisplay by mainViewModel.doubleColumnDisplay.collectAsStateWithLifecycle()
-    val confirmRemove by mainViewModel.confirmRemove.collectAsStateWithLifecycle()
+    val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
+    val groups = uiState.groups
+    val isLoading = uiState.isLoading
+    val isRunning = uiState.isRunning
+    val displayText = uiState.statusText
+    val selectedGuid = uiState.selectedGuid
+    val doubleColumnDisplay = uiState.doubleColumnDisplay
+    val confirmRemove = uiState.confirmRemove
 
     val isDarkTheme = LocalDarkTheme.current
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -692,8 +872,7 @@ fun MainScreen(
     var showQRCodeBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
     val pagerState = rememberPagerState(
-        initialPage = groups.indexOfFirst { it.id == mainViewModel.subscriptionId }
-            .takeIf { it >= 0 } ?: 0,
+        initialPage = 0,
         pageCount = { groups.size.coerceAtLeast(1) }
     )
 
@@ -716,59 +895,75 @@ fun MainScreen(
         lazyGridStates.keys.retainAll(validGroupIds)
     }
 
-    DisposableEffect(pagerState.currentPage) {
-        onDispose {
-            mainViewModel.cancelAllPing()
+    val latestDoubleColumnDisplay by rememberUpdatedState(doubleColumnDisplay)
+
+    LaunchedEffect(groups, uiState.selectedGroupId) {
+        if (groups.isEmpty()) return@LaunchedEffect
+        val selectedIndex = groups.indexOfFirst { it.id == uiState.selectedGroupId }
+            .takeIf { it >= 0 } ?: 0
+        if (!pagerState.isScrollInProgress && pagerState.settledPage != selectedIndex) {
+            pagerState.scrollToPage(selectedIndex)
         }
     }
 
-    LaunchedEffect(Unit) {
+    val latestGroups by rememberUpdatedState(groups)
+    val latestLocateInProgress by rememberUpdatedState(locateInProgress)
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }
+            .distinctUntilChanged()
+            .collect { page ->
+                val currentGroups = latestGroups
+                if (!latestLocateInProgress && page in currentGroups.indices) {
+                    onSubscriptionIdChanged(currentGroups[page].id)
+                }
+            }
+    }
+
+    LaunchedEffect(mainViewModel, pagerState) {
         mainViewModel.locateEvent.collect { target ->
+            if (target.groupIndex !in 0 until pagerState.pageCount) return@collect
+
             locateInProgress = true
             try {
-                if (pagerState.currentPage != target.groupIndex) {
-                    pagerState.animateScrollToPage(
-                        target.groupIndex,
-                        animationSpec = tween(durationMillis = 400)
+                if (pagerState.settledPage != target.groupIndex) {
+                    pagerState.navigateToPageOptimized(
+                        targetPage = target.groupIndex,
+                        animateAdjacentPage = false
                     )
                 }
-
                 onSubscriptionIdChanged(target.groupId)
-                delay(100)
 
-                if (doubleColumnDisplay) {
-                    val gridState = lazyGridStates[target.groupId]
-                    if (gridState != null) {
+                repeat(10) {
+                    val ready = if (latestDoubleColumnDisplay) {
+                        lazyGridStates[target.groupId] != null
+                    } else {
+                        lazyListStates[target.groupId] != null
+                    }
+                    if (ready) return@repeat
+                    delay(16L)
+                }
+
+                if (latestDoubleColumnDisplay) {
+                    lazyGridStates[target.groupId]?.let { gridState ->
                         gridState.scrollToItem(
-                            target.itemPosition,
-                            -gridState.layoutInfo.viewportSize.height / 3
+                            index = target.itemPosition,
+                            scrollOffset = -gridState.layoutInfo.viewportSize.height / 3
                         )
                     }
                 } else {
-                    val listState = lazyListStates[target.groupId]
-                    if (listState != null) {
+                    lazyListStates[target.groupId]?.let { listState ->
                         listState.scrollToItem(
-                            target.itemPosition,
-                            -listState.layoutInfo.viewportSize.height / 3
+                            index = target.itemPosition,
+                            scrollOffset = -listState.layoutInfo.viewportSize.height / 3
                         )
                     }
                 }
             } finally {
-                delay(200)
+                delay(32L)
                 locateInProgress = false
             }
         }
-    }
-
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.settledPage }
-            .collect { page ->
-                if (groups.isNotEmpty() && page in groups.indices && !locateInProgress) {
-                    if (pageChangeSource != MainViewModel.PageChangeSource.LOCATE) {
-                        onSubscriptionIdChanged(groups[page].id)
-                    }
-                }
-            }
     }
 
     MainDialogs(
@@ -790,8 +985,7 @@ fun MainScreen(
         val (guid, profile, more) = shareTarget!!
         val isCustom = profile.configType.isComplexType()
         val (shareOptions, skip) = if (more) {
-            val options =
-                if (isCustom) shareMethodMoreEntries.takeLast(3) else shareMethodMoreEntries
+            val options = if (isCustom) shareMethodMoreEntries.takeLast(3) else shareMethodMoreEntries
             options to if (isCustom) 2 else 0
         } else {
             val options = if (isCustom) shareMethodEntries.takeLast(1) else shareMethodEntries
@@ -1090,83 +1284,45 @@ fun MainScreen(
             floatingActionButton = {},
         ) { innerPadding ->
             val layoutDirection = LocalLayoutDirection.current
-            val topPadding = innerPadding.calculateTopPadding()
-            val startPadding = innerPadding.calculateStartPadding(layoutDirection)
-            val endPadding = innerPadding.calculateEndPadding(layoutDirection)
 
-            Column(modifier = Modifier.fillMaxSize()) {
-                if (groups.size > 1) {
-                    PrimaryScrollableTabRow(
-                        selectedTabIndex = pagerState.currentPage.coerceIn(
-                            0, (groups.size - 1).coerceAtLeast(0)
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = topPadding),
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.onSurface,
-                        edgePadding = 0.dp,
-                        minTabWidth = 56.dp,
-                        indicator = {
-                            TabRowDefaults.PrimaryIndicator(
-                                modifier = Modifier.tabIndicatorOffset(
-                                    selectedTabIndex = pagerState.currentPage,
-                                    matchContentSize = true
-                                )
-                                    .clip(RoundedCornerShape(3.dp)),
-                                width = Dp.Unspecified,
-                                color = colorFabActive
-                            )
-                        },
-                        divider = { }
-                    ) {
-                        groups.forEachIndexed { index, group ->
-                            Tab(
-                                selected = pagerState.currentPage == index,
-                                onClick = {
-                                    scope.launch { pagerState.animateScrollToPage(index) }
-                                },
-                                text = {
-                                    val count = perGroupServers[group.id]?.size ?: 0
-                                    if (group.id.isEmpty()) {
-                                        Text(group.remarks)
-                                    } else {
-                                        Text("${group.remarks} ($count)")
-                                    }
+            if (groups.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) {
+                    if (groups.size > 1) {
+                        GroupTabBar(
+                            groups = groups,
+                            selectedTabIndex = pagerState.currentPage.coerceIn(0, groups.lastIndex),
+                            mainViewModel = mainViewModel,
+                            onTabClick = { targetIndex ->
+                                scope.launch {
+                                    pagerState.navigateToPageOptimized(
+                                        targetPage = targetIndex,
+                                        animateAdjacentPage = true
+                                    )
                                 }
-                            )
-                        }
+                            }
+                        )
                     }
-                }
 
-                if (groups.isNotEmpty()) {
                     HorizontalPager(
                         state = pagerState,
                         modifier = Modifier.fillMaxSize(),
                         userScrollEnabled = true,
-                        beyondViewportPageCount = 0,
-                        key = { page -> groups.getOrNull(page)?.id ?: page.toString() },
-                        flingBehavior = PagerDefaults.flingBehavior(
-                            state = pagerState,
-                            snapAnimationSpec = spring(
-                                dampingRatio = 0.9f,
-                                stiffness = 400f
-                            ),
-                            snapPositionalThreshold = 0.35f
-                        )
+                        beyondViewportPageCount = 1,
+                        key = { page -> groups.getOrNull(page)?.id ?: "group-page-$page" }
                     ) { page ->
-                        val groupId = groups.getOrNull(page)?.id ?: ""
-                        val servers = perGroupServers[groupId] ?: emptyList()
-                        val canReorder = groupId.isNotEmpty() && searchQuery.isEmpty()
+                        val group = groups.getOrNull(page) ?: return@HorizontalPager
 
-                        ServerListPage(
-                            servers = servers,
+                        GroupPagerPage(
+                            groupId = group.id,
+                            mainViewModel = mainViewModel,
                             selectedGuid = selectedGuid,
-                            canReorder = canReorder,
                             doubleColumnDisplay = doubleColumnDisplay,
-                            subscriptionId = groupId,
                             confirmRemove = confirmRemove,
-                            groupId = groupId,
+                            searchQuery = searchQuery,
                             lazyListStates = lazyListStates,
                             lazyGridStates = lazyGridStates,
                             onSelectServer = onSelectServer,
@@ -1181,11 +1337,10 @@ fun MainScreen(
                                 if (confirmRemove) showRemoveConfirm = guid
                                 else onRemoveServer(guid)
                             },
-                            onSwapServer = mainViewModel::swapServer,
                             contentPadding = PaddingValues(
-                                start = startPadding,
-                                top = if (groups.size > 1) 0.dp else topPadding,
-                                end = endPadding,
+                                start = 0.dp,
+                                top = 0.dp,
+                                end = 0.dp,
                                 bottom = 80.dp
                             )
                         )
