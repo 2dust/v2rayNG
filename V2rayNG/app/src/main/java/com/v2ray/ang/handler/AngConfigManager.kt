@@ -18,6 +18,7 @@ import com.v2ray.ang.fmt.Hysteria2Fmt
 import com.v2ray.ang.fmt.ShadowsocksFmt
 import com.v2ray.ang.fmt.SocksFmt
 import com.v2ray.ang.fmt.TrojanFmt
+import com.v2ray.ang.fmt.V2rayNFmt
 import com.v2ray.ang.fmt.VlessFmt
 import com.v2ray.ang.fmt.VmessFmt
 import com.v2ray.ang.fmt.WireguardFmt
@@ -42,7 +43,8 @@ object AngConfigManager {
             EConfigType.VLESS.protocolScheme to VlessFmt::parse,
             EConfigType.WIREGUARD.protocolScheme to WireguardFmt::parse,
             EConfigType.HYSTERIA2.protocolScheme to Hysteria2Fmt::parse,
-            AppConfig.HY2 to Hysteria2Fmt::parse
+            AppConfig.HY2 to Hysteria2Fmt::parse,
+            AppConfig.V2RAYNFMTS to V2rayNFmt::parse
         )
     }
 
@@ -493,6 +495,11 @@ object AngConfigManager {
 
             config.subscriptionId = subid
             config.description = generateDescription(config)
+
+            if (str.startsWith(AppConfig.V2RAYNFMTS, ignoreCase = true)
+                && config.policyGroupSubscriptionId == "self") {
+                config.policyGroupSubscriptionId = subid
+            }
 
             return config
         } catch (e: Exception) {
