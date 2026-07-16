@@ -1,5 +1,11 @@
 package com.v2ray.ang.handler
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
@@ -14,6 +20,9 @@ import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.dto.entities.WebDavConfig
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 
 object MmkvManager {
 
@@ -719,6 +728,58 @@ object MmkvManager {
     fun decodeWebDavConfig(): WebDavConfig? {
         val json = mainStorage.decodeString(KEY_WEBDAV_CONFIG) ?: return null
         return JsonUtil.fromJsonSafe(json, WebDavConfig::class.java)
+    }
+
+    //endregion
+
+    //region Compose helpers for Settings
+
+    /**
+     * MMKV-backed String state, auto-persists and notifies on change.
+     */
+    @Composable
+    fun rememberMmkvString(
+        key: String,
+        default: String = ""
+    ): MutableState<String> {
+        val state = remember(key) {
+            mutableStateOf(decodeSettingsString(key, default) ?: default)
+        }
+
+        LaunchedEffect(key) {
+            snapshotFlow { state.value }
+                .drop(1)
+                .distinctUntilChanged()
+                .collectLatest { value ->
+                    encodeSettings(key, value)
+                    SettingsChangeManager.notifySettingChanged(key)
+                }
+        }
+        return state
+    }
+
+    /**
+     * MMKV-backed Boolean state, auto-persists and notifies on change.
+     */
+    @Composable
+    fun rememberMmkvBool(
+        key: String,
+        default: Boolean = false
+    ): MutableState<Boolean> {
+        val state = remember(key) {
+            mutableStateOf(decodeSettingsBool(key, default))
+        }
+
+        LaunchedEffect(key) {
+            snapshotFlow { state.value }
+                .drop(1)
+                .distinctUntilChanged()
+                .collectLatest { value ->
+                    encodeSettings(key, value)
+                    SettingsChangeManager.notifySettingChanged(key)
+                }
+        }
+        return state
     }
 
     //endregion

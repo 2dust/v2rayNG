@@ -250,7 +250,7 @@
     <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موسقیمن ز (مۊرۊرگر/ی قرد ز برنومه یل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
 
     <string name="title_pref_double_column_display">ره وندن نشووݩ داڌن دو سۊتۊنی</string>
-    <string name="summary_pref_double_column_display">نومگه نمایه یل من دو سۊتۊن نشووݩ داڌه ابۊن وو چینوو ترین موئتوا بیشتری ن سیل کۊنین.\nسی ره وستن، وا برنومه ن ز نۊ ره ونین.</string>
+    <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen.</string>
 
     <string name="title_pref_group_all_display">نشووݩ داڌن پوی بونکۊ یل ن ره ونین</string>
     <string name="summary_pref_group_all_display">ی بلگه «پوی بونکۊ یل کانفیگ» ازاف کۊنین</string>
@@ -318,6 +318,7 @@
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>
     <string name="filter_config_all">پوی</string>
     <string name="title_del_duplicate_config_count">پاک کردن %d کانفیگ تکراری</string>
+    <string name="summary_scan_qrcode">Click screen open the camera scan</string>
 
     <string name="title_del_config_count">پاک کردن %d کانفیگ</string>
     <string name="title_import_config_count">و من ٱووردن %d کانفیگ</string>

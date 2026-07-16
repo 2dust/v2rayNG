@@ -3,10 +3,10 @@ package com.v2ray.ang.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.databinding.ActivityLogcatBinding
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AngConfigManager
@@ -16,13 +16,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.URLDecoder
 
-class UrlSchemeActivity : BaseActivity() {
-    private val binding by lazy { ActivityLogcatBinding.inflate(layoutInflater) }
+class UrlSchemeActivity : BaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-
         try {
             intent.apply {
                 if (action == Intent.ACTION_SEND) {
@@ -57,6 +53,10 @@ class UrlSchemeActivity : BaseActivity() {
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Error processing URL scheme", e)
         }
+    }
+
+    @Composable
+    override fun ScreenContent() {
     }
 
     private fun parseUri(uriString: String?, fragment: String?) {

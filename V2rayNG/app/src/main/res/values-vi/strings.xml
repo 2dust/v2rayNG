@@ -250,7 +250,7 @@
     <string name="summary_pref_append_http_proxy">HTTP proxy will be used directly from (browser/ some supported apps), without going through the virtual NIC device (Android 10+)</string>
 
     <string name="title_pref_double_column_display">Enable double column display</string>
-    <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen. You need to restart the application to take effect.</string>
+    <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen.</string>
 
     <string name="title_pref_group_all_display">Enable show all groups</string>
     <string name="summary_pref_group_all_display">Add an extra "All Tabs" page</string>
@@ -312,6 +312,7 @@
     <string name="title_filter_config">Lọc cấu hình theo các gói đăng ký</string>
     <string name="filter_config_all">All</string>
     <string name="title_del_duplicate_config_count">Xoá %d cấu hình trùng lặp</string>
+    <string name="summary_scan_qrcode">Click screen open the camera scan</string>
 
     <string name="title_del_config_count">Delete %d configurations</string>
     <string name="title_import_config_count">Import %d configurations</string>
