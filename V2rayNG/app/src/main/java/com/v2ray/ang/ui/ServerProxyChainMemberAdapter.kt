@@ -31,7 +31,6 @@ class ServerProxyChainMemberAdapter(
     }
 
     override fun onBindViewHolder(holder: MemberViewHolder, position: Int) {
-        val adapterPos = holder.bindingAdapterPosition.takeIf { it != RecyclerView.NO_POSITION } ?: position
         val value = members[position]
         holder.binding.tvMemberIndex.text = (position + 1).toString()
 
@@ -44,17 +43,20 @@ class ServerProxyChainMemberAdapter(
         holder.binding.spMemberRemark.threshold = 0
         holder.binding.spMemberRemark.setText(value, false)
 
-        holder.binding.spMemberRemark.setOnItemClickListener { _, _, selectedIndex, _ ->
-            if (adapterPos in members.indices) {
-                members[adapterPos] = suggestions[selectedIndex].trim()
+        holder.binding.spMemberRemark.setOnItemClickListener { parent, _, selectedIndex, _ ->
+            val currentPos = holder.bindingAdapterPosition
+            val selectedValue = parent.getItemAtPosition(selectedIndex) as? String ?: return@setOnItemClickListener
+            if (currentPos != RecyclerView.NO_POSITION && currentPos in members.indices) {
+                members[currentPos] = selectedValue.trim()
                 adapterListener?.onRefreshData()
             }
         }
         holder.binding.spMemberRemark.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) return@OnFocusChangeListener
+            val currentPos = holder.bindingAdapterPosition
             val text = holder.binding.spMemberRemark.text?.toString().orEmpty().trim()
-            if (adapterPos in members.indices && members[adapterPos] != text) {
-                members[adapterPos] = text
+            if (currentPos != RecyclerView.NO_POSITION && currentPos in members.indices && members[currentPos] != text) {
+                members[currentPos] = text
                 adapterListener?.onRefreshData()
             }
         }
