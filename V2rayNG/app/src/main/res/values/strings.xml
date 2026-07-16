@@ -413,6 +413,12 @@
     <string name="title_webdav_user">Username</string>
     <string name="title_webdav_pass">Password</string>
     <string name="title_webdav_remote_path">Remote directory (optional)</string>
+    <string name="backup_downloads_folder_not_found">Downloads folder not found</string>
+    <string name="backup_no_files_found">No backup files found in Downloads folder</string>
+    <string name="backup_delete_old">Delete old backups</string>
+    <string name="backup_select_to_delete">Select backups to delete</string>
+    <string name="backup_deleted_count">Deleted %d backup(s)</string>
+    <string name="backup_delete_button">Delete</string>
 
     <string-array name="share_method">
         <item>QRcode</item>

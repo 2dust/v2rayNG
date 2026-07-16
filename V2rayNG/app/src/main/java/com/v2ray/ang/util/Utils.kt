@@ -1,9 +1,11 @@
 package com.v2ray.ang.util
 
+import android.app.UiModeManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.os.Build
@@ -611,5 +613,16 @@ object Utils {
             LogUtil.e(AppConfig.TAG, "Failed to format timestamp", e)
             ""
         }
+    }
+
+    /**
+     * Check if the app is running on Android TV.
+     *
+     * @param context The context to use.
+     * @return True if running on Android TV, false otherwise.
+     */
+    fun isAndroidTv(context: Context): Boolean {
+        val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as? UiModeManager
+        return uiModeManager?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
     }
 }

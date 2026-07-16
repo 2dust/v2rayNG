@@ -406,6 +406,12 @@
     <string name="title_webdav_user">使用者名稱</string>
     <string name="title_webdav_pass">密碼</string>
     <string name="title_webdav_remote_path">遠端目錄（可選）</string>
+    <string name="backup_downloads_folder_not_found">找不到下載資料夾</string>
+    <string name="backup_no_files_found">下載資料夾中找不到備份檔案</string>
+    <string name="backup_delete_old">刪除舊備份</string>
+    <string name="backup_select_to_delete">選擇要刪除的備份</string>
+    <string name="backup_deleted_count">已刪除 %d 個備份</string>
+    <string name="backup_delete_button">刪除</string>
 
     <string-array name="share_method">
         <item>二維碼</item>

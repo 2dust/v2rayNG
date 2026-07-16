@@ -410,6 +410,12 @@
     <string name="title_webdav_user">Пользователь</string>
     <string name="title_webdav_pass">Пароль</string>
     <string name="title_webdav_remote_path">Удалённый путь (необязательно)</string>
+    <string name="backup_downloads_folder_not_found">Папка Загрузки не найдена</string>
+    <string name="backup_no_files_found">Файлы резервных копий не найдены в папке Загрузки</string>
+    <string name="backup_delete_old">Удалить старые копии</string>
+    <string name="backup_select_to_delete">Выберите резервные копии для удаления</string>
+    <string name="backup_deleted_count">Удалено копий: %d</string>
+    <string name="backup_delete_button">Удалить</string>
 
     <string-array name="share_method">
         <item>QR-код</item>

@@ -46,7 +46,29 @@ object WebDavManager {
     suspend fun uploadFile(localFile: File, remoteFileName: String): Boolean = withContext(Dispatchers.IO) {
         val remote = buildRemoteUrl(remoteFileName)
         try {
-            val cl = client ?: return@withContext false
+            val cl = client ?: run {
+                LogUtil.e(AppConfig.TAG, "WebDAV upload failed: client not initialized")
+                return@withContext false
+            }
+
+            // Validate local file
+            if (!localFile.exists()) {
+                LogUtil.e(AppConfig.TAG, "WebDAV upload failed: local file does not exist: ${localFile.absolutePath}")
+                return@withContext false
+            }
+
+            if (!localFile.canRead()) {
+                LogUtil.e(AppConfig.TAG, "WebDAV upload failed: cannot read local file: ${localFile.absolutePath}")
+                return@withContext false
+            }
+
+            val fileSize = localFile.length()
+            if (fileSize == 0L) {
+                LogUtil.e(AppConfig.TAG, "WebDAV upload failed: local file is empty (0 bytes): ${localFile.absolutePath}")
+                return@withContext false
+            }
+
+            LogUtil.i(AppConfig.TAG, "WebDAV upload starting: ${localFile.absolutePath} ($fileSize bytes) -> $remote")
 
             // Ensure parent directories exist
             val dirPath = remote.substringBeforeLast('/')
@@ -67,9 +89,9 @@ object WebDavManager {
             cl.newCall(req).execute().use { resp ->
                 val success = resp.isSuccessful
                 if (success) {
-                    LogUtil.i(AppConfig.TAG, "WebDAV upload success: $remote")
+                    LogUtil.i(AppConfig.TAG, "WebDAV upload success: $remote ($fileSize bytes)")
                 } else {
-                    LogUtil.e(AppConfig.TAG, "WebDAV upload failed: $remote (HTTP ${resp.code})")
+                    LogUtil.e(AppConfig.TAG, "WebDAV upload failed: $remote (HTTP ${resp.code}) - ${resp.message}")
                 }
                 return@withContext success
             }

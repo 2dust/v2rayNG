@@ -23,6 +23,11 @@ enum class PermissionType {
     ACCESS_LOCAL_NETWORK {
         @RequiresApi(Build.VERSION_CODES.CINNAMON_BUN)
         override fun getPermission(): String = Manifest.permission.ACCESS_LOCAL_NETWORK
+    },
+
+    /** External storage write permission (Android 12 and below) */
+    WRITE_EXTERNAL_STORAGE {
+        override fun getPermission(): String = Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
     /** Return the actual Android permission string */
@@ -34,6 +39,7 @@ enum class PermissionType {
             CAMERA -> "Camera"
             POST_NOTIFICATIONS -> "Notification"
             ACCESS_LOCAL_NETWORK -> "Local Network"
+            WRITE_EXTERNAL_STORAGE -> "Storage"
         }
     }
 }

@@ -404,10 +404,16 @@
     <string name="title_configuration_share">分享配置</string>
     <string name="title_webdav_config_setting">WebDAV 设置</string>
     <string name="title_webdav_config_setting_unknown">请先设置 WebDAV</string>
-    <string name="title_webdav_url">WebDAV 服务器地址</string>WebDAV server address
+    <string name="title_webdav_url">WebDAV 服务器地址</string>
     <string name="title_webdav_user">用户名</string>
     <string name="title_webdav_pass">密码</string>
     <string name="title_webdav_remote_path">远程文件夹名（可选）</string>
+    <string name="backup_downloads_folder_not_found">未找到下载文件夹</string>
+    <string name="backup_no_files_found">下载文件夹中未找到备份文件</string>
+    <string name="backup_delete_old">删除旧备份</string>
+    <string name="backup_select_to_delete">选择要删除的备份</string>
+    <string name="backup_deleted_count">已删除 %d 个备份</string>
+    <string name="backup_delete_button">删除</string>
 
     <string-array name="share_method">
         <item>二维码</item>
