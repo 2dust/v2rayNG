@@ -1,21 +1,26 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
-import com.v2ray.ang.R
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import com.v2ray.ang.core.CoreServiceManager
 
-class ScSwitchActivity : BaseActivity() {
+class ScSwitchActivity : BaseComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        moveTaskToBack(true)
+    }
 
-        setContentView(R.layout.activity_none)
-
-        if (CoreServiceManager.isRunning()) {
-            CoreServiceManager.stopVService(this)
-        } else {
-            CoreServiceManager.startVServiceFromToggle(this)
+    @Composable
+    override fun ScreenContent() {
+        LaunchedEffect(Unit) {
+            moveTaskToBack(true)
+            if (CoreServiceManager.isRunning()) {
+                CoreServiceManager.stopVService(this@ScSwitchActivity)
+            } else {
+                CoreServiceManager.startVServiceFromToggle(this@ScSwitchActivity)
+            }
+            finish()
         }
-        finish()
     }
 }

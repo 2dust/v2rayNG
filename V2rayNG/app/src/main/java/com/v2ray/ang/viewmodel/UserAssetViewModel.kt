@@ -10,11 +10,17 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.io.File
 
 class UserAssetViewModel : ViewModel() {
     private val assets = mutableListOf<AssetUrlCache>()
     private val builtInGeoFiles = listOf(AppConfig.GEOSITE_DAT, AppConfig.GEOIP_DAT, AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT)
+
+    private val _assetsFlow = MutableStateFlow<List<AssetUrlCache>>(emptyList())
+    val assetsFlow: StateFlow<List<AssetUrlCache>> = _assetsFlow.asStateFlow()
 
     val itemCount: Int
         get() = assets.size
@@ -27,6 +33,7 @@ class UserAssetViewModel : ViewModel() {
         val decoded = MmkvManager.decodeAssetUrls()
         assets.clear()
         assets.addAll(buildAssetList(decoded, geoFilesSource))
+        _assetsFlow.value = assets.toList()
     }
 
     private fun buildAssetList(

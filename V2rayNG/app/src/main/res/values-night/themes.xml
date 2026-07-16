@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-
-    <!-- Night theme: inherit the shared AppThemeBase and only override night-specific items -->
-    <style name="AppThemeDayNight" parent="AppThemeBase">
-        <!-- Night mode specific overrides -->
+<resources>
+    <!-- Night theme: override window background and status bar flags for dark mode -->
+    <style name="AppThemeBase" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowBackground">@color/window_background_dark</item>
     </style>
 
+    <style name="AppThemeDayNight" parent="AppThemeBase" />
+
+    <style name="AppThemeDayNight.NoActionBar" parent="AppThemeBase" />
+
+    <style name="AppThemeDayNight.NoActionBar.Translucent" parent="AppThemeBase">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
 </resources>

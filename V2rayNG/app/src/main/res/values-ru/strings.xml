@@ -256,7 +256,7 @@
     <string name="summary_pref_append_http_proxy">HTTP-прокси будет использоваться напрямую (из браузера и других поддерживающих приложений), минуя виртуальный сетевой адаптер (Android 10+)</string>
 
     <string name="title_pref_double_column_display">Профили в два столбца</string>
-    <string name="summary_pref_double_column_display">Список профилей отображается двумя столбцами, что позволяет показать больше информации на экране. Требуется перезапуск приложения.</string>
+    <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen.</string>
 
     <string name="title_pref_group_all_display">Общая вкладка групп</string>
     <string name="summary_pref_group_all_display">Показывать дополнительную вкладку со всеми профилями групп</string>
@@ -325,6 +325,7 @@
     <string name="title_filter_config">Фильтр профилей</string>
     <string name="filter_config_all">Все</string>
     <string name="title_del_duplicate_config_count">Удалено дубликатов профилей: %d</string>
+    <string name="summary_scan_qrcode">Click screen open the camera scan</string>
     <string name="title_del_config_count">Удалено профилей: %d</string>
     <string name="title_import_config_count">Импортировано профилей: %d</string>
     <string name="title_export_config_count">Экспортировано профилей: %d</string>

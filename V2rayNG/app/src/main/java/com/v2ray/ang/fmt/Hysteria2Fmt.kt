@@ -36,9 +36,6 @@ object Hysteria2Fmt : FmtBase() {
             config.security = queryParam["security"] ?: AppConfig.TLS
             config.obfsPassword = queryParam["obfs-password"]
             config.portHopping = queryParam["mport"]
-            if (config.portHopping.isNotNullEmpty()) {
-                config.portHoppingInterval = queryParam["mportHopInt"]
-            }
             config.pinnedCA256 = queryParam["pinSHA256"]
 
         }
@@ -66,39 +63,6 @@ object Hysteria2Fmt : FmtBase() {
         }
         if (config.portHopping.isNotNullEmpty()) {
             dicQuery["mport"] = config.portHopping.orEmpty()
-        }
-        if (config.portHoppingInterval.isNotNullEmpty()) {
-            val rawInterval = config.portHoppingInterval?.trim().nullIfBlank()
-            val interval = if (rawInterval == null) {
-                null
-            } else {
-                val singleValue = rawInterval.toIntOrNull()
-                if (singleValue != null) {
-                    if (singleValue < 5) {
-                        null
-                    } else {
-                        rawInterval
-                    }
-                } else {
-                    val parts = rawInterval.split('-')
-                    if (parts.size == 2) {
-                        val start = parts[0].trim().toIntOrNull()
-                        val end = parts[1].trim().toIntOrNull()
-                        if (start != null && end != null) {
-                            val minStart = maxOf(5, start)
-                            val minEnd = maxOf(minStart, end)
-                            (minStart + minEnd) / 2
-                        } else {
-                            null
-                        }
-                    } else {
-                        null
-                    }
-                }
-            }
-            if (interval != null) {
-                dicQuery["mportHopInt"] = interval.toString()
-            }
         }
         if (config.pinnedCA256.isNotNullEmpty()) {
             dicQuery["pinSHA256"] = config.pinnedCA256.orEmpty()

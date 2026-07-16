@@ -250,7 +250,7 @@
     <string name="summary_pref_append_http_proxy">瀏覽器 / 一些支援的應用 將直接使用 HTTP 代理, 而不經過虛擬網卡設備 (Android 10+)</string>
 
     <string name="title_pref_double_column_display">啟用雙列顯示</string>
-    <string name="summary_pref_double_column_display">設定檔清單以雙列顯示，允許在螢幕上顯示更多內容。需要重啟應用生效。</string>
+    <string name="summary_pref_double_column_display">設定檔清單以雙列顯示，允許在螢幕上顯示更多內容。</string>
 
     <string name="title_pref_group_all_display">啟用顯示所有群組</string>
     <string name="summary_pref_group_all_display">新增一個額外的「所有選項卡」頁面</string>
@@ -319,6 +319,7 @@
     <string name="title_sort_by_test_results">依偵測結果排序</string>
     <string name="title_filter_config">過濾設定</string>
     <string name="filter_config_all">所有</string>
+    <string name="summary_scan_qrcode">點擊熒幕打開相機掃描</string>
     <string name="title_del_duplicate_config_count">刪除 %d 個重複配置</string>
     <string name="title_del_config_count">刪除 %d 個配置</string>
     <string name="title_import_config_count">匯入 %d 個配置</string>
