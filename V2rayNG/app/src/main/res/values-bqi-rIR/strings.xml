@@ -375,6 +375,14 @@
     <string name="title_pref_fragment_interval">فاسله منجا کتنا فرگمنت (هدقل-هدکسر)</string>
     <string name="title_pref_fragment_enabled">ره وندن فرگمنت</string>
     <string name="title_pref_fragment_maxsplit">هدکسر تقسیم فرگمنت</string>
+    <string name="title_observatory_settings">سامووا واجۊری منپیز</string>
+    <string name="title_pref_observatory_least_ping_interval">فاسله leastPing</string>
+    <string name="title_pref_observatory_least_load_interval">فاسله leastLoad</string>
+    <string name="title_pref_observatory_least_load_method">روش HTTP سی leastLoad</string>
+    <string name="title_pref_observatory_least_load_sampling">نمونه گیری leastLoad</string>
+    <string name="title_pref_observatory_least_load_timeout">مهلت leastLoad</string>
+    <string name="toast_invalid_observatory_duration">زما نادروسته. یه ارزشی وری 3m یا 30s بکار ببرین.</string>
+    <string name="toast_invalid_observatory_sampling">نمونه گیری نادروسته. یه شماره مثبت بکار ببرین.</string>
 
     <string name="update_check_for_update">واجۊری سی ورۊ رسۊوی</string>
     <string name="update_already_latest_version">سکو نوسخه دیندایی پۊرنیڌه هڌ</string>

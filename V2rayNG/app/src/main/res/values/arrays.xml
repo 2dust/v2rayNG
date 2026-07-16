@@ -70,6 +70,16 @@
         <item>1-5</item>
     </string-array>
 
+    <string-array name="observatory_least_load_method" translatable="false">
+        <item>HEAD</item>
+        <item>GET</item>
+    </string-array>
+
+    <string-array name="observatory_least_load_method_value" translatable="false">
+        <item>HEAD</item>
+        <item>GET</item>
+    </string-array>
+
     <string-array name="streamsecurity_utls" translatable="false">
         <item />
         <item>chrome</item>

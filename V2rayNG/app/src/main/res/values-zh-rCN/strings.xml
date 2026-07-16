@@ -380,6 +380,14 @@
     <string name="title_pref_fragment_interval">分片间隔（最小 - 最大）</string>
     <string name="title_pref_fragment_enabled">启用分片（Fragment）</string>
     <string name="title_pref_fragment_maxsplit">分片最大分割数</string>
+    <string name="title_observatory_settings">连接观测设置</string>
+    <string name="title_pref_observatory_least_ping_interval">leastPing 探测间隔</string>
+    <string name="title_pref_observatory_least_load_interval">leastLoad 探测间隔</string>
+    <string name="title_pref_observatory_least_load_method">leastLoad HTTP 方法</string>
+    <string name="title_pref_observatory_least_load_sampling">leastLoad 采样数量</string>
+    <string name="title_pref_observatory_least_load_timeout">leastLoad 探测超时</string>
+    <string name="toast_invalid_observatory_duration">时间格式无效。请使用类似 3m 或 30s 的值。</string>
+    <string name="toast_invalid_observatory_sampling">采样数量无效。请使用正数。</string>
 
     <string name="update_check_for_update">检查更新</string>
     <string name="update_already_latest_version">目前已是最新版本</string>
