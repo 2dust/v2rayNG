@@ -71,7 +71,7 @@ fun CheckUpdateScreen(onBackClick: () -> Unit) {
     val versionText = "v${BuildConfig.VERSION_NAME} (${CoreNativeManager.getLibVersion()})"
 
     fun checkForUpdates(includePreRelease: Boolean) {
-        snackbar.show(context.getString(R.string.update_checking_for_update))
+        snackbar.showInfo(context, (R.string.update_checking_for_update))
         isLoading = true
         scope.launch {
             try {
@@ -80,17 +80,15 @@ fun CheckUpdateScreen(onBackClick: () -> Unit) {
                     updateResult = result
                     showUpdateDialog = true
                 } else {
-                    snackbar.show(
-                        message = context.getString(R.string.update_already_latest_version),
-                        type = ToastType.SUCCESS
-                    )
+                    snackbar.showSuccess(context, R.string.update_already_latest_version)
                 }
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to check for updates: ${e.message}")
-                snackbar.show(
-                    message = e.message ?: context.getString(R.string.toast_failure),
-                    type = ToastType.ERROR
-                )
+                if (e.message == null) {
+                    snackbar.showError(context, R.string.toast_failure)
+                } else {
+                    snackbar.showError(e.message.orEmpty())
+                }
             } finally {
                 isLoading = false
             }

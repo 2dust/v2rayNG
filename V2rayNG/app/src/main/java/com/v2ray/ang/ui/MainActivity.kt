@@ -1148,7 +1148,7 @@ fun MainScreen(
                         if (!showSearch) {
                             IconButton(onClick = { showSearch = true }) {
                                 Icon(
-                                    painterResource(R.drawable.ic_outline_filter_alt_24),
+                                    painterResource(R.drawable.ic_search_24dp),
                                     contentDescription = "filter"
                                 )
                             }

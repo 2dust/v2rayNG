@@ -1,5 +1,7 @@
 package com.v2ray.ang.compose
 
+import android.content.Context
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,7 +9,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -91,11 +92,7 @@ class AppSnackbarController(
     val hostState: SnackbarHostState,
     private val scope: CoroutineScope,
 ) {
-    fun show(
-        message: CharSequence,
-        type: ToastType = ToastType.NORMAL,
-        long: Boolean = false,
-    ) {
+    fun show(message: CharSequence, type: ToastType = ToastType.NORMAL, long: Boolean = false, ) {
         scope.launch {
             hostState.currentSnackbarData?.dismiss()
             hostState.showSnackbar(
@@ -105,6 +102,33 @@ class AppSnackbarController(
                 withDismissAction = false,
             )
         }
+    }
+
+    fun showInfo(context: Context, @StringRes messageRes: Int, long: Boolean = false, ) {
+        show(context.getString(messageRes), ToastType.NORMAL, long)
+    }
+
+
+    fun showInfo(message: CharSequence, long: Boolean = false, ) {
+        show(message, ToastType.NORMAL, long)
+    }
+
+
+    fun showSuccess(context: Context, @StringRes messageRes: Int, long: Boolean = false, ) {
+        show(context.getString(messageRes), ToastType.SUCCESS, long)
+    }
+
+
+    fun showSuccess(message: CharSequence, long: Boolean = false, ) {
+        show(message, ToastType.SUCCESS, long)
+    }
+
+    fun showError(context: Context, @StringRes messageRes: Int, long: Boolean = false, ) {
+        show(context.getString(messageRes), ToastType.ERROR, long)
+    }
+
+    fun showError(message: CharSequence, long: Boolean = false, ) {
+        show(message, ToastType.ERROR, long)
     }
 }
 

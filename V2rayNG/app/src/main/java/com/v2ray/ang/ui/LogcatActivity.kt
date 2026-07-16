@@ -137,7 +137,7 @@ fun LogcatScreen(
 
     val snackbar = LocalAppSnackbar.current
     LaunchedEffect(Unit) {
-        snackbar.show(context.getString(R.string.pull_down_to_refresh))
+        snackbar.showInfo(context,R.string.pull_down_to_refresh)
     }
     val listState = rememberLazyListState()
 
@@ -163,7 +163,7 @@ fun LogcatScreen(
                     if (!showSearch) {
                         IconButton(onClick = { showSearch = true }) {
                             Icon(
-                                painterResource(R.drawable.ic_outline_filter_alt_24),
+                                painterResource(R.drawable.ic_search_24dp),
                                 contentDescription = "filter"
                             )
                         }
@@ -179,7 +179,7 @@ fun LogcatScreen(
                     IconButton(onClick = {
                         val all = viewModel.filteredLogs.value.joinToString("\n")
                         Utils.setClipboard(context, all)
-                        context.toast(context.getString(R.string.toast_success))
+                        snackbar.showInfo(context,R.string.toast_success)
                     }) {
                         Icon(
                             painterResource(R.drawable.ic_copy),
