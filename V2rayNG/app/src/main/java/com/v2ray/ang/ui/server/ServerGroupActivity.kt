@@ -66,17 +66,17 @@ class ServerGroupActivity : BaseComponentActivity() {
 
         val config = MmkvManager.decodeServerConfig(editGuid)
         populateSubscriptionSpinner()
-        fallbackSuggestions = buildPolicyGroupFallbackSuggestions(
-            SettingsManager.getProfileRemarks(
+        fallbackSuggestions = (
+            BUILTIN_OUTBOUND_TAGS + SettingsManager.getProfileRemarks(
                 excludeConfigTypes = setOf(EConfigType.CUSTOM, EConfigType.POLICYGROUP)
             )
-        )
+        ).filter { it != TAG_PROXY }
 
         initialRemarks = config?.remarks ?: ""
         initialFilter = config?.policyGroupFilter ?: ""
         initialType = config?.policyGroupType?.toIntOrNull() ?: 0
-        initialTestOutbounds = config?.policyGroupTestOutbounds
-            ?: BalancerStrategyType.from(config?.policyGroupType).supportsObservatory
+        initialTestOutbounds = config == null || config.policyGroupTestOutbounds != false ||
+                !BalancerStrategyType.from(config.policyGroupType).supportsObservatory
         initialFallbackTag = config?.policyGroupFallbackTag.orEmpty()
         initialSubIndex = if (config != null) {
             subIds.indexOf(config.policyGroupSubscriptionId ?: "").let { if (it >= 0) it else 0 }
@@ -128,8 +128,7 @@ class ServerGroupActivity : BaseComponentActivity() {
         config.policyGroupType = typeIdx.toString()
         config.policyGroupSubscriptionId =
             subIds.getOrNull(subIdx)
-        val strategyType = BalancerStrategyType.from(config.policyGroupType)
-        config.policyGroupTestOutbounds = testOutbounds.takeIf { strategyType.supportsObservatory }
+        config.policyGroupTestOutbounds = testOutbounds
         config.policyGroupFallbackTag = fallbackTag.trim().takeIf { it.isNotEmpty() }
 
         if (
@@ -208,11 +207,6 @@ class ServerGroupActivity : BaseComponentActivity() {
         resources.getStringArray(R.array.policy_group_type)
 }
 
-internal fun buildPolicyGroupFallbackSuggestions(profileRemarks: List<String>): List<String> =
-    (BUILTIN_OUTBOUND_TAGS + profileRemarks)
-        .filterNot { it == TAG_PROXY }
-        .distinct()
-
 @Composable
 fun ServerGroupScreen(
     editGuid: String,
@@ -279,13 +273,7 @@ fun ServerGroupScreen(
                 label = stringResource(R.string.title_policy_group_type),
                 value = typeValue,
                 options = typeEntries,
-                onValueChange = { newTypeValue ->
-                    val newType = typeEntries.indexOf(newTypeValue).coerceAtLeast(0).toString()
-                    if (!supportsObservatory && BalancerStrategyType.from(newType).supportsObservatory) {
-                        testOutbounds = true
-                    }
-                    typeValue = newTypeValue
-                }
+                onValueChange = { typeValue = it }
             )
             FormDropdownField(
                 label = stringResource(R.string.title_policy_group_subscription_id),

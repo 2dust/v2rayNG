@@ -45,7 +45,17 @@ object CoreConfigContextBuilder {
         // Step 2: Resolve all non-builtin routing outbound tags.
         val routingResolvedOutbounds = resolveRoutingOutbounds()
         val resolvedOutbounds = listOf(primaryResolvedOutbound) + routingResolvedOutbounds
-        val fallbackResolvedOutbounds = resolvePolicyGroupFallbackOutbounds(resolvedOutbounds)
+        val fallbackResolvedOutbounds = resolvedOutbounds
+            .filter { it.resolvedType == CoreResolvedType.POLICYGROUP }
+            .filter { BalancerStrategyType.from(it.profile.policyGroupType).supportsObservatory && it.profile.policyGroupTestOutbounds != false }
+            .mapNotNull { it.profile.policyGroupFallbackTag }
+            .filter { it !in AppConfig.BUILTIN_OUTBOUND_TAGS && resolvedOutbounds.none { outbound -> outbound.tag == it } }
+            .distinct()
+            .mapNotNull { tag ->
+                SettingsManager.getServerViaRemarks(tag)
+                    ?.takeUnless { it.configType == EConfigType.CUSTOM || it.configType == EConfigType.POLICYGROUP }
+                    ?.let { resolveOutbound(tag, it) }
+            }
         val routingDomainRules = collectRoutingDomainRulesForDns()
 
         return CoreConfigContext(
@@ -139,54 +149,6 @@ object CoreConfigContextBuilder {
         }
 
         return resolvedOutbounds
-    }
-
-    /**
-     * Resolve non-builtin fallback targets so their tags exist in the generated config.
-     *
-     * A policy group cannot be used as an Xray fallbackTag because fallbackTag addresses
-     * an outbound directly, not another balancer. Custom profiles are likewise unavailable
-     * in the unified config path.
-     */
-    private fun resolvePolicyGroupFallbackOutbounds(
-        resolvedOutbounds: List<CoreConfigContext.ResolvedOutbound>
-    ): List<CoreConfigContext.ResolvedOutbound> {
-        val resolvedTags = resolvedOutbounds.mapTo(mutableSetOf()) { it.tag }
-        val fallbackOutbounds = mutableListOf<CoreConfigContext.ResolvedOutbound>()
-
-        resolvedOutbounds
-            .asSequence()
-            .filter { it.resolvedType == CoreResolvedType.POLICYGROUP }
-            .filter {
-                val strategyType = BalancerStrategyType.from(it.profile.policyGroupType)
-                strategyType.supportsObservatory && it.profile.policyGroupTestOutbounds != false
-            }
-            .mapNotNull { it.profile.policyGroupFallbackTag?.trim()?.takeIf(String::isNotEmpty) }
-            .filter { it !in AppConfig.BUILTIN_OUTBOUND_TAGS }
-            .distinct()
-            .forEach { fallbackTag ->
-                if (!resolvedTags.add(fallbackTag)) {
-                    return@forEach
-                }
-
-                val profile = SettingsManager.getServerViaRemarks(fallbackTag) ?: run {
-                    LogUtil.w(AppConfig.TAG, "Policy-group fallback '$fallbackTag' has no matching profile")
-                    return@forEach
-                }
-                if (profile.configType == EConfigType.CUSTOM || profile.configType == EConfigType.POLICYGROUP) {
-                    LogUtil.w(AppConfig.TAG, "Profile '$fallbackTag' cannot be used as a policy-group fallback outbound")
-                    return@forEach
-                }
-
-                val resolvedFallback = resolveOutbound(fallbackTag, profile) ?: return@forEach
-                if (resolvedFallback.resolvedProfiles.isEmpty()) {
-                    LogUtil.w(AppConfig.TAG, "Policy-group fallback '$fallbackTag' resolved to an empty profile list")
-                    return@forEach
-                }
-                fallbackOutbounds.add(resolvedFallback)
-            }
-
-        return fallbackOutbounds
     }
 
     private fun resolvePolicyGroupProfiles(config: ProfileItem): List<ProfileItem> {

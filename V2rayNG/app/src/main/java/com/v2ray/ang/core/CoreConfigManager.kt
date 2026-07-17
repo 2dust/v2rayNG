@@ -147,13 +147,6 @@ object CoreConfigManager {
             v2rayConfig.outbounds.removeAt(0)
         }
         val existingTags = v2rayConfig.outbounds.mapTo(mutableSetOf()) { it.tag }
-        val availableOutboundTags = buildSet {
-            add(AppConfig.TAG_DIRECT)
-            add(AppConfig.TAG_BLOCKED)
-            configContext.resolvedOutbounds
-                .filter { it.resolvedType != CoreResolvedType.POLICYGROUP }
-                .forEach { add(it.tag) }
-        }
         val policyGroupBalancerTags = mutableMapOf<String, String>()
         val balancerStrategies = mutableListOf<BalancerStrategy>()
 
@@ -165,7 +158,6 @@ object CoreConfigManager {
                 prepend = index == 0,
                 existingTags = existingTags,
                 v2rayConfig = v2rayConfig,
-                availableOutboundTags = availableOutboundTags,
                 policyGroupBalancerTags = policyGroupBalancerTags,
                 balancerStrategies = balancerStrategies,
             )
@@ -214,7 +206,6 @@ object CoreConfigManager {
         prepend: Boolean,
         existingTags: MutableSet<String>,
         v2rayConfig: V2rayConfig,
-        availableOutboundTags: Set<String>,
         policyGroupBalancerTags: MutableMap<String, String>,
         balancerStrategies: MutableList<BalancerStrategy>,
     ) {
@@ -243,7 +234,6 @@ object CoreConfigManager {
                 prepend = prepend,
                 existingTags = existingTags,
                 v2rayConfig = v2rayConfig,
-                availableOutboundTags = availableOutboundTags,
                 policyGroupBalancerTags = policyGroupBalancerTags,
                 balancerStrategies = balancerStrategies,
             )
@@ -342,7 +332,6 @@ object CoreConfigManager {
         prepend: Boolean,
         existingTags: MutableSet<String>,
         v2rayConfig: V2rayConfig,
-        availableOutboundTags: Set<String>,
         policyGroupBalancerTags: MutableMap<String, String>,
         balancerStrategies: MutableList<BalancerStrategy>,
     ) {
@@ -385,16 +374,12 @@ object CoreConfigManager {
         } else {
             "${AppConfig.TAG_BALANCER_PRE}-${resolvedOutbound.tag}"
         }
-        val memberTags = membersToAdd.map { it.tag }
-        val availableFallbackTags = availableOutboundTags + memberTags
         val strategyType = BalancerStrategyType.from(resolvedOutbound.profile.policyGroupType)
-        val fallbackTag = resolvePolicyGroupFallbackTag(
-            strategyType = strategyType,
-            testOutbounds = resolvedOutbound.profile.policyGroupTestOutbounds,
-            configuredFallbackTag = resolvedOutbound.profile.policyGroupFallbackTag,
-            defaultFallbackTag = memberTags.first(),
-            availableOutboundTags = availableFallbackTags,
-        )
+        val fallbackTag = if (strategyType.supportsObservatory && resolvedOutbound.profile.policyGroupTestOutbounds != false) {
+            resolvedOutbound.profile.policyGroupFallbackTag
+                ?.takeIf { it.isNotEmpty() && it != AppConfig.TAG_PROXY }
+                ?: membersToAdd.first().tag
+        } else null
         val strategy = buildBalancerStrategy(
             strategyType = strategyType,
             selector = listOf(memberTagPrefix),
@@ -1240,28 +1225,6 @@ object CoreConfigManager {
             )
         } else null
         return BalancerStrategy(balancer, observatory, burstObservatory)
-    }
-
-    /** Select a usable fallback, defaulting to the policy group's first member. */
-    internal fun resolvePolicyGroupFallbackTag(
-        strategyType: BalancerStrategyType,
-        testOutbounds: Boolean?,
-        configuredFallbackTag: String?,
-        defaultFallbackTag: String,
-        availableOutboundTags: Set<String>,
-    ): String? {
-        if (!strategyType.supportsObservatory || testOutbounds == false) {
-            return null
-        }
-
-        val defaultTag = defaultFallbackTag
-            .trim()
-            .takeIf { it.isNotEmpty() && it in availableOutboundTags }
-            ?: return null
-        return configuredFallbackTag
-            ?.trim()
-            ?.takeIf { it.isNotEmpty() && it in availableOutboundTags }
-            ?: defaultTag
     }
 
     private fun decodeObservatoryDuration(key: String, default: String): String {
