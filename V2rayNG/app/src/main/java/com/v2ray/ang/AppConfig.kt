@@ -335,4 +335,6 @@ object AppConfig {
         TAG_DIRECT,
         TAG_BLOCKED,
     )
+
+    val OBSERVATORY_DURATION_PATTERN = Regex("""[1-9]\d*(ms|s|m|h)""")
 }

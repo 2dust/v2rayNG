@@ -44,8 +44,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private val OBSERVATORY_DURATION_PATTERN = Regex("""[1-9]\d*(ms|s|m|h)""")
-
 class SettingsActivity : BaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,26 +95,11 @@ fun SettingsScreen(
     var fragmentLength by rememberMmkvString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
     var fragmentInterval by rememberMmkvString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
     var fragmentMaxSplit by rememberMmkvString(AppConfig.PREF_FRAGMENT_MAXSPLIT, "10")
-    var observatoryLeastPingInterval by rememberMmkvString(
-        AppConfig.PREF_OBSERVATORY_LEAST_PING_INTERVAL,
-        AppConfig.OBSERVATORY_LEAST_PING_INTERVAL
-    )
-    var observatoryLeastLoadInterval by rememberMmkvString(
-        AppConfig.PREF_OBSERVATORY_LEAST_LOAD_INTERVAL,
-        AppConfig.OBSERVATORY_LEAST_LOAD_INTERVAL
-    )
-    var observatoryLeastLoadMethod by rememberMmkvString(
-        AppConfig.PREF_OBSERVATORY_LEAST_LOAD_METHOD,
-        AppConfig.OBSERVATORY_LEAST_LOAD_METHOD
-    )
-    var observatoryLeastLoadSampling by rememberMmkvString(
-        AppConfig.PREF_OBSERVATORY_LEAST_LOAD_SAMPLING,
-        AppConfig.OBSERVATORY_LEAST_LOAD_SAMPLING
-    )
-    var observatoryLeastLoadTimeout by rememberMmkvString(
-        AppConfig.PREF_OBSERVATORY_LEAST_LOAD_TIMEOUT,
-        AppConfig.OBSERVATORY_LEAST_LOAD_TIMEOUT
-    )
+    var observatoryLeastPingInterval by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_PING_INTERVAL, AppConfig.OBSERVATORY_LEAST_PING_INTERVAL)
+    var observatoryLeastLoadInterval by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_INTERVAL, AppConfig.OBSERVATORY_LEAST_LOAD_INTERVAL)
+    var observatoryLeastLoadMethod by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_METHOD, AppConfig.OBSERVATORY_LEAST_LOAD_METHOD)
+    var observatoryLeastLoadSampling by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_SAMPLING, AppConfig.OBSERVATORY_LEAST_LOAD_SAMPLING)
+    var observatoryLeastLoadTimeout by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_TIMEOUT, AppConfig.OBSERVATORY_LEAST_LOAD_TIMEOUT)
 
     var mode by rememberMmkvString(AppConfig.PREF_MODE, VPN)
     var enableRootMode by rememberMmkvBool(AppConfig.PREF_ROOT_MODE_ENABLE, false)
@@ -184,13 +167,13 @@ fun SettingsScreen(
     val fragmentPacketsEntries = stringArrayResource(R.array.fragment_packets).toList()
     val fragmentPacketsValues = stringArrayResource(R.array.fragment_packets).toList()
     val observatoryLeastLoadMethodEntries = stringArrayResource(R.array.observatory_least_load_method).toList()
-    val observatoryLeastLoadMethodValues = stringArrayResource(R.array.observatory_least_load_method_value).toList()
+    val observatoryLeastLoadMethodValues = stringArrayResource(R.array.observatory_least_load_method).toList()
     val modeEntries = stringArrayResource(R.array.mode_entries).toList()
     val modeValues = stringArrayResource(R.array.mode_value).toList()
 
     fun updateObservatoryDuration(value: String, onValid: (String) -> Unit) {
         val duration = value.trim()
-        if (OBSERVATORY_DURATION_PATTERN.matches(duration)) {
+        if (AppConfig.OBSERVATORY_DURATION_PATTERN.matches(duration)) {
             onValid(duration)
         } else {
             context.toastError(R.string.toast_invalid_observatory_duration)
