@@ -75,7 +75,6 @@ class SubEditActivity : BaseComponentActivity() {
     }
 
     private fun saveServer(subItem: SubscriptionItem): Boolean {
-        val intervalMinutes = subItem.updateInterval
 
         if (TextUtils.isEmpty(subItem.remarks)) {
             toast(R.string.sub_setting_remarks)
@@ -92,6 +91,11 @@ class SubEditActivity : BaseComponentActivity() {
                     return false
                 }
             }
+        }
+
+        if (subItem.autoUpdate && subItem.updateInterval < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
+            toast(R.string.toast_invalid_update_interval)
+            return false
         }
 
         MmkvManager.encodeSubscription(editSubId, subItem)
@@ -123,11 +127,11 @@ fun SubEditScreen(
     onSave: (SubscriptionItem) -> Boolean,
     onDelete: () -> Unit
 ) {
-    val context = LocalContext.current
-
+    //val context = LocalContext.current
     var remarks by rememberSaveable { mutableStateOf(initial.remarks.orEmpty()) }
     var url by rememberSaveable { mutableStateOf(initial.url.orEmpty()) }
     var userAgent by rememberSaveable { mutableStateOf(initial.userAgent.orEmpty()) }
+    var requestHeaders by rememberSaveable { mutableStateOf(initial.requestHeaders.orEmpty()) }
     var filter by rememberSaveable { mutableStateOf(initial.filter ?: "") }
     var enabled by rememberSaveable { mutableStateOf(initial.enabled) }
     var autoUpdate by rememberSaveable { mutableStateOf(initial.autoUpdate) }
@@ -145,25 +149,11 @@ fun SubEditScreen(
         subItem.remarks = remarks
         subItem.url = url
         subItem.userAgent = userAgent
+        subItem.requestHeaders = requestHeaders
         subItem.filter = filter
         subItem.enabled = enabled
         subItem.autoUpdate = autoUpdate
-        val intervalInput = updateInterval.trim()
-        val intervalMinutes = intervalInput.toLongOrNull()
-        if (autoUpdate) {
-            if (intervalMinutes == null) {
-                subItem.updateInterval = SubscriptionItem().updateInterval
-            } else if (intervalMinutes < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
-                context.toast(context.getString(R.string.toast_invalid_update_interval))
-                return null
-            } else {
-                subItem.updateInterval = intervalMinutes
-            }
-        } else {
-            if (intervalMinutes != null && intervalMinutes >= AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
-                subItem.updateInterval = intervalMinutes
-            }
-        }
+        subItem.updateInterval = updateInterval.toLong()
         subItem.prevProfile = prevProfile
         subItem.nextProfile = nextProfile
         subItem.allowInsecureUrl = allowInsecureUrl
@@ -203,6 +193,7 @@ fun SubEditScreen(
             FormTextField(stringResource(R.string.sub_setting_remarks), remarks, { remarks = it })
             FormTextField(stringResource(R.string.sub_setting_url), url, { url = it })
             FormTextField(stringResource(R.string.sub_setting_user_agent), userAgent, { userAgent = it })
+            FormTextField(stringResource(R.string.sub_setting_request_headers), requestHeaders, { requestHeaders = it })
             FormTextField(stringResource(R.string.sub_setting_filter), filter, { filter = it })
             SettingsSwitchItem(
                 title = stringResource(R.string.sub_setting_enable),

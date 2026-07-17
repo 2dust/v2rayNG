@@ -164,6 +164,16 @@ object HttpUtil {
 
             applyEmbeddedBasicAuthHeader(currentUrl, requestBuilder)
 
+
+            val headersMap = JsonUtil.parseHeadersToMap(request.requestHeaders)
+            for ((key, value) in headersMap) {
+                LogUtil.d(AppConfig.TAG, "Adding custom header: $key = $value")
+                try {
+                    requestBuilder.header(key, value)
+                } catch (_: IllegalArgumentException) {
+                }
+            }
+
             if (request.httpPort != 0 && !request.proxyUsername.isNullOrBlank() && !request.proxyPassword.isNullOrBlank()) {
                 requestBuilder.header("Proxy-Authorization", Credentials.basic(request.proxyUsername, request.proxyPassword))
             }
