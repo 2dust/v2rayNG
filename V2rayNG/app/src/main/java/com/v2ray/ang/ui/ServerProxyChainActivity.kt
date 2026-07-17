@@ -4,8 +4,10 @@ import android.os.Bundle
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -238,8 +240,10 @@ fun ProxyChainScreen(
             state = lazyListState,
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScrollbar(lazyListState)
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .imepadding()
+                .verticalScrollbar(lazyListState),
             contentPadding = PaddingValues(
                 top = 8.dp,
                 start = 16.dp,
