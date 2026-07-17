@@ -306,6 +306,7 @@
     <string name="sub_setting_remarks">备注</string>
     <string name="sub_setting_url">可选地址 (url)</string>
     <string name="sub_setting_user_agent">User Agent</string>
+    <string name="sub_setting_request_headers">请求头（JSON 格式）</string>
     <string name="sub_setting_filter">别名正则过滤</string>
     <string name="sub_setting_enable">启用更新</string>
     <string name="sub_auto_update">启用自动更新</string>
@@ -353,6 +354,7 @@
     <string name="routing_settings_domain">domain</string>
     <string name="routing_settings_ip">ip</string>
     <string name="routing_settings_process">process (包名 — 仅在使用 Xray 的 TUN、开启 routeOnly 且 Android 10+ 时可用)</string>
+    <string name="routing_settings_process_select">选择包名</string>
     <string name="routing_settings_port">port</string>
     <string name="routing_settings_protocol">protocol</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
@@ -381,6 +383,14 @@
     <string name="title_pref_fragment_interval">分片间隔（最小 - 最大）</string>
     <string name="title_pref_fragment_enabled">启用分片（Fragment）</string>
     <string name="title_pref_fragment_maxsplit">分片最大分割数</string>
+    <string name="title_observatory_settings">连接观测设置</string>
+    <string name="title_pref_observatory_least_ping_interval">leastPing 探测间隔</string>
+    <string name="title_pref_observatory_least_load_interval">leastLoad 探测间隔</string>
+    <string name="title_pref_observatory_least_load_method">leastLoad HTTP 方法</string>
+    <string name="title_pref_observatory_least_load_sampling">leastLoad 采样数量</string>
+    <string name="title_pref_observatory_least_load_timeout">leastLoad 探测超时</string>
+    <string name="toast_invalid_observatory_duration">时间格式无效。请使用类似 3m 或 30s 的值。</string>
+    <string name="toast_invalid_observatory_sampling">采样数量无效。请使用正数。</string>
 
     <string name="update_check_for_update">检查更新</string>
     <string name="update_already_latest_version">目前已是最新版本</string>

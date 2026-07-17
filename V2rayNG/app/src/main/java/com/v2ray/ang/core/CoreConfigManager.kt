@@ -1184,6 +1184,11 @@ object CoreConfigManager {
         balancerTag: String = AppConfig.TAG_BALANCER,
     ): BalancerStrategy {
         val probeUrl = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL) ?: AppConfig.DELAY_TEST_URL
+        val leastPingInterval = decodeObservatoryDuration(AppConfig.PREF_OBSERVATORY_LEAST_PING_INTERVAL, AppConfig.OBSERVATORY_LEAST_PING_INTERVAL)
+        val leastLoadInterval = decodeObservatoryDuration(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_INTERVAL, AppConfig.OBSERVATORY_LEAST_LOAD_INTERVAL)
+        val leastLoadMethod = MmkvManager.decodeSettingsString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_METHOD, AppConfig.OBSERVATORY_LEAST_LOAD_METHOD)
+        val leastLoadSampling = decodeObservatorySampling()
+        val leastLoadTimeout = decodeObservatoryDuration(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_TIMEOUT, AppConfig.OBSERVATORY_LEAST_LOAD_TIMEOUT)
         val strategyType = BalancerStrategyType.from(policyGroupType)
         val balancer = V2rayConfig.RoutingBean.BalancerBean(
             tag = balancerTag,
@@ -1194,7 +1199,7 @@ object CoreConfigManager {
             V2rayConfig.ObservatoryObject(
                 subjectSelector = selector,
                 probeUrl = probeUrl,
-                probeInterval = "3m",
+                probeInterval = leastPingInterval,
                 enableConcurrency = true
             )
         } else null
@@ -1203,13 +1208,31 @@ object CoreConfigManager {
                 subjectSelector = selector,
                 pingConfig = V2rayConfig.BurstObservatoryObject.PingConfigObject(
                     destination = probeUrl,
-                    interval = "5m",
-                    sampling = 2,
-                    timeout = "30s"
+                    httpMethod = leastLoadMethod,
+                    interval = leastLoadInterval,
+                    sampling = leastLoadSampling,
+                    timeout = leastLoadTimeout
                 )
             )
         } else null
         return BalancerStrategy(balancer, observatory, burstObservatory)
+    }
+
+    private fun decodeObservatoryDuration(key: String, default: String): String {
+        val value = MmkvManager.decodeSettingsString(key)?.trim()
+        return if (!value.isNullOrEmpty() && AppConfig.OBSERVATORY_DURATION_PATTERN.matches(value)) {
+            value
+        } else {
+            default
+        }
+    }
+
+    private fun decodeObservatorySampling(): Int {
+        return MmkvManager.decodeSettingsString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_SAMPLING)
+            ?.trim()
+            ?.toIntOrNull()
+            ?.takeIf { it > 0 }
+            ?: AppConfig.OBSERVATORY_LEAST_LOAD_SAMPLING.toInt()
     }
 
     /**

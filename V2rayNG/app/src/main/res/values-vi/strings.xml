@@ -372,6 +372,14 @@
     <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
     <string name="title_pref_fragment_enabled">Enable Fragment</string>
     <string name="title_pref_fragment_maxsplit">Fragment Max Split</string>
+    <string name="title_observatory_settings">Cài đặt giám sát kết nối</string>
+    <string name="title_pref_observatory_least_ping_interval">Khoảng thời gian leastPing</string>
+    <string name="title_pref_observatory_least_load_interval">Khoảng thời gian leastLoad</string>
+    <string name="title_pref_observatory_least_load_method">Phương thức HTTP leastLoad</string>
+    <string name="title_pref_observatory_least_load_sampling">Lấy mẫu leastLoad</string>
+    <string name="title_pref_observatory_least_load_timeout">Thời gian chờ leastLoad</string>
+    <string name="toast_invalid_observatory_duration">Khoảng thời gian không hợp lệ. Dùng giá trị như 3m hoặc 30s.</string>
+    <string name="toast_invalid_observatory_sampling">Lấy mẫu không hợp lệ. Dùng một số dương.</string>
 
     <string name="update_check_for_update">Check for update</string>
     <string name="update_already_latest_version">Already on the latest version</string>

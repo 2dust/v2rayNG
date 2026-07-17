@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -38,7 +39,6 @@ import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
 import com.v2ray.ang.compose.FormTextField
 import com.v2ray.ang.compose.SettingsSwitchItem
-import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.extension.toast
@@ -198,8 +198,8 @@ fun RoutingEditScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .imePadding()
                 .verticalScroll(scrollState)
-                .verticalScrollbar(scrollState)
                 .padding(vertical = 8.dp)
         ) {
             FormTextField(
@@ -243,7 +243,7 @@ fun RoutingEditScreen(
                             AppPickerActivity.createIntent(
                                 context = context,
                                 selectedPackages = current,
-                                title = context.getString(R.string.routing_settings_process)
+                                title = context.getString(R.string.routing_settings_process_select)
                             )
                         )
                     },
@@ -254,7 +254,7 @@ fun RoutingEditScreen(
                         contentDescription = null
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.routing_settings_process))
+                    Text(stringResource(R.string.routing_settings_process_select))
                 }
             }
             FormTextField(

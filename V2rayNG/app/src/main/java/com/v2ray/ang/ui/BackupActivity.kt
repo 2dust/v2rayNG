@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
@@ -86,11 +85,7 @@ class BackupActivity : HelperBaseComponentActivity() {
                     1 -> restoreViaWebDav()
                 }
             },
-            onWebDavSave = { config ->
-                MmkvManager.encodeWebDavConfig(config)
-                webDavConfigState.value = config
-                toastSuccess(R.string.toast_success)
-            },
+            onWebDavSave = { config -> saveWebDav(config) },
             onBackClick = { finish() }
         )
     }
@@ -309,6 +304,12 @@ class BackupActivity : HelperBaseComponentActivity() {
             }
         }
     }
+
+    private fun saveWebDav(config: WebDavConfig){
+        MmkvManager.encodeWebDavConfig(config)
+        webDavConfigState.value = config
+        toastSuccess(R.string.toast_success)
+    }
 }
 
 @Composable
@@ -329,9 +330,7 @@ fun BackupScreen(
     var showRestoreDialog by remember { mutableStateOf(false) }
     var showWebDavDialog by remember { mutableStateOf(false) }
 
-    val webDavSummary = if (currentWebDavConfig != null && currentWebDavConfig!!.baseUrl.isNotEmpty()) {
-        "${currentWebDavConfig!!.baseUrl} | ${currentWebDavConfig!!.username ?: ""}"
-    } else null
+    val webDavSummary = currentWebDavConfig?.baseUrl
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,

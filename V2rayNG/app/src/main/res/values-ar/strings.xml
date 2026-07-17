@@ -371,6 +371,14 @@
     <string name="title_pref_fragment_interval">فاصل الجزء (الحد الأدنى - الحد الأقصى)</string>
     <string name="title_pref_fragment_enabled">تفعيل الجزء</string>
     <string name="title_pref_fragment_maxsplit">ماكس سبليت الجزء</string>
+    <string name="title_observatory_settings">إعدادات مراقبة الاتصال</string>
+    <string name="title_pref_observatory_least_ping_interval">فاصل leastPing</string>
+    <string name="title_pref_observatory_least_load_interval">فاصل leastLoad</string>
+    <string name="title_pref_observatory_least_load_method">طريقة HTTP لـ leastLoad</string>
+    <string name="title_pref_observatory_least_load_sampling">عينات leastLoad</string>
+    <string name="title_pref_observatory_least_load_timeout">مهلة leastLoad</string>
+    <string name="toast_invalid_observatory_duration">مدة غير صالحة. استخدم قيمة مثل 3m أو 30s.</string>
+    <string name="toast_invalid_observatory_sampling">عدد العينات غير صالح. استخدم رقمًا موجبًا.</string>
 
     <string name="update_check_for_update">Check for update</string>
     <string name="update_already_latest_version">Already on the latest version</string>
