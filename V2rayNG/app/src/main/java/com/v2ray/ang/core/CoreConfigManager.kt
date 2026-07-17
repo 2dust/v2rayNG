@@ -390,7 +390,7 @@ object CoreConfigManager {
         val strategyType = BalancerStrategyType.from(resolvedOutbound.profile.policyGroupType)
         val fallbackTag = resolvePolicyGroupFallbackTag(
             strategyType = strategyType,
-            testOutbounds = resolvedOutbound.profile.policyGroupTestOutbounds == true,
+            testOutbounds = resolvedOutbound.profile.policyGroupTestOutbounds,
             configuredFallbackTag = resolvedOutbound.profile.policyGroupFallbackTag,
             defaultFallbackTag = memberTags.first(),
             availableOutboundTags = availableFallbackTags,
@@ -1245,12 +1245,12 @@ object CoreConfigManager {
     /** Select a usable fallback, defaulting to the policy group's first member. */
     internal fun resolvePolicyGroupFallbackTag(
         strategyType: BalancerStrategyType,
-        testOutbounds: Boolean,
+        testOutbounds: Boolean?,
         configuredFallbackTag: String?,
         defaultFallbackTag: String,
         availableOutboundTags: Set<String>,
     ): String? {
-        if (!testOutbounds || !strategyType.supportsFallbackTesting) {
+        if (!strategyType.supportsObservatory || testOutbounds == false) {
             return null
         }
 

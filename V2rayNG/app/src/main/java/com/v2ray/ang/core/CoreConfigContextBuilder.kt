@@ -157,9 +157,9 @@ object CoreConfigContextBuilder {
         resolvedOutbounds
             .asSequence()
             .filter { it.resolvedType == CoreResolvedType.POLICYGROUP }
-            .filter { it.profile.policyGroupTestOutbounds == true }
             .filter {
-                BalancerStrategyType.from(it.profile.policyGroupType).supportsFallbackTesting
+                val strategyType = BalancerStrategyType.from(it.profile.policyGroupType)
+                strategyType.supportsObservatory && it.profile.policyGroupTestOutbounds != false
             }
             .mapNotNull { it.profile.policyGroupFallbackTag?.trim()?.takeIf(String::isNotEmpty) }
             .filter { it !in AppConfig.BUILTIN_OUTBOUND_TAGS }

@@ -2,8 +2,11 @@ package com.v2ray.ang
 
 import com.v2ray.ang.core.CoreConfigManager
 import com.v2ray.ang.enums.BalancerStrategyType
+import com.v2ray.ang.ui.buildPolicyGroupFallbackSuggestions
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PolicyGroupFallbackTest {
@@ -21,6 +24,26 @@ class PolicyGroupFallbackTest {
         assertEquals(
             firstMember,
             resolve(BalancerStrategyType.RANDOM, configuredFallbackTag = " ")
+        )
+    }
+
+    @Test
+    fun randomAndRoundRobinTestOutboundsByDefault() {
+        assertEquals(
+            firstMember,
+            resolve(
+                BalancerStrategyType.RANDOM,
+                configuredFallbackTag = null,
+                testOutbounds = null
+            )
+        )
+        assertEquals(
+            firstMember,
+            resolve(
+                BalancerStrategyType.ROUND_ROBIN,
+                configuredFallbackTag = null,
+                testOutbounds = null
+            )
         )
     }
 
@@ -64,10 +87,22 @@ class PolicyGroupFallbackTest {
         )
     }
 
+    @Test
+    fun fallbackSuggestionsExcludeProxy() {
+        val suggestions = buildPolicyGroupFallbackSuggestions(
+            listOf("profile-a", AppConfig.TAG_PROXY, "profile-a")
+        )
+
+        assertFalse(AppConfig.TAG_PROXY in suggestions)
+        assertTrue(AppConfig.TAG_DIRECT in suggestions)
+        assertTrue("profile-a" in suggestions)
+        assertEquals(1, suggestions.count { it == "profile-a" })
+    }
+
     private fun resolve(
         strategyType: BalancerStrategyType,
         configuredFallbackTag: String?,
-        testOutbounds: Boolean = true,
+        testOutbounds: Boolean? = true,
     ): String? = CoreConfigManager.resolvePolicyGroupFallbackTag(
         strategyType = strategyType,
         testOutbounds = testOutbounds,

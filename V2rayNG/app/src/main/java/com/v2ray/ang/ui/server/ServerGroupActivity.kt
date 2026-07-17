@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
+import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
@@ -65,16 +66,17 @@ class ServerGroupActivity : BaseComponentActivity() {
 
         val config = MmkvManager.decodeServerConfig(editGuid)
         populateSubscriptionSpinner()
-        fallbackSuggestions = (
-            BUILTIN_OUTBOUND_TAGS.toList() + SettingsManager.getProfileRemarks(
+        fallbackSuggestions = buildPolicyGroupFallbackSuggestions(
+            SettingsManager.getProfileRemarks(
                 excludeConfigTypes = setOf(EConfigType.CUSTOM, EConfigType.POLICYGROUP)
             )
-        ).distinct()
+        )
 
         initialRemarks = config?.remarks ?: ""
         initialFilter = config?.policyGroupFilter ?: ""
         initialType = config?.policyGroupType?.toIntOrNull() ?: 0
-        initialTestOutbounds = config?.policyGroupTestOutbounds == true
+        initialTestOutbounds = config?.policyGroupTestOutbounds
+            ?: BalancerStrategyType.from(config?.policyGroupType).supportsObservatory
         initialFallbackTag = config?.policyGroupFallbackTag.orEmpty()
         initialSubIndex = if (config != null) {
             subIds.indexOf(config.policyGroupSubscriptionId ?: "").let { if (it >= 0) it else 0 }
@@ -126,7 +128,8 @@ class ServerGroupActivity : BaseComponentActivity() {
         config.policyGroupType = typeIdx.toString()
         config.policyGroupSubscriptionId =
             subIds.getOrNull(subIdx)
-        config.policyGroupTestOutbounds = testOutbounds
+        val strategyType = BalancerStrategyType.from(config.policyGroupType)
+        config.policyGroupTestOutbounds = testOutbounds.takeIf { strategyType.supportsObservatory }
         config.policyGroupFallbackTag = fallbackTag.trim().takeIf { it.isNotEmpty() }
 
         if (
@@ -205,6 +208,11 @@ class ServerGroupActivity : BaseComponentActivity() {
         resources.getStringArray(R.array.policy_group_type)
 }
 
+internal fun buildPolicyGroupFallbackSuggestions(profileRemarks: List<String>): List<String> =
+    (BUILTIN_OUTBOUND_TAGS + profileRemarks)
+        .filterNot { it == TAG_PROXY }
+        .distinct()
+
 @Composable
 fun ServerGroupScreen(
     editGuid: String,
@@ -232,7 +240,7 @@ fun ServerGroupScreen(
     var showDeleteConfirm by remember { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
     val selectedType = typeEntries.indexOf(typeValue).coerceAtLeast(0).toString()
-    val supportsFallbackTesting = BalancerStrategyType.from(selectedType).supportsFallbackTesting
+    val supportsObservatory = BalancerStrategyType.from(selectedType).supportsObservatory
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
@@ -271,7 +279,13 @@ fun ServerGroupScreen(
                 label = stringResource(R.string.title_policy_group_type),
                 value = typeValue,
                 options = typeEntries,
-                onValueChange = { typeValue = it }
+                onValueChange = { newTypeValue ->
+                    val newType = typeEntries.indexOf(newTypeValue).coerceAtLeast(0).toString()
+                    if (!supportsObservatory && BalancerStrategyType.from(newType).supportsObservatory) {
+                        testOutbounds = true
+                    }
+                    typeValue = newTypeValue
+                }
             )
             FormDropdownField(
                 label = stringResource(R.string.title_policy_group_subscription_id),
@@ -280,7 +294,7 @@ fun ServerGroupScreen(
                 onValueChange = { subValue = it }
             )
             FormTextField(stringResource(R.string.title_policy_group_subscription_filter), filter, { filter = it })
-            if (supportsFallbackTesting) {
+            if (supportsObservatory) {
                 SettingsSwitchItem(
                     title = stringResource(R.string.title_policy_group_test_outbounds),
                     checked = testOutbounds,
