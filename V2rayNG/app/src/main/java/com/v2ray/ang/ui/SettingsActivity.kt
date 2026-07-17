@@ -95,6 +95,11 @@ fun SettingsScreen(
     var fragmentLength by rememberMmkvString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
     var fragmentInterval by rememberMmkvString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
     var fragmentMaxSplit by rememberMmkvString(AppConfig.PREF_FRAGMENT_MAXSPLIT, "10")
+    var observatoryLeastPingInterval by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_PING_INTERVAL, AppConfig.OBSERVATORY_LEAST_PING_INTERVAL)
+    var observatoryLeastLoadInterval by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_INTERVAL, AppConfig.OBSERVATORY_LEAST_LOAD_INTERVAL)
+    var observatoryLeastLoadMethod by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_METHOD, AppConfig.OBSERVATORY_LEAST_LOAD_METHOD)
+    var observatoryLeastLoadSampling by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_SAMPLING, AppConfig.OBSERVATORY_LEAST_LOAD_SAMPLING)
+    var observatoryLeastLoadTimeout by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_TIMEOUT, AppConfig.OBSERVATORY_LEAST_LOAD_TIMEOUT)
 
     var mode by rememberMmkvString(AppConfig.PREF_MODE, VPN)
     var enableRootMode by rememberMmkvBool(AppConfig.PREF_ROOT_MODE_ENABLE, false)
@@ -161,8 +166,28 @@ fun SettingsScreen(
     val xudpQuicValues = stringArrayResource(R.array.mux_xudp_quic_value).toList()
     val fragmentPacketsEntries = stringArrayResource(R.array.fragment_packets).toList()
     val fragmentPacketsValues = stringArrayResource(R.array.fragment_packets).toList()
+    val observatoryLeastLoadMethodEntries = stringArrayResource(R.array.observatory_least_load_method).toList()
+    val observatoryLeastLoadMethodValues = stringArrayResource(R.array.observatory_least_load_method).toList()
     val modeEntries = stringArrayResource(R.array.mode_entries).toList()
     val modeValues = stringArrayResource(R.array.mode_value).toList()
+
+    fun updateObservatoryDuration(value: String, onValid: (String) -> Unit) {
+        val duration = value.trim()
+        if (AppConfig.OBSERVATORY_DURATION_PATTERN.matches(duration)) {
+            onValid(duration)
+        } else {
+            context.toastError(R.string.toast_invalid_observatory_duration)
+        }
+    }
+
+    fun updateObservatorySampling(value: String) {
+        val sampling = value.trim().toIntOrNull()?.takeIf { it > 0 }
+        if (sampling != null) {
+            observatoryLeastLoadSampling = sampling.toString()
+        } else {
+            context.toastError(R.string.toast_invalid_observatory_sampling)
+        }
+    }
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
@@ -488,6 +513,48 @@ fun SettingsScreen(
                 enabled = fragment,
                 keyboardNumber = true,
                 onValueChanged = { fragmentMaxSplit = it }
+            )
+
+            PreferenceGroupHeader(title = stringResource(R.string.title_observatory_settings))
+            SettingsEditItem(
+                title = stringResource(R.string.title_pref_observatory_least_ping_interval),
+                value = observatoryLeastPingInterval,
+                onValueChanged = {
+                    updateObservatoryDuration(it) { value ->
+                        observatoryLeastPingInterval = value
+                    }
+                }
+            )
+            SettingsEditItem(
+                title = stringResource(R.string.title_pref_observatory_least_load_interval),
+                value = observatoryLeastLoadInterval,
+                onValueChanged = {
+                    updateObservatoryDuration(it) { value ->
+                        observatoryLeastLoadInterval = value
+                    }
+                }
+            )
+            SettingsListItem(
+                title = stringResource(R.string.title_pref_observatory_least_load_method),
+                entries = observatoryLeastLoadMethodEntries,
+                values = observatoryLeastLoadMethodValues,
+                selectedValue = observatoryLeastLoadMethod,
+                onSelected = { observatoryLeastLoadMethod = it }
+            )
+            SettingsEditItem(
+                title = stringResource(R.string.title_pref_observatory_least_load_sampling),
+                value = observatoryLeastLoadSampling,
+                keyboardNumber = true,
+                onValueChanged = { updateObservatorySampling(it) }
+            )
+            SettingsEditItem(
+                title = stringResource(R.string.title_pref_observatory_least_load_timeout),
+                value = observatoryLeastLoadTimeout,
+                onValueChanged = {
+                    updateObservatoryDuration(it) { value ->
+                        observatoryLeastLoadTimeout = value
+                    }
+                }
             )
 
             PreferenceGroupHeader(title = stringResource(R.string.title_advanced))

@@ -437,6 +437,7 @@ data class V2rayConfig(
         data class PingConfigObject(
             val destination: String,
             val connectivity: String? = null,
+            val httpMethod: String? = null,
             val interval: String,
             val sampling: Int,
             val timeout: String? = null

@@ -385,6 +385,14 @@
     <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
     <string name="title_pref_fragment_enabled">Enable Fragment</string>
     <string name="title_pref_fragment_maxsplit">Fragment Max Split</string>
+    <string name="title_observatory_settings">Observatory Settings</string>
+    <string name="title_pref_observatory_least_ping_interval">leastPing Interval</string>
+    <string name="title_pref_observatory_least_load_interval">leastLoad Interval</string>
+    <string name="title_pref_observatory_least_load_method">leastLoad Mode</string>
+    <string name="title_pref_observatory_least_load_sampling">leastLoad Sampling</string>
+    <string name="title_pref_observatory_least_load_timeout">leastLoad Timeout</string>
+    <string name="toast_invalid_observatory_duration">Invalid duration. Use a value like 3m or 30s.</string>
+    <string name="toast_invalid_observatory_sampling">Invalid sampling. Use a positive number.</string>
 
     <string name="update_check_for_update">Check for update</string>
     <string name="update_already_latest_version">Already on the latest version</string>
