@@ -26,7 +26,6 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.DEFAULT_PORT
 import com.v2ray.ang.AppConfig.REALITY
 import com.v2ray.ang.AppConfig.TLS
@@ -37,6 +36,7 @@ import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
 import com.v2ray.ang.compose.FormTextField
+import com.v2ray.ang.compose.SettingsSwitchItem
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
@@ -214,7 +214,6 @@ fun ServerScreen(
     val grpcModeOptions = stringArrayResource(R.array.mode_type_grpc).toList()
     val xhttpModeOptions = stringArrayResource(R.array.xhttp_mode).toList()
     val streamSecurityOptions = stringArrayResource(R.array.streamsecurityxs).toList()
-    val allowInsecureOptions = stringArrayResource(R.array.allowinsecures).toList()
     val uTlsOptions = stringArrayResource(R.array.streamsecurity_utls).toList()
     val alpnOptions = stringArrayResource(R.array.streamsecurity_alpn).toList()
     val browserDialerOptions = stringArrayResource(R.array.browser_dialer_mode_value).toList()
@@ -256,15 +255,7 @@ fun ServerScreen(
     var browserDialerMode by rememberSaveable { mutableStateOf(initialConfig.browserDialerMode ?: browserDialerOptions.firstOrNull() ?: "Disable") }
     var streamSecurity by rememberSaveable { mutableStateOf(initialConfig.security ?: "") }
     var sni by rememberSaveable { mutableStateOf(initialConfig.sni ?: "") }
-    var allowInsecureStr by rememberSaveable {
-        mutableStateOf(
-            when {
-                initialConfig.insecure == true -> "true"
-                initialConfig.insecure == false -> "false"
-                else -> ""
-            }
-        )
-    }
+    var allowInsecure by rememberSaveable { mutableStateOf(initialConfig.insecure == true) }
     var fingerPrint by rememberSaveable { mutableStateOf(initialConfig.fingerPrint ?: "") }
     var alpn by rememberSaveable { mutableStateOf(initialConfig.alpn ?: "") }
     var publicKeyReality by rememberSaveable { mutableStateOf(initialConfig.publicKey ?: "") }
@@ -288,6 +279,62 @@ fun ServerScreen(
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
+    fun buildProfileItem(): ProfileItem = initialConfig.copy(
+        remarks = remarks,
+        server = address,
+        serverPort = port,
+        password = password,
+        method = when {
+            isVmess || isShadowsocks -> method
+            isVless -> encryption
+            else -> null
+        },
+        flow = if (isVless) flow else null,
+        username = if (isSocksOrHttp) username else null,
+        secretKey = if (isWireguard) secretKey else null,
+        publicKey = when {
+            isWireguard -> publicKey
+            streamSecurity == REALITY -> publicKeyReality
+            else -> null
+        },
+        preSharedKey = if (isWireguard) preSharedKey else null,
+        reserved = if (isWireguard) reserved else null,
+        localAddress = if (isWireguard) localAddress else null,
+        mtu = if (isWireguard) mtu.toIntOrNull() else null,
+        obfsPassword = if (isHysteria2) obfsPassword else null,
+        portHopping = if (isHysteria2) portHopping else null,
+        portHoppingInterval = if (isHysteria2) portHoppingInterval else null,
+        bandwidthDown = if (isHysteria2) bandwidthDown else null,
+        bandwidthUp = if (isHysteria2) bandwidthUp else null,
+        network = network,
+        headerType = headerType,
+        host = host,
+        path = path,
+        seed = seed,
+        quicSecurity = quicSecurity,
+        quicKey = quicKey,
+        mode = mode,
+        serviceName = serviceName,
+        authority = authority,
+        xhttpMode = xhttpMode,
+        xhttpExtra = xhttpExtra.nullIfBlank(),
+        finalMask = finalMask.nullIfBlank(),
+        kcpMtu = kcpMtu.toIntOrNull(),
+        kcpTti = kcpTti.toIntOrNull(),
+        browserDialerMode = if (network in listOf(NetworkType.WS.type, NetworkType.XHTTP.type)) browserDialerMode.nullIfBlank() else null,
+        security = streamSecurity,
+        sni = sni,
+        insecure = allowInsecure,
+        fingerPrint = fingerPrint,
+        alpn = alpn,
+        shortId = shortId,
+        spiderX = spiderX,
+        mldsa65Verify = mldsa65Verify,
+        echConfigList = echConfigList,
+        verifyPeerCertByName = verifyPeerCertByName,
+        pinnedCA256 = pinnedCA256
+    )
+
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
         topBar = {
@@ -301,33 +348,7 @@ fun ServerScreen(
                         }
                     }
                     IconButton(onClick = {
-                        val updated = initialConfig.copy(
-                            remarks = remarks, server = address, serverPort = port, password = password,
-                            method = when { isVmess || isShadowsocks -> method; isVless -> encryption; else -> null },
-                            flow = if (isVless) flow else null,
-                            username = if (isSocksOrHttp) username else null,
-                            secretKey = if (isWireguard) secretKey else null,
-                            publicKey = when { isWireguard -> publicKey; streamSecurity == REALITY -> publicKeyReality; else -> null },
-                            preSharedKey = if (isWireguard) preSharedKey else null,
-                            reserved = if (isWireguard) reserved else null,
-                            localAddress = if (isWireguard) localAddress else null,
-                            mtu = if (isWireguard) mtu.toIntOrNull() else null,
-                            obfsPassword = if (isHysteria2) obfsPassword else null,
-                            portHopping = if (isHysteria2) portHopping else null,
-                            portHoppingInterval = if (isHysteria2) portHoppingInterval else null,
-                            bandwidthDown = if (isHysteria2) bandwidthDown else null,
-                            bandwidthUp = if (isHysteria2) bandwidthUp else null,
-                            network = network, headerType = headerType, host = host, path = path, seed = seed,
-                            quicSecurity = quicSecurity, quicKey = quicKey, mode = mode, serviceName = serviceName,
-                            authority = authority, xhttpMode = xhttpMode, xhttpExtra = xhttpExtra.nullIfBlank(),
-                            finalMask = finalMask.nullIfBlank(), kcpMtu = kcpMtu.toIntOrNull(), kcpTti = kcpTti.toIntOrNull(),
-                            browserDialerMode = if (network in listOf(NetworkType.WS.type, NetworkType.XHTTP.type)) browserDialerMode.nullIfBlank() else null,
-                            security = streamSecurity, sni = sni, insecure = allowInsecureStr == "true",
-                            fingerPrint = fingerPrint, alpn = alpn, shortId = shortId, spiderX = spiderX,
-                            mldsa65Verify = mldsa65Verify, echConfigList = echConfigList,
-                            verifyPeerCertByName = verifyPeerCertByName, pinnedCA256 = pinnedCA256
-                        )
-                        onSave(updated)
+                        onSave(buildProfileItem())
                     }) {
                         Icon(painterResource(R.drawable.ic_fab_check), stringResource(R.string.menu_item_save_config))
                     }
@@ -411,12 +432,12 @@ fun ServerScreen(
             }), path, { path = it }) }
             if (network == NetworkType.XHTTP.type) {
                 item { FormTextField(stringResource(R.string.server_lab_xhttp_extra), xhttpExtra, { xhttpExtra = it }) }
-                item { FormTextField(stringResource(R.string.server_lab_final_mask), finalMask, { finalMask = it }) }
             }
             if (network == NetworkType.KCP.type) {
                 item { FormTextField(stringResource(R.string.server_lab_kcp_mtu), kcpMtu, { kcpMtu = it }, keyboardType = KeyboardType.Number) }
                 item { FormTextField(stringResource(R.string.server_lab_kcp_tti), kcpTti, { kcpTti = it }, keyboardType = KeyboardType.Number) }
             }
+            item { FormTextField(stringResource(R.string.server_lab_final_mask), finalMask, { finalMask = it }) }
             if (network == NetworkType.WS.type || network == NetworkType.XHTTP.type) {
                 item { FormDropdownField(stringResource(R.string.server_lab_browser_dialer), browserDialerMode, browserDialerOptions, { browserDialerMode = it }) }
             }
@@ -425,7 +446,7 @@ fun ServerScreen(
                 item { FormTextField(stringResource(R.string.server_lab_sni), sni, { sni = it }) }
                 item { FormDropdownField(stringResource(R.string.server_lab_stream_fingerprint), fingerPrint, uTlsOptions, { fingerPrint = it }) }
                 if (streamSecurity == TLS) {
-                    item { FormDropdownField(stringResource(R.string.server_lab_allow_insecure), allowInsecureStr, allowInsecureOptions, { allowInsecureStr = it }) }
+                    item { SettingsSwitchItem(title = stringResource(R.string.server_lab_allow_insecure), checked = allowInsecure, onCheckedChange = { allowInsecure = it }) }
                     item { FormDropdownField(stringResource(R.string.server_lab_stream_alpn), alpn, alpnOptions, { alpn = it }) }
                     item { FormTextField(stringResource(R.string.server_lab_ech_config_list), echConfigList, { echConfigList = it }) }
                     item { FormTextField(stringResource(R.string.server_lab_verify_peer_cert_by_name), verifyPeerCertByName, { verifyPeerCertByName = it }) }
@@ -435,31 +456,7 @@ fun ServerScreen(
                             onClick = {
                                 if (address.isBlank()) { context.toast(R.string.server_lab_address); return@Button }
                                 if (configType != EConfigType.HYSTERIA2 && (port.toIntOrNull() ?: 0) <= 0) { context.toast(R.string.server_lab_port); return@Button }
-                                val temp = initialConfig.copy(
-                                    remarks = remarks, server = address, serverPort = port, password = password,
-                                    method = when { isVmess||isShadowsocks -> method; isVless -> encryption; else -> null },
-                                    flow = if (isVless) flow else null, username = if (isSocksOrHttp) username else null,
-                                    secretKey = if (isWireguard) secretKey else null,
-                                    publicKey = when { isWireguard -> publicKey; streamSecurity == REALITY -> publicKeyReality; else -> null },
-                                    preSharedKey = if (isWireguard) preSharedKey else null,
-                                    reserved = if (isWireguard) reserved else null,
-                                    localAddress = if (isWireguard) localAddress else null,
-                                    mtu = if (isWireguard) mtu.toIntOrNull() else null,
-                                    obfsPassword = if (isHysteria2) obfsPassword else null,
-                                    portHopping = if (isHysteria2) portHopping else null,
-                                    portHoppingInterval = if (isHysteria2) portHoppingInterval else null,
-                                    bandwidthDown = if (isHysteria2) bandwidthDown else null,
-                                    bandwidthUp = if (isHysteria2) bandwidthUp else null,
-                                    network = network, headerType = headerType, host = host, path = path, seed = seed,
-                                    quicSecurity = quicSecurity, quicKey = quicKey, mode = mode, serviceName = serviceName,
-                                    authority = authority, xhttpMode = xhttpMode, xhttpExtra = xhttpExtra.nullIfBlank(),
-                                    finalMask = finalMask.nullIfBlank(), kcpMtu = kcpMtu.toIntOrNull(), kcpTti = kcpTti.toIntOrNull(),
-                                    browserDialerMode = if (network in listOf(NetworkType.WS.type, NetworkType.XHTTP.type)) browserDialerMode.nullIfBlank() else null,
-                                    security = streamSecurity, sni = sni, insecure = allowInsecureStr == "true",
-                                    fingerPrint = fingerPrint, alpn = alpn, shortId = shortId, spiderX = spiderX,
-                                    mldsa65Verify = mldsa65Verify, echConfigList = echConfigList,
-                                    verifyPeerCertByName = verifyPeerCertByName, pinnedCA256 = pinnedCA256
-                                )
+                                val temp = buildProfileItem()
                                 scope.launch {
                                     isFetchingCert = true
                                     try {
