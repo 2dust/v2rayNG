@@ -243,7 +243,7 @@ fun RoutingEditScreen(
                             AppPickerActivity.createIntent(
                                 context = context,
                                 selectedPackages = current,
-                                title = context.getString(R.string.routing_settings_process)
+                                title = context.getString(R.string.routing_settings_process_select)
                             )
                         )
                     },
@@ -254,7 +254,7 @@ fun RoutingEditScreen(
                         contentDescription = null
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.routing_settings_process))
+                    Text(stringResource(R.string.routing_settings_process_select))
                 }
             }
             FormTextField(

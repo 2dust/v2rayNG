@@ -1572,7 +1572,7 @@ fun ServerListItem(
             if (isSelected) {
                 Row {
                     Spacer(Modifier.width(6.dp))
-                    Box(Modifier.width(4.dp).fillMaxHeight().padding(vertical = 10.dp).background(colorFabActive))
+                    Box(Modifier.width(4.dp).fillMaxHeight().padding(vertical = 10.dp).background(MaterialTheme.colorScheme.primary))
                 }
             }
         }

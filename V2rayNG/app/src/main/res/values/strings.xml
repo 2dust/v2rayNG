@@ -358,6 +358,7 @@
     <string name="routing_settings_domain">domain</string>
     <string name="routing_settings_ip">ip</string>
     <string name="routing_settings_process">process (Package Name — only supported when using Xray TUN, routeOnly enabled, and Android 10+)</string>
+    <string name="routing_settings_process_select">Select package name</string>
     <string name="routing_settings_port">port</string>
     <string name="routing_settings_protocol">protocol</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
