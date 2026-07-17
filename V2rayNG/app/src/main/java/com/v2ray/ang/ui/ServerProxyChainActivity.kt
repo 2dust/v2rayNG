@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -239,7 +238,7 @@ fun ProxyChainScreen(
             state = lazyListState,
             modifier = Modifier
                 .fillMaxSize()
-                .imePadding()
+                .verticalScrollbar(lazyListState)
                 .padding(innerPadding),
             contentPadding = PaddingValues(
                 top = 8.dp,

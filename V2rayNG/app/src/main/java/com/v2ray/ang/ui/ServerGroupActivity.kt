@@ -3,7 +3,6 @@ package com.v2ray.ang.ui
 import android.os.Bundle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -223,13 +222,7 @@ fun ServerGroupScreen(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(vertical = 8.dp)
-                .imePadding()
-        ) {
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding).padding(vertical = 8.dp)) {
             FormTextField(stringResource(R.string.server_lab_remarks), remarks, { remarks = it })
             FormDropdownField(
                 label = stringResource(R.string.title_policy_group_type),
