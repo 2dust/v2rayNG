@@ -387,6 +387,8 @@
     <string name="title_policy_group_type">Policy group type</string>
     <string name="title_policy_group_subscription_id">From subscription group</string>
     <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+    <string name="title_policy_group_test_outbounds">اختبار المخارج</string>
+    <string name="title_policy_group_fallback">المخرج الاحتياطي (اختياري)</string>
     <string name="server_proxy_chain_members">اعضاء سلسلة الوكيل</string>
     <string name="server_proxy_chain_pick_members">اضغط هنا لاختيار عضو</string>
     <string name="server_proxy_chain_member_unselected">اختر عضوا</string>

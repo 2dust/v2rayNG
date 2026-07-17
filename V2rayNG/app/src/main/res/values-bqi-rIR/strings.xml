@@ -392,6 +392,8 @@
     <string name="title_policy_group_type">نوع بونکۊ سیاست</string>
     <string name="title_policy_group_subscription_id">ز بونکۊ اشتراک</string>
     <string name="title_policy_group_subscription_filter">توزیهات فیلتر معمۊلی</string>
+    <string name="title_policy_group_test_outbounds">آزمایش بارتا</string>
+    <string name="title_policy_group_fallback">بارت جایگزین (اختیاری)</string>
     <string name="server_proxy_chain_members">ٱئزا زنجیره پروکسی</string>
     <string name="server_proxy_chain_pick_members">سی پسند عوزو ایچو بزنین</string>
     <string name="server_proxy_chain_member_unselected">ی عوزو پسند کۊنین</string>
