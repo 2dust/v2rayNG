@@ -1,7 +1,8 @@
-package com.v2ray.ang.ui
+package com.v2ray.ang.ui.server
 
 import android.os.Bundle
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -31,6 +32,7 @@ import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.ui.BaseComponentActivity
 
 class ServerGroupActivity : BaseComponentActivity() {
 
@@ -227,8 +229,9 @@ fun ServerGroupScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(vertical = 8.dp)
+                .consumeWindowInsets(innerPadding)
                 .imePadding()
+                .padding(vertical = 8.dp)
         ) {
             FormTextField(stringResource(R.string.server_lab_remarks), remarks, { remarks = it })
             FormDropdownField(

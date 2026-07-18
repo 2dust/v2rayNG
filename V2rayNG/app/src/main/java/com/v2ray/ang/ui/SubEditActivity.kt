@@ -3,6 +3,7 @@ package com.v2ray.ang.ui
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -186,8 +187,10 @@ fun SubEditScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
                 .imePadding()
                 .verticalScroll(scrollState)
+                .verticalScrollbar(scrollState)
                 .padding(vertical = 8.dp)
                 .padding(bottom = 36.dp)
         ) {

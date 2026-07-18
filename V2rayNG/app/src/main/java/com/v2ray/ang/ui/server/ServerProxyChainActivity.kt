@@ -1,9 +1,10 @@
-package com.v2ray.ang.ui
+package com.v2ray.ang.ui.server
 
 import android.os.Bundle
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -46,6 +47,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.ui.BaseComponentActivity
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -239,8 +241,10 @@ fun ProxyChainScreen(
             state = lazyListState,
             modifier = Modifier
                 .fillMaxSize()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
                 .imePadding()
-                .padding(innerPadding),
+                .verticalScrollbar(lazyListState),
             contentPadding = PaddingValues(
                 top = 8.dp,
                 start = 16.dp,
