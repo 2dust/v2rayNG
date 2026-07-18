@@ -364,7 +364,7 @@ fun ServerScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .imepadding()
+                .imePadding()
                 .verticalScrollbar(listState),
             contentPadding = PaddingValues(bottom = 36.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)

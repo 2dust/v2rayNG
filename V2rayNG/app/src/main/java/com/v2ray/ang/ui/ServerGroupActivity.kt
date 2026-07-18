@@ -229,7 +229,7 @@ fun ServerGroupScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .imepadding()
+                .imePadding()
                 .padding(vertical = 8.dp)
         ) {
             FormTextField(stringResource(R.string.server_lab_remarks), remarks, { remarks = it })

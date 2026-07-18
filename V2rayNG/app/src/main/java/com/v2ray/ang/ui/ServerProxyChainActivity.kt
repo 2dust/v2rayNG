@@ -242,7 +242,7 @@ fun ProxyChainScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .imepadding()
+                .imePadding()
                 .verticalScrollbar(lazyListState),
             contentPadding = PaddingValues(
                 top = 8.dp,

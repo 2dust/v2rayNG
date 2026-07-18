@@ -332,7 +332,7 @@ fun ServerCustomConfigScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .imepadding()
+                .imePadding()
         ) {
             FormTextField(
                 label = stringResource(R.string.server_lab_remarks),
