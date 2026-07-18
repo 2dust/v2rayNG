@@ -2,6 +2,7 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -227,8 +228,9 @@ fun ServerGroupScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .imepadding()
                 .padding(vertical = 8.dp)
-                .imePadding()
         ) {
             FormTextField(stringResource(R.string.server_lab_remarks), remarks, { remarks = it })
             FormDropdownField(

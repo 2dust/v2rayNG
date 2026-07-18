@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -325,12 +326,13 @@ fun ServerCustomConfigScreen(
                 }
             )
         },
-    ) { padding ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .imePadding()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .imepadding()
         ) {
             FormTextField(
                 label = stringResource(R.string.server_lab_remarks),
