@@ -108,7 +108,7 @@ data class V2rayConfig(
         }
 
         data class StreamSettingsBean(
-            var network: String = AppConfig.DEFAULT_NETWORK,
+            var network: String? = AppConfig.DEFAULT_NETWORK,
             var security: String? = null,
             var tcpSettings: TcpSettingsBean? = null,
             var kcpSettings: KcpSettingsBean? = null,

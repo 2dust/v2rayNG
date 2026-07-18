@@ -264,6 +264,13 @@ object CoreOutboundBuilder {
             wireguard.reserved = profileItem.reserved?.takeIf { it.isNotBlank() }?.split(",")?.filter { it.isNotBlank() }?.map { it.trim().toInt() }
         }
 
+        if (!profileItem.finalMask.isNullOrBlank()) {
+            outboundBean?.streamSettings = OutboundBean.StreamSettingsBean()
+            outboundBean?.streamSettings?.let {
+                updateOutboundFinalMask(it, profileItem)
+                it.network = null
+            }
+        }
         return outboundBean
     }
 
@@ -669,5 +676,17 @@ object CoreOutboundBuilder {
             return domain
         }
         return resolvedIps.first()
+    }
+
+    fun updateOutboundFinalMask(streamSettings: OutboundBean.StreamSettingsBean, profileItem: ProfileItem) {
+        val finalMask = profileItem.finalMask
+        finalMask?.let {
+            val parsedFinalMask = JsonUtil.parseString(profileItem.finalMask)
+            if (parsedFinalMask != null) {
+                streamSettings.finalmask = parsedFinalMask
+            } else {
+                LogUtil.w("V2rayConfigManager", "Invalid finalMask JSON, keeping previously generated finalmask")
+            }
+        }
     }
 }
