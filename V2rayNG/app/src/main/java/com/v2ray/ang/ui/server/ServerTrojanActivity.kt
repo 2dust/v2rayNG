@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui
+package com.v2ray.ang.ui.server
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -6,11 +6,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.FormTextField
+import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.extension.toast
 
-class ServerSocksActivity : BaseServerActivity() {
+class ServerTrojanActivity : BaseServerActivity() {
 
-    override val serverConfigType: EConfigType = EConfigType.SOCKS
+    override val serverConfigType: EConfigType = EConfigType.TROJAN
 
     @Composable
     override fun ScreenContent() {
@@ -22,7 +24,7 @@ class ServerSocksActivity : BaseServerActivity() {
                 browserDialerDefault = options.browserDialerOptions.firstOrNull() ?: "Disable"
             )
         }.apply {
-            configType = serverConfigType
+            configType = EConfigType.TROJAN
         }
 
         ServerEditorScaffold(
@@ -30,7 +32,7 @@ class ServerSocksActivity : BaseServerActivity() {
             onSaveClick = { saveServer(uiState) }
         ) {
             item { CommonBasicFields(uiState) }
-            item { SocksProtocolFields(uiState) }
+            item { TrojanProtocolFields(uiState) }
             item { CommonNetworkFields(uiState, options) }
             item {
                 CommonStreamSecurityFields(
@@ -43,17 +45,25 @@ class ServerSocksActivity : BaseServerActivity() {
         }
     }
 
+    override fun validateProtocolConfig(config: ProfileItem): Boolean {
+        if (config.password.isNullOrBlank()) {
+            toast(R.string.server_lab_id3)
+            return false
+        }
+        if (config.security.isNullOrBlank()) {
+            toast(R.string.server_lab_stream_security)
+            return false
+        }
+        return true
+    }
+
     @Composable
-    private fun SocksProtocolFields(state: ServerUiState) {
+    private fun TrojanProtocolFields(state: ServerUiState) {
         FormTextField(
-            stringResource(R.string.server_lab_security4),
-            state.username,
-            { state.username = it }
-        )
-        FormTextField(
-            stringResource(R.string.server_lab_id4),
+            stringResource(R.string.server_lab_id3),
             state.password,
             { state.password = it }
         )
     }
 }
+

@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui
+package com.v2ray.ang.ui.server
 
 import android.os.Bundle
 import androidx.compose.foundation.layout.Column
@@ -32,6 +32,7 @@ import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.ui.BaseComponentActivity
 
 class ServerGroupActivity : BaseComponentActivity() {
 

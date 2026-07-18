@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui
+package com.v2ray.ang.ui.server
 
 import android.app.Activity
 import android.content.Intent

@@ -129,6 +129,7 @@ import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.ui.server.*
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
@@ -309,7 +310,15 @@ class MainActivity : HelperBaseComponentActivity() {
         val intent = when (createConfigType) {
             EConfigType.POLICYGROUP.value -> Intent(this, ServerGroupActivity::class.java)
             EConfigType.PROXYCHAIN.value -> Intent(this, ServerProxyChainActivity::class.java)
-            else -> Intent(this, ServerActivity::class.java).apply {
+            EConfigType.VMESS.value -> Intent(this, ServerVmessActivity::class.java)
+            EConfigType.VLESS.value -> Intent(this, ServerVlessActivity::class.java)
+            EConfigType.SHADOWSOCKS.value -> Intent(this, ServerShadowsocksActivity::class.java)
+            EConfigType.SOCKS.value -> Intent(this, ServerSocksActivity::class.java)
+            EConfigType.HTTP.value -> Intent(this, ServerHttpActivity::class.java)
+            EConfigType.TROJAN.value -> Intent(this, ServerTrojanActivity::class.java)
+            EConfigType.WIREGUARD.value -> Intent(this, ServerWireguardActivity::class.java)
+            EConfigType.HYSTERIA2.value -> Intent(this, ServerHysteria2Activity::class.java)
+            else -> Intent(this, ServerHttpActivity::class.java).apply {
                 putExtra("createConfigType", createConfigType)
             }
         }.apply {
@@ -524,7 +533,7 @@ class MainActivity : HelperBaseComponentActivity() {
             EConfigType.TROJAN -> ServerTrojanActivity::class.java
             EConfigType.WIREGUARD -> ServerWireguardActivity::class.java
             EConfigType.HYSTERIA2 -> ServerHysteria2Activity::class.java
-            else -> ServerCustomConfigActivity::class.java
+            else -> ServerHttpActivity::class.java
         }
         val intent = Intent(this, activityClass).apply {
             putExtra("guid", guid)

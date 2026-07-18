@@ -1,17 +1,16 @@
-package com.v2ray.ang.ui
+package com.v2ray.ang.ui.server
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.FormTextField
 import com.v2ray.ang.enums.EConfigType
 
-class ServerWireguardActivity : BaseServerActivity() {
+class ServerHttpActivity : BaseServerActivity() {
 
-    override val serverConfigType: EConfigType = EConfigType.WIREGUARD
+    override val serverConfigType: EConfigType = EConfigType.HTTP
 
     @Composable
     override fun ScreenContent() {
@@ -23,7 +22,7 @@ class ServerWireguardActivity : BaseServerActivity() {
                 browserDialerDefault = options.browserDialerOptions.firstOrNull() ?: "Disable"
             )
         }.apply {
-            configType = EConfigType.WIREGUARD
+            configType = serverConfigType
         }
 
         ServerEditorScaffold(
@@ -31,7 +30,7 @@ class ServerWireguardActivity : BaseServerActivity() {
             onSaveClick = { saveServer(uiState) }
         ) {
             item { CommonBasicFields(uiState) }
-            item { WireguardProtocolFields(uiState) }
+            item { HttpProtocolFields(uiState) }
             item { CommonNetworkFields(uiState, options) }
             item {
                 CommonStreamSecurityFields(
@@ -45,38 +44,16 @@ class ServerWireguardActivity : BaseServerActivity() {
     }
 
     @Composable
-    private fun WireguardProtocolFields(state: ServerUiState) {
+    private fun HttpProtocolFields(state: ServerUiState) {
         FormTextField(
-            stringResource(R.string.server_lab_secret_key),
-            state.secretKey,
-            { state.secretKey = it }
+            stringResource(R.string.server_lab_security4),
+            state.username,
+            { state.username = it }
         )
         FormTextField(
-            stringResource(R.string.server_lab_public_key),
-            state.publicKey,
-            { state.publicKey = it }
-        )
-        FormTextField(
-            stringResource(R.string.server_lab_preshared_key),
-            state.preSharedKey,
-            { state.preSharedKey = it }
-        )
-        FormTextField(
-            stringResource(R.string.server_lab_reserved),
-            state.reserved,
-            { state.reserved = it }
-        )
-        FormTextField(
-            stringResource(R.string.server_lab_local_address),
-            state.localAddress,
-            { state.localAddress = it }
-        )
-        FormTextField(
-            stringResource(R.string.server_lab_local_mtu),
-            state.mtu,
-            { state.mtu = it },
-            keyboardType = KeyboardType.Number
+            stringResource(R.string.server_lab_id4),
+            state.password,
+            { state.password = it }
         )
     }
 }
-

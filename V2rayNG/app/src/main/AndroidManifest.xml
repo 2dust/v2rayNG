@@ -71,51 +71,47 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".ui.ServerVmessActivity"
+            android:name=".ui.server.ServerVmessActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.ServerVlessActivity"
+            android:name=".ui.server.ServerVlessActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.ServerShadowsocksActivity"
+            android:name=".ui.server.ServerShadowsocksActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.ServerSocksActivity"
+            android:name=".ui.server.ServerSocksActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.ServerHttpActivity"
+            android:name=".ui.server.ServerHttpActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.ServerTrojanActivity"
+            android:name=".ui.server.ServerTrojanActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.ServerWireguardActivity"
+            android:name=".ui.server.ServerWireguardActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.ServerHysteria2Activity"
+            android:name=".ui.server.ServerHysteria2Activity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.ServerActivity"
+            android:name=".ui.server.ServerCustomConfigActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.ServerCustomConfigActivity"
+            android:name=".ui.server.ServerGroupActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.ServerGroupActivity"
-            android:exported="false"
-            android:windowSoftInputMode="stateUnchanged|adjustResize" />
-        <activity
-            android:name=".ui.ServerProxyChainActivity"
+            android:name=".ui.server.ServerProxyChainActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
