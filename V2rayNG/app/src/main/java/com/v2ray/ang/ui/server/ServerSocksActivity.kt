@@ -31,15 +31,7 @@ class ServerSocksActivity : BaseServerActivity() {
         ) {
             item { CommonBasicFields(uiState) }
             item { SocksProtocolFields(uiState) }
-            item { CommonNetworkFields(uiState, options) }
-            item {
-                CommonStreamSecurityFields(
-                    state = uiState,
-                    options = options,
-                    scope = scope,
-                    buildProfileItem = { uiState.toProfileItem(initialConfig) }
-                )
-            }
+
         }
     }
 

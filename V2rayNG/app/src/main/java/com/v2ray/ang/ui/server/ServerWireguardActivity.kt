@@ -32,15 +32,7 @@ class ServerWireguardActivity : BaseServerActivity() {
         ) {
             item { CommonBasicFields(uiState) }
             item { WireguardProtocolFields(uiState) }
-            item { CommonNetworkFields(uiState, options) }
-            item {
-                CommonStreamSecurityFields(
-                    state = uiState,
-                    options = options,
-                    scope = scope,
-                    buildProfileItem = { uiState.toProfileItem(initialConfig) }
-                )
-            }
+
         }
     }
 

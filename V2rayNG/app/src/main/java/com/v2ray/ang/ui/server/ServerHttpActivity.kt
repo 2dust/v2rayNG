@@ -31,15 +31,7 @@ class ServerHttpActivity : BaseServerActivity() {
         ) {
             item { CommonBasicFields(uiState) }
             item { HttpProtocolFields(uiState) }
-            item { CommonNetworkFields(uiState, options) }
-            item {
-                CommonStreamSecurityFields(
-                    state = uiState,
-                    options = options,
-                    scope = scope,
-                    buildProfileItem = { uiState.toProfileItem(initialConfig) }
-                )
-            }
+
         }
     }
 

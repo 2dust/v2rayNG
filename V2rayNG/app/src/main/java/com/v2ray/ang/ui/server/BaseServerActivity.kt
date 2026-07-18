@@ -373,20 +373,24 @@ abstract class BaseServerActivity : BaseComponentActivity() {
     protected open fun validateProtocolConfig(config: ProfileItem): Boolean = true
 
     protected open fun validateCommonConfig(config: ProfileItem): Boolean {
-        if (
-            config.configType != EConfigType.SOCKS &&
-            config.configType != EConfigType.HTTP &&
-            config.password.isNullOrBlank()
-        ) {
-            val message = when (config.configType) {
-                EConfigType.TROJAN,
-                EConfigType.SHADOWSOCKS,
-                EConfigType.HYSTERIA2 -> R.string.server_lab_id3
-                else -> R.string.server_lab_id
+
+        if (config.password.isNullOrBlank()) {
+            if (config.configType == EConfigType.VMESS ||
+                config.configType == EConfigType.VLESS
+            ) {
+                toast(R.string.server_lab_id)
+                return false
             }
-            toast(message)
-            return false
+
+            if (config.configType == EConfigType.TROJAN ||
+                config.configType == EConfigType.SHADOWSOCKS ||
+                config.configType == EConfigType.HYSTERIA2
+            ) {
+                toast(R.string.server_lab_id3)
+                return false
+            }
         }
+
         if (
             config.configType == EConfigType.TROJAN &&
             config.security.isNullOrBlank()

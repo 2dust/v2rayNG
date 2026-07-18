@@ -4,8 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.FormTextField
+import com.v2ray.ang.compose.SettingsSwitchItem
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
@@ -33,15 +35,7 @@ class ServerHysteria2Activity : BaseServerActivity() {
         ) {
             item { CommonBasicFields(uiState, showPort = false) }
             item { Hysteria2ProtocolFields(uiState) }
-            item { CommonNetworkFields(uiState, options) }
-            item {
-                CommonStreamSecurityFields(
-                    state = uiState,
-                    options = options,
-                    scope = scope,
-                    buildProfileItem = { uiState.toProfileItem(initialConfig) }
-                )
-            }
+
         }
     }
 
@@ -49,6 +43,9 @@ class ServerHysteria2Activity : BaseServerActivity() {
         if (config.password.isNullOrBlank()) {
             toast(R.string.server_lab_id3)
             return false
+        }
+        if (config.security.isNullOrBlank()) {
+            config.security = AppConfig.TLS
         }
         return true
     }
@@ -84,6 +81,22 @@ class ServerHysteria2Activity : BaseServerActivity() {
             stringResource(R.string.server_lab_bandwidth_up),
             state.bandwidthUp,
             { state.bandwidthUp = it }
+        )
+
+        SettingsSwitchItem(
+            title = stringResource(R.string.server_lab_allow_insecure),
+            checked = state.allowInsecure,
+            onCheckedChange = { state.allowInsecure = it }
+        )
+        FormTextField(
+            stringResource(R.string.server_lab_sni),
+            state.sni,
+            { state.sni = it }
+        )
+        FormTextField(
+            stringResource(R.string.server_lab_pinned_ca256),
+            state.pinnedCA256,
+            { state.pinnedCA256 = it }
         )
     }
 }
