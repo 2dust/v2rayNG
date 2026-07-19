@@ -24,7 +24,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,7 +36,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppDivider
@@ -49,21 +47,15 @@ import com.v2ray.ang.compose.ReorderableListItem
 import com.v2ray.ang.compose.colorFabActive
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.SubscriptionsViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 class SubSettingActivity : BaseComponentActivity() {
     private val viewModel: SubscriptionsViewModel by viewModels()
-    private val isLoadingState = MutableStateFlow(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,12 +63,13 @@ class SubSettingActivity : BaseComponentActivity() {
 
     @Composable
     override fun ScreenContent() {
+        val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
         SubSettingScreen(
             viewModel = viewModel,
-            isLoadingState = isLoadingState,
+            isLoading = isLoading,
             onBackClick = { finish() },
             onAddClick = { startActivity(Intent(this, SubEditActivity::class.java)) },
-            onSubUpdate = { updateSubscriptions() },
+            onSubUpdate = { viewModel.updateSubscriptions() },
             onEditSub = { subId ->
                 startActivity(Intent(this, SubEditActivity::class.java).putExtra("subId", subId))
             },
@@ -98,37 +91,13 @@ class SubSettingActivity : BaseComponentActivity() {
     private fun removeSub(subId: String) {
         viewModel.remove(subId)
     }
-
-    private fun updateSubscriptions() {
-        isLoadingState.value = true
-        lifecycleScope.launch(Dispatchers.IO) {
-            val result = AngConfigManager.updateConfigViaSubAll()
-            delay(500L)
-            launch(Dispatchers.Main) {
-                if (result.successCount + result.failureCount + result.skipCount == 0) {
-                    toast(R.string.title_update_subscription_no_subscription)
-                } else if (result.successCount > 0 && result.failureCount + result.skipCount == 0) {
-                    toast(getString(R.string.title_update_config_count, result.configCount))
-                } else {
-                    toast(
-                        getString(
-                            R.string.title_update_subscription_result,
-                            result.configCount, result.successCount, result.failureCount, result.skipCount
-                        )
-                    )
-                }
-                isLoadingState.value = false
-                viewModel.reload()
-            }
-        }
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubSettingScreen(
     viewModel: SubscriptionsViewModel,
-    isLoadingState: MutableStateFlow<Boolean>,
+    isLoading: Boolean,
     onBackClick: () -> Unit,
     onAddClick: () -> Unit,
     onSubUpdate: () -> Unit,
@@ -139,7 +108,6 @@ fun SubSettingScreen(
     shareSubMethodEntries: List<String>
 ) {
     val subscriptions by viewModel.subsFlow.collectAsStateWithLifecycle()
-    val isLoading by isLoadingState.collectAsState()
     var removeTarget by remember { mutableStateOf<String?>(null) }
     val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
 
