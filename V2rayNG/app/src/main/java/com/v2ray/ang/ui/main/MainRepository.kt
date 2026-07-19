@@ -33,38 +33,38 @@ class MainRepository(
 
     private val closed = AtomicBoolean(false)
 
-    private val _serviceEvent = MutableSharedFlow<ServiceEvent>(
+    private val _mainServiceEvent = MutableSharedFlow<MainServiceEvent>(
         replay = 0,
         extraBufferCapacity = 64,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    override val serviceEvent: SharedFlow<ServiceEvent> = _serviceEvent.asSharedFlow()
+    override val mainServiceEvent: SharedFlow<MainServiceEvent> = _mainServiceEvent.asSharedFlow()
 
     private val serviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val safeIntent = intent ?: return
             val event = when (safeIntent.getIntExtra("key", 0)) {
-                AppConfig.MSG_STATE_RUNNING -> ServiceEvent.StateRunning
-                AppConfig.MSG_STATE_NOT_RUNNING -> ServiceEvent.StateNotRunning
-                AppConfig.MSG_STATE_START_SUCCESS -> ServiceEvent.StateStartSuccess
-                AppConfig.MSG_STATE_START_FAILURE -> ServiceEvent.StateStartFailure(
+                AppConfig.MSG_STATE_RUNNING -> MainServiceEvent.StateRunning
+                AppConfig.MSG_STATE_NOT_RUNNING -> MainServiceEvent.StateNotRunning
+                AppConfig.MSG_STATE_START_SUCCESS -> MainServiceEvent.StateStartSuccess
+                AppConfig.MSG_STATE_START_FAILURE -> MainServiceEvent.StateStartFailure(
                     safeIntent.getStringExtra("content").orEmpty()
                 )
-                AppConfig.MSG_STATE_STOP_SUCCESS -> ServiceEvent.StateStopSuccess
-                AppConfig.MSG_MEASURE_DELAY_SUCCESS -> ServiceEvent.MeasureDelaySuccess(
+                AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess
+                AppConfig.MSG_MEASURE_DELAY_SUCCESS -> MainServiceEvent.MeasureDelaySuccess(
                     safeIntent.getStringExtra("content").orEmpty()
                 )
-                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> ServiceEvent.MeasureConfigSuccess
-                AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> ServiceEvent.MeasureConfigNotify(
+                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> MainServiceEvent.MeasureConfigSuccess
+                AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> MainServiceEvent.MeasureConfigNotify(
                     safeIntent.getStringExtra("content").orEmpty()
                 )
-                AppConfig.MSG_MEASURE_CONFIG_FINISH -> ServiceEvent.MeasureConfigFinish(
+                AppConfig.MSG_MEASURE_CONFIG_FINISH -> MainServiceEvent.MeasureConfigFinish(
                     safeIntent.getStringExtra("content")
                 )
                 else -> null
             }
-            event?.let { _serviceEvent.tryEmit(it) }
+            event?.let { _mainServiceEvent.tryEmit(it) }
         }
     }
 

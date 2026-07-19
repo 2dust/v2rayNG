@@ -16,7 +16,7 @@ import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.ui.main.MainAction
 import com.v2ray.ang.ui.main.MainDataSource
 import com.v2ray.ang.ui.main.MainUiState
-import com.v2ray.ang.ui.main.ServiceEvent
+import com.v2ray.ang.ui.main.MainServiceEvent
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -90,22 +90,22 @@ class MainViewModel(
 
     private fun collectServiceEvents() {
         viewModelScope.launch {
-            dataSource.serviceEvent.collect { event ->
+            dataSource.mainServiceEvent.collect { event ->
                 handleServiceEvent(event)
             }
         }
     }
 
-    private suspend fun handleServiceEvent(event: ServiceEvent) {
+    private suspend fun handleServiceEvent(event: MainServiceEvent) {
         when (event) {
-            ServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
-            ServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
-            ServiceEvent.StateStartSuccess -> {
+            MainServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
+            MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
+            MainServiceEvent.StateStartSuccess -> {
                 toastSuccess(R.string.toast_services_success)
                 updateRunningState(true)
             }
 
-            is ServiceEvent.StateStartFailure -> {
+            is MainServiceEvent.StateStartFailure -> {
                 val error = event.errorMessage
                 if (error.isNotBlank()) {
                     toastError(error)
@@ -115,12 +115,12 @@ class MainViewModel(
                 updateRunningState(false)
             }
 
-            ServiceEvent.StateStopSuccess -> updateRunningState(false)
-            is ServiceEvent.MeasureDelaySuccess -> {
+            MainServiceEvent.StateStopSuccess -> updateRunningState(false)
+            is MainServiceEvent.MeasureDelaySuccess -> {
                 _uiState.update { it.copy(statusText = event.content) }
             }
 
-            ServiceEvent.MeasureConfigSuccess -> {
+            MainServiceEvent.MeasureConfigSuccess -> {
                 viewModelScope.launch(ioDispatcher) {
                     val gid = testingGroupId ?: uiState.value.selectedGroupId
                     cacheMutex.withLock { groupDataCache.remove(gid) }
@@ -128,7 +128,7 @@ class MainViewModel(
                 }
             }
 
-            is ServiceEvent.MeasureConfigNotify -> {
+            is MainServiceEvent.MeasureConfigNotify -> {
                 _uiState.update {
                     it.copy(
                         statusText = dataSource.getString(
@@ -139,7 +139,7 @@ class MainViewModel(
                 }
             }
 
-            is ServiceEvent.MeasureConfigFinish -> {
+            is MainServiceEvent.MeasureConfigFinish -> {
                 if (event.finishedCount == "0") {
                     onTestsFinished()
                 }

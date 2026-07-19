@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import java.io.Closeable
 
 interface MainDataSource : Closeable {
-    val serviceEvent: Flow<ServiceEvent>
+    val mainServiceEvent: Flow<MainServiceEvent>
 
     fun getSelectedSubscriptionId(): String
     fun setSelectedSubscriptionId(id: String)
