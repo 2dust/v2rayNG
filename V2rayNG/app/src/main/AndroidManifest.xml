@@ -53,7 +53,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
