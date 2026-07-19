@@ -2,7 +2,7 @@ package com.v2ray.ang.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.v2ray.ang.AngApplication
+import com.v2ray.ang.extension.myApp
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -31,42 +31,56 @@ abstract class BaseViewModel : ViewModel() {
      * Send neutral toast event (Resource ID).
      */
     fun toast(resId: Int) {
-        AngApplication.application.toast(resId)
+        myApp.toast(resId)
     }
 
     /**
      * Send neutral toast event (String).
      */
     fun toast(message: String) {
-        AngApplication.application.toast(message)
+        myApp.toast(message)
     }
 
     /**
      * Send success toast event (Resource ID).
      */
     fun toastSuccess(resId: Int) {
-        AngApplication.application.toastSuccess(resId)
+        myApp.toastSuccess(resId)
     }
 
     /**
      * Send success toast event (String).
      */
     fun toastSuccess(message: String) {
-        AngApplication.application.toastSuccess(message)
+        myApp.toastSuccess(message)
     }
 
     /**
      * Send error toast event (Resource ID).
      */
     fun toastError(resId: Int) {
-        AngApplication.application.toastError(resId)
+        myApp.toastError(resId)
     }
 
     /**
      * Send error toast event (String).
      */
     fun toastError(message: String) {
-        AngApplication.application.toastError(message)
+        myApp.toastError(message)
+    }
+
+    /**
+     * Get string from resource ID.
+     */
+    fun getString(resId: Int): String {
+        return myApp.getString(resId)
+    }
+
+    /**
+     * Get formatted string from resource ID.
+     */
+    fun getString(resId: Int, vararg formatArgs: Any?): String {
+        return myApp.getString(resId, *formatArgs)
     }
 
     /**

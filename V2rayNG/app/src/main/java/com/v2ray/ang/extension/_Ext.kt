@@ -17,8 +17,8 @@ import java.io.Serializable
 import java.net.URI
 import java.util.Locale
 
-val Context.v2RayApplication: AngApplication?
-    get() = applicationContext as? AngApplication
+val myApp: AngApplication
+    get() = AngApplication.application
 
 private inline fun runOnMain(crossinline block: () -> Unit) {
     if (Looper.myLooper() == Looper.getMainLooper()) {
