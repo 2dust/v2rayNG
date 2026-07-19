@@ -14,20 +14,9 @@ data class MainUiState(
     val isLoading: Boolean = false,
     val isTesting: Boolean = false,
     val statusText: String = "",
-    val userMessage: UserMessage? = null,
     val locateTarget: LocateTarget? = null,
     val confirmRemove: Boolean = false,
     val doubleColumnDisplay: Boolean = false
-)
-
-/**
- * One-time user message (e.g., Toast), using id to avoid re-consumption on recomposition
- */
-data class UserMessage(
-    val id: Long = System.nanoTime(),
-    val text: String,
-    val isError: Boolean = false,
-    val isSuccess: Boolean = false
 )
 
 /**
@@ -56,6 +45,5 @@ sealed interface MainAction {
 
     data class ImportBatchConfig(val configText: String) : MainAction
 
-    data class UserMessageShown(val messageId: Long) : MainAction
     data class LocateHandled(val target: LocateTarget) : MainAction
 }

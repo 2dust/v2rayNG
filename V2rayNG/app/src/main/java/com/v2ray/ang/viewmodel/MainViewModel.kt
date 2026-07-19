@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.main
+package com.v2ray.ang.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +13,10 @@ import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
+import com.v2ray.ang.ui.main.MainAction
+import com.v2ray.ang.ui.main.MainDataSource
+import com.v2ray.ang.ui.main.MainUiState
+import com.v2ray.ang.ui.main.ServiceEvent
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -36,7 +40,7 @@ import java.util.regex.PatternSyntaxException
 
 class MainViewModel(
     private val dataSource: MainDataSource
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
@@ -120,25 +124,25 @@ class MainViewModel(
             ServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
             ServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
             ServiceEvent.StateStartSuccess -> {
-                showToast(dataSource.getString(R.string.toast_services_success), isSuccess = true)
+                toastSuccess(R.string.toast_services_success)
                 updateRunningState(true)
             }
+
             is ServiceEvent.StateStartFailure -> {
                 val error = event.errorMessage
                 if (error.isNotBlank()) {
-                    showToast(error, isError = true)
+                    toastError(error)
                 } else {
-                    showToast(
-                        dataSource.getString(R.string.toast_services_failure),
-                        isError = true
-                    )
+                    toastError(R.string.toast_services_failure)
                 }
                 updateRunningState(false)
             }
+
             ServiceEvent.StateStopSuccess -> updateRunningState(false)
             is ServiceEvent.MeasureDelaySuccess -> {
                 _uiState.update { it.copy(statusText = event.content) }
             }
+
             ServiceEvent.MeasureConfigSuccess -> {
                 viewModelScope.launch(ioDispatcher) {
                     val gid = testingGroupId ?: uiState.value.selectedGroupId
@@ -146,6 +150,7 @@ class MainViewModel(
                     updateGroupUi(gid, loadGroup(gid, forceRefresh = true))
                 }
             }
+
             is ServiceEvent.MeasureConfigNotify -> {
                 _uiState.update {
                     it.copy(
@@ -156,6 +161,7 @@ class MainViewModel(
                     )
                 }
             }
+
             is ServiceEvent.MeasureConfigFinish -> {
                 if (event.finishedCount == "0") {
                     onTestsFinished()
@@ -195,7 +201,6 @@ class MainViewModel(
             is MainAction.Search -> filterConfig(action.query)
             is MainAction.SwapServer -> swapServer(action.fromIndex, action.toIndex)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
-            is MainAction.UserMessageShown -> consumeUserMessage(action.messageId)
             is MainAction.LocateHandled -> consumeLocateTarget(action.target)
             MainAction.ToggleService,
             MainAction.TestCurrentServer -> {
@@ -378,22 +383,18 @@ class MainViewModel(
                 )
                 when {
                     count > 0 -> {
-                        showToast(
-                            dataSource.getString(R.string.title_import_config_count, count)
-                        )
+                        toast(dataSource.getString(R.string.title_import_config_count, count))
                         setupGroupTab(forceRefresh = true)
                     }
+
                     countSub > 0 -> setupGroupTab(forceRefresh = true)
-                    else -> showToast(
-                        dataSource.getString(R.string.toast_failure),
-                        isError = true
-                    )
+                    else -> toastError(R.string.toast_failure)
                 }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
-                showToast(dataSource.getString(R.string.toast_failure), isError = true)
+                toastError(R.string.toast_failure)
             }
         }
     }
@@ -405,35 +406,18 @@ class MainViewModel(
                 val result = if (subId.isEmpty()) {
                     dataSource.updateConfigViaSubAll()
                 } else {
-                    val item = dataSource.getSubscriptionItem(subId)
-                        ?: return@launchWithLoading showToast(
-                            dataSource.getString(R.string.toast_failure),
-                            isError = true
-                        )
+                    val item = dataSource.getSubscriptionItem(subId) ?: return@launchWithLoading
                     dataSource.updateConfigViaSub(SubscriptionCache(subId, item))
                 }
                 when {
                     result.successCount + result.failureCount + result.skipCount == 0 ->
-                        showToast(
-                            dataSource.getString(R.string.title_update_subscription_no_subscription)
-                        )
+                        toast(R.string.title_update_subscription_no_subscription)
+
                     result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
-                        showToast(
-                            dataSource.getString(
-                                R.string.title_update_config_count,
-                                result.configCount
-                            )
-                        )
+                        toast(dataSource.getString(R.string.title_update_config_count, result.configCount))
+
                     else ->
-                        showToast(
-                            dataSource.getString(
-                                R.string.title_update_subscription_result,
-                                result.configCount,
-                                result.successCount,
-                                result.failureCount,
-                                result.skipCount
-                            )
-                        )
+                        toast(dataSource.getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
                 }
                 if (result.configCount > 0) {
                     setupGroupTab(forceRefresh = true)
@@ -443,7 +427,7 @@ class MainViewModel(
                 throw cancelled
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Subscription update failed", e)
-                showToast(dataSource.getString(R.string.toast_failure), isError = true)
+                toastError(R.string.toast_failure)
             }
         }
     }
@@ -459,15 +443,15 @@ class MainViewModel(
                 }
                 val ret = dataSource.shareNonCustomConfigsToClipboard(list)
                 if (ret > 0) {
-                    showToast(dataSource.getString(R.string.title_export_config_count, ret))
+                    toast(dataSource.getString(R.string.title_export_config_count, ret))
                 } else {
-                    showToast(dataSource.getString(R.string.toast_failure), isError = true)
+                    toastError(R.string.toast_failure)
                 }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Export failed", e)
-                showToast(dataSource.getString(R.string.toast_failure), isError = true)
+                toastError(R.string.toast_failure)
             }
         }
     }
@@ -487,12 +471,12 @@ class MainViewModel(
                     cacheMutex.withLock { groupDataCache.clear() }
                 }
                 setupGroupTab(forceRefresh = true)
-                showToast(dataSource.getString(R.string.title_del_config_count, count))
+                toast(dataSource.getString(R.string.title_del_config_count, count))
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Delete all failed", e)
-                showToast(dataSource.getString(R.string.toast_failure), isError = true)
+                toastError(R.string.toast_failure)
             }
         }
     }
@@ -511,17 +495,12 @@ class MainViewModel(
                 }
                 duplicates.forEach { dataSource.removeServer(it) }
                 setupGroupTab(forceRefresh = true)
-                showToast(
-                    dataSource.getString(
-                        R.string.title_del_duplicate_config_count,
-                        duplicates.size
-                    )
-                )
+                toast(dataSource.getString(R.string.title_del_duplicate_config_count, duplicates.size))
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Delete duplicate failed", e)
-                showToast(dataSource.getString(R.string.toast_failure), isError = true)
+                toastError(R.string.toast_failure)
             }
         }
     }
@@ -534,12 +513,12 @@ class MainViewModel(
                     cacheMutex.withLock { groupDataCache.clear() }
                     setupGroupTab(forceRefresh = true)
                 }
-                showToast(dataSource.getString(R.string.title_del_config_count, count))
+                toast(dataSource.getString(R.string.title_del_config_count, count))
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Delete invalid failed", e)
-                showToast(dataSource.getString(R.string.toast_failure), isError = true)
+                toastError(R.string.toast_failure)
             }
         }
     }
@@ -566,7 +545,7 @@ class MainViewModel(
                 throw cancelled
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Sort by test results failed", e)
-                showToast(dataSource.getString(R.string.toast_failure), isError = true)
+                toastError(R.string.toast_failure)
             }
         }
     }
@@ -649,7 +628,7 @@ class MainViewModel(
 
     fun removeServerAndRefresh(guid: String) {
         if (guid == uiState.value.selectedGuid) {
-            showToast(dataSource.getString(R.string.toast_action_not_allowed), isError = false)
+            toast(R.string.toast_action_not_allowed)
             return
         }
         viewModelScope.launch(ioDispatcher) {
@@ -759,29 +738,6 @@ class MainViewModel(
     }
 
     fun getPosition(guid: String): Int = currentServers().indexOfFirst { it.guid == guid }
-
-    // ---------- User messages ----------
-    private fun showToast(
-        text: String,
-        isError: Boolean = false,
-        isSuccess: Boolean = false
-    ) {
-        _uiState.update {
-            it.copy(
-                userMessage = UserMessage(
-                    text = text,
-                    isError = isError,
-                    isSuccess = isSuccess
-                )
-            )
-        }
-    }
-
-    private fun consumeUserMessage(messageId: Long) {
-        _uiState.update { state ->
-            if (state.userMessage?.id == messageId) state.copy(userMessage = null) else state
-        }
-    }
 
     private fun consumeLocateTarget(target: LocateTarget) {
         _uiState.update { state ->

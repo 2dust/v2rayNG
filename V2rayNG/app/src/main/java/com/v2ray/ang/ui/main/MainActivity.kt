@@ -10,9 +10,7 @@ import android.view.KeyEvent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -51,6 +49,7 @@ import com.v2ray.ang.ui.server.ServerVmessActivity
 import com.v2ray.ang.ui.server.ServerWireguardActivity
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -97,20 +96,6 @@ class MainActivity : HelperBaseComponentActivity() {
         super.onCreate(savedInstanceState)
         mainViewModel.onAction(MainAction.Initialize)
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mainViewModel.uiState.collect { state ->
-                    state.userMessage?.let { msg ->
-                        when {
-                            msg.isSuccess -> toastSuccess(msg.text)
-                            msg.isError -> toastError(msg.text)
-                            else -> toast(msg.text)
-                        }
-                        mainViewModel.onAction(MainAction.UserMessageShown(msg.id))
-                    }
-                }
-            }
-        }
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
     }
 
