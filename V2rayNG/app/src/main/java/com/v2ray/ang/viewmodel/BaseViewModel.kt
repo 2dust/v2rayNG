@@ -3,6 +3,7 @@ package com.v2ray.ang.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AngApplication
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import kotlinx.coroutines.channels.Channel
@@ -25,6 +26,20 @@ abstract class BaseViewModel : ViewModel() {
     @Suppress("PropertyName")
     protected val _viewModelEvent = Channel<ViewModelEvent>()
     val viewModelEvent = _viewModelEvent.receiveAsFlow()
+
+    /**
+     * Send neutral toast event (Resource ID).
+     */
+    fun toast(resId: Int) {
+        AngApplication.application.toast(resId)
+    }
+
+    /**
+     * Send neutral toast event (String).
+     */
+    fun toast(message: String) {
+        AngApplication.application.toast(message)
+    }
 
     /**
      * Send success toast event (Resource ID).
