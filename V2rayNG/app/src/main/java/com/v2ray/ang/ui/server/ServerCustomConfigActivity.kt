@@ -84,10 +84,10 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
     private var initialContent: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         val config = MmkvManager.decodeServerConfig(editGuid)
         initialRemarks = config?.remarks ?: ""
         initialContent = MmkvManager.decodeServerRaw(editGuid).orEmpty()
-        super.onCreate(savedInstanceState)
     }
 
     @Composable

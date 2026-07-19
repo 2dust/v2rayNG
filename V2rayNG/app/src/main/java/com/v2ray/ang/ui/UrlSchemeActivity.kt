@@ -10,6 +10,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.ui.main.MainActivity
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,6 +20,7 @@ import java.net.URLDecoder
 class UrlSchemeActivity : BaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         try {
             intent.apply {
                 if (action == Intent.ACTION_SEND) {

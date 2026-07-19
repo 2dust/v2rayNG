@@ -1,6 +1,5 @@
 package com.v2ray.ang.viewmodel
 
-import androidx.lifecycle.ViewModel
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
@@ -9,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.UUID
 
-class RoutingSettingsViewModel : ViewModel() {
+class RoutingSettingsViewModel : BaseViewModel() {
     private val rulesets: MutableList<RulesetItem> = mutableListOf()
 
     private val _rulesetsFlow = MutableStateFlow<List<RulesetItem>>(emptyList())

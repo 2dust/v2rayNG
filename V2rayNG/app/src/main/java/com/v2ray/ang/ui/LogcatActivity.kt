@@ -130,7 +130,6 @@ fun LogcatScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val logs by viewModel.filteredLogs.collectAsStateWithLifecycle()
-    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
     var searchQuery by remember { mutableStateOf("") }
     var showSearch by remember { mutableStateOf(false) }
@@ -197,7 +196,7 @@ fun LogcatScreen(
         }
     ) { innerPadding ->
         PullToRefreshBox(
-            isRefreshing = isRefreshing,
+            isRefreshing = viewModel.isLoading.collectAsStateWithLifecycle().value,
             onRefresh = {
                 scope.launch(Dispatchers.IO) { viewModel.loadLogcat() }
             },

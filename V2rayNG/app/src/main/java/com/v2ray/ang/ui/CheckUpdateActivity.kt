@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,35 +16,24 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.v2ray.ang.AppConfig
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.LocalAppSnackbar
 import com.v2ray.ang.compose.SettingsMenuItem
 import com.v2ray.ang.compose.SettingsSwitchItem
-import com.v2ray.ang.compose.ToastType
 import com.v2ray.ang.compose.VersionInfoBlock
 import com.v2ray.ang.core.CoreNativeManager
-import com.v2ray.ang.dto.CheckUpdateResult
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.UpdateCheckerManager
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.launch
+import com.v2ray.ang.viewmodel.CheckUpdateViewModel
 
 class CheckUpdateActivity : BaseComponentActivity() {
+
+    private val viewModel: CheckUpdateViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,51 +41,27 @@ class CheckUpdateActivity : BaseComponentActivity() {
 
     @Composable
     override fun ScreenContent() {
-        CheckUpdateScreen(onBackClick = { finish() })
+        CheckUpdateScreen(viewModel = viewModel, onBackClick = { finish() })
     }
 }
 
 @Composable
-fun CheckUpdateScreen(onBackClick: () -> Unit) {
+fun CheckUpdateScreen(
+    viewModel: CheckUpdateViewModel,
+    onBackClick: () -> Unit
+) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val snackbar = LocalAppSnackbar.current
 
-    var isLoading by remember { mutableStateOf(false) }
-    var checkPreRelease by remember {
-        mutableStateOf(MmkvManager.decodeSettingsBool(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, false))
-    }
-    var showUpdateDialog by remember { mutableStateOf(false) }
-    var updateResult by remember { mutableStateOf<CheckUpdateResult?>(null) }
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val checkPreRelease by viewModel.checkPreRelease.collectAsStateWithLifecycle()
+    val showUpdateDialog by viewModel.showUpdateDialog.collectAsStateWithLifecycle()
+    val updateResult by viewModel.updateResult.collectAsStateWithLifecycle()
 
     val versionText = "v${BuildConfig.VERSION_NAME} (${CoreNativeManager.getLibVersion()})"
 
-    fun checkForUpdates(includePreRelease: Boolean) {
-        snackbar.showInfo(context, (R.string.update_checking_for_update))
-        isLoading = true
-        scope.launch {
-            try {
-                val result = UpdateCheckerManager.checkForUpdate(includePreRelease)
-                if (result.hasUpdate) {
-                    updateResult = result
-                    showUpdateDialog = true
-                } else {
-                    snackbar.showSuccess(context, R.string.update_already_latest_version)
-                }
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to check for updates: ${e.message}")
-                if (e.message == null) {
-                    snackbar.showError(context, R.string.toast_failure)
-                } else {
-                    snackbar.showError(e.message.orEmpty())
-                }
-            } finally {
-                isLoading = false
-            }
-        }
+    LaunchedEffect(Unit) {
+        viewModel.checkForUpdates()
     }
-
-    LaunchedEffect(Unit) { checkForUpdates(checkPreRelease) }
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
@@ -117,15 +83,12 @@ fun CheckUpdateScreen(onBackClick: () -> Unit) {
                 icon = painterResource(R.drawable.ic_source_code_24dp),
                 title = stringResource(R.string.update_check_pre_release),
                 checked = checkPreRelease,
-                onCheckedChange = { checked ->
-                    checkPreRelease = checked
-                    MmkvManager.encodeSettings(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, checked)
-                }
+                onCheckedChange = { viewModel.toggleCheckPreRelease(it) }
             )
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_check_update_24dp),
                 title = stringResource(R.string.update_check_for_update),
-                onClick = { checkForUpdates(checkPreRelease) }
+                onClick = { viewModel.checkForUpdates() }
             )
             VersionInfoBlock(versionText = versionText)
         }
@@ -134,19 +97,19 @@ fun CheckUpdateScreen(onBackClick: () -> Unit) {
     if (showUpdateDialog && updateResult != null) {
         val result = updateResult!!
         AlertDialog(
-            onDismissRequest = { showUpdateDialog = false },
+            onDismissRequest = { viewModel.dismissUpdateDialog() },
             title = { Text(stringResource(R.string.update_new_version_found, result.latestVersion ?: "")) },
             text = { Text(result.releaseNotes ?: "") },
             confirmButton = {
                 TextButton(onClick = {
-                    showUpdateDialog = false
+                    viewModel.dismissUpdateDialog()
                     result.downloadUrl?.let { Utils.openUri(context, it) }
                 }) {
                     Text(stringResource(R.string.update_now))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showUpdateDialog = false }) {
+                TextButton(onClick = { viewModel.dismissUpdateDialog() }) {
                     Text(stringResource(android.R.string.cancel))
                 }
             },

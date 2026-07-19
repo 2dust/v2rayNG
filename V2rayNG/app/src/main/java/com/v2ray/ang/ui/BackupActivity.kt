@@ -1,7 +1,9 @@
 package com.v2ray.ang.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,10 +25,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import com.tencent.mmkv.MMKV
+import androidx.lifecycle.repeatOnLifecycle
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.WEBDAV_BACKUP_FILE_NAME
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppTopBar
@@ -37,25 +39,18 @@ import com.v2ray.ang.compose.SettingsMenuItem
 import com.v2ray.ang.dto.entities.WebDavConfig
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.handler.WebDavManager
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.ZipUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.v2ray.ang.viewmodel.BackupViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class BackupActivity : HelperBaseComponentActivity() {
 
-    private val isLoadingState = MutableStateFlow(false)
-    private val webDavConfigState = MutableStateFlow(MmkvManager.decodeWebDavConfig())
+    private val viewModel: BackupViewModel by viewModels()
 
     private val configBackupOptions: Array<out String> by lazy {
         resources.getStringArray(R.array.config_backup_options)
@@ -63,94 +58,89 @@ class BackupActivity : HelperBaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewModelEvent.collect { event ->
+                    when (event) {
+                        is BackupViewModel.BackupViewModelEvent.ShareFile -> {
+                            handleShareFile(event.filePath)
+                        }
+
+                        is BackupViewModel.BackupViewModelEvent.ExportLocal -> {
+                            handleExportLocal(event.cachePath, event.targetUri)
+                        }
+
+                        is BackupViewModel.BackupViewModelEvent.RestoreSuccess -> {
+                            SettingsManager.initApp(this@BackupActivity)
+                        }
+
+                        else -> {}
+                    }
+                }
+            }
+        }
     }
 
     @Composable
     override fun ScreenContent() {
         BackupScreen(
-            isLoadingState = isLoadingState,
-            webDavConfigState = webDavConfigState,
+            isLoadingState = viewModel.isLoading,
+            webDavConfigState = viewModel.webDavConfig,
             backupOptions = configBackupOptions.toList(),
             onBackupOptionSelected = { which ->
                 when (which) {
                     0 -> backupViaLocal()
-                    1 -> backupViaWebDav()
+                    1 -> viewModel.backupViaWebDav(cacheDir, getString(R.string.app_name))
                 }
             },
-            onShareClick = { shareBackup() },
+            onShareClick = { viewModel.shareBackup(cacheDir, getString(R.string.app_name)) },
             restoreOptions = configBackupOptions.toList(),
             onRestoreOptionSelected = { which ->
                 when (which) {
                     0 -> restoreViaLocal()
-                    1 -> restoreViaWebDav()
+                    1 -> viewModel.restoreViaWebDav(cacheDir)
                 }
             },
-            onWebDavSave = { config -> saveWebDav(config) },
+            onWebDavSave = { config -> viewModel.saveWebDavConfig(config) },
             onBackClick = { finish() }
         )
     }
 
-    private fun shareBackup() {
-        val ret = backupConfigurationToCache()
-        if (ret.first) {
-            startActivity(
-                Intent.createChooser(
-                    Intent(Intent.ACTION_SEND).setType("application/zip")
-                        .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        .putExtra(
-                            Intent.EXTRA_STREAM,
-                            FileProvider.getUriForFile(
-                                this,
-                                BuildConfig.APPLICATION_ID + ".cache",
-                                File(ret.second)
-                            )
-                        ),
-                    getString(R.string.title_configuration_share)
-                )
+    private fun handleShareFile(filePath: String) {
+        startActivity(
+            Intent.createChooser(
+                Intent(Intent.ACTION_SEND).setType("application/zip")
+                    .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    .putExtra(
+                        Intent.EXTRA_STREAM,
+                        FileProvider.getUriForFile(
+                            this,
+                            BuildConfig.APPLICATION_ID + ".cache",
+                            File(filePath)
+                        )
+                    ),
+                getString(R.string.title_configuration_share)
             )
-        } else {
+        )
+    }
+
+    private fun handleExportLocal(cachePath: String, targetUri: Uri) {
+        try {
+            contentResolver.openOutputStream(targetUri)?.use { output ->
+                File(cachePath).inputStream().use { input ->
+                    input.copyTo(output)
+                }
+            }
+            File(cachePath).delete()
+            toastSuccess(R.string.toast_success)
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to copy backup to Uri", e)
             toastError(R.string.toast_failure)
         }
-    }
-
-    /**
-     * Backup configuration to cache directory
-     * Returns Pair<success, zipFilePath>
-     */
-    private fun backupConfigurationToCache(): Pair<Boolean, String> {
-        val dateFormatted = SimpleDateFormat(
-            "yyyy-MM-dd-HH-mm-ss",
-            Locale.getDefault()
-        ).format(System.currentTimeMillis())
-        val folderName = "${getString(R.string.app_name)}_${dateFormatted}"
-        val backupDir = this.cacheDir.absolutePath + "/$folderName"
-        val outputZipFilePath = "${this.cacheDir.absolutePath}/$folderName.zip"
-
-        val count = MMKV.backupAllToDirectory(backupDir)
-        if (count <= 0) {
-            return Pair(false, "")
-        }
-
-        if (ZipUtil.zipFromFolder(backupDir, outputZipFilePath)) {
-            return Pair(true, outputZipFilePath)
-        } else {
-            return Pair(false, "")
-        }
-    }
-
-    private fun restoreConfiguration(zipFile: File): Boolean {
-        val backupDir = this.cacheDir.absolutePath + "/${System.currentTimeMillis()}"
-
-        if (!ZipUtil.unzipToFolder(zipFile, backupDir)) {
-            return false
-        }
-
-        val count = MMKV.restoreAllFromDirectory(backupDir)
-        SettingsChangeManager.makeSetupGroupTab()
-        SettingsChangeManager.makeRestartService()
-
-        SettingsManager.initApp(this)
-        return count > 0
     }
 
     private fun backupViaLocal() {
@@ -162,25 +152,7 @@ class BackupActivity : HelperBaseComponentActivity() {
 
         launchCreateDocument(defaultFileName) { uri ->
             if (uri != null) {
-                try {
-                    val ret = backupConfigurationToCache()
-                    if (ret.first) {
-                        // Copy the cached zip file to user-selected location
-                        contentResolver.openOutputStream(uri)?.use { output ->
-                            File(ret.second).inputStream().use { input ->
-                                input.copyTo(output)
-                            }
-                        }
-                        // Clean up cache file
-                        File(ret.second).delete()
-                        toastSuccess(R.string.toast_success)
-                    } else {
-                        toastError(R.string.toast_failure)
-                    }
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Failed to backup configuration", e)
-                    toastError(R.string.toast_failure)
-                }
+                viewModel.prepareBackupForUri(cacheDir, getString(R.string.app_name), uri)
             }
         }
     }
@@ -192,123 +164,18 @@ class BackupActivity : HelperBaseComponentActivity() {
             }
             try {
                 val targetFile =
-                    File(this.cacheDir.absolutePath, "${System.currentTimeMillis()}.zip")
+                    File(cacheDir.absolutePath, "${System.currentTimeMillis()}.zip")
                 contentResolver.openInputStream(uri).use { input ->
                     targetFile.outputStream().use { fileOut ->
                         input?.copyTo(fileOut)
                     }
                 }
-                if (restoreConfiguration(targetFile)) {
-                    toastSuccess(R.string.toast_success)
-                } else {
-                    toastError(R.string.toast_failure)
-                }
+                viewModel.restoreConfiguration(cacheDir, targetFile)
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Error during file restore", e)
                 toastError(R.string.toast_failure)
             }
         }
-    }
-
-    private fun backupViaWebDav() {
-        val saved = MmkvManager.decodeWebDavConfig()
-        if (saved == null || saved.baseUrl.isEmpty()) {
-            toastError(R.string.title_webdav_config_setting_unknown)
-            return
-        }
-
-        isLoadingState.value = true
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            var tempFile: File? = null
-            try {
-                val ret = backupConfigurationToCache()
-                if (!ret.first) {
-                    withContext(Dispatchers.Main) {
-                        toastError(R.string.toast_failure)
-                    }
-                    return@launch
-                }
-
-                tempFile = File(ret.second)
-                WebDavManager.init(saved)
-
-                val ok = try {
-                    WebDavManager.uploadFile(tempFile, WEBDAV_BACKUP_FILE_NAME)
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "WebDAV upload error", e)
-                    false
-                }
-
-                withContext(Dispatchers.Main) {
-                    if (ok) toastSuccess(R.string.toast_success) else toastError(R.string.toast_failure)
-                }
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "WebDAV backup error", e)
-                withContext(Dispatchers.Main) {
-                    toastError(R.string.toast_failure)
-                }
-            } finally {
-                try {
-                    tempFile?.delete()
-                } catch (_: Exception) {
-                }
-                withContext(Dispatchers.Main) {
-                    isLoadingState.value = false
-                }
-            }
-        }
-    }
-
-    private fun restoreViaWebDav() {
-        val saved = MmkvManager.decodeWebDavConfig()
-        if (saved == null || saved.baseUrl.isEmpty()) {
-            toastError(R.string.title_webdav_config_setting_unknown)
-            return
-        }
-
-        isLoadingState.value = true
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            var target: File? = null
-            try {
-                target = File(cacheDir, "download_${System.currentTimeMillis()}.zip")
-                WebDavManager.init(saved)
-                val ok = WebDavManager.downloadFile(WEBDAV_BACKUP_FILE_NAME, target)
-                if (!ok) {
-                    withContext(Dispatchers.Main) {
-                        toastError(R.string.toast_failure)
-                    }
-                    return@launch
-                }
-
-                val restored = restoreConfiguration(target)
-                withContext(Dispatchers.Main) {
-                    if (restored) {
-                        toastSuccess(R.string.toast_success)
-                    } else {
-                        toastError(R.string.toast_failure)
-                    }
-                }
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "WebDAV download error", e)
-                withContext(Dispatchers.Main) { toastError(R.string.toast_failure) }
-            } finally {
-                try {
-                    target?.delete()
-                } catch (_: Exception) {
-                }
-                withContext(Dispatchers.Main) {
-                    isLoadingState.value = false
-                }
-            }
-        }
-    }
-
-    private fun saveWebDav(config: WebDavConfig){
-        MmkvManager.encodeWebDavConfig(config)
-        webDavConfigState.value = config
-        toastSuccess(R.string.toast_success)
     }
 }
 
