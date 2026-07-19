@@ -69,7 +69,7 @@ fun MainScreen(
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val groups = uiState.groups
-    val isLoading = uiState.isLoading
+    val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
     val isRunning = uiState.isRunning
     val displayText = uiState.statusText
     val selectedGuid = uiState.selectedGuid

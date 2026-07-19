@@ -11,7 +11,6 @@ data class MainUiState(
     val selectedGroupId: String = "",
     val selectedGuid: String? = null,
     val isRunning: Boolean = false,
-    val isLoading: Boolean = false,
     val isTesting: Boolean = false,
     val statusText: String = "",
     val locateTarget: LocateTarget? = null,

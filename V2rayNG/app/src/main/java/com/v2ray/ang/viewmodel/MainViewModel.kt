@@ -33,9 +33,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 import java.util.regex.PatternSyntaxException
 
 class MainViewModel(
@@ -60,29 +60,6 @@ class MainViewModel(
         )
     )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
-
-    // ---------- Loading management ----------
-    private val loadingCount = AtomicInteger(0)
-    private val loadingMutex = Mutex()
-
-    private suspend fun withLoading(block: suspend () -> Unit) {
-        loadingMutex.withLock {
-            val count = loadingCount.incrementAndGet()
-            if (count == 1) _uiState.update { it.copy(isLoading = true) }
-        }
-        try {
-            block()
-        } finally {
-            val count = loadingCount.decrementAndGet()
-            if (count == 0) _uiState.update { it.copy(isLoading = false) }
-        }
-    }
-
-    private fun launchWithLoading(block: suspend () -> Unit): Job {
-        return viewModelScope.launch(ioDispatcher) {
-            withLoading { block() }
-        }
-    }
 
     // ---------- Keyword filtering ----------
     @Volatile
@@ -376,149 +353,161 @@ class MainViewModel(
 
     // ---------- Business actions (coroutine-based) ----------
     private fun importBatchConfig(configText: String) {
-        launchWithLoading {
-            try {
-                val (count, countSub) = dataSource.importBatchConfig(
-                    configText, uiState.value.selectedGroupId, true
-                )
-                when {
-                    count > 0 -> {
-                        toast(dataSource.getString(R.string.title_import_config_count, count))
-                        setupGroupTab(forceRefresh = true)
-                    }
+        launchLoading {
+            withContext(ioDispatcher) {
+                try {
+                    val (count, countSub) = dataSource.importBatchConfig(
+                        configText, uiState.value.selectedGroupId, true
+                    )
+                    when {
+                        count > 0 -> {
+                            toast(dataSource.getString(R.string.title_import_config_count, count))
+                            setupGroupTab(forceRefresh = true)
+                        }
 
-                    countSub > 0 -> setupGroupTab(forceRefresh = true)
-                    else -> toastError(R.string.toast_failure)
+                        countSub > 0 -> setupGroupTab(forceRefresh = true)
+                        else -> toastError(R.string.toast_failure)
+                    }
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
+                    toastError(R.string.toast_failure)
                 }
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
-                toastError(R.string.toast_failure)
             }
         }
     }
 
     private fun importConfigViaSub() {
         val subId = uiState.value.selectedGroupId
-        launchWithLoading {
-            try {
-                val result = if (subId.isEmpty()) {
-                    dataSource.updateConfigViaSubAll()
-                } else {
-                    val item = dataSource.getSubscriptionItem(subId) ?: return@launchWithLoading
-                    dataSource.updateConfigViaSub(SubscriptionCache(subId, item))
-                }
-                when {
-                    result.successCount + result.failureCount + result.skipCount == 0 ->
-                        toast(R.string.title_update_subscription_no_subscription)
+        launchLoading {
+            withContext(ioDispatcher) {
+                try {
+                    val result = if (subId.isEmpty()) {
+                        dataSource.updateConfigViaSubAll()
+                    } else {
+                        val item = dataSource.getSubscriptionItem(subId) ?: return@withContext
+                        dataSource.updateConfigViaSub(SubscriptionCache(subId, item))
+                    }
+                    when {
+                        result.successCount + result.failureCount + result.skipCount == 0 ->
+                            toast(R.string.title_update_subscription_no_subscription)
 
-                    result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
-                        toast(dataSource.getString(R.string.title_update_config_count, result.configCount))
+                        result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
+                            toast(dataSource.getString(R.string.title_update_config_count, result.configCount))
 
-                    else ->
-                        toast(dataSource.getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
+                        else ->
+                            toast(dataSource.getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
+                    }
+                    if (result.configCount > 0) {
+                        setupGroupTab(forceRefresh = true)
+                        refreshSelectedGuid()
+                    }
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Subscription update failed", e)
+                    toastError(R.string.toast_failure)
                 }
-                if (result.configCount > 0) {
-                    setupGroupTab(forceRefresh = true)
-                    refreshSelectedGuid()
-                }
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Subscription update failed", e)
-                toastError(R.string.toast_failure)
             }
         }
     }
 
     private fun exportAllAsync() {
-        launchWithLoading {
-            try {
-                val groupId = uiState.value.selectedGroupId
-                val list = if (groupId.isEmpty() && keywordFilter.isEmpty()) {
-                    dataSource.getServerGuidList("")
-                } else {
-                    currentServers().map { it.guid }
-                }
-                val ret = dataSource.shareNonCustomConfigsToClipboard(list)
-                if (ret > 0) {
-                    toast(dataSource.getString(R.string.title_export_config_count, ret))
-                } else {
+        launchLoading {
+            withContext(ioDispatcher) {
+                try {
+                    val groupId = uiState.value.selectedGroupId
+                    val list = if (groupId.isEmpty() && keywordFilter.isEmpty()) {
+                        dataSource.getServerGuidList("")
+                    } else {
+                        currentServers().map { it.guid }
+                    }
+                    val ret = dataSource.shareNonCustomConfigsToClipboard(list)
+                    if (ret > 0) {
+                        toast(dataSource.getString(R.string.title_export_config_count, ret))
+                    } else {
+                        toastError(R.string.toast_failure)
+                    }
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Export failed", e)
                     toastError(R.string.toast_failure)
                 }
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Export failed", e)
-                toastError(R.string.toast_failure)
             }
         }
     }
 
     private fun removeAllServerAsync() {
-        launchWithLoading {
-            try {
-                val count =
-                    if (uiState.value.selectedGroupId.isEmpty() && keywordFilter.isEmpty()) {
-                        dataSource.removeAllServer()
-                    } else {
-                        val guids = currentServers().map { it.guid }
-                        guids.forEach { dataSource.removeServer(it) }
-                        guids.size
+        launchLoading {
+            withContext(ioDispatcher) {
+                try {
+                    val count =
+                        if (uiState.value.selectedGroupId.isEmpty() && keywordFilter.isEmpty()) {
+                            dataSource.removeAllServer()
+                        } else {
+                            val guids = currentServers().map { it.guid }
+                            guids.forEach { dataSource.removeServer(it) }
+                            guids.size
+                        }
+                    viewModelScope.launch(ioDispatcher) {
+                        cacheMutex.withLock { groupDataCache.clear() }
                     }
-                viewModelScope.launch(ioDispatcher) {
-                    cacheMutex.withLock { groupDataCache.clear() }
+                    setupGroupTab(forceRefresh = true)
+                    toast(dataSource.getString(R.string.title_del_config_count, count))
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Delete all failed", e)
+                    toastError(R.string.toast_failure)
                 }
-                setupGroupTab(forceRefresh = true)
-                toast(dataSource.getString(R.string.title_del_config_count, count))
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Delete all failed", e)
-                toastError(R.string.toast_failure)
             }
         }
     }
 
     private fun removeDuplicateServerAsync() {
-        launchWithLoading {
-            try {
-                val seen = HashSet<ProfileItem>()
-                val duplicates = ArrayList<String>()
-                currentServers().forEach { server ->
-                    val profile = server.profile
-                    if (!profile.configType.isComplexType()) {
-                        val identity = profile.duplicateIdentity()
-                        if (!seen.add(identity)) duplicates += server.guid
+        launchLoading {
+            withContext(ioDispatcher) {
+                try {
+                    val seen = HashSet<ProfileItem>()
+                    val duplicates = ArrayList<String>()
+                    currentServers().forEach { server ->
+                        val profile = server.profile
+                        if (!profile.configType.isComplexType()) {
+                            val identity = profile.duplicateIdentity()
+                            if (!seen.add(identity)) duplicates += server.guid
+                        }
                     }
+                    duplicates.forEach { dataSource.removeServer(it) }
+                    setupGroupTab(forceRefresh = true)
+                    toast(dataSource.getString(R.string.title_del_duplicate_config_count, duplicates.size))
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Delete duplicate failed", e)
+                    toastError(R.string.toast_failure)
                 }
-                duplicates.forEach { dataSource.removeServer(it) }
-                setupGroupTab(forceRefresh = true)
-                toast(dataSource.getString(R.string.title_del_duplicate_config_count, duplicates.size))
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Delete duplicate failed", e)
-                toastError(R.string.toast_failure)
             }
         }
     }
 
     private fun removeInvalidServerAsync() {
-        launchWithLoading {
-            try {
-                val count = removeInvalidServerInternal()
-                viewModelScope.launch(ioDispatcher) {
-                    cacheMutex.withLock { groupDataCache.clear() }
-                    setupGroupTab(forceRefresh = true)
+        launchLoading {
+            withContext(ioDispatcher) {
+                try {
+                    val count = removeInvalidServerInternal()
+                    viewModelScope.launch(ioDispatcher) {
+                        cacheMutex.withLock { groupDataCache.clear() }
+                        setupGroupTab(forceRefresh = true)
+                    }
+                    toast(dataSource.getString(R.string.title_del_config_count, count))
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Delete invalid failed", e)
+                    toastError(R.string.toast_failure)
                 }
-                toast(dataSource.getString(R.string.title_del_config_count, count))
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Delete invalid failed", e)
-                toastError(R.string.toast_failure)
             }
         }
     }
@@ -536,16 +525,18 @@ class MainViewModel(
     }
 
     private fun sortByTestResultsAsync() {
-        launchWithLoading {
-            try {
-                sortByTestResultsInternal()
-                cacheMutex.withLock { groupDataCache.clear() }
-                setupGroupTab(forceRefresh = true)
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Sort by test results failed", e)
-                toastError(R.string.toast_failure)
+        launchLoading {
+            withContext(ioDispatcher) {
+                try {
+                    sortByTestResultsInternal()
+                    cacheMutex.withLock { groupDataCache.clear() }
+                    setupGroupTab(forceRefresh = true)
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Sort by test results failed", e)
+                    toastError(R.string.toast_failure)
+                }
             }
         }
     }
