@@ -1,14 +1,12 @@
 package com.v2ray.ang.viewmodel
 
-import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AngApplication
+import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.GroupMapItem
@@ -65,12 +63,10 @@ data class MainUiState(
     val doubleColumnDisplay: Boolean = false
 )
 
-class MainViewModel(
-    application: Application
-) : AndroidViewModel(application) {
+class MainViewModel : BaseViewModel() {
 
     private val app: AngApplication
-        get() = getApplication()
+        get() = AngApplication.application
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
@@ -203,6 +199,7 @@ class MainViewModel(
             val count = loadingCount.incrementAndGet()
             if (count == 1) {
                 _uiState.update { it.copy(isLoading = true) }
+                _isLoading.value = true
             }
         } else {
             val count = loadingCount.updateAndGet {
@@ -210,6 +207,7 @@ class MainViewModel(
             }
             if (count == 0) {
                 _uiState.update { it.copy(isLoading = false) }
+                _isLoading.value = false
             }
         }
     }

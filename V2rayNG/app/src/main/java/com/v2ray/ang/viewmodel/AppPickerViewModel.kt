@@ -1,8 +1,6 @@
 package com.v2ray.ang.viewmodel
 
 import android.content.Context
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.util.AppManagerUtil
@@ -11,20 +9,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.Collator
 
 /**
  * ViewModel for AppPicker screen.
  */
-class AppPickerViewModel : ViewModel() {
+class AppPickerViewModel : BaseViewModel() {
 
     private val _selectedPackages = MutableStateFlow<Set<String>>(emptySet())
     val selectedPackages: StateFlow<Set<String>> = _selectedPackages.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _displayedApps = MutableStateFlow<List<AppInfo>>(emptyList())
     val displayedApps: StateFlow<List<AppInfo>> = _displayedApps.asStateFlow()
@@ -38,8 +32,7 @@ class AppPickerViewModel : ViewModel() {
     }
 
     fun loadApps(context: Context) {
-        viewModelScope.launch {
-            _isLoading.value = true
+        launchLoading {
             try {
                 SelectedSnapshot = _selectedPackages.value.toSet()
                 val apps = withContext(Dispatchers.IO) {
@@ -51,8 +44,7 @@ class AppPickerViewModel : ViewModel() {
                 _displayedApps.value = applyFilter(currentQuery)
             } catch (e: Exception) {
                 LogUtil.e("AppPickerViewModel", "Failed to load app list", e)
-            } finally {
-                _isLoading.value = false
+                toastError(com.v2ray.ang.R.string.toast_failure)
             }
         }
     }

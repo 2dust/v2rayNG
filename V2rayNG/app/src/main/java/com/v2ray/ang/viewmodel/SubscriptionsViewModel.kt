@@ -1,6 +1,5 @@
 package com.v2ray.ang.viewmodel
 
-import androidx.lifecycle.ViewModel
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.handler.MmkvManager
@@ -10,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class SubscriptionsViewModel : ViewModel() {
+class SubscriptionsViewModel : BaseViewModel() {
     private val subscriptions: MutableList<SubscriptionCache> =
         MmkvManager.decodeSubscriptions().toMutableList()
 

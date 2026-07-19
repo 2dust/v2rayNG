@@ -1,30 +1,22 @@
 package com.v2ray.ang.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.util.LogUtil
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import java.io.IOException
 
-class LogcatViewModel : ViewModel() {
+class LogcatViewModel : BaseViewModel() {
     private val logsetsAll: MutableList<String> = mutableListOf()
     private var currentFilter: String = ""
 
     private val _filteredLogs = MutableStateFlow<List<String>>(emptyList())
     val filteredLogs: StateFlow<List<String>> = _filteredLogs.asStateFlow()
 
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
-
     fun loadLogcat() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _isRefreshing.value = true
+        launchLoading {
             try {
                 val lst = LinkedHashSet<String>()
                 lst.add("logcat")
@@ -41,8 +33,6 @@ class LogcatViewModel : ViewModel() {
                 applyFilter()
             } catch (e: IOException) {
                 LogUtil.e(AppConfig.TAG, "Failed to get logcat", e)
-            } finally {
-                _isRefreshing.value = false
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.v2ray.ang.viewmodel
 
 import android.net.Uri
-import androidx.lifecycle.viewModelScope
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.WEBDAV_BACKUP_FILE_NAME
