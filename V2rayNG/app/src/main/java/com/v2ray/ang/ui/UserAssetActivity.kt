@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -234,7 +233,6 @@ class UserAssetActivity : HelperBaseComponentActivity() {
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun refreshData() {
         viewModel.reload(getGeoFilesSources())
         refreshTrigger.value++

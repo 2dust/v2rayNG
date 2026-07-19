@@ -1,7 +1,7 @@
 package com.v2ray.ang.ui
 
-import android.content.Context
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,19 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
@@ -34,17 +32,16 @@ import com.v2ray.ang.compose.SettingsMenuItem
 import com.v2ray.ang.compose.SettingsSwitchItem
 import com.v2ray.ang.compose.ThemeManager
 import com.v2ray.ang.compose.verticalScrollbar
-import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvString
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.root.RootManager
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.v2ray.ang.viewmodel.SettingsViewModel
 
 class SettingsActivity : BaseComponentActivity() {
+
+    private val viewModel: SettingsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +50,7 @@ class SettingsActivity : BaseComponentActivity() {
     @Composable
     override fun ScreenContent() {
         SettingsScreen(
+            viewModel = viewModel,
             onBackClick = { finish() },
             onModeHelpClicked = { Utils.openUri(this, AppConfig.APP_WIKI_MODE) }
         )
@@ -62,20 +60,12 @@ class SettingsActivity : BaseComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
+    viewModel: SettingsViewModel,
     onBackClick: () -> Unit,
     onModeHelpClicked: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val scrollState = rememberScrollState()
-
-    suspend fun checkAndRequestRoot(context: Context): Boolean {
-        val hasRoot = withContext(Dispatchers.IO) { RootManager.refresh() }
-        if (!hasRoot) {
-            context.toastError(R.string.toast_root_required)
-        }
-        return hasRoot
-    }
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     var localDns by rememberMmkvBool(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
     var fakeDns by rememberMmkvBool(AppConfig.PREF_FAKE_DNS_ENABLED, false)
@@ -171,30 +161,13 @@ fun SettingsScreen(
     val modeEntries = stringArrayResource(R.array.mode_entries).toList()
     val modeValues = stringArrayResource(R.array.mode_value).toList()
 
-    fun updateObservatoryDuration(value: String, onValid: (String) -> Unit) {
-        val duration = value.trim()
-        if (AppConfig.OBSERVATORY_DURATION_PATTERN.matches(duration)) {
-            onValid(duration)
-        } else {
-            context.toastError(R.string.toast_invalid_observatory_duration)
-        }
-    }
-
-    fun updateObservatorySampling(value: String) {
-        val sampling = value.trim().toIntOrNull()?.takeIf { it > 0 }
-        if (sampling != null) {
-            observatoryLeastLoadSampling = sampling.toString()
-        } else {
-            context.toastError(R.string.toast_invalid_observatory_sampling)
-        }
-    }
-
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.title_settings),
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
+                isLoading = isLoading
             )
         }
     ) { innerPadding ->
@@ -520,7 +493,7 @@ fun SettingsScreen(
                 title = stringResource(R.string.title_pref_observatory_least_ping_interval),
                 value = observatoryLeastPingInterval,
                 onValueChanged = {
-                    updateObservatoryDuration(it) { value ->
+                    viewModel.validateObservatoryDuration(it)?.let { value ->
                         observatoryLeastPingInterval = value
                     }
                 }
@@ -529,7 +502,7 @@ fun SettingsScreen(
                 title = stringResource(R.string.title_pref_observatory_least_load_interval),
                 value = observatoryLeastLoadInterval,
                 onValueChanged = {
-                    updateObservatoryDuration(it) { value ->
+                    viewModel.validateObservatoryDuration(it)?.let { value ->
                         observatoryLeastLoadInterval = value
                     }
                 }
@@ -545,13 +518,17 @@ fun SettingsScreen(
                 title = stringResource(R.string.title_pref_observatory_least_load_sampling),
                 value = observatoryLeastLoadSampling,
                 keyboardNumber = true,
-                onValueChanged = { updateObservatorySampling(it) }
+                onValueChanged = {
+                    viewModel.validateObservatorySampling(it)?.let { value ->
+                        observatoryLeastLoadSampling = value
+                    }
+                }
             )
             SettingsEditItem(
                 title = stringResource(R.string.title_pref_observatory_least_load_timeout),
                 value = observatoryLeastLoadTimeout,
                 onValueChanged = {
-                    updateObservatoryDuration(it) { value ->
+                    viewModel.validateObservatoryDuration(it)?.let { value ->
                         observatoryLeastLoadTimeout = value
                     }
                 }
@@ -611,10 +588,8 @@ fun SettingsScreen(
                 checked = enableRootMode,
                 onCheckedChange = { newValue ->
                     if (newValue && !RootManager.cachedRoot()) {
-                        scope.launch {
-                            if (checkAndRequestRoot(context)) {
-                                enableRootMode = true
-                            }
+                        viewModel.checkAndRequestRoot {
+                            enableRootMode = true
                         }
                     } else {
                         enableRootMode = newValue
@@ -627,10 +602,8 @@ fun SettingsScreen(
                 checked = lanSharing,
                 onCheckedChange = { newValue ->
                     if (newValue && !RootManager.cachedRoot()) {
-                        scope.launch {
-                            if (checkAndRequestRoot(context)) {
-                                lanSharing = true
-                            }
+                        viewModel.checkAndRequestRoot {
+                            lanSharing = true
                         }
                     } else {
                         lanSharing = newValue
