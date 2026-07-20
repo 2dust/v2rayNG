@@ -11,6 +11,30 @@ import java.util.concurrent.TimeUnit
 /** Android 11+ tethering calls that are shared with, or hidden before, API 36. */
 internal object TetheringPlatformCompat {
 
+    fun getUpstreamInterfaceName(): String {
+        require(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+        val process = ProcessBuilder("dumpsys", "tethering")
+            .redirectErrorStream(true)
+            .start()
+        return try {
+            process.inputStream.bufferedReader().useLines { lines ->
+                lines.firstNotNullOfOrNull(::parseUpstreamInterfaceName).orEmpty()
+            }
+        } finally {
+            process.destroy()
+        }
+    }
+
+    internal fun parseUpstreamInterfaceName(line: String): String? {
+        val trimmed = line.trimStart()
+        if (!trimmed.startsWith(UPSTREAM_INTERFACES_PREFIX)) return null
+        val interfaces = trimmed.substringAfter(UPSTREAM_INTERFACES_PREFIX)
+            .trim()
+            .removePrefix("[")
+            .removeSuffix("]")
+        return interfaces.takeUnless { it == "null" }.orEmpty()
+    }
+
     @SuppressLint("NewApi")
     fun startTethering(
         service: Any,
@@ -124,6 +148,7 @@ internal object TetheringPlatformCompat {
         .mapNotNull { pattern -> runCatching { Regex(pattern) }.getOrNull() }
 
     private const val TAG = "ShizukuTethering"
+    private const val UPSTREAM_INTERFACES_PREFIX = "Current upstream interface(s):"
     private const val LEGACY_TETHERING_TYPE_BLUETOOTH = 2
     private const val LEGACY_STOP_POLL_MILLIS = 100L
 }

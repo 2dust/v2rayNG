@@ -165,7 +165,6 @@ class ShizukuActivity : BaseComponentActivity() {
 
     private fun queryCoreState() {
         MessageUtil.sendMsg2Service(this, AppConfig.MSG_REGISTER_CLIENT, "")
-        requestCoreSnapshotAsync()
     }
 
     private fun requestCoreSnapshotAsync() {

@@ -56,7 +56,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     private var routingState = ROUTING_STATE_DISABLED
     @Volatile
     private var routingDetail = ""
-    private var routingUsesHev = false
     private var routingProfileName = ""
     private var routingSession: RoutingSession? = null
     private var testNetworkHandle: TestNetworkHandle? = null
@@ -86,7 +85,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         var network: Network? = null,
     )
 
-    override fun setWifiHotspotEnabled(enabled: Boolean): Int = synchronized(this) {
+    @Synchronized
+    override fun setWifiHotspotEnabled(enabled: Boolean): Int {
         val result = setTetheringEnabled(TETHERING_TYPE_WIFI, enabled)
         if (result == RESULT_OK) {
             val bit = tetheringTypeBit(TETHERING_TYPE_WIFI)
@@ -98,7 +98,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
                 }
             }
         }
-        result
+        return result
     }
 
     override fun getActiveTetheringTypes(): Int {
@@ -118,6 +118,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         }
     }
 
+    @Synchronized
     override fun getRoutingState(): Int {
         if (routingState == ROUTING_STATE_ACTIVE_NATIVE && nativeController?.isRunning != true) {
             routingState = ROUTING_STATE_ERROR
@@ -126,8 +127,23 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         return routingState
     }
 
-    override fun getRoutingDetail(): String = routingDetail
+    @Synchronized
+    override fun getRoutingDetail(): String {
+        if (routingState != ROUTING_STATE_ACTIVE_HEV &&
+            routingState != ROUTING_STATE_ACTIVE_NATIVE &&
+            routingState != ROUTING_STATE_WAITING
+        ) {
+            return routingDetail
+        }
+        val upstreamInterface = runCatching {
+            TetheringPlatformCompat.getUpstreamInterfaceName()
+        }.onFailure {
+            Log.e(TAG, "Unable to read the active tethering upstream", it)
+        }.getOrDefault("")
+        return routingDetail(upstreamInterface)
+    }
 
+    @Synchronized
     override fun startRouting(
         useHev: Boolean,
         profileName: String,
@@ -135,10 +151,10 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         assetPath: String,
         xudpKey: String,
         syncToken: String,
-    ): Int = synchronized(this) {
+    ): Int {
         if (syncToken.isBlank()) {
             routingDetail = "Tethering synchronization token is empty"
-            return@synchronized RESULT_INVALID_SESSION
+            return RESULT_INVALID_SESSION
         }
         val activeTypes = getActiveTetheringTypes()
         val launchConfig = HotspotRoutingLaunchConfig(
@@ -157,12 +173,13 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
 
         val result = startRoutingLocked(launchConfig)
         if (result == RESULT_OK) routingSession = newSession
-        result
+        return result
     }
 
     private fun startRoutingLocked(config: HotspotRoutingLaunchConfig): Int {
         if (routingState == ROUTING_STATE_ACTIVE_HEV || routingState == ROUTING_STATE_ACTIVE_NATIVE) {
-            return if (routingUsesHev == config.engine.useHev) {
+            val activeUsesHev = routingState == ROUTING_STATE_ACTIVE_HEV
+            return if (activeUsesHev == config.engine.useHev) {
                 routingDetail = "Tethering routing is already active"
                 RESULT_ALREADY_ACTIVE
             } else {
@@ -196,8 +213,9 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         return startRoutingOnNewTestNetworkLocked(config)
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun startRoutingOnNewTestNetworkLocked(config: HotspotRoutingLaunchConfig): Int {
-        cleanupRouting(resetPreference = true)
+        cleanupRouting()
         routingState = ROUTING_STATE_STARTING
         routingDetail = "Creating Android test-network TUN"
 
@@ -211,16 +229,15 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         } catch (error: Throwable) {
             val detail = rootCauseMessage(error)
             Log.e(TAG, "Unable to start v2rayNG tethering routing: $detail", error)
-            cleanupRouting(resetPreference = true)
+            cleanupRouting()
             routingState = ROUTING_STATE_ERROR
             routingDetail = detail
             RESULT_ROUTING_FAILED
         }
     }
 
-    override fun stopRouting(): Int = synchronized(this) {
-        shutdownRoutingLocked()
-    }
+    @Synchronized
+    override fun stopRouting(): Int = shutdownRoutingLocked()
 
     private fun shutdownRoutingLocked(): Int {
         val tetheringResult = stopActiveTetheringLocked(clearDesired = true)
@@ -232,7 +249,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         routingSession = null
         routingState = ROUTING_STATE_STOPPING
         routingDetail = "Stopping v2rayNG tethering routing"
-        cleanupRouting(resetPreference = true)
+        cleanupRouting()
         routingState = ROUTING_STATE_DISABLED
         routingDetail = ""
         return RESULT_OK
@@ -253,8 +270,9 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         return result
     }
 
-    override fun notifyCoreStopping(token: String): Int = synchronized(this) {
-        val session = findRoutingSession(token) ?: return@synchronized RESULT_INVALID_SESSION
+    @Synchronized
+    override fun notifyCoreStopping(token: String): Int {
+        val session = findRoutingSession(token) ?: return RESULT_INVALID_SESSION
         val activeTypes = getActiveTetheringTypes()
         if (activeTypes >= 0 &&
             (routingState == ROUTING_STATE_ACTIVE_HEV ||
@@ -284,22 +302,23 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
                     "with result $tetheringResult",
             )
         }
-        RESULT_OK
+        return RESULT_OK
     }
 
+    @Synchronized
     override fun synchronizeRouting(
         token: String,
         useHev: Boolean,
         profileName: String,
         engineConfig: String,
-    ): Int = synchronized(this) {
-        val session = findRoutingSession(token) ?: return@synchronized RESULT_INVALID_SESSION
+    ): Int {
+        val session = findRoutingSession(token) ?: return RESULT_INVALID_SESSION
         val launchConfig = HotspotRoutingLaunchConfig(
             engine = HotspotRoutingEngineConfig(useHev, profileName, engineConfig),
             assetPath = session.assetPath,
             xudpKey = session.xudpKey,
         )
-        return@synchronized runCatching {
+        return runCatching {
             applyRoutingConfigLocked(launchConfig, session)
             RESULT_OK
         }.getOrElse {
@@ -308,13 +327,14 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         }
     }
 
-    override fun notifyCoreStartFailed(token: String, detail: String): Int = synchronized(this) {
-        val session = findRoutingSession(token) ?: return@synchronized RESULT_INVALID_SESSION
+    @Synchronized
+    override fun notifyCoreStartFailed(token: String, detail: String): Int {
+        val session = findRoutingSession(token) ?: return RESULT_INVALID_SESSION
         failRoutingSynchronizationLocked(
             IllegalStateException(detail.ifBlank { "v2rayNG failed to restart" }),
             session,
         )
-        RESULT_OK
+        return RESULT_OK
     }
 
     private fun findRoutingSession(token: String): RoutingSession? {
@@ -345,7 +365,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         val canSwitchInPlace = testTun != null &&
             (routingState == ROUTING_STATE_ACTIVE_HEV ||
                 routingState == ROUTING_STATE_ACTIVE_NATIVE ||
-                routingState == ROUTING_STATE_STARTING ||
                 routingState == ROUTING_STATE_WAITING)
         var switchedInPlace = false
         if (canSwitchInPlace) {
@@ -405,7 +424,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             Log.w(TAG, "Tethering remains fail-closed on ${testInterfaceName.orEmpty()}")
         } else {
             val tetheringResult = stopActiveTetheringLocked(clearDesired = false)
-            if (tetheringResult == RESULT_OK) cleanupRouting(resetPreference = true)
+            if (tetheringResult == RESULT_OK) cleanupRouting()
             routingState = ROUTING_STATE_ERROR
             routingDetail = detail
         }
@@ -427,6 +446,17 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         if (activeTypes >= 0) {
             val alreadyEnabled = activeTypes and tetheringTypeBit(type) != 0
             if (enabled == alreadyEnabled) return RESULT_OK
+        }
+
+        if (enabled) {
+            if (testTun == null) {
+                Log.e(TAG, "Refusing to start tethering without a protected test network")
+                return RESULT_ROUTING_FAILED
+            }
+            val preferenceReady = runCatching { setPreferTestNetworks(true) }
+                .onFailure { Log.e(TAG, "Unable to select the protected tethering upstream", it) }
+                .isSuccess
+            if (!preferenceReady) return RESULT_INTERNAL_ERROR
         }
 
         return changeTetheringEnabled(type, enabled)
@@ -467,6 +497,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun rebuildRoutingLocked(config: HotspotRoutingLaunchConfig, restoreTypes: Int): Int {
         val stopResult = stopActiveTetheringLocked(clearDesired = false)
         check(stopResult == RESULT_OK) {
@@ -589,7 +620,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             require(config.engine.content.isNotBlank()) { "Xray configuration is empty" }
             startNativeXray(config.engine.content, fd, config.assetPath, config.xudpKey)
         }
-        routingUsesHev = config.engine.useHev
     }
 
     private fun setRoutingActiveLocked(config: HotspotRoutingLaunchConfig) {
@@ -599,10 +629,14 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     }
 
     private fun updateRoutingDetailLocked() {
-        routingDetail = buildString {
-            append(testInterfaceName.orEmpty())
+        routingDetail = routingDetail(testInterfaceName.orEmpty())
+    }
+
+    private fun routingDetail(interfaceName: String): String {
+        return buildString {
+            append(interfaceName)
             if (routingProfileName.isNotBlank()) {
-                append(" · ")
+                if (isNotEmpty()) append(" · ")
                 append(routingProfileName)
             }
         }
@@ -612,11 +646,10 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         runCatching { nativeController?.stopLoop() }
             .onFailure { Log.w(TAG, "Unable to stop native hotspot core", it) }
         nativeController = null
-        runCatching { if (routingUsesHev || hevConfigFile != null) TProxyService.stopExternalTunnel() }
+        runCatching { if (hevConfigFile != null) TProxyService.stopExternalTunnel() }
             .onFailure { Log.w(TAG, "Unable to stop hotspot HEV", it) }
         hevConfigFile?.let { runCatching { it.delete() } }
         hevConfigFile = null
-        routingUsesHev = false
     }
 
     private fun startHev(config: String, fd: Int) {
@@ -653,7 +686,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         }
     }
 
-    private fun cleanupRouting(resetPreference: Boolean) {
+    private fun cleanupRouting() {
         stopRoutingEngineLocked()
 
         testNetworkHandle?.let { handle ->
@@ -669,10 +702,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         testNetworkHandle = null
         routingProfileName = ""
 
-        if (resetPreference) {
-            runCatching { setPreferTestNetworks(false) }
-                .onFailure { Log.w(TAG, "Unable to restore tethering upstream preference", it) }
-        }
+        runCatching { setPreferTestNetworks(false) }
+            .onFailure { Log.w(TAG, "Unable to restore tethering upstream preference", it) }
     }
 
     private fun createLinkAddress(cidr: String): LinkAddress {
@@ -706,7 +737,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_727
+        const val USER_SERVICE_VERSION = 20_260_729
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"

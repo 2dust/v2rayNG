@@ -37,12 +37,12 @@ class TProxyService(
          * The Shizuku tethering UserService runs in its own process, so HEV's process-global
          * native state is independent from the instance serving the regular VpnService TUN.
          */
-        fun startExternalTunnel(configPath: String, fd: Int) {
+        internal fun startExternalTunnel(configPath: String, fd: Int) {
             TProxyStartService(configPath, fd)
         }
 
         /** Stops the HEV instance started in the current process. */
-        fun stopExternalTunnel() {
+        internal fun stopExternalTunnel() {
             TProxyStopService()
         }
 

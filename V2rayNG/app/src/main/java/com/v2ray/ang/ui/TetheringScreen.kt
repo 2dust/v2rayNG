@@ -29,11 +29,11 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.shizuku.ShizukuTetheringService
+import com.v2ray.ang.shizuku.tetheringTypeBit
 
 internal enum class ShizukuStatus(
     val statusRes: Int,
     val detailsRes: Int?,
-    val canRequestPermission: Boolean = false,
 ) {
     CHECKING(R.string.shizuku_status_checking, R.string.shizuku_status_checking),
     NOT_INSTALLED(R.string.shizuku_status_not_installed, R.string.shizuku_status_open_manager),
@@ -42,13 +42,15 @@ internal enum class ShizukuStatus(
     PERMISSION_REQUIRED(
         R.string.shizuku_status_permission_required,
         R.string.shizuku_status_permission_hint,
-        true,
     ),
     PERMISSION_DENIED(
         R.string.shizuku_status_permission_denied,
         R.string.shizuku_status_permission_hint,
     ),
-    READY(R.string.shizuku_status_ready, null),
+    READY(R.string.shizuku_status_ready, null);
+
+    val canRequestPermission: Boolean
+        get() = this == PERMISSION_REQUIRED
 }
 
 internal enum class TetheringOperation {
@@ -60,7 +62,7 @@ internal enum class TetheringOperation {
     STARTING_HOTSPOT,
     STOPPING_HOTSPOT;
 
-    val isLoading: Boolean
+    val isToggleInProgress: Boolean
         get() = this == STARTING_ROUTING || this == STOPPING_ROUTING ||
             this == STARTING_HOTSPOT || this == STOPPING_HOTSPOT
 }
@@ -72,57 +74,51 @@ internal data class TetheringUiState(
     val routingDetail: String = "",
     val activeTetheringTypes: Int = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
     val coreRunning: Boolean = false,
-)
+) {
+    val routingActive: Boolean
+        get() = routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV ||
+            routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE
+    val routingSessionEnabled: Boolean
+        get() = routingActive || routingState == ShizukuTetheringService.ROUTING_STATE_WAITING
+    val hotspotEnabled: Boolean
+        get() = activeTetheringTypes >= 0 &&
+            activeTetheringTypes and tetheringTypeBit(ShizukuTetheringService.TETHERING_TYPE_WIFI) != 0
+    val tetheringStateKnown: Boolean
+        get() = activeTetheringTypes >= 0
+}
 
-internal val TetheringUiState.routingActive: Boolean
-    get() = routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV ||
-        routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE
-
-internal val TetheringUiState.routingSessionEnabled: Boolean
-    get() = routingActive || routingState == ShizukuTetheringService.ROUTING_STATE_WAITING
-
-internal val TetheringUiState.hotspotEnabled: Boolean
-    get() = activeTetheringTypes >= 0 &&
-        activeTetheringTypes and (1 shl ShizukuTetheringService.TETHERING_TYPE_WIFI) != 0
-
-internal val TetheringUiState.tetheringStateKnown: Boolean
-    get() = activeTetheringTypes >= 0
-
-private data class TetheringAction(
+internal data class TetheringControlState(
     val statusRes: Int,
     val buttonRes: Int,
     val enabled: Boolean,
 )
 
-private fun routingAction(
+internal fun routingAction(
     state: TetheringUiState,
     serviceConnected: Boolean,
     platformSupported: Boolean,
-): TetheringAction {
-    val statusRes = if (!platformSupported) {
-        R.string.shizuku_routing_status_unavailable
-    } else when (state.operation) {
-        TetheringOperation.CONNECTING -> R.string.shizuku_routing_status_connecting
-        TetheringOperation.CHECKING -> R.string.shizuku_routing_status_checking
-        TetheringOperation.STARTING_ROUTING -> R.string.shizuku_routing_status_starting
-        TetheringOperation.STOPPING_ROUTING -> R.string.shizuku_routing_status_stopping
-        else -> when {
-            !serviceConnected -> R.string.shizuku_routing_status_unavailable
-            state.routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV ->
-                R.string.shizuku_routing_status_hev
-            state.routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE ->
-                R.string.shizuku_routing_status_native
-            state.routingState == ShizukuTetheringService.ROUTING_STATE_STARTING ->
-                R.string.shizuku_routing_status_starting
-            state.routingState == ShizukuTetheringService.ROUTING_STATE_STOPPING ->
-                R.string.shizuku_routing_status_stopping
-            state.routingState == ShizukuTetheringService.ROUTING_STATE_WAITING ->
-                R.string.shizuku_routing_status_waiting
-            state.routingState == ShizukuTetheringService.ROUTING_STATE_ERROR ->
-                R.string.shizuku_routing_status_error
-            state.coreRunning -> R.string.shizuku_routing_status_disabled
-            else -> R.string.shizuku_routing_status_start_v2ray
-        }
+): TetheringControlState {
+    val statusRes = when {
+        !platformSupported -> R.string.shizuku_routing_status_unavailable
+        state.operation == TetheringOperation.CONNECTING -> R.string.shizuku_routing_status_connecting
+        state.operation == TetheringOperation.CHECKING -> R.string.shizuku_routing_status_checking
+        state.operation == TetheringOperation.STARTING_ROUTING -> R.string.shizuku_routing_status_starting
+        state.operation == TetheringOperation.STOPPING_ROUTING -> R.string.shizuku_routing_status_stopping
+        !serviceConnected -> R.string.shizuku_routing_status_unavailable
+        state.routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV ->
+            R.string.shizuku_routing_status_hev
+        state.routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE ->
+            R.string.shizuku_routing_status_native
+        state.routingState == ShizukuTetheringService.ROUTING_STATE_STARTING ->
+            R.string.shizuku_routing_status_starting
+        state.routingState == ShizukuTetheringService.ROUTING_STATE_STOPPING ->
+            R.string.shizuku_routing_status_stopping
+        state.routingState == ShizukuTetheringService.ROUTING_STATE_WAITING ->
+            R.string.shizuku_routing_status_waiting
+        state.routingState == ShizukuTetheringService.ROUTING_STATE_ERROR ->
+            R.string.shizuku_routing_status_error
+        state.coreRunning -> R.string.shizuku_routing_status_disabled
+        else -> R.string.shizuku_routing_status_start_v2ray
     }
     val enabled = platformSupported && serviceConnected &&
         state.operation == TetheringOperation.NONE &&
@@ -134,7 +130,7 @@ private fun routingAction(
             ShizukuTetheringService.ROUTING_STATE_DISABLED -> state.coreRunning
             else -> false
         }
-    return TetheringAction(
+    return TetheringControlState(
         statusRes = statusRes,
         buttonRes = if (state.routingSessionEnabled) {
             R.string.shizuku_routing_disable
@@ -145,31 +141,26 @@ private fun routingAction(
     )
 }
 
-private fun hotspotAction(
+internal fun hotspotAction(
     state: TetheringUiState,
     serviceConnected: Boolean,
     platformSupported: Boolean,
-): TetheringAction {
-    val statusRes = if (!platformSupported) {
-        R.string.shizuku_hotspot_status_unsupported
-    } else when (state.operation) {
-        TetheringOperation.CONNECTING -> R.string.shizuku_hotspot_status_connecting
-        TetheringOperation.CHECKING -> R.string.shizuku_hotspot_status_checking
-        TetheringOperation.STARTING_HOTSPOT -> R.string.shizuku_hotspot_status_starting
-        TetheringOperation.STOPPING_HOTSPOT -> R.string.shizuku_hotspot_status_stopping
-        else -> when {
-            !serviceConnected -> R.string.shizuku_hotspot_status_unavailable
-            state.hotspotEnabled && state.routingActive -> R.string.shizuku_hotspot_status_enabled
-            state.hotspotEnabled &&
-                state.routingState == ShizukuTetheringService.ROUTING_STATE_WAITING ->
-                R.string.shizuku_hotspot_status_waiting
-            state.hotspotEnabled -> R.string.shizuku_hotspot_status_enabled_direct
-            state.tetheringStateKnown ->
-                R.string.shizuku_hotspot_status_disabled
-            else -> R.string.shizuku_hotspot_status_unavailable
-        }
+): TetheringControlState {
+    val statusRes = when {
+        !platformSupported -> R.string.shizuku_hotspot_status_unsupported
+        state.operation == TetheringOperation.CONNECTING -> R.string.shizuku_hotspot_status_connecting
+        state.operation == TetheringOperation.CHECKING -> R.string.shizuku_hotspot_status_checking
+        state.operation == TetheringOperation.STARTING_HOTSPOT -> R.string.shizuku_hotspot_status_starting
+        state.operation == TetheringOperation.STOPPING_HOTSPOT -> R.string.shizuku_hotspot_status_stopping
+        !serviceConnected -> R.string.shizuku_hotspot_status_unavailable
+        state.hotspotEnabled && state.routingActive -> R.string.shizuku_hotspot_status_enabled
+        state.hotspotEnabled && state.routingState == ShizukuTetheringService.ROUTING_STATE_WAITING ->
+            R.string.shizuku_hotspot_status_waiting
+        state.hotspotEnabled -> R.string.shizuku_hotspot_status_enabled_direct
+        state.tetheringStateKnown -> R.string.shizuku_hotspot_status_disabled
+        else -> R.string.shizuku_hotspot_status_unavailable
     }
-    return TetheringAction(
+    return TetheringControlState(
         statusRes = statusRes,
         buttonRes = if (state.hotspotEnabled) {
             R.string.shizuku_hotspot_disable
@@ -200,7 +191,7 @@ internal fun TetheringScreen(
     val routingSummary = stringResource(R.string.shizuku_routing_summary)
     val usbStatus = stringResource(R.string.shizuku_usb_status_enabled)
     val usbActive = state.activeTetheringTypes >= 0 &&
-        state.activeTetheringTypes and (1 shl ShizukuTetheringService.TETHERING_TYPE_USB) != 0
+        state.activeTetheringTypes and tetheringTypeBit(ShizukuTetheringService.TETHERING_TYPE_USB) != 0
     val routingDetails = buildString {
         append(state.routingDetail.ifBlank { routingSummary })
         if (usbActive) append("\n").append(usbStatus)
@@ -212,7 +203,7 @@ internal fun TetheringScreen(
             AppTopBar(
                 title = stringResource(R.string.title_tethering),
                 onBackClick = onBackClick,
-                isLoading = state.operation.isLoading,
+                isLoading = state.operation.isToggleInProgress,
             )
         },
     ) { innerPadding ->
@@ -239,13 +230,13 @@ internal fun TetheringScreen(
                 TetheringActionButton(
                     text = stringResource(R.string.shizuku_request_permission),
                     enabled = state.shizukuStatus.canRequestPermission &&
-                        !state.operation.isLoading,
+                        !state.operation.isToggleInProgress,
                     onClick = onRequestPermission,
                     modifier = Modifier.weight(1f),
                 )
                 TetheringActionButton(
                     text = stringResource(R.string.shizuku_refresh_permission),
-                    enabled = !state.operation.isLoading,
+                    enabled = !state.operation.isToggleInProgress,
                     onClick = onRefresh,
                     modifier = Modifier.weight(1f),
                 )
@@ -257,7 +248,7 @@ internal fun TetheringScreen(
                 title = stringResource(R.string.shizuku_routing_title),
                 status = stringResource(routingAction.statusRes),
                 details = listOf(
-                    routingDetails.ifBlank { stringResource(R.string.shizuku_routing_summary) },
+                    routingDetails,
                     stringResource(R.string.shizuku_routing_rules_disclaimer),
                 ),
             )
@@ -323,7 +314,8 @@ private fun TetheringStatusSection(
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
             )
-            details.filter { it.isNotBlank() }.forEach { detail ->
+            details.forEach { detail ->
+                if (detail.isBlank()) return@forEach
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = detail,

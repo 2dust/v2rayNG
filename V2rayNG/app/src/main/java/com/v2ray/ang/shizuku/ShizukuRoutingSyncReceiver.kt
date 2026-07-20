@@ -18,15 +18,13 @@ import rikka.shizuku.Shizuku
 import java.util.ArrayDeque
 import java.util.concurrent.Executors
 
+private const val TAG = "ShizukuSyncReceiver"
+
 /** Relays app-core lifecycle updates to the shell-owned Shizuku UserService over Binder. */
 class ShizukuRoutingSyncReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != AppConfig.BROADCAST_ACTION_SHIZUKU ||
-            intent.getIntExtra("key", 0) != AppConfig.MSG_HOTSPOT_SYNC
-        ) {
-            return
-        }
-        val update = readUpdate(intent) ?: run {
+        intent.setExtrasClassLoader(HotspotRoutingSync::class.java.classLoader)
+        val update = intent.serializable<HotspotRoutingSync>("content") ?: run {
             LogUtil.w(TAG, "Ignoring malformed hotspot synchronization broadcast")
             return
         }
@@ -35,20 +33,10 @@ class ShizukuRoutingSyncReceiver : BroadcastReceiver() {
             pendingResult.finish()
         }
     }
-
-    private fun readUpdate(intent: Intent): HotspotRoutingSync? {
-        intent.setExtrasClassLoader(HotspotRoutingSync::class.java.classLoader)
-        return intent.serializable("content")
-    }
-
-    private companion object {
-        const val TAG = "ShizukuSyncReceiver"
-    }
 }
 
 /** Keeps updates ordered across the normal core's stop/start process boundary. */
 private object ShizukuRoutingSyncDispatcher {
-    private const val TAG = "ShizukuSyncReceiver"
     private const val BIND_TIMEOUT_MS = 10_000L
 
     private data class PendingUpdate(

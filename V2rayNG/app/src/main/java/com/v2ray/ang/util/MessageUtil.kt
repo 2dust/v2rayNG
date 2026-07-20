@@ -35,11 +35,6 @@ object MessageUtil {
         sendMsg(ctx, AppConfig.BROADCAST_ACTION_ACTIVITY, what, content)
     }
 
-    /** Sends an authenticated lifecycle update to the shell-owned Shizuku UserService. */
-    fun sendMsg2Shizuku(ctx: Context, what: Int, content: Serializable) {
-        sendMsg(ctx, AppConfig.BROADCAST_ACTION_SHIZUKU, what, content)
-    }
-
     /**
      * Sends a message to the test service.
      *

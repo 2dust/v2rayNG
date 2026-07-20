@@ -97,7 +97,6 @@ object AppConfig {
     /** Broadcast actions. */
     const val BROADCAST_ACTION_SERVICE = "$ANG_PACKAGE.action.service"
     const val BROADCAST_ACTION_ACTIVITY = "$ANG_PACKAGE.action.activity"
-    const val BROADCAST_ACTION_SHIZUKU = "$ANG_PACKAGE.action.shizuku"
     const val BROADCAST_ACTION_WIDGET_CLICK = "$ANG_PACKAGE.action.widget.click"
 
     /** Tasker extras. */
@@ -187,7 +186,6 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG_FINISH = 74
     const val MSG_QUERY_HOTSPOT_CONFIG = 81
     const val MSG_HOTSPOT_CONFIG_RESPONSE = 82
-    const val MSG_HOTSPOT_SYNC = 83
 
     /** Notification channel IDs and names. */
     const val RAY_NG_CHANNEL_ID = "RAY_NG_M_CH_ID"

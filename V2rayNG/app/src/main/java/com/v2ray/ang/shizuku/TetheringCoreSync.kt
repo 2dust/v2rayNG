@@ -1,6 +1,7 @@
 package com.v2ray.ang.shizuku
 
 import android.app.Service
+import android.content.Intent
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.HotspotRoutingSnapshot
 import com.v2ray.ang.dto.HotspotRoutingSync
@@ -9,7 +10,6 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.service.CoreVpnService
 import com.v2ray.ang.service.HevTunnelSettings
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.MessageUtil
 
 /** Keeps the normal core's lifecycle and the privileged tethering core synchronized. */
 internal object TetheringCoreSync {
@@ -86,10 +86,11 @@ internal object TetheringCoreSync {
             AppConfig.TAG,
             "Sending tethering sync event $event${snapshot?.profileName?.let { " for $it" }.orEmpty()}",
         )
-        MessageUtil.sendMsg2Shizuku(
-            service,
-            AppConfig.MSG_HOTSPOT_SYNC,
-            HotspotRoutingSync(token, event, snapshot, detail),
-        )
+        runCatching {
+            service.sendBroadcast(
+                Intent(service, ShizukuRoutingSyncReceiver::class.java)
+                    .putExtra("content", HotspotRoutingSync(token, event, snapshot, detail)),
+            )
+        }.onFailure { LogUtil.e(AppConfig.TAG, "Unable to send tethering synchronization", it) }
     }
 }

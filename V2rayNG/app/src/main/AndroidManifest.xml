@@ -202,11 +202,7 @@
             android:exported="false" />
         <receiver
             android:name=".shizuku.ShizukuRoutingSyncReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="${applicationId}.action.shizuku" />
-            </intent-filter>
-        </receiver>
+            android:exported="false" />
         <activity
             android:name=".ui.AboutActivity"
             android:exported="false" />

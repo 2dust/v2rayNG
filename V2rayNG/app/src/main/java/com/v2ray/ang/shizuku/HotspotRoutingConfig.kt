@@ -49,8 +49,6 @@ object HotspotRoutingConfig {
 
     private fun nativeTunOnlyConfig(rawConfig: String): String {
         val root = JsonUtil.parseString(rawConfig)
-            ?.takeIf { it.isJsonObject }
-            ?.asJsonObject
             ?: error("The running Xray configuration is invalid")
         val inbounds = root.get("inbounds")
             ?.takeIf { it.isJsonArray }
