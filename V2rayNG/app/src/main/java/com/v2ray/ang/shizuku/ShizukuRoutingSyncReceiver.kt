@@ -6,14 +6,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.dto.HotspotRoutingSync
+import com.v2ray.ang.extension.serializable
+import com.v2ray.ang.util.LogUtil
 import rikka.shizuku.Shizuku
 import java.util.ArrayDeque
 import java.util.concurrent.Executors
@@ -27,7 +26,7 @@ class ShizukuRoutingSyncReceiver : BroadcastReceiver() {
             return
         }
         val update = readUpdate(intent) ?: run {
-            Log.w(TAG, "Ignoring malformed hotspot synchronization broadcast")
+            LogUtil.w(TAG, "Ignoring malformed hotspot synchronization broadcast")
             return
         }
         val pendingResult = goAsync()
@@ -36,14 +35,9 @@ class ShizukuRoutingSyncReceiver : BroadcastReceiver() {
         }
     }
 
-    @Suppress("DEPRECATION")
     private fun readUpdate(intent: Intent): HotspotRoutingSync? {
         intent.setExtrasClassLoader(HotspotRoutingSync::class.java.classLoader)
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getSerializableExtra("content", HotspotRoutingSync::class.java)
-        } else {
-            intent.getSerializableExtra("content") as? HotspotRoutingSync
-        }
+        return intent.serializable("content")
     }
 
     private companion object {
@@ -69,7 +63,6 @@ private object ShizukuRoutingSyncDispatcher {
     private var binding = false
     private var inFlight = false
     private var bindGeneration = 0
-    private var appContext: Context? = null
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, binder: IBinder) {
@@ -87,7 +80,6 @@ private object ShizukuRoutingSyncDispatcher {
 
     fun enqueue(context: Context, update: HotspotRoutingSync, finish: () -> Unit) {
         mainHandler.post {
-            appContext = context.applicationContext
             queue.addLast(PendingUpdate(context.applicationContext, update, finish))
             pump()
         }
@@ -105,7 +97,7 @@ private object ShizukuRoutingSyncDispatcher {
         inFlight = true
         worker.execute {
             runCatching { forward(currentService, pending) }
-                .onFailure { Log.e(TAG, "Unable to forward hotspot synchronization", it) }
+                .onFailure { LogUtil.e(TAG, "Unable to forward hotspot synchronization", it) }
             mainHandler.post {
                 pending.finish()
                 inFlight = false
@@ -116,7 +108,6 @@ private object ShizukuRoutingSyncDispatcher {
 
     private fun bindIfNeeded() {
         if (binding) return
-        val context = appContext ?: return
         if (!Shizuku.pingBinder() ||
             Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED
         ) {
@@ -124,16 +115,11 @@ private object ShizukuRoutingSyncDispatcher {
             return
         }
 
-        val args = Shizuku.UserServiceArgs(
-            ComponentName(BuildConfig.APPLICATION_ID, ShizukuTetheringService::class.java.name)
-        )
-            .daemon(true)
-            .processNameSuffix("shizuku_tethering")
-            .debuggable(BuildConfig.DEBUG)
-            .version(ShizukuTetheringService.USER_SERVICE_VERSION)
         binding = true
         val generation = ++bindGeneration
-        runCatching { Shizuku.bindUserService(args, connection) }
+        runCatching {
+            Shizuku.bindUserService(ShizukuTetheringService.createUserServiceArgs(), connection)
+        }
             .onFailure {
                 binding = false
                 failAll("Unable to bind Shizuku tethering service: ${it.message.orEmpty()}")
@@ -169,11 +155,11 @@ private object ShizukuRoutingSyncDispatcher {
         check(result == ShizukuTetheringService.RESULT_OK) {
             "Shizuku tethering service rejected synchronization with result $result"
         }
-        Log.i(TAG, "Forwarded hotspot sync event ${update.event}")
+        LogUtil.i(TAG, "Forwarded hotspot sync event ${update.event}")
     }
 
     private fun failAll(message: String) {
-        if (queue.isNotEmpty()) Log.w(TAG, message)
+        if (queue.isNotEmpty()) LogUtil.w(TAG, message)
         while (queue.isNotEmpty()) queue.removeFirst().finish()
         inFlight = false
     }

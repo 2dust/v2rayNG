@@ -9,7 +9,6 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.system.OsConstants
-import android.util.Log
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -51,9 +50,8 @@ object CoreServiceManager {
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
-    @Volatile private var runningConfigContent = ""
-    @Volatile private var runningUsesHevTun = false
-    @Volatile private var runningInVpnMode = false
+    @Volatile
+    private var hotspotSnapshot = HotspotRoutingSnapshot()
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -285,9 +283,7 @@ object CoreServiceManager {
             error("Core failed to start")
         }
 
-        runningConfigContent = result.content
-        runningUsesHevTun = usesHevTun
-        runningInVpnMode = service is CoreVpnService
+        hotspotSnapshot = createHotspotSnapshot(service, result.content, usesHevTun)
 
         if (browserDialer != null) {
             browserDialer!!.stop()
@@ -304,7 +300,7 @@ object CoreServiceManager {
         sendHotspotSync(
             service,
             HotspotRoutingSync.EVENT_CORE_STARTED,
-            createHotspotSnapshot()
+            currentHotspotSnapshot()
         )
         MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
         NotificationManager.startSpeedNotification()
@@ -355,26 +351,24 @@ object CoreServiceManager {
     }
 
     private fun clearHotspotSnapshot() {
-        runningConfigContent = ""
-        runningUsesHevTun = false
-        runningInVpnMode = false
+        hotspotSnapshot = HotspotRoutingSnapshot()
     }
 
-    private fun createHotspotSnapshot(): HotspotRoutingSnapshot {
-        if (!coreController.isRunning || runningConfigContent.isBlank()) {
-            return HotspotRoutingSnapshot.stopped()
-        }
-
+    private fun createHotspotSnapshot(
+        service: Service,
+        coreConfig: String,
+        useHev: Boolean,
+    ): HotspotRoutingSnapshot {
         val timeoutSetting = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT)
             ?: AppConfig.HEVTUN_RW_TIMEOUT
         val timeoutParts = timeoutSetting.split(',').map { it.trim() }
 
         return HotspotRoutingSnapshot(
             running = true,
-            vpnMode = runningInVpnMode,
+            vpnMode = service is CoreVpnService,
             profileName = currentConfig?.remarks.orEmpty(),
-            useHev = runningUsesHevTun,
-            coreConfig = runningConfigContent,
+            useHev = useHev,
+            coreConfig = coreConfig,
             socksPort = SettingsManager.getSocksPort(),
             socksUsername = SettingsManager.getSocksUsername(),
             socksPassword = SettingsManager.getSocksPassword(),
@@ -386,6 +380,9 @@ object CoreServiceManager {
         )
     }
 
+    private fun currentHotspotSnapshot(): HotspotRoutingSnapshot =
+        hotspotSnapshot.takeIf { coreController.isRunning } ?: HotspotRoutingSnapshot()
+
     private fun sendHotspotSync(
         service: Service,
         event: Int,
@@ -395,10 +392,10 @@ object CoreServiceManager {
         val token = MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN)
             ?.takeIf { it.isNotBlank() }
             ?: run {
-                Log.i(AppConfig.TAG, "Hotspot sync event $event skipped: no active Shizuku session")
+                LogUtil.i(AppConfig.TAG, "Hotspot sync event $event skipped: no active Shizuku session")
                 return
             }
-        Log.i(
+        LogUtil.i(
             AppConfig.TAG,
             "Sending hotspot sync event $event${snapshot?.profileName?.let { " for $it" }.orEmpty()}",
         )
@@ -594,7 +591,7 @@ object CoreServiceManager {
                     MessageUtil.sendMsg2UI(
                         serviceControl.getService(),
                         AppConfig.MSG_HOTSPOT_CONFIG_RESPONSE,
-                        createHotspotSnapshot()
+                        currentHotspotSnapshot()
                     )
                 }
 

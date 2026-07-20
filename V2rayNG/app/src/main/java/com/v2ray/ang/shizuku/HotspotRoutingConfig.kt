@@ -20,18 +20,6 @@ data class HotspotRoutingLaunchConfig(
 object HotspotRoutingConfig {
 
     fun fromSnapshot(context: Context, snapshot: HotspotRoutingSnapshot): HotspotRoutingLaunchConfig {
-        return fromSnapshot(
-            snapshot,
-            Utils.userAssetPath(context),
-            Utils.getDeviceIdForXUDPBaseKey(),
-        )
-    }
-
-    fun fromSnapshot(
-        snapshot: HotspotRoutingSnapshot,
-        assetPath: String,
-        xudpKey: String,
-    ): HotspotRoutingLaunchConfig {
         require(snapshot.running) { "Start v2rayNG before enabling tethering routing" }
         require(snapshot.vpnMode) { "v2rayNG must be running in VPN mode" }
 
@@ -40,8 +28,8 @@ object HotspotRoutingConfig {
             profileName = snapshot.profileName,
             coreConfig = if (snapshot.useHev) "" else nativeTunOnlyConfig(snapshot.coreConfig),
             hevConfig = if (snapshot.useHev) buildHevConfig(snapshot) else "",
-            assetPath = assetPath,
-            xudpKey = xudpKey,
+            assetPath = Utils.userAssetPath(context),
+            xudpKey = Utils.getDeviceIdForXUDPBaseKey(),
         )
     }
 

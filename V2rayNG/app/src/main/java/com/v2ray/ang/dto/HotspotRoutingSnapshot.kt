@@ -10,35 +10,20 @@ import java.io.Serializable
  * changed since that core was started.
  */
 data class HotspotRoutingSnapshot(
-    val running: Boolean,
-    val vpnMode: Boolean,
-    val profileName: String,
-    val useHev: Boolean,
-    val coreConfig: String,
-    val socksPort: Int,
-    val socksUsername: String?,
-    val socksPassword: String?,
-    val mtu: Int,
-    val hevTcpTimeoutSeconds: Int,
-    val hevUdpTimeoutSeconds: Int,
-    val hevLogLevel: String,
+    val running: Boolean = false,
+    val vpnMode: Boolean = false,
+    val profileName: String = "",
+    val useHev: Boolean = false,
+    val coreConfig: String = "",
+    val socksPort: Int = 0,
+    val socksUsername: String? = null,
+    val socksPassword: String? = null,
+    val mtu: Int = 0,
+    val hevTcpTimeoutSeconds: Int = 0,
+    val hevUdpTimeoutSeconds: Int = 0,
+    val hevLogLevel: String = "warn",
 ) : Serializable {
     companion object {
         private const val serialVersionUID = 2L
-
-        fun stopped() = HotspotRoutingSnapshot(
-            running = false,
-            vpnMode = false,
-            profileName = "",
-            useHev = false,
-            coreConfig = "",
-            socksPort = 0,
-            socksUsername = null,
-            socksPassword = null,
-            mtu = 0,
-            hevTcpTimeoutSeconds = 0,
-            hevUdpTimeoutSeconds = 0,
-            hevLogLevel = "warn",
-        )
     }
 }

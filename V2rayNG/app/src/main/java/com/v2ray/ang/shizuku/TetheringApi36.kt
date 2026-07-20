@@ -11,10 +11,11 @@ import java.util.concurrent.TimeUnit
 @RequiresApi(36)
 internal object TetheringApi36 {
     fun getActiveTetheringTypes(
-        manager: TetheringManager,
+        service: Any,
         executor: Executor,
         timeoutSeconds: Long,
     ): Int {
+        val manager = service as TetheringManager
         var types = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN
         val callbackReceived = CountDownLatch(1)
         val callback = object : TetheringManager.TetheringEventCallback {
@@ -38,29 +39,50 @@ internal object TetheringApi36 {
         }
     }
 
-    fun stopTethering(
-        manager: TetheringManager,
-        request: TetheringManager.TetheringRequest,
+    fun setTetheringEnabled(
+        service: Any,
+        type: Int,
+        enabled: Boolean,
         executor: Executor,
         timeoutSeconds: Long,
     ): Int {
+        val manager = service as TetheringManager
         var result = ShizukuTetheringService.RESULT_INTERNAL_ERROR
         val callbackReceived = CountDownLatch(1)
-        manager.stopTethering(
-            request,
-            executor,
-            object : TetheringManager.StopTetheringCallback {
-                override fun onStopTetheringSucceeded() {
-                    result = ShizukuTetheringService.RESULT_OK
-                    callbackReceived.countDown()
-                }
+        val request = TetheringManager.TetheringRequest.Builder(type).build()
+        if (enabled) {
+            manager.startTethering(
+                request,
+                executor,
+                object : TetheringManager.StartTetheringCallback {
+                    override fun onTetheringStarted() {
+                        result = ShizukuTetheringService.RESULT_OK
+                        callbackReceived.countDown()
+                    }
 
-                override fun onStopTetheringFailed(error: Int) {
-                    result = error
-                    callbackReceived.countDown()
-                }
-            },
-        )
+                    override fun onTetheringFailed(error: Int) {
+                        result = error
+                        callbackReceived.countDown()
+                    }
+                },
+            )
+        } else {
+            manager.stopTethering(
+                request,
+                executor,
+                object : TetheringManager.StopTetheringCallback {
+                    override fun onStopTetheringSucceeded() {
+                        result = ShizukuTetheringService.RESULT_OK
+                        callbackReceived.countDown()
+                    }
+
+                    override fun onStopTetheringFailed(error: Int) {
+                        result = error
+                        callbackReceived.countDown()
+                    }
+                },
+            )
+        }
         return if (callbackReceived.await(timeoutSeconds, TimeUnit.SECONDS)) {
             result
         } else {

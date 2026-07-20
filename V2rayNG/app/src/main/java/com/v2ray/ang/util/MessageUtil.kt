@@ -82,17 +82,11 @@ object MessageUtil {
      * @param what The message identifier.
      * @param content The message content.
      */
-    private fun sendMsg(
-        ctx: Context,
-        action: String,
-        what: Int,
-        content: Serializable,
-        targetPackage: String = AppConfig.ANG_PACKAGE,
-    ) {
+    private fun sendMsg(ctx: Context, action: String, what: Int, content: Serializable) {
         try {
             val intent = Intent()
             intent.action = action
-            intent.`package` = targetPackage
+            intent.`package` = AppConfig.ANG_PACKAGE
             intent.putExtra("key", what)
             intent.putExtra("content", content)
             ctx.sendBroadcast(intent)

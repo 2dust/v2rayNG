@@ -30,7 +30,6 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,10 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.dto.HotspotRoutingSnapshot
+import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
@@ -63,53 +62,80 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import rikka.shizuku.Shizuku
-import java.util.UUID
+
+private enum class ShizukuStatus(
+    val statusRes: Int,
+    val detailsRes: Int?,
+    val canRequestPermission: Boolean = false,
+) {
+    CHECKING(R.string.shizuku_status_checking, R.string.shizuku_status_checking),
+    NOT_INSTALLED(R.string.shizuku_status_not_installed, R.string.shizuku_status_open_manager),
+    NOT_RUNNING(R.string.shizuku_status_not_running, R.string.shizuku_status_open_manager),
+    UNSUPPORTED(R.string.shizuku_status_unsupported, R.string.shizuku_status_update_required),
+    PERMISSION_REQUIRED(
+        R.string.shizuku_status_permission_required,
+        R.string.shizuku_status_permission_hint,
+        true,
+    ),
+    PERMISSION_DENIED(
+        R.string.shizuku_status_permission_denied,
+        R.string.shizuku_status_permission_hint,
+    ),
+    READY(R.string.shizuku_status_ready, null),
+}
+
+private enum class TetheringOperation {
+    NONE,
+    CONNECTING,
+    CHECKING,
+    STARTING_ROUTING,
+    STOPPING_ROUTING,
+    STARTING_HOTSPOT,
+    STOPPING_HOTSPOT;
+
+    val isLoading: Boolean
+        get() = this == STARTING_ROUTING || this == STOPPING_ROUTING ||
+            this == STARTING_HOTSPOT || this == STOPPING_HOTSPOT
+}
+
+private data class TetheringUiState(
+    val shizukuStatus: ShizukuStatus = ShizukuStatus.CHECKING,
+    val operation: TetheringOperation = TetheringOperation.NONE,
+    val hotspotState: Int = ShizukuTetheringService.HOTSPOT_STATE_UNKNOWN,
+    val routingState: Int = ShizukuTetheringService.ROUTING_STATE_DISABLED,
+    val routingDetail: String = "",
+    val activeTetheringTypes: Int = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
+    val coreRunning: Boolean = false,
+)
+
+private val TetheringUiState.routingActive: Boolean
+    get() = routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV ||
+        routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE
+
+private val TetheringUiState.routingSessionEnabled: Boolean
+    get() = routingActive || routingState == ShizukuTetheringService.ROUTING_STATE_WAITING
+
+private val TetheringUiState.hotspotEnabled: Boolean
+    get() = hotspotState == ShizukuTetheringService.HOTSPOT_STATE_ENABLED
 
 class ShizukuActivity : BaseComponentActivity() {
     private var tetheringService: IShizukuTetheringService? = null
-    private var bindingUserService = false
-    private var hotspotState = ShizukuTetheringService.HOTSPOT_STATE_UNKNOWN
-    private var routingState = ShizukuTetheringService.ROUTING_STATE_DISABLED
-    private var routingDetail = ""
-    private var activeTetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN
-    private var coreRunning = false
     private var operationJob: Job? = null
     private var snapshotWaiter: CompletableDeferred<HotspotRoutingSnapshot>? = null
-
-    private var shizukuStatusRes by mutableIntStateOf(R.string.shizuku_status_checking)
-    private var shizukuDetailsRes by mutableStateOf<Int?>(R.string.shizuku_status_checking)
-    private var requestPermissionEnabled by mutableStateOf(false)
-    private var routingStatusRes by mutableIntStateOf(R.string.shizuku_routing_status_unavailable)
-    private var routingDetails by mutableStateOf("")
-    private var routingButtonRes by mutableIntStateOf(R.string.shizuku_routing_enable)
-    private var routingButtonEnabled by mutableStateOf(false)
-    private var hotspotStatusRes by mutableIntStateOf(R.string.shizuku_hotspot_status_unavailable)
-    private var hotspotButtonRes by mutableIntStateOf(R.string.shizuku_hotspot_enable)
-    private var hotspotButtonEnabled by mutableStateOf(false)
-    private var isLoading by mutableStateOf(false)
+    private var uiState by mutableStateOf(TetheringUiState())
 
     private val userServiceArgs by lazy {
-        Shizuku.UserServiceArgs(
-            ComponentName(BuildConfig.APPLICATION_ID, ShizukuTetheringService::class.java.name)
-        )
-            .daemon(true)
-            .processNameSuffix("shizuku_tethering")
-            .debuggable(BuildConfig.DEBUG)
-            .version(ShizukuTetheringService.USER_SERVICE_VERSION)
+        ShizukuTetheringService.createUserServiceArgs()
     }
 
     private val userServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-            bindingUserService = false
             tetheringService = IShizukuTetheringService.Stub.asInterface(binder)
             refreshTetheringStatus()
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
-            bindingUserService = false
-            tetheringService = null
-            renderRoutingUnavailable()
-            renderHotspotUnavailable()
+            clearServiceState()
         }
     }
 
@@ -118,8 +144,7 @@ class ShizukuActivity : BaseComponentActivity() {
     }
     private val binderDeadListener = Shizuku.OnBinderDeadListener {
         runOnUiThread {
-            bindingUserService = false
-            tetheringService = null
+            clearServiceState()
             refreshShizukuStatus()
         }
     }
@@ -141,26 +166,21 @@ class ShizukuActivity : BaseComponentActivity() {
             when (intent?.getIntExtra("key", 0)) {
                 AppConfig.MSG_STATE_RUNNING,
                 AppConfig.MSG_STATE_START_SUCCESS -> {
-                    coreRunning = true
+                    uiState = uiState.copy(coreRunning = true)
                     requestCoreSnapshotAsync()
-                    renderRoutingState()
-                    renderHotspotState()
                 }
 
                 AppConfig.MSG_STATE_NOT_RUNNING,
                 AppConfig.MSG_STATE_STOP_SUCCESS,
                 AppConfig.MSG_STATE_START_FAILURE -> {
-                    coreRunning = false
-                    renderRoutingState()
-                    renderHotspotState()
+                    uiState = uiState.copy(coreRunning = false)
                 }
 
                 AppConfig.MSG_HOTSPOT_CONFIG_RESPONSE -> {
-                    val snapshot = readSnapshot(intent) ?: HotspotRoutingSnapshot.stopped()
-                    coreRunning = snapshot.running
+                    val snapshot = intent.serializable<HotspotRoutingSnapshot>("content")
+                        ?: HotspotRoutingSnapshot()
+                    uiState = uiState.copy(coreRunning = snapshot.running)
                     snapshotWaiter?.takeIf { !it.isCompleted }?.complete(snapshot)
-                    renderRoutingState()
-                    renderHotspotState()
                 }
             }
         }
@@ -169,17 +189,9 @@ class ShizukuActivity : BaseComponentActivity() {
     @Composable
     override fun ScreenContent() {
         TetheringScreen(
-            isLoading = isLoading,
-            shizukuStatusRes = shizukuStatusRes,
-            shizukuDetailsRes = shizukuDetailsRes,
-            requestPermissionEnabled = requestPermissionEnabled,
-            routingStatusRes = routingStatusRes,
-            routingDetails = routingDetails,
-            routingButtonRes = routingButtonRes,
-            routingButtonEnabled = routingButtonEnabled,
-            hotspotStatusRes = hotspotStatusRes,
-            hotspotButtonRes = hotspotButtonRes,
-            hotspotButtonEnabled = hotspotButtonEnabled,
+            state = uiState,
+            serviceConnected = tetheringService != null,
+            platformSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R,
             onBackClick = { finish() },
             onRequestPermission = ::requestShizukuPermission,
             onRefresh = {
@@ -203,7 +215,6 @@ class ShizukuActivity : BaseComponentActivity() {
         Shizuku.addBinderReceivedListenerSticky(binderReceivedListener)
         Shizuku.addBinderDeadListener(binderDeadListener)
         Shizuku.addRequestPermissionResultListener(permissionResultListener)
-        queryCoreState()
     }
 
     override fun onResume() {
@@ -219,7 +230,7 @@ class ShizukuActivity : BaseComponentActivity() {
         Shizuku.removeBinderReceivedListener(binderReceivedListener)
         Shizuku.removeBinderDeadListener(binderDeadListener)
         Shizuku.removeRequestPermissionResultListener(permissionResultListener)
-        if (tetheringService != null || bindingUserService) {
+        if (tetheringService != null || uiState.operation == TetheringOperation.CONNECTING) {
             runCatching {
                 // The service owns the live TUN and tethering upstream. Screen teardown must
                 // never destroy it based on a potentially stale status snapshot; only the
@@ -228,7 +239,6 @@ class ShizukuActivity : BaseComponentActivity() {
             }
         }
         tetheringService = null
-        bindingUserService = false
         super.onDestroy()
     }
 
@@ -246,23 +256,20 @@ class ShizukuActivity : BaseComponentActivity() {
         val installed = isPackageInstalled(SHIZUKU_PACKAGE_NAME)
 
         if (!binderAlive) {
-            shizukuStatusRes = if (installed) R.string.shizuku_status_not_running
-            else R.string.shizuku_status_not_installed
-            shizukuDetailsRes = R.string.shizuku_status_open_manager
-            requestPermissionEnabled = false
-            bindingUserService = false
-            tetheringService = null
-            renderRoutingUnavailable()
-            renderHotspotUnavailable()
+            clearServiceState()
+            uiState = uiState.copy(
+                shizukuStatus = if (installed) {
+                    ShizukuStatus.NOT_RUNNING
+                } else {
+                    ShizukuStatus.NOT_INSTALLED
+                }
+            )
             return
         }
 
         if (runCatching { Shizuku.isPreV11() }.getOrDefault(true)) {
-            shizukuStatusRes = R.string.shizuku_status_unsupported
-            shizukuDetailsRes = R.string.shizuku_status_update_required
-            requestPermissionEnabled = false
-            renderRoutingUnavailable()
-            renderHotspotUnavailable()
+            clearServiceState()
+            uiState = uiState.copy(shizukuStatus = ShizukuStatus.UNSUPPORTED)
             return
         }
 
@@ -273,25 +280,21 @@ class ShizukuActivity : BaseComponentActivity() {
             val permanentlyDenied = runCatching {
                 Shizuku.shouldShowRequestPermissionRationale()
             }.getOrDefault(false)
-            shizukuStatusRes = if (permanentlyDenied) R.string.shizuku_status_permission_denied
-            else R.string.shizuku_status_permission_required
-            shizukuDetailsRes = R.string.shizuku_status_permission_hint
-            requestPermissionEnabled = !permanentlyDenied
-            tetheringService = null
-            bindingUserService = false
-            renderRoutingUnavailable()
-            renderHotspotUnavailable()
+            clearServiceState()
+            uiState = uiState.copy(
+                shizukuStatus = if (permanentlyDenied) {
+                    ShizukuStatus.PERMISSION_DENIED
+                } else {
+                    ShizukuStatus.PERMISSION_REQUIRED
+                }
+            )
             return
         }
 
-        shizukuStatusRes = R.string.shizuku_status_ready
-        shizukuDetailsRes = null
-        requestPermissionEnabled = false
+        uiState = uiState.copy(shizukuStatus = ShizukuStatus.READY)
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            hotspotStatusRes = R.string.shizuku_hotspot_status_unsupported
-            hotspotButtonEnabled = false
-            renderRoutingUnavailable()
+            clearServiceState()
             return
         }
 
@@ -323,35 +326,24 @@ class ShizukuActivity : BaseComponentActivity() {
     }
 
     private fun bindUserService() {
-        if (bindingUserService || tetheringService != null) return
-        bindingUserService = true
-        routingStatusRes = R.string.shizuku_routing_status_connecting
-        hotspotStatusRes = R.string.shizuku_hotspot_status_connecting
-        routingButtonEnabled = false
-        hotspotButtonEnabled = false
+        if (uiState.operation == TetheringOperation.CONNECTING || tetheringService != null) return
+        uiState = uiState.copy(operation = TetheringOperation.CONNECTING)
 
         runCatching {
             Shizuku.bindUserService(userServiceArgs, userServiceConnection)
         }.onFailure {
-            bindingUserService = false
-            tetheringService = null
-            renderRoutingUnavailable()
-            renderHotspotUnavailable()
+            clearServiceState()
             toastError(it.message ?: getString(R.string.shizuku_operation_failed))
         }
     }
 
     private fun refreshTetheringStatus() {
         val service = tetheringService ?: run {
-            renderRoutingUnavailable()
-            renderHotspotUnavailable()
+            clearServiceState()
             return
         }
         operationJob?.cancel()
-        routingStatusRes = R.string.shizuku_routing_status_checking
-        hotspotStatusRes = R.string.shizuku_hotspot_status_checking
-        routingButtonEnabled = false
-        hotspotButtonEnabled = false
+        uiState = uiState.copy(operation = TetheringOperation.CHECKING)
         operationJob = lifecycleScope.launch {
             val status = withContext(Dispatchers.IO) {
                 StatusSnapshot(
@@ -364,75 +356,74 @@ class ShizukuActivity : BaseComponentActivity() {
                         .getOrDefault(ShizukuTetheringService.TETHERING_TYPES_UNKNOWN),
                 )
             }
-            hotspotState = status.hotspot
-            routingState = status.routing
-            routingDetail = status.detail
-            activeTetheringTypes = status.tetheringTypes
-            renderRoutingState()
-            renderHotspotState()
+            uiState = uiState.copy(
+                operation = TetheringOperation.NONE,
+                hotspotState = status.hotspot,
+                routingState = status.routing,
+                routingDetail = status.detail,
+                activeTetheringTypes = status.tetheringTypes,
+            )
+            operationJob = null
         }
     }
 
     private fun toggleRouting() {
         val service = tetheringService ?: return
-        val enable = !isRoutingSessionEnabled()
+        val enable = !uiState.routingSessionEnabled
         operationJob?.cancel()
-        routingStatusRes = if (enable) R.string.shizuku_routing_status_starting
-        else R.string.shizuku_routing_status_stopping
-        routingButtonEnabled = false
-        hotspotButtonEnabled = false
-        isLoading = true
+        uiState = uiState.copy(
+            operation = if (enable) {
+                TetheringOperation.STARTING_ROUTING
+            } else {
+                TetheringOperation.STOPPING_ROUTING
+            }
+        )
 
         operationJob = lifecycleScope.launch {
             if (enable) {
                 val result = startRouting(service)
                 if (result != ShizukuTetheringService.RESULT_OK) {
-                    isLoading = false
                     showRoutingError(result, service)
-                    refreshTetheringStatus()
+                    refreshAfterOperation()
                     return@launch
                 }
                 toastSuccess(R.string.shizuku_routing_enabled)
             } else {
                 val result = withContext(Dispatchers.IO) {
-                    val tetheringStop = runCatching { service.stopActiveTethering() }
-                        .getOrDefault(ShizukuTetheringService.RESULT_INTERNAL_ERROR)
-                    if (tetheringStop != ShizukuTetheringService.RESULT_OK) tetheringStop
-                    else runCatching { service.stopRouting() }
+                    runCatching { service.stopRouting() }
                         .getOrDefault(ShizukuTetheringService.RESULT_INTERNAL_ERROR)
                 }
                 if (result != ShizukuTetheringService.RESULT_OK) {
-                    isLoading = false
                     showRoutingError(result, service)
-                    refreshTetheringStatus()
+                    refreshAfterOperation()
                     return@launch
                 }
                 MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, "")
                 toastSuccess(R.string.shizuku_routing_disabled)
             }
-            isLoading = false
-            refreshTetheringStatus()
+            refreshAfterOperation()
         }
     }
 
     private fun toggleHotspot() {
         val service = tetheringService ?: return
-        val enable = hotspotState != ShizukuTetheringService.HOTSPOT_STATE_ENABLED
+        val enable = !uiState.hotspotEnabled
         operationJob?.cancel()
-        hotspotStatusRes = if (enable) R.string.shizuku_hotspot_status_starting
-        else R.string.shizuku_hotspot_status_stopping
-        routingButtonEnabled = false
-        hotspotButtonEnabled = false
-        isLoading = true
+        uiState = uiState.copy(
+            operation = if (enable) {
+                TetheringOperation.STARTING_HOTSPOT
+            } else {
+                TetheringOperation.STOPPING_HOTSPOT
+            }
+        )
 
         operationJob = lifecycleScope.launch {
             var routingStartedHere = false
-            if (enable && !isRoutingActive()) {
+            if (enable && !uiState.routingActive) {
                 val routingResult = startRouting(service)
                 if (routingResult != ShizukuTetheringService.RESULT_OK) {
-                    isLoading = false
                     showRoutingError(routingResult, service)
-                    refreshTetheringStatus()
+                    refreshAfterOperation()
                     return@launch
                 }
                 routingStartedHere = true
@@ -447,9 +438,8 @@ class ShizukuActivity : BaseComponentActivity() {
                     withContext(Dispatchers.IO) { runCatching { service.stopRouting() } }
                     MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, "")
                 }
-                isLoading = false
                 toastError(getString(R.string.shizuku_hotspot_operation_failed, result))
-                refreshTetheringStatus()
+                refreshAfterOperation()
                 return@launch
             }
 
@@ -464,13 +454,12 @@ class ShizukuActivity : BaseComponentActivity() {
                     !enable && state == ShizukuTetheringService.HOTSPOT_STATE_DISABLED
                 if (reachedTarget) break
             }
-            isLoading = false
-            hotspotState = state
+            uiState = uiState.copy(hotspotState = state)
             toastSuccess(
                 if (enable) R.string.shizuku_hotspot_enabled
                 else R.string.shizuku_hotspot_disabled
             )
-            refreshTetheringStatus()
+            refreshAfterOperation()
         }
     }
 
@@ -488,7 +477,7 @@ class ShizukuActivity : BaseComponentActivity() {
             return ShizukuTetheringService.RESULT_ROUTING_FAILED
         }
 
-        val syncToken = UUID.randomUUID().toString()
+        val syncToken = Utils.getUuid()
         MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, syncToken)
         val result = withContext(Dispatchers.IO) {
             runCatching {
@@ -520,118 +509,37 @@ class ShizukuActivity : BaseComponentActivity() {
             .also { if (snapshotWaiter === waiter) snapshotWaiter = null }
     }
 
-    private fun showRoutingError(result: Int, service: IShizukuTetheringService) {
-        lifecycleScope.launch {
-            val detail = withContext(Dispatchers.IO) {
-                runCatching { service.routingDetail }.getOrDefault("")
-            }
-            toastError(
-                getString(
-                    R.string.shizuku_routing_operation_failed,
-                    result,
-                    detail.ifBlank { getString(R.string.shizuku_operation_failed) }
-                )
+    private suspend fun showRoutingError(result: Int, service: IShizukuTetheringService) {
+        val detail = withContext(Dispatchers.IO) {
+            runCatching { service.routingDetail }.getOrDefault("")
+        }
+        toastError(
+            getString(
+                R.string.shizuku_routing_operation_failed,
+                result,
+                detail.ifBlank { getString(R.string.shizuku_operation_failed) }
             )
-        }
+        )
     }
 
-    private fun renderRoutingState() {
-        val usbActive = activeTetheringTypes >= 0 &&
-            activeTetheringTypes and (1 shl ShizukuTetheringService.TETHERING_TYPE_USB) != 0
-        when (routingState) {
-            ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV -> {
-                routingStatusRes = R.string.shizuku_routing_status_hev
-                routingButtonRes = R.string.shizuku_routing_disable
-                routingButtonEnabled = true
-            }
-            ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE -> {
-                routingStatusRes = R.string.shizuku_routing_status_native
-                routingButtonRes = R.string.shizuku_routing_disable
-                routingButtonEnabled = true
-            }
-            ShizukuTetheringService.ROUTING_STATE_STARTING -> {
-                routingStatusRes = R.string.shizuku_routing_status_starting
-                routingButtonEnabled = false
-            }
-            ShizukuTetheringService.ROUTING_STATE_STOPPING -> {
-                routingStatusRes = R.string.shizuku_routing_status_stopping
-                routingButtonEnabled = false
-            }
-            ShizukuTetheringService.ROUTING_STATE_WAITING -> {
-                routingStatusRes = R.string.shizuku_routing_status_waiting
-                routingButtonRes = R.string.shizuku_routing_disable
-                routingButtonEnabled = tetheringService != null
-            }
-            ShizukuTetheringService.ROUTING_STATE_ERROR -> {
-                routingStatusRes = R.string.shizuku_routing_status_error
-                routingButtonRes = R.string.shizuku_routing_enable
-                routingButtonEnabled = coreRunning
-            }
-            else -> {
-                routingStatusRes = if (coreRunning) R.string.shizuku_routing_status_disabled
-                else R.string.shizuku_routing_status_start_v2ray
-                routingButtonRes = R.string.shizuku_routing_enable
-                routingButtonEnabled = coreRunning && tetheringService != null
-            }
-        }
-        routingDetails = buildString {
-            append(routingDetail.ifBlank { getString(R.string.shizuku_routing_summary) })
-            if (usbActive) append("\n").append(getString(R.string.shizuku_usb_status_enabled))
-        }
+    private fun refreshAfterOperation() {
+        uiState = uiState.copy(operation = TetheringOperation.NONE)
+        operationJob = null
+        refreshTetheringStatus()
     }
 
-    private fun renderHotspotState() {
-        when (hotspotState) {
-            ShizukuTetheringService.HOTSPOT_STATE_ENABLED -> {
-                hotspotStatusRes = when {
-                    isRoutingActive() -> R.string.shizuku_hotspot_status_enabled
-                    routingState == ShizukuTetheringService.ROUTING_STATE_WAITING ->
-                        R.string.shizuku_hotspot_status_waiting
-                    else -> R.string.shizuku_hotspot_status_enabled_direct
-                }
-                hotspotButtonRes = R.string.shizuku_hotspot_disable
-                hotspotButtonEnabled = tetheringService != null
-            }
-            ShizukuTetheringService.HOTSPOT_STATE_DISABLED -> {
-                hotspotStatusRes = R.string.shizuku_hotspot_status_disabled
-                hotspotButtonRes = R.string.shizuku_hotspot_enable
-                hotspotButtonEnabled = tetheringService != null &&
-                    (isRoutingActive() || coreRunning)
-            }
-            else -> renderHotspotUnavailable()
-        }
+    private fun clearServiceState() {
+        operationJob?.cancel()
+        operationJob = null
+        tetheringService = null
+        uiState = uiState.copy(
+            operation = TetheringOperation.NONE,
+            hotspotState = ShizukuTetheringService.HOTSPOT_STATE_UNKNOWN,
+            routingState = ShizukuTetheringService.ROUTING_STATE_DISABLED,
+            routingDetail = "",
+            activeTetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
+        )
     }
-
-    private fun isRoutingActive(): Boolean =
-        routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV ||
-            routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE
-
-    private fun isRoutingSessionEnabled(): Boolean =
-        isRoutingActive() || routingState == ShizukuTetheringService.ROUTING_STATE_WAITING
-
-    private fun renderRoutingUnavailable() {
-        routingState = ShizukuTetheringService.ROUTING_STATE_DISABLED
-        routingDetail = ""
-        routingStatusRes = R.string.shizuku_routing_status_unavailable
-        routingDetails = getString(R.string.shizuku_routing_summary)
-        routingButtonRes = R.string.shizuku_routing_enable
-        routingButtonEnabled = false
-    }
-
-    private fun renderHotspotUnavailable() {
-        hotspotState = ShizukuTetheringService.HOTSPOT_STATE_UNKNOWN
-        hotspotStatusRes = R.string.shizuku_hotspot_status_unavailable
-        hotspotButtonRes = R.string.shizuku_hotspot_enable
-        hotspotButtonEnabled = false
-    }
-
-    @Suppress("DEPRECATION")
-    private fun readSnapshot(intent: Intent): HotspotRoutingSnapshot? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getSerializableExtra("content", HotspotRoutingSnapshot::class.java)
-        } else {
-            intent.getSerializableExtra("content") as? HotspotRoutingSnapshot
-        }
 
     @Suppress("DEPRECATION")
     private fun isPackageInstalled(packageName: String): Boolean = try {
@@ -664,32 +572,131 @@ class ShizukuActivity : BaseComponentActivity() {
     }
 }
 
+private data class TetheringAction(
+    val statusRes: Int,
+    val buttonRes: Int,
+    val enabled: Boolean,
+)
+
+private fun routingAction(
+    state: TetheringUiState,
+    serviceConnected: Boolean,
+    platformSupported: Boolean,
+): TetheringAction {
+    val statusRes = if (!platformSupported) {
+        R.string.shizuku_routing_status_unavailable
+    } else when (state.operation) {
+        TetheringOperation.CONNECTING -> R.string.shizuku_routing_status_connecting
+        TetheringOperation.CHECKING -> R.string.shizuku_routing_status_checking
+        TetheringOperation.STARTING_ROUTING -> R.string.shizuku_routing_status_starting
+        TetheringOperation.STOPPING_ROUTING -> R.string.shizuku_routing_status_stopping
+        else -> when {
+            !serviceConnected -> R.string.shizuku_routing_status_unavailable
+            state.routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV ->
+                R.string.shizuku_routing_status_hev
+            state.routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE ->
+                R.string.shizuku_routing_status_native
+            state.routingState == ShizukuTetheringService.ROUTING_STATE_STARTING ->
+                R.string.shizuku_routing_status_starting
+            state.routingState == ShizukuTetheringService.ROUTING_STATE_STOPPING ->
+                R.string.shizuku_routing_status_stopping
+            state.routingState == ShizukuTetheringService.ROUTING_STATE_WAITING ->
+                R.string.shizuku_routing_status_waiting
+            state.routingState == ShizukuTetheringService.ROUTING_STATE_ERROR ->
+                R.string.shizuku_routing_status_error
+            state.coreRunning -> R.string.shizuku_routing_status_disabled
+            else -> R.string.shizuku_routing_status_start_v2ray
+        }
+    }
+    val enabled = platformSupported && serviceConnected &&
+        state.operation == TetheringOperation.NONE &&
+        when (state.routingState) {
+            ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV,
+            ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE,
+            ShizukuTetheringService.ROUTING_STATE_WAITING -> true
+            ShizukuTetheringService.ROUTING_STATE_ERROR,
+            ShizukuTetheringService.ROUTING_STATE_DISABLED -> state.coreRunning
+            else -> false
+        }
+    return TetheringAction(
+        statusRes = statusRes,
+        buttonRes = if (state.routingSessionEnabled) {
+            R.string.shizuku_routing_disable
+        } else {
+            R.string.shizuku_routing_enable
+        },
+        enabled = enabled,
+    )
+}
+
+private fun hotspotAction(
+    state: TetheringUiState,
+    serviceConnected: Boolean,
+    platformSupported: Boolean,
+): TetheringAction {
+    val statusRes = if (!platformSupported) {
+        R.string.shizuku_hotspot_status_unsupported
+    } else when (state.operation) {
+        TetheringOperation.CONNECTING -> R.string.shizuku_hotspot_status_connecting
+        TetheringOperation.CHECKING -> R.string.shizuku_hotspot_status_checking
+        TetheringOperation.STARTING_HOTSPOT -> R.string.shizuku_hotspot_status_starting
+        TetheringOperation.STOPPING_HOTSPOT -> R.string.shizuku_hotspot_status_stopping
+        else -> when {
+            !serviceConnected -> R.string.shizuku_hotspot_status_unavailable
+            state.hotspotEnabled && state.routingActive -> R.string.shizuku_hotspot_status_enabled
+            state.hotspotEnabled &&
+                state.routingState == ShizukuTetheringService.ROUTING_STATE_WAITING ->
+                R.string.shizuku_hotspot_status_waiting
+            state.hotspotEnabled -> R.string.shizuku_hotspot_status_enabled_direct
+            state.hotspotState == ShizukuTetheringService.HOTSPOT_STATE_DISABLED ->
+                R.string.shizuku_hotspot_status_disabled
+            else -> R.string.shizuku_hotspot_status_unavailable
+        }
+    }
+    return TetheringAction(
+        statusRes = statusRes,
+        buttonRes = if (state.hotspotEnabled) {
+            R.string.shizuku_hotspot_disable
+        } else {
+            R.string.shizuku_hotspot_enable
+        },
+        enabled = platformSupported && serviceConnected &&
+            state.operation == TetheringOperation.NONE &&
+            (state.hotspotEnabled ||
+                state.hotspotState == ShizukuTetheringService.HOTSPOT_STATE_DISABLED &&
+                (state.routingActive || state.coreRunning)),
+    )
+}
+
 @Composable
 private fun TetheringScreen(
-    isLoading: Boolean,
-    shizukuStatusRes: Int,
-    shizukuDetailsRes: Int?,
-    requestPermissionEnabled: Boolean,
-    routingStatusRes: Int,
-    routingDetails: String,
-    routingButtonRes: Int,
-    routingButtonEnabled: Boolean,
-    hotspotStatusRes: Int,
-    hotspotButtonRes: Int,
-    hotspotButtonEnabled: Boolean,
+    state: TetheringUiState,
+    serviceConnected: Boolean,
+    platformSupported: Boolean,
     onBackClick: () -> Unit,
     onRequestPermission: () -> Unit,
     onRefresh: () -> Unit,
     onToggleRouting: () -> Unit,
     onToggleHotspot: () -> Unit,
 ) {
+    val routingAction = routingAction(state, serviceConnected, platformSupported)
+    val hotspotAction = hotspotAction(state, serviceConnected, platformSupported)
+    val routingSummary = stringResource(R.string.shizuku_routing_summary)
+    val usbStatus = stringResource(R.string.shizuku_usb_status_enabled)
+    val usbActive = state.activeTetheringTypes >= 0 &&
+        state.activeTetheringTypes and (1 shl ShizukuTetheringService.TETHERING_TYPE_USB) != 0
+    val routingDetails = buildString {
+        append(state.routingDetail.ifBlank { routingSummary })
+        if (usbActive) append("\n").append(usbStatus)
+    }
+
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.title_tethering),
                 onBackClick = onBackClick,
-                isLoading = isLoading,
+                isLoading = state.operation.isLoading,
             )
         },
     ) { innerPadding ->
@@ -702,8 +709,10 @@ private fun TetheringScreen(
             TetheringStatusSection(
                 iconRes = R.drawable.ic_device_hub_24dp,
                 title = stringResource(R.string.shizuku_status_title),
-                status = stringResource(shizukuStatusRes),
-                details = shizukuDetailsRes?.let { listOf(stringResource(it)) }.orEmpty(),
+                status = stringResource(state.shizukuStatus.statusRes),
+                details = state.shizukuStatus.detailsRes
+                    ?.let { listOf(stringResource(it)) }
+                    .orEmpty(),
             )
             Row(
                 modifier = Modifier
@@ -713,13 +722,14 @@ private fun TetheringScreen(
             ) {
                 TetheringActionButton(
                     text = stringResource(R.string.shizuku_request_permission),
-                    enabled = requestPermissionEnabled && !isLoading,
+                    enabled = state.shizukuStatus.canRequestPermission &&
+                        !state.operation.isLoading,
                     onClick = onRequestPermission,
                     modifier = Modifier.weight(1f),
                 )
                 TetheringActionButton(
                     text = stringResource(R.string.shizuku_refresh_permission),
-                    enabled = !isLoading,
+                    enabled = !state.operation.isLoading,
                     onClick = onRefresh,
                     modifier = Modifier.weight(1f),
                 )
@@ -729,15 +739,15 @@ private fun TetheringScreen(
             TetheringStatusSection(
                 iconRes = R.drawable.ic_routing_24dp,
                 title = stringResource(R.string.shizuku_routing_title),
-                status = stringResource(routingStatusRes),
+                status = stringResource(routingAction.statusRes),
                 details = listOf(
                     routingDetails.ifBlank { stringResource(R.string.shizuku_routing_summary) },
                     stringResource(R.string.shizuku_routing_rules_disclaimer),
                 ),
             )
             TetheringActionButton(
-                text = stringResource(routingButtonRes),
-                enabled = routingButtonEnabled && !isLoading,
+                text = stringResource(routingAction.buttonRes),
+                enabled = routingAction.enabled,
                 onClick = onToggleRouting,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -748,12 +758,12 @@ private fun TetheringScreen(
             TetheringStatusSection(
                 iconRes = R.drawable.ic_wifi_tethering_24dp,
                 title = stringResource(R.string.shizuku_hotspot_title),
-                status = stringResource(hotspotStatusRes),
+                status = stringResource(hotspotAction.statusRes),
                 details = listOf(stringResource(R.string.shizuku_hotspot_summary)),
             )
             TetheringActionButton(
-                text = stringResource(hotspotButtonRes),
-                enabled = hotspotButtonEnabled && !isLoading,
+                text = stringResource(hotspotAction.buttonRes),
+                enabled = hotspotAction.enabled,
                 onClick = onToggleHotspot,
                 modifier = Modifier
                     .fillMaxWidth()

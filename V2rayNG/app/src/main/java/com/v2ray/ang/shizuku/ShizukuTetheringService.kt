@@ -1,26 +1,29 @@
 package com.v2ray.ang.shizuku
 
+import android.annotation.SuppressLint
+import android.content.ComponentName
 import android.content.Context
-import android.content.ContextWrapper
 import android.net.ConnectivityManager
 import android.net.LinkAddress
 import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.net.TetheringManager
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import androidx.annotation.Keep
+import androidx.annotation.RequiresApi
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.service.TProxyService
 import go.Seq
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
 import libv2ray.Libv2ray
+import rikka.shizuku.Shizuku
 import java.io.File
 import java.lang.reflect.InvocationTargetException
 import java.net.InetAddress
@@ -42,23 +45,20 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
 
     private val executor = Executor { command -> command.run() }
     private val appContext = context
-    private val shellContext = createShellContext(context)
+    private val shellContext = ShellContextCompat.create(context)
     private val tetheringManager = requireNotNull(
-        shellContext.getSystemService(TetheringManager::class.java)
+        shellContext.getSystemService(TETHERING_SERVICE)
     ) { "TetheringManager is unavailable" }
     private val connectivityManager = requireNotNull(
         shellContext.getSystemService(ConnectivityManager::class.java)
     ) { "ConnectivityManager is unavailable" }
-    @Volatile private var routingState = ROUTING_STATE_DISABLED
-    @Volatile private var routingDetail = ""
-    private var routingRequested = false
+    @Volatile
+    private var routingState = ROUTING_STATE_DISABLED
+    @Volatile
+    private var routingDetail = ""
     private var routingUsesHev = false
     private var routingProfileName = ""
-    private var syncToken = ""
-    private var coreAssetPath = ""
-    private var coreXudpKey = ""
-    private var desiredTetheringTypes = 0
-    private var coreRestartPending = false
+    private var routingSession: RoutingSession? = null
     private var testNetworkManager: Any? = null
     private var testNetworkInterface: Any? = null
     private var testTun: ParcelFileDescriptor? = null
@@ -69,10 +69,18 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     private var nativeController: CoreController? = null
     private var hevConfigFile: File? = null
 
+    private data class RoutingSession(
+        val token: String,
+        val assetPath: String,
+        val xudpKey: String,
+        var desiredTetheringTypes: Int,
+        var coreRestartPending: Boolean = false,
+    )
+
     override fun getWifiHotspotState(): Int {
         val types = getActiveTetheringTypes()
         if (types < 0) return HOTSPOT_STATE_UNKNOWN
-        return if (types and tetheringTypeBit(TetheringManager.TETHERING_WIFI) != 0) {
+        return if (types and tetheringTypeBit(TETHERING_TYPE_WIFI) != 0) {
             HOTSPOT_STATE_ENABLED
         } else {
             HOTSPOT_STATE_DISABLED
@@ -80,13 +88,15 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     }
 
     override fun setWifiHotspotEnabled(enabled: Boolean): Int = synchronized(this) {
-        val result = setTetheringEnabled(TetheringManager.TETHERING_WIFI, enabled)
+        val result = setTetheringEnabled(TETHERING_TYPE_WIFI, enabled)
         if (result == RESULT_OK) {
-            val bit = tetheringTypeBit(TetheringManager.TETHERING_WIFI)
-            desiredTetheringTypes = if (enabled) {
-                desiredTetheringTypes or bit
-            } else {
-                desiredTetheringTypes and bit.inv()
+            val bit = tetheringTypeBit(TETHERING_TYPE_WIFI)
+            routingSession?.let { session ->
+                session.desiredTetheringTypes = if (enabled) {
+                    session.desiredTetheringTypes or bit
+                } else {
+                    session.desiredTetheringTypes and bit.inv()
+                }
             }
         }
         result
@@ -128,38 +138,39 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         xudpKey: String,
         syncToken: String,
     ): Int = synchronized(this) {
-        routingRequested = true
-        this.syncToken = syncToken
-        coreAssetPath = assetPath
-        coreXudpKey = xudpKey
-        getActiveTetheringTypes().takeIf { it >= 0 }?.let { desiredTetheringTypes = it }
-
-        val result = startRoutingLocked(
-            useHev,
-            profileName,
-            coreConfig,
-            hevConfig,
-            assetPath,
-            xudpKey,
+        val activeTypes = getActiveTetheringTypes()
+        val launchConfig = HotspotRoutingLaunchConfig(
+            useHev = useHev,
+            profileName = profileName,
+            coreConfig = coreConfig,
+            hevConfig = hevConfig,
+            assetPath = assetPath,
+            xudpKey = xudpKey,
         )
+        routingSession = RoutingSession(
+            token = syncToken,
+            assetPath = launchConfig.assetPath,
+            xudpKey = launchConfig.xudpKey,
+            desiredTetheringTypes = activeTypes.takeIf { it >= 0 }
+                ?: routingSession?.desiredTetheringTypes
+                ?: 0,
+        )
+
+        val result = startRoutingLocked(launchConfig)
         if (result != RESULT_OK) {
-            routingRequested = false
-            this.syncToken = ""
-            desiredTetheringTypes = 0
+            routingSession = null
         }
         result
     }
 
-    private fun startRoutingLocked(
-        useHev: Boolean,
-        profileName: String,
-        coreConfig: String,
-        hevConfig: String,
-        assetPath: String,
-        xudpKey: String,
-    ): Int {
+    private fun startRoutingLocked(config: HotspotRoutingLaunchConfig): Int {
         if (routingState == ROUTING_STATE_ACTIVE_HEV || routingState == ROUTING_STATE_ACTIVE_NATIVE) {
-            return if (routingUsesHev == useHev) RESULT_OK else RESULT_IMPLEMENTATION_MISMATCH
+            return if (routingUsesHev == config.useHev) RESULT_OK else RESULT_IMPLEMENTATION_MISMATCH
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            routingState = ROUTING_STATE_ERROR
+            routingDetail = "Shizuku tethering requires Android 11 or newer"
+            return RESULT_ROUTING_FAILED
         }
 
         cleanupRouting(resetPreference = true)
@@ -170,8 +181,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             setPreferTestNetworks(true)
             createTestNetwork()
             val tun = checkNotNull(testTun) { "Test TUN file descriptor is unavailable" }
-            startRoutingEngineLocked(useHev, coreConfig, hevConfig, assetPath, xudpKey, tun.fd)
-            setRoutingActiveLocked(useHev, profileName)
+            startRoutingEngineLocked(config, tun.fd)
+            setRoutingActiveLocked(config)
             RESULT_OK
         } catch (error: Throwable) {
             val detail = rootCauseMessage(error)
@@ -186,11 +197,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     override fun stopRouting(): Int = synchronized(this) {
         val tetheringResult = stopActiveTetheringLocked(clearDesired = true)
         if (tetheringResult != RESULT_OK) return@synchronized tetheringResult
-        routingRequested = false
-        syncToken = ""
-        coreAssetPath = ""
-        coreXudpKey = ""
-        coreRestartPending = false
+        routingSession = null
         routingState = ROUTING_STATE_STOPPING
         routingDetail = "Stopping v2rayNG tethering routing"
         cleanupRouting(resetPreference = true)
@@ -199,15 +206,11 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         RESULT_OK
     }
 
-    override fun stopActiveTethering(): Int = synchronized(this) {
-        stopActiveTetheringLocked(clearDesired = true)
-    }
-
     private fun stopActiveTetheringLocked(clearDesired: Boolean): Int {
         val activeTypes = getActiveTetheringTypes()
         if (activeTypes < 0) return RESULT_INTERNAL_ERROR
 
-        if (clearDesired) desiredTetheringTypes = 0
+        if (clearDesired) routingSession?.desiredTetheringTypes = 0
 
         var result = RESULT_OK
         for (type in 0..MAX_TETHERING_TYPE) {
@@ -219,24 +222,25 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     }
 
     override fun notifyCoreStopping(token: String): Int = synchronized(this) {
-        if (!isValidSyncSession(token)) return@synchronized RESULT_INVALID_SESSION
+        val session = findRoutingSession(token) ?: return@synchronized RESULT_INVALID_SESSION
         val activeTypes = getActiveTetheringTypes()
         if (activeTypes >= 0 &&
             (routingState == ROUTING_STATE_ACTIVE_HEV ||
                 routingState == ROUTING_STATE_ACTIVE_NATIVE ||
-                desiredTetheringTypes == 0)
+                session.desiredTetheringTypes == 0)
         ) {
-            desiredTetheringTypes = activeTypes
+            session.desiredTetheringTypes = activeTypes
         }
         stopRoutingEngineLocked()
-        coreRestartPending = true
+        session.coreRestartPending = true
         if (testTun != null) {
             routingState = ROUTING_STATE_WAITING
             updateRoutingDetailLocked()
             Log.i(
                 TAG,
                 "Main core stopping; tethering core stopped while preserving the protected " +
-                    "test network and tethering types 0x${desiredTetheringTypes.toString(16)}",
+                    "test network and tethering types " +
+                    "0x${session.desiredTetheringTypes.toString(16)}",
             )
         } else {
             val tetheringResult = stopActiveTetheringLocked(clearDesired = false)
@@ -258,50 +262,57 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         coreConfig: String,
         hevConfig: String,
     ): Int = synchronized(this) {
-        if (!isValidSyncSession(token)) return@synchronized RESULT_INVALID_SESSION
+        val session = findRoutingSession(token) ?: return@synchronized RESULT_INVALID_SESSION
         val launchConfig = HotspotRoutingLaunchConfig(
             useHev = useHev,
             profileName = profileName,
             coreConfig = coreConfig,
             hevConfig = hevConfig,
-            assetPath = coreAssetPath,
-            xudpKey = coreXudpKey,
+            assetPath = session.assetPath,
+            xudpKey = session.xudpKey,
         )
         return@synchronized runCatching {
-            applyRoutingConfigLocked(launchConfig)
+            applyRoutingConfigLocked(launchConfig, session)
             RESULT_OK
         }.getOrElse {
-            failRoutingSynchronizationLocked(it)
+            failRoutingSynchronizationLocked(it, session)
             RESULT_ROUTING_FAILED
         }
     }
 
     override fun notifyCoreStartFailed(token: String, detail: String): Int = synchronized(this) {
-        if (!isValidSyncSession(token)) return@synchronized RESULT_INVALID_SESSION
+        val session = findRoutingSession(token) ?: return@synchronized RESULT_INVALID_SESSION
         failRoutingSynchronizationLocked(
-            IllegalStateException(detail.ifBlank { "v2rayNG failed to restart" })
+            IllegalStateException(detail.ifBlank { "v2rayNG failed to restart" }),
+            session,
         )
         RESULT_OK
     }
 
-    private fun isValidSyncSession(token: String): Boolean {
-        val valid = routingRequested && syncToken.isNotBlank() && token == syncToken
-        if (!valid) Log.w(TAG, "Ignoring hotspot update for an inactive or invalid session")
-        return valid
+    private fun findRoutingSession(token: String): RoutingSession? {
+        val session = routingSession
+        if (session == null || token.isBlank() || token != session.token) {
+            Log.w(TAG, "Ignoring hotspot update for an inactive or invalid session")
+            return null
+        }
+        return session
     }
 
-    private fun applyRoutingConfigLocked(launchConfig: HotspotRoutingLaunchConfig) {
+    private fun applyRoutingConfigLocked(
+        launchConfig: HotspotRoutingLaunchConfig,
+        session: RoutingSession,
+    ) {
         Log.i(
             TAG,
             "Synchronizing hotspot routing to profile ${launchConfig.profileName.ifBlank { "<unnamed>" }}",
         )
         val currentlyActive = getActiveTetheringTypes().coerceAtLeast(0)
-        val restoreTypes = if (coreRestartPending) {
-            desiredTetheringTypes or currentlyActive
+        val restoreTypes = if (session.coreRestartPending) {
+            session.desiredTetheringTypes or currentlyActive
         } else {
             currentlyActive
         }
-        desiredTetheringTypes = restoreTypes
+        session.desiredTetheringTypes = restoreTypes
 
         val canSwitchInPlace = testTun != null &&
             (routingState == ROUTING_STATE_ACTIVE_HEV ||
@@ -322,21 +333,14 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             check(stopResult == RESULT_OK) {
                 "Unable to pause tethering safely before rebuilding its protected route"
             }
-            val result = startRoutingLocked(
-                launchConfig.useHev,
-                launchConfig.profileName,
-                launchConfig.coreConfig,
-                launchConfig.hevConfig,
-                launchConfig.assetPath,
-                launchConfig.xudpKey,
-            )
+            val result = startRoutingLocked(launchConfig)
             check(result == RESULT_OK) {
                 routingDetail.ifBlank { "Unable to rebuild hotspot routing" }
             }
         }
 
         val failedTypes = restoreTetheringTypesLocked(restoreTypes)
-        coreRestartPending = false
+        session.coreRestartPending = false
         if (failedTypes != 0) {
             routingDetail += " · Unable to restore tethering types 0x${failedTypes.toString(16)}"
             Log.w(TAG, routingDetail)
@@ -353,15 +357,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         routingDetail = "Switching tethering to the new v2rayNG connection"
         stopRoutingEngineLocked()
         val tun = checkNotNull(testTun) { "Test TUN file descriptor is unavailable" }
-        startRoutingEngineLocked(
-            config.useHev,
-            config.coreConfig,
-            config.hevConfig,
-            config.assetPath,
-            config.xudpKey,
-            tun.fd,
-        )
-        setRoutingActiveLocked(config.useHev, config.profileName)
+        startRoutingEngineLocked(config, tun.fd)
+        setRoutingActiveLocked(config)
     }
 
     private fun restoreTetheringTypesLocked(types: Int): Int {
@@ -378,11 +375,11 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         return failedTypes
     }
 
-    private fun failRoutingSynchronizationLocked(error: Throwable) {
+    private fun failRoutingSynchronizationLocked(error: Throwable, session: RoutingSession) {
         val detail = rootCauseMessage(error)
         Log.e(TAG, "Unable to synchronize hotspot routing: $detail", error)
         stopRoutingEngineLocked()
-        coreRestartPending = true
+        session.coreRestartPending = true
         if (testTun != null) {
             routingState = ROUTING_STATE_WAITING
             updateRoutingDetailLocked()
@@ -397,8 +394,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
 
     override fun destroy() {
         synchronized(this) {
-            routingRequested = false
-            desiredTetheringTypes = 0
+            routingSession = null
             cleanupRouting(resetPreference = true)
         }
         System.exit(0)
@@ -411,70 +407,48 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             if (enabled == alreadyEnabled) return RESULT_OK
         }
 
-        if (!enabled) {
-            return if (Build.VERSION.SDK_INT >= 36) {
-                runCatching {
-                    TetheringApi36.stopTethering(
-                        tetheringManager,
-                        TetheringManager.TetheringRequest.Builder(type).build(),
-                        executor,
-                        CALLBACK_TIMEOUT_SECONDS,
-                    )
-                }.onFailure {
-                    Log.e(TAG, "Unable to stop API 36 tethering type $type", it)
-                }.getOrDefault(RESULT_INTERNAL_ERROR)
-            } else {
-                stopLegacyTethering(type)
-            }
+        if (Build.VERSION.SDK_INT >= 36) {
+            return runCatching {
+                TetheringApi36.setTetheringEnabled(
+                    tetheringManager,
+                    type,
+                    enabled,
+                    executor,
+                    CALLBACK_TIMEOUT_SECONDS,
+                )
+            }.onFailure {
+                Log.e(TAG, "Unable to change API 36 tethering type $type to $enabled", it)
+            }.getOrDefault(RESULT_INTERNAL_ERROR)
         }
 
-        val callbackReceived = CountDownLatch(1)
-        var result = RESULT_INTERNAL_ERROR
-
-        return try {
-            tetheringManager.startTethering(
-                TetheringManager.TetheringRequest.Builder(type).build(),
-                executor,
-                object : TetheringManager.StartTetheringCallback {
-                    override fun onTetheringStarted() {
-                        result = RESULT_OK
-                        callbackReceived.countDown()
-                    }
-
-                    override fun onTetheringFailed(error: Int) {
-                        result = error
-                        callbackReceived.countDown()
-                    }
-                }
-            )
-
-            if (!callbackReceived.await(CALLBACK_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                RESULT_INTERNAL_ERROR
-            } else {
-                result
-            }
-        } catch (error: Throwable) {
-            Log.e(TAG, "Unable to change tethering type $type to $enabled", error)
-            RESULT_INTERNAL_ERROR
+        return if (enabled) {
+            runCatching {
+                TetheringApi30To35.startTethering(
+                    tetheringManager,
+                    type,
+                    executor,
+                    CALLBACK_TIMEOUT_SECONDS,
+                )
+            }.onFailure {
+                Log.e(TAG, "Unable to start legacy tethering type $type", it)
+            }.getOrDefault(RESULT_INTERNAL_ERROR)
+        } else {
+            stopLegacyTethering(type)
         }
     }
 
     private fun getLegacyActiveTetheringTypes(): Int {
-        val method = tetheringManager.javaClass.methods.firstOrNull {
-            it.name == "getTetheredIfaces" && it.parameterCount == 0
-        } ?: error("TetheringManager.getTetheredIfaces is unavailable")
-        val interfaces = when (val result = method.invoke(tetheringManager)) {
-            is Array<*> -> result.filterIsInstance<String>()
-            is Collection<*> -> result.filterIsInstance<String>()
-            else -> error("TetheringManager returned an unsupported tethered-interface list")
-        }
+        val interfaces = invokeLegacyStringList("getTetheredIfaces")
+            ?: error("TetheringManager.getTetheredIfaces is unavailable")
         if (interfaces.isEmpty()) return 0
 
         val regexesByType = mapOf(
-            TetheringManager.TETHERING_WIFI to getLegacyTetheringRegexes("getTetherableWifiRegexs"),
-            LEGACY_TETHERING_TYPE_USB to getLegacyTetheringRegexes("getTetherableUsbRegexs"),
+            TETHERING_TYPE_WIFI to
+                invokeLegacyStringList("getTetherableWifiRegexs").orEmpty(),
+            TETHERING_TYPE_USB to
+                invokeLegacyStringList("getTetherableUsbRegexs").orEmpty(),
             LEGACY_TETHERING_TYPE_BLUETOOTH to
-                getLegacyTetheringRegexes("getTetherableBluetoothRegexs"),
+                invokeLegacyStringList("getTetherableBluetoothRegexs").orEmpty(),
         )
         return interfaces.fold(0) { mask, interfaceName ->
             val type = regexesByType.entries.firstOrNull { (_, regexes) ->
@@ -484,14 +458,15 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         }
     }
 
-    private fun getLegacyTetheringRegexes(methodName: String): List<String> {
+    private fun invokeLegacyStringList(methodName: String): List<String>? {
         val method = tetheringManager.javaClass.methods.firstOrNull {
             it.name == methodName && it.parameterCount == 0
-        } ?: return emptyList()
+        } ?: return null
         return when (val result = method.invoke(tetheringManager)) {
+            null -> null
             is Array<*> -> result.filterIsInstance<String>()
             is Collection<*> -> result.filterIsInstance<String>()
-            else -> emptyList()
+            else -> null
         }
     }
 
@@ -499,9 +474,9 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         val name = interfaceName.lowercase()
         return when {
             name.startsWith("wlan") || name.startsWith("ap") || name.startsWith("softap") ->
-                TetheringManager.TETHERING_WIFI
+                TETHERING_TYPE_WIFI
             name.startsWith("usb") || name.startsWith("rndis") || name.startsWith("ncm") ->
-                LEGACY_TETHERING_TYPE_USB
+                TETHERING_TYPE_USB
             name.startsWith("bt-pan") || name.startsWith("bnep") ->
                 LEGACY_TETHERING_TYPE_BLUETOOTH
             else -> null
@@ -536,6 +511,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
+    @SuppressLint("WrongConstant") // TRANSPORT_TEST is a hidden transport type.
     private fun createTestNetwork() {
         val manager = checkNotNull(shellContext.getSystemService(TEST_NETWORK_SERVICE)) {
             "TestNetworkManager is unavailable on this Android build"
@@ -621,27 +598,20 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         method.invoke(tetheringManager, prefer)
     }
 
-    private fun startRoutingEngineLocked(
-        useHev: Boolean,
-        coreConfig: String,
-        hevConfig: String,
-        assetPath: String,
-        xudpKey: String,
-        fd: Int,
-    ) {
-        if (useHev) {
-            require(hevConfig.isNotBlank()) { "HEV configuration is empty" }
-            startHev(hevConfig, fd)
+    private fun startRoutingEngineLocked(config: HotspotRoutingLaunchConfig, fd: Int) {
+        if (config.useHev) {
+            require(config.hevConfig.isNotBlank()) { "HEV configuration is empty" }
+            startHev(config.hevConfig, fd)
         } else {
-            require(coreConfig.isNotBlank()) { "Xray configuration is empty" }
-            startNativeXray(coreConfig, fd, assetPath, xudpKey)
+            require(config.coreConfig.isNotBlank()) { "Xray configuration is empty" }
+            startNativeXray(config.coreConfig, fd, config.assetPath, config.xudpKey)
         }
-        routingUsesHev = useHev
+        routingUsesHev = config.useHev
     }
 
-    private fun setRoutingActiveLocked(useHev: Boolean, profileName: String) {
-        routingProfileName = profileName
-        routingState = if (useHev) ROUTING_STATE_ACTIVE_HEV else ROUTING_STATE_ACTIVE_NATIVE
+    private fun setRoutingActiveLocked(config: HotspotRoutingLaunchConfig) {
+        routingProfileName = config.profileName
+        routingState = if (config.useHev) ROUTING_STATE_ACTIVE_HEV else ROUTING_STATE_ACTIVE_NATIVE
         updateRoutingDetailLocked()
     }
 
@@ -730,48 +700,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         }
     }
 
-    private fun createShellContext(context: Context): Context {
-        val baseContext = (context as? ContextWrapper)?.baseContext ?: context
-        val contextImplClass = Class.forName("android.app.ContextImpl")
-        val activityThreadClass = Class.forName("android.app.ActivityThread")
-        val loadedApkClass = Class.forName("android.app.LoadedApk")
-
-        val mainThreadField = contextImplClass.getDeclaredField("mMainThread").apply {
-            isAccessible = true
-        }
-        val activityThread = mainThreadField.get(baseContext)
-        val systemContext = activityThreadClass.getDeclaredMethod("getSystemContext")
-            .invoke(activityThread) as Context
-        val packageContext = systemContext.createPackageContext(
-            SHELL_PACKAGE_NAME,
-            Context.CONTEXT_INCLUDE_CODE or Context.CONTEXT_IGNORE_SECURITY
-        )
-
-        val packageInfoField = contextImplClass.getDeclaredField("mPackageInfo").apply {
-            isAccessible = true
-        }
-        val loadedApk = packageInfoField.get(packageContext)
-        val createAppContext = contextImplClass.declaredMethods
-            .filter { it.name == "createAppContext" }
-            .firstOrNull {
-                it.parameterTypes.contentEquals(
-                    arrayOf(activityThreadClass, loadedApkClass, String::class.java)
-                )
-            }
-            ?: contextImplClass.getDeclaredMethod(
-                "createAppContext",
-                activityThreadClass,
-                loadedApkClass
-            )
-        createAppContext.isAccessible = true
-
-        return if (createAppContext.parameterCount == 3) {
-            createAppContext.invoke(null, activityThread, loadedApk, SHELL_PACKAGE_NAME) as Context
-        } else {
-            createAppContext.invoke(null, activityThread, loadedApk) as Context
-        }
-    }
-
     private fun createLinkAddress(cidr: String): LinkAddress {
         val addressClass = LinkAddress::class.java
         val stringConstructor = addressClass.declaredConstructors.firstOrNull {
@@ -805,13 +733,13 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_721
-        private const val SHELL_PACKAGE_NAME = "com.android.shell"
+        const val USER_SERVICE_VERSION = 20_260_725
+        private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"
         private const val TRANSPORT_TEST = 7
         private const val MAX_TETHERING_TYPE = 15
-        private const val LEGACY_TETHERING_TYPE_USB = 1
+        private const val TETHERING_TYPE_WIFI = 0
         private const val LEGACY_TETHERING_TYPE_BLUETOOTH = 2
         private const val CALLBACK_TIMEOUT_SECONDS = 10L
         private const val LEGACY_STOP_POLL_MILLIS = 100L
@@ -837,5 +765,13 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         const val RESULT_ROUTING_FAILED = -2
         const val RESULT_IMPLEMENTATION_MISMATCH = -3
         const val RESULT_INVALID_SESSION = -4
+
+        internal fun createUserServiceArgs() = Shizuku.UserServiceArgs(
+            ComponentName(BuildConfig.APPLICATION_ID, ShizukuTetheringService::class.java.name)
+        )
+            .daemon(true)
+            .processNameSuffix("shizuku_tethering")
+            .debuggable(BuildConfig.DEBUG)
+            .version(USER_SERVICE_VERSION)
     }
 }
