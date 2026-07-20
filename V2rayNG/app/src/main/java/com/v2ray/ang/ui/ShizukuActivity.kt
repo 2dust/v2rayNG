@@ -375,7 +375,7 @@ class ShizukuActivity : BaseComponentActivity() {
         }
         val launchConfig = runCatching {
             withContext(Dispatchers.Default) {
-                HotspotRoutingConfig.fromSnapshot(this@ShizukuActivity, snapshot)
+                HotspotRoutingConfig.launchFromSnapshot(this@ShizukuActivity, snapshot)
             }
         }.getOrElse {
             toastError(it.message ?: getString(R.string.shizuku_routing_snapshot_timeout))
@@ -388,10 +388,9 @@ class ShizukuActivity : BaseComponentActivity() {
         MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, syncToken)
         val result = callService {
             service.startRouting(
-                launchConfig.useHev,
-                launchConfig.profileName,
-                launchConfig.coreConfig,
-                launchConfig.hevConfig,
+                launchConfig.engine.useHev,
+                launchConfig.engine.profileName,
+                launchConfig.engine.content,
                 launchConfig.assetPath,
                 launchConfig.xudpKey,
                 syncToken,

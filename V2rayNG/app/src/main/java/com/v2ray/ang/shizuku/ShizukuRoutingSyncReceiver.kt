@@ -31,7 +31,7 @@ class ShizukuRoutingSyncReceiver : BroadcastReceiver() {
             return
         }
         val pendingResult = goAsync()
-        ShizukuRoutingSyncDispatcher.enqueue(context.applicationContext, update) {
+        ShizukuRoutingSyncDispatcher.enqueue(update) {
             pendingResult.finish()
         }
     }
@@ -52,7 +52,6 @@ private object ShizukuRoutingSyncDispatcher {
     private const val BIND_TIMEOUT_MS = 10_000L
 
     private data class PendingUpdate(
-        val context: Context,
         val update: HotspotRoutingSync,
         val finish: () -> Unit,
     )
@@ -79,9 +78,9 @@ private object ShizukuRoutingSyncDispatcher {
         }
     }
 
-    fun enqueue(context: Context, update: HotspotRoutingSync, finish: () -> Unit) {
+    fun enqueue(update: HotspotRoutingSync, finish: () -> Unit) {
         mainHandler.post {
-            queue.addLast(PendingUpdate(context.applicationContext, update, finish))
+            queue.addLast(PendingUpdate(update, finish))
             pump()
         }
     }
@@ -139,13 +138,12 @@ private object ShizukuRoutingSyncDispatcher {
             HotspotRoutingSync.EVENT_CORE_STOPPING -> service.notifyCoreStopping(update.token)
             HotspotRoutingSync.EVENT_CORE_STARTED -> {
                 val snapshot = requireNotNull(update.snapshot) { "Core-start update has no snapshot" }
-                val config = HotspotRoutingConfig.fromSnapshot(pending.context, snapshot)
+                val config = HotspotRoutingConfig.engineFromSnapshot(snapshot)
                 service.synchronizeRouting(
                     update.token,
                     config.useHev,
                     config.profileName,
-                    config.coreConfig,
-                    config.hevConfig,
+                    config.content,
                 )
             }
             HotspotRoutingSync.EVENT_CORE_START_FAILED -> {

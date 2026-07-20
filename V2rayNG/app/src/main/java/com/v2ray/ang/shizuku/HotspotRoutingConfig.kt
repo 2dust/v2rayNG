@@ -7,11 +7,14 @@ import com.v2ray.ang.dto.HotspotRoutingSnapshot
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 
-data class HotspotRoutingLaunchConfig(
+data class HotspotRoutingEngineConfig(
     val useHev: Boolean,
     val profileName: String,
-    val coreConfig: String,
-    val hevConfig: String,
+    val content: String,
+)
+
+data class HotspotRoutingLaunchConfig(
+    val engine: HotspotRoutingEngineConfig,
     val assetPath: String,
     val xudpKey: String,
 )
@@ -19,17 +22,25 @@ data class HotspotRoutingLaunchConfig(
 /** Builds the privileged datapath configuration from the exact running-core snapshot. */
 object HotspotRoutingConfig {
 
-    fun fromSnapshot(context: Context, snapshot: HotspotRoutingSnapshot): HotspotRoutingLaunchConfig {
+    fun launchFromSnapshot(context: Context, snapshot: HotspotRoutingSnapshot): HotspotRoutingLaunchConfig =
+        HotspotRoutingLaunchConfig(
+            engine = engineFromSnapshot(snapshot),
+            assetPath = Utils.userAssetPath(context),
+            xudpKey = Utils.getDeviceIdForXUDPBaseKey(),
+        )
+
+    fun engineFromSnapshot(snapshot: HotspotRoutingSnapshot): HotspotRoutingEngineConfig {
         require(snapshot.running) { "Start v2rayNG before enabling tethering routing" }
         require(snapshot.vpnMode) { "v2rayNG must be running in VPN mode" }
 
-        return HotspotRoutingLaunchConfig(
+        return HotspotRoutingEngineConfig(
             useHev = snapshot.useHev,
             profileName = snapshot.profileName,
-            coreConfig = if (snapshot.useHev) "" else nativeTunOnlyConfig(snapshot.coreConfig),
-            hevConfig = if (snapshot.useHev) buildHevConfig(snapshot) else "",
-            assetPath = Utils.userAssetPath(context),
-            xudpKey = Utils.getDeviceIdForXUDPBaseKey(),
+            content = if (snapshot.useHev) {
+                buildHevConfig(snapshot)
+            } else {
+                nativeTunOnlyConfig(snapshot.coreConfig)
+            },
         )
     }
 

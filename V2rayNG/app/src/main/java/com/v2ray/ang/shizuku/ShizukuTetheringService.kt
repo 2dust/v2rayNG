@@ -122,8 +122,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     override fun startRouting(
         useHev: Boolean,
         profileName: String,
-        coreConfig: String,
-        hevConfig: String,
+        engineConfig: String,
         assetPath: String,
         xudpKey: String,
         syncToken: String,
@@ -134,10 +133,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         }
         val activeTypes = getActiveTetheringTypes()
         val launchConfig = HotspotRoutingLaunchConfig(
-            useHev = useHev,
-            profileName = profileName,
-            coreConfig = coreConfig,
-            hevConfig = hevConfig,
+            engine = HotspotRoutingEngineConfig(useHev, profileName, engineConfig),
             assetPath = assetPath,
             xudpKey = xudpKey,
         )
@@ -157,7 +153,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
 
     private fun startRoutingLocked(config: HotspotRoutingLaunchConfig): Int {
         if (routingState == ROUTING_STATE_ACTIVE_HEV || routingState == ROUTING_STATE_ACTIVE_NATIVE) {
-            return if (routingUsesHev == config.useHev) {
+            return if (routingUsesHev == config.engine.useHev) {
                 routingDetail = "Tethering routing is already active"
                 RESULT_ALREADY_ACTIVE
             } else {
@@ -286,15 +282,11 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         token: String,
         useHev: Boolean,
         profileName: String,
-        coreConfig: String,
-        hevConfig: String,
+        engineConfig: String,
     ): Int = synchronized(this) {
         val session = findRoutingSession(token) ?: return@synchronized RESULT_INVALID_SESSION
         val launchConfig = HotspotRoutingLaunchConfig(
-            useHev = useHev,
-            profileName = profileName,
-            coreConfig = coreConfig,
-            hevConfig = hevConfig,
+            engine = HotspotRoutingEngineConfig(useHev, profileName, engineConfig),
             assetPath = session.assetPath,
             xudpKey = session.xudpKey,
         )
@@ -331,7 +323,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     ) {
         Log.i(
             TAG,
-            "Synchronizing hotspot routing to profile ${launchConfig.profileName.ifBlank { "<unnamed>" }}",
+            "Synchronizing hotspot routing to profile ${launchConfig.engine.profileName.ifBlank { "<unnamed>" }}",
         )
         val currentlyActive = getActiveTetheringTypes().coerceAtLeast(0)
         val restoreTypes = if (session.coreRestartPending) {
@@ -572,19 +564,19 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     }
 
     private fun startRoutingEngineLocked(config: HotspotRoutingLaunchConfig, fd: Int) {
-        if (config.useHev) {
-            require(config.hevConfig.isNotBlank()) { "HEV configuration is empty" }
-            startHev(config.hevConfig, fd)
+        if (config.engine.useHev) {
+            require(config.engine.content.isNotBlank()) { "HEV configuration is empty" }
+            startHev(config.engine.content, fd)
         } else {
-            require(config.coreConfig.isNotBlank()) { "Xray configuration is empty" }
-            startNativeXray(config.coreConfig, fd, config.assetPath, config.xudpKey)
+            require(config.engine.content.isNotBlank()) { "Xray configuration is empty" }
+            startNativeXray(config.engine.content, fd, config.assetPath, config.xudpKey)
         }
-        routingUsesHev = config.useHev
+        routingUsesHev = config.engine.useHev
     }
 
     private fun setRoutingActiveLocked(config: HotspotRoutingLaunchConfig) {
-        routingProfileName = config.profileName
-        routingState = if (config.useHev) ROUTING_STATE_ACTIVE_HEV else ROUTING_STATE_ACTIVE_NATIVE
+        routingProfileName = config.engine.profileName
+        routingState = if (config.engine.useHev) ROUTING_STATE_ACTIVE_HEV else ROUTING_STATE_ACTIVE_NATIVE
         updateRoutingDetailLocked()
     }
 
@@ -704,7 +696,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_726
+        const val USER_SERVICE_VERSION = 20_260_727
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"
