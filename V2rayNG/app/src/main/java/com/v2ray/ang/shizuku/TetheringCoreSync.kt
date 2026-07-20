@@ -7,6 +7,7 @@ import com.v2ray.ang.dto.HotspotRoutingSync
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.service.CoreVpnService
+import com.v2ray.ang.service.HevTunnelSettings
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MessageUtil
 
@@ -51,9 +52,7 @@ internal object TetheringCoreSync {
         coreConfig: String,
         useHev: Boolean,
     ): HotspotRoutingSnapshot {
-        val timeoutSetting = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT)
-            ?: AppConfig.HEVTUN_RW_TIMEOUT
-        val timeoutParts = timeoutSetting.split(',').map { it.trim() }
+        val hevSettings = HevTunnelSettings.current()
 
         return HotspotRoutingSnapshot(
             running = true,
@@ -65,10 +64,9 @@ internal object TetheringCoreSync {
             socksUsername = SettingsManager.getSocksUsername(),
             socksPassword = SettingsManager.getSocksPassword(),
             mtu = SettingsManager.getVpnMtu(),
-            hevTcpTimeoutSeconds = timeoutParts.getOrNull(0)?.toIntOrNull() ?: 300,
-            hevUdpTimeoutSeconds = timeoutParts.getOrNull(1)?.toIntOrNull() ?: 60,
-            hevLogLevel = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL)
-                ?: "warn",
+            hevTcpTimeoutSeconds = hevSettings.tcpTimeoutSeconds,
+            hevUdpTimeoutSeconds = hevSettings.udpTimeoutSeconds,
+            hevLogLevel = hevSettings.logLevel,
         )
     }
 

@@ -4,6 +4,9 @@ import android.content.Context
 import com.google.gson.JsonArray
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.HotspotRoutingSnapshot
+import com.v2ray.ang.service.HevTunnelConfig
+import com.v2ray.ang.service.HevTunnelParameters
+import com.v2ray.ang.service.HevTunnelSettings
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 
@@ -72,26 +75,20 @@ object HotspotRoutingConfig {
     }
 
     private fun buildHevConfig(snapshot: HotspotRoutingSnapshot): String {
-        val username = snapshot.socksUsername?.yamlSingleQuoted()
-        val password = snapshot.socksPassword?.yamlSingleQuoted()
-        return buildString {
-            appendLine("tunnel:")
-            appendLine("  mtu: ${snapshot.mtu}")
-            appendLine("  ipv4: '${AppConfig.SHIZUKU_TUN_ADDR_V4.substringBefore('/')}'")
-            appendLine("socks5:")
-            appendLine("  port: ${snapshot.socksPort}")
-            appendLine("  address: '${AppConfig.LOOPBACK}'")
-            appendLine("  udp: 'udp'")
-            if (username != null && password != null) {
-                appendLine("  username: '$username'")
-                appendLine("  password: '$password'")
-            }
-            appendLine("misc:")
-            appendLine("  tcp-read-write-timeout: ${snapshot.hevTcpTimeoutSeconds * 1000}")
-            appendLine("  udp-read-write-timeout: ${snapshot.hevUdpTimeoutSeconds * 1000}")
-            appendLine("  log-level: '${snapshot.hevLogLevel.yamlSingleQuoted()}'")
-        }
+        return HevTunnelConfig.build(
+            HevTunnelParameters(
+                mtu = snapshot.mtu,
+                ipv4 = AppConfig.SHIZUKU_TUN_ADDR_V4.substringBefore('/'),
+                socksAddress = AppConfig.LOOPBACK,
+                socksPort = snapshot.socksPort,
+                socksUsername = snapshot.socksUsername,
+                socksPassword = snapshot.socksPassword,
+                settings = HevTunnelSettings(
+                    tcpTimeoutSeconds = snapshot.hevTcpTimeoutSeconds,
+                    udpTimeoutSeconds = snapshot.hevUdpTimeoutSeconds,
+                    logLevel = snapshot.hevLogLevel,
+                ),
+            ),
+        )
     }
-
-    private fun String.yamlSingleQuoted(): String = replace("'", "''")
 }
