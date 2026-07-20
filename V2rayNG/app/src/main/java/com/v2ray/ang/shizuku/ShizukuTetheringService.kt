@@ -138,6 +138,10 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         xudpKey: String,
         syncToken: String,
     ): Int = synchronized(this) {
+        if (syncToken.isBlank()) {
+            routingDetail = "Tethering synchronization token is empty"
+            return@synchronized RESULT_INVALID_SESSION
+        }
         val activeTypes = getActiveTetheringTypes()
         val launchConfig = HotspotRoutingLaunchConfig(
             useHev = useHev,
@@ -147,7 +151,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             assetPath = assetPath,
             xudpKey = xudpKey,
         )
-        routingSession = RoutingSession(
+        val newSession = RoutingSession(
             token = syncToken,
             assetPath = launchConfig.assetPath,
             xudpKey = launchConfig.xudpKey,
@@ -157,15 +161,18 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         )
 
         val result = startRoutingLocked(launchConfig)
-        if (result != RESULT_OK) {
-            routingSession = null
-        }
+        if (result == RESULT_OK) routingSession = newSession
         result
     }
 
     private fun startRoutingLocked(config: HotspotRoutingLaunchConfig): Int {
         if (routingState == ROUTING_STATE_ACTIVE_HEV || routingState == ROUTING_STATE_ACTIVE_NATIVE) {
-            return if (routingUsesHev == config.useHev) RESULT_OK else RESULT_IMPLEMENTATION_MISMATCH
+            return if (routingUsesHev == config.useHev) {
+                routingDetail = "Tethering routing is already active"
+                RESULT_ALREADY_ACTIVE
+            } else {
+                RESULT_IMPLEMENTATION_MISMATCH
+            }
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             routingState = ROUTING_STATE_ERROR
@@ -807,6 +814,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         const val RESULT_ROUTING_FAILED = -2
         const val RESULT_IMPLEMENTATION_MISMATCH = -3
         const val RESULT_INVALID_SESSION = -4
+        const val RESULT_ALREADY_ACTIVE = -5
 
         internal fun createUserServiceArgs() = Shizuku.UserServiceArgs(
             ComponentName(BuildConfig.APPLICATION_ID, ShizukuTetheringService::class.java.name)

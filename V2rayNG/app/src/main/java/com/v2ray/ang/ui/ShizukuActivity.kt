@@ -385,6 +385,8 @@ class ShizukuActivity : BaseComponentActivity() {
             return ShizukuTetheringService.RESULT_ROUTING_FAILED
         }
 
+        val previousSyncToken = MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN)
+            .orEmpty()
         val syncToken = Utils.getUuid()
         MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, syncToken)
         val result = callService {
@@ -401,7 +403,7 @@ class ShizukuActivity : BaseComponentActivity() {
         if (result != ShizukuTetheringService.RESULT_OK &&
             MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN) == syncToken
         ) {
-            MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, "")
+            MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, previousSyncToken)
         }
         return result
     }

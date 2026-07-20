@@ -12,6 +12,7 @@ import android.os.Looper
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.HotspotRoutingSync
 import com.v2ray.ang.extension.serializable
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.LogUtil
 import rikka.shizuku.Shizuku
 import java.util.ArrayDeque
@@ -152,10 +153,21 @@ private object ShizukuRoutingSyncDispatcher {
             }
             else -> error("Unknown hotspot synchronization event ${update.event}")
         }
+        if (result == ShizukuTetheringService.RESULT_INVALID_SESSION) {
+            clearSyncTokenIfCurrent(update.token)
+            LogUtil.w(TAG, "Dropped stale Shizuku tethering synchronization session")
+            return
+        }
         check(result == ShizukuTetheringService.RESULT_OK) {
             "Shizuku tethering service rejected synchronization with result $result"
         }
         LogUtil.i(TAG, "Forwarded hotspot sync event ${update.event}")
+    }
+
+    private fun clearSyncTokenIfCurrent(token: String) {
+        if (MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN) == token) {
+            MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, "")
+        }
     }
 
     private fun failAll(message: String) {
