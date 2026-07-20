@@ -426,6 +426,7 @@
     <string name="shizuku_routing_status_disabled">Định tuyến đang tắt</string>
     <string name="shizuku_routing_status_starting">Đang bật chia sẻ kết nối qua v2rayNG…</string>
     <string name="shizuku_routing_status_stopping">Đang dừng kết nối chia sẻ được bảo vệ…</string>
+    <string name="shizuku_routing_status_waiting">Đang chờ v2rayNG khởi động · lưu lượng từ thiết bị bị chặn</string>
     <string name="shizuku_routing_status_hev">Đang hoạt động · HEV TUN</string>
     <string name="shizuku_routing_status_native">Đang hoạt động · Xray TUN gốc</string>
     <string name="shizuku_routing_status_error">Lỗi định tuyến</string>
@@ -444,6 +445,7 @@
     <string name="shizuku_hotspot_status_connecting">Đang kết nối với dịch vụ đặc quyền…</string>
     <string name="shizuku_hotspot_status_enabled">Điểm phát sóng đang bật · định tuyến qua v2rayNG</string>
     <string name="shizuku_hotspot_status_enabled_direct">Điểm phát sóng đang bật · định tuyến v2rayNG đang tắt</string>
+    <string name="shizuku_hotspot_status_waiting">Điểm phát sóng đang bật · Internet bị chặn cho đến khi v2rayNG khởi động lại</string>
     <string name="shizuku_hotspot_status_disabled">Điểm phát sóng đang tắt</string>
     <string name="shizuku_hotspot_status_starting">Đang bật điểm phát sóng…</string>
     <string name="shizuku_hotspot_status_stopping">Đang tắt điểm phát sóng…</string>

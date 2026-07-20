@@ -437,6 +437,7 @@
     <string name="shizuku_routing_status_disabled">Маршрутизация отключена</string>
     <string name="shizuku_routing_status_starting">Запуск раздачи через v2rayNG…</string>
     <string name="shizuku_routing_status_stopping">Остановка защищённой раздачи…</string>
+    <string name="shizuku_routing_status_waiting">Ожидание запуска v2rayNG · трафик устройств заблокирован</string>
     <string name="shizuku_routing_status_hev">Активно · HEV TUN</string>
     <string name="shizuku_routing_status_native">Активно · нативный Xray TUN</string>
     <string name="shizuku_routing_status_error">Ошибка маршрутизации</string>
@@ -455,6 +456,7 @@
     <string name="shizuku_hotspot_status_connecting">Подключение к привилегированной службе…</string>
     <string name="shizuku_hotspot_status_enabled">Точка доступа включена · трафик идёт через v2rayNG</string>
     <string name="shizuku_hotspot_status_enabled_direct">Точка доступа включена · маршрутизация v2rayNG отключена</string>
+    <string name="shizuku_hotspot_status_waiting">Точка доступа включена · интернет заблокирован до запуска v2rayNG</string>
     <string name="shizuku_hotspot_status_disabled">Точка доступа отключена</string>
     <string name="shizuku_hotspot_status_starting">Включение точки доступа…</string>
     <string name="shizuku_hotspot_status_stopping">Отключение точки доступа…</string>

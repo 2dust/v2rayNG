@@ -424,6 +424,7 @@
     <string name="shizuku_routing_status_disabled">রাউটিং বন্ধ</string>
     <string name="shizuku_routing_status_starting">v2rayNG টেথারিং চালু হচ্ছে…</string>
     <string name="shizuku_routing_status_stopping">সুরক্ষিত টেথারিং বন্ধ হচ্ছে…</string>
+    <string name="shizuku_routing_status_waiting">v2rayNG চালুর অপেক্ষায় · ডিভাইসের ট্র্যাফিক বন্ধ</string>
     <string name="shizuku_routing_status_hev">সক্রিয় · HEV TUN</string>
     <string name="shizuku_routing_status_native">সক্রিয় · নেটিভ Xray TUN</string>
     <string name="shizuku_routing_status_error">রাউটিং ত্রুটি</string>
@@ -442,6 +443,7 @@
     <string name="shizuku_hotspot_status_connecting">বিশেষ অনুমতিপ্রাপ্ত সার্ভিসে সংযোগ করা হচ্ছে…</string>
     <string name="shizuku_hotspot_status_enabled">হটস্পট চালু · v2rayNG-এর মাধ্যমে রাউট করা হচ্ছে</string>
     <string name="shizuku_hotspot_status_enabled_direct">হটস্পট চালু · v2rayNG রাউটিং বন্ধ</string>
+    <string name="shizuku_hotspot_status_waiting">হটস্পট চালু · v2rayNG আবার চালু না হওয়া পর্যন্ত ইন্টারনেট বন্ধ</string>
     <string name="shizuku_hotspot_status_disabled">হটস্পট বন্ধ</string>
     <string name="shizuku_hotspot_status_starting">হটস্পট চালু হচ্ছে…</string>
     <string name="shizuku_hotspot_status_stopping">হটস্পট বন্ধ হচ্ছে…</string>

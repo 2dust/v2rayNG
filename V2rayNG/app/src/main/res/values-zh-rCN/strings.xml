@@ -440,6 +440,7 @@
     <string name="shizuku_routing_status_disabled">路由已关闭</string>
     <string name="shizuku_routing_status_starting">正在启动 v2rayNG 网络共享…</string>
     <string name="shizuku_routing_status_stopping">正在停止受保护的网络共享…</string>
+    <string name="shizuku_routing_status_waiting">等待 v2rayNG 启动 · 已阻止接入设备的流量</string>
     <string name="shizuku_routing_status_hev">已启用 · HEV TUN</string>
     <string name="shizuku_routing_status_native">已启用 · 原生 Xray TUN</string>
     <string name="shizuku_routing_status_error">路由错误</string>
@@ -458,6 +459,7 @@
     <string name="shizuku_hotspot_status_connecting">正在连接特权服务…</string>
     <string name="shizuku_hotspot_status_enabled">热点已开启 · 流量经 v2rayNG 转发</string>
     <string name="shizuku_hotspot_status_enabled_direct">热点已开启 · v2rayNG 路由已关闭</string>
+    <string name="shizuku_hotspot_status_waiting">热点已开启 · v2rayNG 重启前禁止联网</string>
     <string name="shizuku_hotspot_status_disabled">热点已关闭</string>
     <string name="shizuku_hotspot_status_starting">正在开启热点…</string>
     <string name="shizuku_hotspot_status_stopping">正在关闭热点…</string>

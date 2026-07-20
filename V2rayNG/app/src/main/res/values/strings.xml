@@ -446,6 +446,7 @@
     <string name="shizuku_routing_status_disabled">Routing disabled</string>
     <string name="shizuku_routing_status_starting">Starting v2rayNG tethering…</string>
     <string name="shizuku_routing_status_stopping">Stopping protected tethering…</string>
+    <string name="shizuku_routing_status_waiting">Waiting for v2rayNG · device traffic blocked</string>
     <string name="shizuku_routing_status_hev">Active · HEV TUN</string>
     <string name="shizuku_routing_status_native">Active · Native Xray TUN</string>
     <string name="shizuku_routing_status_error">Routing error</string>
@@ -464,6 +465,7 @@
     <string name="shizuku_hotspot_status_connecting">Connecting to the privileged service…</string>
     <string name="shizuku_hotspot_status_enabled">Hotspot enabled · routed through v2rayNG</string>
     <string name="shizuku_hotspot_status_enabled_direct">Hotspot enabled · v2rayNG routing is off</string>
+    <string name="shizuku_hotspot_status_waiting">Hotspot enabled · Internet blocked until v2rayNG restarts</string>
     <string name="shizuku_hotspot_status_disabled">Hotspot disabled</string>
     <string name="shizuku_hotspot_status_starting">Starting hotspot…</string>
     <string name="shizuku_hotspot_status_stopping">Stopping hotspot…</string>

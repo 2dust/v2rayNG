@@ -53,6 +53,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     @Volatile private var routingDetail = ""
     private var routingRequested = false
     private var routingUsesHev = false
+    private var routingProfileName = ""
     private var syncToken = ""
     private var coreAssetPath = ""
     private var coreXudpKey = ""
@@ -227,9 +228,26 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         ) {
             desiredTetheringTypes = activeTypes
         }
+        stopRoutingEngineLocked()
         coreRestartPending = true
-        routingDetail = "${testInterfaceName.orEmpty()} · Waiting for v2rayNG restart"
-        Log.i(TAG, "Core stopping; preserving tethering types 0x${desiredTetheringTypes.toString(16)}")
+        if (testTun != null) {
+            routingState = ROUTING_STATE_WAITING
+            updateRoutingDetailLocked()
+            Log.i(
+                TAG,
+                "Main core stopping; tethering core stopped while preserving the protected " +
+                    "test network and tethering types 0x${desiredTetheringTypes.toString(16)}",
+            )
+        } else {
+            val tetheringResult = stopActiveTetheringLocked(clearDesired = false)
+            routingState = ROUTING_STATE_ERROR
+            routingDetail = "Protected test network is unavailable"
+            Log.e(
+                TAG,
+                "Main core stopping without a protected test network; disabled tethering " +
+                    "with result $tetheringResult",
+            )
+        }
         RESULT_OK
     }
 
@@ -288,7 +306,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         val canSwitchInPlace = testTun != null &&
             (routingState == ROUTING_STATE_ACTIVE_HEV ||
                 routingState == ROUTING_STATE_ACTIVE_NATIVE ||
-                routingState == ROUTING_STATE_STARTING)
+                routingState == ROUTING_STATE_STARTING ||
+                routingState == ROUTING_STATE_WAITING)
         var switchedInPlace = false
         if (canSwitchInPlace) {
             switchedInPlace = runCatching {
@@ -362,15 +381,18 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     private fun failRoutingSynchronizationLocked(error: Throwable) {
         val detail = rootCauseMessage(error)
         Log.e(TAG, "Unable to synchronize hotspot routing: $detail", error)
-        val tetheringResult = stopActiveTetheringLocked(clearDesired = false)
-        if (tetheringResult == RESULT_OK) cleanupRouting(resetPreference = true)
-        routingState = ROUTING_STATE_ERROR
-        routingDetail = if (tetheringResult == RESULT_OK) {
-            detail
-        } else {
-            "$detail · Tethering remains attached to the protected test network"
-        }
+        stopRoutingEngineLocked()
         coreRestartPending = true
+        if (testTun != null) {
+            routingState = ROUTING_STATE_WAITING
+            updateRoutingDetailLocked()
+            Log.w(TAG, "Tethering remains fail-closed on ${testInterfaceName.orEmpty()}")
+        } else {
+            val tetheringResult = stopActiveTetheringLocked(clearDesired = false)
+            if (tetheringResult == RESULT_OK) cleanupRouting(resetPreference = true)
+            routingState = ROUTING_STATE_ERROR
+            routingDetail = detail
+        }
     }
 
     override fun destroy() {
@@ -618,12 +640,17 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     }
 
     private fun setRoutingActiveLocked(useHev: Boolean, profileName: String) {
+        routingProfileName = profileName
         routingState = if (useHev) ROUTING_STATE_ACTIVE_HEV else ROUTING_STATE_ACTIVE_NATIVE
+        updateRoutingDetailLocked()
+    }
+
+    private fun updateRoutingDetailLocked() {
         routingDetail = buildString {
             append(testInterfaceName.orEmpty())
-            if (profileName.isNotBlank()) {
+            if (routingProfileName.isNotBlank()) {
                 append(" · ")
-                append(profileName)
+                append(routingProfileName)
             }
         }
     }
@@ -695,6 +722,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         testNetworkManager = null
         testNetworkToken = null
         testInterfaceName = null
+        routingProfileName = ""
 
         if (resetPreference) {
             runCatching { setPreferTestNetworks(false) }
@@ -777,7 +805,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_712
+        const val USER_SERVICE_VERSION = 20_260_721
         private const val SHELL_PACKAGE_NAME = "com.android.shell"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"
@@ -802,6 +830,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         const val ROUTING_STATE_ACTIVE_NATIVE = 3
         const val ROUTING_STATE_STOPPING = 4
         const val ROUTING_STATE_ERROR = 5
+        const val ROUTING_STATE_WAITING = 6
 
         const val RESULT_OK = 0
         const val RESULT_INTERNAL_ERROR = -1

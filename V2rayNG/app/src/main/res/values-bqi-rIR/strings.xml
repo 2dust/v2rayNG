@@ -430,6 +430,7 @@
     <string name="shizuku_routing_status_disabled">تور جوستن خاموشه</string>
     <string name="shizuku_routing_status_starting">تترینگ v2rayNG راه و افته…</string>
     <string name="shizuku_routing_status_stopping">تترینگ ٱمن واداره…</string>
+    <string name="shizuku_routing_status_waiting">من وارستن راه افتادن v2rayNG · ترافیک دسگاها بسته‌س</string>
     <string name="shizuku_routing_status_hev">کار کنه · HEV TUN</string>
     <string name="shizuku_routing_status_native">کار کنه · Xray TUN بۊمی</string>
     <string name="shizuku_routing_status_error">خوتا من تور جوستن</string>
@@ -448,6 +449,7 @@
     <string name="shizuku_hotspot_status_connecting">من منپیز وابیڌن وا سرویس موجوزدار…</string>
     <string name="shizuku_hotspot_status_enabled">هات‌اسپات راه افتا · ز v2rayNG تور جۊری ابۊ</string>
     <string name="shizuku_hotspot_status_enabled_direct">هات‌اسپات راه افتا · تور جوستن v2rayNG خاموشه</string>
+    <string name="shizuku_hotspot_status_waiting">هات‌اسپات راه افتا · تا v2rayNG دوواره راه نیفته اینترنت بسته‌س</string>
     <string name="shizuku_hotspot_status_disabled">هات‌اسپات خاموشه</string>
     <string name="shizuku_hotspot_status_starting">هات‌اسپات راه و افته…</string>
     <string name="shizuku_hotspot_status_stopping">هات‌اسپات واداره…</string>

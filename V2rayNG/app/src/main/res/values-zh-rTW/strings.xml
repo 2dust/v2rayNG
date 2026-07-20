@@ -438,6 +438,7 @@
     <string name="shizuku_routing_status_disabled">路由已關閉</string>
     <string name="shizuku_routing_status_starting">正在啟動 v2rayNG 網路共用…</string>
     <string name="shizuku_routing_status_stopping">正在停止受保護的網路共用…</string>
+    <string name="shizuku_routing_status_waiting">等待 v2rayNG 啟動 · 已阻止連線裝置的流量</string>
     <string name="shizuku_routing_status_hev">已啟用 · HEV TUN</string>
     <string name="shizuku_routing_status_native">已啟用 · 原生 Xray TUN</string>
     <string name="shizuku_routing_status_error">路由錯誤</string>
@@ -456,6 +457,7 @@
     <string name="shizuku_hotspot_status_connecting">正在連線至特殊權限服務…</string>
     <string name="shizuku_hotspot_status_enabled">熱點已開啟 · 流量經 v2rayNG 轉送</string>
     <string name="shizuku_hotspot_status_enabled_direct">熱點已開啟 · v2rayNG 路由已關閉</string>
+    <string name="shizuku_hotspot_status_waiting">熱點已開啟 · v2rayNG 重新啟動前停止網路連線</string>
     <string name="shizuku_hotspot_status_disabled">熱點已關閉</string>
     <string name="shizuku_hotspot_status_starting">正在開啟熱點…</string>
     <string name="shizuku_hotspot_status_stopping">正在關閉熱點…</string>

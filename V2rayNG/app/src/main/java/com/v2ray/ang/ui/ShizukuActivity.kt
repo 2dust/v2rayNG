@@ -375,7 +375,7 @@ class ShizukuActivity : BaseComponentActivity() {
 
     private fun toggleRouting() {
         val service = tetheringService ?: return
-        val enable = !isRoutingActive()
+        val enable = !isRoutingSessionEnabled()
         operationJob?.cancel()
         routingStatusRes = if (enable) R.string.shizuku_routing_status_starting
         else R.string.shizuku_routing_status_stopping
@@ -557,6 +557,11 @@ class ShizukuActivity : BaseComponentActivity() {
                 routingStatusRes = R.string.shizuku_routing_status_stopping
                 routingButtonEnabled = false
             }
+            ShizukuTetheringService.ROUTING_STATE_WAITING -> {
+                routingStatusRes = R.string.shizuku_routing_status_waiting
+                routingButtonRes = R.string.shizuku_routing_disable
+                routingButtonEnabled = tetheringService != null
+            }
             ShizukuTetheringService.ROUTING_STATE_ERROR -> {
                 routingStatusRes = R.string.shizuku_routing_status_error
                 routingButtonRes = R.string.shizuku_routing_enable
@@ -578,8 +583,12 @@ class ShizukuActivity : BaseComponentActivity() {
     private fun renderHotspotState() {
         when (hotspotState) {
             ShizukuTetheringService.HOTSPOT_STATE_ENABLED -> {
-                hotspotStatusRes = if (isRoutingActive()) R.string.shizuku_hotspot_status_enabled
-                else R.string.shizuku_hotspot_status_enabled_direct
+                hotspotStatusRes = when {
+                    isRoutingActive() -> R.string.shizuku_hotspot_status_enabled
+                    routingState == ShizukuTetheringService.ROUTING_STATE_WAITING ->
+                        R.string.shizuku_hotspot_status_waiting
+                    else -> R.string.shizuku_hotspot_status_enabled_direct
+                }
                 hotspotButtonRes = R.string.shizuku_hotspot_disable
                 hotspotButtonEnabled = tetheringService != null
             }
@@ -596,6 +605,9 @@ class ShizukuActivity : BaseComponentActivity() {
     private fun isRoutingActive(): Boolean =
         routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV ||
             routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE
+
+    private fun isRoutingSessionEnabled(): Boolean =
+        isRoutingActive() || routingState == ShizukuTetheringService.ROUTING_STATE_WAITING
 
     private fun renderRoutingUnavailable() {
         routingState = ShizukuTetheringService.ROUTING_STATE_DISABLED

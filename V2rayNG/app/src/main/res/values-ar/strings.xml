@@ -425,6 +425,7 @@
     <string name="shizuku_routing_status_disabled">التوجيه معطّل</string>
     <string name="shizuku_routing_status_starting">جارٍ تشغيل مشاركة الاتصال عبر v2rayNG…</string>
     <string name="shizuku_routing_status_stopping">جارٍ إيقاف مشاركة الاتصال المحمية…</string>
+    <string name="shizuku_routing_status_waiting">بانتظار تشغيل v2rayNG · حركة بيانات الأجهزة محجوبة</string>
     <string name="shizuku_routing_status_hev">نشط · HEV TUN</string>
     <string name="shizuku_routing_status_native">نشط · Xray TUN الأصلي</string>
     <string name="shizuku_routing_status_error">خطأ في التوجيه</string>
@@ -443,6 +444,7 @@
     <string name="shizuku_hotspot_status_connecting">جارٍ الاتصال بالخدمة ذات الصلاحيات…</string>
     <string name="shizuku_hotspot_status_enabled">نقطة الاتصال مفعّلة · موجّهة عبر v2rayNG</string>
     <string name="shizuku_hotspot_status_enabled_direct">نقطة الاتصال مفعّلة · توجيه v2rayNG متوقف</string>
+    <string name="shizuku_hotspot_status_waiting">نقطة الاتصال مفعّلة · الإنترنت محجوب حتى إعادة تشغيل v2rayNG</string>
     <string name="shizuku_hotspot_status_disabled">نقطة الاتصال معطّلة</string>
     <string name="shizuku_hotspot_status_starting">جارٍ تشغيل نقطة الاتصال…</string>
     <string name="shizuku_hotspot_status_stopping">جارٍ إيقاف نقطة الاتصال…</string>
