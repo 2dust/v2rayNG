@@ -1,5 +1,6 @@
 package com.v2ray.ang.viewmodel
 
+import android.app.Application
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.root.RootManager
@@ -7,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
-class SettingsViewModel : BaseViewModel() {
+class SettingsViewModel(application: Application) : BaseViewModel(application) {
 
     /**
      * Checks for root access and requests it if necessary.

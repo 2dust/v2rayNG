@@ -1,8 +1,9 @@
 package com.v2ray.ang.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.v2ray.ang.extension.myApp
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -17,7 +18,14 @@ import kotlinx.coroutines.launch
 /**
  * Base ViewModel that encapsulates common UI event handling logic.
  */
-abstract class BaseViewModel : ViewModel() {
+abstract class BaseViewModel(application: Application) : AndroidViewModel(application) {
+
+    /**
+     * Safe access to custom application instance.
+     */
+    protected val app: AngApplication by lazy {
+        application as AngApplication
+    }
 
     @Suppress("PropertyName")
     protected val _isLoading = MutableStateFlow(false)
@@ -31,56 +39,56 @@ abstract class BaseViewModel : ViewModel() {
      * Send neutral toast event (Resource ID).
      */
     fun toast(resId: Int) {
-        myApp.toast(resId)
+        app.toast(resId)
     }
 
     /**
      * Send neutral toast event (String).
      */
     fun toast(message: String) {
-        myApp.toast(message)
+        app.toast(message)
     }
 
     /**
      * Send success toast event (Resource ID).
      */
     fun toastSuccess(resId: Int) {
-        myApp.toastSuccess(resId)
+        app.toastSuccess(resId)
     }
 
     /**
      * Send success toast event (String).
      */
     fun toastSuccess(message: String) {
-        myApp.toastSuccess(message)
+        app.toastSuccess(message)
     }
 
     /**
      * Send error toast event (Resource ID).
      */
     fun toastError(resId: Int) {
-        myApp.toastError(resId)
+        app.toastError(resId)
     }
 
     /**
      * Send error toast event (String).
      */
     fun toastError(message: String) {
-        myApp.toastError(message)
+        app.toastError(message)
     }
 
     /**
      * Get string from resource ID.
      */
     fun getString(resId: Int): String {
-        return myApp.getString(resId)
+        return app.getString(resId)
     }
 
     /**
      * Get formatted string from resource ID.
      */
     fun getString(resId: Int, vararg formatArgs: Any?): String {
-        return myApp.getString(resId, *formatArgs)
+        return app.getString(resId, *formatArgs)
     }
 
     /**

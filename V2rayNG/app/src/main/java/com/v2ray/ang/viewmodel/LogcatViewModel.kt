@@ -1,5 +1,6 @@
 package com.v2ray.ang.viewmodel
 
+import android.app.Application
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.util.LogUtil
@@ -8,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.IOException
 
-class LogcatViewModel : BaseViewModel() {
+class LogcatViewModel(application: Application) : BaseViewModel(application) {
     private val logsetsAll: MutableList<String> = mutableListOf()
     private var currentFilter: String = ""
 

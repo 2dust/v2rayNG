@@ -1,5 +1,6 @@
 package com.v2ray.ang.viewmodel
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -39,8 +40,9 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.PatternSyntaxException
 
 class MainViewModel(
+    application: Application,
     private val dataSource: MainDataSource
-) : BaseViewModel() {
+) : BaseViewModel(application) {
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
@@ -759,11 +761,11 @@ class MainViewModel(
     }
 
     // ---------- Factory ----------
-    class Factory(private val dataSource: MainDataSource) : ViewModelProvider.Factory {
+    class Factory(private val application: Application, private val dataSource: MainDataSource) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-                return MainViewModel(dataSource) as T
+                return MainViewModel(application, dataSource) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

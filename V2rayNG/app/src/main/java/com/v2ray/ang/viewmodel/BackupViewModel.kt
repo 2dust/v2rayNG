@@ -1,5 +1,6 @@
 package com.v2ray.ang.viewmodel
 
+import android.app.Application
 import android.net.Uri
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
@@ -19,7 +20,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class BackupViewModel : BaseViewModel() {
+class BackupViewModel(application: Application) : BaseViewModel(application) {
 
     private val _webDavConfig = MutableStateFlow(MmkvManager.decodeWebDavConfig())
     val webDavConfig: StateFlow<WebDavConfig?> = _webDavConfig.asStateFlow()

@@ -1,5 +1,6 @@
 package com.v2ray.ang.viewmodel
 
+import android.app.Application
 import android.content.Context
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.AppInfo
@@ -15,7 +16,7 @@ import java.text.Collator
 /**
  * ViewModel for AppPicker screen.
  */
-class AppPickerViewModel : BaseViewModel() {
+class AppPickerViewModel(application: Application) : BaseViewModel(application) {
 
     private val _selectedPackages = MutableStateFlow<Set<String>>(emptySet())
     val selectedPackages: StateFlow<Set<String>> = _selectedPackages.asStateFlow()

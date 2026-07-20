@@ -1,5 +1,6 @@
 package com.v2ray.ang.viewmodel
 
+import android.app.Application
 import android.content.Context
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
@@ -23,7 +24,7 @@ import java.text.Collator
  * ViewModel for PerAppProxy screen.
  * Holds all UI state and business logic.
  */
-class PerAppProxyViewModel : BaseViewModel() {
+class PerAppProxyViewModel(application: Application) : BaseViewModel(application) {
 
     // Blacklist (apps to be proxied or bypassed)
     private val _blacklist = MutableStateFlow(loadBlacklist())

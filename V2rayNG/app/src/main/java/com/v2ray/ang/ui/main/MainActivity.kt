@@ -57,7 +57,7 @@ import kotlinx.coroutines.withContext
 class MainActivity : HelperBaseComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels {
-        MainViewModel.Factory(MainRepository(application as AngApplication))
+        MainViewModel.Factory(application, MainRepository(application as AngApplication))
     }
 
     private val requestVpnPermission =
