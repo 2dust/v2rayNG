@@ -13,8 +13,6 @@ import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.contracts.ServiceControl
-import com.v2ray.ang.dto.HotspotRoutingSnapshot
-import com.v2ray.ang.dto.HotspotRoutingSync
 import com.v2ray.ang.dto.OutboundTrafficStat
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.extension.isComplexType
@@ -31,6 +29,7 @@ import com.v2ray.ang.service.CoreVpnService
 import com.v2ray.ang.service.DialerNativeService
 import com.v2ray.ang.service.DialerWebviewService
 import com.v2ray.ang.service.IDialerService
+import com.v2ray.ang.shizuku.TetheringCoreSync
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
@@ -50,9 +49,6 @@ object CoreServiceManager {
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
-    @Volatile
-    private var hotspotSnapshot = HotspotRoutingSnapshot()
-
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
             field = value
@@ -227,18 +223,14 @@ object CoreServiceManager {
             return false
         }
 
-        clearHotspotSnapshot()
+        TetheringCoreSync.onStarting()
         try {
             doStartCoreLoop(service, vpnInterface)
             return true
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: $message", e)
-            sendHotspotSync(
-                service,
-                HotspotRoutingSync.EVENT_CORE_START_FAILED,
-                detail = message
-            )
+            TetheringCoreSync.onStartFailed(service, message)
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
             NotificationManager.cancelNotification()
             return false
@@ -283,8 +275,6 @@ object CoreServiceManager {
             error("Core failed to start")
         }
 
-        hotspotSnapshot = createHotspotSnapshot(service, result.content, usesHevTun)
-
         if (browserDialer != null) {
             browserDialer!!.stop()
             browserDialer = null
@@ -297,10 +287,11 @@ object CoreServiceManager {
             browserDialer!!.start(service, dialerAddr)
         }
 
-        sendHotspotSync(
+        TetheringCoreSync.onStarted(
             service,
-            HotspotRoutingSync.EVENT_CORE_STARTED,
-            currentHotspotSnapshot()
+            currentConfig?.remarks.orEmpty(),
+            result.content,
+            usesHevTun,
         )
         MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
         NotificationManager.startSpeedNotification()
@@ -315,11 +306,10 @@ object CoreServiceManager {
     fun stopCoreLoop(): Boolean {
         val service = getService()
         if (service == null) {
-            clearHotspotSnapshot()
+            TetheringCoreSync.clear()
             return false
         }
-        sendHotspotSync(service, HotspotRoutingSync.EVENT_CORE_STOPPING)
-        clearHotspotSnapshot()
+        TetheringCoreSync.onStopping(service)
 
         if (coreController.isRunning) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -348,62 +338,6 @@ object CoreServiceManager {
         }
 
         return true
-    }
-
-    private fun clearHotspotSnapshot() {
-        hotspotSnapshot = HotspotRoutingSnapshot()
-    }
-
-    private fun createHotspotSnapshot(
-        service: Service,
-        coreConfig: String,
-        useHev: Boolean,
-    ): HotspotRoutingSnapshot {
-        val timeoutSetting = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT)
-            ?: AppConfig.HEVTUN_RW_TIMEOUT
-        val timeoutParts = timeoutSetting.split(',').map { it.trim() }
-
-        return HotspotRoutingSnapshot(
-            running = true,
-            vpnMode = service is CoreVpnService,
-            profileName = currentConfig?.remarks.orEmpty(),
-            useHev = useHev,
-            coreConfig = coreConfig,
-            socksPort = SettingsManager.getSocksPort(),
-            socksUsername = SettingsManager.getSocksUsername(),
-            socksPassword = SettingsManager.getSocksPassword(),
-            mtu = SettingsManager.getVpnMtu(),
-            hevTcpTimeoutSeconds = timeoutParts.getOrNull(0)?.toIntOrNull() ?: 300,
-            hevUdpTimeoutSeconds = timeoutParts.getOrNull(1)?.toIntOrNull() ?: 60,
-            hevLogLevel = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL)
-                ?: "warn",
-        )
-    }
-
-    private fun currentHotspotSnapshot(): HotspotRoutingSnapshot =
-        hotspotSnapshot.takeIf { coreController.isRunning } ?: HotspotRoutingSnapshot()
-
-    private fun sendHotspotSync(
-        service: Service,
-        event: Int,
-        snapshot: HotspotRoutingSnapshot? = null,
-        detail: String = "",
-    ) {
-        val token = MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN)
-            ?.takeIf { it.isNotBlank() }
-            ?: run {
-                LogUtil.i(AppConfig.TAG, "Hotspot sync event $event skipped: no active Shizuku session")
-                return
-            }
-        LogUtil.i(
-            AppConfig.TAG,
-            "Sending hotspot sync event $event${snapshot?.profileName?.let { " for $it" }.orEmpty()}",
-        )
-        MessageUtil.sendMsg2Shizuku(
-            service,
-            AppConfig.MSG_HOTSPOT_SYNC,
-            HotspotRoutingSync(token, event, snapshot, detail)
-        )
     }
 
     /**
@@ -591,7 +525,7 @@ object CoreServiceManager {
                     MessageUtil.sendMsg2UI(
                         serviceControl.getService(),
                         AppConfig.MSG_HOTSPOT_CONFIG_RESPONSE,
-                        currentHotspotSnapshot()
+                        TetheringCoreSync.currentSnapshot(coreController.isRunning),
                     )
                 }
 
