@@ -68,7 +68,6 @@ internal enum class TetheringOperation {
 internal data class TetheringUiState(
     val shizukuStatus: ShizukuStatus = ShizukuStatus.CHECKING,
     val operation: TetheringOperation = TetheringOperation.NONE,
-    val hotspotState: Int = ShizukuTetheringService.HOTSPOT_STATE_UNKNOWN,
     val routingState: Int = ShizukuTetheringService.ROUTING_STATE_DISABLED,
     val routingDetail: String = "",
     val activeTetheringTypes: Int = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
@@ -83,7 +82,11 @@ internal val TetheringUiState.routingSessionEnabled: Boolean
     get() = routingActive || routingState == ShizukuTetheringService.ROUTING_STATE_WAITING
 
 internal val TetheringUiState.hotspotEnabled: Boolean
-    get() = hotspotState == ShizukuTetheringService.HOTSPOT_STATE_ENABLED
+    get() = activeTetheringTypes >= 0 &&
+        activeTetheringTypes and (1 shl ShizukuTetheringService.TETHERING_TYPE_WIFI) != 0
+
+internal val TetheringUiState.tetheringStateKnown: Boolean
+    get() = activeTetheringTypes >= 0
 
 private data class TetheringAction(
     val statusRes: Int,
@@ -161,7 +164,7 @@ private fun hotspotAction(
                 state.routingState == ShizukuTetheringService.ROUTING_STATE_WAITING ->
                 R.string.shizuku_hotspot_status_waiting
             state.hotspotEnabled -> R.string.shizuku_hotspot_status_enabled_direct
-            state.hotspotState == ShizukuTetheringService.HOTSPOT_STATE_DISABLED ->
+            state.tetheringStateKnown ->
                 R.string.shizuku_hotspot_status_disabled
             else -> R.string.shizuku_hotspot_status_unavailable
         }
@@ -176,7 +179,7 @@ private fun hotspotAction(
         enabled = platformSupported && serviceConnected &&
             state.operation == TetheringOperation.NONE &&
             (state.hotspotEnabled ||
-                state.hotspotState == ShizukuTetheringService.HOTSPOT_STATE_DISABLED &&
+                state.tetheringStateKnown &&
                 (state.routingActive || state.coreRunning)),
     )
 }

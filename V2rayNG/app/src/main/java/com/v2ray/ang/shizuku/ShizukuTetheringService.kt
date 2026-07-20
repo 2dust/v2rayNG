@@ -77,16 +77,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         var coreRestartPending: Boolean = false,
     )
 
-    override fun getWifiHotspotState(): Int {
-        val types = getActiveTetheringTypes()
-        if (types < 0) return HOTSPOT_STATE_UNKNOWN
-        return if (types and tetheringTypeBit(TETHERING_TYPE_WIFI) != 0) {
-            HOTSPOT_STATE_ENABLED
-        } else {
-            HOTSPOT_STATE_DISABLED
-        }
-    }
-
     override fun setWifiHotspotEnabled(enabled: Boolean): Int = synchronized(this) {
         val result = setTetheringEnabled(TETHERING_TYPE_WIFI, enabled)
         if (result == RESULT_OK) {
@@ -782,24 +772,20 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_725
+        const val USER_SERVICE_VERSION = 20_260_726
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"
         private const val TRANSPORT_TEST = 7
         private const val MAX_TETHERING_TYPE = 15
-        private const val TETHERING_TYPE_WIFI = 0
         private const val LEGACY_TETHERING_TYPE_BLUETOOTH = 2
         private const val CALLBACK_TIMEOUT_SECONDS = 10L
         private const val LEGACY_STOP_POLL_MILLIS = 100L
         private const val TEST_NETWORK_TIMEOUT_SECONDS = 15L
 
+        const val TETHERING_TYPE_WIFI = 0
         const val TETHERING_TYPE_USB = 1
         const val TETHERING_TYPES_UNKNOWN = -1
-
-        const val HOTSPOT_STATE_DISABLED = 0
-        const val HOTSPOT_STATE_ENABLED = 1
-        const val HOTSPOT_STATE_UNKNOWN = 2
 
         const val ROUTING_STATE_DISABLED = 0
         const val ROUTING_STATE_STARTING = 1

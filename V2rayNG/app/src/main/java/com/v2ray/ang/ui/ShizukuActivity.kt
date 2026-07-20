@@ -259,8 +259,6 @@ class ShizukuActivity : BaseComponentActivity() {
         operationJob = lifecycleScope.launch {
             val status = withContext(Dispatchers.IO) {
                 StatusSnapshot(
-                    hotspot = runCatching { service.wifiHotspotState }
-                        .getOrDefault(ShizukuTetheringService.HOTSPOT_STATE_UNKNOWN),
                     routing = runCatching { service.routingState }
                         .getOrDefault(ShizukuTetheringService.ROUTING_STATE_ERROR),
                     detail = runCatching { service.routingDetail }.getOrDefault(""),
@@ -270,7 +268,6 @@ class ShizukuActivity : BaseComponentActivity() {
             }
             uiState = uiState.copy(
                 operation = TetheringOperation.NONE,
-                hotspotState = status.hotspot,
                 routingState = status.routing,
                 routingDetail = status.detail,
                 activeTetheringTypes = status.tetheringTypes,
@@ -328,7 +325,7 @@ class ShizukuActivity : BaseComponentActivity() {
                 return@launchOperation
             }
 
-            uiState = uiState.copy(hotspotState = awaitHotspotState(service, enable))
+            uiState = uiState.copy(activeTetheringTypes = awaitTetheringTypes(service, enable))
             toastSuccess(
                 if (enable) R.string.shizuku_hotspot_enabled
                 else R.string.shizuku_hotspot_disabled
@@ -353,22 +350,22 @@ class ShizukuActivity : BaseComponentActivity() {
         runCatching(action).getOrDefault(ShizukuTetheringService.RESULT_INTERNAL_ERROR)
     }
 
-    private suspend fun awaitHotspotState(
+    private suspend fun awaitTetheringTypes(
         service: IShizukuTetheringService,
         enabled: Boolean,
     ): Int {
-        var state = ShizukuTetheringService.HOTSPOT_STATE_UNKNOWN
+        var types = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN
+        val wifiBit = 1 shl ShizukuTetheringService.TETHERING_TYPE_WIFI
         repeat(HOTSPOT_STATUS_POLL_COUNT) {
             delay(HOTSPOT_STATUS_POLL_INTERVAL_MS)
-            state = withContext(Dispatchers.IO) {
-                runCatching { service.wifiHotspotState }
-                    .getOrDefault(ShizukuTetheringService.HOTSPOT_STATE_UNKNOWN)
+            types = withContext(Dispatchers.IO) {
+                runCatching { service.activeTetheringTypes }
+                    .getOrDefault(ShizukuTetheringService.TETHERING_TYPES_UNKNOWN)
             }
-            val reachedTarget = enabled && state == ShizukuTetheringService.HOTSPOT_STATE_ENABLED ||
-                !enabled && state == ShizukuTetheringService.HOTSPOT_STATE_DISABLED
-            if (reachedTarget) return state
+            val hotspotEnabled = types >= 0 && types and wifiBit != 0
+            if (types >= 0 && enabled == hotspotEnabled) return types
         }
-        return state
+        return types
     }
 
     private suspend fun startRouting(service: IShizukuTetheringService): Int {
@@ -442,7 +439,6 @@ class ShizukuActivity : BaseComponentActivity() {
         tetheringService = null
         uiState = uiState.copy(
             operation = TetheringOperation.NONE,
-            hotspotState = ShizukuTetheringService.HOTSPOT_STATE_UNKNOWN,
             routingState = ShizukuTetheringService.ROUTING_STATE_DISABLED,
             routingDetail = "",
             activeTetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
@@ -465,7 +461,6 @@ class ShizukuActivity : BaseComponentActivity() {
     }
 
     private data class StatusSnapshot(
-        val hotspot: Int,
         val routing: Int,
         val detail: String,
         val tetheringTypes: Int,

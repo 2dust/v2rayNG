@@ -1,7 +1,6 @@
 package com.v2ray.ang.shizuku;
 
 interface IShizukuTetheringService {
-    int getWifiHotspotState() = 1;
     int setWifiHotspotEnabled(boolean enabled) = 2;
     int getActiveTetheringTypes() = 3;
     int getRoutingState() = 4;
