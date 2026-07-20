@@ -28,6 +28,7 @@ import com.v2ray.ang.shizuku.IShizukuTetheringService
 import com.v2ray.ang.shizuku.ShizukuTetheringService
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -40,6 +41,7 @@ import rikka.shizuku.Shizuku
 class ShizukuActivity : BaseComponentActivity() {
     private var tetheringService: IShizukuTetheringService? = null
     private var operationJob: Job? = null
+    private var operationGeneration = 0L
     private var snapshotWaiter: CompletableDeferred<HotspotRoutingSnapshot>? = null
     private var uiState by mutableStateOf(TetheringUiState())
 
@@ -143,7 +145,7 @@ class ShizukuActivity : BaseComponentActivity() {
     }
 
     override fun onDestroy() {
-        operationJob?.cancel()
+        cancelCurrentOperation()
         snapshotWaiter?.cancel()
         runCatching { unregisterReceiver(coreStateReceiver) }
         Shizuku.removeBinderReceivedListener(binderReceivedListener)
@@ -254,7 +256,7 @@ class ShizukuActivity : BaseComponentActivity() {
             clearServiceState()
             return
         }
-        operationJob?.cancel()
+        val generation = cancelCurrentOperation()
         uiState = uiState.copy(operation = TetheringOperation.CHECKING)
         operationJob = lifecycleScope.launch {
             val status = withContext(Dispatchers.IO) {
@@ -266,6 +268,7 @@ class ShizukuActivity : BaseComponentActivity() {
                         .getOrDefault(ShizukuTetheringService.TETHERING_TYPES_UNKNOWN),
                 )
             }
+            if (generation != operationGeneration) return@launch
             uiState = uiState.copy(
                 operation = TetheringOperation.NONE,
                 routingState = status.routing,
@@ -338,11 +341,21 @@ class ShizukuActivity : BaseComponentActivity() {
         action: suspend (IShizukuTetheringService) -> Unit,
     ) {
         val service = tetheringService ?: return
-        operationJob?.cancel()
+        val generation = cancelCurrentOperation()
         uiState = uiState.copy(operation = operation)
         operationJob = lifecycleScope.launch {
-            action(service)
-            refreshAfterOperation()
+            try {
+                action(service)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                toastError(error.message ?: getString(R.string.shizuku_operation_failed))
+            } finally {
+                if (generation == operationGeneration) {
+                    operationJob = null
+                    refreshTetheringStatus()
+                }
+            }
         }
     }
 
@@ -373,12 +386,14 @@ class ShizukuActivity : BaseComponentActivity() {
             toastError(R.string.shizuku_routing_snapshot_timeout)
             return ShizukuTetheringService.RESULT_INTERNAL_ERROR
         }
-        val launchConfig = runCatching {
+        val launchConfig = try {
             withContext(Dispatchers.Default) {
                 HotspotRoutingConfig.launchFromSnapshot(this@ShizukuActivity, snapshot)
             }
-        }.getOrElse {
-            toastError(it.message ?: getString(R.string.shizuku_routing_snapshot_timeout))
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Throwable) {
+            toastError(error.message ?: getString(R.string.shizuku_routing_snapshot_timeout))
             return ShizukuTetheringService.RESULT_ROUTING_FAILED
         }
 
@@ -426,15 +441,15 @@ class ShizukuActivity : BaseComponentActivity() {
         )
     }
 
-    private fun refreshAfterOperation() {
-        uiState = uiState.copy(operation = TetheringOperation.NONE)
+    private fun cancelCurrentOperation(): Long {
+        operationGeneration++
+        operationJob?.cancel()
         operationJob = null
-        refreshTetheringStatus()
+        return operationGeneration
     }
 
     private fun clearServiceState() {
-        operationJob?.cancel()
-        operationJob = null
+        cancelCurrentOperation()
         tetheringService = null
         uiState = uiState.copy(
             operation = TetheringOperation.NONE,
