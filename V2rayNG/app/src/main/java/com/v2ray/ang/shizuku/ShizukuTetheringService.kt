@@ -313,6 +313,11 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         engineConfig: String,
     ): Int {
         val session = findRoutingSession(token) ?: return RESULT_INVALID_SESSION
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            routingState = ROUTING_STATE_ERROR
+            routingDetail = "Shizuku tethering requires Android 11 or newer"
+            return RESULT_ROUTING_FAILED
+        }
         val launchConfig = HotspotRoutingLaunchConfig(
             engine = HotspotRoutingEngineConfig(useHev, profileName, engineConfig),
             assetPath = session.assetPath,
@@ -346,6 +351,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         return session
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun applyRoutingConfigLocked(
         launchConfig: HotspotRoutingLaunchConfig,
         session: RoutingSession,
