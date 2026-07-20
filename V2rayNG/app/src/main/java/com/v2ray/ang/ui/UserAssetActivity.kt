@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
 import androidx.activity.viewModels
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,6 +49,7 @@ import com.v2ray.ang.compose.AppDivider
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.SelectListDialog
+import com.v2ray.ang.compose.SettingsListItem
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
@@ -263,7 +263,6 @@ fun UserAssetScreen(
     val trigger by refreshTrigger.collectAsState()
 
     var showAddMenu by remember { mutableStateOf(false) }
-    var showGeoSourceDialog by remember { mutableStateOf(false) }
     var deleteTargetGuid by remember { mutableStateOf<String?>(null) }
     val listState = rememberLazyListState()
 
@@ -315,24 +314,13 @@ fun UserAssetScreen(
                 .verticalScrollbar(listState)
         ) {
             item(key = "geo_source_$trigger") {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showGeoSourceDialog = true }
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.asset_geo_files_sources),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = geoFilesSource,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 2
-                    )
-                }
+                SettingsListItem(
+                    title = stringResource(R.string.asset_geo_files_sources),
+                    entries = geoFilesSourcesList,
+                    values = geoFilesSourcesList,
+                    selectedValue = geoFilesSource,
+                    onSelected = { onGeoSourceSelected(it) }
+                )
             }
             item {
                 Text(
@@ -348,24 +336,11 @@ fun UserAssetScreen(
                     onEdit = { onEditAsset(item.guid) },
                     onDeleteClick = { deleteTargetGuid = item.guid }
                 )
-                AppDivider()
+                AppDivider(modifier = Modifier.padding(horizontal = 14.dp))
             }
         }
     }
 
-    if (showGeoSourceDialog) {
-        SelectListDialog(
-            title = stringResource(R.string.asset_geo_files_sources),
-            options = geoFilesSourcesList,
-            selectedOption = geoFilesSource,
-            showRadio = true,
-            onSelected = { _, value ->
-                onGeoSourceSelected(value)
-                showGeoSourceDialog = false
-            },
-            onDismiss = { showGeoSourceDialog = false }
-        )
-    }
 
     if (deleteTargetGuid != null) {
         val guid = deleteTargetGuid!!

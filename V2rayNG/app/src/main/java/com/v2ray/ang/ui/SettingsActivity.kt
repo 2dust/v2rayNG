@@ -231,14 +231,12 @@ fun SettingsScreen(
                 title = stringResource(R.string.title_pref_ipv6_enabled),
                 summary = stringResource(R.string.summary_pref_ipv6_enabled),
                 checked = ipv6Enabled,
-                enabled = isVpn,
                 onCheckedChange = { ipv6Enabled = it }
             )
             SettingsSwitchItem(
                 title = stringResource(R.string.title_pref_prefer_ipv6),
                 summary = stringResource(R.string.summary_pref_prefer_ipv6),
                 checked = preferIpv6,
-                enabled = isVpn && ipv6Enabled,
                 onCheckedChange = { preferIpv6 = it }
             )
             SettingsSwitchItem(
@@ -265,7 +263,7 @@ fun SettingsScreen(
                 title = stringResource(R.string.title_pref_append_http_proxy),
                 summary = stringResource(R.string.summary_pref_append_http_proxy),
                 checked = appendHttpProxy,
-                enabled = isVpn && effectiveLocalProxy,
+                enabled = effectiveLocalProxy,
                 onCheckedChange = { appendHttpProxy = it }
             )
             SettingsListItem(

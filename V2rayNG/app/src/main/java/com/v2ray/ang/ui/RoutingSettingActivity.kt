@@ -3,7 +3,6 @@ package com.v2ray.ang.ui
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,9 +49,11 @@ import com.v2ray.ang.compose.AppDivider
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ReorderableListItem
 import com.v2ray.ang.compose.SelectListDialog
+import com.v2ray.ang.compose.SettingsListItem
 import com.v2ray.ang.compose.colorConfigType
 import com.v2ray.ang.compose.colorFabActive
 import com.v2ray.ang.compose.verticalScrollbar
+import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
@@ -188,7 +189,6 @@ fun RoutingSettingScreen(
     val rulesets by viewModel.rulesetsFlow.collectAsStateWithLifecycle()
     val domainStrategy by domainStrategyState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
-    var showDomainDialog by remember { mutableStateOf(false) }
     var showPresetDialog by remember { mutableStateOf(false) }
 
     val domainStrategies = stringArrayResource(R.array.routing_domain_strategy).toList()
@@ -254,24 +254,20 @@ fun RoutingSettingScreen(
                 .verticalScrollbar(lazyListState)
         ) {
             item(key = "domain_strategy") {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showDomainDialog = true }
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                ) {
-                    Text(
-                        stringResource(R.string.routing_settings_domain_strategy),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        domainStrategy,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                AppDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                SettingsListItem(
+                    title = stringResource(R.string.routing_settings_domain_strategy),
+                    entries = domainStrategies,
+                    values = domainStrategies,
+                    selectedValue = domainStrategy,
+                    onSelected = { onDomainStrategySelected(it) }
+                )
+            }
+            item {
+                Text(
+                    text = stringResource(R.string.routing_settings_rule_title),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(16.dp)
+                )
             }
 
             itemsIndexed(
@@ -283,76 +279,14 @@ fun RoutingSettingScreen(
                         scope = this,
                         isDragging = isDragging
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(
-                                        text = ruleset.remarks ?: "",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    if (ruleset.locked == true) {
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_lock_24dp),
-                                            contentDescription = "Locked",
-                                            modifier = Modifier.size(16.dp),
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                }
-                                val domainIpInfo = (ruleset.domain ?: ruleset.ip ?: ruleset.process ?: ruleset.port)?.toString() ?: ""
-                                if (domainIpInfo.isNotEmpty()) {
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = domainIpInfo,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
-                                if (!ruleset.outboundTag.isNullOrEmpty()) {
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = ruleset.outboundTag,
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = colorConfigType
-                                    )
-                                }
+                        RoutingRulesetItem(
+                            ruleset = ruleset,
+                            onEdit = { onEditRule(index) },
+                            onEnabledChange = { checked ->
+                                val updated = ruleset.copy(enabled = checked)
+                                viewModel.update(index, updated)
                             }
-
-                            Column(
-                                horizontalAlignment = Alignment.End,
-                                modifier = Modifier.padding(start = 8.dp)
-                            ) {
-                                IconButton(onClick = { onEditRule(index) }) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_edit_24dp),
-                                        contentDescription = "Edit"
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Switch(
-                                    checked = ruleset.enabled ?: false,
-                                    onCheckedChange = { checked ->
-                                        val updated = ruleset.copy(enabled = checked)
-                                        viewModel.update(index, updated)
-                                    },
-                                    modifier = Modifier.scale(0.7f),
-                                    colors = SwitchDefaults.colors(
-                                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                        checkedTrackColor = colorFabActive
-                                    )
-                                )
-                            }
-                        }
+                        )
                     }
                     AppDivider(modifier = Modifier.padding(horizontal = 14.dp))
                 }
@@ -360,19 +294,6 @@ fun RoutingSettingScreen(
         }
     }
 
-    if (showDomainDialog) {
-        SelectListDialog(
-            title = stringResource(R.string.routing_settings_domain_strategy),
-            options = domainStrategies,
-            selectedOption = domainStrategy,
-            showRadio = true,
-            onSelected = { _, value ->
-                onDomainStrategySelected(value)
-                showDomainDialog = false
-            },
-            onDismiss = { showDomainDialog = false }
-        )
-    }
 
     if (showPresetDialog) {
         SelectListDialog(
@@ -384,5 +305,80 @@ fun RoutingSettingScreen(
             },
             onDismiss = { showPresetDialog = false }
         )
+    }
+}
+
+@Composable
+private fun RoutingRulesetItem(
+    ruleset: RulesetItem,
+    onEdit: () -> Unit,
+    onEnabledChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = ruleset.remarks ?: "",
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if (ruleset.locked == true) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        painter = painterResource(R.drawable.ic_lock_24dp),
+                        contentDescription = "Locked",
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            val domainIpInfo = (ruleset.domain ?: ruleset.ip ?: ruleset.process ?: ruleset.port)?.toString() ?: ""
+            if (domainIpInfo.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = domainIpInfo,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            if (!ruleset.outboundTag.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = ruleset.outboundTag,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = colorConfigType
+                )
+            }
+        }
+
+        Column(
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier.padding(start = 8.dp)
+        ) {
+            IconButton(onClick = onEdit) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_edit_24dp),
+                    contentDescription = "Edit"
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Switch(
+                checked = ruleset.enabled ?: false,
+                onCheckedChange = onEnabledChange,
+                modifier = Modifier.scale(0.7f),
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                    checkedTrackColor = colorFabActive
+                )
+            )
+        }
     }
 }
