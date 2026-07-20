@@ -378,7 +378,6 @@ object CoreConfigManager {
         val fallbackTag = if (strategyType.supportsObservatory && resolvedOutbound.profile.policyGroupTestOutbounds != false) {
             resolvedOutbound.profile.policyGroupFallbackTag
                 ?.takeIf { it.isNotEmpty() && it != AppConfig.TAG_PROXY }
-                ?: membersToAdd.first().tag
         } else null
         val strategy = buildBalancerStrategy(
             strategyType = strategyType,
