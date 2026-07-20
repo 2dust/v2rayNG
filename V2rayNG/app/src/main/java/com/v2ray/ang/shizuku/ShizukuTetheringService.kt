@@ -173,6 +173,28 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             return RESULT_ROUTING_FAILED
         }
 
+        if (testTun != null) {
+            return try {
+                val restoreTypes = getActiveTetheringTypes()
+                check(restoreTypes >= 0) {
+                    "Unable to determine active tethering before rebuilding its protected route"
+                }
+                val failedTypes = rebuildRoutingLocked(config, restoreTypes)
+                reportTetheringRestoreFailuresLocked(failedTypes)
+                RESULT_OK
+            } catch (error: Throwable) {
+                val detail = rootCauseMessage(error)
+                Log.e(TAG, "Unable to rebuild v2rayNG tethering routing: $detail", error)
+                routingState = ROUTING_STATE_ERROR
+                routingDetail = detail
+                RESULT_ROUTING_FAILED
+            }
+        }
+
+        return startRoutingOnNewTestNetworkLocked(config)
+    }
+
+    private fun startRoutingOnNewTestNetworkLocked(config: HotspotRoutingLaunchConfig): Int {
         cleanupRouting(resetPreference = true)
         routingState = ROUTING_STATE_STARTING
         routingDetail = "Creating Android test-network TUN"
@@ -195,15 +217,23 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     }
 
     override fun stopRouting(): Int = synchronized(this) {
+        shutdownRoutingLocked()
+    }
+
+    private fun shutdownRoutingLocked(): Int {
         val tetheringResult = stopActiveTetheringLocked(clearDesired = true)
-        if (tetheringResult != RESULT_OK) return@synchronized tetheringResult
+        if (tetheringResult != RESULT_OK) {
+            routingState = ROUTING_STATE_ERROR
+            routingDetail = "Unable to disable tethering safely before removing its protected route"
+            return tetheringResult
+        }
         routingSession = null
         routingState = ROUTING_STATE_STOPPING
         routingDetail = "Stopping v2rayNG tethering routing"
         cleanupRouting(resetPreference = true)
         routingState = ROUTING_STATE_DISABLED
         routingDetail = ""
-        RESULT_OK
+        return RESULT_OK
     }
 
     private fun stopActiveTetheringLocked(clearDesired: Boolean): Int {
@@ -328,23 +358,14 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             }.isSuccess
         }
 
-        if (!switchedInPlace) {
-            val stopResult = stopActiveTetheringLocked(clearDesired = false)
-            check(stopResult == RESULT_OK) {
-                "Unable to pause tethering safely before rebuilding its protected route"
-            }
-            val result = startRoutingLocked(launchConfig)
-            check(result == RESULT_OK) {
-                routingDetail.ifBlank { "Unable to rebuild hotspot routing" }
-            }
-        }
-
-        val failedTypes = restoreTetheringTypesLocked(restoreTypes)
-        session.coreRestartPending = false
-        if (failedTypes != 0) {
-            routingDetail += " · Unable to restore tethering types 0x${failedTypes.toString(16)}"
-            Log.w(TAG, routingDetail)
+        val failedTypes = if (switchedInPlace) {
+            restoreTetheringTypesLocked(restoreTypes)
         } else {
+            rebuildRoutingLocked(launchConfig, restoreTypes)
+        }
+        session.coreRestartPending = false
+        reportTetheringRestoreFailuresLocked(failedTypes)
+        if (failedTypes == 0) {
             Log.i(
                 TAG,
                 "Hotspot routing synchronized on ${testInterfaceName.orEmpty()}; tethering types 0x${restoreTypes.toString(16)}",
@@ -393,9 +414,12 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     }
 
     override fun destroy() {
-        synchronized(this) {
-            routingSession = null
-            cleanupRouting(resetPreference = true)
+        val safeToExit = synchronized(this) {
+            shutdownRoutingLocked() == RESULT_OK
+        }
+        if (!safeToExit) {
+            Log.e(TAG, "Refusing to destroy the UserService while tethering may still be active")
+            return
         }
         System.exit(0)
     }
@@ -435,6 +459,24 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         } else {
             stopLegacyTethering(type)
         }
+    }
+
+    private fun rebuildRoutingLocked(config: HotspotRoutingLaunchConfig, restoreTypes: Int): Int {
+        val stopResult = stopActiveTetheringLocked(clearDesired = false)
+        check(stopResult == RESULT_OK) {
+            "Unable to pause tethering safely before rebuilding its protected route"
+        }
+        val result = startRoutingOnNewTestNetworkLocked(config)
+        check(result == RESULT_OK) {
+            routingDetail.ifBlank { "Unable to rebuild tethering routing" }
+        }
+        return restoreTetheringTypesLocked(restoreTypes)
+    }
+
+    private fun reportTetheringRestoreFailuresLocked(failedTypes: Int) {
+        if (failedTypes == 0) return
+        routingDetail += " · Unable to restore tethering types 0x${failedTypes.toString(16)}"
+        Log.w(TAG, routingDetail)
     }
 
     private fun getLegacyActiveTetheringTypes(): Int {
