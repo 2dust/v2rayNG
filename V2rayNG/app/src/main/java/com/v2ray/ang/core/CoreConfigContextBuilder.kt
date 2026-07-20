@@ -45,17 +45,7 @@ object CoreConfigContextBuilder {
         // Step 2: Resolve all non-builtin routing outbound tags.
         val routingResolvedOutbounds = resolveRoutingOutbounds()
         val resolvedOutbounds = listOf(primaryResolvedOutbound) + routingResolvedOutbounds
-        val fallbackResolvedOutbounds = resolvedOutbounds
-            .filter { it.resolvedType == CoreResolvedType.POLICYGROUP }
-            .filter { BalancerStrategyType.from(it.profile.policyGroupType).supportsObservatory && it.profile.policyGroupTestOutbounds != false }
-            .mapNotNull { it.profile.policyGroupFallbackTag }
-            .filter { it !in AppConfig.BUILTIN_OUTBOUND_TAGS && resolvedOutbounds.none { outbound -> outbound.tag == it } }
-            .distinct()
-            .mapNotNull { tag ->
-                SettingsManager.getServerViaRemarks(tag)
-                    ?.takeUnless { it.configType == EConfigType.CUSTOM || it.configType == EConfigType.POLICYGROUP }
-                    ?.let { resolveOutbound(tag, it) }
-            }
+        val fallbackResolvedOutbounds = resolveFallbackOutbounds(resolvedOutbounds)
         val routingDomainRules = collectRoutingDomainRulesForDns()
 
         return CoreConfigContext(
@@ -258,5 +248,26 @@ object CoreConfigContextBuilder {
             }
 
         return result
+    }
+
+    /**
+     * Resolve and collect fallback outbounds from all POLICYGROUP nodes.
+     *
+     * Fallback targets must not overlap with already resolved tags or builtin tags.
+     */
+    private fun resolveFallbackOutbounds(resolvedOutbounds: List<CoreConfigContext.ResolvedOutbound>): List<CoreConfigContext.ResolvedOutbound> {
+        return resolvedOutbounds
+            .asSequence()
+            .filter { it.resolvedType == CoreResolvedType.POLICYGROUP }
+            .filter { BalancerStrategyType.from(it.profile.policyGroupType).supportsObservatory && it.profile.policyGroupTestOutbounds != false }
+            .mapNotNull { it.profile.policyGroupFallbackTag }
+            .filter { it !in AppConfig.BUILTIN_OUTBOUND_TAGS && resolvedOutbounds.none { outbound -> outbound.tag == it } }
+            .distinct()
+            .mapNotNull { tag ->
+                SettingsManager.getServerViaRemarks(tag)
+                    ?.takeUnless { it.configType == EConfigType.CUSTOM || it.configType == EConfigType.POLICYGROUP }
+                    ?.let { resolveOutbound(tag, it) }
+            }
+            .toList()
     }
 }
