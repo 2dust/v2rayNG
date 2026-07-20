@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +24,7 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,10 +46,12 @@ import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.SelectListDialog
 import com.v2ray.ang.compose.QRCodeDialog
 import com.v2ray.ang.compose.ReorderableListItem
+import com.v2ray.ang.compose.SettingsSwitchItem
 import com.v2ray.ang.compose.colorFabActive
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.SubscriptionsViewModel
@@ -108,6 +112,7 @@ fun SubSettingScreen(
     shareSubMethodEntries: List<String>
 ) {
     val subscriptions by viewModel.subsFlow.collectAsStateWithLifecycle()
+    var showUpdateDialog by remember { mutableStateOf(false) }
     var removeTarget by remember { mutableStateOf<String?>(null) }
     val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
 
@@ -130,7 +135,7 @@ fun SubSettingScreen(
                     IconButton(onClick = onAddClick) {
                         Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = stringResource(R.string.menu_item_add_config))
                     }
-                    IconButton(onClick = onSubUpdate) {
+                    IconButton(onClick = { showUpdateDialog = true }) {
                         Icon(painterResource(R.drawable.ic_restore_24dp), contentDescription = stringResource(R.string.title_sub_update))
                     }
                 }
@@ -277,6 +282,53 @@ fun SubSettingScreen(
                 removeTarget = null
             },
             onDismiss = { removeTarget = null }
+        )
+    }
+
+    if (showUpdateDialog) {
+
+        var autoTestAfterUpdateSubscription by rememberMmkvBool(AppConfig.PREF_AUTO_TEST_AFTER_UPDATE_SUBSCRIPTION, false)
+        var autoRemoveInvalidAfterTest by rememberMmkvBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST, false)
+        var autoSortAfterTest by rememberMmkvBool(AppConfig.PREF_AUTO_SORT_AFTER_TEST, false)
+
+        AlertDialog(
+            onDismissRequest = { showUpdateDialog = false },
+            title = { Text(text = stringResource(R.string.title_sub_update)) },
+            text = {
+                Column {
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.title_pref_auto_test_after_update_subscription),
+                        summary = stringResource(R.string.summary_pref_auto_test_after_update_subscription),
+                        checked = autoTestAfterUpdateSubscription,
+                        onCheckedChange = { autoTestAfterUpdateSubscription = it }
+                    )
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.title_pref_auto_remove_invalid_after_test),
+                        summary = stringResource(R.string.summary_pref_auto_remove_invalid_after_test),
+                        checked = autoRemoveInvalidAfterTest,
+                        onCheckedChange = { autoRemoveInvalidAfterTest = it }
+                    )
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.title_pref_auto_sort_after_test),
+                        summary = stringResource(R.string.summary_pref_auto_sort_after_test),
+                        checked = autoSortAfterTest,
+                        onCheckedChange = { autoSortAfterTest = it }
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showUpdateDialog = false
+                    onSubUpdate()
+                }) {
+                    Text(text = stringResource(android.R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showUpdateDialog = false }) {
+                    Text(text = stringResource(android.R.string.cancel))
+                }
+            }
         )
     }
 }

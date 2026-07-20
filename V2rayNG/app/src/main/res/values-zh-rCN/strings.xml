@@ -161,6 +161,9 @@
     <string name="title_pref_is_booted">开机时自动连接</string>
     <string name="summary_pref_is_booted">开机时自动连接选择的服务器，可能会不成功</string>
 
+    <string name="subscription_updater_job_tips">任务将在后台运行，在通知中会显示进度信息</string>
+    <string name="title_pref_auto_test_after_update_subscription">更新订阅后自动测试</string>
+    <string name="summary_pref_auto_test_after_update_subscription">自动测试需要比较长的时间，请耐心等待</string>
     <string name="title_pref_auto_remove_invalid_after_test">测试后自动删除无效配置</string>
     <string name="summary_pref_auto_remove_invalid_after_test">测试结果可能不准确且已删除的配置无法恢复</string>
     <string name="title_pref_auto_sort_after_test">测试后自动排序</string>
