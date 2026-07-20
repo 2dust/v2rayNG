@@ -16,15 +16,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +45,9 @@ import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.LogcatViewModel
+import kotlinx.coroutines.Delay
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -130,14 +131,12 @@ fun LogcatScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val logs by viewModel.filteredLogs.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     var searchQuery by remember { mutableStateOf("") }
     var showSearch by remember { mutableStateOf(false) }
 
     val snackbar = LocalAppSnackbar.current
-    LaunchedEffect(Unit) {
-        snackbar.showInfo(context,R.string.pull_down_to_refresh)
-    }
     val listState = rememberLazyListState()
 
     Scaffold(
@@ -146,6 +145,7 @@ fun LogcatScreen(
             AppTopBar(
                 title = stringResource(R.string.title_logcat),
                 onBackClick = onBackClick,
+                isLoading = isLoading,
                 isSearchActive = showSearch,
                 searchQuery = searchQuery,
                 onSearchQueryChange = {
@@ -168,14 +168,6 @@ fun LogcatScreen(
                         }
                     }
                     IconButton(onClick = {
-                        scope.launch(Dispatchers.IO) { viewModel.clearLogcat() }
-                    }) {
-                        Icon(
-                            painterResource(R.drawable.ic_delete_24dp),
-                            contentDescription = stringResource(R.string.logcat_clear)
-                        )
-                    }
-                    IconButton(onClick = {
                         val all = viewModel.filteredLogs.value.joinToString("\n")
                         Utils.setClipboard(context, all)
                         snackbar.showInfo(context,R.string.toast_success)
@@ -185,21 +177,35 @@ fun LogcatScreen(
                             contentDescription = stringResource(R.string.logcat_copy)
                         )
                     }
-                    IconButton(onClick = onShareLogcat) {
+                    IconButton(onClick = { onShareLogcat() }) {
                         Icon(
                             painterResource(R.drawable.ic_share_24dp),
                             contentDescription = stringResource(R.string.logcat_share)
                         )
                     }
+                    IconButton(onClick = {
+                        scope.launch(Dispatchers.IO) { viewModel.clearLogcat() }
+                    }) {
+                        Icon(
+                            painterResource(R.drawable.ic_delete_24dp),
+                            contentDescription = stringResource(R.string.logcat_clear)
+                        )
+                    }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                viewModel.loadLogcat()
+            }) {
+                Icon(
+                    painterResource(R.drawable.ic_restore_24dp),
+                    contentDescription = stringResource(R.string.pull_down_to_refresh)
+                )
+            }
         }
     ) { innerPadding ->
-        PullToRefreshBox(
-            isRefreshing = viewModel.isLoading.collectAsStateWithLifecycle().value,
-            onRefresh = {
-                scope.launch(Dispatchers.IO) { viewModel.loadLogcat() }
-            },
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
