@@ -82,14 +82,7 @@ class ScannerActivity : HelperBaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val startImmediate = MmkvManager.decodeSettingsBool(AppConfig.PREF_START_SCAN_IMMEDIATE, false)
-        if (ContextCompat.checkSelfPermission(
-                this,
-                PermissionType.CAMERA.getPermission()
-            ) == PackageManager.PERMISSION_GRANTED && startImmediate
-        ) {
-            uiState.value = ScannerUiState.ACTIVE
-        }
+        startScan()
     }
 
     @Composable

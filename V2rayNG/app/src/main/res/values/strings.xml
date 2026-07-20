@@ -254,8 +254,6 @@
     <string name="title_pref_confirm_remove">Delete config confirmation</string>
     <string name="summary_pref_confirm_remove">Whether deleting a config requires a second confirmation by the user</string>
 
-    <string name="title_pref_start_scan_immediate">Start scanning immediately</string>
-    <string name="summary_pref_start_scan_immediate">Open the camera to scan immediately at startup, otherwise you can choose to scan the code or select a photo in the toolbar</string>
 
     <string name="title_pref_append_http_proxy">Append HTTP Proxy to VPN</string>
     <string name="summary_pref_append_http_proxy">HTTP proxy will be used directly from (browser/ some supported apps), without going through the virtual NIC device (Android 10+)</string>

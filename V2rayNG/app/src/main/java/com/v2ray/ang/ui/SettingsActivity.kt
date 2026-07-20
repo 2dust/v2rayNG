@@ -109,7 +109,6 @@ fun SettingsScreen(
 
     var speedEnabled by rememberMmkvBool(AppConfig.PREF_SPEED_ENABLED, false)
     var confirmRemove by rememberMmkvBool(AppConfig.PREF_CONFIRM_REMOVE, false)
-    var startScanImmediate by rememberMmkvBool(AppConfig.PREF_START_SCAN_IMMEDIATE, false)
     var doubleColumnDisplay by rememberMmkvBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
     var groupAllDisplay by rememberMmkvBool(AppConfig.PREF_GROUP_ALL_DISPLAY, false)
     var language by rememberMmkvString(AppConfig.PREF_LANGUAGE, "auto")
@@ -190,12 +189,6 @@ fun SettingsScreen(
                 summary = stringResource(R.string.summary_pref_confirm_remove),
                 checked = confirmRemove,
                 onCheckedChange = { confirmRemove = it }
-            )
-            SettingsSwitchItem(
-                title = stringResource(R.string.title_pref_start_scan_immediate),
-                summary = stringResource(R.string.summary_pref_start_scan_immediate),
-                checked = startScanImmediate,
-                onCheckedChange = { startScanImmediate = it }
             )
             SettingsSwitchItem(
                 title = stringResource(R.string.title_pref_double_column_display),

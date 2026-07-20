@@ -243,8 +243,6 @@
     <string name="title_pref_confirm_remove">قوۊل کردن پاک کردن کانفیگ</string>
     <string name="summary_pref_confirm_remove">سی پاک وابیڌن فایل کانفیگ، لنگ قوۊل کردن دووارته ز سمت منتور هڌ.</string>
 
-    <string name="title_pref_start_scan_immediate">زی بنه پا اسکن کود QR</string>
-    <string name="summary_pref_start_scan_immediate">شؽواتگرن سی اسکن، زی مجال ره وندن بۊگۊشین، ٱندی ترین کودن اسکن کۊنین یا شؽواتی ن منه نوار ٱوزار پسند کۊنین.</string>
 
     <string name="title_pref_append_http_proxy">پروکسی HTTP ن و VPN ازاف کۊنین</string>
     <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موسقیمن ز (مۊرۊرگر/ی قرد ز برنومه یل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
