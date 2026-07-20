@@ -59,15 +59,14 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     private var routingUsesHev = false
     private var routingProfileName = ""
     private var routingSession: RoutingSession? = null
-    private var testNetworkManager: Any? = null
-    private var testNetworkInterface: Any? = null
-    private var testTun: ParcelFileDescriptor? = null
-    private var testNetwork: Network? = null
-    private var testNetworkCallback: ConnectivityManager.NetworkCallback? = null
-    private var testNetworkToken: IBinder? = null
-    private var testInterfaceName: String? = null
+    private var testNetworkHandle: TestNetworkHandle? = null
     private var nativeController: CoreController? = null
     private var hevConfigFile: File? = null
+
+    private val testTun: ParcelFileDescriptor?
+        get() = testNetworkHandle?.tun
+    private val testInterfaceName: String?
+        get() = testNetworkHandle?.interfaceName
 
     private data class RoutingSession(
         val token: String,
@@ -75,6 +74,16 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         val xudpKey: String,
         var desiredTetheringTypes: Int,
         var coreRestartPending: Boolean = false,
+    )
+
+    private class TestNetworkHandle(
+        val manager: Any,
+        val interfaceLifetime: Any,
+        val tun: ParcelFileDescriptor,
+        val interfaceName: String,
+        val callback: ConnectivityManager.NetworkCallback,
+        val networkLifetimeToken: IBinder,
+        var network: Network? = null,
     )
 
     override fun setWifiHotspotEnabled(enabled: Boolean): Int = synchronized(this) {
@@ -482,7 +491,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         val manager = checkNotNull(shellContext.getSystemService(TEST_NETWORK_SERVICE)) {
             "TestNetworkManager is unavailable on this Android build"
         }
-        testNetworkManager = manager
 
         val address = createLinkAddress(AppConfig.SHIZUKU_TUN_ADDR_V4)
         val createMethod = manager.javaClass.methods
@@ -498,31 +506,43 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         } else {
             createMethod.invoke(manager, listOf(address))
         } ?: error("TestNetworkManager returned no TUN interface")
-        testNetworkInterface = testInterface
-        testTun = testInterface.javaClass.getMethod("getFileDescriptor")
+        val tun = testInterface.javaClass.getMethod("getFileDescriptor")
             .invoke(testInterface) as ParcelFileDescriptor
-        testInterfaceName = testInterface.javaClass.getMethod("getInterfaceName")
-            .invoke(testInterface) as String
+        val interfaceName = try {
+            testInterface.javaClass.getMethod("getInterfaceName").invoke(testInterface) as String
+        } catch (error: Throwable) {
+            runCatching { tun.close() }
+            throw error
+        }
 
         val networkReady = CountDownLatch(1)
+        lateinit var handle: TestNetworkHandle
         val callback = object : ConnectivityManager.NetworkCallback() {
             private fun capture(network: Network) {
                 val interfaceName = connectivityManager.getLinkProperties(network)?.interfaceName
-                if (interfaceName == testInterfaceName) {
-                    testNetwork = network
+                if (interfaceName == handle.interfaceName) {
+                    handle.network = network
                     networkReady.countDown()
                 }
             }
 
             override fun onAvailable(network: Network) = capture(network)
             override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-                if (linkProperties.interfaceName == testInterfaceName) {
-                    testNetwork = network
+                if (linkProperties.interfaceName == handle.interfaceName) {
+                    handle.network = network
                     networkReady.countDown()
                 }
             }
         }
-        testNetworkCallback = callback
+        handle = TestNetworkHandle(
+            manager = manager,
+            interfaceLifetime = testInterface,
+            tun = tun,
+            interfaceName = interfaceName,
+            callback = callback,
+            networkLifetimeToken = Binder(),
+        )
+        testNetworkHandle = handle
         val request = NetworkRequest.Builder()
             .addTransportType(TRANSPORT_TEST)
             .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
@@ -530,10 +550,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             .build()
         connectivityManager.requestNetwork(request, callback)
 
-        val token = Binder()
-        testNetworkToken = token
         val linkProperties = LinkProperties().apply {
-            interfaceName = testInterfaceName
+            this.interfaceName = handle.interfaceName
             setLinkAddresses(listOf(address))
             setDnsServers(
                 listOf(
@@ -547,7 +565,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
                 arrayOf(LinkProperties::class.java, java.lang.Boolean.TYPE, IBinder::class.java)
             )
         } ?: error("TestNetworkManager.setupTestNetwork is unavailable")
-        setupMethod.invoke(manager, linkProperties, true, token)
+        setupMethod.invoke(manager, linkProperties, true, handle.networkLifetimeToken)
 
         if (!networkReady.await(TEST_NETWORK_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
             error("Android did not publish the test-network TUN")
@@ -638,25 +656,17 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     private fun cleanupRouting(resetPreference: Boolean) {
         stopRoutingEngineLocked()
 
-        testNetworkCallback?.let { callback ->
-            runCatching { connectivityManager.unregisterNetworkCallback(callback) }
+        testNetworkHandle?.let { handle ->
+            runCatching { connectivityManager.unregisterNetworkCallback(handle.callback) }
+            handle.network?.let { network ->
+                runCatching {
+                    handle.manager.javaClass.getMethod("teardownTestNetwork", Network::class.java)
+                        .invoke(handle.manager, network)
+                }.onFailure { Log.w(TAG, "Unable to tear down test network", it) }
+            }
+            runCatching { handle.tun.close() }
         }
-        testNetworkCallback = null
-        val manager = testNetworkManager
-        val network = testNetwork
-        if (manager != null && network != null) {
-            runCatching {
-                manager.javaClass.getMethod("teardownTestNetwork", Network::class.java)
-                    .invoke(manager, network)
-            }.onFailure { Log.w(TAG, "Unable to tear down test network", it) }
-        }
-        testNetwork = null
-        runCatching { testTun?.close() }
-        testTun = null
-        testNetworkInterface = null
-        testNetworkManager = null
-        testNetworkToken = null
-        testInterfaceName = null
+        testNetworkHandle = null
         routingProfileName = ""
 
         if (resetPreference) {
