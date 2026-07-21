@@ -57,5 +57,5 @@ sealed interface MainAction {
 
     data class ImportBatchConfig(val configText: String) : MainAction
 
-    data class LocateHandled(val target: com.v2ray.ang.dto.LocateTarget) : MainAction
+    data class LocateHandled(val target: LocateTarget) : MainAction
 }

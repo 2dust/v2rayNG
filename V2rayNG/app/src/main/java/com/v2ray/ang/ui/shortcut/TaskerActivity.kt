@@ -141,7 +141,11 @@ fun TaskerScreen(
             )
         }
     ) { innerPadding ->
-        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             SettingsSwitchItem(
                 title = stringResource(R.string.tasker_start_service),
                 checked = switchState.value,

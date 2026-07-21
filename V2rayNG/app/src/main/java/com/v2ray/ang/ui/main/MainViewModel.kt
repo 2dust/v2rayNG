@@ -181,9 +181,11 @@ class MainViewModel(
                 val bitmap = dataSource.share2QRCode(action.guid)
                 _uiState.update { it.copy(shareQRCodeBitmap = bitmap) }
             }
+
             MainAction.DismissQRCodeDialog -> {
                 _uiState.update { it.copy(shareQRCodeBitmap = null) }
             }
+
             MainAction.ToggleService,
             MainAction.TestCurrentServer,
             MainAction.ImportQRcode,

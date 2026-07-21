@@ -51,17 +51,21 @@ class MainRepository(
                 AppConfig.MSG_STATE_START_FAILURE -> MainServiceEvent.StateStartFailure(
                     safeIntent.getStringExtra("content").orEmpty()
                 )
+
                 AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess
                 AppConfig.MSG_MEASURE_DELAY_SUCCESS -> MainServiceEvent.MeasureDelaySuccess(
                     safeIntent.getStringExtra("content").orEmpty()
                 )
+
                 AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> MainServiceEvent.MeasureConfigSuccess
                 AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> MainServiceEvent.MeasureConfigNotify(
                     safeIntent.getStringExtra("content").orEmpty()
                 )
+
                 AppConfig.MSG_MEASURE_CONFIG_FINISH -> MainServiceEvent.MeasureConfigFinish(
                     safeIntent.getStringExtra("content")
                 )
+
                 else -> null
             }
             event?.let { _mainServiceEvent.tryEmit(it) }

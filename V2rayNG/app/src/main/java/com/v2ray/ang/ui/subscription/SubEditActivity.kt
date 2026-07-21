@@ -16,8 +16,8 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -145,7 +145,7 @@ fun SubEditScreen(
     val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
     val scrollState = rememberScrollState()
 
-    fun buildSubItem(): SubscriptionItem? {
+    fun buildSubItem(): SubscriptionItem {
         val subItem = MmkvManager.decodeSubscription(editSubId) ?: SubscriptionItem()
         subItem.remarks = remarks
         subItem.url = url

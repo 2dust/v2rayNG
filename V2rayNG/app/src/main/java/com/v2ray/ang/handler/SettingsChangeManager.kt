@@ -38,7 +38,7 @@ object SettingsChangeManager {
     fun makeRestartService() {
         restartService.set(true)
     }
-    
+
     /**
      * Atomically consumes the restart flag.
      * @return true if a restart was requested, false otherwise.

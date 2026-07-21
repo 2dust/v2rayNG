@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import java.text.Collator
-import kotlin.collections.plus
 
 /**
  * ViewModel for AppPicker screen.

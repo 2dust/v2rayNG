@@ -915,7 +915,7 @@ object CoreConfigManager {
         return hosts
     }
 
-    private fun buildDnsCnModeFromRoutingRules(configContext: CoreConfigContext, servers: ArrayList<Any>, domesticDns: List<String>,    ): List<String> {
+    private fun buildDnsCnModeFromRoutingRules(configContext: CoreConfigContext, servers: ArrayList<Any>, domesticDns: List<String>): List<String> {
         val cnRegionFilter = { domain: String ->
             domain.startsWith("geosite:") && (domain.endsWith("-cn") || domain.endsWith("@cn"))
                     || domain == AppConfig.GEOSITE_CN
@@ -981,6 +981,7 @@ object CoreConfigManager {
                         domesticDnsTags.add(tag)
                     }
                 }
+
                 AppConfig.TAG_BLOCKED -> Unit
                 else -> {
                     servers.add(

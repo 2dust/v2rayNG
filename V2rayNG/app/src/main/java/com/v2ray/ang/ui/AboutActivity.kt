@@ -114,7 +114,9 @@ fun AboutScreen(onBackClick: () -> Unit) {
                             loadUrl("file:///android_asset/open_source_licenses.html")
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 300.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 300.dp)
                 )
             },
             confirmButton = {

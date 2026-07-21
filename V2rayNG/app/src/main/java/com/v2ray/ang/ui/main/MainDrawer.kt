@@ -53,9 +53,11 @@ fun MainDrawerContent(onNavigate: (String) -> Unit) {
                 .verticalScrollbar(drawerScrollState)
                 .padding(bottom = 80.dp)
         ) {
-            Surface(modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp)) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()

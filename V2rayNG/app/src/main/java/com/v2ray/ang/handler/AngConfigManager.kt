@@ -497,7 +497,8 @@ object AngConfigManager {
             config.description = generateDescription(config)
 
             if (str.startsWith(AppConfig.V2RAYNFMTS, ignoreCase = true)
-                && config.policyGroupSubscriptionId == "self") {
+                && config.policyGroupSubscriptionId == "self"
+            ) {
                 config.policyGroupSubscriptionId = subid
             }
 

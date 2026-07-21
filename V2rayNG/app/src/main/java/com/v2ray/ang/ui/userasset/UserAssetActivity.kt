@@ -52,10 +52,10 @@ import com.v2ray.ang.compose.SettingsListItem
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
+import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
@@ -373,10 +373,16 @@ private fun UserAssetItem(
     val showEditButton = item.assetUrl.locked != true && item.assetUrl.url != "file"
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f).padding(8.dp)) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(8.dp)
+        ) {
             Text(
                 text = item.assetUrl.remarks,
                 style = MaterialTheme.typography.bodyLarge,

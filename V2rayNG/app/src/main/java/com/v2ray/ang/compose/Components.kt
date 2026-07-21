@@ -140,7 +140,9 @@ private fun SearchInputField(
                 )
             ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            modifier = Modifier.weight(1f).focusRequester(focusRequester)
+            modifier = Modifier
+                .weight(1f)
+                .focusRequester(focusRequester)
         )
         if (query.isNotEmpty()) {
             IconButton(onClick = { onQueryChange("") }) {
@@ -176,6 +178,7 @@ fun AppListItem(
                         contentScale = ContentScale.Fit
                     )
                 }
+
                 is Int -> {
                     Image(
                         painter = painterResource(id = icon),
@@ -184,6 +187,7 @@ fun AppListItem(
                         contentScale = ContentScale.Fit
                     )
                 }
+
                 is Drawable -> {
                     val bitmap = remember(icon) { createBitmapFromDrawable(icon) }
                     Image(
@@ -193,6 +197,7 @@ fun AppListItem(
                         contentScale = ContentScale.Fit
                     )
                 }
+
                 else -> {
                     Box(modifier = Modifier.size(40.dp))
                 }

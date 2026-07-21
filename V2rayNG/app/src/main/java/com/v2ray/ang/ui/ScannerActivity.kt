@@ -3,7 +3,6 @@ package com.v2ray.ang.ui
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Size as TargetSize
 import androidx.camera.compose.CameraXViewfinder
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraControl
@@ -72,6 +71,7 @@ import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
+import android.util.Size as TargetSize
 
 private val qrReader = MultiFormatReader()
 

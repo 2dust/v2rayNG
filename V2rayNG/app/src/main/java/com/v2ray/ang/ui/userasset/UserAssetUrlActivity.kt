@@ -54,10 +54,12 @@ class UserAssetUrlActivity : BaseComponentActivity() {
                 initialRemarks = assetItem.remarks
                 initialUrl = assetItem.url
             }
+
             assetUrlQrcode != null -> {
                 initialRemarks = assetNameQrcode
                 initialUrl = assetUrlQrcode
             }
+
             else -> {
                 initialRemarks = ""
                 initialUrl = ""

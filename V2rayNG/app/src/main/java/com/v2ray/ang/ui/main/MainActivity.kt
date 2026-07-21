@@ -26,14 +26,11 @@ import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.AboutActivity
 import com.v2ray.ang.ui.backup.BackupActivity
-import com.v2ray.ang.ui.checkupdate.CheckUpdateActivity
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
+import com.v2ray.ang.ui.checkupdate.CheckUpdateActivity
 import com.v2ray.ang.ui.logcat.LogcatActivity
 import com.v2ray.ang.ui.perappproxy.PerAppProxyActivity
 import com.v2ray.ang.ui.routing.RoutingSettingActivity
-import com.v2ray.ang.ui.settings.SettingsActivity
-import com.v2ray.ang.ui.subscription.SubSettingActivity
-import com.v2ray.ang.ui.userasset.UserAssetActivity
 import com.v2ray.ang.ui.server.ProfileEditorResult
 import com.v2ray.ang.ui.server.ServerCustomConfigActivity
 import com.v2ray.ang.ui.server.ServerGroupActivity
@@ -46,6 +43,9 @@ import com.v2ray.ang.ui.server.ServerTrojanActivity
 import com.v2ray.ang.ui.server.ServerVlessActivity
 import com.v2ray.ang.ui.server.ServerVmessActivity
 import com.v2ray.ang.ui.server.ServerWireguardActivity
+import com.v2ray.ang.ui.settings.SettingsActivity
+import com.v2ray.ang.ui.subscription.SubSettingActivity
+import com.v2ray.ang.ui.userasset.UserAssetActivity
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +65,7 @@ class MainActivity : HelperBaseComponentActivity() {
 
     private val profileEditorLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+            if (result.resultCode != RESULT_OK) return@registerForActivityResult
             val data = result.data ?: return@registerForActivityResult
             val action = data.getStringExtra(ProfileEditorResult.EXTRA_ACTION)
                 ?: return@registerForActivityResult
@@ -155,6 +155,7 @@ class MainActivity : HelperBaseComponentActivity() {
                 )
                 return
             }
+
             else -> return
         }
         settingsActivityLauncher.launch(intent)

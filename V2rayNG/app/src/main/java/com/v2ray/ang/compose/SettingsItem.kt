@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.R
 
 @Composable
 fun PreferenceGroupHeader(title: String, modifier: Modifier = Modifier) {
@@ -113,7 +112,9 @@ fun SettingsEditItem(
         title = title,
         description = description,
         enabled = enabled,
-        onClick = if (enabled) { { showDialog = true } } else null,
+        onClick = if (enabled) {
+            { showDialog = true }
+        } else null,
         modifier = modifier
     )
 
@@ -157,7 +158,9 @@ fun SettingsListItem(
         title = title,
         description = summary.ifEmpty { null },
         enabled = enabled,
-        onClick = if (enabled) { { showDialog = true } } else null,
+        onClick = if (enabled) {
+            { showDialog = true }
+        } else null,
         modifier = modifier
     )
 
@@ -209,7 +212,9 @@ fun SettingsSwitchItem(
         title = title,
         description = summary,
         enabled = enabled,
-        onClick = if (enabled) { { onCheckedChange(!checked) } } else null,
+        onClick = if (enabled) {
+            { onCheckedChange(!checked) }
+        } else null,
         modifier = modifier,
         trailing = {
             Switch(

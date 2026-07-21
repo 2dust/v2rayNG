@@ -61,6 +61,7 @@ data class V2rayNShareItem(
         val Filter: String?,
         val MultipleLoad: Int?,
     )
+
     data class V2rayNTransportExtraShareItem(
         val RawHeaderType: String?,
         val Host: String?,

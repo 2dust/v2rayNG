@@ -168,7 +168,7 @@ fun LogcatScreen(
                     IconButton(onClick = {
                         val all = viewModel.filteredLogs.value.joinToString("\n")
                         Utils.setClipboard(context, all)
-                        snackbar.showInfo(context,R.string.toast_success)
+                        snackbar.showInfo(context, R.string.toast_success)
                     }) {
                         Icon(
                             painterResource(R.drawable.ic_copy),

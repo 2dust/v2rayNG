@@ -43,9 +43,9 @@ import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppDivider
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
-import com.v2ray.ang.compose.SelectListDialog
 import com.v2ray.ang.compose.QRCodeDialog
 import com.v2ray.ang.compose.ReorderableListItem
+import com.v2ray.ang.compose.SelectListDialog
 import com.v2ray.ang.compose.SettingsSwitchItem
 import com.v2ray.ang.compose.colorFabActive
 import com.v2ray.ang.compose.verticalScrollbar
@@ -254,6 +254,7 @@ fun SubSettingScreen(
                         // QRCode
                         showQRCodeBitmap = onShareQRCode(url)
                     }
+
                     1 -> {
                         // Export to clipboard
                         onShareClipboard(url)

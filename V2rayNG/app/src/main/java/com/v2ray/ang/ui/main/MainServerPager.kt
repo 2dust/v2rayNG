@@ -317,18 +317,36 @@ fun ServerListItem(
     dragModifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min).clickable(onClick = onClick).then(dragModifier)
+        modifier = modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .clickable(onClick = onClick)
+            .then(dragModifier)
     ) {
-        Box(Modifier.width(10.dp).fillMaxHeight()) {
+        Box(
+            Modifier
+                .width(10.dp)
+                .fillMaxHeight()
+        ) {
             if (isSelected) {
                 Row {
                     Spacer(Modifier.width(6.dp))
-                    Box(Modifier.width(4.dp).fillMaxHeight().padding(vertical = 10.dp).background(MaterialTheme.colorScheme.primary))
+                    Box(
+                        Modifier
+                            .width(4.dp)
+                            .fillMaxHeight()
+                            .padding(vertical = 10.dp)
+                            .background(MaterialTheme.colorScheme.primary)
+                    )
                 }
             }
         }
 
-        Column(Modifier.weight(1f).padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)) {
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
+        ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(remarks, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge.copy(lineBreak = LineBreak.Paragraph), maxLines = 2, overflow = TextOverflow.Ellipsis)
                 if (doubleColumnDisplay) {
@@ -344,7 +362,12 @@ fun ServerListItem(
             Spacer(modifier = Modifier.height(6.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 if (subscriptionRemarks.isNotBlank()) {
-                    Box(Modifier.size(24.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)), Alignment.Center) {
+                    Box(
+                        Modifier
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)), Alignment.Center
+                    ) {
                         Text(subscriptionRemarks.take(1).uppercase(), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     }
                 }
