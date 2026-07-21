@@ -8,11 +8,11 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 
-/** Android 11+ tethering calls that are shared with, or hidden before, API 36. */
+/** Android 13+ tethering calls that are shared with, or hidden before, API 36. */
 internal object TetheringPlatformCompat {
 
     fun getUpstreamInterfaceName(): String {
-        require(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+        require(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
         val process = ProcessBuilder("dumpsys", "tethering")
             .redirectErrorStream(true)
             .start()
@@ -50,7 +50,7 @@ internal object TetheringPlatformCompat {
         executor: Executor,
         timeoutSeconds: Long,
     ): Int {
-        require(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+        require(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
         val manager = service as TetheringManager
         var result = ShizukuTetheringService.RESULT_INTERNAL_ERROR
         val callbackReceived = CountDownLatch(1)
@@ -77,7 +77,7 @@ internal object TetheringPlatformCompat {
     }
 
     fun getActiveTetheringTypes(service: Any): Int {
-        require(Build.VERSION.SDK_INT in Build.VERSION_CODES.R until Build.VERSION_CODES.BAKLAVA)
+        require(Build.VERSION.SDK_INT in Build.VERSION_CODES.TIRAMISU until Build.VERSION_CODES.BAKLAVA)
         val interfaces = invokeStringList(service, "getTetheredIfaces")
             ?: error("TetheringManager.getTetheredIfaces is unavailable")
         if (interfaces.isEmpty()) return 0
@@ -99,7 +99,7 @@ internal object TetheringPlatformCompat {
     }
 
     fun stopTethering(service: Any, type: Int, timeoutSeconds: Long): Int {
-        require(Build.VERSION.SDK_INT in Build.VERSION_CODES.R until Build.VERSION_CODES.BAKLAVA)
+        require(Build.VERSION.SDK_INT in Build.VERSION_CODES.TIRAMISU until Build.VERSION_CODES.BAKLAVA)
         return try {
             val method = service.javaClass.methods.firstOrNull {
                 it.name == "stopTethering" &&

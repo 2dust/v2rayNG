@@ -470,7 +470,6 @@
     <string name="shizuku_hotspot_status_starting">Starting hotspot…</string>
     <string name="shizuku_hotspot_status_stopping">Stopping hotspot…</string>
     <string name="shizuku_hotspot_status_unavailable">Hotspot status unavailable</string>
-    <string name="shizuku_hotspot_status_unsupported">Hotspot control requires Android 11 or newer</string>
     <string name="shizuku_hotspot_enable">Enable Wi-Fi hotspot</string>
     <string name="shizuku_hotspot_disable">Disable Wi-Fi hotspot</string>
     <string name="shizuku_hotspot_enabled">Wi-Fi hotspot enabled</string>

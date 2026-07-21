@@ -454,7 +454,6 @@
     <string name="shizuku_hotspot_status_starting">هات‌اسپات راه و افته…</string>
     <string name="shizuku_hotspot_status_stopping">هات‌اسپات واداره…</string>
     <string name="shizuku_hotspot_status_unavailable">وازیت هات‌اسپات من دسرس نی</string>
-    <string name="shizuku_hotspot_status_unsupported">کونترول هات‌اسپات Android 11 یا نووتر ن اخۊ</string>
     <string name="shizuku_hotspot_enable">راه وندن هات‌اسپات وای‌فای</string>
     <string name="shizuku_hotspot_disable">واداشتن هات‌اسپات وای‌فای</string>
     <string name="shizuku_hotspot_enabled">هات‌اسپات وای‌فای راه افتا</string>

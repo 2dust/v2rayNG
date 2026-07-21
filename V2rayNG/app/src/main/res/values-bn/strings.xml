@@ -448,7 +448,6 @@
     <string name="shizuku_hotspot_status_starting">হটস্পট চালু হচ্ছে…</string>
     <string name="shizuku_hotspot_status_stopping">হটস্পট বন্ধ হচ্ছে…</string>
     <string name="shizuku_hotspot_status_unavailable">হটস্পটের অবস্থা পাওয়া যাচ্ছে না</string>
-    <string name="shizuku_hotspot_status_unsupported">হটস্পট নিয়ন্ত্রণের জন্য Android 11 বা নতুন সংস্করণ প্রয়োজন</string>
     <string name="shizuku_hotspot_enable">Wi-Fi হটস্পট চালু করুন</string>
     <string name="shizuku_hotspot_disable">Wi-Fi হটস্পট বন্ধ করুন</string>
     <string name="shizuku_hotspot_enabled">Wi-Fi হটস্পট চালু হয়েছে</string>

@@ -3,6 +3,7 @@ package com.v2ray.ang.shizuku
 import android.app.Service
 import android.content.Intent
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.HotspotRoutingSnapshot
 import com.v2ray.ang.dto.HotspotRoutingSync
 import com.v2ray.ang.handler.MmkvManager
@@ -26,6 +27,7 @@ internal object TetheringCoreSync {
         coreConfig: String,
         useHev: Boolean,
     ) {
+        if (!service.resources.getBoolean(R.bool.shizuku_tethering_enabled)) return
         snapshot = createSnapshot(service, profileName, coreConfig, useHev)
         send(service, HotspotRoutingSync.EVENT_CORE_STARTED, snapshot)
     }
@@ -76,6 +78,7 @@ internal object TetheringCoreSync {
         snapshot: HotspotRoutingSnapshot? = null,
         detail: String = "",
     ) {
+        if (!service.resources.getBoolean(R.bool.shizuku_tethering_enabled)) return
         val token = MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN)
             ?.takeIf { it.isNotBlank() }
             ?: run {

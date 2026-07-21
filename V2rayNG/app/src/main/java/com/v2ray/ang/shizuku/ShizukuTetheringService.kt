@@ -97,6 +97,9 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
 
     @Synchronized
     override fun setWifiHotspotEnabled(enabled: Boolean): Int {
+        if (enabled && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return RESULT_ROUTING_FAILED
+        }
         val result = setTetheringEnabled(TETHERING_TYPE_WIFI, enabled)
         if (result == RESULT_OK) {
             val bit = tetheringTypeBit(TETHERING_TYPE_WIFI)
@@ -162,6 +165,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         xudpKey: String,
         syncToken: String,
     ): Int {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return RESULT_ROUTING_FAILED
         if (syncToken.isBlank()) {
             routingDetail = "Tethering synchronization token is empty"
             return RESULT_INVALID_SESSION
@@ -196,12 +200,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
                 RESULT_IMPLEMENTATION_MISMATCH
             }
         }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            routingState = ROUTING_STATE_ERROR
-            routingDetail = "Shizuku tethering requires Android 11 or newer"
-            return RESULT_ROUTING_FAILED
-        }
-
         if (testTun != null) {
             return try {
                 val restoreTypes = getActiveTetheringTypes()
@@ -223,7 +221,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         return startRoutingOnNewTestNetworkLocked(config)
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun startRoutingOnNewTestNetworkLocked(config: HotspotRoutingLaunchConfig): Int {
         cleanupRouting()
         routingState = ROUTING_STATE_STARTING
@@ -325,12 +323,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         profileName: String,
         engineConfig: String,
     ): Int {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return RESULT_ROUTING_FAILED
         val session = findRoutingSession(token) ?: return RESULT_INVALID_SESSION
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            routingState = ROUTING_STATE_ERROR
-            routingDetail = "Shizuku tethering requires Android 11 or newer"
-            return RESULT_ROUTING_FAILED
-        }
         val launchConfig = HotspotRoutingLaunchConfig(
             engine = HotspotRoutingEngineConfig(useHev, profileName, engineConfig),
             assetPath = session.assetPath,
@@ -364,7 +358,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         return session
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun applyRoutingConfigLocked(
         launchConfig: HotspotRoutingLaunchConfig,
         session: RoutingSession,
@@ -631,7 +625,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun rebuildRoutingLocked(config: HotspotRoutingLaunchConfig, restoreTypes: Int): Int {
         val stopResult = stopActiveTetheringLocked(clearDesired = false)
         check(stopResult == RESULT_OK) {
@@ -871,7 +865,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_739
+        const val USER_SERVICE_VERSION = 20_260_740
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"

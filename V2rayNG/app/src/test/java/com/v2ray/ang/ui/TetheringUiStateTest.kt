@@ -35,32 +35,24 @@ class TetheringUiStateTest {
         val connecting = TetheringUiState(operation = TetheringOperation.CONNECTING)
         assertEquals(
             R.string.shizuku_routing_status_connecting,
-            routingAction(connecting, serviceConnected = false, platformSupported = true).statusRes,
+            routingAction(connecting, serviceConnected = false).statusRes,
         )
         assertEquals(
             R.string.shizuku_hotspot_status_connecting,
-            hotspotAction(connecting, serviceConnected = false, platformSupported = true).statusRes,
+            hotspotAction(connecting, serviceConnected = false).statusRes,
         )
 
         val waiting = TetheringUiState(
             routingState = ShizukuTetheringService.ROUTING_STATE_WAITING,
             activeTetheringTypes = 1 shl ShizukuTetheringService.TETHERING_TYPE_WIFI,
         )
-        val routing = routingAction(waiting, serviceConnected = true, platformSupported = true)
+        val routing = routingAction(waiting, serviceConnected = true)
         assertEquals(R.string.shizuku_routing_status_waiting, routing.statusRes)
         assertEquals(R.string.shizuku_routing_disable, routing.buttonRes)
         assertTrue(routing.enabled)
         assertEquals(
             R.string.shizuku_hotspot_status_waiting,
-            hotspotAction(waiting, serviceConnected = true, platformSupported = true).statusRes,
+            hotspotAction(waiting, serviceConnected = true).statusRes,
         )
-
-        val unsupported = hotspotAction(
-            TetheringUiState(),
-            serviceConnected = true,
-            platformSupported = false,
-        )
-        assertEquals(R.string.shizuku_hotspot_status_unsupported, unsupported.statusRes)
-        assertFalse(unsupported.enabled)
     }
 }

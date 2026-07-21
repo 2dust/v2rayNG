@@ -112,7 +112,6 @@ class ShizukuActivity : BaseComponentActivity() {
         TetheringScreen(
             state = uiState,
             serviceConnected = tetheringService != null,
-            platformSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R,
             onBackClick = { finish() },
             onRequestPermission = ::requestShizukuPermission,
             onRefresh = {
@@ -179,11 +178,6 @@ class ShizukuActivity : BaseComponentActivity() {
             return
         }
         uiState = uiState.copy(shizukuStatus = status)
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            clearServiceState()
-            return
-        }
 
         if (tetheringService == null) bindUserService() else refreshTetheringStatus()
     }

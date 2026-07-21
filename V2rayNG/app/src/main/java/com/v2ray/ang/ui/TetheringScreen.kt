@@ -96,10 +96,8 @@ internal data class TetheringControlState(
 internal fun routingAction(
     state: TetheringUiState,
     serviceConnected: Boolean,
-    platformSupported: Boolean,
 ): TetheringControlState {
     val statusRes = when {
-        !platformSupported -> R.string.shizuku_routing_status_unavailable
         state.operation == TetheringOperation.CONNECTING -> R.string.shizuku_routing_status_connecting
         state.operation == TetheringOperation.CHECKING -> R.string.shizuku_routing_status_checking
         state.operation == TetheringOperation.STARTING_ROUTING -> R.string.shizuku_routing_status_starting
@@ -120,7 +118,7 @@ internal fun routingAction(
         state.coreRunning -> R.string.shizuku_routing_status_disabled
         else -> R.string.shizuku_routing_status_start_v2ray
     }
-    val enabled = platformSupported && serviceConnected &&
+    val enabled = serviceConnected &&
         state.operation == TetheringOperation.NONE &&
         when (state.routingState) {
             ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV,
@@ -144,10 +142,8 @@ internal fun routingAction(
 internal fun hotspotAction(
     state: TetheringUiState,
     serviceConnected: Boolean,
-    platformSupported: Boolean,
 ): TetheringControlState {
     val statusRes = when {
-        !platformSupported -> R.string.shizuku_hotspot_status_unsupported
         state.operation == TetheringOperation.CONNECTING -> R.string.shizuku_hotspot_status_connecting
         state.operation == TetheringOperation.CHECKING -> R.string.shizuku_hotspot_status_checking
         state.operation == TetheringOperation.STARTING_HOTSPOT -> R.string.shizuku_hotspot_status_starting
@@ -167,7 +163,7 @@ internal fun hotspotAction(
         } else {
             R.string.shizuku_hotspot_enable
         },
-        enabled = platformSupported && serviceConnected &&
+        enabled = serviceConnected &&
             state.operation == TetheringOperation.NONE &&
             (state.hotspotEnabled ||
                 state.tetheringStateKnown &&
@@ -179,15 +175,14 @@ internal fun hotspotAction(
 internal fun TetheringScreen(
     state: TetheringUiState,
     serviceConnected: Boolean,
-    platformSupported: Boolean,
     onBackClick: () -> Unit,
     onRequestPermission: () -> Unit,
     onRefresh: () -> Unit,
     onToggleRouting: () -> Unit,
     onToggleHotspot: () -> Unit,
 ) {
-    val routingAction = routingAction(state, serviceConnected, platformSupported)
-    val hotspotAction = hotspotAction(state, serviceConnected, platformSupported)
+    val routingAction = routingAction(state, serviceConnected)
+    val hotspotAction = hotspotAction(state, serviceConnected)
     val routingSummary = stringResource(R.string.shizuku_routing_summary)
     val usbStatus = stringResource(R.string.shizuku_usb_status_enabled)
     val usbActive = state.activeTetheringTypes >= 0 &&

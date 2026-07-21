@@ -199,9 +199,11 @@
             android:exported="false" />
         <activity
             android:name=".ui.ShizukuActivity"
+            android:enabled="@bool/shizuku_tethering_enabled"
             android:exported="false" />
         <receiver
             android:name=".shizuku.ShizukuRoutingSyncReceiver"
+            android:enabled="@bool/shizuku_tethering_enabled"
             android:exported="false" />
         <activity
             android:name=".ui.AboutActivity"
@@ -210,7 +212,7 @@
         <provider
             android:name="rikka.shizuku.ShizukuProvider"
             android:authorities="${applicationId}.shizuku"
-            android:enabled="true"
+            android:enabled="@bool/shizuku_tethering_enabled"
             android:exported="true"
             android:multiprocess="false"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />

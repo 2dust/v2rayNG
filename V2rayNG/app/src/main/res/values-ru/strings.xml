@@ -461,7 +461,6 @@
     <string name="shizuku_hotspot_status_starting">Включение точки доступа…</string>
     <string name="shizuku_hotspot_status_stopping">Отключение точки доступа…</string>
     <string name="shizuku_hotspot_status_unavailable">Состояние точки доступа недоступно</string>
-    <string name="shizuku_hotspot_status_unsupported">Управление точкой доступа требует Android 11 или новее</string>
     <string name="shizuku_hotspot_enable">Включить точку доступа Wi-Fi</string>
     <string name="shizuku_hotspot_disable">Отключить точку доступа Wi-Fi</string>
     <string name="shizuku_hotspot_enabled">Точка доступа Wi-Fi включена</string>

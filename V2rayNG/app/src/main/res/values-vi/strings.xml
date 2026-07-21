@@ -450,7 +450,6 @@
     <string name="shizuku_hotspot_status_starting">Đang bật điểm phát sóng…</string>
     <string name="shizuku_hotspot_status_stopping">Đang tắt điểm phát sóng…</string>
     <string name="shizuku_hotspot_status_unavailable">Không thể xác định trạng thái điểm phát sóng</string>
-    <string name="shizuku_hotspot_status_unsupported">Điều khiển điểm phát sóng yêu cầu Android 11 trở lên</string>
     <string name="shizuku_hotspot_enable">Bật điểm phát sóng Wi-Fi</string>
     <string name="shizuku_hotspot_disable">Tắt điểm phát sóng Wi-Fi</string>
     <string name="shizuku_hotspot_enabled">Đã bật điểm phát sóng Wi-Fi</string>

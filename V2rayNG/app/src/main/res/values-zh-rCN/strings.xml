@@ -464,7 +464,6 @@
     <string name="shizuku_hotspot_status_starting">正在开启热点…</string>
     <string name="shizuku_hotspot_status_stopping">正在关闭热点…</string>
     <string name="shizuku_hotspot_status_unavailable">无法获取热点状态</string>
-    <string name="shizuku_hotspot_status_unsupported">热点控制需要 Android 11 或更高版本</string>
     <string name="shizuku_hotspot_enable">开启 Wi-Fi 热点</string>
     <string name="shizuku_hotspot_disable">关闭 Wi-Fi 热点</string>
     <string name="shizuku_hotspot_enabled">Wi-Fi 热点已开启</string>

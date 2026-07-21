@@ -462,7 +462,6 @@
     <string name="shizuku_hotspot_status_starting">正在開啟熱點…</string>
     <string name="shizuku_hotspot_status_stopping">正在關閉熱點…</string>
     <string name="shizuku_hotspot_status_unavailable">無法取得熱點狀態</string>
-    <string name="shizuku_hotspot_status_unsupported">熱點控制需要 Android 11 或更新版本</string>
     <string name="shizuku_hotspot_enable">開啟 Wi-Fi 熱點</string>
     <string name="shizuku_hotspot_disable">關閉 Wi-Fi 熱點</string>
     <string name="shizuku_hotspot_enabled">Wi-Fi 熱點已開啟</string>

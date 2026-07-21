@@ -8,7 +8,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 
-/** Keeps API 36-only tethering types out of classes loaded on Android 11 through 15. */
+/** Keeps API 36-only tethering types out of classes loaded on Android 13 through 15. */
 @RequiresApi(Build.VERSION_CODES.BAKLAVA)
 internal object TetheringApi36 {
     fun getActiveTetheringTypes(

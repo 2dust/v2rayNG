@@ -449,7 +449,6 @@
     <string name="shizuku_hotspot_status_starting">جارٍ تشغيل نقطة الاتصال…</string>
     <string name="shizuku_hotspot_status_stopping">جارٍ إيقاف نقطة الاتصال…</string>
     <string name="shizuku_hotspot_status_unavailable">حالة نقطة الاتصال غير متاحة</string>
-    <string name="shizuku_hotspot_status_unsupported">يتطلب التحكم في نقطة الاتصال Android 11 أو أحدث</string>
     <string name="shizuku_hotspot_enable">تفعيل نقطة اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_disable">تعطيل نقطة اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_enabled">تم تفعيل نقطة اتصال Wi-Fi</string>

@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.booleanResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -40,6 +41,7 @@ import com.v2ray.ang.compose.verticalScrollbar
 @Composable
 fun MainDrawerContent(onNavigate: (String) -> Unit) {
     val drawerScrollState = rememberScrollState()
+    val tetheringEnabled = booleanResource(R.bool.shizuku_tethering_enabled)
 
     ModalDrawerSheet(
         modifier = Modifier
@@ -87,14 +89,16 @@ fun MainDrawerContent(onNavigate: (String) -> Unit) {
             )
             AppDivider(modifier = Modifier.padding(vertical = 4.dp))
             DrawerMenuGroup(
-                items = listOf(
-                    DrawerMenuItemData(R.drawable.ic_promotion_24dp, R.string.title_pref_promotion, "promotion"),
-                    DrawerMenuItemData(R.drawable.ic_logcat_24dp, R.string.title_logcat, "logcat"),
-                    DrawerMenuItemData(R.drawable.ic_check_update_24dp, R.string.update_check_for_update, "check_update"),
-                    DrawerMenuItemData(R.drawable.ic_restore_24dp, R.string.title_configuration_backup_restore, "backup_restore"),
-                    DrawerMenuItemData(R.drawable.ic_device_hub_24dp, R.string.title_tethering, "tethering"),
-                    DrawerMenuItemData(R.drawable.ic_about_24dp, R.string.title_about, "about")
-                ),
+                items = buildList {
+                    add(DrawerMenuItemData(R.drawable.ic_promotion_24dp, R.string.title_pref_promotion, "promotion"))
+                    add(DrawerMenuItemData(R.drawable.ic_logcat_24dp, R.string.title_logcat, "logcat"))
+                    add(DrawerMenuItemData(R.drawable.ic_check_update_24dp, R.string.update_check_for_update, "check_update"))
+                    add(DrawerMenuItemData(R.drawable.ic_restore_24dp, R.string.title_configuration_backup_restore, "backup_restore"))
+                    if (tetheringEnabled) {
+                        add(DrawerMenuItemData(R.drawable.ic_device_hub_24dp, R.string.title_tethering, "tethering"))
+                    }
+                    add(DrawerMenuItemData(R.drawable.ic_about_24dp, R.string.title_about, "about"))
+                },
                 onNavigate = onNavigate
             )
         }

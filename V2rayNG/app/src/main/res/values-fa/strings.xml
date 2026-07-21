@@ -445,7 +445,6 @@
     <string name="shizuku_hotspot_status_starting">در حال روشن کردن نقطه اتصال…</string>
     <string name="shizuku_hotspot_status_stopping">در حال خاموش کردن نقطه اتصال…</string>
     <string name="shizuku_hotspot_status_unavailable">وضعیت نقطه اتصال در دسترس نیست</string>
-    <string name="shizuku_hotspot_status_unsupported">کنترل نقطه اتصال به Android 11 یا جدیدتر نیاز دارد</string>
     <string name="shizuku_hotspot_enable">روشن کردن نقطه اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_disable">خاموش کردن نقطه اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_enabled">نقطه اتصال Wi-Fi روشن شد</string>

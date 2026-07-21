@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="shizuku_tethering_enabled">true</bool>
+</resources>
