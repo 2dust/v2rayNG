@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -95,32 +96,48 @@ class AppSnackbarController(
     val hostState: SnackbarHostState,
     private val scope: CoroutineScope,
 ) {
+    private var currentId = 0
+    private var currentShowTime = 0L
+
     fun show(message: CharSequence, type: ToastType = ToastType.NORMAL, long: Boolean = false) {
-        scope.launch {
-            hostState.currentSnackbarData?.dismiss()
-            hostState.showSnackbar(
-                message = message.toString(),
-                actionLabel = type.name,
-                duration = if (long) SnackbarDuration.Long else SnackbarDuration.Short,
-                withDismissAction = false,
-            )
-        }
-    }
+        val id = ++currentId
+         scope.launch {
+            if (currentShowTime != 0L) {
+                val elapsed = System.currentTimeMillis() - currentShowTime
+                if (elapsed < 500) {
+                    delay(500 - elapsed)
+                }
+            }
+
+             hostState.currentSnackbarData?.dismiss()
+
+            launch {
+                hostState.showSnackbar(
+                    message = message.toString(),
+                    actionLabel = type.name,
+                    duration = if (long) SnackbarDuration.Long else SnackbarDuration.Short,
+                    withDismissAction = false,
+                )
+                if (id == currentId) {
+                    currentShowTime = 0L
+                }
+            }
+
+            currentShowTime = System.currentTimeMillis()
+         }
+     }
 
     fun showInfo(context: Context, @StringRes messageRes: Int, long: Boolean = false) {
         show(context.getString(messageRes), ToastType.NORMAL, long)
     }
 
-
     fun showInfo(message: CharSequence, long: Boolean = false) {
         show(message, ToastType.NORMAL, long)
     }
 
-
     fun showSuccess(context: Context, @StringRes messageRes: Int, long: Boolean = false) {
         show(context.getString(messageRes), ToastType.SUCCESS, long)
     }
-
 
     fun showSuccess(message: CharSequence, long: Boolean = false) {
         show(message, ToastType.SUCCESS, long)
