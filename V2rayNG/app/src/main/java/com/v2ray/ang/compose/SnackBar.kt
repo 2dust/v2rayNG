@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,12 +32,16 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -92,32 +98,48 @@ class AppSnackbarController(
     val hostState: SnackbarHostState,
     private val scope: CoroutineScope,
 ) {
+    private var currentId = 0
+    private var currentShowTime = 0L
+
     fun show(message: CharSequence, type: ToastType = ToastType.NORMAL, long: Boolean = false) {
-        scope.launch {
-            hostState.currentSnackbarData?.dismiss()
-            hostState.showSnackbar(
-                message = message.toString(),
-                actionLabel = type.name,
-                duration = if (long) SnackbarDuration.Long else SnackbarDuration.Short,
-                withDismissAction = false,
-            )
-        }
-    }
+        val id = ++currentId
+         scope.launch {
+            if (currentShowTime != 0L) {
+                val elapsed = System.currentTimeMillis() - currentShowTime
+                if (elapsed < 500) {
+                    delay(500 - elapsed)
+                }
+            }
+
+             hostState.currentSnackbarData?.dismiss()
+
+            launch {
+                hostState.showSnackbar(
+                    message = message.toString(),
+                    actionLabel = type.name,
+                    duration = if (long) SnackbarDuration.Long else SnackbarDuration.Short,
+                    withDismissAction = false,
+                )
+                if (id == currentId) {
+                    currentShowTime = 0L
+                }
+            }
+
+            currentShowTime = System.currentTimeMillis()
+         }
+     }
 
     fun showInfo(context: Context, @StringRes messageRes: Int, long: Boolean = false) {
         show(context.getString(messageRes), ToastType.NORMAL, long)
     }
 
-
     fun showInfo(message: CharSequence, long: Boolean = false) {
         show(message, ToastType.NORMAL, long)
     }
 
-
     fun showSuccess(context: Context, @StringRes messageRes: Int, long: Boolean = false) {
         show(context.getString(messageRes), ToastType.SUCCESS, long)
     }
-
 
     fun showSuccess(message: CharSequence, long: Boolean = false) {
         show(message, ToastType.SUCCESS, long)
@@ -147,18 +169,22 @@ fun rememberAppSnackbarController(): AppSnackbarController {
 fun AppSnackbarBridge(
     controller: AppSnackbarController
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     DisposableEffect(Unit) {
         AppSnackbarManager.registerHost()
         onDispose { AppSnackbarManager.unregisterHost() }
     }
 
-    LaunchedEffect(controller) {
+    LaunchedEffect(controller, lifecycleOwner) {
         AppSnackbarManager.messages.collect { event ->
-            controller.show(
-                message = event.message,
-                type = event.type,
-                long = event.long
-            )
+            if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                controller.show(
+                    message = event.message,
+                    type = event.type,
+                    long = event.long
+                )
+            }
         }
     }
 }
@@ -179,6 +205,10 @@ fun AppSnackbarHost(
 ) {
     BoxWithConstraints(modifier = modifier) {
         val maxSnackbarWidth = maxWidth * ToastMaxWidthFraction
+        val density = LocalDensity.current
+        val navigationBarHeight = with(density) {
+            WindowInsets.navigationBars.getBottom(this).toDp()
+        }
 
         SnackbarHost(
             hostState = hostState,
@@ -206,7 +236,7 @@ fun AppSnackbarHost(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = ToastBottomOffset),
+                    .padding(bottom = ToastBottomOffset + navigationBarHeight),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Surface(
