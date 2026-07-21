@@ -356,6 +356,7 @@
     <string name="connection_test_fail">ইন্টারনেট উপলব্ধ নয়</string>
     <string name="connection_test_error_status_code">ত্রুটি কোড: #%d</string>
     <string name="connection_connected">সংযুক্ত, সংযোগ পরীক্ষা করতে ট্যাপ করুন</string>
+    <string name="connection_connected_via">সংযুক্ত: %s এর মাধ্যমে</string>
     <string name="connection_not_connected">সংযুক্ত নয়</string>
     <string name="connection_runing_task_left">Number of running test tasks: %s</string>
 

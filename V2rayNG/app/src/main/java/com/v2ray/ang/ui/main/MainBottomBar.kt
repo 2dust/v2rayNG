@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppDivider
@@ -33,7 +34,8 @@ import com.v2ray.ang.compose.colorFabInactiveLight
 
 @Composable
 fun MainBottomBar(
-    displayText: String,
+    connectionText: String,
+    diagnosticText: String,
     isRunning: Boolean,
     isDarkTheme: Boolean,
     onAction: (MainAction) -> Unit
@@ -57,7 +59,23 @@ fun MainBottomBar(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = displayText, style = MaterialTheme.typography.bodyMedium)
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = connectionText,
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = diagnosticText,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
         }

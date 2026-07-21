@@ -357,6 +357,7 @@
     <string name="connection_test_fail">الإنترنت غير متاح</string>
     <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
     <string name="connection_connected">متصل، انقر للتحقق من الاتصال</string>
+    <string name="connection_connected_via">متصل عبر %s</string>
     <string name="connection_not_connected">غير متصل</string>
     <string name="connection_runing_task_left">Number of running test tasks: %s</string>
 

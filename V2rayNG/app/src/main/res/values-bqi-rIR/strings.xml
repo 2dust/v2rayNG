@@ -362,6 +362,7 @@
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود ختا: #%d</string>
     <string name="connection_connected">منپیز هڌ، سی واجۊری کیلیک کوݩ</string>
+    <string name="connection_connected_via">منپیز وا %s</string>
     <string name="connection_not_connected">منپیز نؽڌ</string>
     <string name="connection_runing_task_left">تعداد وزیفه یل آزمایشی ک ره اۊفتانه: %s</string>
 

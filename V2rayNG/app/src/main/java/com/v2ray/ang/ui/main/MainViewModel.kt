@@ -45,15 +45,11 @@ class MainViewModel(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
     private val preloadDispatcher: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(1)
 
-    private val disconnectedText: String = dataSource.getString(R.string.connection_not_connected)
-    private val connectedText: String = dataSource.getString(R.string.connection_connected)
-
     // ---------- UI state ----------
     private val _uiState = MutableStateFlow(
         MainUiState(
             selectedGroupId = dataSource.getSelectedSubscriptionId(),
             selectedGuid = dataSource.getSelectServer(),
-            statusText = disconnectedText,
             confirmRemove = dataSource.getConfirmRemove(),
             doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
         )
@@ -115,8 +111,25 @@ class MainViewModel(
             }
 
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
+            is MainServiceEvent.ActiveOutboundChanged -> {
+                val displayName = outboundTargetDisplayName(event.target)
+                _uiState.update {
+                    if (it.isRunning) {
+                        it.copy(
+                            connectionTargetText = displayName.ifBlank {
+                                selectedConnectionTarget(it.selectedGuid)
+                            }
+                        )
+                    } else {
+                        it
+                    }
+                }
+            }
+
             is MainServiceEvent.MeasureDelaySuccess -> {
-                _uiState.update { it.copy(statusText = event.content) }
+                _uiState.update {
+                    it.copy(diagnosticTextRes = null, diagnosticText = event.content)
+                }
             }
 
             MainServiceEvent.MeasureConfigSuccess -> {
@@ -130,7 +143,8 @@ class MainViewModel(
             is MainServiceEvent.MeasureConfigNotify -> {
                 _uiState.update {
                     it.copy(
-                        statusText = dataSource.getString(
+                        diagnosticTextRes = null,
+                        diagnosticText = dataSource.getString(
                             R.string.connection_runing_task_left,
                             event.progress
                         )
@@ -156,6 +170,30 @@ class MainViewModel(
 
     private fun currentServers(): List<ServersCache> =
         mutableServersForGroup(uiState.value.selectedGroupId).value
+
+    private fun selectedConnectionTarget(guid: String? = _uiState.value.selectedGuid): String =
+        guid
+            ?.let(dataSource::decodeServerConfig)
+            ?.takeUnless { it.configType.isComplexType() }
+            ?.remarks
+            .orEmpty()
+
+    private fun outboundTargetDisplayName(target: String): String {
+        val trimmed = target.trim()
+        if (trimmed.isBlank()) return ""
+
+        val parts = trimmed.split("-", limit = 4)
+        return if (
+            parts.size == 4 &&
+            parts[0] == AppConfig.TAG_PROXY &&
+            parts[2].toIntOrNull() != null &&
+            parts[3].isNotBlank()
+        ) {
+            parts[3]
+        } else {
+            trimmed
+        }
+    }
 
     // ---------- Action handler ----------
     fun onAction(action: MainAction) {
@@ -626,7 +664,16 @@ class MainViewModel(
 
     fun updateSelectedGuid(guid: String) {
         dataSource.setSelectServer(guid)
-        _uiState.update { it.copy(selectedGuid = guid) }
+        _uiState.update {
+            it.copy(
+                selectedGuid = guid,
+                connectionTargetText = if (it.isRunning) {
+                    selectedConnectionTarget(guid)
+                } else {
+                    ""
+                }
+            )
+        }
     }
 
     fun refreshSelectedGuid() {
@@ -666,7 +713,8 @@ class MainViewModel(
         _uiState.update {
             it.copy(
                 isTesting = false,
-                statusText = if (it.isRunning) connectedText else disconnectedText
+                diagnosticTextRes = null,
+                diagnosticText = ""
             )
         }
     }
@@ -684,7 +732,8 @@ class MainViewModel(
         _uiState.update {
             it.copy(
                 isTesting = true,
-                statusText = dataSource.getString(R.string.connection_test_testing)
+                diagnosticTextRes = R.string.connection_test_testing,
+                diagnosticText = ""
             )
         }
         viewModelScope.launch(ioDispatcher) {
@@ -702,7 +751,8 @@ class MainViewModel(
     fun testCurrentServerRealPing() {
         _uiState.update {
             it.copy(
-                statusText = dataSource.getString(R.string.connection_test_testing)
+                diagnosticTextRes = R.string.connection_test_testing,
+                diagnosticText = ""
             )
         }
         dataSource.testCurrentServerRealPing()
@@ -721,7 +771,8 @@ class MainViewModel(
             _uiState.update {
                 it.copy(
                     isTesting = false,
-                    statusText = if (it.isRunning) connectedText else disconnectedText
+                    diagnosticTextRes = null,
+                    diagnosticText = ""
                 )
             }
             reloadAllGroups(_uiState.value.groups.map { it.id })
@@ -757,8 +808,23 @@ class MainViewModel(
         _uiState.update { state ->
             state.copy(
                 isRunning = running,
-                statusText = if (!clearTestingText && state.isTesting) state.statusText
-                else if (running) connectedText else disconnectedText
+                connectionTargetText = if (!running) {
+                    ""
+                } else if (clearTestingText || state.connectionTargetText.isBlank()) {
+                    selectedConnectionTarget(state.selectedGuid)
+                } else {
+                    state.connectionTargetText
+                },
+                diagnosticTextRes = if (!clearTestingText && state.isTesting) {
+                    state.diagnosticTextRes
+                } else {
+                    null
+                },
+                diagnosticText = if (!clearTestingText && state.isTesting) {
+                    state.diagnosticText
+                } else {
+                    ""
+                }
             )
         }
     }

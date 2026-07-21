@@ -34,6 +34,8 @@ import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
@@ -43,11 +45,14 @@ import java.net.InetSocketAddress
 
 object CoreServiceManager {
 
+    private const val ACTIVE_OUTBOUND_POLL_INTERVAL_MS = 500L
+
     private val coreController: CoreController = CoreNativeManager.newCoreController(CoreCallback())
     private val mMsgReceive = ReceiveMessageHandler()
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
+    private var activeOutboundPollJob: Job? = null
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -120,6 +125,45 @@ object CoreServiceManager {
      * @return The name of the running server.
      */
     fun getRunningServerName() = currentConfig?.remarks.orEmpty()
+
+    private fun currentActiveOutbound(): String = try {
+        coreController.getBalancerPrincipleTarget(AppConfig.TAG_BALANCER)
+    } catch (e: Exception) {
+        LogUtil.d(AppConfig.TAG, "Active outbound unavailable: ${e.message}")
+        ""
+    }
+
+    private fun emitActiveOutbound(serviceControl: ServiceControl, target: String) {
+        MessageUtil.sendMsg2UI(
+            serviceControl.getService(),
+            AppConfig.MSG_ACTIVE_OUTBOUND_CHANGED,
+            target
+        )
+    }
+
+    private fun emitCurrentActiveOutbound(serviceControl: ServiceControl) {
+        emitActiveOutbound(serviceControl, currentActiveOutbound())
+    }
+
+    private fun startActiveOutboundPolling() {
+        activeOutboundPollJob?.cancel()
+        activeOutboundPollJob = CoroutineScope(Dispatchers.IO).launch {
+            var lastTarget = ""
+            while (coreController.isRunning) {
+                val target = currentActiveOutbound()
+                if (target.isNotBlank() && target != lastTarget) {
+                    serviceControl?.get()?.let { emitActiveOutbound(it, target) }
+                    lastTarget = target
+                }
+                delay(ACTIVE_OUTBOUND_POLL_INTERVAL_MS)
+            }
+        }
+    }
+
+    private fun stopActiveOutboundPolling() {
+        activeOutboundPollJob?.cancel()
+        activeOutboundPollJob = null
+    }
 
     /**
      * Starts the context service for V2Ray.
@@ -272,6 +316,7 @@ object CoreServiceManager {
             error("Core failed to start")
         }
 
+        startActiveOutboundPolling()
         if (browserDialer != null) {
             browserDialer!!.stop()
             browserDialer = null
@@ -295,6 +340,7 @@ object CoreServiceManager {
      * @return True if the core was stopped successfully, false otherwise.
      */
     fun stopCoreLoop(): Boolean {
+        stopActiveOutboundPolling()
         val service = getService() ?: return false
 
         if (coreController.isRunning) {
@@ -502,6 +548,7 @@ object CoreServiceManager {
                 AppConfig.MSG_REGISTER_CLIENT -> {
                     if (coreController.isRunning) {
                         MessageUtil.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_RUNNING, "")
+                        emitCurrentActiveOutbound(serviceControl)
                     } else {
                         MessageUtil.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_NOT_RUNNING, "")
                     }

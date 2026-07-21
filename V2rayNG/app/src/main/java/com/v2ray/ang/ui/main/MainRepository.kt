@@ -57,6 +57,10 @@ class MainRepository(
                     safeIntent.getStringExtra("content").orEmpty()
                 )
 
+                AppConfig.MSG_ACTIVE_OUTBOUND_CHANGED -> MainServiceEvent.ActiveOutboundChanged(
+                    safeIntent.getStringExtra("content").orEmpty()
+                )
+
                 AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> MainServiceEvent.MeasureConfigSuccess
                 AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> MainServiceEvent.MeasureConfigNotify(
                     safeIntent.getStringExtra("content").orEmpty()
