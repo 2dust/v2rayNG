@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppDivider
+import com.v2ray.ang.compose.ItemDivider
 import com.v2ray.ang.compose.ReorderableGridItem
 import com.v2ray.ang.compose.ReorderableListItem
 import com.v2ray.ang.compose.colorConfigType
@@ -207,7 +207,7 @@ private fun ServerListPage(
                                 onRemoveServer = onRemoveServer
                             )
                         }
-                        AppDivider(modifier = Modifier.padding(horizontal = 12.dp))
+                        ItemDivider()
                     }
                 } else {
                     ServerItemRow(
@@ -220,7 +220,7 @@ private fun ServerListPage(
                         onMoreServer = onMoreServer,
                         onRemoveServer = onRemoveServer
                     )
-                    AppDivider(modifier = Modifier.padding(horizontal = 12.dp))
+                    ItemDivider()
                 }
             }
         }
@@ -294,7 +294,7 @@ private fun ServerItemColumn(
             onRemove = { onRemoveServer(serverCache.guid) },
             onMore = { onMoreServer(serverCache.guid, profile) }
         )
-        AppDivider(modifier = Modifier.padding(horizontal = 12.dp))
+        ItemDivider()
     }
 }
 

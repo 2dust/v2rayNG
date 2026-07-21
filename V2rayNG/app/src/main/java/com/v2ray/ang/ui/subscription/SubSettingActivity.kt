@@ -40,9 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppDivider
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
+import com.v2ray.ang.compose.ItemDivider
 import com.v2ray.ang.compose.QRCodeDialog
 import com.v2ray.ang.compose.ReorderableListItem
 import com.v2ray.ang.compose.SelectListDialog
@@ -237,7 +237,7 @@ fun SubSettingScreen(
                             }
                         }
                     }
-                    AppDivider(modifier = Modifier.padding(horizontal = 14.dp))
+                    ItemDivider()
                 }
             }
         }

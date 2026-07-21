@@ -44,6 +44,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppDivider
 import com.v2ray.ang.compose.AppListItem
 import com.v2ray.ang.compose.AppTopBar
+import com.v2ray.ang.compose.ItemDivider
 import com.v2ray.ang.compose.colorFabActive
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.AppInfo
@@ -275,7 +276,7 @@ fun PerAppProxyScreen(
                         checked = checked,
                         onCheckedChange = { onToggleApp(app.packageName) }
                     )
-                    AppDivider()
+                    ItemDivider()
                 }
             }
         }

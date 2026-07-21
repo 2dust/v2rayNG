@@ -85,7 +85,7 @@ fun MainDrawerContent(onNavigate: (String) -> Unit) {
                 ),
                 onNavigate = onNavigate
             )
-            AppDivider(modifier = Modifier.padding(vertical = 4.dp))
+            AppDivider()
             DrawerMenuGroup(
                 items = listOf(
                     DrawerMenuItemData(R.drawable.ic_promotion_24dp, R.string.title_pref_promotion, "promotion"),

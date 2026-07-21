@@ -38,8 +38,8 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppDivider
 import com.v2ray.ang.compose.AppTopBar
+import com.v2ray.ang.compose.ItemDivider
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.base.BaseComponentActivity
@@ -210,7 +210,7 @@ fun LogcatScreen(
             ) {
                 itemsIndexed(items = logs, key = { index, _ -> index }) { _, log ->
                     LogcatItem(log = log, onLongClick = { Utils.setClipboard(context, log) })
-                    AppDivider()
+                    ItemDivider()
                 }
             }
         }

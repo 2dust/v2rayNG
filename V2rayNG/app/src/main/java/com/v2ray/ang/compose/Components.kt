@@ -242,6 +242,11 @@ private fun createBitmapFromDrawable(drawable: Drawable): Bitmap {
 }
 
 @Composable
+fun ItemDivider() {
+    AppDivider(modifier = Modifier.padding(horizontal = 12.dp))
+}
+
+@Composable
 fun AppDivider(modifier: Modifier = Modifier) {
     val color = if (LocalDarkTheme.current) dividerColorDark else dividerColorLight
     HorizontalDivider(modifier = modifier.fillMaxWidth(), thickness = 1.dp, color = color)

@@ -45,9 +45,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppDivider
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
+import com.v2ray.ang.compose.ItemDivider
 import com.v2ray.ang.compose.SettingsListItem
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.AssetUrlCache
@@ -335,7 +335,7 @@ fun UserAssetScreen(
                     onEdit = { onEditAsset(item.guid) },
                     onDeleteClick = { deleteTargetGuid = item.guid }
                 )
-                AppDivider(modifier = Modifier.padding(horizontal = 14.dp))
+                ItemDivider()
             }
         }
     }
