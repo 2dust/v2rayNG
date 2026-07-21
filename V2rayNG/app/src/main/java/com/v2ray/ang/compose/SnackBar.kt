@@ -37,6 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
@@ -167,18 +169,22 @@ fun rememberAppSnackbarController(): AppSnackbarController {
 fun AppSnackbarBridge(
     controller: AppSnackbarController
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     DisposableEffect(Unit) {
         AppSnackbarManager.registerHost()
         onDispose { AppSnackbarManager.unregisterHost() }
     }
 
-    LaunchedEffect(controller) {
+    LaunchedEffect(controller, lifecycleOwner) {
         AppSnackbarManager.messages.collect { event ->
-            controller.show(
-                message = event.message,
-                type = event.type,
-                long = event.long
-            )
+            if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                controller.show(
+                    message = event.message,
+                    type = event.type,
+                    long = event.long
+                )
+            }
         }
     }
 }
