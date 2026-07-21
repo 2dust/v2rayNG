@@ -39,6 +39,12 @@ import java.util.concurrent.TimeUnit
  * DHCP, forwarding, NAT and DNS machinery sends client traffic into that TUN. The TUN is consumed
  * either by a process-local HEV instance (which connects to the normal v2rayNG SOCKS inbound) or
  * by a second Xray controller initialized with the exact running-core configuration.
+ *
+ * Selecting a preferred test network and starting a tethering downstream are separate Android
+ * operations. During that gap, especially while Wi-Fi changes from station to access-point mode,
+ * Tethering may briefly choose a physical default network. Every downstream start is therefore
+ * treated as provisional until Android reports only the owned test TUN as its actual upstream.
+ * Any other non-empty upstream is stopped immediately, keeping the feature fail-closed.
  */
 @Keep
 class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub() {
@@ -61,6 +67,10 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     private var testNetworkHandle: TestNetworkHandle? = null
     private var nativeController: CoreController? = null
     private var hevConfigFile: File? = null
+    // Tethering callbacks can acknowledge a start before the downstream appears in the active
+    // type list. Retain that in-flight intent so concurrent shutdown and failed-start cleanup
+    // still issue stopTethering instead of mistaking the downstream for already stopped.
+    private var requestedTetheringTypes = 0
 
     private val testTun: ParcelFileDescriptor?
         get() = testNetworkHandle?.tun
@@ -259,12 +269,15 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         val activeTypes = getActiveTetheringTypes()
         if (activeTypes < 0) return RESULT_INTERNAL_ERROR
 
+        // Include starts that Android accepted but has not published as active yet. The protected
+        // test network and routing engine must not be removed while such a start can still finish.
+        val typesToStop = activeTypes or requestedTetheringTypes
         if (clearDesired) routingSession?.desiredTetheringTypes = 0
 
         var result = RESULT_OK
         for (type in 0..MAX_TETHERING_TYPE) {
-            if (activeTypes and tetheringTypeBit(type) == 0) continue
-            val stopResult = changeTetheringEnabled(type, false)
+            if (typesToStop and tetheringTypeBit(type) == 0) continue
+            val stopResult = stopTetheringTypeLocked(type)
             if (stopResult != RESULT_OK && result == RESULT_OK) result = stopResult
         }
         return result
@@ -406,15 +419,14 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     }
 
     private fun restoreTetheringTypesLocked(types: Int): Int {
-        var activeTypes = getActiveTetheringTypes()
-        if (activeTypes < 0) return types
+        if (getActiveTetheringTypes() < 0) return types
 
         var failedTypes = 0
         for (type in 0..MAX_TETHERING_TYPE) {
             val bit = tetheringTypeBit(type)
-            if (types and bit == 0 || activeTypes and bit != 0) continue
-            val result = changeTetheringEnabled(type, true)
-            if (result == RESULT_OK) activeTypes = activeTypes or bit else failedTypes = failedTypes or bit
+            if (types and bit == 0) continue
+            val result = setTetheringEnabled(type, true)
+            if (result != RESULT_OK) failedTypes = failedTypes or bit
         }
         return failedTypes
     }
@@ -447,25 +459,141 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         System.exit(0)
     }
 
+    /**
+     * Changes one real Android tethering downstream while preserving the protected-upstream
+     * invariant.
+     *
+     * `setPreferTestNetworks(true)` influences Android's upstream choice, but it does not make the
+     * subsequent tethering start atomic. The callback can also arrive before the downstream and
+     * its selected upstream are visible. A successful start is consequently not returned to the
+     * app until the downstream is active and its actual upstream is exactly [testInterfaceName].
+     */
     private fun setTetheringEnabled(type: Int, enabled: Boolean): Int {
+        val bit = tetheringTypeBit(type)
+        if (bit == 0) return RESULT_INTERNAL_ERROR
+
         val activeTypes = getActiveTetheringTypes()
-        if (activeTypes >= 0) {
-            val alreadyEnabled = activeTypes and tetheringTypeBit(type) != 0
-            if (enabled == alreadyEnabled) return RESULT_OK
-        }
-
-        if (enabled) {
-            if (testTun == null) {
-                Log.e(TAG, "Refusing to start tethering without a protected test network")
-                return RESULT_ROUTING_FAILED
+        var alreadyEnabled = activeTypes >= 0 && activeTypes and bit != 0
+        if (!enabled) {
+            return if (activeTypes >= 0 && !alreadyEnabled && requestedTetheringTypes and bit == 0) {
+                RESULT_OK
+            } else {
+                stopTetheringTypeLocked(type)
             }
-            val preferenceReady = runCatching { setPreferTestNetworks(true) }
-                .onFailure { Log.e(TAG, "Unable to select the protected tethering upstream", it) }
-                .isSuccess
-            if (!preferenceReady) return RESULT_INTERNAL_ERROR
         }
 
-        return changeTetheringEnabled(type, enabled)
+        val expectedUpstream = testInterfaceName
+        if (!isRoutingReadyLocked() || testTun == null || expectedUpstream.isNullOrBlank()) {
+            Log.e(TAG, "Refusing to start tethering before protected routing is ready")
+            return RESULT_ROUTING_FAILED
+        }
+
+        // Record the request before crossing into Android. From this point onward every error and
+        // every concurrent shutdown path must explicitly stop the possibly in-flight downstream.
+        requestedTetheringTypes = requestedTetheringTypes or bit
+        val preferenceReady = runCatching { setPreferTestNetworks(true) }
+            .onFailure { Log.e(TAG, "Unable to select the protected tethering upstream", it) }
+            .isSuccess
+        if (!preferenceReady) return stopAfterFailedStartLocked(type, RESULT_INTERNAL_ERROR)
+
+        if (alreadyEnabled && !awaitProtectedUpstream(expectedUpstream)) {
+            // A downstream started outside this protected session may remain latched to its old
+            // physical upstream. Restart it so Android applies the test-network preference while
+            // making the new upstream selection.
+            Log.w(TAG, "Resetting tethering type $type before protected startup")
+            val stopResult = stopTetheringTypeLocked(type)
+            if (stopResult != RESULT_OK) return stopAfterFailedStartLocked(type, stopResult)
+            alreadyEnabled = false
+        }
+
+        if (!alreadyEnabled) {
+            val startResult = changeTetheringEnabled(type, true)
+            if (startResult != RESULT_OK) return stopAfterFailedStartLocked(type, startResult)
+            if (!awaitTetheringTypeState(type, enabled = true)) {
+                return stopAfterFailedStartLocked(type, RESULT_INTERNAL_ERROR)
+            }
+        }
+
+        if (!awaitProtectedUpstream(expectedUpstream)) {
+            // Do not wait for a non-empty physical upstream to hand over later: once Android has
+            // installed that forwarding path, tethered traffic may already bypass v2rayNG.
+            val actualUpstream = runCatching {
+                TetheringPlatformCompat.getUpstreamInterfaceName()
+            }.getOrDefault("")
+            Log.e(
+                TAG,
+                "Refusing tethering type $type on unprotected upstream " +
+                    actualUpstream.ifBlank { "<none>" },
+            )
+            return stopAfterFailedStartLocked(type, RESULT_ROUTING_FAILED)
+        }
+
+        requestedTetheringTypes = requestedTetheringTypes and bit.inv()
+        return RESULT_OK
+    }
+
+    private fun isRoutingReadyLocked(): Boolean {
+        return when (routingState) {
+            ROUTING_STATE_ACTIVE_NATIVE -> nativeController?.isRunning == true
+            ROUTING_STATE_ACTIVE_HEV -> hevConfigFile != null
+            else -> false
+        }
+    }
+
+    private fun stopAfterFailedStartLocked(type: Int, startResult: Int): Int {
+        // Cleanup is part of the safety contract. Prefer its failure when Android could not be
+        // observed stopping, because the original start error no longer describes the main risk.
+        val stopResult = stopTetheringTypeLocked(type)
+        return if (stopResult == RESULT_OK) startResult else stopResult
+    }
+
+    private fun stopTetheringTypeLocked(type: Int): Int {
+        val bit = tetheringTypeBit(type)
+        val stopResult = changeTetheringEnabled(type, false)
+        if (awaitTetheringTypeState(type, enabled = false)) {
+            // Clear the in-flight marker only after Android confirms the downstream is absent.
+            requestedTetheringTypes = requestedTetheringTypes and bit.inv()
+            return RESULT_OK
+        }
+        Log.e(TAG, "Timed out waiting for tethering type $type to stop")
+        return if (stopResult == RESULT_OK) RESULT_INTERNAL_ERROR else stopResult
+    }
+
+    private fun awaitTetheringTypeState(type: Int, enabled: Boolean): Boolean {
+        val bit = tetheringTypeBit(type)
+        val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(TETHERING_STATE_TIMEOUT_SECONDS)
+        do {
+            val activeTypes = getActiveTetheringTypes()
+            if (activeTypes >= 0 && (activeTypes and bit != 0) == enabled) return true
+        } while (sleepUntilNextPoll(deadline))
+        return false
+    }
+
+    private fun awaitProtectedUpstream(expectedInterface: String): Boolean {
+        val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(UPSTREAM_SELECTION_TIMEOUT_SECONDS)
+        do {
+            val actualInterface = runCatching {
+                TetheringPlatformCompat.getUpstreamInterfaceName()
+            }.getOrDefault("")
+            if (TetheringPlatformCompat.isProtectedUpstream(actualInterface, expectedInterface)) {
+                return true
+            }
+            // An empty value means upstream selection has not completed and is safe to poll. Any
+            // named, unexpected interface is already a usable forwarding path and must fail fast.
+            if (actualInterface.isNotBlank()) return false
+        } while (sleepUntilNextPoll(deadline))
+        return false
+    }
+
+    private fun sleepUntilNextPoll(deadline: Long): Boolean {
+        if (System.nanoTime() >= deadline) return false
+        return try {
+            Thread.sleep(TETHERING_STATE_POLL_MILLIS)
+            true
+        } catch (_: InterruptedException) {
+            Thread.currentThread().interrupt()
+            false
+        }
     }
 
     private fun changeTetheringEnabled(type: Int, enabled: Boolean): Int {
@@ -743,7 +871,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_729
+        const val USER_SERVICE_VERSION = 20_260_739
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"
@@ -751,6 +879,9 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         private const val MAX_TETHERING_TYPE = 15
         private const val CALLBACK_TIMEOUT_SECONDS = 10L
         private const val TEST_NETWORK_TIMEOUT_SECONDS = 15L
+        private const val TETHERING_STATE_TIMEOUT_SECONDS = 10L
+        private const val UPSTREAM_SELECTION_TIMEOUT_SECONDS = 5L
+        private const val TETHERING_STATE_POLL_MILLIS = 200L
 
         const val TETHERING_TYPE_WIFI = 0
         const val TETHERING_TYPE_USB = 1

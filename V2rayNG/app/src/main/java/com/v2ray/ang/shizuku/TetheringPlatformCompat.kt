@@ -35,6 +35,14 @@ internal object TetheringPlatformCompat {
         return interfaces.takeUnless { it == "null" }.orEmpty()
     }
 
+    internal fun isProtectedUpstream(actual: String, expected: String): Boolean {
+        if (expected.isBlank()) return false
+        val interfaces = actual.split(',').map(String::trim).filter(String::isNotEmpty)
+        // Tethering may expose multiple stacked upstream interfaces. Accept the state only when
+        // every reported path is the owned test TUN; a mixed "testtun, physical" state can leak.
+        return interfaces.isNotEmpty() && interfaces.all { it == expected }
+    }
+
     @SuppressLint("NewApi")
     fun startTethering(
         service: Any,

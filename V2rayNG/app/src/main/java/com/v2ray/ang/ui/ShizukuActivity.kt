@@ -251,6 +251,7 @@ class ShizukuActivity : BaseComponentActivity() {
     }
 
     private fun refreshTetheringStatus() {
+        if (uiState.operation.isToggleInProgress) return
         val service = tetheringService ?: run {
             clearServiceState()
             return
@@ -339,6 +340,7 @@ class ShizukuActivity : BaseComponentActivity() {
         operation: TetheringOperation,
         action: suspend (IShizukuTetheringService) -> Unit,
     ) {
+        if (uiState.operation.isToggleInProgress) return
         val service = tetheringService ?: return
         val generation = cancelCurrentOperation()
         uiState = uiState.copy(operation = operation)
@@ -352,6 +354,7 @@ class ShizukuActivity : BaseComponentActivity() {
             } finally {
                 if (generation == operationGeneration) {
                     operationJob = null
+                    uiState = uiState.copy(operation = TetheringOperation.NONE)
                     refreshTetheringStatus()
                 }
             }
