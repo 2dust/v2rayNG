@@ -26,6 +26,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.shizuku.HotspotRoutingConfig
 import com.v2ray.ang.shizuku.IShizukuTetheringService
 import com.v2ray.ang.shizuku.ShizukuTetheringService
+import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CancellationException
