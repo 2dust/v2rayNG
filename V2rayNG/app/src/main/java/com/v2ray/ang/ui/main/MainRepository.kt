@@ -201,6 +201,12 @@ class MainRepository(
     override fun shareNonCustomConfigsToClipboard(guids: List<String>): Int =
         AngConfigManager.shareNonCustomConfigsToClipboard(app, guids)
 
+    override fun share2QRCode(guid: String): android.graphics.Bitmap? =
+        AngConfigManager.share2QRCode(guid)
+
+    override fun share2Clipboard(guid: String): Boolean =
+        AngConfigManager.share2Clipboard(app, guid) == 0
+
     override fun sendMsg2Service(msgId: Int, content: String) =
         MessageUtil.sendMsg2Service(app, msgId, content)
 

@@ -173,7 +173,6 @@ class MainViewModel(
             MainAction.SortByTestResults -> sortByTestResultsAsync()
             MainAction.UpdateSubscriptions -> importConfigViaSub()
             MainAction.ExportAll -> exportAllAsync()
-            MainAction.ImportConfigViaSub -> importConfigViaSub()
             is MainAction.SelectGroup -> subscriptionIdChanged(action.groupId)
             is MainAction.SelectServer -> updateSelectedGuid(action.guid)
             is MainAction.RemoveServer -> removeServerAndRefresh(action.guid)
@@ -181,9 +180,25 @@ class MainViewModel(
             is MainAction.SwapServer -> swapServer(action.fromIndex, action.toIndex)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
             is MainAction.LocateHandled -> consumeLocateTarget(action.target)
+            is MainAction.ShareQRCode -> {
+                val bitmap = dataSource.share2QRCode(action.guid)
+                _uiState.update { it.copy(shareQRCodeBitmap = bitmap) }
+            }
+            MainAction.DismissQRCodeDialog -> {
+                _uiState.update { it.copy(shareQRCodeBitmap = null) }
+            }
             MainAction.ToggleService,
-            MainAction.TestCurrentServer -> {
-                // Platform-specific, handled by Activity
+            MainAction.TestCurrentServer,
+            MainAction.ImportQRcode,
+            MainAction.ImportClipboard,
+            MainAction.ImportConfigLocal,
+            is MainAction.ImportManually,
+            MainAction.RestartService,
+            MainAction.LocateSelectedServer,
+            is MainAction.EditServer,
+            is MainAction.ShareClipboard,
+            is MainAction.ShareFullContent -> {
+                // Handled by Activity via its onAction lambda
             }
         }
     }

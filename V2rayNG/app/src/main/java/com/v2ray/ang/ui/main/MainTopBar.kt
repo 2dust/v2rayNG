@@ -39,19 +39,10 @@ fun MainTopBar(
     onSearchClose: () -> Unit,
     onSearchToggle: (Boolean) -> Unit,
     onMenuClick: () -> Unit,
-    onImportQRcode: () -> Unit,
-    onImportClipboard: () -> Unit,
-    onImportLocal: () -> Unit,
-    onImportManually: (Int) -> Unit,
-    onRestartService: () -> Unit,
+    onAction: (MainAction) -> Unit,
     onDelAllConfig: () -> Unit,
     onDelDuplicateConfig: () -> Unit,
-    onDelInvalidConfig: () -> Unit,
-    onExportAll: () -> Unit,
-    onRealPingAll: () -> Unit,
-    onLocateSelectedServer: () -> Unit,
-    onSortByTestResults: () -> Unit,
-    onSubUpdate: () -> Unit
+    onDelInvalidConfig: () -> Unit
 ) {
     var showImportMenu by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
@@ -101,10 +92,10 @@ fun MainTopBar(
                         .verticalScrollbar(importMenuScrollState)
                 ) {
                     ImportMenuContent(
-                        onImportQRcode = { showImportMenu = false; onImportQRcode() },
-                        onImportClipboard = { showImportMenu = false; onImportClipboard() },
-                        onImportLocal = { showImportMenu = false; onImportLocal() },
-                        onImportManually = { type -> showImportMenu = false; onImportManually(type) }
+                        onAction = { action ->
+                            showImportMenu = false
+                            onAction(action)
+                        }
                     )
                 }
             }
@@ -122,15 +113,13 @@ fun MainTopBar(
                         .verticalScrollbar(moreMenuScrollState)
                 ) {
                     MoreMenuContent(
-                        onRestartService = { showMenu = false; onRestartService() },
+                        onAction = { action ->
+                            showMenu = false
+                            onAction(action)
+                        },
                         onDelAllConfig = { showMenu = false; onDelAllConfig() },
                         onDelDuplicateConfig = { showMenu = false; onDelDuplicateConfig() },
-                        onDelInvalidConfig = { showMenu = false; onDelInvalidConfig() },
-                        onExportAll = { showMenu = false; onExportAll() },
-                        onRealPingAll = { showMenu = false; onRealPingAll() },
-                        onLocateSelectedServer = { showMenu = false; onLocateSelectedServer() },
-                        onSortByTestResults = { showMenu = false; onSortByTestResults() },
-                        onSubUpdate = { showMenu = false; onSubUpdate() }
+                        onDelInvalidConfig = { showMenu = false; onDelInvalidConfig() }
                     )
                 }
             }

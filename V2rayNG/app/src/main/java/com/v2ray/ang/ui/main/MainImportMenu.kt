@@ -14,80 +14,72 @@ import com.v2ray.ang.extension.isComplexType
 
 @Composable
 fun ImportMenuContent(
-    onImportQRcode: () -> Unit,
-    onImportClipboard: () -> Unit,
-    onImportLocal: () -> Unit,
-    onImportManually: (Int) -> Unit
+    onAction: (MainAction) -> Unit
 ) {
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_qrcode)) },
-        onClick = onImportQRcode
+        onClick = { onAction(MainAction.ImportQRcode) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_clipboard)) },
-        onClick = onImportClipboard
+        onClick = { onAction(MainAction.ImportClipboard) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_local)) },
-        onClick = onImportLocal
+        onClick = { onAction(MainAction.ImportConfigLocal) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_policy_group)) },
-        onClick = { onImportManually(EConfigType.POLICYGROUP.value) }
+        onClick = { onAction(MainAction.ImportManually(EConfigType.POLICYGROUP.value)) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_proxy_chain)) },
-        onClick = { onImportManually(EConfigType.PROXYCHAIN.value) }
+        onClick = { onAction(MainAction.ImportManually(EConfigType.PROXYCHAIN.value)) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_manually_vmess)) },
-        onClick = { onImportManually(EConfigType.VMESS.value) }
+        onClick = { onAction(MainAction.ImportManually(EConfigType.VMESS.value)) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_manually_vless)) },
-        onClick = { onImportManually(EConfigType.VLESS.value) }
+        onClick = { onAction(MainAction.ImportManually(EConfigType.VLESS.value)) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_manually_ss)) },
-        onClick = { onImportManually(EConfigType.SHADOWSOCKS.value) }
+        onClick = { onAction(MainAction.ImportManually(EConfigType.SHADOWSOCKS.value)) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_manually_socks)) },
-        onClick = { onImportManually(EConfigType.SOCKS.value) }
+        onClick = { onAction(MainAction.ImportManually(EConfigType.SOCKS.value)) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_manually_http)) },
-        onClick = { onImportManually(EConfigType.HTTP.value) }
+        onClick = { onAction(MainAction.ImportManually(EConfigType.HTTP.value)) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_manually_trojan)) },
-        onClick = { onImportManually(EConfigType.TROJAN.value) }
+        onClick = { onAction(MainAction.ImportManually(EConfigType.TROJAN.value)) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_manually_wireguard)) },
-        onClick = { onImportManually(EConfigType.WIREGUARD.value) }
+        onClick = { onAction(MainAction.ImportManually(EConfigType.WIREGUARD.value)) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.menu_item_import_config_manually_hysteria2)) },
-        onClick = { onImportManually(EConfigType.HYSTERIA2.value) }
+        onClick = { onAction(MainAction.ImportManually(EConfigType.HYSTERIA2.value)) }
     )
 }
 
 @Composable
 fun MoreMenuContent(
-    onRestartService: () -> Unit,
+    onAction: (MainAction) -> Unit,
     onDelAllConfig: () -> Unit,
     onDelDuplicateConfig: () -> Unit,
-    onDelInvalidConfig: () -> Unit,
-    onExportAll: () -> Unit,
-    onRealPingAll: () -> Unit,
-    onLocateSelectedServer: () -> Unit,
-    onSortByTestResults: () -> Unit,
-    onSubUpdate: () -> Unit
+    onDelInvalidConfig: () -> Unit
 ) {
     DropdownMenuItem(
         text = { Text(stringResource(R.string.title_service_restart)) },
-        onClick = onRestartService
+        onClick = { onAction(MainAction.RestartService) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.title_del_all_config)) },
@@ -103,23 +95,23 @@ fun MoreMenuContent(
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.title_export_all)) },
-        onClick = onExportAll
+        onClick = { onAction(MainAction.ExportAll) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.title_real_ping_all_server)) },
-        onClick = onRealPingAll
+        onClick = { onAction(MainAction.TestAllServers) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.title_locate_selected_config)) },
-        onClick = onLocateSelectedServer
+        onClick = { onAction(MainAction.LocateSelectedServer) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.title_sort_by_test_results)) },
-        onClick = onSortByTestResults
+        onClick = { onAction(MainAction.SortByTestResults) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.title_sub_update)) },
-        onClick = onSubUpdate
+        onClick = { onAction(MainAction.UpdateSubscriptions) }
     )
 }
 
@@ -131,12 +123,7 @@ fun ShareMethodDialog(
     shareMethodEntries: List<String>,
     shareMethodMoreEntries: List<String>,
     onDismiss: () -> Unit,
-    onShareQRCode: (String) -> Bitmap?,
-    onShareClipboard: (String) -> Boolean,
-    onShareFullContent: (String) -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit,
-    showQRCodeBitmap: (Bitmap?) -> Unit
+    onAction: (MainAction) -> Unit
 ) {
     val isCustom = profile.configType.isComplexType()
     val (shareOptions, skip) = if (more) {
@@ -151,11 +138,11 @@ fun ShareMethodDialog(
         onSelected = { index, _ ->
             onDismiss()
             when (index + skip) {
-                0 -> showQRCodeBitmap(onShareQRCode(guid))
-                1 -> onShareClipboard(guid)
-                2 -> onShareFullContent(guid)
-                3 -> onEditServer(guid, profile)
-                4 -> onRemoveServer(guid)
+                0 -> onAction(MainAction.ShareQRCode(guid))
+                1 -> onAction(MainAction.ShareClipboard(guid))
+                2 -> onAction(MainAction.ShareFullContent(guid))
+                3 -> onAction(MainAction.EditServer(guid, profile))
+                4 -> onAction(MainAction.RemoveServer(guid))
             }
         },
         onDismiss = onDismiss
