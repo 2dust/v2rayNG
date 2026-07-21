@@ -455,6 +455,7 @@
     <string name="shizuku_hotspot_enabled">Đã bật điểm phát sóng Wi-Fi</string>
     <string name="shizuku_hotspot_disabled">Đã tắt điểm phát sóng Wi-Fi</string>
     <string name="shizuku_hotspot_operation_failed">Thao tác với điểm phát sóng không thành công (lỗi %1$d)</string>
+    <string name="shizuku_tethering_wrong_upstream">Chia sẻ kết nối đã chọn nhầm đường truyền nên bị hủy. Vui lòng thử lại.</string>
     <string name="title_configuration_share">Chia sẻ cấu hình</string>
     <string name="title_webdav_config_setting">WebDAV Settings</string>
     <string name="title_webdav_config_setting_unknown">Please configure WebDAV first.</string>

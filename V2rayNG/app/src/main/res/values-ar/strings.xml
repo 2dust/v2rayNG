@@ -454,6 +454,7 @@
     <string name="shizuku_hotspot_enabled">تم تفعيل نقطة اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_disabled">تم تعطيل نقطة اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_operation_failed">فشلت عملية نقطة الاتصال (الخطأ %1$d)</string>
+    <string name="shizuku_tethering_wrong_upstream">اختار الربط اتصالًا غير صحيح، لذلك أُلغي. يُرجى المحاولة مرة أخرى.</string>
     <string name="title_configuration_share">مشاركة التكوين</string>
     <string name="title_webdav_config_setting">WebDAV Settings</string>
     <string name="title_webdav_config_setting_unknown">Please configure WebDAV first.</string>

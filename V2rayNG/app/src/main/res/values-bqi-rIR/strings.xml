@@ -459,6 +459,7 @@
     <string name="shizuku_hotspot_enabled">هات‌اسپات وای‌فای راه افتا</string>
     <string name="shizuku_hotspot_disabled">هات‌اسپات وای‌فای واداشت وابی</string>
     <string name="shizuku_hotspot_operation_failed">کار هات‌اسپات نامووفق وابی (خوتا %1$d)</string>
+    <string name="shizuku_tethering_wrong_upstream">تیترینگ یه اتصال اشتبا ویرگزید و لغو وابی. دوواره امتحان کنین.</string>
     <string name="title_configuration_share">یک رسۊوی کانفیگ</string>
     <string name="title_webdav_config_setting">WebDAV سامووا</string>
     <string name="title_webdav_config_setting_unknown">ٱول WebDAV ن کانفیگ کۊنین</string>

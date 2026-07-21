@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 
 enum class ToastType {
-    NORMAL, SUCCESS, ERROR, INFO
+    NORMAL, SUCCESS, ERROR, WARNING, INFO
 }
 
 data class AppSnackbarMessage(
@@ -193,12 +193,14 @@ fun AppSnackbarHost(
                 ToastType.NORMAL -> if (isDark) toastNormalBgDark else toastNormalBgLight
                 ToastType.SUCCESS -> toastSuccessBg
                 ToastType.ERROR -> toastErrorBg
+                ToastType.WARNING -> toastWarningBg
                 ToastType.INFO -> toastInfoBg
             }
 
             val iconText = when (type) {
                 ToastType.SUCCESS -> "✓"
                 ToastType.ERROR -> "✕"
+                ToastType.WARNING -> "!"
                 ToastType.INFO -> "ℹ"
                 ToastType.NORMAL -> null
             }

@@ -453,6 +453,7 @@
     <string name="shizuku_hotspot_enabled">Wi-Fi হটস্পট চালু হয়েছে</string>
     <string name="shizuku_hotspot_disabled">Wi-Fi হটস্পট বন্ধ হয়েছে</string>
     <string name="shizuku_hotspot_operation_failed">হটস্পট অপারেশন ব্যর্থ হয়েছে (ত্রুটি %1$d)</string>
+    <string name="shizuku_tethering_wrong_upstream">টেথারিং ভুল সংযোগ বেছে নেওয়ায় তা বাতিল করা হয়েছে। আবার চেষ্টা করুন।</string>
     <string name="title_configuration_share">কনফিগারেশন শেয়ার করুন</string>
     <string name="title_webdav_config_setting">WebDAV Settings</string>
     <string name="title_webdav_config_setting_unknown">Please configure WebDAV first.</string>

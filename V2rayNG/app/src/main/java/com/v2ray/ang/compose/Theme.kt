@@ -112,6 +112,7 @@ val toastNormalBgLight = Color(0xB3353A3E) // Dark Gray 深灰色
 val toastNormalBgDark = Color(0xB34A4F54) // Darker Gray 暗灰色
 val toastSuccessBg = Color(0xB3388E3C) // Green 绿色
 val toastErrorBg = Color(0xB3D50000) // Red 红色
+val toastWarningBg = Color(0xB3F9A825) // Amber 琥珀色
 val toastInfoBg = Color(0xB33F51B5) // Indigo Blue 靛蓝色
 val toastIconCircleBg = Color(0x33FFFFFF) // Semi-transparent White 半透明白色
 val toastTextColor = Color.White // White 白色

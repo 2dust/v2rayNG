@@ -469,6 +469,7 @@
     <string name="shizuku_hotspot_enabled">Wi-Fi 热点已开启</string>
     <string name="shizuku_hotspot_disabled">Wi-Fi 热点已关闭</string>
     <string name="shizuku_hotspot_operation_failed">热点操作失败（错误 %1$d）</string>
+    <string name="shizuku_tethering_wrong_upstream">系统为网络共享选择了错误的连接，操作已取消。请重试。</string>
     <string name="title_configuration_share">分享配置</string>
     <string name="title_webdav_config_setting">WebDAV 设置</string>
     <string name="title_webdav_config_setting_unknown">请先设置 WebDAV</string>

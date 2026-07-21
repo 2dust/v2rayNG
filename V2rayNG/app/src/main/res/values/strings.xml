@@ -475,6 +475,7 @@
     <string name="shizuku_hotspot_enabled">Wi-Fi hotspot enabled</string>
     <string name="shizuku_hotspot_disabled">Wi-Fi hotspot disabled</string>
     <string name="shizuku_hotspot_operation_failed">Hotspot operation failed (error %1$d)</string>
+    <string name="shizuku_tethering_wrong_upstream">Tethering chose wrong connection and was cancelled. Please, try again.</string>
     <string name="title_configuration_share">Share config</string>
     <string name="title_webdav_config_setting">WebDAV Settings</string>
     <string name="title_webdav_config_setting_unknown">Please configure WebDAV first.</string>

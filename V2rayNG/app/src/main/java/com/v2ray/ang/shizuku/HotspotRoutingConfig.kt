@@ -18,6 +18,7 @@ data class HotspotRoutingEngineConfig(
 
 data class HotspotRoutingLaunchConfig(
     val engine: HotspotRoutingEngineConfig,
+    val dnsServers: List<String>,
     val assetPath: String,
     val xudpKey: String,
 )
@@ -28,6 +29,7 @@ object HotspotRoutingConfig {
     fun launchFromSnapshot(context: Context, snapshot: HotspotRoutingSnapshot): HotspotRoutingLaunchConfig =
         HotspotRoutingLaunchConfig(
             engine = engineFromSnapshot(snapshot),
+            dnsServers = snapshot.vpnDnsServers,
             assetPath = Utils.userAssetPath(context),
             xudpKey = Utils.getDeviceIdForXUDPBaseKey(),
         )

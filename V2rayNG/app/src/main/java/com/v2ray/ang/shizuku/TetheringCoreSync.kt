@@ -62,6 +62,7 @@ internal object TetheringCoreSync {
             profileName = profileName,
             useHev = useHev,
             coreConfig = coreConfig,
+            vpnDnsServers = SettingsManager.getVpnDnsServers(),
             socksPort = SettingsManager.getSocksPort(),
             socksUsername = SettingsManager.getSocksUsername(),
             socksPassword = SettingsManager.getSocksPassword(),

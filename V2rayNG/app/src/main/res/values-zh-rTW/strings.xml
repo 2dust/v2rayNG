@@ -467,6 +467,7 @@
     <string name="shizuku_hotspot_enabled">Wi-Fi 熱點已開啟</string>
     <string name="shizuku_hotspot_disabled">Wi-Fi 熱點已關閉</string>
     <string name="shizuku_hotspot_operation_failed">熱點操作失敗（錯誤 %1$d）</string>
+    <string name="shizuku_tethering_wrong_upstream">系統為網路共享選擇了錯誤的連線，操作已取消。請再試一次。</string>
     <string name="title_configuration_share">分享設定</string>
     <string name="title_webdav_config_setting">WebDAV 設定</string>
     <string name="title_webdav_config_setting_unknown">請先設定 WebDAV</string>

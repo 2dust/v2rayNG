@@ -22,6 +22,7 @@ import com.v2ray.ang.dto.HotspotRoutingSnapshot
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
+import com.v2ray.ang.extension.toastWarning
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.shizuku.HotspotRoutingConfig
 import com.v2ray.ang.shizuku.IShizukuTetheringService
@@ -261,6 +262,8 @@ class ShizukuActivity : BaseComponentActivity() {
                     detail = runCatching { service.routingDetail }.getOrDefault(""),
                     tetheringTypes = runCatching { service.activeTetheringTypes }
                         .getOrDefault(ShizukuTetheringService.TETHERING_TYPES_UNKNOWN),
+                    warning = runCatching { service.consumeWarning() }
+                        .getOrDefault(ShizukuTetheringService.RESULT_OK),
                 )
             }
             if (generation != operationGeneration) return@launch
@@ -271,6 +274,9 @@ class ShizukuActivity : BaseComponentActivity() {
                 activeTetheringTypes = status.tetheringTypes,
             )
             operationJob = null
+            if (status.warning == ShizukuTetheringService.RESULT_UNPROTECTED_UPSTREAM) {
+                toastWarning(R.string.shizuku_tethering_wrong_upstream)
+            }
         }
     }
 
@@ -319,7 +325,9 @@ class ShizukuActivity : BaseComponentActivity() {
                     callService { service.stopRouting() }
                     MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, "")
                 }
-                toastError(getString(R.string.shizuku_hotspot_operation_failed, result))
+                if (result != ShizukuTetheringService.RESULT_UNPROTECTED_UPSTREAM) {
+                    toastError(getString(R.string.shizuku_hotspot_operation_failed, result))
+                }
                 return@launchOperation
             }
 
@@ -403,6 +411,7 @@ class ShizukuActivity : BaseComponentActivity() {
                 launchConfig.engine.useHev,
                 launchConfig.engine.profileName,
                 launchConfig.engine.content,
+                launchConfig.dnsServers.toTypedArray(),
                 launchConfig.assetPath,
                 launchConfig.xudpKey,
                 syncToken,
@@ -475,6 +484,7 @@ class ShizukuActivity : BaseComponentActivity() {
         val routing: Int,
         val detail: String,
         val tetheringTypes: Int,
+        val warning: Int,
     )
 
     companion object {
