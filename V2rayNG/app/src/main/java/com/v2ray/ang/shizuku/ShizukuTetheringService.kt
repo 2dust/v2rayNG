@@ -705,7 +705,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
                 else -> TetheringPlatformCompat.stopTethering(
                     tetheringManager,
                     type,
-                    CALLBACK_TIMEOUT_SECONDS,
                 )
             }
         }.onFailure {
@@ -906,7 +905,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_744
+        const val USER_SERVICE_VERSION = 20_260_745
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"

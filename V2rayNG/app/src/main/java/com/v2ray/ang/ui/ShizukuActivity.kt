@@ -34,11 +34,11 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import rikka.shizuku.Shizuku
+import rikka.shizuku.ShizukuProvider
 
 class ShizukuActivity : BaseComponentActivity() {
     private var tetheringService: IShizukuTetheringService? = null
@@ -186,7 +186,7 @@ class ShizukuActivity : BaseComponentActivity() {
 
     private fun getShizukuStatus(): ShizukuStatus {
         if (!runCatching { Shizuku.pingBinder() }.getOrDefault(false)) {
-            return if (isPackageInstalled(SHIZUKU_PACKAGE_NAME)) {
+            return if (isPackageInstalled(ShizukuProvider.MANAGER_APPLICATION_ID)) {
                 ShizukuStatus.NOT_RUNNING
             } else {
                 ShizukuStatus.NOT_INSTALLED
@@ -211,26 +211,19 @@ class ShizukuActivity : BaseComponentActivity() {
     }
 
     private fun requestShizukuPermission() {
-        if (!runCatching { Shizuku.pingBinder() }.getOrDefault(false)) {
-            toastError(R.string.shizuku_status_not_running)
-            refreshShizukuStatus()
-            return
-        }
-
-        runCatching {
-            when {
-                Shizuku.isPreV11() -> toastError(R.string.shizuku_status_unsupported)
-                Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED -> {
-                    refreshShizukuStatus()
-                }
-                Shizuku.shouldShowRequestPermissionRationale() -> {
-                    toastError(R.string.shizuku_permission_denied)
-                }
-                else -> Shizuku.requestPermission(SHIZUKU_PERMISSION_REQUEST_CODE)
+        when (val status = getShizukuStatus()) {
+            ShizukuStatus.PERMISSION_REQUIRED -> runCatching {
+                Shizuku.requestPermission(SHIZUKU_PERMISSION_REQUEST_CODE)
+            }.onFailure {
+                toastError(it.message ?: getString(R.string.shizuku_operation_failed))
+                refreshShizukuStatus()
             }
-        }.onFailure {
-            toastError(it.message ?: getString(R.string.shizuku_operation_failed))
-            refreshShizukuStatus()
+
+            ShizukuStatus.READY -> refreshShizukuStatus()
+            else -> {
+                toastError(status.statusRes)
+                refreshShizukuStatus()
+            }
         }
     }
 
@@ -331,7 +324,6 @@ class ShizukuActivity : BaseComponentActivity() {
                 return@launchOperation
             }
 
-            uiState = uiState.copy(activeTetheringTypes = awaitTetheringTypes(service, enable))
             toastSuccess(
                 if (enable) R.string.shizuku_hotspot_enabled
                 else R.string.shizuku_hotspot_disabled
@@ -366,24 +358,6 @@ class ShizukuActivity : BaseComponentActivity() {
 
     private suspend fun callService(action: () -> Int): Int = withContext(Dispatchers.IO) {
         runCatching(action).getOrDefault(ShizukuTetheringService.RESULT_INTERNAL_ERROR)
-    }
-
-    private suspend fun awaitTetheringTypes(
-        service: IShizukuTetheringService,
-        enabled: Boolean,
-    ): Int {
-        var types = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN
-        val wifiBit = 1 shl ShizukuTetheringService.TETHERING_TYPE_WIFI
-        repeat(HOTSPOT_STATUS_POLL_COUNT) {
-            delay(HOTSPOT_STATUS_POLL_INTERVAL_MS)
-            types = withContext(Dispatchers.IO) {
-                runCatching { service.activeTetheringTypes }
-                    .getOrDefault(ShizukuTetheringService.TETHERING_TYPES_UNKNOWN)
-            }
-            val hotspotEnabled = types >= 0 && types and wifiBit != 0
-            if (types >= 0 && enabled == hotspotEnabled) return types
-        }
-        return types
     }
 
     private suspend fun startRouting(service: IShizukuTetheringService): Int {
@@ -488,10 +462,7 @@ class ShizukuActivity : BaseComponentActivity() {
     )
 
     companion object {
-        private const val SHIZUKU_PACKAGE_NAME = "moe.shizuku.privileged.api"
         private const val SHIZUKU_PERMISSION_REQUEST_CODE = 1001
-        private const val HOTSPOT_STATUS_POLL_COUNT = 6
-        private const val HOTSPOT_STATUS_POLL_INTERVAL_MS = 750L
         private const val CORE_SNAPSHOT_TIMEOUT_MS = 5_000L
     }
 }

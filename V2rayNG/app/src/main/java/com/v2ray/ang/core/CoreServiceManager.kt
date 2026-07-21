@@ -289,7 +289,7 @@ object CoreServiceManager {
 
         TetheringCoreSync.onStarted(
             service,
-            currentConfig?.remarks.orEmpty(),
+            getRunningServerName(),
             result.content,
             usesHevTun,
         )

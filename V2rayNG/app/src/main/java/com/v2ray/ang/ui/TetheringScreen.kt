@@ -35,7 +35,7 @@ internal enum class ShizukuStatus(
     val statusRes: Int,
     val detailsRes: Int?,
 ) {
-    CHECKING(R.string.shizuku_status_checking, R.string.shizuku_status_checking),
+    CHECKING(R.string.shizuku_status_checking, null),
     NOT_INSTALLED(R.string.shizuku_status_not_installed, R.string.shizuku_status_open_manager),
     NOT_RUNNING(R.string.shizuku_status_not_running, R.string.shizuku_status_open_manager),
     UNSUPPORTED(R.string.shizuku_status_unsupported, R.string.shizuku_status_update_required),

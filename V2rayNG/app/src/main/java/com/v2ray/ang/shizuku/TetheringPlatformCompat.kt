@@ -3,7 +3,6 @@ package com.v2ray.ang.shizuku
 import android.annotation.SuppressLint
 import android.net.TetheringManager
 import android.os.Build
-import android.util.Log
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
@@ -98,33 +97,16 @@ internal object TetheringPlatformCompat {
         }
     }
 
-    fun stopTethering(service: Any, type: Int, timeoutSeconds: Long): Int {
+    // The service performs the shared postcondition check after this legacy API returns, so
+    // Android 13-15 follows the same single bounded wait as newer releases.
+    fun stopTethering(service: Any, type: Int): Int {
         require(Build.VERSION.SDK_INT in Build.VERSION_CODES.TIRAMISU until Build.VERSION_CODES.BAKLAVA)
-        return try {
-            val method = service.javaClass.methods.firstOrNull {
-                it.name == "stopTethering" &&
-                    it.parameterTypes.contentEquals(arrayOf(Integer.TYPE))
-            } ?: error("TetheringManager.stopTethering(int) is unavailable")
-            method.invoke(service, type)
-
-            val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(timeoutSeconds)
-            val bit = tetheringTypeBit(type)
-            while (System.nanoTime() < deadline) {
-                if (getActiveTetheringTypes(service) and bit == 0) {
-                    return ShizukuTetheringService.RESULT_OK
-                }
-                Thread.sleep(LEGACY_STOP_POLL_MILLIS)
-            }
-            Log.e(TAG, "Timed out waiting for legacy tethering type $type to stop")
-            ShizukuTetheringService.RESULT_INTERNAL_ERROR
-        } catch (error: InterruptedException) {
-            Thread.currentThread().interrupt()
-            Log.e(TAG, "Interrupted while stopping legacy tethering type $type", error)
-            ShizukuTetheringService.RESULT_INTERNAL_ERROR
-        } catch (error: Throwable) {
-            Log.e(TAG, "Unable to stop legacy tethering type $type", error)
-            ShizukuTetheringService.RESULT_INTERNAL_ERROR
-        }
+        val method = service.javaClass.methods.firstOrNull {
+            it.name == "stopTethering" &&
+                it.parameterTypes.contentEquals(arrayOf(Integer.TYPE))
+        } ?: error("TetheringManager.stopTethering(int) is unavailable")
+        method.invoke(service, type)
+        return ShizukuTetheringService.RESULT_OK
     }
 
     internal fun inferLegacyTetheringType(interfaceName: String): Int? {
@@ -155,10 +137,8 @@ internal object TetheringPlatformCompat {
     private fun compileRegexes(patterns: List<String>?): List<Regex> = patterns.orEmpty()
         .mapNotNull { pattern -> runCatching { Regex(pattern) }.getOrNull() }
 
-    private const val TAG = "ShizukuTethering"
     private const val UPSTREAM_INTERFACES_PREFIX = "Current upstream interface(s):"
     private const val LEGACY_TETHERING_TYPE_BLUETOOTH = 2
-    private const val LEGACY_STOP_POLL_MILLIS = 100L
 }
 
 internal fun tetheringTypeBit(type: Int): Int = if (type in 0..30) 1 shl type else 0
