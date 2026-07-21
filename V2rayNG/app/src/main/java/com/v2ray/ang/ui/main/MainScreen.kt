@@ -31,7 +31,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.compose.LocalDarkTheme
 import com.v2ray.ang.compose.QRCodeDialog
 import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch

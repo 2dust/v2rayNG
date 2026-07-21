@@ -115,58 +115,58 @@
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.SettingsActivity"
+            android:name=".ui.settings.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.PerAppProxyActivity"
+            android:name=".ui.perappproxy.PerAppProxyActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.AppPickerActivity"
+            android:name=".ui.apppicker.AppPickerActivity"
             android:exported="false" />
         <activity
             android:name=".ui.ScannerActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.LogcatActivity"
+            android:name=".ui.logcat.LogcatActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.RoutingSettingActivity"
+            android:name=".ui.routing.RoutingSettingActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.RoutingEditActivity"
+            android:name=".ui.routing.RoutingEditActivity"
             android:windowSoftInputMode="stateUnchanged|adjustResize"
             android:exported="false" />
         <activity
-            android:name=".ui.SubSettingActivity"
+            android:name=".ui.subscription.SubSettingActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.UserAssetActivity"
+            android:name=".ui.userasset.UserAssetActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.UserAssetUrlActivity"
+            android:name=".ui.userasset.UserAssetUrlActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ui.SubEditActivity"
+            android:name=".ui.subscription.SubEditActivity"
             android:windowSoftInputMode="stateUnchanged|adjustResize"
             android:exported="false" />
         <activity
-            android:name=".ui.ScScannerActivity"
+            android:name=".ui.shortcut.ScScannerActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.ScSwitchActivity"
+            android:name=".ui.shortcut.ScSwitchActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:process=":RunSoLibV2RayDaemon"
             android:theme="@style/AppThemeDayNight.NoActionBar.Translucent" />
         <activity
-            android:name=".ui.ScStartActivity"
+            android:name=".ui.shortcut.ScStartActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:process=":RunSoLibV2RayDaemon"
             android:theme="@style/AppThemeDayNight.NoActionBar.Translucent" />
         <activity
-            android:name=".ui.ScStopActivity"
+            android:name=".ui.shortcut.ScStopActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:process=":RunSoLibV2RayDaemon"
@@ -192,10 +192,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.CheckUpdateActivity"
+            android:name=".ui.checkupdate.CheckUpdateActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.BackupActivity"
+            android:name=".ui.backup.BackupActivity"
             android:exported="false" />
         <activity
             android:name=".ui.AboutActivity"
@@ -292,7 +292,7 @@
         </service>
         <!-- =====================Tasker===================== -->
         <activity
-            android:name=".ui.TaskerActivity"
+            android:name=".ui.shortcut.TaskerActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher">
             <intent-filter>

@@ -19,7 +19,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.compose.colorFabActive
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.entities.ServersCache
-import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable

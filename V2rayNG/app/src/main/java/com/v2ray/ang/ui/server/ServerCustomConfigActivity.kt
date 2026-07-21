@@ -67,7 +67,7 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.ui.BaseComponentActivity
+import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.flow.collectLatest
 

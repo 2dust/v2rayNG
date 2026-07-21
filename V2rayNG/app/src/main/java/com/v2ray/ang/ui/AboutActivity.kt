@@ -33,6 +33,7 @@ import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.SettingsMenuItem
 import com.v2ray.ang.compose.VersionInfoBlock
 import com.v2ray.ang.core.CoreNativeManager
+import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.util.Utils
 
 class AboutActivity : BaseComponentActivity() {

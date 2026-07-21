@@ -49,7 +49,7 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.CertificateFingerprintManager
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.ui.BaseComponentActivity
+import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

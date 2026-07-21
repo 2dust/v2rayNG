@@ -47,7 +47,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.ui.BaseComponentActivity
+import com.v2ray.ang.ui.base.BaseComponentActivity
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 

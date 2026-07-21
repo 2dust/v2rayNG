@@ -56,7 +56,6 @@ import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.viewmodel.MainViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import sh.calvin.reorderable.rememberReorderableLazyListState

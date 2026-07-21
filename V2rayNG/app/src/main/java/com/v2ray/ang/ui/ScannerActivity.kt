@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Size as TargetSize
@@ -68,7 +67,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.enums.PermissionType
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import java.util.concurrent.Executors
