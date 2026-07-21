@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.R
 
 @Composable
 fun ConfirmDialog(
@@ -175,7 +174,9 @@ fun SelectListDialog(
                             text = option,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = if (!showRadio)
-                                Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 4.dp)
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp, horizontal = 4.dp)
                             else Modifier
                         )
                     }

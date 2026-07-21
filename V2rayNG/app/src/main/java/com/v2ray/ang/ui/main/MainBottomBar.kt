@@ -5,15 +5,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,8 +36,7 @@ fun MainBottomBar(
     displayText: String,
     isRunning: Boolean,
     isDarkTheme: Boolean,
-    onTestClick: () -> Unit,
-    onFabClick: () -> Unit
+    onAction: (MainAction) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -47,7 +46,7 @@ fun MainBottomBar(
                     .fillMaxWidth()
                     .windowInsetsPadding(WindowInsets.navigationBars)
                     .height(64.dp)
-                    .clickable(onClick = onTestClick),
+                    .clickable(onClick = { onAction(MainAction.TestCurrentServer) }),
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 0.dp
             ) {
@@ -63,7 +62,7 @@ fun MainBottomBar(
             }
         }
         FloatingActionButton(
-            onClick = onFabClick,
+            onClick = { onAction(MainAction.ToggleService) },
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(end = 24.dp)

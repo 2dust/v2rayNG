@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.R
 
 @Composable
 fun PreferenceGroupHeader(title: String, modifier: Modifier = Modifier) {
@@ -50,8 +49,10 @@ private fun SettingsItemRow(
     modifier: Modifier = Modifier,
     trailing: @Composable (() -> Unit)? = null
 ) {
-    val contentColor = if (enabled) MaterialTheme.colorScheme.onSurface
-    else MaterialTheme.colorScheme.onSurfaceVariant
+    val titleColor = if (enabled) MaterialTheme.colorScheme.onSurface
+    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    val descriptionColor = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant
+    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
 
     Row(
         modifier = modifier
@@ -65,7 +66,7 @@ private fun SettingsItemRow(
                 painter = icon,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                tint = contentColor
+                tint = titleColor
             )
             Spacer(modifier = Modifier.width(16.dp))
         }
@@ -73,14 +74,14 @@ private fun SettingsItemRow(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
-                color = contentColor
+                color = titleColor
             )
             if (!description.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = descriptionColor
                 )
             }
         }
@@ -111,7 +112,9 @@ fun SettingsEditItem(
         title = title,
         description = description,
         enabled = enabled,
-        onClick = if (enabled) { { showDialog = true } } else null,
+        onClick = if (enabled) {
+            { showDialog = true }
+        } else null,
         modifier = modifier
     )
 
@@ -155,7 +158,9 @@ fun SettingsListItem(
         title = title,
         description = summary.ifEmpty { null },
         enabled = enabled,
-        onClick = if (enabled) { { showDialog = true } } else null,
+        onClick = if (enabled) {
+            { showDialog = true }
+        } else null,
         modifier = modifier
     )
 
@@ -207,7 +212,9 @@ fun SettingsSwitchItem(
         title = title,
         description = summary,
         enabled = enabled,
-        onClick = if (enabled) { { onCheckedChange(!checked) } } else null,
+        onClick = if (enabled) {
+            { onCheckedChange(!checked) }
+        } else null,
         modifier = modifier,
         trailing = {
             Switch(

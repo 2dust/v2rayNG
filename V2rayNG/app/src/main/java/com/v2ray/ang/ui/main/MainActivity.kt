@@ -1,8 +1,6 @@
 package com.v2ray.ang.ui.main
 
-import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
@@ -26,15 +24,12 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.AboutActivity
-import com.v2ray.ang.ui.BackupActivity
-import com.v2ray.ang.ui.CheckUpdateActivity
-import com.v2ray.ang.ui.HelperBaseComponentActivity
-import com.v2ray.ang.ui.LogcatActivity
-import com.v2ray.ang.ui.PerAppProxyActivity
-import com.v2ray.ang.ui.RoutingSettingActivity
-import com.v2ray.ang.ui.SettingsActivity
-import com.v2ray.ang.ui.SubSettingActivity
-import com.v2ray.ang.ui.UserAssetActivity
+import com.v2ray.ang.ui.backup.BackupActivity
+import com.v2ray.ang.ui.base.HelperBaseComponentActivity
+import com.v2ray.ang.ui.checkupdate.CheckUpdateActivity
+import com.v2ray.ang.ui.logcat.LogcatActivity
+import com.v2ray.ang.ui.perappproxy.PerAppProxyActivity
+import com.v2ray.ang.ui.routing.RoutingSettingActivity
 import com.v2ray.ang.ui.server.ProfileEditorResult
 import com.v2ray.ang.ui.server.ServerCustomConfigActivity
 import com.v2ray.ang.ui.server.ServerGroupActivity
@@ -47,9 +42,11 @@ import com.v2ray.ang.ui.server.ServerTrojanActivity
 import com.v2ray.ang.ui.server.ServerVlessActivity
 import com.v2ray.ang.ui.server.ServerVmessActivity
 import com.v2ray.ang.ui.server.ServerWireguardActivity
+import com.v2ray.ang.ui.settings.SettingsActivity
+import com.v2ray.ang.ui.subscription.SubSettingActivity
+import com.v2ray.ang.ui.userasset.UserAssetActivity
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
-import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -57,7 +54,7 @@ import kotlinx.coroutines.withContext
 class MainActivity : HelperBaseComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels {
-        MainViewModel.Factory(MainRepository(application as AngApplication))
+        MainViewModel.Factory(application, MainRepository(application as AngApplication))
     }
 
     private val requestVpnPermission =
@@ -67,7 +64,7 @@ class MainActivity : HelperBaseComponentActivity() {
 
     private val profileEditorLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+            if (result.resultCode != RESULT_OK) return@registerForActivityResult
             val data = result.data ?: return@registerForActivityResult
             val action = data.getStringExtra(ProfileEditorResult.EXTRA_ACTION)
                 ?: return@registerForActivityResult
@@ -103,40 +100,33 @@ class MainActivity : HelperBaseComponentActivity() {
     override fun ScreenContent() {
         MainScreen(
             mainViewModel = mainViewModel,
-            onFabClick = ::handleFabAction,
-            onTestClick = ::handleLayoutTestClick,
-            onNavigate = ::navigateTo,
-            onImportManually = ::importManually,
-            onImportQRcode = ::importQRcode,
-            onImportClipboard = ::importClipboard,
-            onImportLocal = ::importConfigLocal,
-            onSubUpdate = ::importConfigViaSub,
-            onExportAll = { mainViewModel.onAction(MainAction.ExportAll) },
-            onRealPingAll = { mainViewModel.onAction(MainAction.TestAllServers) },
-            onRestartService = ::restartV2Ray,
-            onDelAllConfig = { mainViewModel.onAction(MainAction.RemoveAllServers) },
-            onDelDuplicateConfig = { mainViewModel.onAction(MainAction.RemoveDuplicateServers) },
-            onDelInvalidConfig = { mainViewModel.onAction(MainAction.RemoveInvalidServers) },
-            onSortByTestResults = { mainViewModel.onAction(MainAction.SortByTestResults) },
-            onEditServer = ::editServer,
-            onRemoveServer = { guid -> mainViewModel.onAction(MainAction.RemoveServer(guid)) },
-            onSelectServer = ::setSelectServer,
-            onShareQRCode = ::getShareQRCodeBitmap,
-            onShareClipboard = ::shareToClipboard,
-            onShareFullContent = ::shareFullContentAsync,
-            onSubscriptionIdChanged = { id -> mainViewModel.onAction(MainAction.SelectGroup(id)) },
-            onLocateSelectedServer = { mainViewModel.triggerLocateSelectedServer() },
+            onAction = { action ->
+                when (action) {
+                    MainAction.ToggleService -> handleFabAction()
+                    MainAction.TestCurrentServer -> handleLayoutTestClick()
+                    MainAction.ImportQRcode -> importQRcode()
+                    MainAction.ImportClipboard -> importClipboard()
+                    MainAction.ImportConfigLocal -> importConfigLocal()
+                    is MainAction.ImportManually -> importManually(action.type)
+                    MainAction.RestartService -> restartV2Ray()
+                    MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
+                    is MainAction.SelectServer -> setSelectServer(action.guid)
+                    is MainAction.EditServer -> editServer(action.guid, action.profile)
+                    is MainAction.ShareClipboard -> shareToClipboard(action.guid)
+                    is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
+                    else -> mainViewModel.onAction(action)
+                }
+            },
+            onNavigate = { route -> navigateTo(route) },
             shareMethodEntries = resources.getStringArray(R.array.share_method).toList(),
             shareMethodMoreEntries = resources.getStringArray(R.array.share_method_more).toList()
         )
     }
 
-    fun getShareQRCodeBitmap(guid: String): Bitmap? = AngConfigManager.share2QRCode(guid)
-
-    fun shareToClipboard(guid: String): Boolean =
+    private fun shareToClipboard(guid: String): Boolean =
         AngConfigManager.share2Clipboard(this, guid) == 0
 
-    fun shareFullContentAsync(guid: String) {
+    private fun shareFullContentAsync(guid: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             val result = AngConfigManager.shareFullContent2Clipboard(this@MainActivity, guid)
             withContext(Dispatchers.Main) {
@@ -164,6 +154,7 @@ class MainActivity : HelperBaseComponentActivity() {
                 )
                 return
             }
+
             else -> return
         }
         settingsActivityLauncher.launch(intent)
@@ -256,10 +247,6 @@ class MainActivity : HelperBaseComponentActivity() {
                 LogUtil.e(AppConfig.TAG, "Failed to read content from URI", e)
             }
         }
-    }
-
-    private fun importConfigViaSub() {
-        mainViewModel.onAction(MainAction.ImportConfigViaSub)
     }
 
     private fun editServer(guid: String, profile: ProfileItem) {

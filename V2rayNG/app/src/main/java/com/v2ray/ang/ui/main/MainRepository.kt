@@ -51,17 +51,21 @@ class MainRepository(
                 AppConfig.MSG_STATE_START_FAILURE -> MainServiceEvent.StateStartFailure(
                     safeIntent.getStringExtra("content").orEmpty()
                 )
+
                 AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess
                 AppConfig.MSG_MEASURE_DELAY_SUCCESS -> MainServiceEvent.MeasureDelaySuccess(
                     safeIntent.getStringExtra("content").orEmpty()
                 )
+
                 AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> MainServiceEvent.MeasureConfigSuccess
                 AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> MainServiceEvent.MeasureConfigNotify(
                     safeIntent.getStringExtra("content").orEmpty()
                 )
+
                 AppConfig.MSG_MEASURE_CONFIG_FINISH -> MainServiceEvent.MeasureConfigFinish(
                     safeIntent.getStringExtra("content")
                 )
+
                 else -> null
             }
             event?.let { _mainServiceEvent.tryEmit(it) }
@@ -200,6 +204,12 @@ class MainRepository(
 
     override fun shareNonCustomConfigsToClipboard(guids: List<String>): Int =
         AngConfigManager.shareNonCustomConfigsToClipboard(app, guids)
+
+    override fun share2QRCode(guid: String): android.graphics.Bitmap? =
+        AngConfigManager.share2QRCode(guid)
+
+    override fun share2Clipboard(guid: String): Boolean =
+        AngConfigManager.share2Clipboard(app, guid) == 0
 
     override fun sendMsg2Service(msgId: Int, content: String) =
         MessageUtil.sendMsg2Service(app, msgId, content)

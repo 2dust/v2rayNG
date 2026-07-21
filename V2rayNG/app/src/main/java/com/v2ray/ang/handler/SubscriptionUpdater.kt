@@ -5,7 +5,9 @@ import android.content.Context
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.multiprocess.RemoteWorkManager
@@ -13,10 +15,16 @@ import androidx.work.workDataOf
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.core.CoreNativeManager
+import com.v2ray.ang.dto.RealPingEvent
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.enums.NotificationChannelType
+import com.v2ray.ang.service.RealPingWorkerService
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.NotificationHelper
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import java.util.concurrent.TimeUnit
 
 object SubscriptionUpdater {
@@ -48,7 +56,6 @@ object SubscriptionUpdater {
             scheduleOne(
                 context = context,
                 subId = sub.guid,
-                shouldRun = sub.subscription.autoUpdate,
                 existingWorkPolicy = existingWorkPolicy
             )
         }
@@ -63,11 +70,9 @@ object SubscriptionUpdater {
      * Call from: SubEditActivity after saving, after a manual update (to reset the timer).
      */
     fun syncOne(context: Context = AngApplication.application, subId: String) {
-        val subItem = MmkvManager.decodeSubscription(subId) ?: return
         scheduleOne(
             context = context,
             subId = subId,
-            shouldRun = subItem.autoUpdate,
             existingWorkPolicy = ExistingPeriodicWorkPolicy.REPLACE
         )
     }
@@ -81,26 +86,62 @@ object SubscriptionUpdater {
             .cancelUniqueWork(taskName(subId))
     }
 
+    /**
+     * Update all subscriptions immediately in the background.
+     * Call from: SubscriptionsViewModel.updateSubscriptions().
+     */
+    fun updateAllByManual(context: Context = AngApplication.application) {
+        LogUtil.i(AppConfig.TAG, "SubscriptionUpdater: manual updateAll triggered")
+        val rw = RemoteWorkManager.getInstance(context)
+
+        MmkvManager.decodeSubscriptions().forEach { sub ->
+            if (!sub.subscription.enabled || sub.subscription.url.isEmpty()) {
+                return@forEach
+            }
+            val subId = sub.guid
+            val request = OneTimeWorkRequestBuilder<UpdateTask>()
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build()
+                )
+                .setInputData(
+                    workDataOf(
+                        KEY_SUB_ID to subId,
+                    )
+                )
+                .addTag(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
+                .build()
+
+            rw.enqueueUniqueWork(
+                "${taskName(subId)}_manual",
+                ExistingWorkPolicy.KEEP,
+                request
+            )
+            LogUtil.d(AppConfig.TAG, "SubscriptionUpdater: enqueued manual task for ${sub.subscription.remarks} ($subId)")
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Internal scheduling logic
     // -------------------------------------------------------------------------
+
+    private val updateSemaphore = Semaphore(2)
 
     private fun taskName(subId: String) = "${AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME}_$subId"
 
     private fun scheduleOne(
         context: Context,
         subId: String,
-        shouldRun: Boolean,
         existingWorkPolicy: ExistingPeriodicWorkPolicy
     ) {
+        val subItem = MmkvManager.decodeSubscription(subId) ?: return
         val rw = RemoteWorkManager.getInstance(context)
-        if (!shouldRun) {
-            rw.cancelUniqueWork(taskName(subId))
-            LogUtil.d(AppConfig.TAG, "SubscriptionUpdater: cancelled task for $subId")
+        if (!subItem.autoUpdate) {
+            cancelOne(context, subId)
+            LogUtil.d(AppConfig.TAG, "SubscriptionUpdater: cancelled task for ${subItem.remarks}")
             return
         }
-
-        val subItem = MmkvManager.decodeSubscription(subId) ?: return
 
         val intervalMinutes = maxOf(
             AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES,
@@ -136,7 +177,7 @@ object SubscriptionUpdater {
 
         LogUtil.i(
             AppConfig.TAG,
-            "SubscriptionUpdater: scheduled [$subId] interval=${intervalMinutes}min " +
+            "SubscriptionUpdater: scheduled [${subItem.remarks}] interval=${intervalMinutes}min " +
                     "initialDelay=${initialDelayMillis / 1000}s policy=$existingWorkPolicy"
         )
     }
@@ -151,9 +192,9 @@ object SubscriptionUpdater {
         CoroutineWorker(context, params) {
 
         @SuppressLint("MissingPermission")
-        override suspend fun doWork(): Result {
+        override suspend fun doWork(): Result = updateSemaphore.withPermit {
             val subId = inputData.getString(KEY_SUB_ID)
-            LogUtil.i(AppConfig.TAG, "SubscriptionUpdater automatic update starting: $subId")
+            LogUtil.i(AppConfig.TAG, "SubscriptionUpdater update starting: $subId")
 
             if (subId.isNullOrEmpty()) {
                 LogUtil.w(AppConfig.TAG, "SubscriptionUpdater: missing subId in worker input")
@@ -166,28 +207,106 @@ object SubscriptionUpdater {
                 return Result.success()
             }
 
-            if (!subItem.autoUpdate) {
-                LogUtil.i(AppConfig.TAG, "SubscriptionUpdater: auto-update disabled for $subId, skip")
+            if (subItem.url.isEmpty()) {
+                LogUtil.i(AppConfig.TAG, "SubscriptionUpdater: url isEmpty for ${subItem.remarks}, skip")
                 return Result.success()
             }
 
             val sub = SubscriptionCache(subId, subItem)
 
             // Notify about update start
-            NotificationHelper.notify(
-                NotificationChannelType.SUBSCRIPTION_UPDATE,
+            showNotification(
                 applicationContext,
-                applicationContext.getString(R.string.title_pref_auto_update_subscription),
+                R.string.title_pref_auto_update_subscription,
                 "Updating ${sub.subscription.remarks}"
             )
 
-            LogUtil.i(AppConfig.TAG, "SubscriptionUpdater automatic update: ---${sub.subscription.remarks}")
+            LogUtil.i(AppConfig.TAG, "SubscriptionUpdater update: ---${subItem.remarks}")
             AngConfigManager.updateConfigViaSub(sub)
+
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_TEST_AFTER_UPDATE_SUBSCRIPTION, false)) {
+                testSubscriptionServers(applicationContext, sub)
+
+                if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST, false)) {
+                    LogUtil.i(AppConfig.TAG, "SubscriptionUpdater: removing invalid servers for ${subItem.remarks}")
+                    showNotification(
+                        applicationContext,
+                        R.string.title_del_invalid_config,
+                        sub.subscription.remarks
+                    )
+                    AngConfigManager.removeInvalidServer(subId)
+                }
+                if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SORT_AFTER_TEST, false)) {
+                    LogUtil.i(AppConfig.TAG, "SubscriptionUpdater: sorting servers for ${subItem.remarks}")
+                    showNotification(
+                        applicationContext,
+                        R.string.title_sort_by_test_results,
+                        sub.subscription.remarks
+                    )
+                    AngConfigManager.sortByTestResultsForSub(subId)
+                }
+            }
 
             // Clear notification
             NotificationHelper.cancel(NotificationChannelType.SUBSCRIPTION_UPDATE, applicationContext)
 
+            // Reset periodic task timer to align with this successful update
+            syncOne(applicationContext, subId)
+
+            LogUtil.i(AppConfig.TAG, "SubscriptionUpdater update finished and rescheduled: ${subItem.remarks}")
+
             return Result.success()
         }
+    }
+
+    private suspend fun testSubscriptionServers(context: Context, sub: SubscriptionCache) {
+        val subId = sub.guid
+        LogUtil.i(AppConfig.TAG, "SubscriptionUpdater: starting test phase for ${sub.subscription.remarks}")
+        showNotification(
+            context,
+            R.string.title_real_ping_all_server,
+            sub.subscription.remarks
+        )
+        CoreNativeManager.initCoreEnv(context)
+        val guids = MmkvManager.decodeServerList(subId)
+        if (guids.isNotEmpty()) {
+            val deferred = CompletableDeferred<Unit>()
+            val worker = RealPingWorkerService(
+                context = context,
+                guids = guids,
+                onEvent = { event ->
+                    when (event) {
+                        is RealPingEvent.Progress -> {
+                            showNotification(
+                                context,
+                                R.string.title_real_ping_all_server,
+                                "${event.text} in ${sub.subscription.remarks}"
+                            )
+                            LogUtil.i(AppConfig.TAG, "SubscriptionUpdater: ${event.text} in ${sub.subscription.remarks}")
+                        }
+
+                        is RealPingEvent.Result -> {
+                            MmkvManager.encodeServerTestDelayMillis(event.guid, event.delayMillis)
+                        }
+
+                        is RealPingEvent.Finish -> {
+                            deferred.complete(Unit)
+                        }
+                    }
+                }
+            )
+            worker.start()
+            deferred.await()
+            LogUtil.i(AppConfig.TAG, "SubscriptionUpdater: test phase finished for ${sub.subscription.remarks}")
+        }
+    }
+
+    private fun showNotification(context: Context, titleResId: Int, content: String) {
+        NotificationHelper.notify(
+            NotificationChannelType.SUBSCRIPTION_UPDATE,
+            context,
+            context.getString(titleResId),
+            content
+        )
     }
 }

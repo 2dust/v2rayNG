@@ -67,7 +67,7 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.ui.BaseComponentActivity
+import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.flow.collectLatest
 
@@ -268,8 +268,10 @@ fun ServerCustomConfigScreen(
                 val targetY = when {
                     lineBottom > scrollY + vh - pad ->
                         (lineBottom - vh + pad).toInt()
+
                     lineTop < scrollY + pad ->
                         (lineTop - pad).toInt()
+
                     else -> null
                 }
                 targetY?.let {
@@ -288,9 +290,11 @@ fun ServerCustomConfigScreen(
                 val targetX = when {
                     cursorX < scrollX + pad ->
                         (cursorX - pad).toInt().coerceAtLeast(0)
+
                     cursorX > scrollX + vw - pad ->
                         (cursorX - vw + pad).toInt()
                             .coerceAtMost(horizontalScroll.maxValue)
+
                     else -> null
                 }
                 targetX?.let {

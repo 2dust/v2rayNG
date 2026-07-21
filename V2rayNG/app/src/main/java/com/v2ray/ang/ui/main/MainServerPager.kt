@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppDivider
+import com.v2ray.ang.compose.ItemDivider
 import com.v2ray.ang.compose.ReorderableGridItem
 import com.v2ray.ang.compose.ReorderableListItem
 import com.v2ray.ang.compose.colorConfigType
@@ -56,7 +56,6 @@ import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.viewmodel.MainViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -208,7 +207,7 @@ private fun ServerListPage(
                                 onRemoveServer = onRemoveServer
                             )
                         }
-                        AppDivider(modifier = Modifier.padding(horizontal = 12.dp))
+                        ItemDivider()
                     }
                 } else {
                     ServerItemRow(
@@ -221,7 +220,7 @@ private fun ServerListPage(
                         onMoreServer = onMoreServer,
                         onRemoveServer = onRemoveServer
                     )
-                    AppDivider(modifier = Modifier.padding(horizontal = 12.dp))
+                    ItemDivider()
                 }
             }
         }
@@ -295,7 +294,7 @@ private fun ServerItemColumn(
             onRemove = { onRemoveServer(serverCache.guid) },
             onMore = { onMoreServer(serverCache.guid, profile) }
         )
-        AppDivider(modifier = Modifier.padding(horizontal = 12.dp))
+        ItemDivider()
     }
 }
 
@@ -318,18 +317,36 @@ fun ServerListItem(
     dragModifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min).clickable(onClick = onClick).then(dragModifier)
+        modifier = modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .clickable(onClick = onClick)
+            .then(dragModifier)
     ) {
-        Box(Modifier.width(10.dp).fillMaxHeight()) {
+        Box(
+            Modifier
+                .width(10.dp)
+                .fillMaxHeight()
+        ) {
             if (isSelected) {
                 Row {
                     Spacer(Modifier.width(6.dp))
-                    Box(Modifier.width(4.dp).fillMaxHeight().padding(vertical = 10.dp).background(MaterialTheme.colorScheme.primary))
+                    Box(
+                        Modifier
+                            .width(4.dp)
+                            .fillMaxHeight()
+                            .padding(vertical = 10.dp)
+                            .background(MaterialTheme.colorScheme.primary)
+                    )
                 }
             }
         }
 
-        Column(Modifier.weight(1f).padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)) {
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
+        ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(remarks, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge.copy(lineBreak = LineBreak.Paragraph), maxLines = 2, overflow = TextOverflow.Ellipsis)
                 if (doubleColumnDisplay) {
@@ -345,7 +362,12 @@ fun ServerListItem(
             Spacer(modifier = Modifier.height(6.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 if (subscriptionRemarks.isNotBlank()) {
-                    Box(Modifier.size(24.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)), Alignment.Center) {
+                    Box(
+                        Modifier
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)), Alignment.Center
+                    ) {
                         Text(subscriptionRemarks.take(1).uppercase(), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     }
                 }

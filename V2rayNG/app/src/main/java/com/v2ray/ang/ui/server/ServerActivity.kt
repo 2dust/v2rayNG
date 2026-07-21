@@ -3,8 +3,8 @@ package com.v2ray.ang.ui.server
 import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,8 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -49,7 +49,7 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.CertificateFingerprintManager
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.ui.BaseComponentActivity
+import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -377,13 +377,21 @@ fun ServerScreen(
             if (configType != EConfigType.HYSTERIA2) item { FormTextField(stringResource(R.string.server_lab_port), port, { port = it }, keyboardType = KeyboardType.Number) }
             when {
                 isVmess || isTrojan || isShadowsocks || isHysteria2 -> item {
-                    FormTextField(stringResource(when { isTrojan||isShadowsocks||isHysteria2 -> R.string.server_lab_id3 else -> R.string.server_lab_id }), password, { password = it })
+                    FormTextField(
+                        stringResource(
+                            when {
+                                isTrojan || isShadowsocks || isHysteria2 -> R.string.server_lab_id3
+                                else -> R.string.server_lab_id
+                            }
+                        ), password, { password = it })
                 }
+
                 isVless -> {
                     item { FormTextField(stringResource(R.string.server_lab_id), password, { password = it }) }
                     item { FormTextField(stringResource(R.string.server_lab_encryption), encryption, { encryption = it }) }
                     item { FormDropdownField(stringResource(R.string.server_lab_flow), flow, flowOptions, { flow = it }) }
                 }
+
                 isSocksOrHttp -> {
                     item { FormTextField(stringResource(R.string.server_lab_security4), username, { username = it }) }
                     item { FormTextField(stringResource(R.string.server_lab_id4), password, { password = it }) }
@@ -417,26 +425,40 @@ fun ServerScreen(
             if (headerOptions.size > 1) {
                 item {
                     FormDropdownField(
-                        stringResource(when (network) { NetworkType.GRPC.type -> R.string.server_lab_mode_type; NetworkType.XHTTP.type -> R.string.server_lab_xhttp_mode; else -> R.string.server_lab_head_type }),
+                        stringResource(
+                            when (network) {
+                                NetworkType.GRPC.type -> R.string.server_lab_mode_type; NetworkType.XHTTP.type -> R.string.server_lab_xhttp_mode; else -> R.string.server_lab_head_type
+                            }
+                        ),
                         headerType, headerOptions, { headerType = it }
                     )
                 }
             }
-            item { FormTextField(stringResource(when (network) {
-                NetworkType.TCP.type, NetworkType.HTTP_UPGRADE.type, NetworkType.XHTTP.type, NetworkType.H2.type -> R.string.server_lab_request_host_http
-                NetworkType.WS.type -> R.string.server_lab_request_host_ws
-                NetworkType.GRPC.type -> R.string.server_lab_request_host_grpc
-                else -> R.string.server_lab_request_host6
-            }), host, { host = it }) }
-            item { FormTextField(stringResource(when (network) {
-                NetworkType.KCP.type -> R.string.server_lab_path_kcp
-                NetworkType.WS.type -> R.string.server_lab_path_ws
-                NetworkType.HTTP_UPGRADE.type -> R.string.server_lab_path_httpupgrade
-                NetworkType.XHTTP.type -> R.string.server_lab_path_xhttp
-                NetworkType.H2.type -> R.string.server_lab_path_h2
-                NetworkType.GRPC.type -> R.string.server_lab_path_grpc
-                else -> R.string.server_lab_path
-            }), path, { path = it }) }
+            item {
+                FormTextField(
+                    stringResource(
+                        when (network) {
+                            NetworkType.TCP.type, NetworkType.HTTP_UPGRADE.type, NetworkType.XHTTP.type, NetworkType.H2.type -> R.string.server_lab_request_host_http
+                            NetworkType.WS.type -> R.string.server_lab_request_host_ws
+                            NetworkType.GRPC.type -> R.string.server_lab_request_host_grpc
+                            else -> R.string.server_lab_request_host6
+                        }
+                    ), host, { host = it })
+            }
+            item {
+                FormTextField(
+                    stringResource(
+                        when (network) {
+                            NetworkType.KCP.type -> R.string.server_lab_path_kcp
+                            NetworkType.WS.type -> R.string.server_lab_path_ws
+                            NetworkType.HTTP_UPGRADE.type -> R.string.server_lab_path_httpupgrade
+                            NetworkType.XHTTP.type -> R.string.server_lab_path_xhttp
+                            NetworkType.H2.type -> R.string.server_lab_path_h2
+                            NetworkType.GRPC.type -> R.string.server_lab_path_grpc
+                            else -> R.string.server_lab_path
+                        }
+                    ), path, { path = it })
+            }
             if (network == NetworkType.XHTTP.type) {
                 item { FormTextField(stringResource(R.string.server_lab_xhttp_extra), xhttpExtra, { xhttpExtra = it }) }
             }
@@ -462,8 +484,12 @@ fun ServerScreen(
                     item {
                         Button(
                             onClick = {
-                                if (address.isBlank()) { context.toast(R.string.server_lab_address); return@Button }
-                                if (configType != EConfigType.HYSTERIA2 && (port.toIntOrNull() ?: 0) <= 0) { context.toast(R.string.server_lab_port); return@Button }
+                                if (address.isBlank()) {
+                                    context.toast(R.string.server_lab_address); return@Button
+                                }
+                                if (configType != EConfigType.HYSTERIA2 && (port.toIntOrNull() ?: 0) <= 0) {
+                                    context.toast(R.string.server_lab_port); return@Button
+                                }
                                 val temp = buildProfileItem()
                                 scope.launch {
                                     isFetchingCert = true
@@ -473,7 +499,9 @@ fun ServerScreen(
                                             pinnedCA256 = sha256
                                             context.toastSuccess(R.string.toast_fetch_cert_sha256_success)
                                         }
-                                    } finally { isFetchingCert = false }
+                                    } finally {
+                                        isFetchingCert = false
+                                    }
                                 }
                             },
                             enabled = !isFetchingCert,

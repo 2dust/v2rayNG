@@ -244,8 +244,6 @@
     <string name="title_pref_confirm_remove">Xác nhận xóa tệp cấu hình</string>
     <string name="summary_pref_confirm_remove">Yêu cầu xác nhận từ người dùng khi thực hiện xóa tệp cấu hình.</string>
 
-    <string name="title_pref_start_scan_immediate">Quét mã QR ngay lập tức</string>
-    <string name="summary_pref_start_scan_immediate">Mở camera để quét mã QR ngay khi khởi động, nếu không, bạn cũng có thể chọn quét mã hoặc chọn ảnh từ thanh công cụ.</string>
 
     <string name="title_pref_append_http_proxy">Append HTTP Proxy to VPN</string>
     <string name="summary_pref_append_http_proxy">HTTP proxy will be used directly from (browser/ some supported apps), without going through the virtual NIC device (Android 10+)</string>

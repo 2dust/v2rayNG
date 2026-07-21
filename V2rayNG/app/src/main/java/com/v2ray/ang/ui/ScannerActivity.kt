@@ -1,10 +1,8 @@
 package com.v2ray.ang.ui
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Size as TargetSize
 import androidx.camera.compose.CameraXViewfinder
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraControl
@@ -68,11 +66,12 @@ import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.enums.PermissionType
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
+import android.util.Size as TargetSize
 
 private val qrReader = MultiFormatReader()
 
@@ -82,14 +81,7 @@ class ScannerActivity : HelperBaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val startImmediate = MmkvManager.decodeSettingsBool(AppConfig.PREF_START_SCAN_IMMEDIATE, false)
-        if (ContextCompat.checkSelfPermission(
-                this,
-                PermissionType.CAMERA.getPermission()
-            ) == PackageManager.PERMISSION_GRANTED && startImmediate
-        ) {
-            uiState.value = ScannerUiState.ACTIVE
-        }
+        startScan()
     }
 
     @Composable
