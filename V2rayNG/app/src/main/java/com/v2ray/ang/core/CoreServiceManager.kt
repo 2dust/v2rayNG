@@ -45,7 +45,7 @@ import java.net.InetSocketAddress
 
 object CoreServiceManager {
 
-    private const val ACTIVE_OUTBOUND_POLL_INTERVAL_MS = 500L
+    private const val ACTIVE_OUTBOUND_POLL_INTERVAL_MS = 1000L
 
     private val coreController: CoreController = CoreNativeManager.newCoreController(CoreCallback())
     private val mMsgReceive = ReceiveMessageHandler()
@@ -53,6 +53,8 @@ object CoreServiceManager {
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
     private var activeOutboundPollJob: Job? = null
+    @Volatile
+    private var activeOutboundUpdatesEnabled = false
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -126,6 +128,15 @@ object CoreServiceManager {
      */
     fun getRunningServerName() = currentConfig?.remarks.orEmpty()
 
+    fun setActiveOutboundUpdatesEnabled(enabled: Boolean) {
+        activeOutboundUpdatesEnabled = enabled
+        if (enabled) {
+            emitAndStartActiveOutboundPolling()
+        } else {
+            stopActiveOutboundPolling()
+        }
+    }
+
     private fun currentActiveOutbound(): String = try {
         coreController.getBalancerPrincipleTarget(AppConfig.TAG_BALANCER)
     } catch (e: Exception) {
@@ -145,11 +156,21 @@ object CoreServiceManager {
         emitActiveOutbound(serviceControl, currentActiveOutbound())
     }
 
-    private fun startActiveOutboundPolling() {
+    private fun emitAndStartActiveOutboundPolling() {
+        if (!coreController.isRunning) return
+
+        val target = currentActiveOutbound()
+        serviceControl?.get()?.let { emitActiveOutbound(it, target) }
+        startActiveOutboundPolling(target)
+    }
+
+    private fun startActiveOutboundPolling(initialTarget: String = "") {
+        if (activeOutboundPollJob?.isActive == true) return
+
         activeOutboundPollJob?.cancel()
         activeOutboundPollJob = CoroutineScope(Dispatchers.IO).launch {
-            var lastTarget = ""
-            while (coreController.isRunning) {
+            var lastTarget = initialTarget
+            while (coreController.isRunning && activeOutboundUpdatesEnabled) {
                 val target = currentActiveOutbound()
                 if (target.isNotBlank() && target != lastTarget) {
                     serviceControl?.get()?.let { emitActiveOutbound(it, target) }
@@ -316,7 +337,9 @@ object CoreServiceManager {
             error("Core failed to start")
         }
 
-        startActiveOutboundPolling()
+        if (activeOutboundUpdatesEnabled) {
+            emitAndStartActiveOutboundPolling()
+        }
         if (browserDialer != null) {
             browserDialer!!.stop()
             browserDialer = null

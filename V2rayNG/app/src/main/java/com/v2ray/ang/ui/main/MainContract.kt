@@ -44,6 +44,7 @@ sealed interface MainAction {
     data class ImportManually(val type: Int) : MainAction
     data object RestartService : MainAction
     data object LocateSelectedServer : MainAction
+    data class MainUiVisibilityChanged(val visible: Boolean) : MainAction
 
     data class SelectGroup(val groupId: String) : MainAction
     data class SelectServer(val guid: String) : MainAction

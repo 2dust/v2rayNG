@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.TestServiceMessage
@@ -215,6 +216,9 @@ class MainViewModel(
             is MainAction.SwapServer -> swapServer(action.fromIndex, action.toIndex)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
             is MainAction.LocateHandled -> consumeLocateTarget(action.target)
+            is MainAction.MainUiVisibilityChanged -> {
+                CoreServiceManager.setActiveOutboundUpdatesEnabled(action.visible)
+            }
             is MainAction.ShareQRCode -> {
                 val bitmap = dataSource.share2QRCode(action.guid)
                 _uiState.update { it.copy(shareQRCodeBitmap = bitmap) }
@@ -835,6 +839,7 @@ class MainViewModel(
         selectedGroupLoadJob?.cancel()
         reloadJob?.cancel()
         filterJob?.cancel()
+        CoreServiceManager.setActiveOutboundUpdatesEnabled(false)
         cancelAllPing()
         dataSource.close()
         super.onCleared()

@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -28,7 +29,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.LocalDarkTheme
 import com.v2ray.ang.compose.QRCodeDialog
@@ -87,6 +91,31 @@ fun MainScreen(
     val lazyGridStates = remember { mutableStateMapOf<String, LazyGridState>() }
 
     var locateInProgress by remember { mutableStateOf(false) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val latestOnAction by rememberUpdatedState(onAction)
+
+    DisposableEffect(lifecycleOwner) {
+        fun setMainUiVisible(visible: Boolean) {
+            latestOnAction(MainAction.MainUiVisibilityChanged(visible))
+        }
+
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> setMainUiVisible(true)
+                Lifecycle.Event.ON_STOP -> setMainUiVisible(false)
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            setMainUiVisible(true)
+        }
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            setMainUiVisible(false)
+        }
+    }
 
     LaunchedEffect(groups) {
         val validGroupIds = groups.map { it.id }.toSet()
