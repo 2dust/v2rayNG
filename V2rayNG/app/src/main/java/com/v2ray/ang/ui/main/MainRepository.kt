@@ -177,15 +177,7 @@ class MainRepository(
         MmkvManager.clearAllTestDelayResults(guids)
 
     override fun sortByTestResultsForSub(subId: String) {
-        val sorted = MmkvManager.decodeServerList(subId)
-            .map { guid ->
-                val delay =
-                    MmkvManager.decodeServerAffiliationInfo(guid)?.testDelayMillis ?: 0L
-                guid to if (delay <= 0L) Long.MAX_VALUE else delay
-            }
-            .sortedBy { it.second }
-            .mapTo(ArrayList()) { it.first }
-        MmkvManager.encodeServerList(sorted, subId)
+        AngConfigManager.sortByTestResultsForSub(subId)
     }
 
     override fun getSubsList(): List<String> = MmkvManager.decodeSubsList()

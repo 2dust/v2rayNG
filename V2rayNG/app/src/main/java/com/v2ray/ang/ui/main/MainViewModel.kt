@@ -95,7 +95,7 @@ class MainViewModel(
         }
     }
 
-    private suspend fun handleServiceEvent(event: MainServiceEvent) {
+    private fun handleServiceEvent(event: MainServiceEvent) {
         when (event) {
             MainServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
             MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
