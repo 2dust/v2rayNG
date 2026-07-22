@@ -449,7 +449,7 @@
     <string name="shizuku_hotspot_enabled">نقطه اتصال Wi-Fi روشن شد</string>
     <string name="shizuku_hotspot_disabled">نقطه اتصال Wi-Fi خاموش شد</string>
     <string name="shizuku_hotspot_operation_failed">عملیات نقطه اتصال ناموفق بود (خطای %1$d)</string>
-    <string name="shizuku_tethering_wrong_upstream">تترینگ اتصال اشتباهی را انتخاب کرد و لغو شد. لطفاً دوباره تلاش کنید.</string>
+    <string name="shizuku_tethering_wrong_upstream">هنگام تغییر اتصال توسط Android، تترینگ لغو شد. کمی صبر کنید و دوباره تلاش کنید.</string>
     <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
     <string name="title_webdav_config_setting">تنظیمات WebDAV</string>
     <string name="title_webdav_config_setting_unknown">لطفا ابتدا WebDAV را پیکربندی کنید.</string>

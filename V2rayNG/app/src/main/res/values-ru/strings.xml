@@ -465,7 +465,7 @@
     <string name="shizuku_hotspot_enabled">Точка доступа Wi-Fi включена</string>
     <string name="shizuku_hotspot_disabled">Точка доступа Wi-Fi отключена</string>
     <string name="shizuku_hotspot_operation_failed">Не удалось выполнить операцию с точкой доступа (ошибка %1$d)</string>
-    <string name="shizuku_tethering_wrong_upstream">Для раздачи интернета было выбрано неверное подключение, поэтому она была отменена. Попробуйте ещё раз.</string>
+    <string name="shizuku_tethering_wrong_upstream">Раздача была отменена, пока Android переключал подключение. Немного подождите и попробуйте ещё раз.</string>
     <string name="title_configuration_share">Поделиться конфигурацией</string>
     <string name="title_webdav_config_setting">Настройки WebDAV</string>
     <string name="title_webdav_config_setting_unknown">Необходимо настроить WebDAV</string>

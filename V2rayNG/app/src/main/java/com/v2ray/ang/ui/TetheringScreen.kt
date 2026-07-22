@@ -299,7 +299,7 @@ private fun TetheringStatusSection(
     onToggle: (() -> Unit)? = null,
 ) {
     val toggleAction = onToggle?.takeIf { checked != null }
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .then(
@@ -310,40 +310,39 @@ private fun TetheringStatusSection(
                 },
             )
             .padding(16.dp),
-        verticalAlignment = Alignment.Top,
     ) {
-        Icon(
-            painter = painterResource(iconRes),
-            contentDescription = null,
-            modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.onSurface,
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f),
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f),
+            )
+            if (checked != null && toggleAction != null) {
+                Switch(
+                    checked = checked,
+                    onCheckedChange = if (toggleEnabled) {
+                        { _ -> toggleAction() }
+                    } else {
+                        null
+                    },
+                    modifier = Modifier.scale(0.8f),
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                        checkedTrackColor = MaterialTheme.colorScheme.secondary,
+                    ),
+                    enabled = toggleEnabled,
                 )
-                if (checked != null && toggleAction != null) {
-                    Switch(
-                        checked = checked,
-                        onCheckedChange = if (toggleEnabled) {
-                            { _ -> toggleAction() }
-                        } else {
-                            null
-                        },
-                        modifier = Modifier.scale(0.8f),
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                            checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                        ),
-                        enabled = toggleEnabled,
-                    )
-                }
             }
+        }
+        Column(modifier = Modifier.padding(start = 40.dp)) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = status,
