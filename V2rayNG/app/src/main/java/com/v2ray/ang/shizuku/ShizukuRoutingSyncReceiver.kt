@@ -133,6 +133,7 @@ private object ShizukuRoutingSyncDispatcher {
                     config.profileName,
                     config.content,
                     snapshot.vpnDnsServers.toTypedArray(),
+                    snapshot.ipv6Enabled,
                 )
             }
             HotspotRoutingSync.EVENT_CORE_START_FAILED -> {

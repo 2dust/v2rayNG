@@ -19,6 +19,7 @@ data class HotspotRoutingEngineConfig(
 data class HotspotRoutingLaunchConfig(
     val engine: HotspotRoutingEngineConfig,
     val dnsServers: List<String>,
+    val ipv6Enabled: Boolean,
     val assetPath: String,
     val xudpKey: String,
 )
@@ -30,6 +31,7 @@ object HotspotRoutingConfig {
         HotspotRoutingLaunchConfig(
             engine = engineFromSnapshot(snapshot),
             dnsServers = snapshot.vpnDnsServers,
+            ipv6Enabled = snapshot.ipv6Enabled,
             assetPath = Utils.userAssetPath(context),
             xudpKey = Utils.getDeviceIdForXUDPBaseKey(),
         )
@@ -79,6 +81,8 @@ object HotspotRoutingConfig {
             HevTunnelParameters(
                 mtu = snapshot.mtu,
                 ipv4 = AppConfig.SHIZUKU_TUN_ADDR_V4.substringBefore('/'),
+                ipv6 = AppConfig.SHIZUKU_TUN_ADDR_V6.substringBefore('/')
+                    .takeIf { snapshot.ipv6Enabled },
                 socksAddress = AppConfig.LOOPBACK,
                 socksPort = snapshot.socksPort,
                 socksUsername = snapshot.socksUsername,

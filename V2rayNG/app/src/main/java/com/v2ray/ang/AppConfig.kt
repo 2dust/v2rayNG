@@ -236,6 +236,14 @@ object AppConfig {
 
     /** Shizuku test-network TUN used as Android tethering's preferred upstream. */
     const val SHIZUKU_TUN_ADDR_V4 = "192.0.2.2/24"
+    /**
+     * Android only delegates a /64 that it considers globally scoped. The documentation
+     * prefix satisfies that platform requirement without claiming a real public network.
+     */
+    const val SHIZUKU_TUN_ADDR_V6 = "2001:db8:9877::1/64"
+
+    /** IPv6-shaped DNS hint required by Android; configured app resolvers remain first. */
+    const val SHIZUKU_TUN_DNS_HINT_V6 = "fdfe:dcba:9877::53"
 
     /** hev-sock5-tunnel read-write-timeout value */
     const val HEVTUN_RW_TIMEOUT = "300,60"

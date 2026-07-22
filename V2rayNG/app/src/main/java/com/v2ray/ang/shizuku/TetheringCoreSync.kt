@@ -62,6 +62,7 @@ internal object TetheringCoreSync {
             profileName = profileName,
             useHev = useHev,
             coreConfig = coreConfig,
+            ipv6Enabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED) == true,
             vpnDnsServers = SettingsManager.getVpnDnsServers(),
             socksPort = SettingsManager.getSocksPort(),
             socksUsername = SettingsManager.getSocksUsername(),

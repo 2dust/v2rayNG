@@ -386,6 +386,7 @@ class ShizukuActivity : BaseComponentActivity() {
                 launchConfig.engine.profileName,
                 launchConfig.engine.content,
                 launchConfig.dnsServers.toTypedArray(),
+                launchConfig.ipv6Enabled,
                 launchConfig.assetPath,
                 launchConfig.xudpKey,
                 syncToken,

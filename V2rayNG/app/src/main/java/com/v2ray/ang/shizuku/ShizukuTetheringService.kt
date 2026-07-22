@@ -25,6 +25,7 @@ import libv2ray.CoreController
 import libv2ray.Libv2ray
 import rikka.shizuku.Shizuku
 import java.io.File
+import java.net.Inet6Address
 import java.net.InetAddress
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
@@ -91,6 +92,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         val assetPath: String,
         val xudpKey: String,
         var dnsServers: List<String>,
+        var ipv6Enabled: Boolean,
         var desiredTetheringTypes: Int,
         var coreRestartPending: Boolean = false,
     )
@@ -213,6 +215,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         profileName: String,
         engineConfig: String,
         dnsServers: Array<out String>,
+        ipv6Enabled: Boolean,
         assetPath: String,
         xudpKey: String,
         syncToken: String,
@@ -226,6 +229,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         val launchConfig = HotspotRoutingLaunchConfig(
             engine = HotspotRoutingEngineConfig(useHev, profileName, engineConfig),
             dnsServers = dnsServers.toList(),
+            ipv6Enabled = ipv6Enabled,
             assetPath = assetPath,
             xudpKey = xudpKey,
         )
@@ -234,6 +238,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             assetPath = launchConfig.assetPath,
             xudpKey = launchConfig.xudpKey,
             dnsServers = launchConfig.dnsServers,
+            ipv6Enabled = launchConfig.ipv6Enabled,
             desiredTetheringTypes = activeTypes.takeIf { it >= 0 }
                 ?: routingSession?.desiredTetheringTypes
                 ?: 0,
@@ -282,7 +287,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
 
         try {
             setPreferTestNetworks(true)
-            createTestNetwork(config.dnsServers)
+            createTestNetwork(config.dnsServers, config.ipv6Enabled)
             val tun = checkNotNull(testTun) { "Test TUN file descriptor is unavailable" }
             startRoutingEngineLocked(config, tun.fd)
             setRoutingActiveLocked(config)
@@ -371,12 +376,14 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         profileName: String,
         engineConfig: String,
         dnsServers: Array<out String>,
+        ipv6Enabled: Boolean,
     ): Int {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return RESULT_ROUTING_FAILED
         val session = findRoutingSession(token) ?: return RESULT_INVALID_SESSION
         val launchConfig = HotspotRoutingLaunchConfig(
             engine = HotspotRoutingEngineConfig(useHev, profileName, engineConfig),
             dnsServers = dnsServers.toList(),
+            ipv6Enabled = ipv6Enabled,
             assetPath = session.assetPath,
             xudpKey = session.xudpKey,
         )
@@ -426,6 +433,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         session.desiredTetheringTypes = restoreTypes
 
         val switchedInPlace = launchConfig.dnsServers == session.dnsServers &&
+            launchConfig.ipv6Enabled == session.ipv6Enabled &&
             testTun != null &&
             (routingActive || routingState == ROUTING_STATE_WAITING) &&
             runCatching {
@@ -442,6 +450,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             rebuildRoutingLocked(launchConfig, restoreTypes)
         }
         session.dnsServers = launchConfig.dnsServers
+        session.ipv6Enabled = launchConfig.ipv6Enabled
         session.coreRestartPending = false
         reportTetheringRestoreFailuresLocked(failedTypes)
         if (failedTypes == 0) {
@@ -730,12 +739,17 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
 
     @RequiresApi(Build.VERSION_CODES.Q)
     @SuppressLint("WrongConstant") // TRANSPORT_TEST is a hidden transport type.
-    private fun createTestNetwork(dnsServers: List<String>) {
+    private fun createTestNetwork(dnsServers: List<String>, ipv6Enabled: Boolean) {
         val manager = checkNotNull(shellContext.getSystemService(TEST_NETWORK_SERVICE)) {
             "TestNetworkManager is unavailable on this Android build"
         }
-        val address = createLinkAddress(AppConfig.SHIZUKU_TUN_ADDR_V4)
-        val handle = createTestNetworkHandle(manager, address)
+        // TestNetworkManager installs a default route for every represented address family.
+        // Tethering can then delegate this synthetic /64 while Xray owns the shared TUN fd.
+        val addresses = buildList {
+            add(createLinkAddress(AppConfig.SHIZUKU_TUN_ADDR_V4))
+            if (ipv6Enabled) add(createLinkAddress(AppConfig.SHIZUKU_TUN_ADDR_V6))
+        }
+        val handle = createTestNetworkHandle(manager, addresses)
         testNetworkHandle = handle
 
         val request = NetworkRequest.Builder()
@@ -747,10 +761,19 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
 
         val properties = LinkProperties().apply {
             interfaceName = handle.interfaceName
-            setLinkAddresses(listOf(address))
+            setLinkAddresses(addresses)
             // Mirror CoreVpnService instead of inventing tethering-specific resolvers. The core
             // configuration decides whether port 53 is handled by v2rayNG's local DNS outbound.
-            setDnsServers(dnsServers.map(InetAddress::getByName))
+            val configuredDns = dnsServers.map(InetAddress::getByName)
+            setDnsServers(buildList {
+                addAll(configuredDns)
+                // Android requires an IPv6 DNS server before it will advertise an upstream /64.
+                // Most existing VPN DNS settings are IPv4-only, so append an internal ULA hint;
+                // it is not a hardcoded external resolver and configured servers remain first.
+                if (ipv6Enabled && configuredDns.none { it is Inet6Address }) {
+                    add(InetAddress.getByName(AppConfig.SHIZUKU_TUN_DNS_HINT_V6))
+                }
+            })
         }
         val setupMethod = manager.javaClass.getMethod(
             "setupTestNetwork",
@@ -767,11 +790,14 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
      * TestNetworkManager is not part of the app SDK. Keep its API 33+ reflection in this helper so
      * the routing lifecycle above can use an ordinary [TestNetworkHandle].
      */
-    private fun createTestNetworkHandle(manager: Any, address: LinkAddress): TestNetworkHandle {
-        val addresses = arrayOf(address)
+    private fun createTestNetworkHandle(
+        manager: Any,
+        addresses: List<LinkAddress>,
+    ): TestNetworkHandle {
+        val addressArray = addresses.toTypedArray()
         val testInterface = manager.javaClass
-            .getMethod("createTunInterface", addresses.javaClass)
-            .invoke(manager, addresses as Any)
+            .getMethod("createTunInterface", addressArray.javaClass)
+            .invoke(manager, addressArray as Any)
             ?: error("TestNetworkManager returned no TUN interface")
         val tun = testInterface.javaClass.getMethod("getFileDescriptor")
             .invoke(testInterface) as ParcelFileDescriptor
@@ -905,7 +931,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_745
+        const val USER_SERVICE_VERSION = 20_260_747
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"

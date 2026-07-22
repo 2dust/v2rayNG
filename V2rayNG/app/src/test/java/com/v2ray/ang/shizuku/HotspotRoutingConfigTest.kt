@@ -1,6 +1,7 @@
 package com.v2ray.ang.shizuku
 
 import com.google.gson.JsonParser
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.HotspotRoutingSnapshot
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -66,5 +67,20 @@ class HotspotRoutingConfigTest {
         assertTrue(config.content.contains("tcp-read-write-timeout: 5000"))
         assertTrue(config.content.contains("udp-read-write-timeout: 7000"))
         assertTrue(config.content.contains("log-level: 'w''arn'"))
+        assertFalse(config.content.contains("  ipv6:"))
+    }
+
+    @Test
+    fun hevEngineAddsIpv6OnlyWhenEnabled() {
+        val config = HotspotRoutingConfig.engineFromSnapshot(
+            HotspotRoutingSnapshot(
+                running = true,
+                vpnMode = true,
+                useHev = true,
+                ipv6Enabled = true,
+            ),
+        )
+
+        assertTrue(config.content.contains("  ipv6: '${AppConfig.SHIZUKU_TUN_ADDR_V6.substringBefore('/')}'"))
     }
 }
