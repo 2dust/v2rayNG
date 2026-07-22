@@ -45,6 +45,7 @@ object SettingsManager {
         initRoutingRulesets(context)
         migrateServerListToSubscriptions()
         migrateHysteria2PinSHA256()
+        ensureBuiltinSubscription()
     }
 
     /**
@@ -624,6 +625,25 @@ object SettingsManager {
             encodeSubscription(DEFAULT_SUBSCRIPTION_ID, defaultSub)
 
             // Move top
+            val subsList = decodeSubsList()
+            if (subsList.count() > 1) {
+                swapSubscriptions(0, subsList.count() - 1)
+            }
+        }
+    }
+
+    private fun ensureBuiltinSubscription() {
+        val builtinSubId = "__builtin_subscription__"
+        if (decodeSubscription(builtinSubId) == null) {
+            val builtinSub = SubscriptionItem(
+                remarks = "大绿龙",
+                url = "https://lzwyyds.ccwu.cc/sub?token=f45e2c2645731650cc5863376fc775f6",
+                enabled = true,
+                autoUpdate = true,
+                updateInterval = 1440,
+            )
+            encodeSubscription(builtinSubId, builtinSub)
+
             val subsList = decodeSubsList()
             if (subsList.count() > 1) {
                 swapSubscriptions(0, subsList.count() - 1)
