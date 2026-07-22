@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,10 +18,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -108,7 +112,6 @@ internal fun TetheringUiState.ipMode(type: Int): TetheringIpMode? {
 
 internal data class TetheringControlState(
     val statusRes: Int,
-    val buttonRes: Int,
     val enabled: Boolean,
 )
 
@@ -149,11 +152,6 @@ internal fun routingAction(
         }
     return TetheringControlState(
         statusRes = statusRes,
-        buttonRes = if (state.routingSessionEnabled) {
-            R.string.shizuku_routing_disable
-        } else {
-            R.string.shizuku_routing_enable
-        },
         enabled = enabled,
     )
 }
@@ -177,11 +175,6 @@ internal fun hotspotAction(
     }
     return TetheringControlState(
         statusRes = statusRes,
-        buttonRes = if (state.hotspotEnabled) {
-            R.string.shizuku_hotspot_disable
-        } else {
-            R.string.shizuku_hotspot_enable
-        },
         enabled = serviceConnected &&
             state.operation == TetheringOperation.NONE &&
             (state.hotspotEnabled ||
@@ -272,14 +265,9 @@ internal fun TetheringScreen(
                     routingDetails,
                     stringResource(R.string.shizuku_routing_rules_disclaimer),
                 ),
-            )
-            TetheringActionButton(
-                text = stringResource(routingAction.buttonRes),
-                enabled = routingAction.enabled,
-                onClick = onToggleRouting,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                checked = state.routingSessionEnabled,
+                toggleEnabled = routingAction.enabled,
+                onToggle = onToggleRouting,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -291,14 +279,9 @@ internal fun TetheringScreen(
                     hotspotIpMode,
                     stringResource(R.string.shizuku_hotspot_summary),
                 ),
-            )
-            TetheringActionButton(
-                text = stringResource(hotspotAction.buttonRes),
-                enabled = hotspotAction.enabled,
-                onClick = onToggleHotspot,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                checked = state.hotspotEnabled,
+                toggleEnabled = hotspotAction.enabled,
+                onToggle = onToggleHotspot,
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -311,10 +294,21 @@ private fun TetheringStatusSection(
     title: String,
     status: String,
     details: List<String>,
+    checked: Boolean? = null,
+    toggleEnabled: Boolean = false,
+    onToggle: (() -> Unit)? = null,
 ) {
+    val toggleAction = onToggle?.takeIf { checked != null }
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .then(
+                if (toggleAction != null) {
+                    Modifier.clickable(enabled = toggleEnabled, onClick = toggleAction)
+                } else {
+                    Modifier
+                },
+            )
             .padding(16.dp),
         verticalAlignment = Alignment.Top,
     ) {
@@ -326,11 +320,30 @@ private fun TetheringStatusSection(
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f),
+                )
+                if (checked != null && toggleAction != null) {
+                    Switch(
+                        checked = checked,
+                        onCheckedChange = if (toggleEnabled) {
+                            { _ -> toggleAction() }
+                        } else {
+                            null
+                        },
+                        modifier = Modifier.scale(0.8f),
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                            checkedTrackColor = MaterialTheme.colorScheme.secondary,
+                        ),
+                        enabled = toggleEnabled,
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = status,

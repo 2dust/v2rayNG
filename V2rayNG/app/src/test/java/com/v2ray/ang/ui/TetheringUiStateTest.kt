@@ -50,7 +50,6 @@ class TetheringUiStateTest {
         )
         val routing = routingAction(waiting, serviceConnected = true)
         assertEquals(R.string.shizuku_routing_status_waiting, routing.statusRes)
-        assertEquals(R.string.shizuku_routing_disable, routing.buttonRes)
         assertTrue(routing.enabled)
         assertEquals(
             R.string.shizuku_hotspot_status_waiting,
