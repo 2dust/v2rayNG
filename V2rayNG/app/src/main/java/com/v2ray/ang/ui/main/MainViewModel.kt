@@ -13,6 +13,8 @@ import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.enums.BalancerStrategyType
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.ui.base.BaseViewModel
@@ -76,6 +78,7 @@ class MainViewModel(
 
     @Volatile
     private var testingGroupId: String? = null
+    private var mainUiVisible: Boolean = false
 
     private val initialPageReady = CompletableDeferred<Unit>()
 
@@ -115,15 +118,17 @@ class MainViewModel(
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
             is MainServiceEvent.ActiveOutboundChanged -> {
                 val displayName = outboundTargetDisplayName(event.target)
-                _uiState.update {
-                    if (it.isRunning) {
-                        it.copy(
+                _uiState.update { state ->
+                    if (!state.isRunning) {
+                        state
+                    } else if (shouldPollActiveOutbound(state.selectedGuid)) {
+                        state.copy(
                             connectionTargetText = displayName.ifBlank {
-                                selectedConnectionTarget(it.selectedGuid)
+                                selectedConnectionTarget(state.selectedGuid)
                             }
                         )
                     } else {
-                        it
+                        state.copy(connectionTargetText = selectedConnectionTarget(state.selectedGuid))
                     }
                 }
             }
@@ -175,12 +180,35 @@ class MainViewModel(
     private fun idleDiagnosticText(running: Boolean, currentText: String = ""): String =
         if (!running) "" else currentText.ifBlank { checkConnectionText }
 
-    private fun selectedConnectionTarget(guid: String? = _uiState.value.selectedGuid): String =
-        guid
-            ?.let(dataSource::decodeServerConfig)
-            ?.takeUnless { it.configType.isComplexType() }
-            ?.remarks
-            .orEmpty()
+    private fun selectedProfile(guid: String? = _uiState.value.selectedGuid): ProfileItem? =
+        guid?.let(dataSource::decodeServerConfig)
+
+    private fun selectedConnectionTarget(guid: String? = _uiState.value.selectedGuid): String {
+        val profile = selectedProfile(guid) ?: return ""
+        return when {
+            isRandomOrRoundRobinPolicyGroup(profile) -> profile.remarks
+            !profile.configType.isComplexType() -> profile.remarks
+            else -> ""
+        }
+    }
+
+    private fun shouldPollActiveOutbound(guid: String? = _uiState.value.selectedGuid): Boolean {
+        val profile = selectedProfile(guid) ?: return false
+        return profile.configType == EConfigType.POLICYGROUP && !isRandomOrRoundRobinPolicyGroup(profile)
+    }
+
+    private fun isRandomOrRoundRobinPolicyGroup(profile: ProfileItem): Boolean {
+        if (profile.configType != EConfigType.POLICYGROUP) return false
+        return when (BalancerStrategyType.from(profile.policyGroupType)) {
+            BalancerStrategyType.RANDOM,
+            BalancerStrategyType.ROUND_ROBIN -> true
+            else -> false
+        }
+    }
+
+    private fun updateActiveOutboundUpdates(guid: String? = _uiState.value.selectedGuid) {
+        CoreServiceManager.setActiveOutboundUpdatesEnabled(mainUiVisible && shouldPollActiveOutbound(guid))
+    }
 
     private fun outboundTargetDisplayName(target: String): String {
         val trimmed = target.trim()
@@ -220,7 +248,8 @@ class MainViewModel(
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
             is MainAction.LocateHandled -> consumeLocateTarget(action.target)
             is MainAction.MainUiVisibilityChanged -> {
-                CoreServiceManager.setActiveOutboundUpdatesEnabled(action.visible)
+                mainUiVisible = action.visible
+                updateActiveOutboundUpdates()
             }
             is MainAction.ShareQRCode -> {
                 val bitmap = dataSource.share2QRCode(action.guid)
@@ -681,10 +710,22 @@ class MainViewModel(
                 }
             )
         }
+        updateActiveOutboundUpdates(guid)
     }
 
     fun refreshSelectedGuid() {
-        _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
+        val guid = dataSource.getSelectServer()
+        _uiState.update {
+            it.copy(
+                selectedGuid = guid,
+                connectionTargetText = if (it.isRunning) {
+                    selectedConnectionTarget(guid)
+                } else {
+                    ""
+                }
+            )
+        }
+        updateActiveOutboundUpdates(guid)
     }
 
     fun removeServerAndRefresh(guid: String) {
