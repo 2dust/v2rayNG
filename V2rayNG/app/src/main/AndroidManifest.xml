@@ -186,7 +186,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:scheme="v2rayng" />
+                <data android:scheme="dalulong" />
                 <data android:host="install-config" />
                 <data android:host="install-sub" />
             </intent-filter>

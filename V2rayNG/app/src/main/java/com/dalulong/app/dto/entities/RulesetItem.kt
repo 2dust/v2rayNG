@@ -1,0 +1,15 @@
+package com.dalulong.app.dto.entities
+
+data class RulesetItem(
+    var id: String = "",
+    var remarks: String? = "",
+    var ip: List<String>? = null,
+    var domain: List<String>? = null,
+    var process: List<String>? = null,
+    var outboundTag: String = "",
+    var port: String? = null,
+    var network: String? = null,
+    var protocol: List<String>? = null,
+    var enabled: Boolean = true,
+    var locked: Boolean? = false,
+)
