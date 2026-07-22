@@ -431,8 +431,6 @@
     <string name="shizuku_routing_status_error">خطأ في التوجيه</string>
     <string name="shizuku_routing_status_unavailable">حالة التوجيه غير متاحة</string>
     <string name="shizuku_routing_status_start_v2ray">شغّل v2rayNG في وضع VPN أولًا</string>
-    <string name="shizuku_routing_enable">تفعيل مشاركة الاتصال عبر v2rayNG</string>
-    <string name="shizuku_routing_disable">تعطيل مشاركة الاتصال عبر v2rayNG</string>
     <string name="shizuku_routing_enabled">تم تفعيل مشاركة الاتصال عبر v2rayNG</string>
     <string name="shizuku_routing_disabled">تم تعطيل مشاركة الاتصال عبر v2rayNG</string>
     <string name="shizuku_routing_operation_failed">فشل توجيه مشاركة الاتصال (الخطأ %1$d): %2$s</string>
@@ -452,8 +450,6 @@
     <string name="shizuku_hotspot_status_starting">جارٍ تشغيل نقطة الاتصال…</string>
     <string name="shizuku_hotspot_status_stopping">جارٍ إيقاف نقطة الاتصال…</string>
     <string name="shizuku_hotspot_status_unavailable">حالة نقطة الاتصال غير متاحة</string>
-    <string name="shizuku_hotspot_enable">تفعيل نقطة اتصال Wi-Fi</string>
-    <string name="shizuku_hotspot_disable">تعطيل نقطة اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_enabled">تم تفعيل نقطة اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_disabled">تم تعطيل نقطة اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_operation_failed">فشلت عملية نقطة الاتصال (الخطأ %1$d)</string>

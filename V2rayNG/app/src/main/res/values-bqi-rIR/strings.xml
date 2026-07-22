@@ -436,8 +436,6 @@
     <string name="shizuku_routing_status_error">خوتا من تور جوستن</string>
     <string name="shizuku_routing_status_unavailable">وازیت تور جوستن من دسرس نی</string>
     <string name="shizuku_routing_status_start_v2ray">ٱول v2rayNG ن من هالت VPN راه بندازین</string>
-    <string name="shizuku_routing_enable">راه وندن تترینگ v2rayNG</string>
-    <string name="shizuku_routing_disable">واداشتن تترینگ v2rayNG</string>
     <string name="shizuku_routing_enabled">تترینگ v2rayNG راه و افتا</string>
     <string name="shizuku_routing_disabled">تترینگ v2rayNG واداشت وابی</string>
     <string name="shizuku_routing_operation_failed">تور جوستن تترینگ نامووفق وابی (خوتا %1$d): %2$s</string>
@@ -457,8 +455,6 @@
     <string name="shizuku_hotspot_status_starting">هات‌اسپات راه و افته…</string>
     <string name="shizuku_hotspot_status_stopping">هات‌اسپات واداره…</string>
     <string name="shizuku_hotspot_status_unavailable">وازیت هات‌اسپات من دسرس نی</string>
-    <string name="shizuku_hotspot_enable">راه وندن هات‌اسپات وای‌فای</string>
-    <string name="shizuku_hotspot_disable">واداشتن هات‌اسپات وای‌فای</string>
     <string name="shizuku_hotspot_enabled">هات‌اسپات وای‌فای راه افتا</string>
     <string name="shizuku_hotspot_disabled">هات‌اسپات وای‌فای واداشت وابی</string>
     <string name="shizuku_hotspot_operation_failed">کار هات‌اسپات نامووفق وابی (خوتا %1$d)</string>

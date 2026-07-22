@@ -452,8 +452,6 @@
     <string name="shizuku_routing_status_error">Routing error</string>
     <string name="shizuku_routing_status_unavailable">Routing status unavailable</string>
     <string name="shizuku_routing_status_start_v2ray">Start v2rayNG in VPN mode first</string>
-    <string name="shizuku_routing_enable">Enable v2rayNG tethering</string>
-    <string name="shizuku_routing_disable">Disable v2rayNG tethering</string>
     <string name="shizuku_routing_enabled">v2rayNG tethering enabled</string>
     <string name="shizuku_routing_disabled">v2rayNG tethering disabled</string>
     <string name="shizuku_routing_operation_failed">Tethering routing failed (error %1$d): %2$s</string>
@@ -473,8 +471,6 @@
     <string name="shizuku_hotspot_status_starting">Starting hotspot…</string>
     <string name="shizuku_hotspot_status_stopping">Stopping hotspot…</string>
     <string name="shizuku_hotspot_status_unavailable">Hotspot status unavailable</string>
-    <string name="shizuku_hotspot_enable">Enable Wi-Fi hotspot</string>
-    <string name="shizuku_hotspot_disable">Disable Wi-Fi hotspot</string>
     <string name="shizuku_hotspot_enabled">Wi-Fi hotspot enabled</string>
     <string name="shizuku_hotspot_disabled">Wi-Fi hotspot disabled</string>
     <string name="shizuku_hotspot_operation_failed">Hotspot operation failed (error %1$d)</string>

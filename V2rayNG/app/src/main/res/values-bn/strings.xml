@@ -430,8 +430,6 @@
     <string name="shizuku_routing_status_error">রাউটিং ত্রুটি</string>
     <string name="shizuku_routing_status_unavailable">রাউটিংয়ের অবস্থা পাওয়া যাচ্ছে না</string>
     <string name="shizuku_routing_status_start_v2ray">আগে VPN মোডে v2rayNG চালু করুন</string>
-    <string name="shizuku_routing_enable">v2rayNG টেথারিং চালু করুন</string>
-    <string name="shizuku_routing_disable">v2rayNG টেথারিং বন্ধ করুন</string>
     <string name="shizuku_routing_enabled">v2rayNG টেথারিং চালু হয়েছে</string>
     <string name="shizuku_routing_disabled">v2rayNG টেথারিং বন্ধ হয়েছে</string>
     <string name="shizuku_routing_operation_failed">টেথারিং রাউটিং ব্যর্থ হয়েছে (ত্রুটি %1$d): %2$s</string>
@@ -451,8 +449,6 @@
     <string name="shizuku_hotspot_status_starting">হটস্পট চালু হচ্ছে…</string>
     <string name="shizuku_hotspot_status_stopping">হটস্পট বন্ধ হচ্ছে…</string>
     <string name="shizuku_hotspot_status_unavailable">হটস্পটের অবস্থা পাওয়া যাচ্ছে না</string>
-    <string name="shizuku_hotspot_enable">Wi-Fi হটস্পট চালু করুন</string>
-    <string name="shizuku_hotspot_disable">Wi-Fi হটস্পট বন্ধ করুন</string>
     <string name="shizuku_hotspot_enabled">Wi-Fi হটস্পট চালু হয়েছে</string>
     <string name="shizuku_hotspot_disabled">Wi-Fi হটস্পট বন্ধ হয়েছে</string>
     <string name="shizuku_hotspot_operation_failed">হটস্পট অপারেশন ব্যর্থ হয়েছে (ত্রুটি %1$d)</string>

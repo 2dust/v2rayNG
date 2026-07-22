@@ -427,8 +427,6 @@
     <string name="shizuku_routing_status_error">خطای مسیریابی</string>
     <string name="shizuku_routing_status_unavailable">وضعیت مسیریابی در دسترس نیست</string>
     <string name="shizuku_routing_status_start_v2ray">ابتدا v2rayNG را در حالت VPN اجرا کنید</string>
-    <string name="shizuku_routing_enable">فعال کردن اشتراک‌گذاری v2rayNG</string>
-    <string name="shizuku_routing_disable">غیرفعال کردن اشتراک‌گذاری v2rayNG</string>
     <string name="shizuku_routing_enabled">اشتراک‌گذاری v2rayNG فعال شد</string>
     <string name="shizuku_routing_disabled">اشتراک‌گذاری v2rayNG غیرفعال شد</string>
     <string name="shizuku_routing_operation_failed">مسیریابی اتصال اشتراکی ناموفق بود (خطای %1$d): %2$s</string>
@@ -448,8 +446,6 @@
     <string name="shizuku_hotspot_status_starting">در حال روشن کردن نقطه اتصال…</string>
     <string name="shizuku_hotspot_status_stopping">در حال خاموش کردن نقطه اتصال…</string>
     <string name="shizuku_hotspot_status_unavailable">وضعیت نقطه اتصال در دسترس نیست</string>
-    <string name="shizuku_hotspot_enable">روشن کردن نقطه اتصال Wi-Fi</string>
-    <string name="shizuku_hotspot_disable">خاموش کردن نقطه اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_enabled">نقطه اتصال Wi-Fi روشن شد</string>
     <string name="shizuku_hotspot_disabled">نقطه اتصال Wi-Fi خاموش شد</string>
     <string name="shizuku_hotspot_operation_failed">عملیات نقطه اتصال ناموفق بود (خطای %1$d)</string>

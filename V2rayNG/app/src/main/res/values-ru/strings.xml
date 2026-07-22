@@ -443,8 +443,6 @@
     <string name="shizuku_routing_status_error">Ошибка маршрутизации</string>
     <string name="shizuku_routing_status_unavailable">Состояние маршрутизации недоступно</string>
     <string name="shizuku_routing_status_start_v2ray">Сначала запустите v2rayNG в режиме VPN</string>
-    <string name="shizuku_routing_enable">Включить раздачу через v2rayNG</string>
-    <string name="shizuku_routing_disable">Отключить раздачу через v2rayNG</string>
     <string name="shizuku_routing_enabled">Раздача через v2rayNG включена</string>
     <string name="shizuku_routing_disabled">Раздача через v2rayNG отключена</string>
     <string name="shizuku_routing_operation_failed">Не удалось настроить маршрутизацию раздачи (ошибка %1$d): %2$s</string>
@@ -464,8 +462,6 @@
     <string name="shizuku_hotspot_status_starting">Включение точки доступа…</string>
     <string name="shizuku_hotspot_status_stopping">Отключение точки доступа…</string>
     <string name="shizuku_hotspot_status_unavailable">Состояние точки доступа недоступно</string>
-    <string name="shizuku_hotspot_enable">Включить точку доступа Wi-Fi</string>
-    <string name="shizuku_hotspot_disable">Отключить точку доступа Wi-Fi</string>
     <string name="shizuku_hotspot_enabled">Точка доступа Wi-Fi включена</string>
     <string name="shizuku_hotspot_disabled">Точка доступа Wi-Fi отключена</string>
     <string name="shizuku_hotspot_operation_failed">Не удалось выполнить операцию с точкой доступа (ошибка %1$d)</string>

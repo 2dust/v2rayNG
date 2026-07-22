@@ -432,8 +432,6 @@
     <string name="shizuku_routing_status_error">Lỗi định tuyến</string>
     <string name="shizuku_routing_status_unavailable">Không thể xác định trạng thái định tuyến</string>
     <string name="shizuku_routing_status_start_v2ray">Hãy khởi động v2rayNG ở chế độ VPN trước</string>
-    <string name="shizuku_routing_enable">Bật chia sẻ kết nối qua v2rayNG</string>
-    <string name="shizuku_routing_disable">Tắt chia sẻ kết nối qua v2rayNG</string>
     <string name="shizuku_routing_enabled">Đã bật chia sẻ kết nối qua v2rayNG</string>
     <string name="shizuku_routing_disabled">Đã tắt chia sẻ kết nối qua v2rayNG</string>
     <string name="shizuku_routing_operation_failed">Định tuyến kết nối chia sẻ không thành công (lỗi %1$d): %2$s</string>
@@ -453,8 +451,6 @@
     <string name="shizuku_hotspot_status_starting">Đang bật điểm phát sóng…</string>
     <string name="shizuku_hotspot_status_stopping">Đang tắt điểm phát sóng…</string>
     <string name="shizuku_hotspot_status_unavailable">Không thể xác định trạng thái điểm phát sóng</string>
-    <string name="shizuku_hotspot_enable">Bật điểm phát sóng Wi-Fi</string>
-    <string name="shizuku_hotspot_disable">Tắt điểm phát sóng Wi-Fi</string>
     <string name="shizuku_hotspot_enabled">Đã bật điểm phát sóng Wi-Fi</string>
     <string name="shizuku_hotspot_disabled">Đã tắt điểm phát sóng Wi-Fi</string>
     <string name="shizuku_hotspot_operation_failed">Thao tác với điểm phát sóng không thành công (lỗi %1$d)</string>
