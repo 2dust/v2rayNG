@@ -73,6 +73,8 @@ internal data class TetheringUiState(
     val routingState: Int = ShizukuTetheringService.ROUTING_STATE_DISABLED,
     val routingDetail: String = "",
     val activeTetheringTypes: Int = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
+    val ipv6TetheringTypes: Int = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
+    val ipv6Enabled: Boolean = false,
     val coreRunning: Boolean = false,
 ) {
     val routingActive: Boolean
@@ -85,6 +87,23 @@ internal data class TetheringUiState(
             activeTetheringTypes and tetheringTypeBit(ShizukuTetheringService.TETHERING_TYPE_WIFI) != 0
     val tetheringStateKnown: Boolean
         get() = activeTetheringTypes >= 0
+}
+
+internal enum class TetheringIpMode(val labelRes: Int) {
+    IPV4_ONLY(R.string.shizuku_tethering_ip_mode_ipv4),
+    DUAL_STACK(R.string.shizuku_tethering_ip_mode_dual_stack),
+    UNKNOWN(R.string.shizuku_tethering_ip_mode_unknown),
+}
+
+internal fun TetheringUiState.ipMode(type: Int): TetheringIpMode? {
+    val bit = tetheringTypeBit(type)
+    if (!ipv6Enabled || activeTetheringTypes < 0 || activeTetheringTypes and bit == 0) return null
+    if (ipv6TetheringTypes < 0) return TetheringIpMode.UNKNOWN
+    return if (ipv6TetheringTypes and bit != 0) {
+        TetheringIpMode.DUAL_STACK
+    } else {
+        TetheringIpMode.IPV4_ONLY
+    }
 }
 
 internal data class TetheringControlState(
@@ -187,9 +206,16 @@ internal fun TetheringScreen(
     val usbStatus = stringResource(R.string.shizuku_usb_status_enabled)
     val usbActive = state.activeTetheringTypes >= 0 &&
         state.activeTetheringTypes and tetheringTypeBit(ShizukuTetheringService.TETHERING_TYPE_USB) != 0
+    val usbIpMode = state.ipMode(ShizukuTetheringService.TETHERING_TYPE_USB)
+        ?.let { stringResource(it.labelRes) }
+    val hotspotIpMode = state.ipMode(ShizukuTetheringService.TETHERING_TYPE_WIFI)
+        ?.let { stringResource(it.labelRes) }
     val routingDetails = buildString {
         append(state.routingDetail.ifBlank { routingSummary })
-        if (usbActive) append("\n").append(usbStatus)
+        if (usbActive) {
+            append("\n").append(usbStatus)
+            usbIpMode?.let { append(" · ").append(it) }
+        }
     }
 
     Scaffold(
@@ -261,7 +287,10 @@ internal fun TetheringScreen(
                 iconRes = R.drawable.ic_wifi_tethering_24dp,
                 title = stringResource(R.string.shizuku_hotspot_title),
                 status = stringResource(hotspotAction.statusRes),
-                details = listOf(stringResource(R.string.shizuku_hotspot_summary)),
+                details = listOfNotNull(
+                    hotspotIpMode,
+                    stringResource(R.string.shizuku_hotspot_summary),
+                ),
             )
             TetheringActionButton(
                 text = stringResource(hotspotAction.buttonRes),

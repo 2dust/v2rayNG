@@ -451,6 +451,9 @@
     <string name="shizuku_routing_operation_failed">網路共用路由失敗（錯誤 %1$d）：%2$s</string>
     <string name="shizuku_routing_snapshot_timeout">無法讀取目前執行中的 v2rayNG 設定</string>
     <string name="shizuku_usb_status_enabled">USB 網路共用已啟用</string>
+    <string name="shizuku_tethering_ip_mode_ipv4">僅 IPv4</string>
+    <string name="shizuku_tethering_ip_mode_dual_stack">IPv4 + IPv6</string>
+    <string name="shizuku_tethering_ip_mode_unknown">無法判斷 IP 版本</string>
     <string name="shizuku_hotspot_title">Wi-Fi 熱點</string>
     <string name="shizuku_hotspot_summary">從這裡開啟熱點時，會先自動啟用 v2rayNG 網路共用。上方的路由控制也能保護從 Android 設定中開啟的 USB 網路共用。</string>
     <string name="shizuku_hotspot_status_checking">正在檢查熱點狀態…</string>

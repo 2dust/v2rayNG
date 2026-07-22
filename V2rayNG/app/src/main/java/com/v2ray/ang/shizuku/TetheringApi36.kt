@@ -11,18 +11,18 @@ import java.util.concurrent.TimeUnit
 /** Keeps API 36-only tethering types out of classes loaded on Android 13 through 15. */
 @RequiresApi(Build.VERSION_CODES.BAKLAVA)
 internal object TetheringApi36 {
-    fun getActiveTetheringTypes(
+    fun getTetheredInterfaces(
         service: Any,
         executor: Executor,
         timeoutSeconds: Long,
-    ): Int {
+    ): List<ActiveTetheringInterface>? {
         val manager = service as TetheringManager
-        var types = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN
+        var result: List<ActiveTetheringInterface>? = null
         val callbackReceived = CountDownLatch(1)
         val callback = object : TetheringManager.TetheringEventCallback {
             override fun onTetheredInterfacesChanged(interfaces: Set<TetheringInterface>) {
-                types = interfaces.fold(0) { mask, item ->
-                    mask or tetheringTypeBit(item.type)
+                result = interfaces.map { item ->
+                    ActiveTetheringInterface(item.type, item.`interface`)
                 }
                 callbackReceived.countDown()
             }
@@ -31,9 +31,9 @@ internal object TetheringApi36 {
         return try {
             manager.registerTetheringEventCallback(executor, callback)
             if (callbackReceived.await(timeoutSeconds, TimeUnit.SECONDS)) {
-                types
+                result
             } else {
-                ShizukuTetheringService.TETHERING_TYPES_UNKNOWN
+                null
             }
         } finally {
             runCatching { manager.unregisterTetheringEventCallback(callback) }

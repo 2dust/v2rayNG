@@ -438,6 +438,9 @@
     <string name="shizuku_routing_operation_failed">فشل توجيه مشاركة الاتصال (الخطأ %1$d): %2$s</string>
     <string name="shizuku_routing_snapshot_timeout">تعذرت قراءة إعدادات v2rayNG الحالية</string>
     <string name="shizuku_usb_status_enabled">مشاركة اتصال USB نشطة</string>
+    <string name="shizuku_tethering_ip_mode_ipv4">IPv4 فقط</string>
+    <string name="shizuku_tethering_ip_mode_dual_stack">IPv4 وIPv6</string>
+    <string name="shizuku_tethering_ip_mode_unknown">يتعذر تحديد إصدار IP</string>
     <string name="shizuku_hotspot_title">نقطة اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_summary">يؤدي تشغيل نقطة الاتصال من هنا إلى تفعيل مشاركة الاتصال عبر v2rayNG أولًا تلقائيًا. ويمكن لعنصر التحكم بالتوجيه أعلاه أيضًا حماية مشاركة اتصال USB التي تبدأها من إعدادات Android.</string>
     <string name="shizuku_hotspot_status_checking">جارٍ التحقق من حالة نقطة الاتصال…</string>

@@ -11,5 +11,6 @@ interface IShizukuTetheringService {
     int synchronizeRouting(String syncToken, boolean useHev, String profileName, String engineConfig, in String[] dnsServers, boolean ipv6Enabled) = 10;
     int notifyCoreStartFailed(String syncToken, String detail) = 11;
     int consumeWarning() = 12;
+    int getIpv6TetheringTypes() = 13;
     void destroy() = 16777114;
 }

@@ -450,6 +450,9 @@
     <string name="shizuku_routing_operation_failed">Не удалось настроить маршрутизацию раздачи (ошибка %1$d): %2$s</string>
     <string name="shizuku_routing_snapshot_timeout">Не удалось прочитать текущую конфигурацию v2rayNG</string>
     <string name="shizuku_usb_status_enabled">USB-модем активен</string>
+    <string name="shizuku_tethering_ip_mode_ipv4">Только IPv4</string>
+    <string name="shizuku_tethering_ip_mode_dual_stack">IPv4 + IPv6</string>
+    <string name="shizuku_tethering_ip_mode_unknown">Версию IP определить не удалось</string>
     <string name="shizuku_hotspot_title">Точка доступа Wi-Fi</string>
     <string name="shizuku_hotspot_summary">При включении точки доступа здесь сначала автоматически включается раздача через v2rayNG. Маршрутизация выше также защищает USB-модем, включённый в настройках Android.</string>
     <string name="shizuku_hotspot_status_checking">Проверка состояния точки доступа…</string>

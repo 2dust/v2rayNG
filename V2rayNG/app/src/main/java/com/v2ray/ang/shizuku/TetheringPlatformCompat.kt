@@ -75,11 +75,10 @@ internal object TetheringPlatformCompat {
         }
     }
 
-    fun getActiveTetheringTypes(service: Any): Int {
+    fun getTetheredInterfaces(service: Any): List<ActiveTetheringInterface> {
         require(Build.VERSION.SDK_INT in Build.VERSION_CODES.TIRAMISU until Build.VERSION_CODES.BAKLAVA)
         val interfaces = invokeStringList(service, "getTetheredIfaces")
             ?: error("TetheringManager.getTetheredIfaces is unavailable")
-        if (interfaces.isEmpty()) return 0
 
         val regexesByType = mapOf(
             ShizukuTetheringService.TETHERING_TYPE_WIFI to
@@ -89,11 +88,11 @@ internal object TetheringPlatformCompat {
             LEGACY_TETHERING_TYPE_BLUETOOTH to
                 compileRegexes(invokeStringList(service, "getTetherableBluetoothRegexs")),
         )
-        return interfaces.fold(0) { mask, interfaceName ->
+        return interfaces.mapNotNull { interfaceName ->
             val type = regexesByType.entries.firstOrNull { (_, regexes) ->
                 regexes.any { it.matches(interfaceName) }
             }?.key ?: inferLegacyTetheringType(interfaceName)
-            if (type == null) mask else mask or tetheringTypeBit(type)
+            type?.let { ActiveTetheringInterface(it, interfaceName) }
         }
     }
 
@@ -140,5 +139,10 @@ internal object TetheringPlatformCompat {
     private const val UPSTREAM_INTERFACES_PREFIX = "Current upstream interface(s):"
     private const val LEGACY_TETHERING_TYPE_BLUETOOTH = 2
 }
+
+internal data class ActiveTetheringInterface(
+    val type: Int,
+    val name: String,
+)
 
 internal fun tetheringTypeBit(type: Int): Int = if (type in 0..30) 1 shl type else 0

@@ -434,6 +434,9 @@
     <string name="shizuku_routing_operation_failed">مسیریابی اتصال اشتراکی ناموفق بود (خطای %1$d): %2$s</string>
     <string name="shizuku_routing_snapshot_timeout">خواندن پیکربندی در حال اجرای v2rayNG ممکن نیست</string>
     <string name="shizuku_usb_status_enabled">اتصال اشتراکی USB فعال است</string>
+    <string name="shizuku_tethering_ip_mode_ipv4">فقط IPv4</string>
+    <string name="shizuku_tethering_ip_mode_dual_stack">IPv4 + IPv6</string>
+    <string name="shizuku_tethering_ip_mode_unknown">نسخه IP قابل تشخیص نیست</string>
     <string name="shizuku_hotspot_title">نقطه اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_summary">با روشن کردن نقطه اتصال از اینجا، ابتدا اشتراک‌گذاری v2rayNG به‌طور خودکار فعال می‌شود. کنترل مسیریابی بالا می‌تواند از اتصال اشتراکی USB که در تنظیمات Android روشن شده نیز محافظت کند.</string>
     <string name="shizuku_hotspot_status_checking">در حال بررسی وضعیت نقطه اتصال…</string>

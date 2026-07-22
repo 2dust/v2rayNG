@@ -437,6 +437,9 @@
     <string name="shizuku_routing_operation_failed">টেথারিং রাউটিং ব্যর্থ হয়েছে (ত্রুটি %1$d): %2$s</string>
     <string name="shizuku_routing_snapshot_timeout">চালু থাকা v2rayNG-এর কনফিগারেশন পড়া যায়নি</string>
     <string name="shizuku_usb_status_enabled">USB টেথারিং সক্রিয়</string>
+    <string name="shizuku_tethering_ip_mode_ipv4">শুধু IPv4</string>
+    <string name="shizuku_tethering_ip_mode_dual_stack">IPv4 + IPv6</string>
+    <string name="shizuku_tethering_ip_mode_unknown">IP সংস্করণ জানা যায়নি</string>
     <string name="shizuku_hotspot_title">Wi-Fi হটস্পট</string>
     <string name="shizuku_hotspot_summary">এখান থেকে হটস্পট চালু করলে আগে স্বয়ংক্রিয়ভাবে v2rayNG টেথারিং চালু হয়। ওপরের রাউটিং নিয়ন্ত্রণ Android সেটিংস থেকে চালু করা USB টেথারিংকেও সুরক্ষিত করতে পারে।</string>
     <string name="shizuku_hotspot_status_checking">হটস্পটের অবস্থা যাচাই করা হচ্ছে…</string>

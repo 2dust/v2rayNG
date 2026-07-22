@@ -248,6 +248,7 @@ class ShizukuActivity : BaseComponentActivity() {
         val generation = cancelCurrentOperation()
         uiState = uiState.copy(operation = TetheringOperation.CHECKING)
         operationJob = lifecycleScope.launch {
+            val ipv6Enabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED) == true
             val status = withContext(Dispatchers.IO) {
                 StatusSnapshot(
                     routing = runCatching { service.routingState }
@@ -255,6 +256,12 @@ class ShizukuActivity : BaseComponentActivity() {
                     detail = runCatching { service.routingDetail }.getOrDefault(""),
                     tetheringTypes = runCatching { service.activeTetheringTypes }
                         .getOrDefault(ShizukuTetheringService.TETHERING_TYPES_UNKNOWN),
+                    ipv6TetheringTypes = if (ipv6Enabled) {
+                        runCatching { service.ipv6TetheringTypes }
+                            .getOrDefault(ShizukuTetheringService.TETHERING_TYPES_UNKNOWN)
+                    } else {
+                        ShizukuTetheringService.TETHERING_TYPES_UNKNOWN
+                    },
                     warning = runCatching { service.consumeWarning() }
                         .getOrDefault(ShizukuTetheringService.RESULT_OK),
                 )
@@ -265,6 +272,8 @@ class ShizukuActivity : BaseComponentActivity() {
                 routingState = status.routing,
                 routingDetail = status.detail,
                 activeTetheringTypes = status.tetheringTypes,
+                ipv6TetheringTypes = status.ipv6TetheringTypes,
+                ipv6Enabled = ipv6Enabled,
             )
             operationJob = null
             if (status.warning == ShizukuTetheringService.RESULT_UNPROTECTED_UPSTREAM) {
@@ -437,6 +446,7 @@ class ShizukuActivity : BaseComponentActivity() {
             routingState = ShizukuTetheringService.ROUTING_STATE_DISABLED,
             routingDetail = "",
             activeTetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
+            ipv6TetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
         )
     }
 
@@ -459,6 +469,7 @@ class ShizukuActivity : BaseComponentActivity() {
         val routing: Int,
         val detail: String,
         val tetheringTypes: Int,
+        val ipv6TetheringTypes: Int,
         val warning: Int,
     )
 

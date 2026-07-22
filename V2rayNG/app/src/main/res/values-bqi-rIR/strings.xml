@@ -443,6 +443,9 @@
     <string name="shizuku_routing_operation_failed">تور جوستن تترینگ نامووفق وابی (خوتا %1$d): %2$s</string>
     <string name="shizuku_routing_snapshot_timeout">کانفیگ v2rayNG هیم سکو کار خونڌه نوابی</string>
     <string name="shizuku_usb_status_enabled">تترینگ USB کار کنه</string>
+    <string name="shizuku_tethering_ip_mode_ipv4">فقط IPv4</string>
+    <string name="shizuku_tethering_ip_mode_dual_stack">IPv4 + IPv6</string>
+    <string name="shizuku_tethering_ip_mode_unknown">نسخه IP دیار نی</string>
     <string name="shizuku_hotspot_title">هات‌اسپات وای‌فای</string>
     <string name="shizuku_hotspot_summary">وا راه وندن هات‌اسپات ز ئیجا، ٱول تترینگ v2rayNG خوتکار راه و افته. کونترول تور جوستن بالا هنی تترینگ USB راه افتا ز سامووای Android ن ٱمن کنه.</string>
     <string name="shizuku_hotspot_status_checking">من وارسۊوی وازیت هات‌اسپات…</string>

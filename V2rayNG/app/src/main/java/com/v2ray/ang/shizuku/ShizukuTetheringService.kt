@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.IpPrefix
 import android.net.LinkAddress
 import android.net.LinkProperties
 import android.net.Network
@@ -27,6 +28,7 @@ import rikka.shizuku.Shizuku
 import java.io.File
 import java.net.Inet6Address
 import java.net.InetAddress
+import java.net.NetworkInterface
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
@@ -164,19 +166,50 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
 
     override fun getActiveTetheringTypes(): Int {
         return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
-                TetheringApi36.getActiveTetheringTypes(
-                    tetheringManager,
-                    executor,
-                    CALLBACK_TIMEOUT_SECONDS,
-                )
-            } else {
-                TetheringPlatformCompat.getActiveTetheringTypes(tetheringManager)
+            getTetheredInterfaces().fold(0) { mask, item ->
+                mask or tetheringTypeBit(item.type)
             }
         } catch (error: Throwable) {
             Log.e(TAG, "Unable to read tethering state", error)
             TETHERING_TYPES_UNKNOWN
         }
+    }
+
+    override fun getIpv6TetheringTypes(): Int {
+        return try {
+            getTetheredInterfaces().fold(0) { mask, item ->
+                if (hasDelegatedIpv6Prefix(item.name)) {
+                    mask or tetheringTypeBit(item.type)
+                } else {
+                    mask
+                }
+            }
+        } catch (error: Throwable) {
+            Log.e(TAG, "Unable to read tethered IPv6 state", error)
+            TETHERING_TYPES_UNKNOWN
+        }
+    }
+
+    private fun getTetheredInterfaces(): List<ActiveTetheringInterface> {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
+            TetheringApi36.getTetheredInterfaces(
+                tetheringManager,
+                executor,
+                CALLBACK_TIMEOUT_SECONDS,
+            ) ?: error("Timed out while reading tethered interfaces")
+        } else {
+            TetheringPlatformCompat.getTetheredInterfaces(tetheringManager)
+        }
+    }
+
+    /**
+     * Android assigns a local DNS address from the delegated upstream /64 to each downstream.
+     * Its presence on that real Wi-Fi or USB interface means Router Advertisement setup has
+     * completed; checking the test TUN itself would only prove that IPv6 was requested.
+     */
+    private fun hasDelegatedIpv6Prefix(interfaceName: String): Boolean {
+        val addresses = NetworkInterface.getByName(interfaceName)?.inetAddresses ?: return false
+        return addresses.asSequence().any(TETHERING_IPV6_PREFIX::contains)
     }
 
     @Synchronized
@@ -931,9 +964,15 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_747
+        const val USER_SERVICE_VERSION = 20_260_748
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
+        private val TETHERING_IPV6_PREFIX = AppConfig.SHIZUKU_TUN_ADDR_V6.let { cidr ->
+            IpPrefix(
+                InetAddress.getByName(cidr.substringBefore('/')),
+                cidr.substringAfter('/').toInt(),
+            )
+        }
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"
         private const val TRANSPORT_TEST = 7
         private const val CALLBACK_TIMEOUT_SECONDS = 10L

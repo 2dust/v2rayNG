@@ -439,6 +439,9 @@
     <string name="shizuku_routing_operation_failed">Định tuyến kết nối chia sẻ không thành công (lỗi %1$d): %2$s</string>
     <string name="shizuku_routing_snapshot_timeout">Không thể đọc cấu hình v2rayNG đang chạy</string>
     <string name="shizuku_usb_status_enabled">Chia sẻ kết nối qua USB đang hoạt động</string>
+    <string name="shizuku_tethering_ip_mode_ipv4">Chỉ IPv4</string>
+    <string name="shizuku_tethering_ip_mode_dual_stack">IPv4 + IPv6</string>
+    <string name="shizuku_tethering_ip_mode_unknown">Không xác định được phiên bản IP</string>
     <string name="shizuku_hotspot_title">Điểm phát sóng Wi-Fi</string>
     <string name="shizuku_hotspot_summary">Khi bật điểm phát sóng tại đây, chia sẻ kết nối qua v2rayNG sẽ tự động được bật trước. Tùy chọn định tuyến phía trên cũng có thể bảo vệ kết nối USB được bật trong phần cài đặt Android.</string>
     <string name="shizuku_hotspot_status_checking">Đang kiểm tra trạng thái điểm phát sóng…</string>

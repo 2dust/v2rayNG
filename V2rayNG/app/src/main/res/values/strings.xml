@@ -459,6 +459,9 @@
     <string name="shizuku_routing_operation_failed">Tethering routing failed (error %1$d): %2$s</string>
     <string name="shizuku_routing_snapshot_timeout">Unable to read the running v2rayNG configuration</string>
     <string name="shizuku_usb_status_enabled">USB tethering is active</string>
+    <string name="shizuku_tethering_ip_mode_ipv4">IPv4 only</string>
+    <string name="shizuku_tethering_ip_mode_dual_stack">IPv4 + IPv6</string>
+    <string name="shizuku_tethering_ip_mode_unknown">IP version unavailable</string>
     <string name="shizuku_hotspot_title">Wi-Fi hotspot</string>
     <string name="shizuku_hotspot_summary">Starting the hotspot here automatically enables v2rayNG tethering first. The routing control above can also protect USB tethering started from Android settings.</string>
     <string name="shizuku_hotspot_status_checking">Checking hotspot status…</string>

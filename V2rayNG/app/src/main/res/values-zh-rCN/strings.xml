@@ -453,6 +453,9 @@
     <string name="shizuku_routing_operation_failed">网络共享路由失败（错误 %1$d）：%2$s</string>
     <string name="shizuku_routing_snapshot_timeout">无法读取当前运行的 v2rayNG 配置</string>
     <string name="shizuku_usb_status_enabled">USB 网络共享已启用</string>
+    <string name="shizuku_tethering_ip_mode_ipv4">仅 IPv4</string>
+    <string name="shizuku_tethering_ip_mode_dual_stack">IPv4 + IPv6</string>
+    <string name="shizuku_tethering_ip_mode_unknown">无法确定 IP 版本</string>
     <string name="shizuku_hotspot_title">Wi-Fi 热点</string>
     <string name="shizuku_hotspot_summary">从此处开启热点时，会先自动启用 v2rayNG 网络共享。上方的路由控制也可以保护从 Android 设置中开启的 USB 网络共享。</string>
     <string name="shizuku_hotspot_status_checking">正在检查热点状态…</string>
