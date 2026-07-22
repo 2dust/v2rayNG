@@ -362,14 +362,14 @@
     <string name="routing_settings_network_tip">[udp|tcp]</string>
     <string name="routing_settings_outbound_tag">outboundTag</string>
 
-    <string name="connection_test_pending">"检查网络连接"</string>
+    <string name="connection_test_pending">"点击测试连接"</string>
     <string name="connection_test_testing">"测试中…"</string>
     <string name="connection_test_testing_count">测试 %d 个配置中…</string>
     <string name="connection_test_available">"连接成功：延时 %d 毫秒"</string>
     <string name="connection_test_error">"失败：%s"</string>
     <string name="connection_test_fail">"无互联网连接"</string>
     <string name="connection_test_error_status_code">"状态码无效（#%d）"</string>
-    <string name="connection_connected">"已连接，点击测试连接"</string>
+    <string name="connection_connected">"已连接"</string>
     <string name="connection_connected_via">已通过 %s 连接</string>
     <string name="connection_not_connected">"未连接"</string>
     <string name="connection_runing_task_left">运行中的测试任务数：%s</string>

@@ -45,6 +45,7 @@ class MainViewModel(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
     private val preloadDispatcher: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(1)
+    private val checkConnectionText: String = dataSource.getString(R.string.connection_test_pending)
 
     // ---------- UI state ----------
     private val _uiState = MutableStateFlow(
@@ -129,7 +130,7 @@ class MainViewModel(
 
             is MainServiceEvent.MeasureDelaySuccess -> {
                 _uiState.update {
-                    it.copy(diagnosticTextRes = null, diagnosticText = event.content)
+                    it.copy(diagnosticText = event.content)
                 }
             }
 
@@ -144,7 +145,6 @@ class MainViewModel(
             is MainServiceEvent.MeasureConfigNotify -> {
                 _uiState.update {
                     it.copy(
-                        diagnosticTextRes = null,
                         diagnosticText = dataSource.getString(
                             R.string.connection_runing_task_left,
                             event.progress
@@ -171,6 +171,9 @@ class MainViewModel(
 
     private fun currentServers(): List<ServersCache> =
         mutableServersForGroup(uiState.value.selectedGroupId).value
+
+    private fun idleDiagnosticText(running: Boolean, currentText: String = ""): String =
+        if (!running) "" else currentText.ifBlank { checkConnectionText }
 
     private fun selectedConnectionTarget(guid: String? = _uiState.value.selectedGuid): String =
         guid
@@ -717,8 +720,7 @@ class MainViewModel(
         _uiState.update {
             it.copy(
                 isTesting = false,
-                diagnosticTextRes = null,
-                diagnosticText = ""
+                diagnosticText = idleDiagnosticText(it.isRunning)
             )
         }
     }
@@ -736,8 +738,7 @@ class MainViewModel(
         _uiState.update {
             it.copy(
                 isTesting = true,
-                diagnosticTextRes = R.string.connection_test_testing,
-                diagnosticText = ""
+                diagnosticText = dataSource.getString(R.string.connection_test_testing)
             )
         }
         viewModelScope.launch(ioDispatcher) {
@@ -755,8 +756,7 @@ class MainViewModel(
     fun testCurrentServerRealPing() {
         _uiState.update {
             it.copy(
-                diagnosticTextRes = R.string.connection_test_testing,
-                diagnosticText = ""
+                diagnosticText = dataSource.getString(R.string.connection_test_testing)
             )
         }
         dataSource.testCurrentServerRealPing()
@@ -775,8 +775,7 @@ class MainViewModel(
             _uiState.update {
                 it.copy(
                     isTesting = false,
-                    diagnosticTextRes = null,
-                    diagnosticText = ""
+                    diagnosticText = idleDiagnosticText(it.isRunning)
                 )
             }
             reloadAllGroups(_uiState.value.groups.map { it.id })
@@ -819,15 +818,10 @@ class MainViewModel(
                 } else {
                     state.connectionTargetText
                 },
-                diagnosticTextRes = if (!clearTestingText && state.isTesting) {
-                    state.diagnosticTextRes
-                } else {
-                    null
-                },
                 diagnosticText = if (!clearTestingText && state.isTesting) {
                     state.diagnosticText
                 } else {
-                    ""
+                    idleDiagnosticText(running, state.diagnosticText)
                 }
             )
         }

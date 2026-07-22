@@ -63,8 +63,7 @@ fun MainScreen(
     } else {
         stringResource(R.string.connection_not_connected)
     }
-    val diagnosticText =
-        uiState.diagnosticTextRes?.let { stringResource(it) } ?: uiState.diagnosticText
+    val diagnosticText = uiState.diagnosticText
     val selectedGuid = uiState.selectedGuid
     val doubleColumnDisplay = uiState.doubleColumnDisplay
     val confirmRemove = uiState.confirmRemove
@@ -95,25 +94,21 @@ fun MainScreen(
     val latestOnAction by rememberUpdatedState(onAction)
 
     DisposableEffect(lifecycleOwner) {
-        fun setMainUiVisible(visible: Boolean) {
-            latestOnAction(MainAction.MainUiVisibilityChanged(visible))
-        }
-
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-                Lifecycle.Event.ON_START -> setMainUiVisible(true)
-                Lifecycle.Event.ON_STOP -> setMainUiVisible(false)
+                Lifecycle.Event.ON_START -> latestOnAction(MainAction.MainUiVisibilityChanged(true))
+                Lifecycle.Event.ON_STOP -> latestOnAction(MainAction.MainUiVisibilityChanged(false))
                 else -> Unit
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-            setMainUiVisible(true)
+            latestOnAction(MainAction.MainUiVisibilityChanged(true))
         }
 
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            setMainUiVisible(false)
+            latestOnAction(MainAction.MainUiVisibilityChanged(false))
         }
     }
 

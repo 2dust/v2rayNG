@@ -131,7 +131,7 @@ object CoreServiceManager {
     fun setActiveOutboundUpdatesEnabled(enabled: Boolean) {
         activeOutboundUpdatesEnabled = enabled
         if (enabled) {
-            emitAndStartActiveOutboundPolling()
+            startActiveOutboundPolling()
         } else {
             stopActiveOutboundPolling()
         }
@@ -156,23 +156,15 @@ object CoreServiceManager {
         emitActiveOutbound(serviceControl, currentActiveOutbound())
     }
 
-    private fun emitAndStartActiveOutboundPolling() {
-        if (!coreController.isRunning) return
-
-        val target = currentActiveOutbound()
-        serviceControl?.get()?.let { emitActiveOutbound(it, target) }
-        startActiveOutboundPolling(target)
-    }
-
-    private fun startActiveOutboundPolling(initialTarget: String = "") {
-        if (activeOutboundPollJob?.isActive == true) return
+    private fun startActiveOutboundPolling() {
+        if (!coreController.isRunning || activeOutboundPollJob?.isActive == true) return
 
         activeOutboundPollJob?.cancel()
         activeOutboundPollJob = CoroutineScope(Dispatchers.IO).launch {
-            var lastTarget = initialTarget
+            var lastTarget: String? = null
             while (coreController.isRunning && activeOutboundUpdatesEnabled) {
                 val target = currentActiveOutbound()
-                if (target.isNotBlank() && target != lastTarget) {
+                if (target != lastTarget) {
                     serviceControl?.get()?.let { emitActiveOutbound(it, target) }
                     lastTarget = target
                 }
@@ -338,7 +330,7 @@ object CoreServiceManager {
         }
 
         if (activeOutboundUpdatesEnabled) {
-            emitAndStartActiveOutboundPolling()
+            startActiveOutboundPolling()
         }
         if (browserDialer != null) {
             browserDialer!!.stop()

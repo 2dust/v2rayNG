@@ -13,7 +13,6 @@ data class MainUiState(
     val isRunning: Boolean = false,
     val isTesting: Boolean = false,
     val connectionTargetText: String = "",
-    val diagnosticTextRes: Int? = null,
     val diagnosticText: String = "",
     val locateTarget: LocateTarget? = null,
     val confirmRemove: Boolean = false,

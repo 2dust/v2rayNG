@@ -345,14 +345,14 @@
     <string name="routing_settings_network_tip">[udp|tcp]</string>
     <string name="routing_settings_outbound_tag">برچسب خروجی</string>
 
-    <string name="connection_test_pending">اتصال را بررسی کنید</string>
+    <string name="connection_test_pending">برای بررسی اتصال ضربه بزنید</string>
     <string name="connection_test_testing">در حال آزمایش...</string>
     <string name="connection_test_testing_count">تست کردن %d کانفیگ…</string>
     <string name="connection_test_available">موفقیت: اتصال %dms طول کشید</string>
     <string name="connection_test_error">اتصال به اینترنت شناسایی نشد: %s</string>
     <string name="connection_test_fail">اینترنت در دسترس نیست</string>
     <string name="connection_test_error_status_code">کد خطا: #%d</string>
-    <string name="connection_connected">متصل است، برای بررسی اتصال ضربه بزنید</string>
+    <string name="connection_connected">متصل است</string>
     <string name="connection_connected_via">متصل از طریق %s</string>
     <string name="connection_not_connected">متصل نیست</string>
     <string name="connection_runing_task_left">تعداد وظایف آزمایشی در حال اجرا: %s</string>
