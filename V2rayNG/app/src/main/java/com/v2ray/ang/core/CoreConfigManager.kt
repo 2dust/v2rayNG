@@ -378,6 +378,9 @@ object CoreConfigManager {
         val fallbackTag = if (strategyType.supportsObservatory && resolvedOutbound.profile.policyGroupTestOutbounds != false) {
             resolvedOutbound.profile.policyGroupFallbackTag
                 ?.takeIf { it.isNotEmpty() && it != AppConfig.TAG_PROXY }
+                // Xray excludes dead random/roundRobin candidates only when fallbackTag is set;
+                // without this default, an enabled empty field creates no observatory.
+                ?: membersToAdd.first().tag
         } else null
         val strategy = buildBalancerStrategy(
             strategyType = strategyType,
