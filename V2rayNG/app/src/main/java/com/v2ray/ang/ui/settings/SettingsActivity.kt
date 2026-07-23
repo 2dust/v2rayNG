@@ -124,8 +124,6 @@ fun SettingsScreen(
     var outboundResolveMethod by rememberMmkvString(AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD, "0")
 
     var isBooted by rememberMmkvBool(AppConfig.PREF_IS_BOOTED, false)
-    var autoRemoveInvalidAfterTest by rememberMmkvBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST, false)
-    var autoSortAfterTest by rememberMmkvBool(AppConfig.PREF_AUTO_SORT_AFTER_TEST, false)
     var delayTestUrl by rememberMmkvString(AppConfig.PREF_DELAY_TEST_URL, "")
     var realPingConcurrency by rememberMmkvString(AppConfig.PREF_REAL_PING_CONCURRENCY, "16")
     var ipApiUrl by rememberMmkvString(AppConfig.PREF_IP_API_URL, "")
@@ -530,18 +528,6 @@ fun SettingsScreen(
                 summary = stringResource(R.string.summary_pref_is_booted),
                 checked = isBooted,
                 onCheckedChange = { isBooted = it }
-            )
-            SettingsSwitchItem(
-                title = stringResource(R.string.title_pref_auto_remove_invalid_after_test),
-                summary = stringResource(R.string.summary_pref_auto_remove_invalid_after_test),
-                checked = autoRemoveInvalidAfterTest,
-                onCheckedChange = { autoRemoveInvalidAfterTest = it }
-            )
-            SettingsSwitchItem(
-                title = stringResource(R.string.title_pref_auto_sort_after_test),
-                summary = stringResource(R.string.summary_pref_auto_sort_after_test),
-                checked = autoSortAfterTest,
-                onCheckedChange = { autoSortAfterTest = it }
             )
             SettingsEditItem(
                 title = stringResource(R.string.title_pref_delay_test_url),
