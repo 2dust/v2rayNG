@@ -348,14 +348,14 @@
     <string name="routing_settings_network_tip">[udp|tcp]</string>
     <string name="routing_settings_outbound_tag">outboundTag</string>
 
-    <string name="connection_test_pending">সংযোগ পরীক্ষা করুন</string>
+    <string name="connection_test_pending">সংযোগ পরীক্ষা করতে ট্যাপ করুন</string>
     <string name="connection_test_testing">পরীক্ষা চলছে…</string>
     <string name="connection_test_testing_count">Testing %d configurations…</string>
-    <string name="connection_test_available">সফল: HTTP সংযোগ নিয়েছে %dms</string>
+    <string name="connection_test_available">HTTP সংযোগ নিয়েছে %dms</string>
     <string name="connection_test_error">ইন্টারনেট সংযোগ সনাক্ত করতে ব্যর্থ: %s</string>
     <string name="connection_test_fail">ইন্টারনেট উপলব্ধ নয়</string>
     <string name="connection_test_error_status_code">ত্রুটি কোড: #%d</string>
-    <string name="connection_connected">সংযুক্ত, সংযোগ পরীক্ষা করতে ট্যাপ করুন</string>
+    <string name="connection_connected">সংযুক্ত</string>
     <string name="connection_not_connected">সংযুক্ত নয়</string>
     <string name="connection_runing_task_left">Number of running test tasks: %s</string>
 

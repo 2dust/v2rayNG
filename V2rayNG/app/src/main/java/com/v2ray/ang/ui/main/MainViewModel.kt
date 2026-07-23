@@ -44,16 +44,13 @@ class MainViewModel(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
     private val preloadDispatcher: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(1)
-
-    private val disconnectedText: String = dataSource.getString(R.string.connection_not_connected)
-    private val connectedText: String = dataSource.getString(R.string.connection_connected)
+    private val checkConnectionText: String = dataSource.getString(R.string.connection_test_pending)
 
     // ---------- UI state ----------
     private val _uiState = MutableStateFlow(
         MainUiState(
             selectedGroupId = dataSource.getSelectedSubscriptionId(),
             selectedGuid = dataSource.getSelectServer(),
-            statusText = disconnectedText,
             confirmRemove = dataSource.getConfirmRemove(),
             doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
         )
@@ -156,6 +153,9 @@ class MainViewModel(
 
     private fun currentServers(): List<ServersCache> =
         mutableServersForGroup(uiState.value.selectedGroupId).value
+
+    private fun idleStatusText(running: Boolean, currentText: String = ""): String =
+        if (!running) "" else currentText.ifBlank { checkConnectionText }
 
     // ---------- Action handler ----------
     fun onAction(action: MainAction) {
@@ -666,7 +666,7 @@ class MainViewModel(
         _uiState.update {
             it.copy(
                 isTesting = false,
-                statusText = if (it.isRunning) connectedText else disconnectedText
+                statusText = idleStatusText(it.isRunning)
             )
         }
     }
@@ -715,7 +715,7 @@ class MainViewModel(
             _uiState.update {
                 it.copy(
                     isTesting = false,
-                    statusText = if (it.isRunning) connectedText else disconnectedText
+                    statusText = idleStatusText(it.isRunning)
                 )
             }
             reloadAllGroups(_uiState.value.groups.map { it.id })
@@ -751,8 +751,11 @@ class MainViewModel(
         _uiState.update { state ->
             state.copy(
                 isRunning = running,
-                statusText = if (!clearTestingText && state.isTesting) state.statusText
-                else if (running) connectedText else disconnectedText
+                statusText = if (!clearTestingText && state.isTesting) {
+                    state.statusText
+                } else {
+                    idleStatusText(running, state.statusText)
+                }
             )
         }
     }

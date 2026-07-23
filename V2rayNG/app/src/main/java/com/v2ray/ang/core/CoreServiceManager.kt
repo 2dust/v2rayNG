@@ -15,6 +15,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.dto.OutboundTrafficStat
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.enums.BalancerStrategyType
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
@@ -120,6 +122,42 @@ object CoreServiceManager {
      * @return The name of the running server.
      */
     fun getRunningServerName() = currentConfig?.remarks.orEmpty()
+
+    fun getActiveBalancerTarget(): String {
+        val config = currentConfig
+        if (!coreController.isRunning || config?.configType != EConfigType.POLICYGROUP) {
+            return ""
+        }
+        when (BalancerStrategyType.from(config.policyGroupType)) {
+            BalancerStrategyType.LEAST_PING,
+            BalancerStrategyType.LEAST_LOAD -> Unit
+            else -> return ""
+        }
+        return try {
+            coreController.getBalancerPrincipleTarget(AppConfig.TAG_BALANCER)
+        } catch (e: Exception) {
+            LogUtil.d(AppConfig.TAG, "Active balancer target unavailable: ${e.message}")
+            ""
+        }
+    }
+
+    private fun activeBalancerDisplayName(): String {
+        val target = getActiveBalancerTarget().trim()
+        if (target.isBlank()) return ""
+
+        val parts = target.split("-", limit = 4)
+        if (parts.size != 4 || parts[0] != AppConfig.TAG_PROXY || parts[2].toIntOrNull() == null) {
+            return ""
+        }
+
+        val remarks = parts[3].trim()
+        return if (
+            remarks.isNotBlank() &&
+            !remarks.contains('\n') &&
+            !remarks.contains('\r') &&
+            !remarks.contains(",${AppConfig.TAG_PROXY}-")
+        ) remarks else ""
+    }
 
     /**
      * Starts the context service for V2Ray.
@@ -386,7 +424,9 @@ object CoreServiceManager {
             }
 
             val result = if (time >= 0) {
-                service.getString(R.string.connection_test_available, time)
+                val activeTarget = activeBalancerDisplayName()
+                val delayResult = service.getString(R.string.connection_test_available, time)
+                if (activeTarget.isBlank()) delayResult else "$delayResult ($activeTarget)"
             } else {
                 service.getString(R.string.connection_test_error, errorStr)
             }

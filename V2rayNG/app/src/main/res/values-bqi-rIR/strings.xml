@@ -354,14 +354,14 @@
     <string name="routing_settings_network_tip" translatable="false">[udp|tcp]</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
-    <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
+    <string name="connection_test_pending">سی واجۊری کیلیک کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ...</string>
-    <string name="connection_test_available">مووفق بی: منپیز %dms تۊل کشی</string>
+    <string name="connection_test_available">منپیز %dms تۊل کشی</string>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود ختا: #%d</string>
-    <string name="connection_connected">منپیز هڌ، سی واجۊری کیلیک کوݩ</string>
+    <string name="connection_connected">منپیز هڌ</string>
     <string name="connection_not_connected">منپیز نؽڌ</string>
     <string name="connection_runing_task_left">تعداد وزیفه یل آزمایشی ک ره اۊفتانه: %s</string>
 

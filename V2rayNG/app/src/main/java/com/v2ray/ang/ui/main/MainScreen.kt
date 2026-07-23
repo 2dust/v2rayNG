@@ -26,8 +26,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.R
 import com.v2ray.ang.compose.LocalDarkTheme
 import com.v2ray.ang.compose.QRCodeDialog
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -48,7 +50,12 @@ fun MainScreen(
     val groups = uiState.groups
     val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
     val isRunning = uiState.isRunning
-    val displayText = uiState.statusText
+    val connectionText = if (isRunning) {
+        stringResource(R.string.connection_connected)
+    } else {
+        stringResource(R.string.connection_not_connected)
+    }
+    val statusText = uiState.statusText
     val selectedGuid = uiState.selectedGuid
     val doubleColumnDisplay = uiState.doubleColumnDisplay
     val confirmRemove = uiState.confirmRemove
@@ -224,7 +231,8 @@ fun MainScreen(
             },
             bottomBar = {
                 MainBottomBar(
-                    displayText = displayText,
+                    connectionText = connectionText,
+                    statusText = statusText,
                     isRunning = isRunning,
                     isDarkTheme = isDarkTheme,
                     onAction = onAction
