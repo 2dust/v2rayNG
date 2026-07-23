@@ -2,8 +2,10 @@ package com.v2ray.ang.ui.logcat
 
 import android.app.Application
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +38,12 @@ class LogcatViewModel(application: Application) : BaseViewModel(application) {
                 LogUtil.e(AppConfig.TAG, "Failed to get logcat", e)
             }
         }
+    }
+
+    fun copyLogcat() {
+        val all = filteredLogs.value.joinToString("\n")
+        Utils.setClipboard(app, all)
+        toast(R.string.toast_success)
     }
 
     fun clearLogcat() {

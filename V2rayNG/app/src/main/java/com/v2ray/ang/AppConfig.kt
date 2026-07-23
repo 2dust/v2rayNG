@@ -82,6 +82,7 @@ object AppConfig {
     const val PREF_USE_HEV_TUNNEL = "pref_use_hev_tunnel_v2"
     const val PREF_HEV_TUNNEL_LOGLEVEL = "pref_hev_tunnel_loglevel"
     const val PREF_HEV_TUNNEL_RW_TIMEOUT = "pref_hev_tunnel_rw_timeout_v2"
+    const val PREF_UPDATE_SUBSCRIPTION = "pref_update_subscription"
     const val PREF_AUTO_TEST_AFTER_UPDATE_SUBSCRIPTION = "pref_auto_test_after_update_subscription"
     const val PREF_SHIZUKU_SYNC_TOKEN = "pref_shizuku_sync_token"
     const val PREF_AUTO_REMOVE_INVALID_AFTER_TEST = "pref_auto_remove_invalid_after_test"
@@ -186,6 +187,9 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG_FINISH = 74
     const val MSG_QUERY_HOTSPOT_CONFIG = 81
     const val MSG_HOTSPOT_CONFIG_RESPONSE = 82
+
+    const val MSG_SUB_UPDATE_START = 8
+    const val MSG_SUB_UPDATE_CANCEL = 81
 
     /** Notification channel IDs and names. */
     const val RAY_NG_CHANNEL_ID = "RAY_NG_M_CH_ID"

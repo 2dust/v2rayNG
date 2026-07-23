@@ -1,20 +1,15 @@
 package com.v2ray.ang.compose
 
-import android.content.Context
-import androidx.annotation.StringRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -29,17 +24,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.time.Duration.Companion.milliseconds
 
 enum class ToastType {
     NORMAL, SUCCESS, ERROR, WARNING, INFO
@@ -92,44 +90,36 @@ class AppSnackbarController(
     val hostState: SnackbarHostState,
     private val scope: CoroutineScope,
 ) {
+    private var currentId = 0
+    private var currentShowTime = 0L
+
     fun show(message: CharSequence, type: ToastType = ToastType.NORMAL, long: Boolean = false) {
-        scope.launch {
-            hostState.currentSnackbarData?.dismiss()
-            hostState.showSnackbar(
-                message = message.toString(),
-                actionLabel = type.name,
-                duration = if (long) SnackbarDuration.Long else SnackbarDuration.Short,
-                withDismissAction = false,
-            )
-        }
-    }
+        val id = ++currentId
+         scope.launch {
+            if (currentShowTime != 0L) {
+                val elapsed = System.currentTimeMillis() - currentShowTime
+                if (elapsed < 500) {
+                    delay((500 - elapsed).milliseconds)
+                }
+            }
 
-    fun showInfo(context: Context, @StringRes messageRes: Int, long: Boolean = false) {
-        show(context.getString(messageRes), ToastType.NORMAL, long)
-    }
+             hostState.currentSnackbarData?.dismiss()
 
+            launch {
+                hostState.showSnackbar(
+                    message = message.toString(),
+                    actionLabel = type.name,
+                    duration = if (long) SnackbarDuration.Long else SnackbarDuration.Short,
+                    withDismissAction = false,
+                )
+                if (id == currentId) {
+                    currentShowTime = 0L
+                }
+            }
 
-    fun showInfo(message: CharSequence, long: Boolean = false) {
-        show(message, ToastType.NORMAL, long)
-    }
-
-
-    fun showSuccess(context: Context, @StringRes messageRes: Int, long: Boolean = false) {
-        show(context.getString(messageRes), ToastType.SUCCESS, long)
-    }
-
-
-    fun showSuccess(message: CharSequence, long: Boolean = false) {
-        show(message, ToastType.SUCCESS, long)
-    }
-
-    fun showError(context: Context, @StringRes messageRes: Int, long: Boolean = false) {
-        show(context.getString(messageRes), ToastType.ERROR, long)
-    }
-
-    fun showError(message: CharSequence, long: Boolean = false) {
-        show(message, ToastType.ERROR, long)
-    }
+            currentShowTime = System.currentTimeMillis()
+         }
+     }
 }
 
 val LocalAppSnackbar = staticCompositionLocalOf<AppSnackbarController> {
@@ -147,18 +137,22 @@ fun rememberAppSnackbarController(): AppSnackbarController {
 fun AppSnackbarBridge(
     controller: AppSnackbarController
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     DisposableEffect(Unit) {
         AppSnackbarManager.registerHost()
         onDispose { AppSnackbarManager.unregisterHost() }
     }
 
-    LaunchedEffect(controller) {
+    LaunchedEffect(controller, lifecycleOwner) {
         AppSnackbarManager.messages.collect { event ->
-            controller.show(
-                message = event.message,
-                type = event.type,
-                long = event.long
-            )
+            if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                controller.show(
+                    message = event.message,
+                    type = event.type,
+                    long = event.long
+                )
+            }
         }
     }
 }
@@ -166,10 +160,8 @@ fun AppSnackbarBridge(
 private val ToastCornerRadius = 24.dp
 private val ToastHorizontalPad = 16.dp
 private val ToastVerticalPad = 12.dp
-private val ToastIconSize = 24.dp
-private val ToastIconSpacing = 10.dp
-private val ToastMaxLines = 8
-private val ToastMaxWidthFraction = 0.75f
+private const val ToastMaxLines = 8
+private const val ToastMaxWidthFraction = 0.75f
 private val ToastBottomOffset = 100.dp
 
 @Composable
@@ -179,6 +171,10 @@ fun AppSnackbarHost(
 ) {
     BoxWithConstraints(modifier = modifier) {
         val maxSnackbarWidth = maxWidth * ToastMaxWidthFraction
+        val density = LocalDensity.current
+        val navigationBarHeight = with(density) {
+            WindowInsets.navigationBars.getBottom(this).toDp()
+        }
 
         SnackbarHost(
             hostState = hostState,
@@ -197,18 +193,10 @@ fun AppSnackbarHost(
                 ToastType.INFO -> toastInfoBg
             }
 
-            val iconText = when (type) {
-                ToastType.SUCCESS -> "✓"
-                ToastType.ERROR -> "✕"
-                ToastType.WARNING -> "!"
-                ToastType.INFO -> "ℹ"
-                ToastType.NORMAL -> null
-            }
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = ToastBottomOffset),
+                    .padding(bottom = ToastBottomOffset + navigationBarHeight),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Surface(
@@ -227,24 +215,6 @@ fun AppSnackbarHost(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (iconText != null) {
-                            Box(
-                                modifier = Modifier
-                                    .size(ToastIconSize)
-                                    .clip(CircleShape)
-                                    .background(toastIconCircleBg),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = iconText,
-                                    color = toastTextColor,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(ToastIconSpacing))
-                        }
-
                         Text(
                             text = data.visuals.message,
                             color = toastTextColor,

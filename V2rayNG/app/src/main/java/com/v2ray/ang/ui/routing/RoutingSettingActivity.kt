@@ -45,8 +45,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppDivider
 import com.v2ray.ang.compose.AppTopBar
+import com.v2ray.ang.compose.ItemDivider
 import com.v2ray.ang.compose.ReorderableListItem
 import com.v2ray.ang.compose.SelectListDialog
 import com.v2ray.ang.compose.SettingsListItem
@@ -288,7 +288,7 @@ fun RoutingSettingScreen(
                             }
                         )
                     }
-                    AppDivider(modifier = Modifier.padding(horizontal = 14.dp))
+                    ItemDivider()
                 }
             }
         }

@@ -38,9 +38,8 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppDivider
 import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.LocalAppSnackbar
+import com.v2ray.ang.compose.ItemDivider
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.base.BaseComponentActivity
@@ -134,7 +133,6 @@ fun LogcatScreen(
     var searchQuery by remember { mutableStateOf("") }
     var showSearch by remember { mutableStateOf(false) }
 
-    val snackbar = LocalAppSnackbar.current
     val listState = rememberLazyListState()
 
     Scaffold(
@@ -165,11 +163,7 @@ fun LogcatScreen(
                             )
                         }
                     }
-                    IconButton(onClick = {
-                        val all = viewModel.filteredLogs.value.joinToString("\n")
-                        Utils.setClipboard(context, all)
-                        snackbar.showInfo(context, R.string.toast_success)
-                    }) {
+                    IconButton(onClick = { viewModel.copyLogcat() }) {
                         Icon(
                             painterResource(R.drawable.ic_copy),
                             contentDescription = stringResource(R.string.logcat_copy)
@@ -216,7 +210,7 @@ fun LogcatScreen(
             ) {
                 itemsIndexed(items = logs, key = { index, _ -> index }) { _, log ->
                     LogcatItem(log = log, onLongClick = { Utils.setClipboard(context, log) })
-                    AppDivider()
+                    ItemDivider()
                 }
             }
         }

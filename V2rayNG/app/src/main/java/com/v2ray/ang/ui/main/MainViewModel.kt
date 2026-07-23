@@ -95,7 +95,7 @@ class MainViewModel(
         }
     }
 
-    private suspend fun handleServiceEvent(event: MainServiceEvent) {
+    private fun handleServiceEvent(event: MainServiceEvent) {
         when (event) {
             MainServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
             MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
@@ -710,12 +710,6 @@ class MainViewModel(
 
     private fun onTestsFinished() {
         viewModelScope.launch(ioDispatcher) {
-            if (dataSource.getAutoRemoveInvalidAfterTest()) {
-                removeInvalidServerInternal()
-            }
-            if (dataSource.getAutoSortAfterTest()) {
-                sortByTestResultsInternal()
-            }
             cacheMutex.withLock { groupDataCache.clear() }
             testingGroupId = null
             _uiState.update {
