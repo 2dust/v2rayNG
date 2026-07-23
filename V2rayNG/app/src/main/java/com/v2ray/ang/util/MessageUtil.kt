@@ -6,8 +6,10 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.dto.SubscriptionUpdateMessage
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.service.CoreTestService
+import com.v2ray.ang.service.SubscriptionUpdateService
 import java.io.Serializable
 
 object MessageUtil {
@@ -66,6 +68,39 @@ object MessageUtil {
             }
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to send message to test service", e)
+        }
+    }
+
+    /**
+     * Sends a message to the subscription service.
+     *
+     * @param ctx The context.
+     * @param message The subscription service message containing key and subId.
+     */
+    fun sendMsg2SubscriptionService(ctx: Context, message: SubscriptionUpdateMessage) {
+        try {
+            val intent = Intent()
+            intent.component = ComponentName(ctx, SubscriptionUpdateService::class.java)
+            intent.putExtra("content", message)
+            when (message.key) {
+                AppConfig.MSG_SUB_UPDATE_START -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        ContextCompat.startForegroundService(ctx, intent)
+                    } else {
+                        ctx.startService(intent)
+                    }
+                }
+
+                AppConfig.MSG_SUB_UPDATE_CANCEL -> {
+                    ctx.stopService(intent)
+                }
+
+                else -> {
+                    ctx.startService(intent)
+                }
+            }
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to send message to subscription service", e)
         }
     }
 

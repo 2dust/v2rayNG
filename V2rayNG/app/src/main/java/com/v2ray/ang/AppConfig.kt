@@ -184,6 +184,9 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG_NOTIFY = 73
     const val MSG_MEASURE_CONFIG_FINISH = 74
 
+    const val MSG_SUB_UPDATE_START = 8
+    const val MSG_SUB_UPDATE_CANCEL = 81
+
     /** Notification channel IDs and names. */
     const val RAY_NG_CHANNEL_ID = "RAY_NG_M_CH_ID"
     const val RAY_NG_CHANNEL_NAME = "v2rayNG Background Service"
