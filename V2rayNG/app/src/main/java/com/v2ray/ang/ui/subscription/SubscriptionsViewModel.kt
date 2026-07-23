@@ -19,7 +19,7 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
     private val subscriptions: MutableList<SubscriptionCache> =
         MmkvManager.decodeSubscriptions().toMutableList()
 
-    private val _subsFlow = MutableStateFlow<List<SubscriptionCache>>(subscriptions.toList())
+    private val _subsFlow = MutableStateFlow(subscriptions.toList())
     val subsFlow: StateFlow<List<SubscriptionCache>> = _subsFlow.asStateFlow()
 
     fun getAll(): List<SubscriptionCache> = subscriptions.toList()
@@ -64,9 +64,9 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         val subIds = MmkvManager.decodeSubscriptions()
             .filter { it.subscription.enabled && it.subscription.url.isNotEmpty() }
             .map { it.guid }
-        
+
         if (subIds.isNotEmpty()) {
-            MessageUtil.sendMsg2SubscriptionService(app, SubscriptionUpdateMessage(AppConfig.MSG_SUB_UPDATE_START, subIds))
+            MessageUtil.sendMsg2SubscriptionService(app, SubscriptionUpdateMessage(AppConfig.MSG_SUB_UPDATE_START, false, subIds))
         }
 
         toast(R.string.subscription_updater_job_tips)

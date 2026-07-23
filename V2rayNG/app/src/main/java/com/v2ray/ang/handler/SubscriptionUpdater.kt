@@ -180,7 +180,7 @@ object SubscriptionUpdater {
 
             MessageUtil.sendMsg2SubscriptionService(
                 applicationContext,
-                SubscriptionUpdateMessage(AppConfig.MSG_SUB_UPDATE_START, listOf(subId))
+                SubscriptionUpdateMessage(AppConfig.MSG_SUB_UPDATE_START, true, listOf(subId))
             )
 
             return Result.success()
