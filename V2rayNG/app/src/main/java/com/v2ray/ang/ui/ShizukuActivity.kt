@@ -21,8 +21,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.HotspotRoutingSnapshot
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.extension.toastError
+import com.v2ray.ang.extension.toastInfo
 import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.extension.toastWarning
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.shizuku.HotspotRoutingConfig
 import com.v2ray.ang.shizuku.IShizukuTetheringService
@@ -277,7 +277,7 @@ class ShizukuActivity : BaseComponentActivity() {
             )
             operationJob = null
             if (status.warning == ShizukuTetheringService.RESULT_UNPROTECTED_UPSTREAM) {
-                toastWarning(R.string.shizuku_tethering_wrong_upstream)
+                toastInfo(R.string.shizuku_tethering_wrong_upstream)
             }
         }
     }
