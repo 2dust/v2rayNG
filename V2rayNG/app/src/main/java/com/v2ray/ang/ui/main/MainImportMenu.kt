@@ -96,16 +96,16 @@ fun MoreMenuContent(
         onClick = { onAction(MainAction.ExportAll) }
     )
     DropdownMenuItem(
-        text = { Text(stringResource(R.string.title_real_ping_all_server)) },
-        onClick = { onAction(MainAction.TestAllServers) }
-    )
-    DropdownMenuItem(
         text = { Text(stringResource(R.string.title_locate_selected_config)) },
         onClick = { onAction(MainAction.LocateSelectedServer) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.title_sort_by_test_results)) },
         onClick = { onAction(MainAction.SortByTestResults) }
+    )
+    DropdownMenuItem(
+        text = { Text(stringResource(R.string.title_real_ping_all_server)) },
+        onClick = { onAction(MainAction.TestAllServers) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.title_sub_update)) },
