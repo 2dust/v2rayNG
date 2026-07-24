@@ -8,7 +8,7 @@ on:
       - feat/security-interface
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-nightly:
@@ -90,9 +90,12 @@ jobs:
         chmod +x gradlew
         ./gradlew assembleDebug
 
-    - name: Upload Nightly Debug APK Artifact
-      uses: actions/upload-artifact@v4
-      if: ${{ success() }}
+    - name: Create Direct Download Release
+      uses: softprops/action-gh-release@v2
       with:
-        name: v2rayNG-nightly-debug-apk
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/**/*.apk
+        tag_name: nightly-build
+        name: Nightly Security Build
+        files: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/playstore/debug/*arm64-v8a*.apk
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
