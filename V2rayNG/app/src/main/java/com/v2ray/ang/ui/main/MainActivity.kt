@@ -24,6 +24,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.AboutActivity
+import com.v2ray.ang.ui.ShizukuActivity
 import com.v2ray.ang.ui.backup.BackupActivity
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.checkupdate.CheckUpdateActivity
@@ -146,6 +147,7 @@ class MainActivity : HelperBaseComponentActivity() {
             "logcat" -> Intent(this, LogcatActivity::class.java)
             "check_update" -> Intent(this, CheckUpdateActivity::class.java)
             "backup_restore" -> Intent(this, BackupActivity::class.java)
+            "tethering" -> Intent(this, ShizukuActivity::class.java)
             "about" -> Intent(this, AboutActivity::class.java)
             "promotion" -> {
                 Utils.openUri(

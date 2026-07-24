@@ -84,6 +84,7 @@ object AppConfig {
     const val PREF_HEV_TUNNEL_RW_TIMEOUT = "pref_hev_tunnel_rw_timeout_v2"
     const val PREF_UPDATE_SUBSCRIPTION = "pref_update_subscription"
     const val PREF_AUTO_TEST_AFTER_UPDATE_SUBSCRIPTION = "pref_auto_test_after_update_subscription"
+    const val PREF_SHIZUKU_SYNC_TOKEN = "pref_shizuku_sync_token"
     const val PREF_AUTO_REMOVE_INVALID_AFTER_TEST = "pref_auto_remove_invalid_after_test"
     const val PREF_AUTO_SORT_AFTER_TEST = "pref_auto_sort_after_test"
     const val PREF_REAL_PING_CONCURRENCY = "pref_real_ping_concurrency"
@@ -184,6 +185,8 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG_SUCCESS = 72
     const val MSG_MEASURE_CONFIG_NOTIFY = 73
     const val MSG_MEASURE_CONFIG_FINISH = 74
+    const val MSG_QUERY_HOTSPOT_CONFIG = 81
+    const val MSG_HOTSPOT_CONFIG_RESPONSE = 82
 
     const val MSG_SUB_UPDATE_START = 8
     const val MSG_SUB_UPDATE_CANCEL = 81
@@ -234,6 +237,17 @@ object AppConfig {
     const val ROOT_V6_PRE_CHAIN = "CORE6_PRE" // ip6tables mangle/PREROUTING chain: mark forwarded clients' IPv6 into the tun
     const val ROOT_LAN_DNS = "1.1.1.1"          // fallback resolver for tethered clients when no plain-IPv4 DNS is configured
     const val ROOT_OOM_SCORE = "-1000"          // oom_score_adj that makes the LMK never kill us
+
+    /** Shizuku test-network TUN used as Android tethering's preferred upstream. */
+    const val SHIZUKU_TUN_ADDR_V4 = "192.0.2.2/24"
+    /**
+     * Android only delegates a /64 that it considers globally scoped. The documentation
+     * prefix satisfies that platform requirement without claiming a real public network.
+     */
+    const val SHIZUKU_TUN_ADDR_V6 = "2001:db8:9877::1/64"
+
+    /** IPv6-shaped DNS hint required by Android; configured app resolvers remain first. */
+    const val SHIZUKU_TUN_DNS_HINT_V6 = "fdfe:dcba:9877::53"
 
     /** hev-sock5-tunnel read-write-timeout value */
     const val HEVTUN_RW_TIMEOUT = "300,60"

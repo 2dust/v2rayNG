@@ -110,6 +110,29 @@ fun Context.toastError(message: CharSequence) {
 }
 
 /**
+ * Shows a warning toast message with the given resource ID.
+ *
+ * @param message The resource ID of the message to show.
+ */
+fun Context.toastWarning(message: Int) {
+    val text = getString(message)
+    dispatchMessage(text, ToastType.WARNING) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+    }
+}
+
+/**
+ * Shows a warning toast message with the given text.
+ *
+ * @param message The text of the message to show.
+ */
+fun Context.toastWarning(message: CharSequence) {
+    dispatchMessage(message, ToastType.WARNING) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+}
+
+/**
  * Shows an info toast message with the given resource ID.
  *
  * @param message The resource ID of the message to show.

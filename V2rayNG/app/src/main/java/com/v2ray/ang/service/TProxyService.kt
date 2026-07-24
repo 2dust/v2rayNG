@@ -31,6 +31,21 @@ class TProxyService(
         @Suppress("FunctionName")
         private external fun TProxyGetStats(): LongArray?
 
+        /**
+         * Starts a second HEV instance from a dedicated process.
+         *
+         * The Shizuku tethering UserService runs in its own process, so HEV's process-global
+         * native state is independent from the instance serving the regular VpnService TUN.
+         */
+        internal fun startExternalTunnel(configPath: String, fd: Int) {
+            TProxyStartService(configPath, fd)
+        }
+
+        /** Stops the HEV instance started in the current process. */
+        internal fun stopExternalTunnel() {
+            TProxyStopService()
+        }
+
         init {
             System.loadLibrary("hev-socks5-tunnel")
         }
@@ -58,43 +73,21 @@ class TProxyService(
     }
 
     private fun buildConfig(): String {
-        val socksPort = SettingsManager.getSocksPort()
-        val socksUsername = SettingsManager.getSocksUsername()
-        val socksPassword = SettingsManager.getSocksPassword()
         val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
-        val escapedSocksUsername = socksUsername?.replace("'", "''")
-        val escapedSocksPassword = socksPassword?.replace("'", "''")
-        return buildString {
-            appendLine("tunnel:")
-            appendLine("  mtu: ${SettingsManager.getVpnMtu()}")
-            appendLine("  ipv4: ${vpnConfig.ipv4Client}")
-
-            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED)) {
-                appendLine("  ipv6: '${vpnConfig.ipv6Client}'")
-            }
-
-            appendLine("socks5:")
-            appendLine("  port: ${socksPort}")
-            appendLine("  address: ${AppConfig.LOOPBACK}")
-            appendLine("  udp: 'udp'")
-            if (escapedSocksUsername != null && escapedSocksPassword != null) {
-                appendLine("  username: '${escapedSocksUsername}'")
-                appendLine("  password: '${escapedSocksPassword}'")
-            }
-
-            // Read-write timeout settings
-            val timeoutSetting = MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) ?: AppConfig.HEVTUN_RW_TIMEOUT
-            val parts = timeoutSetting.split(",")
-                .map { it.trim() }
-                .filter { it.isNotEmpty() }
-            val tcpTimeout = parts.getOrNull(0)?.toIntOrNull() ?: 300
-            val udpTimeout = parts.getOrNull(1)?.toIntOrNull() ?: 60
-
-            appendLine("misc:")
-            appendLine("  tcp-read-write-timeout: ${tcpTimeout * 1000}")
-            appendLine("  udp-read-write-timeout: ${udpTimeout * 1000}")
-            appendLine("  log-level: ${MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) ?: "warn"}")
-        }
+        return HevTunnelConfig.build(
+            HevTunnelParameters(
+                mtu = SettingsManager.getVpnMtu(),
+                ipv4 = vpnConfig.ipv4Client,
+                ipv6 = vpnConfig.ipv6Client.takeIf {
+                    MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED)
+                },
+                socksAddress = AppConfig.LOOPBACK,
+                socksPort = SettingsManager.getSocksPort(),
+                socksUsername = SettingsManager.getSocksUsername(),
+                socksPassword = SettingsManager.getSocksPassword(),
+                settings = HevTunnelSettings.current(),
+            ),
+        )
     }
 
     /**
