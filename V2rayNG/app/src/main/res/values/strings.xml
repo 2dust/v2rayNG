@@ -498,4 +498,26 @@
         <item>WebDAV</item>
     </string-array>
 
+    <string name="category_internal_interface">Internal Network Interface &amp; Security</string>
+    <string name="title_pref_interface_name_mode">Network interface name</string>
+    <string-array name="pref_interface_name_mode_entries">
+        <item>Random</item>
+        <item>Custom</item>
+    </string-array>
+    <string-array name="pref_interface_name_mode_values">
+        <item>random</item>
+        <item>custom</item>
+    </string-array>
+    <string name="title_pref_interface_name_custom">Custom interface name</string>
+
+    <string name="title_pref_socks_auth_mode">Local proxy credentials</string>
+    <string-array name="pref_socks_auth_mode_entries">
+        <item>Random</item>
+        <item>Static</item>
+    </string-array>
+    <string-array name="pref_socks_auth_mode_values">
+        <item>random</item>
+        <item>static</item>
+    </string-array>
+
 </resources>

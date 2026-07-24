@@ -39,6 +39,15 @@ object SettingsManager {
     @Volatile
     private var runtimeSocksPort: Int? = null
 
+    @Volatile
+    private var runtimeInterfaceName: String? = null
+
+    @Volatile
+    private var runtimeSocksUsername: String? = null
+
+    @Volatile
+    private var runtimeSocksPassword: String? = null
+
     fun initApp(context: Context) {
         ensureDefaultSettings()
         //ensureDefaultSubscription()
@@ -304,12 +313,67 @@ object SettingsManager {
         return null
     }
 
+    fun getInterfaceNameMode(): String {
+        return MmkvManager.decodeSettingsString(AppConfig.PREF_INTERFACE_NAME_MODE) ?: "random"
+    }
+
+    fun getSocksAuthMode(): String {
+        return MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_AUTH_MODE) ?: "random"
+    }
+
+    @Synchronized
+    fun refreshRuntimeInterfaceName(): String {
+        val mode = getInterfaceNameMode()
+        if (mode == "custom") {
+            val custom = MmkvManager.decodeSettingsString(AppConfig.PREF_INTERFACE_NAME_CUSTOM)?.trim()
+            runtimeInterfaceName = if (!custom.isNullOrEmpty()) custom else "v2rayNG"
+        } else {
+            runtimeInterfaceName = "v2ray_" + generateRandomAlphanumeric(6)
+        }
+        return runtimeInterfaceName!!
+    }
+
+    fun getVpnInterfaceName(): String {
+        return runtimeInterfaceName ?: refreshRuntimeInterfaceName()
+    }
+
+    @Synchronized
+    fun refreshRuntimeSocksCredentials() {
+        val mode = getSocksAuthMode()
+        if (mode == "random") {
+            runtimeSocksUsername = "usr_" + generateRandomAlphanumeric(8)
+            runtimeSocksPassword = "pwd_" + generateRandomAlphanumeric(12)
+        } else {
+            runtimeSocksUsername = null
+            runtimeSocksPassword = null
+        }
+    }
+
+    private fun generateRandomAlphanumeric(length: Int): String {
+        val allowed = "abcdefghijklmnopqrstuvwxyz0123456789"
+        return (1..length).map { allowed.random() }.joinToString("")
+    }
+
     fun getSocksUsername(): String? {
-        return MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_USERNAME)?.trim()?.takeIf { it.isNotEmpty() }
+        val mode = getSocksAuthMode()
+        if (mode == "static") {
+            return MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_USERNAME)?.trim()?.takeIf { it.isNotEmpty() }
+        }
+        return runtimeSocksUsername ?: run {
+            refreshRuntimeSocksCredentials()
+            runtimeSocksUsername
+        }
     }
 
     fun getSocksPassword(): String? {
-        return MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PASSWORD)?.trim()?.takeIf { it.isNotEmpty() }
+        val mode = getSocksAuthMode()
+        if (mode == "static") {
+            return MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PASSWORD)?.trim()?.takeIf { it.isNotEmpty() }
+        }
+        return runtimeSocksPassword ?: run {
+            refreshRuntimeSocksCredentials()
+            runtimeSocksPassword
+        }
     }
 
     /**
@@ -528,6 +592,9 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_METHOD, AppConfig.OBSERVATORY_LEAST_LOAD_METHOD)
         ensureDefaultValue(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_SAMPLING, AppConfig.OBSERVATORY_LEAST_LOAD_SAMPLING)
         ensureDefaultValue(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_TIMEOUT, AppConfig.OBSERVATORY_LEAST_LOAD_TIMEOUT)
+        ensureDefaultValue(AppConfig.PREF_INTERFACE_NAME_MODE, "random")
+        ensureDefaultValue(AppConfig.PREF_INTERFACE_NAME_CUSTOM, "v2rayNG")
+        ensureDefaultValue(AppConfig.PREF_SOCKS_AUTH_MODE, "random")
     }
 
     private fun ensureDefaultValue(key: String, default: String) {

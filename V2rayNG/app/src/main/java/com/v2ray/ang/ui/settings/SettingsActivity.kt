@@ -27,6 +27,7 @@ import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.CollapsiblePreferenceGroupHeader
+import com.v2ray.ang.compose.PreferenceGroupHeader
 import com.v2ray.ang.compose.SettingsEditItem
 import com.v2ray.ang.compose.SettingsListItem
 import com.v2ray.ang.compose.SettingsMenuItem
@@ -138,6 +139,10 @@ fun SettingsScreen(
     var realPingConcurrency by rememberMmkvString(AppConfig.PREF_REAL_PING_CONCURRENCY, "16")
     var ipApiUrl by rememberMmkvString(AppConfig.PREF_IP_API_URL, "")
 
+    var interfaceNameMode by rememberMmkvString(AppConfig.PREF_INTERFACE_NAME_MODE, "random")
+    var interfaceNameCustom by rememberMmkvString(AppConfig.PREF_INTERFACE_NAME_CUSTOM, "v2rayNG")
+    var socksAuthMode by rememberMmkvString(AppConfig.PREF_SOCKS_AUTH_MODE, "random")
+
     val isVpn = mode == VPN
     val hevTunEnabled = isVpn && useHevTun
     val localProxyForced = hevTunEnabled
@@ -166,6 +171,10 @@ fun SettingsScreen(
     val observatoryLeastLoadMethodValues = stringArrayResource(R.array.observatory_least_load_method).toList()
     val modeEntries = stringArrayResource(R.array.mode_entries).toList()
     val modeValues = stringArrayResource(R.array.mode_value).toList()
+    val interfaceNameModeEntries = stringArrayResource(R.array.pref_interface_name_mode_entries).toList()
+    val interfaceNameModeValues = stringArrayResource(R.array.pref_interface_name_mode_values).toList()
+    val socksAuthModeEntries = stringArrayResource(R.array.pref_socks_auth_mode_entries).toList()
+    val socksAuthModeValues = stringArrayResource(R.array.pref_socks_auth_mode_values).toList()
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
@@ -389,19 +398,43 @@ fun SettingsScreen(
                     keyboardNumber = true,
                     onValueChanged = { socksPort = it }
                 )
-                SettingsEditItem(
-                    title = stringResource(R.string.title_pref_socks_username),
-                    value = socksUsername,
-                    enabled = effectiveLocalProxy,
-                    onValueChanged = { socksUsername = it }
+                PreferenceGroupHeader(title = stringResource(R.string.category_internal_interface))
+                SettingsListItem(
+                    title = stringResource(R.string.title_pref_interface_name_mode),
+                    entries = interfaceNameModeEntries,
+                    values = interfaceNameModeValues,
+                    selectedValue = interfaceNameMode,
+                    onSelected = { interfaceNameMode = it }
                 )
-                SettingsEditItem(
-                    title = stringResource(R.string.title_pref_socks_password),
-                    value = socksPassword,
-                    enabled = effectiveLocalProxy,
-                    isPassword = true,
-                    onValueChanged = { socksPassword = it }
+                if (interfaceNameMode == "custom") {
+                    SettingsEditItem(
+                        title = stringResource(R.string.title_pref_interface_name_custom),
+                        value = interfaceNameCustom,
+                        onValueChanged = { interfaceNameCustom = it }
+                    )
+                }
+                SettingsListItem(
+                    title = stringResource(R.string.title_pref_socks_auth_mode),
+                    entries = socksAuthModeEntries,
+                    values = socksAuthModeValues,
+                    selectedValue = socksAuthMode,
+                    onSelected = { socksAuthMode = it }
                 )
+                if (socksAuthMode == "static") {
+                    SettingsEditItem(
+                        title = stringResource(R.string.title_pref_socks_username),
+                        value = socksUsername,
+                        enabled = effectiveLocalProxy,
+                        onValueChanged = { socksUsername = it }
+                    )
+                    SettingsEditItem(
+                        title = stringResource(R.string.title_pref_socks_password),
+                        value = socksPassword,
+                        enabled = effectiveLocalProxy,
+                        isPassword = true,
+                        onValueChanged = { socksPassword = it }
+                    )
+                }
                 SettingsSwitchItem(
                     title = stringResource(R.string.title_pref_socks_enable_udp),
                     summary = stringResource(R.string.summary_pref_socks_enable_udp),

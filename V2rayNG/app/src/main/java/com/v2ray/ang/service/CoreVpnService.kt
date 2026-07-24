@@ -268,7 +268,7 @@ class CoreVpnService : VpnService(), ServiceControl {
             }
         }
 
-        //builder.setSession(V2RayServiceManager.getRunningServerName())
+        builder.setSession(SettingsManager.getVpnInterfaceName())
     }
 
     /**
