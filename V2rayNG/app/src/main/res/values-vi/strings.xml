@@ -43,6 +43,17 @@
     <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
     <string name="server_lab_remarks">Tên cấu hình</string>
     <string name="server_lab_address">Địa chỉ</string>
+    <string name="server_lab_cf_ip_scan">Lấy IP CF sạch</string>
+    <string name="toast_cf_ip_scanning">Đang quét IP Cloudflare (ping + tải xuống)...</string>
+    <string name="toast_cf_ip_scan_success">Đã điền IP Cloudflare nhanh nhất vào địa chỉ</string>
+    <string name="toast_cf_ip_scan_failed">Quét IP Cloudflare thất bại. Tắt VPN rồi thử lại.</string>
+    <string name="toast_cf_ip_scan_stop_vpn">Tắt nút Start/VPN trước khi quét</string>
+    <string name="toast_cf_ip_scan_data_warning">Quét đầy đủ gồm kiểm tra tải xuống và có thể tốn nhiều dữ liệu</string>
+    <string name="cf_ip_status_fetching">Đang lấy dải IP Cloudflare...</string>
+    <string name="cf_ip_status_ping">Đang kiểm tra ping...</string>
+    <string name="cf_ip_status_download">Đang kiểm tra tốc độ tải...</string>
+    <string name="cf_ip_status_testing">Đang kiểm tra...</string>
+    <string name="cf_ip_ping_ms">%d ms</string>
     <string name="server_lab_port">Cổng</string>
     <string name="server_lab_id">ID</string>
     <string name="server_lab_alterid">ID bổ sung (AlterID)</string>

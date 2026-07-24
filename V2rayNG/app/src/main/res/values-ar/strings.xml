@@ -43,6 +43,17 @@
     <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
     <string name="server_lab_remarks">ملاحظات</string>
     <string name="server_lab_address">العنوان</string>
+    <string name="server_lab_cf_ip_scan">الحصول على IP نظيف لـ CF</string>
+    <string name="toast_cf_ip_scanning">جارٍ فحص عناوين Cloudflare (بينغ + تنزيل)...</string>
+    <string name="toast_cf_ip_scan_success">تم تعبئة أسرع عنوان Cloudflare في حقل العنوان</string>
+    <string name="toast_cf_ip_scan_failed">فشل فحص عناوين Cloudflare. أوقف VPN ثم أعد المحاولة.</string>
+    <string name="toast_cf_ip_scan_stop_vpn">أوقف زر Start/VPN قبل الفحص</string>
+    <string name="toast_cf_ip_scan_data_warning">الفحص الكامل يشمل اختبار التنزيل وقد يستهلك بيانات كثيرة</string>
+    <string name="cf_ip_status_fetching">جارٍ جلب نطاقات عناوين Cloudflare...</string>
+    <string name="cf_ip_status_ping">جارٍ اختبار البينغ...</string>
+    <string name="cf_ip_status_download">جارٍ اختبار سرعة التنزيل...</string>
+    <string name="cf_ip_status_testing">جارٍ الاختبار...</string>
+    <string name="cf_ip_ping_ms">%d ms</string>
     <string name="server_lab_port">المنفذ</string>
     <string name="server_lab_id">المعرف</string>
     <string name="server_lab_alterid">AlterId</string>

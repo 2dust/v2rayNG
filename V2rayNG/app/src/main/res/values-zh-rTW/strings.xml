@@ -43,6 +43,17 @@
     <string name="del_invalid_config_comfirm">刪除前請先測試！確認刪除？</string>
     <string name="server_lab_remarks">備註</string>
     <string name="server_lab_address">位址</string>
+    <string name="server_lab_cf_ip_scan">取得優選 CF IP</string>
+    <string name="toast_cf_ip_scanning">正在掃描 Cloudflare IP（延遲+下載）...</string>
+    <string name="toast_cf_ip_scan_success">已將最快的 Cloudflare IP 填入位址</string>
+    <string name="toast_cf_ip_scan_failed">Cloudflare IP 掃描失敗。請關閉 VPN 後重試。</string>
+    <string name="toast_cf_ip_scan_stop_vpn">掃描前請先關閉開始/VPN 按鈕</string>
+    <string name="toast_cf_ip_scan_data_warning">完整測速包含延遲與下載測試，可能消耗較多流量</string>
+    <string name="cf_ip_status_fetching">正在取得 Cloudflare IP 段...</string>
+    <string name="cf_ip_status_ping">正在 Ping 測試...</string>
+    <string name="cf_ip_status_download">正在下載測速...</string>
+    <string name="cf_ip_status_testing">正在測試...</string>
+    <string name="cf_ip_ping_ms">%d ms</string>
     <string name="server_lab_port">埠</string>
     <string name="server_lab_id">使用者 ID</string>
     <string name="server_lab_alterid">alterId</string>

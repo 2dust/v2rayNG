@@ -43,6 +43,17 @@
     <string name="del_invalid_config_comfirm">Выполните проверку перед удалением! Подтверждаете удаление?</string>
     <string name="server_lab_remarks">Название</string>
     <string name="server_lab_address">Адрес</string>
+    <string name="server_lab_cf_ip_scan">Получить чистый CF IP</string>
+    <string name="toast_cf_ip_scanning">Сканирование IP Cloudflare (пинг + загрузка)...</string>
+    <string name="toast_cf_ip_scan_success">Самый быстрый IP Cloudflare записан в адрес</string>
+    <string name="toast_cf_ip_scan_failed">Сканирование IP Cloudflare не удалось. Отключите VPN и повторите.</string>
+    <string name="toast_cf_ip_scan_stop_vpn">Перед сканированием выключите кнопку Start/VPN</string>
+    <string name="toast_cf_ip_scan_data_warning">Полный тест включает загрузку и может израсходовать много трафика</string>
+    <string name="cf_ip_status_fetching">Загрузка диапазонов IP Cloudflare...</string>
+    <string name="cf_ip_status_ping">Тест пинга...</string>
+    <string name="cf_ip_status_download">Тест скорости загрузки...</string>
+    <string name="cf_ip_status_testing">Тестирование...</string>
+    <string name="cf_ip_ping_ms">%d мс</string>
     <string name="server_lab_port">Порт</string>
     <string name="server_lab_id">ID</string>
     <string name="server_lab_alterid">Альтернативный ID</string>

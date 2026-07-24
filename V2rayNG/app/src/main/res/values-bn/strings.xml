@@ -43,6 +43,17 @@
     <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
     <string name="server_lab_remarks">মন্তব্য</string>
     <string name="server_lab_address">ঠিকানা</string>
+    <string name="server_lab_cf_ip_scan">পরিষ্কার CF IP নিন</string>
+    <string name="toast_cf_ip_scanning">Cloudflare IP স্ক্যান হচ্ছে (পিং + ডাউনলোড)...</string>
+    <string name="toast_cf_ip_scan_success">সবচেয়ে দ্রুত Cloudflare IP ঠিকানায় বসানো হয়েছে</string>
+    <string name="toast_cf_ip_scan_failed">Cloudflare IP স্ক্যান ব্যর্থ। VPN বন্ধ করে আবার চেষ্টা করুন।</string>
+    <string name="toast_cf_ip_scan_stop_vpn">স্ক্যানের আগে Start/VPN বাটন বন্ধ করুন</string>
+    <string name="toast_cf_ip_scan_data_warning">পূর্ণ স্ক্যানে ডাউনলোড পরীক্ষা আছে এবং অনেক ডেটা খরচ হতে পারে</string>
+    <string name="cf_ip_status_fetching">Cloudflare IP রেঞ্জ আনা হচ্ছে...</string>
+    <string name="cf_ip_status_ping">পিং পরীক্ষা চলছে...</string>
+    <string name="cf_ip_status_download">ডাউনলোড গতি পরীক্ষা চলছে...</string>
+    <string name="cf_ip_status_testing">পরীক্ষা চলছে...</string>
+    <string name="cf_ip_ping_ms">%d ms</string>
     <string name="server_lab_port">পোর্ট</string>
     <string name="server_lab_id">আইডি</string>
     <string name="server_lab_alterid">অলটারআইডি</string>

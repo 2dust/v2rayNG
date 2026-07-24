@@ -43,6 +43,17 @@
     <string name="del_invalid_config_comfirm">پؽش ز پاک کردن، پینگ بگرین! الن اخۊین پاک کۊنین؟</string>
     <string name="server_lab_remarks">نیشتنا</string>
     <string name="server_lab_address">نشۊوی</string>
+    <string name="server_lab_cf_ip_scan">گرفتن IP پاک CF</string>
+    <string name="toast_cf_ip_scanning">داره IPهای Cloudflare اسکن ابۊ (پینگ + دانلود)...</string>
+    <string name="toast_cf_ip_scan_success">سریع‌ترین IP کلودفلر وه نشۊوی نیشته بیه</string>
+    <string name="toast_cf_ip_scan_failed">اسکن IP کلودفلر شکست خوارد. VPN ره خاموش کۊنین و دوواره امتحان کۊنین.</string>
+    <string name="toast_cf_ip_scan_stop_vpn">قبل از اسکن، دکمه Start/VPN ره خاموش کۊنین</string>
+    <string name="toast_cf_ip_scan_data_warning">اسکن کامل پینگ و تست دانلود داره و ممکنه اینترنت زیاتی بخوره</string>
+    <string name="cf_ip_status_fetching">داره بازه‌های IP کلودفلر بیاره...</string>
+    <string name="cf_ip_status_ping">داره پینگ تست ابۊ...</string>
+    <string name="cf_ip_status_download">داره سرعت دانلود تست ابۊ...</string>
+    <string name="cf_ip_status_testing">داره تست ابۊ...</string>
+    <string name="cf_ip_ping_ms">%d ms</string>
     <string name="server_lab_port">پورت</string>
     <string name="server_lab_id">نوم منتوری</string>
     <string name="server_lab_alterid">شناسه جایگۊزین</string>

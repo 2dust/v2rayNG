@@ -4,8 +4,10 @@ import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,14 +16,19 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -32,12 +39,14 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.AppConfig.REALITY
 import com.v2ray.ang.AppConfig.TLS
 import com.v2ray.ang.R
+import com.v2ray.ang.cfscan.CloudflareIpScanner
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
 import com.v2ray.ang.compose.FormTextField
 import com.v2ray.ang.compose.SettingsSwitchItem
 import com.v2ray.ang.compose.verticalScrollbar
+import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
@@ -104,17 +113,139 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         state: ServerUiState,
         showPort: Boolean = true
     ) {
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        val showCfIpScan = state.configType == EConfigType.VLESS ||
+            state.configType == EConfigType.VMESS ||
+            state.configType == EConfigType.TROJAN
+        var isScanning by rememberSaveable { mutableStateOf(false) }
+        var scanProgress by rememberSaveable { mutableFloatStateOf(0f) }
+        var scanStatus by rememberSaveable { mutableStateOf("") }
+        var addressPingMs by rememberSaveable { mutableStateOf<String?>(null) }
+
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             FormTextField(
                 stringResource(R.string.server_lab_remarks),
                 state.remarks,
                 { state.remarks = it }
             )
-            FormTextField(
-                stringResource(R.string.server_lab_address),
-                state.address,
-                { state.address = it }
-            )
+            if (showCfIpScan) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FormTextField(
+                        label = stringResource(R.string.server_lab_address),
+                        value = state.address,
+                        onValueChange = {
+                            state.address = it
+                            addressPingMs = null
+                        },
+                        enabled = !isScanning,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (!addressPingMs.isNullOrBlank()) {
+                        Text(
+                            text = addressPingMs.orEmpty(),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(end = 4.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            if (isScanning) return@IconButton
+                            // VPN / Start must be OFF before scanning
+                            if (CoreServiceManager.isRunning()) {
+                                context.toast(R.string.toast_cf_ip_scan_stop_vpn)
+                                return@IconButton
+                            }
+                            isScanning = true
+                            scanProgress = 0f
+                            addressPingMs = null
+                            scanStatus = context.getString(R.string.toast_cf_ip_scanning)
+                            context.toast(R.string.toast_cf_ip_scan_data_warning)
+                            scope.launch {
+                                try {
+                                    // Full scan: ping 100 + download top 20
+                                    val best = CloudflareIpScanner.findBestCloudflareIp { progress ->
+                                        scope.launch(Dispatchers.Main.immediate) {
+                                            val total = progress.total.coerceAtLeast(1)
+                                            scanProgress =
+                                                (progress.current.toFloat() / total).coerceIn(0f, 1f)
+                                            val statusText = when (progress.status) {
+                                                CloudflareIpScanner.STATUS_FETCHING ->
+                                                    context.getString(R.string.cf_ip_status_fetching)
+                                                CloudflareIpScanner.STATUS_PING ->
+                                                    context.getString(R.string.cf_ip_status_ping)
+                                                CloudflareIpScanner.STATUS_DOWNLOAD ->
+                                                    context.getString(R.string.cf_ip_status_download)
+                                                CloudflareIpScanner.STATUS_TESTING ->
+                                                    context.getString(R.string.cf_ip_status_testing)
+                                                else ->
+                                                    context.getString(R.string.toast_cf_ip_scanning)
+                                            }
+                                            val ipPart = progress.currentIp.takeIf { it.isNotBlank() }
+                                                ?.let { " $it" }
+                                                .orEmpty()
+                                            scanStatus =
+                                                "$statusText$ipPart (${progress.current}/${progress.total})"
+                                        }
+                                    }
+                                    if (best == null || best.ipAddress.isBlank()) {
+                                        context.toast(R.string.toast_cf_ip_scan_failed)
+                                    } else {
+                                        state.address = best.ipAddress
+                                        addressPingMs = context.getString(
+                                            R.string.cf_ip_ping_ms,
+                                            best.avgLatencyMs.toInt().coerceAtLeast(0)
+                                        )
+                                        context.toastSuccess(R.string.toast_cf_ip_scan_success)
+                                    }
+                                } catch (_: Exception) {
+                                    context.toast(R.string.toast_cf_ip_scan_failed)
+                                } finally {
+                                    isScanning = false
+                                    scanProgress = 0f
+                                    scanStatus = ""
+                                }
+                            }
+                        },
+                        // Off while scanning, or while VPN Start is on
+                        enabled = !isScanning && !CoreServiceManager.isRunning(),
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_cloud_download_24dp),
+                            contentDescription = stringResource(R.string.server_lab_cf_ip_scan)
+                        )
+                    }
+                }
+                if (isScanning) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        LinearProgressIndicator(
+                            progress = { scanProgress },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Text(
+                            text = scanStatus.ifBlank { stringResource(R.string.toast_cf_ip_scanning) },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            } else {
+                FormTextField(
+                    stringResource(R.string.server_lab_address),
+                    state.address,
+                    { state.address = it }
+                )
+            }
             if (showPort) {
                 FormTextField(
                     stringResource(R.string.server_lab_port),

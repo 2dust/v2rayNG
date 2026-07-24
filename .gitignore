@@ -2,6 +2,9 @@
 *.dat
 *.jks
 
+# Temporary clone used when porting CF scan engine
+CFSTAPP-tmp/
+
 # Ignore output JSON file
 V2rayNG/app/release/output.json
 

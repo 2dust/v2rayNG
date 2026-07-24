@@ -44,6 +44,17 @@
     <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
     <string name="server_lab_remarks">remarks</string>
     <string name="server_lab_address">address</string>
+    <string name="server_lab_cf_ip_scan">Get clean CF IP</string>
+    <string name="toast_cf_ip_scanning">Scanning Cloudflare IPs (ping + download)...</string>
+    <string name="toast_cf_ip_scan_success">Fastest Cloudflare IP filled into address</string>
+    <string name="toast_cf_ip_scan_failed">Cloudflare IP scan failed. Turn off VPN and try again.</string>
+    <string name="toast_cf_ip_scan_stop_vpn">Turn off the Start/VPN button before scanning</string>
+    <string name="toast_cf_ip_scan_data_warning">Full scan uses ping + download test and may consume significant data</string>
+    <string name="cf_ip_status_fetching">Fetching Cloudflare IP ranges...</string>
+    <string name="cf_ip_status_ping">Ping testing...</string>
+    <string name="cf_ip_status_download">Download speed testing...</string>
+    <string name="cf_ip_status_testing">Testing...</string>
+    <string name="cf_ip_ping_ms">%d ms</string>
     <string name="server_lab_port">port</string>
     <string name="server_lab_id">id</string>
     <string name="server_lab_alterid">alterId</string>

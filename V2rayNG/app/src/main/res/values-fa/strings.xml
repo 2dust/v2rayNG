@@ -43,6 +43,17 @@
     <string name="del_invalid_config_comfirm">لطفاً قبل از حذف، پینگ بگیرید! آیا از حذف اطمینان دارید؟</string>
     <string name="server_lab_remarks">ملاحظات</string>
     <string name="server_lab_address">نشانی</string>
+    <string name="server_lab_cf_ip_scan">دریافت IP تمیز CF</string>
+    <string name="toast_cf_ip_scanning">در حال اسکن IPهای Cloudflare (پینگ + دانلود)...</string>
+    <string name="toast_cf_ip_scan_success">سریع‌ترین IP کلودفلر در آدرس قرار گرفت</string>
+    <string name="toast_cf_ip_scan_failed">اسکن IP کلودفلر ناموفق بود. VPN را خاموش کنید و دوباره تلاش کنید.</string>
+    <string name="toast_cf_ip_scan_stop_vpn">قبل از اسکن، دکمه Start/VPN را خاموش کنید</string>
+    <string name="toast_cf_ip_scan_data_warning">اسکن کامل شامل پینگ و تست دانلود است و ممکن است اینترنت زیادی مصرف کند</string>
+    <string name="cf_ip_status_fetching">در حال دریافت بازه‌های IP کلودفلر...</string>
+    <string name="cf_ip_status_ping">در حال تست پینگ...</string>
+    <string name="cf_ip_status_download">در حال تست سرعت دانلود...</string>
+    <string name="cf_ip_status_testing">در حال تست...</string>
+    <string name="cf_ip_ping_ms">%d ms</string>
     <string name="server_lab_port">پورت</string>
     <string name="server_lab_id">شناسه</string>
     <string name="server_lab_alterid">شناسه جایگزین</string>
