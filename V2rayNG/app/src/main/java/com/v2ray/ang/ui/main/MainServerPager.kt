@@ -151,7 +151,8 @@ private fun ServerListPage(
                         onEditServer = onEditServer,
                         onShareServer = onShareServer,
                         onMoreServer = onMoreServer,
-                        onRemoveServer = onRemoveServer
+                        onRemoveServer = onRemoveServer,
+                        onPingServer = { mainViewModel.testSingleRealPing(it) }
                     )
                 }
                 if (canReorder && reorderableGridState != null) {
@@ -218,7 +219,8 @@ private fun ServerListPage(
                         onEditServer = onEditServer,
                         onShareServer = onShareServer,
                         onMoreServer = onMoreServer,
-                        onRemoveServer = onRemoveServer
+                        onRemoveServer = onRemoveServer,
+                        onPingServer = { mainViewModel.testSingleRealPing(it) }
                     )
                     ItemDivider()
                 }
@@ -236,7 +238,8 @@ private fun ServerItemRow(
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit
+    onRemoveServer: (String) -> Unit,
+    onPingServer: (String) -> Unit
 ) {
     val profile = serverCache.profile
     val subRemarks = if (subscriptionId.isEmpty()) {
@@ -258,7 +261,8 @@ private fun ServerItemRow(
         onShare = { onShareServer(serverCache.guid, profile) },
         onEdit = { onEditServer(serverCache.guid, profile) },
         onRemove = { onRemoveServer(serverCache.guid) },
-        onMore = { onMoreServer(serverCache.guid, profile) }
+        onMore = { onMoreServer(serverCache.guid, profile) },
+        onPing = { onPingServer(serverCache.guid) }
     )
 }
 
@@ -272,7 +276,8 @@ private fun ServerItemColumn(
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit
+    onRemoveServer: (String) -> Unit,
+    onPingServer: (String) -> Unit
 ) {
     val profile = serverCache.profile
     val subRemarks = if (subscriptionId.isEmpty()) {
@@ -292,7 +297,8 @@ private fun ServerItemColumn(
             onEdit = { onEditServer(serverCache.guid, profile) },
             onShare = { onShareServer(serverCache.guid, profile) },
             onRemove = { onRemoveServer(serverCache.guid) },
-            onMore = { onMoreServer(serverCache.guid, profile) }
+            onMore = { onMoreServer(serverCache.guid, profile) },
+            onPing = { onPingServer(serverCache.guid) }
         )
         ItemDivider()
     }
@@ -313,6 +319,7 @@ fun ServerListItem(
     onShare: () -> Unit,
     onRemove: () -> Unit,
     onMore: () -> Unit,
+    onPing: () -> Unit = {},
     modifier: Modifier = Modifier,
     dragModifier: Modifier = Modifier
 ) {
@@ -354,6 +361,7 @@ fun ServerListItem(
                         Icon(painterResource(R.drawable.ic_more_vert_24dp), null, Modifier.size(24.dp))
                     }
                 } else {
+                    IconButton(onClick = onPing, Modifier.size(36.dp)) { Icon(painterResource(R.drawable.ic_lte_ping_24dp), null, Modifier.size(24.dp)) }
                     IconButton(onClick = onShare, Modifier.size(36.dp)) { Icon(painterResource(R.drawable.ic_share_24dp), null, Modifier.size(24.dp)) }
                     IconButton(onClick = onEdit, Modifier.size(36.dp)) { Icon(painterResource(R.drawable.ic_edit_24dp), null, Modifier.size(24.dp)) }
                     IconButton(onClick = onRemove, Modifier.size(36.dp)) { Icon(painterResource(R.drawable.ic_delete_24dp), null, Modifier.size(24.dp)) }

@@ -44,7 +44,7 @@ class RealPingWorkerService(
                 runningCount.incrementAndGet()
                 try {
                     val result = startRealPing(guid)
-                    onEvent(RealPingEvent.Result(guid, result))
+                    onEvent(RealPingEvent.Result(guid, result.first, result.second))
                 } catch (_: Throwable) {
                     // ignore
                 } finally {
@@ -79,29 +79,42 @@ class RealPingWorkerService(
         }
     }
 
-    private fun startRealPing(guid: String): Long {
+    private fun startRealPing(guid: String): Pair<Long, Long> {
         val retFailure = -1L
+        val config = MmkvManager.decodeServerConfig(guid) ?: return Pair(retFailure, retFailure)
+        
+        val pingType = SettingsManager.getPingType()
+        var icmpDelay = 0L
 
-        val config = MmkvManager.decodeServerConfig(guid) ?: return retFailure
-        if (!config.configType.isComplexType()
-            && config.configType != EConfigType.HYSTERIA2
-            && config.configType != EConfigType.WIREGUARD
-            && config.alpn?.startsWith("h3") != true
-            && config.server.isNotNullEmpty()
-            && config.serverPort?.toIntOrNull() != null
-        ) {
-            val url = config.server.orEmpty()
-            val port = config.serverPort.orEmpty().toInt()
-            val tcpTime = SpeedtestManager.socketConnectTime(url, port, 1000)
-            if (tcpTime <= -1L) {
-                return retFailure
+        if (pingType == "both" || pingType == "icmp") {
+            if (!config.configType.isComplexType()
+                && config.configType != EConfigType.HYSTERIA2
+                && config.configType != EConfigType.WIREGUARD
+                && config.alpn?.startsWith("h3") != true
+                && config.server.isNotNullEmpty()
+                && config.serverPort?.toIntOrNull() != null
+            ) {
+                val url = config.server.orEmpty()
+                val port = config.serverPort.orEmpty().toInt()
+                val tcpTime = SpeedtestManager.socketConnectTime(url, port, 1000)
+                icmpDelay = tcpTime
+                if (tcpTime <= -1L && pingType == "both") {
+                    return Pair(retFailure, tcpTime)
+                }
+            } else if (pingType == "icmp") {
+                icmpDelay = retFailure
             }
+        }
+
+        if (pingType == "icmp") {
+            return Pair(0L, icmpDelay)
         }
 
         val configResult = CoreConfigManager.getV2rayConfig4Speedtest(context, guid)
         if (!configResult.status) {
-            return retFailure
+            return Pair(retFailure, icmpDelay)
         }
-        return CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
+        val httpDelay = CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
+        return Pair(httpDelay, icmpDelay)
     }
 }

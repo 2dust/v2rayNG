@@ -497,4 +497,16 @@
         <item>WebDAV</item>
     </string-array>
 
+    <string name="title_pref_ping_type">Ping type</string>
+    <string-array name="pref_ping_type_entries">
+        <item>Both</item>
+        <item>ICMP/Tcping</item>
+        <item>HTTP</item>
+    </string-array>
+    <string-array name="pref_ping_type_values">
+        <item>both</item>
+        <item>icmp</item>
+        <item>http</item>
+    </string-array>
+
 </resources>

@@ -137,6 +137,7 @@ fun SettingsScreen(
     var delayTestUrl by rememberMmkvString(AppConfig.PREF_DELAY_TEST_URL, "")
     var realPingConcurrency by rememberMmkvString(AppConfig.PREF_REAL_PING_CONCURRENCY, "16")
     var ipApiUrl by rememberMmkvString(AppConfig.PREF_IP_API_URL, "")
+    var pingType by rememberMmkvString(AppConfig.PREF_PING_TYPE, "both")
 
     val isVpn = mode == VPN
     val hevTunEnabled = isVpn && useHevTun
@@ -166,6 +167,8 @@ fun SettingsScreen(
     val observatoryLeastLoadMethodValues = stringArrayResource(R.array.observatory_least_load_method).toList()
     val modeEntries = stringArrayResource(R.array.mode_entries).toList()
     val modeValues = stringArrayResource(R.array.mode_value).toList()
+    val pingTypeEntries = stringArrayResource(R.array.pref_ping_type_entries).toList()
+    val pingTypeValues = stringArrayResource(R.array.pref_ping_type_values).toList()
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
@@ -590,6 +593,13 @@ fun SettingsScreen(
                     value = realPingConcurrency,
                     keyboardNumber = true,
                     onValueChanged = { realPingConcurrency = it }
+                )
+                SettingsListItem(
+                    title = stringResource(R.string.title_pref_ping_type),
+                    entries = pingTypeEntries,
+                    values = pingTypeValues,
+                    selectedValue = pingType,
+                    onSelected = { pingType = it }
                 )
                 SettingsEditItem(
                     title = stringResource(R.string.title_pref_ip_api_url),

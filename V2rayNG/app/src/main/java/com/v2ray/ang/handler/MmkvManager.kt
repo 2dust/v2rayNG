@@ -300,6 +300,23 @@ object MmkvManager {
     }
 
     /**
+     * Encodes both HTTP and ICMP test delays in milliseconds.
+     *
+     * @param guid The server GUID.
+     * @param httpDelay The HTTP test delay in milliseconds.
+     * @param icmpDelay The ICMP test delay in milliseconds.
+     */
+    fun encodeServerDelays(guid: String, httpDelay: Long, icmpDelay: Long) {
+        if (guid.isBlank()) {
+            return
+        }
+        val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
+        aff.testDelayMillis = httpDelay
+        aff.icmpDelayMillis = icmpDelay
+        serverAffStorage.encode(guid, JsonUtil.toJson(aff))
+    }
+
+    /**
      * Clears all test delay results.
      *
      * @param keys The list of server GUIDs.
@@ -308,6 +325,7 @@ object MmkvManager {
         keys?.forEach { key ->
             decodeServerAffiliationInfo(key)?.let { aff ->
                 aff.testDelayMillis = 0
+                aff.icmpDelayMillis = 0
                 serverAffStorage.encode(key, JsonUtil.toJson(aff))
             }
         }

@@ -237,6 +237,7 @@ class MainViewModel(
                 guid = guid,
                 profile = profile.copy(),
                 testDelayMillis = affiliation?.testDelayMillis ?: 0L,
+                icmpDelayMillis = affiliation?.icmpDelayMillis ?: 0L,
                 testDelayString = affiliation?.getTestDelayString().orEmpty()
             )
         }
@@ -694,6 +695,19 @@ class MainViewModel(
                     key = AppConfig.MSG_MEASURE_CONFIG_START,
                     subscriptionId = groupId,
                     serverGuids = if (keywordFilter.isNotEmpty()) servers.map { it.guid } else emptyList()
+                )
+            )
+        }
+    }
+
+    fun testSingleRealPing(guid: String) {
+        dataSource.clearAllTestDelayResults(listOf(guid))
+        viewModelScope.launch(ioDispatcher) {
+            dataSource.sendMsg2TestService(
+                TestServiceMessage(
+                    key = AppConfig.MSG_MEASURE_CONFIG_START,
+                    subscriptionId = "",
+                    serverGuids = listOf(guid)
                 )
             )
         }

@@ -385,15 +385,33 @@ object CoreServiceManager {
                 }
             }
 
-            val result = if (time >= 0) {
-                service.getString(R.string.connection_test_available, time)
-            } else {
-                service.getString(R.string.connection_test_error, errorStr)
+            val pingType = SettingsManager.getPingType()
+            var tcpTime = -1L
+            if (pingType == "both" || pingType == "icmp") {
+                val selectGuid = MmkvManager.getSelectServer()
+                if (!selectGuid.isNullOrEmpty()) {
+                    val config = MmkvManager.decodeServerConfig(selectGuid)
+                    if (config != null && config.server.isNotNullEmpty() && config.serverPort?.toIntOrNull() != null) {
+                        tcpTime = SpeedtestManager.socketConnectTime(config.server.orEmpty(), config.serverPort.orEmpty().toInt(), 1000)
+                    }
+                }
+            }
+
+            val httpStr = if (time >= 0) "${time}ms" else ""
+            val icmpStr = if (tcpTime >= 0) "${tcpTime}ms" else ""
+            val result = when {
+                pingType == "both" && httpStr.isNotEmpty() && icmpStr.isNotEmpty() -> "HTTP: $httpStr | ICMP: $icmpStr"
+                pingType == "both" && httpStr.isNotEmpty() -> "HTTP: $httpStr"
+                pingType == "both" && icmpStr.isNotEmpty() -> "ICMP: $icmpStr"
+                pingType == "icmp" && icmpStr.isNotEmpty() -> "ICMP: $icmpStr"
+                pingType == "icmp" -> service.getString(R.string.connection_test_error, errorStr)
+                time >= 0 -> service.getString(R.string.connection_test_available, time)
+                else -> service.getString(R.string.connection_test_error, errorStr)
             }
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, result)
 
             // Only fetch IP info if the delay test was successful
-            if (time >= 0) {
+            if (time >= 0 || tcpTime >= 0) {
                 SpeedtestManager.getRemoteIPInfo()?.let { ip ->
                     MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, "$result\n$ip")
                 }

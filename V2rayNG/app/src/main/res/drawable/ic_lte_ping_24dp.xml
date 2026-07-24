@@ -1,0 +1,26 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <!-- Bar 1 -->
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M2,14 h2 v6 h-2 z" />
+  <!-- Bar 2 -->
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M5.5,10 h2 v10 h-2 z" />
+  <!-- Bar 3 -->
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M9,6 h2 v14 h-2 z" />
+  <!-- Bar 4 -->
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M12.5,2 h2 v18 h-2 z" />
+  <!-- Lightning bolt -->
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M19.5,2 L15.5,11 H18.5 L16.5,22 L22,10 H18.5 Z" />
+</vector>
