@@ -70,6 +70,7 @@
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn">Alpn</string>
+    <string name="server_lab_cipher_suites">Cipher Suites</string>
     <string name="server_lab_allow_insecure">Bỏ qua xác minh chứng chỉ</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">Địa chỉ</string>

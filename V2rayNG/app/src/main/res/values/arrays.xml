@@ -87,6 +87,7 @@
         <item>qq</item>
         <item>random</item>
         <item>randomized</item>
+        <item>unsafe</item>
     </string-array>
 
     <string-array name="streamsecurity_alpn" translatable="false">

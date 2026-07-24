@@ -70,6 +70,7 @@
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint" translatable="false">ফিঙ্গারপ্রিন্ট</string>
     <string name="server_lab_stream_alpn" translatable="false">Alpn</string>
+    <string name="server_lab_cipher_suites">সাইফার স্যুট (Cipher Suites)</string>
     <string name="server_lab_allow_insecure">অনিরাপদ অনুমতি দিন</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">ঠিকানা</string>

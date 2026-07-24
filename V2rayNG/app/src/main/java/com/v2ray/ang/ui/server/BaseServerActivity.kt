@@ -276,6 +276,11 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                     { state.alpn = it }
                 )
                 FormTextField(
+                    stringResource(R.string.server_lab_cipher_suites),
+                    state.cipherSuites,
+                    { state.cipherSuites = it }
+                )
+                FormTextField(
                     stringResource(R.string.server_lab_ech_config_list),
                     state.echConfigList,
                     { state.echConfigList = it }
