@@ -55,13 +55,14 @@ object NotificationHelper {
     fun updateNotification(
         channelType: NotificationChannelType,
         context: Context,
+        title: String,
         content: String
     ) {
         val notificationManager = getNotificationManager(context)
 
         // Get or create builder from cache
         val builder = builderCache.getOrPut(channelType.notificationId) {
-            buildNotificationBuilder(channelType, context, "", content)
+            buildNotificationBuilder(channelType, context, title, content)
         }
 
         // Update only the content text (fast operation)

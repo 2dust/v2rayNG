@@ -104,8 +104,12 @@ fun MoreMenuContent(
         onClick = { onAction(MainAction.SortByTestResults) }
     )
     DropdownMenuItem(
-        text = { Text(stringResource(R.string.title_real_ping_all_server)) },
+        text = { Text(stringResource(R.string.title_ping_all_server)) },
         onClick = { onAction(MainAction.TestAllServers) }
+    )
+    DropdownMenuItem(
+        text = { Text(stringResource(R.string.title_real_ping_all_server)) },
+        onClick = { onAction(MainAction.TestRealAllServers) }
     )
     DropdownMenuItem(
         text = { Text(stringResource(R.string.title_sub_update)) },
