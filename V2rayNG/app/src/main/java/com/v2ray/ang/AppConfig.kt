@@ -87,6 +87,9 @@ object AppConfig {
     const val PREF_AUTO_REMOVE_INVALID_AFTER_TEST = "pref_auto_remove_invalid_after_test"
     const val PREF_AUTO_SORT_AFTER_TEST = "pref_auto_sort_after_test"
     const val PREF_REAL_PING_CONCURRENCY = "pref_real_ping_concurrency"
+    const val PREF_INTERFACE_NAME_MODE = "pref_interface_name_mode"
+    const val PREF_INTERFACE_NAME_CUSTOM = "pref_interface_name_custom"
+    const val PREF_SOCKS_AUTH_MODE = "pref_socks_auth_mode"
 
     /** Cache keys. */
     const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"

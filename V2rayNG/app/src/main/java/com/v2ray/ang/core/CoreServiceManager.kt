@@ -92,6 +92,9 @@ object CoreServiceManager {
             MmkvManager.setSelectServer(guid)
         }
 
+        SettingsManager.refreshRuntimeInterfaceName()
+        SettingsManager.refreshRuntimeSocksCredentials()
+
         try {
             startContextService(context)
         } catch (e: Exception) {
