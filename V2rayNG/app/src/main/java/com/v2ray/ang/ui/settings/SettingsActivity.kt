@@ -27,6 +27,7 @@ import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.CollapsiblePreferenceGroupHeader
+import com.v2ray.ang.compose.PreferenceGroupHeader
 import com.v2ray.ang.compose.SettingsEditItem
 import com.v2ray.ang.compose.SettingsListItem
 import com.v2ray.ang.compose.SettingsMenuItem
@@ -397,7 +398,7 @@ fun SettingsScreen(
                     keyboardNumber = true,
                     onValueChanged = { socksPort = it }
                 )
-                SettingsCategoryHeader(title = stringResource(R.string.category_internal_interface))
+                PreferenceGroupHeader(title = stringResource(R.string.category_internal_interface))
                 SettingsListItem(
                     title = stringResource(R.string.title_pref_interface_name_mode),
                     entries = interfaceNameModeEntries,
