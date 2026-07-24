@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.milliseconds
 
 enum class ToastType {
-    NORMAL, SUCCESS, ERROR, WARNING, INFO
+    NORMAL, SUCCESS, ERROR, INFO
 }
 
 data class AppSnackbarMessage(
@@ -189,7 +189,6 @@ fun AppSnackbarHost(
                 ToastType.NORMAL -> if (isDark) toastNormalBgDark else toastNormalBgLight
                 ToastType.SUCCESS -> toastSuccessBg
                 ToastType.ERROR -> toastErrorBg
-                ToastType.WARNING -> toastWarningBg
                 ToastType.INFO -> toastInfoBg
             }
 
