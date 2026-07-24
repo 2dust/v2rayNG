@@ -383,6 +383,8 @@
     <string name="title_policy_group_type">نوع گروه خط مشی</string>
     <string name="title_policy_group_subscription_id">از گروه اشتراک</string>
     <string name="title_policy_group_subscription_filter">توضیحات فیلتر معمولی</string>
+    <string name="title_policy_group_test_outbounds">آزمایش خروجی‌ها</string>
+    <string name="title_policy_group_fallback">خروجی جایگزین (اختیاری)</string>
     <string name="server_proxy_chain_members">اعضای زنجیره پروکسی</string>
     <string name="server_proxy_chain_pick_members">برای انتخاب عضو اینجا بزنید</string>
     <string name="server_proxy_chain_member_unselected">یک عضو را انتخاب کنید</string>

@@ -398,6 +398,8 @@
     <string name="title_policy_group_type">Тип политики группы</string>
     <string name="title_policy_group_subscription_id">Из группы подписки</string>
     <string name="title_policy_group_subscription_filter">Название фильтра</string>
+    <string name="title_policy_group_test_outbounds">Проверять исходящие соединения</string>
+    <string name="title_policy_group_fallback">Резервное исходящее соединение (необязательно)</string>
 
     <string name="server_proxy_chain_members">Участники цепочки прокси</string>
     <string name="server_proxy_chain_pick_members">Нажмите здесь, чтобы выбрать участника</string>

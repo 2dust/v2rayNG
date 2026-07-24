@@ -407,6 +407,8 @@
     <string name="title_policy_group_type">Policy group type</string>
     <string name="title_policy_group_subscription_id">From subscription group</string>
     <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+    <string name="title_policy_group_test_outbounds">Test outbounds</string>
+    <string name="title_policy_group_fallback">Fallback outbound (optional)</string>
 
     <string name="server_proxy_chain_members">Proxy chain members</string>
     <string name="server_proxy_chain_pick_members">Tap here to pick member</string>

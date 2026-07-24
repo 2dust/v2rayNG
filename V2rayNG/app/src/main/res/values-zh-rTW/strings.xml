@@ -400,6 +400,8 @@
     <string name="title_policy_group_type">策略群組類型</string>
     <string name="title_policy_group_subscription_id">來自訂閱分組</string>
     <string name="title_policy_group_subscription_filter">別名正規過濾</string>
+    <string name="title_policy_group_test_outbounds">測試出口</string>
+    <string name="title_policy_group_fallback">備用出口（選填）</string>
     <string name="server_proxy_chain_members">代理鏈成員</string>
     <string name="server_proxy_chain_pick_members">點此選擇成員</string>
     <string name="server_proxy_chain_member_unselected">請選擇成員</string>
