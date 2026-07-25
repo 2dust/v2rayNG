@@ -97,11 +97,8 @@ internal object TetheringPlatformCompat {
             LEGACY_TETHERING_TYPE_BLUETOOTH to
                 compileRegexes(invokeStringList(service, "getTetherableBluetoothRegexs")),
         )
-        return interfaces.mapNotNull { interfaceName ->
-            val type = regexesByType.entries.firstOrNull { (_, regexes) ->
-                regexes.any { it.matches(interfaceName) }
-            }?.key ?: inferLegacyTetheringType(interfaceName)
-            type?.let { ActiveTetheringInterface(it, interfaceName) }
+        return interfaces.map { interfaceName ->
+            ActiveTetheringInterface(requireLegacyTetheringType(interfaceName, regexesByType), interfaceName)
         }
     }
 
@@ -122,13 +119,24 @@ internal object TetheringPlatformCompat {
         return when {
             name.startsWith("wlan") || name.startsWith("ap") || name.startsWith("softap") ->
                 ShizukuTetheringService.TETHERING_TYPE_WIFI
-            name.startsWith("usb") || name.startsWith("rndis") || name.startsWith("ncm") ->
+            name.startsWith("usb") || name.startsWith("rndis") ->
                 ShizukuTetheringService.TETHERING_TYPE_USB
             name.startsWith("bt-pan") || name.startsWith("bnep") ->
                 LEGACY_TETHERING_TYPE_BLUETOOTH
+            name.startsWith("p2p") -> LEGACY_TETHERING_TYPE_WIFI_P2P
+            name.startsWith("ncm") -> LEGACY_TETHERING_TYPE_NCM
+            name.startsWith("eth") -> LEGACY_TETHERING_TYPE_ETHERNET
             else -> null
         }
     }
+
+    internal fun requireLegacyTetheringType(interfaceName: String, regexesByType: Map<Int, List<Regex>>): Int =
+        inferLegacyTetheringType(interfaceName)
+        ?: regexesByType.entries.firstOrNull { (_, regexes) ->
+            regexes.any { it.matches(interfaceName) }
+        }?.key
+        // Never omit an active downstream: doing so could let callers release its protected upstream.
+        ?: error("Unknown active tethering interface: $interfaceName")
 
     private fun invokeStringList(service: Any, methodName: String): List<String>? {
         val method = service.javaClass.methods.firstOrNull {
@@ -148,6 +156,9 @@ internal object TetheringPlatformCompat {
     private const val UPSTREAM_INTERFACES_PREFIX = "Current upstream interface(s):"
     private const val TRANSPORT_TEST = 7
     private const val LEGACY_TETHERING_TYPE_BLUETOOTH = 2
+    private const val LEGACY_TETHERING_TYPE_WIFI_P2P = 3
+    private const val LEGACY_TETHERING_TYPE_NCM = 4
+    private const val LEGACY_TETHERING_TYPE_ETHERNET = 5
 }
 
 internal data class ActiveTetheringInterface(
