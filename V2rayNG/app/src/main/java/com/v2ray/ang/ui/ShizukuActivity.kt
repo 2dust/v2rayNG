@@ -136,7 +136,8 @@ class ShizukuActivity : BaseComponentActivity() {
             this,
             coreStateReceiver,
             IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY),
-            Utils.receiverFlags()
+            // The response carries the Binder that owns the protected test network.
+            ContextCompat.RECEIVER_NOT_EXPORTED
         )
         Shizuku.addBinderReceivedListenerSticky(binderReceivedListener)
         Shizuku.addBinderDeadListener(binderDeadListener)
