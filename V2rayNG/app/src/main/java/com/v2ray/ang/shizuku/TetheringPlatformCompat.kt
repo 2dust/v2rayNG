@@ -41,7 +41,11 @@ internal object TetheringPlatformCompat {
             Thread.currentThread().interrupt()
             throw error
         } finally {
-            process.destroyForcibly()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                process.destroyForcibly()
+            } else {
+                process.destroy()
+            }
             output.cancel(true)
         }
     }

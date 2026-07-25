@@ -40,22 +40,13 @@ internal object TetheringApi36 {
         }
     }
 
-    fun setTetheringEnabled(
+    fun stopTethering(
         service: Any,
         type: Int,
-        enabled: Boolean,
         executor: Executor,
         timeoutSeconds: Long,
     ): Int {
         val manager = service as TetheringManager
-        if (enabled) {
-            return TetheringPlatformCompat.startTethering(
-                service,
-                type,
-                executor,
-                timeoutSeconds,
-            )
-        }
         var result = ShizukuTetheringService.RESULT_INTERNAL_ERROR
         val callbackReceived = CountDownLatch(1)
         val request = TetheringManager.TetheringRequest.Builder(type).build()

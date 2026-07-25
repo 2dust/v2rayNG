@@ -49,6 +49,7 @@ object CoreServiceManager {
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
+
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
             field = value

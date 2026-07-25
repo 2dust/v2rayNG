@@ -183,6 +183,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun getIpv6TetheringTypes(): Int {
         return try {
             getTetheredInterfaces().fold(0) { mask, item ->
@@ -215,6 +216,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
      * Its presence on that real Wi-Fi or USB interface means Router Advertisement setup has
      * completed; checking the test TUN itself would only prove that IPv6 was requested.
      */
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun hasDelegatedIpv6Prefix(interfaceName: String): Boolean {
         val addresses = NetworkInterface.getByName(interfaceName)?.inetAddresses ?: return false
         return addresses.asSequence().any(TETHERING_IPV6_PREFIX::contains)
@@ -586,7 +588,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         setRoutingActiveLocked(config)
     }
 
-    private fun restoreTetheringTypesLocked(types: Int, activeTypes: Int = getActiveTetheringTypes()): Int {
+    private fun restoreTetheringTypesLocked(types: Int): Int {
+        val activeTypes = getActiveTetheringTypes()
         if (activeTypes < 0) return types
 
         var failedTypes = 0
@@ -811,16 +814,14 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     private fun changeTetheringEnabled(type: Int, enabled: Boolean): Int {
         return runCatching {
             when {
+                enabled -> TetheringPlatformCompat.startTethering(
+                    tetheringManager,
+                    type,
+                    executor,
+                    CALLBACK_TIMEOUT_SECONDS,
+                )
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA ->
-                    TetheringApi36.setTetheringEnabled(
-                        tetheringManager,
-                        type,
-                        enabled,
-                        executor,
-                        CALLBACK_TIMEOUT_SECONDS,
-                    )
-                enabled ->
-                    TetheringPlatformCompat.startTethering(
+                    TetheringApi36.stopTethering(
                         tetheringManager,
                         type,
                         executor,
@@ -1059,9 +1060,10 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_752
+        const val USER_SERVICE_VERSION = 20_260_753
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         private val TETHERING_IPV6_PREFIX = AppConfig.SHIZUKU_TUN_ADDR_V6.let { cidr ->
             IpPrefix(
                 InetAddress.getByName(cidr.substringBefore('/')),

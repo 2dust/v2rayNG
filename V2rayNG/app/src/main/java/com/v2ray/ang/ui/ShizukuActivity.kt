@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import androidx.compose.runtime.Composable
@@ -462,14 +461,7 @@ class ShizukuActivity : BaseComponentActivity() {
 
     @Suppress("DEPRECATION")
     private fun isPackageInstalled(packageName: String): Boolean = try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            packageManager.getApplicationInfo(
-                packageName,
-                PackageManager.ApplicationInfoFlags.of(0)
-            )
-        } else {
-            packageManager.getApplicationInfo(packageName, 0)
-        }
+        packageManager.getApplicationInfo(packageName, 0)
         true
     } catch (_: PackageManager.NameNotFoundException) {
         false

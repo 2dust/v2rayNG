@@ -41,8 +41,7 @@ internal object TetheringCoreSync {
     }
 
     fun onStarting() {
-        snapshot = HotspotRoutingSnapshot()
-        coreLease.clearEngineConfig()
+        clearCoreState()
     }
 
     fun onStarted(
@@ -65,11 +64,12 @@ internal object TetheringCoreSync {
 
     fun onStopping(service: Service) {
         send(service, HotspotRoutingSync.EVENT_CORE_STOPPING)
-        snapshot = HotspotRoutingSnapshot()
-        coreLease.clearEngineConfig()
+        clearCoreState()
     }
 
-    fun clear() {
+    fun clear() = clearCoreState()
+
+    private fun clearCoreState() {
         snapshot = HotspotRoutingSnapshot()
         coreLease.clearEngineConfig()
     }
@@ -83,11 +83,8 @@ internal object TetheringCoreSync {
         ShizukuProvider.requestBinderForNonProviderProcess(service)
     }
 
-    private fun currentSnapshot(coreRunning: Boolean): HotspotRoutingSnapshot =
-        snapshot.takeIf { coreRunning } ?: HotspotRoutingSnapshot()
-
     fun sendCurrentSnapshot(service: Service, coreRunning: Boolean) {
-        val currentSnapshot = currentSnapshot(coreRunning)
+        val currentSnapshot = snapshot.takeIf { coreRunning } ?: HotspotRoutingSnapshot()
         service.sendBroadcast(
             Intent(AppConfig.BROADCAST_ACTION_ACTIVITY)
                 .setPackage(AppConfig.ANG_PACKAGE)

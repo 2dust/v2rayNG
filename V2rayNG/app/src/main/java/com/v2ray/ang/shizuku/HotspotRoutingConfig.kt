@@ -10,13 +10,13 @@ import com.v2ray.ang.service.HevTunnelSettings
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 
-data class HotspotRoutingEngineConfig(
+internal data class HotspotRoutingEngineConfig(
     val useHev: Boolean,
     val profileName: String,
     val content: String,
 )
 
-data class HotspotRoutingLaunchConfig(
+internal data class HotspotRoutingLaunchConfig(
     val engine: HotspotRoutingEngineConfig,
     val dnsServers: List<String>,
     val ipv6Enabled: Boolean,
@@ -24,7 +24,7 @@ data class HotspotRoutingLaunchConfig(
     val xudpKey: String,
 )
 
-data class HotspotRoutingParameters(
+internal data class HotspotRoutingParameters(
     val useHev: Boolean,
     val profileName: String,
     val dnsServers: List<String>,
@@ -34,7 +34,7 @@ data class HotspotRoutingParameters(
 )
 
 /** Builds the privileged datapath configuration from the exact running-core snapshot. */
-object HotspotRoutingConfig {
+internal object HotspotRoutingConfig {
 
     fun parametersFromSnapshot(context: Context, snapshot: HotspotRoutingSnapshot): HotspotRoutingParameters {
         requireRoutableSnapshot(snapshot)
