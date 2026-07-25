@@ -259,6 +259,10 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             return RESULT_INVALID_SESSION
         }
         val activeTypes = getActiveTetheringTypes()
+        if (activeTypes < 0) {
+            setRoutingError("Unable to determine active tethering before enabling its protected route")
+            return RESULT_ROUTING_FAILED
+        }
         val launchConfig = HotspotRoutingLaunchConfig(
             engine = HotspotRoutingEngineConfig(useHev, profileName, engineConfig),
             dnsServers = dnsServers.toList(),
@@ -272,18 +276,16 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             xudpKey = launchConfig.xudpKey,
             dnsServers = launchConfig.dnsServers,
             ipv6Enabled = launchConfig.ipv6Enabled,
-            desiredTetheringTypes = activeTypes.takeIf { it >= 0 }
-                ?: routingSession?.desiredTetheringTypes
-                ?: 0,
+            desiredTetheringTypes = activeTypes,
         )
 
-        val result = startRoutingLocked(launchConfig)
+        val result = startRoutingLocked(launchConfig, activeTypes)
         if (result == RESULT_OK) routingSession = newSession
         return result
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun startRoutingLocked(config: HotspotRoutingLaunchConfig): Int {
+    private fun startRoutingLocked(config: HotspotRoutingLaunchConfig, activeTypes: Int): Int {
         if (routingActive) {
             if ((routingState == ROUTING_STATE_ACTIVE_HEV) != config.engine.useHev) {
                 return RESULT_IMPLEMENTATION_MISMATCH
@@ -295,12 +297,13 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         return try {
             if (testTun == null) {
                 createRoutingLocked(config)
+                // Tethering started outside v2rayNG can remain latched to its physical upstream.
+                // Run every existing downstream through the same verified start path as a new one;
+                // it restarts a wrong-upstream downstream and leaves it stopped if protection fails.
+                val failedTypes = restoreTetheringTypesLocked(activeTypes, activeTypes)
+                reportTetheringRestoreFailuresLocked(failedTypes)
             } else {
-                val restoreTypes = getActiveTetheringTypes()
-                check(restoreTypes >= 0) {
-                    "Unable to determine active tethering before rebuilding its protected route"
-                }
-                val failedTypes = rebuildRoutingLocked(config, restoreTypes)
+                val failedTypes = rebuildRoutingLocked(config, activeTypes)
                 reportTetheringRestoreFailuresLocked(failedTypes)
             }
             RESULT_OK
@@ -503,12 +506,12 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         setRoutingActiveLocked(config)
     }
 
-    private fun restoreTetheringTypesLocked(types: Int): Int {
-        if (getActiveTetheringTypes() < 0) return types
+    private fun restoreTetheringTypesLocked(types: Int, activeTypes: Int = getActiveTetheringTypes()): Int {
+        if (activeTypes < 0) return types
 
         var failedTypes = 0
         forEachTetheringType(types) { type, bit ->
-            val result = setTetheringEnabled(type, true)
+            val result = setTetheringEnabled(type, true, activeTypes)
             if (result != RESULT_OK) failedTypes = failedTypes or bit
         }
         return failedTypes
@@ -560,11 +563,10 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
      * its selected upstream are visible. A successful start is consequently not returned to the
      * app until the downstream is active and its actual upstream is exactly [testInterfaceName].
      */
-    private fun setTetheringEnabled(type: Int, enabled: Boolean): Int {
+    private fun setTetheringEnabled(type: Int, enabled: Boolean, activeTypes: Int = getActiveTetheringTypes()): Int {
         val bit = tetheringTypeBit(type)
         if (bit == 0) return RESULT_INTERNAL_ERROR
 
-        val activeTypes = getActiveTetheringTypes()
         val result = if (!enabled) {
             val alreadyStopped = activeTypes >= 0 && activeTypes and bit == 0 &&
                 requestedTetheringTypes and bit == 0
@@ -964,7 +966,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_748
+        const val USER_SERVICE_VERSION = 20_260_749
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private val TETHERING_IPV6_PREFIX = AppConfig.SHIZUKU_TUN_ADDR_V6.let { cidr ->
