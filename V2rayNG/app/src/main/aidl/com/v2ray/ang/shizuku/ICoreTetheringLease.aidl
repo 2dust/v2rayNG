@@ -2,8 +2,9 @@ package com.v2ray.ang.shizuku;
 
 import android.os.ParcelFileDescriptor;
 
-/** Keeps the protected test network alive in the normal core process. */
+/** Exposes the running engine configuration and keeps the protected test network alive. */
 interface ICoreTetheringLease {
+    ParcelFileDescriptor openEngineConfig();
     void holdTestNetwork(in ParcelFileDescriptor tun);
     void releaseTestNetwork();
 }

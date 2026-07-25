@@ -139,14 +139,13 @@ private object ShizukuRoutingSyncDispatcher {
                 val coreLease = requireNotNull(pending.coreLease) {
                     "Core-start update has no protected-network lease"
                 }
-                val config = HotspotRoutingConfig.launchFromSnapshot(pending.context, snapshot)
+                val parameters = HotspotRoutingConfig.parametersFromSnapshot(pending.context, snapshot)
                 val syncResult = service.synchronizeRouting(
                     update.token,
-                    config.engine.useHev,
-                    config.engine.profileName,
-                    config.engine.content,
-                    config.dnsServers.toTypedArray(),
-                    config.ipv6Enabled,
+                    parameters.useHev,
+                    parameters.profileName,
+                    parameters.dnsServers.toTypedArray(),
+                    parameters.ipv6Enabled,
                     coreLease,
                 )
                 if (syncResult != ShizukuTetheringService.RESULT_INVALID_SESSION) {
@@ -154,13 +153,12 @@ private object ShizukuRoutingSyncDispatcher {
                 } else {
                     LogUtil.i(TAG, "Recreating Shizuku tethering after its UserService was lost")
                     service.startRouting(
-                        config.engine.useHev,
-                        config.engine.profileName,
-                        config.engine.content,
-                        config.dnsServers.toTypedArray(),
-                        config.ipv6Enabled,
-                        config.assetPath,
-                        config.xudpKey,
+                        parameters.useHev,
+                        parameters.profileName,
+                        parameters.dnsServers.toTypedArray(),
+                        parameters.ipv6Enabled,
+                        parameters.assetPath,
+                        parameters.xudpKey,
                         update.token,
                         coreLease,
                     )

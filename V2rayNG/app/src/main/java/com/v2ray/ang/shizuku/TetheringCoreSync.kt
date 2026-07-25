@@ -42,6 +42,7 @@ internal object TetheringCoreSync {
 
     fun onStarting() {
         snapshot = HotspotRoutingSnapshot()
+        coreLease.clearEngineConfig()
     }
 
     fun onStarted(
@@ -51,8 +52,9 @@ internal object TetheringCoreSync {
         useHev: Boolean,
     ) {
         if (!service.resources.getBoolean(R.bool.shizuku_tethering_enabled)) return
-        coreLease.attach(service)
-        snapshot = createSnapshot(service, profileName, coreConfig, useHev)
+        val currentSnapshot = createSnapshot(service, profileName, useHev)
+        coreLease.attach(service, currentSnapshot, coreConfig)
+        snapshot = currentSnapshot
         watchShizuku(service)
         send(service, HotspotRoutingSync.EVENT_CORE_STARTED, snapshot)
     }
@@ -64,10 +66,12 @@ internal object TetheringCoreSync {
     fun onStopping(service: Service) {
         send(service, HotspotRoutingSync.EVENT_CORE_STOPPING)
         snapshot = HotspotRoutingSnapshot()
+        coreLease.clearEngineConfig()
     }
 
     fun clear() {
         snapshot = HotspotRoutingSnapshot()
+        coreLease.clearEngineConfig()
     }
 
     private fun watchShizuku(service: Service) {
@@ -96,7 +100,6 @@ internal object TetheringCoreSync {
     private fun createSnapshot(
         service: Service,
         profileName: String,
-        coreConfig: String,
         useHev: Boolean,
     ): HotspotRoutingSnapshot {
         val hevSettings = HevTunnelSettings.current()
@@ -106,7 +109,6 @@ internal object TetheringCoreSync {
             vpnMode = service is CoreVpnService,
             profileName = profileName,
             useHev = useHev,
-            coreConfig = coreConfig,
             ipv6Enabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED) == true,
             vpnDnsServers = SettingsManager.getVpnDnsServers(),
             socksPort = SettingsManager.getSocksPort(),
@@ -150,10 +152,41 @@ private class CoreTetheringLease : ICoreTetheringLease.Stub() {
     private var connectivityManager: ConnectivityManager? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var tun: ParcelFileDescriptor? = null
+    private var routingSnapshot: HotspotRoutingSnapshot? = null
+    private var coreConfig: String? = null
 
     @Synchronized
-    fun attach(service: Service) {
+    fun attach(service: Service, snapshot: HotspotRoutingSnapshot, coreConfig: String) {
         connectivityManager = service.getSystemService(ConnectivityManager::class.java)
+        routingSnapshot = snapshot
+        this.coreConfig = coreConfig
+    }
+
+    @Synchronized
+    fun clearEngineConfig() {
+        routingSnapshot = null
+        coreConfig = null
+    }
+
+    @Synchronized
+    override fun openEngineConfig(): ParcelFileDescriptor {
+        val snapshot = checkNotNull(routingSnapshot) { "Core routing snapshot is unavailable" }
+        val rawConfig = checkNotNull(coreConfig) { "Core configuration is unavailable" }
+        val content = HotspotRoutingConfig.engineContentFromSnapshot(snapshot, rawConfig)
+        val (readSide, writeSide) = ParcelFileDescriptor.createReliablePipe()
+        // A writer thread is necessary because writing a large config before returning the read
+        // descriptor could fill the pipe and deadlock this Binder call.
+        Thread({
+            runCatching {
+                ParcelFileDescriptor.AutoCloseOutputStream(writeSide).use {
+                    it.write(content.toByteArray(Charsets.UTF_8))
+                }
+            }.onFailure { LogUtil.e(AppConfig.TAG, "Unable to stream tethering configuration", it) }
+        }, ENGINE_CONFIG_WRITER_NAME).apply {
+            isDaemon = true
+            start()
+        }
+        return readSide
     }
 
     @Synchronized
@@ -183,6 +216,7 @@ private class CoreTetheringLease : ICoreTetheringLease.Stub() {
 }
 
 private const val EXTRA_CORE_LEASE = "core_tethering_lease"
+private const val ENGINE_CONFIG_WRITER_NAME = "TetheringConfigWriter"
 
 private fun Intent.withCoreLease(lease: ICoreTetheringLease?): Intent = apply {
     lease ?: return@apply

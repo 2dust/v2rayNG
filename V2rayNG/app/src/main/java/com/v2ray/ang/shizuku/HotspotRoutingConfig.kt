@@ -24,31 +24,38 @@ data class HotspotRoutingLaunchConfig(
     val xudpKey: String,
 )
 
+data class HotspotRoutingParameters(
+    val useHev: Boolean,
+    val profileName: String,
+    val dnsServers: List<String>,
+    val ipv6Enabled: Boolean,
+    val assetPath: String,
+    val xudpKey: String,
+)
+
 /** Builds the privileged datapath configuration from the exact running-core snapshot. */
 object HotspotRoutingConfig {
 
-    fun launchFromSnapshot(context: Context, snapshot: HotspotRoutingSnapshot): HotspotRoutingLaunchConfig =
-        HotspotRoutingLaunchConfig(
-            engine = engineFromSnapshot(snapshot),
+    fun parametersFromSnapshot(context: Context, snapshot: HotspotRoutingSnapshot): HotspotRoutingParameters {
+        requireRoutableSnapshot(snapshot)
+        return HotspotRoutingParameters(
+            useHev = snapshot.useHev,
+            profileName = snapshot.profileName,
             dnsServers = snapshot.vpnDnsServers,
             ipv6Enabled = snapshot.ipv6Enabled,
             assetPath = Utils.userAssetPath(context),
             xudpKey = Utils.getDeviceIdForXUDPBaseKey(),
         )
+    }
 
-    fun engineFromSnapshot(snapshot: HotspotRoutingSnapshot): HotspotRoutingEngineConfig {
+    fun engineContentFromSnapshot(snapshot: HotspotRoutingSnapshot, coreConfig: String): String {
+        requireRoutableSnapshot(snapshot)
+        return if (snapshot.useHev) buildHevConfig(snapshot) else nativeTunOnlyConfig(coreConfig)
+    }
+
+    private fun requireRoutableSnapshot(snapshot: HotspotRoutingSnapshot) {
         require(snapshot.running) { "Start v2rayNG before enabling tethering routing" }
         require(snapshot.vpnMode) { "v2rayNG must be running in VPN mode" }
-
-        return HotspotRoutingEngineConfig(
-            useHev = snapshot.useHev,
-            profileName = snapshot.profileName,
-            content = if (snapshot.useHev) {
-                buildHevConfig(snapshot)
-            } else {
-                nativeTunOnlyConfig(snapshot.coreConfig)
-            },
-        )
     }
 
     private fun nativeTunOnlyConfig(rawConfig: String): String {

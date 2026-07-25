@@ -254,7 +254,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     override fun startRouting(
         useHev: Boolean,
         profileName: String,
-        engineConfig: String,
         dnsServers: Array<out String>,
         ipv6Enabled: Boolean,
         assetPath: String,
@@ -270,6 +269,10 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         val activeTypes = getActiveTetheringTypes()
         if (activeTypes < 0) {
             setRoutingError("Unable to determine active tethering before enabling its protected route")
+            return RESULT_ROUTING_FAILED
+        }
+        val engineConfig = runCatching { readEngineConfig(coreLease) }.getOrElse {
+            setRoutingError(rootCauseMessage(it))
             return RESULT_ROUTING_FAILED
         }
         val launchConfig = HotspotRoutingLaunchConfig(
@@ -439,21 +442,20 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         token: String,
         useHev: Boolean,
         profileName: String,
-        engineConfig: String,
         dnsServers: Array<out String>,
         ipv6Enabled: Boolean,
         coreLease: ICoreTetheringLease,
     ): Int {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return RESULT_ROUTING_FAILED
         val session = findRoutingSession(token) ?: return RESULT_INVALID_SESSION
-        val launchConfig = HotspotRoutingLaunchConfig(
-            engine = HotspotRoutingEngineConfig(useHev, profileName, engineConfig),
-            dnsServers = dnsServers.toList(),
-            ipv6Enabled = ipv6Enabled,
-            assetPath = session.assetPath,
-            xudpKey = session.xudpKey,
-        )
         return runCatching {
+            val launchConfig = HotspotRoutingLaunchConfig(
+                engine = HotspotRoutingEngineConfig(useHev, profileName, readEngineConfig(coreLease)),
+                dnsServers = dnsServers.toList(),
+                ipv6Enabled = ipv6Enabled,
+                assetPath = session.assetPath,
+                xudpKey = session.xudpKey,
+            )
             watchCoreLifetimeLocked(coreLease)
             applyRoutingConfigLocked(launchConfig, session)
             RESULT_OK
@@ -953,6 +955,14 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         }
     }
 
+    private fun readEngineConfig(coreLease: ICoreTetheringLease): String {
+        val descriptor = coreLease.openEngineConfig()
+        return ParcelFileDescriptor.AutoCloseInputStream(descriptor)
+            .bufferedReader(Charsets.UTF_8)
+            .use { it.readText() }
+            .also { require(it.isNotBlank()) { "Tethering engine configuration is empty" } }
+    }
+
     private fun setRoutingActiveLocked(config: HotspotRoutingLaunchConfig) {
         routingProfileName = config.engine.profileName
         routingState = if (config.engine.useHev) ROUTING_STATE_ACTIVE_HEV else ROUTING_STATE_ACTIVE_NATIVE
@@ -1049,7 +1059,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_751
+        const val USER_SERVICE_VERSION = 20_260_752
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private val TETHERING_IPV6_PREFIX = AppConfig.SHIZUKU_TUN_ADDR_V6.let { cidr ->

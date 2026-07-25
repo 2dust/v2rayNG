@@ -14,7 +14,6 @@ data class HotspotRoutingSnapshot(
     val vpnMode: Boolean = false,
     val profileName: String = "",
     val useHev: Boolean = false,
-    val coreConfig: String = "",
     val ipv6Enabled: Boolean = false,
     // This is the same IP-only list advertised by CoreVpnService. When local DNS is enabled,
     // the generated core configuration intercepts its port-53 traffic and sends it to dns-out;
@@ -29,6 +28,6 @@ data class HotspotRoutingSnapshot(
     val hevLogLevel: String = "warn",
 ) : Serializable {
     companion object {
-        private const val serialVersionUID = 4L
+        private const val serialVersionUID = 5L
     }
 }

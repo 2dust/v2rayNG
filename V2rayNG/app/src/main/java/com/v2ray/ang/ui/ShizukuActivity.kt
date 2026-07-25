@@ -380,9 +380,9 @@ class ShizukuActivity : BaseComponentActivity() {
             return ShizukuTetheringService.RESULT_INTERNAL_ERROR
         }
         val snapshot = core.snapshot
-        val launchConfig = try {
+        val parameters = try {
             withContext(Dispatchers.Default) {
-                HotspotRoutingConfig.launchFromSnapshot(this@ShizukuActivity, snapshot)
+                HotspotRoutingConfig.parametersFromSnapshot(this@ShizukuActivity, snapshot)
             }
         } catch (error: CancellationException) {
             throw error
@@ -401,13 +401,12 @@ class ShizukuActivity : BaseComponentActivity() {
         MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, syncToken)
         val result = callService {
             service.startRouting(
-                launchConfig.engine.useHev,
-                launchConfig.engine.profileName,
-                launchConfig.engine.content,
-                launchConfig.dnsServers.toTypedArray(),
-                launchConfig.ipv6Enabled,
-                launchConfig.assetPath,
-                launchConfig.xudpKey,
+                parameters.useHev,
+                parameters.profileName,
+                parameters.dnsServers.toTypedArray(),
+                parameters.ipv6Enabled,
+                parameters.assetPath,
+                parameters.xudpKey,
                 syncToken,
                 coreLease,
             )
