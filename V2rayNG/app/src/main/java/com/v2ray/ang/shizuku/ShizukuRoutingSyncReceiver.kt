@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.os.DeadObjectException
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -29,7 +30,7 @@ class ShizukuRoutingSyncReceiver : BroadcastReceiver() {
             return
         }
         val pendingResult = goAsync()
-        ShizukuRoutingSyncDispatcher.enqueue(update) {
+        ShizukuRoutingSyncDispatcher.enqueue(context.applicationContext, update, intent.coreTetheringLease()) {
             pendingResult.finish()
         }
     }
@@ -40,8 +41,11 @@ private object ShizukuRoutingSyncDispatcher {
     private const val BIND_TIMEOUT_MS = 10_000L
 
     private data class PendingUpdate(
+        val context: Context,
         val update: HotspotRoutingSync,
+        val coreLease: ICoreTetheringLease?,
         val finish: () -> Unit,
+        val retryAfterDisconnect: Boolean = true,
     )
 
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -66,9 +70,9 @@ private object ShizukuRoutingSyncDispatcher {
         }
     }
 
-    fun enqueue(update: HotspotRoutingSync, finish: () -> Unit) {
+    fun enqueue(context: Context, update: HotspotRoutingSync, coreLease: ICoreTetheringLease?, finish: () -> Unit) {
         mainHandler.post {
-            queue.addLast(PendingUpdate(update, finish))
+            queue.addLast(PendingUpdate(context, update, coreLease, finish))
             pump()
         }
     }
@@ -84,10 +88,16 @@ private object ShizukuRoutingSyncDispatcher {
         val pending = queue.removeFirst()
         inFlight = true
         worker.execute {
-            runCatching { forward(currentService, pending) }
-                .onFailure { LogUtil.e(TAG, "Unable to forward hotspot synchronization", it) }
+            val result = runCatching { forward(currentService, pending) }
             mainHandler.post {
-                pending.finish()
+                if (result.exceptionOrNull() is DeadObjectException && pending.retryAfterDisconnect) {
+                    // ServiceConnection may still hold the old proxy when the new Shizuku Binder arrives.
+                    service = null
+                    queue.addFirst(pending.copy(retryAfterDisconnect = false))
+                } else {
+                    result.onFailure { LogUtil.e(TAG, "Unable to forward hotspot synchronization", it) }
+                    pending.finish()
+                }
                 inFlight = false
                 pump()
             }
@@ -126,15 +136,35 @@ private object ShizukuRoutingSyncDispatcher {
             HotspotRoutingSync.EVENT_CORE_STOPPING -> service.notifyCoreStopping(update.token)
             HotspotRoutingSync.EVENT_CORE_STARTED -> {
                 val snapshot = requireNotNull(update.snapshot) { "Core-start update has no snapshot" }
-                val config = HotspotRoutingConfig.engineFromSnapshot(snapshot)
-                service.synchronizeRouting(
+                val coreLease = requireNotNull(pending.coreLease) {
+                    "Core-start update has no protected-network lease"
+                }
+                val config = HotspotRoutingConfig.launchFromSnapshot(pending.context, snapshot)
+                val syncResult = service.synchronizeRouting(
                     update.token,
-                    config.useHev,
-                    config.profileName,
-                    config.content,
-                    snapshot.vpnDnsServers.toTypedArray(),
-                    snapshot.ipv6Enabled,
+                    config.engine.useHev,
+                    config.engine.profileName,
+                    config.engine.content,
+                    config.dnsServers.toTypedArray(),
+                    config.ipv6Enabled,
+                    coreLease,
                 )
+                if (syncResult != ShizukuTetheringService.RESULT_INVALID_SESSION) {
+                    syncResult
+                } else {
+                    LogUtil.i(TAG, "Recreating Shizuku tethering after its UserService was lost")
+                    service.startRouting(
+                        config.engine.useHev,
+                        config.engine.profileName,
+                        config.engine.content,
+                        config.dnsServers.toTypedArray(),
+                        config.ipv6Enabled,
+                        config.assetPath,
+                        config.xudpKey,
+                        update.token,
+                        coreLease,
+                    )
+                }
             }
             HotspotRoutingSync.EVENT_CORE_START_FAILED -> {
                 service.notifyCoreStartFailed(update.token, update.detail)

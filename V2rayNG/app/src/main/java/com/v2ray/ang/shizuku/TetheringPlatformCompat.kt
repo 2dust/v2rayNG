@@ -1,6 +1,8 @@
 package com.v2ray.ang.shizuku
 
 import android.annotation.SuppressLint
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.TetheringManager
 import android.os.Build
 import java.util.concurrent.CountDownLatch
@@ -9,6 +11,13 @@ import java.util.concurrent.TimeUnit
 
 /** Android 13+ tethering calls that are shared with, or hidden before, API 36. */
 internal object TetheringPlatformCompat {
+
+    @SuppressLint("WrongConstant") // TRANSPORT_TEST is a hidden transport type.
+    fun testNetworkRequest(): NetworkRequest = NetworkRequest.Builder()
+        .addTransportType(TRANSPORT_TEST)
+        .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+        .removeCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+        .build()
 
     fun getUpstreamInterfaceName(): String {
         require(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
@@ -137,6 +146,7 @@ internal object TetheringPlatformCompat {
         .mapNotNull { pattern -> runCatching { Regex(pattern) }.getOrNull() }
 
     private const val UPSTREAM_INTERFACES_PREFIX = "Current upstream interface(s):"
+    private const val TRANSPORT_TEST = 7
     private const val LEGACY_TETHERING_TYPE_BLUETOOTH = 2
 }
 

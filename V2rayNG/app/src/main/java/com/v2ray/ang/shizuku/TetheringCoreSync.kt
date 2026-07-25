@@ -1,7 +1,12 @@
 package com.v2ray.ang.shizuku
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.os.Bundle
+import android.os.ParcelFileDescriptor
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.HotspotRoutingSnapshot
@@ -11,11 +16,29 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.service.CoreVpnService
 import com.v2ray.ang.service.HevTunnelSettings
 import com.v2ray.ang.util.LogUtil
+import rikka.shizuku.Shizuku
+import rikka.shizuku.ShizukuProvider
 
 /** Keeps the normal core's lifecycle and the privileged tethering core synchronized. */
 internal object TetheringCoreSync {
     @Volatile
     private var snapshot = HotspotRoutingSnapshot()
+    private val coreLease = CoreTetheringLease()
+    private var watchingShizuku = false
+    @Volatile
+    private var recoverWhenShizukuReturns = false
+
+    private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
+        if (!recoverWhenShizukuReturns) return@OnBinderReceivedListener
+        recoverWhenShizukuReturns = false
+        val currentSnapshot = snapshot.takeIf { it.running } ?: return@OnBinderReceivedListener
+        LogUtil.i(AppConfig.TAG, "Shizuku restarted; recovering protected tethering")
+        send(AngApplication.application, HotspotRoutingSync.EVENT_CORE_STARTED, currentSnapshot)
+    }
+
+    private val binderDeadListener = Shizuku.OnBinderDeadListener {
+        recoverWhenShizukuReturns = snapshot.running
+    }
 
     fun onStarting() {
         snapshot = HotspotRoutingSnapshot()
@@ -28,7 +51,9 @@ internal object TetheringCoreSync {
         useHev: Boolean,
     ) {
         if (!service.resources.getBoolean(R.bool.shizuku_tethering_enabled)) return
+        coreLease.attach(service)
         snapshot = createSnapshot(service, profileName, coreConfig, useHev)
+        watchShizuku(service)
         send(service, HotspotRoutingSync.EVENT_CORE_STARTED, snapshot)
     }
 
@@ -45,8 +70,28 @@ internal object TetheringCoreSync {
         snapshot = HotspotRoutingSnapshot()
     }
 
-    fun currentSnapshot(coreRunning: Boolean): HotspotRoutingSnapshot =
+    private fun watchShizuku(service: Service) {
+        if (watchingShizuku) return
+        watchingShizuku = true
+        Shizuku.addBinderReceivedListener(binderReceivedListener)
+        Shizuku.addBinderDeadListener(binderDeadListener)
+        recoverWhenShizukuReturns = !Shizuku.pingBinder()
+        ShizukuProvider.requestBinderForNonProviderProcess(service)
+    }
+
+    private fun currentSnapshot(coreRunning: Boolean): HotspotRoutingSnapshot =
         snapshot.takeIf { coreRunning } ?: HotspotRoutingSnapshot()
+
+    fun sendCurrentSnapshot(service: Service, coreRunning: Boolean) {
+        val currentSnapshot = currentSnapshot(coreRunning)
+        service.sendBroadcast(
+            Intent(AppConfig.BROADCAST_ACTION_ACTIVITY)
+                .setPackage(AppConfig.ANG_PACKAGE)
+                .putExtra("key", AppConfig.MSG_HOTSPOT_CONFIG_RESPONSE)
+                .putExtra("content", currentSnapshot)
+                .withCoreLease(coreLease.takeIf { currentSnapshot.running }),
+        )
+    }
 
     private fun createSnapshot(
         service: Service,
@@ -75,12 +120,12 @@ internal object TetheringCoreSync {
     }
 
     private fun send(
-        service: Service,
+        context: Context,
         event: Int,
         snapshot: HotspotRoutingSnapshot? = null,
         detail: String = "",
     ) {
-        if (!service.resources.getBoolean(R.bool.shizuku_tethering_enabled)) return
+        if (!context.resources.getBoolean(R.bool.shizuku_tethering_enabled)) return
         val token = MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN)
             ?.takeIf { it.isNotBlank() }
             ?: run {
@@ -92,10 +137,58 @@ internal object TetheringCoreSync {
             "Sending tethering sync event $event${snapshot?.profileName?.let { " for $it" }.orEmpty()}",
         )
         runCatching {
-            service.sendBroadcast(
-                Intent(service, ShizukuRoutingSyncReceiver::class.java)
-                    .putExtra("content", HotspotRoutingSync(token, event, snapshot, detail)),
+            context.sendBroadcast(
+                Intent(context, ShizukuRoutingSyncReceiver::class.java)
+                    .putExtra("content", HotspotRoutingSync(token, event, snapshot, detail))
+                    .withCoreLease(coreLease.takeIf { snapshot != null }),
             )
         }.onFailure { LogUtil.e(AppConfig.TAG, "Unable to send tethering synchronization", it) }
     }
 }
+
+private class CoreTetheringLease : ICoreTetheringLease.Stub() {
+    private var connectivityManager: ConnectivityManager? = null
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var tun: ParcelFileDescriptor? = null
+
+    @Synchronized
+    fun attach(service: Service) {
+        connectivityManager = service.getSystemService(ConnectivityManager::class.java)
+    }
+
+    @Synchronized
+    override fun holdTestNetwork(tun: ParcelFileDescriptor) {
+        releaseTestNetwork()
+        val manager = checkNotNull(connectivityManager) { "Core network manager is unavailable" }
+        val callback = ConnectivityManager.NetworkCallback()
+        try {
+            manager.requestNetwork(TetheringPlatformCompat.testNetworkRequest(), callback)
+            networkCallback = callback
+            this.tun = tun
+        } catch (error: Throwable) {
+            runCatching { tun.close() }
+            throw error
+        }
+    }
+
+    @Synchronized
+    override fun releaseTestNetwork() {
+        networkCallback?.let { callback ->
+            runCatching { connectivityManager?.unregisterNetworkCallback(callback) }
+        }
+        networkCallback = null
+        tun?.let { runCatching { it.close() } }
+        tun = null
+    }
+}
+
+private const val EXTRA_CORE_LEASE = "core_tethering_lease"
+
+private fun Intent.withCoreLease(lease: ICoreTetheringLease?): Intent = apply {
+    lease ?: return@apply
+    putExtra(EXTRA_CORE_LEASE, Bundle().apply { putBinder(EXTRA_CORE_LEASE, lease.asBinder()) })
+}
+
+internal fun Intent.coreTetheringLease(): ICoreTetheringLease? =
+    getBundleExtra(EXTRA_CORE_LEASE)?.getBinder(EXTRA_CORE_LEASE)
+        ?.let(ICoreTetheringLease.Stub::asInterface)

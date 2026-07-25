@@ -522,11 +522,7 @@ object CoreServiceManager {
                 }
 
                 AppConfig.MSG_QUERY_HOTSPOT_CONFIG -> {
-                    MessageUtil.sendMsg2UI(
-                        serviceControl.getService(),
-                        AppConfig.MSG_HOTSPOT_CONFIG_RESPONSE,
-                        TetheringCoreSync.currentSnapshot(coreController.isRunning),
-                    )
+                    TetheringCoreSync.sendCurrentSnapshot(serviceControl.getService(), coreController.isRunning)
                 }
 
                 AppConfig.MSG_UNREGISTER_CLIENT -> {

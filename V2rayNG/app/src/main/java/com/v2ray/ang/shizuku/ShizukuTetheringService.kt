@@ -1,6 +1,5 @@
 package com.v2ray.ang.shizuku
 
-import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.net.ConnectivityManager
@@ -8,9 +7,6 @@ import android.net.IpPrefix
 import android.net.LinkAddress
 import android.net.LinkProperties
 import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
-import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
@@ -25,6 +21,7 @@ import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
 import libv2ray.Libv2ray
 import rikka.shizuku.Shizuku
+import rikka.shizuku.SystemServiceHelper
 import java.io.File
 import java.net.Inet6Address
 import java.net.InetAddress
@@ -79,6 +76,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     // Profile synchronization may restore several downstream types in the background. Track the
     // warning per type so a later success clears only its own stale failure before the UI sees it.
     private var wrongUpstreamWarningTypes = 0
+    private var coreLease: ICoreTetheringLease? = null
+    private var coreLifetime: LifetimeWatch? = null
 
     private val routingActive: Boolean
         get() = routingState == ROUTING_STATE_ACTIVE_HEV ||
@@ -99,7 +98,16 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         var coreRestartPending: Boolean = false,
     )
 
-    /** Owns every Android object whose lifetime is tied to one test-network TUN. */
+    private data class LifetimeWatch(
+        val binder: IBinder,
+        val recipient: IBinder.DeathRecipient,
+    ) {
+        fun unlink() {
+            runCatching { binder.unlinkToDeath(recipient, 0) }
+        }
+    }
+
+    /** Owns the UserService side of one test-network TUN. */
     private class TestNetworkHandle(
         val manager: Any,
         // Keep TestNetworkInterface reachable; Android associates its lifetime with this object.
@@ -107,9 +115,9 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         val tun: ParcelFileDescriptor,
         val interfaceName: String,
         private val connectivityManager: ConnectivityManager,
+        val networkLifetimeToken: IBinder,
     ) {
         private val published = CountDownLatch(1)
-        val networkLifetimeToken: IBinder = Binder()
         var network: Network? = null
             private set
 
@@ -252,6 +260,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         assetPath: String,
         xudpKey: String,
         syncToken: String,
+        coreLease: ICoreTetheringLease,
     ): Int {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return RESULT_ROUTING_FAILED
         if (syncToken.isBlank()) {
@@ -279,8 +288,19 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             desiredTetheringTypes = activeTypes,
         )
 
+        try {
+            watchCoreLifetimeLocked(coreLease)
+        } catch (error: Throwable) {
+            clearCoreLifetimeWatchLocked()
+            setRoutingError(rootCauseMessage(error))
+            return RESULT_ROUTING_FAILED
+        }
         val result = startRoutingLocked(launchConfig, activeTypes)
-        if (result == RESULT_OK) routingSession = newSession
+        if (result == RESULT_OK) {
+            routingSession = newSession
+        } else {
+            clearCoreLifetimeWatchLocked()
+        }
         return result
     }
 
@@ -296,11 +316,15 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
 
         return try {
             if (testTun == null) {
+                // A fresh UserService may be replacing one lost with Shizuku. Its core-side lease
+                // can still own the old protected network, but this process has no handle for it.
+                // Stop downstreams before cleanup releases that lease, then restore them only
+                // after the replacement network is ready.
+                check(stopActiveTetheringLocked(clearDesired = false) == RESULT_OK) {
+                    "Unable to stop tethering before replacing its protected route"
+                }
                 createRoutingLocked(config)
-                // Tethering started outside v2rayNG can remain latched to its physical upstream.
-                // Run every existing downstream through the same verified start path as a new one;
-                // it restarts a wrong-upstream downstream and leaves it stopped if protection fails.
-                val failedTypes = restoreTetheringTypesLocked(activeTypes, activeTypes)
+                val failedTypes = restoreTetheringTypesLocked(activeTypes)
                 reportTetheringRestoreFailuresLocked(failedTypes)
             } else {
                 val failedTypes = rebuildRoutingLocked(config, activeTypes)
@@ -348,6 +372,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         routingState = ROUTING_STATE_STOPPING
         routingDetail = "Stopping v2rayNG tethering routing"
         cleanupRouting()
+        clearCoreLifetimeWatchLocked()
         routingState = ROUTING_STATE_DISABLED
         routingDetail = ""
         return RESULT_OK
@@ -378,6 +403,11 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     @Synchronized
     override fun notifyCoreStopping(token: String): Int {
         val session = findRoutingSession(token) ?: return RESULT_INVALID_SESSION
+        pauseForCoreRestartLocked(session, "Main core stopping")
+        return RESULT_OK
+    }
+
+    private fun pauseForCoreRestartLocked(session: RoutingSession, reason: String) {
         val activeTypes = getActiveTetheringTypes()
         if (activeTypes >= 0 && (routingActive || session.desiredTetheringTypes == 0)) {
             session.desiredTetheringTypes = activeTypes
@@ -389,8 +419,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             updateRoutingDetailLocked()
             Log.i(
                 TAG,
-                "Main core stopping; tethering core stopped while preserving the protected " +
-                    "test network and tethering types " +
+                "$reason; tethering core stopped while preserving the protected test network " +
+                    "and tethering types " +
                     "0x${session.desiredTetheringTypes.toString(16)}",
             )
         } else {
@@ -398,11 +428,10 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             setRoutingError("Protected test network is unavailable")
             Log.e(
                 TAG,
-                "Main core stopping without a protected test network; disabled tethering " +
+                "$reason without a protected test network; disabled tethering " +
                     "with result $tetheringResult",
             )
         }
-        return RESULT_OK
     }
 
     @Synchronized
@@ -413,6 +442,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         engineConfig: String,
         dnsServers: Array<out String>,
         ipv6Enabled: Boolean,
+        coreLease: ICoreTetheringLease,
     ): Int {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return RESULT_ROUTING_FAILED
         val session = findRoutingSession(token) ?: return RESULT_INVALID_SESSION
@@ -424,6 +454,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             xudpKey = session.xudpKey,
         )
         return runCatching {
+            watchCoreLifetimeLocked(coreLease)
             applyRoutingConfigLocked(launchConfig, session)
             RESULT_OK
         }.getOrElse {
@@ -449,6 +480,53 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             return null
         }
         return session
+    }
+
+    /**
+     * Keep the network request and TUN open in both failure domains. If the app dies, this
+     * UserService retains them; if Shizuku dies, the main core retains the duplicates supplied
+     * through [coreLease]. The lease Binder also reports a main-core death when no event can be sent.
+     */
+    private fun watchCoreLifetimeLocked(coreLease: ICoreTetheringLease) {
+        val binder = coreLease.asBinder()
+        if (coreLifetime?.binder === binder && binder.isBinderAlive) return
+        clearCoreLifetimeWatchLocked()
+        val recipient = IBinder.DeathRecipient {
+            synchronized(this) {
+                if (coreLifetime?.binder !== binder) return@synchronized
+                coreLifetime = null
+                this.coreLease = null
+                routingSession?.let {
+                    Log.w(TAG, "Main core process died without a stop notification")
+                    pauseForCoreRestartLocked(it, "Main core process died")
+                }
+            }
+        }
+        this.coreLease = coreLease
+        coreLifetime = LifetimeWatch(binder, recipient)
+        try {
+            binder.linkToDeath(recipient, 0)
+            shareTestNetworkWithCoreLocked()
+        } catch (error: Throwable) {
+            this.coreLease = null
+            coreLifetime = null
+            throw IllegalStateException("Main core is no longer running", error)
+        }
+    }
+
+    private fun shareTestNetworkWithCoreLocked() {
+        val lease = coreLease ?: return
+        val tun = testTun ?: return
+        ParcelFileDescriptor.dup(tun.fileDescriptor).use {
+            lease.holdTestNetwork(it)
+        }
+    }
+
+    private fun clearCoreLifetimeWatchLocked() {
+        runCatching { coreLease?.releaseTestNetwork() }
+        coreLifetime?.unlink()
+        coreLease = null
+        coreLifetime = null
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -773,7 +851,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    @SuppressLint("WrongConstant") // TRANSPORT_TEST is a hidden transport type.
     private fun createTestNetwork(dnsServers: List<String>, ipv6Enabled: Boolean) {
         val manager = checkNotNull(shellContext.getSystemService(TEST_NETWORK_SERVICE)) {
             "TestNetworkManager is unavailable on this Android build"
@@ -787,12 +864,11 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         val handle = createTestNetworkHandle(manager, addresses)
         testNetworkHandle = handle
 
-        val request = NetworkRequest.Builder()
-            .addTransportType(TRANSPORT_TEST)
-            .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
-            .removeCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-            .build()
-        connectivityManager.requestNetwork(request, handle.callback)
+        // Register the duplicate request and TUN descriptor before publishing the network. From
+        // this point on, either the core process or this UserService can preserve the fail-closed
+        // upstream if the other process disappears.
+        shareTestNetworkWithCoreLocked()
+        connectivityManager.requestNetwork(TetheringPlatformCompat.testNetworkRequest(), handle.callback)
 
         val properties = LinkProperties().apply {
             interfaceName = handle.interfaceName
@@ -845,6 +921,12 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
                 tun = tun,
                 interfaceName = interfaceName,
                 connectivityManager = connectivityManager,
+                // The service and normal app are independent failure domains. Let system_server
+                // anchor the published test network so either process can disappear without
+                // Android immediately moving active tethering to a physical upstream.
+                networkLifetimeToken = checkNotNull(SystemServiceHelper.getSystemService(Context.CONNECTIVITY_SERVICE)) {
+                    "Android connectivity service has no Binder"
+                },
             )
         } catch (error: Throwable) {
             runCatching { tun.close() }
@@ -939,6 +1021,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Callers stop real tethering first. Releasing the engine and TUN in this order then leaves
         // no downstream that Android could silently move back to a physical upstream.
         stopRoutingEngineLocked()
+        runCatching { coreLease?.releaseTestNetwork() }
 
         testNetworkHandle?.release()
         testNetworkHandle = null
@@ -966,7 +1049,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_749
+        const val USER_SERVICE_VERSION = 20_260_751
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         private val TETHERING_IPV6_PREFIX = AppConfig.SHIZUKU_TUN_ADDR_V6.let { cidr ->
@@ -976,7 +1059,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             )
         }
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"
-        private const val TRANSPORT_TEST = 7
         private const val CALLBACK_TIMEOUT_SECONDS = 10L
         private const val TEST_NETWORK_TIMEOUT_SECONDS = 15L
         private const val TETHERING_STATE_TIMEOUT_SECONDS = 10L

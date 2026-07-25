@@ -25,8 +25,10 @@ import com.v2ray.ang.extension.toastInfo
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.shizuku.HotspotRoutingConfig
+import com.v2ray.ang.shizuku.ICoreTetheringLease
 import com.v2ray.ang.shizuku.IShizukuTetheringService
 import com.v2ray.ang.shizuku.ShizukuTetheringService
+import com.v2ray.ang.shizuku.coreTetheringLease
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
@@ -44,7 +46,7 @@ class ShizukuActivity : BaseComponentActivity() {
     private var tetheringService: IShizukuTetheringService? = null
     private var operationJob: Job? = null
     private var operationGeneration = 0L
-    private var snapshotWaiter: CompletableDeferred<HotspotRoutingSnapshot>? = null
+    private var snapshotWaiter: CompletableDeferred<CoreRoutingSnapshot>? = null
     private var uiState by mutableStateOf(TetheringUiState())
 
     private val userServiceArgs by lazy {
@@ -103,7 +105,9 @@ class ShizukuActivity : BaseComponentActivity() {
                     val snapshot = intent.serializable<HotspotRoutingSnapshot>("content")
                         ?: HotspotRoutingSnapshot()
                     uiState = uiState.copy(coreRunning = snapshot.running)
-                    snapshotWaiter?.takeIf { !it.isCompleted }?.complete(snapshot)
+                    snapshotWaiter?.takeIf { !it.isCompleted }?.complete(
+                        CoreRoutingSnapshot(snapshot, intent.coreTetheringLease()),
+                    )
                 }
             }
         }
@@ -370,10 +374,11 @@ class ShizukuActivity : BaseComponentActivity() {
     }
 
     private suspend fun startRouting(service: IShizukuTetheringService): Int {
-        val snapshot = requestCoreSnapshot() ?: run {
+        val core = requestCoreSnapshot() ?: run {
             toastError(R.string.shizuku_routing_snapshot_timeout)
             return ShizukuTetheringService.RESULT_INTERNAL_ERROR
         }
+        val snapshot = core.snapshot
         val launchConfig = try {
             withContext(Dispatchers.Default) {
                 HotspotRoutingConfig.launchFromSnapshot(this@ShizukuActivity, snapshot)
@@ -382,6 +387,10 @@ class ShizukuActivity : BaseComponentActivity() {
             throw error
         } catch (error: Throwable) {
             toastError(error.message ?: getString(R.string.shizuku_routing_snapshot_timeout))
+            return ShizukuTetheringService.RESULT_ROUTING_FAILED
+        }
+        val coreLease = core.lease ?: run {
+            toastError(R.string.shizuku_operation_failed)
             return ShizukuTetheringService.RESULT_ROUTING_FAILED
         }
 
@@ -399,6 +408,7 @@ class ShizukuActivity : BaseComponentActivity() {
                 launchConfig.assetPath,
                 launchConfig.xudpKey,
                 syncToken,
+                coreLease,
             )
         }
         if (result != ShizukuTetheringService.RESULT_OK &&
@@ -409,8 +419,8 @@ class ShizukuActivity : BaseComponentActivity() {
         return result
     }
 
-    private suspend fun requestCoreSnapshot(): HotspotRoutingSnapshot? {
-        val waiter = CompletableDeferred<HotspotRoutingSnapshot>()
+    private suspend fun requestCoreSnapshot(): CoreRoutingSnapshot? {
+        val waiter = CompletableDeferred<CoreRoutingSnapshot>()
         snapshotWaiter?.cancel()
         snapshotWaiter = waiter
         requestCoreSnapshotAsync()
@@ -477,4 +487,9 @@ class ShizukuActivity : BaseComponentActivity() {
         private const val SHIZUKU_PERMISSION_REQUEST_CODE = 1001
         private const val CORE_SNAPSHOT_TIMEOUT_MS = 5_000L
     }
+
+    private data class CoreRoutingSnapshot(
+        val snapshot: HotspotRoutingSnapshot,
+        val lease: ICoreTetheringLease?,
+    )
 }
