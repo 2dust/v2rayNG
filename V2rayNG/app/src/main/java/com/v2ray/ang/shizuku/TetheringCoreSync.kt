@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
 import com.v2ray.ang.AngApplication
@@ -27,10 +28,13 @@ internal object TetheringCoreSync {
     private var watchingShizuku = false
     @Volatile
     private var recoverWhenShizukuReturns = false
+    @Volatile
+    private var foregroundRecoveryRequested = false
 
     private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
         if (!recoverWhenShizukuReturns) return@OnBinderReceivedListener
         recoverWhenShizukuReturns = false
+        foregroundRecoveryRequested = false
         val currentSnapshot = snapshot.takeIf { it.running } ?: return@OnBinderReceivedListener
         LogUtil.i(AppConfig.TAG, "Shizuku restarted; recovering protected tethering")
         send(AngApplication.application, HotspotRoutingSync.EVENT_CORE_STARTED, currentSnapshot)
@@ -38,6 +42,7 @@ internal object TetheringCoreSync {
 
     private val binderDeadListener = Shizuku.OnBinderDeadListener {
         recoverWhenShizukuReturns = snapshot.running
+        foregroundRecoveryRequested = false
     }
 
     fun onStarting() {
@@ -68,6 +73,22 @@ internal object TetheringCoreSync {
     }
 
     fun clear() = clearCoreState()
+
+    fun onAppForegrounded(service: Service) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE ||
+            !recoverWhenShizukuReturns || foregroundRecoveryRequested
+        ) return
+
+        // Android 14+ queues Shizuku's cross-process Binder broadcast while the provider
+        // process is cached. Once the UI foregrounds that process, explicitly ask it for the
+        // replacement Binder so protected tethering can be restored without another user action.
+        foregroundRecoveryRequested = true
+        runCatching { ShizukuProvider.requestBinderForNonProviderProcess(service) }
+            .onFailure {
+                foregroundRecoveryRequested = false
+                LogUtil.e(AppConfig.TAG, "Unable to request Shizuku recovery", it)
+            }
+    }
 
     private fun clearCoreState() {
         snapshot = HotspotRoutingSnapshot()

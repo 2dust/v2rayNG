@@ -1,13 +1,16 @@
 package com.v2ray.ang.ui.base
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.compose.AppTheme
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MyContextWrapper
 
 abstract class BaseComponentActivity : ComponentActivity() {
@@ -23,6 +26,13 @@ abstract class BaseComponentActivity : ComponentActivity() {
             AppTheme {
                 ScreenContent()
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            MessageUtil.sendMsg2Service(this, AppConfig.MSG_SHIZUKU_APP_FOREGROUND, "")
         }
     }
 

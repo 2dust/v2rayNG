@@ -526,6 +526,10 @@ object CoreServiceManager {
                     TetheringCoreSync.sendCurrentSnapshot(serviceControl.getService(), coreController.isRunning)
                 }
 
+                AppConfig.MSG_SHIZUKU_APP_FOREGROUND -> {
+                    TetheringCoreSync.onAppForegrounded(serviceControl.getService())
+                }
+
                 AppConfig.MSG_UNREGISTER_CLIENT -> {
                     // nothing to do
                 }

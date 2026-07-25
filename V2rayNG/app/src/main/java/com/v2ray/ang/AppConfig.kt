@@ -187,6 +187,7 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG_FINISH = 74
     const val MSG_QUERY_HOTSPOT_CONFIG = 81
     const val MSG_HOTSPOT_CONFIG_RESPONSE = 82
+    const val MSG_SHIZUKU_APP_FOREGROUND = 83
 
     const val MSG_SUB_UPDATE_START = 8
     const val MSG_SUB_UPDATE_CANCEL = 81
