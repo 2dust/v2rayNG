@@ -139,6 +139,8 @@ class ShadowsocksFmtTest {
         assertEquals("8388", result?.serverPort)
         assertEquals("aes-256-gcm", result?.method)
         assertEquals("my-secret-password", result?.password)
+        assertNull(result?.security)
+        assertNull(result?.sni)
     }
 
     @Test
@@ -167,6 +169,38 @@ class ShadowsocksFmtTest {
 
         assertNotNull(result)
         assertEquals("chacha20-ietf-poly1305", result?.method)
+    }
+
+    @Test
+    fun test_parseSip002_preservesXrayTlsQueryParameters() {
+        val ssUrl =
+            "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpzZWNyZXRwYXNz@example.com:443" +
+                "?alpn=h2%2Chttp%2F1.1&fp=firefox&security=tls&sni=example.com&type=tcp#TLS"
+
+        val result = ShadowsocksFmt.parseSip002(ssUrl)
+
+        assertNotNull(result)
+        assertEquals("tcp", result?.network)
+        assertEquals("tls", result?.security)
+        assertEquals("example.com", result?.sni)
+        assertEquals("h2,http/1.1", result?.alpn)
+        assertEquals("firefox", result?.fingerPrint)
+    }
+
+    @Test
+    fun test_parseSip002_preservesObfsLocalPluginMapping() {
+        val ssUrl =
+            "ss://YWVzLTI1Ni1nY206c2VjcmV0@example.com:8388" +
+                "?plugin=obfs-local%3Bobfs%3Dhttp%3Bobfs-host%3Dcdn.example.com%3Bpath%3D%2Fws#Obfs"
+
+        val result = ShadowsocksFmt.parseSip002(ssUrl)
+
+        assertNotNull(result)
+        assertEquals("tcp", result?.network)
+        assertEquals("http", result?.headerType)
+        assertEquals("cdn.example.com", result?.host)
+        assertEquals("/ws", result?.path)
+        assertNull(result?.security)
     }
 
     @Test
