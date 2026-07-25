@@ -5,9 +5,11 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.TetheringManager
 import android.os.Build
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 /** Android 13+ tethering calls that are shared with, or hidden before, API 36. */
 internal object TetheringPlatformCompat {
@@ -24,12 +26,23 @@ internal object TetheringPlatformCompat {
         val process = ProcessBuilder("dumpsys", "tethering")
             .redirectErrorStream(true)
             .start()
-        return try {
+        // Drain the pipe concurrently so neither a full buffer nor a stuck dumpsys can hold the
+        // synchronized tethering state machine indefinitely.
+        val output = CompletableFuture.supplyAsync {
             process.inputStream.bufferedReader().useLines { lines ->
                 lines.firstNotNullOfOrNull(::parseUpstreamInterfaceName).orEmpty()
             }
+        }
+        return try {
+            output.get(DUMPSYS_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        } catch (error: TimeoutException) {
+            throw IllegalStateException("Timed out reading Android tethering state", error)
+        } catch (error: InterruptedException) {
+            Thread.currentThread().interrupt()
+            throw error
         } finally {
-            process.destroy()
+            process.destroyForcibly()
+            output.cancel(true)
         }
     }
 
@@ -154,6 +167,7 @@ internal object TetheringPlatformCompat {
         .mapNotNull { pattern -> runCatching { Regex(pattern) }.getOrNull() }
 
     private const val UPSTREAM_INTERFACES_PREFIX = "Current upstream interface(s):"
+    private const val DUMPSYS_TIMEOUT_SECONDS = 2L
     private const val TRANSPORT_TEST = 7
     private const val LEGACY_TETHERING_TYPE_BLUETOOTH = 2
     private const val LEGACY_TETHERING_TYPE_WIFI_P2P = 3
