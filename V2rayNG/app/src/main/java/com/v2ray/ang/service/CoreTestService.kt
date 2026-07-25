@@ -96,6 +96,7 @@ class CoreTestService : Service() {
             worker = RealPingWorkerService(
                 context = this,
                 guids = guidsList,
+                onlyTcp = message.onlyTcp,
                 onEvent = { event -> handleWorkerEvent(event) { activeWorkers.remove(worker) } }
             )
             activeWorkers.add(worker)
@@ -112,6 +113,7 @@ class CoreTestService : Service() {
                 NotificationHelper.updateNotification(
                     channelType = NotificationChannelType.CORE_TEST,
                     context = this,
+                    title = getString(R.string.app_name),
                     content = getString(R.string.connection_runing_task_left, event.text)
                 )
                 MessageUtil.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_NOTIFY, event.text)

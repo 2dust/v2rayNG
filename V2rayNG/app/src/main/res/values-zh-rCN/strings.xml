@@ -316,6 +316,7 @@
     <string name="sub_setting_pre_profile_tip">请确保配置别名存在并唯一</string>
     <string name="toast_invalid_update_interval">更新间隔无效，最小值为 15 分钟。</string>
     <string name="title_sub_update">更新订阅</string>
+    <string name="title_ping_all_server">测试配置 Tcping</string>
     <string name="title_real_ping_all_server">测试配置真连接</string>
     <string name="title_user_asset_setting">资源文件</string>
     <string name="title_sort_by_test_results">按测试结果排序</string>
@@ -402,6 +403,8 @@
     <string name="title_policy_group_type">策略组类型</string>
     <string name="title_policy_group_subscription_id">来自订阅分组</string>
     <string name="title_policy_group_subscription_filter">别名正则过滤</string>
+    <string name="title_policy_group_test_outbounds">测试出站</string>
+    <string name="title_policy_group_fallback">备用出站（可选）</string>
     <string name="server_proxy_chain_members">代理链成员</string>
     <string name="server_proxy_chain_pick_members">点此选择成员</string>
     <string name="server_proxy_chain_member_unselected">请选择成员</string>

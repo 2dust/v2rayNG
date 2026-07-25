@@ -27,11 +27,12 @@ import java.util.concurrent.atomic.AtomicInteger
 class RealPingWorkerService(
     private val context: Context,
     private val guids: List<String>,
+    private val onlyTcp : Boolean = false,
     private val onEvent: (RealPingEvent) -> Unit = {}
 ) {
     private val job = SupervisorJob()
     private val concurrency = SettingsManager.getRealPingConcurrency()
-    private val dispatcher = Executors.newFixedThreadPool(concurrency).asCoroutineDispatcher()
+    private val dispatcher = Executors.newFixedThreadPool(if (onlyTcp) concurrency * 2 else concurrency).asCoroutineDispatcher()
     private val scope = CoroutineScope(job + dispatcher + CoroutineName("RealPingBatchWorker"))
 
     private val runningCount = AtomicInteger(0)
@@ -43,7 +44,7 @@ class RealPingWorkerService(
             scope.launch {
                 runningCount.incrementAndGet()
                 try {
-                    val result = startRealPing(guid)
+                    val result = if (onlyTcp) startTcping(guid) else startRealPing(guid)
                     onEvent(RealPingEvent.Result(guid, result))
                 } catch (_: Throwable) {
                     // ignore
@@ -103,5 +104,26 @@ class RealPingWorkerService(
             return retFailure
         }
         return CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
+    }
+
+    private fun startTcping(guid: String): Long {
+        val retFailure = -1L
+
+        val config = MmkvManager.decodeServerConfig(guid) ?: return retFailure
+        if (!config.configType.isComplexType()
+            && config.configType != EConfigType.HYSTERIA2
+            && config.configType != EConfigType.WIREGUARD
+            && config.alpn?.startsWith("h3") != true
+            && config.server.isNotNullEmpty()
+            && config.serverPort?.toIntOrNull() != null
+        ) {
+            val url = config.server.orEmpty()
+            val port = config.serverPort.orEmpty().toInt()
+            val tcpTime = SpeedtestManager.socketConnectTime(url, port, 1000)
+
+            return tcpTime
+        }
+
+        return retFailure
     }
 }

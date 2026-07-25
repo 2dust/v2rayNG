@@ -323,6 +323,7 @@
     <string name="sub_setting_pre_profile_tip">The config remarks exist and are unique</string>
     <string name="toast_invalid_update_interval">Invalid update interval. Minimum is 15 minutes.</string>
     <string name="title_sub_update">Update subscription</string>
+    <string name="title_ping_all_server">Tcping config</string>
     <string name="title_real_ping_all_server">Real delay config</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sorting by test results</string>
@@ -407,6 +408,8 @@
     <string name="title_policy_group_type">Policy group type</string>
     <string name="title_policy_group_subscription_id">From subscription group</string>
     <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+    <string name="title_policy_group_test_outbounds">Test outbounds</string>
+    <string name="title_policy_group_fallback">Fallback outbound (optional)</string>
 
     <string name="server_proxy_chain_members">Proxy chain members</string>
     <string name="server_proxy_chain_pick_members">Tap here to pick member</string>
