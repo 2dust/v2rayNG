@@ -458,15 +458,76 @@ object Utils {
     fun getSysLocale(): Locale = LocaleList.getDefault().get(0) ?: Locale.getDefault()
 
     /**
-     * Fix illegal characters in a URL.
+     * Escape illegal fragment characters in a URI so [java.net.URI] can parse it.
      *
-     * @param str The URL string.
-     * @return The URL string with illegal characters replaced.
+     * Only the fragment (after the first `#`) is rewritten; existing `%XX` escapes are kept
+     * so the call is idempotent, and a string without `#` is returned unchanged.
+     *
+     * @param str The raw URI string, possibly with illegal fragment characters.
+     * @return A URI string safe to pass to [java.net.URI].
      */
     fun fixIllegalUrl(str: String): String {
-        return str.replace(" ", "%20")
-            .replace("|", "%7C")
+        val base = str.replace(" ", "%20").replace("|", "%7C")
+        val hash = base.indexOf('#')
+        if (hash < 0) return base
+
+        val out = StringBuilder(base.length).append(base, 0, hash + 1)
+        val frag = base.substring(hash + 1)
+        var i = 0
+        while (i < frag.length) {
+            // already-escaped %XX, copy as-is
+            if (frag[i] == '%' && i + 2 < frag.length && frag[i + 1].isHex() && frag[i + 2].isHex()) {
+                out.append(frag, i, i + 3)
+                i += 3
+                continue
+            }
+            val cp = frag.codePointAt(i)
+            if (cp.isFragmentSafe()) {
+                out.append(cp.toChar())
+            } else {
+                for (b in String(Character.toChars(cp)).toByteArray(Charsets.UTF_8)) {
+                    out.append('%').append("%02X".format(b.toInt() and 0xFF))
+                }
+            }
+            i += Character.charCount(cp)
+        }
+        return out.toString()
     }
+
+    private const val FRAGMENT_SAFE_PUNCT = "-._~!\$&'()*+,;=:@/?"
+
+    private fun Char.isHex() = this in '0'..'9' || this in 'a'..'f' || this in 'A'..'F'
+
+    private fun Int.isFragmentSafe() =
+        this <= 0x7F && (toChar().isLetterOrDigit() || toChar() in FRAGMENT_SAFE_PUNCT)
+
+    // schemes that begin a new entry - keep in sync with configFmtParsers in
+    // AngConfigManager (can't derive: it imports Utils, would be circular).
+    // http(s):// left out on purpose, those are sub urls for isValidSubUrl.
+    private val CONFIG_SCHEMES = listOf(
+        AppConfig.VMESS, AppConfig.SHADOWSOCKS, AppConfig.SOCKS, AppConfig.SOCKS4,
+        AppConfig.SOCKS5, AppConfig.TROJAN, AppConfig.VLESS, AppConfig.WIREGUARD,
+        AppConfig.HYSTERIA2, AppConfig.HY2, AppConfig.V2RAYNFMTS,
+    )
+
+    private val CONFIG_SCHEME_BOUNDARY = Regex(
+        "\\n|\\s+(?=(?:${CONFIG_SCHEMES.joinToString("|")}))",
+        RegexOption.IGNORE_CASE,
+    )
+
+    /**
+     * Split a pasted or subscribed blob into individual config entries.
+     *
+     * Handles both newline-separated and single-line space-separated blobs.
+     *
+     * @param text The raw pasted or subscribed blob.
+     * @return The trimmed, non-empty, de-duplicated config entries.
+     */
+    fun splitConfigEntries(text: String): List<String> =
+        text.trim().split(CONFIG_SCHEME_BOUNDARY)
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
 
     /**
      * Find a free port from a list of ports.

@@ -243,8 +243,7 @@ object AngConfigManager {
 
             // Parse all configs first (no I/O during parsing)
             val configs = mutableListOf<ProfileItem>()
-            servers.lines()
-                .distinct()
+            Utils.splitConfigEntries(servers)
                 .reversed()
                 .forEach {
                     val config = parseConfig(it, subid, subItem)
