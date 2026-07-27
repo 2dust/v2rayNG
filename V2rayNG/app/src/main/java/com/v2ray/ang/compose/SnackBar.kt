@@ -1,22 +1,15 @@
 package com.v2ray.ang.compose
 
-import android.content.Context
-import androidx.annotation.StringRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -31,9 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,6 +37,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.time.Duration.Companion.milliseconds
 
 enum class ToastType {
     NORMAL, SUCCESS, ERROR, INFO
@@ -107,7 +99,7 @@ class AppSnackbarController(
             if (currentShowTime != 0L) {
                 val elapsed = System.currentTimeMillis() - currentShowTime
                 if (elapsed < 500) {
-                    delay(500 - elapsed)
+                    delay((500 - elapsed).milliseconds)
                 }
             }
 
@@ -128,30 +120,6 @@ class AppSnackbarController(
             currentShowTime = System.currentTimeMillis()
          }
      }
-
-    fun showInfo(context: Context, @StringRes messageRes: Int, long: Boolean = false) {
-        show(context.getString(messageRes), ToastType.NORMAL, long)
-    }
-
-    fun showInfo(message: CharSequence, long: Boolean = false) {
-        show(message, ToastType.NORMAL, long)
-    }
-
-    fun showSuccess(context: Context, @StringRes messageRes: Int, long: Boolean = false) {
-        show(context.getString(messageRes), ToastType.SUCCESS, long)
-    }
-
-    fun showSuccess(message: CharSequence, long: Boolean = false) {
-        show(message, ToastType.SUCCESS, long)
-    }
-
-    fun showError(context: Context, @StringRes messageRes: Int, long: Boolean = false) {
-        show(context.getString(messageRes), ToastType.ERROR, long)
-    }
-
-    fun showError(message: CharSequence, long: Boolean = false) {
-        show(message, ToastType.ERROR, long)
-    }
 }
 
 val LocalAppSnackbar = staticCompositionLocalOf<AppSnackbarController> {
@@ -192,10 +160,8 @@ fun AppSnackbarBridge(
 private val ToastCornerRadius = 24.dp
 private val ToastHorizontalPad = 16.dp
 private val ToastVerticalPad = 12.dp
-private val ToastIconSize = 24.dp
-private val ToastIconSpacing = 10.dp
-private val ToastMaxLines = 8
-private val ToastMaxWidthFraction = 0.75f
+private const val ToastMaxLines = 8
+private const val ToastMaxWidthFraction = 0.75f
 private val ToastBottomOffset = 100.dp
 
 @Composable
@@ -226,13 +192,6 @@ fun AppSnackbarHost(
                 ToastType.INFO -> toastInfoBg
             }
 
-            val iconText = when (type) {
-                ToastType.SUCCESS -> "✓"
-                ToastType.ERROR -> "✕"
-                ToastType.INFO -> "ℹ"
-                ToastType.NORMAL -> null
-            }
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -255,24 +214,6 @@ fun AppSnackbarHost(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (iconText != null) {
-                            Box(
-                                modifier = Modifier
-                                    .size(ToastIconSize)
-                                    .clip(CircleShape)
-                                    .background(toastIconCircleBg),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = iconText,
-                                    color = toastTextColor,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(ToastIconSpacing))
-                        }
-
                         Text(
                             text = data.visuals.message,
                             color = toastTextColor,

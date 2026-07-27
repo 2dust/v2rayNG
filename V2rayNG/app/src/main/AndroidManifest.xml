@@ -253,6 +253,16 @@
                 android:value="test" />
         </service>
 
+        <service
+            android:name=".service.SubscriptionUpdateService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:process=":RunSoLibV2RayDaemon">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="test" />
+        </service>
+
         <receiver
             android:name=".receiver.WidgetProvider"
             android:exported="true"
