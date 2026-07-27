@@ -26,10 +26,11 @@ object RootShell {
             writeText(script)
             setExecutable(true, false)
         }
-        return exec("sh ${file.absolutePath}")
+        val safePath = file.absolutePath.replace("'", "'\\''")
+        return exec("sh '$safePath'")
     }
 
-    fun exec(command: String, timeoutSeconds: Long = 30): Result {
+    private fun exec(command: String, timeoutSeconds: Long = 30): Result {
         return try {
             val process = ProcessBuilder("su", "-c", command)
                 .redirectErrorStream(true)
