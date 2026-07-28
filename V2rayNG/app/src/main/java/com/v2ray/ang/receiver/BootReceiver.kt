@@ -12,7 +12,7 @@ import com.v2ray.ang.util.LogUtil
 class BootReceiver : BroadcastReceiver() {
     /**
      * This method is called when the BroadcastReceiver is receiving an Intent broadcast.
-     * It checks if the context is not null and the action is ACTION_BOOT_COMPLETED.
+     * It handles BOOT_COMPLETED, LOCKED_BOOT_COMPLETED, and MY_PACKAGE_REPLACED.
      * If the conditions are met, it starts the V2Ray service.
      *
      * @param context The Context in which the receiver is running.
@@ -21,7 +21,12 @@ class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         LogUtil.i(AppConfig.TAG, "BootReceiver received: ${intent?.action}")
 
-        if (context == null || intent?.action != Intent.ACTION_BOOT_COMPLETED) {
+        val validActions = setOf(
+            Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_LOCKED_BOOT_COMPLETED,
+            Intent.ACTION_MY_PACKAGE_REPLACED,
+        )
+        if (context == null || intent?.action !in validActions) {
             LogUtil.w(AppConfig.TAG, "BootReceiver: Invalid context or action")
             return
         }
