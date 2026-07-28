@@ -130,10 +130,7 @@ class CoreVpnService : VpnService(), ServiceControl {
         NotificationManager.showNotification(null)
         if (!setupVpnService()) {
             unlockStart()
-            if (isSystemVpnStart) {
-                // Keep service alive for OS Always-on reconnection attempts
-                return START_STICKY
-            }
+            // Stop service if setup fails to avoid infinite restart loops (START_STICKY)
             stopSelf()
             return START_NOT_STICKY
         }
