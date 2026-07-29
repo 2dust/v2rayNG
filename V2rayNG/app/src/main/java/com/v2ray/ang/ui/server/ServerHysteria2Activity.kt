@@ -18,12 +18,10 @@ class ServerHysteria2Activity : BaseServerActivity() {
 
     @Composable
     override fun ScreenContent() {
-        val options = rememberFieldOptions()
         val scope = rememberCoroutineScope()
         val uiState = rememberSaveable(saver = ServerUiState.Saver) {
             ServerUiState.from(
-                initialConfig = initialConfig,
-                browserDialerDefault = options.browserDialerOptions.firstOrNull() ?: "Disable"
+                initialConfig = initialConfig
             )
         }.apply {
             configType = EConfigType.HYSTERIA2

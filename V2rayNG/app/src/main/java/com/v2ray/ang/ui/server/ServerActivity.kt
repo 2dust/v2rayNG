@@ -255,7 +255,7 @@ fun ServerScreen(
     var finalMask by rememberSaveable { mutableStateOf(initialConfig.finalMask ?: "") }
     var kcpMtu by rememberSaveable { mutableStateOf(initialConfig.kcpMtu?.toString() ?: "") }
     var kcpTti by rememberSaveable { mutableStateOf(initialConfig.kcpTti?.toString() ?: "") }
-    var browserDialerMode by rememberSaveable { mutableStateOf(initialConfig.browserDialerMode ?: browserDialerOptions.firstOrNull() ?: "Disable") }
+    var browserDialerMode by rememberSaveable { mutableStateOf(initialConfig.browserDialerMode?: "") }
     var streamSecurity by rememberSaveable { mutableStateOf(initialConfig.security ?: "") }
     var sni by rememberSaveable { mutableStateOf(initialConfig.sni ?: "") }
     var allowInsecure by rememberSaveable { mutableStateOf(initialConfig.insecure == true) }

@@ -43,7 +43,7 @@ class ServerUiState(
     finalMask: String = "",
     kcpMtu: String = "",
     kcpTti: String = "",
-    browserDialerMode: String = "Disable",
+    browserDialerMode: String = "",
     streamSecurity: String = "",
     sni: String = "",
     allowInsecure: Boolean = false,
@@ -166,8 +166,7 @@ class ServerUiState(
 
     companion object {
         fun fromProfileItem(
-            initialConfig: ProfileItem,
-            browserDialerDefault: String
+            initialConfig: ProfileItem
         ): ServerUiState =
             ServerUiState(
                 configType = initialConfig.configType,
@@ -198,7 +197,7 @@ class ServerUiState(
                 finalMask = initialConfig.finalMask ?: "",
                 kcpMtu = initialConfig.kcpMtu?.toString() ?: "",
                 kcpTti = initialConfig.kcpTti?.toString() ?: "",
-                browserDialerMode = initialConfig.browserDialerMode ?: browserDialerDefault,
+                browserDialerMode = initialConfig.browserDialerMode ?: "",
                 streamSecurity = initialConfig.security ?: "",
                 sni = initialConfig.sni ?: "",
                 allowInsecure = initialConfig.insecure == true,
@@ -214,15 +213,14 @@ class ServerUiState(
             )
 
         fun from(
-            initialConfig: ProfileItem,
-            browserDialerDefault: String
-        ): ServerUiState = fromProfileItem(initialConfig, browserDialerDefault)
+            initialConfig: ProfileItem
+        ): ServerUiState = fromProfileItem(initialConfig)
 
         val Saver: Saver<ServerUiState, String> = Saver(
             save = { JsonUtil.toJson(it.toProfileItem(ProfileItem.create(it.configType))) },
             restore = { saved ->
                 JsonUtil.fromJsonSafe(saved, ProfileItem::class.java)?.let {
-                    fromProfileItem(it, browserDialerDefault = "Disable")
+                    fromProfileItem(it)
                 }
             }
         )
