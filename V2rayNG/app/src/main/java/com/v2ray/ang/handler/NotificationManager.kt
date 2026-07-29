@@ -93,8 +93,8 @@ object NotificationManager {
 
         mBuilder = NotificationCompat.Builder(service, channelId)
             .setSmallIcon(R.drawable.ic_stat_name)
-            .setContentTitle(currentConfig?.remarks)
-            .setPriority(NotificationCompat.PRIORITY_MIN)
+            .setContentTitle(currentConfig?.remarks ?: service.getString(R.string.app_name))
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .setShowWhen(false)
             .setOnlyAlertOnce(true)
@@ -113,6 +113,17 @@ object NotificationManager {
         //mBuilder?.setDefaults(NotificationCompat.FLAG_ONLY_ALERT_ONCE)
 
         service.startForeground(NOTIFICATION_ID, mBuilder?.build())
+    }
+
+    /**
+     * Fulfills or refreshes the foreground-service contract before a start command can
+     * return early. A duplicate startForegroundService call still requires the service
+     * to enter foreground state promptly, even when the core is already running.
+     */
+    fun ensureForeground() {
+        val service = getService() ?: return
+        val notification = mBuilder?.build()
+        if (notification == null) showNotification(null) else service.startForeground(NOTIFICATION_ID, notification)
     }
 
     /**
@@ -147,12 +158,9 @@ object NotificationManager {
     private fun createNotificationChannel(): String {
         val channelId = AppConfig.RAY_NG_CHANNEL_ID
         val channelName = AppConfig.RAY_NG_CHANNEL_NAME
-        val chan = NotificationChannel(
-            channelId,
-            channelName, NotificationManager.IMPORTANCE_HIGH
-        )
+        // Foreground-service notifications must remain visible; LOW is silent but valid.
+        val chan = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
         chan.lightColor = Color.DKGRAY
-        chan.importance = NotificationManager.IMPORTANCE_NONE
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         getNotificationManager()?.createNotificationChannel(chan)
         return channelId

@@ -36,6 +36,7 @@ import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
@@ -50,6 +51,8 @@ object CoreServiceManager {
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
+    private var pendingCoreStop: Job? = null
+    private var restartAfterServiceStop = false
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -111,6 +114,11 @@ object CoreServiceManager {
         MessageUtil.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
     }
 
+    /** Requests a daemon-owned restart after the running core is fully stopped. */
+    fun restartVService(context: Context) {
+        MessageUtil.sendMsg2Service(context, AppConfig.MSG_STATE_RESTART, "")
+    }
+
     /**
      * Checks if the V2Ray service is running.
      * @return True if the service is running, false otherwise.
@@ -127,17 +135,15 @@ object CoreServiceManager {
      * Starts the context service for V2Ray.
      * Chooses between VPN service or Proxy-only service based on user settings.
      * @param context The context from which the service is started.
-     * @throws IllegalStateException if the core is already running, no server is selected,
-     *   server config cannot be decoded, or server configuration is invalid.
+     * @throws IllegalStateException if no server is selected, the server config cannot be
+     *   decoded, or the server configuration is invalid.
      * @throws Exception if the foreground service fails to start.
      */
     @Throws(Exception::class)
     private fun startContextService(context: Context) {
-        if (coreController.isRunning) {
-            LogUtil.w(AppConfig.TAG, "StartCore-Manager: Core already running")
-            return
-        }
-
+        // The app and daemon processes each have their own CoreServiceManager instance.
+        // Only the daemon can reliably decide whether this is a duplicate start, so always
+        // dispatch the command and let the selected service handle it idempotently.
         val guid = MmkvManager.getSelectServer()
             ?: run {
                 LogUtil.e(AppConfig.TAG, "StartCore-Manager: No server selected")
@@ -308,8 +314,8 @@ object CoreServiceManager {
     fun stopCoreLoop(): Boolean {
         val service = getService() ?: return false
 
-        if (coreController.isRunning) {
-            CoroutineScope(Dispatchers.IO).launch {
+        if (pendingCoreStop == null && coreController.isRunning) {
+            pendingCoreStop = CoroutineScope(Dispatchers.IO).launch {
                 try {
                     coreController.stopLoop()
                 } catch (e: Exception) {
@@ -335,6 +341,24 @@ object CoreServiceManager {
         }
 
         return true
+    }
+
+    /**
+     * Defers a requested restart until both the Android service and its asynchronous core
+     * stop have finished, so the old core cannot retain ports needed by the new instance.
+     * The detached coroutine intentionally outlives the destroyed service.
+     */
+    fun onServiceDestroyed(context: Context) {
+        val stopJob = pendingCoreStop
+        val shouldRestart = restartAfterServiceStop
+        pendingCoreStop = null
+        restartAfterServiceStop = false
+        if (!shouldRestart) return
+        val appContext = context.applicationContext
+        CoroutineScope(Dispatchers.IO).launch {
+            stopJob?.join()
+            startVService(appContext)
+        }
     }
 
     /**
@@ -533,9 +557,8 @@ object CoreServiceManager {
 
                 AppConfig.MSG_STATE_RESTART -> {
                     LogUtil.i(AppConfig.TAG, "StartCore-Manager: Restart service")
+                    restartAfterServiceStop = true
                     serviceControl.stopService()
-                    Thread.sleep(500L)
-                    startVService(serviceControl.getService())
                 }
 
                 AppConfig.MSG_MEASURE_DELAY -> {

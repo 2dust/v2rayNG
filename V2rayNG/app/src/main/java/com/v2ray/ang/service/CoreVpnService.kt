@@ -26,6 +26,7 @@ import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.root.RootLanSharing
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
 import java.lang.ref.SoftReference
@@ -113,29 +114,37 @@ class CoreVpnService : VpnService(), ServiceControl {
 
         unlockStart()
         NotificationManager.cancelNotification()
+        CoreServiceManager.onServiceDestroyed(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Always-on VPN restarts from OS deliver intent.action == SERVICE_INTERFACE or null intent.
-        // Reset any stuck start lock left by a killed process to allow setupVpnService() to run.
-        val isSystemVpnStart = intent == null || intent.action == SERVICE_INTERFACE
-        if (isSystemVpnStart) {
-            unlockStart()
+        NotificationManager.ensureForeground()
+        if (isRunning || CoreServiceManager.isRunning()) {
+            LogUtil.i(AppConfig.TAG, "StartCore-VPN: Core is already running")
+            return START_STICKY
         }
         if (!tryLockStart()) {
             LogUtil.w(AppConfig.TAG, "StartCore-VPN: Start already in progress")
-            return START_NOT_STICKY
+            return START_STICKY
         }
-        LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service command received, systemVpnStart=$isSystemVpnStart")
-        NotificationManager.showNotification(null)
-        if (!setupVpnService()) {
+        return try {
+            LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service command received")
+            if (!setupVpnService()) {
+                stopSelf()
+                START_NOT_STICKY
+            } else {
+                startService()
+                if (isRunning && CoreServiceManager.isRunning()) START_STICKY else START_NOT_STICKY
+            }
+        } catch (e: Exception) {
+            val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
+            LogUtil.e(AppConfig.TAG, "StartCore-VPN: $message", e)
+            stopAllService()
+            MessageUtil.sendMsg2UI(this, AppConfig.MSG_STATE_START_FAILURE, message)
+            START_NOT_STICKY
+        } finally {
             unlockStart()
-            // Stop service if setup fails to avoid infinite restart loops (START_STICKY)
-            stopSelf()
-            return START_NOT_STICKY
         }
-        startService()
-        return START_STICKY
     }
 
     override fun getService(): Service {
@@ -415,13 +424,13 @@ class CoreVpnService : VpnService(), ServiceControl {
         }
     }
 
-    fun tryLockStart(): Boolean {
-        LogUtil.w(AppConfig.TAG, "StartCore-VPN: tryLockStart: ${isStartingLock.get()}")
+    private fun tryLockStart(): Boolean {
+        LogUtil.d(AppConfig.TAG, "StartCore-VPN: tryLockStart: ${isStartingLock.get()}")
         return isStartingLock.compareAndSet(false, true)
     }
 
-    fun unlockStart() {
+    private fun unlockStart() {
         isStartingLock.set(false)
-        LogUtil.w(AppConfig.TAG, "StartCore-VPN: unlockStart")
+        LogUtil.d(AppConfig.TAG, "StartCore-VPN: unlockStart")
     }
 }

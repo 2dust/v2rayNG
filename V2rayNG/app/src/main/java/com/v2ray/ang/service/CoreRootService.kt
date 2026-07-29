@@ -7,6 +7,7 @@ import android.os.IBinder
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.core.CoreServiceManager
+import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.root.RootProxyManager
 import com.v2ray.ang.util.LogUtil
@@ -39,7 +40,13 @@ class CoreRootService : Service(), ServiceControl {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        NotificationManager.ensureForeground()
         LogUtil.i(AppConfig.TAG, "StartCore-Root: command received")
+
+        if (CoreServiceManager.isRunning()) {
+            LogUtil.i(AppConfig.TAG, "StartCore-Root: Core is already running")
+            return START_STICKY
+        }
 
         // Start the in-process core first (this also posts the foreground notification),
         // then install the root routing off the main thread.
@@ -71,6 +78,7 @@ class CoreRootService : Service(), ServiceControl {
         // to a dead listener. Synchronous on purpose — leaving rules behind breaks the net.
         RootProxyManager.stop(this)
         CoreServiceManager.stopCoreLoop()
+        CoreServiceManager.onServiceDestroyed(this)
     }
 
     override fun getService(): Service = this

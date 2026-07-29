@@ -191,10 +191,10 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private fun restartV2Ray() {
-        if (mainViewModel.uiState.value.isRunning) CoreServiceManager.stopVService(this)
-        lifecycleScope.launch {
-            kotlinx.coroutines.delay(500)
+        if (!mainViewModel.uiState.value.isRunning) {
             startV2Ray()
+        } else {
+            CoreServiceManager.restartVService(this)
         }
     }
 
