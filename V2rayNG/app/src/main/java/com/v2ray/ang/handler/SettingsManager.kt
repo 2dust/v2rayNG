@@ -19,6 +19,7 @@ import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.Language
 import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.enums.VpnInterfaceAddressConfig
+import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.MmkvManager.decodeAllServerList
 import com.v2ray.ang.handler.MmkvManager.decodeServerConfig
 import com.v2ray.ang.handler.MmkvManager.decodeSubsList
@@ -30,7 +31,6 @@ import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import java.io.File
 import java.io.FileOutputStream
-import java.util.Collections
 import java.util.Locale
 import kotlin.random.Random
 
@@ -202,32 +202,6 @@ object SettingsManager {
             it.domain?.contains(GEOSITE_PRIVATE) == true || it.ip?.contains(GEOIP_PRIVATE) == true
         }
         return exist == true
-    }
-
-    /**
-     * Swap routing rulesets.
-     * @param fromPosition The position to swap from.
-     * @param toPosition The position to swap to.
-     */
-    fun swapRoutingRuleset(fromPosition: Int, toPosition: Int) {
-        val rulesetList = MmkvManager.decodeRoutingRulesets()
-        if (rulesetList.isNullOrEmpty()) return
-
-        Collections.swap(rulesetList, fromPosition, toPosition)
-        MmkvManager.encodeRoutingRulesets(rulesetList)
-    }
-
-    /**
-     * Swap subscriptions.
-     * @param fromPosition The position to swap from.
-     * @param toPosition The position to swap to.
-     */
-    fun swapSubscriptions(fromPosition: Int, toPosition: Int) {
-        val subsList = decodeSubsList()
-        if (subsList.isEmpty()) return
-
-        Collections.swap(subsList, fromPosition, toPosition)
-        MmkvManager.encodeSubsList(subsList)
     }
 
     /**
@@ -623,10 +597,10 @@ object SettingsManager {
             )
             encodeSubscription(DEFAULT_SUBSCRIPTION_ID, defaultSub)
 
-            // Move top
+            // Move to the top
             val subsList = decodeSubsList()
-            if (subsList.count() > 1) {
-                swapSubscriptions(0, subsList.count() - 1)
+            if (subsList.moveItem(subsList.lastIndex, 0)) {
+                MmkvManager.encodeSubsList(subsList)
             }
         }
     }
