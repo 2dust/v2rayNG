@@ -39,6 +39,7 @@ import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
 import com.v2ray.ang.compose.FormTextField
+import com.v2ray.ang.compose.reorderableDragHandle
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
@@ -286,7 +287,7 @@ fun ProxyChainScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .then(with(this) { Modifier.longPressDraggableHandle() })
+                                .then(with(this) { reorderableDragHandle() })
                                 .padding(horizontal = 4.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
