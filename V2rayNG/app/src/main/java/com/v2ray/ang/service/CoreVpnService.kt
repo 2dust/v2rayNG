@@ -130,8 +130,9 @@ class CoreVpnService : VpnService(), ServiceControl {
         return try {
             LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service command received")
             if (!setupVpnService()) {
-                stopSelf()
+                stopSelf(startId)
                 START_NOT_STICKY
+            }
             } else {
                 startService()
                 if (isRunning && CoreServiceManager.isRunning()) START_STICKY else START_NOT_STICKY
