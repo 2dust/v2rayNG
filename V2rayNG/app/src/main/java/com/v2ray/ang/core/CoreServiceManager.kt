@@ -15,7 +15,9 @@ import com.v2ray.ang.R
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.dto.OutboundTrafficStat
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.enums.BrowserDialerMode
 import com.v2ray.ang.extension.isComplexType
+import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager
@@ -162,9 +164,9 @@ object CoreServiceManager {
 //        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
 //        if (!result.status) error(result.errorMessage.ifBlank { "Failed to get V2Ray config" })
 
-        if (config.insecure == true) {
+        if (config.insecure == true && config.pinnedCA256.isNullOrEmpty()) {
             context.toastError(R.string.toast_allow_insecure_deprecated)
-            context.toastError(R.string.toast_allow_insecure_deprecated)
+            Utils.setClipboard(context,context.getString(R.string.toast_allow_insecure_deprecated))
         }
 
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
@@ -255,17 +257,20 @@ object CoreServiceManager {
 
         currentConfig = config
         var tunFd = vpnInterface?.fd ?: 0
-        val dialerAddr = if (currentConfig?.browserDialerMode.isNullOrEmpty()) {
-            ""
-        } else {
+        val dialerMode = BrowserDialerMode.from(config.browserDialerMode)
+        val dialerAddr = if (dialerMode != null) {
             "127.0.0.1:${Utils.findRandomFreePort()}"
+        } else {
+            ""
         }
         if (SettingsManager.isUsingHevTun()) {
             tunFd = 0
         }
 
         NotificationManager.showNotification(currentConfig)
-        CoreNativeManager.reconcileBrowserDialer(dialerAddr)
+        if (dialerAddr.isNotNullEmpty()) {
+            CoreNativeManager.reconcileBrowserDialer(dialerAddr)
+        }
         coreController.startLoop(result.content, tunFd)
 
         if (!coreController.isRunning) {
@@ -276,12 +281,18 @@ object CoreServiceManager {
             browserDialer!!.stop()
             browserDialer = null
         }
-        if (config.browserDialerMode == "OkHttp") {
-            browserDialer = DialerNativeService()
-            browserDialer!!.start(service, dialerAddr)
-        } else if (config.browserDialerMode == "WebView") {
-            browserDialer = DialerWebviewService()
-            browserDialer!!.start(service, dialerAddr)
+        when (dialerMode) {
+            BrowserDialerMode.OKHTTP -> {
+                browserDialer = DialerNativeService()
+                browserDialer!!.start(service, dialerAddr)
+            }
+
+            BrowserDialerMode.WEBVIEW -> {
+                browserDialer = DialerWebviewService()
+                browserDialer!!.start(service, dialerAddr)
+            }
+
+            else -> {}
         }
 
         MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
