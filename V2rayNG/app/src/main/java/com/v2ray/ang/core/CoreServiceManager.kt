@@ -1,5 +1,6 @@
 package com.v2ray.ang.core
 
+import android.app.Activity
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -117,6 +118,20 @@ object CoreServiceManager {
     /** Requests a daemon-owned restart after the running core is fully stopped. */
     fun restartVService(context: Context) {
         MessageUtil.sendMsg2Service(context, AppConfig.MSG_STATE_RESTART, "")
+    }
+
+    /**
+     * Restarts the daemon when it is running, or invokes [startIfStopped] when no daemon handled
+     * the request. The daemon acknowledgement avoids relying on stale app-process UI state.
+     */
+    fun restartVServiceOrStart(context: Context, startIfStopped: () -> Unit) {
+        MessageUtil.sendMsg2ServiceForResult(
+            context,
+            AppConfig.MSG_STATE_RESTART,
+            ""
+        ) { handled ->
+            if (!handled) startIfStopped()
+        }
     }
 
     /**
@@ -557,6 +572,9 @@ object CoreServiceManager {
 
                 AppConfig.MSG_STATE_RESTART -> {
                     LogUtil.i(AppConfig.TAG, "StartCore-Manager: Restart service")
+                    if (isOrderedBroadcast) {
+                        resultCode = Activity.RESULT_OK
+                    }
                     restartAfterServiceStop = true
                     serviceControl.stopService()
                 }

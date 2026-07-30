@@ -71,13 +71,15 @@ class MainActivity : HelperBaseComponentActivity() {
             if (action != ProfileEditorResult.ACTION_SAVED &&
                 action != ProfileEditorResult.ACTION_DELETED
             ) return@registerForActivityResult
+            val changedGuid = data.getStringExtra(ProfileEditorResult.EXTRA_GUID)
+            val selectedProfileSaved =
+                action == ProfileEditorResult.ACTION_SAVED &&
+                    changedGuid == mainViewModel.uiState.value.selectedGuid
             val restartService = data.getBooleanExtra(
                 ProfileEditorResult.EXTRA_RESTART_SERVICE, false
-            )
+            ) || selectedProfileSaved
             mainViewModel.onAction(MainAction.RefreshGroups)
-            if (restartService && mainViewModel.uiState.value.isRunning) {
-                restartV2Ray()
-            }
+            if (restartService) CoreServiceManager.restartVService(this)
         }
 
     private val settingsActivityLauncher =
@@ -86,7 +88,7 @@ class MainActivity : HelperBaseComponentActivity() {
             val refreshGroups = SettingsChangeManager.consumeSetupGroupTab()
             mainViewModel.refreshUiSettings()
             if (refreshGroups) mainViewModel.onAction(MainAction.RefreshGroups)
-            if (restartService && mainViewModel.uiState.value.isRunning) restartV2Ray()
+            if (restartService) CoreServiceManager.restartVService(this)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,7 +110,7 @@ class MainActivity : HelperBaseComponentActivity() {
                     MainAction.ImportClipboard -> importClipboard()
                     MainAction.ImportConfigLocal -> importConfigLocal()
                     is MainAction.ImportManually -> importManually(action.type)
-                    MainAction.RestartService -> restartV2Ray()
+                    MainAction.RestartService -> restartOrStartV2Ray()
                     MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
                     is MainAction.SelectServer -> setSelectServer(action.guid)
                     is MainAction.EditServer -> editServer(action.guid, action.profile)
@@ -190,12 +192,8 @@ class MainActivity : HelperBaseComponentActivity() {
         CoreServiceManager.startVService(this)
     }
 
-    private fun restartV2Ray() {
-        if (!mainViewModel.uiState.value.isRunning) {
-            startV2Ray()
-        } else {
-            CoreServiceManager.restartVService(this)
-        }
+    private fun restartOrStartV2Ray() {
+        CoreServiceManager.restartVServiceOrStart(this, ::startV2Ray)
     }
 
     private fun importManually(createConfigType: Int) {
@@ -277,7 +275,7 @@ class MainActivity : HelperBaseComponentActivity() {
         val selected = mainViewModel.uiState.value.selectedGuid
         if (guid != selected) {
             mainViewModel.updateSelectedGuid(guid)
-            if (mainViewModel.uiState.value.isRunning) restartV2Ray()
+            CoreServiceManager.restartVService(this)
         }
     }
 
