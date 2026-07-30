@@ -29,8 +29,11 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
     private var appsAll: List<AppInfo> = emptyList()
     private var currentQuery: String = ""
     private var SelectedSnapshot: Set<String> = emptySet()
+    private var initialized = false
 
     fun initialize(initialSelected: Collection<String>) {
+        if (initialized) return
+        initialized = true
         _selectedPackages.value = initialSelected.toSet()
     }
 
