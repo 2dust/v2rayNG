@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -128,7 +129,7 @@ fun SubEditScreen(
     onSave: (SubscriptionItem) -> Boolean,
     onDelete: () -> Unit
 ) {
-    //val context = LocalContext.current
+    val context = LocalContext.current
     var remarks by rememberSaveable { mutableStateOf(initial.remarks.orEmpty()) }
     var url by rememberSaveable { mutableStateOf(initial.url.orEmpty()) }
     var userAgent by rememberSaveable { mutableStateOf(initial.userAgent.orEmpty()) }
@@ -145,7 +146,12 @@ fun SubEditScreen(
     val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
     val scrollState = rememberScrollState()
 
-    fun buildSubItem(): SubscriptionItem {
+    fun buildSubItem(): SubscriptionItem? {
+        val parsedUpdateInterval = updateInterval.toLongOrNull()
+        if (parsedUpdateInterval == null) {
+            context.toast(R.string.toast_invalid_update_interval)
+            return null
+        }
         val subItem = MmkvManager.decodeSubscription(editSubId) ?: SubscriptionItem()
         subItem.remarks = remarks
         subItem.url = url
@@ -154,7 +160,7 @@ fun SubEditScreen(
         subItem.filter = filter
         subItem.enabled = enabled
         subItem.autoUpdate = autoUpdate
-        subItem.updateInterval = updateInterval.toLong()
+        subItem.updateInterval = parsedUpdateInterval
         subItem.prevProfile = prevProfile
         subItem.nextProfile = nextProfile
         subItem.allowInsecureUrl = allowInsecureUrl
