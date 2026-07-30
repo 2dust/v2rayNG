@@ -125,7 +125,7 @@ fun PerAppProxyScreen(
     var showMenu by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
 
-    LaunchedEffect(searchQuery) {
+    LaunchedEffect(Unit) {
         onSearch(searchQuery)
     }
 
@@ -140,9 +140,11 @@ fun PerAppProxyScreen(
                 searchQuery = searchQuery,
                 onSearchQueryChange = { query ->
                     searchQuery = query
+                    onSearch(query)
                 },
                 onSearchClose = {
                     searchQuery = ""
+                    onSearch("")
                     showSearch = false
                 },
                 searchPlaceholder = stringResource(R.string.menu_item_search),
@@ -169,19 +171,23 @@ fun PerAppProxyScreen(
                         ) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.menu_item_select_all)) },
-                                onClick = { showMenu = false; onSelectAll() }
+                                onClick = { showMenu = false; onSelectAll() },
+                                enabled = !isLoading
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.menu_item_invert_selection)) },
-                                onClick = { showMenu = false; onInvertSelection() }
+                                onClick = { showMenu = false; onInvertSelection() },
+                                enabled = !isLoading
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.menu_item_select_proxy_app)) },
-                                onClick = { showMenu = false; onSelectProxyAuto() }
+                                onClick = { showMenu = false; onSelectProxyAuto() },
+                                enabled = !isLoading
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.menu_item_import_proxy_app)) },
-                                onClick = { showMenu = false; onImportProxyApp() }
+                                onClick = { showMenu = false; onImportProxyApp() },
+                                enabled = !isLoading
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.menu_item_export_proxy_app)) },
@@ -274,7 +280,8 @@ fun PerAppProxyScreen(
                         packageName = app.packageName,
                         icon = null,
                         checked = checked,
-                        onCheckedChange = { onToggleApp(app.packageName) }
+                        onCheckedChange = { onToggleApp(app.packageName) },
+                        enabled = !isLoading
                     )
                     ItemDivider()
                 }

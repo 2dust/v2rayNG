@@ -119,7 +119,7 @@ fun AppPickerScreen(
     var showMenu by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
 
-    LaunchedEffect(searchQuery) {
+    LaunchedEffect(Unit) {
         onSearch(searchQuery)
     }
 
@@ -134,9 +134,11 @@ fun AppPickerScreen(
                 searchQuery = searchQuery,
                 onSearchQueryChange = { query ->
                     searchQuery = query
+                    onSearch(query)
                 },
                 onSearchClose = {
                     searchQuery = ""
+                    onSearch("")
                     showSearch = false
                 },
                 searchPlaceholder = stringResource(R.string.menu_item_search),
