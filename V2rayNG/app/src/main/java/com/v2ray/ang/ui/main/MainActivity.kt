@@ -118,8 +118,6 @@ class MainActivity : HelperBaseComponentActivity() {
                 }
             },
             onNavigate = { route -> navigateTo(route) },
-            shareMethodEntries = resources.getStringArray(R.array.share_method).toList(),
-            shareMethodMoreEntries = resources.getStringArray(R.array.share_method_more).toList()
         )
     }
 

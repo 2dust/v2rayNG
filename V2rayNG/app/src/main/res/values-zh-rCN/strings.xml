@@ -39,8 +39,16 @@
     <string name="menu_item_import_config_manually_trojan">添加 [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">添加 [Wireguard]</string>
     <string name="menu_item_import_config_manually_hysteria2">添加 [Hysteria2]</string>
-    <string name="del_config_comfirm">确认删除？</string>
-    <string name="del_invalid_config_comfirm">删除前请先测试！确认删除？</string>
+    <string name="confirm_delete_visible_profiles">确定要删除当前显示的所有配置吗？</string>
+    <string name="confirm_delete_duplicate_profiles">确定要删除当前显示的所有重复配置吗？</string>
+    <string name="confirm_delete_invalid_profiles">请先测试配置。确定要删除当前显示的所有无效配置吗？</string>
+    <string name="confirm_delete_profile">确定要删除此配置吗？</string>
+    <string name="confirm_delete_policy_group">确定要删除此策略组吗？</string>
+    <string name="confirm_delete_proxy_chain_member">确定要删除此代理链成员吗？</string>
+    <string name="confirm_delete_routing_rule">确定要删除此路由规则吗？</string>
+    <string name="confirm_delete_subscription_group">确定要删除此订阅组吗？</string>
+    <string name="confirm_delete_asset_file">确定要删除资源文件“%1$s”吗？</string>
+    <string name="confirm_delete_asset_source">确定要删除此资源来源吗？</string>
     <string name="server_lab_remarks">别名 (remarks)</string>
     <string name="server_lab_address">地址 (address)</string>
     <string name="server_lab_port">端口 (port)</string>
@@ -424,19 +432,12 @@
     <string name="title_webdav_pass">密码</string>
     <string name="title_webdav_remote_path">远程文件夹名（可选）</string>
 
-    <string-array name="share_method">
-        <item>二维码</item>
-        <item>导出至剪贴板</item>
-        <item>导出完整配置至剪贴板</item>
-    </string-array>
-
-    <string-array name="share_method_more">
-        <item>二维码</item>
-        <item>导出至剪贴板</item>
-        <item>导出完整配置至剪贴板</item>
-        <item>编辑</item>
-        <item>删除</item>
-    </string-array>
+    <string name="share_method_qrcode">二维码</string>
+    <string name="share_method_clipboard">导出至剪贴板</string>
+    <string name="share_method_full_content">导出完整配置至剪贴板</string>
+    <string name="action_edit">编辑</string>
+    <string name="action_delete">删除</string>
+    <string name="action_close">关闭</string>
 
     <string-array name="share_sub_method">
         <item>二维码</item>

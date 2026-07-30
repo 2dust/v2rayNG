@@ -39,8 +39,16 @@
     <string name="menu_item_import_config_manually_trojan">新增 [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">新增 [Wireguard]</string>
     <string name="menu_item_import_config_manually_hysteria2">新增 [Hysteria2]</string>
-    <string name="del_config_comfirm">確定刪除？</string>
-    <string name="del_invalid_config_comfirm">刪除前請先測試！確認刪除？</string>
+    <string name="confirm_delete_visible_profiles">確定要刪除目前顯示的所有設定檔嗎？</string>
+    <string name="confirm_delete_duplicate_profiles">確定要刪除目前顯示的所有重複設定檔嗎？</string>
+    <string name="confirm_delete_invalid_profiles">請先測試設定檔。確定要刪除目前顯示的所有無效設定檔嗎？</string>
+    <string name="confirm_delete_profile">確定要刪除此設定檔嗎？</string>
+    <string name="confirm_delete_policy_group">確定要刪除此策略組嗎？</string>
+    <string name="confirm_delete_proxy_chain_member">確定要刪除此代理鏈成員嗎？</string>
+    <string name="confirm_delete_routing_rule">確定要刪除此路由規則嗎？</string>
+    <string name="confirm_delete_subscription_group">確定要刪除此訂閱群組嗎？</string>
+    <string name="confirm_delete_asset_file">確定要刪除資源檔案「%1$s」嗎？</string>
+    <string name="confirm_delete_asset_source">確定要刪除此資源來源嗎？</string>
     <string name="server_lab_remarks">備註</string>
     <string name="server_lab_address">位址</string>
     <string name="server_lab_port">埠</string>
@@ -422,19 +430,12 @@
     <string name="title_webdav_pass">密碼</string>
     <string name="title_webdav_remote_path">遠端目錄（可選）</string>
 
-    <string-array name="share_method">
-        <item>二維碼</item>
-        <item>匯出至剪貼簿</item>
-        <item>匯出完整設定至剪貼簿</item>
-    </string-array>
-
-    <string-array name="share_method_more">
-        <item>QR Code</item>
-        <item>匯出至剪貼簿</item>
-        <item>匯出完整設定至剪貼簿</item>
-        <item>編輯</item>
-        <item>刪除</item>
-    </string-array>
+    <string name="share_method_qrcode">二維碼</string>
+    <string name="share_method_clipboard">匯出至剪貼簿</string>
+    <string name="share_method_full_content">匯出完整設定至剪貼簿</string>
+    <string name="action_edit">編輯</string>
+    <string name="action_delete">刪除</string>
+    <string name="action_close">關閉</string>
 
     <string-array name="share_sub_method">
         <item>二維碼</item>

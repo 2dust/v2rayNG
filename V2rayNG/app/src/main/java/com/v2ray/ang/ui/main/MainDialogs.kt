@@ -3,7 +3,7 @@ package com.v2ray.ang.ui.main
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.ConfirmDialog
+import com.v2ray.ang.compose.DeleteConfirmDialog
 
 @Composable
 fun MainDialogs(
@@ -21,38 +21,30 @@ fun MainDialogs(
     onConfirmRemove: (String) -> Unit,
 ) {
     if (showDelAllConfirm) {
-        ConfirmDialog(
-            message = stringResource(R.string.del_config_comfirm),
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_visible_profiles),
             onConfirm = onConfirmDelAll,
             onDismiss = onDismissDelAll
         )
     }
     if (showDelDuplicateConfirm) {
-        ConfirmDialog(
-            message = stringResource(R.string.del_config_comfirm),
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_duplicate_profiles),
             onConfirm = onConfirmDelDuplicate,
             onDismiss = onDismissDelDuplicate
         )
     }
     if (showDelInvalidConfirm) {
-        ConfirmDialog(
-            message = stringResource(R.string.del_invalid_config_comfirm),
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_invalid_profiles),
             onConfirm = onConfirmDelInvalid,
             onDismiss = onDismissDelInvalid
         )
     }
     if (showRemoveConfirm != null) {
         val guid = showRemoveConfirm
-        ConfirmDialog(
-            message = stringResource(R.string.del_config_comfirm),
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_profile),
             onConfirm = { onConfirmRemove(guid) },
             onDismiss = onDismissRemove
         )
