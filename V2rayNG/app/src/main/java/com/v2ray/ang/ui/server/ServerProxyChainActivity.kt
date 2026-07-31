@@ -36,7 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.ConfirmDialog
+import com.v2ray.ang.compose.DeleteConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
 import com.v2ray.ang.compose.FormTextField
 import com.v2ray.ang.compose.reorderableDragHandle
@@ -198,10 +198,9 @@ fun ProxyChainScreen(
     onDelete: () -> Unit
 ) {
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
-    var members by rememberSaveable { mutableStateOf(initialMembers.toList()) }
-    // Member remarks may be blank or duplicated, so they cannot serve as stable Compose keys.
-    var memberKeys by rememberSaveable { mutableStateOf(List(initialMembers.size) { UUID.randomUUID().toString() }) }
-    var showDeleteConfirm by remember { mutableStateOf(false) }
+    var members by rememberSaveable { mutableStateOf(initialMembers.toMutableList()) }
+    var showProfileDeleteConfirm by remember { mutableStateOf(false) }
+    var memberToDeleteIndex by rememberSaveable { mutableStateOf<Int?>(null) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
 
     val lazyListState = rememberLazyListState()
@@ -225,7 +224,7 @@ fun ProxyChainScreen(
                 onBackClick = onBackClick,
                 actions = {
                     if (showDelete) {
-                        IconButton(onClick = { showDeleteConfirm = true }) {
+                        IconButton(onClick = { showProfileDeleteConfirm = true }) {
                             Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.menu_item_del_config))
                         }
                     }
@@ -309,8 +308,8 @@ fun ProxyChainScreen(
                                 modifier = Modifier.weight(1f)
                             )
                             IconButton(onClick = {
-                                members = members.toMutableList().also { it.removeAt(index) }
-                                memberKeys = memberKeys.toMutableList().also { it.removeAt(index) }
+                                if (member.isBlank()) members = members.toMutableList().also { it.removeAt(index) }
+                                else memberToDeleteIndex = index
                             }) {
                                 Icon(
                                     painterResource(R.drawable.ic_delete_24dp),
@@ -324,13 +323,21 @@ fun ProxyChainScreen(
         }
     }
 
-    if (showDeleteConfirm) {
-        ConfirmDialog(
-            message = stringResource(R.string.del_config_comfirm),
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
-            onConfirm = { showDeleteConfirm = false; onDelete() },
-            onDismiss = { showDeleteConfirm = false }
+    if (showProfileDeleteConfirm) {
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_profile),
+            onConfirm = { showProfileDeleteConfirm = false; onDelete() },
+            onDismiss = { showProfileDeleteConfirm = false }
+        )
+    }
+    memberToDeleteIndex?.let { index ->
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_proxy_chain_member),
+            onConfirm = {
+                members = members.toMutableList().also { it.removeAt(index) }
+                memberToDeleteIndex = null
+            },
+            onDismiss = { memberToDeleteIndex = null }
         )
     }
 }

@@ -46,7 +46,7 @@ import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.ConfirmDialog
+import com.v2ray.ang.compose.DeleteConfirmDialog
 import com.v2ray.ang.compose.ItemDivider
 import com.v2ray.ang.compose.SettingsListItem
 import com.v2ray.ang.compose.verticalScrollbar
@@ -344,10 +344,8 @@ fun UserAssetScreen(
     if (deleteTargetGuid != null) {
         val guid = deleteTargetGuid!!
         val assetName = assets.find { it.guid == guid }?.assetUrl?.remarks ?: ""
-        ConfirmDialog(
-            message = stringResource(R.string.del_config_comfirm) + "\n$assetName",
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_asset_file, assetName),
             onConfirm = { onRemoveAsset(guid) },
             onDismiss = { deleteTargetGuid = null }
         )
