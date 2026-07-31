@@ -14,8 +14,8 @@ import com.v2ray.ang.enums.NotificationChannelType
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.helper.NotificationHelper
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.NotificationHelper
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -109,7 +109,7 @@ class SubscriptionUpdateService : Service() {
 
     private suspend fun updateSingle(subId: String, forcedUpdate: Boolean) {
         val subItem = MmkvManager.decodeSubscription(subId) ?: return
-        if(!subItem.enabled || subItem.url.isEmpty()){
+        if (!subItem.enabled || subItem.url.isEmpty()) {
             return
         }
 

@@ -6,8 +6,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.FormTextField
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.ui.compose.FormTextField
 
 class ServerWireguardActivity : BaseServerActivity() {
 

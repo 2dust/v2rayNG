@@ -11,12 +11,12 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.root.RootManager
 import com.v2ray.ang.service.CoreProxyOnlyService
 import com.v2ray.ang.service.CoreRootService
 import com.v2ray.ang.service.CoreVpnService
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 
 object LauncherManager {
@@ -53,7 +53,7 @@ object LauncherManager {
 
     fun stopService(context: Context) {
         //context.toast(R.string.toast_services_stop)
-        MessageUtil.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
+        MessageHelper.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
     }
 
     @Throws(Exception::class)

@@ -6,10 +6,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.SelectListDialog
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
+import com.v2ray.ang.ui.compose.SelectListDialog
 
 internal enum class ServerMenuAction(
     @StringRes val labelRes: Int,

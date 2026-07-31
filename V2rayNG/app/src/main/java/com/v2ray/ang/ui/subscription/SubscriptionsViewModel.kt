@@ -10,8 +10,8 @@ import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.ui.base.BaseViewModel
-import com.v2ray.ang.util.MessageUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -65,7 +65,7 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
             .map { it.guid }
 
         if (subIds.isNotEmpty()) {
-            MessageUtil.sendMsg2SubscriptionService(app, SubscriptionUpdateMessage(AppConfig.MSG_SUB_UPDATE_START, false, subIds))
+            MessageHelper.sendMsg2SubscriptionService(app, SubscriptionUpdateMessage(AppConfig.MSG_SUB_UPDATE_START, false, subIds))
         }
 
         toast(R.string.subscription_updater_job_tips)

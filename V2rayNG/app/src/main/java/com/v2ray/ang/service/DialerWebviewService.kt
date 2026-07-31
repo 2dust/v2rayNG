@@ -7,6 +7,7 @@ import android.os.Looper
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.v2ray.ang.contracts.IDialerService
 
 class DialerWebviewService : IDialerService {
     private var webView: WebView? = null

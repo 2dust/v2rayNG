@@ -18,8 +18,8 @@ import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SubscriptionUpdater
+import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -79,13 +79,13 @@ class MainRepository(
             IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY),
             Utils.receiverFlags()
         )
-        MessageUtil.sendMsg2Service(app, AppConfig.MSG_REGISTER_CLIENT, "")
+        MessageHelper.sendMsg2Service(app, AppConfig.MSG_REGISTER_CLIENT, "")
     }
 
     override fun close() {
         if (!closed.compareAndSet(false, true)) return
         runCatching {
-            MessageUtil.sendMsg2Service(app, AppConfig.MSG_UNREGISTER_CLIENT, "")
+            MessageHelper.sendMsg2Service(app, AppConfig.MSG_UNREGISTER_CLIENT, "")
         }.onFailure {
             LogUtil.e(AppConfig.TAG, "Failed to unregister service client", it)
         }
@@ -198,10 +198,10 @@ class MainRepository(
         AngConfigManager.share2Clipboard(app, guid) == 0
 
     override fun sendMsg2Service(msgId: Int, content: String) =
-        MessageUtil.sendMsg2Service(app, msgId, content)
+        MessageHelper.sendMsg2Service(app, msgId, content)
 
     override fun sendMsg2TestService(msg: TestServiceMessage) =
-        MessageUtil.sendMsg2TestService(app, msg)
+        MessageHelper.sendMsg2TestService(app, msg)
 
     override fun cancelAllPing() {
         sendMsg2TestService(

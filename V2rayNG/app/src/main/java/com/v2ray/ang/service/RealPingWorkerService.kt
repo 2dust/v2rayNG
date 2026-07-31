@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class RealPingWorkerService(
     private val context: Context,
     private val guids: List<String>,
-    private val onlyTcp : Boolean = false,
+    private val onlyTcp: Boolean = false,
     private val onEvent: (RealPingEvent) -> Unit = {}
 ) {
     private val job = SupervisorJob()

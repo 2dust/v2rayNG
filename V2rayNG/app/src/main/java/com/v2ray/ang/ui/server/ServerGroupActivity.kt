@@ -26,11 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.DeleteConfirmDialog
-import com.v2ray.ang.compose.FormDropdownField
-import com.v2ray.ang.compose.FormTextField
-import com.v2ray.ang.compose.SettingsSwitchItem
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BalancerStrategyType
 import com.v2ray.ang.enums.EConfigType
@@ -40,6 +35,11 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
+import com.v2ray.ang.ui.compose.FormDropdownField
+import com.v2ray.ang.ui.compose.FormTextField
+import com.v2ray.ang.ui.compose.SettingsSwitchItem
 
 class ServerGroupActivity : BaseComponentActivity() {
 
@@ -67,10 +67,10 @@ class ServerGroupActivity : BaseComponentActivity() {
         val config = MmkvManager.decodeServerConfig(editGuid)
         populateSubscriptionSpinner()
         fallbackSuggestions = (
-            BUILTIN_OUTBOUND_TAGS + SettingsManager.getProfileRemarks(
-                excludeConfigTypes = setOf(EConfigType.CUSTOM, EConfigType.POLICYGROUP)
-            )
-        ).filter { it != TAG_PROXY }
+                BUILTIN_OUTBOUND_TAGS + SettingsManager.getProfileRemarks(
+                    excludeConfigTypes = setOf(EConfigType.CUSTOM, EConfigType.POLICYGROUP)
+                )
+                ).filter { it != TAG_PROXY }
 
         initialRemarks = config?.remarks ?: ""
         initialFilter = config?.policyGroupFilter ?: ""
