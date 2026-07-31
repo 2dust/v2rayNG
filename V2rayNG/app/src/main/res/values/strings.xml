@@ -379,6 +379,7 @@
 
     <string name="connection_test_pending">Check Connectivity</string>
     <string name="connection_test_testing">Testing…</string>
+    <string name="connection_test_testing_tap_to_stop">Testing… Tap to stop</string>
     <string name="connection_test_testing_count">Testing %d configs…</string>
     <string name="connection_test_available">Success: Connection took %dms</string>
     <string name="connection_test_error">Fail to detect internet connection: %s</string>
@@ -387,6 +388,7 @@
     <string name="connection_connected">Connected, tap to check connection</string>
     <string name="connection_not_connected">Not connected</string>
     <string name="connection_runing_task_left">Number of running test tasks: %s</string>
+    <string name="connection_running_tasks_tap_to_stop">Number of running test tasks: %s. Tap to stop</string>
 
     <string name="import_subscription_success">Subscription imported Successfully</string>
     <string name="import_subscription_failure">Import subscription failed</string>

@@ -359,6 +359,7 @@
 
     <string name="connection_test_pending">Kiểm tra kết nối</string>
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng...</string>
+    <string name="connection_test_testing_tap_to_stop">Đang kiểm tra… Nhấn để dừng</string>
     <string name="connection_test_testing_count">Testing %d configurations…</string>
     <string name="connection_test_available">Kiểm tra thành công: thời gian truy cập Google là %d ms</string>
     <string name="connection_test_error">Lỗi kết nối mạng, hãy thử đổi cấu hình hoặc kiểm tra lại! Mã lỗi: %s</string>
@@ -367,6 +368,7 @@
     <string name="connection_connected">Đã kết nối, nhấn để kiểm tra kết nối mạng!</string>
     <string name="connection_not_connected">Chưa kết nối</string>
     <string name="connection_runing_task_left">Number of running test tasks: %s</string>
+    <string name="connection_running_tasks_tap_to_stop">Số tác vụ kiểm tra đang chạy: %s. Nhấn để dừng</string>
 
     <string name="import_subscription_success">Nhập gói đăng ký thành công!</string>
     <string name="import_subscription_failure">Nhập gói đăng ký không thành công!</string>

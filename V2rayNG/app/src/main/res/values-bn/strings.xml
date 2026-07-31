@@ -358,6 +358,7 @@
 
     <string name="connection_test_pending">সংযোগ পরীক্ষা করুন</string>
     <string name="connection_test_testing">পরীক্ষা চলছে…</string>
+    <string name="connection_test_testing_tap_to_stop">পরীক্ষা চলছে… থামাতে ট্যাপ করুন</string>
     <string name="connection_test_testing_count">Testing %d configurations…</string>
     <string name="connection_test_available">সফল: HTTP সংযোগ নিয়েছে %dms</string>
     <string name="connection_test_error">ইন্টারনেট সংযোগ সনাক্ত করতে ব্যর্থ: %s</string>
@@ -366,6 +367,7 @@
     <string name="connection_connected">সংযুক্ত, সংযোগ পরীক্ষা করতে ট্যাপ করুন</string>
     <string name="connection_not_connected">সংযুক্ত নয়</string>
     <string name="connection_runing_task_left">Number of running test tasks: %s</string>
+    <string name="connection_running_tasks_tap_to_stop">চলমান পরীক্ষার কাজের সংখ্যা: %s। থামাতে ট্যাপ করুন</string>
 
     <string name="import_subscription_success">সাবস্ক্রিপশন সফলভাবে আমদানি করা হয়েছে</string>
     <string name="import_subscription_failure">সাবস্ক্রিপশন আমদানি ব্যর্থ</string>

@@ -364,6 +364,7 @@
 
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>
+    <string name="connection_test_testing_tap_to_stop">هونی آزمایش ابۊ… برای توقف ضربه بزنید</string>
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ...</string>
     <string name="connection_test_available">مووفق بی: منپیز %dms تۊل کشی</string>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
@@ -372,6 +373,7 @@
     <string name="connection_connected">منپیز هڌ، سی واجۊری کیلیک کوݩ</string>
     <string name="connection_not_connected">منپیز نؽڌ</string>
     <string name="connection_runing_task_left">تعداد وزیفه یل آزمایشی ک ره اۊفتانه: %s</string>
+    <string name="connection_running_tasks_tap_to_stop">تعداد وزیفه یل آزمایشی ک ره اۊفتانه: %s. برای توقف ضربه بزنید</string>
 
     <string name="import_subscription_success">اشتراک وا مووفقیت زفت وابی</string>
     <string name="import_subscription_failure">اشتراک زفت نوابی</string>

@@ -370,6 +370,7 @@
 
     <string name="connection_test_pending">Проверить соединение</string>
     <string name="connection_test_testing">Проверка…</string>
+    <string name="connection_test_testing_tap_to_stop">Проверка… Нажмите, чтобы остановить</string>
     <string name="connection_test_testing_count">Проверка профилей (%d)</string>
     <string name="connection_test_available">Успешно: соединение заняло %d мс</string>
     <string name="connection_test_error">Сбой проверки интернет-соединения: %s</string>
@@ -378,6 +379,7 @@
     <string name="connection_connected">Соединено, нажмите для проверки</string>
     <string name="connection_not_connected">Нет соединения</string>
     <string name="connection_runing_task_left">Запущено проверок: %s</string>
+    <string name="connection_running_tasks_tap_to_stop">Запущено проверок: %s. Нажмите, чтобы остановить</string>
 
     <string name="import_subscription_success">Подписка импортирована</string>
     <string name="import_subscription_failure">Невозможно импортировать подписку</string>
