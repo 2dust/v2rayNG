@@ -98,7 +98,7 @@ fun GroupPagerPage(
         onShareServer = onShareServer,
         onMoreServer = onMoreServer,
         onRemoveServer = onRemoveServer,
-        onSwapServer = mainViewModel::swapServer,
+        onMoveServer = { fromIndex, toIndex -> mainViewModel.moveServer(groupId, fromIndex, toIndex) },
         contentPadding = contentPadding
     )
 }
@@ -119,7 +119,7 @@ private fun ServerListPage(
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
     onRemoveServer: (String) -> Unit,
-    onSwapServer: (Int, Int) -> Unit,
+    onMoveServer: (Int, Int) -> Unit,
     contentPadding: PaddingValues
 ) {
     if (doubleColumnDisplay) {
@@ -128,7 +128,7 @@ private fun ServerListPage(
         }
         val reorderableGridState = if (canReorder) {
             rememberReorderableLazyGridState(gridState) { from, to ->
-                onSwapServer(from.index, to.index)
+                onMoveServer(from.index, to.index)
             }
         } else null
 
@@ -175,7 +175,7 @@ private fun ServerListPage(
         }
         val reorderableState = if (canReorder) {
             rememberReorderableLazyListState(listState) { from, to ->
-                onSwapServer(from.index, to.index)
+                onMoveServer(from.index, to.index)
             }
         } else null
 

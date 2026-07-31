@@ -39,15 +39,18 @@ import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.compose.ConfirmDialog
 import com.v2ray.ang.compose.FormDropdownField
 import com.v2ray.ang.compose.FormTextField
+import com.v2ray.ang.compose.reorderableDragHandle
 import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
+import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import java.util.UUID
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -195,16 +198,22 @@ fun ProxyChainScreen(
     onDelete: () -> Unit
 ) {
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
-    var members by rememberSaveable { mutableStateOf(initialMembers.toMutableList()) }
+    var members by rememberSaveable { mutableStateOf(initialMembers.toList()) }
+    // Member remarks may be blank or duplicated, so they cannot serve as stable Compose keys.
+    var memberKeys by rememberSaveable { mutableStateOf(List(initialMembers.size) { UUID.randomUUID().toString() }) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
 
     val lazyListState = rememberLazyListState()
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        val fromIdx = from.index - 1
-        val toIdx = to.index - 1
-        if (fromIdx in members.indices && toIdx in members.indices) {
-            members = members.toMutableList().apply { add(toIdx, removeAt(fromIdx)) }
+        val fromIndex = memberKeys.indexOf(from.key)
+        val toIndex = memberKeys.indexOf(to.key)
+        val reordered = members.toMutableList()
+        val reorderedKeys = memberKeys.toMutableList()
+        if (reordered.moveItem(fromIndex, toIndex)) {
+            reorderedKeys.moveItem(fromIndex, toIndex)
+            members = reordered
+            memberKeys = reorderedKeys
         }
     }
 
@@ -228,7 +237,10 @@ fun ProxyChainScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { members = members.toMutableList().also { it.add("") } },
+                onClick = {
+                    members = members + ""
+                    memberKeys = memberKeys + UUID.randomUUID().toString()
+                },
                 modifier = Modifier
                     .offset(y = -20.dp)
                     .navigationBarsPadding()
@@ -268,13 +280,14 @@ fun ProxyChainScreen(
                 )
             }
 
-            itemsIndexed(items = members, key = { idx, _ -> "member_$idx" }) { index, member ->
-                ReorderableItem(reorderableState, key = "member_$index") { isDragging ->
+            itemsIndexed(items = members, key = { index, _ -> memberKeys[index] }) { index, member ->
+                ReorderableItem(reorderableState, key = memberKeys[index]) { isDragging ->
                     val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
                     Surface(shadowElevation = elevation) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .then(with(this) { reorderableDragHandle() })
                                 .padding(horizontal = 4.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -297,6 +310,7 @@ fun ProxyChainScreen(
                             )
                             IconButton(onClick = {
                                 members = members.toMutableList().also { it.removeAt(index) }
+                                memberKeys = memberKeys.toMutableList().also { it.removeAt(index) }
                             }) {
                                 Icon(
                                     painterResource(R.drawable.ic_delete_24dp),
