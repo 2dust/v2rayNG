@@ -14,10 +14,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,13 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.milliseconds
 
 enum class ToastType {
@@ -50,8 +50,6 @@ data class AppSnackbarMessage(
 )
 
 object AppSnackbarManager {
-    private val activeHosts = AtomicInteger(0)
-
     private val _messages = MutableSharedFlow<AppSnackbarMessage>(
         replay = 0,
         extraBufferCapacity = 32,
@@ -59,16 +57,7 @@ object AppSnackbarManager {
     )
     val messages = _messages.asSharedFlow()
 
-    fun registerHost() {
-        activeHosts.incrementAndGet()
-    }
-
-    fun unregisterHost() {
-        val current = activeHosts.decrementAndGet()
-        if (current < 0) activeHosts.set(0)
-    }
-
-    fun hasActiveHost(): Boolean = activeHosts.get() > 0
+    fun hasActiveHost(): Boolean = _messages.subscriptionCount.value > 0
 
     fun show(
         message: CharSequence,
@@ -98,8 +87,8 @@ class AppSnackbarController(
          scope.launch {
             if (currentShowTime != 0L) {
                 val elapsed = System.currentTimeMillis() - currentShowTime
-                if (elapsed < 500) {
-                    delay((500 - elapsed).milliseconds)
+                if (elapsed < SnackbarThrottleMs) {
+                    delay((SnackbarThrottleMs - elapsed).milliseconds)
                 }
             }
 
@@ -107,10 +96,11 @@ class AppSnackbarController(
 
             launch {
                 hostState.showSnackbar(
-                    message = message.toString(),
-                    actionLabel = type.name,
-                    duration = if (long) SnackbarDuration.Long else SnackbarDuration.Short,
-                    withDismissAction = false,
+                    AppSnackbarVisuals(
+                        message = message.toString(),
+                        type = type,
+                        duration = if (long) SnackbarDuration.Long else SnackbarDuration.Short
+                    )
                 )
                 if (id == currentId) {
                     currentShowTime = 0L
@@ -121,6 +111,14 @@ class AppSnackbarController(
          }
      }
 }
+
+private data class AppSnackbarVisuals(
+    override val message: String,
+    val type: ToastType,
+    override val duration: SnackbarDuration,
+    override val actionLabel: String? = null,
+    override val withDismissAction: Boolean = false
+) : SnackbarVisuals
 
 val LocalAppSnackbar = staticCompositionLocalOf<AppSnackbarController> {
     error("AppSnackbarController not provided. Wrap your content in AppTheme.")
@@ -139,14 +137,9 @@ fun AppSnackbarBridge(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    DisposableEffect(Unit) {
-        AppSnackbarManager.registerHost()
-        onDispose { AppSnackbarManager.unregisterHost() }
-    }
-
     LaunchedEffect(controller, lifecycleOwner) {
-        AppSnackbarManager.messages.collect { event ->
-            if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            AppSnackbarManager.messages.collect { event ->
                 controller.show(
                     message = event.message,
                     type = event.type,
@@ -163,6 +156,7 @@ private val ToastVerticalPad = 12.dp
 private const val ToastMaxLines = 8
 private const val ToastMaxWidthFraction = 0.75f
 private val ToastBottomOffset = 100.dp
+private const val SnackbarThrottleMs = 2000L
 
 @Composable
 fun AppSnackbarHost(
@@ -180,9 +174,7 @@ fun AppSnackbarHost(
             hostState = hostState,
             modifier = Modifier.fillMaxSize()
         ) { data ->
-            val type = runCatching {
-                ToastType.valueOf(data.visuals.actionLabel.orEmpty())
-            }.getOrDefault(ToastType.NORMAL)
+            val type = (data.visuals as? AppSnackbarVisuals)?.type ?: ToastType.NORMAL
 
             val isDark = LocalDarkTheme.current
             val bgColor = when (type) {
