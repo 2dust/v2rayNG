@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.core.CoreServiceManager
+import com.v2ray.ang.core.LauncherManager
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.PermissionType
@@ -160,7 +160,7 @@ class MainActivity : HelperBaseComponentActivity() {
 
     private fun handleFabAction() {
         if (mainViewModel.uiState.value.isRunning) {
-            CoreServiceManager.stopVService(this)
+            LauncherManager.stopService(this)
         } else if (SettingsManager.isVpnMode()) {
             val intent = VpnService.prepare(this)
             if (intent == null) startV2Ray() else requestVpnPermission.launch(intent)
@@ -185,11 +185,11 @@ class MainActivity : HelperBaseComponentActivity() {
         ) {
             checkAndRequestPermission(PermissionType.ACCESS_LOCAL_NETWORK) {}
         }
-        CoreServiceManager.startVService(this)
+        LauncherManager.startService(this)
     }
 
     private fun restartV2Ray() {
-        if (mainViewModel.uiState.value.isRunning) CoreServiceManager.stopVService(this)
+        if (mainViewModel.uiState.value.isRunning) LauncherManager.stopService(this)
         lifecycleScope.launch {
             kotlinx.coroutines.delay(500)
             startV2Ray()
