@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.routing
 
 import android.app.Application
 import com.v2ray.ang.dto.entities.RulesetItem
+import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseViewModel
@@ -41,11 +42,9 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
         }
     }
 
-    fun swap(fromPosition: Int, toPosition: Int) {
-        if (fromPosition in rulesets.indices && toPosition in rulesets.indices) {
-            SettingsManager.swapRoutingRuleset(fromPosition, toPosition)
-            val item = rulesets.removeAt(fromPosition)
-            rulesets.add(toPosition, item)
+    fun move(fromPosition: Int, toPosition: Int) {
+        if (rulesets.moveItem(fromPosition, toPosition)) {
+            MmkvManager.encodeRoutingRulesets(rulesets)
             _rulesetsFlow.value = rulesets.toList()
         }
     }

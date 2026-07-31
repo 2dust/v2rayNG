@@ -6,6 +6,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.SubscriptionUpdateMessage
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
@@ -49,11 +50,9 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         _subsFlow.value = subscriptions.toList()
     }
 
-    fun swap(fromPosition: Int, toPosition: Int) {
-        if (fromPosition in subscriptions.indices && toPosition in subscriptions.indices) {
-            val item = subscriptions.removeAt(fromPosition)
-            subscriptions.add(toPosition, item)
-            SettingsManager.swapSubscriptions(fromPosition, toPosition)
+    fun move(fromPosition: Int, toPosition: Int) {
+        if (subscriptions.moveItem(fromPosition, toPosition)) {
+            MmkvManager.encodeSubsList(subscriptions.mapTo(mutableListOf()) { it.guid })
             SettingsChangeManager.makeSetupGroupTab()
             _subsFlow.value = subscriptions.toList()
         }

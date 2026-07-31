@@ -39,8 +39,16 @@
     <string name="menu_item_import_config_manually_trojan">ٱووردن [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">ٱووردن [Wireguard]</string>
     <string name="menu_item_import_config_manually_hysteria2">ٱووردن [Hysteria2]</string>
-    <string name="del_config_comfirm">پاک بۊ؟</string>
-    <string name="del_invalid_config_comfirm">پؽش ز پاک کردن، پینگ بگرین! الن اخۊین پاک کۊنین؟</string>
+    <string name="confirm_delete_visible_profiles">آیا مطمئن هستید که می‌خواهید همه پروفایل‌های نمایش‌داده‌شده را حذف کنید؟</string>
+    <string name="confirm_delete_duplicate_profiles">آیا مطمئن هستید که می‌خواهید همه پروفایل‌های تکراری نمایش‌داده‌شده را حذف کنید؟</string>
+    <string name="confirm_delete_invalid_profiles">لطفاً ابتدا پروفایل‌ها را آزمایش کنید. آیا مطمئن هستید که می‌خواهید همه پروفایل‌های نامعتبر نمایش‌داده‌شده را حذف کنید؟</string>
+    <string name="confirm_delete_profile">آیا مطمئن هستید که می‌خواهید این پروفایل را حذف کنید؟</string>
+    <string name="confirm_delete_policy_group">آیا مطمئن هستید که می‌خواهید این گروه سیاست را حذف کنید؟</string>
+    <string name="confirm_delete_proxy_chain_member">آیا مطمئن هستید که می‌خواهید این عضو زنجیره پراکسی را حذف کنید؟</string>
+    <string name="confirm_delete_routing_rule">آیا مطمئن هستید که می‌خواهید این قانون مسیریابی را حذف کنید؟</string>
+    <string name="confirm_delete_subscription_group">آیا مطمئن هستید که می‌خواهید این گروه اشتراک را حذف کنید؟</string>
+    <string name="confirm_delete_asset_file">آیا مطمئن هستید که می‌خواهید فایل دارایی \"%1$s\" را حذف کنید؟</string>
+    <string name="confirm_delete_asset_source">آیا مطمئن هستید که می‌خواهید این منبع دارایی را حذف کنید؟</string>
     <string name="server_lab_remarks">نیشتنا</string>
     <string name="server_lab_address">نشۊوی</string>
     <string name="server_lab_port">پورت</string>
@@ -353,7 +361,6 @@
     <string name="routing_settings_protocol" translatable="false">protocol</string>
     <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
     <string name="routing_settings_network" translatable="false">network</string>"[udp|tcp]"
-    <string name="routing_settings_network_tip" translatable="false">[udp|tcp]</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
@@ -415,19 +422,12 @@
     <string name="title_webdav_pass">رزم</string>
     <string name="title_webdav_remote_path">دایرکتوری ره دیر (اختیاری)</string>
 
-    <string-array name="share_method">
-        <item>QRcode</item>
-        <item>و در کشیڌن من کلیپ بورد</item>
-        <item>و در کشیڌن پوی کانفیگ من کلیپ بورد</item>
-    </string-array>
-
-    <string-array name="share_method_more">
-        <item>QRcode</item>
-        <item>و در کشیڌن من کلیپ بورد</item>
-        <item>و در کشیڌن پوی کانفیگ من کلیپ بورد</item>
-        <item>آلشت</item>
-        <item>پاک کردن</item>
-    </string-array>
+    <string name="share_method_qrcode">QRcode</string>
+    <string name="share_method_clipboard">و در کشیڌن من کلیپ بورد</string>
+    <string name="share_method_full_content">و در کشیڌن پوی کانفیگ من کلیپ بورد</string>
+    <string name="action_edit">آلشتکاری</string>
+    <string name="action_delete">پاک کردن</string>
+    <string name="action_close">بستن</string>
 
     <string-array name="share_sub_method">
         <item>QRcode</item>

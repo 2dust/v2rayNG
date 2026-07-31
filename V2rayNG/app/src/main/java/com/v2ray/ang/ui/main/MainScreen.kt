@@ -41,8 +41,6 @@ fun MainScreen(
     mainViewModel: MainViewModel,
     onAction: (MainAction) -> Unit,
     onNavigate: (String) -> Unit,
-    shareMethodEntries: List<String>,
-    shareMethodMoreEntries: List<String>
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val groups = uiState.groups
@@ -65,6 +63,9 @@ fun MainScreen(
     var showRemoveConfirm by remember { mutableStateOf<String?>(null) }
 
     var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
+    val removeServer: (String) -> Unit = { guid ->
+        if (confirmRemove) showRemoveConfirm = guid else onAction(MainAction.RemoveServer(guid))
+    }
 
     val pagerState = rememberPagerState(
         initialPage = 0,
@@ -177,10 +178,9 @@ fun MainScreen(
             guid = guid,
             profile = profile,
             more = more,
-            shareMethodEntries = shareMethodEntries,
-            shareMethodMoreEntries = shareMethodMoreEntries,
             onDismiss = { shareTarget = null },
-            onAction = onAction
+            onAction = onAction,
+            onRemove = removeServer,
         )
     }
     if (shareQRCodeBitmap != null) {
@@ -282,10 +282,7 @@ fun MainScreen(
                             onMoreServer = { guid, profile ->
                                 shareTarget = Triple(guid, profile, true)
                             },
-                            onRemoveServer = { guid ->
-                                if (confirmRemove) showRemoveConfirm = guid
-                                else onAction(MainAction.RemoveServer(guid))
-                            },
+                            onRemoveServer = removeServer,
                             contentPadding = PaddingValues(
                                 start = 0.dp,
                                 top = 0.dp,

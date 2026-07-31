@@ -40,8 +40,16 @@
     <string name="menu_item_import_config_manually_trojan">Add [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">Add [Wireguard]</string>
     <string name="menu_item_import_config_manually_hysteria2">Add [Hysteria2]</string>
-    <string name="del_config_comfirm">Confirm delete ?</string>
-    <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
+    <string name="confirm_delete_visible_profiles">Are you sure you want to delete all profiles currently shown?</string>
+    <string name="confirm_delete_duplicate_profiles">Are you sure you want to delete all duplicate profiles currently shown?</string>
+    <string name="confirm_delete_invalid_profiles">Please test the profiles first. Are you sure you want to delete all invalid profiles currently shown?</string>
+    <string name="confirm_delete_profile">Are you sure you want to delete this profile?</string>
+    <string name="confirm_delete_policy_group">Are you sure you want to delete this policy group?</string>
+    <string name="confirm_delete_proxy_chain_member">Are you sure you want to delete this chain member?</string>
+    <string name="confirm_delete_routing_rule">Are you sure you want to delete this routing rule?</string>
+    <string name="confirm_delete_subscription_group">Are you sure you want to delete this subscription group?</string>
+    <string name="confirm_delete_asset_file">Are you sure you want to delete the asset file \"%1$s\"?</string>
+    <string name="confirm_delete_asset_source">Are you sure you want to delete this asset source?</string>
     <string name="server_lab_remarks">remarks</string>
     <string name="server_lab_address">address</string>
     <string name="server_lab_port">port</string>
@@ -367,7 +375,6 @@
     <string name="routing_settings_protocol">protocol</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">network</string>
-    <string name="routing_settings_network_tip">[udp|tcp]</string>
     <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;remarks&gt;</string>
     <string name="routing_settings_outbound_tag">outboundTag</string>
 
@@ -431,19 +438,12 @@
     <string name="title_webdav_pass">Password</string>
     <string name="title_webdav_remote_path">Remote directory (optional)</string>
 
-    <string-array name="share_method">
-        <item>QRcode</item>
-        <item>Export to clipboard</item>
-        <item>Export full config to clipboard</item>
-    </string-array>
-
-    <string-array name="share_method_more">
-        <item>QRcode</item>
-        <item>Export to clipboard</item>
-        <item>Export full config to clipboard</item>
-        <item>Edit</item>
-        <item>Delete</item>
-    </string-array>
+    <string name="share_method_qrcode">QRcode</string>
+    <string name="share_method_clipboard">Export to clipboard</string>
+    <string name="share_method_full_content">Export full config to clipboard</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_close">Close</string>
 
     <string-array name="share_sub_method">
         <item>QRcode</item>
