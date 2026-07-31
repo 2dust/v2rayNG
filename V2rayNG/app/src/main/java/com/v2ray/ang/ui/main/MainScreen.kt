@@ -226,7 +226,7 @@ fun MainScreen(
                 MainBottomBar(
                     displayText = displayText,
                     isRunning = isRunning,
-                    isTesting = uiState.isTesting,
+                    isBatchTesting = uiState.isBatchTesting,
                     isDarkTheme = isDarkTheme,
                     onAction = onAction
                 )

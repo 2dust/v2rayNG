@@ -129,7 +129,7 @@ class MainViewModel(
             }
 
             is MainServiceEvent.MeasureConfigNotify -> {
-                if (!uiState.value.isTesting) return
+                if (!uiState.value.isBatchTesting) return
                 _uiState.update {
                     it.copy(
                         statusText = dataSource.getString(
@@ -667,7 +667,7 @@ class MainViewModel(
         testingGroupId = null
         _uiState.update {
             it.copy(
-                isTesting = false,
+                isBatchTesting = false,
                 statusText = if (it.isRunning) connectedText else disconnectedText
             )
         }
@@ -679,13 +679,13 @@ class MainViewModel(
         val servers = currentServers()
         dataSource.clearAllTestDelayResults(servers.map { it.guid })
         if (servers.isEmpty()) {
-            _uiState.update { it.copy(isTesting = false) }
+            _uiState.update { it.copy(isBatchTesting = false) }
             return
         }
         testingGroupId = groupId
         _uiState.update {
             it.copy(
-                isTesting = true,
+                isBatchTesting = true,
                 statusText = dataSource.getString(R.string.connection_test_testing_tap_to_stop)
             )
         }
@@ -717,7 +717,7 @@ class MainViewModel(
             testingGroupId = null
             _uiState.update {
                 it.copy(
-                    isTesting = false,
+                    isBatchTesting = false,
                     statusText = if (it.isRunning) connectedText else disconnectedText
                 )
             }
@@ -754,7 +754,7 @@ class MainViewModel(
         _uiState.update { state ->
             state.copy(
                 isRunning = running,
-                statusText = if (!clearTestingText && state.isTesting) state.statusText
+                statusText = if (!clearTestingText && state.isBatchTesting) state.statusText
                 else if (running) connectedText else disconnectedText
             )
         }
