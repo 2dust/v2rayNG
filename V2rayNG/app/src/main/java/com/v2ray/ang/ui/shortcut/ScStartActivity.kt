@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.v2ray.ang.core.CoreServiceManager
+import com.v2ray.ang.core.LauncherManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 
 class ScStartActivity : BaseComponentActivity() {
@@ -17,7 +18,7 @@ class ScStartActivity : BaseComponentActivity() {
         LaunchedEffect(Unit) {
             moveTaskToBack(true)
             if (!CoreServiceManager.isRunning()) {
-                CoreServiceManager.startVServiceFromToggle(this@ScStartActivity)
+                LauncherManager.startServiceFromToggle(this@ScStartActivity)
             }
             finish()
         }
