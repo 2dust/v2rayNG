@@ -26,11 +26,11 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.DeleteConfirmDialog
-import com.v2ray.ang.compose.FormDropdownField
-import com.v2ray.ang.compose.FormTextField
-import com.v2ray.ang.compose.SettingsSwitchItem
+import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
+import com.v2ray.ang.ui.compose.FormDropdownField
+import com.v2ray.ang.ui.compose.FormTextField
+import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BalancerStrategyType
 import com.v2ray.ang.enums.EConfigType

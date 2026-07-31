@@ -20,9 +20,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.DeleteConfirmDialog
-import com.v2ray.ang.compose.FormTextField
+import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
+import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.dto.entities.AssetUrlItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess

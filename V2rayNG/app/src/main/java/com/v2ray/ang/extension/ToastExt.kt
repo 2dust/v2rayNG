@@ -4,8 +4,8 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
-import com.v2ray.ang.compose.AppSnackbarManager
-import com.v2ray.ang.compose.ToastType
+import com.v2ray.ang.ui.compose.AppSnackbarManager
+import com.v2ray.ang.ui.compose.ToastType
 
 /**
  * Shows a toast message with the given resource ID.

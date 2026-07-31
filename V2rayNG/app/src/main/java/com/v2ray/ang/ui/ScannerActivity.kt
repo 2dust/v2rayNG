@@ -63,7 +63,7 @@ import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppTopBar
+import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.enums.PermissionType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity

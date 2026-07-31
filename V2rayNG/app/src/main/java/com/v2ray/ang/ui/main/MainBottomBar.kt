@@ -26,10 +26,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppDivider
-import com.v2ray.ang.compose.colorFabActive
-import com.v2ray.ang.compose.colorFabInactiveDark
-import com.v2ray.ang.compose.colorFabInactiveLight
+import com.v2ray.ang.ui.compose.AppDivider
+import com.v2ray.ang.ui.compose.colorFabActive
+import com.v2ray.ang.ui.compose.colorFabInactiveDark
+import com.v2ray.ang.ui.compose.colorFabInactiveLight
 
 @Composable
 fun MainBottomBar(

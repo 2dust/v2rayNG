@@ -5,7 +5,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.FormTextField
+import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.enums.EConfigType
 
 class ServerSocksActivity : BaseServerActivity() {

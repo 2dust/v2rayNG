@@ -31,10 +31,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppListItem
-import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.ItemDivider
-import com.v2ray.ang.compose.verticalScrollbar
+import com.v2ray.ang.ui.compose.AppListItem
+import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.ItemDivider
+import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.ui.base.BaseComponentActivity
 

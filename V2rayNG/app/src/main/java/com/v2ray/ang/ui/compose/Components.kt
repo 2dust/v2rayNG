@@ -1,4 +1,4 @@
-package com.v2ray.ang.compose
+package com.v2ray.ang.ui.compose
 
 import android.graphics.Bitmap
 import android.graphics.Canvas

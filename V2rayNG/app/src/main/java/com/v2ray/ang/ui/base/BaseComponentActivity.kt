@@ -6,7 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import com.v2ray.ang.compose.AppTheme
+import com.v2ray.ang.ui.compose.AppTheme
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.MyContextWrapper
 
