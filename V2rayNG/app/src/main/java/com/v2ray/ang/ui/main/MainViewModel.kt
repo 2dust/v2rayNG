@@ -14,6 +14,7 @@ import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
+import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
@@ -32,7 +33,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.PatternSyntaxException
 
@@ -70,6 +70,7 @@ class MainViewModel(
     private val groupDataCache = mutableMapOf<String, List<ServersCache>>()
     private val groupPageFlows = ConcurrentHashMap<String, MutableStateFlow<List<ServersCache>>>()
     private val groupLoadMutexes = ConcurrentHashMap<String, Mutex>()
+    private val serverOrderPersistenceJobs = mutableMapOf<String, Job>()
 
     private var setupGroupJob: Job? = null
     private var preloadJob: Job? = null
@@ -175,7 +176,6 @@ class MainViewModel(
             is MainAction.SelectServer -> updateSelectedGuid(action.guid)
             is MainAction.RemoveServer -> removeServerAndRefresh(action.guid)
             is MainAction.Search -> filterConfig(action.query)
-            is MainAction.SwapServer -> swapServer(action.fromIndex, action.toIndex)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
             is MainAction.LocateHandled -> consumeLocateTarget(action.target)
             is MainAction.ShareQRCode -> {
@@ -646,15 +646,15 @@ class MainViewModel(
         }
     }
 
-    fun swapServer(fromPosition: Int, toPosition: Int) {
-        val groupId = uiState.value.selectedGroupId
-        if (groupId.isEmpty()) return
-        val servers = currentServers().toMutableList()
-        if (fromPosition !in servers.indices || toPosition !in servers.indices) return
-        Collections.swap(servers, fromPosition, toPosition)
-        val guids = servers.mapTo(ArrayList(servers.size)) { it.guid }
+    fun moveServer(groupId: String, fromPosition: Int, toPosition: Int) {
+        val servers = mutableServersForGroup(groupId).value.toMutableList()
+        if (!servers.moveItem(fromPosition, toPosition)) return
+        val guids = servers.map { it.guid }
         mutableServersForGroup(groupId).value = servers
-        viewModelScope.launch(ioDispatcher) {
+        // A drag emits several moves; serialize writes so an older order cannot overwrite a newer one.
+        val previousPersistenceJob = serverOrderPersistenceJobs[groupId]
+        serverOrderPersistenceJobs[groupId] = viewModelScope.launch(ioDispatcher) {
+            previousPersistenceJob?.join()
             dataSource.encodeServerList(guids, groupId)
             cacheMutex.withLock { groupDataCache[groupId] = servers }
         }

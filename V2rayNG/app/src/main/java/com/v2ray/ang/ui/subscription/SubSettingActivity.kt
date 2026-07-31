@@ -121,7 +121,7 @@ fun SubSettingScreen(
 
     val lazyListState = rememberLazyListState()
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        viewModel.swap(from.index, to.index)
+        viewModel.move(from.index, to.index)
     }
 
     Scaffold(

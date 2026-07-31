@@ -196,7 +196,10 @@ fun RoutingSettingScreen(
 
     val lazyListState = rememberLazyListState()
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        viewModel.swap(from.index - 1, to.index - 1)
+        // Lazy list indices include the preceding non-rule content, so resolve the stable rule keys.
+        val fromIndex = rulesets.indexOfFirst { it.id == from.key }
+        val toIndex = rulesets.indexOfFirst { it.id == to.key }
+        viewModel.move(fromIndex, toIndex)
     }
 
     Scaffold(

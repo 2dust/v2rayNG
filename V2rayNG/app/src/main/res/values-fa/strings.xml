@@ -351,7 +351,6 @@
     <string name="routing_settings_protocol">پورتکل</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">شبکه</string>
-    <string name="routing_settings_network_tip">[udp|tcp]</string>
     <string name="routing_settings_outbound_tag">برچسب خروجی</string>
 
     <string name="connection_test_pending">اتصال را بررسی کنید</string>

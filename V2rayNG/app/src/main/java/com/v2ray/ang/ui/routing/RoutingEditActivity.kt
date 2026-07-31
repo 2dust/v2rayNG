@@ -52,6 +52,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
 
+private val ROUTING_NETWORK_OPTIONS = listOf("tcp", "udp", "tcp,udp")
+
 class RoutingEditActivity : BaseComponentActivity() {
     private val position by lazy { intent.getIntExtra("position", -1) }
 
@@ -130,6 +132,7 @@ fun RoutingEditScreen(
         mutableStateOf(initial?.outboundTag ?: BUILTIN_OUTBOUND_TAGS.first())
     }
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
+    val selectedNetwork = network.ifBlank { "tcp,udp" }
 
     val processPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -273,10 +276,10 @@ fun RoutingEditScreen(
                 value = protocol,
                 onValueChange = { protocol = it }
             )
-            FormTextField(
+            FormDropdownField(
                 label = stringResource(R.string.routing_settings_network),
-                placeholder = stringResource(R.string.routing_settings_network_tip),
-                value = network,
+                value = selectedNetwork,
+                options = ROUTING_NETWORK_OPTIONS,
                 onValueChange = { network = it }
             )
             FormDropdownField(
