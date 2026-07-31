@@ -25,6 +25,7 @@ import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.service.DialerNativeService
 import com.v2ray.ang.service.DialerWebviewService
+import com.v2ray.ang.service.NetworkMonitor
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
@@ -43,6 +44,10 @@ object CoreServiceManager {
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
+    private var networkMonitor: NetworkMonitor? = null
+
+    /** Tun descriptor the core was started with, null in the proxy only and root run modes. */
+    private var currentVpnInterface: ParcelFileDescriptor? = null
 
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
@@ -98,6 +103,26 @@ object CoreServiceManager {
 
     @Throws(Exception::class)
     private fun doStartCoreLoop(service: Service, vpnInterface: ParcelFileDescriptor?) {
+        val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
+        mFilter.addAction(Intent.ACTION_SCREEN_ON)
+        mFilter.addAction(Intent.ACTION_SCREEN_OFF)
+        mFilter.addAction(Intent.ACTION_USER_PRESENT)
+        ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
+
+        currentVpnInterface = vpnInterface
+        launchCore(service, vpnInterface)
+        startNetworkMonitor(service)
+    }
+
+    /**
+     * Builds the runtime config and starts the core loop. Split out of [doStartCoreLoop] so that
+     * [reloadCore] can start the core again without restarting the service around it.
+     *
+     * @param isReload True when the tunnel is only being rebuilt, so that a reload does not look
+     *   like a restart in the notification, the tile and the widget.
+     */
+    @Throws(Exception::class)
+    private fun launchCore(service: Service, vpnInterface: ParcelFileDescriptor?, isReload: Boolean = false) {
         val guid = MmkvManager.getSelectServer() ?: error("No server selected")
         val config = MmkvManager.decodeServerConfig(guid) ?: error("Failed to decode server config")
 
@@ -107,12 +132,6 @@ object CoreServiceManager {
         if (!result.status) {
             error(result.errorMessage.ifBlank { "Failed to get V2Ray config" })
         }
-
-        val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
-        mFilter.addAction(Intent.ACTION_SCREEN_ON)
-        mFilter.addAction(Intent.ACTION_SCREEN_OFF)
-        mFilter.addAction(Intent.ACTION_USER_PRESENT)
-        ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
 
         currentConfig = config
         var tunFd = vpnInterface?.fd ?: 0
@@ -154,7 +173,7 @@ object CoreServiceManager {
             else -> {}
         }
 
-        MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
+        if (!isReload) MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
         NotificationManager.startSpeedNotification()
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
     }
@@ -166,6 +185,10 @@ object CoreServiceManager {
      */
     fun stopCoreLoop(): Boolean {
         val service = getService() ?: return false
+
+        networkMonitor?.unregister()
+        networkMonitor = null
+        currentVpnInterface = null
 
         if (isRunning()) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -197,10 +220,68 @@ object CoreServiceManager {
     }
 
     /**
+     * Subscribes to upstream network changes for whichever run mode is active.
+     * All three services share this manager, so the tunnel recovers from a handover in proxy only
+     * and root mode as well, not just behind the VPN interface.
+     */
+    private fun startNetworkMonitor(service: Service) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return
+        if (networkMonitor != null) return
+
+        val connectivity = service.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return
+        networkMonitor = NetworkMonitor(
+            connectivity = connectivity,
+            onUnderlyingNetworksChanged = { networks -> serviceControl?.get()?.setUnderlyingNetworks(networks) },
+            onHandover = { reloadCore() },
+        ).also { it.register() }
+    }
+
+    /**
+     * Restarts the core in place after the upstream network changed: the service, the notification
+     * and the VPN interface all stay up, so nothing of this is visible.
+     *
+     * The config is rebuilt on purpose, outbound server domains are resolved while building it and
+     * an address resolved on a network that is gone can be unusable on the new one.
+     *
+     * @return True if the core is running again.
+     */
+    private fun reloadCore(): Boolean {
+        val service = getService() ?: return false
+        if (!isRunning()) return false
+
+        return try {
+            coreController.stopLoop()
+            launchCore(service, tunFdForCore(), isReload = true)
+            LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reloaded")
+            true
+        } catch (e: Exception) {
+            val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to reload core: $message", e)
+            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+            false
+        }
+    }
+
+    /**
+     * Returns the tun descriptor to hand to the core on a reload.
+     *
+     * With hev-socks5-tunnel the core is started without a tun and never touches the descriptor.
+     * Otherwise it closes the one it was given when it stops, which would take the VPN interface
+     * down, so it gets a duplicate to close instead.
+     */
+    private fun tunFdForCore(): ParcelFileDescriptor? {
+        val vpnInterface = currentVpnInterface ?: return null
+        return if (SettingsManager.isUsingHevTun()) vpnInterface else vpnInterface.dup()
+    }
+
+    /**
      * Queries and resets all outbound traffic counters in one core call.
      * Go side format: tag,direction,value;tag,direction,value;
      */
     fun queryAllOutboundTrafficStats(): List<OutboundTrafficStat> {
+        // The stats manager is gone once the core stops, querying it then reaches into freed state.
+        if (!isRunning()) return emptyList()
+
         val payload = coreController.queryAllOutboundTrafficStats()
 
         val result = ArrayList<OutboundTrafficStat>()
