@@ -87,8 +87,8 @@ class AppSnackbarController(
          scope.launch {
             if (currentShowTime != 0L) {
                 val elapsed = System.currentTimeMillis() - currentShowTime
-                if (elapsed < 500) {
-                    delay((500 - elapsed).milliseconds)
+                if (elapsed < SnackbarThrottleMs) {
+                    delay((SnackbarThrottleMs - elapsed).milliseconds)
                 }
             }
 
@@ -156,6 +156,7 @@ private val ToastVerticalPad = 12.dp
 private const val ToastMaxLines = 8
 private const val ToastMaxWidthFraction = 0.75f
 private val ToastBottomOffset = 100.dp
+private const val SnackbarThrottleMs = 2000L
 
 @Composable
 fun AppSnackbarHost(
