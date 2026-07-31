@@ -30,6 +30,7 @@ class BootReceiver : BroadcastReceiver() {
             Intent.ACTION_MY_PACKAGE_REPLACED -> {
                 // Continue
             }
+
             Intent.ACTION_LOCKED_BOOT_COMPLETED -> {
                 val userManager = context.getSystemService(Context.USER_SERVICE) as? UserManager
                 if (userManager != null && !userManager.isUserUnlocked) {
@@ -37,6 +38,7 @@ class BootReceiver : BroadcastReceiver() {
                     return
                 }
             }
+
             else -> {
                 LogUtil.w(AppConfig.TAG, "BootReceiver: Unhandled action: $action")
                 return

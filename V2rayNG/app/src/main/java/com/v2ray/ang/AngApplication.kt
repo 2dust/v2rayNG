@@ -6,8 +6,8 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
-import com.v2ray.ang.ui.compose.ThemeManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.ui.compose.ThemeManager
 
 class AngApplication : Application() {
     companion object {

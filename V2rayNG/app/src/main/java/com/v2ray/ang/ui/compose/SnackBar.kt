@@ -84,7 +84,7 @@ class AppSnackbarController(
 
     fun show(message: CharSequence, type: ToastType = ToastType.NORMAL, long: Boolean = false) {
         val id = ++currentId
-         scope.launch {
+        scope.launch {
             if (currentShowTime != 0L) {
                 val elapsed = System.currentTimeMillis() - currentShowTime
                 if (elapsed < SnackbarThrottleMs) {
@@ -92,7 +92,7 @@ class AppSnackbarController(
                 }
             }
 
-             hostState.currentSnackbarData?.dismiss()
+            hostState.currentSnackbarData?.dismiss()
 
             launch {
                 hostState.showSnackbar(
@@ -108,8 +108,8 @@ class AppSnackbarController(
             }
 
             currentShowTime = System.currentTimeMillis()
-         }
-     }
+        }
+    }
 }
 
 private data class AppSnackbarVisuals(

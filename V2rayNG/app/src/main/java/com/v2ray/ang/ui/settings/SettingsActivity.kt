@@ -25,6 +25,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
+import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
+import com.v2ray.ang.handler.MmkvManager.rememberMmkvString
+import com.v2ray.ang.handler.SettingsChangeManager
+import com.v2ray.ang.root.RootManager
+import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.CollapsiblePreferenceGroupHeader
 import com.v2ray.ang.ui.compose.SettingsEditItem
@@ -33,11 +38,6 @@ import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.ThemeManager
 import com.v2ray.ang.ui.compose.verticalScrollbar
-import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
-import com.v2ray.ang.handler.MmkvManager.rememberMmkvString
-import com.v2ray.ang.handler.SettingsChangeManager
-import com.v2ray.ang.root.RootManager
-import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.util.Utils
 
 class SettingsActivity : BaseComponentActivity() {

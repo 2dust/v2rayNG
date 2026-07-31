@@ -13,8 +13,8 @@ import androidx.work.workDataOf
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.SubscriptionUpdateMessage
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.helper.MessageHelper
+import com.v2ray.ang.util.LogUtil
 import java.util.concurrent.TimeUnit
 
 object SubscriptionUpdater {
@@ -45,12 +45,12 @@ object SubscriptionUpdater {
         MmkvManager.decodeSubscriptions()
             .filter { it.subscription.autoUpdate && it.subscription.url.isNotEmpty() }
             .forEach { sub ->
-            scheduleOne(
-                context = context,
-                subId = sub.guid,
-                existingWorkPolicy = existingWorkPolicy
-            )
-        }
+                scheduleOne(
+                    context = context,
+                    subId = sub.guid,
+                    existingWorkPolicy = existingWorkPolicy
+                )
+            }
         LogUtil.i(
             AppConfig.TAG,
             "SubscriptionUpdater: sync complete forceReschedule=$forceReschedule"

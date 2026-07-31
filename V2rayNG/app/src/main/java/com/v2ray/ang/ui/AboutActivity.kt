@@ -29,11 +29,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.core.CoreNativeManager
+import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.compose.VersionInfoBlock
-import com.v2ray.ang.core.CoreNativeManager
-import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.util.Utils
 
 class AboutActivity : BaseComponentActivity() {

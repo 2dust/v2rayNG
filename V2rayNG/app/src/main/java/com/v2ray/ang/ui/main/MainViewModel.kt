@@ -672,7 +672,7 @@ class MainViewModel(
         }
     }
 
-    fun testAllRealPing(onlyTcp : Boolean = false) {
+    fun testAllRealPing(onlyTcp: Boolean = false) {
         dataSource.cancelAllPing()
         val groupId = uiState.value.selectedGroupId
         val servers = currentServers()
