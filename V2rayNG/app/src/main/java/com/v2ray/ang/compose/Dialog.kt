@@ -39,29 +39,69 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 
 @Composable
+fun ConfirmDialog(
+    title: String? = null,
+    message: String,
+    confirmText: String = stringResource(android.R.string.ok),
+    dismissText: String? = stringResource(android.R.string.cancel),
+    confirmIcon: @Composable (() -> Unit)? = null,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val confirmFocusRequester = remember { FocusRequester() }
+    val dismissFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(dismissText) {
+        if (dismissText != null) dismissFocusRequester.requestFocus()
+        else confirmFocusRequester.requestFocus()
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = title?.let { { Text(it) } },
+        text = { Text(message, style = MaterialTheme.typography.bodyMedium) },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirm(); onDismiss() },
+                modifier = Modifier.focusRequester(confirmFocusRequester)
+            ) {
+                confirmIcon?.invoke()
+                if (confirmIcon != null) Spacer(Modifier.width(8.dp))
+                Text(confirmText)
+            }
+        },
+        dismissButton = dismissText?.let { text ->
+            {
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.focusRequester(dismissFocusRequester)
+                ) {
+                    Text(text)
+                }
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface
+    )
+}
+
+@Composable
 fun DeleteConfirmDialog(
     message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        text = { Text(message, style = MaterialTheme.typography.bodyMedium) },
-        confirmButton = {
-            TextButton(onClick = { onConfirm(); onDismiss() }) {
-                Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.action_delete))
-            }
+    ConfirmDialog(
+        message = message,
+        confirmText = stringResource(R.string.action_delete),
+        confirmIcon = {
+            Icon(
+                painter = painterResource(R.drawable.ic_delete_24dp),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
         },
-        dismissButton = {
-            val dismissFocusRequester = remember { FocusRequester() }
-            LaunchedEffect(Unit) { dismissFocusRequester.requestFocus() }
-            TextButton(onClick = onDismiss, modifier = Modifier.focusRequester(dismissFocusRequester)) {
-                Text(stringResource(android.R.string.cancel))
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.surface
+        onConfirm = onConfirm,
+        onDismiss = onDismiss
     )
 }
 
