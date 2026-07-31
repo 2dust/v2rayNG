@@ -33,17 +33,15 @@ class ServerVlessActivity : BaseServerActivity() {
             title = serverConfigType.toString(),
             onSaveClick = { saveServer(uiState) }
         ) {
-            item { CommonBasicFields(uiState) }
-            item { VlessProtocolFields(uiState, flowOptions) }
-            item { CommonNetworkFields(uiState, options) }
-            item {
-                CommonStreamSecurityFields(
-                    state = uiState,
-                    options = options,
-                    scope = scope,
-                    buildProfileItem = { uiState.toProfileItem(initialConfig) }
-                )
-            }
+            CommonBasicFields(uiState)
+            VlessProtocolFields(uiState, flowOptions)
+            CommonNetworkFields(uiState, options)
+            CommonStreamSecurityFields(
+                state = uiState,
+                options = options,
+                scope = scope,
+                buildProfileItem = { uiState.toProfileItem(initialConfig) }
+            )
         }
     }
 

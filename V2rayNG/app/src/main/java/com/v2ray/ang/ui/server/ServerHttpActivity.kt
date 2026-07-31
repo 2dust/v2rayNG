@@ -27,8 +27,8 @@ class ServerHttpActivity : BaseServerActivity() {
             title = serverConfigType.toString(),
             onSaveClick = { saveServer(uiState) }
         ) {
-            item { CommonBasicFields(uiState) }
-            item { HttpProtocolFields(uiState) }
+            CommonBasicFields(uiState)
+            HttpProtocolFields(uiState)
 
         }
     }
