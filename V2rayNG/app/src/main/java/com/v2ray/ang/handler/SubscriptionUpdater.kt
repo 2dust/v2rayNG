@@ -14,7 +14,7 @@ import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.SubscriptionUpdateMessage
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.MessageUtil
+import com.v2ray.ang.helper.MessageHelper
 import java.util.concurrent.TimeUnit
 
 object SubscriptionUpdater {
@@ -178,7 +178,7 @@ object SubscriptionUpdater {
 
             updateLastUpdatedAndReschedule(applicationContext, subId)
 
-            MessageUtil.sendMsg2SubscriptionService(
+            MessageHelper.sendMsg2SubscriptionService(
                 applicationContext,
                 SubscriptionUpdateMessage(AppConfig.MSG_SUB_UPDATE_START, true, listOf(subId))
             )

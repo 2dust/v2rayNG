@@ -1,4 +1,4 @@
-package com.v2ray.ang.util
+package com.v2ray.ang.helper
 
 import android.content.ComponentName
 import android.content.Context
@@ -10,9 +10,10 @@ import com.v2ray.ang.dto.SubscriptionUpdateMessage
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.service.CoreTestService
 import com.v2ray.ang.service.SubscriptionUpdateService
+import com.v2ray.ang.util.LogUtil
 import java.io.Serializable
 
-object MessageUtil {
+object MessageHelper {
 
 
     /**
