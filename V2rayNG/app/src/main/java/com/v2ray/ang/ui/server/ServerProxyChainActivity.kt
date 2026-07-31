@@ -198,7 +198,8 @@ fun ProxyChainScreen(
     onDelete: () -> Unit
 ) {
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
-    var members by rememberSaveable { mutableStateOf(initialMembers.toMutableList()) }
+    var members by rememberSaveable { mutableStateOf(initialMembers) }
+    var memberKeys by rememberSaveable { mutableStateOf(List(initialMembers.size) { UUID.randomUUID().toString() }) }
     var showProfileDeleteConfirm by remember { mutableStateOf(false) }
     var memberToDeleteIndex by rememberSaveable { mutableStateOf<Int?>(null) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
@@ -207,12 +208,14 @@ fun ProxyChainScreen(
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
         val fromIndex = memberKeys.indexOf(from.key)
         val toIndex = memberKeys.indexOf(to.key)
-        val reordered = members.toMutableList()
-        val reorderedKeys = memberKeys.toMutableList()
-        if (reordered.moveItem(fromIndex, toIndex)) {
-            reorderedKeys.moveItem(fromIndex, toIndex)
-            members = reordered
-            memberKeys = reorderedKeys
+        if (fromIndex != -1 && toIndex != -1) {
+            val reordered = members.toMutableList()
+            val reorderedKeys = memberKeys.toMutableList()
+            if (reordered.moveItem(fromIndex, toIndex)) {
+                reorderedKeys.moveItem(fromIndex, toIndex)
+                members = reordered
+                memberKeys = reorderedKeys
+            }
         }
     }
 
@@ -308,8 +311,12 @@ fun ProxyChainScreen(
                                 modifier = Modifier.weight(1f)
                             )
                             IconButton(onClick = {
-                                if (member.isBlank()) members = members.toMutableList().also { it.removeAt(index) }
-                                else memberToDeleteIndex = index
+                                if (member.isBlank()) {
+                                    members = members.toMutableList().also { it.removeAt(index) }
+                                    memberKeys = memberKeys.toMutableList().also { it.removeAt(index) }
+                                } else {
+                                    memberToDeleteIndex = index
+                                }
                             }) {
                                 Icon(
                                     painterResource(R.drawable.ic_delete_24dp),
@@ -335,6 +342,7 @@ fun ProxyChainScreen(
             message = stringResource(R.string.confirm_delete_proxy_chain_member),
             onConfirm = {
                 members = members.toMutableList().also { it.removeAt(index) }
+                memberKeys = memberKeys.toMutableList().also { it.removeAt(index) }
                 memberToDeleteIndex = null
             },
             onDismiss = { memberToDeleteIndex = null }
