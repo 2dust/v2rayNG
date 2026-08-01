@@ -240,7 +240,7 @@ object NotificationManager {
                     }
                 }
 
-                stat.tag.startsWith(AppConfig.TAG_PROXY) -> {
+                stat.tag != AppConfig.TAG_BLOCKED -> {
                     when (stat.direction) {
                         AppConfig.UPLINK -> proxyUplink += stat.value
                         AppConfig.DOWNLINK -> proxyDownlink += stat.value
