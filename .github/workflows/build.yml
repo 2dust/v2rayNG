@@ -30,6 +30,7 @@ jobs:
             repository: 'shashachkaaa/AndroidLibXrayLite'
             path: 'AndroidLibXrayLite'
             token: ${{ secrets.GITHUB_TOKEN }}
+            fetch-depth: '0'
 
     - name: Fetch AndroidLibXrayLite tag
       run: |
