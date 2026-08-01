@@ -19,10 +19,34 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v7
+          uses: actions/checkout@v4
+          with:
+            submodules: 'recursive'
+            fetch-depth: '0'
+
+        # --- ДОБАВЬ ЭТОТ ШАГ ДЛЯ ПОДМЕНЫ ЯДРА НА СВОЙ ФОРК ---
+    - name: Override AndroidLibXrayLite with my fork
+      uses: actions/checkout@v4
       with:
-        submodules: 'recursive'
-        fetch-depth: '0'
+            repository: 'shashachkaaa/AndroidLibXrayLite'
+            path: 'AndroidLibXrayLite'
+            token: ${{ secrets.GITHUB_TOKEN }}
+        # --------------------------------------------------
+    - name: Fetch AndroidLibXrayLite tag
+      run: |
+            pushd AndroidLibXrayLite
+            CURRENT_TAG=$(git describe --tags --abbrev=0)
+            echo "Current tag in this repo: $CURRENT_TAG"
+            echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
+            popd
+
+    - name: Download libv2ray
+      uses: robinraju/release-downloader@v1.13
+      with:
+            repository: 'shashachkaaa/AndroidLibXrayLite' # <--- ПОМЕНЯЛИ 2dust НА ТВОЙ АККАУНТ
+            tag: ${{ env.CURRENT_TAG }}
+            fileName: 'libv2ray.aar'
+            out-file-path: V2rayNG/app/libs/
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v4
@@ -63,22 +87,6 @@ jobs:
     - name: Copy libhevtun
       run: |
         cp -r ${{ github.workspace }}/libs ${{ github.workspace }}/V2rayNG/app
-
-    - name: Fetch AndroidLibXrayLite tag
-      run: |
-        pushd AndroidLibXrayLite
-        CURRENT_TAG=$(git describe --tags --abbrev=0)
-        echo "Current tag in this repo: $CURRENT_TAG"
-        echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
-        popd
-
-    - name: Download libv2ray
-      uses: robinraju/release-downloader@v1.13
-      with:
-        repository: '2dust/AndroidLibXrayLite'
-        tag: ${{ env.CURRENT_TAG }}
-        fileName: 'libv2ray.aar'
-        out-file-path: V2rayNG/app/libs/
 
     - name: Setup Java
       uses: actions/setup-java@v5.6.0
