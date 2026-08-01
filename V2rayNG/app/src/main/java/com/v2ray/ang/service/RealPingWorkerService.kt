@@ -1,6 +1,7 @@
 package com.v2ray.ang.service
 
 import android.content.Context
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.CoreConfigManager
 import com.v2ray.ang.core.CoreNativeManager
 import com.v2ray.ang.dto.RealPingEvent
@@ -10,127 +11,143 @@ import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SpeedtestManager
+import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicInteger
+import libv2ray.OutboundProbeHandler
+import java.util.concurrent.atomic.AtomicBoolean
 
-/**
- * Worker that runs a batch of real-ping tests independently.
- * Each batch owns its own CoroutineScope/dispatcher and can be cancelled separately.
- */
+/** Runs one progressively reported delay-test batch through one native core. */
 class RealPingWorkerService(
     private val context: Context,
     private val guids: List<String>,
     private val onlyTcp: Boolean = false,
-    private val onEvent: (RealPingEvent) -> Unit = {}
+    private val onEvent: (RealPingEvent) -> Unit = {},
 ) {
-    private val job = SupervisorJob()
-    private val concurrency = SettingsManager.getRealPingConcurrency()
-    private val dispatcher = Executors.newFixedThreadPool(if (onlyTcp) concurrency * 2 else concurrency).asCoroutineDispatcher()
-    private val scope = CoroutineScope(job + dispatcher + CoroutineName("RealPingBatchWorker"))
-
-    private val runningCount = AtomicInteger(0)
-    private val totalCount = AtomicInteger(0)
+    private val job = Job()
+    private val scope = CoroutineScope(job + Dispatchers.IO + CoroutineName("OutboundProbeBatch"))
+    private val controller = CoreNativeManager.newOutboundProbeController()
+    private val finished = AtomicBoolean(false)
+    private val emittedDelays = mutableMapOf<String, Long>()
+    private val completedGuids = mutableSetOf<String>()
+    private var totalProfiles = 0
 
     fun start() {
-        val jobs = guids.map { guid ->
-            totalCount.incrementAndGet()
-            scope.launch {
-                runningCount.incrementAndGet()
-                try {
-                    val result = if (onlyTcp) startTcping(guid) else startRealPing(guid)
-                    if (scope.isActive) {
-                        onEvent(RealPingEvent.Result(guid, result))
-                    }
-                } catch (_: Throwable) {
-                    // ignore
-                } finally {
-                    val count = totalCount.decrementAndGet()
-                    val left = runningCount.decrementAndGet()
-                    if (scope.isActive) {
-                        onEvent(RealPingEvent.Progress("$left / $count"))
-                    }
+        if (onlyTcp) {
+            startTcpBatch()
+            return
+        }
+        scope.launch {
+            try {
+                val plan = CoreConfigManager.getV2rayConfig4BatchSpeedtest(context, guids)
+                totalProfiles = (plan.profiles.map { it.guid } + plan.failedGuids).distinct().size
+                plan.failedGuids.forEach { emitResult(it, -1L, completed = true) }
+                if (plan.profiles.isNotEmpty()) {
+                    val concurrency = SettingsManager.getRealPingConcurrency()
+                    LogUtil.i(
+                        AppConfig.TAG,
+                        "Starting ${plan.profiles.size} real-delay profiles with concurrency $concurrency",
+                    )
+                    controller.probe(
+                        plan.content,
+                        JsonUtil.toJson(plan.profiles),
+                        concurrency,
+                        plan.samples,
+                        object : OutboundProbeHandler {
+                            override fun onOutboundProbeResult(
+                                groupID: String?,
+                                delay: Long,
+                                alive: Boolean,
+                                completed: Boolean,
+                            ): Long {
+                                groupID?.let {
+                                    emitResult(it, if (alive) delay else -1L, completed)
+                                }
+                                return 0
+                            }
+                        },
+                    )
+                }
+                completeMissing(plan.profiles.map { it.guid } + plan.failedGuids)
+                finish("0")
+            } catch (_: CancellationException) {
+                finish("-1")
+            } catch (error: Throwable) {
+                if (!finished.get()) {
+                    LogUtil.e(AppConfig.TAG, "Outbound probe batch failed", error)
+                    finish("-1")
                 }
             }
         }
+    }
 
+    private fun startTcpBatch() {
+        totalProfiles = guids.size
+        val jobs = guids.map { guid ->
+            scope.launch(Dispatchers.IO.limitedParallelism(SettingsManager.getRealPingConcurrency() * 2)) {
+                emitResult(guid, startTcping(guid), completed = true)
+            }
+        }
         scope.launch {
             try {
-                joinAll(*jobs.toTypedArray())
-                if (isActive) {
-                    onEvent(RealPingEvent.Finish("0"))
-                }
+                jobs.joinAll()
+                finish("0")
             } catch (_: CancellationException) {
-                // If cancelled, don't send finish event to avoid confusion
-            } finally {
-                close()
+                finish("-1")
             }
         }
     }
 
     fun cancel() {
+        controller.cancel()
         job.cancel()
+        finish("-1")
     }
 
-    private fun close() {
-        try {
-            dispatcher.close()
-        } catch (_: Throwable) {
-            // ignore
+    @Synchronized
+    private fun completeMissing(allGuids: List<String>) {
+        allGuids.distinct().forEach { guid ->
+            if (guid !in completedGuids) emitResult(guid, emittedDelays[guid] ?: -1L, completed = true)
         }
     }
 
-    private fun startRealPing(guid: String): Long {
-        val retFailure = -1L
-
-        val config = MmkvManager.decodeServerConfig(guid) ?: return retFailure
-        if (!config.configType.isComplexType()
-            && config.configType != EConfigType.HYSTERIA2
-            && config.configType != EConfigType.WIREGUARD
-            && config.alpn?.startsWith("h3") != true
-            && config.server.isNotNullEmpty()
-            && config.serverPort?.toIntOrNull() != null
-        ) {
-            val url = config.server.orEmpty()
-            val port = config.serverPort.orEmpty().toInt()
-            val tcpTime = SpeedtestManager.socketConnectTime(url, port, 1000)
-            if (tcpTime <= -1L) {
-                return retFailure
-            }
+    @Synchronized
+    private fun emitResult(guid: String, delay: Long, completed: Boolean) {
+        if (finished.get()) return
+        if (emittedDelays[guid] != delay) {
+            emittedDelays[guid] = delay
+            onEvent(RealPingEvent.Result(guid, delay))
         }
-
-        val configResult = CoreConfigManager.getV2rayConfig4Speedtest(context, guid)
-        if (!configResult.status) {
-            return retFailure
+        if (completed && completedGuids.add(guid)) {
+            val remaining = (totalProfiles - completedGuids.size).coerceAtLeast(0)
+            onEvent(RealPingEvent.Progress("$remaining / $totalProfiles"))
         }
-        return CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
+    }
+
+    @Synchronized
+    private fun finish(status: String) {
+        if (finished.compareAndSet(false, true)) {
+            onEvent(RealPingEvent.Finish(status))
+        }
     }
 
     private fun startTcping(guid: String): Long {
-        val retFailure = -1L
-
-        val config = MmkvManager.decodeServerConfig(guid) ?: return retFailure
-        if (!config.configType.isComplexType()
-            && config.configType != EConfigType.HYSTERIA2
-            && config.configType != EConfigType.WIREGUARD
-            && config.alpn?.startsWith("h3") != true
-            && config.server.isNotNullEmpty()
-            && config.serverPort?.toIntOrNull() != null
+        val config = MmkvManager.decodeServerConfig(guid) ?: return -1L
+        if (!config.configType.isComplexType() &&
+            config.configType != EConfigType.HYSTERIA2 &&
+            config.configType != EConfigType.WIREGUARD &&
+            config.alpn?.startsWith("h3") != true &&
+            config.server.isNotNullEmpty() &&
+            config.serverPort?.toIntOrNull() != null
         ) {
-            val url = config.server.orEmpty()
-            val port = config.serverPort.orEmpty().toInt()
-            val tcpTime = SpeedtestManager.socketConnectTime(url, port, 1000)
-
-            return tcpTime
+            return SpeedtestManager.socketConnectTime(config.server.orEmpty(), config.serverPort.orEmpty().toInt(), 1000)
         }
-
-        return retFailure
+        return -1L
     }
 }

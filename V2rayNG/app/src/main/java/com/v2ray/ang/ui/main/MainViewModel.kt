@@ -129,6 +129,7 @@ class MainViewModel(
             }
 
             is MainServiceEvent.MeasureConfigNotify -> {
+                if (!uiState.value.isTesting) return
                 _uiState.update {
                     it.copy(
                         statusText = dataSource.getString(
@@ -683,7 +684,7 @@ class MainViewModel(
         _uiState.update {
             it.copy(
                 isTesting = true,
-                statusText = dataSource.getString(R.string.connection_test_testing)
+                statusText = dataSource.getString(R.string.connection_test_testing_tap_to_stop)
             )
         }
         viewModelScope.launch(ioDispatcher) {

@@ -7,6 +7,7 @@ import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.CoreConfigContext
+import com.v2ray.ang.dto.OutboundProbePlan
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.RulesetItem
@@ -81,6 +82,25 @@ object CoreConfigManager {
                 errorMessage = "Failed to get V2ray config: ${e.message ?: e.javaClass.simpleName}"
             )
         }
+    }
+
+    /** Builds one isolated Xray configuration for a complete UI delay-test batch. */
+    fun getV2rayConfig4BatchSpeedtest(context: Context, guids: List<String>): OutboundProbePlan {
+        val sources = mutableListOf<OutboundProbeConfigBuilder.Source>()
+        val failedGuids = mutableListOf<String>()
+        guids.distinct().forEach { guid ->
+            val result = getV2rayConfig4Speedtest(context, guid)
+            if (result.status && result.content.isNotBlank()) {
+                sources += OutboundProbeConfigBuilder.Source(guid, result.content)
+            } else {
+                failedGuids += guid
+            }
+        }
+        val plan = OutboundProbeConfigBuilder.build(
+            sources = sources,
+            destination = SettingsManager.getDelayTestUrl(),
+        )
+        return plan.copy(failedGuids = (failedGuids + plan.failedGuids).distinct())
     }
 
     /**
@@ -435,7 +455,18 @@ object CoreConfigManager {
     private fun postProcessForSpeedtest(v2rayConfig: V2rayConfig) {
         v2rayConfig.log.loglevel = MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL) ?: "warning"
         v2rayConfig.inbounds.clear()
+        val usesPrimaryBalancer = v2rayConfig.routing.balancers
+            ?.any { it.tag == AppConfig.TAG_BALANCER }
+            ?: false
         v2rayConfig.routing.rules.clear()
+        if (usesPrimaryBalancer) {
+            v2rayConfig.routing.rules.add(
+                V2rayConfig.RoutingBean.RulesBean(
+                    network = "tcp,udp",
+                    balancerTag = AppConfig.TAG_BALANCER,
+                )
+            )
+        }
         v2rayConfig.dns = null
         v2rayConfig.fakedns = null
         v2rayConfig.stats = null
