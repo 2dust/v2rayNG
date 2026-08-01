@@ -240,6 +240,7 @@ object NotificationManager {
                     }
                 }
 
+                // Accumulate stats for all proxy outbounds (including custom subscription tags)
                 stat.tag != AppConfig.TAG_BLOCKED -> {
                     when (stat.direction) {
                         AppConfig.UPLINK -> proxyUplink += stat.value

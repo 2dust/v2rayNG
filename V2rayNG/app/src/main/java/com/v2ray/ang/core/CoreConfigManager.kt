@@ -86,6 +86,7 @@ object CoreConfigManager {
 
         val json = JsonUtil.parseString(raw)?.takeIf { it.isJsonObject }?.asJsonObject ?: return result
 
+        // Inject or remove traffic statistics configuration based on user preference
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) == true) {
             if (!json.has("stats")) {
                 json.add("stats", JsonObject())
