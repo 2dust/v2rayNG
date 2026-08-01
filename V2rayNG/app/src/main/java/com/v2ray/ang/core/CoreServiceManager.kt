@@ -31,6 +31,7 @@ import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.jvm.Volatile
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
 import libv2ray.ProcessFinder
@@ -45,6 +46,9 @@ object CoreServiceManager {
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
     private var networkMonitor: NetworkMonitor? = null
+
+    @Volatile
+    private var isReloading = false
 
     /** Tun descriptor the core was started with, null in the proxy only and root run modes. */
     private var currentVpnInterface: ParcelFileDescriptor? = null
@@ -114,13 +118,6 @@ object CoreServiceManager {
         startNetworkMonitor(service)
     }
 
-    /**
-     * Builds the runtime config and starts the core loop. Split out of [doStartCoreLoop] so that
-     * [reloadCore] can start the core again without restarting the service around it.
-     *
-     * @param isReload True when the tunnel is only being rebuilt, so that a reload does not look
-     *   like a restart in the notification, the tile and the widget.
-     */
     @Throws(Exception::class)
     private fun launchCore(service: Service, vpnInterface: ParcelFileDescriptor?, isReload: Boolean = false) {
         val guid = MmkvManager.getSelectServer() ?: error("No server selected")
@@ -173,7 +170,9 @@ object CoreServiceManager {
             else -> {}
         }
 
-        if (!isReload) MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
+        if (!isReload) {
+            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
+        }
         NotificationManager.startSpeedNotification()
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
     }
@@ -246,19 +245,28 @@ object CoreServiceManager {
      * @return True if the core is running again.
      */
     private fun reloadCore(): Boolean {
+        if (isReloading) return false
         val service = getService() ?: return false
         if (!isRunning()) return false
 
         return try {
+            val tunFd = tunFdForCore()
+
+            isReloading = true
+            LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reload start...")
+
             coreController.stopLoop()
-            launchCore(service, tunFdForCore(), isReload = true)
-            LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reloaded")
+            launchCore(service, tunFd, isReload = true)
+
+            LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reload finished")
             true
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to reload core: $message", e)
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
             false
+        } finally {
+            isReloading = false
         }
     }
 
@@ -271,7 +279,12 @@ object CoreServiceManager {
      */
     private fun tunFdForCore(): ParcelFileDescriptor? {
         val vpnInterface = currentVpnInterface ?: return null
-        return if (SettingsManager.isUsingHevTun()) vpnInterface else vpnInterface.dup()
+        return try {
+            if (SettingsManager.isUsingHevTun()) vpnInterface else vpnInterface.dup()
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to duplicate VPN interface", e)
+            throw e
+        }
     }
 
     /**
