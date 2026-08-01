@@ -21,11 +21,15 @@ class TProxyService(
     companion object {
         @JvmStatic
         @Suppress("FunctionName")
-        private external fun TProxyStartService(configPath: String, fd: Int)
+        private external fun TProxyStartService(configPath: String, fd: Int):Boolean
 
         @JvmStatic
         @Suppress("FunctionName")
-        private external fun TProxyStopService()
+        private external fun TProxyStopService():Boolean
+
+        @JvmStatic
+        @Suppress("FunctionName")
+        private external fun TProxyIsRunning(): Boolean
 
         @JvmStatic
         @Suppress("FunctionName")
