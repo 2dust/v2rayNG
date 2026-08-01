@@ -7,7 +7,7 @@ import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.CoreConfigContext
-import com.v2ray.ang.dto.OutboundProbePlan
+import com.v2ray.ang.dto.ProbePlan
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.RulesetItem
@@ -85,18 +85,18 @@ object CoreConfigManager {
     }
 
     /** Builds one isolated Xray configuration for a complete UI delay-test batch. */
-    fun getV2rayConfig4BatchSpeedtest(context: Context, guids: List<String>): OutboundProbePlan {
-        val sources = mutableListOf<OutboundProbeConfigBuilder.Source>()
+    fun getV2rayConfig4BatchSpeedtest(context: Context, guids: List<String>): ProbePlan {
+        val sources = mutableListOf<ProbeConfigBuilder.Source>()
         val failedGuids = mutableListOf<String>()
         guids.distinct().forEach { guid ->
             val result = getV2rayConfig4Speedtest(context, guid)
             if (result.status && result.content.isNotBlank()) {
-                sources += OutboundProbeConfigBuilder.Source(guid, result.content)
+                sources += ProbeConfigBuilder.Source(guid, result.content)
             } else {
                 failedGuids += guid
             }
         }
-        val plan = OutboundProbeConfigBuilder.build(
+        val plan = ProbeConfigBuilder.build(
             sources = sources,
             destination = SettingsManager.getDelayTestUrl(),
         )

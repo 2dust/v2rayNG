@@ -256,7 +256,7 @@
             android:name=".service.CoreTestService"
             android:exported="false"
             android:foregroundServiceType="specialUse"
-            android:process=":OutboundProbe">
+            android:process=":Probe">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="test" />

@@ -3,8 +3,8 @@ package com.v2ray.ang.core
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.v2ray.ang.dto.OutboundProbePlan
-import com.v2ray.ang.dto.OutboundProbeProfilePlan
+import com.v2ray.ang.dto.ProbePlan
+import com.v2ray.ang.dto.ProbeProfile
 import com.v2ray.ang.util.JsonUtil
 
 /**
@@ -12,11 +12,11 @@ import com.v2ray.ang.util.JsonUtil
  *
  * Every source gets a private tag namespace. Only outbound definitions and the
  * primary policy-group balancer are retained. AndroidLib drives the unchanged
- * upstream BurstObservatory.Check API with profile-level concurrency and
+ * upstream BurstObservatory.Check API with probe-level concurrency and
  * progressive group results, so unrelated routing and inbound state must
  * not affect another profile in the same batch.
  */
-object OutboundProbeConfigBuilder {
+object ProbeConfigBuilder {
     data class Source(val guid: String, val content: String)
 
     fun build(
@@ -24,13 +24,13 @@ object OutboundProbeConfigBuilder {
         destination: String,
         timeout: String = DEFAULT_PROBE_TIMEOUT,
         samples: Int = 1,
-    ): OutboundProbePlan {
+    ): ProbePlan {
         require(destination.isNotBlank()) { "probe destination is empty" }
         require(samples > 0) { "probe sample count must be positive" }
 
         val mergedOutbounds = JsonArray()
         val mergedBalancers = JsonArray()
-        val profiles = mutableListOf<OutboundProbeProfilePlan>()
+        val profiles = mutableListOf<ProbeProfile>()
         val failedGuids = mutableListOf<String>()
         var batchSamples = samples
         var batchTimeout = timeout
@@ -116,7 +116,7 @@ object OutboundProbeConfigBuilder {
                 }
                 val routedTag = catchAllOutbound
                 val runtimeTag = routedTag ?: tagMap.keys.first()
-                OutboundProbeProfilePlan(
+                ProbeProfile(
                     guid = source.guid,
                     outboundTags = listOf(tagMap.getValue(runtimeTag)),
                 )
@@ -171,7 +171,7 @@ object OutboundProbeConfigBuilder {
             })
         }
 
-        return OutboundProbePlan(
+        return ProbePlan(
             content = JsonUtil.toJsonPretty(root).orEmpty(),
             profiles = profiles,
             failedGuids = failedGuids,
@@ -185,7 +185,7 @@ object OutboundProbeConfigBuilder {
         sourceBalancer: JsonObject,
         tagMap: Map<String, String>,
         mergedBalancers: JsonArray,
-    ): OutboundProbeProfilePlan? {
+    ): ProbeProfile? {
         val strategy = sourceBalancer.obj("strategy") ?: return null
         val strategyType = strategy.string("type")
         if (strategyType?.equals("leastPing", ignoreCase = true) != true &&
@@ -216,7 +216,7 @@ object OutboundProbeConfigBuilder {
             balancer.addProperty("fallbackTag", mappedFallback)
         }
         mergedBalancers.add(balancer)
-        return OutboundProbeProfilePlan(guid, outboundTags, probeBalancerTag)
+        return ProbeProfile(guid, outboundTags, probeBalancerTag)
     }
 
     private fun remapOutboundReferences(outbound: JsonObject, tagMap: Map<String, String>): Boolean {

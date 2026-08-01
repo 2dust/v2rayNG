@@ -20,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import libv2ray.OutboundProbeHandler
+import libv2ray.ProbeHandler
 import java.util.concurrent.atomic.AtomicBoolean
 
 /** Runs one progressively reported delay-test batch through one native core. */
@@ -31,8 +31,8 @@ class RealPingWorkerService(
     private val onEvent: (RealPingEvent) -> Unit = {},
 ) {
     private val job = Job()
-    private val scope = CoroutineScope(job + Dispatchers.IO + CoroutineName("OutboundProbeBatch"))
-    private val controller = CoreNativeManager.newOutboundProbeController()
+    private val scope = CoroutineScope(job + Dispatchers.IO + CoroutineName("ProbeBatch"))
+    private val controller = CoreNativeManager.newProbeController()
     private val finished = AtomicBoolean(false)
     private val emittedDelays = mutableMapOf<String, Long>()
     private val completedGuids = mutableSetOf<String>()
@@ -50,17 +50,18 @@ class RealPingWorkerService(
                 plan.failedGuids.forEach { emitResult(it, -1L, completed = true) }
                 if (plan.profiles.isNotEmpty()) {
                     val concurrency = SettingsManager.getRealPingConcurrency()
+                    val probeCount = plan.profiles.sumOf { it.outboundTags.size }
                     LogUtil.i(
                         AppConfig.TAG,
-                        "Starting ${plan.profiles.size} real-delay profiles with concurrency $concurrency",
+                        "Starting $probeCount real-delay probes for ${plan.profiles.size} profiles with limit $concurrency",
                     )
                     controller.probe(
                         plan.content,
                         JsonUtil.toJson(plan.profiles),
                         concurrency,
                         plan.samples,
-                        object : OutboundProbeHandler {
-                            override fun onOutboundProbeResult(
+                        object : ProbeHandler {
+                            override fun onProbeResult(
                                 groupID: String?,
                                 delay: Long,
                                 alive: Boolean,
@@ -80,7 +81,7 @@ class RealPingWorkerService(
                 finish("-1")
             } catch (error: Throwable) {
                 if (!finished.get()) {
-                    LogUtil.e(AppConfig.TAG, "Outbound probe batch failed", error)
+                    LogUtil.e(AppConfig.TAG, "Probe batch failed", error)
                     finish("-1")
                 }
             }
@@ -89,8 +90,9 @@ class RealPingWorkerService(
 
     private fun startTcpBatch() {
         totalProfiles = guids.size
+        val dispatcher = Dispatchers.IO.limitedParallelism(SettingsManager.getRealPingConcurrency())
         val jobs = guids.map { guid ->
-            scope.launch(Dispatchers.IO.limitedParallelism(SettingsManager.getRealPingConcurrency() * 2)) {
+            scope.launch(dispatcher) {
                 emitResult(guid, startTcping(guid), completed = true)
             }
         }
