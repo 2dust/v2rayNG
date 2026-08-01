@@ -10,5 +10,4 @@ data class ProbePlan(
     val content: String,
     val profiles: List<ProbeProfile>,
     val failedGuids: List<String>,
-    val samples: Int,
 )

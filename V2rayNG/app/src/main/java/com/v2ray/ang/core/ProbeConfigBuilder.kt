@@ -23,16 +23,13 @@ object ProbeConfigBuilder {
         sources: List<Source>,
         destination: String,
         timeout: String = DEFAULT_PROBE_TIMEOUT,
-        samples: Int = 1,
     ): ProbePlan {
         require(destination.isNotBlank()) { "probe destination is empty" }
-        require(samples > 0) { "probe sample count must be positive" }
 
         val mergedOutbounds = JsonArray()
         val mergedBalancers = JsonArray()
         val profiles = mutableListOf<ProbeProfile>()
         val failedGuids = mutableListOf<String>()
-        var batchSamples = samples
         var batchTimeout = timeout
         var leastLoadHttpMethod: String? = null
 
@@ -129,7 +126,6 @@ object ProbeConfigBuilder {
                         ?.equals("leastLoad", ignoreCase = true) == true
                 ) {
                     root.obj("burstObservatory")?.obj("pingConfig")?.let { pingConfig ->
-                        batchSamples = maxOf(batchSamples, pingConfig.positiveInt("sampling") ?: 1)
                         batchTimeout = longerDuration(
                             batchTimeout,
                             pingConfig.string("timeout") ?: DEFAULT_PROBE_TIMEOUT,
@@ -165,7 +161,7 @@ object ProbeConfigBuilder {
                     addProperty("destination", destination)
                     addProperty("httpMethod", leastLoadHttpMethod ?: DEFAULT_HTTP_METHOD)
                     addProperty("interval", "1h")
-                    addProperty("sampling", batchSamples)
+                    addProperty("sampling", 1)
                     addProperty("timeout", batchTimeout)
                 })
             })
@@ -175,7 +171,6 @@ object ProbeConfigBuilder {
             content = JsonUtil.toJsonPretty(root).orEmpty(),
             profiles = profiles,
             failedGuids = failedGuids,
-            samples = batchSamples,
         )
     }
 
@@ -249,12 +244,6 @@ object ProbeConfigBuilder {
 
     private fun JsonObject.string(name: String): String? =
         get(name)?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }?.asString
-
-    private fun JsonObject.positiveInt(name: String): Int? =
-        get(name)?.takeIf { it.isJsonPrimitive }
-            ?.runCatching { asInt }
-            ?.getOrNull()
-            ?.takeIf { it > 0 }
 
     private fun longerDuration(first: String, second: String): String {
         val firstMillis = durationMillis(first) ?: return second

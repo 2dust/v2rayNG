@@ -59,7 +59,6 @@ class RealPingWorkerService(
                         plan.content,
                         JsonUtil.toJson(plan.profiles),
                         concurrency,
-                        plan.samples,
                         object : ProbeHandler {
                             override fun onProbeResult(
                                 groupID: String?,
