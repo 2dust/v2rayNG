@@ -10,15 +10,16 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * Watches the network that carries the tunnel and reports topology changes.
+ * Watches the network that carries the tunnel and reports stable handovers.
  *
- * Cellular -> Wi-Fi is a make-before-break handover: the new network is announced while the old one
- * is still connected, so the socket to the server is never reset and the core keeps using a dead
- * connection. Deciding that a handover happened is what this class is for, acting on it is not.
+ * Android may announce a replacement network before losing the old one, and may deliver stale
+ * capability or loss callbacks for that old network afterwards. Only the newest network is allowed
+ * to update the VPN underlay or complete the debounced handover.
  *
  * Only used from Android P and above, see CoreServiceManager.startNetworkMonitor().
  * [onHandover] is invoked on a background thread after the debounce window and may block.
@@ -32,8 +33,11 @@ class NetworkMonitor(
         const val HANDOVER_DEBOUNCE_MS = 1000L
     }
 
-    private var upstream: Network? = null
+    private val state = UnderlyingNetworkStateTracker<Network>()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var handoverJob: Job? = null
+
+    @Volatile
     private var registered = false
 
     /**
@@ -54,47 +58,34 @@ class NetworkMonitor(
     }
 
     private val callback = object : ConnectivityManager.NetworkCallback() {
-        override fun onAvailable(network: Network) {
-            val previous = upstream
-            upstream = network
-            onUnderlyingNetworksChanged(arrayOf(network))
-            if (previous != null && previous != network) {
-                scheduleHandover(network)
-            }
-        }
+        override fun onAvailable(network: Network) = handleAvailable(network)
 
-        override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-            // it's a good idea to refresh capabilities
-            onUnderlyingNetworksChanged(arrayOf(network))
-        }
+        override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) =
+            handleCapabilitiesChanged(network)
 
-        override fun onLost(network: Network) {
-            onUnderlyingNetworksChanged(null)
-        }
+        override fun onLost(network: Network) = handleLost(network)
     }
 
-    /**
-     * Starts watching. Safe to call more than once, only the first call registers.
-     */
+    /** Starts watching. Safe to call more than once, only the first call registers. */
     fun register() {
         if (registered) return
+        registered = true
         try {
             connectivity.requestNetwork(request, callback)
-            registered = true
         } catch (e: Exception) {
+            registered = false
             LogUtil.e(AppConfig.TAG, "NetworkMonitor: Failed to request network", e)
         }
     }
 
-    /**
-     * Stops watching and drops the tracked state. Safe to call more than once.
-     */
+    /** Stops watching and drops the tracked state. Safe to call more than once. */
     fun unregister() {
+        val wasRegistered = registered
+        registered = false
         handoverJob?.cancel()
         handoverJob = null
-        upstream = null
-        if (!registered) return
-        registered = false
+        state.reset()
+        if (!wasRegistered) return
         try {
             connectivity.unregisterNetworkCallback(callback)
         } catch (e: Exception) {
@@ -102,18 +93,49 @@ class NetworkMonitor(
         }
     }
 
+    private fun handleAvailable(network: Network) {
+        if (!registered) return
+        val isHandover = state.onAvailable(network)
+        notifyUnderlyingNetworksChanged(arrayOf(network))
+        if (isHandover) {
+            scheduleHandover(network)
+        }
+    }
+
+    private fun handleCapabilitiesChanged(network: Network) {
+        if (!registered || !state.isCurrent(network)) return
+        notifyUnderlyingNetworksChanged(arrayOf(network))
+    }
+
+    private fun handleLost(network: Network) {
+        if (!registered || !state.onLost(network)) return
+        handoverJob?.cancel()
+        handoverJob = null
+        notifyUnderlyingNetworksChanged(null)
+    }
+
     private fun scheduleHandover(network: Network) {
         LogUtil.i(AppConfig.TAG, "NetworkMonitor: Upstream is now $network")
         handoverJob?.cancel()
-        handoverJob = CoroutineScope(Dispatchers.IO).launch {
+        handoverJob = scope.launch {
             try {
                 delay(HANDOVER_DEBOUNCE_MS)
-                onHandover()
+                if (state.isCurrent(network)) {
+                    onHandover()
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "NetworkMonitor: Failed to handle upstream change", e)
             }
+        }
+    }
+
+    private fun notifyUnderlyingNetworksChanged(networks: Array<Network>?) {
+        try {
+            onUnderlyingNetworksChanged(networks)
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "NetworkMonitor: Failed to publish underlying network", e)
         }
     }
 }
