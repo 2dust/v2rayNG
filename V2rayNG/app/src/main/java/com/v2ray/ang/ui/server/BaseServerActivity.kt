@@ -3,14 +3,13 @@ package com.v2ray.ang.ui.server
 import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -436,10 +435,10 @@ abstract class BaseServerActivity : BaseComponentActivity() {
     protected fun ServerEditorScaffold(
         title: String,
         onSaveClick: () -> Unit,
-        content: LazyListScope.() -> Unit
+        content: @Composable ColumnScope.() -> Unit
     ) {
         var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
-        val listState = rememberLazyListState()
+        val scrollState = rememberScrollState()
         Scaffold(
             contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
             topBar = {
@@ -465,15 +464,15 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 )
             }
         ) { innerPadding ->
-            LazyColumn(
-                state = listState,
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
                     .consumeWindowInsets(innerPadding)
                     .imePadding()
-                    .verticalScrollbar(listState),
-                contentPadding = PaddingValues(bottom = 36.dp),
+                    .verticalScroll(scrollState)
+                    .verticalScrollbar(scrollState)
+                    .padding(bottom = 36.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 content = content
             )

@@ -33,17 +33,15 @@ class ServerVmessActivity : BaseServerActivity() {
             title = serverConfigType.toString(),
             onSaveClick = { saveServer(uiState) }
         ) {
-            item { CommonBasicFields(uiState) }
-            item { VmessProtocolFields(uiState, securityOptions) }
-            item { CommonNetworkFields(uiState, options) }
-            item {
-                CommonStreamSecurityFields(
-                    state = uiState,
-                    options = options,
-                    scope = scope,
-                    buildProfileItem = { uiState.toProfileItem(initialConfig) }
-                )
-            }
+            CommonBasicFields(uiState)
+            VmessProtocolFields(uiState, securityOptions)
+            CommonNetworkFields(uiState, options)
+            CommonStreamSecurityFields(
+                state = uiState,
+                options = options,
+                scope = scope,
+                buildProfileItem = { uiState.toProfileItem(initialConfig) }
+            )
         }
     }
 
