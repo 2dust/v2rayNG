@@ -31,8 +31,8 @@ class ServerHysteria2Activity : BaseServerActivity() {
             title = serverConfigType.toString(),
             onSaveClick = { saveServer(uiState) }
         ) {
-            item { CommonBasicFields(uiState, showPort = false) }
-            item { Hysteria2ProtocolFields(uiState) }
+            CommonBasicFields(uiState, showPort = false)
+            Hysteria2ProtocolFields(uiState)
 
         }
     }

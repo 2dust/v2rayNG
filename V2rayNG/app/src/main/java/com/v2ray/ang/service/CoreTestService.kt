@@ -59,6 +59,12 @@ class CoreTestService : Service() {
      * @return The start mode.
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        NotificationHelper.startForeground(
+            this,
+            NotificationChannelType.CORE_TEST,
+            getString(R.string.app_name),
+            getString(R.string.title_real_ping_all_server)
+        )
         val message = intent?.serializable<TestServiceMessage>("content")
         if (message == null) {
             stopSelf(startId)
@@ -77,13 +83,6 @@ class CoreTestService : Service() {
 
     private fun handleMeasureStart(message: TestServiceMessage, startId: Int) {
         LogUtil.i(AppConfig.TAG, "CoreTestService starting worker   subscription ${message.subscriptionId}")
-
-        NotificationHelper.startForeground(
-            this,
-            NotificationChannelType.CORE_TEST,
-            getString(R.string.app_name),
-            getString(R.string.title_real_ping_all_server)
-        )
 
         val guidsList = when {
             message.serverGuids.isNotEmpty() -> message.serverGuids

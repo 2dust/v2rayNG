@@ -30,17 +30,15 @@ class ServerTrojanActivity : BaseServerActivity() {
             title = serverConfigType.toString(),
             onSaveClick = { saveServer(uiState) }
         ) {
-            item { CommonBasicFields(uiState) }
-            item { TrojanProtocolFields(uiState) }
-            item { CommonNetworkFields(uiState, options) }
-            item {
-                CommonStreamSecurityFields(
-                    state = uiState,
-                    options = options,
-                    scope = scope,
-                    buildProfileItem = { uiState.toProfileItem(initialConfig) }
-                )
-            }
+            CommonBasicFields(uiState)
+            TrojanProtocolFields(uiState)
+            CommonNetworkFields(uiState, options)
+            CommonStreamSecurityFields(
+                state = uiState,
+                options = options,
+                scope = scope,
+                buildProfileItem = { uiState.toProfileItem(initialConfig) }
+            )
         }
     }
 
