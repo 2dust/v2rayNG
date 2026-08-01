@@ -7,6 +7,7 @@ import android.os.IBinder
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.core.CoreServiceManager
+import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.root.RootProxyManager
 import com.v2ray.ang.util.LogUtil
@@ -39,6 +40,7 @@ class CoreRootService : Service(), ServiceControl {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        NotificationManager.ensureForeground()
         LogUtil.i(AppConfig.TAG, "StartCore-Root: command received")
 
         // Start the in-process core first (this also posts the foreground notification),
