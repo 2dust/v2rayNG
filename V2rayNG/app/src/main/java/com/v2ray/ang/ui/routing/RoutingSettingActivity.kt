@@ -45,20 +45,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.ItemDivider
-import com.v2ray.ang.compose.ReorderableListItem
-import com.v2ray.ang.compose.SelectListDialog
-import com.v2ray.ang.compose.SettingsListItem
-import com.v2ray.ang.compose.colorConfigType
-import com.v2ray.ang.compose.colorFabActive
-import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
+import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.ItemDivider
+import com.v2ray.ang.ui.compose.ReorderableListItem
+import com.v2ray.ang.ui.compose.SelectListDialog
+import com.v2ray.ang.ui.compose.SettingsListItem
+import com.v2ray.ang.ui.compose.colorConfigType
+import com.v2ray.ang.ui.compose.colorFabActive
+import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
@@ -196,7 +196,10 @@ fun RoutingSettingScreen(
 
     val lazyListState = rememberLazyListState()
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        viewModel.swap(from.index - 1, to.index - 1)
+        // Lazy list indices include the preceding non-rule content, so resolve the stable rule keys.
+        val fromIndex = rulesets.indexOfFirst { it.id == from.key }
+        val toIndex = rulesets.indexOfFirst { it.id == to.key }
+        viewModel.move(fromIndex, toIndex)
     }
 
     Scaffold(

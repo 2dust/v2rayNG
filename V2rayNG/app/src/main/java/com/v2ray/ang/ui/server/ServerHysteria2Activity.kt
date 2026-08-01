@@ -6,11 +6,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.FormTextField
-import com.v2ray.ang.compose.SettingsSwitchItem
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.ui.compose.FormTextField
+import com.v2ray.ang.ui.compose.SettingsSwitchItem
 
 class ServerHysteria2Activity : BaseServerActivity() {
 
@@ -18,12 +18,10 @@ class ServerHysteria2Activity : BaseServerActivity() {
 
     @Composable
     override fun ScreenContent() {
-        val options = rememberFieldOptions()
         val scope = rememberCoroutineScope()
         val uiState = rememberSaveable(saver = ServerUiState.Saver) {
             ServerUiState.from(
-                initialConfig = initialConfig,
-                browserDialerDefault = options.browserDialerOptions.firstOrNull() ?: "Disable"
+                initialConfig = initialConfig
             )
         }.apply {
             configType = EConfigType.HYSTERIA2
@@ -33,8 +31,8 @@ class ServerHysteria2Activity : BaseServerActivity() {
             title = serverConfigType.toString(),
             onSaveClick = { saveServer(uiState) }
         ) {
-            item { CommonBasicFields(uiState, showPort = false) }
-            item { Hysteria2ProtocolFields(uiState) }
+            CommonBasicFields(uiState, showPort = false)
+            Hysteria2ProtocolFields(uiState)
 
         }
     }

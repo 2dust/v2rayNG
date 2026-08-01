@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.core.CoreServiceManager
+import com.v2ray.ang.core.LauncherManager
 import com.v2ray.ang.util.LogUtil
 
 class TaskerReceiver : BroadcastReceiver() {
@@ -28,12 +28,12 @@ class TaskerReceiver : BroadcastReceiver() {
                 return
             } else if (switch) {
                 if (guid == AppConfig.TASKER_DEFAULT_GUID) {
-                    CoreServiceManager.startVServiceFromToggle(context)
+                    LauncherManager.startServiceFromToggle(context)
                 } else {
-                    CoreServiceManager.startVService(context, guid)
+                    LauncherManager.startService(context, guid)
                 }
             } else {
-                CoreServiceManager.stopVService(context)
+                LauncherManager.stopService(context)
             }
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Error processing Tasker broadcast", e)

@@ -25,8 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.verticalScrollbar
+import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.verticalScrollbar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

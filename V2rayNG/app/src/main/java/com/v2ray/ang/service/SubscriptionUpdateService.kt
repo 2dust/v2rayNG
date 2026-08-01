@@ -14,8 +14,8 @@ import com.v2ray.ang.enums.NotificationChannelType
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.helper.NotificationHelper
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.NotificationHelper
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,6 +57,12 @@ class SubscriptionUpdateService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        NotificationHelper.startForeground(
+            this,
+            NotificationChannelType.SUBSCRIPTION_UPDATE,
+            getString(R.string.title_pref_auto_update_subscription),
+            getString(R.string.app_name)
+        )
         val message = intent?.serializable<SubscriptionUpdateMessage>("content")
         if (message == null) {
             stopSelf(startId)
@@ -81,13 +87,6 @@ class SubscriptionUpdateService : Service() {
     private fun handleUpdateStart(message: SubscriptionUpdateMessage) {
         LogUtil.i(AppConfig.TAG, "SubscriptionUpdateService starting update task for ${message.subIds.size} subscriptions")
 
-        NotificationHelper.startForeground(
-            this,
-            NotificationChannelType.SUBSCRIPTION_UPDATE,
-            getString(R.string.title_pref_auto_update_subscription),
-            getString(R.string.app_name)
-        )
-
         runningTasks.incrementAndGet()
         serviceScope.launch {
             updateSemaphore.withPermit {
@@ -109,7 +108,7 @@ class SubscriptionUpdateService : Service() {
 
     private suspend fun updateSingle(subId: String, forcedUpdate: Boolean) {
         val subItem = MmkvManager.decodeSubscription(subId) ?: return
-        if(!subItem.enabled || subItem.url.isEmpty()){
+        if (!subItem.enabled || subItem.url.isEmpty()) {
             return
         }
 

@@ -31,9 +31,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppTopBar
 import com.v2ray.ang.shizuku.ShizukuTetheringService
 import com.v2ray.ang.shizuku.tetheringTypeBit
+import com.v2ray.ang.ui.compose.AppTopBar
 
 internal enum class ShizukuStatus(
     val statusRes: Int,

@@ -40,19 +40,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.ConfirmDialog
-import com.v2ray.ang.compose.ItemDivider
-import com.v2ray.ang.compose.QRCodeDialog
-import com.v2ray.ang.compose.ReorderableListItem
-import com.v2ray.ang.compose.SelectListDialog
-import com.v2ray.ang.compose.SettingsSwitchItem
-import com.v2ray.ang.compose.colorFabActive
-import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
+import com.v2ray.ang.ui.compose.ItemDivider
+import com.v2ray.ang.ui.compose.QRCodeDialog
+import com.v2ray.ang.ui.compose.ReorderableListItem
+import com.v2ray.ang.ui.compose.SelectListDialog
+import com.v2ray.ang.ui.compose.SettingsSwitchItem
+import com.v2ray.ang.ui.compose.colorFabActive
+import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
 import sh.calvin.reorderable.ReorderableItem
@@ -121,7 +121,7 @@ fun SubSettingScreen(
 
     val lazyListState = rememberLazyListState()
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        viewModel.swap(from.index, to.index)
+        viewModel.move(from.index, to.index)
     }
 
     Scaffold(
@@ -274,10 +274,8 @@ fun SubSettingScreen(
     }
 
     if (removeTarget != null) {
-        ConfirmDialog(
-            message = stringResource(R.string.del_config_comfirm),
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_subscription_group),
             onConfirm = {
                 onRemoveSub(removeTarget!!)
                 removeTarget = null

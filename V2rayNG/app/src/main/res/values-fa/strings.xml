@@ -39,8 +39,16 @@
     <string name="menu_item_import_config_manually_trojan">افزودن [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">افزودن [Wireguard]</string>
     <string name="menu_item_import_config_manually_hysteria2">افزودن [Hysteria2]</string>
-    <string name="del_config_comfirm">از حذف این کانفیگ اطمینان دارید؟</string>
-    <string name="del_invalid_config_comfirm">لطفاً قبل از حذف، پینگ بگیرید! آیا از حذف اطمینان دارید؟</string>
+    <string name="confirm_delete_visible_profiles">آیا مطمئن هستید که می‌خواهید همه پروفایل‌های نمایش‌داده‌شده را حذف کنید؟</string>
+    <string name="confirm_delete_duplicate_profiles">آیا مطمئن هستید که می‌خواهید همه پروفایل‌های تکراری نمایش‌داده‌شده را حذف کنید؟</string>
+    <string name="confirm_delete_invalid_profiles">لطفاً ابتدا پروفایل‌ها را آزمایش کنید. آیا مطمئن هستید که می‌خواهید همه پروفایل‌های نامعتبر نمایش‌داده‌شده را حذف کنید؟</string>
+    <string name="confirm_delete_profile">آیا مطمئن هستید که می‌خواهید این پروفایل را حذف کنید؟</string>
+    <string name="confirm_delete_policy_group">آیا مطمئن هستید که می‌خواهید این گروه سیاست را حذف کنید؟</string>
+    <string name="confirm_delete_proxy_chain_member">آیا مطمئن هستید که می‌خواهید این عضو زنجیره پراکسی را حذف کنید؟</string>
+    <string name="confirm_delete_routing_rule">آیا مطمئن هستید که می‌خواهید این قانون مسیریابی را حذف کنید؟</string>
+    <string name="confirm_delete_subscription_group">آیا مطمئن هستید که می‌خواهید این گروه اشتراک را حذف کنید؟</string>
+    <string name="confirm_delete_asset_file">آیا مطمئن هستید که می‌خواهید فایل دارایی \"%1$s\" را حذف کنید؟</string>
+    <string name="confirm_delete_asset_source">آیا مطمئن هستید که می‌خواهید این منبع دارایی را حذف کنید؟</string>
     <string name="server_lab_remarks">ملاحظات</string>
     <string name="server_lab_address">نشانی</string>
     <string name="server_lab_port">پورت</string>
@@ -343,7 +351,6 @@
     <string name="routing_settings_protocol">پورتکل</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">شبکه</string>
-    <string name="routing_settings_network_tip">[udp|tcp]</string>
     <string name="routing_settings_outbound_tag">برچسب خروجی</string>
 
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
@@ -461,19 +468,12 @@
     <string name="title_webdav_pass">پسورد</string>
     <string name="title_webdav_remote_path">دایرکتوری راه دور (اختیاری)</string>
 
-    <string-array name="share_method">
-        <item>QRcode</item>
-        <item>خروجی گرفتن در کلیپ‌ بورد</item>
-        <item>خروجی گرفتن کانفیگ کامل در کلیپ بورد</item>
-    </string-array>
-
-    <string-array name="share_method_more">
-        <item>QRcode</item>
-        <item>صادر کردن به کلیپ بورد</item>
-        <item>صادر کردن پیکربندی کامل به کلیپ بورد</item>
-        <item>ویرایش کردن</item>
-        <item>حذف کردن</item>
-    </string-array>
+    <string name="share_method_qrcode">QRcode</string>
+    <string name="share_method_clipboard">خروجی گرفتن در کلیپ‌ بورد</string>
+    <string name="share_method_full_content">خروجی گرفتن کانفیگ کامل در کلیپ بورد</string>
+    <string name="action_edit">ویرایش</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_close">بستن</string>
 
     <string-array name="share_sub_method">
         <item>QRcode</item>

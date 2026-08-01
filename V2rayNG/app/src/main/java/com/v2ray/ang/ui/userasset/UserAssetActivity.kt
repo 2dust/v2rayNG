@@ -45,11 +45,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.ConfirmDialog
-import com.v2ray.ang.compose.ItemDivider
-import com.v2ray.ang.compose.SettingsListItem
-import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
 import com.v2ray.ang.extension.toTrafficString
@@ -59,6 +54,11 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
+import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
+import com.v2ray.ang.ui.compose.ItemDivider
+import com.v2ray.ang.ui.compose.SettingsListItem
+import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
@@ -344,10 +344,8 @@ fun UserAssetScreen(
     if (deleteTargetGuid != null) {
         val guid = deleteTargetGuid!!
         val assetName = assets.find { it.guid == guid }?.assetUrl?.remarks ?: ""
-        ConfirmDialog(
-            message = stringResource(R.string.del_config_comfirm) + "\n$assetName",
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_asset_file, assetName),
             onConfirm = { onRemoveAsset(guid) },
             onDismiss = { deleteTargetGuid = null }
         )

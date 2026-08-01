@@ -2,6 +2,7 @@ package com.v2ray.ang.service
 
 import android.content.Context
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.contracts.IDialerService
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

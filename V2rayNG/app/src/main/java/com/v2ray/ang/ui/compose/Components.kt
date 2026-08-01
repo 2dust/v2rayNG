@@ -1,4 +1,4 @@
-package com.v2ray.ang.compose
+package com.v2ray.ang.ui.compose
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -46,7 +46,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -279,6 +281,17 @@ private fun reorderableElevation(isDragging: Boolean) = animateDpAsState(
 )
 
 @Composable
+fun ReorderableCollectionItemScope.reorderableDragHandle(): Modifier {
+    val hapticFeedback = LocalHapticFeedback.current
+    return Modifier.longPressDraggableHandle(
+        onDragStarted = {
+            // Platform haptics honor the user's touch-feedback setting.
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+        }
+    )
+}
+
+@Composable
 fun ReorderableListItem(
     scope: ReorderableCollectionItemScope,
     isDragging: Boolean,
@@ -292,7 +305,7 @@ fun ReorderableListItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .then(with(scope) { Modifier.longPressDraggableHandle() }),
+                .then(with(scope) { reorderableDragHandle() }),
             verticalAlignment = Alignment.CenterVertically,
             content = content
         )
@@ -309,7 +322,7 @@ fun ReorderableGridItem(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .then(with(scope) { Modifier.longPressDraggableHandle() }),
+            .then(with(scope) { reorderableDragHandle() }),
         shadowElevation = elevation
     ) {
         content()

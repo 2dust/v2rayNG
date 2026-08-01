@@ -6,11 +6,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.FormDropdownField
-import com.v2ray.ang.compose.FormTextField
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.ui.compose.FormDropdownField
+import com.v2ray.ang.ui.compose.FormTextField
 
 class ServerVlessActivity : BaseServerActivity() {
 
@@ -22,8 +22,7 @@ class ServerVlessActivity : BaseServerActivity() {
         val scope = rememberCoroutineScope()
         val uiState = rememberSaveable(saver = ServerUiState.Saver) {
             ServerUiState.from(
-                initialConfig = initialConfig,
-                browserDialerDefault = options.browserDialerOptions.firstOrNull() ?: "Disable"
+                initialConfig = initialConfig
             )
         }.apply {
             configType = EConfigType.VLESS
@@ -34,17 +33,15 @@ class ServerVlessActivity : BaseServerActivity() {
             title = serverConfigType.toString(),
             onSaveClick = { saveServer(uiState) }
         ) {
-            item { CommonBasicFields(uiState) }
-            item { VlessProtocolFields(uiState, flowOptions) }
-            item { CommonNetworkFields(uiState, options) }
-            item {
-                CommonStreamSecurityFields(
-                    state = uiState,
-                    options = options,
-                    scope = scope,
-                    buildProfileItem = { uiState.toProfileItem(initialConfig) }
-                )
-            }
+            CommonBasicFields(uiState)
+            VlessProtocolFields(uiState, flowOptions)
+            CommonNetworkFields(uiState, options)
+            CommonStreamSecurityFields(
+                state = uiState,
+                options = options,
+                scope = scope,
+                buildProfileItem = { uiState.toProfileItem(initialConfig) }
+            )
         }
     }
 

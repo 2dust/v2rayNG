@@ -35,8 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppDivider
-import com.v2ray.ang.compose.verticalScrollbar
+import com.v2ray.ang.ui.compose.AppDivider
+import com.v2ray.ang.ui.compose.verticalScrollbar
 
 @Composable
 fun MainDrawerContent(onNavigate: (String) -> Unit) {

@@ -1,136 +1,12 @@
 package com.v2ray.ang.extension
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.widget.Toast
-import com.v2ray.ang.compose.AppSnackbarManager
-import com.v2ray.ang.compose.ToastType
 import com.v2ray.ang.enums.EConfigType
 import java.io.Serializable
 import java.net.URI
 import java.util.Locale
-
-private inline fun runOnMain(crossinline block: () -> Unit) {
-    if (Looper.myLooper() == Looper.getMainLooper()) {
-        block()
-    } else {
-        Handler(Looper.getMainLooper()).post { block() }
-    }
-}
-
-private inline fun Context.dispatchMessage(
-    message: CharSequence,
-    type: ToastType,
-    long: Boolean = false,
-    crossinline fallback: () -> Unit
-) {
-    val handledBySnackbar = AppSnackbarManager.show(
-        message = message,
-        type = type,
-        long = long
-    )
-    if (!handledBySnackbar) {
-        runOnMain { fallback() }
-    }
-}
-
-/**
- * Shows a toast message with the given resource ID.
- *
- * @param message The resource ID of the message to show.
- */
-fun Context.toast(message: Int) {
-    val text = getString(message)
-    dispatchMessage(text, ToastType.NORMAL) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
-}
-
-/**
- * Shows a toast message with the given text.
- *
- * @param message The text of the message to show.
- */
-fun Context.toast(message: CharSequence) {
-    dispatchMessage(message, ToastType.NORMAL) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-}
-
-/**
- * Shows a toast message with the given resource ID.
- *
- * @param message The resource ID of the message to show.
- */
-fun Context.toastSuccess(message: Int) {
-    val text = getString(message)
-    dispatchMessage(text, ToastType.SUCCESS) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
-}
-
-/**
- * Shows a toast message with the given text.
- *
- * @param message The text of the message to show.
- */
-fun Context.toastSuccess(message: CharSequence) {
-    dispatchMessage(message, ToastType.SUCCESS) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-}
-
-/**
- * Shows a toast message with the given resource ID.
- *
- * @param message The resource ID of the message to show.
- */
-fun Context.toastError(message: Int) {
-    val text = getString(message)
-    dispatchMessage(text, ToastType.ERROR) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
-}
-
-/**
- * Shows a toast message with the given text.
- *
- * @param message The text of the message to show.
- */
-fun Context.toastError(message: CharSequence) {
-    dispatchMessage(message, ToastType.ERROR) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-}
-
-/**
- * Shows an info toast message with the given resource ID.
- *
- * @param message The resource ID of the message to show.
- */
-fun Context.toastInfo(message: Int) {
-    val text = getString(message)
-    dispatchMessage(text, ToastType.INFO) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
-}
-
-/**
- * Shows an info toast message with the given text.
- *
- * @param message The text of the message to show.
- */
-fun Context.toastInfo(message: CharSequence) {
-    dispatchMessage(message, ToastType.INFO) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-}
 
 const val THRESHOLD = 1000L
 const val DIVISOR = 1024.0
@@ -162,56 +38,6 @@ val URI.idnHost: String
     get() = host?.replace("[", "")?.replace("]", "").orEmpty()
 
 /**
- * Removes all whitespace from the string.
- *
- * @return The string without whitespace.
- */
-fun String?.removeWhiteSpace(): String? = this?.replace(" ", "")
-
-/**
- * Returns null if the string is null or blank, otherwise returns the string itself.
- *
- * @return The string or null.
- */
-fun String?.nullIfBlank(): String? = this?.takeIf { it.isNotBlank() }
-
-/**
- * Converts the string to a Long value, or returns 0 if the conversion fails.
- *
- * @return The Long value.
- */
-fun String.toLongEx(): Long = toLongOrNull() ?: 0
-
-/**
- * Listens for package changes and executes a callback when a change occurs.
- *
- * @param onetime Whether to unregister the receiver after the first callback.
- * @param callback The callback to execute when a package change occurs.
- * @return The BroadcastReceiver that was registered.
- */
-fun Context.listenForPackageChanges(onetime: Boolean = true, callback: () -> Unit) =
-    object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            callback()
-            if (onetime) context.unregisterReceiver(this)
-        }
-    }.apply {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(this, IntentFilter().apply {
-                addAction(Intent.ACTION_PACKAGE_ADDED)
-                addAction(Intent.ACTION_PACKAGE_REMOVED)
-                addDataScheme("package")
-            }, Context.RECEIVER_EXPORTED)
-        } else {
-            registerReceiver(this, IntentFilter().apply {
-                addAction(Intent.ACTION_PACKAGE_ADDED)
-                addAction(Intent.ACTION_PACKAGE_REMOVED)
-                addDataScheme("package")
-            })
-        }
-    }
-
-/**
  * Retrieves a serializable object from the Bundle.
  *
  * @param key The key of the serializable object.
@@ -231,37 +57,6 @@ inline fun <reified T : Serializable> Bundle.serializable(key: String): T? = whe
 inline fun <reified T : Serializable> Intent.serializable(key: String): T? = when {
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializableExtra(key, T::class.java)
     else -> @Suppress("DEPRECATION") getSerializableExtra(key) as? T
-}
-
-/**
- * Checks if the CharSequence is not null and not empty.
- *
- * @return True if the CharSequence is not null and not empty, false otherwise.
- */
-fun CharSequence?.isNotNullEmpty(): Boolean = !this.isNullOrBlank()
-
-fun String.concatUrl(vararg paths: String): String {
-    val builder = StringBuilder(this.trimEnd('/'))
-
-    paths.forEach { path ->
-        val trimmedPath = path.trim('/')
-        if (trimmedPath.isNotEmpty()) {
-            builder.append('/').append(trimmedPath)
-        }
-    }
-
-    return builder.toString()
-}
-
-/**
- * Helper function to match text either by Regex or literal string.
- */
-fun String.matchesPattern(regex: Regex?, keyword: String?, ignoreCase: Boolean = true): Boolean {
-    if (keyword.isNullOrEmpty()) {
-        return true
-    }
-    return regex?.containsMatchIn(this)
-        ?: this.contains(keyword, ignoreCase = ignoreCase)
 }
 
 /**

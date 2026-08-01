@@ -7,6 +7,7 @@ import android.os.IBinder
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.core.CoreServiceManager
+import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.MyContextWrapper
@@ -30,8 +31,15 @@ class CoreProxyOnlyService : Service(), ServiceControl {
      * @return The start mode.
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        NotificationManager.ensureForeground()
         LogUtil.i(AppConfig.TAG, "StartCore-Proxy: Service command received")
-        CoreServiceManager.startCoreLoop(null)
+
+        if (!CoreServiceManager.startCoreLoop(null)) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Proxy: Failed to start core loop")
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
         return START_STICKY
     }
 

@@ -41,16 +41,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppDivider
-import com.v2ray.ang.compose.AppListItem
-import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.ItemDivider
-import com.v2ray.ang.compose.colorFabActive
-import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.extension.toastInfo
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.compose.AppDivider
+import com.v2ray.ang.ui.compose.AppListItem
+import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.ItemDivider
+import com.v2ray.ang.ui.compose.colorFabActive
+import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
 
 class PerAppProxyActivity : BaseComponentActivity() {

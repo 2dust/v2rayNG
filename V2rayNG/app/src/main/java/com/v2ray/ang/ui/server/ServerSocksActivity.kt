@@ -5,8 +5,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.FormTextField
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.ui.compose.FormTextField
 
 class ServerSocksActivity : BaseServerActivity() {
 
@@ -14,12 +14,10 @@ class ServerSocksActivity : BaseServerActivity() {
 
     @Composable
     override fun ScreenContent() {
-        val options = rememberFieldOptions()
         val scope = rememberCoroutineScope()
         val uiState = rememberSaveable(saver = ServerUiState.Saver) {
             ServerUiState.from(
-                initialConfig = initialConfig,
-                browserDialerDefault = options.browserDialerOptions.firstOrNull() ?: "Disable"
+                initialConfig = initialConfig
             )
         }.apply {
             configType = serverConfigType
@@ -29,8 +27,8 @@ class ServerSocksActivity : BaseServerActivity() {
             title = serverConfigType.toString(),
             onSaveClick = { saveServer(uiState) }
         ) {
-            item { CommonBasicFields(uiState) }
-            item { SocksProtocolFields(uiState) }
+            CommonBasicFields(uiState)
+            SocksProtocolFields(uiState)
 
         }
     }

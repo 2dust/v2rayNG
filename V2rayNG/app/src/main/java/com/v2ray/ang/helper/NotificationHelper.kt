@@ -1,4 +1,4 @@
-package com.v2ray.ang.util
+package com.v2ray.ang.helper
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -160,4 +160,3 @@ object NotificationHelper {
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
     }
 }
-

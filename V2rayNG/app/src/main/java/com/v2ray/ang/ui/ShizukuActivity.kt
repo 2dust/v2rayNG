@@ -23,13 +23,13 @@ import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastInfo
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.shizuku.HotspotRoutingConfig
 import com.v2ray.ang.shizuku.ICoreTetheringLease
 import com.v2ray.ang.shizuku.IShizukuTetheringService
 import com.v2ray.ang.shizuku.ShizukuTetheringService
 import com.v2ray.ang.shizuku.coreTetheringLease
 import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -169,11 +169,11 @@ class ShizukuActivity : BaseComponentActivity() {
     }
 
     private fun queryCoreState() {
-        MessageUtil.sendMsg2Service(this, AppConfig.MSG_REGISTER_CLIENT, "")
+        MessageHelper.sendMsg2Service(this, AppConfig.MSG_REGISTER_CLIENT, "")
     }
 
     private fun requestCoreSnapshotAsync() {
-        MessageUtil.sendMsg2Service(this, AppConfig.MSG_QUERY_HOTSPOT_CONFIG, "")
+        MessageHelper.sendMsg2Service(this, AppConfig.MSG_QUERY_HOTSPOT_CONFIG, "")
     }
 
     private fun refreshShizukuStatus() {

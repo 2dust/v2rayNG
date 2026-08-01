@@ -11,8 +11,9 @@ import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreServiceManager
+import com.v2ray.ang.core.LauncherManager
+import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import java.lang.ref.SoftReference
 
@@ -50,7 +51,7 @@ class QSTileService : TileService() {
         mMsgReceive = ReceiveMessageHandler(this)
         val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY)
         ContextCompat.registerReceiver(applicationContext, mMsgReceive, mFilter, Utils.receiverFlags())
-        MessageUtil.sendMsg2Service(this, AppConfig.MSG_REGISTER_CLIENT, "")
+        MessageHelper.sendMsg2Service(this, AppConfig.MSG_REGISTER_CLIENT, "")
     }
 
     /**
@@ -75,11 +76,11 @@ class QSTileService : TileService() {
         super.onClick()
         when (qsTile.state) {
             Tile.STATE_INACTIVE -> {
-                CoreServiceManager.startVServiceFromToggle(this)
+                LauncherManager.startServiceFromToggle(this)
             }
 
             Tile.STATE_ACTIVE -> {
-                CoreServiceManager.stopVService(this)
+                LauncherManager.stopService(this)
             }
         }
     }

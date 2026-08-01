@@ -34,12 +34,6 @@ import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.R
-import com.v2ray.ang.compose.AppTopBar
-import com.v2ray.ang.compose.ConfirmDialog
-import com.v2ray.ang.compose.FormDropdownField
-import com.v2ray.ang.compose.FormTextField
-import com.v2ray.ang.compose.SettingsSwitchItem
-import com.v2ray.ang.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.extension.toast
@@ -47,10 +41,18 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.apppicker.AppPickerActivity
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
+import com.v2ray.ang.ui.compose.FormDropdownField
+import com.v2ray.ang.ui.compose.FormTextField
+import com.v2ray.ang.ui.compose.SettingsSwitchItem
+import com.v2ray.ang.ui.compose.verticalScrollbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
+
+private val ROUTING_NETWORK_OPTIONS = listOf("tcp", "udp", "tcp,udp")
 
 class RoutingEditActivity : BaseComponentActivity() {
     private val position by lazy { intent.getIntExtra("position", -1) }
@@ -130,6 +132,7 @@ fun RoutingEditScreen(
         mutableStateOf(initial?.outboundTag ?: BUILTIN_OUTBOUND_TAGS.first())
     }
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
+    val selectedNetwork = network.ifBlank { "tcp,udp" }
 
     val processPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -273,10 +276,10 @@ fun RoutingEditScreen(
                 value = protocol,
                 onValueChange = { protocol = it }
             )
-            FormTextField(
+            FormDropdownField(
                 label = stringResource(R.string.routing_settings_network),
-                placeholder = stringResource(R.string.routing_settings_network_tip),
-                value = network,
+                value = selectedNetwork,
+                options = ROUTING_NETWORK_OPTIONS,
                 onValueChange = { network = it }
             )
             FormDropdownField(
@@ -290,10 +293,8 @@ fun RoutingEditScreen(
         }
 
         if (showDeleteConfirm) {
-            ConfirmDialog(
-                message = stringResource(R.string.del_config_comfirm),
-                confirmText = stringResource(android.R.string.ok),
-                dismissText = stringResource(android.R.string.cancel),
+            DeleteConfirmDialog(
+                message = stringResource(R.string.confirm_delete_routing_rule),
                 onConfirm = onDelete,
                 onDismiss = { showDeleteConfirm = false }
             )

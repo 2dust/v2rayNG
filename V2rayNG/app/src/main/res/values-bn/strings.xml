@@ -39,8 +39,16 @@
     <string name="menu_item_import_config_manually_trojan">ম্যানুয়ালি টাইপ করুন [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">ম্যানুয়ালি টাইপ করুন [Wireguard]</string>
     <string name="menu_item_import_config_manually_hysteria2">Type manually[Hysteria2]</string>
-    <string name="del_config_comfirm">মুছে ফেলুন নিশ্চিত করুন？</string>
-    <string name="del_invalid_config_comfirm">Please test before deleting! Confirm delete ?</string>
+    <string name="confirm_delete_visible_profiles">আপনি কি বর্তমানে প্রদর্শিত সব প্রোফাইল মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_duplicate_profiles">আপনি কি বর্তমানে প্রদর্শিত সব সদৃশ প্রোফাইল মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_invalid_profiles">প্রথমে প্রোফাইলগুলো পরীক্ষা করুন। আপনি কি বর্তমানে প্রদর্শিত সব অবৈধ প্রোফাইল মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_profile">আপনি কি এই প্রোফাইলটি মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_policy_group">আপনি কি এই পলিসি গ্রুপটি মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_proxy_chain_member">আপনি কি এই প্রক্সি চেইন সদস্যটিকে মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_routing_rule">আপনি কি এই রাউটিং নিয়মটি মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_subscription_group">আপনি কি এই সাবস্ক্রিপশন গ্রুপটি মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_asset_file">আপনি কি \"%1$s\" অ্যাসেট ফাইলটি মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_asset_source">আপনি কি এই অ্যাসেট উৎসটি মুছে ফেলতে চান?</string>
     <string name="server_lab_remarks">মন্তব্য</string>
     <string name="server_lab_address">ঠিকানা</string>
     <string name="server_lab_port">পোর্ট</string>
@@ -346,7 +354,6 @@
     <string name="routing_settings_protocol">protocol</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">network</string>
-    <string name="routing_settings_network_tip">[udp|tcp]</string>
     <string name="routing_settings_outbound_tag">outboundTag</string>
 
     <string name="connection_test_pending">সংযোগ পরীক্ষা করুন</string>
@@ -464,19 +471,12 @@
     <string name="title_webdav_pass">Password</string>
     <string name="title_webdav_remote_path">Remote directory (optional)</string>
 
-    <string-array name="share_method">
-        <item>QR কোড</item>
-        <item>ক্লিপবোর্ডে রপ্তানি করুন</item>
-        <item>পূর্ণ কনফিগারেশন ক্লিপবোর্ডে রপ্তানি করুন</item>
-    </string-array>
-
-    <string-array name="share_method_more">
-        <item>QRcode</item>
-        <item>Export to clipboard</item>
-        <item>Export full configuration to clipboard</item>
-        <item>Edit</item>
-        <item>Delete</item>
-    </string-array>
+    <string name="share_method_qrcode">QR কোড</string>
+    <string name="share_method_clipboard">ক্লিপবোর্ডে রপ্তানি করুন</string>
+    <string name="share_method_full_content">পূর্ণ কনফিগারেশন ক্লিপবোর্ডে রপ্তানি করুন</string>
+    <string name="action_edit">সম্পাদনা</string>
+    <string name="action_delete">মুছুন</string>
+    <string name="action_close">বন্ধ করুন</string>
 
     <string-array name="share_sub_method">
         <item>QR কোড</item>
