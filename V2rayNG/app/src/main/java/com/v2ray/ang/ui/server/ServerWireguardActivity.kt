@@ -28,8 +28,8 @@ class ServerWireguardActivity : BaseServerActivity() {
             title = serverConfigType.toString(),
             onSaveClick = { saveServer(uiState) }
         ) {
-            item { CommonBasicFields(uiState) }
-            item { WireguardProtocolFields(uiState) }
+            CommonBasicFields(uiState)
+            WireguardProtocolFields(uiState)
 
         }
     }

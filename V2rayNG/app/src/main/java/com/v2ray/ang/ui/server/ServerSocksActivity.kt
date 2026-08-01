@@ -27,8 +27,8 @@ class ServerSocksActivity : BaseServerActivity() {
             title = serverConfigType.toString(),
             onSaveClick = { saveServer(uiState) }
         ) {
-            item { CommonBasicFields(uiState) }
-            item { SocksProtocolFields(uiState) }
+            CommonBasicFields(uiState)
+            SocksProtocolFields(uiState)
 
         }
     }
