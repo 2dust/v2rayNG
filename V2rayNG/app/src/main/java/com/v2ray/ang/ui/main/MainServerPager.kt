@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.main
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -119,7 +120,7 @@ fun ProfileCard(
                 }
                 
                 IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(32.dp)) {
-                    Icon(painterResource(id = android.R.drawable.ic_menu_revert), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
                 }
                 Spacer(Modifier.width(8.dp))
                 IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(32.dp)) {
@@ -128,9 +129,8 @@ fun ProfileCard(
                 Spacer(Modifier.width(8.dp))
                 Box {
                     IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_menu_more), contentDescription = "Меню", tint = Color.Gray)
+                        Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
                     }
-                    // Выпадающее меню с 1 кнопкой редактирования конкретного профиля
                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         DropdownMenuItem(
                             text = { Text("Редактировать профиль") },
@@ -161,12 +161,11 @@ fun ProfileCard(
                     }, 
                     modifier = Modifier.size(24.dp)
                 ) {
-                    Icon(painterResource(id = R.drawable.ic_menu_info_details), contentDescription = "Info", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0))
                 }
                 
                 Spacer(Modifier.width(12.dp))
                 
-                // Используем CircleShape вместо RoundedCornerShape для 100% безопасной компиляции
                 Box(modifier = Modifier
                     .border(1.dp, Color.LightGray, CircleShape)
                     .padding(horizontal = 24.dp, vertical = 4.dp)) {
@@ -183,7 +182,7 @@ fun ProfileCard(
                     }, 
                     modifier = Modifier.size(24.dp)
                 ) {
-                    Icon(painterResource(id = R.drawable.ic_menu_share), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
                 }
             }
             
@@ -239,7 +238,7 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         
-                        // ПАРСИМ ПРОТОКОЛЫ КРАСИВО
+                        // Парсим протоколы красиво
                         val configType = serverCache.profile.configType.name.uppercase()
                         val network = serverCache.profile.network?.uppercase()?.takeIf { it.isNotBlank() } ?: "TCP"
                         val security = serverCache.profile.security?.uppercase()?.takeIf { it.isNotBlank() && it != "NONE" }
