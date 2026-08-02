@@ -8,6 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -99,10 +101,10 @@ fun ProfileCard(
     subscription: SubscriptionCache,
     servers: List<ServersCache>,
     selectedGuid: String?,
-    onAction: (MainAction) -> Unit,
     onPingProfile: (String) -> Unit,
     onUpdateSubscription: (String) -> Unit,
-    onSelectServer: (String) -> Unit
+    onSelectServer: (String) -> Unit,
+    onEditServer: (String) -> Unit
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -277,9 +279,9 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Редактировать сервер
+                    // Кликабельная стрелочка "Редактировать"
                     IconButton(
-                        onClick = { onAction(MainAction.EditServer(serverCache.guid)) },
+                        onClick = { onEditServer(serverCache.guid) },
                         modifier = Modifier.size(40.dp)
                     ) {
                         ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
@@ -290,6 +292,7 @@ fun ProfileCard(
     }
 }
 
+// 100% Оригинальная сигнатура
 @Composable
 fun GroupPagerPage(
     groupId: String,
@@ -298,8 +301,8 @@ fun GroupPagerPage(
     doubleColumnDisplay: Boolean,
     confirmRemove: Boolean,
     searchQuery: String,
-    lazyListStates: MutableMap<String, androidx.compose.foundation.lazy.LazyListState>,
-    lazyGridStates: MutableMap<String, androidx.compose.foundation.lazy.grid.LazyGridState>,
+    lazyListStates: MutableMap<String, LazyListState>,
+    lazyGridStates: MutableMap<String, LazyGridState>,
     onSelectServer: (String) -> Unit,
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
