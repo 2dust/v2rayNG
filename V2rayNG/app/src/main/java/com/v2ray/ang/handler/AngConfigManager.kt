@@ -575,26 +575,32 @@ object AngConfigManager {
                 LogUtil.e(AppConfig.TAG, "Failed to get HWID for headers", e)
             }
 
-            // Подготавливаем заголовки для запроса
-            val requestHeaders = mutableMapOf<String, String>()
+            // Собираем заголовки в Map, учитывая уже существующие
+            val headersMap = mutableMapOf<String, String>()
             try {
-                it.subscription.requestHeaders?.let { existing ->
-                    if (existing is Map<*, *>) {
-                        for ((k, v) in existing) {
-                            if (k is String && v is String) {
-                                requestHeaders[k] = v
-                            }
-                        }
+                val existingHeadersStr = it.subscription.requestHeaders
+                if (!existingHeadersStr.isNullOrEmpty()) {
+                    val type = object : com.google.gson.reflect.TypeToken<Map<String, String>>() {}.type
+                    val parsed = com.google.gson.Gson().fromJson<Map<String, String>>(existingHeadersStr, type)
+                    if (parsed != null) {
+                        headersMap.putAll(parsed)
                     }
                 }
             } catch (e: Exception) {
-                // игнорируем ошибки маппинга
+                // Игнорируем ошибки парсинга старых заголовков
             }
 
-            // Передаем заголовки, которые требует Remnawave
-            requestHeaders["x-hwid"] = hwid
-            requestHeaders["x-device-os"] = "Android"
-            requestHeaders["x-device-model"] = android.os.Build.MODEL ?: "Android"
+            // Добавляем обязательные для Remnawave параметры
+            headersMap["x-hwid"] = hwid
+            headersMap["x-device-os"] = "Android"
+            headersMap["x-device-model"] = android.os.Build.MODEL ?: "Android"
+
+            // Переводим обратно в JSON-строку, которую ожидает UrlContentRequest
+            val finalHeadersJson = try {
+                com.google.gson.Gson().toJson(headersMap)
+            } catch (e: Exception) {
+                null
+            }
             // ------------------------------------------------------------------
 
             LogUtil.i(AppConfig.TAG, url)
@@ -608,7 +614,7 @@ object AngConfigManager {
                     UrlContentRequest(
                         url = url,
                         userAgent = userAgent,
-                        requestHeaders = requestHeaders, // <-- здесь полетят наши заголовки с x-hwid
+                        requestHeaders = finalHeadersJson, // Передаем корректную JSON-строку
                         timeout = 15000,
                         httpPort = httpPort,
                         proxyUsername = proxyUsername,
@@ -625,7 +631,7 @@ object AngConfigManager {
                         UrlContentRequest(
                             url = url,
                             userAgent = userAgent,
-                            requestHeaders = requestHeaders // <-- и здесь тоже
+                            requestHeaders = finalHeadersJson // И здесь тоже JSON-строка
                         )
                     )
                 } catch (e: Exception) {
@@ -655,6 +661,7 @@ object AngConfigManager {
             return SubscriptionUpdateResult(failureCount = 1)
         }
     }
+    
     
     
     /**
