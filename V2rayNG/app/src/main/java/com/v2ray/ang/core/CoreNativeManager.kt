@@ -8,7 +8,6 @@ import go.Seq
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
 import libv2ray.Libv2ray
-import libv2ray.ProbeController
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -67,9 +66,6 @@ object CoreNativeManager {
             "Unknown"
         }
     }
-
-    fun newProbeController(): ProbeController =
-        Libv2ray.newProbeController()
 
     /**
      * Measure outbound connection delay.

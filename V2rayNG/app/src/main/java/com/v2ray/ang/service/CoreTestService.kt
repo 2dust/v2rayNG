@@ -22,7 +22,6 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.helper.NotificationHelper
 import com.v2ray.ang.util.LogUtil
-import java.util.concurrent.atomic.AtomicBoolean
 
 class CoreTestService : Service() {
     @Volatile
@@ -30,7 +29,6 @@ class CoreTestService : Service() {
     @Volatile
     private var replacementRequested = false
     private var batchStarted = false
-    private val batchFinished = AtomicBoolean(false)
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(newBase?.let(AppLocaleManager::localizedContext))
@@ -65,9 +63,6 @@ class CoreTestService : Service() {
         LogUtil.i(AppConfig.TAG, "CoreTestService is being destroyed")
         activeWorker?.cancel()
         activeWorker = null
-        if (!replacementRequested && batchFinished.compareAndSet(false, true)) {
-            MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_FINISH, "-1")
-        }
         NotificationHelper.stopForeground(this)
         super.onDestroy()
         // A new process for every batch prevents Xray's process-wide state from
@@ -114,7 +109,6 @@ class CoreTestService : Service() {
             else -> MmkvManager.decodeAllServerList()
         }
         if (guids.isEmpty()) {
-            batchFinished.set(true)
             MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_FINISH, "0")
             NotificationHelper.stopForeground(this)
             stopSelf(startId)
@@ -172,7 +166,6 @@ class CoreTestService : Service() {
                         AngConfigManager.sortByTestResultsForSub(message.subscriptionId)
                     }
                 }
-                if (!batchFinished.compareAndSet(false, true)) return
                 MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_FINISH, event.status)
                 activeWorker = null
                 NotificationHelper.stopForeground(this)

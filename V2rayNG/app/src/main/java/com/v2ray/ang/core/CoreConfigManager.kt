@@ -70,10 +70,7 @@ object CoreConfigManager {
             if (configContext.isCustom) {
                 return buildV2rayCustomConfig(configContext)
             }
-            val v2rayConfig = buildUnifiedConfig(configContext)
-            postProcessForSpeedtest(v2rayConfig)
-
-            return toConfigResult(configContext, v2rayConfig)
+            return toConfigResult(configContext, buildSpeedtestConfig(configContext))
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to get V2ray config for speedtest", e)
             return ConfigResult(
@@ -85,14 +82,22 @@ object CoreConfigManager {
     }
 
     /** Builds one isolated Xray configuration for a complete UI delay-test batch. */
-    fun getV2rayConfig4BatchSpeedtest(context: Context, guids: List<String>): ProbePlan {
+    fun getProbePlan(context: Context, guids: List<String>): ProbePlan {
         val sources = mutableListOf<ProbeConfigBuilder.Source>()
+        val individualGuids = mutableListOf<String>()
         val failedGuids = mutableListOf<String>()
         guids.distinct().forEach { guid ->
-            val result = getV2rayConfig4Speedtest(context, guid)
-            if (result.status && result.content.isNotBlank()) {
-                sources += ProbeConfigBuilder.Source(guid, result.content)
-            } else {
+            try {
+                val configContext = CoreConfigContextBuilder.build(context, guid)
+                if (configContext == null) {
+                    failedGuids += guid
+                } else if (configContext.isCustom) {
+                    individualGuids += guid
+                } else {
+                    sources += ProbeConfigBuilder.Source(guid, buildSpeedtestConfig(configContext))
+                }
+            } catch (error: Exception) {
+                LogUtil.e(AppConfig.TAG, "Failed to build probe config for $guid", error)
                 failedGuids += guid
             }
         }
@@ -100,8 +105,14 @@ object CoreConfigManager {
             sources = sources,
             destination = SettingsManager.getDelayTestUrl(),
         )
-        return plan.copy(failedGuids = (failedGuids + plan.failedGuids).distinct())
+        return plan.copy(
+            individualGuids = (individualGuids + plan.individualGuids).distinct(),
+            failedGuids = failedGuids,
+        )
     }
+
+    private fun buildSpeedtestConfig(configContext: CoreConfigContext): V2rayConfig =
+        buildUnifiedConfig(configContext).also(::postProcessForSpeedtest)
 
     /**
      * Build configuration for custom profiles.

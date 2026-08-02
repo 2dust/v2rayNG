@@ -20,23 +20,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import libv2ray.Libv2ray
 import libv2ray.ProbeHandler
-import java.util.concurrent.atomic.AtomicBoolean
 
 /** Runs one progressively reported delay-test batch through one native core. */
 class RealPingWorkerService(
     private val context: Context,
-    private val guids: List<String>,
+    guids: List<String>,
     private val onlyTcp: Boolean = false,
     private val onEvent: (RealPingEvent) -> Unit = {},
 ) {
+    private val guids = guids.distinct()
     private val job = Job()
     private val scope = CoroutineScope(job + Dispatchers.IO + CoroutineName("ProbeBatch"))
-    private val controller = CoreNativeManager.newProbeController()
-    private val finished = AtomicBoolean(false)
+    private val controller = Libv2ray.newProbeController()
+    @Volatile
+    private var finished = false
     private val emittedDelays = mutableMapOf<String, Long>()
-    private val completedGuids = mutableSetOf<String>()
-    private var totalProfiles = 0
+    private val pendingGuids = guids.toMutableSet()
 
     fun start() {
         if (onlyTcp) {
@@ -45,8 +46,7 @@ class RealPingWorkerService(
         }
         scope.launch {
             try {
-                val plan = CoreConfigManager.getV2rayConfig4BatchSpeedtest(context, guids)
-                totalProfiles = (plan.profiles.map { it.guid } + plan.failedGuids).distinct().size
+                val plan = CoreConfigManager.getProbePlan(context, guids)
                 plan.failedGuids.forEach { emitResult(it, -1L, completed = true) }
                 if (plan.profiles.isNotEmpty()) {
                     val concurrency = SettingsManager.getRealPingConcurrency()
@@ -66,29 +66,27 @@ class RealPingWorkerService(
                                 alive: Boolean,
                                 completed: Boolean,
                             ): Long {
-                                groupID?.let {
-                                    emitResult(it, if (alive) delay else -1L, completed)
-                                }
+                                emitResult(groupID!!, if (alive) delay else -1L, completed)
                                 return 0
                             }
                         },
                     )
                 }
-                completeMissing(plan.profiles.map { it.guid } + plan.failedGuids)
+                probeIndividually(plan.individualGuids)
                 finish("0")
             } catch (_: CancellationException) {
                 finish("-1")
             } catch (error: Throwable) {
-                if (!finished.get()) {
+                if (!finished) {
                     LogUtil.e(AppConfig.TAG, "Probe batch failed", error)
-                    finish("-1")
+                    failPending()
+                    finish("0")
                 }
             }
         }
     }
 
     private fun startTcpBatch() {
-        totalProfiles = guids.size
         val dispatcher = Dispatchers.IO.limitedParallelism(SettingsManager.getRealPingConcurrency())
         val jobs = guids.map { guid ->
             scope.launch(dispatcher) {
@@ -111,31 +109,40 @@ class RealPingWorkerService(
         finish("-1")
     }
 
+    private suspend fun probeIndividually(individualGuids: List<String>) {
+        val dispatcher = Dispatchers.IO.limitedParallelism(SettingsManager.getRealPingConcurrency())
+        individualGuids.map { guid ->
+            scope.launch(dispatcher) {
+                emitResult(guid, startRealPing(guid), completed = true)
+            }
+        }.joinAll()
+    }
+
     @Synchronized
-    private fun completeMissing(allGuids: List<String>) {
-        allGuids.distinct().forEach { guid ->
-            if (guid !in completedGuids) emitResult(guid, emittedDelays[guid] ?: -1L, completed = true)
+    private fun failPending() {
+        pendingGuids.toList().forEach { guid ->
+            emitResult(guid, emittedDelays[guid] ?: -1L, completed = true)
         }
     }
 
     @Synchronized
     private fun emitResult(guid: String, delay: Long, completed: Boolean) {
-        if (finished.get()) return
+        if (finished) return
         if (emittedDelays[guid] != delay) {
             emittedDelays[guid] = delay
             onEvent(RealPingEvent.Result(guid, delay))
         }
-        if (completed && completedGuids.add(guid)) {
-            val remaining = (totalProfiles - completedGuids.size).coerceAtLeast(0)
-            onEvent(RealPingEvent.Progress("$remaining / $totalProfiles"))
+        if (completed) {
+            pendingGuids.remove(guid)
+            onEvent(RealPingEvent.Progress("${pendingGuids.size} / ${guids.size}"))
         }
     }
 
     @Synchronized
     private fun finish(status: String) {
-        if (finished.compareAndSet(false, true)) {
-            onEvent(RealPingEvent.Finish(status))
-        }
+        if (finished) return
+        finished = true
+        onEvent(RealPingEvent.Finish(status))
     }
 
     private fun startTcping(guid: String): Long {
@@ -150,5 +157,21 @@ class RealPingWorkerService(
             return SpeedtestManager.socketConnectTime(config.server.orEmpty(), config.serverPort.orEmpty().toInt(), 1000)
         }
         return -1L
+    }
+
+    private fun startRealPing(guid: String): Long {
+        val config = MmkvManager.decodeServerConfig(guid) ?: return -1L
+        if (!config.configType.isComplexType() &&
+            config.configType != EConfigType.HYSTERIA2 &&
+            config.configType != EConfigType.WIREGUARD &&
+            config.alpn?.startsWith("h3") != true &&
+            config.server.isNotNullEmpty() &&
+            config.serverPort?.toIntOrNull() != null &&
+            SpeedtestManager.socketConnectTime(config.server.orEmpty(), config.serverPort.orEmpty().toInt(), 1000) <= -1L
+        ) return -1L
+
+        val configResult = CoreConfigManager.getV2rayConfig4Speedtest(context, guid)
+        if (!configResult.status) return -1L
+        return CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
     }
 }

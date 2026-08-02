@@ -9,5 +9,6 @@ data class ProbeProfile(
 data class ProbePlan(
     val content: String,
     val profiles: List<ProbeProfile>,
-    val failedGuids: List<String>,
+    val individualGuids: List<String> = emptyList(),
+    val failedGuids: List<String> = emptyList(),
 )
