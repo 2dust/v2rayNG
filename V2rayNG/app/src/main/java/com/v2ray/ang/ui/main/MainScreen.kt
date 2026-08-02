@@ -1,5 +1,8 @@
 package com.v2ray.ang.ui.main
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -68,10 +71,18 @@ fun MainScreen(
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val subscriptions by mainViewModel.subscriptions.collectAsStateWithLifecycle()
     val isImporting by mainViewModel.isImporting.collectAsStateWithLifecycle()
+    val importError by mainViewModel.importError.collectAsStateWithLifecycle()
 
     var showImportMenu by remember { mutableStateOf(false) }
 
-    // Таймер подключения
+    // Очистка ошибки через 3 секунды
+    LaunchedEffect(importError) {
+        if (importError != null) {
+            delay(3000)
+            mainViewModel.importError.value = null
+        }
+    }
+
     var uptime by remember { mutableLongStateOf(0L) }
     LaunchedEffect(uiState.isRunning, uiState.serviceStartTime) {
         if (uiState.isRunning && uiState.serviceStartTime != null) {
@@ -229,6 +240,7 @@ fun MainScreen(
                                 subscription = subCache,
                                 servers = servers,
                                 selectedGuid = uiState.selectedGuid,
+                                onAction = onAction,
                                 onPingProfile = { guid -> 
                                     mainViewModel.onAction(MainAction.SelectGroup(guid))
                                     mainViewModel.onAction(MainAction.TestProfileTcpPing(guid)) 
@@ -238,8 +250,7 @@ fun MainScreen(
                                 },
                                 onSelectServer = { guid -> 
                                     onAction?.invoke(MainAction.SelectServer(guid)) ?: mainViewModel.onAction(MainAction.SelectServer(guid)) 
-                                },
-                                onEditServer = { guid, profile -> onEditServer?.invoke(guid, profile) }
+                                }
                             )
                         }
                     }
@@ -247,13 +258,17 @@ fun MainScreen(
             }
         }
         
-        // Анимация загрузки
-        if (isImporting) {
+        // Анимация импорта
+        AnimatedVisibility(
+            visible = isImporting,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.4f))
-                    .clickable(enabled = false) {}, // Блокируем нажатия
+                    .clickable(enabled = false) {}, // Блокируем UI
                 contentAlignment = Alignment.Center
             ) {
                 Card(
@@ -261,14 +276,34 @@ fun MainScreen(
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
-                        modifier = Modifier.padding(24.dp),
+                        modifier = Modifier.padding(32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        CircularProgressIndicator(color = Color(0xFF5C6BC0))
+                        CircularProgressIndicator(color = Color(0xFF5C6BC0), strokeWidth = 4.dp)
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("Импорт подписки...", fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
+                        Text("Обновление подписки...", fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), fontSize = 16.sp)
                     }
                 }
+            }
+        }
+
+        // Вывод ошибки импорта
+        AnimatedVisibility(
+            visible = importError != null,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp)
+        ) {
+            Card(
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF44336))
+            ) {
+                Text(
+                    text = importError ?: "", 
+                    color = Color.White, 
+                    fontWeight = FontWeight.Bold, 
+                    modifier = Modifier.padding(16.dp)
+                )
             }
         }
     }
