@@ -16,11 +16,17 @@ import com.v2ray.ang.R
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
-    onAction: (MainAction) -> Unit,
-    onNavigate: (String) -> Unit
+    onAddServer: () -> Unit,
+    onScanQR: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenSubscriptions: () -> Unit,
+    onEditServer: (String, com.v2ray.ang.dto.entities.ProfileItem) -> Unit,
+    onShareServer: (String, com.v2ray.ang.dto.entities.ProfileItem) -> Unit,
+    onMoreServer: (String, com.v2ray.ang.dto.entities.ProfileItem) -> Unit,
+    onRemoveServer: (String) -> Unit
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
-    // Получаем подписки (без сортировки по несуществующей дате, чтобы не было ошибок)
+    // Получаем подписки, где default уже отфильтрован в ViewModel
     val subscriptions = mainViewModel.getSubscriptions()
 
     Scaffold(
@@ -28,17 +34,17 @@ fun MainScreen(
             TopAppBar(
                 title = { Text(text = "VanguardClient") },
                 actions = {
-                    IconButton(onClick = { onNavigate("subscriptions") }) {
+                    IconButton(onClick = onOpenSubscriptions) {
                         Icon(painterResource(id = R.drawable.ic_subscriptions_24dp), contentDescription = "Подписки")
                     }
-                    IconButton(onClick = { onNavigate("settings") }) {
+                    IconButton(onClick = onOpenSettings) {
                         Icon(painterResource(id = R.drawable.ic_settings_24dp), contentDescription = "Настройки")
                     }
                 }
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { onAction(MainAction.ImportClipboard) }) {
+            FloatingActionButton(onClick = onAddServer) {
                 Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить")
             }
         }
@@ -54,7 +60,7 @@ fun MainScreen(
 
             // Кнопка подключения вверху по центру
             Button(
-                onClick = { onAction(MainAction.ToggleService) },
+                onClick = { mainViewModel.onAction(MainAction.ToggleService) },
                 modifier = Modifier.width(200.dp)
             ) {
                 Text(text = if (uiState.isRunning) "Отключить" else "Подключить")
@@ -75,12 +81,13 @@ fun MainScreen(
                         subscription = subCache,
                         servers = servers,
                         selectedGuid = uiState.selectedGuid,
-                        onPingProfile = { guid -> onAction(MainAction.TestProfileTcpPing(guid)) },
-                        onUpdateSubscription = { onAction(MainAction.UpdateSubscriptions) },
-                        onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) }
+                        onPingProfile = { guid -> mainViewModel.onAction(MainAction.TestProfileTcpPing(guid)) },
+                        onUpdateSubscription = { mainViewModel.onAction(MainAction.UpdateSubscriptions) },
+                        onSelectServer = { guid -> mainViewModel.onAction(MainAction.SelectServer(guid)) }
                     )
                 }
             }
         }
     }
 }
+
