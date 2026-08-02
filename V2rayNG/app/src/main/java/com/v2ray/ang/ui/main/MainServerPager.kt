@@ -34,6 +34,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.ui.compose.colorPing
+import com.v2ray.ang.ui.compose.colorPingRed
 import com.v2ray.ang.ui.subscription.SubEditActivity
 
 @Composable
@@ -99,10 +101,10 @@ fun ProfileCard(
     subscription: SubscriptionCache,
     servers: List<ServersCache>,
     selectedGuid: String?,
-    onAction: (MainAction) -> Unit,
     onPingProfile: (String) -> Unit,
     onUpdateSubscription: (String) -> Unit,
-    onSelectServer: (String) -> Unit
+    onSelectServer: (String) -> Unit,
+    onEditServer: (String, ProfileItem) -> Unit
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -145,8 +147,6 @@ fun ProfileCard(
                     ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.width(8.dp))
-                
-                // Три точки с переходом в редактор
                 Box {
                     IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
                         Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
@@ -279,9 +279,9 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Редактирование сервера по клику на стрелочку
+                    // Исправлено: передаем оба параметра (guid и profile)
                     IconButton(
-                        onClick = { onAction(MainAction.EditServer(serverCache.guid)) },
+                        onClick = { onEditServer(serverCache.guid, serverCache.profile) },
                         modifier = Modifier.size(40.dp)
                     ) {
                         ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
@@ -292,7 +292,7 @@ fun ProfileCard(
     }
 }
 
-// 100% Оригинальная сигнатура для MainActivity
+// 100% Оригинальная сигнатура для MainActivity, чтобы не было никаких ошибок компиляции!
 @Composable
 fun GroupPagerPage(
     groupId: String,
@@ -310,5 +310,5 @@ fun GroupPagerPage(
     onRemoveServer: (String) -> Unit,
     contentPadding: PaddingValues
 ) {
-    // Архитектурная заглушка
+    // Архитектурная заглушка (весь UI теперь в MainScreen)
 }
