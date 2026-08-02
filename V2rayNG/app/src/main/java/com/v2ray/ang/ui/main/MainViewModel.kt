@@ -192,10 +192,10 @@ class MainViewModel(
     private fun mutableServersForGroup(groupId: String): MutableStateFlow<List<ServersCache>> =
         groupPageFlows.computeIfAbsent(groupId) { MutableStateFlow(emptyList()) }
 
-    // Возвращаем подписки, фильтруя пустоты и профиль "default"
+    // Скрываем профиль "default", чтобы он никогда не отображался
     fun getSubscriptions(): List<SubscriptionCache> {
         return dataSource.getSubscriptions().filter { 
-            it.guid.isNotBlank() && it.subscription.remarks?.lowercase() != "default"
+            it.subscription.remarks?.lowercase() != "default"
         }
     }
 
@@ -397,10 +397,7 @@ class MainViewModel(
     }
 
     private fun importBatchConfig(configText: String) {
-        // Проверяем, является ли текст ссылкой на подписку
         val isUrl = configText.startsWith("http://", true) || configText.startsWith("https://", true)
-        
-        // Если это ссылка, передаем пустой ID, чтобы создать новый профиль подписки, а не засовывать ссылку в старый
         val targetGroupId = if (isUrl) "" else uiState.value.selectedGroupId
 
         launchLoading {
@@ -410,12 +407,13 @@ class MainViewModel(
                         configText, targetGroupId, true
                     )
                     when {
-                        count > 0 -> {
+                        countSub > 0 -> {
+                            // Автоматически обновляем и качаем сервера для новой ссылки
+                            dataSource.updateConfigViaSubAll()
                             setupGroupTab(forceRefresh = true)
                         }
-                        countSub > 0 -> {
-                            // Подписка успешно добавлена. Автоматически скачиваем для нее сервера
-                            dataSource.updateConfigViaSubAll()
+                        count > 0 -> {
+                            toast(dataSource.getString(R.string.title_import_config_count, count))
                             setupGroupTab(forceRefresh = true)
                         }
                         else -> toastError(R.string.toast_failure)
