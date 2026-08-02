@@ -99,7 +99,7 @@ class MainViewModel(
         startBackgroundPolling()
     }
 
-    // Фоновый поллинг: тихо обновляет UI, когда подписка в фоне закончила парситься
+    // Фоновый поллинг: тихо обновляет UI, когда подписка в фоне закончила парситься (решает проблему с "import sub")
     private fun startBackgroundPolling() {
         viewModelScope.launch(ioDispatcher) {
             var lastHash = 0
@@ -250,7 +250,9 @@ class MainViewModel(
             MainAction.DismissQRCodeDialog -> {
                 _uiState.update { it.copy(shareQRCodeBitmap = null) }
             }
-            MainAction.ToggleService,
+            MainAction.ToggleService -> {
+                dataSource.toggleService()
+            }
             MainAction.TestCurrentServer,
             MainAction.ImportQRcode,
             MainAction.ImportClipboard,
