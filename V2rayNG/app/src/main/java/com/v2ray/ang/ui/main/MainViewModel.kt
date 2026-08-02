@@ -73,7 +73,6 @@ class MainViewModel(
 
     private val initialPageReady = CompletableDeferred<Unit>()
 
-    // Исправлено: Factory теперь класс, который можно вызывать как функцию
     class Factory(
         private val application: Application,
         private val dataSource: MainDataSource
@@ -155,7 +154,6 @@ class MainViewModel(
                 if (guids.isEmpty()) return@launch
                 _uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
                 
-                // Используем правильный метод из MainDataSource
                 dataSource.clearAllTestDelayResults(guids)
                 
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
@@ -172,10 +170,7 @@ class MainViewModel(
             if (fromIndex in guids.indices && toIndex in guids.indices) {
                 val item = guids.removeAt(fromIndex)
                 guids.add(toIndex, item)
-                
-                // Используем правильный метод из MainDataSource
                 dataSource.encodeServerList(guids, groupId)
-                
                 cacheMutex.withLock { groupDataCache.remove(groupId) }
                 updateGroupUi(groupId, loadGroup(groupId, forceRefresh = true))
             }
@@ -185,7 +180,6 @@ class MainViewModel(
     fun sortByTestResultsInternal() {
         viewModelScope.launch(ioDispatcher) {
             val currentGroup = uiState.value.selectedGroupId
-            // Используем правильный метод из MainDataSource
             dataSource.sortByTestResultsForSub(currentGroup)
             cacheMutex.withLock { groupDataCache.remove(currentGroup) }
             updateGroupUi(currentGroup, loadGroup(currentGroup, forceRefresh = true))
@@ -198,8 +192,12 @@ class MainViewModel(
     private fun mutableServersForGroup(groupId: String): MutableStateFlow<List<ServersCache>> =
         groupPageFlows.computeIfAbsent(groupId) { MutableStateFlow(emptyList()) }
 
-    // ИСПРАВЛЕНО: Один-единственный метод getSubscriptions
-    fun getSubscriptions(): List<SubscriptionCache> = dataSource.getSubscriptions()
+    // Возвращаем подписки, фильтруя пустоты и профиль "default"
+    fun getSubscriptions(): List<SubscriptionCache> {
+        return dataSource.getSubscriptions().filter { 
+            it.guid.isNotBlank() && it.subscription.remarks?.lowercase() != "default"
+        }
+    }
 
     fun onAction(action: MainAction) {
         when (action) {
@@ -348,7 +346,7 @@ class MainViewModel(
                 if (forceRefresh) {
                     cacheMutex.withLock { groupDataCache.clear() }
                 }
-                val subs = dataSource.getSubscriptions()
+                val subs = getSubscriptions()
                 val groups = subs.map { GroupMapItem(id = it.guid, remarks = it.subscription.remarks) }
                 val selectedGroup = resolveSelectedGroup(groups)
                 val validIds = groups.mapTo(HashSet()) { it.id }
@@ -399,18 +397,27 @@ class MainViewModel(
     }
 
     private fun importBatchConfig(configText: String) {
+        // Проверяем, является ли текст ссылкой на подписку
+        val isUrl = configText.startsWith("http://", true) || configText.startsWith("https://", true)
+        
+        // Если это ссылка, передаем пустой ID, чтобы создать новый профиль подписки, а не засовывать ссылку в старый
+        val targetGroupId = if (isUrl) "" else uiState.value.selectedGroupId
+
         launchLoading {
             withContext(ioDispatcher) {
                 try {
                     val (count, countSub) = dataSource.importBatchConfig(
-                        configText, uiState.value.selectedGroupId, true
+                        configText, targetGroupId, true
                     )
                     when {
                         count > 0 -> {
-                            toast(dataSource.getString(R.string.title_import_config_count, count))
                             setupGroupTab(forceRefresh = true)
                         }
-                        countSub > 0 -> setupGroupTab(forceRefresh = true)
+                        countSub > 0 -> {
+                            // Подписка успешно добавлена. Автоматически скачиваем для нее сервера
+                            dataSource.updateConfigViaSubAll()
+                            setupGroupTab(forceRefresh = true)
+                        }
                         else -> toastError(R.string.toast_failure)
                     }
                 } catch (cancelled: CancellationException) {
