@@ -31,10 +31,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
-import com.v2ray.ang.ui.compose.colorPing
-import com.v2ray.ang.ui.compose.colorPingRed
 import com.v2ray.ang.ui.subscription.SubEditActivity
 
 @Composable
@@ -75,9 +74,8 @@ fun WireframeGlobe(color: Color, modifier: Modifier = Modifier) {
     }
 }
 
-// Умный парсер протоколов (VLESS / TCP / REALITY | JSON)
-fun getProtocolDescription(server: ServersCache): String {
-    val profile = server.profile
+// Парсер типа протокола для корректного отображения
+fun getProtocolDescription(profile: ProfileItem): String {
     val configType = profile.configType.name.uppercase().let { if (it == "CUSTOM") "AUTO" else it }
     val parts = mutableListOf(configType)
     
@@ -101,10 +99,10 @@ fun ProfileCard(
     subscription: SubscriptionCache,
     servers: List<ServersCache>,
     selectedGuid: String?,
-    onAction: (MainAction) -> Unit,
     onPingProfile: (String) -> Unit,
     onUpdateSubscription: (String) -> Unit,
-    onSelectServer: (String) -> Unit
+    onSelectServer: (String) -> Unit,
+    onEditServer: (String, ProfileItem) -> Unit
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -119,7 +117,6 @@ fun ProfileCard(
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F9FC))
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp)) {
-            // Первая строка
             Row(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -147,8 +144,6 @@ fun ProfileCard(
                     ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.width(8.dp))
-                
-                // Три точки с переходом в редактор
                 Box {
                     IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
                         Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
@@ -167,7 +162,6 @@ fun ProfileCard(
             
             Spacer(Modifier.height(12.dp))
 
-            // Вторая строка
             Row(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -222,7 +216,6 @@ fun ProfileCard(
             
             Spacer(Modifier.height(16.dp))
             
-            // Список серверов
             servers.forEach { serverCache ->
                 val isSelected = serverCache.guid == selectedGuid
                 
@@ -259,7 +252,7 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         
-                        val finalDesc = getProtocolDescription(serverCache) + " | JSON"
+                        val finalDesc = getProtocolDescription(serverCache.profile) + " | JSON"
 
                         Text(
                             text = finalDesc, 
@@ -281,9 +274,9 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Стрелочка открывает сервер через MainAction
+                    // Вызов с передачей двух параметров: guid и profile
                     IconButton(
-                        onClick = { onAction(MainAction.EditServer(serverCache.guid)) },
+                        onClick = { onEditServer(serverCache.guid, serverCache.profile) },
                         modifier = Modifier.size(40.dp)
                     ) {
                         ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
@@ -294,7 +287,6 @@ fun ProfileCard(
     }
 }
 
-// Оригинальная архитектурная сигнатура
 @Composable
 fun GroupPagerPage(
     groupId: String,
@@ -305,8 +297,12 @@ fun GroupPagerPage(
     searchQuery: String,
     lazyListStates: MutableMap<String, LazyListState>,
     lazyGridStates: MutableMap<String, LazyGridState>,
-    onAction: (MainAction) -> Unit,
+    onSelectServer: (String) -> Unit,
+    onEditServer: (String, ProfileItem) -> Unit,
+    onShareServer: (String, ProfileItem) -> Unit,
+    onMoreServer: (String, ProfileItem) -> Unit,
+    onRemoveServer: (String) -> Unit,
     contentPadding: PaddingValues
 ) {
-    // Архитектурная заглушка
+    // Заглушка для совместимости
 }
