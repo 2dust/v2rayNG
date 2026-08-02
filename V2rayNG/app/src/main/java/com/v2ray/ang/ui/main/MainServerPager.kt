@@ -32,9 +32,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
-import com.v2ray.ang.ui.compose.colorPing
-import com.v2ray.ang.ui.compose.colorPingRed
-import com.v2ray.ang.ui.subscription.SubSettingActivity
+import com.v2ray.ang.ui.subscription.SubEditActivity
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
@@ -79,13 +77,14 @@ fun ProfileCard(
     subscription: SubscriptionCache,
     servers: List<ServersCache>,
     selectedGuid: String?,
+    onAction: ((MainAction) -> Unit)?,
     onPingProfile: (String) -> Unit,
     onUpdateSubscription: (String) -> Unit,
-    onSelectServer: (String) -> Unit,
-    onEditServer: ((String, ProfileItem) -> Unit)? = null
+    onSelectServer: (String) -> Unit
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
+    var showMenu by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -122,17 +121,26 @@ fun ProfileCard(
                     ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.width(8.dp))
-                IconButton(
-                    onClick = { context.startActivity(Intent(context, SubSettingActivity::class.java)) }, 
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
+                Box {
+                    IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
+                        Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
+                    }
+                    // Выпадающее меню с 1 кнопкой редактирования конкретного профиля
+                    DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                        DropdownMenuItem(
+                            text = { Text("Редактировать профиль") },
+                            onClick = { 
+                                showMenu = false
+                                context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.guid))
+                            }
+                        )
+                    }
                 }
             }
             
             Spacer(Modifier.height(12.dp))
 
-            // Вторая строка: Инфо таблетка
+            // Вторая строка
             Row(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -175,7 +183,6 @@ fun ProfileCard(
             
             Spacer(Modifier.height(16.dp))
             
-            // Текст-хардкод
             Text(
                 "💪 Vanguard VPN - Это не про обход, это про\nпревосходство.\nЕсли подписка не работает — нажмите на кнопку «↻»,\nчтобы обновить её", 
                 fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), modifier = Modifier.fillMaxWidth()
@@ -225,11 +232,13 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         
-                        // ПАРСИМ ПРОТОКОЛЫ КРАСИВО
-                        val protocol = serverCache.profile.configType.name.uppercase()
+                        // КРАСИВЫЙ ПАРСИНГ ПРОТОКОЛОВ!
+                        val configType = serverCache.profile.configType.name.uppercase()
                         val network = serverCache.profile.network?.uppercase()?.takeIf { it.isNotBlank() } ?: "TCP"
-                        val security = serverCache.profile.security?.uppercase()?.takeIf { it.isNotBlank() } ?: "NONE"
-                        val finalDesc = "$protocol / $network / $security | JSON"
+                        val security = serverCache.profile.security?.uppercase()?.takeIf { it.isNotBlank() && it != "NONE" }
+                        val parts = listOfNotNull(configType, network, security)
+                        
+                        val finalDesc = if (parts.isNotEmpty()) parts.joinToString(" / ") + " | JSON" else "JSON"
 
                         Text(
                             text = finalDesc, 
@@ -251,9 +260,9 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Клибельная стрелочка "Редактировать"
+                    // Стрелочка ">" теперь вызывает Экшен "EditServer"
                     IconButton(
-                        onClick = { onEditServer?.invoke(serverCache.guid, serverCache.profile) },
+                        onClick = { onAction?.invoke(MainAction.EditServer(serverCache.guid)) },
                         modifier = Modifier.size(40.dp)
                     ) {
                         ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
