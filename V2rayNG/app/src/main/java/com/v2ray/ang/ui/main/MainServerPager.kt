@@ -34,6 +34,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.ui.compose.colorPing
+import com.v2ray.ang.ui.compose.colorPingRed
 import com.v2ray.ang.ui.subscription.SubEditActivity
 
 @Composable
@@ -74,7 +76,7 @@ fun WireframeGlobe(color: Color, modifier: Modifier = Modifier) {
     }
 }
 
-// Парсер типа протокола для корректного отображения
+// Парсер типа протокола для корректного отображения без CUSTOM
 fun getProtocolDescription(profile: ProfileItem): String {
     val configType = profile.configType.name.uppercase().let { if (it == "CUSTOM") "AUTO" else it }
     val parts = mutableListOf(configType)
@@ -99,10 +101,10 @@ fun ProfileCard(
     subscription: SubscriptionCache,
     servers: List<ServersCache>,
     selectedGuid: String?,
+    onAction: (MainAction) -> Unit,
     onPingProfile: (String) -> Unit,
     onUpdateSubscription: (String) -> Unit,
-    onSelectServer: (String) -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit
+    onSelectServer: (String) -> Unit
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -117,6 +119,7 @@ fun ProfileCard(
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F9FC))
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp)) {
+            // Первая строка
             Row(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -144,6 +147,8 @@ fun ProfileCard(
                     ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.width(8.dp))
+                
+                // Три точки с переходом в редактор
                 Box {
                     IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
                         Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
@@ -162,6 +167,7 @@ fun ProfileCard(
             
             Spacer(Modifier.height(12.dp))
 
+            // Вторая строка
             Row(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -216,6 +222,7 @@ fun ProfileCard(
             
             Spacer(Modifier.height(16.dp))
             
+            // Список серверов
             servers.forEach { serverCache ->
                 val isSelected = serverCache.guid == selectedGuid
                 
@@ -274,9 +281,9 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Вызов с передачей двух параметров: guid и profile
+                    // Кликабельная стрелочка "Редактировать"
                     IconButton(
-                        onClick = { onEditServer(serverCache.guid, serverCache.profile) },
+                        onClick = { onAction(MainAction.EditServer(serverCache.guid, serverCache.profile)) },
                         modifier = Modifier.size(40.dp)
                     ) {
                         ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
@@ -287,6 +294,7 @@ fun ProfileCard(
     }
 }
 
+// 100% Оригинальная сигнатура
 @Composable
 fun GroupPagerPage(
     groupId: String,
@@ -304,5 +312,5 @@ fun GroupPagerPage(
     onRemoveServer: (String) -> Unit,
     contentPadding: PaddingValues
 ) {
-    // Заглушка для совместимости
+    // Архитектурная заглушка
 }
