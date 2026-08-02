@@ -11,25 +11,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.entities.ProfileItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
-    onAddServer: () -> Unit,
-    onScanQR: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onOpenSubscriptions: () -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit,
-    onShareServer: (String, ProfileItem) -> Unit,
-    onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit
+    onAction: (MainAction) -> Unit,
+    onNavigate: (String) -> Unit
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
-    // Получаем подписки, где default уже отфильтрован в ViewModel
+    // Получаем подписки (дефолтная скрыта в ViewModel)
     val subscriptions = mainViewModel.getSubscriptions()
 
+    // Состояние для выпадающего меню кнопки "+"
     var showImportMenu by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -37,10 +31,10 @@ fun MainScreen(
             TopAppBar(
                 title = { Text(text = "VanguardClient") },
                 actions = {
-                    IconButton(onClick = onOpenSubscriptions) {
+                    IconButton(onClick = { onNavigate("subscriptions") }) {
                         Icon(painterResource(id = R.drawable.ic_subscriptions_24dp), contentDescription = "Подписки")
                     }
-                    IconButton(onClick = onOpenSettings) {
+                    IconButton(onClick = { onNavigate("settings") }) {
                         Icon(painterResource(id = R.drawable.ic_settings_24dp), contentDescription = "Настройки")
                     }
                 }
@@ -60,28 +54,21 @@ fun MainScreen(
                         text = { Text("Импорт из буфера обмена") },
                         onClick = {
                             showImportMenu = false
-                            mainViewModel.onAction(MainAction.ImportClipboard)
+                            onAction(MainAction.ImportClipboard)
                         }
                     )
                     DropdownMenuItem(
                         text = { Text("Сканировать QR-код") },
                         onClick = {
                             showImportMenu = false
-                            onScanQR()
+                            onAction(MainAction.ImportQRcode)
                         }
                     )
                     DropdownMenuItem(
                         text = { Text("Импорт из файла") },
                         onClick = {
                             showImportMenu = false
-                            mainViewModel.onAction(MainAction.ImportConfigLocal)
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Добавить вручную") },
-                        onClick = {
-                            showImportMenu = false
-                            onAddServer()
+                            onAction(MainAction.ImportConfigLocal)
                         }
                     )
                 }
@@ -99,7 +86,7 @@ fun MainScreen(
 
             // Кнопка подключения вверху по центру
             Button(
-                onClick = { mainViewModel.onAction(MainAction.ToggleService) },
+                onClick = { onAction(MainAction.ToggleService) },
                 modifier = Modifier.width(200.dp)
             ) {
                 Text(text = if (uiState.isRunning) "Отключить" else "Подключить")
@@ -120,9 +107,9 @@ fun MainScreen(
                         subscription = subCache,
                         servers = servers,
                         selectedGuid = uiState.selectedGuid,
-                        onPingProfile = { guid -> mainViewModel.onAction(MainAction.TestProfileTcpPing(guid)) },
-                        onUpdateSubscription = { mainViewModel.onAction(MainAction.UpdateSubscriptions) },
-                        onSelectServer = { guid -> mainViewModel.onAction(MainAction.SelectServer(guid)) }
+                        onPingProfile = { guid -> onAction(MainAction.TestProfileTcpPing(guid)) },
+                        onUpdateSubscription = { onAction(MainAction.UpdateSubscriptions) },
+                        onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) }
                     )
                 }
             }
