@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -32,6 +31,9 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.ui.compose.colorPing
+import com.v2ray.ang.ui.compose.colorPingRed
 import com.v2ray.ang.ui.subscription.SubEditActivity
 
 @Composable
@@ -80,7 +82,8 @@ fun ProfileCard(
     onAction: ((MainAction) -> Unit)?,
     onPingProfile: (String) -> Unit,
     onUpdateSubscription: (String) -> Unit,
-    onSelectServer: (String) -> Unit
+    onSelectServer: (String) -> Unit,
+    onEditServer: ((String, ProfileItem) -> Unit)? = null
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -140,7 +143,7 @@ fun ProfileCard(
             
             Spacer(Modifier.height(12.dp))
 
-            // Вторая строка
+            // Вторая строка: Инфо таблетка
             Row(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -232,16 +235,12 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         
-                        // КРАСИВЫЙ ПАРСИНГ ПРОТОКОЛОВ!
-                        val configType = serverCache.profile.configType.name.uppercase()
-                        val network = serverCache.profile.network?.uppercase()?.takeIf { it.isNotBlank() } ?: "TCP"
-                        val security = serverCache.profile.security?.uppercase()?.takeIf { it.isNotBlank() && it != "NONE" }
-                        val parts = listOfNotNull(configType, network, security)
-                        
-                        val finalDesc = if (parts.isNotEmpty()) parts.joinToString(" / ") + " | JSON" else "JSON"
-
+                        // Парсим протоколы: Hysteria2, Vless Reality и т.д.
+                        val desc = serverCache.profile.description.takeIf { !it.isNullOrBlank() } 
+                            ?: AngConfigManager.generateDescription(serverCache.profile)
+                            
                         Text(
-                            text = finalDesc, 
+                            text = "$desc | JSON", 
                             fontSize = 10.sp, 
                             color = Color.Gray, 
                             fontWeight = FontWeight.Bold,
@@ -260,9 +259,10 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Стрелочка ">" теперь вызывает Экшен "EditServer"
+                    // Клибельная стрелочка "Редактировать"
                     IconButton(
-                        onClick = { onAction?.invoke(MainAction.EditServer(serverCache.guid)) },
+                        // ИСПРАВЛЕНО: Передаем ОБА параметра: guid и profile
+                        onClick = { onEditServer?.invoke(serverCache.guid, serverCache.profile) },
                         modifier = Modifier.size(40.dp)
                     ) {
                         ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
