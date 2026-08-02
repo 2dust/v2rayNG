@@ -13,6 +13,7 @@ import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
+import com.v2ray.ang.storage.MmkvManager
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
@@ -155,7 +156,7 @@ class MainViewModel(
                 _uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
                 
                 guids.forEach { guid ->
-                    dataSource.updateServerTestResult(guid, -1L)
+                    MmkvManager.encodeServerTestResult(guid, -1L)
                 }
                 
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
@@ -172,7 +173,7 @@ class MainViewModel(
             if (fromIndex in guids.indices && toIndex in guids.indices) {
                 val item = guids.removeAt(fromIndex)
                 guids.add(toIndex, item)
-                dataSource.saveServerGuidList(groupId, guids)
+                MmkvManager.encodeServerList(groupId, guids)
                 cacheMutex.withLock { groupDataCache.remove(groupId) }
                 updateGroupUi(groupId, loadGroup(groupId, forceRefresh = true))
             }
@@ -188,7 +189,7 @@ class MainViewModel(
                 val delay = affiliation?.testDelayMillis ?: 9999L
                 if (delay < 0L) 9999L else delay
             }
-            dataSource.saveServerGuidList(currentGroup, sortedGuids)
+            MmkvManager.encodeServerList(currentGroup, sortedGuids)
             cacheMutex.withLock { groupDataCache.remove(currentGroup) }
             updateGroupUi(currentGroup, loadGroup(currentGroup, forceRefresh = true))
         }
