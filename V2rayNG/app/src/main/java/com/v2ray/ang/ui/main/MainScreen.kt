@@ -11,6 +11,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.entities.ProfileItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,14 +21,16 @@ fun MainScreen(
     onScanQR: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenSubscriptions: () -> Unit,
-    onEditServer: (String, com.v2ray.ang.dto.entities.ProfileItem) -> Unit,
-    onShareServer: (String, com.v2ray.ang.dto.entities.ProfileItem) -> Unit,
-    onMoreServer: (String, com.v2ray.ang.dto.entities.ProfileItem) -> Unit,
+    onEditServer: (String, ProfileItem) -> Unit,
+    onShareServer: (String, ProfileItem) -> Unit,
+    onMoreServer: (String, ProfileItem) -> Unit,
     onRemoveServer: (String) -> Unit
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     // Получаем подписки, где default уже отфильтрован в ViewModel
     val subscriptions = mainViewModel.getSubscriptions()
+
+    var showImportMenu by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -44,8 +47,44 @@ fun MainScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddServer) {
-                Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить")
+            Box {
+                FloatingActionButton(onClick = { showImportMenu = true }) {
+                    Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить")
+                }
+                
+                DropdownMenu(
+                    expanded = showImportMenu,
+                    onDismissRequest = { showImportMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Импорт из буфера обмена") },
+                        onClick = {
+                            showImportMenu = false
+                            mainViewModel.onAction(MainAction.ImportClipboard)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Сканировать QR-код") },
+                        onClick = {
+                            showImportMenu = false
+                            onScanQR()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Импорт из файла") },
+                        onClick = {
+                            showImportMenu = false
+                            mainViewModel.onAction(MainAction.ImportConfigLocal)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Добавить вручную") },
+                        onClick = {
+                            showImportMenu = false
+                            onAddServer()
+                        }
+                    )
+                }
             }
         }
     ) { innerPadding ->
@@ -90,4 +129,3 @@ fun MainScreen(
         }
     }
 }
-
