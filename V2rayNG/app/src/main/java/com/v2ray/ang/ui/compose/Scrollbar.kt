@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.compose
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.lazy.LazyListState
@@ -9,6 +8,8 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -22,6 +23,9 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.currentStateAsState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
@@ -43,8 +47,9 @@ private fun <T> rememberScrollbarAlpha(
     key: Any,
     config: ScrollbarConfig,
     position: () -> T,
-): Animatable<Float, AnimationVector1D> {
+): State<Float> {
     val alpha = remember(key) { Animatable(0f) }
+    val lifecycleState = LocalLifecycleOwner.current.lifecycle.currentStateAsState()
     LaunchedEffect(key, config.fadeOutDurationMs, config.fadeAnimDurationMs) {
         snapshotFlow(position).collectLatest {
             alpha.snapTo(1f)
@@ -52,7 +57,11 @@ private fun <T> rememberScrollbarAlpha(
             alpha.animateTo(0f, tween(config.fadeAnimDurationMs))
         }
     }
-    return alpha
+    return remember(alpha, lifecycleState) {
+        derivedStateOf {
+            if (lifecycleState.value == Lifecycle.State.RESUMED) alpha.value else 0f
+        }
+    }
 }
 
 @Composable
