@@ -16,7 +16,8 @@ data class MainUiState(
     val locateTarget: LocateTarget? = null,
     val confirmRemove: Boolean = false,
     val doubleColumnDisplay: Boolean = false,
-    val shareQRCodeBitmap: android.graphics.Bitmap? = null
+    val shareQRCodeBitmap: android.graphics.Bitmap? = null,
+    val serviceStartTime: Long? = null
 )
 
 /**
@@ -57,4 +58,6 @@ sealed interface MainAction {
     data class ImportBatchConfig(val configText: String) : MainAction
 
     data class LocateHandled(val target: LocateTarget) : MainAction
+    
+    data class TestProfileTcpPing(val subscriptionId: String) : MainAction
 }
