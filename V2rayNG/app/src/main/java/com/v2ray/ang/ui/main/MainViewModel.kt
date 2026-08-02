@@ -98,6 +98,7 @@ class MainViewModel(
         startBackgroundPolling()
     }
 
+    // Тихое фоновое обновление UI для замены "import sub" на скачанное имя
     private fun startBackgroundPolling() {
         viewModelScope.launch(ioDispatcher) {
             var lastHash = 0
@@ -248,6 +249,7 @@ class MainViewModel(
             MainAction.DismissQRCodeDialog -> {
                 _uiState.update { it.copy(shareQRCodeBitmap = null) }
             }
+            // Эти экшены обрабатываются в MainActivity, поэтому тут пустые блоки во избежание Unresolved reference
             MainAction.ToggleService,
             MainAction.TestCurrentServer,
             MainAction.ImportQRcode,
