@@ -558,33 +558,47 @@ object AngConfigManager {
                 }
             }
 
-            // --- ДОБАВЛЕНИЕ HWID К URL (Универсальный метод) ---
+            // --- ДОБАВЛЕНИЕ HWID И ДАННЫХ УСТРОЙСТВА В ЗАГОЛОВКИ ДЛЯ Remnawave ---
+            var hwid = "unknown_hwid"
             try {
                 val context = Class.forName("android.app.ActivityThread")
                     .getMethod("currentApplication")
                     .invoke(null) as? android.content.Context
                 
-                val hwid = if (context != null) {
-                    android.provider.Settings.Secure.getString(
+                if (context != null) {
+                    hwid = android.provider.Settings.Secure.getString(
                         context.contentResolver,
                         android.provider.Settings.Secure.ANDROID_ID
                     ) ?: "unknown_hwid"
-                } else {
-                    "unknown_hwid"
                 }
-
-                val uri = android.net.Uri.parse(url).buildUpon()
-                    .appendQueryParameter("hwid", hwid)
-                    .build()
-                url = uri.toString()
             } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to append HWID to subscription URL", e)
+                LogUtil.e(AppConfig.TAG, "Failed to get HWID for headers", e)
             }
-            // --------------------------------------------------
+
+            // Подготавливаем заголовки для запроса
+            val requestHeaders = mutableMapOf<String, String>()
+            try {
+                it.subscription.requestHeaders?.let { existing ->
+                    if (existing is Map<*, *>) {
+                        for ((k, v) in existing) {
+                            if (k is String && v is String) {
+                                requestHeaders[k] = v
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                // игнорируем ошибки маппинга
+            }
+
+            // Передаем заголовки, которые требует Remnawave
+            requestHeaders["x-hwid"] = hwid
+            requestHeaders["x-device-os"] = "Android"
+            requestHeaders["x-device-model"] = android.os.Build.MODEL ?: "Android"
+            // ------------------------------------------------------------------
 
             LogUtil.i(AppConfig.TAG, url)
             val userAgent = it.subscription.userAgent
-            val requestHeaders = it.subscription.requestHeaders
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
 
@@ -594,7 +608,7 @@ object AngConfigManager {
                     UrlContentRequest(
                         url = url,
                         userAgent = userAgent,
-                        requestHeaders = requestHeaders,
+                        requestHeaders = requestHeaders, // <-- здесь полетят наши заголовки с x-hwid
                         timeout = 15000,
                         httpPort = httpPort,
                         proxyUsername = proxyUsername,
@@ -611,7 +625,7 @@ object AngConfigManager {
                         UrlContentRequest(
                             url = url,
                             userAgent = userAgent,
-                            requestHeaders = requestHeaders
+                            requestHeaders = requestHeaders // <-- и здесь тоже
                         )
                     )
                 } catch (e: Exception) {
@@ -641,6 +655,7 @@ object AngConfigManager {
             return SubscriptionUpdateResult(failureCount = 1)
         }
     }
+    
     
     /**
      * Removes invalid server configurations for a subscription.
