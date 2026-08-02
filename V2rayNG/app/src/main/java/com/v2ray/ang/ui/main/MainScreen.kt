@@ -52,14 +52,16 @@ fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
-    onAddServer: () -> Unit,
-    onScanQR: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onOpenSubscriptions: () -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit,
-    onShareServer: (String, ProfileItem) -> Unit,
-    onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit
+    onAction: ((MainAction) -> Unit)? = null,
+    onNavigate: ((String) -> Unit)? = null,
+    onAddServer: (() -> Unit)? = null,
+    onScanQR: (() -> Unit)? = null,
+    onOpenSettings: (() -> Unit)? = null,
+    onOpenSubscriptions: (() -> Unit)? = null,
+    onEditServer: ((String, ProfileItem) -> Unit)? = null,
+    onShareServer: ((String, ProfileItem) -> Unit)? = null,
+    onMoreServer: ((String, ProfileItem) -> Unit)? = null,
+    onRemoveServer: ((String) -> Unit)? = null
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val subscriptions = mainViewModel.getSubscriptions()
@@ -100,7 +102,7 @@ fun MainScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onOpenSettings) {
+                IconButton(onClick = { onOpenSettings?.invoke() ?: onNavigate?.invoke("settings") }) {
                     Icon(painterResource(id = R.drawable.ic_settings_24dp), contentDescription = "Настройки", modifier = Modifier.size(32.dp))
                 }
                 Box {
@@ -109,9 +111,9 @@ fun MainScreen(
                     }
                     DropdownMenu(expanded = showImportMenu, onDismissRequest = { showImportMenu = false }) {
                         DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; mainViewModel.onAction(MainAction.ImportClipboard) })
-                        DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onScanQR() })
+                        DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onScanQR?.invoke() ?: onAction?.invoke(MainAction.ImportQRcode) ?: mainViewModel.onAction(MainAction.ImportQRcode) })
                         DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; mainViewModel.onAction(MainAction.ImportConfigLocal) })
-                        DropdownMenuItem(text = { Text("Добавить вручную") }, onClick = { showImportMenu = false; onAddServer() })
+                        DropdownMenuItem(text = { Text("Добавить вручную") }, onClick = { showImportMenu = false; onAddServer?.invoke() })
                     }
                 }
             }
