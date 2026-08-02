@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +21,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -64,8 +66,8 @@ fun MainScreen(
     onRemoveServer: ((String) -> Unit)? = null
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
-    // Подписываемся на StateFlow, чтобы UI мгновенно перерисовывался при импорте
     val subscriptions by mainViewModel.subscriptions.collectAsStateWithLifecycle()
+    val isImporting by mainViewModel.isImporting.collectAsStateWithLifecycle()
 
     var showImportMenu by remember { mutableStateOf(false) }
 
@@ -86,150 +88,186 @@ fun MainScreen(
     val hours = (uptime / (1000 * 60 * 60))
     val timeString = "${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
 
-    Scaffold(
-        containerColor = Color(0xFFF3F4F6) // Светло-серый фон
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Верхняя панель (Настройки слева, Добавить справа)
-            Row(
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = Color(0xFFF3F4F6)
+        ) { innerPadding ->
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                IconButton(onClick = { onOpenSettings?.invoke() ?: onNavigate?.invoke("settings") }) {
-                    Icon(painterResource(id = R.drawable.ic_settings_24dp), contentDescription = "Настройки", modifier = Modifier.size(32.dp))
-                }
-                Box {
-                    IconButton(onClick = { showImportMenu = true }) {
-                        Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить", modifier = Modifier.size(32.dp))
-                    }
-                    DropdownMenu(expanded = showImportMenu, onDismissRequest = { showImportMenu = false }) {
-                        DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; onAction?.invoke(MainAction.ImportClipboard) ?: mainViewModel.onAction(MainAction.ImportClipboard) })
-                        DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onScanQR?.invoke() ?: onAction?.invoke(MainAction.ImportQRcode) ?: mainViewModel.onAction(MainAction.ImportQRcode) })
-                        DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; onAction?.invoke(MainAction.ImportConfigLocal) ?: mainViewModel.onAction(MainAction.ImportConfigLocal) })
-                        DropdownMenuItem(text = { Text("Добавить вручную") }, onClick = { showImportMenu = false; onAddServer?.invoke() })
-                    }
-                }
-            }
-
-            // Центральная круглая кнопка
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Box(
+                Row(
                     modifier = Modifier
-                        .size(240.dp)
-                        .border(
-                            width = 1.dp,
-                            brush = Brush.linearGradient(colors = listOf(Color(0xFFE0E0E0), Color(0xFFFFCDD2), Color(0xFFE0E0E0))),
-                            shape = CircleShape
-                        )
-                )
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { onOpenSettings?.invoke() ?: onNavigate?.invoke("settings") }) {
+                        Icon(painterResource(id = R.drawable.ic_settings_24dp), contentDescription = "Настройки", modifier = Modifier.size(32.dp))
+                    }
+                    Box {
+                        IconButton(onClick = { showImportMenu = true }) {
+                            Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить", modifier = Modifier.size(32.dp))
+                        }
+                        DropdownMenu(expanded = showImportMenu, onDismissRequest = { showImportMenu = false }) {
+                            DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; onAction?.invoke(MainAction.ImportClipboard) ?: mainViewModel.onAction(MainAction.ImportClipboard) })
+                            DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onScanQR?.invoke() ?: onAction?.invoke(MainAction.ImportQRcode) })
+                            DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; onAction?.invoke(MainAction.ImportConfigLocal) ?: mainViewModel.onAction(MainAction.ImportConfigLocal) })
+                            DropdownMenuItem(text = { Text("Добавить вручную") }, onClick = { showImportMenu = false; onAddServer?.invoke() })
+                        }
+                    }
+                }
 
                 Box(
                     modifier = Modifier
-                        .size(170.dp)
-                        .shadow(
-                            elevation = 32.dp,
-                            shape = CircleShape,
-                            ambientColor = Color(0xFF5C6BC0).copy(alpha = 0.5f),
-                            spotColor = Color(0xFF5C6BC0).copy(alpha = 0.5f)
-                        )
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .border(8.dp, Color(0xFFF4F6F9), CircleShape)
-                        .clickable { onAction?.invoke(MainAction.ToggleService) ?: mainViewModel.onAction(MainAction.ToggleService) },
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        PowerIcon(
-                            color = if (uiState.isRunning) Color(0xFF5C6BC0) else Color.LightGray,
-                            modifier = Modifier.size(40.dp)
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        
-                        // Текст стал крупнее
-                        Text(
-                            text = if (uiState.isRunning) "ПОДКЛЮЧЕН" else "ОТКЛЮЧЕН",
-                            color = Color(0xFF2C3E50),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            letterSpacing = 1.sp
-                        )
-                        
-                        // Таймер виден только если есть подключение и он стал меньше текста
-                        if (uiState.isRunning) {
-                            Spacer(modifier = Modifier.height(4.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(240.dp)
+                            .border(
+                                width = 1.dp,
+                                brush = Brush.linearGradient(colors = listOf(Color(0xFFE0E0E0), Color(0xFFFFCDD2), Color(0xFFE0E0E0))),
+                                shape = CircleShape
+                            )
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .size(170.dp)
+                            .shadow(
+                                elevation = 32.dp,
+                                shape = CircleShape,
+                                ambientColor = Color(0xFF5C6BC0).copy(alpha = 0.5f),
+                                spotColor = Color(0xFF5C6BC0).copy(alpha = 0.5f)
+                            )
+                            .clip(CircleShape)
+                            .background(Color.White)
+                            .border(8.dp, Color(0xFFF4F6F9), CircleShape)
+                            .clickable { onAction?.invoke(MainAction.ToggleService) ?: mainViewModel.onAction(MainAction.ToggleService) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            PowerIcon(
+                                color = if (uiState.isRunning) Color(0xFF5C6BC0) else Color.LightGray,
+                                modifier = Modifier.size(40.dp)
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            
                             Text(
-                                text = timeString,
+                                text = if (uiState.isRunning) "ПОДКЛЮЧЕН" else "ОТКЛЮЧЕН",
+                                color = Color(0xFF2C3E50),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                letterSpacing = 1.sp
+                            )
+                            
+                            if (uiState.isRunning) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = timeString,
+                                    color = Color.Gray,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Text(
+                        text = "Проверить текущее\nподключение",
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable { onAction?.invoke(MainAction.TestCurrentServer) ?: mainViewModel.onAction(MainAction.TestCurrentServer) }
+                    )
+                    Text(
+                        text = "Скрыть все",
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                if (subscriptions.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(painterResource(id = R.drawable.ic_cloud_download_24dp), contentDescription = null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
+                            Spacer(Modifier.height(16.dp))
+                            Text(
+                                text = "Нет добавленных профилей.\nНажмите '+' чтобы импортировать подписку.",
+                                textAlign = TextAlign.Center,
                                 color = Color.Gray,
                                 fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(subscriptions, key = { it.guid }) { subCache ->
+                            val serversFlow = remember(subCache.guid) { mainViewModel.serversForGroup(subCache.guid) }
+                            val servers by serversFlow.collectAsStateWithLifecycle(initialValue = emptyList())
+
+                            ProfileCard(
+                                subscription = subCache,
+                                servers = servers,
+                                selectedGuid = uiState.selectedGuid,
+                                onPingProfile = { guid -> 
+                                    mainViewModel.onAction(MainAction.SelectGroup(guid))
+                                    mainViewModel.onAction(MainAction.TestProfileTcpPing(guid)) 
+                                },
+                                onUpdateSubscription = { 
+                                    mainViewModel.updateSubscription(it)
+                                },
+                                onSelectServer = { guid -> 
+                                    onAction?.invoke(MainAction.SelectServer(guid)) ?: mainViewModel.onAction(MainAction.SelectServer(guid)) 
+                                },
+                                onEditServer = { guid, profile -> onEditServer?.invoke(guid, profile) }
                             )
                         }
                     }
                 }
             }
-
-            // Ряд текстов под кнопкой
-            Row(
+        }
+        
+        // Анимация загрузки
+        if (isImporting) {
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.4f))
+                    .clickable(enabled = false) {}, // Блокируем нажатия
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Проверить текущее\nподключение",
-                    color = Color.Gray,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { onAction?.invoke(MainAction.TestCurrentServer) ?: mainViewModel.onAction(MainAction.TestCurrentServer) }
-                )
-                Text(
-                    text = "Скрыть все",
-                    color = Color.Gray,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // Список подписок с серверами
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(subscriptions, key = { it.guid }) { subCache ->
-                    val serversFlow = remember(subCache.guid) { mainViewModel.serversForGroup(subCache.guid) }
-                    val servers by serversFlow.collectAsStateWithLifecycle(initialValue = emptyList())
-
-                    ProfileCard(
-                        subscription = subCache,
-                        servers = servers,
-                        selectedGuid = uiState.selectedGuid,
-                        onPingProfile = { guid -> 
-                            mainViewModel.onAction(MainAction.SelectGroup(guid))
-                            mainViewModel.onAction(MainAction.TestProfileTcpPing(guid)) 
-                        },
-                        onUpdateSubscription = { 
-                            mainViewModel.onAction(MainAction.SelectGroup(it))
-                            mainViewModel.onAction(MainAction.UpdateSubscriptions) 
-                        },
-                        onSelectServer = { guid -> 
-                            onAction?.invoke(MainAction.SelectServer(guid)) ?: mainViewModel.onAction(MainAction.SelectServer(guid)) 
-                        },
-                        onEditServer = { guid, profile -> onEditServer?.invoke(guid, profile) }
-                    )
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator(color = Color(0xFF5C6BC0))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Импорт подписки...", fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
+                    }
                 }
             }
         }
