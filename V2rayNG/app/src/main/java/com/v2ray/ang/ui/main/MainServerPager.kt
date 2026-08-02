@@ -2,9 +2,9 @@ package com.v2ray.ang.ui.main
 
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -90,10 +90,12 @@ fun ProfileCard(
     var showMenu by remember { mutableStateOf(false) }
 
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(24.dp)),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F9FC)),
-        border = BorderStroke(1.dp, Color(0xFFE2E8F0))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F9FC))
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp)) {
             // Первая строка
@@ -126,7 +128,7 @@ fun ProfileCard(
                 Spacer(Modifier.width(8.dp))
                 Box {
                     IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
+                        Icon(painterResource(id = R.drawable.ic_menu_more), contentDescription = "Меню", tint = Color.Gray)
                     }
                     // Выпадающее меню с 1 кнопкой редактирования конкретного профиля
                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
@@ -159,13 +161,14 @@ fun ProfileCard(
                     }, 
                     modifier = Modifier.size(24.dp)
                 ) {
-                    Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_menu_info_details), contentDescription = "Info", tint = Color(0xFF5C6BC0))
                 }
                 
                 Spacer(Modifier.width(12.dp))
                 
+                // Используем CircleShape вместо RoundedCornerShape для 100% безопасной компиляции
                 Box(modifier = Modifier
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(50))
+                    .border(1.dp, Color.LightGray, CircleShape)
                     .padding(horizontal = 24.dp, vertical = 4.dp)) {
                     Text("54,8GB/∞", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
                 }
@@ -180,12 +183,13 @@ fun ProfileCard(
                     }, 
                     modifier = Modifier.size(24.dp)
                 ) {
-                    Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_menu_share), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
                 }
             }
             
             Spacer(Modifier.height(16.dp))
             
+            // Текст-хардкод
             Text(
                 "💪 Vanguard VPN - Это не про обход, это про\nпревосходство.\nЕсли подписка не работает — нажмите на кнопку «↻»,\nчтобы обновить её", 
                 fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), modifier = Modifier.fillMaxWidth()
@@ -235,12 +239,16 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         
-                        // Парсим протоколы: Hysteria2, Vless Reality и т.д.
-                        val desc = serverCache.profile.description.takeIf { !it.isNullOrBlank() } 
-                            ?: AngConfigManager.generateDescription(serverCache.profile)
-                            
+                        // ПАРСИМ ПРОТОКОЛЫ КРАСИВО
+                        val configType = serverCache.profile.configType.name.uppercase()
+                        val network = serverCache.profile.network?.uppercase()?.takeIf { it.isNotBlank() } ?: "TCP"
+                        val security = serverCache.profile.security?.uppercase()?.takeIf { it.isNotBlank() && it != "NONE" }
+                        val parts = listOfNotNull(configType, network, security)
+                        
+                        val finalDesc = if (parts.isNotEmpty()) parts.joinToString(" / ") + " | JSON" else "JSON"
+
                         Text(
-                            text = "$desc | JSON", 
+                            text = finalDesc, 
                             fontSize = 10.sp, 
                             color = Color.Gray, 
                             fontWeight = FontWeight.Bold,
@@ -259,9 +267,8 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Клибельная стрелочка "Редактировать"
+                    // Кликабельная стрелочка "Редактировать"
                     IconButton(
-                        // ИСПРАВЛЕНО: Передаем ОБА параметра: guid и profile
                         onClick = { onEditServer?.invoke(serverCache.guid, serverCache.profile) },
                         modifier = Modifier.size(40.dp)
                     ) {
