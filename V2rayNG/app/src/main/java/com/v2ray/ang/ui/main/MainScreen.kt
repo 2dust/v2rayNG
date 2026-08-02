@@ -51,7 +51,6 @@ fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
     }
 }
 
-// 100% Оригинальная сигнатура
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -117,7 +116,6 @@ fun MainScreen(
                             DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; onAction(MainAction.ImportClipboard) })
                             DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onAction(MainAction.ImportQRcode) })
                             DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; onAction(MainAction.ImportConfigLocal) })
-                            DropdownMenuItem(text = { Text("Добавить вручную") }, onClick = { showImportMenu = false; onAction(MainAction.ImportManually) })
                         }
                     }
                 }
@@ -230,6 +228,7 @@ fun MainScreen(
                                 subscription = subCache,
                                 servers = servers,
                                 selectedGuid = uiState.selectedGuid,
+                                onAction = onAction,
                                 onPingProfile = { guid -> 
                                     onAction(MainAction.SelectGroup(guid))
                                     onAction(MainAction.TestProfileTcpPing(guid)) 
@@ -239,9 +238,6 @@ fun MainScreen(
                                 },
                                 onSelectServer = { guid -> 
                                     onAction(MainAction.SelectServer(guid)) 
-                                },
-                                onEditServer = { guid ->
-                                    onAction(MainAction.EditServer(guid))
                                 }
                             )
                         }
