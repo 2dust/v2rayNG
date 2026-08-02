@@ -32,10 +32,9 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
-import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.ui.compose.colorPing
 import com.v2ray.ang.ui.compose.colorPingRed
-import com.v2ray.ang.ui.subscription.SubEditActivity
+import com.v2ray.ang.ui.subscription.SubSettingActivity
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
@@ -80,11 +79,10 @@ fun ProfileCard(
     subscription: SubscriptionCache,
     servers: List<ServersCache>,
     selectedGuid: String?,
-    onAction: ((MainAction) -> Unit)?,
     onPingProfile: (String) -> Unit,
     onUpdateSubscription: (String) -> Unit,
     onSelectServer: (String) -> Unit,
-    onEditServer: ((String, ProfileItem) -> Unit)? = null
+    onEditServer: (String, ProfileItem) -> Unit
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -120,7 +118,7 @@ fun ProfileCard(
                 }
                 
                 IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(32.dp)) {
-                    Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = android.R.drawable.ic_menu_revert), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
                 }
                 Spacer(Modifier.width(8.dp))
                 IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(32.dp)) {
@@ -129,14 +127,14 @@ fun ProfileCard(
                 Spacer(Modifier.width(8.dp))
                 Box {
                     IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
+                        Icon(painterResource(id = R.drawable.ic_menu_more), contentDescription = "Меню", tint = Color.Gray)
                     }
                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         DropdownMenuItem(
-                            text = { Text("Редактировать профиль") },
+                            text = { Text("Управление подписками") },
                             onClick = { 
                                 showMenu = false
-                                context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.guid))
+                                context.startActivity(Intent(context, SubSettingActivity::class.java))
                             }
                         )
                     }
@@ -161,7 +159,7 @@ fun ProfileCard(
                     }, 
                     modifier = Modifier.size(24.dp)
                 ) {
-                    Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_menu_info_details), contentDescription = "Info", tint = Color(0xFF5C6BC0))
                 }
                 
                 Spacer(Modifier.width(12.dp))
@@ -182,7 +180,7 @@ fun ProfileCard(
                     }, 
                     modifier = Modifier.size(24.dp)
                 ) {
-                    Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_menu_share), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
                 }
             }
             
@@ -238,13 +236,17 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         
-                        // Парсим протоколы красиво
+                        // Парсим протоколы красиво без CUSTOM: "VLESS / TCP / REALITY | JSON"
                         val configType = serverCache.profile.configType.name.uppercase()
-                        val network = serverCache.profile.network?.uppercase()?.takeIf { it.isNotBlank() } ?: "TCP"
+                        val network = serverCache.profile.network?.uppercase()?.takeIf { it.isNotBlank() }
                         val security = serverCache.profile.security?.uppercase()?.takeIf { it.isNotBlank() && it != "NONE" }
-                        val parts = listOfNotNull(configType, network, security)
                         
-                        val finalDesc = if (parts.isNotEmpty()) parts.joinToString(" / ") + " | JSON" else "JSON"
+                        val parts = mutableListOf<String>()
+                        parts.add(if (configType == "CUSTOM") "AUTO" else configType)
+                        if (network != null) parts.add(network) else if (configType != "HYSTERIA2") parts.add("TCP")
+                        if (security != null) parts.add(security)
+                        
+                        val finalDesc = parts.joinToString(" / ") + " | JSON"
 
                         Text(
                             text = finalDesc, 
@@ -268,7 +270,7 @@ fun ProfileCard(
                     
                     // Кликабельная стрелочка "Редактировать"
                     IconButton(
-                        onClick = { onEditServer?.invoke(serverCache.guid, serverCache.profile) },
+                        onClick = { onEditServer(serverCache.guid, serverCache.profile) },
                         modifier = Modifier.size(40.dp)
                     ) {
                         ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
