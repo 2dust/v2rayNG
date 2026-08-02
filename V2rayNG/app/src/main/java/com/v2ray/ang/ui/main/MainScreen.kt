@@ -35,6 +35,42 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
+@Composable
+fun ConnectButton(uiState: MainUiState, onAction: (MainAction) -> Unit) {
+    val startTime = uiState.serviceStartTime
+    var elapsed by remember { mutableStateOf(0L) }
+    LaunchedEffect(startTime) {
+        while (startTime != null) {
+            elapsed = System.currentTimeMillis() - startTime
+            delay(1000)
+        }
+    }
+    Button(onClick = {
+        val selected = uiState.selectedGuid
+        if (selected == null) {
+        } else {
+            onAction(MainAction.SelectServer(selected))
+            onAction(MainAction.ToggleService)
+        }
+    }, modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)) {
+        if (uiState.isRunning && startTime != null) {
+            Text("подключено — ${formatElapsed(elapsed)}")
+        } else {
+            Icon(painterResource(R.drawable.ic_launch), contentDescription = null)
+            Spacer(Modifier.width(8.dp))
+            Text("Подключиться")
+        }
+    }
+}
+
+private fun formatElapsed(ms: Long): String {
+    val s = (ms / 1000).coerceAtLeast(0)
+    val hh = s / 3600
+    val mm = (s % 3600) / 60
+    val ss = s % 60
+    return "%02d:%02d:%02d".format(hh, mm, ss)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
