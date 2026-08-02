@@ -115,6 +115,7 @@ val toastErrorBg = Color(0xB3D50000) // Red
 val toastInfoBg = Color(0xB33F51B5) // Indigo Blue
 val toastIconCircleBg = Color(0x33FFFFFF) // Semi-transparent White
 val toastTextColor = Color.White // White
+val colorPingSlow = Color(0xFFFFA500) // Orange
 
 object ThemeManager {
     private val _themeMode = MutableStateFlow(
