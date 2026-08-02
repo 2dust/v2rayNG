@@ -31,7 +31,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.ui.compose.colorPing
@@ -77,7 +76,8 @@ fun WireframeGlobe(color: Color, modifier: Modifier = Modifier) {
 }
 
 // Умный парсер протоколов (VLESS / TCP / REALITY | JSON)
-fun getProtocolDescription(profile: ProfileItem): String {
+fun getProtocolDescription(server: ServersCache): String {
+    val profile = server.profile
     val configType = profile.configType.name.uppercase().let { if (it == "CUSTOM") "AUTO" else it }
     val parts = mutableListOf(configType)
     
@@ -101,10 +101,10 @@ fun ProfileCard(
     subscription: SubscriptionCache,
     servers: List<ServersCache>,
     selectedGuid: String?,
+    onAction: (MainAction) -> Unit,
     onPingProfile: (String) -> Unit,
     onUpdateSubscription: (String) -> Unit,
-    onSelectServer: (String) -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit
+    onSelectServer: (String) -> Unit
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -147,6 +147,8 @@ fun ProfileCard(
                     ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.width(8.dp))
+                
+                // Три точки с переходом в редактор
                 Box {
                     IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
                         Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
@@ -257,7 +259,7 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         
-                        val finalDesc = getProtocolDescription(serverCache.profile) + " | JSON"
+                        val finalDesc = getProtocolDescription(serverCache) + " | JSON"
 
                         Text(
                             text = finalDesc, 
@@ -279,9 +281,9 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Исправлено: передаем оба параметра (guid и profile)
+                    // Стрелочка открывает сервер через MainAction
                     IconButton(
-                        onClick = { onEditServer(serverCache.guid, serverCache.profile) },
+                        onClick = { onAction(MainAction.EditServer(serverCache.guid)) },
                         modifier = Modifier.size(40.dp)
                     ) {
                         ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
@@ -292,7 +294,7 @@ fun ProfileCard(
     }
 }
 
-// 100% Оригинальная сигнатура для MainActivity, чтобы не было никаких ошибок компиляции!
+// Оригинальная архитектурная сигнатура
 @Composable
 fun GroupPagerPage(
     groupId: String,
@@ -303,12 +305,8 @@ fun GroupPagerPage(
     searchQuery: String,
     lazyListStates: MutableMap<String, LazyListState>,
     lazyGridStates: MutableMap<String, LazyGridState>,
-    onSelectServer: (String) -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit,
-    onShareServer: (String, ProfileItem) -> Unit,
-    onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit,
+    onAction: (MainAction) -> Unit,
     contentPadding: PaddingValues
 ) {
-    // Архитектурная заглушка (весь UI теперь в MainScreen)
+    // Архитектурная заглушка
 }
