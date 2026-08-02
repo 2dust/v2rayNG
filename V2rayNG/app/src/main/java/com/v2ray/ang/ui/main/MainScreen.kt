@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.entities.ProfileItem
 
 @Composable
 fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
@@ -52,19 +51,13 @@ fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
     }
 }
 
-// ОРИГИНАЛЬНАЯ СИГНАТУРА MAIN SCREEN - ГАРАНТИРУЕТ РАБОТУ ВСЕХ КНОПОК!
+// ОРИГИНАЛЬНАЯ СИГНАТУРА MAIN SCREEN (Чтобы компилятор MainActivity был счастлив)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
-    onAddServer: () -> Unit,
-    onScanQR: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onOpenSubscriptions: () -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit,
-    onShareServer: (String, ProfileItem) -> Unit,
-    onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit
+    onAction: (MainAction) -> Unit,
+    onNavigate: (String) -> Unit
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val subscriptions by mainViewModel.subscriptions.collectAsStateWithLifecycle()
@@ -113,7 +106,7 @@ fun MainScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = onOpenSettings) {
+                    IconButton(onClick = { onNavigate("settings") }) {
                         Icon(painterResource(id = R.drawable.ic_settings_24dp), contentDescription = "Настройки", modifier = Modifier.size(32.dp))
                     }
                     Box {
@@ -121,10 +114,9 @@ fun MainScreen(
                             Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить", modifier = Modifier.size(32.dp))
                         }
                         DropdownMenu(expanded = showImportMenu, onDismissRequest = { showImportMenu = false }) {
-                            DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; mainViewModel.onAction(MainAction.ImportClipboard) })
-                            DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onScanQR() })
-                            DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; mainViewModel.onAction(MainAction.ImportConfigLocal) })
-                            DropdownMenuItem(text = { Text("Добавить вручную") }, onClick = { showImportMenu = false; onAddServer() })
+                            DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; onAction(MainAction.ImportClipboard) })
+                            DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onAction(MainAction.ImportQRcode) })
+                            DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; onAction(MainAction.ImportConfigLocal) })
                         }
                     }
                 }
@@ -157,7 +149,7 @@ fun MainScreen(
                             .clip(CircleShape)
                             .background(Color.White)
                             .border(8.dp, Color(0xFFF4F6F9), CircleShape)
-                            .clickable { mainViewModel.onAction(MainAction.ToggleService) },
+                            .clickable { onAction(MainAction.ToggleService) },
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -200,7 +192,7 @@ fun MainScreen(
                         color = Color.Gray,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable { mainViewModel.onAction(MainAction.TestCurrentServer) }
+                        modifier = Modifier.clickable { onAction(MainAction.TestCurrentServer) }
                     )
                     Text(
                         text = "Скрыть все",
@@ -237,17 +229,17 @@ fun MainScreen(
                                 subscription = subCache,
                                 servers = servers,
                                 selectedGuid = uiState.selectedGuid,
+                                onAction = onAction,
                                 onPingProfile = { guid -> 
-                                    mainViewModel.onAction(MainAction.SelectGroup(guid))
-                                    mainViewModel.onAction(MainAction.TestProfileTcpPing(guid)) 
+                                    onAction(MainAction.SelectGroup(guid))
+                                    onAction(MainAction.TestProfileTcpPing(guid)) 
                                 },
                                 onUpdateSubscription = { 
                                     mainViewModel.updateSubscription(it)
                                 },
                                 onSelectServer = { guid -> 
-                                    mainViewModel.onAction(MainAction.SelectServer(guid)) 
-                                },
-                                onEditServer = onEditServer // Пробрасываем оригинальный вызов!
+                                    onAction(MainAction.SelectServer(guid)) 
+                                }
                             )
                         }
                     }
