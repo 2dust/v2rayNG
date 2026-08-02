@@ -64,7 +64,7 @@ fun ConnectButton(uiState: MainUiState, onAction: (MainAction) -> Unit) {
         if (uiState.isRunning && startTime != null) {
             Text("подключено — ${formatElapsed(elapsed)}")
         } else {
-            Icon(painterResource(R.drawable.ic_launch), contentDescription = null)
+            Icon(painterResource(android.R.drawable.ic_menu_send), contentDescription = null)
             Spacer(Modifier.width(8.dp))
             Text("Подключиться")
         }
