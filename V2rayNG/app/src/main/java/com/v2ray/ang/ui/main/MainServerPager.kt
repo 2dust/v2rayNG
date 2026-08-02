@@ -32,6 +32,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.ui.compose.colorPing
+import com.v2ray.ang.ui.compose.colorPingRed
 import com.v2ray.ang.ui.subscription.SubEditActivity
 
 @Composable
@@ -72,7 +74,7 @@ fun WireframeGlobe(color: Color, modifier: Modifier = Modifier) {
     }
 }
 
-// Умный парсер протоколов (VLESS / TCP / REALITY)
+// Умный парсер протоколов (VLESS / TCP / REALITY | JSON)
 fun getProtocolDescription(profile: ProfileItem): String {
     val configType = profile.configType.name.uppercase().let { if (it == "CUSTOM") "AUTO" else it }
     val parts = mutableListOf(configType)
@@ -97,10 +99,10 @@ fun ProfileCard(
     subscription: SubscriptionCache,
     servers: List<ServersCache>,
     selectedGuid: String?,
+    onAction: (MainAction) -> Unit,
     onPingProfile: (String) -> Unit,
     onUpdateSubscription: (String) -> Unit,
-    onSelectServer: (String) -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit
+    onSelectServer: (String) -> Unit
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -136,18 +138,16 @@ fun ProfileCard(
                 }
                 
                 IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(32.dp)) {
-                    Icon(painterResource(id = android.R.drawable.ic_menu_revert), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
                 }
                 Spacer(Modifier.width(8.dp))
                 IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(32.dp)) {
                     ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.width(8.dp))
-                
-                // Три точки
                 Box {
                     IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_menu_more), contentDescription = "Меню", tint = Color.Gray)
+                        Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
                     }
                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         DropdownMenuItem(
@@ -179,7 +179,7 @@ fun ProfileCard(
                     }, 
                     modifier = Modifier.size(24.dp)
                 ) {
-                    Icon(painterResource(id = R.drawable.ic_menu_info_details), contentDescription = "Info", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0))
                 }
                 
                 Spacer(Modifier.width(12.dp))
@@ -200,7 +200,7 @@ fun ProfileCard(
                     }, 
                     modifier = Modifier.size(24.dp)
                 ) {
-                    Icon(painterResource(id = R.drawable.ic_menu_share), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
                 }
             }
             
@@ -255,7 +255,6 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         
-                        // Используем наш умный парсер!
                         val finalDesc = getProtocolDescription(serverCache.profile) + " | JSON"
 
                         Text(
@@ -278,9 +277,9 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Кликабельная стрелочка с вызовом onEditServer (ОТКРЫВАЕТ СЕРВЕР)
+                    // Редактировать сервер
                     IconButton(
-                        onClick = { onEditServer(serverCache.guid, serverCache.profile) },
+                        onClick = { onAction(MainAction.EditServer(serverCache.guid)) },
                         modifier = Modifier.size(40.dp)
                     ) {
                         ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
