@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -98,7 +99,9 @@ fun ProfileCard(
                         text = subscription.subscription.remarks ?: "Без названия", 
                         style = MaterialTheme.typography.titleLarge,
                         color = Color(0xFF1E293B),
-                        fontWeight = FontWeight.ExtraBold
+                        fontWeight = FontWeight.ExtraBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text("- 1 ч. 02.08.2026 20:03 | ...", fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.SemiBold)
                 }
@@ -193,7 +196,6 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         
-                        // Парсинг протокола (VLESS / TCP...)
                         val protocol = serverCache.profile.configType.name.uppercase()
                         val network = serverCache.profile.network?.uppercase() ?: "TCP"
                         val security = serverCache.profile.security?.uppercase() ?: "NONE"
@@ -201,16 +203,23 @@ fun ProfileCard(
                             text = "$protocol / $network / $security | JSON", 
                             fontSize = 10.sp, 
                             color = Color.Gray, 
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                     
-                    // Пинг или таймер, и стрелка вправо
+                    // Пинг
                     val delay = serverCache.testDelayMillis
                     if (delay > 0L) {
-                        Text(text = "${delay}ms", style = MaterialTheme.typography.bodySmall, color = colorPing)
+                        val pingColor = if (delay <= 300L) Color(0xFF4CAF50) else Color(0xFFFF9800)
+                        Text(text = "${delay}ms", style = MaterialTheme.typography.bodySmall, color = pingColor)
+                        Spacer(Modifier.width(8.dp))
+                    } else if (delay < 0L) {
+                        Text(text = "таймаут", style = MaterialTheme.typography.bodySmall, color = Color(0xFFF44336))
                         Spacer(Modifier.width(8.dp))
                     }
+                    
                     ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(8.dp))
                 }
@@ -236,6 +245,5 @@ fun GroupPagerPage(
     onRemoveServer: (String) -> Unit,
     contentPadding: PaddingValues
 ) {
-    // Эта функция требуется архитектурой для совместимости, но она тут не используется напрямую, 
-    // так как мы перенесли список в MainScreen.kt. Оставляем пустышку для сборки.
+    // Архитектурная заглушка, функция теперь не используется в MainScreen
 }
