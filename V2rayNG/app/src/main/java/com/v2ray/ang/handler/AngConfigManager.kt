@@ -557,11 +557,12 @@ object AngConfigManager {
                     return SubscriptionUpdateResult(failureCount = 1)
                 }
             }
-
             // --- ДОБАВЛЕНИЕ HWID К URL ---
             try {
+                val context = com.v2ray.ang.App.INSTANCE // или попробуем через Utils
+                // Если Instance не сработает, используем альтернативный метод получения черезкостыль контекста:
                 val hwid = Settings.Secure.getString(
-                    com.v2ray.ang.App.application.contentResolver,
+                    com.v2ray.ang.App.application?.contentResolver ?: android.app.Application().contentResolver,
                     Settings.Secure.ANDROID_ID
                 ) ?: "unknown_hwid"
 
@@ -573,6 +574,7 @@ object AngConfigManager {
                 LogUtil.e(AppConfig.TAG, "Failed to append HWID to subscription URL", e)
             }
             // -----------------------------
+            
 
             LogUtil.i(AppConfig.TAG, url)
             val userAgent = it.subscription.userAgent
