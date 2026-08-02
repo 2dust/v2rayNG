@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
@@ -57,16 +58,14 @@ fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
-    onAction: ((MainAction) -> Unit)? = null,
-    onNavigate: ((String) -> Unit)? = null,
-    onAddServer: (() -> Unit)? = null,
-    onScanQR: (() -> Unit)? = null,
-    onOpenSettings: (() -> Unit)? = null,
-    onOpenSubscriptions: (() -> Unit)? = null,
-    onEditServer: ((String, ProfileItem) -> Unit)? = null,
-    onShareServer: ((String, ProfileItem) -> Unit)? = null,
-    onMoreServer: ((String, ProfileItem) -> Unit)? = null,
-    onRemoveServer: ((String) -> Unit)? = null
+    onAddServer: () -> Unit,
+    onScanQR: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenSubscriptions: () -> Unit,
+    onEditServer: (String, ProfileItem) -> Unit,
+    onShareServer: (String, ProfileItem) -> Unit,
+    onMoreServer: (String, ProfileItem) -> Unit,
+    onRemoveServer: (String) -> Unit
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val subscriptions by mainViewModel.subscriptions.collectAsStateWithLifecycle()
@@ -75,10 +74,10 @@ fun MainScreen(
 
     var showImportMenu by remember { mutableStateOf(false) }
 
-    // Очистка ошибки через 3 секунды
+    // Очистка текста ошибки через 4 секунды
     LaunchedEffect(importError) {
         if (importError != null) {
-            delay(3000)
+            delay(4000)
             mainViewModel.importError.value = null
         }
     }
@@ -116,7 +115,7 @@ fun MainScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { onOpenSettings?.invoke() ?: onNavigate?.invoke("settings") }) {
+                    IconButton(onClick = onOpenSettings) {
                         Icon(painterResource(id = R.drawable.ic_settings_24dp), contentDescription = "Настройки", modifier = Modifier.size(32.dp))
                     }
                     Box {
@@ -124,10 +123,10 @@ fun MainScreen(
                             Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить", modifier = Modifier.size(32.dp))
                         }
                         DropdownMenu(expanded = showImportMenu, onDismissRequest = { showImportMenu = false }) {
-                            DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; onAction?.invoke(MainAction.ImportClipboard) ?: mainViewModel.onAction(MainAction.ImportClipboard) })
-                            DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onScanQR?.invoke() ?: onAction?.invoke(MainAction.ImportQRcode) })
-                            DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; onAction?.invoke(MainAction.ImportConfigLocal) ?: mainViewModel.onAction(MainAction.ImportConfigLocal) })
-                            DropdownMenuItem(text = { Text("Добавить вручную") }, onClick = { showImportMenu = false; onAddServer?.invoke() })
+                            DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; mainViewModel.onAction(MainAction.ImportClipboard) })
+                            DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onScanQR() })
+                            DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; mainViewModel.onAction(MainAction.ImportConfigLocal) })
+                            DropdownMenuItem(text = { Text("Добавить вручную") }, onClick = { showImportMenu = false; onAddServer() })
                         }
                     }
                 }
@@ -160,7 +159,7 @@ fun MainScreen(
                             .clip(CircleShape)
                             .background(Color.White)
                             .border(8.dp, Color(0xFFF4F6F9), CircleShape)
-                            .clickable { onAction?.invoke(MainAction.ToggleService) ?: mainViewModel.onAction(MainAction.ToggleService) },
+                            .clickable { mainViewModel.onAction(MainAction.ToggleService) },
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -203,7 +202,7 @@ fun MainScreen(
                         color = Color.Gray,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable { onAction?.invoke(MainAction.TestCurrentServer) ?: mainViewModel.onAction(MainAction.TestCurrentServer) }
+                        modifier = Modifier.clickable { mainViewModel.onAction(MainAction.TestCurrentServer) }
                     )
                     Text(
                         text = "Скрыть все",
@@ -232,7 +231,7 @@ fun MainScreen(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        items(subscriptions, key = { it.guid }) { subCache ->
+                        items(subscriptions, key = { it.guid + (it.subscription.remarks ?: "") }) { subCache ->
                             val serversFlow = remember(subCache.guid) { mainViewModel.serversForGroup(subCache.guid) }
                             val servers by serversFlow.collectAsStateWithLifecycle(initialValue = emptyList())
 
@@ -240,7 +239,6 @@ fun MainScreen(
                                 subscription = subCache,
                                 servers = servers,
                                 selectedGuid = uiState.selectedGuid,
-                                onAction = onAction,
                                 onPingProfile = { guid -> 
                                     mainViewModel.onAction(MainAction.SelectGroup(guid))
                                     mainViewModel.onAction(MainAction.TestProfileTcpPing(guid)) 
@@ -249,8 +247,9 @@ fun MainScreen(
                                     mainViewModel.updateSubscription(it)
                                 },
                                 onSelectServer = { guid -> 
-                                    onAction?.invoke(MainAction.SelectServer(guid)) ?: mainViewModel.onAction(MainAction.SelectServer(guid)) 
-                                }
+                                    mainViewModel.onAction(MainAction.SelectServer(guid)) 
+                                },
+                                onEditServer = onEditServer
                             )
                         }
                     }
@@ -258,17 +257,17 @@ fun MainScreen(
             }
         }
         
-        // Анимация импорта
+        // Плавная анимация загрузки импорта
         AnimatedVisibility(
             visible = isImporting,
-            enter = fadeIn(),
-            exit = fadeOut()
+            enter = fadeIn(animationSpec = tween(300)),
+            exit = fadeOut(animationSpec = tween(300))
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.4f))
-                    .clickable(enabled = false) {}, // Блокируем UI
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable(enabled = false) {}, 
                 contentAlignment = Alignment.Center
             ) {
                 Card(
@@ -281,17 +280,17 @@ fun MainScreen(
                     ) {
                         CircularProgressIndicator(color = Color(0xFF5C6BC0), strokeWidth = 4.dp)
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("Обновление подписки...", fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), fontSize = 16.sp)
+                        Text("Обновление профиля...", fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), fontSize = 16.sp)
                     }
                 }
             }
         }
 
-        // Вывод ошибки импорта
+        // Всплывающая плашка с ошибкой
         AnimatedVisibility(
             visible = importError != null,
-            enter = fadeIn(),
-            exit = fadeOut(),
+            enter = fadeIn(animationSpec = tween(300)),
+            exit = fadeOut(animationSpec = tween(300)),
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp)
         ) {
             Card(
