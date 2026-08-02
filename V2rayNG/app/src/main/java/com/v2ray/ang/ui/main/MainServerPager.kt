@@ -25,13 +25,6 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.NetworkCheck
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,14 +36,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.v2ray.ang.dto.SubscriptionCache
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.extension.isComplexType
@@ -68,78 +61,6 @@ import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import kotlin.math.abs
-
-@Composable
-fun ProfileCard(
-    subscription: SubscriptionCache,
-    servers: List<ServersCache>,
-    selectedGuid: String?,
-    onPingProfile: (String) -> Unit,
-    onUpdateSubscription: (String) -> Unit,
-    onSelectServer: (String) -> Unit,
-) {
-    Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-        // Шапка профиля
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = subscription.subscription.remarks ?: "Без названия", 
-                modifier = Modifier.weight(1f), 
-                style = MaterialTheme.typography.titleMedium
-            )
-            
-            // Кнопка Пинг
-            IconButton(onClick = { onPingProfile(subscription.guid) }) {
-                Icon(Icons.Default.NetworkCheck, contentDescription = "Ping")
-            }
-            
-            // Кнопка Обновить
-            IconButton(onClick = { onUpdateSubscription(subscription.guid) }) {
-                Icon(Icons.Default.Refresh, contentDescription = "Обновить подписку")
-            }
-        }
-        
-        // Трафик и дата (временная заглушка до интеграции парсера Remnawave)
-        Text(
-            text = "До 31.12.2026 — 15 ГБ / 50 ГБ", 
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall
-        )
-        
-        Spacer(Modifier.height(8.dp))
-        
-        // Список серверов этого профиля
-        servers.forEach { serverCache ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onSelectServer(serverCache.guid) }
-                    .padding(vertical = 6.dp)
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text(text = serverCache.profile.remarks ?: "")
-                    Text(
-                        text = serverCache.profile.server ?: "", 
-                        style = MaterialTheme.typography.bodySmall, 
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                
-                val delay = serverCache.testDelayMillis
-                val delayText = serverCache.testDelayString.ifEmpty { if (delay < 0) "таймаут" else "" }
-                val pingColor = when {
-                    delay < 0L -> Color(0xFFF44336)
-                    delay in 1L..300L -> Color(0xFF4CAF50)
-                    delay > 300L -> Color(0xFFFF9800)
-                    else -> Color.Gray
-                }
-                
-                Text(text = delayText, color = pingColor)
-            }
-            HorizontalDivider()
-        }
-    }
-}
 
 @Composable
 fun GroupPagerPage(
@@ -437,17 +358,17 @@ fun ServerListItem(
                 )
                 if (doubleColumnDisplay) {
                     IconButton(onClick = onMore, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Еще", modifier = Modifier.size(24.dp))
+                        Icon(painterResource(id = R.drawable.ic_more_vert), contentDescription = "Еще", modifier = Modifier.size(24.dp))
                     }
                 } else {
                     IconButton(onClick = onShare, modifier = Modifier.size(36.dp)) { 
-                        Icon(Icons.Default.Share, contentDescription = "Поделиться", modifier = Modifier.size(24.dp)) 
+                        Icon(painterResource(id = R.drawable.ic_share), contentDescription = "Поделиться", modifier = Modifier.size(24.dp)) 
                     }
                     IconButton(onClick = onEdit, modifier = Modifier.size(36.dp)) { 
-                        Icon(Icons.Default.Edit, contentDescription = "Изменить", modifier = Modifier.size(24.dp)) 
+                        Icon(painterResource(id = R.drawable.ic_edit), contentDescription = "Изменить", modifier = Modifier.size(24.dp)) 
                     }
                     IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) { 
-                        Icon(Icons.Default.Delete, contentDescription = "Удалить", modifier = Modifier.size(24.dp)) 
+                        Icon(painterResource(id = R.drawable.ic_delete), contentDescription = "Удалить", modifier = Modifier.size(24.dp)) 
                     }
                 }
             }
