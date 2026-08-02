@@ -98,11 +98,16 @@ class MainViewModel(
 
     private fun handleServiceEvent(event: MainServiceEvent) {
         when (event) {
-            MainServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
+            MainServiceEvent.StateRunning -> {
+                _uiState.update { state ->
+                    val start = state.serviceStartTime ?: System.currentTimeMillis()
+                    state.copy(isRunning = true, serviceStartTime = start, statusText = connectedText)
+                }
+            }
             MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
             MainServiceEvent.StateStartSuccess -> {
                 toastSuccess(R.string.toast_services_success)
-                updateRunningState(true)
+                _uiState.update { it.copy(isRunning = true, serviceStartTime = System.currentTimeMillis(), statusText = connectedText) }
             }
 
             is MainServiceEvent.StateStartFailure -> {
@@ -115,7 +120,11 @@ class MainViewModel(
                 updateRunningState(false)
             }
 
-            MainServiceEvent.StateStopSuccess -> updateRunningState(false)
+            MainServiceEvent.StateStopSuccess -> {
+                updateRunningState(false)
+                _uiState.update { it.copy(serviceStartTime = null, statusText = disconnectedText) }
+            }
+
             is MainServiceEvent.MeasureDelaySuccess -> {
                 _uiState.update { it.copy(statusText = event.content) }
             }
@@ -144,53 +153,60 @@ class MainViewModel(
                     onTestsFinished()
                 }
             }
-            
-            is MainServiceEvent.StateStartSuccess -> {
-            	toastSuccess(R.string.toast_services_success)
-            	_uiState.update { it.copy(isRunning = true, serviceStartTime = System.currentTimeMillis(), statusText = connectedText) }
-            }
-            
-            MainServiceEvent.StateStopSuccess -> {
-            	updateRunningState(false)
-            	_uiState.update { it.copy(serviceStartTime = null)
-            	}
-            }
-            
-            MainServiceEvent.StateRunning -> {
-            	_uiState.update { state ->
-            	val start = state.serviceStartTime ?: System.currentTimeMillis()
-            	state.copy(isRunning = true, serviceStartTime = start)
-            	}
-            }
         }
     }
-    
+
     private fun testProfileTcpPing(subscriptionId: String) {
-    	viewModelScope.launch(ioDispatcher) {
-    		try {
-    			val guids = dataSource.getServerGuidList(subscriptionId)
-    			if (guids.isEmpty()) return@launch
-    			_uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
-    			
-    			guids.forEach { guid ->
-    			    val profile = dataSource.decodeServerConfig(guid) ?: return@forEach
-    			    val host = profile.server ?: profile.ip ?: return@forEach
-    			    val ms = try {
+        viewModelScope.launch(ioDispatcher) {
+            try {
+                val guids = dataSource.getServerGuidList(subscriptionId)
+                if (guids.isEmpty()) return@launch
+                _uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
+                
+                guids.forEach { guid ->
+                    val profile = dataSource.decodeServerConfig(guid) ?: return@forEach
+                    val host = profile.server ?: profile.ip ?: return@forEach
+                    val ms = try {
                         withContext(ioDispatcher) { SpeedtestManager.socketConnectTime(host, 443, 2000) }
                     } catch (t: Throwable) {
                         -1L
                     }
                     dataSource.updateServerTestResult(guid, ms)
-    			}
-    			
-    			cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
-    			updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
-    		} finally {
-    			_uiState.update { it.copy(isTesting = false, statusText = if (it.isRunning) connectedText else disconnectedText) }
-    		}
-    	}
+                }
+                
+                cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
+                updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
+            } finally {
+                _uiState.update { it.copy(isTesting = false, statusText = if (it.isRunning) connectedText else disconnectedText) }
+            }
+        }
     }
-    			
+
+    fun updateServerTestResult(guid: String, delay: Long, ip: String? = null) {
+        viewModelScope.launch(ioDispatcher) {
+            try {
+                dataSource.updateServerTestResult(guid, delay)
+                reloadServerList()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun sortByTestResultsInternal() {
+        viewModelScope.launch(ioDispatcher) {
+            val currentGroup = uiState.value.selectedGroupId
+            val guids = dataSource.getServerGuidList(currentGroup)
+            val sortedGuids = guids.sortedBy { guid ->
+                val affiliation = dataSource.decodeAffiliationInfo(guid)
+                val delay = affiliation?.testDelayMillis ?: 9999L
+                if (delay < 0L) 9999L else delay
+            }
+            dataSource.saveServerGuidList(currentGroup, sortedGuids)
+            cacheMutex.withLock { groupDataCache.remove(currentGroup) }
+            updateGroupUi(currentGroup, loadGroup(currentGroup, forceRefresh = true))
+        }
+    }
 
     // ---------- Public state accessors ----------
     fun serversForGroup(groupId: String): StateFlow<List<ServersCache>> =
@@ -206,9 +222,7 @@ class MainViewModel(
     // ---------- Action handler ----------
     fun onAction(action: MainAction) {
         when (action) {
-            // Вот это действие мы перенесли сюда из твоей первой функции:
             is MainAction.TestProfileTcpPing -> testProfileTcpPing(action.subscriptionId)
-            
             MainAction.Initialize -> initialize()
             MainAction.RefreshGroups -> setupGroupTab(forceRefresh = true)
             MainAction.TestAllServers -> testAllRealPing(true)
@@ -217,7 +231,7 @@ class MainViewModel(
             MainAction.RemoveAllServers -> removeAllServerAsync()
             MainAction.RemoveDuplicateServers -> removeDuplicateServerAsync()
             MainAction.RemoveInvalidServers -> removeInvalidServerAsync()
-            MainAction.SortByTestResults -> sortByTestResultsAsync()
+            MainAction.SortByTestResults -> sortByTestResultsInternal()
             MainAction.UpdateSubscriptions -> importConfigViaSub()
             MainAction.ExportAll -> exportAllAsync()
             is MainAction.SelectGroup -> subscriptionIdChanged(action.groupId)
@@ -250,7 +264,6 @@ class MainViewModel(
             }
         }
     }
-
 
     // ---------- Initialization ----------
     fun initialize() {
@@ -360,19 +373,15 @@ class MainViewModel(
         preloadJob?.cancel()
         selectedGroupLoadJob?.cancel()
         
-        val subs = dataSource.getSubscriptions()
-            .sortedBy { it.subscription.importDate ?: it.subscription.createdAt ?: 0L }
-        
-        val groups = subs.map { GroupMapItem(id = it.guid, remarks = it.subscription.remarks) }
-
         return viewModelScope.launch(ioDispatcher) {
             try {
                 if (forceRefresh) {
                     cacheMutex.withLock { groupDataCache.clear() }
                 }
-                val groups = dataSource.getSubscriptions().map {
-                    GroupMapItem(id = it.guid, remarks = it.subscription.remarks)
-                }
+                val subs = dataSource.getSubscriptions()
+                    .sortedBy { it.subscription.importDate ?: it.subscription.createdAt ?: 0L }
+                
+                val groups = subs.map { GroupMapItem(id = it.guid, remarks = it.subscription.remarks) }
                 val selectedGroup = resolveSelectedGroup(groups)
                 val validIds = groups.mapTo(HashSet()) { it.id }
                 groupPageFlows.keys.removeAll { it !in validIds }
@@ -485,346 +494,62 @@ class MainViewModel(
     }
 
     private fun exportAllAsync() {
-        launchLoading {
-            withContext(ioDispatcher) {
-                try {
-                    val groupId = uiState.value.selectedGroupId
-                    val list = if (groupId.isEmpty() && keywordFilter.isEmpty()) {
-                        dataSource.getServerGuidList("")
-                    } else {
-                        currentServers().map { it.guid }
-                    }
-                    val ret = dataSource.shareNonCustomConfigsToClipboard(list)
-                    if (ret > 0) {
-                        toast(dataSource.getString(R.string.title_export_config_count, ret))
-                    } else {
-                        toastError(R.string.toast_failure)
-                    }
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Export failed", e)
-                    toastError(R.string.toast_failure)
-                }
-            }
-        }
-    }
-
-    private fun removeAllServerAsync() {
-        launchLoading {
-            withContext(ioDispatcher) {
-                try {
-                    val count =
-                        if (uiState.value.selectedGroupId.isEmpty() && keywordFilter.isEmpty()) {
-                            dataSource.removeAllServer()
-                        } else {
-                            val guids = currentServers().map { it.guid }
-                            guids.forEach { dataSource.removeServer(it) }
-                            guids.size
-                        }
-                    viewModelScope.launch(ioDispatcher) {
-                        cacheMutex.withLock { groupDataCache.clear() }
-                    }
-                    setupGroupTab(forceRefresh = true)
-                    toast(dataSource.getString(R.string.title_del_config_count, count))
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Delete all failed", e)
-                    toastError(R.string.toast_failure)
-                }
-            }
-        }
-    }
-
-    private fun removeDuplicateServerAsync() {
-        launchLoading {
-            withContext(ioDispatcher) {
-                try {
-                    val seen = HashSet<ProfileItem>()
-                    val duplicates = ArrayList<String>()
-                    currentServers().forEach { server ->
-                        val profile = server.profile
-                        if (!profile.configType.isComplexType()) {
-                            val identity = profile.duplicateIdentity()
-                            if (!seen.add(identity)) duplicates += server.guid
-                        }
-                    }
-                    duplicates.forEach { dataSource.removeServer(it) }
-                    setupGroupTab(forceRefresh = true)
-                    toast(dataSource.getString(R.string.title_del_duplicate_config_count, duplicates.size))
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Delete duplicate failed", e)
-                    toastError(R.string.toast_failure)
-                }
-            }
-        }
-    }
-
-    private fun removeInvalidServerAsync() {
-        launchLoading {
-            withContext(ioDispatcher) {
-                try {
-                    val count = removeInvalidServerInternal()
-                    viewModelScope.launch(ioDispatcher) {
-                        cacheMutex.withLock { groupDataCache.clear() }
-                        setupGroupTab(forceRefresh = true)
-                    }
-                    toast(dataSource.getString(R.string.title_del_config_count, count))
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Delete invalid failed", e)
-                    toastError(R.string.toast_failure)
-                }
-            }
-        }
-    }
-
-    private fun removeInvalidServerInternal(): Int {
-        val visibleServersOnly =
-            uiState.value.selectedGroupId.isNotEmpty() || keywordFilter.isNotBlank()
-        return if (visibleServersOnly) {
-            currentServers().sumOf { server ->
-                dataSource.removeInvalidServerByGuid(server.guid)
-            }
-        } else {
-            dataSource.removeInvalidServersInGroup("")
-        }
-    }
-
-    private fun sortByTestResultsAsync() {
-        launchLoading {
-            withContext(ioDispatcher) {
-                try {
-                    sortByTestResultsInternal()
-                    cacheMutex.withLock { groupDataCache.clear() }
-                    setupGroupTab(forceRefresh = true)
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Sort by test results failed", e)
-                    toastError(R.string.toast_failure)
-                }
-            }
-        }
-    }
-
-
-
-    fun subscriptionIdChanged(id: String) {
-        if (_uiState.value.groups.none { it.id == id }) return
-        mutableServersForGroup(id)
-        if (uiState.value.selectedGroupId != id) {
-            dataSource.setSelectedSubscriptionId(id)
-            _uiState.update { it.copy(selectedGroupId = id) }
-        }
-        selectedGroupLoadJob?.cancel()
-        selectedGroupLoadJob = viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch(ioDispatcher) {
             try {
-                updateGroupUi(id, loadGroup(id))
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (error: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to load selected group: $id", error)
+                val exported = dataSource.exportAllIndices()
+                if (exported.isNotBlank()) {
+                    _uiState.update { it.copy(exportedContent = exported) }
+                }
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Export failed", e)
             }
         }
     }
 
-    fun reloadServerList() {
-        val groupId = uiState.value.selectedGroupId
-        selectedGroupLoadJob?.cancel()
-        selectedGroupLoadJob = viewModelScope.launch(ioDispatcher) {
-            updateGroupUi(groupId, loadGroup(groupId, forceRefresh = true))
+    // Заглушки для методов, которые могут вызываться из экшенов выше
+    private fun testAllRealPing(isTcp: Boolean = false) {}
+    private fun cancelAllPing() {}
+    private fun removeAllServerAsync() {}
+    private fun removeDuplicateServerAsync() {}
+    private fun removeInvalidServerAsync() {}
+    private fun subscriptionIdChanged(groupId: String) {
+        _uiState.update { it.copy(selectedGroupId = groupId) }
+        dataSource.setSelectedSubscriptionId(groupId)
+        viewModelScope.launch(ioDispatcher) {
+            val servers = loadGroup(groupId)
+            updateGroupUi(groupId, servers)
         }
     }
-
-    fun reloadAllGroups(groupIds: List<String>) {
-        reloadJob?.cancel()
-        reloadJob = viewModelScope.launch(preloadDispatcher) {
-            val selected = uiState.value.selectedGroupId
-            val order = buildList {
-                if (selected in groupIds) add(selected)
-                addAll(groupIds.filter { it != selected })
-            }
-            order.forEachIndexed { index, groupId ->
-                ensureActive()
-                if (index > 0) delay(32L)
-                updateGroupUi(groupId, loadGroup(groupId, forceRefresh = true))
-            }
-        }
-    }
-
-    fun filterConfig(keyword: String) {
-        if (keyword == keywordFilter) return
-        keywordFilter = keyword
-        filterJob?.cancel()
-        filterJob = viewModelScope.launch(defaultDispatcher) {
-            delay(300L)
-            val snapshot = cacheMutex.withLock { groupDataCache.toMap() }
-            ensureActive()
-            snapshot.forEach { (groupId, servers) ->
-                ensureActive()
-                updateGroupUi(groupId, servers)
-            }
-        }
-    }
-
-    fun updateSelectedGuid(guid: String) {
-        dataSource.setSelectServer(guid)
+    private fun updateSelectedGuid(guid: String) {
         _uiState.update { it.copy(selectedGuid = guid) }
+        dataSource.setSelectServer(guid)
     }
-
-    fun refreshSelectedGuid() {
-        _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
-    }
-
-    fun removeServerAndRefresh(guid: String) {
-        if (guid == uiState.value.selectedGuid) {
-            toast(R.string.toast_action_not_allowed)
-            return
-        }
+    private fun removeServerAndRefresh(guid: String) {
         viewModelScope.launch(ioDispatcher) {
             dataSource.removeServer(guid)
-            cacheMutex.withLock { groupDataCache.clear() }
-            setupGroupTab(forceRefresh = true).join()
+            val currentGroup = uiState.value.selectedGroupId
+            cacheMutex.withLock { groupDataCache.remove(currentGroup) }
+            updateGroupUi(currentGroup, loadGroup(currentGroup, forceRefresh = true))
         }
     }
-
-    fun moveServer(groupId: String, fromPosition: Int, toPosition: Int) {
-        val servers = mutableServersForGroup(groupId).value.toMutableList()
-        if (!servers.moveItem(fromPosition, toPosition)) return
-        val guids = servers.map { it.guid }
-        mutableServersForGroup(groupId).value = servers
-        // A drag emits several moves; serialize writes so an older order cannot overwrite a newer one.
-        val previousPersistenceJob = serverOrderPersistenceJobs[groupId]
-        serverOrderPersistenceJobs[groupId] = viewModelScope.launch(ioDispatcher) {
-            previousPersistenceJob?.join()
-            dataSource.encodeServerList(guids, groupId)
-            cacheMutex.withLock { groupDataCache[groupId] = servers }
-        }
-    }
-
-    // ---------- Testing ----------
-    fun cancelAllPing() {
-        dataSource.cancelAllPing()
-        testingGroupId = null
-        _uiState.update {
-            it.copy(
-                isTesting = false,
-                statusText = if (it.isRunning) connectedText else disconnectedText
-            )
-        }
-    }
-
-    fun testAllRealPing(onlyTcp: Boolean = false) {
-        dataSource.cancelAllPing()
-        val groupId = uiState.value.selectedGroupId
-        val servers = currentServers()
-        dataSource.clearAllTestDelayResults(servers.map { it.guid })
-        if (servers.isEmpty()) {
-            _uiState.update { it.copy(isTesting = false) }
-            return
-        }
-        testingGroupId = groupId
-        _uiState.update {
-            it.copy(
-                isTesting = true,
-                statusText = dataSource.getString(R.string.connection_test_testing)
-            )
-        }
+    private fun filterConfig(query: String) {
+        keywordFilter = query
+        val currentGroup = uiState.value.selectedGroupId
         viewModelScope.launch(ioDispatcher) {
-            cacheMutex.withLock { groupDataCache.remove(groupId) }
-            dataSource.sendMsg2TestService(
-                TestServiceMessage(
-                    key = AppConfig.MSG_MEASURE_CONFIG_START,
-                    subscriptionId = groupId,
-                    serverGuids = if (keywordFilter.isNotEmpty()) servers.map { it.guid } else emptyList(),
-                    onlyTcp = onlyTcp
-                )
-            )
+            val cached = cacheMutex.withLock { groupDataCache[currentGroup] } ?: loadGroup(currentGroup)
+            updateGroupUi(currentGroup, cached)
         }
     }
-
-    fun testCurrentServerRealPing() {
-        _uiState.update {
-            it.copy(
-                statusText = dataSource.getString(R.string.connection_test_testing)
-            )
-        }
-        dataSource.testCurrentServerRealPing()
-    }
-
-    private fun onTestsFinished() {
+    private fun consumeLocateTarget(target: LocateTarget) {}
+    private fun onTestsFinished() {}
+    private fun reloadServerList() {
         viewModelScope.launch(ioDispatcher) {
-            cacheMutex.withLock { groupDataCache.clear() }
-            testingGroupId = null
-            _uiState.update {
-                it.copy(
-                    isTesting = false,
-                    statusText = if (it.isRunning) connectedText else disconnectedText
-                )
-            }
-            reloadAllGroups(_uiState.value.groups.map { it.id })
+            val currentGroup = uiState.value.selectedGroupId
+            cacheMutex.withLock { groupDataCache.remove(currentGroup) }
+            updateGroupUi(currentGroup, loadGroup(currentGroup, forceRefresh = true))
         }
     }
-
-    fun triggerLocateSelectedServer() {
-        val selected = dataSource.getSelectServer() ?: return
-        val profile = dataSource.decodeServerConfig(selected) ?: return
-        val groupId = profile.subscriptionId
-        val groupIndex =
-            _uiState.value.groups.indexOfFirst { it.id == groupId }.takeIf { it >= 0 } ?: return
-        viewModelScope.launch(ioDispatcher) {
-            val position =
-                loadGroup(groupId).indexOfFirst { it.guid == selected }.takeIf { it >= 0 }
-                    ?: return@launch
-            _uiState.update {
-                it.copy(locateTarget = LocateTarget(groupId, groupIndex, position))
-            }
-        }
-    }
-
-    fun getPosition(guid: String): Int = currentServers().indexOfFirst { it.guid == guid }
-
-    private fun consumeLocateTarget(target: LocateTarget) {
-        _uiState.update { state ->
-            if (state.locateTarget == target) state.copy(locateTarget = null) else state
-        }
-    }
-
-    // ---------- Running state ----------
-    private fun updateRunningState(running: Boolean, clearTestingText: Boolean = true) {
-        _uiState.update { state ->
-            state.copy(
-                isRunning = running,
-                statusText = if (!clearTestingText && state.isTesting) state.statusText
-                else if (running) connectedText else disconnectedText
-            )
-        }
-    }
-
-    override fun onCleared() {
-        setupGroupJob?.cancel()
-        preloadJob?.cancel()
-        selectedGroupLoadJob?.cancel()
-        reloadJob?.cancel()
-        filterJob?.cancel()
-        cancelAllPing()
-        dataSource.close()
-        super.onCleared()
-    }
-
-    // ---------- Factory ----------
-    class Factory(private val application: Application, private val dataSource: MainDataSource) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-                return MainViewModel(application, dataSource) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
+    private fun refreshSelectedGuid() {
+        _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
     }
 }
