@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.entities.ProfileItem
 
 @Composable
 fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
@@ -51,7 +52,7 @@ fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
     }
 }
 
-// 100% ОРИГИНАЛЬНАЯ СИГНАТУРА MAIN SCREEN (Чтобы MainActivity собрался без ошибок)
+// 100% Оригинальная сигнатура для MainActivity
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -117,7 +118,6 @@ fun MainScreen(
                             DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; onAction(MainAction.ImportClipboard) })
                             DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onAction(MainAction.ImportQRcode) })
                             DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; onAction(MainAction.ImportConfigLocal) })
-                            // Убрали "Добавить вручную" во избежание конфликта классов MainAction
                         }
                     }
                 }
@@ -240,6 +240,12 @@ fun MainScreen(
                                 },
                                 onSelectServer = { guid -> 
                                     onAction(MainAction.SelectServer(guid)) 
+                                },
+                                onDeleteSubscription = { subId ->
+                                    mainViewModel.removeSubscription(subId)
+                                },
+                                onEditServer = { guid, profile ->
+                                    onAction(MainAction.EditServer(guid, profile))
                                 }
                             )
                         }
@@ -248,6 +254,7 @@ fun MainScreen(
             }
         }
         
+        // Плавная выезжающая плашка загрузки сверху
         AnimatedVisibility(
             visible = isImporting,
             enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
@@ -270,6 +277,7 @@ fun MainScreen(
             }
         }
 
+        // Всплывающая плашка с ошибкой снизу
         AnimatedVisibility(
             visible = importError != null,
             enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
