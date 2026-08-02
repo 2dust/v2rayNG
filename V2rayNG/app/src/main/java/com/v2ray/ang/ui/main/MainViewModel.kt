@@ -59,7 +59,6 @@ class MainViewModel(
     private val _subscriptions = MutableStateFlow<List<SubscriptionCache>>(emptyList())
     val subscriptions: StateFlow<List<SubscriptionCache>> = _subscriptions.asStateFlow()
 
-    // Состояния для плавной анимации импорта
     val isImporting = MutableStateFlow(false)
     val importError = MutableStateFlow<String?>(null)
 
@@ -99,15 +98,18 @@ class MainViewModel(
         startBackgroundPolling()
     }
 
-    // Фоновый поллинг: тихо обновляет UI, когда подписка в фоне закончила парситься
+    // Жесткий фоновый мониторинг: если подписка "import sub" обновила имя в БД, сразу перерисовываем UI
     private fun startBackgroundPolling() {
         viewModelScope.launch(ioDispatcher) {
+            var lastHash = 0
             while (true) {
                 delay(2000L)
                 val currentSubs = getSubscriptions()
-                if (_subscriptions.value.map { it.subscription.remarks } != currentSubs.map { it.subscription.remarks }) {
+                val currentHash = currentSubs.map { it.subscription.remarks }.hashCode()
+                if (lastHash != 0 && lastHash != currentHash) {
                     setupGroupTab(forceRefresh = true)
                 }
+                lastHash = currentHash
             }
         }
     }
@@ -247,7 +249,9 @@ class MainViewModel(
             MainAction.DismissQRCodeDialog -> {
                 _uiState.update { it.copy(shareQRCodeBitmap = null) }
             }
-            MainAction.ToggleService,
+            MainAction.ToggleService -> {
+                dataSource.toggleService()
+            }
             MainAction.TestCurrentServer,
             MainAction.ImportQRcode,
             MainAction.ImportClipboard,
@@ -428,10 +432,9 @@ class MainViewModel(
                     val (count, countSub) = dataSource.importBatchConfig(configText, targetGroupId, true)
                     
                     if (countSub > 0 || isUrl) {
-                        val result = dataSource.updateConfigViaSubAll()
-                        if (result.configCount == 0 && result.errorMsg.isNotEmpty()) {
-                            importError.value = "Ошибка сервера: ${result.errorMsg}"
-                        }
+                        dataSource.updateConfigViaSubAll()
+                    } else if (count == 0) {
+                        importError.value = "Буфер обмена пуст или не содержит конфигураций"
                     }
                     
                     setupGroupTab(forceRefresh = true).join()
@@ -457,10 +460,7 @@ class MainViewModel(
             withContext(ioDispatcher) {
                 try {
                     val item = dataSource.getSubscriptionItem(subId) ?: return@withContext
-                    val result = dataSource.updateConfigViaSub(SubscriptionCache(subId, item))
-                    if (result.configCount == 0 && result.errorMsg.isNotEmpty()) {
-                        importError.value = "Ошибка: ${result.errorMsg}"
-                    }
+                    dataSource.updateConfigViaSub(SubscriptionCache(subId, item))
                     setupGroupTab(forceRefresh = true).join()
                 } catch (e: Exception) {
                     importError.value = "Сбой обновления"
