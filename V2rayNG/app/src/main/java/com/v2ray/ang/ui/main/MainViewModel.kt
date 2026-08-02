@@ -144,8 +144,59 @@ class MainViewModel(
                     onTestsFinished()
                 }
             }
+            
+            is MainServiceEvent.StateStartSuccess -> {
+            	toastSuccess(R.string.toast_services_success)
+            	_uiState.update { it.copy(isRunning = true, serviceStartTime = System.currentTimeMillis(), statusText = connectedText) }
+            }
+            
+            MainServiceEvent.StateStopSuccess -> {
+            	updateRunningState(false)
+            	_uiState.update { it.copy(serviceStartTime = null)
+            	}
+            }
+            
+            MainServiceEvent.StateRunning -> {
+            	_uiState.update { state ->
+            	val start = state.serviceStartTime ?: System.currentTimeMillis()
+            	state.copy(isRunning = true, serviceStartTime = start)
+            	}
+            }
         }
     }
+    
+    fun onAction(action: MainAction) {
+    	when (action) {
+    		is MainAction.TestProfileTcpPing -> testProfileTcpPing(action.subscriptionId)
+    	}
+    }
+    
+    private fun testProfileTcpPing(subscriptionId: String) {
+    	viewModelScope.launch(ioDispatcher) {
+    		try {
+    			val guids = dataSource.getServerGuidList(subscriptionId)
+    			if (guids.isEmpty()) return@launch
+    			_uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
+    			
+    			guids.forEach { guid ->
+    			    val profile = dataSource.decodeServerConfig(guid) ?: return@forEach
+    			    val host = profile.server ?: profile.ip ?: return@forEach
+    			    val ms = try {
+                        withContext(ioDispatcher) { SpeedtestManager.socketConnectTime(host, 443, 2000) }
+                    } catch (t: Throwable) {
+                        -1L
+                    }
+                    dataSource.updateServerTestResult(guid, ms)
+    			}
+    			
+    			cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
+    			updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
+    		} finally {
+    			_uiState.update { it.copy(isTesting = false, statusText = if (it.isRunning) connectedText else disconnectedText) }
+    		}
+    	}
+    }
+    			
 
     // ---------- Public state accessors ----------
     fun serversForGroup(groupId: String): StateFlow<List<ServersCache>> =
@@ -310,6 +361,11 @@ class MainViewModel(
         setupGroupJob?.cancel()
         preloadJob?.cancel()
         selectedGroupLoadJob?.cancel()
+        
+        val subs = dataSource.getSubscriptions()
+            .sortedBy { it.subscription.importDate ?: it.subscription.createdAt ?: 0L }
+        
+        val groups = subs.map { GroupMapItem(id = it.guid, remarks = it.subscription.remarks) }
 
         return viewModelScope.launch(ioDispatcher) {
             try {
@@ -558,14 +614,7 @@ class MainViewModel(
         }
     }
 
-    private fun sortByTestResultsInternal() {
-        val subs = if (uiState.value.selectedGroupId.isEmpty()) {
-            dataSource.getSubsList()
-        } else {
-            listOf(uiState.value.selectedGroupId)
-        }
-        subs.forEach { dataSource.sortByTestResultsForSub(it) }
-    }
+
 
     fun subscriptionIdChanged(id: String) {
         if (_uiState.value.groups.none { it.id == id }) return
