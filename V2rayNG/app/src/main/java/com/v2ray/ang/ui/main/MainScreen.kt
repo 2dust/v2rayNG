@@ -1,9 +1,7 @@
 package com.v2ray.ang.ui.main
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -54,6 +52,7 @@ fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
     }
 }
 
+// ОРИГИНАЛЬНАЯ СИГНАТУРА MAIN SCREEN - ГАРАНТИРУЕТ РАБОТУ ВСЕХ КНОПОК!
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -74,7 +73,6 @@ fun MainScreen(
 
     var showImportMenu by remember { mutableStateOf(false) }
 
-    // Очистка текста ошибки через 4 секунды
     LaunchedEffect(importError) {
         if (importError != null) {
             delay(4000)
@@ -249,7 +247,7 @@ fun MainScreen(
                                 onSelectServer = { guid -> 
                                     mainViewModel.onAction(MainAction.SelectServer(guid)) 
                                 },
-                                onEditServer = onEditServer
+                                onEditServer = onEditServer // Пробрасываем оригинальный вызов!
                             )
                         }
                     }
@@ -257,51 +255,46 @@ fun MainScreen(
             }
         }
         
-        // Плавная анимация загрузки импорта
+        // Плавная выезжающая плашка загрузки сверху
         AnimatedVisibility(
             visible = isImporting,
-            enter = fadeIn(animationSpec = tween(300)),
-            exit = fadeOut(animationSpec = tween(300))
+            enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { -it }),
+            modifier = Modifier.align(Alignment.TopCenter).padding(top = 32.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .clickable(enabled = false) {}, 
-                contentAlignment = Alignment.Center
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = Color.White,
+                shadowElevation = 8.dp
             ) {
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                Row(
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(
-                        modifier = Modifier.padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator(color = Color(0xFF5C6BC0), strokeWidth = 4.dp)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("Обновление профиля...", fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), fontSize = 16.sp)
-                    }
+                    CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = Color(0xFF5C6BC0))
+                    Spacer(Modifier.width(12.dp))
+                    Text("Обновление подписки...", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
                 }
             }
         }
 
-        // Всплывающая плашка с ошибкой
+        // Всплывающая плашка с ошибкой снизу
         AnimatedVisibility(
             visible = importError != null,
-            enter = fadeIn(animationSpec = tween(300)),
-            exit = fadeOut(animationSpec = tween(300)),
+            enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { it }),
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp)
         ) {
             Card(
                 shape = RoundedCornerShape(8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF44336))
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF44336)),
+                elevation = CardDefaults.cardElevation(8.dp)
             ) {
                 Text(
                     text = importError ?: "", 
                     color = Color.White, 
                     fontWeight = FontWeight.Bold, 
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
             }
         }
