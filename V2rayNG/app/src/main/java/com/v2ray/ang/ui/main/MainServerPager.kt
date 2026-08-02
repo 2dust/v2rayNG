@@ -32,9 +32,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
-import com.v2ray.ang.ui.compose.colorPing
-import com.v2ray.ang.ui.compose.colorPingRed
-import com.v2ray.ang.ui.subscription.SubSettingActivity
+import com.v2ray.ang.ui.subscription.SubEditActivity
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
@@ -72,6 +70,26 @@ fun WireframeGlobe(color: Color, modifier: Modifier = Modifier) {
         drawOval(color, topLeft = Offset(size.width * 0.25f, 0f), size = Size(size.width * 0.5f, size.height), style = Stroke(width = strokeW))
         drawLine(color, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), strokeWidth = strokeW)
     }
+}
+
+// Умный парсер протоколов (VLESS / TCP / REALITY)
+fun getProtocolDescription(profile: ProfileItem): String {
+    val configType = profile.configType.name.uppercase().let { if (it == "CUSTOM") "AUTO" else it }
+    val parts = mutableListOf(configType)
+    
+    val network = profile.network?.uppercase()
+    if (!network.isNullOrBlank() && network != "TCP") {
+        parts.add(network)
+    } else if (configType != "HYSTERIA2") {
+        parts.add("TCP")
+    }
+    
+    val security = profile.security?.uppercase()
+    if (!security.isNullOrBlank() && security != "NONE") {
+        parts.add(security)
+    }
+    
+    return parts.joinToString(" / ")
 }
 
 @Composable
@@ -125,16 +143,18 @@ fun ProfileCard(
                     ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.width(8.dp))
+                
+                // Три точки
                 Box {
                     IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
                         Icon(painterResource(id = R.drawable.ic_menu_more), contentDescription = "Меню", tint = Color.Gray)
                     }
                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         DropdownMenuItem(
-                            text = { Text("Управление подписками") },
+                            text = { Text("Редактировать профиль") },
                             onClick = { 
                                 showMenu = false
-                                context.startActivity(Intent(context, SubSettingActivity::class.java))
+                                context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.guid))
                             }
                         )
                     }
@@ -143,7 +163,7 @@ fun ProfileCard(
             
             Spacer(Modifier.height(12.dp))
 
-            // Вторая строка: Инфо таблетка
+            // Вторая строка
             Row(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -186,7 +206,6 @@ fun ProfileCard(
             
             Spacer(Modifier.height(16.dp))
             
-            // Текст-хардкод
             Text(
                 "💪 Vanguard VPN - Это не про обход, это про\nпревосходство.\nЕсли подписка не работает — нажмите на кнопку «↻»,\nчтобы обновить её", 
                 fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), modifier = Modifier.fillMaxWidth()
@@ -236,17 +255,8 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         
-                        // Парсим протоколы красиво без CUSTOM: "VLESS / TCP / REALITY | JSON"
-                        val configType = serverCache.profile.configType.name.uppercase()
-                        val network = serverCache.profile.network?.uppercase()?.takeIf { it.isNotBlank() }
-                        val security = serverCache.profile.security?.uppercase()?.takeIf { it.isNotBlank() && it != "NONE" }
-                        
-                        val parts = mutableListOf<String>()
-                        parts.add(if (configType == "CUSTOM") "AUTO" else configType)
-                        if (network != null) parts.add(network) else if (configType != "HYSTERIA2") parts.add("TCP")
-                        if (security != null) parts.add(security)
-                        
-                        val finalDesc = parts.joinToString(" / ") + " | JSON"
+                        // Используем наш умный парсер!
+                        val finalDesc = getProtocolDescription(serverCache.profile) + " | JSON"
 
                         Text(
                             text = finalDesc, 
@@ -268,7 +278,7 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Кликабельная стрелочка "Редактировать"
+                    // Кликабельная стрелочка с вызовом onEditServer (ОТКРЫВАЕТ СЕРВЕР)
                     IconButton(
                         onClick = { onEditServer(serverCache.guid, serverCache.profile) },
                         modifier = Modifier.size(40.dp)
