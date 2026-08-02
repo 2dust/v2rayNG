@@ -165,12 +165,6 @@ class MainViewModel(
         }
     }
     
-    fun onAction(action: MainAction) {
-    	when (action) {
-    		is MainAction.TestProfileTcpPing -> testProfileTcpPing(action.subscriptionId)
-    	}
-    }
-    
     private fun testProfileTcpPing(subscriptionId: String) {
     	viewModelScope.launch(ioDispatcher) {
     		try {
@@ -212,6 +206,9 @@ class MainViewModel(
     // ---------- Action handler ----------
     fun onAction(action: MainAction) {
         when (action) {
+            // Вот это действие мы перенесли сюда из твоей первой функции:
+            is MainAction.TestProfileTcpPing -> testProfileTcpPing(action.subscriptionId)
+            
             MainAction.Initialize -> initialize()
             MainAction.RefreshGroups -> setupGroupTab(forceRefresh = true)
             MainAction.TestAllServers -> testAllRealPing(true)
@@ -253,6 +250,7 @@ class MainViewModel(
             }
         }
     }
+
 
     // ---------- Initialization ----------
     fun initialize() {
