@@ -43,7 +43,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.extension.isComplexType
@@ -358,17 +357,17 @@ fun ServerListItem(
                 )
                 if (doubleColumnDisplay) {
                     IconButton(onClick = onMore, modifier = Modifier.size(36.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_more_vert), contentDescription = "Еще", modifier = Modifier.size(24.dp))
+                        Icon(painterResource(id = android.R.drawable.ic_menu_more), contentDescription = "Еще", modifier = Modifier.size(24.dp))
                     }
                 } else {
                     IconButton(onClick = onShare, modifier = Modifier.size(36.dp)) { 
-                        Icon(painterResource(id = R.drawable.ic_share), contentDescription = "Поделиться", modifier = Modifier.size(24.dp)) 
+                        Icon(painterResource(id = android.R.drawable.ic_menu_share), contentDescription = "Поделиться", modifier = Modifier.size(24.dp)) 
                     }
                     IconButton(onClick = onEdit, modifier = Modifier.size(36.dp)) { 
-                        Icon(painterResource(id = R.drawable.ic_edit), contentDescription = "Изменить", modifier = Modifier.size(24.dp)) 
+                        Icon(painterResource(id = android.R.drawable.ic_menu_edit), contentDescription = "Изменить", modifier = Modifier.size(24.dp)) 
                     }
                     IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) { 
-                        Icon(painterResource(id = R.drawable.ic_delete), contentDescription = "Удалить", modifier = Modifier.size(24.dp)) 
+                        Icon(painterResource(id = android.R.drawable.ic_menu_delete), contentDescription = "Удалить", modifier = Modifier.size(24.dp)) 
                     }
                 }
             }
@@ -379,7 +378,7 @@ fun ServerListItem(
                         Modifier
                             .size(24.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)), Alignment.Center
+                            .background(MaterialTheme.colorScheme.primary.computeAlpha(0.2f)), Alignment.Center
                     ) {
                         Text(subscriptionRemarks.take(1).uppercase(), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     }
@@ -394,6 +393,8 @@ fun ServerListItem(
         }
     }
 }
+
+private fun Color.computeAlpha(alpha: Float): Color = this.copy(alpha = alpha)
 
 private fun getProtocolDescription(profile: ProfileItem): String {
     if (profile.configType.isComplexType()) return profile.configType.name
@@ -428,3 +429,4 @@ internal suspend fun PagerState.navigateToPageOptimized(
         scrollToPage(target)
     }
 }
+c
