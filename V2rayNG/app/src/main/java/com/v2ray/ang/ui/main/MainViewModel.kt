@@ -59,7 +59,7 @@ class MainViewModel(
     private val _subscriptions = MutableStateFlow<List<SubscriptionCache>>(emptyList())
     val subscriptions: StateFlow<List<SubscriptionCache>> = _subscriptions.asStateFlow()
 
-    // Состояние анимации загрузки и текст ошибки
+    // Состояния для плавной анимации импорта
     val isImporting = MutableStateFlow(false)
     val importError = MutableStateFlow<String?>(null)
 
@@ -96,14 +96,18 @@ class MainViewModel(
     init {
         collectServiceEvents()
         setupGroupTab()
-        startBackgroundPolling() // Автообновление UI после фонового скачивания
+        startBackgroundPolling()
     }
 
+    // Фоновый поллинг: тихо обновляет UI, когда подписка в фоне закончила парситься
     private fun startBackgroundPolling() {
         viewModelScope.launch(ioDispatcher) {
             while (true) {
-                delay(3000L) // Раз в 3 секунды тихо проверяем базу на наличие обновлений имён
-                setupGroupTab(forceRefresh = false)
+                delay(2000L)
+                val currentSubs = getSubscriptions()
+                if (_subscriptions.value.map { it.subscription.remarks } != currentSubs.map { it.subscription.remarks }) {
+                    setupGroupTab(forceRefresh = true)
+                }
             }
         }
     }
@@ -210,10 +214,9 @@ class MainViewModel(
     private fun mutableServersForGroup(groupId: String): MutableStateFlow<List<ServersCache>> =
         groupPageFlows.computeIfAbsent(groupId) { MutableStateFlow(emptyList()) }
 
-    // Полностью вырезаем default профиль
     fun getSubscriptions(): List<SubscriptionCache> {
         return dataSource.getSubscriptions().filter { 
-            it.subscription.remarks?.lowercase() != "default" 
+            it.subscription.remarks?.lowercase() != "default" && it.guid.isNotBlank()
         }
     }
 
@@ -361,11 +364,8 @@ class MainViewModel(
                     cacheMutex.withLock { groupDataCache.clear() }
                 }
                 
-                val subs = getSubscriptions()
-                // Если данные не изменились, не дергаем UI (полезно для фонового поллинга)
-                if (_subscriptions.value != subs || forceRefresh) {
-                    _subscriptions.value = subs
-                }
+                val subs = getSubscriptions().toList()
+                _subscriptions.value = subs
                 
                 val groups = subs.map { GroupMapItem(id = it.guid, remarks = it.subscription.remarks) }
                 val selectedGroup = resolveSelectedGroup(groups)
@@ -413,7 +413,7 @@ class MainViewModel(
                     initialPageReady.complete(Unit)
                 }
             }
-        }
+        }.also { setupGroupJob = it }
     }
 
     private fun importBatchConfig(configText: String) {
@@ -425,30 +425,24 @@ class MainViewModel(
             importError.value = null
             withContext(ioDispatcher) {
                 try {
-                    val (count, countSub) = dataSource.importBatchConfig(
-                        configText, targetGroupId, true
-                    )
-                    when {
-                        countSub > 0 -> {
-                            dataSource.updateConfigViaSubAll()
-                            delay(3500) // Даем ядру время скачать и распарсить заголовки!
-                            setupGroupTab(forceRefresh = true).join()
-                            
-                            val newSub = _subscriptions.value.lastOrNull()
-                            if (newSub != null) subscriptionIdChanged(newSub.guid)
-                        }
-                        count > 0 -> {
-                            setupGroupTab(forceRefresh = true).join()
-                        }
-                        else -> {
-                            importError.value = "Буфер обмена не содержит валидной конфигурации или ссылки"
+                    val (count, countSub) = dataSource.importBatchConfig(configText, targetGroupId, true)
+                    
+                    if (countSub > 0 || isUrl) {
+                        val result = dataSource.updateConfigViaSubAll()
+                        if (result.configCount == 0 && result.errorMsg.isNotEmpty()) {
+                            importError.value = "Ошибка сервера: ${result.errorMsg}"
                         }
                     }
+                    
+                    setupGroupTab(forceRefresh = true).join()
+                    val newSub = _subscriptions.value.lastOrNull()
+                    if (newSub != null) subscriptionIdChanged(newSub.guid)
+                    
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
-                    importError.value = "Ошибка: ${e.localizedMessage}"
+                    importError.value = "Сбой: ${e.localizedMessage}"
                 } finally {
                     isImporting.value = false
                 }
@@ -459,14 +453,17 @@ class MainViewModel(
     fun updateSubscription(subId: String) {
         viewModelScope.launch {
             isImporting.value = true
+            importError.value = null
             withContext(ioDispatcher) {
                 try {
                     val item = dataSource.getSubscriptionItem(subId) ?: return@withContext
-                    dataSource.updateConfigViaSub(SubscriptionCache(subId, item))
-                    delay(3000) 
+                    val result = dataSource.updateConfigViaSub(SubscriptionCache(subId, item))
+                    if (result.configCount == 0 && result.errorMsg.isNotEmpty()) {
+                        importError.value = "Ошибка: ${result.errorMsg}"
+                    }
                     setupGroupTab(forceRefresh = true).join()
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) { toastError("Ошибка обновления") }
+                    importError.value = "Сбой обновления"
                 } finally {
                     isImporting.value = false
                 }
