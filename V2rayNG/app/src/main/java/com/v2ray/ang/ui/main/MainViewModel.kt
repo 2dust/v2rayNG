@@ -98,7 +98,6 @@ class MainViewModel(
         startBackgroundPolling()
     }
 
-    // Фоновый поллинг: тихо обновляет UI, решая проблему зависшего имени "import sub"
     private fun startBackgroundPolling() {
         viewModelScope.launch(ioDispatcher) {
             var lastHash = 0
@@ -249,7 +248,6 @@ class MainViewModel(
             MainAction.DismissQRCodeDialog -> {
                 _uiState.update { it.copy(shareQRCodeBitmap = null) }
             }
-            // Обрабатываются в MainActivity, поэтому тут пустые
             MainAction.ToggleService,
             MainAction.TestCurrentServer,
             MainAction.ImportQRcode,
