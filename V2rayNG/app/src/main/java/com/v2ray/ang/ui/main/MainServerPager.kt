@@ -34,8 +34,6 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
-import com.v2ray.ang.ui.compose.colorPing
-import com.v2ray.ang.ui.compose.colorPingRed
 import com.v2ray.ang.ui.subscription.SubEditActivity
 
 @Composable
@@ -76,7 +74,7 @@ fun WireframeGlobe(color: Color, modifier: Modifier = Modifier) {
     }
 }
 
-// Парсер типа протокола для корректного отображения без CUSTOM
+// Умный парсер протоколов (VLESS / TCP / REALITY | JSON)
 fun getProtocolDescription(profile: ProfileItem): String {
     val configType = profile.configType.name.uppercase().let { if (it == "CUSTOM") "AUTO" else it }
     val parts = mutableListOf(configType)
@@ -104,7 +102,9 @@ fun ProfileCard(
     onAction: (MainAction) -> Unit,
     onPingProfile: (String) -> Unit,
     onUpdateSubscription: (String) -> Unit,
-    onSelectServer: (String) -> Unit
+    onSelectServer: (String) -> Unit,
+    onDeleteSubscription: (String) -> Unit,
+    onEditServer: (String, ProfileItem) -> Unit
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -148,7 +148,7 @@ fun ProfileCard(
                 }
                 Spacer(Modifier.width(8.dp))
                 
-                // Три точки с переходом в редактор
+                // Три точки с меню: Редактировать + Удалить профиль
                 Box {
                     IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
                         Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
@@ -159,6 +159,13 @@ fun ProfileCard(
                             onClick = { 
                                 showMenu = false
                                 context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.guid))
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Удалить профиль", color = Color.Red) },
+                            onClick = { 
+                                showMenu = false
+                                onDeleteSubscription(subscription.guid)
                             }
                         )
                     }
@@ -281,9 +288,9 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Кликабельная стрелочка "Редактировать"
+                    // Кликабельная стрелочка "Редактировать сервер"
                     IconButton(
-                        onClick = { onAction(MainAction.EditServer(serverCache.guid, serverCache.profile)) },
+                        onClick = { onEditServer(serverCache.guid, serverCache.profile) },
                         modifier = Modifier.size(40.dp)
                     ) {
                         ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
@@ -294,7 +301,7 @@ fun ProfileCard(
     }
 }
 
-// 100% Оригинальная сигнатура
+// 100% Оригинальная сигнатура для MainActivity
 @Composable
 fun GroupPagerPage(
     groupId: String,
