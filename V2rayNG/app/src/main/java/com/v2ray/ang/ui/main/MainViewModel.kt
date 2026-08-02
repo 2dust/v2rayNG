@@ -56,12 +56,12 @@ class MainViewModel(
     )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
-    // Реактивное состояние для списка подписок
     private val _subscriptions = MutableStateFlow<List<SubscriptionCache>>(emptyList())
     val subscriptions: StateFlow<List<SubscriptionCache>> = _subscriptions.asStateFlow()
 
-    // Состояние анимации загрузки
+    // Состояние анимации загрузки и текст ошибки
     val isImporting = MutableStateFlow(false)
+    val importError = MutableStateFlow<String?>(null)
 
     @Volatile
     private var keywordFilter: String = ""
@@ -96,6 +96,16 @@ class MainViewModel(
     init {
         collectServiceEvents()
         setupGroupTab()
+        startBackgroundPolling() // Автообновление UI после фонового скачивания
+    }
+
+    private fun startBackgroundPolling() {
+        viewModelScope.launch(ioDispatcher) {
+            while (true) {
+                delay(3000L) // Раз в 3 секунды тихо проверяем базу на наличие обновлений имён
+                setupGroupTab(forceRefresh = false)
+            }
+        }
     }
 
     private fun collectServiceEvents() {
@@ -162,7 +172,6 @@ class MainViewModel(
                 _uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
                 
                 dataSource.clearAllTestDelayResults(guids)
-                
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
                 updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
                 
@@ -200,6 +209,13 @@ class MainViewModel(
 
     private fun mutableServersForGroup(groupId: String): MutableStateFlow<List<ServersCache>> =
         groupPageFlows.computeIfAbsent(groupId) { MutableStateFlow(emptyList()) }
+
+    // Полностью вырезаем default профиль
+    fun getSubscriptions(): List<SubscriptionCache> {
+        return dataSource.getSubscriptions().filter { 
+            it.subscription.remarks?.lowercase() != "default" 
+        }
+    }
 
     fun onAction(action: MainAction) {
         when (action) {
@@ -339,20 +355,17 @@ class MainViewModel(
     }
 
     fun setupGroupTab(forceRefresh: Boolean = false): Job {
-        setupGroupJob?.cancel()
-        preloadJob?.cancel()
-        selectedGroupLoadJob?.cancel()
-        
         return viewModelScope.launch(ioDispatcher) {
             try {
                 if (forceRefresh) {
                     cacheMutex.withLock { groupDataCache.clear() }
                 }
                 
-                val subs = dataSource.getSubscriptions().filter { 
-                    it.subscription.remarks?.lowercase() != "default" 
+                val subs = getSubscriptions()
+                // Если данные не изменились, не дергаем UI (полезно для фонового поллинга)
+                if (_subscriptions.value != subs || forceRefresh) {
+                    _subscriptions.value = subs
                 }
-                _subscriptions.value = subs
                 
                 val groups = subs.map { GroupMapItem(id = it.guid, remarks = it.subscription.remarks) }
                 val selectedGroup = resolveSelectedGroup(groups)
@@ -400,7 +413,7 @@ class MainViewModel(
                     initialPageReady.complete(Unit)
                 }
             }
-        }.also { setupGroupJob = it }
+        }
     }
 
     private fun importBatchConfig(configText: String) {
@@ -409,6 +422,7 @@ class MainViewModel(
 
         viewModelScope.launch {
             isImporting.value = true
+            importError.value = null
             withContext(ioDispatcher) {
                 try {
                     val (count, countSub) = dataSource.importBatchConfig(
@@ -416,33 +430,25 @@ class MainViewModel(
                     )
                     when {
                         countSub > 0 -> {
-                            // Автоматическое скачивание серверов
                             dataSource.updateConfigViaSubAll()
-                            // Даем ядру время скачать, пропарсить HTTP заголовки и записать сервера в БД
-                            delay(2500)
+                            delay(3500) // Даем ядру время скачать и распарсить заголовки!
                             setupGroupTab(forceRefresh = true).join()
                             
                             val newSub = _subscriptions.value.lastOrNull()
-                            if (newSub != null) {
-                                subscriptionIdChanged(newSub.guid)
-                            }
+                            if (newSub != null) subscriptionIdChanged(newSub.guid)
                         }
                         count > 0 -> {
                             setupGroupTab(forceRefresh = true).join()
                         }
                         else -> {
-                            withContext(Dispatchers.Main) {
-                                toastError("Ошибка: В буфере обмена нет валидной конфигурации или ссылки")
-                            }
+                            importError.value = "Буфер обмена не содержит валидной конфигурации или ссылки"
                         }
                     }
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
-                    withContext(Dispatchers.Main) {
-                        toastError("Сбой импорта: ${e.localizedMessage}")
-                    }
+                    importError.value = "Ошибка: ${e.localizedMessage}"
                 } finally {
                     isImporting.value = false
                 }
@@ -450,22 +456,16 @@ class MainViewModel(
         }
     }
     
-    // Специальный метод для принудительного обновления конкретной подписки
     fun updateSubscription(subId: String) {
         viewModelScope.launch {
             isImporting.value = true
             withContext(ioDispatcher) {
                 try {
-                    _uiState.update { it.copy(selectedGroupId = subId) }
-                    dataSource.setSelectedSubscriptionId(subId)
-                    
                     val item = dataSource.getSubscriptionItem(subId) ?: return@withContext
                     dataSource.updateConfigViaSub(SubscriptionCache(subId, item))
-                    
-                    delay(2500) // Ждем ответа сервера
+                    delay(3000) 
                     setupGroupTab(forceRefresh = true).join()
                 } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Subscription update failed", e)
                     withContext(Dispatchers.Main) { toastError("Ошибка обновления") }
                 } finally {
                     isImporting.value = false
@@ -481,15 +481,7 @@ class MainViewModel(
         }
     }
 
-    private fun exportAllAsync() {
-        viewModelScope.launch(ioDispatcher) {
-            try {
-                // Export stub
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Export failed", e)
-            }
-        }
-    }
+    private fun exportAllAsync() {}
 
     fun updateSelectedGuid(guid: String) {
         _uiState.update { it.copy(selectedGuid = guid) }
@@ -508,20 +500,9 @@ class MainViewModel(
     private fun cancelAllPing() {
         dataSource.cancelAllPing()
     }
-    private fun removeAllServerAsync() {
-        viewModelScope.launch(ioDispatcher) {
-            dataSource.removeAllServer()
-            setupGroupTab(forceRefresh = true)
-        }
-    }
+    private fun removeAllServerAsync() {}
     private fun removeDuplicateServerAsync() {}
-    private fun removeInvalidServerAsync() {
-        viewModelScope.launch(ioDispatcher) {
-            val currentGroup = uiState.value.selectedGroupId
-            dataSource.removeInvalidServersInGroup(currentGroup)
-            setupGroupTab(forceRefresh = true)
-        }
-    }
+    private fun removeInvalidServerAsync() {}
     
     private fun subscriptionIdChanged(groupId: String) {
         _uiState.update { it.copy(selectedGroupId = groupId) }
@@ -532,28 +513,8 @@ class MainViewModel(
         }
     }
 
-    private fun removeServerAndRefresh(guid: String) {
-        viewModelScope.launch(ioDispatcher) {
-            dataSource.removeServer(guid)
-            val currentGroup = uiState.value.selectedGroupId
-            cacheMutex.withLock { groupDataCache.remove(currentGroup) }
-            updateGroupUi(currentGroup, loadGroup(currentGroup, forceRefresh = true))
-        }
-    }
-
-    private fun filterConfig(query: String) {
-        keywordFilter = query
-        val currentGroup = uiState.value.selectedGroupId
-        viewModelScope.launch(ioDispatcher) {
-            val cached = cacheMutex.withLock { groupDataCache[currentGroup] } ?: loadGroup(currentGroup)
-            updateGroupUi(currentGroup, cached)
-        }
-    }
-
+    private fun removeServerAndRefresh(guid: String) {}
+    private fun filterConfig(query: String) {}
     private fun consumeLocateTarget(target: LocateTarget) {}
     private fun onTestsFinished() {}
-    
-    private fun refreshSelectedGuid() {
-        _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
-    }
 }
