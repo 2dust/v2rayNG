@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.entities.ProfileItem
 
 @Composable
 fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
@@ -57,14 +56,8 @@ fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
-    onAddServer: () -> Unit,
-    onScanQR: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onOpenSubscriptions: () -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit,
-    onShareServer: (String, ProfileItem) -> Unit,
-    onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit
+    onAction: (MainAction) -> Unit,
+    onNavigate: (String) -> Unit
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val subscriptions by mainViewModel.subscriptions.collectAsStateWithLifecycle()
@@ -113,7 +106,7 @@ fun MainScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = onOpenSettings) {
+                    IconButton(onClick = { onNavigate("settings") }) {
                         Icon(painterResource(id = R.drawable.ic_settings_24dp), contentDescription = "Настройки", modifier = Modifier.size(32.dp))
                     }
                     Box {
@@ -121,10 +114,10 @@ fun MainScreen(
                             Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить", modifier = Modifier.size(32.dp))
                         }
                         DropdownMenu(expanded = showImportMenu, onDismissRequest = { showImportMenu = false }) {
-                            DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; mainViewModel.onAction(MainAction.ImportClipboard) })
-                            DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onScanQR() })
-                            DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; mainViewModel.onAction(MainAction.ImportConfigLocal) })
-                            DropdownMenuItem(text = { Text("Добавить вручную") }, onClick = { showImportMenu = false; onAddServer() })
+                            DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; onAction(MainAction.ImportClipboard) })
+                            DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onAction(MainAction.ImportQRcode) })
+                            DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; onAction(MainAction.ImportConfigLocal) })
+                            DropdownMenuItem(text = { Text("Добавить вручную") }, onClick = { showImportMenu = false; onAction(MainAction.ImportManually) })
                         }
                     }
                 }
@@ -157,7 +150,7 @@ fun MainScreen(
                             .clip(CircleShape)
                             .background(Color.White)
                             .border(8.dp, Color(0xFFF4F6F9), CircleShape)
-                            .clickable { mainViewModel.onAction(MainAction.ToggleService) },
+                            .clickable { onAction(MainAction.ToggleService) },
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -200,7 +193,7 @@ fun MainScreen(
                         color = Color.Gray,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable { mainViewModel.onAction(MainAction.TestCurrentServer) }
+                        modifier = Modifier.clickable { onAction(MainAction.TestCurrentServer) }
                     )
                     Text(
                         text = "Скрыть все",
@@ -238,16 +231,18 @@ fun MainScreen(
                                 servers = servers,
                                 selectedGuid = uiState.selectedGuid,
                                 onPingProfile = { guid -> 
-                                    mainViewModel.onAction(MainAction.SelectGroup(guid))
-                                    mainViewModel.onAction(MainAction.TestProfileTcpPing(guid)) 
+                                    onAction(MainAction.SelectGroup(guid))
+                                    onAction(MainAction.TestProfileTcpPing(guid)) 
                                 },
                                 onUpdateSubscription = { 
                                     mainViewModel.updateSubscription(it)
                                 },
                                 onSelectServer = { guid -> 
-                                    mainViewModel.onAction(MainAction.SelectServer(guid)) 
+                                    onAction(MainAction.SelectServer(guid)) 
                                 },
-                                onEditServer = onEditServer
+                                onEditServer = { guid ->
+                                    onAction(MainAction.EditServer(guid))
+                                }
                             )
                         }
                     }
@@ -255,51 +250,46 @@ fun MainScreen(
             }
         }
         
-        // Плавная анимация загрузки импорта
+        // Плавная выезжающая плашка загрузки сверху
         AnimatedVisibility(
             visible = isImporting,
-            enter = fadeIn(animationSpec = tween(300)),
-            exit = fadeOut(animationSpec = tween(300))
+            enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { -it }),
+            modifier = Modifier.align(Alignment.TopCenter).padding(top = 32.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .clickable(enabled = false) {}, 
-                contentAlignment = Alignment.Center
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = Color.White,
+                shadowElevation = 8.dp
             ) {
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                Row(
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(
-                        modifier = Modifier.padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator(color = Color(0xFF5C6BC0), strokeWidth = 4.dp)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("Обновление подписки...", fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), fontSize = 16.sp)
-                    }
+                    CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = Color(0xFF5C6BC0))
+                    Spacer(Modifier.width(12.dp))
+                    Text("Обновление подписки...", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
                 }
             }
         }
 
-        // Всплывающая плашка с ошибкой
+        // Всплывающая плашка с ошибкой снизу
         AnimatedVisibility(
             visible = importError != null,
-            enter = fadeIn(animationSpec = tween(300)),
-            exit = fadeOut(animationSpec = tween(300)),
+            enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { it }),
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp)
         ) {
             Card(
                 shape = RoundedCornerShape(8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF44336))
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF44336)),
+                elevation = CardDefaults.cardElevation(8.dp)
             ) {
                 Text(
                     text = importError ?: "", 
                     color = Color.White, 
                     fontWeight = FontWeight.Bold, 
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
             }
         }
