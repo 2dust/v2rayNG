@@ -110,9 +110,10 @@ fun MainScreen(
                         Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить", modifier = Modifier.size(32.dp))
                     }
                     DropdownMenu(expanded = showImportMenu, onDismissRequest = { showImportMenu = false }) {
-                        DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; mainViewModel.onAction(MainAction.ImportClipboard) })
-                        DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onScanQR?.invoke() ?: onAction?.invoke(MainAction.ImportQRcode) ?: mainViewModel.onAction(MainAction.ImportQRcode) })
-                        DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; mainViewModel.onAction(MainAction.ImportConfigLocal) })
+                        // Исправлено: Вызовы импорта направлены в Activity через onAction
+                        DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; onAction?.invoke(MainAction.ImportClipboard) })
+                        DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onScanQR?.invoke() ?: onAction?.invoke(MainAction.ImportQRcode) })
+                        DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; onAction?.invoke(MainAction.ImportConfigLocal) })
                         DropdownMenuItem(text = { Text("Добавить вручную") }, onClick = { showImportMenu = false; onAddServer?.invoke() })
                     }
                 }
@@ -149,7 +150,8 @@ fun MainScreen(
                         .clip(CircleShape)
                         .background(Color.White)
                         .border(8.dp, Color(0xFFF4F6F9), CircleShape)
-                        .clickable { mainViewModel.onAction(MainAction.ToggleService) },
+                        // Исправлено: Запуск службы передан в Activity
+                        .clickable { onAction?.invoke(MainAction.ToggleService) },
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -158,20 +160,26 @@ fun MainScreen(
                             modifier = Modifier.size(40.dp)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
+                        
+                        // Исправлено: Большой текст статуса
                         Text(
                             text = if (uiState.isRunning) "ПОДКЛЮЧЕН" else "ОТКЛЮЧЕН",
-                            color = Color.Gray,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF2C3E50),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.ExtraBold,
                             letterSpacing = 1.sp
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = timeString,
-                            color = Color(0xFF2C3E50),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.ExtraBold
-                        )
+                        
+                        // Исправлено: Таймер виден только при подключении и стал меньше
+                        if (uiState.isRunning) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = timeString,
+                                color = Color.Gray,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }
@@ -189,7 +197,8 @@ fun MainScreen(
                     color = Color.Gray,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { mainViewModel.onAction(MainAction.TestCurrentServer) }
+                    // Исправлено: Передано в Activity
+                    modifier = Modifier.clickable { onAction?.invoke(MainAction.TestCurrentServer) }
                 )
                 Text(
                     text = "Скрыть все",
