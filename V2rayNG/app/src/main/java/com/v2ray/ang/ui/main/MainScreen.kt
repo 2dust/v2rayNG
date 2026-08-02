@@ -64,7 +64,8 @@ fun MainScreen(
     onRemoveServer: ((String) -> Unit)? = null
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
-    val subscriptions = mainViewModel.getSubscriptions()
+    // Подписываемся на StateFlow, чтобы UI мгновенно перерисовывался при импорте
+    val subscriptions by mainViewModel.subscriptions.collectAsStateWithLifecycle()
 
     var showImportMenu by remember { mutableStateOf(false) }
 
@@ -86,7 +87,7 @@ fun MainScreen(
     val timeString = "${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
 
     Scaffold(
-        containerColor = Color(0xFFF3F4F6) // Светло-серый фон как на скриншоте
+        containerColor = Color(0xFFF3F4F6) // Светло-серый фон
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -94,7 +95,7 @@ fun MainScreen(
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Кастомная верхняя панель (Настройки слева, Добавить справа)
+            // Верхняя панель (Настройки слева, Добавить справа)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -110,23 +111,21 @@ fun MainScreen(
                         Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить", modifier = Modifier.size(32.dp))
                     }
                     DropdownMenu(expanded = showImportMenu, onDismissRequest = { showImportMenu = false }) {
-                        // Исправлено: Вызовы импорта направлены в Activity через onAction
-                        DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; onAction?.invoke(MainAction.ImportClipboard) })
-                        DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onScanQR?.invoke() ?: onAction?.invoke(MainAction.ImportQRcode) })
-                        DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; onAction?.invoke(MainAction.ImportConfigLocal) })
+                        DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; onAction?.invoke(MainAction.ImportClipboard) ?: mainViewModel.onAction(MainAction.ImportClipboard) })
+                        DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onScanQR?.invoke() ?: onAction?.invoke(MainAction.ImportQRcode) ?: mainViewModel.onAction(MainAction.ImportQRcode) })
+                        DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; onAction?.invoke(MainAction.ImportConfigLocal) ?: mainViewModel.onAction(MainAction.ImportConfigLocal) })
                         DropdownMenuItem(text = { Text("Добавить вручную") }, onClick = { showImportMenu = false; onAddServer?.invoke() })
                     }
                 }
             }
 
-            // Центральная круглая кнопка подключения
+            // Центральная круглая кнопка
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                // Внешнее градиентное кольцо
                 Box(
                     modifier = Modifier
                         .size(240.dp)
@@ -137,7 +136,6 @@ fun MainScreen(
                         )
                 )
 
-                // Внутренняя кнопка с мощной тенью
                 Box(
                     modifier = Modifier
                         .size(170.dp)
@@ -150,8 +148,7 @@ fun MainScreen(
                         .clip(CircleShape)
                         .background(Color.White)
                         .border(8.dp, Color(0xFFF4F6F9), CircleShape)
-                        // Исправлено: Запуск службы передан в Activity
-                        .clickable { onAction?.invoke(MainAction.ToggleService) },
+                        .clickable { onAction?.invoke(MainAction.ToggleService) ?: mainViewModel.onAction(MainAction.ToggleService) },
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -161,7 +158,7 @@ fun MainScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         
-                        // Исправлено: Большой текст статуса
+                        // Текст стал крупнее
                         Text(
                             text = if (uiState.isRunning) "ПОДКЛЮЧЕН" else "ОТКЛЮЧЕН",
                             color = Color(0xFF2C3E50),
@@ -170,7 +167,7 @@ fun MainScreen(
                             letterSpacing = 1.sp
                         )
                         
-                        // Исправлено: Таймер виден только при подключении и стал меньше
+                        // Таймер виден только если есть подключение и он стал меньше текста
                         if (uiState.isRunning) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
@@ -197,8 +194,7 @@ fun MainScreen(
                     color = Color.Gray,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    // Исправлено: Передано в Activity
-                    modifier = Modifier.clickable { onAction?.invoke(MainAction.TestCurrentServer) }
+                    modifier = Modifier.clickable { onAction?.invoke(MainAction.TestCurrentServer) ?: mainViewModel.onAction(MainAction.TestCurrentServer) }
                 )
                 Text(
                     text = "Скрыть все",
@@ -221,9 +217,18 @@ fun MainScreen(
                         subscription = subCache,
                         servers = servers,
                         selectedGuid = uiState.selectedGuid,
-                        onPingProfile = { guid -> mainViewModel.onAction(MainAction.TestProfileTcpPing(guid)) },
-                        onUpdateSubscription = { mainViewModel.onAction(MainAction.UpdateSubscriptions) },
-                        onSelectServer = { guid -> mainViewModel.onAction(MainAction.SelectServer(guid)) }
+                        onPingProfile = { guid -> 
+                            mainViewModel.onAction(MainAction.SelectGroup(guid))
+                            mainViewModel.onAction(MainAction.TestProfileTcpPing(guid)) 
+                        },
+                        onUpdateSubscription = { 
+                            mainViewModel.onAction(MainAction.SelectGroup(it))
+                            mainViewModel.onAction(MainAction.UpdateSubscriptions) 
+                        },
+                        onSelectServer = { guid -> 
+                            onAction?.invoke(MainAction.SelectServer(guid)) ?: mainViewModel.onAction(MainAction.SelectServer(guid)) 
+                        },
+                        onEditServer = { guid, profile -> onEditServer?.invoke(guid, profile) }
                     )
                 }
             }
