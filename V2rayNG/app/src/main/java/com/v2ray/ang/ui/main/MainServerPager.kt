@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.main
 
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -22,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,9 +32,9 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
-import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.ui.compose.colorPing
 import com.v2ray.ang.ui.compose.colorPingRed
+import com.v2ray.ang.ui.subscription.SubSettingActivity
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
@@ -85,16 +85,16 @@ fun ProfileCard(
     onEditServer: ((String, ProfileItem) -> Unit)? = null
 ) {
     val context = LocalContext.current
-    var showMenu by remember { mutableStateOf(false) }
+    val uriHandler = LocalUriHandler.current
 
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F9FC)),
-        border = BorderStroke(1.dp, Color(0xFFE2E8F0)) // Обводка профиля
+        border = BorderStroke(1.dp, Color(0xFFE2E8F0))
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp)) {
-            // Первая строка: Стрелочка, Заголовок, Кнопки
+            // Первая строка
             Row(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -115,26 +115,18 @@ fun ProfileCard(
                 }
                 
                 IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(32.dp)) {
-                    Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = android.R.drawable.ic_menu_revert), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
                 }
                 Spacer(Modifier.width(8.dp))
                 IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(32.dp)) {
                     ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.width(8.dp))
-                Box {
-                    IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
-                    }
-                    DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                        DropdownMenuItem(
-                            text = { Text("Настройки подписки") },
-                            onClick = { 
-                                showMenu = false
-                                Toast.makeText(context, "Откройте Настройки для изменения подписок", Toast.LENGTH_LONG).show()
-                            }
-                        )
-                    }
+                IconButton(
+                    onClick = { context.startActivity(Intent(context, SubSettingActivity::class.java)) }, 
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
                 }
             }
             
@@ -146,7 +138,14 @@ fun ProfileCard(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             ) {
                 IconButton(
-                    onClick = { Toast.makeText(context, "Информация профиля", Toast.LENGTH_SHORT).show() }, 
+                    onClick = {
+                        val subUrl = subscription.subscription.url
+                        if (!subUrl.isNullOrBlank()) {
+                            try { uriHandler.openUri(subUrl) } catch(e: Exception) { Toast.makeText(context, "Ссылка недоступна", Toast.LENGTH_SHORT).show() }
+                        } else {
+                            Toast.makeText(context, "В подписке нет URL", Toast.LENGTH_SHORT).show()
+                        }
+                    }, 
                     modifier = Modifier.size(24.dp)
                 ) {
                     Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0))
@@ -166,8 +165,7 @@ fun ProfileCard(
                 
                 IconButton(
                     onClick = { 
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/shashachkaaa"))
-                        context.startActivity(intent)
+                        try { uriHandler.openUri("https://t.me/shashachkaaa") } catch(e: Exception){} 
                     }, 
                     modifier = Modifier.size(24.dp)
                 ) {
@@ -177,7 +175,7 @@ fun ProfileCard(
             
             Spacer(Modifier.height(16.dp))
             
-            // Хардкодный текст как на скриншоте пользователя
+            // Текст-хардкод
             Text(
                 "💪 Vanguard VPN - Это не про обход, это про\nпревосходство.\nЕсли подписка не работает — нажмите на кнопку «↻»,\nчтобы обновить её", 
                 fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), modifier = Modifier.fillMaxWidth()
@@ -201,7 +199,6 @@ fun ProfileCard(
                         .clickable { onSelectServer(serverCache.guid) }
                         .padding(vertical = 12.dp, horizontal = 8.dp)
                 ) {
-                    // Синий индикатор слева
                     if (isSelected) {
                         Box(modifier = Modifier.width(4.dp).height(36.dp).clip(RoundedCornerShape(50)).background(Color(0xFF5C6BC0)))
                     } else {
@@ -209,7 +206,6 @@ fun ProfileCard(
                     }
                     Spacer(Modifier.width(12.dp))
                     
-                    // Глобус в квадрате
                     Box(
                         modifier = Modifier.size(44.dp).background(Color(0xFFE2E8F0), RoundedCornerShape(12.dp)),
                         contentAlignment = Alignment.Center
@@ -219,7 +215,6 @@ fun ProfileCard(
                     
                     Spacer(Modifier.width(16.dp))
                     
-                    // Тексты сервера
                     Column(Modifier.weight(1f)) {
                         Text(
                             text = serverCache.profile.remarks ?: "Без названия", 
@@ -230,12 +225,14 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         
-                        // Парсим протоколы красиво (как Hysteria2, vless reality и т.д.)
-                        val desc = serverCache.profile.description.takeIf { !it.isNullOrBlank() } 
-                            ?: AngConfigManager.generateDescription(serverCache.profile)
-                            
+                        // ПАРСИМ ПРОТОКОЛЫ КРАСИВО
+                        val protocol = serverCache.profile.configType.name.uppercase()
+                        val network = serverCache.profile.network?.uppercase()?.takeIf { it.isNotBlank() } ?: "TCP"
+                        val security = serverCache.profile.security?.uppercase()?.takeIf { it.isNotBlank() } ?: "NONE"
+                        val finalDesc = "$protocol / $network / $security | JSON"
+
                         Text(
-                            text = "$desc | JSON", 
+                            text = finalDesc, 
                             fontSize = 10.sp, 
                             color = Color.Gray, 
                             fontWeight = FontWeight.Bold,
@@ -244,7 +241,6 @@ fun ProfileCard(
                         )
                     }
                     
-                    // Пинг
                     val delay = serverCache.testDelayMillis
                     if (delay > 0L) {
                         val pingColor = if (delay <= 300L) Color(0xFF4CAF50) else Color(0xFFFF9800)
@@ -255,10 +251,10 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Кликабельная стрелочка
+                    // Клибельная стрелочка "Редактировать"
                     IconButton(
                         onClick = { onEditServer?.invoke(serverCache.guid, serverCache.profile) },
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(40.dp)
                     ) {
                         ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
                     }
