@@ -193,6 +193,10 @@ object AngConfigManager {
             updateConfigViaSubAll()
         }
 
+        if (count > 0) {
+            forceDisableInsecure(subid)
+        }
+
         return count to countSub
     }
 
@@ -298,6 +302,24 @@ object AngConfigManager {
         // Write serverList once
         MmkvManager.encodeServerList(serverList, subid)
         return keyToProfile
+    }
+
+    /**
+     * Force-disables the "skip certificate verification" flag for every node in a subscription.
+     * Only writes back nodes whose insecure is currently true (no redundant IO).
+     * CUSTOM nodes are skipped because their runtime config comes from raw JSON.
+     *
+     * @param subId The subscription ID.
+     */
+    private fun forceDisableInsecure(subId: String) {
+        MmkvManager.decodeServerList(subId).forEach { guid ->
+            val profile = MmkvManager.decodeServerConfig(guid) ?: return@forEach
+            if (profile.configType == EConfigType.CUSTOM) return@forEach
+            if (profile.insecure == true) {
+                profile.insecure = false
+                MmkvManager.encodeProfileDirect(guid, JsonUtil.toJson(profile))
+            }
+        }
     }
 
     /**
@@ -601,6 +623,7 @@ object AngConfigManager {
             if (count > 0) {
                 it.subscription.lastUpdated = System.currentTimeMillis()
                 MmkvManager.encodeSubscription(it.guid, it.subscription)
+                forceDisableInsecure(it.guid)
                 LogUtil.i(AppConfig.TAG, "Subscription updated: ${it.subscription.remarks}, $count configs")
                 return SubscriptionUpdateResult(
                     configCount = count,
