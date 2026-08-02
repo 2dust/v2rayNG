@@ -915,9 +915,14 @@ object CoreConfigManager {
         val userHosts = MmkvManager.decodeSettingsString(AppConfig.PREF_DNS_HOSTS)
         if (userHosts.isNotNullEmpty()) {
             val userHostsMap = userHosts?.split(",").orEmpty()
-                .filter { it.isNotEmpty() }
-                .filter { it.contains(":") }
-                .associate { it.split(":").let { (k, v) -> k to v } }
+                .filter { it.isNotBlank() && it.contains(":") }
+                .associate {
+                    // Use limit = 2 to split only at the first colon.
+                    // This ensures that IPv6 addresses (which contain multiple colons)
+                    // are preserved entirely in the second part.
+                    val parts = it.split(":", limit = 2)
+                    parts[0].trim() to parts[1].trim()
+                }
             hosts.putAll(userHostsMap)
         }
 
