@@ -140,9 +140,7 @@ class MainViewModel(
             }
 
             is MainServiceEvent.MeasureConfigFinish -> {
-                if (event.finishedCount == "0") {
-                    onTestsFinished()
-                }
+                onTestsFinished()
             }
         }
     }
