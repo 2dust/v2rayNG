@@ -37,10 +37,15 @@ class ServerUiState(
     bandwidthUp: String = "",
     network: String = NetworkType.TCP.type,
     headerType: String = "none",
+    mode: String = "",
+    xhttpMode: String = "",
+    serviceName: String = "",
+    authority: String = "",
     host: String = "",
     path: String = "",
     xhttpExtra: String = "",
     finalMask: String = "",
+    seed: String = "",
     kcpMtu: String = "",
     kcpTti: String = "",
     browserDialerMode: String = "",
@@ -81,10 +86,15 @@ class ServerUiState(
     var bandwidthUp by mutableStateOf(bandwidthUp)
     var network by mutableStateOf(network)
     var headerType by mutableStateOf(headerType)
+    var mode by mutableStateOf(mode)
+    var xhttpMode by mutableStateOf(xhttpMode)
+    var serviceName by mutableStateOf(serviceName)
+    var authority by mutableStateOf(authority)
     var host by mutableStateOf(host)
     var path by mutableStateOf(path)
     var xhttpExtra by mutableStateOf(xhttpExtra)
     var finalMask by mutableStateOf(finalMask)
+    var seed by mutableStateOf(seed)
     var kcpMtu by mutableStateOf(kcpMtu)
     var kcpTti by mutableStateOf(kcpTti)
     var browserDialerMode by mutableStateOf(browserDialerMode)
@@ -141,10 +151,15 @@ class ServerUiState(
             bandwidthUp = if (isHysteria2) bandwidthUp else null,
             network = network,
             headerType = headerType,
+            mode = mode.nullIfBlank(),
+            xhttpMode = xhttpMode.nullIfBlank(),
+            serviceName = serviceName.nullIfBlank(),
+            authority = authority.nullIfBlank(),
             host = host,
             path = path,
             xhttpExtra = xhttpExtra.nullIfBlank(),
             finalMask = finalMask.nullIfBlank(),
+            seed = seed.nullIfBlank(),
             kcpMtu = kcpMtu.toIntOrNull(),
             kcpTti = kcpTti.toIntOrNull(),
             browserDialerMode = if (network in listOf(NetworkType.WS.type, NetworkType.XHTTP.type)) {
@@ -194,10 +209,15 @@ class ServerUiState(
                 bandwidthUp = initialConfig.bandwidthUp ?: "",
                 network = initialConfig.network ?: NetworkType.TCP.type,
                 headerType = initialConfig.headerType ?: "none",
+                mode = initialConfig.mode ?: "",
+                xhttpMode = initialConfig.xhttpMode ?: "",
+                serviceName = initialConfig.serviceName ?: "",
+                authority = initialConfig.authority ?: "",
                 host = initialConfig.host ?: "",
                 path = initialConfig.path ?: "",
                 xhttpExtra = initialConfig.xhttpExtra ?: "",
                 finalMask = initialConfig.finalMask ?: "",
+                seed = initialConfig.seed ?: "",
                 kcpMtu = initialConfig.kcpMtu?.toString() ?: "",
                 kcpTti = initialConfig.kcpTti?.toString() ?: "",
                 browserDialerMode = initialConfig.browserDialerMode ?: "",

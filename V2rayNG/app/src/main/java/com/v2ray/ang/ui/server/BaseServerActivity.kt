@@ -154,9 +154,19 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                             else -> R.string.server_lab_head_type
                         }
                     ),
-                    state.headerType,
+                    when (state.network) {
+                        NetworkType.GRPC.type -> state.mode
+                        NetworkType.XHTTP.type -> state.xhttpMode
+                        else -> state.headerType
+                    },
                     headerOptions,
-                    { state.headerType = it }
+                    {
+                        when (state.network) {
+                            NetworkType.GRPC.type -> state.mode = it
+                            NetworkType.XHTTP.type -> state.xhttpMode = it
+                            else -> state.headerType = it
+                        }
+                    }
                 )
             }
 
@@ -173,25 +183,26 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                         else -> R.string.server_lab_request_host6
                     }
                 ),
-                state.host,
-                { state.host = it }
+                if (state.network == NetworkType.GRPC.type) state.authority else state.host,
+                { if (state.network == NetworkType.GRPC.type) state.authority = it else state.host = it }
             )
 
-            FormTextField(
-                stringResource(
-                    when (state.network) {
-                        NetworkType.KCP.type -> R.string.server_lab_path_kcp
-                        NetworkType.WS.type -> R.string.server_lab_path_ws
-                        NetworkType.HTTP_UPGRADE.type -> R.string.server_lab_path_httpupgrade
-                        NetworkType.XHTTP.type -> R.string.server_lab_path_xhttp
-                        NetworkType.H2.type -> R.string.server_lab_path_h2
-                        NetworkType.GRPC.type -> R.string.server_lab_path_grpc
-                        else -> R.string.server_lab_path
-                    }
-                ),
-                state.path,
-                { state.path = it }
-            )
+            if (state.network != NetworkType.KCP.type) {
+                FormTextField(
+                    stringResource(
+                        when (state.network) {
+                            NetworkType.WS.type -> R.string.server_lab_path_ws
+                            NetworkType.HTTP_UPGRADE.type -> R.string.server_lab_path_httpupgrade
+                            NetworkType.XHTTP.type -> R.string.server_lab_path_xhttp
+                            NetworkType.H2.type -> R.string.server_lab_path_h2
+                            NetworkType.GRPC.type -> R.string.server_lab_path_grpc
+                            else -> R.string.server_lab_path
+                        }
+                    ),
+                    if (state.network == NetworkType.GRPC.type) state.serviceName else state.path,
+                    { if (state.network == NetworkType.GRPC.type) state.serviceName = it else state.path = it }
+                )
+            }
 
             if (state.network == NetworkType.XHTTP.type) {
                 FormTextField(
@@ -201,6 +212,11 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 )
             }
             if (state.network == NetworkType.KCP.type) {
+                FormTextField(
+                    stringResource(R.string.server_lab_path_kcp),
+                    state.seed,
+                    { state.seed = it }
+                )
                 FormTextField(
                     stringResource(R.string.server_lab_kcp_mtu),
                     state.kcpMtu,
