@@ -3,6 +3,7 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.graphics.Bitmap
 import android.text.TextUtils
+import android.provider.Settings
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreConfigManager
@@ -559,9 +560,8 @@ object AngConfigManager {
 
             // --- ДОБАВЛЕНИЕ HWID К URL ---
             try {
-                // Получаем HWID устройства (например, Android ID) или берем ваш готовый идентификатор из менеджера настроек
                 val hwid = Settings.Secure.getString(
-                    fastech.capstone.client.App.application.contentResolver, // Замените на ваш способ получения Context, если он доступен в классе иначе
+                    com.v2ray.ang.App.application.contentResolver,
                     Settings.Secure.ANDROID_ID
                 ) ?: "unknown_hwid"
 
@@ -633,6 +633,7 @@ object AngConfigManager {
             return SubscriptionUpdateResult(failureCount = 1)
         }
     }
+    
 
     /**
      * Removes invalid server configurations for a subscription.
