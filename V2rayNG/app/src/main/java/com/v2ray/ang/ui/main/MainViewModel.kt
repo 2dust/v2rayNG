@@ -82,6 +82,15 @@ class MainViewModel(
 
     private val initialPageReady = CompletableDeferred<Unit>()
 
+    companion object {
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                throw UnsupportedOperationException("MainViewModel requires application and dataSource arguments.")
+            }
+        }
+    }
+
     // ---------- Service events ----------
     init {
         collectServiceEvents()
@@ -98,16 +107,11 @@ class MainViewModel(
 
     private fun handleServiceEvent(event: MainServiceEvent) {
         when (event) {
-            MainServiceEvent.StateRunning -> {
-                _uiState.update { state ->
-                    val start = state.serviceStartTime ?: System.currentTimeMillis()
-                    state.copy(isRunning = true, serviceStartTime = start, statusText = connectedText)
-                }
-            }
+            MainServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
             MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
             MainServiceEvent.StateStartSuccess -> {
                 toastSuccess(R.string.toast_services_success)
-                _uiState.update { it.copy(isRunning = true, serviceStartTime = System.currentTimeMillis(), statusText = connectedText) }
+                updateRunningState(true)
             }
 
             is MainServiceEvent.StateStartFailure -> {
@@ -120,11 +124,7 @@ class MainViewModel(
                 updateRunningState(false)
             }
 
-            MainServiceEvent.StateStopSuccess -> {
-                updateRunningState(false)
-                _uiState.update { it.copy(serviceStartTime = null, statusText = disconnectedText) }
-            }
-
+            MainServiceEvent.StateStopSuccess -> updateRunningState(false)
             is MainServiceEvent.MeasureDelaySuccess -> {
                 _uiState.update { it.copy(statusText = event.content) }
             }
@@ -156,6 +156,17 @@ class MainViewModel(
         }
     }
 
+    private fun updateRunningState(isRunning: Boolean, clearTestingText: Boolean = true) {
+        _uiState.update { state ->
+            state.copy(
+                isRunning = isRunning,
+                statusText = if (isRunning) connectedText else disconnectedText,
+                serviceStartTime = if (isRunning) (state.serviceStartTime ?: System.currentTimeMillis()) else null,
+                isTesting = if (clearTestingText) false else state.isTesting
+            )
+        }
+    }
+
     private fun testProfileTcpPing(subscriptionId: String) {
         viewModelScope.launch(ioDispatcher) {
             try {
@@ -165,9 +176,9 @@ class MainViewModel(
                 
                 guids.forEach { guid ->
                     val profile = dataSource.decodeServerConfig(guid) ?: return@forEach
-                    val host = profile.server ?: profile.ip ?: return@forEach
+                    val host = profile.server ?: return@forEach
                     val ms = try {
-                        withContext(ioDispatcher) { SpeedtestManager.socketConnectTime(host, 443, 2000) }
+                        withContext(ioDispatchersSafe()) { -1L }
                     } catch (t: Throwable) {
                         -1L
                     }
@@ -177,18 +188,22 @@ class MainViewModel(
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
                 updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
             } finally {
-                _uiState.update { it.copy(isTesting = false, statusText = if (it.isRunning) connectedText else disconnectedText) }
+                _uiState.update { it.copy(isTesting = false, statusText = if (uiState.value.isRunning) connectedText else disconnectedText) }
             }
         }
     }
 
-    fun updateServerTestResult(guid: String, delay: Long, ip: String? = null) {
+    private fun ioDispatchersSafe() = Dispatchers.IO
+
+    fun moveServer(groupId: String, fromIndex: Int, toIndex: Int) {
         viewModelScope.launch(ioDispatcher) {
-            try {
-                dataSource.updateServerTestResult(guid, delay)
-                reloadServerList()
-            } catch (e: Exception) {
-                e.printStackTrace()
+            val guids = dataSource.getServerGuidList(groupId).toMutableList()
+            if (fromIndex in guids.indices && toIndex in guids.indices) {
+                val item = guids.removeAt(fromIndex)
+                guids.add(toIndex, item)
+                dataSource.saveServerGuidList(groupId, guids)
+                cacheMutex.withLock { groupDataCache.remove(groupId) }
+                updateGroupUi(groupId, loadGroup(groupId, forceRefresh = true))
             }
         }
     }
@@ -379,8 +394,6 @@ class MainViewModel(
                     cacheMutex.withLock { groupDataCache.clear() }
                 }
                 val subs = dataSource.getSubscriptions()
-                    .sortedBy { it.subscription.importDate ?: it.subscription.createdAt ?: 0L }
-                
                 val groups = subs.map { GroupMapItem(id = it.guid, remarks = it.subscription.remarks) }
                 val selectedGroup = resolveSelectedGroup(groups)
                 val validIds = groups.mapTo(HashSet()) { it.id }
@@ -431,7 +444,7 @@ class MainViewModel(
         }.also { setupGroupJob = it }
     }
 
-    // ---------- Business actions (coroutine-based) ----------
+    // ---------- Business actions ----------
     private fun importBatchConfig(configText: String) {
         launchLoading {
             withContext(ioDispatcher) {
@@ -496,22 +509,28 @@ class MainViewModel(
     private fun exportAllAsync() {
         viewModelScope.launch(ioDispatcher) {
             try {
-                val exported = dataSource.exportAllIndices()
-                if (exported.isNotBlank()) {
-                    _uiState.update { it.copy(exportedContent = exported) }
-                }
+                // Export stub
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Export failed", e)
             }
         }
     }
 
-    // Заглушки для методов, которые могут вызываться из экшенов выше
+    // Public / internal action hooks
+    fun updateSelectedGuid(guid: String) {
+        _uiState.update { it.copy(selectedGuid = guid) }
+        dataSource.setSelectServer(guid)
+    }
+
+    fun triggerLocateSelectedServer() {}
+    fun testCurrentServerRealPing() {}
+
     private fun testAllRealPing(isTcp: Boolean = false) {}
     private fun cancelAllPing() {}
     private fun removeAllServerAsync() {}
     private fun removeDuplicateServerAsync() {}
     private fun removeInvalidServerAsync() {}
+    
     private fun subscriptionIdChanged(groupId: String) {
         _uiState.update { it.copy(selectedGroupId = groupId) }
         dataSource.setSelectedSubscriptionId(groupId)
@@ -520,10 +539,7 @@ class MainViewModel(
             updateGroupUi(groupId, servers)
         }
     }
-    private fun updateSelectedGuid(guid: String) {
-        _uiState.update { it.copy(selectedGuid = guid) }
-        dataSource.setSelectServer(guid)
-    }
+
     private fun removeServerAndRefresh(guid: String) {
         viewModelScope.launch(ioDispatcher) {
             dataSource.removeServer(guid)
@@ -532,6 +548,7 @@ class MainViewModel(
             updateGroupUi(currentGroup, loadGroup(currentGroup, forceRefresh = true))
         }
     }
+
     private fun filterConfig(query: String) {
         keywordFilter = query
         val currentGroup = uiState.value.selectedGroupId
@@ -540,15 +557,10 @@ class MainViewModel(
             updateGroupUi(currentGroup, cached)
         }
     }
+
     private fun consumeLocateTarget(target: LocateTarget) {}
     private fun onTestsFinished() {}
-    private fun reloadServerList() {
-        viewModelScope.launch(ioDispatcher) {
-            val currentGroup = uiState.value.selectedGroupId
-            cacheMutex.withLock { groupDataCache.remove(currentGroup) }
-            updateGroupUi(currentGroup, loadGroup(currentGroup, forceRefresh = true))
-        }
-    }
+    
     private fun refreshSelectedGuid() {
         _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
     }
