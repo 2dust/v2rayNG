@@ -36,7 +36,6 @@ import com.v2ray.ang.ui.compose.colorFabInactiveLight
 fun MainBottomBar(
     displayText: String,
     isRunning: Boolean,
-    isTesting: Boolean,
     isDarkTheme: Boolean,
     onAction: (MainAction) -> Unit
 ) {
@@ -48,7 +47,7 @@ fun MainBottomBar(
                     .fillMaxWidth()
                     .windowInsetsPadding(WindowInsets.navigationBars)
                     .height(64.dp)
-                    .clickable { onAction(if (isTesting) MainAction.CancelTesting else MainAction.TestCurrentServer) },
+                    .clickable(onClick = { onAction(MainAction.TestCurrentServer) }),
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 0.dp
             ) {

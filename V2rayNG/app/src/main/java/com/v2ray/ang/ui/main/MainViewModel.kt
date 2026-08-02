@@ -129,7 +129,6 @@ class MainViewModel(
             }
 
             is MainServiceEvent.MeasureConfigNotify -> {
-                if (!uiState.value.isTesting) return
                 _uiState.update {
                     it.copy(
                         statusText = dataSource.getString(
@@ -672,7 +671,6 @@ class MainViewModel(
     }
 
     fun testAllRealPing(onlyTcp: Boolean = false) {
-        dataSource.cancelAllPing()
         val groupId = uiState.value.selectedGroupId
         val servers = currentServers()
         dataSource.clearAllTestDelayResults(servers.map { it.guid })
@@ -684,7 +682,7 @@ class MainViewModel(
         _uiState.update {
             it.copy(
                 isTesting = true,
-                statusText = dataSource.getString(R.string.connection_test_testing_tap_to_stop)
+                statusText = dataSource.getString(R.string.connection_test_testing)
             )
         }
         viewModelScope.launch(ioDispatcher) {

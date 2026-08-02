@@ -129,9 +129,6 @@ class CoreTestService : Service() {
         LogUtil.i(AppConfig.TAG, "CoreTestService cancelling the active batch")
         replacementRequested = false
         activeWorker?.cancel()
-        if (batchFinished.compareAndSet(false, true)) {
-            MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_FINISH, "-1")
-        }
         activeWorker = null
         NotificationHelper.stopForeground(this)
         stopSelf(startId)
