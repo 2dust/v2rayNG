@@ -56,8 +56,7 @@ fun ProfileCard(
                 }
             }
             
-            // ВАЖНО: В оригинальном v2rayNG нет полей expiryDate, usedGb, totalGb!
-            // Заглушки для компиляции:
+            // ВАЖНО: В текущей базе нет полей expiryDate и traffic, поэтому стоят временные заглушки для компиляции
             val expiry = "Неизвестно"
             val used = "0 ГБ"
             val total = "∞"
