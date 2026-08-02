@@ -1,18 +1,18 @@
 package com.v2ray.ang.ui.main
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,17 +21,20 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.ui.compose.colorPing
+import com.v2ray.ang.ui.compose.colorPingRed
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
@@ -79,11 +82,16 @@ fun ProfileCard(
     onPingProfile: (String) -> Unit,
     onUpdateSubscription: (String) -> Unit,
     onSelectServer: (String) -> Unit,
+    onEditServer: ((String, ProfileItem) -> Unit)? = null
 ) {
+    val context = LocalContext.current
+    var showMenu by remember { mutableStateOf(false) }
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F8FC))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F9FC)),
+        border = BorderStroke(1.dp, Color(0xFFE2E8F0)) // Обводка профиля
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp)) {
             // Первая строка: Стрелочка, Заголовок, Кнопки
@@ -114,8 +122,19 @@ fun ProfileCard(
                     ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.width(8.dp))
-                IconButton(onClick = { /* More actions */ }, modifier = Modifier.size(32.dp)) {
-                    Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
+                Box {
+                    IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
+                        Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
+                    }
+                    DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                        DropdownMenuItem(
+                            text = { Text("Настройки подписки") },
+                            onClick = { 
+                                showMenu = false
+                                Toast.makeText(context, "Откройте Настройки для изменения подписок", Toast.LENGTH_LONG).show()
+                            }
+                        )
+                    }
                 }
             }
             
@@ -126,7 +145,13 @@ fun ProfileCard(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             ) {
-                Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0), modifier = Modifier.size(24.dp))
+                IconButton(
+                    onClick = { Toast.makeText(context, "Информация профиля", Toast.LENGTH_SHORT).show() }, 
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0))
+                }
+                
                 Spacer(Modifier.width(12.dp))
                 
                 Box(modifier = Modifier
@@ -138,12 +163,21 @@ fun ProfileCard(
                 Spacer(Modifier.weight(1f))
                 Text("Истекает: 17.08.2026", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
                 Spacer(Modifier.width(12.dp))
-                Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0), modifier = Modifier.size(24.dp))
+                
+                IconButton(
+                    onClick = { 
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/shashachkaaa"))
+                        context.startActivity(intent)
+                    }, 
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
+                }
             }
             
             Spacer(Modifier.height(16.dp))
             
-            // Описание (из скриншота)
+            // Хардкодный текст как на скриншоте пользователя
             Text(
                 "💪 Vanguard VPN - Это не про обход, это про\nпревосходство.\nЕсли подписка не работает — нажмите на кнопку «↻»,\nчтобы обновить её", 
                 fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), modifier = Modifier.fillMaxWidth()
@@ -196,11 +230,12 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         
-                        val protocol = serverCache.profile.configType.name.uppercase()
-                        val network = serverCache.profile.network?.uppercase() ?: "TCP"
-                        val security = serverCache.profile.security?.uppercase() ?: "NONE"
+                        // Парсим протоколы красиво (как Hysteria2, vless reality и т.д.)
+                        val desc = serverCache.profile.description.takeIf { !it.isNullOrBlank() } 
+                            ?: AngConfigManager.generateDescription(serverCache.profile)
+                            
                         Text(
-                            text = "$protocol / $network / $security | JSON", 
+                            text = "$desc | JSON", 
                             fontSize = 10.sp, 
                             color = Color.Gray, 
                             fontWeight = FontWeight.Bold,
@@ -220,8 +255,13 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(8.dp))
+                    // Кликабельная стрелочка
+                    IconButton(
+                        onClick = { onEditServer?.invoke(serverCache.guid, serverCache.profile) },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
+                    }
                 }
             }
         }
@@ -245,5 +285,5 @@ fun GroupPagerPage(
     onRemoveServer: (String) -> Unit,
     contentPadding: PaddingValues
 ) {
-    // Архитектурная заглушка, функция теперь не используется в MainScreen
+    // Архитектурная заглушка
 }
