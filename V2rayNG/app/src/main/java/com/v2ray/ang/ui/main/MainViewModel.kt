@@ -59,7 +59,6 @@ class MainViewModel(
     private val _subscriptions = MutableStateFlow<List<SubscriptionCache>>(emptyList())
     val subscriptions: StateFlow<List<SubscriptionCache>> = _subscriptions.asStateFlow()
 
-    // Состояния для плавной анимации импорта
     val isImporting = MutableStateFlow(false)
     val importError = MutableStateFlow<String?>(null)
 
@@ -99,7 +98,6 @@ class MainViewModel(
         startBackgroundPolling()
     }
 
-    // Фоновый поллинг: тихо обновляет UI, когда подписка в фоне закончила парситься (решает проблему с "import sub")
     private fun startBackgroundPolling() {
         viewModelScope.launch(ioDispatcher) {
             var lastHash = 0
@@ -250,9 +248,7 @@ class MainViewModel(
             MainAction.DismissQRCodeDialog -> {
                 _uiState.update { it.copy(shareQRCodeBitmap = null) }
             }
-            MainAction.ToggleService -> {
-                dataSource.toggleService()
-            }
+            MainAction.ToggleService,
             MainAction.TestCurrentServer,
             MainAction.ImportQRcode,
             MainAction.ImportClipboard,
