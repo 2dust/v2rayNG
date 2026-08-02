@@ -62,6 +62,47 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 import kotlin.math.abs
 
 @Composable
+fun ProfileCard(
+    subscription: SubscriptionCache,
+    servers: List<ServersCache>,
+    selectedGuid: String?,
+    onPingProfile: (String) -> Unit,
+    onUpdateSubscription: (String) -> Unit,
+    onSelectServer: (String) -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            Text(subscription.subscription.remarks ?: "", Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
+            IconButton(onClick = { onPingProfile(subscription.guid) }) {
+                Icon(painterResource(R.drawable.ic_ping), contentDescription = "Ping")
+            }
+            IconButton(onClick = { onUpdateSubscription(subscription.guid) }) {
+                Icon(painterResource(R.drawable.ic_refresh), contentDescription = "Обновить подписку")
+            }
+        }
+        Text("${subscription.subscription.expiryDate ?: ""} — ${subscription.usage.usedGb} / ${subscription.usage.totalGb}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(8.dp))
+        servers.forEach { serverCache ->
+            Row(Modifier.fillMaxWidth().clickable { onSelectServer(serverCache.guid) }.padding(vertical = 6.dp)) {
+                Column(Modifier.weight(1f)) {
+                    Text(serverCache.profile.remarks)
+                    Text(serverCache.profile.server ?: "", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Text(
+                    serverCache.testDelayString.ifEmpty { if (serverCache.testDelayMillis < 0) "таймаут" else "" },
+                    color = when {
+                        serverCache.testDelayMillis < 0L -> colorPingRed
+                        serverCache.testDelayMillis <= 300L -> colorPing
+                        else -> colorPingSlow
+                    }
+                )
+            }
+            Divider()
+        }
+    }
+}
+
+@Composable
 fun GroupPagerPage(
     groupId: String,
     mainViewModel: MainViewModel,
