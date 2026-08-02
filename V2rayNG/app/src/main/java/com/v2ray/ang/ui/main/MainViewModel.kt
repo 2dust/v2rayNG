@@ -56,9 +56,12 @@ class MainViewModel(
     )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
-    // Реактивное состояние для подписок, чтобы UI обновлялся сразу после скачивания
+    // Реактивное состояние для списка подписок
     private val _subscriptions = MutableStateFlow<List<SubscriptionCache>>(emptyList())
     val subscriptions: StateFlow<List<SubscriptionCache>> = _subscriptions.asStateFlow()
+
+    // Состояние анимации загрузки
+    val isImporting = MutableStateFlow(false)
 
     @Volatile
     private var keywordFilter: String = ""
@@ -163,7 +166,6 @@ class MainViewModel(
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
                 updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
                 
-                // Триггерим настоящий пинг
                 dataSource.testCurrentServerRealPing()
             } finally {
                 _uiState.update { it.copy(isTesting = false, statusText = if (uiState.value.isRunning) connectedText else disconnectedText) }
@@ -347,7 +349,6 @@ class MainViewModel(
                     cacheMutex.withLock { groupDataCache.clear() }
                 }
                 
-                // Получаем и фильтруем профиль default
                 val subs = dataSource.getSubscriptions().filter { 
                     it.subscription.remarks?.lowercase() != "default" 
                 }
@@ -406,7 +407,8 @@ class MainViewModel(
         val isUrl = configText.startsWith("http://", true) || configText.startsWith("https://", true)
         val targetGroupId = if (isUrl) "" else uiState.value.selectedGroupId
 
-        launchLoading {
+        viewModelScope.launch {
+            isImporting.value = true
             withContext(ioDispatcher) {
                 try {
                     val (count, countSub) = dataSource.importBatchConfig(
@@ -414,26 +416,59 @@ class MainViewModel(
                     )
                     when {
                         countSub > 0 -> {
-                            // Скачиваем сервера и парсим заголовки подписки (profile-title и тд)
+                            // Автоматическое скачивание серверов
                             dataSource.updateConfigViaSubAll()
+                            // Даем ядру время скачать, пропарсить HTTP заголовки и записать сервера в БД
+                            delay(2500)
                             setupGroupTab(forceRefresh = true).join()
-                            // Автоматически выбираем новую подписку
+                            
                             val newSub = _subscriptions.value.lastOrNull()
                             if (newSub != null) {
                                 subscriptionIdChanged(newSub.guid)
                             }
                         }
                         count > 0 -> {
-                            toast(dataSource.getString(R.string.title_import_config_count, count))
-                            setupGroupTab(forceRefresh = true)
+                            setupGroupTab(forceRefresh = true).join()
                         }
-                        else -> toastError(R.string.toast_failure)
+                        else -> {
+                            withContext(Dispatchers.Main) {
+                                toastError("Ошибка: В буфере обмена нет валидной конфигурации или ссылки")
+                            }
+                        }
                     }
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
-                    toastError(R.string.toast_failure)
+                    withContext(Dispatchers.Main) {
+                        toastError("Сбой импорта: ${e.localizedMessage}")
+                    }
+                } finally {
+                    isImporting.value = false
+                }
+            }
+        }
+    }
+    
+    // Специальный метод для принудительного обновления конкретной подписки
+    fun updateSubscription(subId: String) {
+        viewModelScope.launch {
+            isImporting.value = true
+            withContext(ioDispatcher) {
+                try {
+                    _uiState.update { it.copy(selectedGroupId = subId) }
+                    dataSource.setSelectedSubscriptionId(subId)
+                    
+                    val item = dataSource.getSubscriptionItem(subId) ?: return@withContext
+                    dataSource.updateConfigViaSub(SubscriptionCache(subId, item))
+                    
+                    delay(2500) // Ждем ответа сервера
+                    setupGroupTab(forceRefresh = true).join()
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Subscription update failed", e)
+                    withContext(Dispatchers.Main) { toastError("Ошибка обновления") }
+                } finally {
+                    isImporting.value = false
                 }
             }
         }
@@ -441,26 +476,8 @@ class MainViewModel(
 
     private fun importConfigViaSub() {
         val subId = uiState.value.selectedGroupId
-        launchLoading {
-            withContext(ioDispatcher) {
-                try {
-                    val result = if (subId.isEmpty()) {
-                        dataSource.updateConfigViaSubAll()
-                    } else {
-                        val item = dataSource.getSubscriptionItem(subId) ?: return@withContext
-                        dataSource.updateConfigViaSub(SubscriptionCache(subId, item))
-                    }
-                    if (result.configCount > 0) {
-                        setupGroupTab(forceRefresh = true)
-                        refreshSelectedGuid()
-                    }
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Subscription update failed", e)
-                    toastError(R.string.toast_failure)
-                }
-            }
+        if (subId.isNotEmpty()) {
+            updateSubscription(subId)
         }
     }
 
