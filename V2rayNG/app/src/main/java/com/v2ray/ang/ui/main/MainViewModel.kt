@@ -56,6 +56,10 @@ class MainViewModel(
     )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
+    // Реактивное состояние для подписок, чтобы UI обновлялся сразу после скачивания
+    private val _subscriptions = MutableStateFlow<List<SubscriptionCache>>(emptyList())
+    val subscriptions: StateFlow<List<SubscriptionCache>> = _subscriptions.asStateFlow()
+
     @Volatile
     private var keywordFilter: String = ""
 
@@ -158,6 +162,9 @@ class MainViewModel(
                 
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
                 updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
+                
+                // Триггерим настоящий пинг
+                dataSource.testCurrentServerRealPing()
             } finally {
                 _uiState.update { it.copy(isTesting = false, statusText = if (uiState.value.isRunning) connectedText else disconnectedText) }
             }
@@ -191,13 +198,6 @@ class MainViewModel(
 
     private fun mutableServersForGroup(groupId: String): MutableStateFlow<List<ServersCache>> =
         groupPageFlows.computeIfAbsent(groupId) { MutableStateFlow(emptyList()) }
-
-    // Скрываем профиль "default", чтобы он никогда не отображался
-    fun getSubscriptions(): List<SubscriptionCache> {
-        return dataSource.getSubscriptions().filter { 
-            it.subscription.remarks?.lowercase() != "default"
-        }
-    }
 
     fun onAction(action: MainAction) {
         when (action) {
@@ -346,7 +346,13 @@ class MainViewModel(
                 if (forceRefresh) {
                     cacheMutex.withLock { groupDataCache.clear() }
                 }
-                val subs = getSubscriptions()
+                
+                // Получаем и фильтруем профиль default
+                val subs = dataSource.getSubscriptions().filter { 
+                    it.subscription.remarks?.lowercase() != "default" 
+                }
+                _subscriptions.value = subs
+                
                 val groups = subs.map { GroupMapItem(id = it.guid, remarks = it.subscription.remarks) }
                 val selectedGroup = resolveSelectedGroup(groups)
                 val validIds = groups.mapTo(HashSet()) { it.id }
@@ -408,9 +414,14 @@ class MainViewModel(
                     )
                     when {
                         countSub > 0 -> {
-                            // Автоматически обновляем и качаем сервера для новой ссылки
+                            // Скачиваем сервера и парсим заголовки подписки (profile-title и тд)
                             dataSource.updateConfigViaSubAll()
-                            setupGroupTab(forceRefresh = true)
+                            setupGroupTab(forceRefresh = true).join()
+                            // Автоматически выбираем новую подписку
+                            val newSub = _subscriptions.value.lastOrNull()
+                            if (newSub != null) {
+                                subscriptionIdChanged(newSub.guid)
+                            }
                         }
                         count > 0 -> {
                             toast(dataSource.getString(R.string.title_import_config_count, count))
@@ -473,7 +484,10 @@ class MainViewModel(
         dataSource.testCurrentServerRealPing()
     }
 
-    private fun testAllRealPing(isTcp: Boolean = false) {}
+    private fun testAllRealPing(isTcp: Boolean = false) {
+        dataSource.testCurrentServerRealPing()
+    }
+    
     private fun cancelAllPing() {
         dataSource.cancelAllPing()
     }
