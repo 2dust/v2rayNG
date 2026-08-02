@@ -6,7 +6,7 @@ import com.v2ray.ang.dto.ProbeProfile
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.util.JsonUtil
 
-/** Combines v2rayNG-generated speed-test configurations into one probe core. */
+/** Combines v2rayNG-generated real-delay configurations into one probe core. */
 object ProbeConfigBuilder {
     data class Source(val guid: String, val config: V2rayConfig)
 
@@ -91,6 +91,6 @@ object ProbeConfigBuilder {
     }
 
     private val OBSERVATORY_STRATEGIES = setOf("leastPing", "leastLoad")
-    private const val DEFAULT_HTTP_METHOD = "GET"
+    private const val DEFAULT_HTTP_METHOD = "HEAD"
     private const val DEFAULT_TIMEOUT = "5s"
 }

@@ -170,7 +170,7 @@ class RealPingWorkerService(
             SpeedtestManager.socketConnectTime(config.server.orEmpty(), config.serverPort.orEmpty().toInt(), 1000) <= -1L
         ) return -1L
 
-        val configResult = CoreConfigManager.getV2rayConfig4Speedtest(context, guid)
+        val configResult = CoreConfigManager.getV2rayConfig4RealDelay(context, guid)
         if (!configResult.status) return -1L
         return CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
     }
