@@ -547,7 +547,7 @@ object AngConfigManager {
                 return SubscriptionUpdateResult(skipCount = 1)
             }
 
-            val url = HttpUtil.toIdnUrl(it.subscription.url)
+            var url = HttpUtil.toIdnUrl(it.subscription.url)
             if (!Utils.isValidUrl(url)) {
                 return SubscriptionUpdateResult(failureCount = 1)
             }
@@ -556,6 +556,24 @@ object AngConfigManager {
                     return SubscriptionUpdateResult(failureCount = 1)
                 }
             }
+
+            // --- ДОБАВЛЕНИЕ HWID К URL ---
+            try {
+                // Получаем HWID устройства (например, Android ID) или берем ваш готовый идентификатор из менеджера настроек
+                val hwid = Settings.Secure.getString(
+                    fastech.capstone.client.App.application.contentResolver, // Замените на ваш способ получения Context, если он доступен в классе иначе
+                    Settings.Secure.ANDROID_ID
+                ) ?: "unknown_hwid"
+
+                val uri = android.net.Uri.parse(url).buildUpon()
+                    .appendQueryParameter("hwid", hwid)
+                    .build()
+                url = uri.toString()
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Failed to append HWID to subscription URL", e)
+            }
+            // -----------------------------
+
             LogUtil.i(AppConfig.TAG, url)
             val userAgent = it.subscription.userAgent
             val requestHeaders = it.subscription.requestHeaders
@@ -589,7 +607,7 @@ object AngConfigManager {
                         )
                     )
                 } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
+                    LogUtil.e(AppConfig.TAG, "Upate subscription: Failed to get URL content with user agent", e)
                     ""
                 }
             }
