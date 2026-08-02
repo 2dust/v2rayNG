@@ -13,7 +13,6 @@ import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
-import com.v2ray.ang.storage.MmkvManager
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
@@ -155,9 +154,7 @@ class MainViewModel(
                 if (guids.isEmpty()) return@launch
                 _uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
                 
-                guids.forEach { guid ->
-                    MmkvManager.encodeServerTestResult(guid, -1L)
-                }
+                dataSource.clearAllTestDelayResults(guids)
                 
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
                 updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
@@ -173,7 +170,7 @@ class MainViewModel(
             if (fromIndex in guids.indices && toIndex in guids.indices) {
                 val item = guids.removeAt(fromIndex)
                 guids.add(toIndex, item)
-                MmkvManager.encodeServerList(groupId, guids)
+                dataSource.encodeServerList(guids, groupId)
                 cacheMutex.withLock { groupDataCache.remove(groupId) }
                 updateGroupUi(groupId, loadGroup(groupId, forceRefresh = true))
             }
@@ -183,13 +180,7 @@ class MainViewModel(
     fun sortByTestResultsInternal() {
         viewModelScope.launch(ioDispatcher) {
             val currentGroup = uiState.value.selectedGroupId
-            val guids = dataSource.getServerGuidList(currentGroup)
-            val sortedGuids = guids.sortedBy { guid ->
-                val affiliation = dataSource.decodeAffiliationInfo(guid)
-                val delay = affiliation?.testDelayMillis ?: 9999L
-                if (delay < 0L) 9999L else delay
-            }
-            MmkvManager.encodeServerList(currentGroup, sortedGuids)
+            dataSource.sortByTestResultsForSub(currentGroup)
             cacheMutex.withLock { groupDataCache.remove(currentGroup) }
             updateGroupUi(currentGroup, loadGroup(currentGroup, forceRefresh = true))
         }
@@ -464,13 +455,28 @@ class MainViewModel(
     }
 
     fun triggerLocateSelectedServer() {}
-    fun testCurrentServerRealPing() {}
+    fun testCurrentServerRealPing() {
+        dataSource.testCurrentServerRealPing()
+    }
 
     private fun testAllRealPing(isTcp: Boolean = false) {}
-    private fun cancelAllPing() {}
-    private fun removeAllServerAsync() {}
+    private fun cancelAllPing() {
+        dataSource.cancelAllPing()
+    }
+    private fun removeAllServerAsync() {
+        viewModelScope.launch(ioDispatcher) {
+            dataSource.removeAllServer()
+            setupGroupTab(forceRefresh = true)
+        }
+    }
     private fun removeDuplicateServerAsync() {}
-    private fun removeInvalidServerAsync() {}
+    private fun removeInvalidServerAsync() {
+        viewModelScope.launch(ioDispatcher) {
+            val currentGroup = uiState.value.selectedGroupId
+            dataSource.removeInvalidServersInGroup(currentGroup)
+            setupGroupTab(forceRefresh = true)
+        }
+    }
     
     private fun subscriptionIdChanged(groupId: String) {
         _uiState.update { it.copy(selectedGroupId = groupId) }
