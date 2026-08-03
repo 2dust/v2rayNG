@@ -534,27 +534,27 @@ class MainViewModel(
             
                 _uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
             
-            // 1. Очищаем старые результаты
+                // 1. Очищаем старые результаты
                 dataSource.clearAllTestDelayResults(guids)
             
-            // 2. Запускаем TCP-пинг для каждого сервера из подписки
+                // 2. Запускаем TCP-пинг для каждого сервера из подписки
                 guids.forEach { guid ->
                     val profile = dataSource.decodeServerConfig(guid)
                     val serverHost = profile?.server
-                    val serverPort = profile?.serverPort ?: 0
+                    // Безопасное получение порта с учетом возможных типов
+                    val serverPort = profile?.serverPort?.toString()?.toIntOrNull() ?: 0
                 
                     if (!serverHost.isNullOrBlank() && serverPort > 0) {
-                        val delay = com.v2ray.ang.handler.SpeedtestManager.socketConnectTime(serverHost, serverPort)
+                        val delay = SpeedtestManager.socketConnectTime(serverHost, serverPort)
                     
-                    // Сохраняем результат через MmkvManager (используем правильный метод сохранения аффилиации)
-                        com.v2ray.ang.handler.MmkvManager.encodeServerAffiliationInfo(
-                            guid,
-                            com.v2ray.ang.dto.entities.ServerAffiliationInfo(testDelayMillis = delay)
-                        )
+                        // Используем метод обновления аффилиации через MmkvManager, передавая корректные параметры
+                        val affiliation = dataSource.decodeAffiliationInfo(guid) ?: ServerAffiliationInfo()
+                        affiliation.testDelayMillis = delay
+                        MmkvManager.encodeServerAffiliationInfo(guid, affiliation)
                     }
                 }
             
-            // 3. Сбрасываем кэш группы и обновляем UI
+                // 3. Сбрасываем кэш группы и обновляем UI
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
                 updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
             
