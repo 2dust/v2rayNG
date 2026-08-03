@@ -671,6 +671,27 @@ object AngConfigManager {
                 }
             }
             // ------------------------------------------
+            
+            // --- ОБРАБОТКА ЗАГОЛОВКА announce ---
+            val announceRaw = responseHeaders["announce"]
+            if (!announceRaw.isNullOrEmpty()) {
+                var parsedAnnounce = announceRaw
+                if (announceRaw.startsWith("base64:")) {
+                    try {
+                        val base64Str = announceRaw.substringAfter("base64:")
+                        parsedAnnounce = String(android.util.Base64.decode(base64Str, android.util.Base64.DEFAULT), Charsets.UTF_8)
+                    } catch (e: Exception) {
+                        LogUtil.e(AppConfig.TAG, "Failed to decode base64 announce", e)
+                    }
+                }
+                // Записываем полученный анонс в данные подписки
+                it.subscription.announce = parsedAnnounce
+            } else {
+                // ВАЖНО: Очищаем поле, если сервер не прислал announce!
+                // Это предотвратит баг с "перетеканием" текста из прошлой подписки.
+                it.subscription.announce = ""
+            }
+            // ------------------------------------------
 
             val count = parseConfigViaSub(configText, it.guid, false)
             if (count > 0) {
