@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.routing
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,6 +51,7 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
+import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.ReorderableListItem
@@ -68,6 +69,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+
+private enum class RoutingMenuAction(@StringRes val labelRes: Int) {
+    ImportPredefined(R.string.routing_settings_import_predefined_rulesets),
+    ImportClipboard(R.string.routing_settings_import_rulesets_from_clipboard),
+    ImportQRCode(R.string.routing_settings_import_rulesets_from_qrcode),
+    ExportClipboard(R.string.routing_settings_export_rulesets_to_clipboard)
+}
 
 class RoutingSettingActivity : HelperBaseComponentActivity() {
     private val viewModel: RoutingSettingsViewModel by viewModels()
@@ -227,22 +235,15 @@ fun RoutingSettingScreen(
                             onDismissRequest = { showMenu = false },
                             containerColor = MaterialTheme.colorScheme.surface
                         ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.routing_settings_import_predefined_rulesets)) },
-                                onClick = { showMenu = false; showPresetDialog = true }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.routing_settings_import_rulesets_from_clipboard)) },
-                                onClick = { showMenu = false; onImportClipboard() }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.routing_settings_import_rulesets_from_qrcode)) },
-                                onClick = { showMenu = false; onImportQRcode() }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.routing_settings_export_rulesets_to_clipboard)) },
-                                onClick = { showMenu = false; onExportClipboard() }
-                            )
+                            AppDropdownMenuItems(RoutingMenuAction.entries, { it.labelRes }) { action ->
+                                showMenu = false
+                                when (action) {
+                                    RoutingMenuAction.ImportPredefined -> showPresetDialog = true
+                                    RoutingMenuAction.ImportClipboard -> onImportClipboard()
+                                    RoutingMenuAction.ImportQRCode -> onImportQRcode()
+                                    RoutingMenuAction.ExportClipboard -> onExportClipboard()
+                                }
+                            }
                         }
                     }
                 }

@@ -39,9 +39,7 @@ fun MainTopBar(
     onSearchToggle: (Boolean) -> Unit,
     onMenuClick: () -> Unit,
     onAction: (MainAction) -> Unit,
-    onDelAllConfig: () -> Unit,
-    onDelDuplicateConfig: () -> Unit,
-    onDelInvalidConfig: () -> Unit
+    onMoreMenuAction: (MainMoreMenuAction) -> Unit
 ) {
     var showImportMenu by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
@@ -111,15 +109,10 @@ fun MainTopBar(
                         .heightIn(max = maxMenuHeight)
                         .verticalScrollbar(moreMenuScrollState)
                 ) {
-                    MoreMenuContent(
-                        onAction = { action ->
-                            showMenu = false
-                            onAction(action)
-                        },
-                        onDelAllConfig = { showMenu = false; onDelAllConfig() },
-                        onDelDuplicateConfig = { showMenu = false; onDelDuplicateConfig() },
-                        onDelInvalidConfig = { showMenu = false; onDelInvalidConfig() }
-                    )
+                    MoreMenuContent { action ->
+                        showMenu = false
+                        onMoreMenuAction(action)
+                    }
                 }
             }
         }

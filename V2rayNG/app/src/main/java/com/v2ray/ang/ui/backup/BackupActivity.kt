@@ -48,6 +48,8 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+enum class BackupLocation { Local, WebDav }
+
 class BackupActivity : HelperBaseComponentActivity() {
 
     private val viewModel: BackupViewModel by viewModels()
@@ -90,19 +92,18 @@ class BackupActivity : HelperBaseComponentActivity() {
         BackupScreen(
             isLoadingState = viewModel.isLoading,
             webDavConfigState = viewModel.webDavConfig,
-            backupOptions = configBackupOptions.toList(),
-            onBackupOptionSelected = { which ->
-                when (which) {
-                    0 -> backupViaLocal()
-                    1 -> viewModel.backupViaWebDav(cacheDir, getString(R.string.app_name))
+            storageOptions = configBackupOptions.toList(),
+            onBackupOptionSelected = { location ->
+                when (location) {
+                    BackupLocation.Local -> backupViaLocal()
+                    BackupLocation.WebDav -> viewModel.backupViaWebDav(cacheDir, getString(R.string.app_name))
                 }
             },
             onShareClick = { viewModel.shareBackup(cacheDir, getString(R.string.app_name)) },
-            restoreOptions = configBackupOptions.toList(),
-            onRestoreOptionSelected = { which ->
-                when (which) {
-                    0 -> restoreViaLocal()
-                    1 -> viewModel.restoreViaWebDav(cacheDir)
+            onRestoreOptionSelected = { location ->
+                when (location) {
+                    BackupLocation.Local -> restoreViaLocal()
+                    BackupLocation.WebDav -> viewModel.restoreViaWebDav(cacheDir)
                 }
             },
             onWebDavSave = { config -> viewModel.saveWebDavConfig(config) },
@@ -183,11 +184,10 @@ class BackupActivity : HelperBaseComponentActivity() {
 fun BackupScreen(
     isLoadingState: StateFlow<Boolean>,
     webDavConfigState: StateFlow<WebDavConfig?>,
-    backupOptions: List<String>,
-    onBackupOptionSelected: (Int) -> Unit,
+    storageOptions: List<String>,
+    onBackupOptionSelected: (BackupLocation) -> Unit,
     onShareClick: () -> Unit,
-    restoreOptions: List<String>,
-    onRestoreOptionSelected: (Int) -> Unit,
+    onRestoreOptionSelected: (BackupLocation) -> Unit,
     onWebDavSave: (WebDavConfig) -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -243,10 +243,10 @@ fun BackupScreen(
     if (showBackupDialog) {
         SelectListDialog(
             title = stringResource(R.string.title_configuration_backup),
-            options = backupOptions,
+            options = storageOptions,
             onSelected = { index, _ ->
                 showBackupDialog = false
-                onBackupOptionSelected(index)
+                onBackupOptionSelected(BackupLocation.entries[index])
             },
             onDismiss = { showBackupDialog = false }
         )
@@ -254,10 +254,10 @@ fun BackupScreen(
     if (showRestoreDialog) {
         SelectListDialog(
             title = stringResource(R.string.title_configuration_restore),
-            options = restoreOptions,
+            options = storageOptions,
             onSelected = { index, _ ->
                 showRestoreDialog = false
-                onRestoreOptionSelected(index)
+                onRestoreOptionSelected(BackupLocation.entries[index])
             },
             onDismiss = { showRestoreDialog = false }
         )

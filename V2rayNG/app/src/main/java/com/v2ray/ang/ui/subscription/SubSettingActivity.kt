@@ -58,6 +58,8 @@ import com.v2ray.ang.util.Utils
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
+private enum class SubscriptionShareAction { QRCode, Clipboard }
+
 class SubSettingActivity : BaseComponentActivity() {
     private val viewModel: SubscriptionsViewModel by viewModels()
 
@@ -249,16 +251,9 @@ fun SubSettingScreen(
             options = shareSubMethodEntries,
             onSelected = { index, _ ->
                 shareTarget = null
-                when (index) {
-                    0 -> {
-                        // QRCode
-                        showQRCodeBitmap = onShareQRCode(url)
-                    }
-
-                    1 -> {
-                        // Export to clipboard
-                        onShareClipboard(url)
-                    }
+                when (SubscriptionShareAction.entries[index]) {
+                    SubscriptionShareAction.QRCode -> showQRCodeBitmap = onShareQRCode(url)
+                    SubscriptionShareAction.Clipboard -> onShareClipboard(url)
                 }
             },
             onDismiss = { shareTarget = null }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,9 +34,15 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppListItem
+import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.verticalScrollbar
+
+private enum class AppPickerMenuAction(@StringRes val labelRes: Int) {
+    SelectAll(R.string.menu_item_select_all),
+    InvertSelection(R.string.menu_item_invert_selection)
+}
 
 class AppPickerActivity : BaseComponentActivity() {
 
@@ -161,14 +167,13 @@ fun AppPickerScreen(
                             onDismissRequest = { showMenu = false },
                             containerColor = MaterialTheme.colorScheme.surface
                         ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_item_select_all)) },
-                                onClick = { showMenu = false; onSelectAll() }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_item_invert_selection)) },
-                                onClick = { showMenu = false; onInvertSelection() }
-                            )
+                            AppDropdownMenuItems(AppPickerMenuAction.entries, { it.labelRes }) { action ->
+                                showMenu = false
+                                when (action) {
+                                    AppPickerMenuAction.SelectAll -> onSelectAll()
+                                    AppPickerMenuAction.InvertSelection -> onInvertSelection()
+                                }
+                            }
                         }
                     }
                 }
