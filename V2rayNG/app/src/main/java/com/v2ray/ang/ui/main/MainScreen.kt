@@ -31,6 +31,19 @@ import kotlinx.coroutines.delay
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 
+// Умный парсер, который отделяет флаг/эмодзи от названия сервера
+fun splitEmojiAndName(fullName: String): Pair<String?, String> {
+    // Регулярное выражение захватывает суррогатные пары (флаги) и спецсимволы в начале строки
+    val regex = Regex("^([\\uD83C-\\uDBFF\\uDC00-\\uDFFF\\u2600-\\u27BF\\u2B50\\u2B55]+)\\s*(.*)")
+    val match = regex.find(fullName)
+    return if (match != null) {
+        Pair(match.groupValues[1], match.groupValues[2])
+    } else {
+        Pair(null, fullName)
+    }
+}
+
+
 @Composable
 fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
