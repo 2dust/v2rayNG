@@ -34,6 +34,9 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.ui.subscription.SubEditActivity
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
@@ -66,7 +69,7 @@ fun ClockIcon(color: Color, modifier: Modifier = Modifier) {
 @Composable
 fun WireframeGlobe(color: Color, modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
-        val strokeW = 3f // Сделали линии тоньше для маленькой иконки
+        val strokeW = 3f
         drawCircle(color, style = Stroke(width = strokeW))
         drawOval(color, topLeft = Offset(size.width * 0.25f, 0f), size = Size(size.width * 0.5f, size.height), style = Stroke(width = strokeW))
         drawLine(color, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), strokeWidth = strokeW)
@@ -82,6 +85,13 @@ fun getProtocolDescription(profile: ProfileItem): String {
     val security = profile.security?.uppercase()
     if (!security.isNullOrBlank() && security != "NONE") parts.add(security)
     return parts.joinToString(" / ")
+}
+
+// Форматер даты
+fun formatDate(millis: Long, format: String = "dd.MM.yyyy"): String {
+    if (millis <= 0L) return "Никогда"
+    val formatter = SimpleDateFormat(format, Locale.getDefault())
+    return formatter.format(Date(millis))
 }
 
 @Composable
@@ -100,16 +110,40 @@ fun ProfileCard(
     val uriHandler = LocalUriHandler.current
     var showMenu by remember { mutableStateOf(false) }
 
+    val sub = subscription.subscription
+
+    // Менеджер уже всё декодировал, просто берем данные
+    val title = sub.remarks.takeIf { it.isNotBlank() } ?: "Без названия"
+    val lastUpdateStr = formatDate(sub.lastUpdated, "dd.MM.yyyy HH:mm")
+    val intervalHours = sub.updateInterval / 60
+    val updateStatus = "- $intervalHours ч. $lastUpdateStr"
+
+    // Расчет трафика (байты в гигабайты)
+    val gbDivisor = 1073741824.0
+    val usedTraffic = sub.trafficUpload + sub.trafficDownload
+    val usedStr = String.format(Locale.US, "%.1fGB", usedTraffic / gbDivisor)
+    val totalStr = if (sub.trafficTotal == 0L) "∞" else String.format(Locale.US, "%.1fGB", sub.trafficTotal / gbDivisor)
+    val trafficDisplay = "$usedStr/$totalStr"
+
+    // Дата истечения
+    val expireMillis = if (sub.trafficExpire > 9999999999L) sub.trafficExpire else sub.trafficExpire * 1000
+    val expireDisplay = if (expireMillis > 0L) "Истекает: ${formatDate(expireMillis)}" else "Истекает: ∞"
+
+    // Сообщение подписки (уже декодировано в AngConfigManager)
+    val announceText = sub.announce
+    val supportUrl = sub.supportUrl
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 6.dp), // Уменьшили отступ до серверов
+                .padding(bottom = 6.dp),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 12.dp)) { // Компактные отступы
+            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 12.dp)) {
+                
                 Row(
                     verticalAlignment = Alignment.CenterVertically, 
                     modifier = Modifier.fillMaxWidth()
@@ -119,15 +153,15 @@ fun ProfileCard(
                     
                     Column(Modifier.weight(1f)) {
                         Text(
-                            text = subscription.subscription.remarks ?: "Без названия", 
-                            fontSize = 16.sp, // Уменьшили шрифт заголовка
+                            text = title, 
+                            fontSize = 16.sp,
                             color = Color(0xFF1E293B),
                             fontWeight = FontWeight.ExtraBold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "- 1 ч. 02.08.2026 20:03 | ...", 
+                            text = updateStatus, 
                             fontSize = 9.sp, 
                             color = Color.Gray, 
                             fontWeight = FontWeight.SemiBold
@@ -162,7 +196,7 @@ fun ProfileCard(
                 ) {
                     IconButton(
                         onClick = {
-                            val subUrl = subscription.subscription.url
+                            val subUrl = sub.url
                             if (!subUrl.isNullOrBlank()) try { uriHandler.openUri(subUrl) } catch(e: Exception) { Toast.makeText(context, "Ссылка недоступна", Toast.LENGTH_SHORT).show() }
                             else Toast.makeText(context, "В подписке нет URL", Toast.LENGTH_SHORT).show()
                         }, 
@@ -174,38 +208,50 @@ fun ProfileCard(
                     Spacer(Modifier.width(8.dp))
                     
                     Surface(shape = CircleShape, color = Color(0xFFF1F5F9)) {
-                        Text("54,8GB/∞", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
+                        Text(
+                            text = trafficDisplay, 
+                            fontSize = 11.sp, 
+                            fontWeight = FontWeight.Bold, 
+                            color = Color(0xFF2C3E50), 
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                        )
                     }
                     
-                    Text("Истекает: 17.08.2026", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+                    Text(
+                        text = expireDisplay, 
+                        fontSize = 11.sp, 
+                        fontWeight = FontWeight.Bold, 
+                        color = Color(0xFF2C3E50), 
+                        modifier = Modifier.weight(1f), 
+                        textAlign = TextAlign.Center
+                    )
                     
-                    IconButton(
-                        onClick = { try { uriHandler.openUri("https://t.me/shashachkaaa") } catch(e: Exception){} }, 
-                        modifier = Modifier.size(20.dp)
-                    ) {
-                        Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
+                    if (supportUrl.isNotBlank()) {
+                        IconButton(
+                            onClick = { try { uriHandler.openUri(supportUrl) } catch(e: Exception){} }, 
+                            modifier = Modifier.size(20.dp)
+                        ) {
+                            Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Support", tint = Color(0xFF5C6BC0))
+                        }
+                    } else {
+                        Spacer(Modifier.size(20.dp))
                     }
                 }
                 
-                Spacer(Modifier.height(8.dp))
-                
-                Text(
-                    text = "💪 Vanguard VPN - Это не про обход, это про превосходство.", 
-                    fontSize = 10.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = Color(0xFF475569), modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = "Если подписка не работает — нажмите на кнопку «↻», чтобы обновить её", 
-                    fontSize = 9.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Medium, color = Color(0xFF64748B), modifier = Modifier.fillMaxWidth().padding(top = 2.dp)
-                )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = "DALBAEB | Осталось 14 дней", 
-                    fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1E293B), modifier = Modifier.fillMaxWidth()
-                )
+                if (announceText.isNotBlank()) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = announceText, 
+                        fontSize = 11.sp, 
+                        textAlign = TextAlign.Center, 
+                        fontWeight = FontWeight.Bold, 
+                        color = Color(0xFF1E293B), 
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
+                    )
+                }
             }
         }
         
-        // Компактный список серверов
         servers.forEach { serverCache ->
             val isSelected = serverCache.guid == selectedGuid
             
@@ -215,7 +261,7 @@ fun ProfileCard(
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 1.dp) // Максимально плотно
+                    .padding(vertical = 1.dp)
                     .clickable { onSelectServer(serverCache.guid) }
             ) {
                 Row(
@@ -223,7 +269,7 @@ fun ProfileCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(IntrinsicSize.Min)
-                        .padding(vertical = 6.dp, horizontal = 8.dp) // Ужали отступы внутри сервера
+                        .padding(vertical = 6.dp, horizontal = 8.dp)
                 ) {
                     if (isSelected) {
                         Box(modifier = Modifier.width(4.dp).fillMaxHeight().clip(RoundedCornerShape(50)).background(Color(0xFF5C6BC0)))
@@ -233,7 +279,7 @@ fun ProfileCard(
                     Spacer(Modifier.width(8.dp))
                     
                     Box(
-                        modifier = Modifier.size(36.dp).background(Color(0xFFF1F5F9), RoundedCornerShape(10.dp)), // Меньше квадрат глобуса
+                        modifier = Modifier.size(36.dp).background(Color(0xFFF1F5F9), RoundedCornerShape(10.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         WireframeGlobe(color = Color.Gray, modifier = Modifier.size(20.dp))
@@ -245,7 +291,7 @@ fun ProfileCard(
                         Text(
                             text = serverCache.profile.remarks ?: "Без названия", 
                             fontWeight = FontWeight.ExtraBold, 
-                            fontSize = 15.sp, // Чуть меньше шрифт
+                            fontSize = 15.sp, 
                             color = Color(0xFF1E293B),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -283,7 +329,6 @@ fun ProfileCard(
     }
 }
 
-// 100% Оригинальная сигнатура для MainActivity
 @Composable
 fun GroupPagerPage(
     groupId: String,
