@@ -41,7 +41,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import com.v2ray.ang.util.JsonUtil
-import java.io.File
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
