@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.main
 
+import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
@@ -34,9 +35,8 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.ui.subscription.SubEditActivity
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import org.json.JSONObject
+import java.io.File
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
@@ -69,67 +69,87 @@ fun ClockIcon(color: Color, modifier: Modifier = Modifier) {
 @Composable
 fun WireframeGlobe(color: Color, modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
-        val strokeW = 3f
+        val strokeW = 4f
         drawCircle(color, style = Stroke(width = strokeW))
         drawOval(color, topLeft = Offset(size.width * 0.25f, 0f), size = Size(size.width * 0.5f, size.height), style = Stroke(width = strokeW))
         drawLine(color, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), strokeWidth = strokeW)
     }
 }
 
-// Умный анализатор протоколов, читающий структуру JSON-конфига
-fun getProtocolDescription(profile: ProfileItem): String {
-    try {
-        // Если это кастомный конфиг (JSON), пробуем вытащить параметры из его сырого текста
-        val rawJson = profile.configType.name.uppercase()
+// Умный парсер протоколов (VLESS / TCP / REALITY | XHTTP | HYSTERIA2)
+fun getProtocolDescription(context: Context, profile: ProfileItem): String {
+    val configTypeName = profile.configType.name.uppercase()
+    
+    // 1. Стандартные профили (VMESS, VLESS и т.д.), где поля БД уже заполнены
+    if (configTypeName != "CUSTOM") {
+        val parts = mutableListOf(configTypeName)
         
-        // Определяем протокол по ключевым словам или типу конфига
-        var protocol = profile.configType.name.uppercase()
-        if (protocol == "CUSTOM" || protocol == "V2RAY") {
-            protocol = "AUTO"
-        }
-
-        var network = profile.network?.uppercase() ?: ""
-        var security = profile.security?.uppercase() ?: ""
-
-        // Анализируем содержимое описания или сопутствующих полей, если стандартные пустые
-        val summary = (profile.description + " " + profile.remarks).uppercase()
-
-        // Проверяем на Hysteria2
-        if (summary.contains("HYSTERIA") || protocol.contains("HYSTERIA")) {
-            protocol = "HYSTERIA2"
-            network = ""
-            security = "TLS"
-        } 
-        // Проверяем на XHTTP
-        else if (summary.contains("XHTTP")) {
-            network = "XHTTP"
-            security = "TLS"
-        }
-        // Проверяем на Reality
-        else if (summary.contains("REALITY") || profile.security?.uppercase() == "REALITY") {
-            security = "REALITY"
-            if (network.isBlank()) network = "TCP"
-        }
-
-        val parts = mutableListOf(protocol)
-        if (network.isNotBlank() && network != "NONE") {
+        val network = profile.network?.uppercase()
+        if (!network.isNullOrBlank() && network != "TCP") {
             parts.add(network)
+        } else if (configTypeName != "HYSTERIA2") {
+            parts.add("TCP")
         }
-        if (security.isNotBlank() && security != "NONE") {
+        
+        val security = profile.security?.uppercase()
+        if (!security.isNullOrBlank() && security != "NONE") {
             parts.add(security)
         }
-
+        
         return parts.joinToString(" / ")
-    } catch (e: Exception) {
-        return "AUTO / TCP"
     }
-}
 
-// Форматер даты
-fun formatDate(millis: Long, format: String = "dd.MM.yyyy"): String {
-    if (millis <= 0L) return "Никогда"
-    val formatter = SimpleDateFormat(format, Locale.getDefault())
-    return formatter.format(Date(millis))
+    // 2. Парсинг CUSTOM (JSON) профилей
+    return try {
+        // v2rayNG обычно сохраняет JSON профили в папку filesDir с именем {guid}.json
+        val file = File(context.filesDir, "${profile.guid}.json")
+        if (!file.exists()) return "CUSTOM / JSON"
+
+        val jsonStr = file.readText()
+        val root = JSONObject(jsonStr)
+        val outbounds = root.optJSONArray("outbounds") ?: return "CUSTOM / JSON"
+
+        // Ищем первый рабочий outbound (пропускаем direct и blackhole)
+        for (i in 0 until outbounds.length()) {
+            val outbound = outbounds.optJSONObject(i) ?: continue
+            var protocol = outbound.optString("protocol", "").uppercase()
+
+            if (protocol.isEmpty() || protocol == "FREEDOM" || protocol == "BLACKHOLE") continue
+
+            val streamSettings = outbound.optJSONObject("streamSettings")
+            
+            // Детектим Hysteria2 (протокол hysteria + version 2)
+            if (protocol == "HYSTERIA" && streamSettings != null) {
+                val hSettings = streamSettings.optJSONObject("hysteriaSettings")
+                if (hSettings != null && hSettings.optInt("version") == 2) {
+                    protocol = "HYSTERIA2"
+                }
+            }
+
+            val parts = mutableListOf(protocol)
+
+            if (streamSettings != null) {
+                val network = streamSettings.optString("network", "").uppercase()
+                // Исключаем дублирование (чтобы не писать HYSTERIA2 / HYSTERIA)
+                if (network.isNotEmpty() && !protocol.startsWith(network)) {
+                    parts.add(network)
+                } else if (protocol != "HYSTERIA" && protocol != "HYSTERIA2") {
+                    parts.add("TCP") // Дефолт для VLESS/VMESS
+                }
+
+                val security = streamSettings.optString("security", "").uppercase()
+                if (security.isNotEmpty() && security != "NONE") {
+                    parts.add(security)
+                }
+            }
+
+            return parts.joinToString(" / ")
+        }
+        "AUTO / TCP"
+    } catch (e: Exception) {
+        e.printStackTrace()
+        "PARSE ERROR"
+    }
 }
 
 @Composable
@@ -148,196 +168,224 @@ fun ProfileCard(
     val uriHandler = LocalUriHandler.current
     var showMenu by remember { mutableStateOf(false) }
 
-    val sub = subscription.subscription
-
-    // Менеджер уже всё декодировал, просто берем данные
-    val title = sub.remarks.takeIf { it.isNotBlank() } ?: "Без названия"
-    val lastUpdateStr = formatDate(sub.lastUpdated, "dd.MM.yyyy HH:mm")
-    val intervalHours = sub.updateInterval / 60
-    val updateStatus = "- $intervalHours ч. $lastUpdateStr"
-
-    // Расчет трафика (байты в гигабайты)
-    val gbDivisor = 1073741824.0
-    val usedTraffic = sub.trafficUpload + sub.trafficDownload
-    val usedStr = String.format(Locale.US, "%.1fGB", usedTraffic / gbDivisor)
-    val totalStr = if (sub.trafficTotal == 0L) "∞" else String.format(Locale.US, "%.1fGB", sub.trafficTotal / gbDivisor)
-    val trafficDisplay = "$usedStr/$totalStr"
-
-    // Дата истечения
-    val expireMillis = if (sub.trafficExpire > 9999999999L) sub.trafficExpire else sub.trafficExpire * 1000
-    val expireDisplay = if (expireMillis > 0L) "Истекает: ${formatDate(expireMillis)}" else "Истекает: ∞"
-
-    // Сообщение подписки (уже декодировано в AngConfigManager)
-    val announceText = sub.announce
-    val supportUrl = sub.supportUrl
-
     Column(modifier = Modifier.fillMaxWidth()) {
+        // 1. КАРТОЧКА ПОДПИСКИ (Шапка)
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 6.dp),
+                .padding(vertical = 4.dp),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 12.dp)) {
-                
+            Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 16.dp)) {
+                // Первая строка: Название, стрелка, кнопки обновления
                 Row(
                     verticalAlignment = Alignment.CenterVertically, 
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 ) {
-                    ChevronDown(color = Color(0xFF5C6BC0), modifier = Modifier.size(14.dp))
-                    Spacer(Modifier.width(8.dp))
+                    ChevronDown(color = Color(0xFF5C6BC0), modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(12.dp))
                     
                     Column(Modifier.weight(1f)) {
                         Text(
-                            text = title, 
-                            fontSize = 16.sp,
+                            text = subscription.subscription.remarks ?: "Без названия", 
+                            style = MaterialTheme.typography.titleLarge,
                             color = Color(0xFF1E293B),
                             fontWeight = FontWeight.ExtraBold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = updateStatus, 
-                            fontSize = 9.sp, 
+                            text = "- 1 ч. 02.08.2026 20:03 | ...", 
+                            fontSize = 10.sp, 
                             color = Color.Gray, 
                             fontWeight = FontWeight.SemiBold
                         )
                     }
                     
-                    IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(28.dp)) {
+                    IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(32.dp)) {
                         Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
                     }
-                    Spacer(Modifier.width(4.dp))
-                    IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(28.dp)) {
-                        ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(32.dp)) {
+                        ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                     }
-                    Spacer(Modifier.width(4.dp))
+                    Spacer(Modifier.width(8.dp))
                     
+                    // Меню карточки
                     Box {
-                        IconButton(onClick = { showMenu = true }, modifier = Modifier.size(28.dp)) {
+                        IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
                             Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
                         }
                         DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                            DropdownMenuItem(text = { Text("Редактировать") }, onClick = { showMenu = false; context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.guid)) })
-                            DropdownMenuItem(text = { Text("Удалить", color = Color.Red) }, onClick = { showMenu = false; onDeleteSubscription(subscription.guid) })
+                            DropdownMenuItem(
+                                text = { Text("Редактировать профиль") },
+                                onClick = { 
+                                    showMenu = false
+                                    context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.guid))
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Удалить профиль", color = Color.Red) },
+                                onClick = { 
+                                    showMenu = false
+                                    onDeleteSubscription(subscription.guid)
+                                }
+                            )
                         }
                     }
                 }
-                
-                HorizontalDivider(color = Color(0xFFF1F5F9), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
 
+                // Разделительная линия
+                HorizontalDivider(
+                    color = Color(0xFFF1F5F9),
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(vertical = 12.dp)
+                )
+
+                // Вторая строка: Трафик, дата, Телеграм
                 Row(
                     verticalAlignment = Alignment.CenterVertically, 
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 ) {
                     IconButton(
                         onClick = {
-                            val subUrl = sub.url
-                            if (!subUrl.isNullOrBlank()) try { uriHandler.openUri(subUrl) } catch(e: Exception) { Toast.makeText(context, "Ссылка недоступна", Toast.LENGTH_SHORT).show() }
-                            else Toast.makeText(context, "В подписке нет URL", Toast.LENGTH_SHORT).show()
+                            val subUrl = subscription.subscription.url
+                            if (!subUrl.isNullOrBlank()) {
+                                try { uriHandler.openUri(subUrl) } catch(e: Exception) { Toast.makeText(context, "Ссылка недоступна", Toast.LENGTH_SHORT).show() }
+                            } else {
+                                Toast.makeText(context, "В подписке нет URL", Toast.LENGTH_SHORT).show()
+                            }
                         }, 
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(24.dp)
                     ) {
                         Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0))
                     }
                     
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(12.dp))
                     
-                    Surface(shape = CircleShape, color = Color(0xFFF1F5F9)) {
+                    // Мягкая капсула для трафика
+                    Surface(
+                        shape = CircleShape,
+                        color = Color(0xFFF1F5F9),
+                    ) {
                         Text(
-                            text = trafficDisplay, 
-                            fontSize = 11.sp, 
+                            text = "54,8GB/∞", 
+                            fontSize = 12.sp, 
                             fontWeight = FontWeight.Bold, 
-                            color = Color(0xFF2C3E50), 
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                            color = Color(0xFF2C3E50),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                         )
                     }
                     
+                    // Текст с весом 1f отталкивает Телеграм вправо
                     Text(
-                        text = expireDisplay, 
-                        fontSize = 11.sp, 
+                        text = "Истекает: 17.08.2026", 
+                        fontSize = 12.sp, 
                         fontWeight = FontWeight.Bold, 
-                        color = Color(0xFF2C3E50), 
-                        modifier = Modifier.weight(1f), 
+                        color = Color(0xFF2C3E50),
+                        modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center
                     )
                     
-                    if (supportUrl.isNotBlank()) {
-                        IconButton(
-                            onClick = { try { uriHandler.openUri(supportUrl) } catch(e: Exception){} }, 
-                            modifier = Modifier.size(20.dp)
-                        ) {
-                            Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Support", tint = Color(0xFF5C6BC0))
-                        }
-                    } else {
-                        Spacer(Modifier.size(20.dp))
+                    IconButton(
+                        onClick = { 
+                            try { uriHandler.openUri("https://t.me/shashachkaaa") } catch(e: Exception){} 
+                        }, 
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
                     }
                 }
                 
-                if (announceText.isNotBlank()) {
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = announceText, 
-                        fontSize = 11.sp, 
-                        textAlign = TextAlign.Center, 
-                        fontWeight = FontWeight.Bold, 
-                        color = Color(0xFF1E293B), 
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
-                    )
-                }
+                Spacer(Modifier.height(16.dp))
+                
+                Text(
+                    text = "💪 Vanguard VPN - Это не про обход, это про\nпревосходство.\nЕсли подписка не работает — нажмите на кнопку «↻»,\nчтобы обновить её", 
+                    fontSize = 11.sp, 
+                    textAlign = TextAlign.Center, 
+                    fontWeight = FontWeight.Bold, 
+                    color = Color(0xFF475569), 
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = "DALBAEB | Осталось 14 дней", 
+                    fontSize = 12.sp, 
+                    textAlign = TextAlign.Center, 
+                    fontWeight = FontWeight.ExtraBold, 
+                    color = Color(0xFF1E293B), 
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
         
+        Spacer(Modifier.height(8.dp))
+
+        // 2. СПИСОК СЕРВЕРОВ (Вынесен из основной карточки)
         servers.forEach { serverCache ->
             val isSelected = serverCache.guid == selectedGuid
             
+            // Кэшируем описание, чтобы не читать JSON файл при каждом рекомпозе!
+            val finalDesc = remember(serverCache.guid) {
+                getProtocolDescription(context, serverCache.profile) + " | JSON"
+            }
+            
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = if (isSelected) Color(0xFFF8FAFC) else Color.Transparent),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isSelected) Color(0xFFF8FAFC) else Color.Transparent
+                ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 1.dp)
+                    .padding(vertical = 2.dp)
                     .clickable { onSelectServer(serverCache.guid) }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(IntrinsicSize.Min)
-                        .padding(vertical = 6.dp, horizontal = 8.dp)
+                        .height(IntrinsicSize.Min) // Позволяет синей полоске тянуться по высоте
+                        .padding(vertical = 8.dp, horizontal = 8.dp)
                 ) {
+                    // Синий индикатор активного сервера
                     if (isSelected) {
-                        Box(modifier = Modifier.width(4.dp).fillMaxHeight().clip(RoundedCornerShape(50)).background(Color(0xFF5C6BC0)))
+                        Box(
+                            modifier = Modifier
+                                .width(4.dp)
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(50))
+                                .background(Color(0xFF5C6BC0))
+                        )
                     } else {
                         Spacer(Modifier.width(4.dp))
                     }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(12.dp))
                     
                     Box(
-                        modifier = Modifier.size(36.dp).background(Color(0xFFF1F5F9), RoundedCornerShape(10.dp)),
+                        modifier = Modifier.size(44.dp).background(Color(0xFFF1F5F9), RoundedCornerShape(12.dp)),
                         contentAlignment = Alignment.Center
                     ) {
-                        WireframeGlobe(color = Color.Gray, modifier = Modifier.size(20.dp))
+                        WireframeGlobe(color = Color.Gray, modifier = Modifier.size(24.dp))
                     }
                     
-                    Spacer(Modifier.width(12.dp))
+                    Spacer(Modifier.width(16.dp))
                     
                     Column(Modifier.weight(1f)) {
                         Text(
                             text = serverCache.profile.remarks ?: "Без названия", 
                             fontWeight = FontWeight.ExtraBold, 
-                            fontSize = 15.sp, 
+                            fontSize = 16.sp, 
                             color = Color(0xFF1E293B),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-                        val finalDesc = getProtocolDescription(serverCache.profile) + " | JSON"
+
                         Text(
                             text = finalDesc, 
-                            fontSize = 9.sp, 
+                            fontSize = 10.sp, 
                             color = Color.Gray, 
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
@@ -349,17 +397,17 @@ fun ProfileCard(
                     if (delay > 0L) {
                         val pingColor = if (delay <= 300L) Color(0xFF4CAF50) else Color(0xFFFF9800)
                         Text(text = "${delay}ms", style = MaterialTheme.typography.bodySmall, color = pingColor, fontWeight = FontWeight.Bold)
-                        Spacer(Modifier.width(4.dp))
+                        Spacer(Modifier.width(8.dp))
                     } else if (delay < 0L) {
                         Text(text = "таймаут", style = MaterialTheme.typography.bodySmall, color = Color(0xFFF44336), fontWeight = FontWeight.Bold)
-                        Spacer(Modifier.width(4.dp))
+                        Spacer(Modifier.width(8.dp))
                     }
                     
                     IconButton(
                         onClick = { onEditServer(serverCache.guid, serverCache.profile) },
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(40.dp)
                     ) {
-                        ChevronRight(color = Color(0xFFCBD5E1), modifier = Modifier.size(14.dp))
+                        ChevronRight(color = Color(0xFFCBD5E1), modifier = Modifier.size(16.dp))
                     }
                 }
             }
@@ -367,10 +415,11 @@ fun ProfileCard(
     }
 }
 
+// 100% Оригинальная сигнатура для MainActivity
 @Composable
 fun GroupPagerPage(
     groupId: String,
-    mainViewModel: MainViewModel,
+    mainViewModel: MainViewModel, // Требует импорта MainViewModel, если он находится в другом пакете
     selectedGuid: String?,
     doubleColumnDisplay: Boolean,
     confirmRemove: Boolean,
