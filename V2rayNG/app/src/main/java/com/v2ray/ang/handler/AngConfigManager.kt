@@ -353,7 +353,7 @@ object AngConfigManager {
         }?.key?.let { return it }
 
         // If old selected node cannot be matched, fall back to the first imported config.
-        return keyToProfile.keys.firstOrNull()
+        return keyToProfile.keys.lastOrNull()
     }
 
     /**
