@@ -33,6 +33,9 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.PatternSyntaxException
+import com.v2ray.ang.handler.SpeedtestManager
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.dto.entities.ServerAffiliationInfo
 
 class MainViewModel(
     application: Application,
@@ -537,9 +540,13 @@ class MainViewModel(
             // 2. Запускаем TCP-пинг для каждого сервера из подписки
                 guids.forEach { guid ->
                     val profile = dataSource.decodeServerConfig(guid)
-                    if (profile != null && !profile.server.isNullOrBlank() && profile.serverPort > 0) {
-                        val delay = SpeedtestManager.socketConnectTime(profile.server!!, profile.serverPort)
-                    // Сохраняем результат в кэш/базу данных (аналогично тому, как это делает core)
+                    val serverHost = profile?.server
+                    val serverPort = profile?.serverPort ?: 0
+                
+                    if (!serverHost.isNullOrBlank() && serverPort > 0) {
+                        val delay = com.v2ray.ang.handler.SpeedtestManager.socketConnectTime(serverHost, serverPort)
+                    
+                    // Сохраняем результат через MmkvManager (используем правильный метод сохранения аффилиации)
                         com.v2ray.ang.handler.MmkvManager.encodeServerAffiliationInfo(
                             guid,
                             com.v2ray.ang.dto.entities.ServerAffiliationInfo(testDelayMillis = delay)
