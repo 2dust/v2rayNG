@@ -227,7 +227,7 @@ fun ProfileCard(
                 .fillMaxWidth()
                 .padding(bottom = 6.dp),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 12.dp)) {
@@ -236,14 +236,14 @@ fun ProfileCard(
                     verticalAlignment = Alignment.CenterVertically, 
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    ChevronDown(color = Color(0xFF5C6BC0), modifier = Modifier.size(14.dp))
+                    ChevronDown(color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(14.dp))
                     Spacer(Modifier.width(8.dp))
                     
                     Column(Modifier.weight(1f)) {
                         Text(
                             text = title, 
                             fontSize = 16.sp,
-                            color = Color(0xFF1E293B),
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.ExtraBold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -251,35 +251,38 @@ fun ProfileCard(
                         Text(
                             text = updateStatus, 
                             fontSize = 9.sp, 
-                            color = Color.Gray, 
+                            color = MaterialTheme.colorScheme.onSurfaceVariant, 
                             fontWeight = FontWeight.SemiBold
                         )
                     }
                     
-                    // ИСПРАВЛЕНО: Вернули subscription.guid
                     IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(28.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
+                        Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = MaterialTheme.colorScheme.primary)
                     }
                     Spacer(Modifier.width(4.dp))
                     IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(28.dp)) {
-                        ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(16.dp))
+                        ClockIcon(color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                     }
                     Spacer(Modifier.width(4.dp))
                     
                     Box {
                         IconButton(onClick = { showMenu = true }, modifier = Modifier.size(28.dp)) {
-                            Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
+                            Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                        DropdownMenu(
+                            expanded = showMenu, 
+                            onDismissRequest = { showMenu = false },
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                        ) {
                             DropdownMenuItem(
-                                text = { Text("Редактировать") }, 
+                                text = { Text("Редактировать", color = MaterialTheme.colorScheme.onSurface) }, 
                                 onClick = { 
                                     showMenu = false
                                     context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.guid)) 
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Удалить", color = Color.Red) }, 
+                                text = { Text("Удалить", color = MaterialTheme.colorScheme.error) }, 
                                 onClick = { 
                                     showMenu = false
                                     onDeleteSubscription(subscription.guid) 
@@ -289,7 +292,11 @@ fun ProfileCard(
                     }
                 }
                 
-                HorizontalDivider(color = Color(0xFFF1F5F9), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.surfaceVariant, 
+                    thickness = 1.dp, 
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically, 
@@ -303,17 +310,17 @@ fun ProfileCard(
                         }, 
                         modifier = Modifier.size(20.dp)
                     ) {
-                        Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0))
+                        Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = MaterialTheme.colorScheme.primary)
                     }
                     
                     Spacer(Modifier.width(8.dp))
                     
-                    Surface(shape = CircleShape, color = Color(0xFFF1F5F9)) {
+                    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                         Text(
                             text = trafficDisplay, 
                             fontSize = 11.sp, 
                             fontWeight = FontWeight.Bold, 
-                            color = Color(0xFF2C3E50), 
+                            color = MaterialTheme.colorScheme.onSurfaceVariant, 
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                         )
                     }
@@ -322,7 +329,7 @@ fun ProfileCard(
                         text = expireDisplay, 
                         fontSize = 11.sp, 
                         fontWeight = FontWeight.Bold, 
-                        color = Color(0xFF2C3E50), 
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, 
                         modifier = Modifier.weight(1f), 
                         textAlign = TextAlign.Center
                     )
@@ -332,7 +339,7 @@ fun ProfileCard(
                             onClick = { try { uriHandler.openUri(supportUrl) } catch(e: Exception){} }, 
                             modifier = Modifier.size(20.dp)
                         ) {
-                            Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Support", tint = Color(0xFF5C6BC0))
+                            Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Support", tint = MaterialTheme.colorScheme.primary)
                         }
                     } else {
                         Spacer(Modifier.size(20.dp))
@@ -346,7 +353,7 @@ fun ProfileCard(
                         fontSize = 11.sp, 
                         textAlign = TextAlign.Center, 
                         fontWeight = FontWeight.Bold, 
-                        color = Color(0xFF1E293B), 
+                        color = MaterialTheme.colorScheme.onSurface, 
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
                     )
                 }
@@ -356,8 +363,7 @@ fun ProfileCard(
         servers.forEach { serverCache ->
             val isSelected = serverCache.guid == selectedGuid
             
-            // ИСПРАВЛЕНО: Передаем serverCache.guid для корректного поиска JSON
-            val finalDesc = remember(serverCache.guid)              {
+            val finalDesc = remember(serverCache.guid) {
                 val desc = getProtocolDescription(context, serverCache.profile, serverCache.guid)
                 if (serverCache.profile.configType == com.v2ray.ang.enums.EConfigType.CUSTOM) {
                     "$desc | JSON"
@@ -368,7 +374,9 @@ fun ProfileCard(
             
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = if (isSelected) Color(0xFFF8FAFC) else Color.Transparent),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isSelected) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) else Color.Transparent
+                ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -383,17 +391,28 @@ fun ProfileCard(
                         .padding(vertical = 6.dp, horizontal = 8.dp)
                 ) {
                     if (isSelected) {
-                        Box(modifier = Modifier.width(4.dp).fillMaxHeight().clip(RoundedCornerShape(50)).background(Color(0xFF5C6BC0)))
+                        Box(
+                            modifier = Modifier
+                                .width(4.dp)
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(50))
+                                .background(MaterialTheme.colorScheme.primary)
+                        )
                     } else {
                         Spacer(Modifier.width(4.dp))
                     }
                     Spacer(Modifier.width(8.dp))
                     
                     Box(
-                        modifier = Modifier.size(36.dp).background(Color(0xFFF1F5F9), RoundedCornerShape(10.dp)),
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(10.dp)),
                         contentAlignment = Alignment.Center
                     ) {
-                        WireframeGlobe(color = Color.Gray, modifier = Modifier.size(20.dp))
+                        WireframeGlobe(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant, 
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
                     
                     Spacer(Modifier.width(12.dp))
@@ -403,14 +422,14 @@ fun ProfileCard(
                             text = serverCache.profile.remarks ?: "Без названия", 
                             fontWeight = FontWeight.ExtraBold, 
                             fontSize = 15.sp, 
-                            color = Color(0xFF1E293B),
+                            color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = finalDesc, 
                             fontSize = 9.sp, 
-                            color = Color.Gray, 
+                            color = MaterialTheme.colorScheme.onSurfaceVariant, 
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -419,11 +438,12 @@ fun ProfileCard(
                     
                     val delay = serverCache.testDelayMillis
                     if (delay > 0L) {
-                        val pingColor = if (delay <= 300L) Color(0xFF4CAF50) else Color(0xFFFF9800)
+                        // Оставляем цвета пинга зеленым/оранжевым для читаемости, но чуть адаптируем
+                        val pingColor = if (delay <= 300L) Color(0xFF4CAF50) else Color(0xFFFFA500)
                         Text(text = "${delay}ms", style = MaterialTheme.typography.bodySmall, color = pingColor, fontWeight = FontWeight.Bold)
                         Spacer(Modifier.width(4.dp))
                     } else if (delay < 0L) {
-                        Text(text = "таймаут", style = MaterialTheme.typography.bodySmall, color = Color(0xFFF44336), fontWeight = FontWeight.Bold)
+                        Text(text = "таймаут", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
                         Spacer(Modifier.width(4.dp))
                     }
                     
@@ -431,7 +451,10 @@ fun ProfileCard(
                         onClick = { onEditServer(serverCache.guid, serverCache.profile) },
                         modifier = Modifier.size(32.dp)
                     ) {
-                        ChevronRight(color = Color(0xFFCBD5E1), modifier = Modifier.size(14.dp))
+                        ChevronRight(
+                            color = MaterialTheme.colorScheme.outlineVariant, 
+                            modifier = Modifier.size(14.dp)
+                        )
                     }
                 }
             }
