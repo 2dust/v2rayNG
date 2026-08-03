@@ -40,6 +40,8 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.v2ray.ang.util.JsonUtil
+import java.io.File
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
@@ -105,25 +107,48 @@ fun getProtocolDescription(context: Context, profile: ProfileItem, guid: String)
 
     // 2. Парсинг CUSTOM (JSON) профилей
     return try {
-        // Ищем файл по GUID сервера, а не профиля
-        val file = File(context.filesDir, "$guid.json")
-        if (!file.exists()) return "CUSTOM / JSON"
+        var jsonStr = ""
+        
+        // Агрессивный поиск файла конфига по всем типичным путям v2rayNG
+        val possibleFiles = listOf(
+            File(context.filesDir, "$guid.json"),
+            File(context.filesDir, "$guid.txt"),
+            File(context.filesDir, guid), // Часто v2rayNG сохраняет файл без расширения
+            File(context.getExternalFilesDir(null), "$guid.txt"),
+            File(context.getExternalFilesDir(null), guid)
+        )
 
-        val jsonStr = file.readText()
-        val root = JSONObject(jsonStr)
-        val outbounds = root.optJSONArray("outbounds") ?: return "CUSTOM / JSON"
+        for (file in possibleFiles) {
+            if (file.exists()) {
+                jsonStr = file.readText()
+                break
+            }
+        }
 
-        for (i in 0 until outbounds.length()) {
-            val outbound = outbounds.optJSONObject(i) ?: continue
-            var protocol = outbound.optString("protocol", "").uppercase()
+        // Если файла нет, возможно JSON лежит прямо в поле server (если форк переделан под прямую передачу)
+        if (jsonStr.isEmpty() && profile.server?.trim()?.startsWith("{") == true) {
+            jsonStr = profile.server!!
+        }
 
+        // Если так и не нашли данные
+        if (jsonStr.isEmpty()) return "CUSTOM"
+
+        // Используем встроенный JsonUtil (Gson), он не крашится из-за комментариев в Xray-конфигах
+        val root = JsonUtil.parseString(jsonStr) ?: return "CUSTOM"
+        val outbounds = root.getAsJsonArray("outbounds") ?: return "CUSTOM"
+
+        for (i in 0 until outbounds.size()) {
+            val outbound = outbounds.get(i).asJsonObject
+            var protocol = outbound.get("protocol")?.asString?.uppercase() ?: continue
+
+            // Пропускаем технические outbound'ы маршрутизации
             if (protocol.isEmpty() || protocol == "FREEDOM" || protocol == "BLACKHOLE") continue
 
-            val streamSettings = outbound.optJSONObject("streamSettings")
+            val streamSettings = outbound.getAsJsonObject("streamSettings")
             
             if (protocol == "HYSTERIA" && streamSettings != null) {
-                val hSettings = streamSettings.optJSONObject("hysteriaSettings")
-                if (hSettings != null && hSettings.optInt("version") == 2) {
+                val hSettings = streamSettings.getAsJsonObject("hysteriaSettings")
+                if (hSettings != null && hSettings.get("version")?.asInt == 2) {
                     protocol = "HYSTERIA2"
                 }
             }
@@ -131,14 +156,14 @@ fun getProtocolDescription(context: Context, profile: ProfileItem, guid: String)
             val parts = mutableListOf(protocol)
 
             if (streamSettings != null) {
-                val network = streamSettings.optString("network", "").uppercase()
+                val network = streamSettings.get("network")?.asString?.uppercase() ?: ""
                 if (network.isNotEmpty() && !protocol.startsWith(network)) {
                     parts.add(network)
                 } else if (protocol != "HYSTERIA" && protocol != "HYSTERIA2") {
                     parts.add("TCP") 
                 }
 
-                val security = streamSettings.optString("security", "").uppercase()
+                val security = streamSettings.get("security")?.asString?.uppercase() ?: ""
                 if (security.isNotEmpty() && security != "NONE") {
                     parts.add(security)
                 }
@@ -148,9 +173,10 @@ fun getProtocolDescription(context: Context, profile: ProfileItem, guid: String)
         "AUTO / TCP"
     } catch (e: Exception) {
         e.printStackTrace()
-        "PARSE ERROR"
+        "CUSTOM"
     }
 }
+
 
 @Composable
 fun ProfileCard(
@@ -323,8 +349,13 @@ fun ProfileCard(
             val isSelected = serverCache.guid == selectedGuid
             
             // ИСПРАВЛЕНО: Передаем serverCache.guid для корректного поиска JSON
-            val finalDesc = remember(serverCache.guid) {
-                getProtocolDescription(context, serverCache.profile, serverCache.guid) + " | JSON"
+            val finalDesc = remember(serverCache.guid)              {
+                val desc = getProtocolDescription(context, serverCache.profile, serverCache.guid)
+                if (serverCache.profile.configType == com.v2ray.ang.enums.EConfigType.CUSTOM) {
+                    "$desc | JSON"
+                } else {
+                    desc
+                }
             }
             
             Card(
