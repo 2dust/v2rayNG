@@ -166,6 +166,7 @@ class CoreTestService : Service() {
     }
 
     private fun handleMeasureCancel() {
+        MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_FINISH, "0")
         LogUtil.i(AppConfig.TAG, "CoreTestService received cancel message, cancelling ${activeWorkers.size} active workers")
         val snapshot = ArrayList(activeWorkers)
         snapshot.forEach { it.cancel() }
