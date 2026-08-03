@@ -52,7 +52,6 @@ fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
     }
 }
 
-// 100% Оригинальная сигнатура для MainActivity
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -103,7 +102,7 @@ fun MainScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp), // Уменьшили вертикальный отступ шапки (было 16)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -122,61 +121,81 @@ fun MainScreen(
                     }
                 }
 
+                // Центральная секция с обновленной кнопкой
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 4.dp, bottom = 12.dp), // Ужали отступы, чтобы поднять кнопку
+                        .padding(top = 16.dp, bottom = 24.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Уменьшенное внешнее кольцо
+                    // Цвета, которые меняются в зависимости от статуса
+                    val isConnected = uiState.isRunning
+                    val primaryColor = if (isConnected) Color(0xFF4A68FF) else Color(0xFFB0BEC5)
+                    val glowColor = if (isConnected) Color(0xFF4A68FF).copy(alpha = 0.3f) else Color.Transparent
+                    val textColor = if (isConnected) Color(0xFF8A93A6) else Color(0xFF1E293B)
+
+                    // 1. Внешнее мягкое свечение (Glow)
                     Box(
                         modifier = Modifier
-                            .size(190.dp) // Было 240
-                            .border(
-                                width = 1.dp,
-                                brush = Brush.linearGradient(colors = listOf(Color(0xFFE0E0E0), Color(0xFFFFCDD2), Color(0xFFE0E0E0))),
+                            .size(240.dp)
+                            .background(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(glowColor, Color.Transparent)
+                                ),
                                 shape = CircleShape
                             )
                     )
 
-                    // Уменьшенная кнопка
+                    // 2. Тонкое внешнее кольцо
                     Box(
                         modifier = Modifier
-                            .size(130.dp) // Было 170
-                            .shadow(
-                                elevation = 24.dp,
-                                shape = CircleShape,
-                                ambientColor = Color(0xFF5C6BC0).copy(alpha = 0.5f),
-                                spotColor = Color(0xFF5C6BC0).copy(alpha = 0.5f)
+                            .size(190.dp)
+                            .border(
+                                width = 1.dp,
+                                color = if (isConnected) primaryColor.copy(alpha = 0.3f) else Color(0xFFE0E0E0),
+                                shape = CircleShape
                             )
-                            .clip(CircleShape)
-                            .background(Color.White)
-                            .border(8.dp, Color(0xFFF4F6F9), CircleShape)
-                            .clickable { onAction(MainAction.ToggleService) },
-                        contentAlignment = Alignment.Center
+                    )
+
+                    // 3. Сама интерактивная кнопка
+                    Surface(
+                        shape = CircleShape,
+                        color = Color.White,
+                        shadowElevation = 12.dp, // Тень под кнопкой
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clickable { onAction(MainAction.ToggleService) }
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            // Иконка
                             PowerIcon(
-                                color = if (uiState.isRunning) Color(0xFF5C6BC0) else Color.LightGray,
-                                modifier = Modifier.size(32.dp) // Чуть уменьшили иконку питания
+                                color = primaryColor,
+                                modifier = Modifier.size(42.dp)
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
                             
+                            Spacer(modifier = Modifier.height(12.dp))
+                            
+                            // Текст статуса
                             Text(
-                                text = if (uiState.isRunning) "ПОДКЛЮЧЕН" else "ОТКЛЮЧЕН",
-                                color = Color(0xFF2C3E50),
-                                fontSize = 15.sp, // Чуть уменьшили шрифт (было 18)
+                                text = if (isConnected) "ПОДКЛЮЧЕН" else "ОТКЛЮЧЕН",
+                                color = textColor,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 letterSpacing = 0.5.sp
                             )
                             
-                            if (uiState.isRunning) {
-                                Spacer(modifier = Modifier.height(2.dp))
+                            // Таймер (показываем только если подключено)
+                            if (isConnected) {
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = timeString,
-                                    color = Color.Gray,
-                                    fontSize = 12.sp, // Уменьшили шрифт таймера
-                                    fontWeight = FontWeight.Bold
+                                    color = Color.Black,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Black
                                 )
                             }
                         }
@@ -186,7 +205,6 @@ fun MainScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        // Исправленный padding: разделяем горизонтальные и вертикальные отступы
                         .padding(horizontal = 24.dp)
                         .padding(top = 4.dp, bottom = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -195,7 +213,7 @@ fun MainScreen(
                     Text(
                         text = "Проверить текущее\nподключение",
                         color = Color.Gray,
-                        fontSize = 13.sp, // Чуть уменьшили для плотности
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable { onAction(MainAction.TestCurrentServer) }
                     )
@@ -224,7 +242,7 @@ fun MainScreen(
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp) // Уменьшили расстояние между карточками (было 16)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(subscriptions, key = { it.guid + (it.subscription.remarks ?: "") }) { subCache ->
                             val serversFlow = remember(subCache.guid) { mainViewModel.serversForGroup(subCache.guid) }
