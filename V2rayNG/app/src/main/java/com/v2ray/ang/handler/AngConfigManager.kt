@@ -237,6 +237,10 @@ object AngConfigManager {
             if (servers == null) {
                 return 0
             }
+            
+            // ПРОВЕРЯЕМ, БЫЛ ЛИ ВЫБРАН СЕРВЕР ДО ИМПОРТА
+            val isNoServerSelected = MmkvManager.getSelectServer().isNullOrBlank()
+            
             // Find the currently selected server that belongs to the same subscription before replacement.
             val removedSelected = getRemovedSelectedProfile(subid, append)
 
@@ -260,7 +264,13 @@ object AngConfigManager {
                     MmkvManager.removeServerViaSubid(subid)
                 }
                 val keyToProfile = batchSaveConfigs(configs, subid)
-                val matchKey = findMatchedProfileKey(keyToProfile, removedSelected)
+                
+                // НАЗНАЧАЕМ СЕРВЕР В ЗАВИСИМОСТИ ОТ УСЛОВИЙ
+                var matchKey = findMatchedProfileKey(keyToProfile, removedSelected)
+                if (matchKey == null && isNoServerSelected) {
+                    // keyToProfile сохраняет в обратном порядке, поэтому lastOrNull() = первый сервер в подписке
+                    matchKey = keyToProfile.keys.lastOrNull()
+                }
                 matchKey?.let { MmkvManager.setSelectServer(it) }
             }
 
@@ -401,7 +411,9 @@ object AngConfigManager {
                     JsonUtil.fromJson(server, Array<Any>::class.java) ?: arrayOf()
 
                 if (serverList.isNotEmpty()) {
+                    val isNoServerSelected = MmkvManager.getSelectServer().isNullOrBlank()
                     val removedSelected = getRemovedSelectedProfile(subid, append)
+                    
                     if (!append) {
                         MmkvManager.removeServerViaSubid(subid)
                     }
@@ -417,7 +429,10 @@ object AngConfigManager {
                         count += 1
                     }
                     if (count > 0) {
-                        val matchKey = findMatchedProfileKey(keyToProfile, removedSelected)
+                        var matchKey = findMatchedProfileKey(keyToProfile, removedSelected)
+                        if (matchKey == null && isNoServerSelected) {
+                            matchKey = keyToProfile.keys.lastOrNull()
+                        }
                         matchKey?.let { MmkvManager.setSelectServer(it) }
                     }
                     return count
@@ -431,11 +446,18 @@ object AngConfigManager {
                 val config = CustomFmt.parse(server) ?: return 0
                 config.subscriptionId = subid
                 config.description = generateDescription(config)
+                
+                val isNoServerSelected = MmkvManager.getSelectServer().isNullOrBlank()
+                
                 if (!append) {
                     MmkvManager.removeServerViaSubid(subid)
                 }
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
+                
+                if (isNoServerSelected) {
+                    MmkvManager.setSelectServer(key)
+                }
                 return 1
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to parse custom config server as single config", e)
@@ -445,11 +467,19 @@ object AngConfigManager {
             try {
                 val config = WireguardFmt.parseWireguardConfFile(server) ?: return R.string.toast_incorrect_protocol
                 config.description = generateDescription(config)
+                
+                val isNoServerSelected = MmkvManager.getSelectServer().isNullOrBlank()
+                
                 if (!append) {
                     MmkvManager.removeServerViaSubid(subid)
                 }
                 val key = MmkvManager.encodeServerConfig("", config)
                 MmkvManager.encodeServerRaw(key, server)
+                
+                if (isNoServerSelected) {
+                    MmkvManager.setSelectServer(key)
+                }
+                
                 return 1
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to parse WireGuard config file", e)
