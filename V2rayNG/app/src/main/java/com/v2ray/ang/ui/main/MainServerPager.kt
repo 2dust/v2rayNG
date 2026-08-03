@@ -140,7 +140,7 @@ fun ProfileCard(
                         overflow = TextOverflow.Ellipsis
                     )
                     
-                    // Динамическое время обновления
+                    // ДИНАМИЧЕСКОЕ ВРЕМЯ ОБНОВЛЕНИЯ
                     val lastUpdatedText = if (subInfo.lastUpdated > 0) {
                         java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault()).format(java.util.Date(subInfo.lastUpdated))
                     } else {
@@ -204,22 +204,42 @@ fun ProfileCard(
                 
                 Spacer(Modifier.width(12.dp))
                 
-                // ВНИМАНИЕ: Трафик все еще захардкожен. Для динамики нужно парсить subscription-userinfo.
+                // ДИНАМИЧЕСКИЙ ТРАФИК
+                val usedTrafficBytes = subInfo.trafficUpload + subInfo.trafficDownload
+                val gbDivider = 1024.0 * 1024.0 * 1024.0
+                val usedGb = usedTrafficBytes / gbDivider
+                
+                val totalStr = if (subInfo.trafficTotal == 0L) "∞" else {
+                    String.format(java.util.Locale.US, "%.1fGB", subInfo.trafficTotal / gbDivider)
+                }
+                val usedStr = String.format(java.util.Locale.US, "%.1fGB", usedGb)
+                
                 Box(modifier = Modifier
                     .border(1.dp, Color.LightGray, CircleShape)
                     .padding(horizontal = 24.dp, vertical = 4.dp)) {
-                    Text("54,8GB/∞", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
+                    Text("$usedStr/$totalStr", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
                 }
                 
                 Spacer(Modifier.weight(1f))
                 
-                // ВНИМАНИЕ: Дата все еще захардкожена.
-                Text("Истекает: 17.08.2026", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
+                // ДИНАМИЧЕСКАЯ ДАТА ИСТЕЧЕНИЯ
+                val expireText = if (subInfo.trafficExpire > 0L) {
+                    // Умножаем на 1000, так как сервер отдает время в секундах, а Java/Kotlin ждет миллисекунды
+                    val date = java.util.Date(subInfo.trafficExpire * 1000L)
+                    val format = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+                    "Истекает: ${format.format(date)}"
+                } else {
+                    "Без лимита"
+                }
+                Text(expireText, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
                 Spacer(Modifier.width(12.dp))
                 
+                // ДИНАМИЧЕСКАЯ КНОПКА ПОДДЕРЖКИ
                 IconButton(
                     onClick = { 
-                        try { uriHandler.openUri("https://t.me/shashachkaaa") } catch(e: Exception){} 
+                        // Если подписка отдала supportUrl, идем по нему. Иначе — ваша дефолтная группа
+                        val targetUrl = if (subInfo.supportUrl.isNotBlank()) subInfo.supportUrl else "https://t.me/shashachkaaa"
+                        try { uriHandler.openUri(targetUrl) } catch(e: Exception){} 
                     }, 
                     modifier = Modifier.size(24.dp)
                 ) {
@@ -227,7 +247,7 @@ fun ProfileCard(
                 }
             }
             
-            // --- ДИНАМИЧЕСКИЙ ВЫВОД ANNOUNCE ---
+            // ДИНАМИЧЕСКИЙ ВЫВОД ANNOUNCE
             if (subInfo.announce.isNotBlank()) {
                 Spacer(Modifier.height(16.dp))
                 Text(
@@ -239,7 +259,6 @@ fun ProfileCard(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 )
             }
-            // -----------------------------------
             
             Spacer(Modifier.height(16.dp))
             
