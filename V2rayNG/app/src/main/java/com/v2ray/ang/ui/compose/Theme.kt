@@ -77,24 +77,29 @@ private val DarkColor = darkColorScheme(
     errorContainer = Color(0xFF93000A), // Dark Red
     onError = Color(0xFF690005), // Deep Red
     onErrorContainer = Color(0xFFFFDAD6), // Light Red
-    background = Color(0xFF1C1B1F), // Near Black
+    
+    // --- ИЗМЕНЕНИЯ ДЛЯ AMOLED НИЖЕ ---
+    background = Color(0xFF000000), // Pure Black (вместо 0xFF1C1B1F)
     onBackground = Color(0xFFE6E1E5), // Light Gray
-    surface = Color(0xFF1C1B1F), // Near Black
+    surface = Color(0xFF000000), // Pure Black (вместо 0xFF1C1B1F)
     onSurface = Color(0xFFE6E1E5), // Light Gray
     surfaceVariant = Color(0xFF49454F), // Dark Gray
     onSurfaceVariant = Color(0xFFCAC4D0), // Light Gray
     outline = Color(0xFF938F99), // Grayish Purple
     outlineVariant = Color(0xFF49454F), // Dark Gray
     inverseSurface = Color(0xFFE6E1E5), // Light Gray
-    inverseOnSurface = Color(0xFF1C1B1F), // Near Black
+    inverseOnSurface = Color(0xFF000000), // Pure Black (вместо 0xFF1C1B1F)
     inversePrimary = Color(0xFF000000), // Black
     scrim = Color(0xFF000000), // Black
     surfaceTint = Color(0xFFC0C0C0), // Silver Gray
-    surfaceContainerLowest = Color(0xFF0F0F12), // Near Black
-    surfaceContainerLow = Color(0xFF1A191D), // Dark Gray
-    surfaceContainer = Color(0xFF1E1D21), // Dark Gray
-    surfaceContainerHigh = Color(0xFF282729), // Dark Gray
-    surfaceContainerHighest = Color(0xFF333234), // Dark Gray
+    
+    // Затемняем контейнеры. Можно оставить легкий серый оттенок для High/Highest, 
+    // чтобы карточки не сливались в единое пятно, но Lowest, Low и базовый делаем черными.
+    surfaceContainerLowest = Color(0xFF000000), // Pure Black
+    surfaceContainerLow = Color(0xFF000000), // Pure Black
+    surfaceContainer = Color(0xFF000000), // Pure Black
+    surfaceContainerHigh = Color(0xFF121212), // Very Dark Gray (для контраста элементов)
+    surfaceContainerHighest = Color(0xFF1E1E1E), // Dark Gray (для верхних карточек)
 )
 
 // Semantic Colors
