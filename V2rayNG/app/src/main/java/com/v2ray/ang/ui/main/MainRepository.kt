@@ -220,4 +220,8 @@ class MainRepository(
     override fun initAssets() {
         SettingsManager.initAssets(app, app.assets)
     }
+    
+    override fun removeSubscription(subId: String) {
+    	SettingsManager.removeSubscriptionWithDefault(subId)
+    }
 }
