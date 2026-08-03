@@ -109,6 +109,9 @@ fun ProfileCard(
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
     var showMenu by remember { mutableStateOf(false) }
+    
+    // Достаем саму подписку
+    val subInfo = subscription.subscription
 
     Card(
         modifier = Modifier
@@ -129,14 +132,21 @@ fun ProfileCard(
                 
                 Column(Modifier.weight(1f)) {
                     Text(
-                        text = subscription.subscription.remarks ?: "Без названия", 
+                        text = subInfo.remarks ?: "Без названия", 
                         style = MaterialTheme.typography.titleLarge,
                         color = Color(0xFF1E293B),
                         fontWeight = FontWeight.ExtraBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    Text("- 1 ч. 02.08.2026 20:03 | ...", fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.SemiBold)
+                    
+                    // Динамическое время обновления
+                    val lastUpdatedText = if (subInfo.lastUpdated > 0) {
+                        java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault()).format(java.util.Date(subInfo.lastUpdated))
+                    } else {
+                        "Никогда"
+                    }
+                    Text("- Обновлено: $lastUpdatedText", fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.SemiBold)
                 }
                 
                 IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(32.dp)) {
@@ -148,7 +158,6 @@ fun ProfileCard(
                 }
                 Spacer(Modifier.width(8.dp))
                 
-                // Три точки с меню: Редактировать + Удалить профиль
                 Box {
                     IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
                         Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
@@ -174,14 +183,14 @@ fun ProfileCard(
             
             Spacer(Modifier.height(12.dp))
 
-            // Вторая строка
+            // Вторая строка (Инфо, Трафик, Дата, Telegram)
             Row(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             ) {
                 IconButton(
                     onClick = {
-                        val subUrl = subscription.subscription.url
+                        val subUrl = subInfo.url
                         if (!subUrl.isNullOrBlank()) {
                             try { uriHandler.openUri(subUrl) } catch(e: Exception) { Toast.makeText(context, "Ссылка недоступна", Toast.LENGTH_SHORT).show() }
                         } else {
@@ -195,6 +204,7 @@ fun ProfileCard(
                 
                 Spacer(Modifier.width(12.dp))
                 
+                // ВНИМАНИЕ: Трафик все еще захардкожен. Для динамики нужно парсить subscription-userinfo.
                 Box(modifier = Modifier
                     .border(1.dp, Color.LightGray, CircleShape)
                     .padding(horizontal = 24.dp, vertical = 4.dp)) {
@@ -202,6 +212,8 @@ fun ProfileCard(
                 }
                 
                 Spacer(Modifier.weight(1f))
+                
+                // ВНИМАНИЕ: Дата все еще захардкожена.
                 Text("Истекает: 17.08.2026", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
                 Spacer(Modifier.width(12.dp))
                 
@@ -215,17 +227,19 @@ fun ProfileCard(
                 }
             }
             
-            Spacer(Modifier.height(16.dp))
-            
-            Text(
-                "💪 Vanguard VPN - Это не про обход, это про\nпревосходство.\nЕсли подписка не работает — нажмите на кнопку «↻»,\nчтобы обновить её", 
-                fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50), modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(12.dp))
-            Text(
-                "DALBAEB | Осталось 14 дней", 
-                fontSize = 12.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1E293B), modifier = Modifier.fillMaxWidth()
-            )
+            // --- ДИНАМИЧЕСКИЙ ВЫВОД ANNOUNCE ---
+            if (subInfo.announce.isNotBlank()) {
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    text = subInfo.announce, 
+                    fontSize = 12.sp, 
+                    textAlign = TextAlign.Center, 
+                    fontWeight = FontWeight.Bold, 
+                    color = Color(0xFF1E293B), 
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                )
+            }
+            // -----------------------------------
             
             Spacer(Modifier.height(16.dp))
             
@@ -288,7 +302,6 @@ fun ProfileCard(
                         Spacer(Modifier.width(8.dp))
                     }
                     
-                    // Кликабельная стрелочка "Редактировать сервер"
                     IconButton(
                         onClick = { onEditServer(serverCache.guid, serverCache.profile) },
                         modifier = Modifier.size(40.dp)
