@@ -143,7 +143,7 @@ object HttpUtil {
      * @throws IOException If an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun getUrlContentWithUserAgent(request: UrlContentRequest): String {
+    fun getUrlContentWithUserAgent(request: UrlContentRequest): Pair<String, Map<String, String>> {
         var currentUrl = request.url
         var redirects = 0
         val maxRedirects = 3
@@ -163,7 +163,6 @@ object HttpUtil {
                 .header("Connection", "close")
 
             applyEmbeddedBasicAuthHeader(currentUrl, requestBuilder)
-
 
             val headersMap = JsonUtil.parseHeadersToMap(request.requestHeaders)
             for ((key, value) in headersMap) {
@@ -193,7 +192,9 @@ object HttpUtil {
                     }
 
                     response.isSuccessful -> {
-                        return response.body?.string() ?: ""
+                        val body = response.body?.string() ?: ""
+                        val headers = response.headers.toMap().mapKeys { it.key.lowercase() }
+                        return Pair(body, headers)
                     }
 
                     else -> {
