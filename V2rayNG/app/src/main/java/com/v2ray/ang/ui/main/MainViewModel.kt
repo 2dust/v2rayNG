@@ -541,15 +541,16 @@ class MainViewModel(
                 guids.forEach { guid ->
                     val profile = dataSource.decodeServerConfig(guid)
                     val serverHost = profile?.server
-                    // Безопасное получение порта с учетом возможных типов
                     val serverPort = profile?.serverPort?.toString()?.toIntOrNull() ?: 0
                 
                     if (!serverHost.isNullOrBlank() && serverPort > 0) {
                         val delay = SpeedtestManager.socketConnectTime(serverHost, serverPort)
                     
-                        // Используем метод обновления аффилиации через MmkvManager, передавая корректные параметры
+                        // Обновляем информацию о задержке через MmkvManager корректным методом
                         val affiliation = dataSource.decodeAffiliationInfo(guid) ?: ServerAffiliationInfo()
                         affiliation.testDelayMillis = delay
+                        
+                        // Используем стандартный метод сохранения через MmkvManager (или обходим через encode)
                         MmkvManager.encodeServerAffiliationInfo(guid, affiliation)
                     }
                 }
