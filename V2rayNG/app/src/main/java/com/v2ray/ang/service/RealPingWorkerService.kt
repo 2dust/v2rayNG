@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
@@ -45,13 +46,17 @@ class RealPingWorkerService(
                 runningCount.incrementAndGet()
                 try {
                     val result = if (onlyTcp) startTcping(guid) else startRealPing(guid)
-                    onEvent(RealPingEvent.Result(guid, result))
+                    if (scope.isActive) {
+                        onEvent(RealPingEvent.Result(guid, result))
+                    }
                 } catch (_: Throwable) {
                     // ignore
                 } finally {
                     val count = totalCount.decrementAndGet()
                     val left = runningCount.decrementAndGet()
-                    onEvent(RealPingEvent.Progress("$left / $count"))
+                    if (scope.isActive) {
+                        onEvent(RealPingEvent.Progress("$left / $count"))
+                    }
                 }
             }
         }
@@ -59,9 +64,11 @@ class RealPingWorkerService(
         scope.launch {
             try {
                 joinAll(*jobs.toTypedArray())
-                onEvent(RealPingEvent.Finish("0"))
+                if (isActive) {
+                    onEvent(RealPingEvent.Finish("0"))
+                }
             } catch (_: CancellationException) {
-                onEvent(RealPingEvent.Finish("-1"))
+                // If cancelled, don't send finish event to avoid confusion
             } finally {
                 close()
             }
