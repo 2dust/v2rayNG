@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,6 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -49,6 +50,230 @@ fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
             strokeWidth = strokeW,
             cap = StrokeCap.Round
         )
+    }
+}
+
+@Composable
+fun ServerListItem(
+    serverName: String,
+    protocolDetails: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) Color(0xFFF8FAFC) else Color.White
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp), // Плоские карточки
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .clickable { onClick() }
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min) // Позволяет синей полоске тянуться на всю высоту
+        ) {
+            // Синяя полоска слева для активного сервера
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .width(4.dp)
+                        .fillMaxHeight()
+                        .background(Color(0xFF4A68FF), RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
+                )
+            } else {
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // Иконка глобуса
+            Icon(
+                imageVector = Icons.Default.Public,
+                contentDescription = null,
+                tint = Color.Gray,
+                modifier = Modifier.size(32.dp)
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // Тексты сервера
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 12.dp)
+            ) {
+                Text(
+                    text = "⚡ $serverName",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF1E293B)
+                )
+                Text(
+                    text = protocolDetails,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Gray
+                )
+            }
+
+            // Стрелочка вправо
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = null,
+                tint = Color(0xFFCBD5E1),
+                modifier = Modifier.padding(end = 16.dp).size(20.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun ProfileCard(
+    subscription: Any, 
+    servers: List<ProfileItem>,
+    selectedGuid: String,
+    onAction: (MainAction) -> Unit,
+    onPingProfile: (String) -> Unit,
+    onUpdateSubscription: (Any) -> Unit,
+    onSelectServer: (String) -> Unit,
+    onDeleteSubscription: (String) -> Unit,
+    onEditServer: (String, ProfileItem) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        // КАРТОЧКА ПОДПИСКИ (ШАПКА)
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                // Верхний ряд
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = Color(0xFF5C6BC0),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "❤️ Vanguard VPN", // TODO: Привязать к названию подписки
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFF1E293B)
+                        )
+                        Text(
+                            text = "03.08.2026 19:11 | Автообновление",
+                            fontSize = 10.sp,
+                            color = Color.Gray
+                        )
+                    }
+
+                    IconButton(onClick = { onUpdateSubscription(subscription) }, modifier = Modifier.size(32.dp)) {
+                        Icon(imageVector = Icons.Default.Refresh, contentDescription = "Update", tint = Color(0xFF5C6BC0))
+                    }
+                    IconButton(onClick = { /* Вызов пинга */ }, modifier = Modifier.size(32.dp)) {
+                        Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "Ping", tint = Color(0xFF5C6BC0))
+                    }
+                    IconButton(onClick = { /* Меню */ }, modifier = Modifier.size(32.dp)) {
+                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More", tint = Color.Gray)
+                    }
+                }
+
+                HorizontalDivider(
+                    color = Color(0xFFF1F5F9),
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(vertical = 12.dp)
+                )
+
+                // Второй ряд
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        tint = Color(0xFF5C6BC0),
+                        modifier = Modifier.size(20.dp)
+                    )
+                    
+                    Surface(
+                        shape = CircleShape,
+                        color = Color(0xFFF1F5F9),
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    ) {
+                        Text(
+                            text = "59,1GB/∞", // TODO: Привязать к трафику
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF334155),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                        )
+                    }
+                    
+                    Text(
+                        text = "Истекает: 17.08.2026", // TODO: Привязать к дате
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF334155),
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_telegram_24dp), // Ваша иконка телеграмма
+                        contentDescription = "Telegram",
+                        tint = Color(0xFF4A68FF),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "💪 Vanguard VPN - Это не про обход, это про превосходство.",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF475569),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = "Если подписка не работает — нажмите на кнопку «↻», чтобы обновить её",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF64748B),
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        // РЕНДЕР СЕРВЕРОВ
+        servers.forEach { server ->
+            val isSelected = selectedGuid == server.guid 
+            
+            ServerListItem(
+                serverName = server.remarks ?: "Без имени", 
+                protocolDetails = "AUTO / TCP / JSON", // TODO: Вытягивать протокол из конфига
+                isSelected = isSelected,
+                onClick = { onSelectServer(server.guid) }
+            )
+        }
     }
 }
 
@@ -91,7 +316,7 @@ fun MainScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
-            containerColor = Color(0xFFF3F4F6)
+            containerColor = Color(0xFFF4F6FB) // Общий фон приложения
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -99,6 +324,7 @@ fun MainScreen(
                     .padding(innerPadding),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Шапка
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -121,32 +347,29 @@ fun MainScreen(
                     }
                 }
 
-                // Центральная секция с обновленной кнопкой
+                // Центральная секция со светящейся кнопкой (с уменьшенными отступами)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 24.dp),
+                        .padding(top = 8.dp, bottom = 8.dp), 
                     contentAlignment = Alignment.Center
                 ) {
-                    // Цвета, которые меняются в зависимости от статуса
                     val isConnected = uiState.isRunning
                     val primaryColor = if (isConnected) Color(0xFF4A68FF) else Color(0xFFB0BEC5)
                     val glowColor = if (isConnected) Color(0xFF4A68FF).copy(alpha = 0.3f) else Color.Transparent
                     val textColor = if (isConnected) Color(0xFF8A93A6) else Color(0xFF1E293B)
 
-                    // 1. Внешнее мягкое свечение (Glow)
+                    // Свечение
                     Box(
                         modifier = Modifier
                             .size(240.dp)
                             .background(
-                                brush = Brush.radialGradient(
-                                    colors = listOf(glowColor, Color.Transparent)
-                                ),
+                                brush = Brush.radialGradient(colors = listOf(glowColor, Color.Transparent)),
                                 shape = CircleShape
                             )
                     )
 
-                    // 2. Тонкое внешнее кольцо
+                    // Внешнее кольцо
                     Box(
                         modifier = Modifier
                             .size(190.dp)
@@ -157,11 +380,11 @@ fun MainScreen(
                             )
                     )
 
-                    // 3. Сама интерактивная кнопка
+                    // Сама кнопка
                     Surface(
                         shape = CircleShape,
                         color = Color.White,
-                        shadowElevation = 12.dp, // Тень под кнопкой
+                        shadowElevation = 12.dp,
                         modifier = Modifier
                             .size(150.dp)
                             .clickable { onAction(MainAction.ToggleService) }
@@ -171,15 +394,11 @@ fun MainScreen(
                             verticalArrangement = Arrangement.Center,
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            // Иконка
                             PowerIcon(
                                 color = primaryColor,
                                 modifier = Modifier.size(42.dp)
                             )
-                            
                             Spacer(modifier = Modifier.height(12.dp))
-                            
-                            // Текст статуса
                             Text(
                                 text = if (isConnected) "ПОДКЛЮЧЕН" else "ОТКЛЮЧЕН",
                                 color = textColor,
@@ -187,8 +406,6 @@ fun MainScreen(
                                 fontWeight = FontWeight.ExtraBold,
                                 letterSpacing = 0.5.sp
                             )
-                            
-                            // Таймер (показываем только если подключено)
                             if (isConnected) {
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
@@ -202,6 +419,7 @@ fun MainScreen(
                     }
                 }
 
+                // Надписи над списком серверов
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -225,6 +443,7 @@ fun MainScreen(
                     )
                 }
 
+                // Список серверов
                 if (subscriptions.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -241,8 +460,8 @@ fun MainScreen(
                     }
                 } else {
                     LazyColumn(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp) // Уменьшили отступы между карточками
                     ) {
                         items(subscriptions, key = { it.guid + (it.subscription.remarks ?: "") }) { subCache ->
                             val serversFlow = remember(subCache.guid) { mainViewModel.serversForGroup(subCache.guid) }
@@ -276,7 +495,7 @@ fun MainScreen(
             }
         }
         
-        // Плавная выезжающая плашка загрузки сверху
+        // Плашка загрузки
         AnimatedVisibility(
             visible = isImporting,
             enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
@@ -299,7 +518,7 @@ fun MainScreen(
             }
         }
 
-        // Всплывающая плашка с ошибкой снизу
+        // Плашка с ошибкой
         AnimatedVisibility(
             visible = importError != null,
             enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
