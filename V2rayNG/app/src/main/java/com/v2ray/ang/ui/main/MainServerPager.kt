@@ -76,16 +76,37 @@ fun WireframeGlobe(color: Color, modifier: Modifier = Modifier) {
     }
 }
 
+// Умный и точный парсер протоколов для разных типов серверов
 fun getProtocolDescription(profile: ProfileItem): String {
-    val configType = profile.configType.name.uppercase().let { if (it == "CUSTOM") "AUTO" else it }
-    val parts = mutableListOf(configType)
-    val network = profile.network?.uppercase()
-    if (!network.isNullOrBlank() && network != "TCP") parts.add(network)
-    else if (configType != "HYSTERIA2") parts.add("TCP")
-    val security = profile.security?.uppercase()
-    if (!security.isNullOrBlank() && security != "NONE") parts.add(security)
+    // Получаем тип конфига (VMESS, VLESS, HYSTERIA2, TROJAN, SHADOWSOCKS и т.д.)
+    val configType = profile.configType.name.uppercase().let { 
+        if (it == "CUSTOM") "AUTO" else it 
+    }
+    
+    val parts = mutableListOf<String>()
+
+    // Специальная логика для Hysteria2 (часто идет как HYSTERIA2 или HY2)
+    if (configType.contains("HYSTERIA")) {
+        parts.add("HYSTERIA2")
+    } else {
+        parts.add(configType)
+        
+        // Сеть (TCP, XHTTP, WS, gRPC и т.д.)
+        val network = profile.network?.uppercase()
+        if (!network.isNullOrBlank()) {
+            parts.add(network)
+        }
+        
+        // Безопасность/Шифрование (REALITY, TLS, NONE и т.д.)
+        val security = profile.security?.uppercase()
+        if (!security.isNullOrBlank() && security != "NONE") {
+            parts.add(security)
+        }
+    }
+    
     return parts.joinToString(" / ")
 }
+
 
 // Форматер даты
 fun formatDate(millis: Long, format: String = "dd.MM.yyyy"): String {
