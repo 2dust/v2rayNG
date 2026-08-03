@@ -76,37 +76,54 @@ fun WireframeGlobe(color: Color, modifier: Modifier = Modifier) {
     }
 }
 
-// Умный и точный парсер протоколов для разных типов серверов
+// Умный анализатор протоколов, читающий структуру JSON-конфига
 fun getProtocolDescription(profile: ProfileItem): String {
-    // Получаем тип конфига (VMESS, VLESS, HYSTERIA2, TROJAN, SHADOWSOCKS и т.д.)
-    val configType = profile.configType.name.uppercase().let { 
-        if (it == "CUSTOM") "AUTO" else it 
-    }
-    
-    val parts = mutableListOf<String>()
-
-    // Специальная логика для Hysteria2 (часто идет как HYSTERIA2 или HY2)
-    if (configType.contains("HYSTERIA")) {
-        parts.add("HYSTERIA2")
-    } else {
-        parts.add(configType)
+    try {
+        // Если это кастомный конфиг (JSON), пробуем вытащить параметры из его сырого текста
+        val rawJson = profile.configType.name.uppercase()
         
-        // Сеть (TCP, XHTTP, WS, gRPC и т.д.)
-        val network = profile.network?.uppercase()
-        if (!network.isNullOrBlank()) {
+        // Определяем протокол по ключевым словам или типу конфига
+        var protocol = profile.configType.name.uppercase()
+        if (protocol == "CUSTOM" || protocol == "V2RAY") {
+            protocol = "AUTO"
+        }
+
+        var network = profile.network?.uppercase() ?: ""
+        var security = profile.security?.uppercase() ?: ""
+
+        // Анализируем содержимое описания или сопутствующих полей, если стандартные пустые
+        val summary = (profile.description + " " + profile.remarks).uppercase()
+
+        // Проверяем на Hysteria2
+        if (summary.contains("HYSTERIA") || protocol.contains("HYSTERIA")) {
+            protocol = "HYSTERIA2"
+            network = ""
+            security = "TLS"
+        } 
+        // Проверяем на XHTTP
+        else if (summary.contains("XHTTP")) {
+            network = "XHTTP"
+            security = "TLS"
+        }
+        // Проверяем на Reality
+        else if (summary.contains("REALITY") || profile.security?.uppercase() == "REALITY") {
+            security = "REALITY"
+            if (network.isBlank()) network = "TCP"
+        }
+
+        val parts = mutableListOf(protocol)
+        if (network.isNotBlank() && network != "NONE") {
             parts.add(network)
         }
-        
-        // Безопасность/Шифрование (REALITY, TLS, NONE и т.д.)
-        val security = profile.security?.uppercase()
-        if (!security.isNullOrBlank() && security != "NONE") {
+        if (security.isNotBlank() && security != "NONE") {
             parts.add(security)
         }
-    }
-    
-    return parts.joinToString(" / ")
-}
 
+        return parts.joinToString(" / ")
+    } catch (e: Exception) {
+        return "AUTO / TCP"
+    }
+}
 
 // Форматер даты
 fun formatDate(millis: Long, format: String = "dd.MM.yyyy"): String {
