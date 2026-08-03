@@ -89,7 +89,8 @@ fun MainScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
-            containerColor = Color(0xFFF4F6FB)
+            // ДИНАМИЧЕСКИЙ ФОН: Подстраивается под тему (белый, серый или черный AMOLED)
+            containerColor = MaterialTheme.colorScheme.background
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -100,21 +101,35 @@ fun MainScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp), // Ужали верхний бар
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { onNavigate("settings") }) {
-                        Icon(painterResource(id = R.drawable.ic_settings_24dp), contentDescription = "Настройки", modifier = Modifier.size(28.dp))
+                        Icon(
+                            painterResource(id = R.drawable.ic_settings_24dp), 
+                            contentDescription = "Настройки", 
+                            modifier = Modifier.size(28.dp),
+                            tint = MaterialTheme.colorScheme.onBackground // Динамический цвет иконки
+                        )
                     }
                     Box {
                         IconButton(onClick = { showImportMenu = true }) {
-                            Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить", modifier = Modifier.size(28.dp))
+                            Icon(
+                                painterResource(id = R.drawable.ic_add_24dp), 
+                                contentDescription = "Добавить", 
+                                modifier = Modifier.size(28.dp),
+                                tint = MaterialTheme.colorScheme.onBackground // Динамический цвет иконки
+                            )
                         }
-                        DropdownMenu(expanded = showImportMenu, onDismissRequest = { showImportMenu = false }) {
-                            DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; onAction(MainAction.ImportClipboard) })
-                            DropdownMenuItem(text = { Text("Сканировать QR") }, onClick = { showImportMenu = false; onAction(MainAction.ImportQRcode) })
-                            DropdownMenuItem(text = { Text("Импорт из файла") }, onClick = { showImportMenu = false; onAction(MainAction.ImportConfigLocal) })
+                        DropdownMenu(
+                            expanded = showImportMenu, 
+                            onDismissRequest = { showImportMenu = false },
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surface) // Фон меню
+                        ) {
+                            DropdownMenuItem(text = { Text("Импорт из буфера", color = MaterialTheme.colorScheme.onSurface) }, onClick = { showImportMenu = false; onAction(MainAction.ImportClipboard) })
+                            DropdownMenuItem(text = { Text("Сканировать QR", color = MaterialTheme.colorScheme.onSurface) }, onClick = { showImportMenu = false; onAction(MainAction.ImportQRcode) })
+                            DropdownMenuItem(text = { Text("Импорт из файла", color = MaterialTheme.colorScheme.onSurface) }, onClick = { showImportMenu = false; onAction(MainAction.ImportConfigLocal) })
                         }
                     }
                 }
@@ -127,13 +142,14 @@ fun MainScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     val isConnected = uiState.isRunning
-                    val primaryColor = if (isConnected) Color(0xFF4A68FF) else Color(0xFFB0BEC5)
-                    val glowColor = if (isConnected) Color(0xFF4A68FF).copy(alpha = 0.3f) else Color.Transparent
-                    val textColor = if (isConnected) Color(0xFF8A93A6) else Color(0xFF1E293B)
+                    // ДИНАМИЧЕСКИЕ ЦВЕТА КНОПКИ: Primary для активности, Outline для неактивности
+                    val primaryColor = if (isConnected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                    val glowColor = if (isConnected) primaryColor.copy(alpha = 0.3f) else Color.Transparent
+                    val textColor = MaterialTheme.colorScheme.onSurfaceVariant // Текст подстраивается под фон
 
                     Box(
                         modifier = Modifier
-                            .size(170.dp) // Было 240
+                            .size(170.dp)
                             .background(
                                 brush = Brush.radialGradient(colors = listOf(glowColor, Color.Transparent)),
                                 shape = CircleShape
@@ -142,20 +158,20 @@ fun MainScreen(
 
                     Box(
                         modifier = Modifier
-                            .size(130.dp) // Было 190
+                            .size(130.dp)
                             .border(
                                 width = 1.dp,
-                                color = if (isConnected) primaryColor.copy(alpha = 0.3f) else Color(0xFFE0E0E0),
+                                color = if (isConnected) primaryColor.copy(alpha = 0.3f) else MaterialTheme.colorScheme.outlineVariant,
                                 shape = CircleShape
                             )
                     )
 
                     Surface(
                         shape = CircleShape,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.surface, // ДИНАМИЧЕСКИЙ ФОН КНОПКИ (белый или черный)
                         shadowElevation = 8.dp,
                         modifier = Modifier
-                            .size(110.dp) // Было 150
+                            .size(110.dp)
                             .clickable { onAction(MainAction.ToggleService) }
                     ) {
                         Column(
@@ -165,13 +181,13 @@ fun MainScreen(
                         ) {
                             PowerIcon(
                                 color = primaryColor,
-                                modifier = Modifier.size(28.dp) // Было 42
+                                modifier = Modifier.size(28.dp)
                             )
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
                                 text = if (isConnected) "ПОДКЛЮЧЕН" else "ОТКЛЮЧЕН",
                                 color = textColor,
-                                fontSize = 11.sp, // Было 14
+                                fontSize = 11.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 letterSpacing = 0.5.sp
                             )
@@ -179,8 +195,8 @@ fun MainScreen(
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = timeString,
-                                    color = Color.Black,
-                                    fontSize = 13.sp, // Было 16
+                                    color = MaterialTheme.colorScheme.onSurface, // ДИНАМИЧЕСКИЙ ЦВЕТ ТАЙМЕРА
+                                    fontSize = 13.sp,
                                     fontWeight = FontWeight.Black
                                 )
                             }
@@ -192,20 +208,20 @@ fun MainScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp)
-                        .padding(top = 0.dp, bottom = 4.dp), // Ужали отступы
+                        .padding(top = 0.dp, bottom = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
                         text = "Проверить текущее\nподключение",
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f), // ДИНАМИЧЕСКИЙ СЕРЫЙ
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable { onAction(MainAction.TestCurrentServer) }
                     )
                     Text(
                         text = "Скрыть все",
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f), // ДИНАМИЧЕСКИЙ СЕРЫЙ
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -214,12 +230,17 @@ fun MainScreen(
                 if (subscriptions.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(painterResource(id = R.drawable.ic_cloud_download_24dp), contentDescription = null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
+                            Icon(
+                                painterResource(id = R.drawable.ic_cloud_download_24dp), 
+                                contentDescription = null, 
+                                modifier = Modifier.size(64.dp), 
+                                tint = MaterialTheme.colorScheme.outlineVariant // ДИНАМИЧЕСКИЙ СЕРЫЙ
+                            )
                             Spacer(Modifier.height(16.dp))
                             Text(
                                 text = "Нет добавленных профилей.\nНажмите '+' чтобы импортировать подписку.",
                                 textAlign = TextAlign.Center,
-                                color = Color.Gray,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f), // ДИНАМИЧЕСКИЙ СЕРЫЙ
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -229,7 +250,7 @@ fun MainScreen(
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp),
-                        contentPadding = PaddingValues(bottom = 16.dp) // Отступ снизу для красоты прокрутки
+                        contentPadding = PaddingValues(bottom = 16.dp)
                     ) {
                         items(subscriptions, key = { it.guid + (it.subscription.remarks ?: "") }) { subCache ->
                             val serversFlow = remember(subCache.guid) { mainViewModel.serversForGroup(subCache.guid) }
@@ -271,16 +292,25 @@ fun MainScreen(
         ) {
             Surface(
                 shape = RoundedCornerShape(24.dp),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.surfaceContainerHigh, // ДИНАМИЧЕСКИЙ ФОН ПЛАШКИ
                 shadowElevation = 8.dp
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = Color(0xFF5C6BC0))
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp), 
+                        strokeWidth = 2.dp, 
+                        color = MaterialTheme.colorScheme.primary // ДИНАМИЧЕСКИЙ АКЦЕНТ
+                    )
                     Spacer(Modifier.width(12.dp))
-                    Text("Обновление подписки...", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
+                    Text(
+                        "Обновление подписки...", 
+                        fontSize = 14.sp, 
+                        fontWeight = FontWeight.Bold, 
+                        color = MaterialTheme.colorScheme.onSurface // ДИНАМИЧЕСКИЙ ТЕКСТ
+                    )
                 }
             }
         }
@@ -293,12 +323,12 @@ fun MainScreen(
         ) {
             Card(
                 shape = RoundedCornerShape(8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF44336)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer), // ДИНАМИЧЕСКИЙ ЦВЕТ ОШИБКИ
                 elevation = CardDefaults.cardElevation(8.dp)
             ) {
                 Text(
                     text = importError ?: "", 
-                    color = Color.White, 
+                    color = MaterialTheme.colorScheme.onErrorContainer, // ДИНАМИЧЕСКИЙ ЦВЕТ ТЕКСТА ОШИБКИ
                     fontWeight = FontWeight.Bold, 
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
