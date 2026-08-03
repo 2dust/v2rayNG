@@ -522,4 +522,43 @@ class MainViewModel(
     private fun filterConfig(query: String) {}
     private fun consumeLocateTarget(target: LocateTarget) {}
     private fun onTestsFinished() {}
+    
+    private fun testProfileTcpPing(subscriptionId: String) {
+        viewModelScope.launch(ioDispatcher) {
+            try {
+                val guids = dataSource.getServerGuidList(subscriptionId)
+                if (guids.isEmpty()) return@launch
+            
+                _uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
+            
+            // 1. Очищаем старые результаты
+                dataSource.clearAllTestDelayResults(guids)
+            
+            // 2. Запускаем TCP-пинг для каждого сервера из подписки
+                guids.forEach { guid ->
+                    val profile = dataSource.decodeServerConfig(guid)
+                    if (profile != null && !profile.server.isNullOrBlank() && profile.serverPort > 0) {
+                        val delay = SpeedtestManager.socketConnectTime(profile.server!!, profile.serverPort)
+                    // Сохраняем результат в кэш/базу данных (аналогично тому, как это делает core)
+                        com.v2ray.ang.handler.MmkvManager.encodeServerAffiliationInfo(
+                            guid,
+                            com.v2ray.ang.dto.entities.ServerAffiliationInfo(testDelayMillis = delay)
+                        )
+                    }
+                }
+            
+            // 3. Сбрасываем кэш группы и обновляем UI
+                cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
+                updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
+            
+            } finally {
+                _uiState.update { 
+                    it.copy(
+                        isTesting = false, 
+                        statusText = if (uiState.value.isRunning) connectedText else disconnectedText
+                    ) 
+                }
+            }
+        }
+    }
 }
