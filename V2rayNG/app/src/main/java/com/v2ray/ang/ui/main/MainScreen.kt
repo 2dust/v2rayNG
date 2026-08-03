@@ -186,7 +186,9 @@ fun MainScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, top = 4.dp, bottom = 8.dp), // Уменьшили отступы, чтобы поднять карточки (было vertical 16)
+                        // Исправленный padding: разделяем горизонтальные и вертикальные отступы
+                        .padding(horizontal = 24.dp)
+                        .padding(top = 4.dp, bottom = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Bottom
                 ) {
