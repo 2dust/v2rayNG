@@ -93,7 +93,6 @@ fun getProtocolDescription(profile: ProfileItem): String {
     
     return parts.joinToString(" / ")
 }
-
 @Composable
 fun ProfileCard(
     subscription: SubscriptionCache,
@@ -118,25 +117,25 @@ fun ProfileCard(
             .padding(vertical = 4.dp)
             .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(24.dp)),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)) // Чуть более светлый фон, как на оригинале
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC))
     ) {
-        Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp)) {
+        // Уменьшили общий padding карточки
+        Column(modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 4.dp)) {
+            
             // --- ПЕРВАЯ СТРОКА (Шапка) ---
             Row(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             ) {
-                // Иконка-галочка
-                Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
-                    ChevronDown(color = Color(0xFF5C6BC0), modifier = Modifier.size(14.dp))
+                Box(modifier = Modifier.size(20.dp), contentAlignment = Alignment.Center) {
+                    ChevronDown(color = Color(0xFF5C6BC0), modifier = Modifier.size(12.dp))
                 }
                 Spacer(Modifier.width(8.dp))
                 
-                // Текст (Название и Обновление)
                 Column(Modifier.weight(1f)) {
                     Text(
                         text = subInfo.remarks ?: "Без названия", 
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 17.sp), // Чуть меньше шрифт заголовка
                         color = Color(0xFF1E293B),
                         fontWeight = FontWeight.ExtraBold,
                         maxLines = 1,
@@ -150,8 +149,8 @@ fun ProfileCard(
                     }
                     val updateIntervalHours = subInfo.updateInterval / 60
                     Text(
-                        text = "Автообновление - $updateIntervalHours ч.  |  $lastUpdatedText", 
-                        fontSize = 10.sp, 
+                        text = "Автообновление - $updateIntervalHours ч. | $lastUpdatedText", 
+                        fontSize = 9.sp, // Уменьшили шрифт подписи
                         color = Color.Gray, 
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
@@ -159,16 +158,16 @@ fun ProfileCard(
                     )
                 }
                 
-                // Иконки управления
-                IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(32.dp)) {
-                    Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
+                IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(28.dp)) {
+                    Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0), modifier = Modifier.size(18.dp))
                 }
-                IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(32.dp)) {
-                    ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(4.dp))
+                IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(28.dp)) {
+                    ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(16.dp))
                 }
                 Box {
-                    IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray, modifier = Modifier.size(20.dp))
+                    IconButton(onClick = { showMenu = true }, modifier = Modifier.size(28.dp)) {
+                        Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray, modifier = Modifier.size(18.dp))
                     }
                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         DropdownMenuItem(
@@ -189,7 +188,8 @@ fun ProfileCard(
                 }
             }
             
-            Spacer(Modifier.height(14.dp))
+            // Уменьшили отступ между строками
+            Spacer(Modifier.height(8.dp))
 
             // --- ВТОРАЯ СТРОКА (Инфо, Трафик, Дата, Telegram) ---
             Row(
@@ -205,9 +205,9 @@ fun ProfileCard(
                             Toast.makeText(context, "В подписке нет URL", Toast.LENGTH_SHORT).show()
                         }
                     }, 
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(24.dp) // Вернули компактный размер кнопки
                 ) {
-                    Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0), modifier = Modifier.size(22.dp))
+                    Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0), modifier = Modifier.size(18.dp))
                 }
                 
                 Spacer(Modifier.width(8.dp))
@@ -221,14 +221,13 @@ fun ProfileCard(
                 }
                 val usedStr = String.format(java.util.Locale.US, "%.1fGB", usedGb)
                 
-                // Плашка трафика с правильным фоном
+                // ВЕРНУЛИ ЭТАЛОННУЮ КАПСУЛУ: прозрачный фон, тонкая рамка, плотные отступы
                 Box(modifier = Modifier
-                    .background(Color(0xFFF1F5F9), CircleShape)
-                    .border(1.dp, Color(0xFFE2E8F0), CircleShape)
-                    .padding(horizontal = 20.dp, vertical = 4.dp),
+                    .border(1.dp, Color(0xFFCBD5E1), CircleShape)
+                    .padding(horizontal = 12.dp, vertical = 2.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("$usedStr / $totalStr", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1E293B))
+                    Text("$usedStr / $totalStr", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFF334155))
                 }
                 
                 Spacer(Modifier.weight(1f))
@@ -244,33 +243,32 @@ fun ProfileCard(
                 
                 Spacer(Modifier.width(8.dp))
                 
-                // Нормальный размер Telegram иконки
                 IconButton(
                     onClick = { 
                         val targetUrl = if (subInfo.supportUrl.isNotBlank()) subInfo.supportUrl else "https://t.me/shashachkaaa"
                         try { uriHandler.openUri(targetUrl) } catch(e: Exception){} 
                     }, 
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(24.dp)
                 ) {
-                    Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
+                    Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0), modifier = Modifier.size(18.dp))
                 }
             }
             
             // --- ТРЕТИЙ БЛОК (Анонс) ---
             if (subInfo.announce.isNotBlank()) {
-                Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(8.dp)) // Уменьшили отступ
                 Text(
                     text = subInfo.announce, 
                     fontSize = 11.sp, 
-                    lineHeight = 16.sp, // Важно для компактности текста
+                    lineHeight = 14.sp, // Ужали межстрочный интервал
                     textAlign = TextAlign.Center, 
                     fontWeight = FontWeight.Bold, 
-                    color = Color(0xFF2C3E50), 
+                    color = Color(0xFF334155), 
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 )
             }
             
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(8.dp)) // Уменьшили отступ перед серверами
             
             // --- СПИСОК СЕРВЕРОВ ---
             servers.forEach { serverCache ->
@@ -281,29 +279,29 @@ fun ProfileCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onSelectServer(serverCache.guid) }
-                        .padding(vertical = 12.dp, horizontal = 8.dp)
+                        .padding(vertical = 8.dp, horizontal = 8.dp) // Ужали вертикальный паддинг (было 12.dp)
                 ) {
                     if (isSelected) {
-                        Box(modifier = Modifier.width(4.dp).height(36.dp).clip(RoundedCornerShape(50)).background(Color(0xFF5C6BC0)))
+                        Box(modifier = Modifier.width(4.dp).height(32.dp).clip(RoundedCornerShape(50)).background(Color(0xFF5C6BC0)))
                     } else {
                         Spacer(Modifier.width(4.dp))
                     }
                     Spacer(Modifier.width(12.dp))
                     
                     Box(
-                        modifier = Modifier.size(44.dp).background(Color(0xFFE2E8F0), RoundedCornerShape(12.dp)),
+                        modifier = Modifier.size(40.dp).background(Color(0xFFE2E8F0), RoundedCornerShape(10.dp)), // Чуть уменьшили иконку глобуса
                         contentAlignment = Alignment.Center
                     ) {
-                        WireframeGlobe(color = Color.Gray, modifier = Modifier.size(24.dp))
+                        WireframeGlobe(color = Color.Gray, modifier = Modifier.size(22.dp))
                     }
                     
-                    Spacer(Modifier.width(16.dp))
+                    Spacer(Modifier.width(12.dp))
                     
                     Column(Modifier.weight(1f)) {
                         Text(
                             text = serverCache.profile.remarks ?: "Без названия", 
                             fontWeight = FontWeight.ExtraBold, 
-                            fontSize = 16.sp, 
+                            fontSize = 15.sp, 
                             color = Color(0xFF1E293B),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -313,8 +311,8 @@ fun ProfileCard(
 
                         Text(
                             text = finalDesc, 
-                            fontSize = 10.sp, 
-                            color = Color.Gray, 
+                            fontSize = 9.sp, // Уменьшили размер описания протокола
+                            color = Color(0xFF64748B), // Сделали цвет чуть светлее
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -325,17 +323,17 @@ fun ProfileCard(
                     if (delay > 0L) {
                         val pingColor = if (delay <= 300L) Color(0xFF4CAF50) else Color(0xFFFF9800)
                         Text(text = "${delay}ms", style = MaterialTheme.typography.bodySmall, color = pingColor)
-                        Spacer(Modifier.width(8.dp))
+                        Spacer(Modifier.width(4.dp))
                     } else if (delay < 0L) {
-                        Text(text = "таймаут", style = MaterialTheme.typography.bodySmall, color = Color(0xFFF44336))
-                        Spacer(Modifier.width(8.dp))
+                        Text(text = "таймаут", fontSize = 10.sp, color = Color(0xFFF44336))
+                        Spacer(Modifier.width(4.dp))
                     }
                     
                     IconButton(
                         onClick = { onEditServer(serverCache.guid, serverCache.profile) },
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(32.dp)
                     ) {
-                        ChevronRight(color = Color.LightGray, modifier = Modifier.size(16.dp))
+                        ChevronRight(color = Color.LightGray, modifier = Modifier.size(14.dp))
                     }
                 }
             }
