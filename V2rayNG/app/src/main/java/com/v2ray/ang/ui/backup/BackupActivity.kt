@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,15 +49,14 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-enum class BackupLocation { Local, WebDav }
+enum class BackupLocation(@StringRes val labelRes: Int) {
+    Local(R.string.backup_location_local),
+    WebDav(R.string.backup_location_webdav)
+}
 
 class BackupActivity : HelperBaseComponentActivity() {
 
     private val viewModel: BackupViewModel by viewModels()
-
-    private val configBackupOptions: Array<out String> by lazy {
-        resources.getStringArray(R.array.config_backup_options)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,7 +92,6 @@ class BackupActivity : HelperBaseComponentActivity() {
         BackupScreen(
             isLoadingState = viewModel.isLoading,
             webDavConfigState = viewModel.webDavConfig,
-            storageOptions = configBackupOptions.toList(),
             onBackupOptionSelected = { location ->
                 when (location) {
                     BackupLocation.Local -> backupViaLocal()
@@ -184,7 +183,6 @@ class BackupActivity : HelperBaseComponentActivity() {
 fun BackupScreen(
     isLoadingState: StateFlow<Boolean>,
     webDavConfigState: StateFlow<WebDavConfig?>,
-    storageOptions: List<String>,
     onBackupOptionSelected: (BackupLocation) -> Unit,
     onShareClick: () -> Unit,
     onRestoreOptionSelected: (BackupLocation) -> Unit,
@@ -243,10 +241,11 @@ fun BackupScreen(
     if (showBackupDialog) {
         SelectListDialog(
             title = stringResource(R.string.title_configuration_backup),
-            options = storageOptions,
-            onSelected = { index, _ ->
+            options = BackupLocation.entries,
+            optionText = { stringResource(it.labelRes) },
+            onSelected = { location ->
                 showBackupDialog = false
-                onBackupOptionSelected(BackupLocation.entries[index])
+                onBackupOptionSelected(location)
             },
             onDismiss = { showBackupDialog = false }
         )
@@ -254,10 +253,11 @@ fun BackupScreen(
     if (showRestoreDialog) {
         SelectListDialog(
             title = stringResource(R.string.title_configuration_restore),
-            options = storageOptions,
-            onSelected = { index, _ ->
+            options = BackupLocation.entries,
+            optionText = { stringResource(it.labelRes) },
+            onSelected = { location ->
                 showRestoreDialog = false
-                onRestoreOptionSelected(BackupLocation.entries[index])
+                onRestoreOptionSelected(location)
             },
             onDismiss = { showRestoreDialog = false }
         )

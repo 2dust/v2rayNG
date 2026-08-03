@@ -86,10 +86,11 @@ fun ShareMethodDialog(
         includeManagementActions = more,
     )
     SelectListDialog(
-        options = menuActions.map { stringResource(it.labelRes) },
-        onSelected = { index, _ ->
+        options = menuActions,
+        optionText = { stringResource(it.labelRes) },
+        onSelected = { action ->
             onDismiss()
-            when (menuActions[index]) {
+            when (action) {
                 ServerMenuAction.ShareQRCode -> onAction(MainAction.ShareQRCode(guid))
                 ServerMenuAction.ShareClipboard -> onAction(MainAction.ShareClipboard(guid))
                 ServerMenuAction.ShareFullContent -> onAction(MainAction.ShareFullContent(guid))

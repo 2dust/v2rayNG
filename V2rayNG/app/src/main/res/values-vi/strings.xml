@@ -424,10 +424,8 @@
     <string name="action_delete">Xoá</string>
     <string name="action_close">Đóng</string>
 
-    <string-array name="share_sub_method">
-        <item>Xuất gói ra mã QR (Chụp màn hình để lưu)</item>
-        <item>Xuất gói vào Clipboard</item>
-    </string-array>
+    <string name="share_subscription_qrcode">Xuất gói ra mã QR (Chụp màn hình để lưu)</string>
+    <string name="share_subscription_clipboard">Xuất gói vào Clipboard</string>
 
     <string-array name="mode_entries">
         <item>Chế độ VPN</item>
@@ -459,9 +457,7 @@
         <item>Round Robin</item>
     </string-array>
 
-    <string-array name="config_backup_options">
-        <item>Local</item>
-        <item>WebDAV</item>
-    </string-array>
+    <string name="backup_location_local">Local</string>
+    <string name="backup_location_webdav">WebDAV</string>
 
 </resources>

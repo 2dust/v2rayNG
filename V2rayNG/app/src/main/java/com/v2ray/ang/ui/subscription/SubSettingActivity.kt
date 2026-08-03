@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,7 +58,10 @@ import com.v2ray.ang.util.Utils
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
-private enum class SubscriptionShareAction { QRCode, Clipboard }
+private enum class SubscriptionShareAction(@StringRes val labelRes: Int) {
+    QRCode(R.string.share_subscription_qrcode),
+    Clipboard(R.string.share_subscription_clipboard)
+}
 
 class SubSettingActivity : BaseComponentActivity() {
     private val viewModel: SubscriptionsViewModel by viewModels()
@@ -84,8 +87,7 @@ class SubSettingActivity : BaseComponentActivity() {
             onShareClipboard = { url ->
                 Utils.setClipboard(this, url)
                 toast(getString(R.string.toast_success))
-            },
-            shareSubMethodEntries = resources.getStringArray(R.array.share_sub_method).toList()
+            }
         )
     }
 
@@ -99,7 +101,6 @@ class SubSettingActivity : BaseComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubSettingScreen(
     viewModel: SubscriptionsViewModel,
@@ -110,8 +111,7 @@ fun SubSettingScreen(
     onEditSub: (String) -> Unit,
     onRemoveSub: (String) -> Unit,
     onShareQRCode: (String) -> Bitmap?,
-    onShareClipboard: (String) -> Unit,
-    shareSubMethodEntries: List<String>
+    onShareClipboard: (String) -> Unit
 ) {
     val subscriptions by viewModel.subsFlow.collectAsStateWithLifecycle()
     var showUpdateDialog by remember { mutableStateOf(false) }
@@ -248,10 +248,11 @@ fun SubSettingScreen(
     if (shareTarget != null) {
         val (_, url) = shareTarget!!
         SelectListDialog(
-            options = shareSubMethodEntries,
-            onSelected = { index, _ ->
+            options = SubscriptionShareAction.entries,
+            optionText = { stringResource(it.labelRes) },
+            onSelected = { action ->
                 shareTarget = null
-                when (SubscriptionShareAction.entries[index]) {
+                when (action) {
                     SubscriptionShareAction.QRCode -> showQRCodeBitmap = onShareQRCode(url)
                     SubscriptionShareAction.Clipboard -> onShareClipboard(url)
                 }
