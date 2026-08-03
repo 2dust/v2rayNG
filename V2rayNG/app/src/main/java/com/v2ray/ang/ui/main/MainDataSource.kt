@@ -63,4 +63,5 @@ interface MainDataSource : Closeable {
 
     fun syncSubscriptions()
     fun initAssets()
+    fun removeSubscription(subId: String)
 }
