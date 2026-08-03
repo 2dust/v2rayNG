@@ -37,6 +37,9 @@ import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.ui.subscription.SubEditActivity
 import org.json.JSONObject
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
@@ -69,39 +72,39 @@ fun ClockIcon(color: Color, modifier: Modifier = Modifier) {
 @Composable
 fun WireframeGlobe(color: Color, modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
-        val strokeW = 4f
+        val strokeW = 3f // Сделали линии тоньше для компактности
         drawCircle(color, style = Stroke(width = strokeW))
         drawOval(color, topLeft = Offset(size.width * 0.25f, 0f), size = Size(size.width * 0.5f, size.height), style = Stroke(width = strokeW))
         drawLine(color, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), strokeWidth = strokeW)
     }
 }
 
+// Форматер даты
+fun formatDate(millis: Long, format: String = "dd.MM.yyyy"): String {
+    if (millis <= 0L) return "Никогда"
+    val formatter = SimpleDateFormat(format, Locale.getDefault())
+    return formatter.format(Date(millis))
+}
+
 // Умный парсер протоколов (VLESS / TCP / REALITY | XHTTP | HYSTERIA2)
 fun getProtocolDescription(context: Context, profile: ProfileItem): String {
     val configTypeName = profile.configType.name.uppercase()
     
-    // 1. Стандартные профили (VMESS, VLESS и т.д.), где поля БД уже заполнены
+    // 1. Стандартные профили (VMESS, VLESS и т.д.)
     if (configTypeName != "CUSTOM") {
         val parts = mutableListOf(configTypeName)
-        
         val network = profile.network?.uppercase()
-        if (!network.isNullOrBlank() && network != "TCP") {
-            parts.add(network)
-        } else if (configTypeName != "HYSTERIA2") {
-            parts.add("TCP")
-        }
+        if (!network.isNullOrBlank() && network != "TCP") parts.add(network)
+        else if (configTypeName != "HYSTERIA2") parts.add("TCP")
         
         val security = profile.security?.uppercase()
-        if (!security.isNullOrBlank() && security != "NONE") {
-            parts.add(security)
-        }
+        if (!security.isNullOrBlank() && security != "NONE") parts.add(security)
         
         return parts.joinToString(" / ")
     }
 
     // 2. Парсинг CUSTOM (JSON) профилей
     return try {
-        // v2rayNG обычно сохраняет JSON профили в папку filesDir с именем {guid}.json
         val file = File(context.filesDir, "${profile.guid}.json")
         if (!file.exists()) return "CUSTOM / JSON"
 
@@ -109,7 +112,6 @@ fun getProtocolDescription(context: Context, profile: ProfileItem): String {
         val root = JSONObject(jsonStr)
         val outbounds = root.optJSONArray("outbounds") ?: return "CUSTOM / JSON"
 
-        // Ищем первый рабочий outbound (пропускаем direct и blackhole)
         for (i in 0 until outbounds.length()) {
             val outbound = outbounds.optJSONObject(i) ?: continue
             var protocol = outbound.optString("protocol", "").uppercase()
@@ -118,7 +120,6 @@ fun getProtocolDescription(context: Context, profile: ProfileItem): String {
 
             val streamSettings = outbound.optJSONObject("streamSettings")
             
-            // Детектим Hysteria2 (протокол hysteria + version 2)
             if (protocol == "HYSTERIA" && streamSettings != null) {
                 val hSettings = streamSettings.optJSONObject("hysteriaSettings")
                 if (hSettings != null && hSettings.optInt("version") == 2) {
@@ -130,11 +131,10 @@ fun getProtocolDescription(context: Context, profile: ProfileItem): String {
 
             if (streamSettings != null) {
                 val network = streamSettings.optString("network", "").uppercase()
-                // Исключаем дублирование (чтобы не писать HYSTERIA2 / HYSTERIA)
                 if (network.isNotEmpty() && !protocol.startsWith(network)) {
                     parts.add(network)
                 } else if (protocol != "HYSTERIA" && protocol != "HYSTERIA2") {
-                    parts.add("TCP") // Дефолт для VLESS/VMESS
+                    parts.add("TCP") 
                 }
 
                 val security = streamSettings.optString("security", "").uppercase()
@@ -142,7 +142,6 @@ fun getProtocolDescription(context: Context, profile: ProfileItem): String {
                     parts.add(security)
                 }
             }
-
             return parts.joinToString(" / ")
         }
         "AUTO / TCP"
@@ -168,8 +167,29 @@ fun ProfileCard(
     val uriHandler = LocalUriHandler.current
     var showMenu by remember { mutableStateOf(false) }
 
+    val sub = subscription.subscription
+
+    // Динамические данные подписки
+    val title = sub.remarks.takeIf { !it.isNullOrBlank() } ?: "Без названия"
+    val lastUpdateStr = formatDate(sub.lastUpdated, "dd.MM.yyyy HH:mm")
+    val intervalHours = sub.updateInterval / 60
+    val updateStatus = "- $intervalHours ч. $lastUpdateStr"
+
+    // Расчет трафика (байты в гигабайты)
+    val gbDivisor = 1073741824.0
+    val usedTraffic = sub.trafficUpload + sub.trafficDownload
+    val usedStr = String.format(Locale.US, "%.1fGB", usedTraffic / gbDivisor)
+    val totalStr = if (sub.trafficTotal == 0L) "∞" else String.format(Locale.US, "%.1fGB", sub.trafficTotal / gbDivisor)
+    val trafficDisplay = "$usedStr/$totalStr"
+
+    // Дата истечения
+    val expireMillis = if (sub.trafficExpire > 9999999999L) sub.trafficExpire else sub.trafficExpire * 1000
+    val expireDisplay = if (expireMillis > 0L) "Истекает: ${formatDate(expireMillis)}" else "Истекает: ∞"
+
+    val announceText = sub.announce ?: ""
+    val supportUrl = sub.supportUrl ?: ""
+
     Column(modifier = Modifier.fillMaxWidth()) {
-        // 1. КАРТОЧКА ПОДПИСКИ (Шапка)
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -179,7 +199,7 @@ fun ProfileCard(
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 16.dp)) {
-                // Первая строка: Название, стрелка, кнопки обновления
+                // Первая строка
                 Row(
                     verticalAlignment = Alignment.CenterVertically, 
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -189,7 +209,7 @@ fun ProfileCard(
                     
                     Column(Modifier.weight(1f)) {
                         Text(
-                            text = subscription.subscription.remarks ?: "Без названия", 
+                            text = title, 
                             style = MaterialTheme.typography.titleLarge,
                             color = Color(0xFF1E293B),
                             fontWeight = FontWeight.ExtraBold,
@@ -197,26 +217,23 @@ fun ProfileCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "- 1 ч. 02.08.2026 20:03 | ...", 
+                            text = updateStatus, 
                             fontSize = 10.sp, 
                             color = Color.Gray, 
                             fontWeight = FontWeight.SemiBold
                         )
                     }
                     
-                    // ИСПРАВЛЕНО: subscription.guid -> subscription.id
                     IconButton(onClick = { onUpdateSubscription(subscription.id) }, modifier = Modifier.size(32.dp)) {
                         Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
                     }
                     Spacer(Modifier.width(8.dp))
                     
-                    // ИСПРАВЛЕНО: subscription.guid -> subscription.id
                     IconButton(onClick = { onPingProfile(subscription.id) }, modifier = Modifier.size(32.dp)) {
                         ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                     }
                     Spacer(Modifier.width(8.dp))
                     
-                    // Меню карточки
                     Box {
                         IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
                             Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
@@ -226,7 +243,6 @@ fun ProfileCard(
                                 text = { Text("Редактировать профиль") },
                                 onClick = { 
                                     showMenu = false
-                                    // ИСПРАВЛЕНО: subscription.guid -> subscription.id
                                     context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.id))
                                 }
                             )
@@ -234,7 +250,6 @@ fun ProfileCard(
                                 text = { Text("Удалить профиль", color = Color.Red) },
                                 onClick = { 
                                     showMenu = false
-                                    // ИСПРАВЛЕНО: subscription.guid -> subscription.id
                                     onDeleteSubscription(subscription.id)
                                 }
                             )
@@ -242,21 +257,20 @@ fun ProfileCard(
                     }
                 }
 
-                // Разделительная линия
                 HorizontalDivider(
                     color = Color(0xFFF1F5F9),
                     thickness = 1.dp,
                     modifier = Modifier.padding(vertical = 12.dp)
                 )
 
-                // Вторая строка: Трафик, дата, Телеграм
+                // Вторая строка
                 Row(
                     verticalAlignment = Alignment.CenterVertically, 
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 ) {
                     IconButton(
                         onClick = {
-                            val subUrl = subscription.subscription.url
+                            val subUrl = sub.url
                             if (!subUrl.isNullOrBlank()) {
                                 try { uriHandler.openUri(subUrl) } catch(e: Exception) { Toast.makeText(context, "Ссылка недоступна", Toast.LENGTH_SHORT).show() }
                             } else {
@@ -270,13 +284,12 @@ fun ProfileCard(
                     
                     Spacer(Modifier.width(12.dp))
                     
-                    // Мягкая капсула для трафика
                     Surface(
                         shape = CircleShape,
                         color = Color(0xFFF1F5F9),
                     ) {
                         Text(
-                            text = "54,8GB/∞", 
+                            text = trafficDisplay, 
                             fontSize = 12.sp, 
                             fontWeight = FontWeight.Bold, 
                             color = Color(0xFF2C3E50),
@@ -284,9 +297,8 @@ fun ProfileCard(
                         )
                     }
                     
-                    // Текст с весом 1f отталкивает Телеграм вправо
                     Text(
-                        text = "Истекает: 17.08.2026", 
+                        text = expireDisplay, 
                         fontSize = 12.sp, 
                         fontWeight = FontWeight.Bold, 
                         color = Color(0xFF2C3E50),
@@ -294,45 +306,40 @@ fun ProfileCard(
                         textAlign = TextAlign.Center
                     )
                     
-                    IconButton(
-                        onClick = { 
-                            try { uriHandler.openUri("https://t.me/shashachkaaa") } catch(e: Exception){} 
-                        }, 
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
+                    if (supportUrl.isNotBlank()) {
+                        IconButton(
+                            onClick = { try { uriHandler.openUri(supportUrl) } catch(e: Exception){} }, 
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
+                        }
+                    } else {
+                        Spacer(Modifier.size(24.dp))
                     }
                 }
                 
-                Spacer(Modifier.height(16.dp))
-                
-                Text(
-                    text = "💪 Vanguard VPN - Это не про обход, это про\nпревосходство.\nЕсли подписка не работает — нажмите на кнопку «↻»,\nчтобы обновить её", 
-                    fontSize = 11.sp, 
-                    textAlign = TextAlign.Center, 
-                    fontWeight = FontWeight.Bold, 
-                    color = Color(0xFF475569), 
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-                )
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    text = "DALBAEB | Осталось 14 дней", 
-                    fontSize = 12.sp, 
-                    textAlign = TextAlign.Center, 
-                    fontWeight = FontWeight.ExtraBold, 
-                    color = Color(0xFF1E293B), 
-                    modifier = Modifier.fillMaxWidth()
-                )
+                // Третья строка (сообщение от сервера)
+                if (announceText.isNotBlank()) {
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        text = announceText, 
+                        fontSize = 11.sp, 
+                        textAlign = TextAlign.Center, 
+                        fontWeight = FontWeight.Bold, 
+                        color = Color(0xFF1E293B), 
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                    )
+                }
             }
         }
         
         Spacer(Modifier.height(8.dp))
 
-        // 2. СПИСОК СЕРВЕРОВ (Вынесен из основной карточки)
+        // 2. СПИСОК СЕРВЕРОВ
         servers.forEach { serverCache ->
             val isSelected = serverCache.guid == selectedGuid
             
-            // Кэшируем описание, чтобы не читать JSON файл при каждом рекомпозе!
+            // Кэшируем строку описания с вызовом твоей функции
             val finalDesc = remember(serverCache.guid) {
                 getProtocolDescription(context, serverCache.profile) + " | JSON"
             }
@@ -352,10 +359,9 @@ fun ProfileCard(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(IntrinsicSize.Min) // Позволяет синей полоске тянуться по высоте
-                        .padding(vertical = 8.dp, horizontal = 8.dp)
+                        .height(IntrinsicSize.Min)
+                        .padding(vertical = 6.dp, horizontal = 8.dp)
                 ) {
-                    // Синий индикатор активного сервера
                     if (isSelected) {
                         Box(
                             modifier = Modifier
@@ -367,30 +373,30 @@ fun ProfileCard(
                     } else {
                         Spacer(Modifier.width(4.dp))
                     }
-                    Spacer(Modifier.width(12.dp))
+                    Spacer(Modifier.width(8.dp))
                     
                     Box(
-                        modifier = Modifier.size(44.dp).background(Color(0xFFF1F5F9), RoundedCornerShape(12.dp)),
+                        modifier = Modifier.size(36.dp).background(Color(0xFFF1F5F9), RoundedCornerShape(10.dp)),
                         contentAlignment = Alignment.Center
                     ) {
-                        WireframeGlobe(color = Color.Gray, modifier = Modifier.size(24.dp))
+                        WireframeGlobe(color = Color.Gray, modifier = Modifier.size(20.dp))
                     }
                     
-                    Spacer(Modifier.width(16.dp))
+                    Spacer(Modifier.width(12.dp))
                     
                     Column(Modifier.weight(1f)) {
                         Text(
                             text = serverCache.profile.remarks ?: "Без названия", 
                             fontWeight = FontWeight.ExtraBold, 
-                            fontSize = 16.sp, 
+                            fontSize = 15.sp, 
                             color = Color(0xFF1E293B),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-
+                        
                         Text(
                             text = finalDesc, 
-                            fontSize = 10.sp, 
+                            fontSize = 9.sp, 
                             color = Color.Gray, 
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
@@ -402,17 +408,17 @@ fun ProfileCard(
                     if (delay > 0L) {
                         val pingColor = if (delay <= 300L) Color(0xFF4CAF50) else Color(0xFFFF9800)
                         Text(text = "${delay}ms", style = MaterialTheme.typography.bodySmall, color = pingColor, fontWeight = FontWeight.Bold)
-                        Spacer(Modifier.width(8.dp))
+                        Spacer(Modifier.width(4.dp))
                     } else if (delay < 0L) {
                         Text(text = "таймаут", style = MaterialTheme.typography.bodySmall, color = Color(0xFFF44336), fontWeight = FontWeight.Bold)
-                        Spacer(Modifier.width(8.dp))
+                        Spacer(Modifier.width(4.dp))
                     }
                     
                     IconButton(
                         onClick = { onEditServer(serverCache.guid, serverCache.profile) },
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(32.dp)
                     ) {
-                        ChevronRight(color = Color(0xFFCBD5E1), modifier = Modifier.size(16.dp))
+                        ChevronRight(color = Color(0xFFCBD5E1), modifier = Modifier.size(14.dp))
                     }
                 }
             }
@@ -420,11 +426,10 @@ fun ProfileCard(
     }
 }
 
-// 100% Оригинальная сигнатура для MainActivity
 @Composable
 fun GroupPagerPage(
     groupId: String,
-    mainViewModel: MainViewModel, // Требует импорта MainViewModel, если он находится в другом пакете
+    mainViewModel: MainViewModel,
     selectedGuid: String?,
     doubleColumnDisplay: Boolean,
     confirmRemove: Boolean,
