@@ -608,9 +608,12 @@ object AngConfigManager {
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
 
-            var configText = try {
+            var configText = ""
+            var responseHeaders = mapOf<String, String>()
+
+            try {
                 val httpPort = SettingsManager.getHttpPort()
-                HttpUtil.getUrlContentWithUserAgent(
+                val result = HttpUtil.getUrlContentWithUserAgent(
                     UrlContentRequest(
                         url = url,
                         userAgent = userAgent,
@@ -621,27 +624,53 @@ object AngConfigManager {
                         proxyPassword = proxyPassword
                     )
                 )
+                configText = result.first
+                responseHeaders = result.second
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
-                ""
             }
+
             if (configText.isEmpty()) {
-                configText = try {
-                    HttpUtil.getUrlContentWithUserAgent(
+                try {
+                    val result = HttpUtil.getUrlContentWithUserAgent(
                         UrlContentRequest(
                             url = url,
                             userAgent = userAgent,
                             requestHeaders = finalHeadersJson // И здесь тоже JSON-строка
                         )
                     )
+                    configText = result.first
+                    responseHeaders = result.second
                 } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Upate subscription: Failed to get URL content with user agent", e)
-                    ""
+                    LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
                 }
             }
+
             if (configText.isEmpty()) {
                 return SubscriptionUpdateResult(failureCount = 1)
             }
+
+            // --- ОБРАБОТКА ЗАГОЛОВКА profile-title ---
+            val profileTitleRaw = responseHeaders["profile-title"]
+            if (!profileTitleRaw.isNullOrEmpty()) {
+                var parsedTitle = profileTitleRaw
+                if (profileTitleRaw.startsWith("base64:")) {
+                    try {
+                        val base64Str = profileTitleRaw.substringAfter("base64:")
+                        parsedTitle = String(android.util.Base64.decode(base64Str, android.util.Base64.DEFAULT), Charsets.UTF_8)
+                    } catch (e: Exception) {
+                        LogUtil.e(AppConfig.TAG, "Failed to decode base64 profile-title", e)
+                    }
+                }
+                
+                // Обновляем имя, только если оно дефолтное или пустое (чтобы не сбросить кастомное имя)
+                if (!parsedTitle.isNullOrBlank()) {
+                    if (it.subscription.remarks.isNullOrBlank() || it.subscription.remarks == "import sub") {
+                        it.subscription.remarks = parsedTitle
+                    }
+                }
+            }
+            // ------------------------------------------
 
             val count = parseConfigViaSub(configText, it.guid, false)
             if (count > 0) {
@@ -661,8 +690,6 @@ object AngConfigManager {
             return SubscriptionUpdateResult(failureCount = 1)
         }
     }
-    
-    
     
     /**
      * Removes invalid server configurations for a subscription.
