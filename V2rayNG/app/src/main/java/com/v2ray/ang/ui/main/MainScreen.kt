@@ -28,12 +28,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.entities.ProfileItem
 
 @Composable
 fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
-        val strokeW = 6f
+        val strokeW = 5f
         drawArc(
             color = color,
             startAngle = -240f,
@@ -44,7 +43,7 @@ fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
         drawLine(
             color = color,
             start = center.copy(y = center.y - size.height / 2),
-            end = center.copy(y = center.y + 4f),
+            end = center.copy(y = center.y + 2f),
             strokeWidth = strokeW,
             cap = StrokeCap.Round
         )
@@ -101,16 +100,16 @@ fun MainScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 16.dp, vertical = 4.dp), // Ужали верхний бар
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { onNavigate("settings") }) {
-                        Icon(painterResource(id = R.drawable.ic_settings_24dp), contentDescription = "Настройки", modifier = Modifier.size(32.dp))
+                        Icon(painterResource(id = R.drawable.ic_settings_24dp), contentDescription = "Настройки", modifier = Modifier.size(28.dp))
                     }
                     Box {
                         IconButton(onClick = { showImportMenu = true }) {
-                            Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить", modifier = Modifier.size(32.dp))
+                            Icon(painterResource(id = R.drawable.ic_add_24dp), contentDescription = "Добавить", modifier = Modifier.size(28.dp))
                         }
                         DropdownMenu(expanded = showImportMenu, onDismissRequest = { showImportMenu = false }) {
                             DropdownMenuItem(text = { Text("Импорт из буфера") }, onClick = { showImportMenu = false; onAction(MainAction.ImportClipboard) })
@@ -120,10 +119,11 @@ fun MainScreen(
                     }
                 }
 
+                // Компактная центральная кнопка
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp, bottom = 8.dp), 
+                        .padding(top = 0.dp, bottom = 8.dp), 
                     contentAlignment = Alignment.Center
                 ) {
                     val isConnected = uiState.isRunning
@@ -133,7 +133,7 @@ fun MainScreen(
 
                     Box(
                         modifier = Modifier
-                            .size(240.dp)
+                            .size(170.dp) // Было 240
                             .background(
                                 brush = Brush.radialGradient(colors = listOf(glowColor, Color.Transparent)),
                                 shape = CircleShape
@@ -142,7 +142,7 @@ fun MainScreen(
 
                     Box(
                         modifier = Modifier
-                            .size(190.dp)
+                            .size(130.dp) // Было 190
                             .border(
                                 width = 1.dp,
                                 color = if (isConnected) primaryColor.copy(alpha = 0.3f) else Color(0xFFE0E0E0),
@@ -153,9 +153,9 @@ fun MainScreen(
                     Surface(
                         shape = CircleShape,
                         color = Color.White,
-                        shadowElevation = 12.dp,
+                        shadowElevation = 8.dp,
                         modifier = Modifier
-                            .size(150.dp)
+                            .size(110.dp) // Было 150
                             .clickable { onAction(MainAction.ToggleService) }
                     ) {
                         Column(
@@ -165,22 +165,22 @@ fun MainScreen(
                         ) {
                             PowerIcon(
                                 color = primaryColor,
-                                modifier = Modifier.size(42.dp)
+                                modifier = Modifier.size(28.dp) // Было 42
                             )
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
                             Text(
                                 text = if (isConnected) "ПОДКЛЮЧЕН" else "ОТКЛЮЧЕН",
                                 color = textColor,
-                                fontSize = 14.sp,
+                                fontSize = 11.sp, // Было 14
                                 fontWeight = FontWeight.ExtraBold,
                                 letterSpacing = 0.5.sp
                             )
                             if (isConnected) {
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = timeString,
                                     color = Color.Black,
-                                    fontSize = 16.sp,
+                                    fontSize = 13.sp, // Было 16
                                     fontWeight = FontWeight.Black
                                 )
                             }
@@ -192,21 +192,21 @@ fun MainScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp)
-                        .padding(top = 4.dp, bottom = 8.dp),
+                        .padding(top = 0.dp, bottom = 4.dp), // Ужали отступы
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
                         text = "Проверить текущее\nподключение",
                         color = Color.Gray,
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable { onAction(MainAction.TestCurrentServer) }
                     )
                     Text(
                         text = "Скрыть все",
                         color = Color.Gray,
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -228,32 +228,32 @@ fun MainScreen(
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        contentPadding = PaddingValues(bottom = 16.dp) // Отступ снизу для красоты прокрутки
                     ) {
                         items(subscriptions, key = { it.guid + (it.subscription.remarks ?: "") }) { subCache ->
                             val serversFlow = remember(subCache.guid) { mainViewModel.serversForGroup(subCache.guid) }
                             val servers by serversFlow.collectAsStateWithLifecycle(initialValue = emptyList())
 
-                            // Вызываем ProfileCard из MainServerPager
                             ProfileCard(
                                 subscription = subCache,
                                 servers = servers,
                                 selectedGuid = uiState.selectedGuid,
                                 onAction = onAction,
-                                onPingProfile = { guid: String -> 
+                                onPingProfile = { guid -> 
                                     onAction(MainAction.SelectGroup(guid))
                                     onAction(MainAction.TestProfileTcpPing(guid)) 
                                 },
-                                onUpdateSubscription = { subId: String -> 
+                                onUpdateSubscription = { subId -> 
                                     mainViewModel.updateSubscription(subId)
                                 },
-                                onSelectServer = { guid: String -> 
+                                onSelectServer = { guid -> 
                                     onAction(MainAction.SelectServer(guid)) 
                                 },
-                                onDeleteSubscription = { subId: String ->
+                                onDeleteSubscription = { subId ->
                                     mainViewModel.removeSubscription(subId)
                                 },
-                                onEditServer = { guid: String, profile: ProfileItem ->
+                                onEditServer = { guid, profile ->
                                     onAction(MainAction.EditServer(guid, profile))
                                 }
                             )
