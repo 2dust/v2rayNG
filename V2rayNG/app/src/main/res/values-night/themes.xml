@@ -6,7 +6,7 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
-        <item name="android:windowBackground">@color/window_background_dark</item>
+        <item name="android:windowBackground">@android:color/black</item>
     </style>
 
     <style name="AppThemeDayNight" parent="AppThemeBase" />
