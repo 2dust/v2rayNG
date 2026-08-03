@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,20 +28,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.entities.ProfileItem
-
-// Умный парсер, который отделяет флаг/эмодзи от названия сервера
-fun splitEmojiAndName(fullName: String): Pair<String?, String> {
-    // Регулярное выражение захватывает суррогатные пары (флаги) и спецсимволы в начале строки
-    val regex = Regex("^([\\uD83C-\\uDBFF\\uDC00-\\uDFFF\\u2600-\\u27BF\\u2B50\\u2B55]+)\\s*(.*)")
-    val match = regex.find(fullName)
-    return if (match != null) {
-        Pair(match.groupValues[1], match.groupValues[2])
-    } else {
-        Pair(null, fullName)
-    }
-}
-
 
 @Composable
 fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
@@ -65,7 +50,6 @@ fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
     }
 }
 
-// 100% Оригинальная сигнатура для MainActivity
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -116,7 +100,7 @@ fun MainScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp), // Уменьшили вертикальный отступ шапки (было 16)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -138,13 +122,12 @@ fun MainScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 4.dp, bottom = 12.dp), // Ужали отступы, чтобы поднять кнопку
+                        .padding(top = 4.dp, bottom = 12.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Уменьшенное внешнее кольцо
                     Box(
                         modifier = Modifier
-                            .size(190.dp) // Было 240
+                            .size(190.dp)
                             .border(
                                 width = 1.dp,
                                 brush = Brush.linearGradient(colors = listOf(Color(0xFFE0E0E0), Color(0xFFFFCDD2), Color(0xFFE0E0E0))),
@@ -152,10 +135,9 @@ fun MainScreen(
                             )
                     )
 
-                    // Уменьшенная кнопка
                     Box(
                         modifier = Modifier
-                            .size(130.dp) // Было 170
+                            .size(130.dp)
                             .shadow(
                                 elevation = 24.dp,
                                 shape = CircleShape,
@@ -171,14 +153,14 @@ fun MainScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             PowerIcon(
                                 color = if (uiState.isRunning) Color(0xFF5C6BC0) else Color.LightGray,
-                                modifier = Modifier.size(32.dp) // Чуть уменьшили иконку питания
+                                modifier = Modifier.size(32.dp)
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             
                             Text(
                                 text = if (uiState.isRunning) "ПОДКЛЮЧЕН" else "ОТКЛЮЧЕН",
                                 color = Color(0xFF2C3E50),
-                                fontSize = 15.sp, // Чуть уменьшили шрифт (было 18)
+                                fontSize = 15.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 letterSpacing = 0.5.sp
                             )
@@ -188,7 +170,7 @@ fun MainScreen(
                                 Text(
                                     text = timeString,
                                     color = Color.Gray,
-                                    fontSize = 12.sp, // Уменьшили шрифт таймера
+                                    fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -199,7 +181,6 @@ fun MainScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        // Исправленный padding: разделяем горизонтальные и вертикальные отступы
                         .padding(horizontal = 24.dp)
                         .padding(top = 4.dp, bottom = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -208,7 +189,7 @@ fun MainScreen(
                     Text(
                         text = "Проверить текущее\nподключение",
                         color = Color.Gray,
-                        fontSize = 13.sp, // Чуть уменьшили для плотности
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable { onAction(MainAction.TestCurrentServer) }
                     )
@@ -237,7 +218,7 @@ fun MainScreen(
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp) // Уменьшили расстояние между карточками (было 16)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(subscriptions, key = { it.guid + (it.subscription.remarks ?: "") }) { subCache ->
                             val serversFlow = remember(subCache.guid) { mainViewModel.serversForGroup(subCache.guid) }
@@ -271,7 +252,6 @@ fun MainScreen(
             }
         }
         
-        // Плавная выезжающая плашка загрузки сверху
         AnimatedVisibility(
             visible = isImporting,
             enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
@@ -294,7 +274,6 @@ fun MainScreen(
             }
         }
 
-        // Всплывающая плашка с ошибкой снизу
         AnimatedVisibility(
             visible = importError != null,
             enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
