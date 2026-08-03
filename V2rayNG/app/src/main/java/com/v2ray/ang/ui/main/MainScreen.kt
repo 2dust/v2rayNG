@@ -103,7 +103,7 @@ fun MainScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                        .padding(horizontal = 16.dp, vertical = 8.dp), // Уменьшили вертикальный отступ шапки (было 16)
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -125,12 +125,13 @@ fun MainScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .padding(top = 4.dp, bottom = 12.dp), // Ужали отступы, чтобы поднять кнопку
                     contentAlignment = Alignment.Center
                 ) {
+                    // Уменьшенное внешнее кольцо
                     Box(
                         modifier = Modifier
-                            .size(240.dp)
+                            .size(190.dp) // Было 240
                             .border(
                                 width = 1.dp,
                                 brush = Brush.linearGradient(colors = listOf(Color(0xFFE0E0E0), Color(0xFFFFCDD2), Color(0xFFE0E0E0))),
@@ -138,11 +139,12 @@ fun MainScreen(
                             )
                     )
 
+                    // Уменьшенная кнопка
                     Box(
                         modifier = Modifier
-                            .size(170.dp)
+                            .size(130.dp) // Было 170
                             .shadow(
-                                elevation = 32.dp,
+                                elevation = 24.dp,
                                 shape = CircleShape,
                                 ambientColor = Color(0xFF5C6BC0).copy(alpha = 0.5f),
                                 spotColor = Color(0xFF5C6BC0).copy(alpha = 0.5f)
@@ -156,24 +158,24 @@ fun MainScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             PowerIcon(
                                 color = if (uiState.isRunning) Color(0xFF5C6BC0) else Color.LightGray,
-                                modifier = Modifier.size(40.dp)
+                                modifier = Modifier.size(32.dp) // Чуть уменьшили иконку питания
                             )
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
                             
                             Text(
                                 text = if (uiState.isRunning) "ПОДКЛЮЧЕН" else "ОТКЛЮЧЕН",
                                 color = Color(0xFF2C3E50),
-                                fontSize = 18.sp,
+                                fontSize = 15.sp, // Чуть уменьшили шрифт (было 18)
                                 fontWeight = FontWeight.ExtraBold,
-                                letterSpacing = 1.sp
+                                letterSpacing = 0.5.sp
                             )
                             
                             if (uiState.isRunning) {
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = timeString,
                                     color = Color.Gray,
-                                    fontSize = 14.sp,
+                                    fontSize = 12.sp, // Уменьшили шрифт таймера
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -184,21 +186,21 @@ fun MainScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 16.dp),
+                        .padding(horizontal = 24.dp, top = 4.dp, bottom = 8.dp), // Уменьшили отступы, чтобы поднять карточки (было vertical 16)
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
                         text = "Проверить текущее\nподключение",
                         color = Color.Gray,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp, // Чуть уменьшили для плотности
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable { onAction(MainAction.TestCurrentServer) }
                     )
                     Text(
                         text = "Скрыть все",
                         color = Color.Gray,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -220,7 +222,7 @@ fun MainScreen(
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp) // Уменьшили расстояние между карточками (было 16)
                     ) {
                         items(subscriptions, key = { it.guid + (it.subscription.remarks ?: "") }) { subCache ->
                             val serversFlow = remember(subCache.guid) { mainViewModel.serversForGroup(subCache.guid) }
