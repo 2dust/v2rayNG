@@ -204,11 +204,14 @@ fun ProfileCard(
                         )
                     }
                     
-                    IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(32.dp)) {
+                    // ИСПРАВЛЕНО: subscription.guid -> subscription.id
+                    IconButton(onClick = { onUpdateSubscription(subscription.id) }, modifier = Modifier.size(32.dp)) {
                         Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
                     }
                     Spacer(Modifier.width(8.dp))
-                    IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(32.dp)) {
+                    
+                    // ИСПРАВЛЕНО: subscription.guid -> subscription.id
+                    IconButton(onClick = { onPingProfile(subscription.id) }, modifier = Modifier.size(32.dp)) {
                         ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                     }
                     Spacer(Modifier.width(8.dp))
@@ -223,14 +226,16 @@ fun ProfileCard(
                                 text = { Text("Редактировать профиль") },
                                 onClick = { 
                                     showMenu = false
-                                    context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.guid))
+                                    // ИСПРАВЛЕНО: subscription.guid -> subscription.id
+                                    context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.id))
                                 }
                             )
                             DropdownMenuItem(
                                 text = { Text("Удалить профиль", color = Color.Red) },
                                 onClick = { 
                                     showMenu = false
-                                    onDeleteSubscription(subscription.guid)
+                                    // ИСПРАВЛЕНО: subscription.guid -> subscription.id
+                                    onDeleteSubscription(subscription.id)
                                 }
                             )
                         }
