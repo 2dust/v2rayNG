@@ -23,15 +23,12 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.dto.entities.ServersCache
-import com.v2ray.ang.dto.entities.SubscriptionCache
 
 @Composable
 fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
@@ -51,226 +48,6 @@ fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
             strokeWidth = strokeW,
             cap = StrokeCap.Round
         )
-    }
-}
-
-@Composable
-fun ServerListItem(
-    serverName: String,
-    protocolDetails: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFFF8FAFC) else Color.White
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clickable { onClick() }
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-        ) {
-            if (isSelected) {
-                Box(
-                    modifier = Modifier
-                        .width(4.dp)
-                        .fillMaxHeight()
-                        .background(Color(0xFF4A68FF), RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
-                )
-            } else {
-                Spacer(modifier = Modifier.width(4.dp))
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // Используем кастомную иконку глобуса из MainServerPager
-            WireframeGlobe(
-                color = Color.Gray,
-                modifier = Modifier.size(32.dp)
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 12.dp)
-            ) {
-                Text(
-                    text = "⚡ $serverName",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF1E293B),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = protocolDetails,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Gray,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            // Используем кастомную иконку стрелочки из MainServerPager
-            ChevronRight(
-                color = Color(0xFFCBD5E1),
-                modifier = Modifier.padding(end = 16.dp).size(20.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun ProfileCard(
-    subscription: SubscriptionCache, 
-    servers: List<ServersCache>,
-    selectedGuid: String?,
-    onAction: (MainAction) -> Unit,
-    onPingProfile: (String) -> Unit,
-    onUpdateSubscription: (SubscriptionCache) -> Unit,
-    onSelectServer: (String) -> Unit,
-    onDeleteSubscription: (String) -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_expand_more_24dp),
-                        contentDescription = null,
-                        tint = Color(0xFF5C6BC0),
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = subscription.subscription.remarks ?: "Без названия",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF1E293B),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = "03.08.2026 19:11 | Автообновление",
-                            fontSize = 10.sp,
-                            color = Color.Gray
-                        )
-                    }
-
-                    IconButton(onClick = { onUpdateSubscription(subscription) }, modifier = Modifier.size(32.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Update", tint = Color(0xFF5C6BC0))
-                    }
-                    IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(32.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_play_24dp), contentDescription = "Ping", tint = Color(0xFF5C6BC0))
-                    }
-                    IconButton(onClick = { /* Меню */ }, modifier = Modifier.size(32.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "More", tint = Color.Gray)
-                    }
-                }
-
-                HorizontalDivider(
-                    color = Color(0xFFF1F5F9),
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 12.dp)
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_about_24dp),
-                        contentDescription = null,
-                        tint = Color(0xFF5C6BC0),
-                        modifier = Modifier.size(20.dp)
-                    )
-                    
-                    Surface(
-                        shape = CircleShape,
-                        color = Color(0xFFF1F5F9),
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    ) {
-                        Text(
-                            text = "59,1GB/∞",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF334155),
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-                        )
-                    }
-                    
-                    Text(
-                        text = "Истекает: 17.08.2026",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF334155),
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Center
-                    )
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_telegram_24dp),
-                        contentDescription = "Telegram",
-                        tint = Color(0xFF4A68FF),
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(
-                    text = "💪 Vanguard VPN - Это не про обход, это про превосходство.",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF475569),
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = "Если подписка не работает — нажмите на кнопку «↻», чтобы обновить её",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF64748B),
-                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        servers.forEach { serverCache ->
-            val isSelected = selectedGuid == serverCache.guid 
-            
-            ServerListItem(
-                serverName = serverCache.profile.remarks ?: "Без имени", 
-                protocolDetails = "AUTO / TCP / JSON",
-                isSelected = isSelected,
-                onClick = { onSelectServer(serverCache.guid) }
-            )
-        }
     }
 }
 
@@ -457,25 +234,26 @@ fun MainScreen(
                             val serversFlow = remember(subCache.guid) { mainViewModel.serversForGroup(subCache.guid) }
                             val servers by serversFlow.collectAsStateWithLifecycle(initialValue = emptyList())
 
+                            // Вызываем ProfileCard из MainServerPager
                             ProfileCard(
                                 subscription = subCache,
                                 servers = servers,
                                 selectedGuid = uiState.selectedGuid,
                                 onAction = onAction,
-                                onPingProfile = { guid -> 
+                                onPingProfile = { guid: String -> 
                                     onAction(MainAction.SelectGroup(guid))
                                     onAction(MainAction.TestProfileTcpPing(guid)) 
                                 },
-                                onUpdateSubscription = { 
-                                    mainViewModel.updateSubscription(it)
+                                onUpdateSubscription = { subId: String -> 
+                                    mainViewModel.updateSubscription(subId)
                                 },
-                                onSelectServer = { guid -> 
+                                onSelectServer = { guid: String -> 
                                     onAction(MainAction.SelectServer(guid)) 
                                 },
-                                onDeleteSubscription = { subId ->
+                                onDeleteSubscription = { subId: String ->
                                     mainViewModel.removeSubscription(subId)
                                 },
-                                onEditServer = { guid, profile ->
+                                onEditServer = { guid: String, profile: ProfileItem ->
                                     onAction(MainAction.EditServer(guid, profile))
                                 }
                             )
