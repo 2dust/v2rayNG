@@ -41,6 +41,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import com.v2ray.ang.util.JsonUtil
+import android.util.Base64
+import java.nio.charset.Charset
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
@@ -87,7 +89,6 @@ fun formatDate(millis: Long, format: String = "dd.MM.yyyy"): String {
     return formatter.format(Date(millis))
 }
 
-// Умный парсер протоколов (ИСПОЛЬЗУЕТ ПЕРЕДАННЫЙ GUID СЕРВЕРА)
 fun getProtocolDescription(context: Context, profile: ProfileItem, guid: String): String {
     val configTypeName = profile.configType.name.uppercase()
     
@@ -106,33 +107,43 @@ fun getProtocolDescription(context: Context, profile: ProfileItem, guid: String)
 
     // 2. Парсинг CUSTOM (JSON) профилей
     return try {
-        var jsonStr = ""
+        var rawData = ""
         
-        // Агрессивный поиск файла конфига по всем типичным путям v2rayNG
+        // Сначала ищем файл (на всякий случай оставляем логику v2rayNG)
         val possibleFiles = listOf(
             File(context.filesDir, "$guid.json"),
             File(context.filesDir, "$guid.txt"),
-            File(context.filesDir, guid), // Часто v2rayNG сохраняет файл без расширения
-            File(context.getExternalFilesDir(null), "$guid.txt"),
-            File(context.getExternalFilesDir(null), guid)
+            File(context.filesDir, guid)
         )
 
         for (file in possibleFiles) {
             if (file.exists()) {
-                jsonStr = file.readText()
+                rawData = file.readText()
                 break
             }
         }
 
-        // Если файла нет, возможно JSON лежит прямо в поле server (если форк переделан под прямую передачу)
-        if (jsonStr.isEmpty() && profile.server?.trim()?.startsWith("{") == true) {
-            jsonStr = profile.server!!
+        // Если файла нет, берем данные из поля server
+        if (rawData.isEmpty() && !profile.server.isNullOrBlank()) {
+            rawData = profile.server!!
         }
 
-        // Если так и не нашли данные
-        if (jsonStr.isEmpty()) return "CUSTOM"
+        if (rawData.isEmpty()) return "CUSTOM"
 
-        // Используем встроенный JsonUtil (Gson), он не крашится из-за комментариев в Xray-конфигах
+        // --- МАГИЯ BASE64 ---
+        // Если строка не начинается с фигурной скобки, пытаемся ее декодировать
+        var jsonStr = rawData.trim()
+        if (!jsonStr.startsWith("{")) {
+            try {
+                // Флаг Base64.NO_WRAP или DEFAULT обычно подходит
+                val decodedBytes = Base64.decode(jsonStr, Base64.DEFAULT)
+                jsonStr = String(decodedBytes, Charset.forName("UTF-8")).trim()
+            } catch (e: Exception) {
+                // Не смогли декодировать — игнорируем, парсер сам отвалится дальше
+            }
+        }
+
+        // --- ПАРСИНГ ---
         val root = JsonUtil.parseString(jsonStr) ?: return "CUSTOM"
         val outbounds = root.getAsJsonArray("outbounds") ?: return "CUSTOM"
 
@@ -140,7 +151,6 @@ fun getProtocolDescription(context: Context, profile: ProfileItem, guid: String)
             val outbound = outbounds.get(i).asJsonObject
             var protocol = outbound.get("protocol")?.asString?.uppercase() ?: continue
 
-            // Пропускаем технические outbound'ы маршрутизации
             if (protocol.isEmpty() || protocol == "FREEDOM" || protocol == "BLACKHOLE") continue
 
             val streamSettings = outbound.getAsJsonObject("streamSettings")
@@ -175,7 +185,6 @@ fun getProtocolDescription(context: Context, profile: ProfileItem, guid: String)
         "CUSTOM"
     }
 }
-
 
 @Composable
 fun ProfileCard(
