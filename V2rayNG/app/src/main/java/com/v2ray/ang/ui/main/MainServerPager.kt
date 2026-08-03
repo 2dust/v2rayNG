@@ -72,7 +72,7 @@ fun ClockIcon(color: Color, modifier: Modifier = Modifier) {
 @Composable
 fun WireframeGlobe(color: Color, modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
-        val strokeW = 3f // Сделали линии тоньше для компактности
+        val strokeW = 3f
         drawCircle(color, style = Stroke(width = strokeW))
         drawOval(color, topLeft = Offset(size.width * 0.25f, 0f), size = Size(size.width * 0.5f, size.height), style = Stroke(width = strokeW))
         drawLine(color, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), strokeWidth = strokeW)
@@ -86,11 +86,11 @@ fun formatDate(millis: Long, format: String = "dd.MM.yyyy"): String {
     return formatter.format(Date(millis))
 }
 
-// Умный парсер протоколов (VLESS / TCP / REALITY | XHTTP | HYSTERIA2)
-fun getProtocolDescription(context: Context, profile: ProfileItem): String {
+// Умный парсер протоколов (ИСПОЛЬЗУЕТ ПЕРЕДАННЫЙ GUID СЕРВЕРА)
+fun getProtocolDescription(context: Context, profile: ProfileItem, guid: String): String {
     val configTypeName = profile.configType.name.uppercase()
     
-    // 1. Стандартные профили (VMESS, VLESS и т.д.)
+    // 1. Стандартные профили
     if (configTypeName != "CUSTOM") {
         val parts = mutableListOf(configTypeName)
         val network = profile.network?.uppercase()
@@ -105,7 +105,8 @@ fun getProtocolDescription(context: Context, profile: ProfileItem): String {
 
     // 2. Парсинг CUSTOM (JSON) профилей
     return try {
-        val file = File(context.filesDir, "${profile.guid}.json")
+        // Ищем файл по GUID сервера, а не профиля
+        val file = File(context.filesDir, "$guid.json")
         if (!file.exists()) return "CUSTOM / JSON"
 
         val jsonStr = file.readText()
@@ -169,20 +170,17 @@ fun ProfileCard(
 
     val sub = subscription.subscription
 
-    // Динамические данные подписки
     val title = sub.remarks.takeIf { !it.isNullOrBlank() } ?: "Без названия"
     val lastUpdateStr = formatDate(sub.lastUpdated, "dd.MM.yyyy HH:mm")
     val intervalHours = sub.updateInterval / 60
     val updateStatus = "- $intervalHours ч. $lastUpdateStr"
 
-    // Расчет трафика (байты в гигабайты)
     val gbDivisor = 1073741824.0
     val usedTraffic = sub.trafficUpload + sub.trafficDownload
     val usedStr = String.format(Locale.US, "%.1fGB", usedTraffic / gbDivisor)
     val totalStr = if (sub.trafficTotal == 0L) "∞" else String.format(Locale.US, "%.1fGB", sub.trafficTotal / gbDivisor)
     val trafficDisplay = "$usedStr/$totalStr"
 
-    // Дата истечения
     val expireMillis = if (sub.trafficExpire > 9999999999L) sub.trafficExpire else sub.trafficExpire * 1000
     val expireDisplay = if (expireMillis > 0L) "Истекает: ${formatDate(expireMillis)}" else "Истекает: ∞"
 
@@ -193,24 +191,24 @@ fun ProfileCard(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp),
+                .padding(bottom = 6.dp),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 16.dp)) {
-                // Первая строка
+            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 12.dp)) {
+                
                 Row(
                     verticalAlignment = Alignment.CenterVertically, 
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    ChevronDown(color = Color(0xFF5C6BC0), modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(12.dp))
+                    ChevronDown(color = Color(0xFF5C6BC0), modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(8.dp))
                     
                     Column(Modifier.weight(1f)) {
                         Text(
                             text = title, 
-                            style = MaterialTheme.typography.titleLarge,
+                            fontSize = 16.sp,
                             color = Color(0xFF1E293B),
                             fontWeight = FontWeight.ExtraBold,
                             maxLines = 1,
@@ -218,141 +216,124 @@ fun ProfileCard(
                         )
                         Text(
                             text = updateStatus, 
-                            fontSize = 10.sp, 
+                            fontSize = 9.sp, 
                             color = Color.Gray, 
                             fontWeight = FontWeight.SemiBold
                         )
                     }
                     
-                    IconButton(onClick = { onUpdateSubscription(subscription.id) }, modifier = Modifier.size(32.dp)) {
+                    // ИСПРАВЛЕНО: Вернули subscription.guid
+                    IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(28.dp)) {
                         Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
                     }
-                    Spacer(Modifier.width(8.dp))
-                    
-                    IconButton(onClick = { onPingProfile(subscription.id) }, modifier = Modifier.size(32.dp)) {
-                        ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(4.dp))
+                    IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(28.dp)) {
+                        ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(16.dp))
                     }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(4.dp))
                     
                     Box {
-                        IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
+                        IconButton(onClick = { showMenu = true }, modifier = Modifier.size(28.dp)) {
                             Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
                         }
                         DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                             DropdownMenuItem(
-                                text = { Text("Редактировать профиль") },
+                                text = { Text("Редактировать") }, 
                                 onClick = { 
                                     showMenu = false
-                                    context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.id))
+                                    context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.guid)) 
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Удалить профиль", color = Color.Red) },
+                                text = { Text("Удалить", color = Color.Red) }, 
                                 onClick = { 
                                     showMenu = false
-                                    onDeleteSubscription(subscription.id)
+                                    onDeleteSubscription(subscription.guid) 
                                 }
                             )
                         }
                     }
                 }
+                
+                HorizontalDivider(color = Color(0xFFF1F5F9), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
 
-                HorizontalDivider(
-                    color = Color(0xFFF1F5F9),
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 12.dp)
-                )
-
-                // Вторая строка
                 Row(
                     verticalAlignment = Alignment.CenterVertically, 
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     IconButton(
                         onClick = {
                             val subUrl = sub.url
-                            if (!subUrl.isNullOrBlank()) {
-                                try { uriHandler.openUri(subUrl) } catch(e: Exception) { Toast.makeText(context, "Ссылка недоступна", Toast.LENGTH_SHORT).show() }
-                            } else {
-                                Toast.makeText(context, "В подписке нет URL", Toast.LENGTH_SHORT).show()
-                            }
+                            if (!subUrl.isNullOrBlank()) try { uriHandler.openUri(subUrl) } catch(e: Exception) { Toast.makeText(context, "Ссылка недоступна", Toast.LENGTH_SHORT).show() }
+                            else Toast.makeText(context, "В подписке нет URL", Toast.LENGTH_SHORT).show()
                         }, 
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(20.dp)
                     ) {
                         Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0))
                     }
                     
-                    Spacer(Modifier.width(12.dp))
+                    Spacer(Modifier.width(8.dp))
                     
-                    Surface(
-                        shape = CircleShape,
-                        color = Color(0xFFF1F5F9),
-                    ) {
+                    Surface(shape = CircleShape, color = Color(0xFFF1F5F9)) {
                         Text(
                             text = trafficDisplay, 
-                            fontSize = 12.sp, 
+                            fontSize = 11.sp, 
                             fontWeight = FontWeight.Bold, 
-                            color = Color(0xFF2C3E50),
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            color = Color(0xFF2C3E50), 
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                         )
                     }
                     
                     Text(
                         text = expireDisplay, 
-                        fontSize = 12.sp, 
+                        fontSize = 11.sp, 
                         fontWeight = FontWeight.Bold, 
-                        color = Color(0xFF2C3E50),
-                        modifier = Modifier.weight(1f),
+                        color = Color(0xFF2C3E50), 
+                        modifier = Modifier.weight(1f), 
                         textAlign = TextAlign.Center
                     )
                     
                     if (supportUrl.isNotBlank()) {
                         IconButton(
                             onClick = { try { uriHandler.openUri(supportUrl) } catch(e: Exception){} }, 
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(20.dp)
                         ) {
-                            Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
+                            Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Support", tint = Color(0xFF5C6BC0))
                         }
                     } else {
-                        Spacer(Modifier.size(24.dp))
+                        Spacer(Modifier.size(20.dp))
                     }
                 }
                 
-                // Третья строка (сообщение от сервера)
                 if (announceText.isNotBlank()) {
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(8.dp))
                     Text(
                         text = announceText, 
                         fontSize = 11.sp, 
                         textAlign = TextAlign.Center, 
                         fontWeight = FontWeight.Bold, 
                         color = Color(0xFF1E293B), 
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
                     )
                 }
             }
         }
         
-        Spacer(Modifier.height(8.dp))
-
-        // 2. СПИСОК СЕРВЕРОВ
         servers.forEach { serverCache ->
             val isSelected = serverCache.guid == selectedGuid
             
-            // Кэшируем строку описания с вызовом твоей функции
+            // ИСПРАВЛЕНО: Передаем serverCache.guid для корректного поиска JSON
             val finalDesc = remember(serverCache.guid) {
-                getProtocolDescription(context, serverCache.profile) + " | JSON"
+                getProtocolDescription(context, serverCache.profile, serverCache.guid) + " | JSON"
             }
             
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (isSelected) Color(0xFFF8FAFC) else Color.Transparent
-                ),
+                colors = CardDefaults.cardColors(containerColor = if (isSelected) Color(0xFFF8FAFC) else Color.Transparent),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 2.dp)
+                    .padding(vertical = 1.dp)
                     .clickable { onSelectServer(serverCache.guid) }
             ) {
                 Row(
@@ -363,13 +344,7 @@ fun ProfileCard(
                         .padding(vertical = 6.dp, horizontal = 8.dp)
                 ) {
                     if (isSelected) {
-                        Box(
-                            modifier = Modifier
-                                .width(4.dp)
-                                .fillMaxHeight()
-                                .clip(RoundedCornerShape(50))
-                                .background(Color(0xFF5C6BC0))
-                        )
+                        Box(modifier = Modifier.width(4.dp).fillMaxHeight().clip(RoundedCornerShape(50)).background(Color(0xFF5C6BC0)))
                     } else {
                         Spacer(Modifier.width(4.dp))
                     }
@@ -393,7 +368,6 @@ fun ProfileCard(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-                        
                         Text(
                             text = finalDesc, 
                             fontSize = 9.sp, 
