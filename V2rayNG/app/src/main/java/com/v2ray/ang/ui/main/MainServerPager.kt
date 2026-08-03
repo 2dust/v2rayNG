@@ -110,7 +110,6 @@ fun ProfileCard(
     val uriHandler = LocalUriHandler.current
     var showMenu by remember { mutableStateOf(false) }
     
-    // Достаем саму подписку
     val subInfo = subscription.subscription
 
     Card(
@@ -119,48 +118,57 @@ fun ProfileCard(
             .padding(vertical = 4.dp)
             .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(24.dp)),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F9FC))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)) // Чуть более светлый фон, как на оригинале
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp)) {
-            // Первая строка
+            // --- ПЕРВАЯ СТРОКА (Шапка) ---
             Row(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             ) {
-                ChevronDown(color = Color(0xFF5C6BC0), modifier = Modifier.size(16.dp))
-                Spacer(Modifier.width(12.dp))
+                // Иконка-галочка
+                Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
+                    ChevronDown(color = Color(0xFF5C6BC0), modifier = Modifier.size(14.dp))
+                }
+                Spacer(Modifier.width(8.dp))
                 
+                // Текст (Название и Обновление)
                 Column(Modifier.weight(1f)) {
                     Text(
                         text = subInfo.remarks ?: "Без названия", 
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
                         color = Color(0xFF1E293B),
                         fontWeight = FontWeight.ExtraBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     
-                    // ДИНАМИЧЕСКОЕ ВРЕМЯ ОБНОВЛЕНИЯ
                     val lastUpdatedText = if (subInfo.lastUpdated > 0) {
                         java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault()).format(java.util.Date(subInfo.lastUpdated))
                     } else {
                         "Никогда"
                     }
-                    Text("- Обновлено: $lastUpdatedText", fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.SemiBold)
+                    val updateIntervalHours = subInfo.updateInterval / 60
+                    Text(
+                        text = "Автообновление - $updateIntervalHours ч.  |  $lastUpdatedText", 
+                        fontSize = 10.sp, 
+                        color = Color.Gray, 
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
                 
+                // Иконки управления
                 IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(32.dp)) {
-                    Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                 }
-                Spacer(Modifier.width(8.dp))
                 IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(32.dp)) {
-                    ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
+                    ClockIcon(color = Color(0xFF5C6BC0), modifier = Modifier.size(18.dp))
                 }
-                Spacer(Modifier.width(8.dp))
-                
                 Box {
                     IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray)
+                        Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = Color.Gray, modifier = Modifier.size(20.dp))
                     }
                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         DropdownMenuItem(
@@ -181,9 +189,9 @@ fun ProfileCard(
                 }
             }
             
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(14.dp))
 
-            // Вторая строка (Инфо, Трафик, Дата, Telegram)
+            // --- ВТОРАЯ СТРОКА (Инфо, Трафик, Дата, Telegram) ---
             Row(
                 verticalAlignment = Alignment.CenterVertically, 
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -197,14 +205,13 @@ fun ProfileCard(
                             Toast.makeText(context, "В подписке нет URL", Toast.LENGTH_SHORT).show()
                         }
                     }, 
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(32.dp)
                 ) {
-                    Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_about_24dp), contentDescription = "Info", tint = Color(0xFF5C6BC0), modifier = Modifier.size(22.dp))
                 }
                 
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.width(8.dp))
                 
-                // ДИНАМИЧЕСКИЙ ТРАФИК
                 val usedTrafficBytes = subInfo.trafficUpload + subInfo.trafficDownload
                 val gbDivider = 1024.0 * 1024.0 * 1024.0
                 val usedGb = usedTrafficBytes / gbDivider
@@ -214,55 +221,58 @@ fun ProfileCard(
                 }
                 val usedStr = String.format(java.util.Locale.US, "%.1fGB", usedGb)
                 
+                // Плашка трафика с правильным фоном
                 Box(modifier = Modifier
-                    .border(1.dp, Color.LightGray, CircleShape)
-                    .padding(horizontal = 24.dp, vertical = 4.dp)) {
-                    Text("$usedStr/$totalStr", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
+                    .background(Color(0xFFF1F5F9), CircleShape)
+                    .border(1.dp, Color(0xFFE2E8F0), CircleShape)
+                    .padding(horizontal = 20.dp, vertical = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("$usedStr / $totalStr", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1E293B))
                 }
                 
                 Spacer(Modifier.weight(1f))
                 
-                // ДИНАМИЧЕСКАЯ ДАТА ИСТЕЧЕНИЯ
                 val expireText = if (subInfo.trafficExpire > 0L) {
-                    // Умножаем на 1000, так как сервер отдает время в секундах, а Java/Kotlin ждет миллисекунды
                     val date = java.util.Date(subInfo.trafficExpire * 1000L)
                     val format = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
                     "Истекает: ${format.format(date)}"
                 } else {
                     "Без лимита"
                 }
-                Text(expireText, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2C3E50))
-                Spacer(Modifier.width(12.dp))
+                Text(expireText, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1E293B))
                 
-                // ДИНАМИЧЕСКАЯ КНОПКА ПОДДЕРЖКИ
+                Spacer(Modifier.width(8.dp))
+                
+                // Нормальный размер Telegram иконки
                 IconButton(
                     onClick = { 
-                        // Если подписка отдала supportUrl, идем по нему. Иначе — ваша дефолтная группа
                         val targetUrl = if (subInfo.supportUrl.isNotBlank()) subInfo.supportUrl else "https://t.me/shashachkaaa"
                         try { uriHandler.openUri(targetUrl) } catch(e: Exception){} 
                     }, 
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(32.dp)
                 ) {
-                    Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0))
+                    Icon(painterResource(id = R.drawable.ic_telegram_24dp), contentDescription = "Telegram", tint = Color(0xFF5C6BC0), modifier = Modifier.size(20.dp))
                 }
             }
             
-            // ДИНАМИЧЕСКИЙ ВЫВОД ANNOUNCE
+            // --- ТРЕТИЙ БЛОК (Анонс) ---
             if (subInfo.announce.isNotBlank()) {
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(14.dp))
                 Text(
                     text = subInfo.announce, 
-                    fontSize = 12.sp, 
+                    fontSize = 11.sp, 
+                    lineHeight = 16.sp, // Важно для компактности текста
                     textAlign = TextAlign.Center, 
                     fontWeight = FontWeight.Bold, 
-                    color = Color(0xFF1E293B), 
+                    color = Color(0xFF2C3E50), 
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 )
             }
             
             Spacer(Modifier.height(16.dp))
             
-            // Список серверов
+            // --- СПИСОК СЕРВЕРОВ ---
             servers.forEach { serverCache ->
                 val isSelected = serverCache.guid == selectedGuid
                 
